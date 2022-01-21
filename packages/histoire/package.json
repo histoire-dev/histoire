@@ -1,0 +1,42 @@
+{
+  "name": "histoire",
+  "version": "0.0.0",
+  "description": "A fast story book powered by Vite",
+  "license": "MIT",
+  "author": {
+    "name": "Guillaume Chau"
+  },
+  "repository": {
+    "url": "https://github.com/Akryum/histoire.git",
+    "type": "git",
+    "directory": "packages/histoire"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./*": "./*"
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "bin": {
+    "histoire": "./bin.mjs"
+  },
+  "scripts": {
+    "build": "rimraf dist && tsc -d",
+    "watch": "tsc -d -w --sourceMap"
+  },
+  "dependencies": {
+    "@histoire/cli": "^0.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^14.14.21",
+    "typescript": "^4.1.3"
+  }
+}
