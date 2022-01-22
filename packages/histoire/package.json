@@ -33,7 +33,9 @@
     "watch": "tsc -d -w --sourceMap"
   },
   "dependencies": {
-    "@histoire/cli": "^0.0.0"
+    "sade": "^1.8.1",
+    "vite": "^2.7.13",
+    "vue": "^3.2.27"
   },
   "devDependencies": {
     "@types/node": "^14.14.21",
