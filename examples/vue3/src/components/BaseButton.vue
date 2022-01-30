@@ -33,7 +33,6 @@ defineProps({
 <style scoped>
 .btn {
   border-radius: 4px;
-  font-size: 10px;
   padding: 4px 8px;
   background: #e4e4e4;
   cursor: pointer;
@@ -65,12 +64,12 @@ defineProps({
 }
 
 .btn-size-big {
-  font-size: 12px;
+  font-size: 16px;
   padding: 8px 16px;
 }
 
 .btn-size-small {
-  font-size: 9px;
+  font-size: 12px;
   padding: 2px 4px;
 }
 </style>
