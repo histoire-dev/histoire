@@ -1,0 +1,37 @@
+@import url('https://fonts.googleapis.com/css2?family=Lato&display=swap');
+@import 'floating-vue/dist/style.css';
+@import 'floating-vue.css';
+
+*,
+::before,
+::after {
+  box-sizing: border-box;
+  border-width: 0;
+  border-style: solid;
+  border-color: #e5e7eb;
+}
+
+a {
+  color: inherit;
+  text-decoration: inherit;
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  margin: 0;
+}
+
+html,
+body,
+#app {
+  height: 100%;
+  font-family: 'Lato', sans-serif;
+  font-size: 14px;
+}
+
+.__histoire-sandbox {
+  contain: content;
+}

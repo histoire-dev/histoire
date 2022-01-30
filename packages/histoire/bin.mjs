@@ -1,4 +1,4 @@
 #!/usr/bin/env node
 'use strict'
 
-import './dist/bin.js'
+import './dist/node/bin.js'

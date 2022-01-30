@@ -42,6 +42,7 @@ module.exports = {
     '@typescript-eslint/indent': ['error', 2],
     'no-use-before-define': 'off',
     quotes: ['error', 'single', { allowTemplateLiterals: true }],
+    'vue/multi-word-component-names': 'warn',
   },
   overrides: [
     {

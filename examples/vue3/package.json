@@ -1,0 +1,14 @@
+{
+  "name": "histoire-example-vue3",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "story:dev": "histoire dev"
+  },
+  "dependencies": {
+    "vue": "^3.2.27"
+  },
+  "devDependencies": {
+    "histoire": "workspace:*"
+  }
+}

@@ -2,10 +2,16 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 
 const defaultTheme = require('tailwindcss/defaultTheme')
+const colors = require('tailwindcss/colors')
 
 module.exports = {
+  prefix: 'htw-',
   theme: {
     extend: {
+      colors: {
+        primary: colors.indigo, // @TODO use CSS vars
+      },
+
       maxWidth: theme => ({
         ...theme('width'),
       }),
