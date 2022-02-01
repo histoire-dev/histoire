@@ -40,8 +40,8 @@ export async function createVitePlugins (ctx: Context): Promise<Plugin[]> {
 
     load (id) {
       if (id === RESOLVED_STORIES_ID) {
-        return `${stories.map((story, index) => `import Comp${index} from '/${story.file}'`).join('\n')}
-export let files = [${stories.map((story, index) => `{ id: '${story.id}', file: '/${story.file}', component: Comp${index} }`).join(',\n')}]
+        return `${stories.map((story, index) => `import Comp${index} from '${story.file}'`).join('\n')}
+export let files = [${stories.map((story, index) => `{ id: '${story.id}', file: '${story.file}', component: Comp${index} }`).join(',\n')}]
 const handlers = []
 export function onUpdate (cb) {
   handlers.push(cb)
