@@ -2,6 +2,7 @@ import { Context } from './context.js'
 import chokidar from 'chokidar'
 import { globby } from 'globby'
 import Case from 'case'
+import { join } from 'pathe'
 
 export interface Story {
   id: string
@@ -21,7 +22,8 @@ export async function watchStories (ctx: Context) {
     cwd: ctx.config.sourceDir,
   })
   watcher.on('add', (file) => {
-    addStory(file)
+    const absoluteFilePath = join(ctx.config.sourceDir, file)
+    addStory(absoluteFilePath)
     notifyChange()
   })
   watcher.on('unlink', (file) => {
