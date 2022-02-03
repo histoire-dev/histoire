@@ -35,13 +35,17 @@ export async function createVitePlugins (ctx: Context): Promise<Plugin[]> {
     resolveId (id) {
       if (id.startsWith(STORIES_ID)) {
         return RESOLVED_STORIES_ID
+      } else if (id.startsWith('/$story/')) {
+        const [,, storyId] = id.split('/')
+        return `/$$story/${storyId}`
       }
     },
 
     load (id) {
+      console.log(id)
       if (id === RESOLVED_STORIES_ID) {
         return `${stories.map((story, index) => `import Comp${index} from '${story.file}'`).join('\n')}
-export let files = [${stories.map((story, index) => `{ id: '${story.id}', file: '${story.file}', component: Comp${index} }`).join(',\n')}]
+export let files = [${stories.map((story, index) => `{ id: '${story.id}', file: '${story.file}', component: Comp${index}, framework: 'vue3' }`).join(',\n')}]
 const handlers = []
 export function onUpdate (cb) {
   handlers.push(cb)
@@ -55,10 +59,49 @@ if (import.meta.hot) {
     })
   })
 }`
+      } else if (id.startsWith('/$$story/')) {
+        const [,, storyId] = id.split('/')
+        const story = stories.find(s => s.id === storyId)
+        if (!story) {
+          throw new Error(`Story ${id} not found`)
+        }
+        return `import Comp from '${story.file}'
+export const file = { id: '${story.id}', file: '${story.file}', component: Comp, framework: 'vue3' }`
       }
     },
 
     configureServer (server) {
+      server.middlewares.use((req, res, next) => {
+        if (req.url!.startsWith('/__sandbox')) {
+          res.statusCode = 200
+          res.end(`
+<!DOCTYPE html>
+<html>
+<head>
+  <title></title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="">
+</head>
+<body>
+  <div id="app"></div>
+  <script>
+  // Hide spammy vite messages
+  const origConsoleLog = console.log
+  console.log = (...args) => {
+    if (!args[0].startsWith('[vite] connect')) {
+      origConsoleLog(...args)
+    }
+  }
+  </script>
+  <script type="module" src="/@fs/${APP_PATH}/sandbox.js"></script>
+</body>
+</html>`)
+          return
+        }
+        next()
+      })
+
       // serve our index.html after vite history fallback
       return () => {
         server.middlewares.use((req, res, next) => {
