@@ -88,7 +88,7 @@ export const file = { id: '${story.id}', file: '${story.file}', component: Comp,
   // Hide spammy vite messages
   const origConsoleLog = console.log
   console.log = (...args) => {
-    if (!args[0].startsWith('[vite] connect')) {
+    if (typeof args[0] !== 'string' || !args[0].startsWith('[vite] connect')) {
       origConsoleLog(...args)
     }
   }
