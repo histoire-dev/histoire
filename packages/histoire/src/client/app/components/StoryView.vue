@@ -8,6 +8,7 @@ import { useRoute, useRouter } from 'vue-router'
 import StoryVariantSingleView from './StoryVariantSingleView.vue'
 import BaseEmpty from './base/BaseEmpty.vue'
 import StoryControls from './StoryControls.vue'
+import StorySourceCode from './StorySourceCode.vue'
 
 const storyStore = useStoryStore()
 
@@ -117,15 +118,27 @@ watch(() => storyStore.currentStory, () => {
           <span>Select a variant</span>
         </BaseEmpty>
 
-        <div
+        <BaseSplitPane
           v-else
+          save-id="story-sidepane"
+          orientation="portrait"
           class="htw-h-full"
         >
-          <StoryControls
-            :story="storyStore.currentStory"
-            :variant="currentVariant"
-          />
-        </div>
+          <template #first>
+            <StoryControls
+              :story="storyStore.currentStory"
+              :variant="currentVariant"
+              class="htw-h-full htw-overflow-auto"
+            />
+          </template>
+
+          <template #last>
+            <StorySourceCode
+              :variant="currentVariant"
+              class="htw-h-full"
+            />
+          </template>
+        </BaseSplitPane>
       </template>
     </BaseSplitPane>
   </div>

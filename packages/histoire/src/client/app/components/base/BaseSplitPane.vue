@@ -169,35 +169,35 @@ onUnmounted(() => {
 </template>
 
 <style lang="postcss" scoped>
-.landscape .dragger {
+.landscape > div > .dragger {
   width: 10px;
 }
 
-.portrait .dragger {
+.portrait > div > .dragger {
   height: 10px;
 }
 
-.landscape .dragger.dragger-offset-before {
+.landscape > div > .dragger.dragger-offset-before {
   right: 0;
 }
 
-.portrait .dragger.dragger-offset-before {
+.portrait > div > .dragger.dragger-offset-before {
   bottom: 0;
 }
 
-.landscape .dragger.dragger-offset-center {
+.landscape > div > .dragger.dragger-offset-center {
   right: -5px;
 }
 
-.portrait .dragger.dragger-offset-center {
+.portrait > div > .dragger.dragger-offset-center {
   bottom: -5px;
 }
 
-.landscape .dragger.dragger-offset-after {
+.landscape > div > .dragger.dragger-offset-after {
   right: -10px;
 }
 
-.portrait .dragger.dragger-offset-after {
+.portrait > div > .dragger.dragger-offset-after {
   bottom: -10px;
 }
 </style>

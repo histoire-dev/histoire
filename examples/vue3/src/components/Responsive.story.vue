@@ -5,7 +5,9 @@
       iframe
     >
       <div class="target">
-        Responsive
+        <p>
+          Responsive
+        </p>
       </div>
     </Variant>
   </Story>
