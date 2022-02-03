@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { PropType } from 'vue'
 import { Story, Variant } from '../types'
-import SandboxVue from './SandboxVue.vue'
+import SandboxVue from './sandbox/SandboxVue.vue'
 
 defineProps({
   variant: {

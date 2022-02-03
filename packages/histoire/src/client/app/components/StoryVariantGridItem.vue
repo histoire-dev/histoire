@@ -2,7 +2,7 @@
 import { PropType, toRefs } from 'vue'
 import { useCurrentVariantRoute } from '../composable/variant'
 import { Story, Variant } from '../types'
-import SandboxVue from './SandboxVue.vue'
+import SandboxVue from './sandbox/SandboxVue.vue'
 
 const props = defineProps({
   variant: {

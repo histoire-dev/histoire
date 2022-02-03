@@ -2,7 +2,7 @@ import { parseQuery } from 'vue-router'
 import { computed, createApp, h } from 'vue'
 import { createPinia } from 'pinia'
 import { registerGlobalComponents } from './global-components'
-import SandboxVue from './components/SandboxVue.vue'
+import SandboxVue from './components/sandbox/SandboxVue.vue'
 import { useStoryStore } from './stores/story'
 import './style/sandbox.css'
 
