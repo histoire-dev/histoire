@@ -21,15 +21,12 @@ const props = defineProps({
 
 const sandbox = ref<HTMLDivElement>()
 let app: App
-const appRenderForcer = ref(0)
 
 onMounted(async () => {
   await props.variant.initState()
 
   app = createApp({
     render: () => {
-      // eslint-disable-next-line no-unused-expressions
-      appRenderForcer.value
       return props.variant.slots()?.[props.slotName]({
         state: props.variant.state,
       })
@@ -43,10 +40,6 @@ onMounted(async () => {
 onUnmounted(() => {
   app.unmount()
 })
-
-function onReload () {
-  appRenderForcer.value++
-}
 </script>
 
 <template>
