@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { App, createApp, onMounted, onUnmounted, PropType, ref } from 'vue'
-import { Story, Variant } from '../types'
+import { Story, Variant } from '../../types'
 
 const props = defineProps({
   variant: {
