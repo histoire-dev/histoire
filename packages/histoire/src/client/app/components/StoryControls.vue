@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { PropType } from 'vue'
 import { Story, Variant } from '../types'
-import SandboxVue from './sandbox/SandboxVue.vue'
+import SandboxVue3 from './sandbox/SandboxVue3.vue'
 
 defineProps({
   variant: {
@@ -19,7 +19,7 @@ defineProps({
 <template>
   <div>
     <!-- Custom controls -->
-    <SandboxVue
+    <SandboxVue3
       v-if="variant.slots().controls"
       slot-name="controls"
       :variant="variant"

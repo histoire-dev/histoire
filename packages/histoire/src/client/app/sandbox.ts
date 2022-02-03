@@ -2,7 +2,7 @@ import { parseQuery } from 'vue-router'
 import { computed, createApp, h } from 'vue'
 import { createPinia } from 'pinia'
 import { registerGlobalComponents } from './global-components'
-import SandboxVue from './components/sandbox/SandboxVue.vue'
+import SandboxVue3 from './components/sandbox/SandboxVue3.vue'
 import { useStoryStore } from './stores/story'
 import './style/sandbox.css'
 
@@ -26,7 +26,7 @@ const app = createApp({
         data: file,
       }),
       this.story && this.variant
-        ? h(SandboxVue, {
+        ? h(SandboxVue3, {
           story: this.story,
           variant: this.variant,
         })

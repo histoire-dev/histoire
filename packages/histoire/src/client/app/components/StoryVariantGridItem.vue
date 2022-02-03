@@ -2,7 +2,7 @@
 import { PropType, toRefs } from 'vue'
 import { useCurrentVariantRoute } from '../composable/variant'
 import { Story, Variant } from '../types'
-import SandboxVue from './sandbox/SandboxVue.vue'
+import SandboxVue3 from './sandbox/SandboxVue3.vue'
 
 const props = defineProps({
   variant: {
@@ -47,7 +47,7 @@ const { isActive, targetRoute } = useCurrentVariantRoute(variant)
       }"
       @click.stop.prevent
     >
-      <SandboxVue
+      <SandboxVue3
         :variant="variant"
         :story="story"
       />
