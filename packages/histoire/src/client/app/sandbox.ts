@@ -7,7 +7,7 @@ import { useStoryStore } from './stores/story'
 import './style/sandbox.css'
 
 const query = parseQuery(window.location.search)
-const { file } = await import(`/$story/${query.storyId}`)
+const { file } = await import(/* @vite-ignore */ `/$story/${query.storyId}`)
 
 const app = createApp({
   setup () {

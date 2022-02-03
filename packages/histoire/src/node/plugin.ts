@@ -42,7 +42,6 @@ export async function createVitePlugins (ctx: Context): Promise<Plugin[]> {
     },
 
     load (id) {
-      console.log(id)
       if (id === RESOLVED_STORIES_ID) {
         return `${stories.map((story, index) => `import Comp${index} from '${story.file}'`).join('\n')}
 export let files = [${stories.map((story, index) => `{ id: '${story.id}', file: '${story.file}', component: Comp${index}, framework: 'vue3' }`).join(',\n')}]
