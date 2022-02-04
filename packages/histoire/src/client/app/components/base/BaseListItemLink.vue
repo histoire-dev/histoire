@@ -24,7 +24,7 @@ export default defineComponent({
       class="htw-px-4 htw-py-2 htw-flex htw-items-center htw-space-x-2"
       :class="[
         (isActive != null ? isActive : linkIsActive)
-          ? 'htw-bg-primary-500 hover:htw-bg-primary-600 htw-text-white'
+          ? 'htw-bg-primary-500 hover:htw-bg-primary-600 htw-text-white dark:htw-text-black'
           : 'hover:htw-bg-primary-100 dark:hover:htw-bg-primary-900'
       ]"
       @click="navigate"
