@@ -9,7 +9,7 @@ export interface Story {
   path: string
 }
 
-export const stories: Story[] = []
+export let stories: Record<string, Story> = {}
 
 const handlers: (() => unknown)[] = []
 
@@ -26,15 +26,15 @@ export async function watchStories (newContext: Context) {
     cwd: context.config.sourceDir,
   })
 
-  watcher.on('add', (file) => {
-    addStory(file)
-    notifyChange()
-  })
-
-  watcher.on('unlink', (file) => {
-    stories.splice(stories.findIndex((story) => story.path === file), 1)
-    notifyChange()
-  })
+  watcher
+    .on('add', (file) => {
+      addStory(file)
+      notifyChange()
+    })
+    .on('unlink', (file) => {
+      removeStory(file)
+      notifyChange()
+    })
 
   return watcher
 }
@@ -53,17 +53,22 @@ function addStory (relativeFilePath: string) {
   const absoluteFilePath = getAbsoluteFilePath(relativeFilePath)
   const fileId = Case.kebab(relativeFilePath)
 
-  stories.push({
+  stories[fileId] = {
     id: fileId,
     path: absoluteFilePath,
-  })
+  }
+}
+
+function removeStory (relativeFilePath: string) {
+  const fileId = Case.kebab(relativeFilePath)
+  delete stories[fileId]
 }
 
 export async function findStories () {
   const files = await globby(context.config.storyMatch, {
     cwd: context.config.sourceDir,
   })
-  stories.splice(0, stories.length)
+  stories = {}
   for (const file of files) {
     addStory(file)
   }
