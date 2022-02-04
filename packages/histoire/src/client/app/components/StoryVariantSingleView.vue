@@ -17,7 +17,7 @@ defineProps({
 </script>
 
 <template>
-  <div class="htw-border htw-border-gray-100 htw-rounded-lg htw-h-full">
+  <div class="htw-border htw-border-gray-100 dark:htw-border-gray-600 htw-rounded-lg htw-h-full">
     <BaseSplitPane
       save-id="story-single-responsive"
       :min="1"
@@ -44,7 +44,7 @@ defineProps({
         </div>
       </template>
       <template #last>
-        <div class="htw-w-full htw-h-full htw-bg-gray-200 dark:htw-bg-gray-800 htw-rounded-r-lg htw-border-l-2 htw-border-gray-500/10" />
+        <div class="htw-w-full htw-h-full htw-bg-gray-200 dark:htw-bg-gray-800 htw-rounded-r-lg htw-border-l-2 htw-border-gray-500/10 dark:htw-border-gray-200/30" />
       </template>
     </BaseSplitPane>
   </div>

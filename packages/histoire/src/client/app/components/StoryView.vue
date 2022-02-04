@@ -61,10 +61,10 @@ watch(() => storyStore.currentStory, () => {
       class="htw-h-full"
     >
       <template #first>
-        <div class="htw-bg-gray-50 htw-h-full">
+        <div class="htw-bg-gray-50 htw-h-full dark:htw-bg-gray-900">
           <div
             v-if="storyStore.currentStory.layout.type === 'grid'"
-            class="htw-bg-gray-50 htw-h-full htw-overflow-y-auto"
+            class="htw-bg-gray-50 htw-h-full htw-overflow-y-auto dark:htw-bg-gray-900"
           >
             <div
               class="htw-grid htw-gap-4 htw-m-4"
@@ -89,7 +89,7 @@ watch(() => storyStore.currentStory, () => {
             :default-split="17"
           >
             <template #first>
-              <div class="htw-bg-white htw-h-full htw-overflow-y-auto">
+              <div class="htw-bg-white dark:htw-bg-gray-800 htw-h-full htw-overflow-y-auto">
                 <StoryVariantItem
                   v-for="(variant, index) of storyStore.currentStory.variants"
                   :key="index"
