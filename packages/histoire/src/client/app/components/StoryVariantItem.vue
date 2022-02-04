@@ -18,10 +18,8 @@ const { isActive, targetRoute } = useCurrentVariantRoute(variant)
   <div>
     <RouterLink
       :to="targetRoute"
-      class="htw-p-2 htw-flex htw-space-x-2 hover:htw-bg-primary-100 dark:htw-bg-primary-900"
-      :class="{
-        'htw-bg-primary-200 hover:htw-bg-primary-300 htw-text-primary-800': isActive,
-      }"
+      class="htw-p-2 htw-flex htw-space-x-2 hover:htw-bg-primary-100 dark:hover:htw-bg-primary-900"
+      active-class="htw-bg-primary-500 dark:htw-bg-primary-600 htw-text-white htw-font-bold"
     >
       {{ variant.title }}
     </RouterLink>

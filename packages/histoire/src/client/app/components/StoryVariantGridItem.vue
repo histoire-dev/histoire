@@ -41,9 +41,9 @@ const { isActive, targetRoute } = useCurrentVariantRoute(variant)
 
     <!-- Body -->
     <div
-      class="htw-border htw-border-gray-100 htw-bg-white htw-rounded-lg htw-h-full htw-p-4"
+      class="htw-border htw-border-gray-100 dark:htw-border-gray-600 htw-bg-white dark:htw-bg-gray-800 htw-rounded-lg htw-h-full htw-p-4"
       :class="{
-        'htw-border-primary-200': isActive,
+        'htw-border-primary-200 dark:htw-border-primary-500': isActive,
       }"
       @click.stop.prevent
     >

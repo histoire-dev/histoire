@@ -19,8 +19,8 @@ defineProps({
           storyId: story.id,
         },
       }"
-      class="htw-p-2 htw-flex htw-space-x-2 hover:htw-bg-primary-100 dark:htw-bg-primary-900"
-      active-class="htw-bg-primary-500 hover:htw-bg-primary-600 htw-text-white htw-font-bold"
+      class="htw-p-2 htw-flex htw-space-x-2 hover:htw-bg-primary-100 dark:hover:htw-bg-primary-900"
+      active-class="htw-bg-primary-500 dark:htw-bg-primary-600 htw-text-white htw-font-bold"
     >
       <span>
         {{ story.title }}
