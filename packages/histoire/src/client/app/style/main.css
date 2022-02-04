@@ -16,6 +16,11 @@ a {
   text-decoration: inherit;
 }
 
+a,
+button {
+  user-select: none;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
