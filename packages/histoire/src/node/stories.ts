@@ -30,6 +30,7 @@ export async function watchStories (newContext: Context) {
     .on('add', (file) => {
       addStory(file)
       notifyChange()
+      setTimeout(notifyChange, 100) // Delay in case file renaming fired Add event before Unlink event
     })
     .on('unlink', (file) => {
       removeStory(file)
