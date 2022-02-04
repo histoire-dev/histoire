@@ -70,7 +70,6 @@ importers:
       vite: ^2.7.13
       vue: ^3.2.27
       vue-router: ^4.0.0
-      vue-use: ^0.2.0
     dependencies:
       '@vitejs/plugin-vue': 2.1.0_vite@2.7.13+vue@3.2.29
       '@vueuse/core': 7.5.5_vue@3.2.29
@@ -84,7 +83,6 @@ importers:
       vite: 2.7.13
       vue: 3.2.29
       vue-router: 4.0.12_vue@3.2.29
-      vue-use: 0.2.0
     devDependencies:
       '@iconify/vue': 3.1.3_vue@3.2.29
       '@types/node': 14.18.9
@@ -3427,10 +3425,6 @@ packages:
       vue: 3.2.29
     dev: false
 
-  /vue-router/3.5.3:
-    resolution: {integrity: sha512-FUlILrW3DGitS2h+Xaw8aRNvGTwtuaxrRkNSHWTizOfLUie7wuYwezeZ50iflRn8YPV5kxmU2LQuu3nM/b3Zsg==}
-    dev: false
-
   /vue-router/4.0.12_vue@3.2.29:
     resolution: {integrity: sha512-CPXvfqe+mZLB1kBWssssTiWg4EQERyqJZes7USiqfW9B5N2x+nHlnsM1D3b5CaJ6qgCvMmYJnz+G0iWjNCvXrg==}
     peerDependencies:
@@ -3438,18 +3432,6 @@ packages:
     dependencies:
       '@vue/devtools-api': 6.0.0-beta.21.1
       vue: 3.2.29
-    dev: false
-
-  /vue-use/0.2.0:
-    resolution: {integrity: sha512-5AXDyzSQOSTL5MpiDEDZ9OiBCboM1KhbXFA+zgmrYgdSbZn9ntfBtAKQt4ous8xZOKiGehaNIB6w4qHEQ3kdmg==}
-    dependencies:
-      vue: 2.6.14
-      vue-router: 3.5.3
-      vuex: 3.6.2_vue@2.6.14
-    dev: false
-
-  /vue/2.6.14:
-    resolution: {integrity: sha512-x2284lgYvjOMj3Za7kqzRcUSxBboHqtgRE2zlos1qWaOye5yUmHn42LB1250NJBLRwEcdrB0JRwyPTEPhfQjiQ==}
     dev: false
 
   /vue/3.2.29:
@@ -3460,14 +3442,6 @@ packages:
       '@vue/runtime-dom': 3.2.29
       '@vue/server-renderer': 3.2.29_vue@3.2.29
       '@vue/shared': 3.2.29
-
-  /vuex/3.6.2_vue@2.6.14:
-    resolution: {integrity: sha512-ETW44IqCgBpVomy520DT5jf8n0zoCac+sxWnn+hMe/CzaSejb/eVw2YToiXYX+Ex/AuHHia28vWTq4goAexFbw==}
-    peerDependencies:
-      vue: ^2.0.0
-    dependencies:
-      vue: 2.6.14
-    dev: false
 
   /webidl-conversions/3.0.1:
     resolution: {integrity: sha1-JFNCdeKnvGvnvIZhHMFq4KVlSHE=}

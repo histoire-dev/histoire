@@ -45,8 +45,7 @@
     "sade": "^1.8.1",
     "vite": "^2.7.13",
     "vue": "^3.2.27",
-    "vue-router": "^4.0.0",
-    "vue-use": "^0.2.0"
+    "vue-router": "^4.0.0"
   },
   "devDependencies": {
     "@iconify/vue": "^3.1.3",
