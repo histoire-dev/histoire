@@ -30,7 +30,7 @@ onUpdate((newValue) => {
     </template>
   </div>
 
-  <div class="htw-h-screen dark:htw-bg-gray-800 dark:htw-text-slate-200">
+  <div class="htw-h-screen dark:htw-bg-zinc-700 dark:htw-text-slate-100">
     <BaseSplitPane
       save-id="main-horiz"
       :min="5"
@@ -39,7 +39,7 @@ onUpdate((newValue) => {
       class="htw-h-full"
     >
       <template #first>
-        <div class="htw-flex htw-flex-col htw-divide-gray-200 dark:htw-divide-gray-600 htw-divide-y">
+        <div class="htw-flex htw-flex-col htw-divide-zinc-200 dark:htw-divide-zinc-850 htw-divide-y">
           <AppHeader />
           <StoryList
             :stories="storyStore.stories"

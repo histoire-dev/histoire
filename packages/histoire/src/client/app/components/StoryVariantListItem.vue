@@ -19,6 +19,7 @@ const { isActive, targetRoute } = useCurrentVariantRoute(variant)
   <div>
     <BaseListItemLink
       :to="targetRoute"
+      :is-active="isActive"
     >
       {{ variant.title }}
     </BaseListItemLink>

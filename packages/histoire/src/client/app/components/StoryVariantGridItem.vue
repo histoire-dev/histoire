@@ -31,8 +31,8 @@ const { isActive, targetRoute } = useCurrentVariantRoute(variant)
         :to="targetRoute"
         class="htw-rounded htw-w-max htw-px-1.5 htw-cursor-pointer"
         :class="{
-          'hover:htw-bg-gray-200 htw-text-gray-500': !isActive,
-          'htw-bg-primary-200 hover:htw-bg-primary-300 htw-text-primary-800': isActive,
+          'hover:htw-bg-zinc-200 htw-text-zinc-500 dark:hover:htw-bg-zinc-800': !isActive,
+          'htw-bg-primary-200 hover:htw-bg-primary-300 htw-text-primary-800 dark:htw-bg-primary-700 dark:hover:htw-bg-primary-800 dark:htw-text-primary-200': isActive,
         }"
       >
         {{ variant.title }}
@@ -41,9 +41,10 @@ const { isActive, targetRoute } = useCurrentVariantRoute(variant)
 
     <!-- Body -->
     <div
-      class="htw-border htw-border-gray-100 dark:htw-border-gray-600 htw-bg-white dark:htw-bg-gray-800 htw-rounded-lg htw-h-full htw-p-4"
+      class="htw-border htw-bg-white dark:htw-bg-zinc-700 htw-rounded-lg htw-h-full htw-p-4"
       :class="{
-        'htw-border-primary-200 dark:htw-border-primary-500': isActive,
+        'htw-border-zinc-100 dark:htw-border-zinc-800': !isActive,
+        'htw-border-primary-200 dark:htw-border-primary-900': isActive,
       }"
       @click.stop.prevent
     >

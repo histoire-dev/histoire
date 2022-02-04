@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { useStoryStore } from '../stores/story'
 import BaseSplitPane from './base/BaseSplitPane.vue'
-import StoryVariantItem from './StoryVariantItem.vue'
+import StoryVariantListItem from './StoryVariantListItem.vue'
 import StoryVariantGridItem from './StoryVariantGridItem.vue'
 import { computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
@@ -61,10 +61,10 @@ watch(() => storyStore.currentStory, () => {
       class="htw-h-full"
     >
       <template #first>
-        <div class="htw-bg-gray-50 htw-h-full dark:htw-bg-gray-900">
+        <div class="htw-bg-zinc-50 htw-h-full dark:htw-bg-zinc-750">
           <div
             v-if="storyStore.currentStory.layout.type === 'grid'"
-            class="htw-bg-gray-50 htw-h-full htw-overflow-y-auto dark:htw-bg-gray-900"
+            class="htw-h-full htw-overflow-y-auto"
           >
             <div
               class="htw-grid htw-gap-4 htw-m-4"
@@ -89,8 +89,8 @@ watch(() => storyStore.currentStory, () => {
             :default-split="17"
           >
             <template #first>
-              <div class="htw-bg-white dark:htw-bg-gray-800 htw-h-full htw-overflow-y-auto">
-                <StoryVariantItem
+              <div class="htw-h-full htw-overflow-y-auto">
+                <StoryVariantListItem
                   v-for="(variant, index) of storyStore.currentStory.variants"
                   :key="index"
                   :variant="variant"

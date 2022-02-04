@@ -9,7 +9,13 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        primary: colors.indigo, // @TODO use CSS vars
+        primary: colors.amber, // @TODO use CSS vars
+
+        zinc: {
+          750: '#323238',
+          850: '#1f1f21',
+          950: '#101012',
+        },
       },
 
       maxWidth: theme => ({
