@@ -13,7 +13,7 @@ const carbonIcon = computed(() => {
 
 <template>
   <div
-    class="htw-border-gray-200 dark:htw-border-gray-600 htw-border-b htw-px-4 htw-py-4 htw-flex htw-items-center"
+    class="htw-px-4 htw-h-12 htw-flex htw-items-center"
   >
     <div class="">
       Histoire

@@ -30,9 +30,7 @@ onUpdate((newValue) => {
     </template>
   </div>
 
-  <div class="htw-h-screen dark:htw-bg-gray-800 htw-flex htw-flex-col dark:htw-text-slate-200">
-    <AppHeader />
-
+  <div class="htw-h-screen dark:htw-bg-gray-800 dark:htw-text-slate-200">
     <BaseSplitPane
       save-id="main-horiz"
       :min="5"
@@ -41,10 +39,13 @@ onUpdate((newValue) => {
       class="htw-h-full"
     >
       <template #first>
-        <StoryList
-          :stories="storyStore.stories"
-          class="htw-h-full"
-        />
+        <div class="htw-flex htw-flex-col htw-divide-gray-200 dark:htw-divide-gray-600 htw-divide-y">
+          <AppHeader />
+          <StoryList
+            :stories="storyStore.stories"
+            class="htw-h-full"
+          />
+        </div>
       </template>
 
       <template #last>
