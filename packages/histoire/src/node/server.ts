@@ -5,6 +5,7 @@ import { onStoryChange, watchStories } from './stories.js'
 
 export async function createServer (ctx: Context) {
   await watchStories(ctx)
+
   const server = await createViteServer({
     root: ctx.config.sourceDir,
     plugins: await createVitePlugins(ctx),
@@ -14,24 +15,27 @@ export async function createServer (ctx: Context) {
       },
     },
   })
+
   onStoryChange(() => {
     const mod = server.moduleGraph.getModuleById(RESOLVED_STORIES_ID)
-    if (mod) {
-      server.moduleGraph.invalidateModule(mod)
-      const timestamp = Date.now()
-      mod.lastHMRTimestamp = timestamp
-      server.ws.send({
-        type: 'update',
-        updates: [
-          {
-            type: 'js-update',
-            acceptedPath: mod.url,
-            path: mod.url,
-            timestamp: timestamp,
-          },
-        ],
-      })
+    if (!mod) {
+      return
     }
+
+    server.moduleGraph.invalidateModule(mod)
+    const timestamp = Date.now()
+    mod.lastHMRTimestamp = timestamp
+    server.ws.send({
+      type: 'update',
+      updates: [
+        {
+          type: 'js-update',
+          acceptedPath: mod.url,
+          path: mod.url,
+          timestamp: timestamp,
+        },
+      ],
+    })
   })
   return server
 }

@@ -43,8 +43,8 @@ export async function createVitePlugins (ctx: Context): Promise<Plugin[]> {
 
     load (id) {
       if (id === RESOLVED_STORIES_ID) {
-        return `${stories.map((story, index) => `import Comp${index} from '${story.file}'`).join('\n')}
-export let files = [${stories.map((story, index) => `{ id: '${story.id}', file: '${story.file}', component: Comp${index}, framework: 'vue3' }`).join(',\n')}]
+        return `${Object.values(stories).map((story, index) => `import Comp${index} from '${story.path}'`).join('\n')}
+export let files = [${Object.values(stories).map((story, index) => `{ id: '${story.id}', file: '${story.path}', component: Comp${index}, framework: 'vue3' }`).join(',\n')}]
 const handlers = []
 export function onUpdate (cb) {
   handlers.push(cb)
@@ -60,12 +60,12 @@ if (import.meta.hot) {
 }`
       } else if (id.startsWith('/$$story/')) {
         const [,, storyId] = id.split('/')
-        const story = stories.find(s => s.id === storyId)
+        const story = stories[storyId]
         if (!story) {
           throw new Error(`Story ${id} not found`)
         }
-        return `import Comp from '${story.file}'
-export const file = { id: '${story.id}', file: '${story.file}', component: Comp, framework: 'vue3' }`
+        return `import Comp from '${story.path}'
+export const file = { id: '${story.id}', file: '${story.path}', component: Comp, framework: 'vue3' }`
       }
     },
 

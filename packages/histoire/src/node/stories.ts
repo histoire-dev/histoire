@@ -6,30 +6,37 @@ import { join } from 'pathe'
 
 export interface Story {
   id: string
-  file: string
+  path: string
 }
 
-export const stories: Story[] = []
+export let stories: Record<string, Story> = {}
 
 const handlers: (() => unknown)[] = []
+
+let context: Context
 
 export function onStoryChange (handler: () => unknown) {
   handlers.push(handler)
 }
 
-export async function watchStories (ctx: Context) {
-  const watcher = chokidar.watch(ctx.config.storyMatch, {
-    cwd: ctx.config.sourceDir,
+export async function watchStories (newContext: Context) {
+  context = newContext
+
+  const watcher = chokidar.watch(context.config.storyMatch, {
+    cwd: context.config.sourceDir,
   })
-  watcher.on('add', (file) => {
-    const absoluteFilePath = join(ctx.config.sourceDir, file)
-    addStory(absoluteFilePath)
-    notifyChange()
-  })
-  watcher.on('unlink', (file) => {
-    stories.splice(stories.findIndex((story) => story.file === file), 1)
-    notifyChange()
-  })
+
+  watcher
+    .on('add', (file) => {
+      addStory(file)
+      notifyChange()
+      setTimeout(notifyChange, 100) // Delay in case file renaming fired Add event before Unlink event
+    })
+    .on('unlink', (file) => {
+      removeStory(file)
+      notifyChange()
+    })
+
   return watcher
 }
 
@@ -39,18 +46,30 @@ function notifyChange () {
   }
 }
 
-function addStory (file: string) {
-  stories.push({
-    id: Case.kebab(file),
-    file,
-  })
+function getAbsoluteFilePath (relativeFilePath: string) {
+  return join(context.config.sourceDir, relativeFilePath)
 }
 
-export async function findStories (ctx: Context) {
-  const files = await globby(ctx.config.storyMatch, {
-    cwd: ctx.config.sourceDir,
+function addStory (relativeFilePath: string) {
+  const absoluteFilePath = getAbsoluteFilePath(relativeFilePath)
+  const fileId = Case.kebab(relativeFilePath)
+
+  stories[fileId] = {
+    id: fileId,
+    path: absoluteFilePath,
+  }
+}
+
+function removeStory (relativeFilePath: string) {
+  const fileId = Case.kebab(relativeFilePath)
+  delete stories[fileId]
+}
+
+export async function findStories () {
+  const files = await globby(context.config.storyMatch, {
+    cwd: context.config.sourceDir,
   })
-  stories.splice(0, stories.length)
+  stories = {}
   for (const file of files) {
     addStory(file)
   }
