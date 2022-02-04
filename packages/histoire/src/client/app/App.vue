@@ -5,7 +5,7 @@ import { useStoryStore } from './stores/story'
 import StoryList from './components/StoryList.vue'
 import BaseSplitPane from './components/base/BaseSplitPane.vue'
 import { shallowRef } from 'vue'
-import UIHeader from './components/ui/UIHeader.vue'
+import AppHeader from './components/app/AppHeader.vue'
 
 const storyStore = useStoryStore()
 
@@ -31,7 +31,7 @@ onUpdate((newValue) => {
   </div>
 
   <div class="htw-h-screen dark:htw-bg-gray-800 htw-flex htw-flex-col dark:htw-text-slate-200">
-    <UIHeader />
+    <AppHeader />
 
     <BaseSplitPane
       save-id="main-horiz"
