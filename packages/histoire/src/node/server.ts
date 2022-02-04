@@ -5,6 +5,7 @@ import { onStoryChange, watchStories } from './stories.js'
 
 export async function createServer (ctx: Context) {
   await watchStories(ctx)
+
   const server = await createViteServer({
     root: ctx.config.sourceDir,
     plugins: await createVitePlugins(ctx),
@@ -14,6 +15,7 @@ export async function createServer (ctx: Context) {
       },
     },
   })
+
   onStoryChange(() => {
     const mod = server.moduleGraph.getModuleById(RESOLVED_STORIES_ID)
     if (mod) {
