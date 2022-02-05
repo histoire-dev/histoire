@@ -39,11 +39,13 @@ onUpdate((newValue) => {
       class="htw-h-full"
     >
       <template #first>
-        <div class="htw-flex htw-flex-col htw-divide-zinc-200 dark:htw-divide-zinc-850 htw-divide-y">
-          <AppHeader />
+        <div class="htw-flex htw-flex-col htw-divide-zinc-200 dark:htw-divide-zinc-850 htw-divide-y htw-h-full">
+          <AppHeader
+            class="htw-flex-none"
+          />
           <StoryList
             :stories="storyStore.stories"
-            class="htw-h-full"
+            class="htw-flex-1"
           />
         </div>
       </template>
