@@ -15,7 +15,7 @@ export async function generateSourceCode (vnode: VNode | VNode[]) {
   return lines.join('\n')
 }
 
-async function printVNode (vnode: VNode) {
+async function printVNode (vnode: VNode): Promise<string[]> {
   if (vnode.type === Text) {
     return [vnode.children.trim()]
   }

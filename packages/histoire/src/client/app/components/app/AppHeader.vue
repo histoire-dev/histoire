@@ -2,9 +2,7 @@
 import { useDark, useToggle } from '@vueuse/core'
 import { Icon } from '@iconify/vue'
 import { computed } from 'vue'
-
-const isDark = useDark({ valueDark: 'htw-dark' })
-const toggleDark = useToggle(isDark)
+import { isDark, toggleDark } from '../../util/dark'
 
 const carbonIcon = computed(() => {
   return isDark.value ? 'carbon:moon' : 'carbon:sun'

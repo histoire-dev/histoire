@@ -25,7 +25,8 @@ button {
 @tailwind components;
 @tailwind utilities;
 
-body {
+body,
+pre {
   margin: 0;
 }
 
