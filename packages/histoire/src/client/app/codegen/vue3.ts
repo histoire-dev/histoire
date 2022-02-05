@@ -32,7 +32,7 @@ async function printVNode (vnode: VNode): Promise<string[]> {
     const attrs: string[] = []
     for (const prop in vnode.props) {
       if (vnode.dynamicProps?.includes(prop)) {
-        attrs.push(`:${kebab(prop)}="${vnode.props[prop]}"`)
+        attrs.push(`:${kebab(prop)}="${JSON.stringify(vnode.props[prop])}"`) // @TODO better JS serialization
       } else {
         attrs.push(`${kebab(prop)}="${vnode.props[prop]}"`)
       }
