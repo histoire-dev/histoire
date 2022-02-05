@@ -159,7 +159,7 @@ onUnmounted(() => {
       class="htw-relative htw-bottom-0 htw-right-0"
       :class="{
         'htw-pointer-events-none': dragging,
-        'htw-border-t htw-border-zinc-200 dark:htw-border-zinc-600': orientation === 'portrait'
+        'htw-border-t htw-border-zinc-200 dark:htw-border-zinc-850': orientation === 'portrait'
       }"
       :style="rightStyle"
     >
