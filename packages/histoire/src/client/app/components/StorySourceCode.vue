@@ -40,22 +40,20 @@ const sourceHtml = computed(() => highlighter.value?.codeToHtml(sourceCode.value
 </script>
 
 <template>
-  <div class="htw-p-2 htw-h-full">
-    <div class="htw-bg-zinc-50 dark:htw-bg-zinc-750 htw-border htw-border-zinc-100 dark:htw-border-zinc-800 htw-rounded htw-h-full">
-      <textarea
-        v-if="!sourceHtml"
-        class="__histoire-code-placeholder htw-w-full htw-h-full htw-p-2 htw-outline-none htw-bg-transparent"
-        :value="sourceCode"
-        readonly
-      />
-      <!-- eslint-disable vue/no-v-html -->
-      <div
-        v-else
-        class="__histoire-code htw-w-full htw-h-full htw-p-2 htw-overflow-auto"
-        v-html="sourceHtml"
-      />
-      <!-- eslint-enable vue/no-v-html -->
-    </div>
+  <div class="htw-bg-zinc-100 dark:htw-bg-zinc-800 htw-h-full">
+    <textarea
+      v-if="!sourceHtml"
+      class="__histoire-code-placeholder htw-w-full htw-h-full htw-p-2 htw-outline-none htw-bg-transparent"
+      :value="sourceCode"
+      readonly
+    />
+    <!-- eslint-disable vue/no-v-html -->
+    <div
+      v-else
+      class="__histoire-code htw-w-full htw-h-full htw-p-2 htw-overflow-auto"
+      v-html="sourceHtml"
+    />
+    <!-- eslint-enable vue/no-v-html -->
   </div>
 </template>
 
