@@ -14,8 +14,15 @@ program.command('dev')
   .describe('open the stories in your browser for development')
   .option('-p, --port <port>', 'Listening port of the server')
   .action(async (options) => {
-    const { dev } = await import('./commands/dev.js')
-    return dev(options)
+    const { devCommand } = await import('./commands/dev.js')
+    return devCommand(options)
+  })
+
+program.command('build')
+  .describe('build the histoire final app you can deploy')
+  .action(async () => {
+    const { buildCommand } = await import('./commands/build.js')
+    return buildCommand()
   })
 
 program.parse(process.argv)

@@ -65,7 +65,9 @@ function removeStory (relativeFilePath: string) {
   delete stories[fileId]
 }
 
-export async function findStories () {
+export async function findStories (newContext: Context) {
+  context = newContext
+
   const files = await globby(context.config.storyMatch, {
     cwd: context.config.sourceDir,
   })

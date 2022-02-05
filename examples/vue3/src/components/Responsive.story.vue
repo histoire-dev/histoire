@@ -1,22 +1,16 @@
+<script lang="ts" setup>
+import { defineAsyncComponent } from 'vue'
+
+const Responsive = defineAsyncComponent(() => import('./Responsive.vue'))
+</script>
+
 <template>
   <Story title="Responsive">
     <Variant
       title="default"
       iframe
     >
-      <div class="target">
-        <p>
-          Responsive
-        </p>
-      </div>
+      <Responsive />
     </Variant>
   </Story>
 </template>
-
-<style scoped>
-@media (max-width: 768px) {
-  .target {
-    background-color: rgb(236, 132, 132);
-  }
-}
-</style>

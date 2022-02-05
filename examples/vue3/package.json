@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "story:dev": "histoire dev"
+    "story:dev": "histoire dev",
+    "story:build": "histoire build"
   },
   "dependencies": {
     "vue": "^3.2.27"

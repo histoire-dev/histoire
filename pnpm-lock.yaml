@@ -50,6 +50,7 @@ importers:
   packages/histoire:
     specifiers:
       '@iconify/vue': ^3.1.3
+      '@types/fs-extra': ^9.0.13
       '@types/node': ^14.14.21
       '@vitejs/plugin-vue': ^2.1.0
       '@vueuse/core': ^7.5.5
@@ -77,6 +78,7 @@ importers:
       case: 1.6.3
       chokidar: 3.5.3
       floating-vue: 2.0.0-beta.3_vue@3.2.29
+      fs-extra: 10.0.0
       globby: 12.2.0
       pathe: 0.2.0
       pinia: 2.0.10_typescript@4.5.5+vue@3.2.29
@@ -87,10 +89,10 @@ importers:
       vue-router: 4.0.12_vue@3.2.29
     devDependencies:
       '@iconify/vue': 3.1.3_vue@3.2.29
+      '@types/fs-extra': 9.0.13
       '@types/node': 14.18.9
       autoprefixer: 10.4.2_postcss@8.4.5
       concurrently: 7.0.0
-      fs-extra: 10.0.0
       postcss: 8.4.5
       postcss-import: 14.0.2_postcss@8.4.5
       tailwindcss: 3.0.18_ef48b3b8837f8a23677bffe8f9cd866d
@@ -350,6 +352,12 @@ packages:
     dependencies:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.13.0
+
+  /@types/fs-extra/9.0.13:
+    resolution: {integrity: sha512-nEnwB++1u5lVDM2UI4c1+5R+FYaKfaAzS4OococimjVm3nQw3TuzH5UNsocrcTBbhnerblyHj4A49qXbIiZdpA==}
+    dependencies:
+      '@types/node': 14.18.9
+    dev: true
 
   /@types/json-schema/7.0.9:
     resolution: {integrity: sha512-qcUXuemtEu+E5wZSJHNxUXeCZhAfXKQ41D+duX+VYPde7xyEVZci+/oXKJL13tnRs9lR2pr4fod59GT6/X1/yQ==}
@@ -1861,7 +1869,7 @@ packages:
       graceful-fs: 4.2.9
       jsonfile: 6.1.0
       universalify: 2.0.0
-    dev: true
+    dev: false
 
   /fs.realpath/1.0.0:
     resolution: {integrity: sha1-FQStJSMVjKpA20onh8sBQRmU6k8=}
@@ -2005,7 +2013,6 @@ packages:
 
   /graceful-fs/4.2.9:
     resolution: {integrity: sha512-NtNxqUcXgpW2iMrfqSfR73Glt39K+BLwWsPs94yR63v45T0Wbej7eRmL5cWfwEgqXnmjQp3zaJTshdRW/qC2ZQ==}
-    dev: true
 
   /handlebars/4.7.7:
     resolution: {integrity: sha512-aAcXm5OAfE/8IXkcZvCepKU3VzW1/39Fb5ZuqMtgI/hT8X2YgoMvBY5dLhq/cpOvw7Lk1nK/UF71aLG/ZnVYRA==}
@@ -2301,7 +2308,7 @@ packages:
       universalify: 2.0.0
     optionalDependencies:
       graceful-fs: 4.2.9
-    dev: true
+    dev: false
 
   /jsonparse/1.3.1:
     resolution: {integrity: sha1-P02uSpH6wxX3EGL4UhzCOfE2YoA=}
@@ -3325,7 +3332,7 @@ packages:
   /universalify/2.0.0:
     resolution: {integrity: sha512-hAZsKq7Yy11Zu1DE0OzWjw7nnLZmJZYTDZZyEFHZdUhV8FkH5MCfoU1XMaxXovpyW5nq5scPqq0ZDP9Zyl04oQ==}
     engines: {node: '>= 10.0.0'}
-    dev: true
+    dev: false
 
   /uri-js/4.4.1:
     resolution: {integrity: sha512-7rKUyy33Q1yc98pQ1DAmLtwX109F7TIfWlW1Ydo8Wl1ii1SeHieeh0HHfPeL2fMXK6z0s8ecKs9frCuLJvndBg==}
