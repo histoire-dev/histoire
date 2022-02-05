@@ -82,6 +82,8 @@ function getTagName (vnode: VNode) {
     return asyncComp.name ?? getNameFromFile(asyncComp.__file)
   } else if (vnode.type?.name) {
     return vnode.type.name
+  } else if (vnode.type?.__file) {
+    return getNameFromFile(vnode.type.__file)
   }
   return 'Anonymous'
 }

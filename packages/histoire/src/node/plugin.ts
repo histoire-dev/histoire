@@ -1,3 +1,4 @@
+import { relative } from 'pathe'
 import { defineConfig, mergeConfig, Plugin } from 'vite'
 import { APP_PATH, DIST_CLIENT_PATH } from './alias.js'
 import { Context } from './context.js'
@@ -116,8 +117,32 @@ if (import.meta.hot) {
       }
     },
   }
-  return [
+
+  const plugins = [
     vitePlugin,
     vuePlugin,
   ]
+
+  if (ctx.mode === 'build') {
+    // Add file name in build mode to have components names instead of <Anonymous>
+    const include = [/\.vue$/]
+    const exclude = [/[\\/]node_modules[\\/]/, /[\\/]\.git[\\/]/, /[\\/]\.nuxt[\\/]/]
+    const fileNamePlugin: Plugin = {
+      name: 'histoire-file-name-plugin',
+      enforce: 'post',
+
+      transform (code, id) {
+        if (exclude.some(r => r.test(id))) return
+        if (include.some(r => r.test(id))) {
+          const file = relative(ctx.config.sourceDir, id)
+          const index = code.indexOf('export default')
+          const result = `${code.substring(0, index)}_sfc_main.__file = '${file}'\n${code.substring(index)}`
+          return result
+        }
+      },
+    }
+    plugins.push(fileNamePlugin)
+  }
+
+  return plugins
 }

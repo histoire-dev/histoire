@@ -15,6 +15,7 @@ export async function devCommand (options: DevOptions) {
   }
   const ctx: Context = {
     config,
+    mode: 'dev',
   }
   const server = await createServer(ctx)
   await server.listen(options.port)

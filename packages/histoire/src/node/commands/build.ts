@@ -11,6 +11,7 @@ export async function buildCommand () {
   }
   const ctx: Context = {
     config,
+    mode: 'build',
   }
   await build(ctx)
 }
