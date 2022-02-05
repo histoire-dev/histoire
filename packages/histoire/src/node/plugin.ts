@@ -35,9 +35,6 @@ export async function createVitePlugins (ctx: Context): Promise<Plugin[]> {
     resolveId (id) {
       if (id.startsWith(STORIES_ID)) {
         return RESOLVED_STORIES_ID
-      } else if (id.startsWith('/$story/')) {
-        const [,, storyId] = id.split('/')
-        return `/$$story/${storyId}`
       }
     },
 
@@ -58,14 +55,6 @@ if (import.meta.hot) {
     })
   })
 }`
-      } else if (id.startsWith('/$$story/')) {
-        const [,, storyId] = id.split('/')
-        const story = stories[storyId]
-        if (!story) {
-          throw new Error(`Story ${id} not found`)
-        }
-        return `import Comp from '${story.path}'
-export const file = { id: '${story.id}', file: '${story.path}', component: Comp, framework: 'vue3' }`
       }
     },
 

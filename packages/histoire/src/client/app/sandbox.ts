@@ -5,9 +5,11 @@ import { registerGlobalComponents } from './global-components'
 import SandboxVue3 from './components/sandbox/SandboxVue3.vue'
 import { useStoryStore } from './stores/story'
 import './style/sandbox.css'
+// @ts-expect-error virtual module
+import { files } from '$histoire-stories'
 
 const query = parseQuery(window.location.search)
-const { file } = await import(/* @vite-ignore */ `/$story/${query.storyId}`)
+const file = files.find(f => f.id === query.storyId)
 
 const app = createApp({
   setup () {
