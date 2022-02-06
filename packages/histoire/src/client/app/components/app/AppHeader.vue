@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { useDark, useToggle } from '@vueuse/core'
 import { Icon } from '@iconify/vue'
 import { computed } from 'vue'
+import AppLogo from './AppLogo.vue'
 import { isDark, toggleDark } from '../../util/dark'
 
 const carbonIcon = computed(() => {
@@ -11,11 +11,11 @@ const carbonIcon = computed(() => {
 
 <template>
   <div
-    class="htw-px-4 htw-h-12 htw-flex htw-items-center"
+    class="htw-px-4 htw-h-16 htw-flex htw-items-center"
   >
-    <div class="">
-      Histoire
-    </div>
+    <AppLogo
+      class="htw-h-full htw-py-3"
+    />
     <div class="htw-ml-auto">
       <span
         class="hover:htw-text-primary-500 dark:hover:htw-text-primary-400 htw-cursor-pointer"
