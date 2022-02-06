@@ -1,3 +1,9 @@
+<p align="center">
+  <img src="./logo.svg" alt="Histoire logo" width="256px" height="256px">
+</p>
+
+<br>
+
 # Histoire
 
 > Fast and beautiful story collections and component documentations
