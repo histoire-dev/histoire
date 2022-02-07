@@ -4,8 +4,7 @@
 import { VNode } from 'vue'
 import { Text } from '@vue/runtime-core'
 import { pascal, kebab } from 'case'
-import { genObjectFromRaw, genArrayFromRaw } from 'knitwork'
-import { indent } from './util'
+import { indent, serializeJs } from './util'
 
 export async function generateSourceCode (vnode: VNode | VNode[]) {
   const list = Array.isArray(vnode) ? vnode : [vnode]
@@ -17,6 +16,8 @@ export async function generateSourceCode (vnode: VNode | VNode[]) {
 }
 
 async function printVNode (vnode: VNode): Promise<string[]> {
+  console.log(vnode)
+
   if (vnode.type === Text) {
     return [vnode.children.trim()]
   }
@@ -30,14 +31,21 @@ async function printVNode (vnode: VNode): Promise<string[]> {
     }
 
     // Attributes
-    const attrs: string[] = []
+    const attrs: string[][] = []
     for (const prop in vnode.props) {
-      if (vnode.dynamicProps?.includes(prop)) {
-        const value = vnode.props[prop]
-        const serialized = Array.isArray(value) ? genArrayFromRaw(value) : genObjectFromRaw(value)
-        attrs.push(`:${kebab(prop)}="${serialized}"`)
+      const value = vnode.props[prop]
+      if (typeof value !== 'string' || vnode.dynamicProps?.includes(prop)) {
+        const serialized = serializeJs(value).split('\n')
+        if (serialized.length > 1) {
+          let indented: string[] = [`:${kebab(prop)}="${serialized[0]}`]
+          indented.push(...serialized.slice(1, serialized.length - 1))
+          indented.push(`${serialized[serialized.length - 1]}"`)
+          attrs.push(indented)
+        } else {
+          attrs.push([`:${kebab(prop)}="${serialized[0]}"`])
+        }
       } else {
-        attrs.push(`${kebab(prop)}="${vnode.props[prop]}"`)
+        attrs.push([`${kebab(prop)}="${value}"`])
       }
     }
 
@@ -58,15 +66,18 @@ async function printVNode (vnode: VNode): Promise<string[]> {
     // @TODO handle slots
 
     // Template
-    let tag = `<${tagName}`
-    if (attrs.length > 1) {
-      tag += `\n${indent(attrs).join('\n')}\n`
+    const tag = [`<${tagName}`]
+    if (attrs.length > 1 || attrs[0].length > 1) {
+      for (const attrLines of attrs) {
+        tag.push(...indent(attrLines))
+      }
+      tag.push('>')
     } else if (attrs.length === 1) {
-      tag += ` ${attrs.join('')}`
+      tag[0] += ` ${attrs[0]}>`
     }
 
     if (childLines.length > 0) {
-      lines.push(`${tag}>`)
+      lines.push(...tag)
       lines.push(...indent(childLines))
       lines.push(`</${tagName}>`)
     } else {
