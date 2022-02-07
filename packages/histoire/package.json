@@ -41,6 +41,7 @@
     "floating-vue": "^2.0.0-beta.5",
     "fs-extra": "^10.0.0",
     "globby": "^13.1.1",
+    "knitwork": "^0.1.0",
     "pathe": "^0.2.0",
     "pinia": "^2.0.11",
     "sade": "^1.8.1",

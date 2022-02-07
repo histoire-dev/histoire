@@ -4,6 +4,7 @@
 import { VNode } from 'vue'
 import { Text } from '@vue/runtime-core'
 import { pascal, kebab } from 'case'
+import { genObjectFromRaw, genArrayFromRaw } from 'knitwork'
 import { indent } from './util'
 
 export async function generateSourceCode (vnode: VNode | VNode[]) {
@@ -32,7 +33,9 @@ async function printVNode (vnode: VNode): Promise<string[]> {
     const attrs: string[] = []
     for (const prop in vnode.props) {
       if (vnode.dynamicProps?.includes(prop)) {
-        attrs.push(`:${kebab(prop)}="${JSON.stringify(vnode.props[prop])}"`) // @TODO better JS serialization
+        const value = vnode.props[prop]
+        const serialized = Array.isArray(value) ? genArrayFromRaw(value) : genObjectFromRaw(value)
+        attrs.push(`:${kebab(prop)}="${serialized}"`)
       } else {
         attrs.push(`${kebab(prop)}="${vnode.props[prop]}"`)
       }

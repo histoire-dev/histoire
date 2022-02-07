@@ -61,6 +61,7 @@ importers:
       floating-vue: ^2.0.0-beta.5
       fs-extra: ^10.0.0
       globby: ^13.1.1
+      knitwork: ^0.1.0
       pathe: ^0.2.0
       pinia: ^2.0.11
       postcss: ^8.2.4
@@ -80,6 +81,7 @@ importers:
       floating-vue: 2.0.0-beta.5_vue@3.2.30
       fs-extra: 10.0.0
       globby: 13.1.1
+      knitwork: 0.1.0
       pathe: 0.2.0
       pinia: 2.0.11_typescript@4.5.5+vue@3.2.30
       sade: 1.8.1
@@ -2408,6 +2410,10 @@ packages:
     resolution: {integrity: sha512-dcS1ul+9tmeD95T+x28/ehLgd9mENa3LsvDTtzm3vyBEO7RPptvAD+t44WVXaUjTBRcrpFeFlC8WCruUR456hw==}
     engines: {node: '>=0.10.0'}
     dev: true
+
+  /knitwork/0.1.0:
+    resolution: {integrity: sha512-veAmNJu4Niku+zjm2//+xLGsYTwB8OP1jBHjPU5RbQu9Jl263d5PtbM0OaITlYvhLFLov/R12hs0GL4ujzMY3A==}
+    dev: false
 
   /levn/0.4.1:
     resolution: {integrity: sha512-+bT2uH4E5LGE7h/n3evcS/sQlJXCpIp6ym8OWJ5eV6+67Dsql/LaaT7qJBAt2rzfoa/5QBGBhxDix1dMt2kQKQ==}
