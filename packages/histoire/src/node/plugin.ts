@@ -10,7 +10,7 @@ export const RESOLVED_STORIES_ID = `/${STORIES_ID}-resolved`
 export async function createVitePlugins (ctx: Context): Promise<Plugin[]> {
   const userViteConfig = {} // @TODO
 
-  const vuePlugin = (await import('@vitejs/plugin-vue')).default()
+  const vuePlugin = (await import('@vitejs/plugin-vue')).default() // @TODO check if already present in vite config
 
   const vitePlugin: Plugin = {
     name: 'histoire-vite-plugin',
