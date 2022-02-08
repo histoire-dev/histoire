@@ -16,8 +16,6 @@ export async function generateSourceCode (vnode: VNode | VNode[]) {
 }
 
 async function printVNode (vnode: VNode): Promise<string[]> {
-  console.log(vnode)
-
   if (vnode.type === Text) {
     return [vnode.children.trim()]
   }
@@ -37,7 +35,7 @@ async function printVNode (vnode: VNode): Promise<string[]> {
       if (typeof value !== 'string' || vnode.dynamicProps?.includes(prop)) {
         const serialized = serializeJs(value).split('\n')
         if (serialized.length > 1) {
-          let indented: string[] = [`:${kebab(prop)}="${serialized[0]}`]
+          const indented: string[] = [`:${kebab(prop)}="${serialized[0]}`]
           indented.push(...serialized.slice(1, serialized.length - 1))
           indented.push(`${serialized[serialized.length - 1]}"`)
           attrs.push(indented)
@@ -67,13 +65,15 @@ async function printVNode (vnode: VNode): Promise<string[]> {
 
     // Template
     const tag = [`<${tagName}`]
-    if (attrs.length > 1 || attrs[0].length > 1) {
+    if (attrs.length > 1 || attrs[0]?.length > 1) {
       for (const attrLines of attrs) {
         tag.push(...indent(attrLines))
       }
       tag.push('>')
     } else if (attrs.length === 1) {
       tag[0] += ` ${attrs[0]}>`
+    } else {
+      tag[0] += '>'
     }
 
     if (childLines.length > 0) {
