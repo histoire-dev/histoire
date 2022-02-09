@@ -75,7 +75,6 @@ importers:
       vite-node: ^0.2.8
       vue: ^3.2.30
       vue-router: ^4.0.12
-      why-is-node-running: ^2.2.1
     dependencies:
       '@vitejs/plugin-vue': 2.1.0_vite@2.7.13+vue@3.2.30
       '@vueuse/core': 7.5.5_vue@3.2.30
@@ -104,7 +103,6 @@ importers:
       postcss-import: 14.0.2_postcss@8.4.6
       tailwindcss: 3.0.19_833e1018ad0d7954aa80c53675939269
       typescript: 4.5.5
-      why-is-node-running: 2.2.1
 
 packages:
 
@@ -3165,10 +3163,6 @@ packages:
       get-intrinsic: 1.1.1
       object-inspect: 1.12.0
 
-  /siginfo/2.0.0:
-    resolution: {integrity: sha512-ybx0WO1/8bSBLEWXZvEd7gMW3Sn3JFlW3TvX1nREbDLRNQNaeNN8WK0meBwPdAaOI7TtRRRJn/Es1zhrrCHu7g==}
-    dev: true
-
   /slash/3.0.0:
     resolution: {integrity: sha512-g9Q1haeby36OSStwb4ntCGGGaKsaVSjQ68fBxoQcutl5fS1vuY18H3wSt3jFyFtrkx+Kz0V1G85A4MyAdDMi2Q==}
     engines: {node: '>=8'}
@@ -3226,10 +3220,6 @@ packages:
     resolution: {integrity: sha512-9NThjpgZnifTkJpzTZ7Eue85S49QwpNhZTq6GRJwObb6jnLFNGB7Qm73V5HewTROPyxD0C29xqmaI68bQtV+hg==}
     dependencies:
       readable-stream: 3.6.0
-    dev: true
-
-  /stackback/0.0.2:
-    resolution: {integrity: sha1-Gsig2Ug4SNFpXkGLbQMaPDzmjjs=}
     dev: true
 
   /string-width/4.2.3:
@@ -3719,15 +3709,6 @@ packages:
     hasBin: true
     dependencies:
       isexe: 2.0.0
-    dev: true
-
-  /why-is-node-running/2.2.1:
-    resolution: {integrity: sha512-8lT29hvpJh5tdVQfyUKB1FWuRuqms2ucPD+mt64ofv48j0CgMFhkQZxlWcEefNfr/8pJNqbH/gTB8z7jkyngUA==}
-    engines: {node: '>=8'}
-    hasBin: true
-    dependencies:
-      siginfo: 2.0.0
-      stackback: 0.0.2
     dev: true
 
   /word-wrap/1.2.3:
