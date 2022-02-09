@@ -23,7 +23,6 @@ defineProps({
       :min="1"
       :max="99"
       :default-split="99"
-      dragger-offset="before"
       class="htw-w-full"
     >
       <template #first>
