@@ -1,65 +1,21 @@
 <script lang="ts">
-import { defineComponent, onBeforeMount, onBeforeUnmount, PropType, provide, ref, useAttrs } from 'vue'
-import { useStoryStore } from '../../stores/story.js'
-import { Story, Variant } from '../../types.js'
+import { computed, defineComponent, provide, useAttrs, VNode } from 'vue'
+import { Story } from '../../types.js'
 
 export default defineComponent({
+  // eslint-disable-next-line vue/multi-word-component-names
+  name: 'Story',
+  __histoireType: 'story',
+
   inheritAttrs: false,
 
-  props: {
-    title: {
-      type: String,
-      required: true,
-    },
-
-    layout: {
-      type: Object as PropType<Story['layout']>,
-      default: () => ({ type: 'single' }),
-    },
-  },
-
-  setup (props) {
+  setup () {
     const attrs = useAttrs() as {
-      data: {
-        id: string
-        reloadHandlers: (() => unknown)[]
-      }
+      story: Story
     }
 
-    // Story
-
-    const storyStore = useStoryStore()
-
-    const story = ref<Story>(null)
-
-    onBeforeMount(() => {
-      story.value = storyStore.addStory({
-        id: attrs.data.id,
-        title: props.title,
-        layout: props.layout,
-        variants: [],
-        mountTime: Date.now(),
-      })
-    })
-
-    onBeforeUnmount(() => {
-      storyStore.removeStory(story.value)
-    })
-
-    // Variants
-
+    const story = computed(() => attrs.story)
     provide('story', story)
-
-    provide('addVariant', (variant: Variant) => {
-      story.value.variants.push(variant)
-    })
-
-    provide('removeVariant', (variant: Variant) => {
-      const index = story.value.variants.indexOf(variant)
-      if (index !== -1) {
-        story.value.variants.splice(index, 1)
-      }
-    })
 
     return {
       story,
@@ -67,11 +23,20 @@ export default defineComponent({
   },
 
   render () {
-    Object.assign(this.story, {
-      title: this.title,
-      layout: this.layout,
-    })
-    return this.$slots.default()
+    // Apply variant as attribute to each child vnode (should be `<Variant>` components)
+    const vnodes: VNode[] = this.$slots.default()
+      // @ts-expect-error custom option
+      .filter(vnode => vnode.type?.__histoireType === 'variant')
+      // Same number of vnodes as variants
+      .slice(0, this.story.variants.length)
+    for (const index in vnodes) {
+      const vnode = vnodes[index]
+      if (!vnode.props) {
+        vnode.props = {}
+      }
+      vnode.props.variant = this.story.variants[index]
+    }
+    return vnodes
   },
 })
 </script>

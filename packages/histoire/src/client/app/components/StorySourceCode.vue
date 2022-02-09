@@ -30,7 +30,7 @@ onMounted(async () => {
 })
 
 watchEffect(async () => {
-  sourceCode.value = await generateSourceCode(props.variant.slots().default({ state: props.variant.state }))
+  sourceCode.value = await generateSourceCode(props.variant.slots().default?.({ state: props.variant.state }) ?? [])
 })
 
 const sourceHtml = computed(() => highlighter.value?.codeToHtml(sourceCode.value, {

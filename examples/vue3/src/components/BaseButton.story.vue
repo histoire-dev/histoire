@@ -1,7 +1,5 @@
 <script lang="ts" setup>
-import { defineAsyncComponent } from 'vue'
-
-const BaseButton = defineAsyncComponent(() => import('./BaseButton.vue'))
+import BaseButton from './BaseButton.vue'
 
 function initState () {
   return {
@@ -19,7 +17,7 @@ function initState () {
     }"
   >
     <Variant
-      title="default"
+      title="playground"
       :init-state="initState"
     >
       <template #default="{ state }">

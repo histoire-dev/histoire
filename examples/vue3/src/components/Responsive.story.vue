@@ -1,7 +1,5 @@
 <script lang="ts" setup>
-import { defineAsyncComponent } from 'vue'
-
-const Responsive = defineAsyncComponent(() => import('./Responsive.vue'))
+import Responsive from './Responsive.vue'
 </script>
 
 <template>

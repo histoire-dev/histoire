@@ -1,14 +1,30 @@
 import { join } from 'pathe'
-import { build as viteBuild } from 'vite'
+import { build as viteBuild, createServer as createViteServer } from 'vite'
 import fs from 'fs-extra'
 import { APP_PATH } from './alias.js'
 import { Context } from './context.js'
 import { createVitePlugins } from './plugin.js'
-import { findStories } from './stories.js'
+import { findAllStories } from './stories.js'
 import type { RollupOutput } from 'rollup'
+import { useCollectStories } from './collect.js'
 
 export async function build (ctx: Context) {
-  await findStories(ctx)
+  await findAllStories(ctx)
+
+  // Collect story data
+  const server = await createViteServer({
+    root: ctx.config.sourceDir,
+    plugins: [
+      (await import('@vitejs/plugin-vue')).default(), // @TODO check if already present in vite config
+    ],
+  })
+  await server.pluginContainer.buildStart({})
+  const { executeStoryFile, destroy: destroyCollectStories } = useCollectStories(server)
+  for (const storyFile of ctx.storyFiles) {
+    await executeStoryFile(storyFile)
+  }
+  await server.close()
+  await destroyCollectStories()
 
   const results = await viteBuild({
     root: ctx.config.sourceDir,

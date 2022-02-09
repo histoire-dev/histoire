@@ -1,33 +1,47 @@
 <script lang="ts" setup>
 // @ts-expect-error virtual module
 import { files as rawFiles, onUpdate } from '$histoire-stories'
-import { useStoryStore } from './stores/story'
 import StoryList from './components/StoryList.vue'
 import BaseSplitPane from './components/base/BaseSplitPane.vue'
-import { shallowRef } from 'vue'
+import { computed, markRaw, ref, watch } from 'vue'
 import AppHeader from './components/app/AppHeader.vue'
+import type { StoryFile, Variant } from './types'
+import { useStoryStore } from './stores/story'
+import { mapFile } from './util/mapping'
 
-const storyStore = useStoryStore()
+const files = ref<StoryFile[]>(rawFiles.map(file => mapFile(file)))
 
-const files = shallowRef(rawFiles)
-
-onUpdate((newValue) => {
-  files.value = newValue
+onUpdate((newValue: StoryFile[]) => {
+  files.value = newValue.map(file => {
+    const existingFile = files.value.find(f => f.id === file.id)
+    return mapFile(file, existingFile)
+  })
 })
 
+const stories = computed(() => files.value.reduce((acc, file) => {
+  acc.push(file.story)
+  return acc
+}, []))
+
+// Store
+
+const storyStore = useStoryStore()
+watch(stories, value => {
+  storyStore.setStories(value)
+}, {
+  immediate: true,
+})
 </script>
 
 <template>
-  <div class="htw-hidden">
-    <template
-      v-for="storyData of files"
-      :key="storyData.id"
-    >
-      <component
-        :is="storyData.component"
-        :data="storyData"
-      />
-    </template>
+  <div
+    v-if="storyStore.currentStory"
+    class="htw-hidden"
+  >
+    <component
+      :is="storyStore.currentStory.file.component"
+      :story="storyStore.currentStory"
+    />
   </div>
 
   <div class="htw-h-screen dark:htw-bg-zinc-700 dark:htw-text-slate-100">
@@ -44,7 +58,7 @@ onUpdate((newValue) => {
             class="htw-flex-none"
           />
           <StoryList
-            :stories="storyStore.stories"
+            :stories="stories"
             class="htw-flex-1"
           />
         </div>

@@ -1,14 +1,13 @@
 <script lang="ts">
-import { defineComponent, inject, onBeforeMount, onBeforeUnmount, PropType, reactive, Ref, ref } from 'vue'
-import { Story, Variant } from '../../types'
+import { defineComponent, getCurrentInstance, PropType, useAttrs } from 'vue'
+import { Variant } from '../../types'
 
 export default defineComponent({
-  props: {
-    title: {
-      type: String,
-      required: true,
-    },
+  // eslint-disable-next-line vue/multi-word-component-names
+  name: 'Variant',
+  __histoireType: 'variant',
 
+  props: {
     initState: {
       type: Function as PropType<() => any | Promise<any>>,
       default: null,
@@ -16,59 +15,31 @@ export default defineComponent({
   },
 
   setup (props) {
-    const story = inject<Ref<Story>>('story')
-
-    function generateId () {
-      let index = 0
-      const idMap = story.value.variants.reduce((acc, variant) => {
-        acc[variant.id] = true
-        return acc
-      }, {} as Record<string, boolean>)
-      while (idMap[`${story.value.id}-${index}`]) {
-        index++
-      }
-      return `${story.value.id}-${index}`
+    const attrs = useAttrs() as {
+      variant: Variant
     }
 
-    function getVariantData () {
-      return {
-        title: props.title,
+    const vm = getCurrentInstance()
+
+    function updateVariant () {
+      Object.assign(attrs.variant, {
         initState: async () => {
           if (typeof props.initState === 'function') {
-            variant.value.state = await props.initState()
+            attrs.variant.state = await props.initState()
           }
         },
-        slots: () => null,
-      }
+        slots: () => vm.proxy.$slots,
+      })
     }
 
-    const variant = ref<Variant>(null)
-
-    const addVariant = inject('addVariant') as (variant: Variant) => void
-    onBeforeMount(() => {
-      variant.value = {
-        id: generateId(),
-        state: reactive<any>({}),
-        ...getVariantData(),
-      }
-      addVariant(variant.value)
-    })
-
-    const removeVariant = inject('removeVariant') as (variant: Variant) => void
-    onBeforeUnmount(() => {
-      removeVariant(variant.value)
-    })
-
     return {
-      variant,
-      getVariantData,
+      updateVariant,
     }
   },
 
   render () {
-    Object.assign(this.variant, this.getVariantData(), {
-      slots: () => this.$slots,
-    })
+    // Trigger variant updates to (re-)render slots
+    this.updateVariant()
     return null
   },
 })

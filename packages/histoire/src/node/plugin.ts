@@ -2,7 +2,7 @@ import { relative } from 'pathe'
 import { defineConfig, mergeConfig, Plugin } from 'vite'
 import { APP_PATH, DIST_CLIENT_PATH } from './alias.js'
 import { Context } from './context.js'
-import { stories } from './stories.js'
+import { notifyStoryChange } from './stories.js'
 
 export const STORIES_ID = '$histoire-stories'
 export const RESOLVED_STORIES_ID = `/${STORIES_ID}-resolved`
@@ -20,7 +20,10 @@ export async function createVitePlugins (ctx: Context): Promise<Plugin[]> {
 
         optimizeDeps: {
           // force include vue to avoid duplicated copies when linked + optimized
-          include: ['vue'],
+          include: [
+            'vue',
+            '@vue/runtime-core',
+          ],
         },
         server: {
           fs: {
@@ -41,8 +44,10 @@ export async function createVitePlugins (ctx: Context): Promise<Plugin[]> {
 
     load (id) {
       if (id === RESOLVED_STORIES_ID) {
-        return `${Object.values(stories).map((story, index) => `import Comp${index} from '${story.path}'`).join('\n')}
-export let files = [${Object.values(stories).map((story, index) => `{ id: '${story.id}', file: '${story.path}', component: Comp${index}, framework: 'vue3' }`).join(',\n')}]
+        const resolvedStories = ctx.storyFiles.filter(s => !!s.story)
+        return `import { defineAsyncComponent } from 'vue'
+${resolvedStories.map((file, index) => `const Comp${index} = defineAsyncComponent(() => import('${file.path}'))`).join('\n')}
+export let files = [${resolvedStories.map((file, index) => `{ id: '${file.id}', story: ${JSON.stringify(file.story)}, component: Comp${index}, framework: 'vue3' }`).join(',\n')}]
 const handlers = []
 export function onUpdate (cb) {
   handlers.push(cb)
@@ -56,6 +61,13 @@ if (import.meta.hot) {
     })
   })
 }`
+      }
+    },
+
+    handleHotUpdate (updateContext) {
+      const story = ctx.storyFiles.find(file => file.path === updateContext.file)
+      if (story) {
+        notifyStoryChange(story)
       }
     },
 

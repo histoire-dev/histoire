@@ -1,8 +1,17 @@
 export interface StoryFile {
   id: string
-  framework: string
-  component: any
-  story: Story
+  /**
+   * Absolute path
+   */
+  path: string
+  /**
+   * Use the module id in imports to allow HMR
+   */
+  moduleId: string
+  /**
+   * Resolved story data from story file execution
+   */
+  story?: Story
 }
 
 export interface Story {
@@ -15,14 +24,9 @@ export interface Story {
     type: 'grid'
     width: number
   }
-  file?: StoryFile
-  lastSelectedVariant?: Variant
 }
 
 export interface Variant {
   id: string
   title: string
-  initState?: () => any
-  slots?: () => Readonly<any>
-  state?: any
 }

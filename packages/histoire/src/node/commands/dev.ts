@@ -16,8 +16,8 @@ export async function devCommand (options: DevOptions) {
   const ctx: Context = {
     config,
     mode: 'dev',
+    storyFiles: [],
   }
-  const server = await createServer(ctx)
-  await server.listen(options.port)
+  const { server } = await createServer(ctx, options.port)
   server.printUrls()
 }

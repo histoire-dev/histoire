@@ -50,7 +50,6 @@ watch(() => storyStore.currentStory, () => {
 
   <div
     v-else
-    :key="storyStore.currentStory.mountTime"
     class="htw-h-full"
   >
     <BaseSplitPane
