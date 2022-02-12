@@ -32,7 +32,7 @@ export function serializeJs (value: any): string {
 }
 
 function printLines (lines: Line[]) {
-  return lines.map(line => ' '.repeat(line.spaces) + line.line).join('\n')
+  return lines.map(line => '  '.repeat(line.spaces) + line.line).join('\n')
 }
 
 function objectToSourceLines (object, indentCount = 0) {
