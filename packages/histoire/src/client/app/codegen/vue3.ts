@@ -1,10 +1,11 @@
 // @ts-nocheck
 // @TODO remove no-check and fix vnode type errors
 
-import { VNode } from 'vue'
+import { VNode, vModelText, vModelCheckbox, vModelSelect, vModelRadio, vModelDynamic } from 'vue'
 import { Text } from '@vue/runtime-core'
 import { pascal, kebab } from 'case'
-import { indent, serializeJs } from './util'
+import { indent } from './util'
+import { serializeJs } from './serialize-js'
 
 export async function generateSourceCode (vnode: VNode | VNode[]) {
   const list = Array.isArray(vnode) ? vnode : [vnode]
@@ -28,23 +29,97 @@ async function printVNode (vnode: VNode): Promise<string[]> {
       await vnode.type.__asyncLoader()
     }
 
-    // Attributes
     const attrs: string[][] = []
+    let multilineAttrs = false
+    const skipProps: string[] = []
+
+    // Directives
+    function genDirective (dirName: string, dir, valueCode: string = null) {
+      let modifiers = ''
+      for (const key in dir.modifiers) {
+        if (dir.modifiers[key]) {
+          modifiers += `.${key}`
+        }
+      }
+      let arg = ''
+      if (dir.arg) {
+        arg = `:${dir.arg}`
+      }
+      const valueLines = valueCode ? [valueCode] : serializeAndCleanJs(dir.value)
+      const attr: string[] = []
+      const dirAttr = `v-${dirName}${modifiers}${arg}="`
+      if (valueLines.length > 1) {
+        attr.push(`${dirAttr}${valueLines[0]}`)
+        attr.push(...valueLines.slice(1, valueLines.length - 1))
+        attr.push(`${valueLines[valueLines.length - 1]}"`)
+        multilineAttrs = true
+      } else {
+        attr.push(`${dirAttr}${valueLines[0] ?? ''}"`)
+      }
+      attrs.push(attr)
+    }
+    if (vnode.dirs) {
+      for (const dir of vnode.dirs) {
+        // Vmodel
+        if (dir.dir === vModelText || dir.dir === vModelSelect || dir.dir === vModelRadio || dir.dir === vModelCheckbox || dir.dir === vModelDynamic) {
+          const listenerKey = `onUpdate:${dir.arg ?? 'modelValue'}`
+          const listener = vnode.props[listenerKey]
+          let valueCode: string = null
+          if (listener) {
+            skipProps.push(listenerKey)
+            const listenerSource = listener.toString()
+            const result = /\(\$event\) => (.*?) = \$event/.exec(listenerSource)
+            if (result) {
+              valueCode = result[1]
+            }
+          }
+          genDirective('model', dir, valueCode)
+        } else {
+          let dirName: string
+          for (const directives of [dir.instance._.directives, dir.instance._.appContext.directives]) {
+            for (const key in directives) {
+              if (dir.instance._.directives[key] === dir.dir) {
+                dirName = key
+                break
+              }
+            }
+            if (dirName) break
+          }
+          if (dirName) {
+            genDirective(dirName, dir)
+          }
+        }
+      }
+    }
+
+    // Attributes
     for (const prop in vnode.props) {
+      if (skipProps.includes(prop)) {
+        continue
+      }
       const value = vnode.props[prop]
       if (typeof value !== 'string' || vnode.dynamicProps?.includes(prop)) {
-        const serialized = serializeJs(value).split('\n')
+        let directive = ':'
+        if (prop.startsWith('on')) {
+          directive = '@'
+        }
+        const arg = kebab(directive === '@' ? prop.slice(2) : prop)
+        const serialized = serializeAndCleanJs(value)
         if (serialized.length > 1) {
-          const indented: string[] = [`:${kebab(prop)}="${serialized[0]}`]
+          multilineAttrs = true
+          const indented: string[] = [`${directive}${arg}="${serialized[0]}`]
           indented.push(...serialized.slice(1, serialized.length - 1))
           indented.push(`${serialized[serialized.length - 1]}"`)
           attrs.push(indented)
         } else {
-          attrs.push([`:${kebab(prop)}="${serialized[0]}"`])
+          attrs.push([`${directive}${arg}="${serialized[0]}"`])
         }
       } else {
         attrs.push([`${kebab(prop)}="${value}"`])
       }
+    }
+    if (attrs.length > 1) {
+      multilineAttrs = true
     }
 
     // Tags
@@ -65,23 +140,31 @@ async function printVNode (vnode: VNode): Promise<string[]> {
 
     // Template
     const tag = [`<${tagName}`]
-    if (attrs.length > 1 || attrs[0]?.length > 1) {
+    if (multilineAttrs) {
       for (const attrLines of attrs) {
         tag.push(...indent(attrLines))
       }
-      tag.push('>')
-    } else if (attrs.length === 1) {
-      tag[0] += ` ${attrs[0]}>`
+      if (childLines.length > 0) {
+        tag.push('>')
+      }
     } else {
-      tag[0] += '>'
+      if (attrs.length === 1) {
+        tag[0] += ` ${attrs[0]}`
+      }
+      if (childLines.length > 0) {
+        tag[0] += '>'
+      }
     }
 
     if (childLines.length > 0) {
       lines.push(...tag)
       lines.push(...indent(childLines))
       lines.push(`</${tagName}>`)
+    } else if (tag.length > 1) {
+      lines.push(...tag)
+      lines.push('/>')
     } else {
-      lines.push(`${tag}${childLines.length > 1 ? '' : ' '}/>`)
+      lines.push(`${tag[0]} />`)
     }
   }
 
@@ -108,4 +191,8 @@ function getNameFromFile (file: string) {
     return pascal(parts[1])
   }
   return 'Anonymous'
+}
+
+function serializeAndCleanJs (value: any) {
+  return serializeJs(value).replace(/\$setup\./g, '').split('\n')
 }

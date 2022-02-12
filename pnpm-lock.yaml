@@ -62,7 +62,6 @@ importers:
       fs-extra: ^10.0.0
       globby: ^13.1.1
       happy-dom: ^2.31.1
-      knitwork: ^0.1.0
       pathe: ^0.2.0
       pinia: ^2.0.11
       postcss: ^8.2.4
@@ -84,7 +83,6 @@ importers:
       fs-extra: 10.0.0
       globby: 13.1.1
       happy-dom: 2.31.1
-      knitwork: 0.1.0
       pathe: 0.2.0
       pinia: 2.0.11_typescript@4.5.5+vue@3.2.30
       sade: 1.8.1
@@ -2429,10 +2427,6 @@ packages:
     resolution: {integrity: sha512-dcS1ul+9tmeD95T+x28/ehLgd9mENa3LsvDTtzm3vyBEO7RPptvAD+t44WVXaUjTBRcrpFeFlC8WCruUR456hw==}
     engines: {node: '>=0.10.0'}
     dev: true
-
-  /knitwork/0.1.0:
-    resolution: {integrity: sha512-veAmNJu4Niku+zjm2//+xLGsYTwB8OP1jBHjPU5RbQu9Jl263d5PtbM0OaITlYvhLFLov/R12hs0GL4ujzMY3A==}
-    dev: false
 
   /kolorist/1.5.1:
     resolution: {integrity: sha512-lxpCM3HTvquGxKGzHeknB/sUjuVoUElLlfYnXZT73K8geR9jQbroGlSCFBax9/0mpGoD3kzcMLnOlGQPJJNyqQ==}
