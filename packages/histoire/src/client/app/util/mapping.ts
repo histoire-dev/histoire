@@ -31,7 +31,7 @@ export function mapVariant (variant: Variant): Variant {
   return {
     ...variant,
     state: {},
-    initState: () => ({}),
+    initState: null,
     slots: () => ({}),
   }
 }

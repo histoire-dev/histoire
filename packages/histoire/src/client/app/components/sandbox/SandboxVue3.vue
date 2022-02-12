@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { App, createApp, onMounted, onUnmounted, PropType, ref } from 'vue'
+import { App, createApp, onMounted, onUnmounted, PropType, ref, watch } from 'vue'
 import { Story, Variant } from '../../types'
 
 const props = defineProps({
@@ -21,8 +21,11 @@ const props = defineProps({
 
 const sandbox = ref<HTMLDivElement>()
 let app: App
+let mounting = false
 
-onMounted(async () => {
+async function mountVariant () {
+  mounting = true
+
   await props.variant.initState()
 
   app = createApp({
@@ -35,10 +38,22 @@ onMounted(async () => {
   const target = document.createElement('div')
   sandbox.value.appendChild(target)
   app.mount(target)
+}
+
+onMounted(async () => {
+  if (props.variant.initState) {
+    await mountVariant()
+  }
+})
+
+watch(() => props.variant.initState, value => {
+  if (value && !mounting) {
+    mountVariant()
+  }
 })
 
 onUnmounted(() => {
-  app.unmount()
+  app?.unmount()
 })
 </script>
 
