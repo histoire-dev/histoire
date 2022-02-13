@@ -25,6 +25,9 @@ export function serializeJs (value: any): string {
   if (typeof value === 'object') {
     return printLines(objectToSourceLines(value))
   }
+  if (value?.__autoBuildingObject) {
+    return value
+  }
   if (typeof value === 'function' && value.name) {
     return value.name
   }

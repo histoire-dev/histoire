@@ -4,10 +4,12 @@
 import { VNode, vModelText, vModelCheckbox, vModelSelect, vModelRadio, vModelDynamic } from 'vue'
 import { Text } from '@vue/runtime-core'
 import { pascal, kebab } from 'case'
-import { indent } from './util'
+import { createAutoBuildingObject, indent } from './util'
 import { serializeJs } from './serialize-js'
+import type { Variant } from '../types'
 
-export async function generateSourceCode (vnode: VNode | VNode[]) {
+export async function generateSourceCode (variant: Variant) {
+  const vnode = variant.slots().default?.({ state: variant.state }) ?? []
   const list = Array.isArray(vnode) ? vnode : [vnode]
   const lines: string[] = []
   for (const vnode of list) {
@@ -104,7 +106,13 @@ async function printVNode (vnode: VNode): Promise<string[]> {
           directive = '@'
         }
         const arg = kebab(directive === '@' ? prop.slice(2) : prop)
-        const serialized = serializeAndCleanJs(value)
+        let serialized: string[]
+        if (typeof value === 'string' && value.startsWith('{{') && value.endsWith('}}')) {
+          // It was formatted from auto building object (slot props)
+          serialized = [value.substring(2, value.length - 2).trim()]
+        } else {
+          serialized = serializeAndCleanJs(value)
+        }
         if (serialized.length > 1) {
           multilineAttrs = true
           const indented: string[] = [`${directive}${arg}="${serialized[0]}`]
@@ -129,14 +137,42 @@ async function printVNode (vnode: VNode): Promise<string[]> {
     const childLines: string[] = []
     if (typeof vnode.children === 'string') {
       childLines.push(vnode.children)
-    } else {
-      const children: VNode[] = Array.isArray(vnode.children) ? vnode.children : vnode.children?.default?.() ?? []
-      for (const child of children) {
+    } else if (Array.isArray(vnode.children)) {
+      for (const child of vnode.children) {
         childLines.push(...await printVNode(child))
       }
     }
 
-    // @TODO handle slots
+    // Slots
+    if (vnode.children && typeof vnode.children === 'object' && !Array.isArray(vnode.children)) {
+      for (const key in vnode.children) {
+        if (typeof vnode.children[key] === 'function') {
+          const autoObject = createAutoBuildingObject(key => `{{ ${key} }}`, (target, p) => {
+            // Vue 3
+            if (p === '__v_isRef') {
+              return () => false
+            }
+          })
+          const children = vnode.children[key](autoObject.proxy)
+          const slotLines: string[] = []
+          for (const child of children) {
+            slotLines.push(...await printVNode(child))
+          }
+          const slotProps = Object.keys(autoObject.cache)
+          if (slotProps.length) {
+            childLines.push(`<template #${key}="{ ${slotProps.join(', ')} }">`)
+            childLines.push(...indent(slotLines))
+            childLines.push('</template>')
+          } else if (key === 'default') {
+            childLines.push(...slotLines)
+          } else {
+            childLines.push(`<template #${key}>`)
+            childLines.push(...indent(slotLines))
+            childLines.push(`</template>`)
+          }
+        }
+      }
+    }
 
     // Template
     const tag = [`<${tagName}`]
@@ -194,5 +230,11 @@ function getNameFromFile (file: string) {
 }
 
 function serializeAndCleanJs (value: any) {
-  return serializeJs(value).replace(/\$setup\./g, '').split('\n')
+  const isAutoBuildingObject = !!value?.__autoBuildingObject
+  const result = serializeJs(value)
+  if (isAutoBuildingObject) {
+    return [result.__autoBuildingObjectGetKey]
+  } else {
+    return result.replace(/\$setup\./g, '').split('\n')
+  }
 }

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, onMounted, PropType, ref, shallowRef, watchEffect } from 'vue'
+import { computed, onMounted, PropType, ref, shallowRef, watch } from 'vue'
 import { getHighlighter, Highlighter, setCDN } from 'shiki'
 import { generateSourceCode } from '../codegen/vue3'
 import { Variant } from '../types'
@@ -14,6 +14,7 @@ const props = defineProps({
 
 const sourceCode = ref('')
 const highlighter = shallowRef<Highlighter>()
+const error = ref<string>(null)
 
 onMounted(async () => {
   setCDN('https://unpkg.com/shiki/')
@@ -29,8 +30,17 @@ onMounted(async () => {
   })
 })
 
-watchEffect(async () => {
-  sourceCode.value = await generateSourceCode(props.variant.slots().default?.({ state: props.variant.state }) ?? [])
+watch(() => props.variant, async (value) => {
+  error.value = null
+  try {
+    sourceCode.value = await generateSourceCode(value)
+  } catch (e) {
+    console.error(e)
+    error.value = e.message
+  }
+}, {
+  deep: true,
+  immediate: true,
 })
 
 const sourceHtml = computed(() => highlighter.value?.codeToHtml(sourceCode.value, {
@@ -41,9 +51,16 @@ const sourceHtml = computed(() => highlighter.value?.codeToHtml(sourceCode.value
 
 <template>
   <div class="htw-bg-zinc-100 dark:htw-bg-zinc-800 htw-h-full">
+    <div
+      v-if="error"
+      class="htw-text-red-500 htw-h-full htw-p-2 htw-overflow-auto htw-font-mono htw-text-sm"
+    >
+      Error: {{ error }}
+    </div>
+
     <textarea
-      v-if="!sourceHtml"
-      class="__histoire-code-placeholder htw-w-full htw-h-full htw-p-2 htw-outline-none htw-bg-transparent"
+      v-else-if="!sourceHtml"
+      class="__histoire-code-placeholder htw-w-full htw-h-full htw-p-2 htw-outline-none htw-bg-transparent htw-resize-none htw-m-0"
       :value="sourceCode"
       readonly
     />
