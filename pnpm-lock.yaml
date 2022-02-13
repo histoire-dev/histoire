@@ -63,6 +63,7 @@ importers:
       globby: ^13.1.1
       happy-dom: ^2.31.1
       pathe: ^0.2.0
+      picocolors: ^1.0.0
       pinia: ^2.0.11
       postcss: ^8.2.4
       postcss-import: ^14.0.2
@@ -84,6 +85,7 @@ importers:
       globby: 13.1.1
       happy-dom: 2.31.1
       pathe: 0.2.0
+      picocolors: 1.0.0
       pinia: 2.0.11_typescript@4.5.5+vue@3.2.30
       sade: 1.8.1
       shiki: 0.10.0
@@ -115,9 +117,6 @@ packages:
     peerDependencies:
       '@algolia/client-search': ^4.9.1
       algoliasearch: ^4.9.1
-    peerDependenciesMeta:
-      '@algolia/client-search':
-        optional: true
     dependencies:
       '@algolia/autocomplete-shared': 1.5.2
       algoliasearch: 4.12.1
@@ -265,13 +264,6 @@ packages:
       '@types/react': '>= 16.8.0 < 18.0.0'
       react: '>= 16.8.0 < 18.0.0'
       react-dom: '>= 16.8.0 < 18.0.0'
-    peerDependenciesMeta:
-      '@types/react':
-        optional: true
-      react:
-        optional: true
-      react-dom:
-        optional: true
     dependencies:
       '@algolia/autocomplete-core': 1.5.2
       '@algolia/autocomplete-preset-algolia': 1.5.2_algoliasearch@4.12.1
@@ -1604,9 +1596,6 @@ packages:
     peerDependencies:
       eslint-plugin-import: '>=1.4.0'
       webpack: '>=1.11.0'
-    peerDependenciesMeta:
-      webpack:
-        optional: true
     dependencies:
       array-find: 1.0.0
       debug: 3.2.7

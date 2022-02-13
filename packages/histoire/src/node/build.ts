@@ -19,7 +19,10 @@ export async function build (ctx: Context) {
     ],
   })
   await server.pluginContainer.buildStart({})
-  const { executeStoryFile, destroy: destroyCollectStories } = useCollectStories(server)
+  const { executeStoryFile, destroy: destroyCollectStories } = useCollectStories({
+    server,
+    throws: true,
+  })
   for (const storyFile of ctx.storyFiles) {
     await executeStoryFile(storyFile)
   }

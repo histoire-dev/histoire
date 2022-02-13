@@ -3,12 +3,19 @@ import type { ViteDevServer } from 'vite'
 import { ViteNodeServer } from 'vite-node/server'
 import { ViteNodeRunner } from 'vite-node/client'
 import { dirname, resolve } from 'pathe'
+import pc from 'picocolors'
 import type { StoryFile, Story } from './types.js'
 import { createDomEnv } from './dom/env.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
-export function useCollectStories (server: ViteDevServer) {
+export interface UseCollectStoriesOptions {
+  server: ViteDevServer
+  throws?: boolean
+}
+
+export function useCollectStories (options: UseCollectStoriesOptions) {
+  const { server } = options
   const { destroy: destroyDomEnv } = createDomEnv()
 
   const node = new ViteNodeServer(server)
@@ -30,18 +37,25 @@ export function useCollectStories (server: ViteDevServer) {
   }
 
   async function executeStoryFile (storyFile: StoryFile) {
-    // Mount app to collect stories/variants
-    const el = window.document.createElement('div')
-    const { run } = await runner.executeFile(resolve(__dirname, '../client/server/index.js'))
-    const storyData: Story[] = []
-    await run(storyFile, storyData, el)
-    if (storyData.length === 0) {
-      console.warn(`No story found for ${storyFile.path}`)
-      return
-    } else if (storyData.length > 1) {
-      console.warn(`Multiple stories not supported: ${storyFile.path}`)
+    try {
+      // Mount app to collect stories/variants
+      const el = window.document.createElement('div')
+      const { run } = await runner.executeFile(resolve(__dirname, '../client/server/index.js'))
+      const storyData: Story[] = []
+      await run(storyFile, storyData, el)
+      if (storyData.length === 0) {
+        console.warn(pc.yellow(`No story found for ${storyFile.path}`))
+        return
+      } else if (storyData.length > 1) {
+        console.warn(pc.yellow(`Multiple stories not supported: ${storyFile.path}`))
+      }
+      storyFile.story = storyData[0]
+    } catch (e) {
+      console.error(pc.red(`Error while collecting story ${storyFile.path}:\n${e.frame ? `${pc.bold(e.message)}\n${e.frame}` : e.stack}`))
+      if (options.throws) {
+        throw e
+      }
     }
-    storyFile.story = storyData[0]
   }
 
   async function destroy () {
