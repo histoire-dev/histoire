@@ -121,5 +121,22 @@ function onClick (event) {
         </template>
       </SlotWithProps>
     </Variant>
+    <Variant
+      title="slots props (named slot)"
+    >
+      <SlotWithProps>
+        <template #named="{ foo, object, fn }">
+          <p :title="foo">
+            foo: {{ foo }}
+          </p>
+          <p :title="object.answer.toString()">
+            object.answer: {{ object.answer }}
+          </p>
+          <p :title="fn(2)">
+            fn: {{ fn(2) }}
+          </p>
+        </template>
+      </SlotWithProps>
+    </Variant>
   </Story>
 </template>
