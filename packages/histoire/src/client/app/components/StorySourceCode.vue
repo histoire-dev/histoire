@@ -60,7 +60,7 @@ const sourceHtml = computed(() => highlighter.value?.codeToHtml(sourceCode.value
 </script>
 
 <template>
-  <div class="htw-bg-zinc-100 dark:htw-bg-zinc-800 htw-h-full">
+  <div class="htw-bg-zinc-100 dark:htw-bg-zinc-800 htw-h-full htw-overflow-hidden">
     <div
       v-if="error"
       class="htw-text-red-500 htw-h-full htw-p-2 htw-overflow-auto htw-font-mono htw-text-sm"
