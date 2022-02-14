@@ -1,6 +1,6 @@
 <script lang="ts">
 import { defineComponent, inject, PropType, provide, useAttrs } from 'vue'
-import type { StoryFile, Story, Variant } from '../../node/stories'
+import type { StoryFile, Story, Variant } from '../../node/types'
 
 export default defineComponent({
   inheritAttrs: false,

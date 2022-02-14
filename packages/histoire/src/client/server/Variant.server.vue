@@ -1,12 +1,12 @@
 <script lang="ts">
 import { defineComponent, inject } from 'vue'
-import type { Story, Variant } from '../../node/stories'
+import type { Story, Variant } from '../../node/types'
 
 export default defineComponent({
   props: {
     title: {
       type: String,
-      required: true,
+      default: 'untitled',
     },
 
     id: {
