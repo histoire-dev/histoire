@@ -12,6 +12,11 @@ export default defineComponent({
       type: Function as PropType<() => any | Promise<any>>,
       default: null,
     },
+
+    source: {
+      type: String,
+      default: null,
+    },
   },
 
   setup (props) {
@@ -29,6 +34,7 @@ export default defineComponent({
           }
         },
         slots: () => vm.proxy.$slots,
+        source: props.source,
       })
     }
 

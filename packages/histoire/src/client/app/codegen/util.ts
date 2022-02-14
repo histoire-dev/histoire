@@ -4,6 +4,25 @@ export function indent (lines: string[], count = 1) {
   return lines.map(line => `${'  '.repeat(count)}${line}`)
 }
 
+export function unindent (code: string) {
+  const lines = code.split('\n')
+  let indentLevel = -1
+  let indentText: string
+  const linesToAnalyze = lines.filter(line => line.trim().length > 0)
+  for (const line of linesToAnalyze) {
+    const match = /^\s*/.exec(line)
+    if (match && (indentLevel === -1 || indentLevel > match[0].length)) {
+      indentLevel = match[0].length
+      indentText = match[0]
+    }
+  }
+  const result: string[] = []
+  for (const line of lines) {
+    result.push(line.replace(indentText, ''))
+  }
+  return result.join('\n').trim()
+}
+
 interface AutoBuildingOject {
   key: string
   cache: Record<string | symbol, AutoBuildingOject>

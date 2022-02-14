@@ -25,4 +25,5 @@ export interface Variant {
   initState?: () => any
   slots?: () => Readonly<any>
   state?: any
+  source?: string
 }

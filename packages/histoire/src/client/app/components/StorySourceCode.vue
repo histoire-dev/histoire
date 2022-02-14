@@ -4,6 +4,7 @@ import { getHighlighter, Highlighter, setCDN } from 'shiki'
 import { generateSourceCode } from '../codegen/vue3'
 import { Variant } from '../types'
 import { isDark } from '../util/dark'
+import { unindent } from '../codegen/util'
 
 const props = defineProps({
   variant: {
@@ -33,7 +34,16 @@ onMounted(async () => {
 watch(() => props.variant, async (value) => {
   error.value = null
   try {
-    sourceCode.value = await generateSourceCode(value)
+    if (value.source) {
+      sourceCode.value = value.source
+    } else if (value.slots?.().source) {
+      const source = value.slots?.().source()[0].children
+      if (source) {
+        sourceCode.value = await unindent(source)
+      }
+    } else {
+      sourceCode.value = await generateSourceCode(value)
+    }
   } catch (e) {
     console.error(e)
     error.value = e.message
