@@ -9,7 +9,9 @@ import { router } from './router'
 
 const app = createApp(App)
 app.use(createPinia())
-app.use(FloatingVue)
+app.use(FloatingVue, {
+  overflowPadding: 4,
+})
 app.use(router)
 registerGlobalComponents(app)
 app.mount('#app')
