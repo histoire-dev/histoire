@@ -3,9 +3,9 @@
 import { files as rawFiles, tree as rawTree, onUpdate } from '$histoire-stories'
 import StoryList from './components/StoryList.vue'
 import BaseSplitPane from './components/base/BaseSplitPane.vue'
-import { computed, markRaw, ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import AppHeader from './components/app/AppHeader.vue'
-import type { StoryFile, Tree, Variant } from './types'
+import type { StoryFile, Tree } from './types'
 import { useStoryStore } from './stores/story'
 import { mapFile } from './util/mapping'
 
