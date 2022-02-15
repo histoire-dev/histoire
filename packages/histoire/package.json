@@ -17,14 +17,14 @@
   "type": "module",
   "exports": {
     ".": {
-      "import": "./dist/index.js",
-      "types": "./dist/index.d.ts"
+      "import": "./dist/node/index.js",
+      "types": "./dist/node/index.d.ts"
     },
     "./*": "./*"
   },
-  "main": "./dist/index.js",
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "main": "./dist/node/index.js",
+  "module": "./dist/node/index.js",
+  "types": "./dist/node/index.d.ts",
   "bin": {
     "histoire": "./bin.mjs"
   },
@@ -38,6 +38,7 @@
     "@vueuse/core": "^7.5.5",
     "case": "^1.6.3",
     "chokidar": "^3.5.3",
+    "defu": "^5.0.1",
     "floating-vue": "^2.0.0-beta.5",
     "fs-extra": "^10.0.0",
     "globby": "^13.1.1",

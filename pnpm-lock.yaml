@@ -58,6 +58,7 @@ importers:
       case: ^1.6.3
       chokidar: ^3.5.3
       concurrently: ^7.0.0
+      defu: ^5.0.1
       floating-vue: ^2.0.0-beta.5
       fs-extra: ^10.0.0
       globby: ^13.1.1
@@ -80,6 +81,7 @@ importers:
       '@vueuse/core': 7.5.5_vue@3.2.30
       case: 1.6.3
       chokidar: 3.5.3
+      defu: 5.0.1
       floating-vue: 2.0.0-beta.5_vue@3.2.30
       fs-extra: 10.0.0
       globby: 13.1.1
@@ -117,6 +119,9 @@ packages:
     peerDependencies:
       '@algolia/client-search': ^4.9.1
       algoliasearch: ^4.9.1
+    peerDependenciesMeta:
+      '@algolia/client-search':
+        optional: true
     dependencies:
       '@algolia/autocomplete-shared': 1.5.2
       algoliasearch: 4.12.1
@@ -264,6 +269,13 @@ packages:
       '@types/react': '>= 16.8.0 < 18.0.0'
       react: '>= 16.8.0 < 18.0.0'
       react-dom: '>= 16.8.0 < 18.0.0'
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
+      react:
+        optional: true
+      react-dom:
+        optional: true
     dependencies:
       '@algolia/autocomplete-core': 1.5.2
       '@algolia/autocomplete-preset-algolia': 1.5.2_algoliasearch@4.12.1
@@ -1304,6 +1316,10 @@ packages:
     resolution: {integrity: sha1-yY2bzvdWdBiOEQlpFRGZ45sfppM=}
     dev: true
 
+  /defu/5.0.1:
+    resolution: {integrity: sha512-EPS1carKg+dkEVy3qNTqIdp2qV7mUP08nIsupfwQpz++slCVRw7qbQyWvSTig+kFPwz2XXp5/kIIkH+CwrJKkQ==}
+    dev: false
+
   /delayed-stream/1.0.0:
     resolution: {integrity: sha1-3zrhmayt+31ECqrgsp4icrJOxhk=}
     engines: {node: '>=0.4.0'}
@@ -1596,6 +1612,9 @@ packages:
     peerDependencies:
       eslint-plugin-import: '>=1.4.0'
       webpack: '>=1.11.0'
+    peerDependenciesMeta:
+      webpack:
+        optional: true
     dependencies:
       array-find: 1.0.0
       debug: 3.2.7
