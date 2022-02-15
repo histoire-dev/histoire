@@ -1,21 +1,23 @@
 <script lang="ts" setup>
 // @ts-expect-error virtual module
-import { files as rawFiles, onUpdate, tree } from '$histoire-stories'
+import { files as rawFiles, tree as rawTree, onUpdate } from '$histoire-stories'
 import StoryList from './components/StoryList.vue'
 import BaseSplitPane from './components/base/BaseSplitPane.vue'
 import { computed, markRaw, ref, watch } from 'vue'
 import AppHeader from './components/app/AppHeader.vue'
-import type { StoryFile, Variant } from './types'
+import type { StoryFile, Tree, Variant } from './types'
 import { useStoryStore } from './stores/story'
 import { mapFile } from './util/mapping'
 
 const files = ref<StoryFile[]>(rawFiles.map(file => mapFile(file)))
+const tree = ref<Tree>(rawTree)
 
-onUpdate((newValue: StoryFile[]) => {
-  files.value = newValue.map(file => {
+onUpdate((newFiles: StoryFile[], newTree: Tree) => {
+  files.value = newFiles.map(file => {
     const existingFile = files.value.find(f => f.id === file.id)
     return mapFile(file, existingFile)
   })
+  tree.value = newTree
 })
 
 const stories = computed(() => files.value.reduce((acc, file) => {

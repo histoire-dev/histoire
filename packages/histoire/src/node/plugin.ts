@@ -66,8 +66,9 @@ export function onUpdate (cb) {
 if (import.meta.hot) {
   import.meta.hot.accept(newModule => {
     files = newModule.files
+    tree = newModule.tree
     handlers.forEach(h => {
-      h(newModule.files)
+      h(newModule.files, newModule.tree)
       newModule.onUpdate(h)
     })
   })
