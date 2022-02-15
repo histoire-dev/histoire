@@ -18,10 +18,6 @@ function toggleOpen () {
   isFolderOpen.value = !isFolderOpen.value
 }
 
-const carbonIcon = computed(() => {
-  return isFolderOpen.value ? 'carbon:folder-open' : 'carbon:folder'
-})
-
 const folderPadding = computed(() => {
   return (props.depth * 16) + 'px'
 })
@@ -30,15 +26,24 @@ const folderPadding = computed(() => {
 <template>
   <div class="toast">
     <div
-      class="htw-px-4 htw-py-2 hover:htw-bg-primary-100 dark:hover:htw-bg-primary-900 htw-cursor-pointer"
+      class="htw-px-0.5 htw-py-2 hover:htw-bg-primary-100 dark:hover:htw-bg-primary-900 htw-cursor-pointer"
       @click="toggleOpen"
     >
-      <span class="folder-padding htw-flex htw-items-center htw-gap-2">
-        <Icon
-          :icon="carbonIcon"
-          class="htw-w-6 htw-h-6"
-        />
-        {{ folder.title }}
+      <span class="bind-tree-padding htw-flex htw-items-center htw-gap-2">
+        <span class="htw-flex htw-gap-1">
+          <Icon
+            icon="carbon:caret-right"
+            class="htw-w-4 htw-h-4 htw-transition-transform htw-duration-150 htw-opacity-30"
+            :class="{
+              'htw-rotate-90': isFolderOpen,
+            }"
+          />
+          <Icon
+            icon="carbon:folder"
+            class="htw-w-4 htw-h-4"
+          />
+        </span>
+        <span>{{ folder.title }}</span>
       </span>
     </div>
     <div
@@ -65,7 +70,7 @@ const folderPadding = computed(() => {
 </template>
 
 <style scoped>
-.folder-padding {
-    padding-left: v-bind(folderPadding);
+.bind-tree-padding {
+  padding-left: v-bind(folderPadding);
 }
 </style>
