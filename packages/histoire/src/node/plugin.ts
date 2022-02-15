@@ -3,6 +3,7 @@ import { defineConfig, mergeConfig, Plugin } from 'vite'
 import { APP_PATH, DIST_CLIENT_PATH } from './alias.js'
 import { Context } from './context.js'
 import { notifyStoryChange } from './stories.js'
+import { makeTree } from './tree.js'
 
 export const STORIES_ID = '$histoire-stories'
 export const RESOLVED_STORIES_ID = `/${STORIES_ID}-resolved`
@@ -57,6 +58,7 @@ export async function createVitePlugins (ctx: Context): Promise<Plugin[]> {
         return `import { defineAsyncComponent } from 'vue'
 ${resolvedStories.map((file, index) => `const Comp${index} = defineAsyncComponent(() => import('${file.path}'))`).join('\n')}
 export let files = [${files.map((file) => `{${JSON.stringify(file).slice(1, -1)}, component: Comp${file.index}}`).join(',\n')}]
+export let tree = ${JSON.stringify(makeTree(ctx.config, files))}
 const handlers = []
 export function onUpdate (cb) {
   handlers.push(cb)

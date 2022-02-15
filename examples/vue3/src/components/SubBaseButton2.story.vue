@@ -10,7 +10,7 @@ function initState () {
 
 <template>
   <Story
-    title="BaseButton"
+    title="Buttons/BaseButton2"
     :layout="{
       type: 'grid',
       width: 200,

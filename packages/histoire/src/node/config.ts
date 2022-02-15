@@ -5,11 +5,7 @@ import { createServer } from 'vite'
 import { ViteNodeServer } from 'vite-node/server'
 import { ViteNodeRunner } from 'vite-node/client'
 import pc from 'picocolors'
-
-export type TFile = {
-  title: string
-  path: string
-}
+import { TFile } from './tree.js'
 
 export interface HistoireConfig {
   sourceDir: string

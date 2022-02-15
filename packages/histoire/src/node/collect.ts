@@ -6,8 +6,8 @@ import { dirname, resolve } from 'pathe'
 import pc from 'picocolors'
 import type { StoryFile, Story } from './types.js'
 import { createDomEnv } from './dom/env.js'
-import { createPath } from './tree.js'
-import { HistoireConfig, TFile } from './config.js'
+import { createPath, TFile } from './tree.js'
+import { HistoireConfig } from './config.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 

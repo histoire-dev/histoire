@@ -10,7 +10,7 @@ function initState () {
 
 <template>
   <Story
-    title="SlashBaseButton"
+    title="BaseButton"
     :layout="{
       type: 'grid',
       width: 200,
