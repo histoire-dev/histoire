@@ -29,10 +29,12 @@ export interface Story {
     width: number
   }
   icon?: string
+  iconColor?: string
 }
 
 export interface Variant {
   id: string
   title: string
   icon?: string
+  iconColor?: string
 }

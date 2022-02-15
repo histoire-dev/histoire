@@ -18,6 +18,11 @@ export default defineComponent({
       type: String,
       default: null,
     },
+
+    iconColor: {
+      type: String,
+      default: null,
+    },
   },
 
   setup (props) {
@@ -31,6 +36,7 @@ export default defineComponent({
       id: props.id ?? generateId(),
       title: props.title,
       icon: props.icon,
+      iconColor: props.iconColor,
     }
 
     const addVariant = inject('addVariant') as (variant: Variant) => void

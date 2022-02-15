@@ -20,6 +20,11 @@ export default defineComponent({
       type: String,
       default: null,
     },
+
+    iconColor: {
+      type: String,
+      default: null,
+    },
   },
 
   setup (props) {
@@ -34,6 +39,7 @@ export default defineComponent({
       title: props.title,
       layout: props.layout,
       icon: props.icon,
+      iconColor: props.iconColor,
       variants: [],
     }
     const addStory = inject('addStory', null)

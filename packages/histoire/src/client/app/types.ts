@@ -16,6 +16,7 @@ export interface Story {
     width: number
   }
   icon?: string
+  iconColor?: string
   file?: StoryFile
   lastSelectedVariant?: Variant
 }
@@ -24,6 +25,7 @@ export interface Variant {
   id: string
   title: string
   icon?: string
+  iconColor?: string
   initState?: () => any
   slots?: () => Readonly<any>
   state?: any

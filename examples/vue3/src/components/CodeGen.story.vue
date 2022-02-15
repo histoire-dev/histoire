@@ -31,6 +31,7 @@ function onClick (event) {
   <Story
     title="Code gen"
     icon="carbon:code"
+    icon-color="#8B5CF6"
   >
     <Variant
       title="props"
@@ -67,6 +68,7 @@ function onClick (event) {
     <Variant
       title="v-model input"
       icon="carbon:text-selection"
+      icon-color="#EAB308"
       :init-state="initState"
     >
       <template #default="{ state }">

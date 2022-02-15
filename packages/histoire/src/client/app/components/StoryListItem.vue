@@ -14,6 +14,8 @@ const props = withDefaults(defineProps<{
 const filePadding = computed(() => {
   return (props.depth * 16) + 'px'
 })
+
+const iconColor = computed(() => props.story.iconColor)
 </script>
 
 <template>
@@ -33,7 +35,8 @@ const filePadding = computed(() => {
           :icon="story.icon ?? 'carbon:cube'"
           class="base-list-item-link-icon htw-w-5 htw-h-5"
           :class="{
-            'htw-text-primary-500': !active,
+            'htw-text-primary-500': !active && !story.iconColor,
+            'bind-icon-color': !active && story.iconColor,
           }"
         />
         <span>{{ story.title }}</span>
@@ -49,5 +52,9 @@ const filePadding = computed(() => {
 <style scoped>
 .bind-tree-margin {
   margin-left: v-bind(filePadding);
+}
+
+.bind-icon-color {
+  color: v-bind(iconColor);
 }
 </style>

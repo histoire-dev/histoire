@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { PropType, toRefs } from 'vue'
+import { computed, PropType, toRefs } from 'vue'
 import { useCurrentVariantRoute } from '../composable/variant'
 import { Variant } from '../types'
 import BaseListItemLink from './base/BaseListItemLink.vue'
@@ -14,6 +14,8 @@ const props = defineProps({
 
 const { variant } = toRefs(props)
 const { isActive, targetRoute } = useCurrentVariantRoute(variant)
+
+const iconColor = computed(() => props.variant.iconColor)
 </script>
 
 <template>
@@ -28,10 +30,17 @@ const { isActive, targetRoute } = useCurrentVariantRoute(variant)
         :icon="variant.icon ?? 'carbon:cube'"
         class="base-list-item-link-icon htw-w-5 htw-h-5"
         :class="{
-          'htw-text-zinc-500': !active,
+          'htw-text-zinc-500': !active && !variant.iconColor,
+          'bind-icon-color': !active && variant.iconColor,
         }"
       />
       <span>{{ variant.title }}</span>
     </BaseListItemLink>
   </div>
 </template>
+
+<style scoped>
+.bind-icon-color {
+  color: v-bind(iconColor);
+}
+</style>
