@@ -1,22 +1,28 @@
 <script lang="ts" setup>
-import { PropType } from 'vue'
-import { Story } from '../types'
+import { Story, TTree } from '../types'
 import StoryListItem from './StoryListItem.vue'
 
-const props = defineProps({
-  stories: {
-    type: Array as PropType<Story[]>,
-    required: true,
-  },
-})
+const props = defineProps<{
+  tree: TTree
+  stories: Story[]
+}>()
 </script>
 
 <template>
   <div class="htw-overflow-y-auto">
-    <StoryListItem
-      v-for="story of stories"
-      :key="story.id"
-      :story="story"
-    />
+    <template
+      v-for="( element, key,) of tree"
+      :key="key"
+    >
+      <StoryListItem
+        v-if="element.index"
+        :story="stories[element.index]"
+      />
+      <StoryList
+        v-else
+        :tree="element.children"
+        :stories="stories"
+      />
+    </template>
   </div>
 </template>

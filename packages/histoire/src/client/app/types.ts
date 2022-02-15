@@ -27,3 +27,15 @@ export interface Variant {
   state?: any
   source?: string
 }
+
+export type TLeaf = {
+  title: string
+  index: number
+}
+
+export type TFolder = {
+  title: string
+  children: (TFolder | TLeaf)[]
+}
+
+export type TTree = (TFolder | TLeaf)[]

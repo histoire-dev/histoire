@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 // @ts-expect-error virtual module
-import { files as rawFiles, onUpdate } from '$histoire-stories'
+import { files as rawFiles, onUpdate, tree } from '$histoire-stories'
 import StoryList from './components/StoryList.vue'
 import BaseSplitPane from './components/base/BaseSplitPane.vue'
 import { computed, markRaw, ref, watch } from 'vue'
@@ -58,6 +58,7 @@ watch(stories, value => {
             class="htw-flex-none"
           />
           <StoryList
+            :tree="tree"
             :stories="stories"
             class="htw-flex-1"
           />
