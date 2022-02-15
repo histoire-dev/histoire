@@ -1,10 +1,10 @@
 <script lang="ts" setup>
-import { Story, TTree } from '../types'
+import { Story, Tree } from '../types'
 import StoryListItem from './StoryListItem.vue'
 import StoryListFolder from './StoryListFolder.vue'
 
 const props = defineProps<{
-  tree: TTree
+  tree: Tree
   stories: Story[]
 }>()
 </script>

@@ -15,7 +15,7 @@ export type TreeFolder = {
   children: (TreeFolder | TreeLeaf)[]
 }
 
-export type TTree = (TreeFolder | TreeLeaf)[]
+export type Tree = (TreeFolder | TreeLeaf)[]
 
 export function createPath (config: HistoireConfig, file: TreeFile) {
   if (config.tree.file === 'title') {
@@ -64,8 +64,8 @@ export function makeTree (config: HistoireConfig, files: { path: string[], index
     }, tree)
   }
 
-  function buildTree (treeObject: ITreeObject): TTree {
-    const tree: TTree = []
+  function buildTree (treeObject: ITreeObject): Tree {
+    const tree: Tree = []
 
     for (const [key, element] of Object.entries(treeObject)) {
       if (Number.isInteger(element)) {

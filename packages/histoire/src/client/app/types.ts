@@ -38,4 +38,4 @@ export type TreeFolder = {
   children: (TreeFolder | TreeLeaf)[]
 }
 
-export type TTree = (TreeFolder | TreeLeaf)[]
+export type Tree = (TreeFolder | TreeLeaf)[]
