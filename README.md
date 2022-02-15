@@ -29,6 +29,12 @@
 
 ## Quick Start
 
+```bash
+pnpm i -D histoire
+pnpm exec histoire dev
+pnpm exec histoire build
+```
+
 ### Vue 3
 
 In your Vite project, create a `MyComponent.story.vue` file inside your `src` directory:
