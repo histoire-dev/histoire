@@ -29,6 +29,8 @@ export default defineComponent({
           : 'hover:htw-bg-primary-100 dark:hover:htw-bg-primary-900'
       ]"
       @click="navigate"
+      @keyup.enter="navigate"
+      @keyup.space="navigate"
     >
       <slot
         :active="isActive != null ? isActive : linkIsActive"

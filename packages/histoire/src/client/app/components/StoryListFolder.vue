@@ -26,8 +26,12 @@ const folderPadding = computed(() => {
 <template>
   <div class="toast">
     <div
+      role="button"
+      tabindex="0"
       class="htw-px-0.5 htw-py-2 hover:htw-bg-primary-100 dark:hover:htw-bg-primary-900 htw-cursor-pointer"
       @click="toggleOpen"
+      @keyup.enter="toggleOpen"
+      @keyup.space="toggleOpen"
     >
       <span class="bind-tree-padding htw-flex htw-items-center htw-gap-2">
         <span class="htw-flex htw-gap-1">
