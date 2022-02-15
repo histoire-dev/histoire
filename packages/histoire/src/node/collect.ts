@@ -7,7 +7,6 @@ import pc from 'picocolors'
 import type { StoryFile, Story } from './types.js'
 import { createDomEnv } from './dom/env.js'
 import { createPath, TreeFile } from './tree.js'
-import type { HistoireConfig } from './config.js'
 import type { Context } from './context.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
