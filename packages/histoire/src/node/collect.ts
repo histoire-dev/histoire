@@ -7,17 +7,17 @@ import pc from 'picocolors'
 import type { StoryFile, Story } from './types.js'
 import { createDomEnv } from './dom/env.js'
 import { createPath, TFile } from './tree.js'
-import { HistoireConfig } from './config.js'
+import type { HistoireConfig } from './config.js'
+import type { Context } from './context.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
 export interface UseCollectStoriesOptions {
   server: ViteDevServer
   throws?: boolean
-  config: HistoireConfig
 }
 
-export function useCollectStories (options: UseCollectStoriesOptions) {
+export function useCollectStories (options: UseCollectStoriesOptions, ctx: Context) {
   const { server } = options
   const { destroy: destroyDomEnv } = createDomEnv()
 
@@ -55,9 +55,9 @@ export function useCollectStories (options: UseCollectStoriesOptions) {
       storyFile.story = storyData[0]
       const file:TFile = {
         title: storyData[0].title,
-        path: relative(options.config.sourceDir, storyFile.path),
+        path: relative(ctx.config.sourceDir, storyFile.path),
       }
-      storyFile.treePath = createPath(options.config, file)
+      storyFile.treePath = createPath(ctx.config, file)
       storyFile.story.title = storyFile.treePath[storyFile.treePath.length - 1]
     } catch (e) {
       console.error(pc.red(`Error while collecting story ${storyFile.path}:\n${e.frame ? `${pc.bold(e.message)}\n${e.frame}` : e.stack}`))

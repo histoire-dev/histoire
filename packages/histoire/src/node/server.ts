@@ -27,8 +27,7 @@ export async function createServer (ctx: Context, port: number) {
     destroy: destroyCollectStories,
   } = useCollectStories({
     server,
-    config: ctx.config,
-  })
+  }, ctx)
 
   // onStoryChange debouncing
   let queue: Promise<void>
