@@ -15,6 +15,7 @@ export interface Story {
     type: 'grid'
     width: number
   }
+  icon?: string
   file?: StoryFile
   lastSelectedVariant?: Variant
 }
@@ -22,6 +23,7 @@ export interface Story {
 export interface Variant {
   id: string
   title: string
+  icon?: string
   initState?: () => any
   slots?: () => Readonly<any>
   state?: any

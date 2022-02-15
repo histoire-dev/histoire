@@ -15,6 +15,11 @@ export default defineComponent({
       type: Object as PropType<Story['layout']>,
       default: () => ({ type: 'single' }),
     },
+
+    icon: {
+      type: String,
+      default: null,
+    },
   },
 
   setup (props) {
@@ -28,6 +33,7 @@ export default defineComponent({
       id: attrs.data.id,
       title: props.title,
       layout: props.layout,
+      icon: props.icon,
       variants: [],
     }
     const addStory = inject('addStory', null)

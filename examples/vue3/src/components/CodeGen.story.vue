@@ -30,6 +30,7 @@ function onClick (event) {
 <template>
   <Story
     title="Code gen"
+    icon="carbon:code"
   >
     <Variant
       title="props"
@@ -54,6 +55,7 @@ function onClick (event) {
     </Variant>
     <Variant
       title="click event"
+      icon="carbon:cursor-1"
     >
       <button @click="onClick">
         Click me
@@ -64,6 +66,7 @@ function onClick (event) {
     </Variant>
     <Variant
       title="v-model input"
+      icon="carbon:text-selection"
       :init-state="initState"
     >
       <template #default="{ state }">

@@ -30,8 +30,8 @@ const filePadding = computed(() => {
     >
       <span class="bind-tree-margin htw-flex htw-items-center htw-gap-2 htw-pl-5">
         <Icon
-          icon="carbon:cube"
-          class="base-list-item-link-icon htw-w-4 htw-h-4"
+          :icon="story.icon ?? 'carbon:cube'"
+          class="base-list-item-link-icon htw-w-5 htw-h-5"
           :class="{
             'htw-text-primary-500': !active,
           }"

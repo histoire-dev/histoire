@@ -28,9 +28,11 @@ export interface Story {
     type: 'grid'
     width: number
   }
+  icon?: string
 }
 
 export interface Variant {
   id: string
   title: string
+  icon?: string
 }

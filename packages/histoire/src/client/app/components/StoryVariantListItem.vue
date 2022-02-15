@@ -25,8 +25,8 @@ const { isActive, targetRoute } = useCurrentVariantRoute(variant)
       class="htw-px-4 htw-py-2 htw-flex htw-items-center htw-gap-2"
     >
       <Icon
-        icon="carbon:cube"
-        class="base-list-item-link-icon htw-w-4 htw-h-4"
+        :icon="variant.icon ?? 'carbon:cube'"
+        class="base-list-item-link-icon htw-w-5 htw-h-5"
         :class="{
           'htw-text-zinc-500': !active,
         }"
