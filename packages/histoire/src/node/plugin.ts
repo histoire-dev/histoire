@@ -45,9 +45,18 @@ export async function createVitePlugins (ctx: Context): Promise<Plugin[]> {
     load (id) {
       if (id === RESOLVED_STORIES_ID) {
         const resolvedStories = ctx.storyFiles.filter(s => !!s.story)
+        const files = resolvedStories.map((file, index) => {
+          return {
+            id: file.id,
+            path: file.treePath,
+            story: file.story,
+            framework: 'vue3',
+            index,
+          }
+        })
         return `import { defineAsyncComponent } from 'vue'
 ${resolvedStories.map((file, index) => `const Comp${index} = defineAsyncComponent(() => import('${file.path}'))`).join('\n')}
-export let files = [${resolvedStories.map((file, index) => `{ id: '${file.id}', story: ${JSON.stringify(file.story)}, component: Comp${index}, framework: 'vue3' }`).join(',\n')}]
+export let files = [${files.map((file) => `{${JSON.stringify(file).slice(1, -1)}, component: Comp${file.index}}`).join(',\n')}]
 const handlers = []
 export function onUpdate (cb) {
   handlers.push(cb)

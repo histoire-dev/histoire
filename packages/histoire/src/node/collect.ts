@@ -6,12 +6,15 @@ import { dirname, resolve } from 'pathe'
 import pc from 'picocolors'
 import type { StoryFile, Story } from './types.js'
 import { createDomEnv } from './dom/env.js'
+import { createPath } from './tree.js'
+import { HistoireConfig, TFile } from './config.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
 export interface UseCollectStoriesOptions {
   server: ViteDevServer
   throws?: boolean
+  config: HistoireConfig
 }
 
 export function useCollectStories (options: UseCollectStoriesOptions) {
@@ -50,6 +53,11 @@ export function useCollectStories (options: UseCollectStoriesOptions) {
         console.warn(pc.yellow(`Multiple stories not supported: ${storyFile.path}`))
       }
       storyFile.story = storyData[0]
+      const file:TFile = {
+        title: storyData[0].title,
+        path: storyFile.path,
+      }
+      storyFile.treePath = createPath(options.config, file)
     } catch (e) {
       console.error(pc.red(`Error while collecting story ${storyFile.path}:\n${e.frame ? `${pc.bold(e.message)}\n${e.frame}` : e.stack}`))
       if (options.throws) {

@@ -5,6 +5,10 @@ export interface StoryFile {
    */
   path: string
   /**
+   * Generated path for tree UI
+   */
+  treePath?: string[]
+  /**
    * Use the module id in imports to allow HMR
    */
   moduleId: string

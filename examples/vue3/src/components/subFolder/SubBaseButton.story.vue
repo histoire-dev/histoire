@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import BaseButton from './BaseButton.vue'
+import BaseButton from '../BaseButton.vue'
 
 function initState () {
   return {
@@ -10,7 +10,7 @@ function initState () {
 
 <template>
   <Story
-    title="SlashBaseButton"
+    title="Sub/BaseButton"
     :layout="{
       type: 'grid',
       width: 200,

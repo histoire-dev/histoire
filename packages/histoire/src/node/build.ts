@@ -22,6 +22,7 @@ export async function build (ctx: Context) {
   const { executeStoryFile, destroy: destroyCollectStories } = useCollectStories({
     server,
     throws: true,
+    config: ctx.config,
   })
   for (const storyFile of ctx.storyFiles) {
     await executeStoryFile(storyFile)

@@ -27,6 +27,7 @@ export async function createServer (ctx: Context, port: number) {
     destroy: destroyCollectStories,
   } = useCollectStories({
     server,
+    config: ctx.config,
   })
 
   // onStoryChange debouncing
