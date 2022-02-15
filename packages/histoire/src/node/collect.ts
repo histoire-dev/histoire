@@ -6,7 +6,7 @@ import { dirname, resolve, relative } from 'pathe'
 import pc from 'picocolors'
 import type { StoryFile, Story } from './types.js'
 import { createDomEnv } from './dom/env.js'
-import { createPath, TFile } from './tree.js'
+import { createPath, TreeFile } from './tree.js'
 import type { HistoireConfig } from './config.js'
 import type { Context } from './context.js'
 
@@ -53,7 +53,7 @@ export function useCollectStories (options: UseCollectStoriesOptions, ctx: Conte
         console.warn(pc.yellow(`Multiple stories not supported: ${storyFile.path}`))
       }
       storyFile.story = storyData[0]
-      const file:TFile = {
+      const file:TreeFile = {
         title: storyData[0].title,
         path: relative(ctx.config.sourceDir, storyFile.path),
       }

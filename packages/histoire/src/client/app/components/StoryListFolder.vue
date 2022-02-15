@@ -1,11 +1,11 @@
 <script lang="ts" setup>
-import { Story, TFolder } from '../types'
+import { Story, TreeFolder } from '../types'
 import StoryListItem from './StoryListItem.vue'
 import { Icon } from '@iconify/vue'
 import { computed, ref, withDefaults } from 'vue'
 
 const props = withDefaults(defineProps<{
-  folder: TFolder
+  folder: TreeFolder
   stories: Story[]
   depth?: number
 }>(), {

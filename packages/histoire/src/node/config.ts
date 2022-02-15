@@ -5,14 +5,14 @@ import { createServer } from 'vite'
 import { ViteNodeServer } from 'vite-node/server'
 import { ViteNodeRunner } from 'vite-node/client'
 import pc from 'picocolors'
-import { TFile } from './tree.js'
+import { TreeFile } from './tree.js'
 
 export interface HistoireConfig {
   sourceDir: string
   outDir: string
   storyMatch: string[]
   tree: {
-    file?: 'title' | 'path' | ((file: TFile) => string[])
+    file?: 'title' | 'path' | ((file: TreeFile) => string[])
     order?: 'asc' | ((a: string, b: string) => number)
   }
 }

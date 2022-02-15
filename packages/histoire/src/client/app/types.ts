@@ -28,14 +28,14 @@ export interface Variant {
   source?: string
 }
 
-export type TLeaf = {
+export type TreeLeaf = {
   title: string
   index: number
 }
 
-export type TFolder = {
+export type TreeFolder = {
   title: string
-  children: (TFolder | TLeaf)[]
+  children: (TreeFolder | TreeLeaf)[]
 }
 
-export type TTree = (TFolder | TLeaf)[]
+export type TTree = (TreeFolder | TreeLeaf)[]

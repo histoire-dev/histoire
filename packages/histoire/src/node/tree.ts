@@ -1,23 +1,23 @@
 import { HistoireConfig } from './config.js'
 
-export type TFile = {
+export type TreeFile = {
   title: string
   path: string
 }
 
-export type TLeaf = {
+export type TreeLeaf = {
   title: string
   index: number
 }
 
-export type TFolder = {
+export type TreeFolder = {
   title: string
-  children: (TFolder | TLeaf)[]
+  children: (TreeFolder | TreeLeaf)[]
 }
 
-export type TTree = (TFolder | TLeaf)[]
+export type TTree = (TreeFolder | TreeLeaf)[]
 
-export function createPath (config: HistoireConfig, file: TFile) {
+export function createPath (config: HistoireConfig, file: TreeFile) {
   if (config.tree.file === 'title') {
     return file.title.split('/')
   }
