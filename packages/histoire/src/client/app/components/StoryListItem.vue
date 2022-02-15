@@ -1,13 +1,17 @@
 <script lang="ts" setup>
-import { PropType } from 'vue'
 import { Story } from '../types'
 import BaseListItemLink from './base/BaseListItemLink.vue'
+import { computed, withDefaults } from 'vue'
 
-defineProps({
-  story: {
-    type: Object as PropType<Story>,
-    required: true,
-  },
+const props = withDefaults(defineProps<{
+  story: Story
+  depth?: number
+}>(), {
+  depth: 0,
+})
+
+const filePadding = computed(() => {
+  return (props.depth * 16) + 'px'
 })
 </script>
 
@@ -21,7 +25,9 @@ defineProps({
         },
       }"
     >
-      <span>
+      <span
+        class="file-padding"
+      >
         {{ story.title }}
       </span>
 
@@ -31,3 +37,9 @@ defineProps({
     </BaseListItemLink>
   </div>
 </template>
+
+<style scoped>
+.file-padding {
+    padding-left: v-bind(filePadding);
+}
+</style>

@@ -23,7 +23,10 @@ export function createPath (config: HistoireConfig, file: TFile) {
   }
 
   if (config.tree.file === 'path') {
-    return file.path.split('/')
+    const path = file.path.split('/')
+    path.pop()
+    path.push(file.title)
+    return path
   }
 
   return config.tree.file(file)

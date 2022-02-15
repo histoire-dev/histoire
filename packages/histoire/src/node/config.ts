@@ -12,8 +12,8 @@ export interface HistoireConfig {
   outDir: string
   storyMatch: string[]
   tree: {
-    file: 'title' | 'path' | ((file: TFile) => string[])
-    order: 'asc' | ((name: string) => number)
+    file?: 'title' | 'path' | ((file: TFile) => string[])
+    order?: 'asc' | ((a: string, b: string) => number)
   }
 }
 

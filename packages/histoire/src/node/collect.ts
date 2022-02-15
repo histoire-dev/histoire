@@ -2,7 +2,7 @@ import { fileURLToPath } from 'url'
 import type { ViteDevServer } from 'vite'
 import { ViteNodeServer } from 'vite-node/server'
 import { ViteNodeRunner } from 'vite-node/client'
-import { dirname, resolve } from 'pathe'
+import { dirname, resolve, relative } from 'pathe'
 import pc from 'picocolors'
 import type { StoryFile, Story } from './types.js'
 import { createDomEnv } from './dom/env.js'
@@ -55,9 +55,10 @@ export function useCollectStories (options: UseCollectStoriesOptions) {
       storyFile.story = storyData[0]
       const file:TFile = {
         title: storyData[0].title,
-        path: storyFile.path,
+        path: relative(options.config.sourceDir, storyFile.path),
       }
       storyFile.treePath = createPath(options.config, file)
+      storyFile.story.title = storyFile.treePath[storyFile.treePath.length - 1]
     } catch (e) {
       console.error(pc.red(`Error while collecting story ${storyFile.path}:\n${e.frame ? `${pc.bold(e.message)}\n${e.frame}` : e.stack}`))
       if (options.throws) {
