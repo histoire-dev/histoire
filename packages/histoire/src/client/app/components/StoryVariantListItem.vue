@@ -20,6 +20,7 @@ const { isActive, targetRoute } = useCurrentVariantRoute(variant)
     <BaseListItemLink
       :to="targetRoute"
       :is-active="isActive"
+      class="htw-px-4 htw-py-2"
     >
       {{ variant.title }}
     </BaseListItemLink>

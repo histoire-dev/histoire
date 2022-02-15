@@ -27,3 +27,15 @@ export interface Variant {
   state?: any
   source?: string
 }
+
+export type TreeLeaf = {
+  title: string
+  index: number
+}
+
+export type TreeFolder = {
+  title: string
+  children: (TreeFolder | TreeLeaf)[]
+}
+
+export type Tree = (TreeFolder | TreeLeaf)[]

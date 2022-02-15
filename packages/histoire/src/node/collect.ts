@@ -2,10 +2,12 @@ import { fileURLToPath } from 'url'
 import type { ViteDevServer } from 'vite'
 import { ViteNodeServer } from 'vite-node/server'
 import { ViteNodeRunner } from 'vite-node/client'
-import { dirname, resolve } from 'pathe'
+import { dirname, resolve, relative } from 'pathe'
 import pc from 'picocolors'
 import type { StoryFile, Story } from './types.js'
 import { createDomEnv } from './dom/env.js'
+import { createPath, TreeFile } from './tree.js'
+import type { Context } from './context.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
@@ -14,7 +16,7 @@ export interface UseCollectStoriesOptions {
   throws?: boolean
 }
 
-export function useCollectStories (options: UseCollectStoriesOptions) {
+export function useCollectStories (options: UseCollectStoriesOptions, ctx: Context) {
   const { server } = options
   const { destroy: destroyDomEnv } = createDomEnv()
 
@@ -50,6 +52,12 @@ export function useCollectStories (options: UseCollectStoriesOptions) {
         console.warn(pc.yellow(`Multiple stories not supported: ${storyFile.path}`))
       }
       storyFile.story = storyData[0]
+      const file:TreeFile = {
+        title: storyData[0].title,
+        path: relative(ctx.config.sourceDir, storyFile.path),
+      }
+      storyFile.treePath = createPath(ctx.config, file)
+      storyFile.story.title = storyFile.treePath[storyFile.treePath.length - 1]
     } catch (e) {
       console.error(pc.red(`Error while collecting story ${storyFile.path}:\n${e.frame ? `${pc.bold(e.message)}\n${e.frame}` : e.stack}`))
       if (options.throws) {

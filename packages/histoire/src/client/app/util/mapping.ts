@@ -7,6 +7,7 @@ export function mapFile (file: StoryFile, existingFile?: StoryFile): StoryFile {
     component: markRaw(file.component),
     story: {
       ...file.story,
+      title: file.story.title,
       file: markRaw(file),
       variants: file.story.variants.map(v => mapVariant(v)),
     },

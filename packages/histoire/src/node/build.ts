@@ -22,7 +22,7 @@ export async function build (ctx: Context) {
   const { executeStoryFile, destroy: destroyCollectStories } = useCollectStories({
     server,
     throws: true,
-  })
+  }, ctx)
   for (const storyFile of ctx.storyFiles) {
     await executeStoryFile(storyFile)
   }
