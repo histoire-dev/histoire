@@ -25,9 +25,7 @@ const filePadding = computed(() => {
         },
       }"
     >
-      <span
-        class="file-padding"
-      >
+      <span class="file-padding">
         {{ story.title }}
       </span>
 
