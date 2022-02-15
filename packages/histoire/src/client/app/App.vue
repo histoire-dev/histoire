@@ -55,7 +55,7 @@ watch(stories, value => {
       class="htw-h-full"
     >
       <template #first>
-        <div class="htw-flex htw-flex-col htw-divide-zinc-200 dark:htw-divide-zinc-850 htw-divide-y htw-h-full">
+        <div class="htw-flex htw-flex-col htw-h-full htw-gap-2">
           <AppHeader
             class="htw-flex-none"
           />
