@@ -41,7 +41,10 @@ function initState () {
       </template>
     </Variant>
 
-    <Variant title="big green button">
+    <Variant
+      title="big green button"
+      icon="el:resize-full"
+    >
       <BaseButton
         color="green"
         size="big"
@@ -50,7 +53,10 @@ function initState () {
       </BaseButton>
     </Variant>
 
-    <Variant title="small red button">
+    <Variant
+      title="small red button"
+      icon-color="#F43F5E"
+    >
       <BaseButton
         color="red"
         size="small"
