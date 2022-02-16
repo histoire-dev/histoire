@@ -1,9 +1,10 @@
 <script lang="ts" setup>
 import { useEventListener } from '@vueuse/core'
-import { PropType, ref, watch, toRaw } from 'vue'
+import { PropType, ref, watch, toRaw, computed } from 'vue'
 import { Story, Variant } from '../types'
 import { STATE_SYNC } from '../util/const.js'
 import BaseSplitPane from './base/BaseSplitPane.vue'
+import { isDark } from '../util/dark'
 
 const props = defineProps({
   variant: {
@@ -40,6 +41,18 @@ useEventListener(window, 'message', (event) => {
     Object.assign(props.variant.state, event.data.state)
   }
 })
+
+const sandboxUrl = computed(() => {
+  const url = new URLSearchParams()
+  url.append('storyId', props.story.id)
+  url.append('variantId', props.variant.id)
+
+  if (isDark.value) {
+    url.append('dark', '1')
+  }
+
+  return '/__sandbox?' + url.toString()
+})
 </script>
 
 <template>
@@ -55,7 +68,7 @@ useEventListener(window, 'message', (event) => {
         <div class="htw-p-4 htw-h-full htw-overflow-hidden htw-bg-white dark:htw-bg-zinc-700 htw-rounded-l-lg htw-relative">
           <iframe
             ref="iframe"
-            :src="`/__sandbox?storyId=${story.id}&variantId=${variant.id}`"
+            :src="sandboxUrl"
             class="htw-w-full htw-h-full htw-border htw-border-zinc-100 dark:htw-border-zinc-800 htw-bg-white"
             @load="syncState()"
           />
