@@ -43,8 +43,6 @@ watch([storyStore.currentStory, currentVariant], () => {
       setVariant(storyStore.currentStory.variants[0].id)
     }
   }
-}, {
-  immediate: true,
 })
 
 function setVariant (variantId: string) {
