@@ -15,10 +15,13 @@ export const useStoryStore = defineStore('story', () => {
 
   const currentStory = computed(() => stories.value.find(s => s.id === router.currentRoute.value.params.storyId))
 
+  const currentVariant = computed(() => currentStory.value?.variants.find(v => v.id === router.currentRoute.value.query.variantId))
+
   return {
     theme,
     stories,
     setStories,
     currentStory,
+    currentVariant,
   }
 })

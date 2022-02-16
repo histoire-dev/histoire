@@ -50,6 +50,7 @@ export interface HistoireConfig {
     setupFile?: string
   }
   setupFile?: string
+  title: string
 }
 
 export function getDefaultConfig (): HistoireConfig {
@@ -61,6 +62,7 @@ export function getDefaultConfig (): HistoireConfig {
       file: 'title',
       order: 'asc',
     },
+    title: 'Histoire',
   }
 }
 
