@@ -15,6 +15,7 @@ export interface HistoireConfig {
     file?: 'title' | 'path' | ((file: TreeFile) => string[])
     order?: 'asc' | ((a: string, b: string) => number)
   }
+  setupFile?: string
 }
 
 export function getDefaultConfig (): HistoireConfig {

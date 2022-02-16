@@ -7,6 +7,8 @@ import { makeTree } from './tree.js'
 
 export const STORIES_ID = '$histoire-stories'
 export const RESOLVED_STORIES_ID = `/${STORIES_ID}-resolved`
+export const SETUP_ID = '$histoire-setup'
+export const NOOP_ID = '/$histoire-noop'
 
 export async function createVitePlugins (ctx: Context): Promise<Plugin[]> {
   const userViteConfig = {} // @TODO
@@ -18,7 +20,6 @@ export async function createVitePlugins (ctx: Context): Promise<Plugin[]> {
 
     config () {
       const baseConfig = defineConfig({
-
         optimizeDeps: {
           // force include vue to avoid duplicated copies when linked + optimized
           include: [
@@ -37,9 +38,18 @@ export async function createVitePlugins (ctx: Context): Promise<Plugin[]> {
         : baseConfig
     },
 
-    resolveId (id) {
+    async resolveId (id, importer) {
       if (id.startsWith(STORIES_ID)) {
         return RESOLVED_STORIES_ID
+      }
+      if (id.startsWith(SETUP_ID)) {
+        if (ctx.config.setupFile) {
+          return this.resolve(ctx.config.setupFile, importer, {
+            skipSelf: true,
+          })
+        } else {
+          return NOOP_ID
+        }
       }
     },
 
@@ -73,6 +83,9 @@ if (import.meta.hot) {
     })
   })
 }`
+      }
+      if (id === NOOP_ID) {
+        return `export default () => {}`
       }
     },
 

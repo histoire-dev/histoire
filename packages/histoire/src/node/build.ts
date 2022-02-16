@@ -41,19 +41,20 @@ export async function build (ctx: Context) {
       },
       outDir: ctx.config.outDir,
       emptyOutDir: true,
+      cssCodeSplit: false,
     },
   })
   const result = Array.isArray(results) ? results[0] : results as RollupOutput
 
+  const styleOutput = result.output.find(o => o.name === 'style.css' && o.type === 'asset')
+
   // Index
   const indexOutput = result.output.find(o => o.name === 'index' && o.type === 'chunk')
-  const indexStyleOutput = result.output.find(o => o.name === 'index.css' && o.type === 'asset')
-  await writeHtml(indexOutput.fileName, indexStyleOutput.fileName, 'index.html', ctx)
+  await writeHtml(indexOutput.fileName, styleOutput.fileName, 'index.html', ctx)
 
   // Sandbox
   const sandboxOutput = result.output.find(o => o.name === 'sandbox' && o.type === 'chunk')
-  const sandboxStyleOutput = result.output.find(o => o.name === 'sandbox.css' && o.type === 'asset')
-  await writeHtml(sandboxOutput.fileName, sandboxStyleOutput.fileName, '__sandbox.html', ctx)
+  await writeHtml(sandboxOutput.fileName, styleOutput.fileName, '__sandbox.html', ctx)
 }
 
 async function writeHtml (jsEntryFile: string, cssEntryFile: string, htmlFileName: string, ctx: Context) {

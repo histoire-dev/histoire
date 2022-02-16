@@ -1,6 +1,8 @@
 <script lang="ts" setup>
 import { App, createApp, onMounted, onUnmounted, PropType, ref, watch } from 'vue'
 import { Story, Variant } from '../../types'
+// @ts-expect-error virtual module id
+import setup from '$histoire-setup'
 
 const props = defineProps({
   variant: {
@@ -35,6 +37,15 @@ async function mountVariant () {
       })
     },
   })
+
+  if (typeof setup === 'function') {
+    await setup({
+      app,
+      story: props.story,
+      variant: props.variant,
+    })
+  }
+
   const target = document.createElement('div')
   sandbox.value.appendChild(target)
   app.mount(target)
