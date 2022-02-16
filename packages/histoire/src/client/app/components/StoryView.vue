@@ -18,6 +18,8 @@ const route = useRoute()
 
 const currentVariant = computed(() => storyStore.currentStory?.variants.find(v => v.id === route.query.variantId))
 
+const hasSingleVariant = computed(() => (storyStore.currentStory?.variants.length === 1))
+
 // Restore variant selection
 
 watch(currentVariant, value => {
@@ -30,17 +32,28 @@ watch(currentVariant, value => {
 
 const router = useRouter()
 
-watch(() => storyStore.currentStory, () => {
-  if (!currentVariant.value && storyStore.currentStory?.lastSelectedVariant) {
-    router.replace({
-      ...route,
-      query: {
-        ...route.query,
-        variantId: storyStore.currentStory.lastSelectedVariant.id,
-      },
-    })
+watch([storyStore.currentStory, currentVariant], () => {
+  if (!currentVariant.value) {
+    if (storyStore.currentStory?.lastSelectedVariant) {
+      setVariant(storyStore.currentStory.lastSelectedVariant.id)
+      return
+    }
+
+    if (storyStore.currentStory.variants.length === 1) {
+      setVariant(storyStore.currentStory.variants[0].id)
+    }
   }
 })
+
+function setVariant (variantId: string) {
+  router.replace({
+    ...route,
+    query: {
+      ...route.query,
+      variantId,
+    },
+  })
+}
 </script>
 
 <template>
@@ -80,35 +93,45 @@ watch(() => storyStore.currentStory, () => {
             </div>
           </div>
 
-          <BaseSplitPane
-            v-else-if="storyStore.currentStory.layout.type === 'single'"
-            save-id="story-single-main-split"
-            :min="5"
-            :max="40"
-            :default-split="17"
-          >
-            <template #first>
-              <div class="htw-h-full htw-overflow-y-auto">
-                <StoryVariantListItem
-                  v-for="(variant, index) of storyStore.currentStory.variants"
-                  :key="index"
-                  :variant="variant"
-                />
-              </div>
-            </template>
-
-            <template #last>
-              <div
-                v-if="currentVariant"
-                class="htw-p-2 htw-h-full"
-              >
-                <StoryVariantSingleView
-                  :variant="currentVariant"
-                  :story="storyStore.currentStory"
-                />
-              </div>
-            </template>
-          </BaseSplitPane>
+          <template v-else-if="storyStore.currentStory.layout.type === 'single'">
+            <div
+              v-if="hasSingleVariant && currentVariant"
+              class="htw-p-2 htw-h-full"
+            >
+              <StoryVariantSingleView
+                :variant="currentVariant"
+                :story="storyStore.currentStory"
+              />
+            </div>
+            <BaseSplitPane
+              v-else
+              save-id="story-single-main-split"
+              :min="5"
+              :max="40"
+              :default-split="17"
+            >
+              <template #first>
+                <div class="htw-h-full htw-overflow-y-auto">
+                  <StoryVariantListItem
+                    v-for="(variant, index) of storyStore.currentStory.variants"
+                    :key="index"
+                    :variant="variant"
+                  />
+                </div>
+              </template>
+              <template #last>
+                <div
+                  v-if="currentVariant"
+                  class="htw-p-2 htw-h-full"
+                >
+                  <StoryVariantSingleView
+                    :variant="currentVariant"
+                    :story="storyStore.currentStory"
+                  />
+                </div>
+              </template>
+            </BaseSplitPane>
+          </template>
         </div>
       </template>
 
