@@ -2,6 +2,7 @@
 import { PropType } from 'vue'
 import { Story, Variant } from '../types'
 import SandboxVue3 from './sandbox/SandboxVue3.vue'
+import BaseEmpty from './base/BaseEmpty.vue'
 
 defineProps({
   variant: {
@@ -25,5 +26,9 @@ defineProps({
       :variant="variant"
       :story="story"
     />
+
+    <BaseEmpty v-else>
+      <span>No controls available for this story</span>
+    </BaseEmpty>
   </div>
 </template>
