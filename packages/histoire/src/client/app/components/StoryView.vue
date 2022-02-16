@@ -14,15 +14,11 @@ const storyStore = useStoryStore()
 
 // Selected variant
 
-const route = useRoute()
-
-const currentVariant = computed(() => storyStore.currentStory?.variants.find(v => v.id === route.query.variantId))
-
 const hasSingleVariant = computed(() => (storyStore.currentStory?.variants.length === 1))
 
 // Restore variant selection
 
-watch(currentVariant, value => {
+watch(() => storyStore.currentVariant, value => {
   if (value) {
     storyStore.currentStory.lastSelectedVariant = value
   }
@@ -30,10 +26,8 @@ watch(currentVariant, value => {
   immediate: true,
 })
 
-const router = useRouter()
-
-watch([storyStore.currentStory, currentVariant], () => {
-  if (!currentVariant.value) {
+watch(() => [storyStore.currentStory, storyStore.currentVariant], () => {
+  if (!storyStore.currentVariant) {
     if (storyStore.currentStory?.lastSelectedVariant) {
       setVariant(storyStore.currentStory.lastSelectedVariant.id)
       return
@@ -43,7 +37,12 @@ watch([storyStore.currentStory, currentVariant], () => {
       setVariant(storyStore.currentStory.variants[0].id)
     }
   }
+}, {
+  immediate: true,
 })
+
+const router = useRouter()
+const route = useRoute()
 
 function setVariant (variantId: string) {
   router.replace({
@@ -95,11 +94,11 @@ function setVariant (variantId: string) {
 
           <template v-else-if="storyStore.currentStory.layout.type === 'single'">
             <div
-              v-if="hasSingleVariant && currentVariant"
+              v-if="hasSingleVariant && storyStore.currentVariant"
               class="htw-p-2 htw-h-full"
             >
               <StoryVariantSingleView
-                :variant="currentVariant"
+                :variant="storyStore.currentVariant"
                 :story="storyStore.currentStory"
               />
             </div>
@@ -121,11 +120,11 @@ function setVariant (variantId: string) {
               </template>
               <template #last>
                 <div
-                  v-if="currentVariant"
+                  v-if="storyStore.currentVariant"
                   class="htw-p-2 htw-h-full"
                 >
                   <StoryVariantSingleView
-                    :variant="currentVariant"
+                    :variant="storyStore.currentVariant"
                     :story="storyStore.currentStory"
                   />
                 </div>
@@ -136,7 +135,7 @@ function setVariant (variantId: string) {
       </template>
 
       <template #last>
-        <BaseEmpty v-if="!currentVariant">
+        <BaseEmpty v-if="!storyStore.currentVariant">
           <span>Select a variant</span>
         </BaseEmpty>
 
@@ -149,14 +148,14 @@ function setVariant (variantId: string) {
           <template #first>
             <StoryControls
               :story="storyStore.currentStory"
-              :variant="currentVariant"
+              :variant="storyStore.currentVariant"
               class="htw-h-full htw-overflow-auto"
             />
           </template>
 
           <template #last>
             <StorySourceCode
-              :variant="currentVariant"
+              :variant="storyStore.currentVariant"
               class="htw-h-full"
             />
           </template>

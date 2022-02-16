@@ -8,6 +8,8 @@ import AppHeader from './components/app/AppHeader.vue'
 import type { StoryFile, Tree } from './types'
 import { useStoryStore } from './stores/story'
 import { mapFile } from './util/mapping'
+import { useTitle } from '@vueuse/core'
+import { histoireConfig } from './util/config.js'
 
 const files = ref<StoryFile[]>(rawFiles.map(file => mapFile(file)))
 const tree = ref<Tree>(rawTree)
@@ -33,6 +35,17 @@ watch(stories, value => {
 }, {
   immediate: true,
 })
+
+useTitle(computed(() => {
+  if (storyStore.currentStory) {
+    let title = storyStore.currentStory.title
+    if (storyStore.currentVariant) {
+      title += ` › ${storyStore.currentVariant.title}`
+    }
+    return `${title} | ${histoireConfig.title}`
+  }
+  return histoireConfig.title
+}))
 </script>
 
 <template>

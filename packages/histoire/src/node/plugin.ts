@@ -9,6 +9,8 @@ export const STORIES_ID = '$histoire-stories'
 export const RESOLVED_STORIES_ID = `/${STORIES_ID}-resolved`
 export const SETUP_ID = '$histoire-setup'
 export const NOOP_ID = '/$histoire-noop'
+export const CONFIG_ID = '$histoire-config'
+export const RESOLVED_CONFIG_ID = `/${CONFIG_ID}-resolved`
 
 export async function createVitePlugins (ctx: Context): Promise<Plugin[]> {
   const userViteConfig = {} // @TODO
@@ -51,6 +53,9 @@ export async function createVitePlugins (ctx: Context): Promise<Plugin[]> {
           return NOOP_ID
         }
       }
+      if (id.startsWith(CONFIG_ID)) {
+        return RESOLVED_CONFIG_ID
+      }
     },
 
     load (id) {
@@ -86,6 +91,9 @@ if (import.meta.hot) {
       }
       if (id === NOOP_ID) {
         return `export default () => {}`
+      }
+      if (id === RESOLVED_CONFIG_ID) {
+        return `export default ${JSON.stringify(ctx.config)}`
       }
     },
 

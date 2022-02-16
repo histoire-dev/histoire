@@ -16,6 +16,7 @@ export interface HistoireConfig {
     order?: 'asc' | ((a: string, b: string) => number)
   }
   setupFile?: string
+  title: string
 }
 
 export function getDefaultConfig (): HistoireConfig {
@@ -27,6 +28,7 @@ export function getDefaultConfig (): HistoireConfig {
       file: 'title',
       order: 'asc',
     },
+    title: 'Histoire',
   }
 }
 
