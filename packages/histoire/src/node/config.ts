@@ -1,7 +1,7 @@
 import path from 'pathe'
 import fs from 'fs'
 import defu from 'defu'
-import { createServer } from 'vite'
+import { createServer, resolveConfig as resolveViteConfig } from 'vite'
 import { ViteNodeServer } from 'vite-node/server'
 import { ViteNodeRunner } from 'vite-node/client'
 import pc from 'picocolors'
@@ -37,8 +37,13 @@ export const configFileNames = [
 ]
 
 export function resolveConfigFile (cwd: string = process.cwd()): string {
-  const { root } = path.parse(cwd)
+  let { root } = path.parse(cwd)
   let dir = cwd
+
+  // Fix for windows, waiting for pathe to fix this: https://github.com/unjs/pathe/issues/5
+  if (root === '' && dir[1] === ':') {
+    root = dir.substring(0, 2)
+  }
 
   while (dir !== root) {
     for (const fileName of configFileNames) {
@@ -82,7 +87,8 @@ export async function resolveConfig (cwd: string = process.cwd()): Promise<Histo
   if (configFile) {
     result = await loadConfigFile(configFile)
   } else {
-    result = {}
+    const viteConfig = await resolveViteConfig({}, 'serve')
+    result = viteConfig.histoire ?? {}
   }
   return processConfig(defu(result, getDefaultConfig()))
 }
@@ -95,4 +101,13 @@ export function processConfig (config: HistoireConfig): HistoireConfig {
 
 export function defineConfig (config: Partial<HistoireConfig>) {
   return config
+}
+
+declare module 'vite' {
+  interface UserConfig {
+    /**
+     * Histoire configuration
+     */
+    histoire?: Partial<HistoireConfig>
+  }
 }
