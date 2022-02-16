@@ -86,11 +86,10 @@ export async function resolveConfig (cwd: string = process.cwd()): Promise<Histo
   const configFile = resolveConfigFile(cwd)
   if (configFile) {
     result = await loadConfigFile(configFile)
-  } else {
-    const viteConfig = await resolveViteConfig({}, 'serve')
-    result = viteConfig.histoire ?? {}
   }
-  return processConfig(defu(result, getDefaultConfig()))
+  const viteConfig = await resolveViteConfig({}, 'serve')
+  const viteHistoireConfig = (viteConfig.histoire ?? {}) as HistoireConfig
+  return processConfig(defu(result, viteHistoireConfig, getDefaultConfig()))
 }
 
 export function processConfig (config: HistoireConfig): HistoireConfig {
