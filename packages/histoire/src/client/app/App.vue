@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 // @ts-expect-error virtual module
-import { files as rawFiles, tree as rawTree, onUpdate } from '$histoire-stories'
+import { files as rawFiles, tree as rawTree, onUpdate, theme } from '$histoire-stories'
 import StoryList from './components/StoryList.vue'
 import BaseSplitPane from './components/base/BaseSplitPane.vue'
 import { computed, onMounted, ref, watch } from 'vue'
@@ -14,6 +14,8 @@ onMounted(async () => {
   if (typeof setup === 'function') {
     await setup()
   }
+
+  document.title = theme.title ?? 'Histoire'
 })
 
 const files = ref<StoryFile[]>(rawFiles.map(file => mapFile(file)))
@@ -40,6 +42,7 @@ watch(stories, value => {
 }, {
   immediate: true,
 })
+
 </script>
 
 <template>

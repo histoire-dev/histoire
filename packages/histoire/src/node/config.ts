@@ -47,10 +47,6 @@ export interface HistoireConfig {
     colors?: {
       [key in AvailableColors]?: string
     }
-    font?: {
-      text?: string
-      code?: string
-    }
     setupFile?: string
   }
   setupFile?: string

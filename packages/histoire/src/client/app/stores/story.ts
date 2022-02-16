@@ -4,6 +4,10 @@ import { router } from '../router'
 import { Story } from '../types'
 
 export const useStoryStore = defineStore('story', () => {
+  const theme = ref({
+    title: 'Histoire',
+  })
+
   const stories = ref<Story[]>([])
   function setStories (value: Story[]) {
     stories.value = value
@@ -12,6 +16,7 @@ export const useStoryStore = defineStore('story', () => {
   const currentStory = computed(() => stories.value.find(s => s.id === router.currentRoute.value.params.storyId))
 
   return {
+    theme,
     stories,
     setStories,
     currentStory,
