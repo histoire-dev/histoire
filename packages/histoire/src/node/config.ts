@@ -51,7 +51,7 @@ export interface HistoireConfig {
       text?: string
       code?: string
     }
-    cssFile?: string
+    setupFile?: string
   }
   setupFile?: string
 }
