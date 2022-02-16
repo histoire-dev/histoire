@@ -53,6 +53,17 @@ const sandboxUrl = computed(() => {
 
   return '/__sandbox?' + url.toString()
 })
+
+const isIframeLoaded = ref(false)
+
+watch(sandboxUrl, () => {
+  isIframeLoaded.value = false
+})
+
+function onIframeLoad () {
+  isIframeLoaded.value = true
+  syncState()
+}
 </script>
 
 <template>
@@ -70,7 +81,8 @@ const sandboxUrl = computed(() => {
             ref="iframe"
             :src="sandboxUrl"
             class="htw-w-full htw-h-full htw-border htw-border-zinc-100 dark:htw-border-zinc-800 htw-bg-white"
-            @load="syncState()"
+            :class="{'htw-invisible': !isIframeLoaded}"
+            @load="onIframeLoad()"
           />
           <!-- Markers -->
           <div class="htw-absolute htw-top-1 htw-left-4 htw-h-2 htw-w-px htw-bg-zinc-200 dark:htw-bg-zinc-800" />
