@@ -8,7 +8,6 @@ export default defineConfig({
     setupFile: '/histoire.setup.ts',
     theme: {
       setupFile: '/histoire.theme.setup.ts',
-      title: 'Toast',
     },
   },
 })

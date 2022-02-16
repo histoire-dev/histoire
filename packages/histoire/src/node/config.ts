@@ -37,8 +37,8 @@ export interface HistoireConfig {
     file?: 'title' | 'path' | ((file: TreeFile) => string[])
     order?: 'asc' | ((a: string, b: string) => number)
   }
-  theme?: {
-    title?: string
+  theme: {
+    title: string
     logo?: {
       square?: string
       light?: string
@@ -50,7 +50,6 @@ export interface HistoireConfig {
     setupFile?: string
   }
   setupFile?: string
-  title: string
 }
 
 export function getDefaultConfig (): HistoireConfig {
@@ -62,7 +61,9 @@ export function getDefaultConfig (): HistoireConfig {
       file: 'title',
       order: 'asc',
     },
-    title: 'Histoire',
+    theme: {
+      title: 'Histoire',
+    },
   }
 }
 
