@@ -80,7 +80,7 @@ function onIframeLoad () {
 
     <BaseSplitPane
       save-id="story-single-responsive"
-      :min="10"
+      :min="30"
       :max="6000"
       :default-split="800"
       fixed
