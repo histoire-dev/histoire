@@ -7,6 +7,28 @@ import { ViteNodeRunner } from 'vite-node/client'
 import pc from 'picocolors'
 import { TreeFile } from './tree.js'
 
+type AvailableColors =
+  | 'primary-50'
+  | 'primary-100'
+  | 'primary-200'
+  | 'primary-300'
+  | 'primary-400'
+  | 'primary-500'
+  | 'primary-600'
+  | 'primary-700'
+  | 'primary-800'
+  | 'primary-900'
+  | 'gray-50'
+  | 'gray-100'
+  | 'gray-200'
+  | 'gray-300'
+  | 'gray-400'
+  | 'gray-500'
+  | 'gray-600'
+  | 'gray-700'
+  | 'gray-800'
+  | 'gray-900';
+
 export interface HistoireConfig {
   sourceDir: string
   outDir: string
@@ -15,8 +37,19 @@ export interface HistoireConfig {
     file?: 'title' | 'path' | ((file: TreeFile) => string[])
     order?: 'asc' | ((a: string, b: string) => number)
   }
+  theme: {
+    title: string
+    logo?: {
+      square?: string
+      light?: string
+      dark?: string
+    }
+    colors?: {
+      [key in AvailableColors]?: string
+    }
+    setupFile?: string
+  }
   setupFile?: string
-  title: string
 }
 
 export function getDefaultConfig (): HistoireConfig {
@@ -28,7 +61,9 @@ export function getDefaultConfig (): HistoireConfig {
       file: 'title',
       order: 'asc',
     },
-    title: 'Histoire',
+    theme: {
+      title: 'Histoire',
+    },
   }
 }
 
