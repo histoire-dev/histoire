@@ -1,9 +1,9 @@
 <script lang="ts" setup>
 import { computed } from 'vue'
-import { histoireConfig } from '../util/config.js'
+import { histoireConfig, customLogos } from '../util/config.js'
 import HistoireLogo from '../assets/histoire.svg'
 
-const logoUrl = computed(() => histoireConfig.theme?.logo?.square ?? HistoireLogo)
+const logoUrl = computed(() => histoireConfig.theme?.logo?.square ? customLogos.square : HistoireLogo)
 </script>
 
 <template>
