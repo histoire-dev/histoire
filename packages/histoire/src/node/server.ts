@@ -1,7 +1,7 @@
 import { createServer as createViteServer } from 'vite'
 import { Context } from './context.js'
 import { createVitePlugins, RESOLVED_STORIES_ID } from './plugin.js'
-import { onStoryChange, watchStories } from './stories.js'
+import { notifyStoryChange, onStoryChange, watchStories } from './stories.js'
 import { useCollectStories } from './collect.js'
 import type { StoryFile } from './types.js'
 
@@ -37,7 +37,7 @@ export async function createServer (ctx: Context, port: number) {
 
   onStoryChange(async (changedFile) => {
     if (queue) {
-      if (queued) {
+      if (queued && changedFile) {
         queuedFiles.push(changedFile)
         return
       } else {
@@ -97,6 +97,14 @@ export async function createServer (ctx: Context, port: number) {
     await server.close()
     await destroyCollectStories()
   }
+
+  // On page refresh, refresh stories
+  // Useful when vite optimizes new dependencies
+  server.ws.on('connection', (socket) => {
+    if (socket.protocol === 'vite-hmr') {
+      notifyStoryChange()
+    }
+  })
 
   return {
     server,
