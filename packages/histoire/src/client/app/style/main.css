@@ -20,6 +20,10 @@ a {
   text-decoration: inherit;
 }
 
+input {
+  font-family: inherit;
+}
+
 a,
 button {
   user-select: none;

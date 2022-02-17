@@ -141,7 +141,7 @@ function selectPrevious () {
           ref="input"
           v-model="search"
           placeholder="Search for stories, variants..."
-          class="htw-bg-transparent htw-w-full htw-flex-1 htw-pr-6 htw-py-4 htw-outline-none"
+          class="htw-bg-transparent htw-w-full htw-flex-1 htw-pl-0 htw-pr-6 htw-py-4 htw-outline-none"
           @keydown.down="selectNext()"
           @keydown.up="selectPrevious()"
           @keydown.escape="close()"
