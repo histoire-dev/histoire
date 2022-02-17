@@ -9,7 +9,6 @@ export async function createServer (ctx: Context, port: number) {
   await watchStories(ctx)
 
   const server = await createViteServer({
-    root: ctx.config.sourceDir,
     plugins: await createVitePlugins(ctx),
     server: {
       watch: {

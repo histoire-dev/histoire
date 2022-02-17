@@ -1,5 +1,5 @@
 import { relative } from 'pathe'
-import { defineConfig, mergeConfig, Plugin } from 'vite'
+import { resolveConfig as resolveViteConfig, Plugin as VitePlugin } from 'vite'
 import { APP_PATH, DIST_CLIENT_PATH } from './alias.js'
 import { Context } from './context.js'
 import { notifyStoryChange } from './stories.js'
@@ -12,16 +12,21 @@ export const NOOP_ID = '/$histoire-noop'
 export const CONFIG_ID = '$histoire-config'
 export const RESOLVED_CONFIG_ID = `/${CONFIG_ID}-resolved`
 
-export async function createVitePlugins (ctx: Context): Promise<Plugin[]> {
-  const userViteConfig = {} // @TODO
+export async function createVitePlugins (ctx: Context): Promise<VitePlugin[]> {
+  const viteConfig = await resolveViteConfig({}, ctx.mode === 'dev' ? 'serve' : 'build')
+  const hasVuePlugin = viteConfig.plugins.find(p => p.name === 'vite:vue')
 
-  const vuePlugin = (await import('@vitejs/plugin-vue')).default() // @TODO check if already present in vite config
+  const plugins: VitePlugin[] = []
 
-  const vitePlugin: Plugin = {
+  if (!hasVuePlugin) {
+    plugins.push((await import('@vitejs/plugin-vue')).default())
+  }
+
+  plugins.push({
     name: 'histoire-vite-plugin',
 
     config () {
-      const baseConfig = defineConfig({
+      return {
         optimizeDeps: {
           // force include vue to avoid duplicated copies when linked + optimized
           include: [
@@ -31,13 +36,10 @@ export async function createVitePlugins (ctx: Context): Promise<Plugin[]> {
         },
         server: {
           fs: {
-            allow: [DIST_CLIENT_PATH, ctx.config.sourceDir, process.cwd()],
+            allow: [DIST_CLIENT_PATH, viteConfig.root, process.cwd()],
           },
         },
-      })
-      return userViteConfig
-        ? mergeConfig(userViteConfig, baseConfig)
-        : baseConfig
+      }
     },
 
     async resolveId (id, importer) {
@@ -162,32 +164,26 @@ if (import.meta.hot) {
         })
       }
     },
-  }
-
-  const plugins = [
-    vitePlugin,
-    vuePlugin,
-  ]
+  })
 
   if (ctx.mode === 'build') {
     // Add file name in build mode to have components names instead of <Anonymous>
     const include = [/\.vue$/]
     const exclude = [/[\\/]node_modules[\\/]/, /[\\/]\.git[\\/]/, /[\\/]\.nuxt[\\/]/]
-    const fileNamePlugin: Plugin = {
+    plugins.push({
       name: 'histoire-file-name-plugin',
       enforce: 'post',
 
       transform (code, id) {
         if (exclude.some(r => r.test(id))) return
         if (include.some(r => r.test(id))) {
-          const file = relative(ctx.config.sourceDir, id)
+          const file = relative(viteConfig.root, id)
           const index = code.indexOf('export default')
           const result = `${code.substring(0, index)}_sfc_main.__file = '${file}'\n${code.substring(index)}`
           return result
         }
       },
-    }
-    plugins.push(fileNamePlugin)
+    })
   }
 
   return plugins

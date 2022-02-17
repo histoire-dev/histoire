@@ -30,7 +30,6 @@ type AvailableColors =
   | 'gray-900';
 
 export interface HistoireConfig {
-  sourceDir: string
   outDir: string
   storyMatch: string[]
   tree: {
@@ -54,7 +53,6 @@ export interface HistoireConfig {
 
 export function getDefaultConfig (): HistoireConfig {
   return {
-    sourceDir: 'src',
     outDir: 'histoire-dist',
     storyMatch: ['**/*.story.vue'],
     tree: {
@@ -131,7 +129,6 @@ export async function resolveConfig (cwd: string = process.cwd()): Promise<Histo
 }
 
 export function processConfig (config: HistoireConfig): HistoireConfig {
-  config.sourceDir = path.resolve(process.cwd(), config.sourceDir)
   config.outDir = path.resolve(process.cwd(), config.outDir)
   return config
 }

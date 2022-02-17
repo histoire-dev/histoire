@@ -52,9 +52,9 @@ export function useCollectStories (options: UseCollectStoriesOptions, ctx: Conte
         console.warn(pc.yellow(`Multiple stories not supported: ${storyFile.path}`))
       }
       storyFile.story = storyData[0]
-      const file:TreeFile = {
+      const file: TreeFile = {
         title: storyData[0].title,
-        path: relative(ctx.config.sourceDir, storyFile.path),
+        path: relative(server.config.root, storyFile.path),
       }
       storyFile.treePath = createPath(ctx.config, file)
       storyFile.story.title = storyFile.treePath[storyFile.treePath.length - 1]

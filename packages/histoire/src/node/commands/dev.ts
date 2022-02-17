@@ -1,5 +1,4 @@
-import { resolveConfig } from '../config.js'
-import { Context } from '../context.js'
+import { createContext } from '../context.js'
 import { createServer } from '../server.js'
 
 export interface DevOptions {
@@ -7,12 +6,9 @@ export interface DevOptions {
 }
 
 export async function devCommand (options: DevOptions) {
-  const config = await resolveConfig()
-  const ctx: Context = {
-    config,
+  const ctx = await createContext({
     mode: 'dev',
-    storyFiles: [],
-  }
+  })
   const { server } = await createServer(ctx, options.port)
   server.printUrls()
 }

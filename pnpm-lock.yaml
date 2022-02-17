@@ -40,12 +40,14 @@ importers:
 
   examples/vue3:
     specifiers:
+      '@vitejs/plugin-vue': ^2.2.0
       histoire: workspace:*
       vite: ^2.8.3
       vue: ^3.2.31
     dependencies:
       vue: 3.2.31
     devDependencies:
+      '@vitejs/plugin-vue': 2.2.0_vite@2.8.3+vue@3.2.31
       histoire: link:../../packages/histoire
       vite: 2.8.3
 

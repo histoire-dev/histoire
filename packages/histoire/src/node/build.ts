@@ -1,5 +1,5 @@
 import { join } from 'pathe'
-import { build as viteBuild, createServer as createViteServer } from 'vite'
+import { build as viteBuild, createServer as createViteServer, resolveConfig as resolveViteConfig, Plugin as VitePlugin } from 'vite'
 import fs from 'fs-extra'
 import { APP_PATH } from './alias.js'
 import { Context } from './context.js'
@@ -12,11 +12,14 @@ export async function build (ctx: Context) {
   await findAllStories(ctx)
 
   // Collect story data
+  const viteConfig = await resolveViteConfig({}, ctx.mode === 'dev' ? 'serve' : 'build')
+  const plugins: VitePlugin[] = []
+  const hasVuePlugin = viteConfig.plugins.find(p => p.name === 'vite:vue')
+  if (!hasVuePlugin) {
+    plugins.push((await import('@vitejs/plugin-vue')).default())
+  }
   const server = await createViteServer({
-    root: ctx.config.sourceDir,
-    plugins: [
-      (await import('@vitejs/plugin-vue')).default(), // @TODO check if already present in vite config
-    ],
+    plugins,
   })
   await server.pluginContainer.buildStart({})
   const { executeStoryFile, destroy: destroyCollectStories } = useCollectStories({
@@ -30,7 +33,6 @@ export async function build (ctx: Context) {
   await destroyCollectStories()
 
   const results = await viteBuild({
-    root: ctx.config.sourceDir,
     plugins: await createVitePlugins(ctx),
     build: {
       rollupOptions: {

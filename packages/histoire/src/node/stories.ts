@@ -18,7 +18,7 @@ export async function watchStories (newContext: Context) {
   context = newContext
 
   const watcher = chokidar.watch(context.config.storyMatch, {
-    cwd: context.config.sourceDir,
+    cwd: context.root,
   })
 
   watcher
@@ -41,7 +41,7 @@ export function notifyStoryChange (file?: StoryFile) {
 }
 
 function getAbsoluteFilePath (relativeFilePath: string) {
-  return join(context.config.sourceDir, relativeFilePath)
+  return join(context.root, relativeFilePath)
 }
 
 function addStory (relativeFilePath: string) {
@@ -67,7 +67,7 @@ export async function findAllStories (newContext: Context) {
   context = newContext
 
   const files = await globby(context.config.storyMatch, {
-    cwd: context.config.sourceDir,
+    cwd: context.root,
   })
   context.storyFiles.length = 0
   for (const file of files) {

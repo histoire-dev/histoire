@@ -43,6 +43,7 @@ module.exports = {
     'no-use-before-define': 'off',
     quotes: ['error', 'single', { allowTemplateLiterals: true }],
     'vue/multi-word-component-names': 'warn',
+    '@typescript-eslint/type-annotation-spacing': ['error'],
   },
   overrides: [
     {
