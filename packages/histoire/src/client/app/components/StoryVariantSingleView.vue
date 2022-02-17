@@ -105,7 +105,7 @@ const responsiveWidth = ref<number>(undefined)
       save-id="story-single-responsive"
       :min="30"
       :max="6000"
-      :default-split="800"
+      :default-split="720"
       fixed
       class="htw-w-full htw-h-full htw-flex-1 htw-border htw-border-gray-100 dark:htw-border-gray-800 htw-rounded-lg"
     >
