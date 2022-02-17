@@ -13,20 +13,66 @@ type ColorKeys = '50' | '100' | '200' | '300' | '400' | '500' | '600' | '700' | 
 type GrayColorKeys = ColorKeys | '750' | '850' | '950'
 
 export interface HistoireConfig {
+  /**
+   * Output directory.
+   */
   outDir: string
+  /**
+   * Glob patterns for story files to include.
+   */
   storyMatch: string[]
+  /**
+   * How to generate the story tree.
+   */
   tree: {
+    /**
+     * Use `'title'` to create the path from the title of the story, using `/` as the separator.
+     *
+     * Use `'path'` use the real folder structure on your computer.
+     */
     file?: 'title' | 'path' | ((file: TreeFile) => string[])
     order?: 'asc' | ((a: string, b: string) => number)
   }
+  /**
+   * Customize the look of the histoire book.
+   */
   theme: {
+    /**
+     * Main page title. For example: 'Acme Inc.'
+     */
     title?: string
+    /**
+     * Custom logo files. Should be import paths (processed by Vite).
+     *
+     * Example: `'/src/assets/my-logo.svg'`
+     */
     logo?: {
+      /**
+       * Square logo without text.
+       */
       square?: string
+      /**
+       * Full logo for light theme.
+       */
       light?: string
+      /**
+       * Full logo for dark theme.
+       */
       dark?: string
     }
+    /**
+     * Href to the favicon file (**not** processed by Vite). Put the file in the public directory.
+     *
+     * Example: `'/favicon.ico'`
+     */
     favicon?: string
+    /**
+     * Customize the colors. Each color should be an object with shades as keys.
+     *
+     * Example: ```{ primary: { 50: '#eef2ff', 100: '#e0e7ff', ..., 900: '#312e81' } }```
+     *
+     * You can import `defaultColors` from `'histoire'` to use predefined colors or you can create your own colors from scratch.
+     */
     colors?: {
       [key in CustomizableColors]?: key extends 'gray' ? {
         [key in GrayColorKeys]?: string
@@ -35,6 +81,13 @@ export interface HistoireConfig {
       }
     }
   }
+  /**
+   * Setup file exposting a default function executed when setting up each story preview.
+   *
+   * Import custom CSS files from this file.
+   *
+   * Example: `'/src/histoire-setup.ts'`
+   */
   setupFile?: string
 }
 
