@@ -64,9 +64,10 @@ function onIframeLoad () {
   <div class="htw-border htw-border-gray-100 dark:htw-border-gray-800 htw-rounded-lg htw-h-full">
     <BaseSplitPane
       save-id="story-single-responsive"
-      :min="1"
-      :max="99"
-      :default-split="99"
+      :min="10"
+      :max="6000"
+      :default-split="800"
+      fixed
       class="htw-w-full"
     >
       <template #first>

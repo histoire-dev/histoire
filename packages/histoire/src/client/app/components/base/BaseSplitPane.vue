@@ -35,6 +35,11 @@ const props = defineProps({
     type: String,
     default: null,
   },
+
+  fixed: {
+    type: Boolean,
+    default: false,
+  },
 })
 
 const split = ref(props.defaultSplit)
@@ -72,11 +77,11 @@ const boundSplit = computed(() => {
 })
 
 const leftStyle = computed(() => ({
-  [props.orientation === 'landscape' ? 'width' : 'height']: `${boundSplit.value}%`,
+  [props.orientation === 'landscape' ? 'width' : 'height']: props.fixed ? `${boundSplit.value}px` : `${boundSplit.value}%`,
 }))
 
 const rightStyle = computed(() => ({
-  [props.orientation === 'landscape' ? 'width' : 'height']: `${100 - boundSplit.value}%`,
+  [props.orientation === 'landscape' ? 'width' : 'height']: props.fixed ? null : `${100 - boundSplit.value}%`,
 }))
 
 const dragging = ref(false)
@@ -104,7 +109,11 @@ function dragMove (e) {
       totalSize = el.value.offsetHeight
     }
     const dPosition = position - startPosition
-    split.value = startSplit + ~~(dPosition / totalSize * 200) / 2
+    if (props.fixed) {
+      split.value = startSplit + dPosition
+    } else {
+      split.value = startSplit + ~~(dPosition / totalSize * 200) / 2
+    }
   }
 }
 
@@ -126,7 +135,7 @@ onUnmounted(() => {
 <template>
   <div
     ref="el"
-    class="htw-flex htw-h-full htw-isolate"
+    class="htw-flex htw-h-full htw-isolate htw-overflow-auto"
     :class="{
       'htw-flex-col': orientation === 'portrait',
       'htw-cursor-ew-resize': dragging && orientation === 'landscape',
@@ -138,7 +147,8 @@ onUnmounted(() => {
       class="htw-relative htw-top-0 htw-left-0 htw-z-20"
       :class="{
         'htw-pointer-events-none': dragging,
-        'htw-border-r htw-border-gray-200 dark:htw-border-gray-850': orientation === 'landscape'
+        'htw-border-r htw-border-gray-200 dark:htw-border-gray-850': orientation === 'landscape',
+        'htw-flex-none': fixed,
       }"
       :style="leftStyle"
     >
@@ -159,7 +169,8 @@ onUnmounted(() => {
       class="htw-relative htw-bottom-0 htw-right-0"
       :class="{
         'htw-pointer-events-none': dragging,
-        'htw-border-t htw-border-gray-200 dark:htw-border-gray-850': orientation === 'portrait'
+        'htw-border-t htw-border-gray-200 dark:htw-border-gray-850': orientation === 'portrait',
+        'htw-flex-1': fixed,
       }"
       :style="rightStyle"
     >
