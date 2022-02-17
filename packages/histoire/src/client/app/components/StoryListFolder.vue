@@ -28,13 +28,13 @@ const folderPadding = computed(() => {
     <div
       role="button"
       tabindex="0"
-      class="htw-px-0.5 htw-py-2 hover:htw-bg-primary-100 dark:hover:htw-bg-primary-900 htw-cursor-pointer htw-select-none"
+      class="htw-px-0.5 htw-py-2 hover:htw-bg-primary-100 dark:hover:htw-bg-primary-900 htw-cursor-pointer htw-select-none htw-flex"
       @click="toggleOpen"
       @keyup.enter="toggleOpen"
       @keyup.space="toggleOpen"
     >
-      <span class="bind-tree-padding htw-flex htw-items-center htw-gap-2">
-        <span class="htw-flex htw-gap-1">
+      <span class="bind-tree-padding htw-flex htw-items-center htw-gap-2 htw-min-w-0">
+        <span class="htw-flex htw-gap-1 htw-flex-none htw-items-center">
           <Icon
             icon="carbon:caret-right"
             class="htw-w-4 htw-h-4 htw-transition-transform htw-duration-150 htw-opacity-30"
@@ -47,7 +47,7 @@ const folderPadding = computed(() => {
             class="htw-w-5 htw-h-5"
           />
         </span>
-        <span>{{ folder.title }}</span>
+        <span class="htw-truncate">{{ folder.title }}</span>
       </span>
     </div>
     <div

@@ -28,13 +28,13 @@ const iconColor = computed(() => props.variant.iconColor)
     >
       <Icon
         :icon="variant.icon ?? 'carbon:cube'"
-        class="base-list-item-link-icon htw-w-5 htw-h-5"
+        class="base-list-item-link-icon htw-w-5 htw-h-5 htw-flex-none"
         :class="{
           'htw-text-gray-500': !active && !variant.iconColor,
           'bind-icon-color': !active && variant.iconColor,
         }"
       />
-      <span>{{ variant.title }}</span>
+      <span class="htw-truncate">{{ variant.title }}</span>
     </BaseListItemLink>
   </div>
 </template>

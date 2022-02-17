@@ -30,16 +30,16 @@ const iconColor = computed(() => props.story.iconColor)
       }"
       class="htw-px-0.5 htw-py-2"
     >
-      <span class="bind-tree-margin htw-flex htw-items-center htw-gap-2 htw-pl-5">
+      <span class="bind-tree-margin htw-flex htw-items-center htw-gap-2 htw-pl-5 htw-min-w-0">
         <Icon
           :icon="story.icon ?? 'carbon:cube'"
-          class="base-list-item-link-icon htw-w-5 htw-h-5"
+          class="base-list-item-link-icon htw-w-5 htw-h-5 htw-flex-none"
           :class="{
             'htw-text-primary-500': !active && !story.iconColor,
             'bind-icon-color': !active && story.iconColor,
           }"
         />
-        <span>{{ story.title }}</span>
+        <span class="htw-truncate">{{ story.title }}</span>
       </span>
 
       <span class="htw-opacity-40 htw-text-sm">
