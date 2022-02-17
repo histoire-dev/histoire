@@ -33,7 +33,7 @@ watch(() => [storyStore.currentStory, storyStore.currentVariant], () => {
       return
     }
 
-    if (storyStore.currentStory.variants.length === 1) {
+    if (storyStore.currentStory?.variants.length === 1) {
       setVariant(storyStore.currentStory.variants[0].id)
     }
   }
