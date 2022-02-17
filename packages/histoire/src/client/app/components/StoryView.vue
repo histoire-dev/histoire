@@ -12,6 +12,9 @@ import StorySourceCode from './StorySourceCode.vue'
 
 const storyStore = useStoryStore()
 
+const router = useRouter()
+const route = useRoute()
+
 // Selected variant
 
 const hasSingleVariant = computed(() => (storyStore.currentStory?.variants.length === 1))
@@ -40,9 +43,6 @@ watch(() => [storyStore.currentStory, storyStore.currentVariant], () => {
 }, {
   immediate: true,
 })
-
-const router = useRouter()
-const route = useRoute()
 
 function setVariant (variantId: string) {
   router.replace({
