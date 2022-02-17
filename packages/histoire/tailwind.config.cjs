@@ -1,7 +1,6 @@
 
 const inheritedConfig = require('../../tailwind.config.cjs')
-// const defaultColors = require('tailwindcss/colors')
-const { parseColor } = require('tailwindcss/lib/util/color.js')
+const defaultColors = require('tailwindcss/colors')
 
 // Colors
 
@@ -25,6 +24,10 @@ const themedColors = ['primary', 'gray'].reduce((acc, color) => {
 }, {})
 
 const colors = {
+  ...{
+    ...defaultColors,
+    gray: undefined,
+  },
   white: '#fff',
   black: '#000',
   transparent: 'transparent',
