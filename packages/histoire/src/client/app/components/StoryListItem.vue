@@ -28,7 +28,7 @@ const iconColor = computed(() => props.story.iconColor)
           storyId: story.id,
         },
       }"
-      class="htw-px-0.5 htw-py-2"
+      class="htw-pl-0.5 htw-pr-2 htw-py-2"
     >
       <span class="bind-tree-margin htw-flex htw-items-center htw-gap-2 htw-pl-5 htw-min-w-0">
         <Icon
