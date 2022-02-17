@@ -51,7 +51,8 @@ const results = computed(() => {
     const s = search.value.toLowerCase()
     const variants: SearchResult[] = []
     for (const story of storyStore.stories) {
-      if (story.title.toLowerCase().includes(s)) {
+      const storyMatched = story.title.toLowerCase().includes(s)
+      if (storyMatched) {
         list.push({
           kind: 'story',
           id: story.id,
@@ -68,7 +69,7 @@ const results = computed(() => {
         })
       }
       for (const variant of story.variants) {
-        if (variant.title.toLowerCase().includes(s)) {
+        if (storyMatched || variant.title.toLowerCase().includes(s)) {
           variants.push({
             kind: 'variant',
             id: variant.id,
