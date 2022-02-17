@@ -7,7 +7,7 @@
     "story:build": "histoire build"
   },
   "dependencies": {
-    "vue": "^3.2.27"
+    "vue": "^3.2.31"
   },
   "devDependencies": {
     "vite": "^2.8.3",
