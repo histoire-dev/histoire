@@ -3,9 +3,16 @@ import { Icon } from '@iconify/vue'
 import { computed } from 'vue'
 import AppLogo from './AppLogo.vue'
 import { isDark, toggleDark } from '../../util/dark'
+import { onKeyboardShortcut } from '../../util/keyboard'
+import { makeTooltip } from '../../util/tooltip'
 
-const carbonIcon = computed(() => {
+const themeIcon = computed(() => {
   return isDark.value ? 'carbon:moon' : 'carbon:sun'
+})
+
+onKeyboardShortcut(['ctrl+shift+d', 'meta+shift+d'], (event) => {
+  toggleDark()
+  event.preventDefault()
 })
 </script>
 
@@ -18,16 +25,18 @@ const carbonIcon = computed(() => {
         class="htw-max-w-full htw-max-h-full"
       />
     </div>
-    <div class="htw-ml-auto htw-flex-none">
-      <span
-        class="hover:htw-text-primary-500 dark:hover:htw-text-primary-400 htw-cursor-pointer"
+    <div class="htw-ml-auto htw-flex-none htw-flex">
+
+      <a
+        v-tooltip="makeTooltip('Toggle dark mode', ({ isMac }) => isMac ? 'meta+shift+d' : 'ctrl+shift+d')"
+        class="htw-p-1 hover:htw-text-primary-500 dark:hover:htw-text-primary-400 htw-cursor-pointer"
         @click="toggleDark()"
       >
         <Icon
-          :icon="carbonIcon"
-          class="htw-w-6 htw-h-6"
+          :icon="themeIcon"
+          class="htw-w-5 htw-h-5"
         />
-      </span>
+      </a>
     </div>
   </div>
 </template>
