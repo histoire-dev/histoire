@@ -71,13 +71,15 @@ function onIframeLoad () {
     >
       <template #first>
         <div class="htw-p-4 htw-h-full htw-overflow-hidden htw-bg-white dark:htw-bg-gray-700 htw-rounded-l-lg htw-relative">
-          <iframe
-            ref="iframe"
-            :src="sandboxUrl"
-            class="htw-w-full htw-h-full htw-border htw-border-gray-100 dark:htw-border-gray-800 htw-bg-white"
-            :class="{'htw-invisible': !isIframeLoaded}"
-            @load="onIframeLoad()"
-          />
+          <div class="htw-w-full htw-h-full htw-border htw-border-gray-100 dark:htw-border-gray-800 htw-bg-white htw-rounded-sm">
+            <iframe
+              ref="iframe"
+              :src="sandboxUrl"
+              class="htw-w-full htw-h-full"
+              :class="{'htw-invisible': !isIframeLoaded}"
+              @load="onIframeLoad()"
+            />
+          </div>
           <!-- Markers -->
           <div class="htw-absolute htw-top-1 htw-left-4 htw-h-2 htw-w-px htw-bg-gray-200 dark:htw-bg-gray-800" />
           <div class="htw-absolute htw-top-1 htw-right-4 htw-h-2 htw-w-px htw-bg-gray-200 dark:htw-bg-gray-800" />
