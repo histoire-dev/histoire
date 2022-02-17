@@ -19,6 +19,8 @@ const props = defineProps({
   },
 })
 
+// Iframe
+
 const iframe = ref<HTMLIFrameElement>()
 
 function syncState () {
@@ -60,13 +62,17 @@ function onIframeLoad () {
   isIframeLoaded.value = true
   syncState()
 }
+
+// Responsive
+
+const responsiveWidth = ref<number>(undefined)
 </script>
 
 <template>
   <div class="htw-h-full htw-flex htw-flex-col htw-gap-2">
-    <div class="htw-flex-none">
+    <div class="htw-flex-none htw-flex htw-items-center htw-gap-2">
       <!-- Variant title -->
-      <div class="htw-flex htw-items-center htw-gap-1 htw-text-gray-500">
+      <div class="htw-flex htw-items-center htw-gap-1 htw-text-gray-500 htw-flex-1 htw-truncate htw-min-w-0">
         <Icon
           :icon="variant.icon ?? 'carbon:cube'"
           class="base-list-item-link-icon htw-w-4 htw-h-4 htw-opacity-50"
@@ -76,9 +82,26 @@ function onIframeLoad () {
         />
         <span>{{ variant.title }}</span>
       </div>
+
+      <!-- Responsive size -->
+      <div class="htw-flex-none htw-flex htw-gap-1 htw-items-center">
+        <Icon
+          icon="ic:baseline-phone-android"
+          class="htw-w-4 htw-h-4 htw-opacity-50"
+        />
+
+        <input
+          v-model.number="responsiveWidth"
+          v-tooltip="'Responsive width (px)'"
+          type="number"
+          class="htw-bg-transparent htw-border htw-border-gray-200 dark:htw-border-gray-850 htw-rounded htw-w-16 htw-opacity-50 focus:htw-opacity-100"
+          step="16"
+        >
+      </div>
     </div>
 
     <BaseSplitPane
+      v-model:split="responsiveWidth"
       save-id="story-single-responsive"
       :min="30"
       :max="6000"

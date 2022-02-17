@@ -11,8 +11,12 @@
   border-color: #e5e7eb;
 }
 
-a {
+a,
+input {
   color: inherit;
+}
+
+a {
   text-decoration: inherit;
 }
 

@@ -15,6 +15,11 @@ const props = defineProps({
     default: 50,
   },
 
+  split: {
+    type: Number,
+    default: undefined,
+  },
+
   min: {
     type: Number,
     default: 20,
@@ -42,7 +47,19 @@ const props = defineProps({
   },
 })
 
-const split = ref(props.defaultSplit)
+const emit = defineEmits({
+  'update:split': (value: number) => true,
+})
+
+const currentSplit = ref(props.defaultSplit)
+
+watch(() => props.split, (value) => {
+  if (value !== undefined) {
+    currentSplit.value = value
+  }
+}, {
+  immediate: true,
+})
 
 if (props.saveId) {
   const storageKey = `${SAVE_PREFIX}-split-pane-${props.saveId}`
@@ -57,22 +74,30 @@ if (props.saveId) {
     }
 
     if (typeof parsedValue === 'number') {
-      split.value = parsedValue
+      currentSplit.value = parsedValue
     }
   }
 
-  watch(split, value => {
+  watch(currentSplit, value => {
     localStorage.setItem(storageKey, JSON.stringify(value))
+  })
+
+  watch(currentSplit, value => {
+    if (value !== props.split) {
+      emit('update:split', value)
+    }
+  }, {
+    immediate: true,
   })
 }
 
 const boundSplit = computed(() => {
-  if (split.value < props.min) {
+  if (currentSplit.value < props.min) {
     return props.min
-  } else if (split.value > props.max) {
+  } else if (currentSplit.value > props.max) {
     return props.max
   } else {
-    return split.value
+    return currentSplit.value
   }
 })
 
@@ -110,9 +135,9 @@ function dragMove (e) {
     }
     const dPosition = position - startPosition
     if (props.fixed) {
-      split.value = startSplit + dPosition
+      currentSplit.value = startSplit + dPosition
     } else {
-      split.value = startSplit + ~~(dPosition / totalSize * 200) / 2
+      currentSplit.value = startSplit + ~~(dPosition / totalSize * 200) / 2
     }
   }
 }
