@@ -16,9 +16,9 @@ export function onStoryChange (handler: StoryChangeHandler) {
 
 export async function watchStories (newContext: Context) {
   context = newContext
-
   const watcher = chokidar.watch(context.config.storyMatch, {
     cwd: context.root,
+    ignored: context.config.storyIgnored,
   })
 
   watcher
@@ -68,6 +68,7 @@ export async function findAllStories (newContext: Context) {
 
   const files = await globby(context.config.storyMatch, {
     cwd: context.root,
+    ignore: context.config.storyIgnored,
   })
   context.storyFiles.length = 0
   for (const file of files) {

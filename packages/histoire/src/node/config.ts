@@ -22,6 +22,10 @@ export interface HistoireConfig {
    */
   storyMatch: string[]
   /**
+   * Glob patterns to ignore files while searching for story files.
+   */
+  storyIgnored: string[]
+  /**
    * How to generate the story tree.
    */
   tree: {
@@ -95,6 +99,7 @@ export function getDefaultConfig (): HistoireConfig {
   return {
     outDir: 'histoire-dist',
     storyMatch: ['**/*.story.vue'],
+    storyIgnored: ['**/node_modules/**'],
     tree: {
       file: 'title',
       order: 'asc',
