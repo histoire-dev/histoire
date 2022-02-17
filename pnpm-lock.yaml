@@ -51,6 +51,19 @@ importers:
       histoire: link:../../packages/histoire
       vite: 2.8.3
 
+  examples/vue3-themed:
+    specifiers:
+      '@vitejs/plugin-vue': ^2.2.0
+      histoire: workspace:*
+      vite: ^2.8.3
+      vue: ^3.2.31
+    dependencies:
+      vue: 3.2.31
+    devDependencies:
+      '@vitejs/plugin-vue': 2.2.0_vite@2.8.3+vue@3.2.31
+      histoire: link:../../packages/histoire
+      vite: 2.8.3
+
   packages/histoire:
     specifiers:
       '@iconify/vue': ^3.1.3
@@ -67,6 +80,7 @@ importers:
       fs-extra: ^10.0.0
       globby: ^13.1.1
       happy-dom: ^2.33.1
+      mrmime: ^1.0.0
       pathe: ^0.2.0
       picocolors: ^1.0.0
       pinia: ^2.0.11
@@ -90,6 +104,7 @@ importers:
       fs-extra: 10.0.0
       globby: 13.1.1
       happy-dom: 2.33.1
+      mrmime: 1.0.0
       pathe: 0.2.0
       picocolors: 1.0.0
       pinia: 2.0.11_typescript@4.5.5+vue@3.2.31
@@ -2635,6 +2650,11 @@ packages:
   /mri/1.2.0:
     resolution: {integrity: sha512-tzzskb3bG8LvYGFF/mDTpq3jpI6Q9wc3LEmBaghu+DdCssd1FakN7Bc0hVNmEyGq1bq3RgfkCb3cmQLpNPOroA==}
     engines: {node: '>=4'}
+    dev: false
+
+  /mrmime/1.0.0:
+    resolution: {integrity: sha512-a70zx7zFfVO7XpnQ2IX1Myh9yY4UYvfld/dikWRnsXxbyvMcfz+u6UfgNAtH+k2QqtJuzVpv6eLTx1G2+WKZbQ==}
+    engines: {node: '>=10'}
     dev: false
 
   /ms/2.0.0:

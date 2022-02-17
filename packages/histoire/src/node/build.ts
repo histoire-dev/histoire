@@ -1,6 +1,7 @@
 import { join } from 'pathe'
 import { build as viteBuild, createServer as createViteServer, resolveConfig as resolveViteConfig, Plugin as VitePlugin } from 'vite'
 import fs from 'fs-extra'
+import { lookup as lookupMime } from 'mrmime'
 import { APP_PATH } from './alias.js'
 import { Context } from './context.js'
 import { createVitePlugins } from './plugin.js'
@@ -68,6 +69,7 @@ async function writeHtml (jsEntryFile: string, cssEntryFile: string, htmlFileNam
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="">
   <link rel="stylesheet" href="/${cssEntryFile}">
+  ${ctx.config.theme?.favicon ? `<link rel="icon" type="${lookupMime(ctx.config.theme.favicon)}" href="${ctx.config.theme.favicon}"/>` : ''}
 </head>
 <body>
   <div id="app"></div>

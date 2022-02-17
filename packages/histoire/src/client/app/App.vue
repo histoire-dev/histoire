@@ -8,7 +8,7 @@ import AppHeader from './components/app/AppHeader.vue'
 import type { StoryFile, Tree } from './types'
 import { useStoryStore } from './stores/story'
 import { mapFile } from './util/mapping'
-import { useTitle, useFavicon } from '@vueuse/core'
+import { useTitle } from '@vueuse/core'
 import { histoireConfig } from './util/config.js'
 import HistoireLogo from './assets/histoire.svg'
 
@@ -47,8 +47,6 @@ useTitle(computed(() => {
   }
   return histoireConfig.theme.title
 }))
-
-useFavicon(computed(() => histoireConfig.theme.logo?.square ?? HistoireLogo), { rel: 'icon' })
 </script>
 
 <template>

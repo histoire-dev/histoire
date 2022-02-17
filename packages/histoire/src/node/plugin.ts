@@ -1,5 +1,6 @@
 import { relative } from 'pathe'
 import { resolveConfig as resolveViteConfig, Plugin as VitePlugin } from 'vite'
+import { lookup as lookupMime } from 'mrmime'
 import { APP_PATH, DIST_CLIENT_PATH } from './alias.js'
 import { Context } from './context.js'
 import { notifyStoryChange } from './stories.js'
@@ -152,6 +153,7 @@ if (import.meta.hot) {
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="description" content="">
+    ${ctx.config.theme?.favicon ? `<link rel="icon" type="${lookupMime(ctx.config.theme.favicon)}" href="${ctx.config.theme.favicon}"/>` : ''}
   </head>
   <body>
     <div id="app"></div>

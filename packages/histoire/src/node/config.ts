@@ -37,16 +37,16 @@ export interface HistoireConfig {
     order?: 'asc' | ((a: string, b: string) => number)
   }
   theme: {
-    title: string
+    title?: string
     logo?: {
       square?: string
       light?: string
       dark?: string
     }
+    favicon?: string
     colors?: {
       [key in AvailableColors]?: string
     }
-    setupFile?: string
   }
   setupFile?: string
 }

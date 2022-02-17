@@ -11,12 +11,14 @@ const carbonIcon = computed(() => {
 
 <template>
   <div
-    class="htw-px-4 htw-h-16 htw-flex htw-items-center"
+    class="htw-px-4 htw-h-16 htw-flex htw-items-center htw-gap-2"
   >
-    <AppLogo
-      class="htw-h-full htw-py-3"
-    />
-    <div class="htw-ml-auto">
+    <div class="htw-py-4 htw-flex-1 htw-h-full htw-flex htw-items-center htw-pr-2">
+      <AppLogo
+        class="htw-max-w-full htw-max-h-full"
+      />
+    </div>
+    <div class="htw-ml-auto htw-flex-none">
       <span
         class="hover:htw-text-primary-500 dark:hover:htw-text-primary-400 htw-cursor-pointer"
         @click="toggleDark()"

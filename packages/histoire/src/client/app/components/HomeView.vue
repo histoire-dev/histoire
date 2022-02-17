@@ -1,8 +1,16 @@
+<script lang="ts" setup>
+import { computed } from 'vue'
+import { histoireConfig } from '../util/config.js'
+import HistoireLogo from '../assets/histoire.svg'
+
+const logoUrl = computed(() => histoireConfig.theme?.logo?.square ?? HistoireLogo)
+</script>
+
 <template>
   <div class="htw-flex htw-items-center htw-justify-center htw-h-full">
     <img
-      src="../assets/histoire.svg"
-      alt="Histoire logo"
+      :src="logoUrl"
+      alt="Logo"
       class="htw-w-64 htw-h-64 htw-opacity-25"
     >
   </div>

@@ -4,7 +4,6 @@ import { PropType, ref, watch, toRaw, computed } from 'vue'
 import { Story, Variant } from '../types'
 import { STATE_SYNC } from '../util/const.js'
 import BaseSplitPane from './base/BaseSplitPane.vue'
-import { isDark } from '../util/dark'
 
 const props = defineProps({
   variant: {
@@ -46,11 +45,6 @@ const sandboxUrl = computed(() => {
   const url = new URLSearchParams()
   url.append('storyId', props.story.id)
   url.append('variantId', props.variant.id)
-
-  if (isDark.value) {
-    url.append('dark', '1')
-  }
-
   return '/__sandbox?' + url.toString()
 })
 

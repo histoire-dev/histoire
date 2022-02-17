@@ -17,9 +17,6 @@ const app = createApp({
   setup () {
     const story = computed(() => file.value.story)
     const variant = computed(() => story.value?.variants.find(v => v.id === query.variantId))
-    const isDark = computed(() => !!query.dark)
-
-    window.document.documentElement.classList.toggle('htw-dark', isDark.value)
 
     window.addEventListener('message', event => {
       if (event.data?.type === STATE_SYNC) {
