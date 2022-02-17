@@ -24,7 +24,7 @@ const iconColor = computed(() => props.variant.iconColor)
       v-slot="{ active }"
       :to="targetRoute"
       :is-active="isActive"
-      class="htw-px-4 htw-py-2 htw-flex htw-items-center htw-gap-2"
+      class="htw-px-2 htw-py-1.5 htw-m-1 htw-rounded-sm htw-flex htw-items-center htw-gap-2"
     >
       <Icon
         :icon="variant.icon ?? 'carbon:cube'"

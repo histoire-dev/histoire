@@ -28,7 +28,7 @@ const folderPadding = computed(() => {
     <div
       role="button"
       tabindex="0"
-      class="htw-px-0.5 htw-py-2 hover:htw-bg-primary-100 dark:hover:htw-bg-primary-900 htw-cursor-pointer htw-select-none htw-flex"
+      class="htw-px-0.5 htw-py-1.5 htw-m-1 htw-rounded-sm hover:htw-bg-primary-100 dark:hover:htw-bg-primary-900 htw-cursor-pointer htw-select-none htw-flex"
       @click="toggleOpen"
       @keyup.enter="toggleOpen"
       @keyup.space="toggleOpen"
