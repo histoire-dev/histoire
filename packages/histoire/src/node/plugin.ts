@@ -5,6 +5,7 @@ import { APP_PATH, DIST_CLIENT_PATH } from './alias.js'
 import { Context } from './context.js'
 import { notifyStoryChange } from './stories.js'
 import { makeTree } from './tree.js'
+import { parseColor } from './colors.js'
 
 export const STORIES_ID = '$histoire-stories'
 export const RESOLVED_STORIES_ID = `/${STORIES_ID}-resolved`
@@ -12,6 +13,8 @@ export const SETUP_ID = '$histoire-setup'
 export const NOOP_ID = '/$histoire-noop'
 export const CONFIG_ID = '$histoire-config'
 export const RESOLVED_CONFIG_ID = `/${CONFIG_ID}-resolved`
+export const THEME_ID = '$histoire-theme'
+export const RESOLVED_THEME_ID = `/${THEME_ID}-resolved.css`
 
 export async function createVitePlugins (ctx: Context): Promise<VitePlugin[]> {
   const viteConfig = await resolveViteConfig({}, ctx.mode === 'dev' ? 'serve' : 'build')
@@ -59,6 +62,9 @@ export async function createVitePlugins (ctx: Context): Promise<VitePlugin[]> {
       if (id.startsWith(CONFIG_ID)) {
         return RESOLVED_CONFIG_ID
       }
+      if (id.startsWith(THEME_ID)) {
+        return RESOLVED_THEME_ID
+      }
     },
 
     load (id) {
@@ -97,6 +103,17 @@ if (import.meta.hot) {
       }
       if (id === RESOLVED_CONFIG_ID) {
         return `export default ${JSON.stringify(ctx.config)}`
+      }
+      if (id === RESOLVED_THEME_ID) {
+        let css = '*, ::before, ::after {'
+        // Colors
+        for (const color in ctx.config.theme?.colors ?? {}) {
+          for (const key in ctx.config.theme.colors[color]) {
+            css += `--_histoire-color-${color}-${key}: ${parseColor(ctx.config.theme.colors[color][key]).color.join(' ')};`
+          }
+        }
+        css += '}'
+        return css
       }
     },
 

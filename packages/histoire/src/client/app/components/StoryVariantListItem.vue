@@ -30,7 +30,7 @@ const iconColor = computed(() => props.variant.iconColor)
         :icon="variant.icon ?? 'carbon:cube'"
         class="base-list-item-link-icon htw-w-5 htw-h-5"
         :class="{
-          'htw-text-zinc-500': !active && !variant.iconColor,
+          'htw-text-gray-500': !active && !variant.iconColor,
           'bind-icon-color': !active && variant.iconColor,
         }"
       />

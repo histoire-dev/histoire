@@ -60,7 +60,7 @@ useTitle(computed(() => {
     />
   </div>
 
-  <div class="htw-h-screen dark:htw-bg-zinc-700 dark:htw-text-slate-100">
+  <div class="htw-h-screen dark:htw-bg-gray-700 dark:htw-text-slate-100">
     <BaseSplitPane
       save-id="main-horiz"
       :min="5"

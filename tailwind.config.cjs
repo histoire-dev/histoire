@@ -9,9 +9,10 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        primary: colors.emerald, // @TODO use CSS vars
+        primary: colors.emerald,
 
-        zinc: {
+        gray: {
+          ...colors.zinc,
           750: '#323238',
           850: '#1f1f21',
           950: '#101012',

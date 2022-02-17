@@ -6,28 +6,11 @@ import { ViteNodeServer } from 'vite-node/server'
 import { ViteNodeRunner } from 'vite-node/client'
 import pc from 'picocolors'
 import { TreeFile } from './tree.js'
+import { defaultColors } from './colors.js'
 
-type AvailableColors =
-  | 'primary-50'
-  | 'primary-100'
-  | 'primary-200'
-  | 'primary-300'
-  | 'primary-400'
-  | 'primary-500'
-  | 'primary-600'
-  | 'primary-700'
-  | 'primary-800'
-  | 'primary-900'
-  | 'gray-50'
-  | 'gray-100'
-  | 'gray-200'
-  | 'gray-300'
-  | 'gray-400'
-  | 'gray-500'
-  | 'gray-600'
-  | 'gray-700'
-  | 'gray-800'
-  | 'gray-900';
+type CustomizableColors = 'primary' | 'gray'
+type ColorKeys = '50' | '100' | '200' | '300' | '400' | '500' | '600' | '700' | '800' | '900'
+type GrayColorKeys = ColorKeys | '750' | '850' | '950'
 
 export interface HistoireConfig {
   outDir: string
@@ -45,7 +28,11 @@ export interface HistoireConfig {
     }
     favicon?: string
     colors?: {
-      [key in AvailableColors]?: string
+      [key in CustomizableColors]?: key extends 'gray' ? {
+        [key in GrayColorKeys]?: string
+      } :{
+        [key in ColorKeys]?: string
+      }
     }
   }
   setupFile?: string
@@ -61,6 +48,10 @@ export function getDefaultConfig (): HistoireConfig {
     },
     theme: {
       title: 'Histoire',
+      colors: {
+        primary: defaultColors.emerald,
+        gray: defaultColors.zinc,
+      },
     },
   }
 }

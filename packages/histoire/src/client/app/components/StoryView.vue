@@ -72,7 +72,7 @@ function setVariant (variantId: string) {
       class="htw-h-full"
     >
       <template #first>
-        <div class="htw-bg-zinc-50 htw-h-full dark:htw-bg-zinc-750">
+        <div class="htw-bg-gray-50 htw-h-full dark:htw-bg-gray-750">
           <div
             v-if="storyStore.currentStory.layout.type === 'grid'"
             class="htw-h-full htw-overflow-y-auto"

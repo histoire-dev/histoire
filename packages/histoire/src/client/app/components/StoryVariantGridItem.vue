@@ -31,7 +31,7 @@ const iconColor = computed(() => props.variant.iconColor)
         :to="targetRoute"
         class="htw-rounded htw-w-max htw-px-2 htw-py-0.5 htw-min-w-16 htw-cursor-pointer htw-flex htw-items-center htw-gap-1"
         :class="{
-          'hover:htw-bg-zinc-200 htw-text-zinc-500 dark:hover:htw-bg-zinc-800': !isActive,
+          'hover:htw-bg-gray-200 htw-text-gray-500 dark:hover:htw-bg-gray-800': !isActive,
           'htw-bg-primary-200 hover:htw-bg-primary-300 htw-text-primary-800 dark:htw-bg-primary-700 dark:hover:htw-bg-primary-800 dark:htw-text-primary-200': isActive,
         }"
       >
@@ -39,7 +39,7 @@ const iconColor = computed(() => props.variant.iconColor)
           :icon="variant.icon ?? 'carbon:cube'"
           class="base-list-item-link-icon htw-w-4 htw-h-4 htw-opacity-50"
           :class="{
-            'htw-text-zinc-500': !isActive && !variant.iconColor,
+            'htw-text-gray-500': !isActive && !variant.iconColor,
             'bind-icon-color': !isActive && variant.iconColor,
           }"
         />
@@ -49,9 +49,9 @@ const iconColor = computed(() => props.variant.iconColor)
 
     <!-- Body -->
     <div
-      class="htw-border htw-bg-white dark:htw-bg-zinc-700 htw-rounded-lg htw-flex-1 htw-p-4"
+      class="htw-border htw-bg-white dark:htw-bg-gray-700 htw-rounded-lg htw-flex-1 htw-p-4"
       :class="{
-        'htw-border-zinc-100 dark:htw-border-zinc-800': !isActive,
+        'htw-border-gray-100 dark:htw-border-gray-800': !isActive,
         'htw-border-primary-200 dark:htw-border-primary-900': isActive,
       }"
       @click.stop.prevent

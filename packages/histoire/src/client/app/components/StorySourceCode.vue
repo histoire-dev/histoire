@@ -67,7 +67,7 @@ const copySourceCode = () => copy(sourceCode.value)
 </script>
 
 <template>
-  <div class="htw-bg-zinc-100 dark:htw-bg-zinc-800 htw-h-full htw-overflow-hidden htw-relative">
+  <div class="htw-bg-gray-100 dark:htw-bg-gray-800 htw-h-full htw-overflow-hidden htw-relative">
     <div
       v-if="error"
       class="htw-text-red-500 htw-h-full htw-p-2 htw-overflow-auto htw-font-mono htw-text-sm"
@@ -92,7 +92,7 @@ const copySourceCode = () => copy(sourceCode.value)
     <!-- Toolbar -->
     <div
       v-if="!error"
-      class="htw-absolute htw-top-2 htw-right-6 htw-p-1 htw-bg-zinc-100 dark:htw-bg-zinc-800"
+      class="htw-absolute htw-top-2 htw-right-6 htw-p-1 htw-bg-gray-100 dark:htw-bg-gray-800"
     >
       <Icon
         v-tooltip="{

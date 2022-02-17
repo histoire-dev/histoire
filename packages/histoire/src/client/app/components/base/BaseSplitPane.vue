@@ -138,14 +138,14 @@ onUnmounted(() => {
       class="htw-relative htw-top-0 htw-left-0 htw-z-20"
       :class="{
         'htw-pointer-events-none': dragging,
-        'htw-border-r htw-border-zinc-200 dark:htw-border-zinc-850': orientation === 'landscape'
+        'htw-border-r htw-border-gray-200 dark:htw-border-gray-850': orientation === 'landscape'
       }"
       :style="leftStyle"
     >
       <slot name="first" />
 
       <div
-        class="dragger htw-absolute htw-z-100 hover:htw-bg-primary-500/25 htw-transition-colors htw-duration-150 htw-delay-150"
+        class="dragger htw-absolute htw-z-100 hover:htw-bg-primary-500/50 htw-transition-colors htw-duration-150 htw-delay-150"
         :class="{
           'htw-top-0 htw-bottom-0 htw-cursor-ew-resize': orientation === 'landscape',
           'htw-left-0 htw-right-0 htw-cursor-ns-resize': orientation === 'portrait',
@@ -159,7 +159,7 @@ onUnmounted(() => {
       class="htw-relative htw-bottom-0 htw-right-0"
       :class="{
         'htw-pointer-events-none': dragging,
-        'htw-border-t htw-border-zinc-200 dark:htw-border-zinc-850': orientation === 'portrait'
+        'htw-border-t htw-border-gray-200 dark:htw-border-gray-850': orientation === 'portrait'
       }"
       :style="rightStyle"
     >
