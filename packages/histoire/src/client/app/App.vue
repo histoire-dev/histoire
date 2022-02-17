@@ -3,14 +3,16 @@
 import { files as rawFiles, tree as rawTree, onUpdate } from '$histoire-stories'
 import StoryList from './components/StoryList.vue'
 import BaseSplitPane from './components/base/BaseSplitPane.vue'
-import { computed, ref, watch } from 'vue'
+import { computed, ref, watch, defineAsyncComponent } from 'vue'
 import AppHeader from './components/app/AppHeader.vue'
 import type { StoryFile, Tree } from './types'
 import { useStoryStore } from './stores/story'
 import { mapFile } from './util/mapping'
 import { useTitle } from '@vueuse/core'
 import { histoireConfig } from './util/config.js'
-import HistoireLogo from './assets/histoire.svg'
+import { onKeyboardShortcut } from './util/keyboard.js'
+
+const SearchModal = defineAsyncComponent(() => import('./components/search/SearchModal.vue'))
 
 const files = ref<StoryFile[]>(rawFiles.map(file => mapFile(file)))
 const tree = ref<Tree>(rawTree)
@@ -47,6 +49,21 @@ useTitle(computed(() => {
   }
   return histoireConfig.theme.title
 }))
+
+// Search
+
+const loadSearch = ref(false)
+const isSearchOpen = ref(false)
+
+watch(isSearchOpen, value => {
+  if (value) {
+    loadSearch.value = true
+  }
+})
+
+onKeyboardShortcut(['ctrl+k', 'meta+k'], () => {
+  isSearchOpen.value = true
+})
 </script>
 
 <template>
@@ -72,6 +89,7 @@ useTitle(computed(() => {
         <div class="htw-flex htw-flex-col htw-h-full htw-gap-2">
           <AppHeader
             class="htw-flex-none"
+            @search="isSearchOpen = true"
           />
           <StoryList
             :tree="tree"
@@ -86,4 +104,10 @@ useTitle(computed(() => {
       </template>
     </BaseSplitPane>
   </div>
+
+  <SearchModal
+    v-if="loadSearch"
+    :shown="isSearchOpen"
+    @close="isSearchOpen = false"
+  />
 </template>

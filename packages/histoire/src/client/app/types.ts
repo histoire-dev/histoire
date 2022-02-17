@@ -1,8 +1,11 @@
+import type { RouteLocationRaw } from 'vue-router'
+
 export interface StoryFile {
   id: string
   framework: string
   component: any
   story: Story
+  path: string[]
 }
 
 export interface Story {
@@ -43,3 +46,13 @@ export type TreeFolder = {
 }
 
 export type Tree = (TreeFolder | TreeLeaf)[]
+
+export interface SearchResult {
+  kind: 'story' | 'variant'
+  id: string
+  title: string
+  route: RouteLocationRaw
+  path?: string[]
+  icon?: string
+  iconColor?: string
+}
