@@ -4,7 +4,7 @@ import { computed, ref, watch } from 'vue'
 import { Icon } from '@iconify/vue'
 import { useStoryStore } from '../../stores/story'
 import BaseEmpty from '../base/BaseEmpty.vue'
-import type { SearchResult } from '../../types'
+import type { SearchResult, Story, Variant } from '../../types'
 import SearchItem from './SearchItem.vue'
 
 const props = defineProps({
@@ -45,54 +45,64 @@ const search = ref('')
 
 const storyStore = useStoryStore()
 
+function storyResultFactory (story: Story, rank: number): SearchResult {
+  return {
+    kind: 'story',
+    rank,
+    id: story.id,
+    title: story.title,
+    route: {
+      name: 'story',
+      params: {
+        storyId: story.id,
+      },
+    },
+    path: story.file.path.slice(0, -1),
+    icon: story.icon,
+    iconColor: story.iconColor,
+  }
+}
+
+function variantResultFactory (story: Story, variant: Variant, rank: number): SearchResult {
+  return {
+    kind: 'variant',
+    rank,
+    id: variant.id,
+    title: variant.title,
+    route: {
+      name: 'story',
+      params: {
+        storyId: story.id,
+      },
+      query: {
+        variantId: variant.id,
+      },
+    },
+    path: [...story.file.path ?? [], story.title],
+    icon: variant.icon,
+    iconColor: variant.iconColor,
+  }
+}
+
 const results = computed(() => {
   const list: SearchResult[] = []
   if (search.value) {
     const s = search.value.toLowerCase()
-    const variants: SearchResult[] = []
     for (const story of storyStore.stories) {
       const storyMatched = story.title.toLowerCase().includes(s)
-      if (storyMatched) {
-        list.push({
-          kind: 'story',
-          id: story.id,
-          title: story.title,
-          route: {
-            name: 'story',
-            params: {
-              storyId: story.id,
-            },
-          },
-          path: story.file.path.slice(0, -1),
-          icon: story.icon,
-          iconColor: story.iconColor,
-        })
+      let storyPathMatched = false
+      if (storyMatched || (storyPathMatched = story.file.path.some(p => p.toLowerCase().includes(s)))) {
+        list.push(storyResultFactory(story, storyMatched ? 1 : 4))
       }
       for (const variant of story.variants) {
-        if (storyMatched || variant.title.toLowerCase().includes(s)) {
-          variants.push({
-            kind: 'variant',
-            id: variant.id,
-            title: variant.title,
-            route: {
-              name: 'story',
-              params: {
-                storyId: story.id,
-              },
-              query: {
-                variantId: variant.id,
-              },
-            },
-            path: [...story.path ?? [], story.title],
-            icon: variant.icon,
-            iconColor: variant.iconColor,
-          })
+        const variantMatched = variant.title.toLowerCase().includes(s)
+        if (storyMatched || storyPathMatched || variantMatched) {
+          list.push(variantResultFactory(story, variant, variantMatched ? 2 : storyMatched ? 3 : 5))
         }
       }
     }
-    list.push(...variants)
   }
-  return list
+  return list.sort((a, b) => a.rank - b.rank)
 })
 
 // Selection

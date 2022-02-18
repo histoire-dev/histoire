@@ -49,6 +49,7 @@ export type Tree = (TreeFolder | TreeLeaf)[]
 
 export interface SearchResult {
   kind: 'story' | 'variant'
+  rank: number
   id: string
   title: string
   route: RouteLocationRaw
