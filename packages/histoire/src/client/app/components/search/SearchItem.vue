@@ -92,8 +92,8 @@ const kindLabels = {
           >
             <Icon
               v-if="index > 0"
-              icon="carbon:caret-right"
-              class="htw-w-4 htw-h-4"
+              icon="carbon:chevron-right"
+              class="htw-w-4 htw-h-4 htw-mt-0.5 htw-opacity-50"
             />
             <span>{{ p }}</span>
           </div>
