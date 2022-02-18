@@ -48,7 +48,6 @@ export const useStoryStore = defineStore('story', () => {
   })
 
   return {
-    openedFolders,
     stories,
     setStories,
     currentStory,
