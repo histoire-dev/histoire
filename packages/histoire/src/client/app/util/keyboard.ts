@@ -51,6 +51,14 @@ window.addEventListener('keyup', event => {
   })
 })
 
+window.addEventListener('blur', () => {
+  pressedKeys.clear()
+  for (const i in modifiers) {
+    const mod = modifiers[i]
+    mod.pressed = false
+  }
+})
+
 function isMatchingShortcut (shortcut: KeyboardShortcut): boolean {
   for (const combination of shortcut) {
     if (isMatchingCombination(combination.toLowerCase())) {
