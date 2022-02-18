@@ -61,8 +61,9 @@ watch(isSearchOpen, value => {
   }
 })
 
-onKeyboardShortcut(['ctrl+k', 'meta+k'], () => {
+onKeyboardShortcut(['ctrl+k', 'meta+k'], (event) => {
   isSearchOpen.value = true
+  event.preventDefault()
 })
 </script>
 
