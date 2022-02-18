@@ -16,7 +16,7 @@ export const useStoryStore = defineStore('story', () => {
   const openedFolders = reactive({} as Record<string, boolean>)
 
   function getStringPath (path: Array<string>) {
-    return path.join('\u0001')
+    return path.join('␜')
   }
 
   function toggleFolder (path: Array<string>, force?: boolean) {
