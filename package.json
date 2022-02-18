@@ -11,6 +11,7 @@
     "build": "pnpm run -r build --filter ./packages",
     "watch": "pnpm run build && pnpm run -r watch --parallel --filter ./packages",
     "test": "pnpm run -r test --parallel --filter ./packages",
+    "test:open": "pnpm run -r test:open --parallel --filter ./packages",
     "release": "pnpm run lint && pnpm run build && pnpm run test && echo \"TODO publish\"",
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
