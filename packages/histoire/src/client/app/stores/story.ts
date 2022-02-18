@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { computed, ref } from 'vue'
+import { computed, reactive, ref, watch } from 'vue'
 import { router } from '../router'
 import { Story } from '../types'
 
@@ -13,10 +13,47 @@ export const useStoryStore = defineStore('story', () => {
 
   const currentVariant = computed(() => currentStory.value?.variants.find(v => v.id === router.currentRoute.value.query.variantId))
 
+  const openedFolders = reactive({} as Record<string, boolean>)
+
+  function getStringPath (path: Array<string>) {
+    return path.join('‽') // Use interrobang to allow slash in folders name
+  }
+
+  function toggleFolder (path: Array<string>, force?: boolean) {
+    const stringPath = getStringPath(path)
+
+    if (force === undefined) {
+      force = !openedFolders[stringPath]
+    }
+
+    if (force) {
+      openedFolders[stringPath] = true
+    } else {
+      delete openedFolders[stringPath]
+    }
+  }
+
+  function isFolderOpened (path: Array<string>) {
+    return openedFolders[getStringPath(path)]
+  }
+
+  function openFileFolders (path: Array<string>) {
+    for (let pathLength = 1; pathLength < path.length; pathLength++) {
+      toggleFolder(path.slice(0, pathLength), true)
+    }
+  }
+
+  watch(currentStory, () => {
+    openFileFolders(currentStory.value.file.path)
+  })
+
   return {
+    openedFolders,
     stories,
     setStories,
     currentStory,
     currentVariant,
+    isFolderOpened,
+    toggleFolder,
   }
 })
