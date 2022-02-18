@@ -13,7 +13,7 @@ export const useStoryStore = defineStore('story', () => {
 
   const currentVariant = computed(() => currentStory.value?.variants.find(v => v.id === router.currentRoute.value.query.variantId))
 
-  const openedFolders = reactive({} as Record<string, boolean>)
+  const openedFolders = ref(new Map() as Map<string, boolean>)
 
   function getStringPath (path: Array<string>) {
     return path.join('␜')
@@ -23,18 +23,18 @@ export const useStoryStore = defineStore('story', () => {
     const stringPath = getStringPath(path)
 
     if (force === undefined) {
-      force = !openedFolders[stringPath]
+      force = !openedFolders.value.get(stringPath)
     }
 
     if (force) {
-      openedFolders[stringPath] = true
+      openedFolders.value.set(stringPath, true)
     } else {
-      delete openedFolders[stringPath]
+      openedFolders.value.delete(stringPath)
     }
   }
 
   function isFolderOpened (path: Array<string>) {
-    return openedFolders[getStringPath(path)]
+    return openedFolders.value.get(getStringPath(path))
   }
 
   function openFileFolders (path: Array<string>) {
