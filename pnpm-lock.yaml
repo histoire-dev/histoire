@@ -67,7 +67,7 @@ importers:
   packages/histoire:
     specifiers:
       '@iconify/vue': ^3.1.3
-      '@peeky/test': ^0.13.0
+      '@peeky/test': ^0.13.2
       '@types/fs-extra': ^9.0.13
       '@types/node': ^17.0.18
       '@vitejs/plugin-vue': ^2.2.0
@@ -115,7 +115,7 @@ importers:
       vue-router: 4.0.12_vue@3.2.31
     devDependencies:
       '@iconify/vue': 3.1.3_vue@3.2.31
-      '@peeky/test': 0.13.0_eslint@8.9.0
+      '@peeky/test': 0.13.2_eslint@8.9.0
       '@types/fs-extra': 9.0.13
       '@types/node': 17.0.18
       autoprefixer: 10.4.2_postcss@8.4.6
@@ -144,9 +144,6 @@ packages:
     peerDependencies:
       '@algolia/client-search': ^4.9.1
       algoliasearch: ^4.9.1
-    peerDependenciesMeta:
-      '@algolia/client-search':
-        optional: true
     dependencies:
       '@algolia/autocomplete-shared': 1.5.2
       algoliasearch: 4.12.1
@@ -345,13 +342,6 @@ packages:
       '@types/react': '>= 16.8.0 < 18.0.0'
       react: '>= 16.8.0 < 18.0.0'
       react-dom: '>= 16.8.0 < 18.0.0'
-    peerDependenciesMeta:
-      '@types/react':
-        optional: true
-      react:
-        optional: true
-      react-dom:
-        optional: true
     dependencies:
       '@algolia/autocomplete-core': 1.5.2
       '@algolia/autocomplete-preset-algolia': 1.5.2_algoliasearch@4.12.1
@@ -457,14 +447,14 @@ packages:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.13.0
 
-  /@peeky/cli/0.13.0_eslint@8.9.0:
-    resolution: {integrity: sha512-bGKsWvdK73es3sGKJ8M/x7Wge1v7na1rurb51PKlrDIq9R4oTebRa85Ft7XSn6JIdGHIcVQyFq/MbSEyzxfTHg==}
+  /@peeky/cli/0.13.2_eslint@8.9.0:
+    resolution: {integrity: sha512-i8j0gbKDpYEzzSoTi1FJPBCz3Jf/eymyLONHcg8Ufmz5mdrMIssB0PbkIf83sPCONBnlh4mgVQjMRQJbAxE+Fw==}
     hasBin: true
     dependencies:
-      '@peeky/config': 0.13.0
-      '@peeky/eslint-plugin': 0.13.0_eslint@8.9.0
-      '@peeky/runner': 0.13.0
-      '@peeky/server': 0.13.0
+      '@peeky/config': 0.13.2
+      '@peeky/eslint-plugin': 0.13.2_eslint@8.9.0
+      '@peeky/runner': 0.13.2
+      '@peeky/server': 0.13.2
       consola: 2.15.3
       lodash: 4.17.21
       open: 7.4.2
@@ -481,17 +471,18 @@ packages:
       - utf-8-validate
     dev: true
 
-  /@peeky/client-dist/0.13.0:
-    resolution: {integrity: sha512-e6KjG9cwT8g4IECMFLApPi53qAA5iSbTTVRQMoYsRPajA6KaHYseVViv+SWMA/YH/J/5J4JT3fbVDvijEBMIkA==}
+  /@peeky/client-dist/0.13.2:
+    resolution: {integrity: sha512-4ILP0/3fFmtySnjZ4wIZEOez6oQHe3whAORqyzf5xsse7ooRuHf8ZNT8a92aPKJuwQy8DgOaQCZKFV9zqeQ2wA==}
     dev: true
 
-  /@peeky/config/0.13.0:
-    resolution: {integrity: sha512-lLa7QN99rs7ifkG3BBHNmujVt+jpmYwQSJkVtQS/aYV+IW3+MtPVQWDtjmerPNg2Pp7+raFXMJsOB1kh4bvHqw==}
+  /@peeky/config/0.13.2:
+    resolution: {integrity: sha512-NTDEiIWhYZvqe9i90UQbE0sWrqH24J/plHsnk8++c52yC/TKMej4FrQnqfwhZoqjMbVDBUaQrPa5JGclfghYUA==}
     dependencies:
-      '@peeky/utils': 0.13.0
+      '@peeky/utils': 0.13.2
+      chokidar: 3.5.3
       consola: 2.15.3
+      fs-extra: 10.0.0
       pathe: 0.2.0
-      reactive-fs: 0.4.1
       shortid: 2.2.16
       vite: 2.8.3
     transitivePeerDependencies:
@@ -500,26 +491,28 @@ packages:
       - stylus
     dev: true
 
-  /@peeky/eslint-plugin/0.13.0_eslint@8.9.0:
-    resolution: {integrity: sha512-/jlE2HG5fWZw7I1c/UGhTraow9bAyPKDIVK55FZhYc6ugpxQ2aWeJULOP/LnbXtXaT9nOrwVAE9p7QDxOlv9XA==}
+  /@peeky/eslint-plugin/0.13.2_eslint@8.9.0:
+    resolution: {integrity: sha512-wh05JIN5V4/ZcOII2f4ehtx0XXNgRNvIIN2B0Hp/fNDkirIkkRGCsztelWvifoAuYnEu6rMb7Pr2QPnO2B3XYg==}
     peerDependencies:
       eslint: '>=6'
     dependencies:
       eslint: 8.9.0
     dev: true
 
-  /@peeky/runner/0.13.0:
-    resolution: {integrity: sha512-iW/cuxt+gHBNyFHNg20CvKJlYB7X5bbMu8Z5yxRzwiroI3g6pZ2roc7NR0xlcSK+xFtChxzy2JePK9jK4mZjOQ==}
+  /@peeky/runner/0.13.2:
+    resolution: {integrity: sha512-QEjMMR5gMaiACM52YmNrFyiVurBokWm0ybDw5eXIzhH4KBwar82Mttm1vN1xQRdW/xhbIGEgyy1D2/ZyMIv6NQ==}
     dependencies:
       '@akryum/workerpool': 6.0.5-alpha.2
-      '@peeky/config': 0.13.0
-      '@peeky/utils': 0.13.0
+      '@peeky/config': 0.13.2
+      '@peeky/utils': 0.13.2
       '@types/sinon': 9.0.11
       c8: 7.11.0
       chalk: 5.0.0
+      chokidar: 3.5.3
       consola: 2.15.3
       diffable-html: 5.0.0
       expect: 27.5.1
+      fast-glob: 3.2.11
       fs-extra: 10.0.0
       fs-monkey: 1.0.3
       happy-dom: 2.33.1
@@ -530,7 +523,6 @@ packages:
       pathe: 0.2.0
       pragma: 1.0.0
       pretty-format: 27.5.1
-      reactive-fs: 0.4.1
       shortid: 2.2.16
       sinon: 9.2.4
       slugify: 1.6.5
@@ -545,19 +537,20 @@ packages:
       - stylus
     dev: true
 
-  /@peeky/server/0.13.0:
-    resolution: {integrity: sha512-jwNK+r4gHtrQJ5RTjYzEjKG8KN55y+9WBYgOT7KhrryxZsV+v8/RSoMExP+E5y3Uc6fVKSyRyqhY8B1bI4tnEQ==}
+  /@peeky/server/0.13.2:
+    resolution: {integrity: sha512-XHZRuGm6HqT+g4PUqok/8xluIQmMT58SBhIPM6RttrkNMUD5lRsDrMy14EtND8sDOXNifdKg7QVX2RPMBGGGzw==}
     dependencies:
-      '@peeky/client-dist': 0.13.0
-      '@peeky/config': 0.13.0
-      '@peeky/runner': 0.13.0
+      '@peeky/client-dist': 0.13.2
+      '@peeky/config': 0.13.2
+      '@peeky/runner': 0.13.2
       ansi_up: 5.1.0
       apollo-server-express: 2.25.3_graphql@15.8.0
       chokidar: 3.5.3
       consola: 2.15.3
       express: 4.17.3
       express-history-api-fallback: 2.2.1
-      fs-extra: 9.1.0
+      fast-glob: 3.2.11
+      fs-extra: 10.0.0
       graphql: 15.8.0
       graphql-ws: 5.5.5_graphql@15.8.0
       launch-editor: 2.3.0
@@ -565,7 +558,6 @@ packages:
       object-inspect: 1.12.0
       pathe: 0.2.0
       random-emoji: 1.0.2
-      reactive-fs: 0.4.1
       shortid: 2.2.16
       slugify: 1.6.5
       ws: 8.5.0
@@ -578,15 +570,15 @@ packages:
       - utf-8-validate
     dev: true
 
-  /@peeky/test/0.13.0_eslint@8.9.0:
-    resolution: {integrity: sha512-ZXnuKD7hTvHnd4auddNezs0eW7OBJ0CjZc8Op+D3+zSmZCfIGmBQBydvOHtnJYXTnkJEVLi+WDG8J51qpywtKg==}
+  /@peeky/test/0.13.2_eslint@8.9.0:
+    resolution: {integrity: sha512-mIEM+8s7RqoDF9bdYG/vNAtYRsQbDoZsaTBUL8UPNFosPzU3D1vgc5jmg1n3g9Zp+TAI7dzEGY3tIlwv+twjtg==}
     hasBin: true
     dependencies:
-      '@peeky/cli': 0.13.0_eslint@8.9.0
-      '@peeky/config': 0.13.0
-      '@peeky/eslint-plugin': 0.13.0_eslint@8.9.0
-      '@peeky/runner': 0.13.0
-      '@peeky/server': 0.13.0
+      '@peeky/cli': 0.13.2_eslint@8.9.0
+      '@peeky/config': 0.13.2
+      '@peeky/eslint-plugin': 0.13.2_eslint@8.9.0
+      '@peeky/runner': 0.13.2
+      '@peeky/server': 0.13.2
     transitivePeerDependencies:
       - bufferutil
       - encoding
@@ -597,8 +589,8 @@ packages:
       - utf-8-validate
     dev: true
 
-  /@peeky/utils/0.13.0:
-    resolution: {integrity: sha512-y11TshxVUh5YuMByPCZVioi/iNXLvxe/VWarc0qmo4QnqafjBEUcxW7Vd2iKfHgxDix1qc3VG3blXM9SxxAN3A==}
+  /@peeky/utils/0.13.2:
+    resolution: {integrity: sha512-jFDtPznA/Sb3aN0D7+MCeJfnU9CpR6CpyN3Kz5or6re3n7bWsd1oXz03XEUBAG1RaE8+7sfah+2Nqtnsg9L79Q==}
     dependencies:
       chalk: 5.0.0
       consola: 2.15.3
@@ -1552,11 +1544,6 @@ packages:
 
   /asynckit/0.4.0:
     resolution: {integrity: sha1-x57Zf380y48robyXkLzDZkdLS3k=}
-
-  /at-least-node/1.0.0:
-    resolution: {integrity: sha512-+q/t7Ekv1EDY2l6Gda6LLiX14rU9TV20Wa3ofeQmwPFZbOMo9DXrLbOjFaaclkXKWidIaopwAObQDqwWtGUjqg==}
-    engines: {node: '>= 4.0.0'}
-    dev: true
 
   /autoprefixer/10.4.2_postcss@8.4.6:
     resolution: {integrity: sha512-9fOPpHKuDW1w/0EKfRmVnxTDt8166MAnLI3mgZ1JCnhNtYWxcJ6Ud5CO/AVOZi/AvFa8DY9RTy3h3+tFBlrrdQ==}
@@ -2716,9 +2703,6 @@ packages:
     peerDependencies:
       eslint-plugin-import: '>=1.4.0'
       webpack: '>=1.11.0'
-    peerDependenciesMeta:
-      webpack:
-        optional: true
     dependencies:
       array-find: 1.0.0
       debug: 3.2.7
@@ -3156,16 +3140,6 @@ packages:
       graceful-fs: 4.2.9
       jsonfile: 6.1.0
       universalify: 2.0.0
-
-  /fs-extra/9.1.0:
-    resolution: {integrity: sha512-hcg3ZmepS30/7BSFqRvoo3DOMQu7IjqxO5nCDt+zM9XWjb33Wg7ziNT+Qvqbuc3+gWpzO02JubVyk2G4Zvo1OQ==}
-    engines: {node: '>=10'}
-    dependencies:
-      at-least-node: 1.0.0
-      graceful-fs: 4.2.9
-      jsonfile: 6.1.0
-      universalify: 2.0.0
-    dev: true
 
   /fs-monkey/1.0.3:
     resolution: {integrity: sha512-cybjIfiiE+pTWicSCLFHSrXZ6EilF30oh91FDP9S2B051prEa7QWfrVTQm10/dDpswBDXZugPa1Ogu8Yh+HV0Q==}
@@ -4607,10 +4581,6 @@ packages:
 
   /react-is/17.0.2:
     resolution: {integrity: sha512-w2GsyukL62IJnlaff/nRegPQR94C/XXamvMWmSHRJ4y7Ts/4ocGRmTHvOs8PSE6pB3dWOrD/nueuU5sduBsQ4w==}
-    dev: true
-
-  /reactive-fs/0.4.1:
-    resolution: {integrity: sha512-l+ZDzjwjob9gmvmwP2/oxnnryuyEi4AJ88eptX4WUR+5HpjKC4b/LWmYHqBr3sE1DQcM+dwck1Yz5qynSzZPcw==}
     dev: true
 
   /read-cache/1.0.0:
