@@ -12,7 +12,7 @@
     "watch": "pnpm run build && pnpm run -r watch --parallel --filter ./packages",
     "test": "pnpm run -r test --parallel --filter ./packages",
     "test:open": "pnpm run -r test:open --parallel --filter ./packages",
-    "release": "pnpm run lint && pnpm run build && pnpm run test && echo \"TODO publish\"",
+    "release": "pnpm run lint && pnpm run test && pnpm run build && sheep release -b main",
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
     "docs:serve": "vitepress serve docs"
@@ -21,6 +21,7 @@
     "node": ">14.5.0"
   },
   "devDependencies": {
+    "@akryum/sheep": "^0.3.1",
     "@typescript-eslint/eslint-plugin": "^5.6.0",
     "@typescript-eslint/parser": "^5.6.0",
     "@vue/eslint-config-standard": "^6.1.0",
