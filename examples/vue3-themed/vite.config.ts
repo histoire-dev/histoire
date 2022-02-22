@@ -21,5 +21,10 @@ export default defineConfig({
       },
     },
     setupFile: '/src/histoire-setup.ts',
+    // vite: {
+    //   server: {
+    //     port: 3042,
+    //   },
+    // },
   },
 })

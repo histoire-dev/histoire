@@ -26,6 +26,15 @@ export async function createVitePlugins (ctx: Context): Promise<VitePlugin[]> {
     plugins.push((await import('@vitejs/plugin-vue')).default())
   }
 
+  if (ctx.config.vite) {
+    plugins.push({
+      name: 'histoire-vite-config-override',
+      config () {
+        return ctx.config.vite
+      },
+    })
+  }
+
   plugins.push({
     name: 'histoire-vite-plugin',
 
