@@ -1,3 +1,13 @@
+## [0.0.2](https://github.com/Akryum/histoire/compare/v0.0.1...v0.0.2) (2022-02-22)
+
+
+### Features
+
+* Add missing gray shades (fix [#35](https://github.com/Akryum/histoire/issues/35)) ([#39](https://github.com/Akryum/histoire/issues/39)) ([389eb18](https://github.com/Akryum/histoire/commit/389eb18d78fc996edad0a7b13720e8c993daa9f9))
+* Auto expand parent folders of selected story (fix [#29](https://github.com/Akryum/histoire/issues/29)) ([#36](https://github.com/Akryum/histoire/issues/36)) ([09727f4](https://github.com/Akryum/histoire/commit/09727f437ae0cf703b03397033c46c5487f100c3))
+
+
+
 ## [0.0.1](https://github.com/Akryum/histoire/compare/105b9433214bb343a6c251bac4af0758d4d2bd47...v0.0.1) (2022-02-18)
 
 
