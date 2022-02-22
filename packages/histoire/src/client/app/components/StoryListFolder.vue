@@ -3,19 +3,25 @@ import { Story, TreeFolder } from '../types'
 import StoryListItem from './StoryListItem.vue'
 import { Icon } from '@iconify/vue'
 import { computed, ref, withDefaults } from 'vue'
+import { useStoryStore } from '../stores/story'
 
 const props = withDefaults(defineProps<{
+  path?: Array<string>
   folder: TreeFolder
   stories: Story[]
   depth?: number
 }>(), {
   depth: 0,
+  path: () => [],
 })
 
-const isFolderOpen = ref(false)
+const storyStore = useStoryStore()
+
+const folderPath = computed(() => [...props.path, props.folder.title])
+const isFolderOpen = computed(() => storyStore.isFolderOpened(folderPath.value))
 
 function toggleOpen () {
-  isFolderOpen.value = !isFolderOpen.value
+  storyStore.toggleFolder(folderPath.value)
 }
 
 const folderPadding = computed(() => {
@@ -59,6 +65,7 @@ const folderPadding = computed(() => {
       >
         <StoryListFolder
           v-if="element.children"
+          :path="folderPath"
           :folder="element"
           :stories="stories"
           :depth="depth + 1"
