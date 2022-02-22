@@ -11,7 +11,8 @@
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "types": [
-      "node"
+      "node",
+      "@peeky/test"
     ],
     "lib": [
       "ESNext",
