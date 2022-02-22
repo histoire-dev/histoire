@@ -23,6 +23,9 @@ export function mapFile (file: StoryFile, existingFile?: StoryFile): StoryFile {
         if (existingVariant.slots) variant.slots = existingVariant.slots
       }
     }
+    if (existingFile.story.lastSelectedVariant) {
+      result.story.lastSelectedVariant = result.story.variants.find(v => v.id === existingFile.story.lastSelectedVariant.id)
+    }
   }
 
   return result
