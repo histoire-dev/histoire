@@ -12,6 +12,11 @@ type CustomizableColors = 'primary' | 'gray'
 type ColorKeys = '50' | '100' | '200' | '300' | '400' | '500' | '600' | '700' | '800' | '900'
 type GrayColorKeys = ColorKeys | '750' | '850' | '950'
 
+interface ResponsivePreset {
+  label: string
+  width: number
+}
+
 export interface HistoireConfig {
   /**
    * Output directory.
@@ -94,6 +99,10 @@ export interface HistoireConfig {
    */
   setupFile?: string
   /**
+   * Predefined responsive sizes for story playgrounds.
+   */
+  responsivePresets?: ResponsivePreset[]
+  /**
    * Vite config override
    */
   vite?: ViteConfig
@@ -115,6 +124,40 @@ export function getDefaultConfig (): HistoireConfig {
         gray: defaultColors.zinc,
       },
     },
+    responsivePresets: [
+      {
+        label: 'Mobile (Small)',
+        width: 320,
+      },
+      {
+        label: 'Mobile (Medium)',
+        width: 375,
+      },
+      {
+        label: 'Mobile (Large)',
+        width: 425,
+      },
+      {
+        label: 'Tablet',
+        width: 768,
+      },
+      {
+        label: 'Laptop (Small)',
+        width: 1024,
+      },
+      {
+        label: 'Laptop (Large)',
+        width: 1440,
+      },
+      {
+        label: 'Desktop',
+        width: 1920,
+      },
+      {
+        label: '4K',
+        width: 3840,
+      },
+    ],
   }
 }
 

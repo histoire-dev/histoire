@@ -4,6 +4,7 @@ import { PropType, ref, watch, toRaw, computed } from 'vue'
 import { Icon } from '@iconify/vue'
 import { Story, Variant } from '../types'
 import { STATE_SYNC } from '../util/const.js'
+import { histoireConfig } from '../util/config.js'
 import BaseSplitPane from './base/BaseSplitPane.vue'
 import HatchedPattern from './misc/HatchedPattern.vue'
 
@@ -85,10 +86,37 @@ const responsiveWidth = ref<number>(undefined)
 
       <!-- Responsive size -->
       <div class="htw-flex-none htw-flex htw-gap-1 htw-items-center">
-        <Icon
-          icon="ic:baseline-phone-android"
-          class="htw-w-4 htw-h-4 htw-opacity-50"
-        />
+        <VDropdown
+          placement="bottom-end"
+          :distance="10"
+          :skidding="6"
+          :disabled="!histoireConfig.responsivePresets?.length"
+        >
+          <Icon
+            icon="ic:baseline-phone-android"
+            class="htw-w-4 htw-h-4 htw-opacity-50"
+            :class="{
+              'htw-cursor-pointer hover:htw-text-primary-500': histoireConfig.responsivePresets?.length,
+            }"
+          />
+
+          <template #popper="{ hide }">
+            <div class="htw-flex htw-flex-col htw-items-stretch">
+              <button
+                v-for="(preset, index) in histoireConfig.responsivePresets"
+                :key="index"
+                class="htw-bg-transparent hover:htw-bg-primary-100 dark:hover:htw-bg-primary-700 htw-px-4 htw-py-3 htw-cursor-pointer htw-text-left htw-flex htw-gap-2"
+                :class="{
+                  'htw-bg-primary-500 hover:htw-bg-primary-600 htw-text-white': responsiveWidth === preset.width,
+                }"
+                @click="responsiveWidth = preset.width;hide()"
+              >
+                {{ preset.label }}
+                <span class="htw-ml-auto htw-opacity-70">{{ preset.width }}px</span>
+              </button>
+            </div>
+          </template>
+        </VDropdown>
 
         <input
           v-model.number="responsiveWidth"

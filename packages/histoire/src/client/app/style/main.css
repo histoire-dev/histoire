@@ -12,7 +12,8 @@
 }
 
 a,
-input {
+input,
+button {
   color: inherit;
 }
 

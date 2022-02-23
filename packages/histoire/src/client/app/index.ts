@@ -12,6 +12,12 @@ const app = createApp(App)
 app.use(createPinia())
 app.use(FloatingVue, {
   overflowPadding: 4,
+  arrowPadding: 8,
+  themes: {
+    dropdown: {
+      computeTransformOrigin: true,
+    },
+  },
 })
 app.use(router)
 registerGlobalComponents(app)
