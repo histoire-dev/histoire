@@ -1,3 +1,21 @@
+## [0.0.3](https://github.com/Akryum/histoire/compare/v0.0.2...v0.0.3) (2022-02-23)
+
+
+### Bug Fixes
+
+* responsive selected dark style ([771bdfb](https://github.com/Akryum/histoire/commit/771bdfbba5fdd7e7486d3fe000f2ac81eab86f20))
+* restore last selected variant on stories HMR ([bf25e84](https://github.com/Akryum/histoire/commit/bf25e84d521af7e6bd6874e1868949be10c01d02))
+* search dark style ([d598906](https://github.com/Akryum/histoire/commit/d59890657e81cb096619455001104d6ace6b9bf0))
+
+
+### Features
+
+* **config:** vite config override, closes [#25](https://github.com/Akryum/histoire/issues/25) ([8dcc6e7](https://github.com/Akryum/histoire/commit/8dcc6e7de0a4c81975e9d59c8262743e18277678))
+* responsive presets, closes [#37](https://github.com/Akryum/histoire/issues/37) ([a27f8cf](https://github.com/Akryum/histoire/commit/a27f8cfd4b4c84c117989cf2e354fcbd9ebdffb2))
+* restart on config change, closes [#28](https://github.com/Akryum/histoire/issues/28) ([ae7d47c](https://github.com/Akryum/histoire/commit/ae7d47cea3bf566bf3439f9fd2ea175166c9fb7f))
+
+
+
 ## [0.0.2](https://github.com/Akryum/histoire/compare/v0.0.1...v0.0.2) (2022-02-22)
 
 
