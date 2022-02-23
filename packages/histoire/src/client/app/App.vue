@@ -104,11 +104,11 @@ onKeyboardShortcut(['ctrl+k', 'meta+k'], (event) => {
         <RouterView />
       </template>
     </BaseSplitPane>
-  </div>
 
-  <SearchModal
-    v-if="loadSearch"
-    :shown="isSearchOpen"
-    @close="isSearchOpen = false"
-  />
+    <SearchModal
+      v-if="loadSearch"
+      :shown="isSearchOpen"
+      @close="isSearchOpen = false"
+    />
+  </div>
 </template>
