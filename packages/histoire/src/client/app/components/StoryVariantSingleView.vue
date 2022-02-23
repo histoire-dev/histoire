@@ -107,7 +107,7 @@ const responsiveWidth = ref<number>(undefined)
                 :key="index"
                 class="htw-bg-transparent hover:htw-bg-primary-100 dark:hover:htw-bg-primary-700 htw-px-4 htw-py-3 htw-cursor-pointer htw-text-left htw-flex htw-gap-2"
                 :class="{
-                  'htw-bg-primary-500 hover:htw-bg-primary-600 htw-text-white': responsiveWidth === preset.width,
+                  'htw-bg-primary-500 hover:htw-bg-primary-600 htw-text-white dark:htw-text-black': responsiveWidth === preset.width,
                 }"
                 @click="responsiveWidth = preset.width;hide()"
               >
