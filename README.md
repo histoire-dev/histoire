@@ -112,7 +112,7 @@ See [Contributing Guide](https://github.com/Akryum/histoire/blob/main/CONTRIBUTI
 
 ### [Guillaume Chau](https://github.com/sponsors/Akryum)
 
-[![sponsors logos](https://guillaume-chau.info/sponsors.png)](https://guillaume-chau.info/sponsors)
+![sponsors logos](https://akryum.netlify.app/sponsors.svg)
 
 ## License
 
