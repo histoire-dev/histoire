@@ -19,6 +19,7 @@ import SlotWithProps from './SlotWithProps.vue'
 function initState () {
   return {
     count: 0,
+    text: 'Foo',
   }
 }
 
@@ -76,6 +77,20 @@ function onClick (event) {
           v-model.number="state.count"
           type="number"
         >
+        <input
+          v-model="state.text"
+        >
+        <HstInput
+          v-model="state.text"
+        />
+        <HstInput
+          v-model.number="state.count"
+          type="number"
+        />
+        <HstInput
+          v-model:foo="state.count"
+          v-model:my-prop.number="state.count"
+        />
       </template>
     </Variant>
     <Variant

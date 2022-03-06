@@ -3,7 +3,7 @@
 
 import { VNode, vModelText, vModelCheckbox, vModelSelect, vModelRadio, vModelDynamic } from 'vue'
 import { Text } from '@vue/runtime-core'
-import { pascal, kebab } from 'case'
+import { pascal } from 'case'
 import { createAutoBuildingObject, indent } from './util'
 import { serializeJs } from './serialize-js'
 import type { Variant } from '../types'
@@ -49,7 +49,7 @@ async function printVNode (vnode: VNode): Promise<string[]> {
       }
       const valueLines = valueCode ? [valueCode] : serializeAndCleanJs(dir.value)
       const attr: string[] = []
-      const dirAttr = `v-${dirName}${modifiers}${arg}="`
+      const dirAttr = `v-${dirName}${arg}${modifiers}="`
       if (valueLines.length > 1) {
         attr.push(`${dirAttr}${valueLines[0]}`)
         attr.push(...valueLines.slice(1, valueLines.length - 1))
@@ -105,7 +105,35 @@ async function printVNode (vnode: VNode): Promise<string[]> {
         if (prop.startsWith('on')) {
           directive = '@'
         }
-        const arg = kebab(directive === '@' ? prop.slice(2) : prop)
+        const arg = directive === '@' ? `${prop[2].toLowerCase()}${prop.slice(3)}` : prop
+
+        // v-model on component
+        const vmodelListener = `onUpdate:${prop}`
+        if (directive === ':' && vnode.dynamicProps.includes(vmodelListener)) {
+          // Listener
+          skipProps.push(vmodelListener)
+          const listener = vnode.props[vmodelListener]
+          const listenerSource = listener.toString()
+          let valueCode: string
+          const result = /\(\$event\) => (.*?) = \$event/.exec(listenerSource)
+          if (result) {
+            valueCode = result[1]
+          }
+
+          // Modifiers
+          const modifiersKey = `${prop === 'modelValue' ? 'model' : prop}Modifiers`
+          const modifiers = vnode.props[modifiersKey] ?? {}
+          skipProps.push(modifiersKey)
+
+          // Directive
+          genDirective('model', {
+            arg: prop === 'modelValue' ? null : prop,
+            modifiers,
+            value,
+          }, valueCode)
+          continue
+        }
+
         let serialized: string[]
         if (typeof value === 'string' && value.startsWith('{{') && value.endsWith('}}')) {
           // It was formatted from auto building object (slot props)
@@ -123,7 +151,7 @@ async function printVNode (vnode: VNode): Promise<string[]> {
           attrs.push([`${directive}${arg}="${serialized[0]}"`])
         }
       } else {
-        attrs.push([`${kebab(prop)}="${value}"`])
+        attrs.push([`${prop}="${value}"`])
       }
     }
     if (attrs.length > 1) {
