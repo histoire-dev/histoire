@@ -168,7 +168,7 @@ const responsiveWidth = ref<number>(undefined)
       </template>
       <template #last>
         <div
-          class="htw-w-full htw-h-full htw-bg-gray-200 dark:htw-bg-gray-850 htw-rounded-r-lg htw-border-l-2 htw-border-gray-500/10 dark:htw-border-gray-700/30"
+          class="htw-w-full htw-h-full htw-bg-gray-200 dark:htw-bg-gray-850 htw-rounded-r-lg htw-border-l-2 htw-border-gray-500/10 dark:htw-border-gray-700/30 htw-overflow-hidden"
         >
           <HatchedPattern
             class="htw-w-full htw-h-full htw-text-black/[2%] dark:htw-text-white/[2%]"
