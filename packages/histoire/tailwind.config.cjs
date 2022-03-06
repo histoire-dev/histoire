@@ -23,11 +23,30 @@ const themedColors = ['primary', 'gray'].reduce((acc, color) => {
   return acc
 }, {})
 
+const excludedDefaultColors = [
+  // Grays
+  'slate',
+  'gray',
+  'zinc',
+  'neutral',
+  'stone',
+  // Deprecated colors
+  'lightBlue',
+  'warmGray',
+  'trueGray',
+  'coolGray',
+  'blueGray',
+]
+
+const includedDefaultColors = {}
+for (const key in defaultColors) {
+  if (!excludedDefaultColors.includes(key)) {
+    includedDefaultColors[key] = defaultColors[key]
+  }
+}
+
 const colors = {
-  ...{
-    ...defaultColors,
-    gray: undefined,
-  },
+  ...includedDefaultColors,
   white: '#fff',
   black: '#000',
   transparent: 'transparent',
