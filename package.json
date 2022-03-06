@@ -8,7 +8,7 @@
   },
   "scripts": {
     "lint": "eslint . --ext js,vue,ts",
-    "build": "pnpm run -r build --filter ./packages",
+    "build": "pnpm run -r build --filter !histoire && pnpm run -r build --filter histoire",
     "watch": "pnpm run build && pnpm run -r watch --parallel --filter ./packages",
     "test": "pnpm run -r test --parallel --filter ./packages",
     "test:open": "pnpm run -r test:open --parallel --filter ./packages",
