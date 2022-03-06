@@ -31,7 +31,9 @@ function initState () {
       <template #controls="{ state }">
         <HstCheckbox
           v-model="state.disabled"
-        />
+        >
+          Disabled
+        </HstCheckbox>
       </template>
     </Variant>
 

@@ -39,7 +39,7 @@ watch(path, value => {
     @keydown.enter.prevent="toggle()"
     @keydown.space.prevent="toggle()"
   >
-    <div class="htw-text-white htw-w-max htw-h-max htw-relative">
+    <div class="htw-text-white htw-w-[16px] htw-h-[16px] htw-relative">
       <div
         class="htw-border group-active:htw-bg-gray-500/20 htw-rounded-sm htw-box-border htw-absolute htw-inset-0 htw-transition-border htw-duration-150 htw-ease-out"
         :class="[
