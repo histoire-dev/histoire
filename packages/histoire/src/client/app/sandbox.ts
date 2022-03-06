@@ -18,13 +18,20 @@ const app = createApp({
     const story = computed(() => file.value.story)
     const variant = computed(() => story.value?.variants.find(v => v.id === query.variantId))
 
+    let synced = false
+
     window.addEventListener('message', event => {
       if (event.data?.type === STATE_SYNC) {
+        synced = true
         Object.assign(variant.value.state, event.data.state)
       }
     })
 
     watch(() => variant.value.state, value => {
+      if (synced) {
+        synced = false
+        return
+      }
       window.parent?.postMessage({
         type: STATE_SYNC,
         state: toRaw(value),

@@ -33,7 +33,13 @@ function syncState () {
   }
 }
 
+let synced = false
+
 watch(() => props.variant.state, () => {
+  if (synced) {
+    synced = false
+    return
+  }
   syncState()
 }, {
   deep: true,
@@ -42,6 +48,7 @@ watch(() => props.variant.state, () => {
 
 useEventListener(window, 'message', (event) => {
   if (event.data.type === STATE_SYNC) {
+    synced = true
     Object.assign(props.variant.state, event.data.state)
   }
 })
