@@ -29,15 +29,9 @@ function initState () {
       </template>
 
       <template #controls="{ state }">
-        <div>
-          <label>
-            <input
-              v-model="state.disabled"
-              type="checkbox"
-            >
-            Disabled
-          </label>
-        </div>
+        <HstCheckbox
+          v-model="state.disabled"
+        />
       </template>
     </Variant>
 

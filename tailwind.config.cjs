@@ -57,6 +57,10 @@ module.exports = {
         'ns-resize': 'ns-resize',
         'cursor-not-allowed': 'cursor-not-allowed',
       },
+
+      transitionProperty: {
+        border: 'border',
+      },
     },
   },
   content: [

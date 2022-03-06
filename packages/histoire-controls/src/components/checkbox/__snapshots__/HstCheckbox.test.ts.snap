@@ -1,0 +1,59 @@
+// Peeky snapshots v1.0
+
+exports[`HstCheckbox toggle to checked 1`] = `
+<div
+  role="checkbox"
+  tabindex="0"
+  class="htw-flex htw-items-center htw-gap-1 htw-select-none htw-px-4 htw-py-2 htw-cursor-pointer hover:htw-bg-primary-500/10"
+>
+  <div class="htw-text-white htw-w-max htw-h-max htw-relative">
+    <div class="htw-border group-active:htw-bg-gray-500/20 htw-rounded-sm htw-box-border htw-absolute htw-inset-0 htw-transition-border htw-duration-150 htw-ease-out htw-border-gray-300 dark:htw-border-gray-500 htw-delay-150">
+    </div>
+    <svg
+      width="16"
+      height="16"
+      viewbox="0 0 24 24"
+      class="htw-relative htw-z-10"
+    >
+      <path
+        d="m 4 12 l 5 5 l 10 -10"
+        fill="none"
+        class="htw-stroke-white htw-stroke-2 htw-duration-200 htw-ease-in-out htw-transition-all"
+        stroke-dasharray="21.21"
+        stroke-dashoffset="21.21"
+      >
+      </path>
+    </svg>
+  </div>
+  Label
+</div>
+`;
+
+exports[`HstCheckbox toggle to unchecked 1`] = `
+<div
+  role="checkbox"
+  tabindex="0"
+  class="htw-flex htw-items-center htw-gap-1 htw-select-none htw-px-4 htw-py-2 htw-cursor-pointer hover:htw-bg-primary-500/10"
+>
+  <div class="htw-text-white htw-w-max htw-h-max htw-relative">
+    <div class="htw-border group-active:htw-bg-gray-500/20 htw-rounded-sm htw-box-border htw-absolute htw-inset-0 htw-transition-border htw-duration-150 htw-ease-out htw-border-primary-500 htw-border-8">
+    </div>
+    <svg
+      width="16"
+      height="16"
+      viewbox="0 0 24 24"
+      class="htw-relative htw-z-10"
+    >
+      <path
+        d="m 4 12 l 5 5 l 10 -10"
+        fill="none"
+        class="htw-stroke-white htw-stroke-2 htw-duration-200 htw-ease-in-out htw-transition-all htw-delay-150"
+        stroke-dasharray="21.21"
+        stroke-dashoffset="0"
+      >
+      </path>
+    </svg>
+  </div>
+  Label
+</div>
+`;

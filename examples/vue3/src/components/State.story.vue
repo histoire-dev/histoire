@@ -2,6 +2,7 @@
 function initState () {
   return {
     count: 0,
+    text: '',
   }
 }
 </script>
@@ -22,6 +23,9 @@ function initState () {
             v-model.number="state.count"
             type="number"
           >
+          <input
+            v-model="state.text"
+          >
         </div>
       </template>
 
@@ -35,6 +39,10 @@ function initState () {
           </button>
           <span>{{ state.count }}</span>
         </div>
+
+        <HstInput v-model="state.text">
+          Text
+        </HstInput>
       </template>
     </Variant>
   </Story>

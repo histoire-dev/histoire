@@ -1,6 +1,7 @@
 
 const inheritedConfig = require('../../tailwind.config.cjs')
 const defaultColors = require('tailwindcss/colors')
+const path = require('pathe')
 
 // Colors
 
@@ -57,6 +58,8 @@ module.exports = {
   ...inheritedConfig,
   content: [
     './src/**/*.{vue,js,ts,jsx,tsx,md}',
+    // Include controls CSS directly
+    path.resolve(__dirname, '../histoire-controls/src/**/*.{vue,js,ts,jsx,tsx,md}'),
   ],
   corePlugins: {
     preflight: false,
