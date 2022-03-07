@@ -1,3 +1,9 @@
+<script lang="ts">
+export default {
+  name: 'HstCheckbox',
+}
+</script>
+
 <script lang="ts" setup>
 import { computed, ref, watch } from 'vue'
 

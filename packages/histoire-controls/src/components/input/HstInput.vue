@@ -1,3 +1,11 @@
+<script lang="ts">
+export default {
+  name: 'HstInput',
+
+  inheritAttrs: false,
+}
+</script>
+
 <script lang="ts" setup>
 import { ref } from 'vue'
 
@@ -13,12 +21,6 @@ const emit = defineEmits({
 })
 
 const input = ref<HTMLInputElement>()
-</script>
-
-<script lang="ts">
-export default {
-  inheritAttrs: false,
-}
 </script>
 
 <template>
