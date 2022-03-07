@@ -19,8 +19,6 @@ const props = defineProps({
 
 const { variant } = toRefs(props)
 const { isActive, targetRoute } = useCurrentVariantRoute(variant)
-
-const iconColor = computed(() => props.variant.iconColor)
 </script>
 
 <template>
@@ -66,6 +64,6 @@ const iconColor = computed(() => props.variant.iconColor)
 
 <style scoped>
 .bind-icon-color {
-  color: v-bind(iconColor);
+  color: v-bind('variant.iconColor');
 }
 </style>

@@ -43,8 +43,6 @@ const defaultIcons = {
   variant: 'carbon:cube',
 }
 
-const iconColor = computed(() => props.result.iconColor)
-
 const kindLabels = {
   story: 'Story',
   variant: 'Variant',
@@ -105,6 +103,6 @@ const kindLabels = {
 
 <style scoped>
 .bind-icon-color {
-  color: v-bind(iconColor);
+  color: v-bind('result.iconColor');
 }
 </style>

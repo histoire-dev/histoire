@@ -14,8 +14,6 @@ const props = withDefaults(defineProps<{
 const filePadding = computed(() => {
   return (props.depth * 16) + 'px'
 })
-
-const iconColor = computed(() => props.story.iconColor)
 </script>
 
 <template>
@@ -55,6 +53,6 @@ const iconColor = computed(() => props.story.iconColor)
 }
 
 .bind-icon-color {
-  color: v-bind(iconColor);
+  color: v-bind('story.iconColor');
 }
 </style>
