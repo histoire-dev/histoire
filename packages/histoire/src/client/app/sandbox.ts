@@ -8,7 +8,8 @@ import type { StoryFile } from './types'
 import { mapFile } from './util/mapping'
 // @ts-expect-error virtual module
 import { files } from '$histoire-stories'
-import { STATE_SYNC } from './util/const.js'
+import { PREVIEW_SETTINGS_SYNC, STATE_SYNC } from './util/const.js'
+import { applyPreviewSettings } from './preview-settings.js'
 
 const query = parseQuery(window.location.search)
 const file = ref<StoryFile>(mapFile(files.find(f => f.id === query.storyId)))
@@ -24,6 +25,8 @@ const app = createApp({
       if (event.data?.type === STATE_SYNC) {
         synced = true
         Object.assign(variant.value.state, event.data.state)
+      } else if (event.data?.type === PREVIEW_SETTINGS_SYNC) {
+        applyPreviewSettings(event.data.settings)
       }
     })
 

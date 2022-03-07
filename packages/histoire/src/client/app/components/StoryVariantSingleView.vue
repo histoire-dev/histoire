@@ -3,10 +3,12 @@ import { useEventListener } from '@vueuse/core'
 import { PropType, ref, watch, toRaw, computed } from 'vue'
 import { Icon } from '@iconify/vue'
 import { Story, Variant } from '../types'
-import { STATE_SYNC } from '../util/const.js'
+import { STATE_SYNC, PREVIEW_SETTINGS_SYNC } from '../util/const.js'
 import { histoireConfig } from '../util/config.js'
 import BaseSplitPane from './base/BaseSplitPane.vue'
 import HatchedPattern from './misc/HatchedPattern.vue'
+import CheckerboardPattern from './misc/CheckerboardPattern.vue'
+import { usePreviewSettings } from '../preview-settings.js'
 
 const props = defineProps({
   variant: {
@@ -66,19 +68,43 @@ watch(sandboxUrl, () => {
   isIframeLoaded.value = false
 })
 
-function onIframeLoad () {
-  isIframeLoaded.value = true
-  syncState()
-}
-
 // Responsive
 
 const responsiveWidth = ref<number>(undefined)
+
+// Iframe settings
+
+const settings = usePreviewSettings()
+
+function syncSettings () {
+  if (iframe.value) {
+    iframe.value.contentWindow.postMessage({
+      type: PREVIEW_SETTINGS_SYNC,
+      settings: toRaw(settings.value),
+    })
+  }
+}
+
+watch(settings, value => {
+  syncSettings()
+}, {
+  deep: true,
+  immediate: true,
+})
+
+// Iframe load
+
+function onIframeLoad () {
+  isIframeLoaded.value = true
+  syncState()
+  syncSettings()
+}
 </script>
 
 <template>
   <div class="htw-h-full htw-flex htw-flex-col htw-gap-2">
-    <div class="htw-flex-none htw-flex htw-items-center htw-gap-2">
+    <!-- Toolbar -->
+    <div class="htw-flex-none htw-flex htw-items-center htw-gap-4">
       <!-- Variant title -->
       <div class="htw-flex htw-items-center htw-gap-1 htw-text-gray-500 htw-flex-1 htw-truncate htw-min-w-0">
         <Icon
@@ -95,24 +121,32 @@ const responsiveWidth = ref<number>(undefined)
       <div class="htw-flex-none htw-flex htw-gap-1 htw-items-center">
         <VDropdown
           placement="bottom-end"
-          :distance="10"
           :skidding="6"
           :disabled="!histoireConfig.responsivePresets?.length"
         >
-          <Icon
-            icon="ic:baseline-phone-android"
-            class="htw-w-4 htw-h-4 htw-opacity-50"
+          <div
+            v-tooltip="'Responsive sizes'"
+            class="htw-flex htw-items-center htw-gap-1"
             :class="{
               'htw-cursor-pointer hover:htw-text-primary-500': histoireConfig.responsivePresets?.length,
             }"
-          />
+          >
+            <Icon
+              icon="ic:baseline-phone-android"
+              class="htw-w-4 htw-h-4 htw-opacity-50"
+            />
+            <Icon
+              icon="carbon:caret-down"
+              class="htw-w-4 htw-h-4 htw-opacity-50"
+            />
+          </div>
 
           <template #popper="{ hide }">
             <div class="htw-flex htw-flex-col htw-items-stretch">
               <button
                 v-for="(preset, index) in histoireConfig.responsivePresets"
                 :key="index"
-                class="htw-bg-transparent hover:htw-bg-primary-100 dark:hover:htw-bg-primary-700 htw-px-4 htw-py-3 htw-cursor-pointer htw-text-left htw-flex htw-gap-2"
+                class="htw-bg-transparent hover:htw-bg-primary-100 dark:hover:htw-bg-primary-700 htw-px-4 htw-py-3 htw-cursor-pointer htw-text-left htw-flex htw-gap-4"
                 :class="{
                   'htw-bg-primary-500 hover:htw-bg-primary-600 htw-text-white dark:htw-text-black': responsiveWidth === preset.width,
                 }"
@@ -133,8 +167,64 @@ const responsiveWidth = ref<number>(undefined)
           step="16"
         >
       </div>
+
+      <!-- Background -->
+      <div
+        v-if="histoireConfig.backgroundPresets.length"
+        class="htw-flex-none htw-flex htw-gap-1 htw-items-center"
+      >
+        <VDropdown
+          placement="bottom-end"
+          :skidding="6"
+        >
+          <div
+            v-tooltip="'Background color'"
+            class="htw-cursor-pointer hover:htw-text-primary-500 htw-flex htw-items-center htw-gap-1"
+          >
+            <div
+              class="bind-preview-bg htw-w-4 htw-h-4 htw-rounded-full htw-border htw-border-black/20 dark:htw-border-white/20"
+            />
+            <Icon
+              icon="carbon:caret-down"
+              class="htw-w-4 htw-h-4 htw-opacity-50"
+            />
+          </div>
+
+          <template #popper="{ hide }">
+            <div class="htw-flex htw-flex-col htw-items-stretch">
+              <HstCheckbox
+                v-model="settings.checkerboard"
+              >
+                Checkerboard
+              </HstCheckbox>
+
+              <button
+                v-for="(option, index) in histoireConfig.backgroundPresets"
+                :key="index"
+                class="htw-bg-transparent hover:htw-bg-primary-100 dark:hover:htw-bg-primary-700 htw-px-4 htw-py-3 htw-cursor-pointer htw-text-left htw-flex htw-gap-4"
+                :class="{
+                  'htw-bg-primary-500 hover:htw-bg-primary-600 htw-text-white dark:htw-text-black': settings.backgroundColor === option.color,
+                }"
+                @click="settings.backgroundColor = option.color;hide()"
+              >
+                <span class="htw-mr-auto">{{ option.label }}</span>
+                <template v-if="option.color !== '$checkerboard'">
+                  <span class="htw-ml-auto htw-opacity-70">{{ option.color }}</span>
+                  <div
+                    class="htw-w-4 htw-h-4 htw-rounded-full htw-border htw-border-black/20 dark:htw-border-white/20"
+                    :style="{
+                      backgroundColor: option.color,
+                    }"
+                  />
+                </template>
+              </button>
+            </div>
+          </template>
+        </VDropdown>
+      </div>
     </div>
 
+    <!-- Preview pane -->
     <BaseSplitPane
       v-model:split="responsiveWidth"
       save-id="story-single-responsive"
@@ -146,11 +236,18 @@ const responsiveWidth = ref<number>(undefined)
     >
       <template #first>
         <div class="htw-p-4 htw-h-full htw-overflow-hidden htw-bg-white dark:htw-bg-gray-700 htw-rounded-l-lg htw-relative">
-          <div class="htw-w-full htw-h-full htw-border htw-border-gray-100 dark:htw-border-gray-800 htw-bg-white htw-rounded-sm">
+          <div class="htw-w-full htw-h-full htw-border htw-border-gray-100 dark:htw-border-gray-800 htw-bg-white htw-rounded-sm htw-relative">
+            <div class="bind-preview-bg htw-absolute htw-inset-0" />
+
+            <CheckerboardPattern
+              v-if="settings.checkerboard"
+              class="htw-absolute htw-inset-0 htw-w-full htw-h-full htw-text-gray-500/20"
+            />
+
             <iframe
               ref="iframe"
               :src="sandboxUrl"
-              class="htw-w-full htw-h-full"
+              class="htw-w-full htw-h-full htw-relative"
               :class="{'htw-invisible': !isIframeLoaded}"
               @load="onIframeLoad()"
             />
@@ -178,3 +275,9 @@ const responsiveWidth = ref<number>(undefined)
     </BaseSplitPane>
   </div>
 </template>
+
+<style scoped>
+.bind-preview-bg {
+  background-color: v-bind('settings.backgroundColor');
+}
+</style>

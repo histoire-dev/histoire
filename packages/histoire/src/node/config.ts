@@ -17,6 +17,11 @@ interface ResponsivePreset {
   width: number
 }
 
+interface BackgroundPreset {
+  label: string
+  color: string
+}
+
 export interface HistoireConfig {
   /**
    * Output directory.
@@ -103,6 +108,10 @@ export interface HistoireConfig {
    */
   responsivePresets?: ResponsivePreset[]
   /**
+   * Background color of the story preview.
+   */
+  backgroundPresets?: BackgroundPreset[]
+  /**
    * Vite config override
    */
   vite?: ViteConfig
@@ -156,6 +165,24 @@ export function getDefaultConfig (): HistoireConfig {
       {
         label: '4K',
         width: 3840,
+      },
+    ],
+    backgroundPresets: [
+      {
+        label: 'White',
+        color: '#fff',
+      },
+      {
+        label: 'Light gray',
+        color: '#aaa',
+      },
+      {
+        label: 'Dark gray',
+        color: '#333',
+      },
+      {
+        label: 'Black',
+        color: '#000',
       },
     ],
   }

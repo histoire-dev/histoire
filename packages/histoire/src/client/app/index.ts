@@ -14,8 +14,12 @@ app.use(FloatingVue, {
   overflowPadding: 4,
   arrowPadding: 8,
   themes: {
+    tooltip: {
+      distance: 8,
+    },
     dropdown: {
       computeTransformOrigin: true,
+      distance: 10,
     },
   },
 })

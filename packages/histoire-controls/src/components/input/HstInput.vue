@@ -23,7 +23,7 @@ export default {
 
 <template>
   <div
-    class="htw-p-2 hover:htw-bg-primary-500/10 htw-cursor-text"
+    class="htw-p-2 hover:htw-bg-primary-100 dark:hover:htw-bg-primary-700 htw-cursor-text"
     :class="$attrs.class"
     :style="$attrs.style"
     @click="input.focus()"
