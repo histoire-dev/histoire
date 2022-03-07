@@ -1,4 +1,5 @@
 import { createApp, h } from 'vue'
+import { registerVueComponents } from '@histoire/controls'
 import type { StoryFile } from '../../node/types'
 import Story from './Story.server.vue'
 import Variant from './Variant.server.vue'
@@ -23,6 +24,8 @@ export async function run (file: StoryFile, storyData, el) {
   app.component('Story', Story)
   // eslint-disable-next-line vue/multi-word-component-names
   app.component('Variant', Variant)
+
+  registerVueComponents(app)
 
   app.mount(el)
   app.unmount()
