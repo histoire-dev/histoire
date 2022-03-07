@@ -109,7 +109,7 @@ async function printVNode (vnode: VNode): Promise<string[]> {
 
         // v-model on component
         const vmodelListener = `onUpdate:${prop}`
-        if (directive === ':' && vnode.dynamicProps.includes(vmodelListener)) {
+        if (directive === ':' && vnode.dynamicProps?.includes(vmodelListener)) {
           // Listener
           skipProps.push(vmodelListener)
           const listener = vnode.props[vmodelListener]
