@@ -10,6 +10,8 @@ import { mapFile } from './util/mapping'
 import { files } from '$histoire-stories'
 import { PREVIEW_SETTINGS_SYNC, STATE_SYNC } from './util/const.js'
 import { applyPreviewSettings } from './preview-settings.js'
+import { isDark } from './util/dark.js'
+import { histoireConfig } from './util/config.js'
 
 const query = parseQuery(window.location.search)
 const file = ref<StoryFile>(mapFile(files.find(f => f.id === query.storyId)))
@@ -68,3 +70,13 @@ const app = createApp({
 app.use(createPinia())
 registerGlobalComponents(app)
 app.mount('#app')
+
+watch(isDark, value => {
+  if (value) {
+    document.documentElement.classList.add(histoireConfig.sandboxDarkClass)
+  } else {
+    document.documentElement.classList.remove(histoireConfig.sandboxDarkClass)
+  }
+}, {
+  immediate: true,
+})

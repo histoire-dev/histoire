@@ -1,6 +1,10 @@
+html,
+body {
+  background: transparent !important;
+}
+
 body {
   margin: 0;
-  background: transparent;
 }
 
 html,

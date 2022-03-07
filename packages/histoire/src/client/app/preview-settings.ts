@@ -8,7 +8,7 @@ export interface PreviewSettings {
 
 export function usePreviewSettings () {
   return useStorage<PreviewSettings>('_histoire-sandbox-settings', {
-    backgroundColor: '#fff',
+    backgroundColor: 'transparent',
     checkerboard: false,
   })
 }

@@ -112,6 +112,10 @@ export interface HistoireConfig {
    */
   backgroundPresets?: BackgroundPreset[]
   /**
+   * Class added to the html root of the story preview when dark mode is enabled.
+   */
+  sandboxDarkClass?: string
+  /**
    * Vite config override
    */
   vite?: ViteConfig
@@ -169,6 +173,10 @@ export function getDefaultConfig (): HistoireConfig {
     ],
     backgroundPresets: [
       {
+        label: 'Transparent',
+        color: 'transparent',
+      },
+      {
         label: 'White',
         color: '#fff',
       },
@@ -185,6 +193,7 @@ export function getDefaultConfig (): HistoireConfig {
         color: '#000',
       },
     ],
+    sandboxDarkClass: 'dark',
   }
 }
 

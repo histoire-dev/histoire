@@ -236,7 +236,7 @@ function onIframeLoad () {
     >
       <template #first>
         <div class="htw-p-4 htw-h-full htw-overflow-hidden htw-bg-white dark:htw-bg-gray-700 htw-rounded-l-lg htw-relative">
-          <div class="htw-w-full htw-h-full htw-border htw-border-gray-100 dark:htw-border-gray-800 htw-bg-white htw-rounded-sm htw-relative">
+          <div class="htw-w-full htw-h-full htw-border htw-border-gray-100 dark:htw-border-gray-800 htw-rounded-sm htw-relative">
             <div class="bind-preview-bg htw-absolute htw-inset-0" />
 
             <CheckerboardPattern
