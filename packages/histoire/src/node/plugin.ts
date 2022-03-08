@@ -6,6 +6,7 @@ import { Context } from './context.js'
 import { notifyStoryChange } from './stories.js'
 import { makeTree } from './tree.js'
 import { parseColor } from './colors.js'
+import { createMarkdownRenderer } from './markdown.js'
 
 export const STORIES_ID = '$histoire-stories'
 export const RESOLVED_STORIES_ID = `/${STORIES_ID}-resolved`
@@ -198,6 +199,26 @@ if (import.meta.hot) {
           next()
         })
       }
+    },
+  })
+
+  // Custom blocks
+  let md = await createMarkdownRenderer()
+  if (ctx.config.markdown) {
+    const result = await ctx.config.markdown(md)
+    if (result) {
+      md = result
+    }
+  }
+  plugins.push({
+    name: 'histoire-vue-docs-block',
+    transform (code, id) {
+      if (!id.includes('?vue&type=docs')) return
+      if (!id.includes('lang.md')) return
+      const html = md.render(code)
+      return `export default Comp => {
+        Comp.doc = ${JSON.stringify(html)}
+      }`
     },
   })
 

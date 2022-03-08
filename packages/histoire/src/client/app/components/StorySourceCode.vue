@@ -114,8 +114,4 @@ const copySourceCode = () => copy(sourceCode.value)
   color: inherit;
   font-size: inherit;
 }
-
-.__histoire-code:deep(.shiki) {
-  background: transparent !important;
-}
 </style>

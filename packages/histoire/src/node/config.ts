@@ -7,6 +7,7 @@ import { ViteNodeRunner } from 'vite-node/client'
 import pc from 'picocolors'
 import { TreeFile } from './tree.js'
 import { defaultColors } from './colors.js'
+import type MarkdownIt from 'markdown-it'
 
 type CustomizableColors = 'primary' | 'gray'
 type ColorKeys = '50' | '100' | '200' | '300' | '400' | '500' | '600' | '700' | '800' | '900'
@@ -115,6 +116,10 @@ export interface HistoireConfig {
    * Class added to the html root of the story preview when dark mode is enabled.
    */
   sandboxDarkClass?: string
+  /**
+   * Customize the markdown-it renderer
+   */
+  markdown?: (md: MarkdownIt) => MarkdownIt | Promise<MarkdownIt>
   /**
    * Vite config override
    */

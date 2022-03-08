@@ -1,6 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Lato&display=swap');
 @import 'floating-vue/dist/style.css';
 @import 'floating-vue.css';
+@import 'transitions.css';
 
 *,
 ::before,
@@ -49,4 +50,18 @@ body,
 
 .__histoire-sandbox {
   contain: content;
+}
+
+.__histoire-code .shiki {
+  background: transparent !important;
+}
+
+.htw-prose {
+  h1, h2, h3, h4 {
+    &:not(:hover) {
+      .header-anchor[aria-hidden="true"] {
+        visibility: hidden;
+      }
+    }
+  }
 }

@@ -69,3 +69,48 @@ module.exports = {
 delete module.exports.theme.extend.colors.primary
 delete module.exports.theme.extend.colors.gray
 module.exports.theme.colors = colors
+
+module.exports.plugins.push(require('@tailwindcss/typography'))
+// prose-a:htw-text-primary-500 prose-headings:htw-mb-2 prose-headings:htw-mt-4 first:prose-headings:htw-mt-0 prose-blockquote:htw-ml-0
+module.exports.theme.extend.typography = (theme) => ({
+  DEFAULT: {
+    css: {
+      a: {
+        color: theme('colors.primary-500'),
+        textDecoration: 'none',
+
+        '&:hover': {
+          textDecoration: 'underline',
+        },
+      },
+
+      'h1, h2, h3, h4, th': {
+        marginBottom: '0.75rem',
+
+        '&:not(:first-child)': {
+          marginTop: '1.25rem',
+        },
+      },
+
+      blockquote: {
+        marginLeft: 0,
+        marginRight: 0,
+        backgroundColor: theme('colors.gray-100'),
+        padding: '4px 6px',
+
+        '& p:first-child': {
+          marginTop: 0,
+        },
+
+        '& p:last-child': {
+          marginBottom: 0,
+        },
+      },
+
+      li: {
+        marginTop: '0.1rem',
+        marginBottom: '0.1rem',
+      },
+    },
+  },
+})
