@@ -103,6 +103,7 @@ This mono-repo contains the following packages:
 | Package | Description |
 | ------- | ----------- |
 | [histoire](https://github.com/Akryum/histoire/tree/main/packages/histoire) | Main package |
+| [@histoire/controls](https://github.com/Akryum/histoire/tree/main/packages/histoire-controls) | Builtin controls components |
 
 ## Contribution
 
