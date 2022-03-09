@@ -26,13 +26,9 @@ export default defineConfig({
 
   histoire: {
     setupFile: '/src/histoire-setup.ts',
-    vite: {
-      build: {
-        lib: false,
-        rollupOptions: {
-          external: [],
-        },
-      },
+    vite: (config) => {
+      config.build.lib = false
+      config.build.rollupOptions.external = []
     },
   },
 

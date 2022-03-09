@@ -1,7 +1,7 @@
 import path from 'pathe'
 import fs from 'fs'
 import defu from 'defu'
-import { createServer, resolveConfig as resolveViteConfig, UserConfig as ViteConfig } from 'vite'
+import { createServer, resolveConfig as resolveViteConfig, UserConfig as ViteConfig, ConfigEnv as ViteConfigEnv } from 'vite'
 import { ViteNodeServer } from 'vite-node/server'
 import { ViteNodeRunner } from 'vite-node/client'
 import pc from 'picocolors'
@@ -123,7 +123,7 @@ export interface HistoireConfig {
   /**
    * Vite config override
    */
-  vite?: ViteConfig
+  vite?: ViteConfig | ((config: ViteConfig, env: ViteConfigEnv) => void | ViteConfig | Promise<void | ViteConfig>)
 }
 
 export function getDefaultConfig (): HistoireConfig {

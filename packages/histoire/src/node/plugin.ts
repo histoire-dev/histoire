@@ -30,8 +30,8 @@ export async function createVitePlugins (ctx: Context): Promise<VitePlugin[]> {
   if (ctx.config.vite) {
     plugins.push({
       name: 'histoire-vite-config-override',
-      config () {
-        return ctx.config.vite
+      config (config, env) {
+        return typeof ctx.config.vite === 'function' ? ctx.config.vite(config, env) : ctx.config.vite
       },
     })
   }
