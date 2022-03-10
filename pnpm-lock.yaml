@@ -98,6 +98,7 @@ importers:
       postcss: ^8.4.6
       postcss-import: ^14.0.2
       sade: ^1.8.1
+      scroll-into-view-if-needed: ^2.2.29
       shiki: ^0.10.1
       tailwindcss: ^3.0.23
       typescript: ^4.5.5
@@ -126,6 +127,7 @@ importers:
       picocolors: 1.0.0
       pinia: 2.0.11_typescript@4.5.5+vue@3.2.31
       sade: 1.8.1
+      scroll-into-view-if-needed: 2.2.29
       shiki: 0.10.1
       vite-node: 0.3.6
       vue-router: 4.0.12_vue@3.2.31
@@ -1991,6 +1993,10 @@ packages:
       array-ify: 1.0.0
       dot-prop: 5.3.0
     dev: true
+
+  /compute-scroll-into-view/1.0.17:
+    resolution: {integrity: sha512-j4dx+Fb0URmzbwwMUrhqWM2BEWHdFGx+qZ9qqASHRPqvTYdqvWnHg0H1hIbcyLnvgnoNAVMlwkepyqM3DaIFUg==}
+    dev: false
 
   /concat-map/0.0.1:
     resolution: {integrity: sha1-2Klr13/Wjfd5OnMDajug1UBdR3s=}
@@ -5183,6 +5189,12 @@ packages:
 
   /safer-buffer/2.1.2:
     resolution: {integrity: sha512-YZo3K82SD7Riyi0E1EQPojLz7kpepnSQI9IyPbHHg1XXXevb5dJI7tpyN2ADxGcQbHG7vcyRHk0cbwqcQriUtg==}
+
+  /scroll-into-view-if-needed/2.2.29:
+    resolution: {integrity: sha512-hxpAR6AN+Gh53AdAimHM6C8oTN1ppwVZITihix+WqalywBeFcQ6LdQP5ABNl26nX8GTEL7VT+b8lKpdqq65wXg==}
+    dependencies:
+      compute-scroll-into-view: 1.0.17
+    dev: false
 
   /semver/5.7.1:
     resolution: {integrity: sha512-sauaDf/PZdVgrLTNYHRtpXa1iRiKcaebiKQ1BJdpQlWH2lCvexQdX55snPFyK7QzpudqbCI0qXFfOasHdyNDGQ==}

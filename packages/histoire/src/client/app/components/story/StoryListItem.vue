@@ -2,7 +2,9 @@
 import type { Story } from '../../types'
 import BaseListItemLink from '../base/BaseListItemLink.vue'
 import { Icon } from '@iconify/vue'
-import { computed, withDefaults } from 'vue'
+import { computed, ref, withDefaults } from 'vue'
+import { useRoute } from 'vue-router'
+import { useScrollOnActive } from '../../util/scroll.js'
 
 const props = withDefaults(defineProps<{
   story: Story
@@ -14,10 +16,15 @@ const props = withDefaults(defineProps<{
 const filePadding = computed(() => {
   return (props.depth * 16) + 'px'
 })
+
+const route = useRoute()
+const active = computed(() => route.params.storyId === props.story.id)
+const el = ref<HTMLDivElement>()
+useScrollOnActive(active, el)
 </script>
 
 <template>
-  <div>
+  <div ref="el">
     <BaseListItemLink
       v-slot="{ active }"
       :to="{

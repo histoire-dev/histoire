@@ -60,6 +60,7 @@
     "picocolors": "^1.0.0",
     "pinia": "^2.0.11",
     "sade": "^1.8.1",
+    "scroll-into-view-if-needed": "^2.2.29",
     "shiki": "^0.10.1",
     "vite-node": "^0.3.6",
     "vue-router": "^4.0.12"

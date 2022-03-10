@@ -1,9 +1,10 @@
 <script lang="ts" setup>
-import { PropType, toRefs } from 'vue'
+import { PropType, ref, toRefs } from 'vue'
 import { useCurrentVariantRoute } from '../../util/variant'
 import type { Variant } from '../../types'
 import BaseListItemLink from '../base/BaseListItemLink.vue'
 import { Icon } from '@iconify/vue'
+import { useScrollOnActive } from '../../util/scroll.js'
 
 const props = defineProps({
   variant: {
@@ -14,10 +15,12 @@ const props = defineProps({
 
 const { variant } = toRefs(props)
 const { isActive, targetRoute } = useCurrentVariantRoute(variant)
+const el = ref<HTMLDivElement>()
+useScrollOnActive(isActive, el)
 </script>
 
 <template>
-  <div>
+  <div ref="el">
     <BaseListItemLink
       v-slot="{ active }"
       :to="targetRoute"
