@@ -1,8 +1,8 @@
 <script lang="ts" setup>
-import { computed, PropType, toRefs } from 'vue'
-import { useCurrentVariantRoute } from '../composable/variant'
-import { Story, Variant } from '../types'
-import SandboxVue3 from './sandbox/SandboxVue3.vue'
+import { PropType, toRefs } from 'vue'
+import { useCurrentVariantRoute } from '../../composable/variant'
+import type { Story, Variant } from '../../types'
+import SandboxVue3 from '../sandbox/SandboxVue3.vue'
 import { Icon } from '@iconify/vue'
 
 const props = defineProps({

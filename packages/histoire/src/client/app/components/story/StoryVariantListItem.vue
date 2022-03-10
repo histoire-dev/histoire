@@ -1,8 +1,8 @@
 <script lang="ts" setup>
-import { computed, PropType, toRefs } from 'vue'
-import { useCurrentVariantRoute } from '../composable/variant'
-import { Variant } from '../types'
-import BaseListItemLink from './base/BaseListItemLink.vue'
+import { PropType, toRefs } from 'vue'
+import { useCurrentVariantRoute } from '../../composable/variant'
+import type { Variant } from '../../types'
+import BaseListItemLink from '../base/BaseListItemLink.vue'
 import { Icon } from '@iconify/vue'
 
 const props = defineProps({

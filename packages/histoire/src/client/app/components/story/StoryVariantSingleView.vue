@@ -2,13 +2,13 @@
 import { useEventListener } from '@vueuse/core'
 import { PropType, ref, watch, toRaw, computed } from 'vue'
 import { Icon } from '@iconify/vue'
-import { Story, Variant } from '../types'
-import { STATE_SYNC, PREVIEW_SETTINGS_SYNC } from '../util/const.js'
-import { histoireConfig } from '../util/config.js'
-import BaseSplitPane from './base/BaseSplitPane.vue'
-import HatchedPattern from './misc/HatchedPattern.vue'
-import CheckerboardPattern from './misc/CheckerboardPattern.vue'
-import { usePreviewSettings } from '../preview-settings.js'
+import type { Story, Variant } from '../../types'
+import { STATE_SYNC, PREVIEW_SETTINGS_SYNC } from '../../util/const'
+import { histoireConfig } from '../../util/config'
+import BaseSplitPane from '../base/BaseSplitPane.vue'
+import HatchedPattern from '../misc/HatchedPattern.vue'
+import CheckerboardPattern from '../misc/CheckerboardPattern.vue'
+import { usePreviewSettings } from '../../preview-settings'
 
 const props = defineProps({
   variant: {

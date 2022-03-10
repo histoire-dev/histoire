@@ -11,7 +11,7 @@ export const router = createRouter({
     {
       path: '/story/:storyId',
       name: 'story',
-      component: () => import('./components/StoryView.vue'),
+      component: () => import('./components/story/StoryView.vue'),
     },
   ],
 })

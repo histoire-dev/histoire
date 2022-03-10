@@ -1,11 +1,11 @@
 <script lang="ts" setup>
 import { computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { useStoryStore } from '../stores/story'
+import { useStoryStore } from '../../stores/story'
 
-import BaseSplitPane from './base/BaseSplitPane.vue'
-import BaseEmpty from './base/BaseEmpty.vue'
-import BaseTab from './base/BaseTab.vue'
+import BaseSplitPane from '../base/BaseSplitPane.vue'
+import BaseEmpty from '../base/BaseEmpty.vue'
+import BaseTab from '../base/BaseTab.vue'
 import StoryVariantListItem from './StoryVariantListItem.vue'
 import StoryVariantGridItem from './StoryVariantGridItem.vue'
 import StoryVariantSingleView from './StoryVariantSingleView.vue'

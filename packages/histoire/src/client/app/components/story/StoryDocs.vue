@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { PropType, ref, watchEffect } from 'vue'
-import { Story } from '../types.js'
-import BaseEmpty from './base/BaseEmpty.vue'
+import type { Story } from '../../types'
+import BaseEmpty from '../base/BaseEmpty.vue'
 
 const props = defineProps({
   story: {

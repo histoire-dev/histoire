@@ -1,9 +1,9 @@
 <script lang="ts" setup>
-import { Story, TreeFolder } from '../types'
+import type { Story, TreeFolder, TreeLeaf } from '../../types'
 import StoryListItem from './StoryListItem.vue'
 import { Icon } from '@iconify/vue'
-import { computed, ref, withDefaults } from 'vue'
-import { useStoryStore } from '../stores/story'
+import { computed, withDefaults } from 'vue'
+import { useStoryStore } from '../../stores/story'
 
 const props = withDefaults(defineProps<{
   path?: Array<string>
@@ -64,7 +64,7 @@ const folderPadding = computed(() => {
         :key="element.title"
       >
         <StoryListFolder
-          v-if="element.children"
+          v-if="(element as TreeFolder).children"
           :path="folderPath"
           :folder="element"
           :stories="stories"
@@ -72,7 +72,7 @@ const folderPadding = computed(() => {
         />
         <StoryListItem
           v-else
-          :story="stories[element.index]"
+          :story="stories[(element as TreeLeaf).index]"
           :depth="depth + 1"
         />
       </template>

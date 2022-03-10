@@ -2,10 +2,10 @@
 import { computed, onMounted, PropType, ref, shallowRef, watch } from 'vue'
 import { getHighlighter, Highlighter, setCDN } from 'shiki'
 import { Icon } from '@iconify/vue'
-import { generateSourceCode } from '../codegen/vue3'
-import { Variant } from '../types'
-import { isDark } from '../util/dark'
-import { unindent } from '../codegen/util'
+import { generateSourceCode } from '../../codegen/vue3'
+import type { Variant } from '../../types'
+import { isDark } from '../../util/dark'
+import { unindent } from '../../codegen/util'
 import { useClipboard } from '@vueuse/core'
 
 const props = defineProps({

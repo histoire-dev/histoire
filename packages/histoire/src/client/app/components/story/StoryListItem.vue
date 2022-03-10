@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import { Story } from '../types'
-import BaseListItemLink from './base/BaseListItemLink.vue'
+import type { Story } from '../../types'
+import BaseListItemLink from '../base/BaseListItemLink.vue'
 import { Icon } from '@iconify/vue'
 import { computed, withDefaults } from 'vue'
 
