@@ -73,19 +73,16 @@ function initState () {
       </template>
 
       <template #controls="{ state }">
-        <div>
-          <label>
-            <input
-              v-model="state.disabled"
-              type="checkbox"
-            >
-            Disabled
-          </label>
-        </div>
-      </template>
+        <HstCheckbox v-model="state.disabled">
+          Disabled
+        </HstCheckbox>
     </Variant>
 
-    <Variant title="green">
+    <Variant
+      title="green"
+      icon="carbon:star-filled"
+      icon-color="#10B981"
+    >
       <MyComponent
         color="green"
       >
