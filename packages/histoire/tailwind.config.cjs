@@ -92,6 +92,8 @@ module.exports.theme.extend.typography = (theme) => ({
         },
       },
 
+      '--tw-prose-invert-quote-borders': theme('colors.gray-800'),
+
       blockquote: {
         marginLeft: 0,
         marginRight: 0,
@@ -105,7 +107,13 @@ module.exports.theme.extend.typography = (theme) => ({
         '& p:last-child': {
           marginBottom: 0,
         },
+
+        '.dark &': {
+          backgroundColor: theme('colors.gray-750'),
+        },
       },
+
+      '--tw-prose-invert-bullets': theme('colors.gray-500'),
 
       li: {
         marginTop: '0.1rem',

@@ -31,7 +31,7 @@ watchEffect(async () => {
   </BaseEmpty>
   <div
     v-else
-    class="htw-prose htw-p-4 htw-max-w-none"
+    class="htw-prose dark:htw-prose-invert htw-p-4 htw-max-w-none"
     v-html="renderedDoc"
   />
 </template>
