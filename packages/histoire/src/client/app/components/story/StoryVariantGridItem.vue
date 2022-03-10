@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { PropType, toRefs } from 'vue'
-import { useCurrentVariantRoute } from '../../composable/variant'
+import { useCurrentVariantRoute } from '../../util/variant'
 import type { Story, Variant } from '../../types'
 import SandboxVue3 from '../sandbox/SandboxVue3.vue'
 import { Icon } from '@iconify/vue'

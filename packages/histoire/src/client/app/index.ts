@@ -19,7 +19,7 @@ app.use(FloatingVue, {
     },
     dropdown: {
       computeTransformOrigin: true,
-      distance: 10,
+      distance: 8,
     },
   },
 })

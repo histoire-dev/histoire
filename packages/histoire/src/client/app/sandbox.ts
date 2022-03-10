@@ -9,7 +9,7 @@ import { mapFile } from './util/mapping'
 // @ts-expect-error virtual module
 import { files } from '$histoire-stories'
 import { PREVIEW_SETTINGS_SYNC, STATE_SYNC } from './util/const.js'
-import { applyPreviewSettings } from './preview-settings.js'
+import { applyPreviewSettings } from './util/preview-settings.js'
 import { isDark } from './util/dark.js'
 import { histoireConfig } from './util/config.js'
 
