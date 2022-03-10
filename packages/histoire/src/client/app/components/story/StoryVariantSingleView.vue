@@ -92,10 +92,12 @@ const settings = usePreviewSettings()
             <button
               v-for="(preset, index) in histoireConfig.responsivePresets"
               :key="index"
-              class="htw-bg-transparent hover:htw-bg-primary-100 dark:hover:htw-bg-primary-700 htw-px-4 htw-py-3 htw-cursor-pointer htw-text-left htw-flex htw-gap-4"
-              :class="{
-                'htw-bg-primary-500 hover:htw-bg-primary-600 htw-text-white dark:htw-text-black': settings.responsiveWidth === preset.width && settings.responsiveHeight === preset.height,
-              }"
+              class="htw-px-4 htw-py-3 htw-cursor-pointer htw-text-left htw-flex htw-gap-4"
+              :class="[
+                settings.responsiveWidth === preset.width && settings.responsiveHeight === preset.height
+                  ? 'htw-bg-primary-500 hover:htw-bg-primary-600 htw-text-white dark:htw-text-black'
+                  : 'htw-bg-transparent hover:htw-bg-primary-100 dark:hover:htw-bg-primary-700',
+              ]"
               @click="settings.responsiveWidth = preset.width;settings.responsiveHeight = preset.height;hide()"
             >
               {{ preset.label }}
@@ -140,10 +142,12 @@ const settings = usePreviewSettings()
             <button
               v-for="(option, index) in histoireConfig.backgroundPresets"
               :key="index"
-              class="htw-bg-transparent hover:htw-bg-primary-100 dark:hover:htw-bg-primary-700 htw-px-4 htw-py-3 htw-cursor-pointer htw-text-left htw-flex htw-gap-4"
-              :class="{
-                'htw-bg-primary-500 hover:htw-bg-primary-600 htw-text-white dark:htw-text-black': settings.backgroundColor === option.color,
-              }"
+              class="htw-px-4 htw-py-3 htw-cursor-pointer htw-text-left htw-flex htw-gap-4"
+              :class="[
+                settings.backgroundColor === option.color
+                  ? 'htw-bg-primary-500 hover:htw-bg-primary-600 htw-text-white dark:htw-text-black'
+                  : 'htw-bg-transparent hover:htw-bg-primary-100 dark:hover:htw-bg-primary-700',
+              ]"
               @click="settings.backgroundColor = option.color;hide()"
             >
               <span class="htw-mr-auto">{{ option.label }}</span>
