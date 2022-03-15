@@ -138,8 +138,12 @@ function setVariant (variantId: string) {
       </template>
 
       <template #last>
-        <BaseEmpty v-if="!storyStore.currentVariant || !storyStore.currentVariant.ready">
+        <BaseEmpty v-if="!storyStore.currentVariant">
           <span>Select a variant</span>
+        </BaseEmpty>
+
+        <BaseEmpty v-else-if="!storyStore.currentVariant.ready">
+          <span>Loading...</span>
         </BaseEmpty>
 
         <BaseSplitPane
