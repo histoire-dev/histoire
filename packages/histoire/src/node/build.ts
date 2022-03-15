@@ -11,6 +11,16 @@ import { findAllStories } from './stories.js'
 import type { RollupOutput } from 'rollup'
 import { useCollectStories } from './collect.js'
 
+const PRELOAD_MODULES = [
+  'vendor',
+]
+
+const PREFETCHED_MODULES = [
+  'StoryView',
+  'reactivity',
+  'global-components',
+]
+
 export async function build (ctx: Context) {
   const startTime = performance.now()
   await findAllStories(ctx)
@@ -52,13 +62,23 @@ export async function build (ctx: Context) {
 
   const styleOutput = result.output.find(o => o.name === 'style.css' && o.type === 'asset')
 
+  // Preload
+  const preloadOutputs = result.output.filter(o => PRELOAD_MODULES.includes(o.name) && o.type === 'chunk')
+  const preloadHtml = generateScriptLinks(preloadOutputs.map(o => o.fileName), 'preload')
+
+  // Prefetch
+  const prefetchOutputs = result.output.filter(o => PREFETCHED_MODULES.includes(o.name) && o.type === 'chunk')
+  const prefetchHtml = generateScriptLinks(prefetchOutputs.map(o => o.fileName), 'prefetch')
+
   // Index
   const indexOutput = result.output.find(o => o.name === 'index' && o.type === 'chunk')
-  await writeHtml(indexOutput.fileName, styleOutput.fileName, 'index.html', ctx)
+  await writeHtml(indexOutput.fileName, styleOutput.fileName, 'index.html', {
+    HEAD: `${preloadHtml}${prefetchHtml}`,
+  }, ctx)
 
   // Sandbox
   const sandboxOutput = result.output.find(o => o.name === 'sandbox' && o.type === 'chunk')
-  await writeHtml(sandboxOutput.fileName, styleOutput.fileName, '__sandbox.html', ctx)
+  await writeHtml(sandboxOutput.fileName, styleOutput.fileName, '__sandbox.html', {}, ctx)
 
   const duration = performance.now() - startTime
   if (emptyStoryCount) {
@@ -67,7 +87,7 @@ export async function build (ctx: Context) {
   console.log(pc.green(`✅ Built ${storyCount} stories (${variantCount} variants) in ${Math.round(duration / 1000 * 100) / 100}s`))
 }
 
-async function writeHtml (jsEntryFile: string, cssEntryFile: string, htmlFileName: string, ctx: Context) {
+async function writeHtml (jsEntryFile: string, cssEntryFile: string, htmlFileName: string, variables: { HEAD?: string }, ctx: Context) {
   const code = `<!DOCTYPE html>
 <html>
 <head>
@@ -77,6 +97,7 @@ async function writeHtml (jsEntryFile: string, cssEntryFile: string, htmlFileNam
   <meta name="description" content="">
   <link rel="stylesheet" href="/${cssEntryFile}">
   ${ctx.config.theme?.favicon ? `<link rel="icon" type="${lookupMime(ctx.config.theme.favicon)}" href="${ctx.config.theme.favicon}"/>` : ''}
+  ${variables.HEAD ?? ''}
 </head>
 <body>
   <div id="app"></div>
@@ -84,4 +105,8 @@ async function writeHtml (jsEntryFile: string, cssEntryFile: string, htmlFileNam
 </body>
 </html>`
   await fs.writeFile(join(ctx.config.outDir, htmlFileName), code, 'utf8')
+}
+
+function generateScriptLinks (prefetchScripts: string[], rel: string) {
+  return prefetchScripts.map(s => `<link rel="${rel}" href="${s}" as="script" crossOrigin="anonymous">`).join('')
 }
