@@ -1,24 +1,19 @@
-# Getting started
+---
+sidebar: false
+---
 
-Welcome! In this guide, you'll learn how to get around Histoire. [Learn more about Histoire here](./introduction.md).
+<div class="htw-flex htw-justify-center htw-mt-12">
+  <img src="/logo.svg" alt="Histoire logo" class="htw-max-h-[256px]">
+</div>
 
-## Installation
+# Early access
 
-Install the Histoire into your project:
+Histoire is currently in early access - [the repository](https://github.com/Akryum/histoire) can only be accessed by our sponsors.
 
-```shell
-npm i -D histoire
-# OR
-yarn add -D histoire
-```
+<div class="htw-flex htw-justify-center htw-my-12">
+  <SponsorButton/>
+</div>
 
-Then add the following scripts to your `package.json`:
+You support will helps us build the best stories app based on [Vite](https://vitejs.dev)!
 
-```json
-{
-  "scripts": {
-    "stories:dev": "histoire dev",
-    "stories:build": "histoire build"
-  }
-}
-```
+The early access will last a few weeks until we finish polishing the documentation and when we will it is ready to be tested by more people.

@@ -1,77 +1,50 @@
 module.exports = {
-  title: 'Peeky',
-  description: 'A fast and fun test runner for Vite & Node 🐈️',
-
-  head: [
-    ['link', { rel: 'stylesheet', href: 'https://cdn.rawgit.com/luizbills/feather-icon-font/v4.7.0/dist/feather.css' }],
-  ],
+  title: 'Histoire',
+  description: 'Fast stories powered by Vite',
 
   themeConfig: {
-    repo: 'Akryum/peeky',
+    repo: 'Akryum/histoire',
     docsDir: 'docs',
-    docsBranch: 'master',
+    docsBranch: 'main',
     editLinks: true,
     editLinkText: 'Suggest changes to this page',
     logo: 'logo.svg',
 
     nav: [
-      { text: 'Guide', link: '/guide/' },
+      // { text: 'Guide', link: '/guide/' },
+      { text: 'Early access', link: '/guide/' },
       {
-        text: '💜️ Sponsor',
-        link: 'https://github.com/sponsors/Akryum',
+        text: '💚 Sponsor',
+        items: [
+          {
+            text: 'Guillaume Chau',
+            link: 'https://github.com/sponsors/Akryum',
+          },
+          {
+            text: 'Hugo Attal',
+            link: 'https://github.com/sponsors/hugoattal',
+          },
+        ],
       },
       {
         text: 'Changelog',
-        link: 'https://github.com/Akryum/peeky/blob/master/CHANGELOG.md',
+        link: 'https://github.com/Akryum/histoire/blob/master/CHANGELOG.md',
       },
     ],
 
     sidebar: {
       // catch-all fallback
-      '/': [
-        {
-          text: 'Guide',
-          children: [
-            {
-              text: 'Introduction',
-              link: '/guide/introduction',
-            },
-            {
-              text: 'Getting Started',
-              link: '/guide/',
-            },
-            {
-              text: 'Setup guides',
-              children: [
-                {
-                  text: 'Vite',
-                  link: '/guide/setup/vite',
-                },
-                {
-                  text: 'TypeScript',
-                  link: '/guide/setup/typescript',
-                },
-                {
-                  text: 'Eslint',
-                  link: '/guide/setup/eslint',
-                },
-              ],
-            },
-            {
-              text: 'Writing tests',
-              link: '/guide/writing-tests',
-            },
-            {
-              text: 'Runtime environments',
-              link: '/guide/runtime-env',
-            },
-            {
-              text: 'Configuration',
-              link: '/guide/config',
-            },
-          ],
-        },
-      ],
+      // '/': [
+      //   {
+      //     text: 'Guide',
+      //     children: [
+      //       {
+      //         text: 'Getting Started',
+      //         link: '/guide/',
+      //       },
+      //     ],
+      //   },
+      // ],
     },
   },
 }

@@ -1,48 +1,31 @@
 @tailwind base;
-
 @tailwind components;
 
-.nav-bar .nav-bar-title {
-  color: var(--c-brand);
-}
-
-.nav-bar .nav-bar-title .logo {
-  height: 2rem;
-  margin-right: 0.25rem;
-}
-
-#main-title {
-  color: var(--c-brand);
-  margin-top: .2rem;
-  margin-bottom: 1rem;
-}
-
-.home header.home-hero {
-  margin-top: .2rem;
-}
-
-.home-hero .figure .image {
-  max-width: 120px;
-}
-
-.home .home-hero .description {
-  @apply text-primary-500;
-}
-
-.home div.home-features {
-  background: var(--c-brand);
-  padding: 5rem 3rem 4rem;
-  margin: -2rem -2rem 0;
-  border-radius: 12px;
-}
-
-.home .home-features .feature {
-  padding: 1rem;
-}
-
-.home-features .feature .title,
-.home-features .feature .details {
-  color: white;
+button {
+  font-size: inherit;
 }
 
 @tailwind utilities;
+
+.home-hero {
+  figure {
+    .image {
+      max-height: 140px;
+    }
+  }
+}
+
+.home-features {
+  .wrapper {
+    @apply htw-pt-0 htw-border-t-0 !important;
+  }
+}
+
+.v-popper__popper.v-popper__popper--show-from .v-popper__wrapper {
+  transform: scale(.5);
+}
+
+.v-popper__popper.v-popper__popper--show-to .v-popper__wrapper {
+  transform: none;
+  transition: transform .15s;
+}
