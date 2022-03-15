@@ -12,6 +12,7 @@ import { PREVIEW_SETTINGS_SYNC, STATE_SYNC } from './util/const.js'
 import { applyPreviewSettings } from './util/preview-settings.js'
 import { isDark } from './util/dark.js'
 import { histoireConfig } from './util/config.js'
+import { toRawDeep } from './util/reactivity'
 
 const query = parseQuery(window.location.search)
 const file = ref<StoryFile>(mapFile(files.find(f => f.id === query.storyId)))
@@ -39,7 +40,7 @@ const app = createApp({
       }
       window.parent?.postMessage({
         type: STATE_SYNC,
-        state: toRaw(value),
+        state: toRawDeep(value),
       })
     }, {
       deep: true,

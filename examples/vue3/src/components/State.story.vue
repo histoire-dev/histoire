@@ -5,6 +5,14 @@ function initState () {
     text: '',
   }
 }
+
+function initState2 () {
+  return {
+    meow: {
+      foo: 'bar',
+    },
+  }
+}
 </script>
 
 <template>
@@ -42,6 +50,21 @@ function initState () {
 
         <HstInput v-model="state.text">
           Text
+        </HstInput>
+      </template>
+    </Variant>
+
+    <Variant
+      title="Nested state object"
+      :init-state="initState2"
+    >
+      <template #default="{ state }">
+        <input v-model="state.meow.foo">
+      </template>
+
+      <template #controls="{ state }">
+        <HstInput v-model="state.meow.foo">
+          meow.foo
         </HstInput>
       </template>
     </Variant>

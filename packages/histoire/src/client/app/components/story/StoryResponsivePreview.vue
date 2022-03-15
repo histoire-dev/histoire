@@ -7,6 +7,7 @@ import { PreviewSettings } from '../../util/preview-settings'
 import type { Story, Variant } from '../../types'
 import HatchedPattern from '../misc/HatchedPattern.vue'
 import CheckerboardPattern from '../misc/CheckerboardPattern.vue'
+import { toRawDeep } from '../../util/reactivity'
 
 const props = defineProps<{
   story: Story
@@ -22,7 +23,7 @@ function syncState () {
   if (iframe.value) {
     iframe.value.contentWindow.postMessage({
       type: STATE_SYNC,
-      state: toRaw(props.variant.state),
+      state: toRawDeep(props.variant.state),
     })
   }
 }
