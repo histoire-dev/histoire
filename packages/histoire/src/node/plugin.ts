@@ -203,24 +203,7 @@ if (import.meta.hot) {
   })
 
   // Custom blocks
-  let md = await createMarkdownRenderer()
-  if (ctx.config.markdown) {
-    const result = await ctx.config.markdown(md)
-    if (result) {
-      md = result
-    }
-  }
-  plugins.push({
-    name: 'histoire-vue-docs-block',
-    transform (code, id) {
-      if (!id.includes('?vue&type=docs')) return
-      if (!id.includes('lang.md')) return
-      const html = md.render(code)
-      return `export default Comp => {
-        Comp.doc = ${JSON.stringify(html)}
-      }`
-    },
-  })
+  plugins.push(...await createCustomBlocksPlugins(ctx))
 
   if (ctx.mode === 'build') {
     // Add file name in build mode to have components names instead of <Anonymous>
@@ -241,6 +224,31 @@ if (import.meta.hot) {
       },
     })
   }
+
+  return plugins
+}
+
+async function createCustomBlocksPlugins (ctx) {
+  const plugins: VitePlugin[] = []
+
+  let md = await createMarkdownRenderer()
+  if (ctx.config.markdown) {
+    const result = await ctx.config.markdown(md)
+    if (result) {
+      md = result
+    }
+  }
+  plugins.push({
+    name: 'histoire-vue-docs-block',
+    transform (code, id) {
+      if (!id.includes('?vue&type=docs')) return
+      if (!id.includes('lang.md')) return
+      const html = md.render(code)
+      return `export default Comp => {
+        Comp.doc = ${JSON.stringify(html)}
+      }`
+    },
+  })
 
   return plugins
 }
