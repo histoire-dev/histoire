@@ -32,6 +32,9 @@ export default defineConfig({
       config.build.lib = false
       config.build.rollupOptions.external = []
     },
+    theme: {
+      favicon: '/histoire.svg',
+    },
   },
 
   test: {
