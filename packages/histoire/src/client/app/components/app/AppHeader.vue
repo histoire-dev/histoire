@@ -5,6 +5,7 @@ import AppLogo from './AppLogo.vue'
 import { isDark, toggleDark } from '../../util/dark'
 import { onKeyboardShortcut } from '../../util/keyboard'
 import { makeTooltip } from '../../util/tooltip'
+import { histoireConfig } from '../../util/config'
 
 defineEmits({
   search: () => true,
@@ -25,9 +26,15 @@ onKeyboardShortcut(['ctrl+shift+d', 'meta+shift+d'], (event) => {
     class="htw-px-4 htw-h-16 htw-flex htw-items-center htw-gap-2"
   >
     <div class="htw-py-4 htw-flex-1 htw-h-full htw-flex htw-items-center htw-pr-2">
-      <AppLogo
-        class="htw-max-w-full htw-max-h-full"
-      />
+      <a
+        :href="histoireConfig.theme?.logoHref"
+        target="_blank"
+        class="htw-block htw-w-full htw-h-full"
+      >
+        <AppLogo
+          class="htw-max-w-full htw-max-h-full"
+        />
+      </a>
     </div>
     <div class="htw-ml-auto htw-flex-none htw-flex">
       <a

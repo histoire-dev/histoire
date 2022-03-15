@@ -96,6 +96,10 @@ export interface HistoireConfig {
         [key in ColorKeys]?: string
       }
     }
+    /**
+     * Add a link to the main logo
+     */
+    logoHref?: string
   }
   /**
    * Setup file exposting a default function executed when setting up each story preview.

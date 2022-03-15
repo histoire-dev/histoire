@@ -11,5 +11,9 @@ export default defineConfig({
   histoire: {
     // Alternative way of specifying histoire config
     setupFile: '/src/histoire.setup.ts',
+
+    theme: {
+      logoHref: 'http://histoire.dev',
+    },
   },
 })
