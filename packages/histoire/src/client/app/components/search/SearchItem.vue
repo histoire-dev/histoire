@@ -1,10 +1,11 @@
 <script lang="ts" setup>
-import { computed, PropType, ref, watch } from 'vue'
+import { PropType, ref, toRefs } from 'vue'
 import { useRouter } from 'vue-router'
 import { Icon } from '@iconify/vue'
 import { SearchResult } from '../../types'
 import { onKeyboardShortcut } from '../../util/keyboard.js'
 import BaseListItemLink from '../base/BaseListItemLink.vue'
+import { useScrollOnActive } from '../../util/scroll'
 
 const props = defineProps({
   result: {
@@ -24,11 +25,8 @@ const emit = defineEmits({
 
 const el = ref<HTMLDivElement>()
 
-watch(() => props.selected, value => {
-  if (value) {
-    el.value.scrollIntoView()
-  }
-})
+const { selected } = toRefs(props)
+useScrollOnActive(selected, el)
 
 const router = useRouter()
 
