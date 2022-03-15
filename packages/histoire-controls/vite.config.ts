@@ -33,6 +33,7 @@ export default defineConfig({
       config.build.rollupOptions.external = []
     },
     theme: {
+      title: 'Histoire controls',
       favicon: '/histoire.svg',
     },
   },
