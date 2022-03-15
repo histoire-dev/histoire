@@ -1,3 +1,12 @@
+## [0.0.5](https://github.com/Akryum/histoire/compare/v0.0.4...v0.0.5) (2022-03-15)
+
+
+### Features
+
+* **build:** optimize scripts loading ([65ee5e5](https://github.com/Akryum/histoire/commit/65ee5e5e8130cf50ba8f605efb6c76269acf9659))
+
+
+
 ## [0.0.4](https://github.com/Akryum/histoire/compare/v0.0.3...v0.0.4) (2022-03-15)
 
 
