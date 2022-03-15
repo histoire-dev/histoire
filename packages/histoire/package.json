@@ -1,6 +1,6 @@
 {
   "name": "histoire",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "A fast story book powered by Vite",
   "license": "MIT",
   "author": {
@@ -40,7 +40,7 @@
     "test": "peeky run"
   },
   "dependencies": {
-    "@histoire/controls": "workspace:^",
+    "@histoire/controls": "^0.0.4",
     "@vitejs/plugin-vue": "^2.2.0",
     "@vueuse/core": "^7.6.2",
     "case": "^1.6.3",

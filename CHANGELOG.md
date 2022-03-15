@@ -1,3 +1,42 @@
+## [0.0.4](https://github.com/Akryum/histoire/compare/v0.0.3...v0.0.4) (2022-03-15)
+
+
+### Bug Fixes
+
+* **build:** not handling custom blocks ([2f60fd8](https://github.com/Akryum/histoire/commit/2f60fd897b457c1c90b03afb263334845c2bd594))
+* checkbox size ([59ea8df](https://github.com/Akryum/histoire/commit/59ea8df7ed71708982ec2c10883a1d35c6d09307))
+* **codegen:** dynamicProps can be null ([eaeb919](https://github.com/Akryum/histoire/commit/eaeb9193a998346aeaa6a9bfbbae2b21a1f35b55))
+* controls component not found warnings on server ([b16d7ad](https://github.com/Akryum/histoire/commit/b16d7ad173f4040d2440d52981237bf6e9bc99bd))
+* controls components name ([dab555a](https://github.com/Akryum/histoire/commit/dab555aee306d5605368af53404fb94ccc651682))
+* **controls:** book dark text color ([419cb1b](https://github.com/Akryum/histoire/commit/419cb1ba5a03d9ffa975952bd6d87e45db5e5f9f))
+* display loading while variant is not ready ([6488c6b](https://github.com/Akryum/histoire/commit/6488c6b345434ce98e9891a24b614601b39a9072))
+* **docs:** support dark mode ([cba01f1](https://github.com/Akryum/histoire/commit/cba01f177f5335fd8fcc3cd5ea16136351cb083c))
+* improved ready state ([1bb0d3f](https://github.com/Akryum/histoire/commit/1bb0d3fc9baae7460e5599cd086941d31abce7e8))
+* infinite sync loop ([59512a6](https://github.com/Akryum/histoire/commit/59512a655e937489b28814f2f8808f7ec8274756))
+* selected item colors ([c99eea0](https://github.com/Akryum/histoire/commit/c99eea0100a934b63e19eba3b6afc968267dfe76))
+* simpler css bind ([a9c8122](https://github.com/Akryum/histoire/commit/a9c8122459c79ed50ef7cc657773b2e169b1bb23))
+* state with nested objects ([e9108df](https://github.com/Akryum/histoire/commit/e9108df0c14dff0b6205392ef057491fe06ad69e))
+* unwanted scroll on Firefox ([7f6f898](https://github.com/Akryum/histoire/commit/7f6f8983d01e33f9907755bd46afb917bd919647))
+
+
+### Features
+
+* auto scroll list item into view ([3e11dda](https://github.com/Akryum/histoire/commit/3e11ddaa9c0cc521099ba09392c76a4e300a8462))
+* **build:** result logs ([0648d58](https://github.com/Akryum/histoire/commit/0648d581dc4b6429299a9811b886d55a5785ca92))
+* **codegen:** improved v-model ([ce40e8e](https://github.com/Akryum/histoire/commit/ce40e8e0ac770e38d6fa83b436f7fb3148abaa6d))
+* **config:** vite as function to mutate config ([d39ca90](https://github.com/Akryum/histoire/commit/d39ca90599a51e07db36fe9d91301ebe518ce00b))
+* initial builtin controls package, [#30](https://github.com/Akryum/histoire/issues/30) ([eb47193](https://github.com/Akryum/histoire/commit/eb47193b8157ae8ded81ee175312e5099047269a))
+* logoHref ([d6ef6f2](https://github.com/Akryum/histoire/commit/d6ef6f274c482c54670e98d9502ad29c9f91047a))
+* new responsive view with height ([5f49d67](https://github.com/Akryum/histoire/commit/5f49d671884d20ae5bf11e1bbff14c622b044b98))
+* optional <Variant>, closes [#38](https://github.com/Akryum/histoire/issues/38) ([1c3af6c](https://github.com/Akryum/histoire/commit/1c3af6ca50e99d414da9f2ab353842c892c3fbe4))
+* preview background + checkerboard ([23f2808](https://github.com/Akryum/histoire/commit/23f2808f435258efe128270558a420f097dc047b))
+* preview dark mode class + transparent bg ([56a5ec3](https://github.com/Akryum/histoire/commit/56a5ec3aed11bdccb9bcf90b43a15a20abd0df39))
+* **search:** improve auto scroll ([29c20fe](https://github.com/Akryum/histoire/commit/29c20fecc650b75d264d493ed8a8cbbea869d925))
+* story markdown docs ([403e0b7](https://github.com/Akryum/histoire/commit/403e0b768629d0a4392e0b7462264a3aa9496a10))
+* variant.ready ([efd56b3](https://github.com/Akryum/histoire/commit/efd56b3e9f5ff6670c142f0e8ee99fca4f3c2e19))
+
+
+
 ## [0.0.3](https://github.com/Akryum/histoire/compare/v0.0.2...v0.0.3) (2022-02-23)
 
 
