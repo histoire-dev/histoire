@@ -1,5 +1,5 @@
 <script lang="ts">
-import { defineComponent, inject, PropType, provide, useAttrs } from 'vue'
+import { defineComponent, inject, onMounted, PropType, provide, useAttrs } from 'vue'
 import type { StoryFile, Story, Variant } from '../../node/types'
 
 export default defineComponent({
@@ -53,13 +53,36 @@ export default defineComponent({
       story.variants.push(variant)
     })
 
+    onMounted(() => {
+      if (!story.variants.length) {
+        story.variants.push({
+          id: '_default',
+          title: 'default',
+        })
+      }
+    })
+
     return {
       story,
     }
   },
 
   render () {
-    return this.$slots.default()
+    let suppressError = false
+    try {
+      return this.$slots.default({
+        get state () {
+          // No variant tags
+          suppressError = true
+          return {}
+        },
+      })
+    } catch (e) {
+      if (!suppressError) {
+        console.error(e)
+      }
+      return null
+    }
   },
 })
 </script>
