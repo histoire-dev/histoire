@@ -2,6 +2,8 @@ import { join } from 'pathe'
 import { build as viteBuild, createServer as createViteServer } from 'vite'
 import fs from 'fs-extra'
 import { lookup as lookupMime } from 'mrmime'
+import pc from 'picocolors'
+import { performance } from 'perf_hooks'
 import { APP_PATH } from './alias.js'
 import { Context } from './context.js'
 import { createVitePlugins } from './plugin.js'
@@ -10,6 +12,7 @@ import type { RollupOutput } from 'rollup'
 import { useCollectStories } from './collect.js'
 
 export async function build (ctx: Context) {
+  const startTime = performance.now()
   await findAllStories(ctx)
 
   // Collect story data
@@ -26,6 +29,10 @@ export async function build (ctx: Context) {
   }
   await server.close()
   await destroyCollectStories()
+
+  const storyCount = ctx.storyFiles.reduce((sum, file) => sum + (file.story?.variants.length ? 1 : 0), 0)
+  const variantCount = ctx.storyFiles.reduce((sum, file) => sum + (file.story?.variants.length ?? 0), 0)
+  const emptyStoryCount = ctx.storyFiles.length - storyCount
 
   const results = await viteBuild({
     plugins: await createVitePlugins(ctx),
@@ -52,6 +59,12 @@ export async function build (ctx: Context) {
   // Sandbox
   const sandboxOutput = result.output.find(o => o.name === 'sandbox' && o.type === 'chunk')
   await writeHtml(sandboxOutput.fileName, styleOutput.fileName, '__sandbox.html', ctx)
+
+  const duration = performance.now() - startTime
+  if (emptyStoryCount) {
+    console.warn(pc.yellow(`⚠️  ${emptyStoryCount} empty story file`))
+  }
+  console.log(pc.green(`✅ Built ${storyCount} stories (${variantCount} variants) in ${Math.round(duration / 1000 * 100) / 100}s`))
 }
 
 async function writeHtml (jsEntryFile: string, cssEntryFile: string, htmlFileName: string, ctx: Context) {

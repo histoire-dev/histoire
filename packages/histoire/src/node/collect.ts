@@ -55,10 +55,10 @@ export function useCollectStories (options: UseCollectStoriesOptions, ctx: Conte
       const storyData: Story[] = []
       await run(storyFile, storyData, el)
       if (storyData.length === 0) {
-        console.warn(pc.yellow(`No story found for ${storyFile.path}`))
+        console.warn(pc.yellow(`⚠️  No story found for ${storyFile.path}`))
         return
       } else if (storyData.length > 1) {
-        console.warn(pc.yellow(`Multiple stories not supported: ${storyFile.path}`))
+        console.warn(pc.yellow(`⚠️  Multiple stories not supported: ${storyFile.path}`))
       }
       storyFile.story = storyData[0]
       const file: TreeFile = {
