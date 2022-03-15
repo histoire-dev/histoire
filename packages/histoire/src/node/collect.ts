@@ -20,7 +20,13 @@ export function useCollectStories (options: UseCollectStoriesOptions, ctx: Conte
   const { server } = options
   const { destroy: destroyDomEnv } = createDomEnv()
 
-  const node = new ViteNodeServer(server)
+  const node = new ViteNodeServer(server, {
+    deps: {
+      inline: [
+        /histoire\/dist/,
+      ],
+    },
+  })
   const runner = new ViteNodeRunner({
     root: server.config.root,
     base: server.config.base,
@@ -30,6 +36,9 @@ export function useCollectStories (options: UseCollectStoriesOptions, ctx: Conte
         id = 'vue'
       }
       return node.fetchModule(id)
+    },
+    resolveId (id, importer) {
+      return node.resolveId(id, importer)
     },
   })
 

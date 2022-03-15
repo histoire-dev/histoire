@@ -248,11 +248,20 @@ export async function loadConfigFile (configFile: string): Promise<Partial<Histo
   try {
     const server = await createServer()
     await server.pluginContainer.buildStart({})
-    const node = new ViteNodeServer(server)
+    const node = new ViteNodeServer(server, {
+      deps: {
+        inline: [
+          /histoire\/dist/,
+        ],
+      },
+    })
     const runner = new ViteNodeRunner({
       root: path.dirname(configFile),
       fetchModule (id) {
         return node.fetchModule(id)
+      },
+      resolveId (id, importer) {
+        return node.resolveId(id, importer)
       },
     })
     const result: { default: Partial<HistoireConfig> } = await runner.executeFile(configFile)
