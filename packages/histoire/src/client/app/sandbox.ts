@@ -1,6 +1,6 @@
 import './style/sandbox.css'
 import { parseQuery } from 'vue-router'
-import { computed, createApp, h, ref, toRaw, watch } from 'vue'
+import { computed, createApp, h, onMounted, ref, toRaw, watch } from 'vue'
 import { createPinia } from 'pinia'
 import { registerGlobalComponents } from './global-components'
 import SandboxVue3 from './components/sandbox/SandboxVue3.vue'
@@ -23,9 +23,11 @@ const app = createApp({
     const variant = computed(() => story.value?.variants.find(v => v.id === query.variantId))
 
     let synced = false
+    let mounted = false
 
     window.addEventListener('message', event => {
       if (event.data?.type === STATE_SYNC) {
+        if (!mounted) return
         synced = true
         Object.assign(variant.value.state, event.data.state)
       } else if (event.data?.type === PREVIEW_SETTINGS_SYNC) {
@@ -34,7 +36,7 @@ const app = createApp({
     })
 
     watch(() => variant.value.state, value => {
-      if (synced) {
+      if (synced && mounted) {
         synced = false
         return
       }
@@ -44,6 +46,10 @@ const app = createApp({
       })
     }, {
       deep: true,
+    })
+
+    onMounted(() => {
+      mounted = true
     })
 
     return {

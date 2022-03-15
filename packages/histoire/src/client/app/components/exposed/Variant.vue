@@ -37,6 +37,7 @@ export default defineComponent({
         source: props.source,
       })
     }
+    updateVariant()
 
     return {
       updateVariant,

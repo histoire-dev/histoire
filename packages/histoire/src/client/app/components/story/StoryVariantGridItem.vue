@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { PropType, toRefs } from 'vue'
+import { onMounted, PropType, toRefs } from 'vue'
 import { useCurrentVariantRoute } from '../../util/variant'
 import type { Story, Variant } from '../../types'
 import SandboxVue3 from '../sandbox/SandboxVue3.vue'
@@ -19,6 +19,12 @@ const props = defineProps({
 
 const { variant } = toRefs(props)
 const { isActive, targetRoute } = useCurrentVariantRoute(variant)
+
+onMounted(() => {
+  Object.assign(props.variant, {
+    ready: true,
+  })
+})
 </script>
 
 <template>

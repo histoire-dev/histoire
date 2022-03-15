@@ -33,6 +33,7 @@ export interface Variant {
   slots?: () => Readonly<any>
   state?: any
   source?: string
+  ready?: boolean
 }
 
 export type TreeLeaf = {

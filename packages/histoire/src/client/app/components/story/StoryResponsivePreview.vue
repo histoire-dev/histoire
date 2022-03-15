@@ -20,7 +20,7 @@ const props = defineProps<{
 const iframe = ref<HTMLIFrameElement>()
 
 function syncState () {
-  if (iframe.value) {
+  if (iframe.value && props.variant.ready) {
     iframe.value.contentWindow.postMessage({
       type: STATE_SYNC,
       state: toRawDeep(props.variant.state),
@@ -45,6 +45,9 @@ useEventListener(window, 'message', (event) => {
   if (event.data.type === STATE_SYNC) {
     synced = true
     Object.assign(props.variant.state, event.data.state)
+    Object.assign(props.variant, {
+      ready: true,
+    })
   }
 })
 
