@@ -2,7 +2,7 @@
 import { computed, Ref, ref, toRaw, toRefs, watch } from 'vue'
 import { useEventListener } from '@vueuse/core'
 import { Icon } from '@iconify/vue'
-import { STATE_SYNC, PREVIEW_SETTINGS_SYNC } from '../../util/const'
+import { STATE_SYNC, PREVIEW_SETTINGS_SYNC, SANDBOX_READY } from '../../util/const'
 import { PreviewSettings } from '../../util/preview-settings'
 import type { Story, Variant } from '../../types'
 import HatchedPattern from '../misc/HatchedPattern.vue'
@@ -41,10 +41,14 @@ watch(() => props.variant.state, () => {
   immediate: true,
 })
 
+Object.assign(props.variant, {
+  ready: false,
+})
 useEventListener(window, 'message', (event) => {
   if (event.data.type === STATE_SYNC) {
     synced = true
     Object.assign(props.variant.state, event.data.state)
+  } else if (event.data.type === SANDBOX_READY) {
     Object.assign(props.variant, {
       ready: true,
     })

@@ -21,6 +21,10 @@ const props = defineProps({
   },
 })
 
+const emit = defineEmits({
+  ready: () => true,
+})
+
 const sandbox = ref<HTMLDivElement>()
 let app: App
 let mounting = false
@@ -49,6 +53,8 @@ async function mountVariant () {
   const target = document.createElement('div')
   sandbox.value.appendChild(target)
   app.mount(target)
+
+  emit('ready')
 }
 
 onMounted(async () => {

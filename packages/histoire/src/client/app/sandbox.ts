@@ -1,6 +1,6 @@
 import './style/sandbox.css'
 import { parseQuery } from 'vue-router'
-import { computed, createApp, h, onMounted, ref, toRaw, watch } from 'vue'
+import { computed, createApp, h, onMounted, ref, watch } from 'vue'
 import { createPinia } from 'pinia'
 import { registerGlobalComponents } from './global-components'
 import SandboxVue3 from './components/sandbox/SandboxVue3.vue'
@@ -8,7 +8,7 @@ import type { StoryFile } from './types'
 import { mapFile } from './util/mapping'
 // @ts-expect-error virtual module
 import { files } from '$histoire-stories'
-import { PREVIEW_SETTINGS_SYNC, STATE_SYNC } from './util/const.js'
+import { PREVIEW_SETTINGS_SYNC, STATE_SYNC, SANDBOX_READY } from './util/const.js'
 import { applyPreviewSettings } from './util/preview-settings.js'
 import { isDark } from './util/dark.js'
 import { histoireConfig } from './util/config.js'
@@ -69,6 +69,11 @@ const app = createApp({
         ? h(SandboxVue3, {
           story: this.story,
           variant: this.variant,
+          onReady: () => {
+            window.parent?.postMessage({
+              type: SANDBOX_READY,
+            })
+          },
         })
         : null,
     ]
