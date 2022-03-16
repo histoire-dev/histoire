@@ -1,3 +1,12 @@
+## [0.1.1](https://github.com/Akryum/histoire/compare/v0.1.0...v0.1.1) (2022-03-16)
+
+
+### Bug Fixes
+
+* build errors with pnpm, closes [#42](https://github.com/Akryum/histoire/issues/42) ([67103d8](https://github.com/Akryum/histoire/commit/67103d8a9e71f2dbad4760d18f7b0b483e17bcb9))
+
+
+
 # [0.1.0](https://github.com/Akryum/histoire/compare/v0.0.5...v0.1.0) (2022-03-16)
 
 
