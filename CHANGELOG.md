@@ -1,3 +1,13 @@
+## [0.1.2](https://github.com/Akryum/histoire/compare/v0.1.1...v0.1.2) (2022-03-16)
+
+
+### Bug Fixes
+
+* **build:** default vite chunks not correct ([b05a35a](https://github.com/Akryum/histoire/commit/b05a35a13cd6ca374d93971841e9952e43b6563e))
+* remove unnecessary peer dep ([7a4c333](https://github.com/Akryum/histoire/commit/7a4c333091064c203f64244f1749ae67d6c88aae))
+
+
+
 ## [0.1.1](https://github.com/Akryum/histoire/compare/v0.1.0...v0.1.1) (2022-03-16)
 
 
