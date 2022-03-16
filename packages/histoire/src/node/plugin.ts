@@ -1,4 +1,5 @@
-import { relative } from 'pathe'
+import { createRequire } from 'module'
+import { relative, dirname } from 'pathe'
 import { resolveConfig as resolveViteConfig, Plugin as VitePlugin } from 'vite'
 import { lookup as lookupMime } from 'mrmime'
 import { APP_PATH, DIST_CLIENT_PATH } from './alias.js'
@@ -7,6 +8,8 @@ import { notifyStoryChange } from './stories.js'
 import { makeTree } from './tree.js'
 import { parseColor } from './colors.js'
 import { createMarkdownRenderer } from './markdown.js'
+
+const require = createRequire(import.meta.url)
 
 export const STORIES_ID = '$histoire-stories'
 export const RESOLVED_STORIES_ID = `/${STORIES_ID}-resolved`
@@ -45,9 +48,11 @@ export async function createVitePlugins (ctx: Context): Promise<VitePlugin[]> {
           // force include vue to avoid duplicated copies when linked + optimized
           include: [
             'vue',
-            '@vue/runtime-core',
-            'shiki',
-            'case',
+            dirname(require.resolve('@vue/runtime-core/package.json')),
+            dirname(require.resolve('shiki/package.json')),
+            dirname(require.resolve('vscode-textmate/package.json')),
+            dirname(require.resolve('vscode-oniguruma/package.json')),
+            dirname(require.resolve('case/package.json')),
           ],
         },
         server: {
