@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, Ref, ref, toRaw, toRefs, watch } from 'vue'
+import { computed, Ref, ref, toRaw, watch } from 'vue'
 import { useEventListener } from '@vueuse/core'
 import { Icon } from '@iconify/vue'
 import { STATE_SYNC, PREVIEW_SETTINGS_SYNC, SANDBOX_READY } from '../../util/const'
@@ -8,12 +8,17 @@ import type { Story, Variant } from '../../types'
 import HatchedPattern from '../misc/HatchedPattern.vue'
 import CheckerboardPattern from '../misc/CheckerboardPattern.vue'
 import { toRawDeep } from '../../util/reactivity'
+import { Settings } from 'http2'
 
 const props = defineProps<{
   story: Story
   variant: Variant
   settings: PreviewSettings
 }>()
+
+const emit = defineEmits({
+  'update:settings': (settings: PreviewSettings) => true,
+})
 
 // Iframe
 
@@ -120,8 +125,43 @@ function useDragger (el: Ref<HTMLDivElement>, value: Ref<number>, min: number, m
   useEventListener(el, 'mousedown', onMouseDown)
 }
 
-const responsiveWidth = computed({ get: () => props.settings[props.settings.rotate ? 'responsiveHeight' : 'responsiveWidth'], set: (value) => props.settings[props.settings.rotate ? 'responsiveHeight' : 'responsiveWidth'] = value })
-const responsiveHeight = computed({ get: () => props.settings[props.settings.rotate ? 'responsiveWidth' : 'responsiveHeight'], set: (value) => props.settings[props.settings.rotate ? 'responsiveWidth' : 'responsiveHeight'] = value })
+// Optimize by batching settings updates to the next frame
+// Prevents sync issues with `useStorage`
+let settingsUpdate: Partial<Settings> = {}
+let settingsUpdateQueued = false
+
+function updateSettings (settings: Partial<PreviewSettings>) {
+  Object.assign(settingsUpdate, settings)
+
+  if (!settingsUpdateQueued) {
+    settingsUpdateQueued = true
+    requestAnimationFrame(() => {
+      emit('update:settings', {
+        ...props.settings,
+        ...settingsUpdate,
+      })
+      settingsUpdate = {}
+      settingsUpdateQueued = false
+    })
+  }
+}
+
+const responsiveWidth = computed({
+  get: () => props.settings[props.settings.rotate ? 'responsiveHeight' : 'responsiveWidth'],
+  set: (value) => {
+    updateSettings({
+      [props.settings.rotate ? 'responsiveHeight' : 'responsiveWidth']: value,
+    })
+  },
+})
+const responsiveHeight = computed({
+  get: () => props.settings[props.settings.rotate ? 'responsiveWidth' : 'responsiveHeight'],
+  set: (value) => {
+    updateSettings({
+      [props.settings.rotate ? 'responsiveWidth' : 'responsiveHeight']: value,
+    })
+  },
+})
 
 const horizontalDragger = ref<HTMLDivElement>()
 const verticalDragger = ref<HTMLDivElement>()

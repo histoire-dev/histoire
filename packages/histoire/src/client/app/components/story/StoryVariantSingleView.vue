@@ -168,9 +168,9 @@ const settings = usePreviewSettings()
 
     <!-- Preview -->
     <StoryResponsivePreview
+      v-model:settings="settings"
       :story="story"
       :variant="variant"
-      :settings="settings"
     />
   </div>
 </template>
