@@ -80,7 +80,7 @@ importers:
       '@types/markdown-it': ^12.2.3
       '@types/node': ^17.0.18
       '@vitejs/plugin-vue': ^2.2.0
-      '@vueuse/core': ^7.6.2
+      '@vueuse/core': ^8.1.1
       autoprefixer: ^10.4.2
       case: ^1.6.3
       chokidar: ^3.5.3
@@ -114,7 +114,7 @@ importers:
       '@histoire/controls': link:../histoire-controls
       '@iconify/vue': 3.1.4_vue@3.2.31
       '@vitejs/plugin-vue': 2.2.4_vite@2.8.6+vue@3.2.31
-      '@vueuse/core': 7.7.1_vue@3.2.31
+      '@vueuse/core': 8.1.1_vue@3.2.31
       case: 1.6.3
       chokidar: 3.5.3
       defu: 5.0.1
@@ -1332,8 +1332,8 @@ packages:
       vue: 3.2.31
     dev: true
 
-  /@vueuse/core/7.7.1_vue@3.2.31:
-    resolution: {integrity: sha512-PRRgbATMpoeUmkCEBtUeJgOwtew8s+4UsEd+Pm7MhkjL2ihCNrSqxNVtM6NFE4uP2sWnkGcZpCjPuNSxowJ1Ow==}
+  /@vueuse/core/8.1.1_vue@3.2.31:
+    resolution: {integrity: sha512-NmpizOcQXW0OHV0qa6YwFtw5hQBe0RxMuxQoIIbCa6jRT16MTweFPecIM6VgA1e5vZJtAO7p//TgLSpzi3joZQ==}
     peerDependencies:
       '@vue/composition-api': ^1.1.0
       vue: ^2.6.0 || ^3.2.0
@@ -1343,13 +1343,18 @@ packages:
       vue:
         optional: true
     dependencies:
-      '@vueuse/shared': 7.7.1_vue@3.2.31
+      '@vueuse/metadata': 8.1.1
+      '@vueuse/shared': 8.1.1_vue@3.2.31
       vue: 3.2.31
       vue-demi: 0.12.4_vue@3.2.31
     dev: false
 
-  /@vueuse/shared/7.7.1_vue@3.2.31:
-    resolution: {integrity: sha512-rN2qd22AUl7VdBxihagWyhUNHCyVk9IpvBTTfHoLH9G7rGE552X1f+zeCfehuno0zXif13jPw+icW/wn2a0rnQ==}
+  /@vueuse/metadata/8.1.1:
+    resolution: {integrity: sha512-TSmA3UaSmBcV8pJ7fnHAL7NjSE1RQZlpJklg6YysFxwxDb0MZlo+Q8j9U1hLBZT1fnAjwZMaoxilanHN8ZwugQ==}
+    dev: false
+
+  /@vueuse/shared/8.1.1_vue@3.2.31:
+    resolution: {integrity: sha512-lWRcK8W9+q1t1XMxW9JIljXFQLIViInTOEF7wUHcISQNAYwHtHgr0z+U5SRM8tA4eJd/dVs/2BV1/z2DG7aKEg==}
     peerDependencies:
       '@vue/composition-api': ^1.1.0
       vue: ^2.6.0 || ^3.2.0
