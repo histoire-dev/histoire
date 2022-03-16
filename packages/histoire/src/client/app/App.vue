@@ -112,7 +112,10 @@ onKeyboardShortcut(['ctrl+k', 'meta+k'], (event) => {
       class="htw-h-full htw-flex htw-flex-col"
     >
       <AppHeader @search="isSearchOpen = true" />
-      <Breadcrumb />
+      <Breadcrumb
+        :tree="tree"
+        :stories="stories"
+      />
       <RouterView class="htw-grow" />
     </div>
 

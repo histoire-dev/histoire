@@ -1,7 +1,14 @@
 <script lang="ts" setup>
-import { computed } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { Icon } from '@iconify/vue'
 import { useStoryStore } from '../../stores/story'
+import { Story, Tree } from '../../types'
+import SideMenu from './SideMenu.vue'
+
+const props = defineProps<{
+  tree: Tree
+  stories: Story[]
+}>()
 
 const storyStore = useStoryStore()
 
@@ -10,11 +17,28 @@ const story = computed(() => storyStore.currentStory)
 const folders = computed(() => {
   return story.value.file.path.slice(0, -1)
 })
+
+const isMenuOpened = ref(false)
+
+function openMenu () {
+  isMenuOpened.value = true
+}
+
+function closeMenu () {
+  isMenuOpened.value = false
+}
+
+watch(story, () => {
+  isMenuOpened.value = false
+})
 </script>
 
 <template>
-  <div class="htw-border-b htw-border-t htw-border-gray-100 dark:htw-border-gray-800 htw-p-4 htw-flex htw-items-center htw-gap-4">
-    <a class="htw-p-1 hover:htw-text-primary-500 dark:hover:htw-text-primary-400 htw-cursor-pointer">
+  <div class="htw-border-b htw-border-t htw-border-gray-100 dark:htw-border-gray-800 htw-p-4 htw-h-16 htw-flex htw-items-center htw-gap-4">
+    <a
+      class="htw-p-1 hover:htw-text-primary-500 dark:hover:htw-text-primary-400 htw-cursor-pointer"
+      @click="openMenu"
+    >
       <Icon
         icon="carbon:menu"
         class="htw-w-8 htw-h-8 htw-shrink-0"
@@ -50,5 +74,11 @@ const folders = computed(() => {
         </span>
       </span>
     </div>
+    <SideMenu
+      :is-opened="isMenuOpened"
+      :tree="tree"
+      :stories="stories"
+      @close="closeMenu"
+    />
   </div>
 </template>
