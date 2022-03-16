@@ -67,6 +67,7 @@
     "vue-router": "^4.0.12"
   },
   "peerDependencies": {
+    "@vue/runtime-core": "^3.2.31",
     "vite": "^2.8.3",
     "vue": "^3.2.31"
   },
