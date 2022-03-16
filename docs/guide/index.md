@@ -16,4 +16,4 @@ Histoire is currently in early access - [the repository](https://github.com/Akry
 
 You support will helps us build the best stories app based on [Vite](https://vitejs.dev)!
 
-The early access will last a few weeks until we finish polishing the documentation and when we will it is ready to be tested by more people.
+The early access will last a few weeks until we finish polishing the documentation and when we will feel it's ready to be tested by more people.
