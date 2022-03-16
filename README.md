@@ -22,12 +22,13 @@
 
 ## Supported frameworks
 
-| Framework | Versions | Support | Auto CodeGen | Docs |
+| Framework | Versions | Support | Auto CodeGen | Auto Docs |
 | --------- | -------- | ------- | ------------ | ---- |
 | [Vue](https://vuejs.org/) | 3.2+ | ✅ | ✅ | Todo |
 | [Svelte](https://svelte.dev/) | - | Planned | - | - |
-| [React](https://reactjs.org/) | - | TBD | - | - |
+| [Solid](https://www.solidjs.com/) | - | Planned | - | - |
 | [Angular](https://angular.io/) | - | TBD | - | - |
+| [React](https://reactjs.org/) | - | [Alternative](https://www.ladle.dev) | - | - |
 
 ## Quick Start
 
