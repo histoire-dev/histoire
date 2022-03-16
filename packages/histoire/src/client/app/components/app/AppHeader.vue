@@ -23,7 +23,7 @@ onKeyboardShortcut(['ctrl+shift+d', 'meta+shift+d'], (event) => {
 
 <template>
   <div
-    class="htw-px-4 htw-h-16 htw-flex htw-items-center htw-gap-2"
+    class="htw-px-4 htw-h-16 htw-flex htw-items-center htw-gap-2 htw-border-b htw-border-gray-100 dark:htw-border-gray-800"
   >
     <div class="htw-py-4 htw-flex-1 htw-h-full htw-flex htw-items-center htw-pr-2">
       <a

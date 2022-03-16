@@ -4,6 +4,7 @@ import { Icon } from '@iconify/vue'
 import { useStoryStore } from '../../stores/story'
 import { Story, Tree } from '../../types'
 import SideMenu from './SideMenu.vue'
+import StoryList from '../story/StoryList.vue'
 
 const props = defineProps<{
   tree: Tree
@@ -34,7 +35,7 @@ watch(story, () => {
 </script>
 
 <template>
-  <div class="htw-border-b htw-border-t htw-border-gray-100 dark:htw-border-gray-800 htw-p-4 htw-h-16 htw-flex htw-items-center htw-gap-4">
+  <div class="htw-border-b htw-border-gray-100 dark:htw-border-gray-800 htw-p-4 htw-h-16 htw-flex htw-items-center htw-gap-4">
     <a
       class="htw-p-1 hover:htw-text-primary-500 dark:hover:htw-text-primary-400 htw-cursor-pointer"
       @click="openMenu"
@@ -76,9 +77,13 @@ watch(story, () => {
     </div>
     <SideMenu
       :is-opened="isMenuOpened"
-      :tree="tree"
-      :stories="stories"
       @close="closeMenu"
-    />
+    >
+      <StoryList
+        :tree="tree"
+        :stories="stories"
+        class="htw-flex-1 htw-overflow-y-scroll"
+      />
+    </SideMenu>
   </div>
 </template>

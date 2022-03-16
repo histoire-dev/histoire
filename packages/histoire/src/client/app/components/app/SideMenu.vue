@@ -1,13 +1,9 @@
 <script lang="ts" setup>
-import { Story, Tree } from '../../types'
-import StoryList from '../story/StoryList.vue'
 import { Icon } from '@iconify/vue'
 import { defineEmits } from '@vue/runtime-core'
 
 const props = defineProps<{
   isOpened: boolean
-  tree: Tree
-  stories: Story[]
 }>()
 
 const emits = defineEmits<{(e: 'close'): void}>()
@@ -29,10 +25,6 @@ const emits = defineEmits<{(e: 'close'): void}>()
         />
       </a>
     </div>
-    <StoryList
-      :tree="tree"
-      :stories="stories"
-      class="htw-flex-1 htw-overflow-y-scroll"
-    />
+    <slot />
   </div>
 </template>

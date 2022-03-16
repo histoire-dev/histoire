@@ -131,7 +131,7 @@ function selectPrevious () {
 <template>
   <div
     v-show="shown"
-    class="htw-fixed htw-inset-0 htw-bg-white/80 dark:htw-bg-gray-700/80"
+    class="htw-fixed htw-inset-0 htw-bg-white/80 dark:htw-bg-gray-700/80 htw-z-20"
   >
     <div
       class="htw-absolute htw-inset-0"
