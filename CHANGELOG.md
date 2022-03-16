@@ -1,3 +1,14 @@
+## [0.1.3](https://github.com/Akryum/histoire/compare/v0.1.2...v0.1.3) (2022-03-16)
+
+
+### Bug Fixes
+
+* responsive view settings update ([4e4bfe4](https://github.com/Akryum/histoire/commit/4e4bfe4a191a77c2aad007eab278dd8087e1de93))
+* **responsive:** resizing while rotated ([9e53d83](https://github.com/Akryum/histoire/commit/9e53d834acc15063501406f122164dab949ef137))
+* storage glitch (upgrade vueuse) ([8f99248](https://github.com/Akryum/histoire/commit/8f99248b776471793b9fe5b9a6b2eba9c5879801))
+
+
+
 ## [0.1.2](https://github.com/Akryum/histoire/compare/v0.1.1...v0.1.2) (2022-03-16)
 
 
