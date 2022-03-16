@@ -6,6 +6,7 @@ import './vars.css'
 import './index.css'
 import SponsorButton from './SponsorButton.vue'
 import MeetTeam from './MeetTeam.vue'
+import DemoPreview from './DemoPreview.vue'
 
 export default {
   ...DefaultTheme,
@@ -20,5 +21,6 @@ export default {
     app.component('Icon', Icon)
     app.component('SponsorButton', SponsorButton)
     app.component('MeetTeam', MeetTeam)
+    app.component('DemoPreview', DemoPreview)
   },
 }

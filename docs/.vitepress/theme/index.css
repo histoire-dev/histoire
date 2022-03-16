@@ -21,11 +21,11 @@ button {
   }
 }
 
-.v-popper__popper.v-popper__popper--show-from .v-popper__wrapper {
+.v-popper__popper.v-popper--theme-dropdown.v-popper__popper--show-from .v-popper__wrapper {
   transform: scale(.5);
 }
 
-.v-popper__popper.v-popper__popper--show-to .v-popper__wrapper {
+.v-popper__popper.v-popper--theme-dropdown.v-popper__popper--show-to .v-popper__wrapper {
   transform: none;
   transition: transform .15s;
 }
