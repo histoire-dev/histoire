@@ -45,9 +45,10 @@
     "peerDependencyRules": {
       "ignoreMissing": [
         "@algolia/client-search",
+        "@types/react",
         "react",
         "react-dom",
-        "@types/react",
+        "vue",
         "webpack"
       ]
     }
