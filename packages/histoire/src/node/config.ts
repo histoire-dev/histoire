@@ -135,7 +135,10 @@ export function getDefaultConfig (): HistoireConfig {
   return {
     outDir: 'histoire-dist',
     storyMatch: ['**/*.story.vue'],
-    storyIgnored: ['**/node_modules/**'],
+    storyIgnored: [
+      '**/node_modules/**',
+      '**/dist/**',
+    ],
     tree: {
       file: 'title',
       order: 'asc',
