@@ -1,3 +1,14 @@
+# [0.1.0](https://github.com/Akryum/histoire/compare/v0.0.5...v0.1.0) (2022-03-16)
+
+
+### Bug Fixes
+
+* default storyIgnored ([e2af9de](https://github.com/Akryum/histoire/commit/e2af9de5ce51cd65dfd1ac8ca238b82d05076ff0))
+* deps on @vue/runtime-core ([756a446](https://github.com/Akryum/histoire/commit/756a446d71f234438facc7f0adc9cdb821c94a1d))
+* vite errors ([6ff6861](https://github.com/Akryum/histoire/commit/6ff6861ee0d954931d7d778ddebce0ceeac51d95))
+
+
+
 ## [0.0.5](https://github.com/Akryum/histoire/compare/v0.0.4...v0.0.5) (2022-03-15)
 
 
