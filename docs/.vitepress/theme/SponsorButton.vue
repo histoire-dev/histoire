@@ -1,7 +1,7 @@
 <template>
   <VDropdown>
     <button
-      class="htw-inline-flex htw-items-center htw-gap-2 htw-px-4 htw-py-2 htw-border htw-border-solid htw-border-gray-200 htw-rounded hover:htw-bg-primary-100 hover:htw-border-primary-200 htw-text-primary-500 htw-cursor-pointer"
+      class="htw-inline-flex htw-items-center htw-gap-2 htw-px-4 htw-py-2 htw-btn"
     >
       <span>💚</span>
       <span>Become a sponsor</span>

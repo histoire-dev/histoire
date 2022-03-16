@@ -83,7 +83,7 @@ const teamMembers: TeamMember[] = [
         <a
           :href="tm.sponsor"
           target="_blank"
-          class="htw-inline-flex htw-items-center htw-gap-2 htw-px-4 htw-py-2 hover:htw-no-underline htw-border htw-border-solid htw-border-gray-200 htw-rounded hover:htw-bg-primary-100 hover:htw-border-primary-200 htw-text-primary-500"
+          class="htw-inline-flex htw-items-center htw-gap-2 htw-px-4 htw-py-2 hover:htw-no-underline htw-btn"
         >
           <span>💚</span>
           <span>Sponsor</span>

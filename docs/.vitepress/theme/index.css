@@ -7,6 +7,10 @@ button {
 
 @tailwind utilities;
 
+.htw-btn {
+  @apply htw-border htw-border-solid htw-border-gray-200 htw-rounded hover:htw-bg-primary-100 hover:htw-border-primary-200 htw-text-primary-500 htw-cursor-pointer;
+}
+
 .home-hero {
   figure {
     .image {
