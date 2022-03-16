@@ -52,6 +52,13 @@ export async function build (ctx: Context) {
           join(APP_PATH, 'index.ts'),
           join(APP_PATH, 'sandbox.ts'),
         ],
+        output: {
+          manualChunks (id) {
+            if (!id.includes('histoire/dist/client') && id.includes('node_modules')) {
+              return 'vendor'
+            }
+          },
+        },
       },
       outDir: ctx.config.outDir,
       emptyOutDir: true,
