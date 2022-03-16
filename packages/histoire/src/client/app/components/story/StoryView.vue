@@ -75,8 +75,8 @@ function setVariant (variantId: string) {
         <StorySidePanel />
       </template>
     </BaseSplitPane>
-    <div v-else>
-      Mobile view
-    </div>
+    <template v-else>
+      <StoryViewer />
+    </template>
   </div>
 </template>

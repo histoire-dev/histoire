@@ -144,7 +144,7 @@ function selectPrevious () {
       >
         <Icon
           icon="carbon:search"
-          class="flex-none htw-w-5 htw-h-5"
+          class="flex-none htw-w-4 htw-h-4"
         />
 
         <input

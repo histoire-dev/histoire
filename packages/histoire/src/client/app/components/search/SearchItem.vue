@@ -57,7 +57,7 @@ const kindLabels = {
     >
       <Icon
         :icon="result.icon ?? defaultIcons[result.kind]"
-        class="htw-w-5 htw-h-5"
+        class="htw-w-4 htw-h-4"
         :class="[
           !selected ? [
             result.iconColor

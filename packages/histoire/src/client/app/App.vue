@@ -12,6 +12,7 @@ import { useTitle } from '@vueuse/core'
 import { histoireConfig } from './util/config.js'
 import { onKeyboardShortcut } from './util/keyboard.js'
 import { isDesktop } from './util/responsive'
+import Breadcrumb from './components/app/Breadcrumb.vue'
 
 const SearchModal = defineAsyncComponent(() => import('./components/search/SearchModal.vue'))
 
@@ -108,9 +109,11 @@ onKeyboardShortcut(['ctrl+k', 'meta+k'], (event) => {
     </BaseSplitPane>
     <div
       v-else
-      class="htw-h-full"
+      class="htw-h-full htw-flex htw-flex-col"
     >
-      <RouterView />
+      <AppHeader @search="isSearchOpen = true" />
+      <Breadcrumb />
+      <RouterView class="htw-grow" />
     </div>
 
     <SearchModal
