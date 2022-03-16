@@ -11,6 +11,7 @@ import { mapFile } from './util/mapping'
 import { useTitle } from '@vueuse/core'
 import { histoireConfig } from './util/config.js'
 import { onKeyboardShortcut } from './util/keyboard.js'
+import { isDesktop } from './util/responsive'
 
 const SearchModal = defineAsyncComponent(() => import('./components/search/SearchModal.vue'))
 
@@ -80,6 +81,7 @@ onKeyboardShortcut(['ctrl+k', 'meta+k'], (event) => {
 
   <div class="htw-h-screen dark:htw-bg-gray-700 dark:htw-text-gray-100">
     <BaseSplitPane
+      v-if="isDesktop"
       save-id="main-horiz"
       :min="5"
       :max="50"
@@ -104,6 +106,12 @@ onKeyboardShortcut(['ctrl+k', 'meta+k'], (event) => {
         <RouterView />
       </template>
     </BaseSplitPane>
+    <div
+      v-else
+      class="htw-h-full"
+    >
+      <RouterView />
+    </div>
 
     <SearchModal
       v-if="loadSearch"

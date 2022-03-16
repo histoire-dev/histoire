@@ -1,26 +1,18 @@
 <script lang="ts" setup>
-import { computed, watch } from 'vue'
+import { watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useStoryStore } from '../../stores/story'
 
 import BaseSplitPane from '../base/BaseSplitPane.vue'
 import BaseEmpty from '../base/BaseEmpty.vue'
-import BaseTab from '../base/BaseTab.vue'
-import StoryVariantListItem from './StoryVariantListItem.vue'
-import StoryVariantGridItem from './StoryVariantGridItem.vue'
-import StoryVariantSingleView from './StoryVariantSingleView.vue'
-import StoryControls from './StoryControls.vue'
-import StoryDocs from './StoryDocs.vue'
-import StorySourceCode from './StorySourceCode.vue'
+import { isDesktop } from '../../util/responsive'
+import StoryViewer from './StoryViewer.vue'
+import StorySidePanel from './StorySidePanel.vue'
 
 const storyStore = useStoryStore()
 
 const router = useRouter()
 const route = useRoute()
-
-// Selected variant
-
-const hasSingleVariant = computed(() => (storyStore.currentStory?.variants.length === 1))
 
 // Restore variant selection
 
@@ -68,6 +60,7 @@ function setVariant (variantId: string) {
     class="htw-h-full"
   >
     <BaseSplitPane
+      v-if="isDesktop"
       save-id="story-main"
       :min="30"
       :max="95"
@@ -75,119 +68,15 @@ function setVariant (variantId: string) {
       class="htw-h-full"
     >
       <template #first>
-        <div class="htw-bg-gray-50 htw-h-full dark:htw-bg-gray-750">
-          <div
-            v-if="storyStore.currentStory.layout.type === 'grid'"
-            class="htw-h-full htw-overflow-y-auto"
-          >
-            <div
-              class="htw-grid htw-gap-4 htw-m-4"
-              :style="{
-                gridTemplateColumns: `repeat(auto-fill, ${storyStore.currentStory.layout.width ?? 200}px)`,
-              }"
-            >
-              <StoryVariantGridItem
-                v-for="(variant, index) of storyStore.currentStory.variants"
-                :key="index"
-                :variant="variant"
-                :story="storyStore.currentStory"
-              />
-            </div>
-          </div>
-
-          <template v-else-if="storyStore.currentStory.layout.type === 'single'">
-            <div
-              v-if="hasSingleVariant && storyStore.currentVariant"
-              class="htw-p-2 htw-h-full"
-            >
-              <StoryVariantSingleView
-                :variant="storyStore.currentVariant"
-                :story="storyStore.currentStory"
-              />
-            </div>
-            <BaseSplitPane
-              v-else
-              save-id="story-single-main-split"
-              :min="5"
-              :max="40"
-              :default-split="17"
-            >
-              <template #first>
-                <div class="htw-h-full htw-overflow-y-auto">
-                  <StoryVariantListItem
-                    v-for="(variant, index) of storyStore.currentStory.variants"
-                    :key="index"
-                    :variant="variant"
-                  />
-                </div>
-              </template>
-              <template #last>
-                <div
-                  v-if="storyStore.currentVariant"
-                  class="htw-p-2 htw-h-full"
-                >
-                  <StoryVariantSingleView
-                    :variant="storyStore.currentVariant"
-                    :story="storyStore.currentStory"
-                  />
-                </div>
-              </template>
-            </BaseSplitPane>
-          </template>
-        </div>
+        <StoryViewer />
       </template>
 
       <template #last>
-        <BaseEmpty v-if="!storyStore.currentVariant">
-          <span>Select a variant</span>
-        </BaseEmpty>
-
-        <BaseEmpty v-else-if="!storyStore.currentVariant.ready">
-          <span>Loading...</span>
-        </BaseEmpty>
-
-        <BaseSplitPane
-          v-else
-          save-id="story-sidepane"
-          orientation="portrait"
-          class="htw-h-full"
-        >
-          <template #first>
-            <div class="htw-flex htw-flex-col htw-h-full">
-              <nav class="htw-h-10 htw-flex-none htw-border-b htw-border-gray-100 dark:htw-border-gray-750">
-                <BaseTab
-                  :to="{ ...$route, query: { ...$route.query, tab: '' } }"
-                  :matched="!$route.query.tab"
-                >
-                  Controls
-                </BaseTab>
-                <BaseTab
-                  :to="{ ...$route, query: { ...$route.query, tab: 'docs' } }"
-                  :matched="$route.query.tab === 'docs'"
-                >
-                  Docs
-                </BaseTab>
-              </nav>
-
-              <component
-                :is="$route.query.tab === 'docs'
-                  ? StoryDocs
-                  : StoryControls"
-                :story="storyStore.currentStory"
-                :variant="storyStore.currentVariant"
-                class="htw-h-full htw-overflow-auto"
-              />
-            </div>
-          </template>
-
-          <template #last>
-            <StorySourceCode
-              :variant="storyStore.currentVariant"
-              class="htw-h-full"
-            />
-          </template>
-        </BaseSplitPane>
+        <StorySidePanel />
       </template>
     </BaseSplitPane>
+    <div v-else>
+      Mobile view
+    </div>
   </div>
 </template>
