@@ -120,8 +120,8 @@ function useDragger (el: Ref<HTMLDivElement>, value: Ref<number>, min: number, m
   useEventListener(el, 'mousedown', onMouseDown)
 }
 
-const responsiveWidth = computed({ get: () => props.settings.responsiveWidth, set: (value) => props.settings.responsiveWidth = value })
-const responsiveHeight = computed({ get: () => props.settings.responsiveHeight, set: (value) => props.settings.responsiveHeight = value })
+const responsiveWidth = computed({ get: () => props.settings[props.settings.rotate ? 'responsiveHeight' : 'responsiveWidth'], set: (value) => props.settings[props.settings.rotate ? 'responsiveHeight' : 'responsiveWidth'] = value })
+const responsiveHeight = computed({ get: () => props.settings[props.settings.rotate ? 'responsiveWidth' : 'responsiveHeight'], set: (value) => props.settings[props.settings.rotate ? 'responsiveWidth' : 'responsiveHeight'] = value })
 
 const horizontalDragger = ref<HTMLDivElement>()
 const verticalDragger = ref<HTMLDivElement>()
