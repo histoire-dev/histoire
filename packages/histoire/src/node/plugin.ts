@@ -46,6 +46,8 @@ export async function createVitePlugins (ctx: Context): Promise<VitePlugin[]> {
           include: [
             'vue',
             '@vue/runtime-core',
+            'shiki',
+            'case',
           ],
         },
         server: {
