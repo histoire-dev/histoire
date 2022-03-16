@@ -130,6 +130,7 @@ watch(variant, () => {
     </template>
   </div>
   <SideMenu
+    title="Select a variant"
     :is-opened="isMenuOpened"
     @close="closeMenu"
   >

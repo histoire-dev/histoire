@@ -76,6 +76,7 @@ watch(story, () => {
       </span>
     </div>
     <SideMenu
+      title="Select a story"
       :is-opened="isMenuOpened"
       @close="closeMenu"
     >
