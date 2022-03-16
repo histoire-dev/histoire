@@ -34,7 +34,7 @@
   },
   "scripts": {
     "build": "rimraf dist && tsc -d && pnpm run build:css && node ./scripts/copy.mjs",
-    "build:css": "tailwindcss -i src/client/app/style/main.css -o ./dist/style.css -c tailwind.config.cjs --postcss postcss.config.cjs",
+    "build:css": "tailwindcss -i src/client/app/style/main.scss -o ./dist/style.css -c tailwind.config.cjs --postcss postcss.config.cjs",
     "watch": "concurrently \"tsc -d -w --sourceMap\" \"pnpm run build:css -- --watch\" \"node ./scripts/watchAndCopy.mjs\"",
     "test:open": "peeky open",
     "test": "peeky run"
