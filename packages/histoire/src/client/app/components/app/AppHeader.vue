@@ -16,8 +16,8 @@ const themeIcon = computed(() => {
 })
 
 onKeyboardShortcut(['ctrl+shift+d', 'meta+shift+d'], (event) => {
-  toggleDark()
   event.preventDefault()
+  toggleDark()
 })
 </script>
 
@@ -44,7 +44,7 @@ onKeyboardShortcut(['ctrl+shift+d', 'meta+shift+d'], (event) => {
       >
         <Icon
           icon="carbon:search"
-          class="htw-w-4 htw-h-4"
+          class="htw-w-8 htw-h-8 sm:htw-w-4 sm:htw-h-4"
         />
       </a>
 
@@ -55,7 +55,7 @@ onKeyboardShortcut(['ctrl+shift+d', 'meta+shift+d'], (event) => {
       >
         <Icon
           :icon="themeIcon"
-          class="htw-w-4 htw-h-4"
+          class="htw-w-8 htw-h-8 sm:htw-w-4 sm:htw-h-4"
         />
       </a>
     </div>
