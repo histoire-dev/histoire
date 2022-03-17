@@ -10,6 +10,7 @@ const themeIcon = computed(() => {
 <template>
   <div class="htw-pt-2 htw-ml-4">
     <a
+      v-tooltip="'Toggle dark mode'"
       class="htw-text-current htw-p-2 hover:htw-text-primary-500 dark:hover:htw-text-primary-400 htw-cursor-pointer"
       @click="toggleDark()"
     >
