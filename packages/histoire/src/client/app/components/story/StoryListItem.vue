@@ -33,7 +33,7 @@ useScrollOnActive(active, el)
           storyId: story.id,
         },
       }"
-      class="htw-pl-0.5 htw-pr-2 htw-py-1.5 htw-m-1 htw-rounded-sm"
+      class="htw-pl-0.5 htw-pr-2 htw-py-2 md:htw-py-1.5 htw-m-1 htw-rounded-sm"
     >
       <span class="bind-tree-margin htw-flex htw-items-center htw-gap-2 htw-pl-5 htw-min-w-0">
         <Icon
