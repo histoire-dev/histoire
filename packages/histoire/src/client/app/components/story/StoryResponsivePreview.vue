@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, Ref, ref, toRaw, watch } from 'vue'
+import { computed, onUnmounted, Ref, ref, toRaw, watch } from 'vue'
 import { useEventListener } from '@vueuse/core'
 import { Icon } from '@iconify/vue'
 import { STATE_SYNC, PREVIEW_SETTINGS_SYNC, SANDBOX_READY } from '../../util/const'
@@ -103,26 +103,70 @@ function onIframeLoad () {
 
 const resizing = ref(false)
 
+const onUnmountedCleanupFns: (() => unknown)[] = []
+onUnmounted(() => {
+  onUnmountedCleanupFns.forEach(fn => fn())
+})
+
+function addWindowListener (event: string, listener: (event: any) => unknown) {
+  window.addEventListener(event, listener)
+  const removeListener = () => window.removeEventListener(event, listener)
+  onUnmountedCleanupFns.push(removeListener)
+  return () => {
+    removeListener()
+    onUnmountedCleanupFns.splice(onUnmountedCleanupFns.indexOf(removeListener), 1)
+  }
+}
+
 function useDragger (el: Ref<HTMLDivElement>, value: Ref<number>, min: number, max: number, axis: 'x' | 'y') {
-  const onMouseDown = (event: MouseEvent) => {
+  function onMouseDown (event: MouseEvent) {
     event.preventDefault()
     event.stopPropagation()
     const start = axis === 'x' ? event.clientX : event.clientY
     const startValue = value.value || (axis === 'x' ? iframe.value.offsetWidth : iframe.value.offsetHeight)
     resizing.value = true
-    const onMouseMove = (event: MouseEvent) => {
+
+    const removeListeners = [
+      addWindowListener('mousemove', onMouseMove),
+      addWindowListener('mouseup', onMouseUp),
+    ]
+
+    function onMouseMove (event: MouseEvent) {
       const delta = (axis === 'x' ? event.clientX : event.clientY) - start
       value.value = Math.max(min, Math.min(max, startValue + delta))
     }
-    const onMouseUp = () => {
-      window.removeEventListener('mousemove', onMouseMove)
-      window.removeEventListener('mouseup', onMouseUp)
+
+    function onMouseUp () {
+      removeListeners.forEach(fn => fn())
       resizing.value = false
     }
-    window.addEventListener('mousemove', onMouseMove)
-    window.addEventListener('mouseup', onMouseUp)
   }
   useEventListener(el, 'mousedown', onMouseDown)
+
+  function onTouchStart (event: TouchEvent) {
+    event.preventDefault()
+    event.stopPropagation()
+    const start = axis === 'x' ? event.touches[0].clientX : event.touches[0].clientY
+    const startValue = value.value || (axis === 'x' ? iframe.value.offsetWidth : iframe.value.offsetHeight)
+    resizing.value = true
+
+    const removeListeners = [
+      addWindowListener('touchmove', onTouchMove),
+      addWindowListener('touchend', onTouchEnd),
+      addWindowListener('touchcancel', onTouchEnd),
+    ]
+
+    function onTouchMove (event: TouchEvent) {
+      const delta = (axis === 'x' ? event.touches[0].clientX : event.touches[0].clientY) - start
+      value.value = Math.max(min, Math.min(max, startValue + delta))
+    }
+
+    function onTouchEnd () {
+      removeListeners.forEach(fn => fn())
+      resizing.value = false
+    }
+  }
+  useEventListener(el, 'touchstart', onTouchStart)
 }
 
 // Optimize by batching settings updates to the next frame
