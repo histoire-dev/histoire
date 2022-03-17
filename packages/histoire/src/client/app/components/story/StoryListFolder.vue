@@ -50,7 +50,7 @@ const folderPadding = computed(() => {
           />
           <Icon
             icon="carbon:folder"
-            class="htw-w-5 htw-h-5"
+            class="htw-w-5 htw-h-5 sm:htw-w-4 sm:htw-h-4"
           />
         </span>
         <span class="htw-truncate">{{ folder.title }}</span>

@@ -1,7 +1,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Lato&display=swap');
 @import 'floating-vue/dist/style.css';
-@import 'floating-vue.css';
-@import 'transitions.css';
+
+@import 'floating-vue.pcss';
+@import 'transitions.pcss';
 
 *,
 ::before,
@@ -45,7 +46,16 @@ body,
 #app {
   height: 100%;
   font-family: 'Lato', sans-serif;
-  font-size: 14px;
+}
+
+#app {
+    font-size: 18px;
+}
+
+@media (min-width: 640px) {
+    #app {
+        font-size: 14px;
+    }
 }
 
 .__histoire-sandbox {

@@ -5,6 +5,7 @@ import type { Story, Variant } from '../../types'
 import { histoireConfig } from '../../util/config'
 import { usePreviewSettings } from '../../util/preview-settings'
 import StoryResponsivePreview from './StoryResponsivePreview.vue'
+import { isMobile } from '../../util/responsive'
 
 defineProps({
   variant: {
@@ -24,7 +25,10 @@ const settings = usePreviewSettings()
 <template>
   <div class="htw-h-full htw-flex htw-flex-col">
     <!-- Toolbar -->
-    <div class="htw-flex-none htw-flex htw-items-center htw-h-8 -htw-mt-1">
+    <div
+      v-if="!isMobile"
+      class="htw-flex-none htw-flex htw-items-center htw-h-8 -htw-mt-1"
+    >
       <!-- Variant title -->
       <div class="htw-flex htw-items-center htw-gap-1 htw-text-gray-500 htw-flex-1 htw-truncate htw-min-w-0">
         <Icon

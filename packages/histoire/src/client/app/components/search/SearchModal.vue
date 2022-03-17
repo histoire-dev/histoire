@@ -131,7 +131,7 @@ function selectPrevious () {
 <template>
   <div
     v-show="shown"
-    class="htw-fixed htw-inset-0 htw-bg-white/80 dark:htw-bg-gray-700/80"
+    class="htw-fixed htw-inset-0 htw-bg-white/80 dark:htw-bg-gray-700/80 htw-z-20"
   >
     <div
       class="htw-absolute htw-inset-0"
@@ -144,7 +144,7 @@ function selectPrevious () {
       >
         <Icon
           icon="carbon:search"
-          class="flex-none htw-w-5 htw-h-5"
+          class="flex-none htw-w-4 htw-h-4"
         />
 
         <input
