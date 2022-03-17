@@ -27,4 +27,17 @@
       </a>
     </div>
   </div>
+
+  <a
+    href="https://vue3.examples.histoire.dev/"
+    target="_blank"
+    class="xl:htw-hidden htw-btn htw-flex htw-items-center htw-gap-4 htw-p-4 hover:htw-no-underline"
+  >
+    <img
+      src="/logo.svg"
+      alt="Logo"
+      class="htw-w-8 htw-h-8"
+    >
+    Online demo
+  </a>
 </template>
