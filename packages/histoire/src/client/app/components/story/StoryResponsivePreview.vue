@@ -182,7 +182,7 @@ const finalHeight = computed(() => props.settings.rotate ? props.settings.respon
   <div class="htw-w-full htw-h-full htw-flex-1 htw-border htw-border-gray-100 dark:htw-border-gray-800 htw-rounded-lg htw-relative htw-overflow-hidden">
     <div class="htw-absolute htw-inset-0 htw-w-full htw-h-full htw-bg-gray-200 dark:htw-bg-gray-850 htw-rounded-r-lg htw-border-l-2 htw-border-gray-500/10 dark:htw-border-gray-700/30 htw-overflow-hidden">
       <HatchedPattern
-        class="htw-w-full htw-h-full htw-text-black/[2%] dark:htw-text-white/[2%]"
+        class="htw-w-full htw-h-full htw-text-black/[4%] dark:htw-text-white/[2%]"
       />
     </div>
 
