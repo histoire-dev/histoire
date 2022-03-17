@@ -1,3 +1,5 @@
+@import "./dark.pcss";
+
 @tailwind base;
 @tailwind components;
 
@@ -9,6 +11,7 @@ button {
 
 .htw-btn {
   @apply htw-border htw-border-solid htw-border-gray-200 htw-rounded hover:htw-bg-primary-100 hover:htw-border-primary-200 htw-text-primary-500 htw-cursor-pointer;
+  @apply dark:htw-bg-gray-850 dark:htw-border-gray-700 dark:hover:htw-bg-primary-900 dark:hover:htw-border-primary-600
 }
 
 .home-hero {

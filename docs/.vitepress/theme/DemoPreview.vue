@@ -1,5 +1,5 @@
 <template>
-  <div class="!xl:htw-hidden -htw-mx-32 htw-bg-gray-200 htw-p-2 htw-rounded-lg htw-h-[550px] htw-flex htw-flex-col htw-relative">
+  <div class="!xl:htw-hidden htw-bg-gray-200 dark:htw-bg-gray-900 htw-p-2 htw-rounded-lg htw-h-[550px] htw-flex htw-flex-col htw-relative">
     <div class="htw-flex-none htw-h-4 htw-flex htw-gap-1 htw-justify-end">
       <div
         v-for="n in 3"
@@ -10,7 +10,7 @@
 
     <iframe
       src="https://vue3.examples.histoire.dev/"
-      class="htw-w-full htw-h-full htw-border htw-border-none htw-rounded htw-bg-white"
+      class="htw-w-full htw-h-full htw-border htw-border-none htw-rounded htw-bg-gray-200 dark:htw-bg-gray-900"
     />
 
     <div class="htw-absolute htw-bottom-4 htw-left-0 htw-w-full htw-flex htw-justify-center htw-pointer-events-none">
