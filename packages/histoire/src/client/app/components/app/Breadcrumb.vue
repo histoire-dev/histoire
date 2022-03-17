@@ -93,6 +93,6 @@ watch(story, () => {
 
 <style scoped>
 .bind-icon-color {
-  color: v-bind('story.iconColor');
+  color: v-bind('story?.iconColor');
 }
 </style>

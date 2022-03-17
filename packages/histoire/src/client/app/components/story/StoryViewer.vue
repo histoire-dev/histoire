@@ -152,6 +152,6 @@ watch(variant, () => {
 
 <style scoped>
 .bind-icon-color {
-  color: v-bind('variant.iconColor');
+  color: v-bind('variant?.iconColor');
 }
 </style>
