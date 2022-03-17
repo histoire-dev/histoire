@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { computed, ref, watch } from 'vue'
 import { router } from '../router'
 import { Story } from '../types'
+import { useStorage } from '@vueuse/core'
 
 export const useStoryStore = defineStore('story', () => {
   const stories = ref<Story[]>([])
@@ -13,7 +14,10 @@ export const useStoryStore = defineStore('story', () => {
 
   const currentVariant = computed(() => currentStory.value?.variants.find(v => v.id === router.currentRoute.value.query.variantId))
 
-  const openedFolders = ref(new Map() as Map<string, boolean>)
+  const openedFolders = useStorage<Map<string, boolean>>(
+    '_histoire-tree-state',
+    new Map(),
+  )
 
   function getStringPath (path: Array<string>) {
     return path.join('␜')
