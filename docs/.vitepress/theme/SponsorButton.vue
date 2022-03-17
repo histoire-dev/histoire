@@ -12,7 +12,7 @@
         <a
           href="https://github.com/sponsors/Akryum"
           target="_blank"
-          class="htw-p-2 htw-pr-4 htw-flex htw-items-center htw-gap-4 hover:htw-no-underline htw-rounded hover:htw-bg-primary-100 htw-border htw-border-solid htw-border-transparent hover:htw-border-primary-200"
+          class="htw-p-2 htw-pr-4 htw-flex htw-items-center htw-gap-4 htw-btn-flat"
         >
           <img
             src="https://avatars.githubusercontent.com/u/2798204?size=80"
@@ -24,7 +24,7 @@
         <a
           href="https://github.com/sponsors/hugoattal"
           target="_blank"
-          class="htw-p-2 htw-pr-4 htw-flex htw-items-center htw-gap-4 hover:htw-no-underline htw-rounded hover:htw-bg-primary-100 htw-border htw-border-solid htw-border-transparent hover:htw-border-primary-200"
+          class="htw-p-2 htw-pr-4 htw-flex htw-items-center htw-gap-4 htw-btn-flat"
         >
           <img
             src="https://avatars.githubusercontent.com/u/4563971?size=80"

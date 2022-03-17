@@ -80,7 +80,7 @@ onKeyboardShortcut(['ctrl+k', 'meta+k'], (event) => {
     />
   </div>
 
-  <div class="htw-h-screen dark:htw-bg-gray-700 dark:htw-text-gray-100">
+  <div class="htw-h-screen htw-bg-white dark:htw-bg-gray-700 dark:htw-text-gray-100">
     <div
       v-if="isMobile"
       class="htw-h-full htw-flex htw-flex-col htw-divide-y htw-divide-gray-100 dark:htw-divide-gray-800"

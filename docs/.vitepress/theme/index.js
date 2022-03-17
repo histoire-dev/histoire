@@ -2,14 +2,16 @@ import DefaultTheme from 'vitepress/dist/client/theme-default'
 import FloatingVue from 'floating-vue'
 import { Icon } from '@iconify/vue'
 import 'floating-vue/dist/style.css'
-import './vars.css'
-import './index.css'
+import './style/vars.pcss'
+import './style/index.pcss'
 import SponsorButton from './SponsorButton.vue'
 import MeetTeam from './MeetTeam.vue'
 import DemoPreview from './DemoPreview.vue'
+import CustomLayout from './CustomLayout.vue'
 
 export default {
   ...DefaultTheme,
+  Layout: CustomLayout,
   enhanceApp ({ app }) {
     app.use(FloatingVue, {
       themes: {
