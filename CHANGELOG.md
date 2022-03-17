@@ -1,3 +1,19 @@
+## [0.1.4](https://github.com/Akryum/histoire/compare/v0.1.3...v0.1.4) (2022-03-17)
+
+
+### Bug Fixes
+
+* **mobile:** bigger hit targets in select lists ([9af124a](https://github.com/Akryum/histoire/commit/9af124a760769dd7f19267e4d8dbbcfb3d4d7e81))
+
+
+### Features
+
+* add responsive design (fix [#33](https://github.com/Akryum/histoire/issues/33)) ([#47](https://github.com/Akryum/histoire/issues/47)) ([17ff259](https://github.com/Akryum/histoire/commit/17ff259aa88614b8500f0611547ffd8d18a55f0c))
+* support resizing with touch ([1cbc1ae](https://github.com/Akryum/histoire/commit/1cbc1ae0f0d18acc34c183f27e6dfd968e060f1d))
+* update hatched pattern ([#49](https://github.com/Akryum/histoire/issues/49)) ([4cf9a50](https://github.com/Akryum/histoire/commit/4cf9a5026ec181ddc750b82bd8094f5616670f6e))
+
+
+
 ## [0.1.3](https://github.com/Akryum/histoire/compare/v0.1.2...v0.1.3) (2022-03-16)
 
 
