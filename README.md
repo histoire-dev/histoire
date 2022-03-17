@@ -77,6 +77,7 @@ function initState () {
         <HstCheckbox v-model="state.disabled">
           Disabled
         </HstCheckbox>
+      </template>
     </Variant>
 
     <Variant
