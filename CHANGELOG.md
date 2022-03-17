@@ -1,3 +1,12 @@
+## [0.1.5](https://github.com/Akryum/histoire/compare/v0.1.4...v0.1.5) (2022-03-17)
+
+
+### Features
+
+* add tree state saving (fix [#22](https://github.com/Akryum/histoire/issues/22)) ([#51](https://github.com/Akryum/histoire/issues/51)) ([96d1071](https://github.com/Akryum/histoire/commit/96d1071bfb11daa80375d2a655df26c2ad064208))
+
+
+
 ## [0.1.4](https://github.com/Akryum/histoire/compare/v0.1.3...v0.1.4) (2022-03-17)
 
 
