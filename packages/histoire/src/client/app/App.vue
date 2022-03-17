@@ -11,7 +11,7 @@ import { mapFile } from './util/mapping'
 import { useTitle } from '@vueuse/core'
 import { histoireConfig } from './util/config.js'
 import { onKeyboardShortcut } from './util/keyboard.js'
-import { isDesktop } from './util/responsive'
+import { isMobile } from './util/responsive'
 import Breadcrumb from './components/app/Breadcrumb.vue'
 
 const SearchModal = defineAsyncComponent(() => import('./components/search/SearchModal.vue'))
@@ -81,8 +81,20 @@ onKeyboardShortcut(['ctrl+k', 'meta+k'], (event) => {
   </div>
 
   <div class="htw-h-screen dark:htw-bg-gray-700 dark:htw-text-gray-100">
+    <div
+      v-if="isMobile"
+      class="htw-h-full htw-flex htw-flex-col htw-divide-y htw-divide-gray-100 dark:htw-divide-gray-800"
+    >
+      <AppHeader @search="isSearchOpen = true" />
+      <Breadcrumb
+        :tree="tree"
+        :stories="stories"
+      />
+      <RouterView class="htw-grow" />
+    </div>
+
     <BaseSplitPane
-      v-if="isDesktop"
+      v-else
       save-id="main-horiz"
       :min="5"
       :max="50"
@@ -107,17 +119,6 @@ onKeyboardShortcut(['ctrl+k', 'meta+k'], (event) => {
         <RouterView />
       </template>
     </BaseSplitPane>
-    <div
-      v-else
-      class="htw-h-full htw-flex htw-flex-col"
-    >
-      <AppHeader @search="isSearchOpen = true" />
-      <Breadcrumb
-        :tree="tree"
-        :stories="stories"
-      />
-      <RouterView class="htw-grow" />
-    </div>
 
     <SearchModal
       v-if="loadSearch"

@@ -23,9 +23,9 @@ onKeyboardShortcut(['ctrl+shift+d', 'meta+shift+d'], (event) => {
 
 <template>
   <div
-    class="htw-px-4 htw-h-16 htw-flex htw-items-center htw-gap-2 htw-border-b htw-border-gray-100 dark:htw-border-gray-800"
+    class="htw-px-4 htw-h-16 htw-flex htw-items-center htw-gap-2"
   >
-    <div class="htw-py-4 htw-flex-1 htw-h-full htw-flex htw-items-center htw-pr-2">
+    <div class="htw-py-3 sm:htw-py-4 htw-flex-1 htw-h-full htw-flex htw-items-center htw-pr-2">
       <a
         :href="histoireConfig.theme?.logoHref"
         target="_blank"
@@ -39,23 +39,23 @@ onKeyboardShortcut(['ctrl+shift+d', 'meta+shift+d'], (event) => {
     <div class="htw-ml-auto htw-flex-none htw-flex">
       <a
         v-tooltip="makeTooltip('Search', ({ isMac }) => isMac ? 'meta+k' : 'ctrl+k')"
-        class="htw-p-1 hover:htw-text-primary-500 dark:hover:htw-text-primary-400 htw-cursor-pointer"
+        class="htw-p-2 sm:htw-p-1 hover:htw-text-primary-500 dark:hover:htw-text-primary-400 htw-cursor-pointer"
         @click="$emit('search')"
       >
         <Icon
           icon="carbon:search"
-          class="htw-w-8 htw-h-8 sm:htw-w-4 sm:htw-h-4"
+          class="htw-w-6 htw-h-6 sm:htw-w-4 sm:htw-h-4"
         />
       </a>
 
       <a
         v-tooltip="makeTooltip('Toggle dark mode', ({ isMac }) => isMac ? 'meta+shift+d' : 'ctrl+shift+d')"
-        class="htw-p-1 hover:htw-text-primary-500 dark:hover:htw-text-primary-400 htw-cursor-pointer"
+        class="htw-p-2 sm:htw-p-1 hover:htw-text-primary-500 dark:hover:htw-text-primary-400 htw-cursor-pointer"
         @click="toggleDark()"
       >
         <Icon
           :icon="themeIcon"
-          class="htw-w-8 htw-h-8 sm:htw-w-4 sm:htw-h-4"
+          class="htw-w-6 htw-h-6 sm:htw-w-4 sm:htw-h-4"
         />
       </a>
     </div>

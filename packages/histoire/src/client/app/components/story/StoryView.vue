@@ -5,7 +5,7 @@ import { useStoryStore } from '../../stores/story'
 
 import BaseSplitPane from '../base/BaseSplitPane.vue'
 import BaseEmpty from '../base/BaseEmpty.vue'
-import { isDesktop } from '../../util/responsive'
+import { isMobile } from '../../util/responsive'
 import StoryViewer from './StoryViewer.vue'
 import StorySidePanel from './StorySidePanel.vue'
 
@@ -59,8 +59,11 @@ function setVariant (variantId: string) {
     v-else
     class="htw-h-full"
   >
+    <template v-if="isMobile">
+      <StoryViewer />
+    </template>
     <BaseSplitPane
-      v-if="isDesktop"
+      v-else
       save-id="story-main"
       :min="30"
       :max="95"
@@ -75,8 +78,5 @@ function setVariant (variantId: string) {
         <StorySidePanel />
       </template>
     </BaseSplitPane>
-    <template v-else>
-      <StoryViewer />
-    </template>
   </div>
 </template>
