@@ -27,7 +27,7 @@ const settings = usePreviewSettings()
     <!-- Toolbar -->
     <div
       v-if="!isMobile"
-      class="htw-flex-none htw-flex htw-items-center htw-h-8"
+      class="htw-flex-none htw-flex htw-items-center htw-h-8 -htw-mt-1"
     >
       <!-- Variant title -->
       <div class="htw-flex htw-items-center htw-gap-1 htw-text-gray-500 htw-flex-1 htw-truncate htw-min-w-0">
