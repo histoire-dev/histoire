@@ -11,6 +11,7 @@ import HstWrapper from '../HstWrapper.vue'
 const props = defineProps<{
   modelValue: boolean
   title?: string
+  reverse?: boolean
 }>()
 
 const emit = defineEmits({
@@ -41,6 +42,7 @@ watch(path, value => {
     tabindex="0"
     class="htw-cursor-pointer htw-items-center"
     :title="title"
+    :reverse="reverse"
     @click="toggle()"
     @keydown.enter.prevent="toggle()"
     @keydown.space.prevent="toggle()"

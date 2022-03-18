@@ -69,9 +69,9 @@ const settings = usePreviewSettings()
           <div class="htw-flex htw-flex-col htw-items-stretch">
             <HstCheckbox
               v-model="settings.rotate"
-            >
-              Rotate
-            </HstCheckbox>
+              title="Rotate"
+              reverse
+            />
 
             <div class="htw-flex htw-gap-2 htw-px-4 htw-py-3">
               <input
@@ -139,9 +139,9 @@ const settings = usePreviewSettings()
           <div class="htw-flex htw-flex-col htw-items-stretch">
             <HstCheckbox
               v-model="settings.checkerboard"
-            >
-              Checkerboard
-            </HstCheckbox>
+              title="Checkerboard"
+              reverse
+            />
 
             <button
               v-for="(option, index) in histoireConfig.backgroundPresets"
