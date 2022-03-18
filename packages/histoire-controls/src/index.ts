@@ -6,6 +6,8 @@ import HstTextareaVue from './components/textarea/HstTextarea.vue'
 
 export const HstCheckbox = HstCheckboxVue
 export const HstText = HstTextVue
+export const HstNumber = HstNumberVue
+export const HstTextarea = HstTextareaVue
 
 export function registerVueComponents (app: App) {
   app.component('HstCheckbox', HstCheckboxVue)
