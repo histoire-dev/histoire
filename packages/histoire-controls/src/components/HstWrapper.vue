@@ -11,13 +11,15 @@ const props = defineProps<{
 </script>
 
 <template>
-  <label class="htw-p-2 hover:htw-bg-primary-100 dark:hover:htw-bg-primary-800 htw-flex htw-gap-2">
+  <label class="htw-p-2 hover:htw-bg-primary-100 dark:hover:htw-bg-primary-800 htw-flex htw-gap-2 htw-flex-wrap">
     <span
       :title="title"
-      class="htw-text-sm htw-w-32 htw-whitespace-nowrap htw-text-ellipsis htw-overflow-hidden htw-shrink-0"
+      class="htw-text-sm htw-w-28 htw-whitespace-nowrap htw-text-ellipsis htw-overflow-hidden htw-shrink-0"
     >
       {{ title }}
     </span>
-    <slot />
+    <span class="htw-block htw-min-w-40 htw-grow">
+      <slot />
+    </span>
   </label>
 </template>

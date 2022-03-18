@@ -1,8 +1,6 @@
 <script lang="ts">
 export default {
-  name: 'HstInput',
-
-  inheritAttrs: false,
+  name: 'HstText',
 }
 </script>
 
@@ -12,11 +10,11 @@ import HstWrapper from '../HstWrapper.vue'
 
 const props = defineProps<{
   title?: string
-  modelValue: string | number
+  modelValue: string
 }>()
 
 const emit = defineEmits({
-  'update:modelValue': (newValue: string | number) => true,
+  'update:modelValue': (newValue: string) => true,
 })
 
 const input = ref<HTMLInputElement>()
@@ -30,6 +28,8 @@ const input = ref<HTMLInputElement>()
   >
     <input
       ref="input"
+      type="text"
+      size="12"
       :value="modelValue"
       class="htw-text-inherit htw-bg-transparent htw-w-full htw-outline-none htw-px-2 htw-py-0 htw-border htw-border-solid htw-border-gray-300 dark:htw-border-gray-500 focus:htw-border-primary-500 dark:focus:htw-border-primary-500 htw-rounded-sm"
       @input="emit('update:modelValue', ($event.target as HTMLInputElement).value)"

@@ -159,6 +159,7 @@ importers:
       '@types/node': ^17.0.18
       '@vitejs/plugin-vue': ^2.2.4
       '@vue/test-utils': ^2.0.0-rc.17
+      '@vueuse/core': ^8.1.1
       autoprefixer: ^10.4.2
       concurrently: ^7.0.0
       histoire: workspace:^
@@ -174,6 +175,7 @@ importers:
       '@types/node': 17.0.21
       '@vitejs/plugin-vue': 2.2.4_vite@2.8.6+vue@3.2.31
       '@vue/test-utils': 2.0.0-rc.17_vue@3.2.31
+      '@vueuse/core': 8.1.1_vue@3.2.31
       autoprefixer: 10.4.4_postcss@8.4.12
       concurrently: 7.0.0
       histoire: link:../histoire
@@ -1365,7 +1367,6 @@ packages:
       '@vueuse/shared': 8.1.1_vue@3.2.31
       vue: 3.2.31
       vue-demi: 0.12.4_vue@3.2.31
-    dev: false
 
   /@vueuse/metadata/8.1.1:
     resolution: {integrity: sha512-TSmA3UaSmBcV8pJ7fnHAL7NjSE1RQZlpJklg6YysFxwxDb0MZlo+Q8j9U1hLBZT1fnAjwZMaoxilanHN8ZwugQ==}
@@ -1397,7 +1398,6 @@ packages:
     dependencies:
       vue: 3.2.31
       vue-demi: 0.12.4_vue@3.2.31
-    dev: false
 
   /@wry/equality/0.1.11:
     resolution: {integrity: sha512-mwEVBDUVODlsQQ5dfuLUS5/Tf7jqUKyhKYHmVi4fPB6bDMOfWvUPJmKgS1Z7Za/sOI3vzWt4+O7yCiL/70MogA==}
@@ -5895,7 +5895,6 @@ packages:
         optional: true
     dependencies:
       vue: 3.2.31
-    dev: false
 
   /vue-eslint-parser/8.3.0_eslint@8.11.0:
     resolution: {integrity: sha512-dzHGG3+sYwSf6zFBa0Gi9ZDshD7+ad14DGOdTLjruRVgZXe2J+DcZ9iUhyR48z5g1PqRa20yt3Njna/veLJL/g==}

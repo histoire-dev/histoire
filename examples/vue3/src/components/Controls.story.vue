@@ -1,8 +1,9 @@
 <script lang="ts" setup>
 function initState () {
   return {
-    input: 'Hello',
+    text: 'Hello',
     checkbox: false,
+    number: 20,
   }
 }
 </script>
@@ -19,13 +20,18 @@ function initState () {
       </template>
 
       <template #controls="{ state }">
-        <HstInput
-          v-model="state.input"
-          title="HstInput"
+        <HstText
+          v-model="state.text"
+          title="HstText"
         />
         <HstCheckbox
           v-model="state.checkbox"
           title="HstCheckbox"
+        />
+        <HstNumber
+          v-model="state.number"
+          title="HstNumber"
+          integer
         />
       </template>
     </Variant>

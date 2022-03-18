@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import HstInput from './HstInput.vue'
+import HstText from './HstText.vue'
 
 function initState () {
   return {
@@ -11,7 +11,7 @@ function initState () {
 
 <template>
   <Story
-    title="HstInput"
+    title="HstText"
     :layout="{
       type: 'grid',
       width: '100%',
@@ -22,18 +22,18 @@ function initState () {
       :init-state="initState"
     >
       <template #default="{ state }">
-        <HstInput
+        <HstText
           v-model="state.text"
           :title="state.label"
         />
       </template>
 
       <template #controls="{ state }">
-        <HstInput
+        <HstText
           v-model="state.label"
           title="Label"
         />
-        <HstInput
+        <HstText
           v-model="state.text"
           title="Text"
         />
@@ -45,14 +45,14 @@ function initState () {
       :init-state="initState"
     >
       <template #default="{ state }">
-        <HstInput
+        <HstText
           v-model="state.text"
           placeholder="Enter some text..."
         />
       </template>
 
       <template #controls="{ state }">
-        <HstInput
+        <HstText
           v-model="state.text"
           title="Text"
         />
