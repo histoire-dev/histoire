@@ -3,31 +3,40 @@ import HstInput from './HstInput.vue'
 
 function initState () {
   return {
+    label: 'My really long label',
     text: '',
   }
 }
 </script>
 
 <template>
-  <Story title="HstInput">
+  <Story
+    title="HstInput"
+    :layout="{
+      type: 'grid',
+      width: '100%',
+    }"
+  >
     <Variant
-      title="playground"
+      title="default"
       :init-state="initState"
     >
       <template #default="{ state }">
         <HstInput
           v-model="state.text"
-        >
-          Label
-        </HstInput>
+          :title="state.label"
+        />
       </template>
 
       <template #controls="{ state }">
         <HstInput
+          v-model="state.label"
+          title="Label"
+        />
+        <HstInput
           v-model="state.text"
-        >
-          Label
-        </HstInput>
+          title="Text"
+        />
       </template>
     </Variant>
 
@@ -45,9 +54,8 @@ function initState () {
       <template #controls="{ state }">
         <HstInput
           v-model="state.text"
-        >
-          Label
-        </HstInput>
+          title="Text"
+        />
       </template>
     </Variant>
   </Story>

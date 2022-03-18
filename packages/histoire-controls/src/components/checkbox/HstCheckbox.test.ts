@@ -6,9 +6,7 @@ describe('HstCheckbox', () => {
     const wrapper = mount(HstCheckbox, {
       props: {
         modelValue: false,
-      },
-      slots: {
-        default: 'Label',
+        title: 'Label',
       },
     })
     await wrapper.trigger('click')
@@ -20,9 +18,7 @@ describe('HstCheckbox', () => {
     const wrapper = mount(HstCheckbox, {
       props: {
         modelValue: true,
-      },
-      slots: {
-        default: 'Label',
+        title: 'Label',
       },
     })
     await wrapper.trigger('click')

@@ -33,6 +33,24 @@ function closeMenu () {
 watch(variant, () => {
   isMenuOpened.value = false
 })
+
+const templateWidth = computed(() => {
+  if (storyStore.currentStory.layout.type !== 'grid') {
+    return
+  }
+
+  const layoutWidth = storyStore.currentStory.layout.width
+
+  if (!layoutWidth) {
+    return '200px'
+  }
+
+  if (typeof layoutWidth === 'number') {
+    return layoutWidth + 'px'
+  }
+
+  return layoutWidth
+})
 </script>
 
 <template>
@@ -44,7 +62,7 @@ watch(variant, () => {
       <div
         class="htw-grid htw-gap-4 htw-m-4"
         :style="{
-          gridTemplateColumns: `repeat(auto-fill, ${storyStore.currentStory.layout.width ?? 200}px)`,
+          gridTemplateColumns: `repeat(auto-fill, ${templateWidth})`,
         }"
       >
         <StoryVariantGridItem

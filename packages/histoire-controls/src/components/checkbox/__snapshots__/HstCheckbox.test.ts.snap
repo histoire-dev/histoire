@@ -1,11 +1,17 @@
 // Peeky snapshots v1.0
 
 exports[`HstCheckbox toggle to checked 1`] = `
-<div
+<label
+  class="htw-p-2 hover:htw-bg-primary-100 dark:hover:htw-bg-primary-800 htw-flex htw-gap-2 htw-cursor-pointer htw-items-center"
   role="checkbox"
   tabindex="0"
-  class="htw-flex htw-items-center htw-gap-2 htw-select-none htw-px-4 htw-py-3 htw-cursor-pointer hover:htw-bg-primary-100 dark:hover:htw-bg-primary-700"
 >
+  <span
+    title="Label"
+    class="htw-text-sm htw-w-32 htw-whitespace-nowrap htw-text-ellipsis htw-overflow-hidden"
+  >
+    Label
+  </span>
   <div class="htw-text-white htw-w-[16px] htw-h-[16px] htw-relative">
     <div class="htw-border group-active:htw-bg-gray-500/20 htw-rounded-sm htw-box-border htw-absolute htw-inset-0 htw-transition-border htw-duration-150 htw-ease-out htw-border-gray-300 dark:htw-border-gray-500 htw-delay-150">
     </div>
@@ -25,16 +31,21 @@ exports[`HstCheckbox toggle to checked 1`] = `
       </path>
     </svg>
   </div>
-  Label
-</div>
+</label>
 `;
 
 exports[`HstCheckbox toggle to unchecked 1`] = `
-<div
+<label
+  class="htw-p-2 hover:htw-bg-primary-100 dark:hover:htw-bg-primary-800 htw-flex htw-gap-2 htw-cursor-pointer htw-items-center"
   role="checkbox"
   tabindex="0"
-  class="htw-flex htw-items-center htw-gap-2 htw-select-none htw-px-4 htw-py-3 htw-cursor-pointer hover:htw-bg-primary-100 dark:hover:htw-bg-primary-700"
 >
+  <span
+    title="Label"
+    class="htw-text-sm htw-w-32 htw-whitespace-nowrap htw-text-ellipsis htw-overflow-hidden"
+  >
+    Label
+  </span>
   <div class="htw-text-white htw-w-[16px] htw-h-[16px] htw-relative">
     <div class="htw-border group-active:htw-bg-gray-500/20 htw-rounded-sm htw-box-border htw-absolute htw-inset-0 htw-transition-border htw-duration-150 htw-ease-out htw-border-primary-500 htw-border-8">
     </div>
@@ -54,6 +65,5 @@ exports[`HstCheckbox toggle to unchecked 1`] = `
       </path>
     </svg>
   </div>
-  Label
-</div>
+</label>
 `;

@@ -1,30 +1,31 @@
 <script lang="ts" setup>
-import HstCheckbox from './HstCheckbox.vue'
-
 function initState () {
   return {
-    checked: false,
+    input: 'Hello',
+    checkbox: false,
   }
 }
 </script>
 
 <template>
-  <Story title="HstCheckbox">
+  <Story title="Controls">
     <Variant
-      title="playground"
+      title="default"
       :init-state="initState"
     >
       <template #default="{ state }">
-        <HstCheckbox
-          v-model="state.checked"
-          title="Label"
-        />
+        <h1>State</h1>
+        <pre>{{ state }}</pre>
       </template>
 
       <template #controls="{ state }">
+        <HstInput
+          v-model="state.input"
+          title="HstInput"
+        />
         <HstCheckbox
-          v-model="state.checked"
-          title="Label"
+          v-model="state.checkbox"
+          title="HstCheckbox"
         />
       </template>
     </Variant>

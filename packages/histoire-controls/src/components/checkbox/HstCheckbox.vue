@@ -6,13 +6,12 @@ export default {
 
 <script lang="ts" setup>
 import { computed, ref, watch } from 'vue'
+import HstWrapper from '../HstWrapper.vue'
 
-const props = defineProps({
-  modelValue: {
-    type: Boolean,
-    default: false,
-  },
-})
+const props = defineProps<{
+  modelValue: boolean
+  title?: string
+}>()
 
 const emit = defineEmits({
   'update:modelValue': (newValue: boolean) => true,
@@ -37,10 +36,11 @@ watch(path, value => {
 </script>
 
 <template>
-  <div
+  <HstWrapper
     role="checkbox"
     tabindex="0"
-    class="htw-flex htw-items-center htw-gap-2 htw-select-none htw-px-4 htw-py-3 htw-cursor-pointer hover:htw-bg-primary-100 dark:hover:htw-bg-primary-700"
+    class="htw-cursor-pointer htw-items-center"
+    :title="title"
     @click="toggle()"
     @keydown.enter.prevent="toggle()"
     @keydown.space.prevent="toggle()"
@@ -76,7 +76,5 @@ watch(path, value => {
         />
       </svg>
     </div>
-
-    <slot />
-  </div>
+  </HstWrapper>
 </template>
