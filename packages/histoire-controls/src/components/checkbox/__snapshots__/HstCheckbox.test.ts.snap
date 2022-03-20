@@ -11,7 +11,7 @@ exports[`HstCheckbox toggle to checked 1`] = `
   </span>
   <span class="htw-block htw-grow">
     <div class="htw-text-white htw-w-[16px] htw-h-[16px] htw-relative">
-      <div class="htw-border htw-border-solid group-active:htw-bg-gray-500/20 htw-rounded-sm htw-box-border htw-absolute htw-inset-0 htw-transition-border htw-duration-150 htw-ease-out htw-border-gray-300 dark:htw-border-gray-500 htw-delay-150">
+      <div class="htw-border htw-border-solid group-active:htw-bg-gray-500/20 htw-rounded-sm htw-box-border htw-absolute htw-inset-0 htw-transition-border htw-duration-150 htw-ease-out htw-border-black/25 dark:htw-border-white/25 htw-delay-150">
       </div>
       <svg
         width="16"
