@@ -12,10 +12,6 @@ function initState () {
 <template>
   <Story
     title="HstNumber"
-    :layout="{
-      type: 'grid',
-      width: '100%',
-    }"
   >
     <Variant
       title="default"
