@@ -25,4 +25,12 @@ program.command('build')
     return buildCommand()
   })
 
+program.command('preview')
+  .describe('preview the built directory')
+  .option('-p, --port <port>', 'Listening port of the server')
+  .action(async (options) => {
+    const { previewCommand } = await import('./commands/preview.js')
+    return previewCommand(options)
+  })
+
 program.parse(process.argv)
