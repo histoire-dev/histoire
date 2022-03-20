@@ -1,16 +1,9 @@
 /// <reference types="cypress" />
 
 describe('Controls', () => {
-  const getIframeDocument = () => {
-    return cy.get('iframe[data-test-id="preview-iframe"]')
-      .its('0.contentDocument').should('exist')
-  }
-
-  const getIframeBody = () => {
-    return getIframeDocument()
-      .its('body').should('not.be.undefined')
-      .then(cy.wrap)
-  }
+  const getIframeBody = () => cy.get('iframe[data-test-id="preview-iframe"]')
+    .its('0.contentDocument.body').should('not.be.empty')
+    .then(cy.wrap)
 
   beforeEach(() => {
     cy.visit('/')
