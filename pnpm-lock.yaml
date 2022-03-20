@@ -1209,7 +1209,7 @@ packages:
       vue:
         optional: true
     dependencies:
-      vite: 2.8.6_sass@1.49.9
+      vite: 2.8.6
       vue: 3.2.31
 
   /@volar/code-gen/0.33.2:
