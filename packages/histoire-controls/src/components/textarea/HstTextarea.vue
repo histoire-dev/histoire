@@ -1,6 +1,7 @@
 <script lang="ts">
 export default {
   name: 'HstTextarea',
+  inheritAttrs: false,
 }
 </script>
 
@@ -22,14 +23,17 @@ const input = ref<HTMLInputElement>()
 
 <template>
   <HstWrapper
-    class="htw-cursor-text"
     :title="title"
+    class="htw-cursor-text"
+    :class="$attrs.class"
+    :style="$attrs.style"
     @click="input.focus()"
   >
     <textarea
       ref="input"
+      v-bind="{ ...$attrs, class: null, style: null }"
       :value="modelValue"
-      class="htw-text-inherit htw-bg-transparent htw-w-full htw-outline-none htw-px-2 htw-py-0 htw-border htw-border-solid htw-border-gray-300 dark:htw-border-gray-500 focus:htw-border-primary-500 dark:focus:htw-border-primary-500 htw-rounded-sm htw-box-border htw-resize-y"
+      class="htw-text-inherit htw-bg-transparent htw-w-full htw-outline-none htw-px-2 htw-py-1 -htw-my-1 htw-border htw-border-solid htw-border-gray-300 dark:htw-border-gray-500 focus:htw-border-primary-500 dark:focus:htw-border-primary-500 htw-rounded-sm htw-box-border htw-resize-y htw-min-h-[26px]"
       @input="emit('update:modelValue', ($event.target as HTMLInputElement).value)"
     />
   </HstWrapper>

@@ -4,6 +4,7 @@ function initState () {
     text: 'Hello',
     checkbox: false,
     number: 20,
+    longText: 'Longer text...',
   }
 }
 </script>
@@ -31,7 +32,10 @@ function initState () {
         <HstNumber
           v-model="state.number"
           title="HstNumber"
-          integer
+        />
+        <HstTextarea
+          v-model="state.longText"
+          title="HstTextarea"
         />
       </template>
     </Variant>
