@@ -4,6 +4,7 @@ import HstNumber from './HstNumber.vue'
 function initState () {
   return {
     count: 20,
+    step: 1,
   }
 }
 </script>
@@ -23,6 +24,7 @@ function initState () {
       <template #default="{ state }">
         <HstNumber
           v-model="state.count"
+          :step="state.step"
           title="Count"
         />
       </template>
@@ -32,26 +34,10 @@ function initState () {
           v-model="state.count"
           title="Count"
         />
-      </template>
-    </Variant>
 
-    <Variant
-      title="integer"
-      :init-state="initState"
-    >
-      <template #default="{ state }">
         <HstNumber
-          v-model="state.count"
-          title="Count"
-          integer
-        />
-      </template>
-
-      <template #controls="{ state }">
-        <HstNumber
-          v-model="state.count"
-          title="Count"
-          integer
+          v-model="state.step"
+          title="Step"
         />
       </template>
     </Variant>

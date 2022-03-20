@@ -1,29 +1,30 @@
 <script lang="ts">
 export default {
   name: 'HstNumber',
+
+  inheritAttrs: false,
 }
 </script>
 
 <script lang="ts" setup>
-import { ref, watch } from 'vue'
+import { computed, ref, onUnmounted } from 'vue'
 import HstWrapper from '../HstWrapper.vue'
-import { useEventListener } from '@vueuse/core'
 
 const props = defineProps<{
   title?: string
   modelValue: number
-  integer?: boolean
 }>()
 
 const emit = defineEmits({
   'update:modelValue': (newValue: number) => true,
 })
 
-const internal = ref(0)
-
-watch(() => props.modelValue, () => {
-  internal.value = props.modelValue
-}, { immediate: true })
+const numberModel = computed({
+  get: () => props.modelValue,
+  set: value => {
+    emit('update:modelValue', value)
+  },
+})
 
 const input = ref<HTMLInputElement>()
 
@@ -32,60 +33,60 @@ function focusAndSelect () {
   input.value.select()
 }
 
-useEventListener(window, 'mousemove', mouseNumber, { passive: true })
-useEventListener(window, 'mouseup', stopMouseNumber, { passive: true })
+// Drag to modify
 
-const isMouseMove = ref(false)
+const isDragging = ref(false)
+let startX: number
+let startValue: number
 
-function startMouseNumber () {
-  isMouseMove.value = true
+function onMouseDown (event: MouseEvent) {
+  isDragging.value = true
+  startX = event.clientX
+  startValue = numberModel.value
+  window.addEventListener('mousemove', onMouseMove)
+  window.addEventListener('mouseup', stopDragging)
 }
 
-function mouseNumber (event: MouseEvent) {
-  const precision = 0.002
-
-  if (!isMouseMove.value) {
-    return
+function onMouseMove (event: MouseEvent) {
+  let step = parseFloat(input.value.step)
+  if (isNaN(step)) {
+    step = 1
   }
-
-  if (internal.value >= 0) {
-    internal.value = (internal.value + 1) * (1 + precision * event.movementX) - 1
-  } else {
-    internal.value = (internal.value - 1) * (1 - precision * event.movementX) + 1
-  }
-
-  const newValue = props.integer ? Math.round(internal.value) : internal.value
-  emit('update:modelValue', newValue)
+  numberModel.value = startValue + Math.round((event.clientX - startX) / 10 / step) * step
 }
 
-function stopMouseNumber () {
-  isMouseMove.value = false
+function stopDragging () {
+  isDragging.value = false
+  window.removeEventListener('mousemove', onMouseMove)
+  window.removeEventListener('mouseup', stopDragging)
 }
 
-function updateValue (event: Event) {
-  const value = (event.target as HTMLInputElement).value
-  if (!value) {
-    return // the value is an empty string if it's not a valid number (ex: "12."), we don't want to wipe it by emitting an empty string
-  }
-  emit('update:modelValue', props.integer ? parseInt(value) : parseFloat(value))
-}
+onUnmounted(() => {
+  stopDragging()
+})
 </script>
 
 <template>
   <HstWrapper
     class="htw-cursor-ew-resize htw-items-center"
     :title="title"
-    :class="{'htw-select-none': isMouseMove}"
+    :class="[
+      $attrs.class,
+      { 'htw-select-none': isDragging },
+    ]"
+    :style="$attrs.style"
     @click="focusAndSelect"
-    @mousedown="startMouseNumber"
+    @mousedown="onMouseDown"
   >
     <input
       ref="input"
+      v-bind="$attrs"
+      v-model.number="numberModel"
       type="number"
-      :value="modelValue"
-      :class="{'htw-select-none': isMouseMove}"
+      :class="{
+        'htw-select-none': isDragging,
+      }"
       class="htw-text-inherit htw-bg-transparent htw-w-full htw-outline-none htw-pl-2 htw-py-0 htw-border htw-border-solid htw-border-gray-300 dark:htw-border-gray-500 focus:htw-border-primary-500 dark:focus:htw-border-primary-500 htw-rounded-sm htw-cursor-ew-resize"
-      @input="updateValue"
     >
   </HstWrapper>
 </template>
