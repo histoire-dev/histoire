@@ -1,33 +1,42 @@
 <script lang="ts" setup>
-import HstInput from './HstInput.vue'
+import HstText from './HstText.vue'
 
 function initState () {
   return {
+    label: 'My really long label',
     text: '',
   }
 }
 </script>
 
 <template>
-  <Story title="HstInput">
+  <Story
+    title="HstText"
+    :layout="{
+      type: 'grid',
+      width: '100%',
+    }"
+  >
     <Variant
-      title="playground"
+      title="default"
       :init-state="initState"
     >
       <template #default="{ state }">
-        <HstInput
+        <HstText
           v-model="state.text"
-        >
-          Label
-        </HstInput>
+          :title="state.label"
+        />
       </template>
 
       <template #controls="{ state }">
-        <HstInput
+        <HstText
+          v-model="state.label"
+          title="Label"
+        />
+        <HstText
           v-model="state.text"
-        >
-          Label
-        </HstInput>
+          title="Text"
+        />
       </template>
     </Variant>
 
@@ -36,18 +45,17 @@ function initState () {
       :init-state="initState"
     >
       <template #default="{ state }">
-        <HstInput
+        <HstText
           v-model="state.text"
           placeholder="Enter some text..."
         />
       </template>
 
       <template #controls="{ state }">
-        <HstInput
+        <HstText
           v-model="state.text"
-        >
-          Label
-        </HstInput>
+          title="Text"
+        />
       </template>
     </Variant>
   </Story>

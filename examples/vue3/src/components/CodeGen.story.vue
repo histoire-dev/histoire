@@ -80,14 +80,14 @@ function onClick (event) {
         <input
           v-model="state.text"
         >
-        <HstInput
+        <HstText
           v-model="state.text"
         />
-        <HstInput
+        <HstText
           v-model.number="state.count"
           type="number"
         />
-        <HstInput
+        <HstText
           v-model:foo="state.count"
           v-model:my-prop.number="state.count"
         />

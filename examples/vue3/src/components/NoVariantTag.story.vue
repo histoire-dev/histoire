@@ -12,9 +12,9 @@
     </template>
 
     <template #controls="{ state }">
-      <HstInput v-model="state.meow.foo">
+      <HstText v-model="state.meow.foo">
         meow.foo
-      </HstInput>
+      </HstText>
     </template>
   </Story>
 </template>

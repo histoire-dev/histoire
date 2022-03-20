@@ -1,11 +1,17 @@
 import type { App } from 'vue'
 import HstCheckboxVue from './components/checkbox/HstCheckbox.vue'
-import HstInputVue from './components/input/HstInput.vue'
+import HstTextVue from './components/text/HstText.vue'
+import HstNumberVue from './components/number/HstNumber.vue'
+import HstTextareaVue from './components/textarea/HstTextarea.vue'
 
 export const HstCheckbox = HstCheckboxVue
-export const HstInput = HstInputVue
+export const HstText = HstTextVue
+export const HstNumber = HstNumberVue
+export const HstTextarea = HstTextareaVue
 
 export function registerVueComponents (app: App) {
   app.component('HstCheckbox', HstCheckboxVue)
-  app.component('HstInput', HstInputVue)
+  app.component('HstText', HstTextVue)
+  app.component('HstNumber', HstNumberVue)
+  app.component('HstTextarea', HstTextareaVue)
 }

@@ -165,8 +165,10 @@ importers:
       '@types/node': ^17.0.18
       '@vitejs/plugin-vue': ^2.2.4
       '@vue/test-utils': ^2.0.0-rc.17
+      '@vueuse/core': ^8.1.1
       autoprefixer: ^10.4.2
       concurrently: ^7.0.0
+      floating-vue: ^2.0.0-beta.6
       histoire: workspace:^
       postcss: ^8.4.6
       postcss-import: ^14.0.2
@@ -180,8 +182,10 @@ importers:
       '@types/node': 17.0.21
       '@vitejs/plugin-vue': 2.2.4_vite@2.8.6+vue@3.2.31
       '@vue/test-utils': 2.0.0-rc.17_vue@3.2.31
+      '@vueuse/core': 8.1.1_vue@3.2.31
       autoprefixer: 10.4.4_postcss@8.4.12
       concurrently: 7.0.0
+      floating-vue: 2.0.0-beta.8_vue@3.2.31
       histoire: link:../histoire
       postcss: 8.4.12
       postcss-import: 14.0.2_postcss@8.4.12
@@ -1371,7 +1375,6 @@ packages:
       '@vueuse/shared': 8.1.1_vue@3.2.31
       vue: 3.2.31
       vue-demi: 0.12.4_vue@3.2.31
-    dev: false
 
   /@vueuse/metadata/8.1.1:
     resolution: {integrity: sha512-TSmA3UaSmBcV8pJ7fnHAL7NjSE1RQZlpJklg6YysFxwxDb0MZlo+Q8j9U1hLBZT1fnAjwZMaoxilanHN8ZwugQ==}
@@ -1403,7 +1406,6 @@ packages:
     dependencies:
       vue: 3.2.31
       vue-demi: 0.12.4_vue@3.2.31
-    dev: false
 
   /@wry/equality/0.1.11:
     resolution: {integrity: sha512-mwEVBDUVODlsQQ5dfuLUS5/Tf7jqUKyhKYHmVi4fPB6bDMOfWvUPJmKgS1Z7Za/sOI3vzWt4+O7yCiL/70MogA==}
@@ -3383,7 +3385,6 @@ packages:
       '@floating-ui/dom': 0.1.10
       vue: 3.2.31
       vue-resize: 2.0.0-alpha.1_vue@3.2.31
-    dev: false
 
   /for-each/0.3.3:
     resolution: {integrity: sha512-jqYfLp7mo9vIyQf8ykW2v7A+2N4QjeCeI5+Dz9XraiO1ign81wjiH7Fb9vSOWvQfNtmSa4H2RoQTrrXivdUZmw==}
@@ -5943,7 +5944,6 @@ packages:
         optional: true
     dependencies:
       vue: 3.2.31
-    dev: false
 
   /vue-eslint-parser/8.3.0_eslint@8.11.0:
     resolution: {integrity: sha512-dzHGG3+sYwSf6zFBa0Gi9ZDshD7+ad14DGOdTLjruRVgZXe2J+DcZ9iUhyR48z5g1PqRa20yt3Njna/veLJL/g==}
@@ -5981,7 +5981,6 @@ packages:
         optional: true
     dependencies:
       vue: 3.2.31
-    dev: false
 
   /vue-router/4.0.14_vue@3.2.31:
     resolution: {integrity: sha512-wAO6zF9zxA3u+7AkMPqw9LjoUCjSxfFvINQj3E/DceTt6uEz1XZLraDhdg2EYmvVwTBSGlLYsUw8bDmx0754Mw==}

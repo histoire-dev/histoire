@@ -26,7 +26,7 @@ export interface Story {
     type: 'single'
   } | {
     type: 'grid'
-    width: number
+    width?: number | string
   }
   icon?: string
   iconColor?: string
