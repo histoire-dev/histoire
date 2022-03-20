@@ -47,14 +47,12 @@ jobs:
       
       - uses: actions/upload-artifact@v2
         if: failure()
-        working-directory: ${{env.dir}}
         with:
           name: cypress-screenshots
-          path: cypress/screenshots
+          path: ${{env.dir}}/cypress/screenshots
 
       - uses: actions/upload-artifact@v2
         if: always()
-        working-directory: ${{env.dir}}
         with:
           name: cypress-videos
-          path: cypress/videos
+          path: ${{env.dir}}/cypress/videos
