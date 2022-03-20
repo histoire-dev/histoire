@@ -45,7 +45,7 @@ watch(path, value => {
         :class="[
           modelValue
             ? 'htw-border-primary-500 htw-border-8'
-            : 'htw-border-gray-300 dark:htw-border-gray-500 htw-delay-150',
+            : 'htw-border-black/25 dark:htw-border-white/25 htw-delay-150',
         ]"
       />
       <svg
