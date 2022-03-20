@@ -1,3 +1,22 @@
+# [0.2.0](https://github.com/Akryum/histoire/compare/v0.1.5...v0.2.0) (2022-03-20)
+
+
+### Bug Fixes
+
+* improve controls border colors ([e76c1f6](https://github.com/Akryum/histoire/commit/e76c1f635ed6ace2f7f08c344dbbcb146c4f70df))
+* move server-side story exec to worker, closes [#56](https://github.com/Akryum/histoire/issues/56) ([d0a2cc9](https://github.com/Akryum/histoire/commit/d0a2cc9705d4c7ac4d3a64f8a061efd6545666ae))
+* **search:** initial focus ([3a19f8b](https://github.com/Akryum/histoire/commit/3a19f8bb6a04ce108fc7de5c6de8cc0eec24d4bf))
+
+
+### Features
+
+* **cli:** preview command ([d82e852](https://github.com/Akryum/histoire/commit/d82e852813612eac54b647ef9aebe400cbe78fd7))
+* Controls refacto + add number and textarea (fix [#30](https://github.com/Akryum/histoire/issues/30)) ([#55](https://github.com/Akryum/histoire/issues/55)) ([96fd481](https://github.com/Akryum/histoire/commit/96fd481352629f5189ca168e6c2194cf5182eb8c))
+* improved text controls ([613d6ac](https://github.com/Akryum/histoire/commit/613d6ac81c76d0557b06e41093a6c9ec2d81402d))
+* upgrade vite-node ([deb1776](https://github.com/Akryum/histoire/commit/deb1776c7b39251ab5972766dd203c8ff4c65d6c))
+
+
+
 ## [0.1.5](https://github.com/Akryum/histoire/compare/v0.1.4...v0.1.5) (2022-03-17)
 
 
