@@ -25,8 +25,7 @@ function close () {
 // Autofocus
 
 const input = ref<HTMLInputElement>()
-const { focused } = useFocus({
-  target: input,
+const { focused } = useFocus(input, {
   initialValue: true,
 })
 
