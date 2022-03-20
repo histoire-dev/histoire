@@ -9,6 +9,7 @@ import HatchedPattern from '../misc/HatchedPattern.vue'
 import CheckerboardPattern from '../misc/CheckerboardPattern.vue'
 import { toRawDeep } from '../../util/reactivity'
 import { Settings } from 'http2'
+import { getSandboxUrl } from '../sandbox/lib'
 
 const props = defineProps<{
   story: Story
@@ -61,10 +62,7 @@ useEventListener(window, 'message', (event) => {
 })
 
 const sandboxUrl = computed(() => {
-  const url = new URLSearchParams()
-  url.append('storyId', props.story.id)
-  url.append('variantId', props.variant.id)
-  return '/__sandbox?' + url.toString()
+  return getSandboxUrl(props.story, props.variant)
 })
 
 const isIframeLoaded = ref(false)

@@ -1,0 +1,29 @@
+<script lang="ts" setup>
+import { Icon } from '@iconify/vue'
+import type { Story, Variant } from '../../../types'
+import { computed } from 'vue'
+import { getSandboxUrl } from '../../sandbox/lib'
+
+const props = defineProps<{
+  variant: Variant
+  story: Story
+}>()
+
+const sandboxUrl = computed(() => {
+  return getSandboxUrl(props.story, props.variant)
+})
+</script>
+
+<template>
+  <a
+    v-tooltip="'Open variant in new tab'"
+    :href="sandboxUrl"
+    target="_blank"
+    class="htw-flex htw-items-center htw-gap-1 htw-h-full htw-px-2 hover:htw-text-primary-500"
+  >
+    <Icon
+      icon="carbon:new-tab"
+      class="base-list-item-link-icon htw-w-4 htw-h-4 htw-opacity-50"
+    />
+  </a>
+</template>

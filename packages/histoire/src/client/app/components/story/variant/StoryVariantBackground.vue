@@ -2,7 +2,7 @@
 import { Icon } from '@iconify/vue'
 import { histoireConfig } from '../../../util/config'
 import { usePreviewSettings } from '../../../util/preview-settings'
-import BaseCheckbox from '../base/BaseCheckbox.vue'
+import BaseCheckbox from '../../base/BaseCheckbox.vue'
 
 const settings = usePreviewSettings()
 </script>

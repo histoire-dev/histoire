@@ -7,18 +7,12 @@ import { isMobile } from '../../util/responsive'
 import StoryVariantTitle from './variant/StoryVariantTitle.vue'
 import StoryVariantResponsiveSize from './variant/StoryVariantResponsiveSize.vue'
 import StoryVariantBackground from './variant/StoryVariantBackground.vue'
+import StoryVariantNewTab from './variant/StoryVariantNewTab.vue'
 
-defineProps({
-  variant: {
-    type: Object as PropType<Variant>,
-    required: true,
-  },
-
-  story: {
-    type: Object as PropType<Story>,
-    required: true,
-  },
-})
+defineProps<{
+  variant: Variant
+  story: Story
+}>()
 
 const settings = usePreviewSettings()
 </script>
@@ -36,6 +30,10 @@ const settings = usePreviewSettings()
       <StoryVariantTitle :variant="variant" />
       <StoryVariantResponsiveSize />
       <StoryVariantBackground />
+      <StoryVariantNewTab
+        :variant="variant"
+        :story="story"
+      />
     </div>
 
     <!-- Preview -->
