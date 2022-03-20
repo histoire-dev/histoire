@@ -109,7 +109,7 @@ importers:
       tailwindcss: ^3.0.23
       typescript: ^4.5.5
       vite: ^2.8.3
-      vite-node: '=0.6.1'
+      vite-node: '=0.7.6'
       vue: ^3.2.31
       vue-router: ^4.0.12
     dependencies:
@@ -136,7 +136,7 @@ importers:
       sade: 1.8.1
       scroll-into-view-if-needed: 2.2.29
       shiki: 0.10.1
-      vite-node: 0.6.1
+      vite-node: 0.7.6
       vue-router: 4.0.14_vue@3.2.31
     devDependencies:
       '@peeky/test': 0.13.5_eslint@8.11.0
@@ -5737,8 +5737,8 @@ packages:
       - stylus
     dev: true
 
-  /vite-node/0.6.1:
-    resolution: {integrity: sha512-d5WJU2OaxpC/0op2SeDmjNDElLwVmCOQvitl4uZKjsIw+Qsc6w4CkA6pGvp7SIsxclIg1g7UMX0ka7Tuqy3Udg==}
+  /vite-node/0.7.6:
+    resolution: {integrity: sha512-WeBR3JOHX3MD4SzJDwIjrJHd+lpaPHpcQf1sbDDgm7k98JqdTGiz9X+C/17EwHUwCd1lgPf5Nu4L3asIGPuXYw==}
     engines: {node: '>=14.14.0'}
     hasBin: true
     dependencies:
