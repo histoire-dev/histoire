@@ -1,15 +1,15 @@
-import { fileURLToPath } from 'url'
+import { MessageChannel } from 'worker_threads'
 import type { ViteDevServer } from 'vite'
 import { ViteNodeServer } from 'vite-node/server'
-import { ViteNodeRunner } from 'vite-node/client'
-import { dirname, resolve, relative } from 'pathe'
+import type { FetchFunction, ResolveIdFunction } from 'vite-node'
+import { relative } from 'pathe'
 import pc from 'picocolors'
-import type { StoryFile, Story } from './types.js'
-import { createDomEnv } from './dom/env.js'
-import { createPath, TreeFile } from './tree.js'
-import type { Context } from './context.js'
-
-const __dirname = dirname(fileURLToPath(import.meta.url))
+import Tinypool from 'tinypool'
+import { createBirpc } from 'birpc'
+import type { StoryFile } from '../types.js'
+import { createPath, TreeFile } from '../tree.js'
+import type { Context } from '../context.js'
+import type { Payload, ReturnData } from './worker.js'
 
 export interface UseCollectStoriesOptions {
   server: ViteDevServer
@@ -18,7 +18,6 @@ export interface UseCollectStoriesOptions {
 
 export function useCollectStories (options: UseCollectStoriesOptions, ctx: Context) {
   const { server } = options
-  const { destroy: destroyDomEnv } = createDomEnv()
 
   const node = new ViteNodeServer(server, {
     deps: {
@@ -27,33 +26,52 @@ export function useCollectStories (options: UseCollectStoriesOptions, ctx: Conte
       ],
     },
   })
-  const runner = new ViteNodeRunner({
-    root: server.config.root,
-    base: server.config.base,
-    fetchModule (id) {
-      // Alias
-      if (id.endsWith('vue.runtime.esm-bundler.js')) {
-        id = 'vue'
-      }
-      return node.fetchModule(id)
-    },
-    resolveId (id, importer) {
-      return node.resolveId(id, importer)
-    },
+
+  const threadPool = new Tinypool({
+    filename: new URL('./worker.js', import.meta.url).href,
+    // WebContainer compatibility (Stackblitz)
+    useAtomics: false,
   })
 
   function clearCache () {
     node.fetchCache.clear()
-    runner.moduleCache.clear()
+  }
+
+  function createChannel () {
+    const channel = new MessageChannel()
+    const port = channel.port2
+    const workerPort = channel.port1
+
+    createBirpc<Record<string, never>, {
+      fetchModule: FetchFunction
+      resolveId: ResolveIdFunction
+    }>({
+      fetchModule: (id) => node.fetchModule(id),
+      resolveId: (id, importer) => node.resolveId(id, importer),
+    }, {
+      post: data => port.postMessage(data),
+      on: data => port.on('message', data),
+    })
+
+    return {
+      port,
+      workerPort,
+    }
   }
 
   async function executeStoryFile (storyFile: StoryFile) {
     try {
-      // Mount app to collect stories/variants
-      const el = window.document.createElement('div')
-      const { run } = await runner.executeFile(resolve(__dirname, '../client/server/index.js'))
-      const storyData: Story[] = []
-      await run(storyFile, storyData, el)
+      const { workerPort } = createChannel()
+      const { storyData } = await threadPool.run({
+        root: server.config.root,
+        base: server.config.base,
+        storyFile,
+        port: workerPort,
+      } as Payload, {
+        transferList: [
+          workerPort,
+        ],
+      }) as ReturnData
       if (storyData.length === 0) {
         console.warn(pc.yellow(`⚠️  No story found for ${storyFile.path}`))
         return
@@ -76,7 +94,7 @@ export function useCollectStories (options: UseCollectStoriesOptions, ctx: Conte
   }
 
   async function destroy () {
-    destroyDomEnv()
+    await threadPool.destroy()
   }
 
   return {

@@ -44,6 +44,7 @@
     "@histoire/controls": "^0.1.5",
     "@vitejs/plugin-vue": "^2.2.0",
     "@vueuse/core": "^8.1.1",
+    "birpc": "^0.1.0",
     "case": "^1.6.3",
     "chokidar": "^3.5.3",
     "defu": "^5.0.1",
@@ -63,6 +64,7 @@
     "sade": "^1.8.1",
     "scroll-into-view-if-needed": "^2.2.29",
     "shiki": "^0.10.1",
+    "tinypool": "^0.1.2",
     "vite-node": "=0.7.6",
     "vue-router": "^4.0.12"
   },

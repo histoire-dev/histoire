@@ -50,6 +50,7 @@ importers:
     specifiers:
       '@vitejs/plugin-vue': ^2.2.0
       histoire: workspace:*
+      sass: ^1.49.9
       vite: ^2.8.3
       vue: ^3.2.31
     dependencies:
@@ -57,7 +58,8 @@ importers:
     devDependencies:
       '@vitejs/plugin-vue': 2.2.4_vite@2.8.6+vue@3.2.31
       histoire: link:../../packages/histoire
-      vite: 2.8.6
+      sass: 1.49.9
+      vite: 2.8.6_sass@1.49.9
 
   examples/vue3-themed:
     specifiers:
@@ -84,6 +86,7 @@ importers:
       '@vitejs/plugin-vue': ^2.2.0
       '@vueuse/core': ^8.1.1
       autoprefixer: ^10.4.2
+      birpc: ^0.1.0
       case: ^1.6.3
       chokidar: ^3.5.3
       concurrently: ^7.0.0
@@ -107,6 +110,7 @@ importers:
       scroll-into-view-if-needed: ^2.2.29
       shiki: ^0.10.1
       tailwindcss: ^3.0.23
+      tinypool: ^0.1.2
       typescript: ^4.5.5
       vite: ^2.8.3
       vite-node: '=0.7.6'
@@ -117,6 +121,7 @@ importers:
       '@iconify/vue': 3.1.4_vue@3.2.31
       '@vitejs/plugin-vue': 2.2.4_vite@2.8.6+vue@3.2.31
       '@vueuse/core': 8.1.1_vue@3.2.31
+      birpc: 0.1.0
       case: 1.6.3
       chokidar: 3.5.3
       defu: 5.0.1
@@ -136,6 +141,7 @@ importers:
       sade: 1.8.1
       scroll-into-view-if-needed: 2.2.29
       shiki: 0.10.1
+      tinypool: 0.1.2
       vite-node: 0.7.6
       vue-router: 4.0.14_vue@3.2.31
     devDependencies:
@@ -1114,7 +1120,7 @@ packages:
       vue:
         optional: true
     dependencies:
-      vite: 2.8.6
+      vite: 2.8.6_sass@1.49.9
       vue: 3.2.31
 
   /@volar/code-gen/0.33.2:
@@ -1820,6 +1826,10 @@ packages:
   /binary-extensions/2.2.0:
     resolution: {integrity: sha512-jDctJ/IVQbZoJykoeHbhXpOlNBqGNcwXJKJog42E5HDPUwQTSdjCHdihjj0DlnheQ7blbT6dHOafNAiS8ooQKA==}
     engines: {node: '>=8'}
+
+  /birpc/0.1.0:
+    resolution: {integrity: sha512-nQ5QDTH0JITjPxAdL1PRLp3f//1FOu5nHwYQYxxabE78Jp+V/mrskcWmHBhHCrKN+eErj3lVLKrv66tMGf5MSg==}
+    dev: false
 
   /body-parser/1.19.2:
     resolution: {integrity: sha512-SAAwOxgoCKMGs9uUAUFHygfLAyaniaoun6I8mFY9pRAJL9+Kec34aU+oIjDhTycub1jozEfEwx1W1IuOYxVSFw==}
@@ -3762,6 +3772,10 @@ packages:
     resolution: {integrity: sha512-CmxgYGiEPCLhfLnpPp1MoRmifwEIOgjcHXxOBjv7mY96c+eWScsOP9c112ZyLdWHi0FxHjI+4uVhKYp/gcdRmQ==}
     engines: {node: '>= 4'}
 
+  /immutable/4.0.0:
+    resolution: {integrity: sha512-zIE9hX70qew5qTUjSS7wi1iwj/l7+m54KWU247nhM3v806UdGj1yDndXj+IOYxxtW9zyLI+xqFNZjTuDaLUqFw==}
+    dev: true
+
   /import-fresh/3.3.0:
     resolution: {integrity: sha512-veYYhQa+D1QBKznvhUHxb8faxlrwUnxseDAbAp457E0wLNio2bOSKnjYDhMj+YiAq61xrMGhQk9iXVk5FzgQMw==}
     engines: {node: '>=6'}
@@ -5087,6 +5101,16 @@ packages:
   /safer-buffer/2.1.2:
     resolution: {integrity: sha512-YZo3K82SD7Riyi0E1EQPojLz7kpepnSQI9IyPbHHg1XXXevb5dJI7tpyN2ADxGcQbHG7vcyRHk0cbwqcQriUtg==}
 
+  /sass/1.49.9:
+    resolution: {integrity: sha512-YlYWkkHP9fbwaFRZQRXgDi3mXZShslVmmo+FVK3kHLUELHHEYrCmL1x6IUjC7wLS6VuJSAFXRQS/DxdsC4xL1A==}
+    engines: {node: '>=12.0.0'}
+    hasBin: true
+    dependencies:
+      chokidar: 3.5.3
+      immutable: 4.0.0
+      source-map-js: 1.0.2
+    dev: true
+
   /scroll-into-view-if-needed/2.2.29:
     resolution: {integrity: sha512-hxpAR6AN+Gh53AdAimHM6C8oTN1ppwVZITihix+WqalywBeFcQ6LdQP5ABNl26nX8GTEL7VT+b8lKpdqq65wXg==}
     dependencies:
@@ -5514,7 +5538,6 @@ packages:
   /tinypool/0.1.2:
     resolution: {integrity: sha512-fvtYGXoui2RpeMILfkvGIgOVkzJEGediv8UJt7TxdAOY8pnvUkFg/fkvqTfXG9Acc9S17Cnn1S4osDc2164guA==}
     engines: {node: '>=14.0.0'}
-    dev: true
 
   /to-regex-range/5.0.1:
     resolution: {integrity: sha512-65P7iz6X5yEr1cwcgvQxbbIw7Uk3gOy5dIdtZ4rDveLqhrdJP+Li/Hx6tyK0NEb+2GCyneCMJiGqrADCSNk8sQ==}
@@ -5775,6 +5798,31 @@ packages:
       rollup: 2.70.1
     optionalDependencies:
       fsevents: 2.3.2
+
+  /vite/2.8.6_sass@1.49.9:
+    resolution: {integrity: sha512-e4H0QpludOVKkmOsRyqQ7LTcMUDF3mcgyNU4lmi0B5JUbe0ZxeBBl8VoZ8Y6Rfn9eFKYtdXNPcYK97ZwH+K2ug==}
+    engines: {node: '>=12.2.0'}
+    hasBin: true
+    peerDependencies:
+      less: '*'
+      sass: '*'
+      stylus: '*'
+    peerDependenciesMeta:
+      less:
+        optional: true
+      sass:
+        optional: true
+      stylus:
+        optional: true
+    dependencies:
+      esbuild: 0.14.27
+      postcss: 8.4.12
+      resolve: 1.22.0
+      rollup: 2.70.1
+      sass: 1.49.9
+    optionalDependencies:
+      fsevents: 2.3.2
+    dev: true
 
   /vitepress/0.22.3:
     resolution: {integrity: sha512-Yfvu/rent2vp/TXIDZMutS6ft2TJPn4xngS48PYFWDEbuFI2ccUAXM481lF1qVVnCKxfh4g8e/KPvevSJdg1Bw==}

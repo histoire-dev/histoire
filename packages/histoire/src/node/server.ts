@@ -2,7 +2,7 @@ import { createServer as createViteServer } from 'vite'
 import { Context } from './context.js'
 import { createVitePlugins, RESOLVED_STORIES_ID } from './plugin.js'
 import { notifyStoryChange, onStoryChange, watchStories } from './stories.js'
-import { useCollectStories } from './collect.js'
+import { useCollectStories } from './collect/index.js'
 import type { StoryFile } from './types.js'
 
 export async function createServer (ctx: Context, port: number) {

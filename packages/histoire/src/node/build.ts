@@ -9,7 +9,7 @@ import { Context } from './context.js'
 import { createVitePlugins } from './plugin.js'
 import { findAllStories } from './stories.js'
 import type { RollupOutput } from 'rollup'
-import { useCollectStories } from './collect.js'
+import { useCollectStories } from './collect/index.js'
 
 const PRELOAD_MODULES = [
   'vendor',
