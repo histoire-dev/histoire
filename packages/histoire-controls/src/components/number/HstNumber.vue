@@ -73,7 +73,7 @@ function updateValue (event: Event) {
 
 <template>
   <HstWrapper
-    class="htw-cursor-ew-resize"
+    class="htw-cursor-ew-resize htw-items-center"
     :title="title"
     :class="{'htw-select-none': isMouseMove}"
     @click="focusAndSelect"

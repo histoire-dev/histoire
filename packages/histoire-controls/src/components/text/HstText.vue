@@ -22,7 +22,7 @@ const input = ref<HTMLInputElement>()
 
 <template>
   <HstWrapper
-    class="htw-cursor-text"
+    class="htw-cursor-text htw-items-center"
     :title="title"
     @click="input.focus()"
   >
