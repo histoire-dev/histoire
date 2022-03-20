@@ -51,17 +51,41 @@ export function makeTree (config: HistoireConfig, files: { path: string[], index
 
   return buildTree(treeObject)
 
-  // Undefined behavior for folder and file that share the same name under the same directory
   function setPath (path: string[], value: unknown, tree: unknown) {
     path.reduce((subtree, key, i) => {
-      if (!subtree[key]) {
-        subtree[key] = {}
-      }
       if (i === path.length - 1) {
-        subtree[key] = value
+        setKey(subtree, key, value)
+      } else if (isLeaf(subtree[key])) {
+        setKey(subtree, key, subtree[key])
+        subtree[key] = {}
+      } else if (!subtree[key]) {
+        subtree[key] = {}
       }
       return subtree[key]
     }, tree)
+
+    function isLeaf (element) {
+      return !isNaN(element)
+    }
+  }
+
+  function setKey (tree, key, value) {
+    if (isUndefined(tree[key])) {
+      tree[key] = value
+      return
+    }
+
+    let copyNumber = 1
+
+    while (!isUndefined(tree[`${key}-${copyNumber}`])) {
+      copyNumber++
+    }
+
+    tree[`${key}-${copyNumber}`] = value
+
+    function isUndefined (element) {
+      return element === undefined
+    }
   }
 
   function buildTree (treeObject: ITreeObject): Tree {
