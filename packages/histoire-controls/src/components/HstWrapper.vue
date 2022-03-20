@@ -1,32 +1,34 @@
 <script lang="ts">
+import { VTooltip } from 'floating-vue'
+
 export default {
   name: 'HstWrapper',
+
+  directives: {
+    tooltip: VTooltip,
+  },
 }
 </script>
 
 <script lang="ts" setup>
 const props = defineProps<{
   title?: string
-  reverse?: boolean
 }>()
 </script>
 
 <template>
-  <label
-    class="htw-p-2 hover:htw-bg-primary-100 dark:hover:htw-bg-primary-800 htw-flex htw-gap-2 htw-flex-wrap"
-    :class="{'htw-flex-row-reverse': reverse}"
-  >
+  <label class="htw-p-2 hover:htw-bg-primary-100 dark:hover:htw-bg-primary-800 htw-flex htw-gap-2 htw-flex-wrap">
     <span
-      :title="title"
+      v-tooltip="{
+        content: title,
+        placement: 'left',
+        distance: 12,
+      }"
       class="htw-text-sm htw-w-28 htw-whitespace-nowrap htw-text-ellipsis htw-overflow-hidden htw-shrink-0"
-      :class="{'htw-grow': reverse}"
     >
       {{ title }}
     </span>
-    <span
-      class="htw-block"
-      :class="{'htw-grow': !reverse}"
-    >
+    <span class="htw-block htw-grow">
       <slot />
     </span>
   </label>

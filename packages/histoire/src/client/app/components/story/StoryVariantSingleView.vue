@@ -5,6 +5,7 @@ import type { Story, Variant } from '../../types'
 import { histoireConfig } from '../../util/config'
 import { usePreviewSettings } from '../../util/preview-settings'
 import StoryResponsivePreview from './StoryResponsivePreview.vue'
+import BaseCheckbox from '../base/BaseCheckbox.vue'
 import { isMobile } from '../../util/responsive'
 
 defineProps({
@@ -67,11 +68,9 @@ const settings = usePreviewSettings()
 
         <template #popper="{ hide }">
           <div class="htw-flex htw-flex-col htw-items-stretch">
-            <HstCheckbox
-              v-model="settings.rotate"
-              title="Rotate"
-              reverse
-            />
+            <BaseCheckbox v-model="settings.rotate">
+              Rotate
+            </BaseCheckbox>
 
             <div class="htw-flex htw-gap-2 htw-px-4 htw-py-3">
               <input
@@ -137,11 +136,9 @@ const settings = usePreviewSettings()
 
         <template #popper="{ hide }">
           <div class="htw-flex htw-flex-col htw-items-stretch">
-            <HstCheckbox
-              v-model="settings.checkerboard"
-              title="Checkerboard"
-              reverse
-            />
+            <BaseCheckbox v-model="settings.checkerboard">
+              Checkerboard
+            </BaseCheckbox>
 
             <button
               v-for="(option, index) in histoireConfig.backgroundPresets"
