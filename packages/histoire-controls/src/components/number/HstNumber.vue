@@ -82,23 +82,10 @@ function updateValue (event: Event) {
     <input
       ref="input"
       type="number"
-      size="12"
       :value="modelValue"
       :class="{'htw-select-none': isMouseMove}"
-      class="htw-text-inherit htw-bg-transparent htw-w-full htw-outline-none htw-px-2 htw-py-0 htw-border htw-border-solid htw-border-gray-300 dark:htw-border-gray-500 focus:htw-border-primary-500 dark:focus:htw-border-primary-500 htw-rounded-sm htw-cursor-ew-resize"
+      class="htw-text-inherit htw-bg-transparent htw-w-full htw-outline-none htw-pl-2 htw-py-0 htw-border htw-border-solid htw-border-gray-300 dark:htw-border-gray-500 focus:htw-border-primary-500 dark:focus:htw-border-primary-500 htw-rounded-sm htw-cursor-ew-resize"
       @input="updateValue"
     >
   </HstWrapper>
 </template>
-
-<style scoped>
-input::-webkit-outer-spin-button,
-input::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-
-input[type=number] {
-  -moz-appearance: textfield;
-}
-</style>
