@@ -20,7 +20,7 @@ const props = defineProps<{
         placement: 'left',
         distance: 12,
       }"
-      class="htw-text-sm htw-w-28 htw-whitespace-nowrap htw-text-ellipsis htw-overflow-hidden htw-shrink-0"
+      class="htw-w-28 htw-whitespace-nowrap htw-text-ellipsis htw-overflow-hidden htw-shrink-0"
     >
       {{ title }}
     </span>
