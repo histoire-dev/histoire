@@ -18,7 +18,7 @@ defineProps({
 </script>
 
 <template>
-  <div>
+  <div data-test-id="story-controls">
     <!-- Custom controls -->
     <SandboxVue3
       v-if="variant.slots().controls"

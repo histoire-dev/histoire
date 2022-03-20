@@ -1,6 +1,6 @@
 <template>
   <Story
-    title="Sub Folder/Meow/Sub Story"
+    title="Sub Folder/Meow/Sub Story 1"
     :layout="{
       type: 'grid',
       width: 200,

@@ -30,7 +30,7 @@ const folderPadding = computed(() => {
 </script>
 
 <template>
-  <div class="toast">
+  <div data-test-id="story-list-folder">
     <div
       role="button"
       tabindex="0"

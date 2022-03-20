@@ -67,7 +67,10 @@ const copySourceCode = () => copy(sourceCode.value)
 </script>
 
 <template>
-  <div class="htw-bg-gray-100 dark:htw-bg-gray-800 htw-h-full htw-overflow-hidden htw-relative">
+  <div
+    class="htw-bg-gray-100 dark:htw-bg-gray-800 htw-h-full htw-overflow-hidden htw-relative"
+    data-test-id="story-source-code"
+  >
     <div
       v-if="error"
       class="htw-text-red-500 htw-h-full htw-p-2 htw-overflow-auto htw-font-mono htw-text-sm"

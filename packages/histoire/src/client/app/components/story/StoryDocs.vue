@@ -32,6 +32,7 @@ watchEffect(async () => {
   <div
     v-else
     class="htw-prose dark:htw-prose-invert htw-p-4 htw-max-w-none"
+    data-test-id="story-docs"
     v-html="renderedDoc"
   />
 </template>

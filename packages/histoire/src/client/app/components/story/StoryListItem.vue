@@ -24,7 +24,10 @@ useScrollOnActive(active, el)
 </script>
 
 <template>
-  <div ref="el">
+  <div
+    ref="el"
+    data-test-id="story-list-item"
+  >
     <BaseListItemLink
       v-slot="{ active }"
       :to="{

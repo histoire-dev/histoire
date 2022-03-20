@@ -24,7 +24,10 @@ const settings = usePreviewSettings()
 </script>
 
 <template>
-  <div class="htw-h-full htw-flex htw-flex-col">
+  <div
+    class="htw-h-full htw-flex htw-flex-col"
+    data-test-id="story-variant-single-view"
+  >
     <!-- Toolbar -->
     <div
       v-if="!isMobile"

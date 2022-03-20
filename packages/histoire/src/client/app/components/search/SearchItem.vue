@@ -48,7 +48,10 @@ const kindLabels = {
 </script>
 
 <template>
-  <div ref="el">
+  <div
+    ref="el"
+    data-test-id="search-item"
+  >
     <BaseListItemLink
       :to="result.route"
       :is-active="selected"

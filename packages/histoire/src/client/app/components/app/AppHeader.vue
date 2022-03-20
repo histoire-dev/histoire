@@ -40,6 +40,7 @@ onKeyboardShortcut(['ctrl+shift+d', 'meta+shift+d'], (event) => {
       <a
         v-tooltip="makeTooltip('Search', ({ isMac }) => isMac ? 'meta+k' : 'ctrl+k')"
         class="htw-p-2 sm:htw-p-1 hover:htw-text-primary-500 dark:hover:htw-text-primary-400 htw-cursor-pointer"
+        data-test-id="search-btn"
         @click="$emit('search')"
       >
         <Icon

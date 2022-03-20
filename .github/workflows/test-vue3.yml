@@ -1,0 +1,46 @@
+name: Continuous tests (Vue 3 example)
+on:
+  - push
+  - pull_request
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    name: Build and test
+
+    env:
+      dir: ./examples/vue3
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Cache pnpm modules
+        uses: actions/cache@v2
+        with:
+          path: ~/.pnpm-store
+          key: ${{ runner.os }}-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2.0.1
+        with:
+          version: 6.15.1
+
+      - name: Set node version to 16
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16
+          cache: 'pnpm'
+
+      - run: pnpm install
+
+      - name: Build
+        run: pnpm run build
+
+      - name: Build book
+        working-directory: ${{env.dir}}
+        run: pnpm run story:build
+
+      - name: Run tests
+        working-directory: ${{env.dir}}
+        run: pnpm run ci

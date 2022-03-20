@@ -57,6 +57,12 @@ module.exports = {
         defineEmits: false,
       },
     },
+    {
+      files: ['**/cypress/integration/**'],
+      extends: [
+        'plugin:cypress/recommended',
+      ],
+    },
   ],
   ignorePatterns: [
     'node_modules/',

@@ -255,6 +255,7 @@ const finalHeight = computed(() => props.settings.rotate ? props.settings.respon
                 'htw-invisible': !isIframeLoaded,
                 'htw-pointer-events-none': resizing,
               }"
+              data-test-id="preview-iframe"
               @load="onIframeLoad()"
             />
           </div>

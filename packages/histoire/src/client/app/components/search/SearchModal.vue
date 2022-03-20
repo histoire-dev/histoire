@@ -131,6 +131,7 @@ function selectPrevious () {
   <div
     v-show="shown"
     class="htw-fixed htw-inset-0 htw-bg-white/80 dark:htw-bg-gray-700/80 htw-z-20"
+    data-test-id="search-modal"
   >
     <div
       class="htw-absolute htw-inset-0"
@@ -151,8 +152,8 @@ function selectPrevious () {
           v-model="search"
           placeholder="Search for stories, variants..."
           class="htw-bg-transparent htw-w-full htw-flex-1 htw-pl-0 htw-pr-6 htw-py-4 htw-outline-none"
-          @keydown.down="selectNext()"
-          @keydown.up="selectPrevious()"
+          @keydown.down.prevent="selectNext()"
+          @keydown.up.prevent="selectPrevious()"
           @keydown.escape="close()"
         >
       </div>

@@ -29,6 +29,7 @@ const route = useRoute()
     save-id="story-sidepane"
     orientation="portrait"
     class="htw-h-full"
+    data-test-id="story-side-panel"
   >
     <template #first>
       <div class="htw-flex htw-flex-col htw-h-full">
