@@ -4,6 +4,14 @@
 @tailwind components;
 @tailwind utilities;
 
+
 body {
+  font-size: 18px;
   @apply dark:htw-text-gray-100;
+}
+
+@media (min-width: 640px) {
+  body {
+    font-size: 14px;
+  }
 }

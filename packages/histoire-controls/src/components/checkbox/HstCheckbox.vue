@@ -47,7 +47,7 @@ watch(path, value => {
   >
     <div class="htw-text-white htw-w-[16px] htw-h-[16px] htw-relative">
       <div
-        class="htw-border group-active:htw-bg-gray-500/20 htw-rounded-sm htw-box-border htw-absolute htw-inset-0 htw-transition-border htw-duration-150 htw-ease-out"
+        class="htw-border htw-border-solid group-active:htw-bg-gray-500/20 htw-rounded-sm htw-box-border htw-absolute htw-inset-0 htw-transition-border htw-duration-150 htw-ease-out"
         :class="[
           modelValue
             ? 'htw-border-primary-500 htw-border-8'
