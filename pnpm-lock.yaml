@@ -162,6 +162,7 @@ importers:
       '@vueuse/core': ^8.1.1
       autoprefixer: ^10.4.2
       concurrently: ^7.0.0
+      floating-vue: ^2.0.0-beta.6
       histoire: workspace:^
       postcss: ^8.4.6
       postcss-import: ^14.0.2
@@ -178,6 +179,7 @@ importers:
       '@vueuse/core': 8.1.1_vue@3.2.31
       autoprefixer: 10.4.4_postcss@8.4.12
       concurrently: 7.0.0
+      floating-vue: 2.0.0-beta.8_vue@3.2.31
       histoire: link:../histoire
       postcss: 8.4.12
       postcss-import: 14.0.2_postcss@8.4.12
@@ -3373,7 +3375,6 @@ packages:
       '@floating-ui/dom': 0.1.10
       vue: 3.2.31
       vue-resize: 2.0.0-alpha.1_vue@3.2.31
-    dev: false
 
   /for-each/0.3.3:
     resolution: {integrity: sha512-jqYfLp7mo9vIyQf8ykW2v7A+2N4QjeCeI5+Dz9XraiO1ign81wjiH7Fb9vSOWvQfNtmSa4H2RoQTrrXivdUZmw==}
@@ -5932,7 +5933,6 @@ packages:
         optional: true
     dependencies:
       vue: 3.2.31
-    dev: false
 
   /vue-router/4.0.14_vue@3.2.31:
     resolution: {integrity: sha512-wAO6zF9zxA3u+7AkMPqw9LjoUCjSxfFvINQj3E/DceTt6uEz1XZLraDhdg2EYmvVwTBSGlLYsUw8bDmx0754Mw==}

@@ -49,6 +49,7 @@
     "@vueuse/core": "^8.1.1",
     "autoprefixer": "^10.4.2",
     "concurrently": "^7.0.0",
+    "floating-vue": "^2.0.0-beta.6",
     "histoire": "workspace:^",
     "postcss": "^8.4.6",
     "postcss-import": "^14.0.2",

@@ -1,16 +1,12 @@
 <script lang="ts">
-import { VTooltip } from 'floating-vue'
-
 export default {
   name: 'HstWrapper',
-
-  directives: {
-    tooltip: VTooltip,
-  },
 }
 </script>
 
 <script lang="ts" setup>
+import { VTooltip as vTooltip } from 'floating-vue'
+
 const props = defineProps<{
   title?: string
 }>()
