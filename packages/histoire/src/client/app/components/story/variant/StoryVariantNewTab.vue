@@ -22,7 +22,7 @@ const sandboxUrl = computed(() => {
     class="htw-flex htw-items-center htw-gap-1 htw-h-full htw-px-2 hover:htw-text-primary-500"
   >
     <Icon
-      icon="carbon:new-tab"
+      icon="carbon:launch"
       class="base-list-item-link-icon htw-w-4 htw-h-4 htw-opacity-50"
     />
   </a>

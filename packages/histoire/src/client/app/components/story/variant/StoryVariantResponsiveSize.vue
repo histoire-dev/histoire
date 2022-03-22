@@ -23,7 +23,7 @@ const settings = usePreviewSettings()
       }"
     >
       <Icon
-        icon="ic:baseline-phone-android"
+        icon="carbon:devices"
         class="htw-w-4 htw-h-4 htw-opacity-50"
       />
       <Icon

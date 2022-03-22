@@ -19,7 +19,7 @@ const settings = usePreviewSettings()
       class="htw-cursor-pointer hover:htw-text-primary-500 htw-flex htw-items-center htw-gap-1 htw-h-full htw-px-2"
     >
       <div
-        class="bind-preview-bg htw-w-4 htw-h-4 htw-rounded-full htw-border htw-border-black/20 dark:htw-border-white/20"
+        class="bind-preview-bg htw-w-4 htw-h-4 htw-rounded-full htw-border htw-border-black/50 dark:htw-border-white/50"
       />
       <Icon
         icon="carbon:caret-down"
