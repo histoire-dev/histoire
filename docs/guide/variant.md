@@ -1,6 +1,6 @@
 # Story variants
 
-Stories can have different variants still representing the same component. You can define variants using the `<Variant>` tag. Same as story, you can provide a title to your variant with the `title` attribute.
+Stories can have different variants representing the same component. You can define variants using the `<Variant>` tag. Same as story, you can provide a title to your variant with the `title` attribute.
 
 ```vue{3-11}
 <template>

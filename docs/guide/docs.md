@@ -1,6 +1,6 @@
 # Documentation
 
-Histoire let you write markdown documentation for your stories. You just have to use the `docs` tag in your story file.
+Histoire lets you write markdown documentation for your stories. You just have to use the `docs` tag in your story file.
 
 ```vue{5-9}
 <template>

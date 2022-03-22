@@ -14,7 +14,7 @@ yarn add -D histoire
 
 ## Commands
 
-Histoire provide two commands:
+Histoire provides two commands:
 - `histoire dev`: start a server with hot-reload
 - `histoire build`: build the app for production
 

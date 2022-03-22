@@ -4,7 +4,7 @@ To customize your experience, you can configure several parts of Histoire.
 
 ## Standalone file
 
-The first option is to create a new file at the root of your project called `histoire.config.{js,ts}`. The configuration file must export the configuration as default. Histoire provide a helper function `defineConfig` to enforce TypeScript typing.
+The first option is to create a new file at the root of your project called `histoire.config.{js,ts}`. The configuration file must export the configuration object as default. Histoire provides a helper function `defineConfig` to enforce TypeScript typing.
 
 ```ts
 import { defineConfig } from 'histoire'
@@ -38,7 +38,7 @@ export default defineConfig({
 
 ## Global JS and CSS
 
-Your components may be using globally defined CSS (like CSS frameworks) or JS (like stores or helpers). Histoire provide an easy way to inject anything into each story by linking a setup file.
+Your components may be using globally defined CSS (like CSS frameworks) or JS (like stores or helpers). Histoire provides an easy way to inject anything into each story by linking a setup file.
 
 ```ts
 // histoire.config.ts
@@ -48,7 +48,7 @@ export default defineConfig({
 })
 ```
 
-Histoire provide a function `defineVue3StorySetup` to access the current app, story and variant for your convenience. You can use it inside your setup file like this:
+Histoire provides a `defineVue3StorySetup` function to access the current app, story and variant for your convenience. You can use it inside your setup file like this:
 
 ```ts
 // src/histoire.setup.ts
@@ -58,7 +58,7 @@ import './histoire.css' // Import global CSS
 import { createPinia } from "pinia";
 import { defineVue3StorySetup } from 'histoire/client'
 
-export default defineVue3StorySetup(({ app }) => {
+export default defineVue3StorySetup(({ app, story, variant }) => {
     const pinia = createPinia();
     app.use(pinia); // Add Pinia store
 })

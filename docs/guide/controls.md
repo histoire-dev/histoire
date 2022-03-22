@@ -2,11 +2,11 @@
 
 Controls give you the ability to interact with your components arguments.
 
-## Defining state
+## Defining a state
 
-The first step is to define the state that will be share to your story. You need to write a function that return the state as object and put it on the `init-state` attribute of your variant.
+The first step is to define the state that will be share to your story. You need to write a function that return the state as an object and put it in the `init-state` attribute of your variant.
 
-State is then provided to your component by using the `state` slot prop
+State is then provided to your component by using the `state` slot prop.
 
 ```vue{4-9,16,18-22}
 <script lang="ts" setup>
@@ -36,9 +36,9 @@ function initState () {
 </template>
 ```
 
-## Creating panel
+## Creating a panel
 
-To create the controls panel, Histoire provide a `controls` slot. You can create your panel however you like in it.
+To create the control panel, Histoire provides a `controls` slot. You can create your panel however you like in it.
 
 ```vue{23-26}
 <script lang="ts" setup>
@@ -74,7 +74,7 @@ function initState () {
 
 ## Builtin controls
 
-To build a control panel a bit more easily, Histoire provide builtin controls specifically designed for this.
+To build a control panel a bit more easily, Histoire provides builtin controls specifically designed for this.
 
 ```vue{24-25}
 <script lang="ts" setup>
