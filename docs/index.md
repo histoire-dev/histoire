@@ -4,10 +4,8 @@ sidebar: false
 heroImage: /logo.svg
 tagline: Fast stories powered by Vite
 
-# actionText: Get Started
-# actionLink: /guide/
 actionText: Get Started
-actionLink: /guide/
+actionLink: /early-access/
 
 features:
   - title: 📖 Stories
