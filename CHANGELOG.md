@@ -1,3 +1,13 @@
+## [0.2.1](https://github.com/Akryum/histoire/compare/v0.2.0...v0.2.1) (2022-03-22)
+
+
+### Features
+
+* Handle files and folders title conflict (fix [#57](https://github.com/Akryum/histoire/issues/57)) ([#58](https://github.com/Akryum/histoire/issues/58)) ([4d21425](https://github.com/Akryum/histoire/commit/4d21425c9e45438467db1fa268c52cc2fff6cd68))
+* Open in new tab (fix [#52](https://github.com/Akryum/histoire/issues/52)) ([#59](https://github.com/Akryum/histoire/issues/59)) ([93a5095](https://github.com/Akryum/histoire/commit/93a5095357b7ea2884f7281731dc63b83df5f6f7))
+
+
+
 # [0.2.0](https://github.com/Akryum/histoire/compare/v0.1.5...v0.2.0) (2022-03-20)
 
 
