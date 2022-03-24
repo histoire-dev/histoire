@@ -43,3 +43,9 @@ footer: MIT Licensed | Copyright © 2022-present Guillaume Chau & Histoire Contr
 <div class="htw-flex htw-justify-center htw-mb-12">
   <SponsorButton/>
 </div>
+
+<div class="htw-text-center htw-my-4">
+  <a href="https://www.netlify.com">
+    <img src="https://www.netlify.com/img/global/badges/netlify-color-accent.svg" alt="Deploys by Netlify" />
+  </a>
+</div>
