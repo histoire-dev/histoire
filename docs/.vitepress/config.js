@@ -12,7 +12,7 @@ module.exports = {
 
     nav: [
       // { text: 'Guide', link: '/guide/' },
-      { text: 'Early access', link: '/early-access/' },
+      { text: 'Early access', link: '/guide/' },
       {
         text: '💚 Sponsor',
         items: [
@@ -39,7 +39,7 @@ module.exports = {
           children: [
             {
               text: 'Introduction',
-              link: '/guide/',
+              link: '/guide/intro',
             },
             {
               text: 'Install',
