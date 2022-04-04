@@ -29,7 +29,7 @@ onKeyboardShortcut(['ctrl+shift+d', 'meta+shift+d'], (event) => {
       <a
         :href="histoireConfig.theme?.logoHref"
         target="_blank"
-        class="htw-w-full htw-h-full htw-flex htw-items-center htw-justify-center"
+        class="htw-w-full htw-h-full htw-flex htw-items-center"
       >
         <AppLogo
           class="htw-max-w-full htw-max-h-full"
