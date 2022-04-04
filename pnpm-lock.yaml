@@ -123,6 +123,7 @@ importers:
       vite: ^2.9.0
       vite-node: '=0.7.6'
       vue: ^3.2.31
+      vue-observe-visibility: ^2.0.0-alpha.1
       vue-router: ^4.0.12
     dependencies:
       '@histoire/controls': link:../histoire-controls
@@ -153,6 +154,7 @@ importers:
       sirv: 2.0.2
       tinypool: 0.1.2
       vite-node: 0.7.6
+      vue-observe-visibility: 2.0.0-alpha.1_vue@3.2.31
       vue-router: 4.0.14_vue@3.2.31
     devDependencies:
       '@peeky/test': 0.13.5_eslint@8.12.0
@@ -6934,6 +6936,17 @@ packages:
     transitivePeerDependencies:
       - supports-color
     dev: true
+
+  /vue-observe-visibility/2.0.0-alpha.1_vue@3.2.31:
+    resolution: {integrity: sha512-flFbp/gs9pZniXR6fans8smv1kDScJ8RS7rEpMjhVabiKeq7Qz3D9+eGsypncjfIyyU84saU88XZ0zjbD6Gq/g==}
+    peerDependencies:
+      vue: ^3.0.0
+    peerDependenciesMeta:
+      vue:
+        optional: true
+    dependencies:
+      vue: 3.2.31
+    dev: false
 
   /vue-resize/2.0.0-alpha.1:
     resolution: {integrity: sha512-7+iqOueLU7uc9NrMfrzbG8hwMqchfVfSzpVlCMeJQe4pyibqyoifDNbKTZvwxZKDvGkB+PdFeKvnGZMoEb8esg==}

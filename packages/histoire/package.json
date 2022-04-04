@@ -68,6 +68,7 @@
     "sirv": "^2.0.2",
     "tinypool": "^0.1.2",
     "vite-node": "=0.7.6",
+    "vue-observe-visibility": "^2.0.0-alpha.1",
     "vue-router": "^4.0.12"
   },
   "peerDependencies": {

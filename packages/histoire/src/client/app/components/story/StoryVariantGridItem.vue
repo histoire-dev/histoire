@@ -1,10 +1,11 @@
 <script lang="ts" setup>
-import { PropType, toRefs } from 'vue'
+import { PropType, ref, toRefs } from 'vue'
+import { Icon } from '@iconify/vue'
+import { useRouter } from 'vue-router'
+import { ObserveVisibility as vObserveVisibility } from 'vue-observe-visibility'
 import { useCurrentVariantRoute } from '../../util/variant'
 import type { Story, Variant } from '../../types'
 import SandboxVue3 from '../sandbox/SandboxVue3.vue'
-import { Icon } from '@iconify/vue'
-import { useRouter } from 'vue-router'
 
 const props = defineProps({
   variant: {
@@ -35,10 +36,20 @@ const router = useRouter()
 function selectVariant () {
   router.push(targetRoute.value)
 }
+
+const lazyMount = ref(false)
+function visibilityChanged (isVisible) {
+  if (isVisible) {
+    lazyMount.value = true
+  }
+}
 </script>
 
 <template>
-  <div class="htw-cursor-default htw-flex htw-flex-col htw-gap-y-1">
+  <div
+    v-observe-visibility="visibilityChanged"
+    class="htw-cursor-default htw-flex htw-flex-col htw-gap-y-1"
+  >
     <!-- Header -->
     <div class="htw-flex-none htw-flex htw-items-center">
       <RouterLink
@@ -63,6 +74,7 @@ function selectVariant () {
 
     <!-- Body -->
     <div
+      v-if="lazyMount"
       class="htw-border htw-bg-white dark:htw-bg-gray-700 htw-rounded-lg htw-flex-1 htw-p-4"
       :class="{
         'htw-border-gray-100 dark:htw-border-gray-800': !isActive,
