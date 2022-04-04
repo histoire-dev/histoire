@@ -40,22 +40,28 @@ export default defineComponent({
       }, this.$slots)
     }
 
-    // Apply variant as attribute to each child vnode (should be `<Variant>` components)
-    const vnodes: VNode[] = this.$slots.default()
-      // @ts-expect-error custom option
-      .filter(vnode => vnode.type?.__histoireType === 'variant')
-      // Same number of vnodes as variants
-      .slice(0, this.story.variants.length)
-    for (const index in vnodes) {
-      const vnode = vnodes[index]
-      if (!vnode.props) {
-        vnode.props = {}
-      }
-      vnode.props.variant = this.story.variants[index]
-      if (!vnode.props.initState && !vnode.props['init-state']) {
-        vnode.props.initState = this.initState
+    let index = 0
+    const applyAttrs = (vnodes: VNode[]) => {
+      for (const vnode of vnodes) {
+        // @ts-expect-error custom option
+        if (vnode.type?.__histoireType === 'variant') {
+          if (!vnode.props) {
+            vnode.props = {}
+          }
+          vnode.props.variant = this.story.variants[index]
+          if (!vnode.props.initState && !vnode.props['init-state']) {
+            vnode.props.initState = this.initState
+          }
+          index++
+        } else if (vnode.children?.length) {
+          applyAttrs(vnode.children as VNode[])
+        }
       }
     }
+
+    // Apply variant as attribute to each child vnode (should be `<Variant>` components)
+    const vnodes: VNode[] = this.$slots.default()
+    applyAttrs(vnodes)
     return vnodes
   },
 })
