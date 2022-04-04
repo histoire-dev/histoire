@@ -4,6 +4,7 @@ import { useCurrentVariantRoute } from '../../util/variant'
 import type { Story, Variant } from '../../types'
 import SandboxVue3 from '../sandbox/SandboxVue3.vue'
 import { Icon } from '@iconify/vue'
+import { useRouter } from 'vue-router'
 
 const props = defineProps({
   variant: {
@@ -27,6 +28,12 @@ function onReady () {
   Object.assign(props.variant, {
     ready: true,
   })
+}
+
+const router = useRouter()
+
+function selectVariant () {
+  router.push(targetRoute.value)
 }
 </script>
 
@@ -61,7 +68,8 @@ function onReady () {
         'htw-border-gray-100 dark:htw-border-gray-800': !isActive,
         'htw-border-primary-200 dark:htw-border-primary-900': isActive,
       }"
-      @click.stop.prevent
+      @click.stop.prevent="selectVariant()"
+      @keyup="selectVariant()"
     >
       <SandboxVue3
         :variant="variant"
