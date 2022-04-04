@@ -1,6 +1,6 @@
 # Hierarchy
 
-## In title
+## Using the title
 
 By default, Histoire uses the title of your stories to create the hierarchy. If you want to put a story in a specific folder or subfolder, just write the path as the title of your Story.
 
@@ -12,7 +12,7 @@ By default, Histoire uses the title of your stories to create the hierarchy. If 
 </template>
 ```
 
-## In path
+## Using the file path
 
 If you want to use the real path of your story files, you can change that in your [Histoire configuration file](/guide/config).
 
@@ -26,7 +26,7 @@ export default defineConfig({
 })
 ```
 
-## Custom
+## Custom logic
 
 If you want a custom hierarchy, you can define your own function that takes an object with the `title` and the `path` of your story as an argument, and returns an array of string being the path of your story in the app.
 

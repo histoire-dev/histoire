@@ -1,6 +1,6 @@
 # How to write stories?
 
-Stories are vue files ending with `.story.vue`. You just need to use the `<Story>` tag at the root of your template. The title of the story is provided by the `title` argument.
+Stories are vue files ending with `.story.vue`. You just need to use the `<Story>` tag at the root of your template. The title of the story is provided with the `title` prop.
 
 ```vue
 <template>
@@ -11,3 +11,76 @@ Stories are vue files ending with `.story.vue`. You just need to use the `<Story
 ```
 
 You can of course add `<style>` and/or `<script>` elements just like you would with any `.vue` file.
+
+## Variants
+
+Stories can have different variants representing the same component. You can define variants using the `<Variant>` tag. Similar to the story, you can provide a title to your variant with the `title` prop.
+
+```vue{3-11}
+<template>
+  <Story title="Cars">
+    <Variant title="default">
+      🚗
+    </Variant>
+    <Variant title="Fast">
+      🏎️
+    </Variant>
+    <Variant title="Slow">
+      🚜
+    </Variant>
+  </Story>
+</template>
+```
+
+## Layout
+
+You can change the layout of the variant by using the `layout` prop with an object. The `type` property is required to specify which layout to use.
+
+### Single layout
+
+This is the default layout, displaying one variant at a time.
+
+```vue{4}
+<template>
+  <Story
+    title="Cars"
+    :layout="{ type: 'single' }"
+  >
+    <Variant title="default">
+      🚗
+    </Variant>
+    <Variant title="Fast">
+      🏎️
+    </Variant>
+    <Variant title="Slow">
+      🚜
+    </Variant>
+  </Story>
+</template>
+```
+
+### Grid layout
+
+Display all the variants in a grid.
+
+Additional `layout` properties:
+- `width`: Column size. Can be number (pixels) or string (like `'100%'`).
+
+```vue{4}
+<template>
+  <Story
+    title="Cars"
+    :layout="{ type: 'grid', width: 200 }"
+  >
+    <Variant title="default">
+      🚗
+    </Variant>
+    <Variant title="Fast">
+      🏎️
+    </Variant>
+    <Variant title="Slow">
+      🚜
+    </Variant>
+  </Story>
+</template>
+```

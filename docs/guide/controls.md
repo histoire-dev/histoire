@@ -21,7 +21,7 @@ function initState () {
 </script>
 
 <template>
-  <Story title="Cars">
+  <Story title="My button">
     <Variant
       title="default"
       :init-state="initState"
@@ -53,7 +53,7 @@ function initState () {
 </script>
 
 <template>
-  <Story title="Cars">
+  <Story title="My button">
     <Variant
       title="default"
       :init-state="initState"
@@ -89,7 +89,7 @@ function initState () {
 </script>
 
 <template>
-  <Story title="Cars">
+  <Story title="My button">
     <Variant
       title="default"
       :init-state="initState"
@@ -108,8 +108,4 @@ function initState () {
 </template>
 ```
 
-Available controls:
-- `HstCheckbox`
-- `HstNumber`
-- `HstText`
-- `HstTextarea`
+Check out the available controls in their book: [controls.histoire.dev](https://controls.histoire.dev/).

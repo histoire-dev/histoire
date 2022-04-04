@@ -77,7 +77,7 @@ export interface HistoireConfig {
       dark?: string
     }
     /**
-     * Href to the favicon file (**not** processed by Vite). Put the file in the public directory.
+     * Href to the favicon file (**not** processed by Vite). Put the file in the `public` directory.
      *
      * Example: `'/favicon.ico'`
      */
@@ -102,7 +102,7 @@ export interface HistoireConfig {
     logoHref?: string
   }
   /**
-   * Setup file exposting a default function executed when setting up each story preview.
+   * Setup file exporting a default function executed when setting up each story preview.
    *
    * Import custom CSS files from this file.
    *

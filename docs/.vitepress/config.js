@@ -33,34 +33,31 @@ module.exports = {
     ],
 
     sidebar: {
+      '/reference/': [
+        {
+          text: 'Configuration reference',
+          link: '/reference/config',
+        },
+        {
+          text: 'Builtin components',
+          link: '/reference/components',
+        },
+      ],
       '/': [
         {
           text: 'Getting Started',
-          children: [
-            {
-              text: 'Introduction',
-              link: '/guide/intro',
-            },
-            {
-              text: 'Install',
-              link: '/guide/install',
-            },
-            {
-              text: 'Configuration',
-              link: '/guide/config',
-            },
-          ],
+          link: '/guide/getting-started',
         },
         {
-          text: 'Write stories',
+          text: 'Configuration',
+          link: '/guide/config',
+        },
+        {
+          text: 'Writing Stories',
           children: [
             {
-              text: 'Introduction',
+              text: 'Stories',
               link: '/guide/stories',
-            },
-            {
-              text: 'Variant',
-              link: '/guide/variant',
             },
             {
               text: 'State & Controls',
@@ -71,30 +68,10 @@ module.exports = {
               link: '/guide/docs',
             },
             {
-              text: 'Serialization',
-              link: '/guide/serialization',
-            },
-            {
               text: 'Hierarchy',
               link: '/guide/hierarchy',
             },
           ],
-        },
-        {
-          text: 'Theme',
-          children: [
-            {
-              text: 'Configuration',
-              link: '/guide/theme',
-            },
-            {
-              text: 'Customization',
-              link: '/guide/customization',
-            },
-          ],
-        }, {
-          text: 'API Reference',
-          children: [],
         },
       ],
     },
