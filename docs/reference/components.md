@@ -76,6 +76,27 @@ The icon color.
 </template>
 ```
 
+### `source`
+
+The copiable source code of the story.
+
+```vue
+<script setup>
+const source = `<h1>Toto</h1>
+
+<input
+  v-model.number="count"
+  type="number"
+>`
+</script>
+
+<template>
+  <Story :source="source">
+    <!-- ... -->
+  </Story>
+</template>
+```
+
 ## Variant
 
 Create different sub stories around the same component by using the `<Variant>` tag multiple times inside the same `<Story>` tag.
@@ -177,6 +198,29 @@ The icon color.
 </template>
 ```
 
+### `source`
+
+The copiable source code of the variant.
+
+```vue
+<script setup>
+const source = `<h1>Toto</h1>
+
+<input
+  v-model.number="count"
+  type="number"
+>`
+</script>
+
+<template>
+  <Story>
+    <Variant :source="source">
+      <!-- ... -->
+    </Variant>
+  </Story>
+</template>
+```
+
 ### Slot: `default`
 
 Content of the variant.
@@ -218,3 +262,28 @@ Props:
 ```
 
 [Learn more](../guide/controls.md)
+
+### Slot: `source`
+
+Manual copiable source code.
+
+```vue
+<template>
+  <Story>
+    <Variant>
+      <template #source>
+        <textarea v-pre>
+          <h1>Toto</h1>
+
+          <input
+            v-model.number="count"
+            type="number"
+          >
+        </textarea>
+      </template>
+    </Variant>
+  </Story>
+</template>
+```
+
+[Learn more](../guide/docs.md#source-code)
