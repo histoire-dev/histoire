@@ -1,20 +1,15 @@
 <script lang="ts" setup>
 import { computed, ref, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
 import { useStoryStore } from '../../stores/story'
-
+import { Icon } from '@iconify/vue'
+import { isMobile } from '../../util/responsive'
 import BaseSplitPane from '../base/BaseSplitPane.vue'
 import StoryVariantListItem from './StoryVariantListItem.vue'
-import StoryVariantGridItem from './StoryVariantGridItem.vue'
 import StoryVariantSingleView from './StoryVariantSingleView.vue'
-import { isMobile } from '../../util/responsive'
-import { Icon } from '@iconify/vue'
 import MobileOverlay from '../app/MobileOverlay.vue'
+import StoryVariantGrid from './StoryVariantGrid.vue'
 
 const storyStore = useStoryStore()
-
-const router = useRouter()
-const route = useRoute()
 
 const hasSingleVariant = computed(() => (storyStore.currentStory?.variants.length === 1))
 
@@ -34,45 +29,13 @@ watch(variant, () => {
   isMenuOpened.value = false
 })
 
-const templateWidth = computed(() => {
-  if (storyStore.currentStory.layout.type !== 'grid') {
-    return
-  }
-
-  const layoutWidth = storyStore.currentStory.layout.width
-
-  if (!layoutWidth) {
-    return '200px'
-  }
-
-  if (typeof layoutWidth === 'number') {
-    return layoutWidth + 'px'
-  }
-
-  return layoutWidth
-})
 </script>
 
 <template>
   <div class="htw-bg-gray-50 htw-h-full dark:htw-bg-gray-750">
-    <div
+    <StoryVariantGrid
       v-if="storyStore.currentStory.layout.type === 'grid'"
-      class="htw-h-full htw-overflow-y-auto"
-    >
-      <div
-        class="htw-grid htw-gap-4 htw-m-4"
-        :style="{
-          gridTemplateColumns: `repeat(auto-fill, ${templateWidth})`,
-        }"
-      >
-        <StoryVariantGridItem
-          v-for="(variant, index) of storyStore.currentStory.variants"
-          :key="index"
-          :variant="variant"
-          :story="storyStore.currentStory"
-        />
-      </div>
-    </div>
+    />
 
     <template v-else-if="storyStore.currentStory.layout.type === 'single'">
       <div

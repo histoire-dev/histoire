@@ -2,7 +2,7 @@
 import { PropType, ref, toRefs } from 'vue'
 import { Icon } from '@iconify/vue'
 import { useRouter } from 'vue-router'
-import { ObserveVisibility as vObserveVisibility } from 'vue-observe-visibility'
+import { useResizeObserver } from '@vueuse/core'
 import { useCurrentVariantRoute } from '../../util/variant'
 import type { Story, Variant } from '../../types'
 import SandboxVue3 from '../sandbox/SandboxVue3.vue'
@@ -17,6 +17,10 @@ const props = defineProps({
     type: Object as PropType<Story>,
     required: true,
   },
+})
+
+const emit = defineEmits({
+  resize: (width: number, height: number) => true,
 })
 
 const { variant } = toRefs(props)
@@ -37,17 +41,17 @@ function selectVariant () {
   router.push(targetRoute.value)
 }
 
-const lazyMount = ref(false)
-function visibilityChanged (isVisible) {
-  if (isVisible) {
-    lazyMount.value = true
+const el = ref<HTMLDivElement>()
+useResizeObserver(el, () => {
+  if (props.variant.ready) {
+    emit('resize', el.value!.clientWidth, el.value!.clientHeight)
   }
-}
+})
 </script>
 
 <template>
   <div
-    v-observe-visibility="visibilityChanged"
+    ref="el"
     class="htw-cursor-default htw-flex htw-flex-col htw-gap-y-1"
   >
     <!-- Header -->
@@ -74,7 +78,6 @@ function visibilityChanged (isVisible) {
 
     <!-- Body -->
     <div
-      v-if="lazyMount"
       class="htw-border htw-bg-white dark:htw-bg-gray-700 htw-rounded-lg htw-flex-1 htw-p-4"
       :class="{
         'htw-border-gray-100 dark:htw-border-gray-800': !isActive,
