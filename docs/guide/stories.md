@@ -4,9 +4,9 @@ Stories are vue files ending with `.story.vue`. You just need to use the `<Story
 
 ```vue
 <template>
-    <Story title="🐱 Meow">
-        🐱
-    </Story>
+  <Story title="🐱 Meow">
+    🐱
+  </Story>
 </template>
 ```
 

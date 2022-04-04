@@ -5,7 +5,7 @@ heroImage: /logo.svg
 tagline: Fast stories powered by Vite
 
 actionText: Get Started
-actionLink: /early-access/
+actionLink: /guide/
 
 features:
   - title: 📖 Stories

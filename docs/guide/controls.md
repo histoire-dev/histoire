@@ -13,26 +13,26 @@ State is then provided to your component by using the `state` slot prop.
 import MyButton from './MyButton.vue'
 
 function initState () {
-    return {
-        disabled: false,
-        content: "Hello world"
-    }
+  return {
+    disabled: false,
+    content: "Hello world"
+  }
 }
 </script>
 
 <template>
-    <Story title="Cars">
-        <Variant
-            title="default"
-            :init-state="initState"
-        >
-            <template #default="{ state }">
-                <MyButton :disabled="state.disabled">
-                    {{ state.content }}
-                </MyButton>
-            </template>
-        </Variant>
-    </Story>
+  <Story title="Cars">
+    <Variant
+      title="default"
+      :init-state="initState"
+    >
+      <template #default="{ state }">
+        <MyButton :disabled="state.disabled">
+          {{ state.content }}
+        </MyButton>
+      </template>
+    </Variant>
+  </Story>
 </template>
 ```
 
@@ -45,30 +45,30 @@ To create the control panel, Histoire provides a `controls` slot. You can create
 import MyButton from './MyButton.vue'
 
 function initState () {
-    return {
-        disabled: false,
-        content: "Hello world"
-    }
+  return {
+    disabled: false,
+    content: "Hello world"
+  }
 }
 </script>
 
 <template>
-    <Story title="Cars">
-        <Variant
-            title="default"
-            :init-state="initState"
-        >
-            <template #default="{ state }">
-                <MyButton :disabled="state.disabled">
-                    {{ state.content }}
-                </MyButton>
-            </template>
-            <template #controls="{ state }">
-                Content: <input type="text" v-model="state.content" />
-                Disabled: <input type="checkbox" v-model="state.disabled" />
-            </template>
-        </Variant>
-    </Story>
+  <Story title="Cars">
+    <Variant
+      title="default"
+      :init-state="initState"
+    >
+      <template #default="{ state }">
+        <MyButton :disabled="state.disabled">
+          {{ state.content }}
+        </MyButton>
+      </template>
+      <template #controls="{ state }">
+        Content: <input type="text" v-model="state.content" />
+        Disabled: <input type="checkbox" v-model="state.disabled" />
+      </template>
+    </Variant>
+  </Story>
 </template>
 ```
 
@@ -81,30 +81,30 @@ To build a control panel a bit more easily, Histoire provides builtin controls s
 import MyButton from './MyButton.vue'
 
 function initState () {
-    return {
-        disabled: false,
-        content: "Hello world"
-    }
+  return {
+    disabled: false,
+    content: "Hello world"
+  }
 }
 </script>
 
 <template>
-    <Story title="Cars">
-        <Variant
-            title="default"
-            :init-state="initState"
-        >
-            <template #default="{ state }">
-                <MyButton :disabled="state.disabled">
-                    {{ state.content }}
-                </MyButton>
-            </template>
-            <template #controls="{ state }">
-                <HstText v-model="state.text" title="Content" />
-                <HstCheckbox v-model="state.disabled" title="Disabled" />
-            </template>
-        </Variant>
-    </Story>
+  <Story title="Cars">
+    <Variant
+      title="default"
+      :init-state="initState"
+    >
+      <template #default="{ state }">
+        <MyButton :disabled="state.disabled">
+          {{ state.content }}
+        </MyButton>
+      </template>
+      <template #controls="{ state }">
+        <HstText v-model="state.text" title="Content" />
+        <HstCheckbox v-model="state.disabled" title="Disabled" />
+      </template>
+    </Variant>
+  </Story>
 </template>
 ```
 

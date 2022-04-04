@@ -4,7 +4,7 @@ Histoire lets you write markdown documentation for your stories. You just have t
 
 ```vue{5-9}
 <template>
-    <!-- Your story goes here -->
+  <!-- Your story goes here -->
 </template>
 
 <docs lang="md">

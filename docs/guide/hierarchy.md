@@ -6,9 +6,9 @@ By default, Histoire uses the title of your stories to create the hierarchy. If 
 
 ```vue{2}
 <template>
-    <Story title="Folder/Sub Folder/My story" >
-        <!-- Your story goes here -->
-    </Story>
+  <Story title="Folder/Sub Folder/My story" >
+    <!-- Your story goes here -->
+  </Story>
 </template>
 ```
 
@@ -20,9 +20,9 @@ If you want to use the real path of your story files, you can change that in you
 // histoire.config.ts
 
 export default defineConfig({ 
-    tree: {
-        file: "path"
-    }
+  tree: {
+    file: "path"
+  }
 })
 ```
 
@@ -34,9 +34,9 @@ If you want a custom hierarchy, you can define your own function that takes an o
 // histoire.config.ts
 
 export default defineConfig({ 
-    tree: {
-        file: ({ title, path }) => title.split("/") // equivalent to default behavior
-    }
+  tree: {
+    file: ({ title, path }) => title.split("/") // equivalent to default behavior
+  }
 })
 ```
 
@@ -48,8 +48,8 @@ By default, files and stories are sorted by ascending order. But you might want 
 // histoire.config.ts
 
 export default defineConfig({ 
-    tree: {
-        order: (a, b) => a.localeCompare(b) // equivalent to default behavior
-    }
+  tree: {
+    order: (a, b) => a.localeCompare(b) // equivalent to default behavior
+  }
 })
 ```

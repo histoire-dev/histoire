@@ -4,17 +4,17 @@ Stories can have different variants representing the same component. You can def
 
 ```vue{3-11}
 <template>
-    <Story title="Cars">
-        <Variant title="default">
-            🚗
-        </Variant>
-        <Variant title="Speedy">
-            🏎️
-        </Variant>
-        <Variant title="Slowy">
-            🚜
-        </Variant>
-    </Story>
+  <Story title="Cars">
+    <Variant title="default">
+      🚗
+    </Variant>
+    <Variant title="Speedy">
+      🏎️
+    </Variant>
+    <Variant title="Slowy">
+      🚜
+    </Variant>
+  </Story>
 </template>
 ```
 
@@ -26,17 +26,17 @@ You can change the layout of the variant by using the `layout` attribute.
 
 ```vue{4}
 <template>
-    <Story
-        title="Cars"
-        :layout="{ type: 'grid', width: 200 }"
-    >
-        <Variant title="Speedy">
-            🏎️
-        </Variant>
-        <Variant title="Slowy">
-            🚜
-        </Variant>
-    </Story>
+  <Story
+    title="Cars"
+    :layout="{ type: 'grid', width: 200 }"
+  >
+    <Variant title="Speedy">
+      🏎️
+    </Variant>
+    <Variant title="Slowy">
+      🚜
+    </Variant>
+  </Story>
 </template>
 
 ```

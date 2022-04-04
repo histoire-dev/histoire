@@ -10,7 +10,7 @@ The first option is to create a new file at the root of your project called `his
 import { defineConfig } from 'histoire'
 
 export default defineConfig({
-    // your Histoire configuration
+  // your Histoire configuration
 })
 ```
 
@@ -30,9 +30,9 @@ Here's what your vite config file should look like:
 import { defineConfig } from 'vite'
 
 export default defineConfig({
-    histoire: {
-        // your Histoire configuration
-    },
+  histoire: {
+    // your Histoire configuration
+  },
 })
 ```
 
@@ -44,7 +44,7 @@ Your components may be using globally defined CSS (like CSS frameworks) or JS (l
 // histoire.config.ts
 
 export default defineConfig({ 
-    setupFile: '/src/histoire.setup.ts'
+  setupFile: '/src/histoire.setup.ts'
 })
 ```
 
@@ -59,7 +59,7 @@ import { createPinia } from "pinia";
 import { defineVue3StorySetup } from 'histoire/client'
 
 export default defineVue3StorySetup(({ app, story, variant }) => {
-    const pinia = createPinia();
-    app.use(pinia); // Add Pinia store
+  const pinia = createPinia();
+  app.use(pinia); // Add Pinia store
 })
 ```
