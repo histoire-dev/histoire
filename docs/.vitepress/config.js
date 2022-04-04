@@ -3,7 +3,7 @@ module.exports = {
   description: 'Fast stories powered by Vite',
 
   themeConfig: {
-    repo: 'Akryum/histoire',
+    repo: 'histoire-dev/histoire',
     docsDir: 'docs',
     docsBranch: 'main',
     editLinks: true,
@@ -33,18 +33,70 @@ module.exports = {
     ],
 
     sidebar: {
-      // catch-all fallback
-      // '/': [
-      //   {
-      //     text: 'Guide',
-      //     children: [
-      //       {
-      //         text: 'Getting Started',
-      //         link: '/guide/',
-      //       },
-      //     ],
-      //   },
-      // ],
+      '/': [
+        {
+          text: 'Getting Started',
+          children: [
+            {
+              text: 'Introduction',
+              link: '/guide/intro',
+            },
+            {
+              text: 'Install',
+              link: '/guide/install',
+            },
+            {
+              text: 'Configuration',
+              link: '/guide/config',
+            },
+          ],
+        },
+        {
+          text: 'Write stories',
+          children: [
+            {
+              text: 'Introduction',
+              link: '/guide/stories',
+            },
+            {
+              text: 'Variant',
+              link: '/guide/variant',
+            },
+            {
+              text: 'State & Controls',
+              link: '/guide/controls',
+            },
+            {
+              text: 'Documentation',
+              link: '/guide/docs',
+            },
+            {
+              text: 'Serialization',
+              link: '/guide/serialization',
+            },
+            {
+              text: 'Hierarchy',
+              link: '/guide/hierarchy',
+            },
+          ],
+        },
+        {
+          text: 'Theme',
+          children: [
+            {
+              text: 'Configuration',
+              link: '/guide/theme',
+            },
+            {
+              text: 'Customization',
+              link: '/guide/customization',
+            },
+          ],
+        }, {
+          text: 'API Reference',
+          children: [],
+        },
+      ],
     },
   },
 }
