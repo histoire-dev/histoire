@@ -54,6 +54,16 @@ It basically gives you:
   <SponsorButton/>
 </div>
 
+## Supported frameworks
+
+| Framework | Versions | Support | Auto CodeGen | Auto Docs |
+| --------- | -------- | ------- | ------------ | ---- |
+| [Vue](https://vuejs.org/) | 3.2+ | ✅ | ✅ | Todo |
+| [Svelte](https://svelte.dev/) | - | Planned | - | - |
+| [Solid](https://www.solidjs.com/) | - | Planned | - | - |
+| [Angular](https://angular.io/) | - | TBD | - | - |
+| [React](https://reactjs.org/) | - | [Alternative](https://www.ladle.dev) | - | - |
+
 ## Installation
 
 Install the `histoire` package into your project:
