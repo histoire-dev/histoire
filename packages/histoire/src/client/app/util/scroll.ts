@@ -24,4 +24,8 @@ export function useScrollOnActive (active: Ref<boolean>, el: Ref<HTMLElement>) {
       autoScroll()
     }
   })
+
+  return {
+    autoScroll,
+  }
 }

@@ -6,6 +6,7 @@ import { useResizeObserver } from '@vueuse/core'
 import { useCurrentVariantRoute } from '../../util/variant'
 import type { Story, Variant } from '../../types'
 import SandboxVue3 from '../sandbox/SandboxVue3.vue'
+import { useScrollOnActive } from '../../util/scroll.js'
 
 const props = defineProps({
   variant: {
@@ -42,9 +43,15 @@ function selectVariant () {
 }
 
 const el = ref<HTMLDivElement>()
+
+const { autoScroll } = useScrollOnActive(isActive, el)
+
 useResizeObserver(el, () => {
   if (props.variant.ready) {
     emit('resize', el.value!.clientWidth, el.value!.clientHeight)
+    if (isActive.value) {
+      autoScroll()
+    }
   }
 })
 </script>

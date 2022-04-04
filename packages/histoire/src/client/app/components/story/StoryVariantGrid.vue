@@ -1,12 +1,12 @@
 <script lang="ts" setup>
 import { useResizeObserver } from '@vueuse/core'
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useStoryStore } from '../../stores/story'
 import StoryVariantGridItem from './StoryVariantGridItem.vue'
 
 const storyStore = useStoryStore()
 
-const templateWidth = computed(() => {
+const gridTemplateWidth = computed(() => {
   if (storyStore.currentStory.layout.type !== 'grid') {
     return
   }
@@ -34,7 +34,6 @@ const countPerRow = ref(0)
 const visibleRows = ref(0)
 
 const el = ref<HTMLDivElement>(null)
-const children = ref([])
 
 useResizeObserver(el, () => {
   updateMaxCount()
@@ -61,7 +60,13 @@ function updateMaxCount () {
   if (maxCount.value < newMaxCount) {
     maxCount.value = newMaxCount
   }
-  console.log(countPerRow.value, visibleRows.value, maxCount.value)
+
+  if (storyStore.currentVariant) {
+    const index = storyStore.currentStory.variants.indexOf(storyStore.currentVariant)
+    if (index + 1 > maxCount.value) {
+      maxCount.value = index + 1
+    }
+  }
 }
 
 function onItemResize (w: number, h: number) {
@@ -71,6 +76,10 @@ function onItemResize (w: number, h: number) {
     updateMaxCount()
   }
 }
+
+watch(() => storyStore.currentVariant, () => {
+  updateMaxCount()
+})
 </script>
 
 <template>
@@ -87,7 +96,7 @@ function onItemResize (w: number, h: number) {
       <div
         class="htw-grid htw-gap-4 htw-m-4"
         :style="{
-          gridTemplateColumns: `repeat(auto-fill, ${templateWidth})`,
+          gridTemplateColumns: `repeat(auto-fill, ${gridTemplateWidth})`,
         }"
       >
         <StoryVariantGridItem
