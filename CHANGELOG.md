@@ -1,3 +1,28 @@
+## [0.2.2](https://github.com/Akryum/histoire/compare/v0.2.1...v0.2.2) (2022-04-04)
+
+
+### Bug Fixes
+
+* app logo horizontal align ([24f510b](https://github.com/Akryum/histoire/commit/24f510bb0372d5944854c6006f50038fe1c0ab38))
+* app logo vertical align ([76e2890](https://github.com/Akryum/histoire/commit/76e289078405ddcc21c23e785e84c891db507c2d))
+* improved vnode handling in <Story> ([fd1e6f1](https://github.com/Akryum/histoire/commit/fd1e6f16c3ab566e80bc03509d39702ee6d43e24))
+* rem issue ([7854104](https://github.com/Akryum/histoire/commit/7854104c50abe388d74db0a8c88d1ec3004f6114))
+
+
+### Features
+
+* Add documentation (fix [#44](https://github.com/Akryum/histoire/issues/44)) ([#60](https://github.com/Akryum/histoire/issues/60)) ([a1a3b3a](https://github.com/Akryum/histoire/commit/a1a3b3a00476888d5d365a2872907817e4afa34c))
+* **grid:** auto scroll to selected variant ([60bf849](https://github.com/Akryum/histoire/commit/60bf849d494f79be3089dee7d07278ac6f690adf))
+* **grid:** select variant on click or keyup inside ([17e9204](https://github.com/Akryum/histoire/commit/17e92048f6a95ef2816fcdd43b9b9bdf2ef0ab36))
+* optimize big grids ([488bda0](https://github.com/Akryum/histoire/commit/488bda0a6878058c246ad4859fd86d983018b7b9))
+
+
+### Performance Improvements
+
+* grid layout ([218f856](https://github.com/Akryum/histoire/commit/218f8564cda736582dc5384be2711101fa2bee9d))
+
+
+
 ## [0.2.1](https://github.com/Akryum/histoire/compare/v0.2.0...v0.2.1) (2022-03-22)
 
 
