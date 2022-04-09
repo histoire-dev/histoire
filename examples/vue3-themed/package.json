@@ -12,7 +12,7 @@
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^2.3.1",
-    "vite": "^2.9.0",
-    "histoire": "workspace:*"
+    "histoire": "workspace:*",
+    "vite": "^2.9.1"
   }
 }
