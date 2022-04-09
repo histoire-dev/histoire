@@ -9,14 +9,16 @@ export interface PreviewSettings {
   checkerboard: boolean
 }
 
+const previewSettings = useStorage<PreviewSettings>('_histoire-sandbox-settings-v2', {
+  responsiveWidth: 720,
+  responsiveHeight: null,
+  rotate: false,
+  backgroundColor: 'transparent',
+  checkerboard: false,
+})
+
 export function usePreviewSettings () {
-  return useStorage<PreviewSettings>('_histoire-sandbox-settings-v1', {
-    responsiveWidth: 720,
-    responsiveHeight: null,
-    rotate: false,
-    backgroundColor: 'transparent',
-    checkerboard: false,
-  })
+  return previewSettings
 }
 
 export const receivedSettings = reactive<PreviewSettings>({} as PreviewSettings)
