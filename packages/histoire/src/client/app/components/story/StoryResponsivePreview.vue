@@ -308,3 +308,9 @@ watch(isResponsiveEnabled, value => {
     </div>
   </div>
 </template>
+
+<style scoped>
+.bind-preview-bg {
+  background-color: v-bind('settings.backgroundColor');
+}
+</style>
