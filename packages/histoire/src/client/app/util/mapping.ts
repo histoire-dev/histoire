@@ -18,10 +18,15 @@ export function mapFile (file: StoryFile, existingFile?: StoryFile): StoryFile {
       const variant = result.story.variants[index]
       const existingVariant = existingFile.story.variants[index]
       if (existingVariant) {
-        if (existingVariant.state) Object.assign(variant.state, existingVariant.state)
-        if (existingVariant.initState) variant.initState = existingVariant.initState
-        if (existingVariant.slots) variant.slots = existingVariant.slots
-        if (existingVariant.ready) variant.ready = existingVariant.ready
+        for (const key in existingVariant) {
+          if (typeof existingVariant[key] !== 'undefined') {
+            if (key === 'state') {
+              Object.assign(variant.state, existingVariant.state)
+              continue
+            }
+            variant[key] = existingVariant[key]
+          }
+        }
       }
     }
     if (existingFile.story.lastSelectedVariant) {
@@ -38,6 +43,6 @@ export function mapVariant (variant: Variant): Variant {
     state: {},
     initState: null,
     slots: () => ({}),
-    ready: false,
+    previewReady: false,
   }
 }

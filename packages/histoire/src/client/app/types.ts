@@ -33,7 +33,9 @@ export interface Variant {
   slots?: () => Readonly<any>
   state?: any
   source?: string
-  ready?: boolean
+  responsiveDisabled?: boolean
+  configReady?: boolean
+  previewReady?: boolean
 }
 
 export type TreeLeaf = {

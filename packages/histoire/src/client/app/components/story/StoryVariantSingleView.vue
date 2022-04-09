@@ -27,8 +27,12 @@ const settings = usePreviewSettings()
       v-if="!isMobile"
       class="htw-flex-none htw-flex htw-items-center htw-h-8 -htw-mt-1"
     >
-      <StoryVariantTitle :variant="variant" />
-      <StoryVariantResponsiveSize />
+      <StoryVariantTitle
+        :variant="variant"
+      />
+      <StoryVariantResponsiveSize
+        v-if="!variant.responsiveDisabled"
+      />
       <StoryVariantBackground />
       <StoryVariantNewTab
         :variant="variant"

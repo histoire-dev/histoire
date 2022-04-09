@@ -20,7 +20,7 @@ const route = useRoute()
     <span>Select a variant</span>
   </BaseEmpty>
 
-  <BaseEmpty v-else-if="!storyStore.currentVariant.ready">
+  <BaseEmpty v-else-if="!storyStore.currentVariant.previewReady">
     <span>Loading...</span>
   </BaseEmpty>
 

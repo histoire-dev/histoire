@@ -26,7 +26,7 @@ const emit = defineEmits({
 const iframe = ref<HTMLIFrameElement>()
 
 function syncState () {
-  if (iframe.value && props.variant.ready) {
+  if (iframe.value && props.variant.previewReady) {
     iframe.value.contentWindow.postMessage({
       type: STATE_SYNC,
       state: toRawDeep(props.variant.state),
@@ -48,7 +48,7 @@ watch(() => props.variant.state, () => {
 })
 
 Object.assign(props.variant, {
-  ready: false,
+  previewReady: false,
 })
 useEventListener(window, 'message', (event) => {
   if (event.data.type === STATE_SYNC) {
@@ -56,7 +56,7 @@ useEventListener(window, 'message', (event) => {
     Object.assign(props.variant.state, event.data.state)
   } else if (event.data.type === SANDBOX_READY) {
     Object.assign(props.variant, {
-      ready: true,
+      previewReady: true,
     })
   }
 })
@@ -218,11 +218,21 @@ useDragger(cornerDragger, responsiveHeight, 10, 20000, 'y')
 
 const finalWidth = computed(() => props.settings.rotate ? props.settings.responsiveHeight : props.settings.responsiveWidth)
 const finalHeight = computed(() => props.settings.rotate ? props.settings.responsiveWidth : props.settings.responsiveHeight)
+
+// Disabled responsive
+
+const isResponsiveEnabled = computed(() => !props.variant.responsiveDisabled)
+watch(isResponsiveEnabled, value => {
+  console.log('isResponsiveEnabled', value, JSON.stringify(props.variant))
+})
 </script>
 
 <template>
   <div class="htw-w-full htw-h-full htw-flex-1 htw-border htw-border-gray-100 dark:htw-border-gray-800 htw-rounded-lg htw-relative htw-overflow-hidden">
-    <div class="htw-absolute htw-inset-0 htw-w-full htw-h-full htw-bg-gray-200 dark:htw-bg-gray-850 htw-rounded-r-lg htw-border-l-2 htw-border-gray-500/10 dark:htw-border-gray-700/30 htw-overflow-hidden">
+    <div
+      v-if="isResponsiveEnabled"
+      class="htw-absolute htw-inset-0 htw-w-full htw-h-full htw-bg-gray-200 dark:htw-bg-gray-850 htw-rounded-r-lg htw-border-l-2 htw-border-gray-500/10 dark:htw-border-gray-700/30 htw-overflow-hidden"
+    >
       <HatchedPattern
         class="htw-w-full htw-h-full htw-text-black/[2%] dark:htw-text-white/[2%]"
       />
@@ -231,10 +241,10 @@ const finalHeight = computed(() => props.settings.rotate ? props.settings.respon
     <div class="htw-h-full htw-overflow-auto htw-relative">
       <div
         class="htw-h-full htw-p-4 htw-overflow-hidden htw-bg-white dark:htw-bg-gray-700 htw-rounded-lg htw-relative"
-        :style="{
+        :style="isResponsiveEnabled ? {
           width: finalWidth ? `${finalWidth + 44}px` : null,
           height: finalHeight ? `${finalHeight + 44}px` : null,
-        }"
+        } : undefined"
       >
         <div class="htw-p-4 htw-h-full htw-relative">
           <div class="htw-w-full htw-h-full htw-border htw-border-gray-100 dark:htw-border-gray-800 htw-rounded-sm htw-relative">
@@ -270,28 +280,30 @@ const finalHeight = computed(() => props.settings.rotate ? props.settings.respon
         </div>
 
         <!-- Resize Dragger -->
-        <div
-          ref="horizontalDragger"
-          class="htw-absolute htw-w-4 htw-top-0 htw-bottom-4 htw-right-0 hover:htw-bg-primary-100 dark:hover:htw-bg-primary-800 htw-flex htw-items-center htw-justify-center htw-cursor-ew-resize htw-group hover:htw-text-primary-500"
-        >
-          <Icon
-            icon="mdi:drag-vertical-variant"
-            class="htw-w-4 htw-h-4 htw-opacity-20 group-hover:htw-opacity-90"
+        <template v-if="isResponsiveEnabled">
+          <div
+            ref="horizontalDragger"
+            class="htw-absolute htw-w-4 htw-top-0 htw-bottom-4 htw-right-0 hover:htw-bg-primary-100 dark:hover:htw-bg-primary-800 htw-flex htw-items-center htw-justify-center htw-cursor-ew-resize htw-group hover:htw-text-primary-500"
+          >
+            <Icon
+              icon="mdi:drag-vertical-variant"
+              class="htw-w-4 htw-h-4 htw-opacity-20 group-hover:htw-opacity-90"
+            />
+          </div>
+          <div
+            ref="verticalDragger"
+            class="htw-absolute htw-h-4 htw-left-0 htw-right-4 htw-bottom-0 hover:htw-bg-primary-100 dark:hover:htw-bg-primary-800 htw-flex htw-items-center htw-justify-center htw-cursor-ns-resize htw-group hover:htw-text-primary-500"
+          >
+            <Icon
+              icon="mdi:drag-horizontal-variant"
+              class="htw-w-4 htw-h-4 htw-opacity-20 group-hover:htw-opacity-90"
+            />
+          </div>
+          <div
+            ref="cornerDragger"
+            class="htw-absolute htw-w-4 htw-h-4 htw-right-0 htw-bottom-0 hover:htw-bg-primary-100 dark:hover:htw-bg-primary-800 htw-flex htw-items-center htw-justify-center htw-cursor-nwse-resize htw-group hover:htw-text-primary-500"
           />
-        </div>
-        <div
-          ref="verticalDragger"
-          class="htw-absolute htw-h-4 htw-left-0 htw-right-4 htw-bottom-0 hover:htw-bg-primary-100 dark:hover:htw-bg-primary-800 htw-flex htw-items-center htw-justify-center htw-cursor-ns-resize htw-group hover:htw-text-primary-500"
-        >
-          <Icon
-            icon="mdi:drag-horizontal-variant"
-            class="htw-w-4 htw-h-4 htw-opacity-20 group-hover:htw-opacity-90"
-          />
-        </div>
-        <div
-          ref="cornerDragger"
-          class="htw-absolute htw-w-4 htw-h-4 htw-right-0 htw-bottom-0 hover:htw-bg-primary-100 dark:hover:htw-bg-primary-800 htw-flex htw-items-center htw-justify-center htw-cursor-nwse-resize htw-group hover:htw-text-primary-500"
-        />
+        </template>
       </div>
     </div>
   </div>

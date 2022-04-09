@@ -43,6 +43,7 @@ watch(variant, () => {
         class="htw-p-2 htw-h-full"
       >
         <StoryVariantSingleView
+          v-if="storyStore.currentVariant.configReady"
           :variant="storyStore.currentVariant"
           :story="storyStore.currentStory"
         />
@@ -81,6 +82,7 @@ watch(variant, () => {
             class="htw-p-2 htw-h-full"
           >
             <StoryVariantSingleView
+              v-if="storyStore.currentVariant.configReady"
               :variant="storyStore.currentVariant"
               :story="storyStore.currentStory"
             />

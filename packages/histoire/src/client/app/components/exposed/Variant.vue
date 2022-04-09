@@ -17,6 +17,11 @@ export default defineComponent({
       type: String,
       default: null,
     },
+
+    responsiveDisabled: {
+      type: Boolean,
+      default: false,
+    },
   },
 
   setup (props) {
@@ -35,6 +40,8 @@ export default defineComponent({
         },
         slots: () => vm.proxy.$slots,
         source: props.source,
+        responsiveDisabled: props.responsiveDisabled,
+        configReady: true,
       })
     }
     updateVariant()

@@ -28,11 +28,11 @@ const { variant } = toRefs(props)
 const { isActive, targetRoute } = useCurrentVariantRoute(variant)
 
 Object.assign(props.variant, {
-  ready: false,
+  previewReady: false,
 })
 function onReady () {
   Object.assign(props.variant, {
-    ready: true,
+    previewReady: true,
   })
 }
 
@@ -47,7 +47,7 @@ const el = ref<HTMLDivElement>()
 const { autoScroll } = useScrollOnActive(isActive, el)
 
 useResizeObserver(el, () => {
-  if (props.variant.ready) {
+  if (props.variant.previewReady) {
     emit('resize', el.value!.clientWidth, el.value!.clientHeight)
     if (isActive.value) {
       autoScroll()
