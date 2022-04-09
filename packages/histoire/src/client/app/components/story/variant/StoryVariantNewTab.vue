@@ -19,11 +19,11 @@ const sandboxUrl = computed(() => {
     v-tooltip="'Open variant in new tab'"
     :href="sandboxUrl"
     target="_blank"
-    class="htw-flex htw-items-center htw-gap-1 htw-h-full htw-px-2 hover:htw-text-primary-500"
+    class="htw-flex htw-items-center htw-gap-1 htw-h-full htw-px-2 hover:htw-text-primary-500 htw-opacity-50 hover:htw-opacity-100"
   >
     <Icon
       icon="carbon:launch"
-      class="base-list-item-link-icon htw-w-4 htw-h-4 htw-opacity-50"
+      class="base-list-item-link-icon htw-w-4 htw-h-4"
     />
   </a>
 </template>

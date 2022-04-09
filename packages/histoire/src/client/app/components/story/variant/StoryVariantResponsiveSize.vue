@@ -17,18 +17,18 @@ const settings = usePreviewSettings()
   >
     <div
       v-tooltip="'Responsive sizes'"
-      class="htw-flex htw-items-center htw-gap-1 htw-h-full htw-px-2"
+      class="htw-flex htw-items-center htw-gap-1 htw-h-full htw-px-2 htw-group"
       :class="{
         'htw-cursor-pointer hover:htw-text-primary-500': histoireConfig.responsivePresets?.length,
       }"
     >
       <Icon
         icon="carbon:devices"
-        class="htw-w-4 htw-h-4 htw-opacity-50"
+        class="htw-w-4 htw-h-4 htw-opacity-50 group-hover:htw-opacity-100"
       />
       <Icon
         icon="carbon:caret-down"
-        class="htw-w-4 htw-h-4 htw-opacity-50"
+        class="htw-w-4 htw-h-4 htw-opacity-50 group-hover:htw-opacity-100"
       />
     </div>
 

@@ -104,8 +104,8 @@ const copySourceCode = () => copy(sourceCode.value)
           shown: copied,
           distance: 12,
         }"
-        icon="cil:copy"
-        class="htw-w-4 htw-h-4 hover:htw-text-primary-500 dark:hover:htw-text-primary-400 htw-cursor-pointer"
+        icon="carbon:copy-file"
+        class="htw-w-4 htw-h-4 htw-opacity-50 hover:htw-opacity-100 hover:htw-text-primary-500 htw-cursor-pointer"
         @click="copySourceCode()"
       />
     </div>
