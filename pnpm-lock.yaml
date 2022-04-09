@@ -171,6 +171,7 @@ importers:
 
   packages/histoire-controls:
     specifiers:
+      '@iconify/vue': ^3.2.1
       '@peeky/test': ^0.13.5
       '@types/node': ^17.0.23
       '@vitejs/plugin-vue': ^2.3.1
@@ -187,15 +188,17 @@ importers:
       vite: ^2.9.1
       vue: ^3.2.31
       vue-tsc: ^0.33.9
+    dependencies:
+      '@iconify/vue': 3.2.1_vue@3.2.31
+      '@vueuse/core': 8.2.5_vue@3.2.31
+      floating-vue: 2.0.0-beta.14_vue@3.2.31
     devDependencies:
       '@peeky/test': 0.13.5_eslint@8.13.0
       '@types/node': 17.0.23
       '@vitejs/plugin-vue': 2.3.1_vite@2.9.1+vue@3.2.31
       '@vue/test-utils': 2.0.0-rc.19_vue@3.2.31
-      '@vueuse/core': 8.2.5_vue@3.2.31
       autoprefixer: 10.4.4_postcss@8.4.12
       concurrently: 7.1.0
-      floating-vue: 2.0.0-beta.14_vue@3.2.31
       histoire: link:../histoire
       postcss: 8.4.12
       postcss-import: 14.1.0_postcss@8.4.12
@@ -1443,6 +1446,7 @@ packages:
       '@vueuse/shared': 8.2.5_vue@3.2.31
       vue: 3.2.31
       vue-demi: 0.12.5_vue@3.2.31
+    dev: false
 
   /@vueuse/metadata/8.2.5:
     resolution: {integrity: sha512-Lk9plJjh9cIdiRdcj16dau+2LANxIdFCiTgdfzwYXbflxq0QnMBeOD2qHgKDE7fuVrtPcVWj8VSuZEx1HRfNQA==}
@@ -1474,6 +1478,7 @@ packages:
     dependencies:
       vue: 3.2.31
       vue-demi: 0.12.5_vue@3.2.31
+    dev: false
 
   /@wry/equality/0.1.11:
     resolution: {integrity: sha512-mwEVBDUVODlsQQ5dfuLUS5/Tf7jqUKyhKYHmVi4fPB6bDMOfWvUPJmKgS1Z7Za/sOI3vzWt4+O7yCiL/70MogA==}
@@ -3856,6 +3861,7 @@ packages:
       '@floating-ui/dom': 0.1.10
       vue: 3.2.31
       vue-resize: 2.0.0-alpha.1_vue@3.2.31
+    dev: false
 
   /follow-redirects/1.14.9_debug@4.3.2:
     resolution: {integrity: sha512-MQDfihBQYMcyy5dhRDJUHcw7lb2Pv/TuE6xP1vyraLukNDHKbDxDNaOE3NbCAdKQApno+GPRyo1YAp89yCjK4w==}
@@ -6872,6 +6878,7 @@ packages:
         optional: true
     dependencies:
       vue: 3.2.31
+    dev: false
 
   /vue-eslint-parser/8.3.0_eslint@8.13.0:
     resolution: {integrity: sha512-dzHGG3+sYwSf6zFBa0Gi9ZDshD7+ad14DGOdTLjruRVgZXe2J+DcZ9iUhyR48z5g1PqRa20yt3Njna/veLJL/g==}
@@ -6909,6 +6916,7 @@ packages:
         optional: true
     dependencies:
       vue: 3.2.31
+    dev: false
 
   /vue-router/4.0.14_vue@3.2.31:
     resolution: {integrity: sha512-wAO6zF9zxA3u+7AkMPqw9LjoUCjSxfFvINQj3E/DceTt6uEz1XZLraDhdg2EYmvVwTBSGlLYsUw8bDmx0754Mw==}

@@ -1,12 +1,11 @@
 <script lang="ts" setup>
 import { computed, onMounted, PropType, ref, shallowRef, watch } from 'vue'
 import { getHighlighter, Highlighter, setCDN } from 'shiki'
-import { Icon } from '@iconify/vue'
+import { HstCopyIcon } from '@histoire/controls'
 import { generateSourceCode } from '../../codegen/vue3'
 import type { Variant } from '../../types'
 import { isDark } from '../../util/dark'
 import { unindent } from '../../codegen/util'
-import { useClipboard } from '@vueuse/core'
 
 const props = defineProps({
   variant: {
@@ -59,11 +58,6 @@ const sourceHtml = computed(() => highlighter.value?.codeToHtml(sourceCode.value
   lang: 'html',
   theme: isDark.value ? 'github-dark' : 'github-light',
 }))
-
-// Copy
-const { copy, copied } = useClipboard()
-
-const copySourceCode = () => copy(sourceCode.value)
 </script>
 
 <template>
@@ -97,16 +91,8 @@ const copySourceCode = () => copy(sourceCode.value)
       v-if="!error"
       class="htw-absolute htw-top-2 htw-right-6 htw-p-1 htw-bg-gray-100 dark:htw-bg-gray-800"
     >
-      <Icon
-        v-tooltip="{
-          content: 'Copied!',
-          triggers: [],
-          shown: copied,
-          distance: 12,
-        }"
-        icon="carbon:copy-file"
-        class="htw-w-4 htw-h-4 htw-opacity-50 hover:htw-opacity-100 hover:htw-text-primary-500 htw-cursor-pointer"
-        @click="copySourceCode()"
+      <HstCopyIcon
+        :content="sourceCode"
       />
     </div>
   </div>
