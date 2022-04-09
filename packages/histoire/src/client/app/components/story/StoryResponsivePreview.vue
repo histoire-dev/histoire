@@ -127,8 +127,13 @@ function useDragger (el: Ref<HTMLDivElement>, value: Ref<number>, min: number, m
     ]
 
     function onMouseMove (event: MouseEvent) {
+      const snapTarget = (axis === 'x' ? previewWrapper.value.clientWidth : previewWrapper.value.clientHeight)
       const delta = (axis === 'x' ? event.clientX : event.clientY) - start
       value.value = Math.max(min, Math.min(max, startValue + delta))
+
+      if (Math.abs(value.value - (snapTarget - 67)) < 16) {
+        value.value = null
+      }
     }
 
     function onMouseUp () {
@@ -176,11 +181,12 @@ const responsiveHeight = computed({
 const horizontalDragger = ref<HTMLDivElement>()
 const verticalDragger = ref<HTMLDivElement>()
 const cornerDragger = ref<HTMLDivElement>()
+const previewWrapper = ref<HTMLDivElement>()
 
-useDragger(horizontalDragger, responsiveWidth, 10, 20000, 'x')
-useDragger(verticalDragger, responsiveHeight, 10, 20000, 'y')
-useDragger(cornerDragger, responsiveWidth, 10, 20000, 'x')
-useDragger(cornerDragger, responsiveHeight, 10, 20000, 'y')
+useDragger(horizontalDragger, responsiveWidth, 32, 20000, 'x')
+useDragger(verticalDragger, responsiveHeight, 32, 20000, 'y')
+useDragger(cornerDragger, responsiveWidth, 32, 20000, 'x')
+useDragger(cornerDragger, responsiveHeight, 32, 20000, 'y')
 
 // Handle rotate
 
@@ -203,12 +209,15 @@ const isResponsiveEnabled = computed(() => !props.variant.responsiveDisabled)
       />
     </div>
 
-    <div class="htw-h-full htw-overflow-auto htw-relative">
+    <div
+      ref="previewWrapper"
+      class="htw-h-full htw-overflow-auto htw-relative"
+    >
       <div
-        class="htw-h-full htw-p-4 htw-overflow-hidden htw-bg-white dark:htw-bg-gray-700 htw-rounded-lg htw-relative"
-        :style="isResponsiveEnabled ? {
-          width: finalWidth ? `${finalWidth + 44}px` : null,
-          height: finalHeight ? `${finalHeight + 44}px` : null,
+        class="htw-h-full htw-p-4 htw-overflow-hidden htw-bg-white dark:htw-bg-gray-700 htw-rounded-lg htw-relative preview-fit"
+        :class="isResponsiveEnabled ? {
+          'preview-fit-width': !!finalWidth,
+          'preview-fit-height': !!finalHeight
         } : undefined"
       >
         <div class="htw-p-4 htw-h-full htw-relative">
@@ -228,6 +237,10 @@ const isResponsiveEnabled = computed(() => !props.variant.responsiveDisabled)
                 'htw-invisible': !isIframeLoaded,
                 'htw-pointer-events-none': resizing,
               }"
+              :style="isResponsiveEnabled ? {
+                width: finalWidth ? `${finalWidth}px` : null,
+                height: finalHeight ? `${finalHeight}px` : null,
+              } : undefined"
               data-test-id="preview-iframe"
               @load="onIframeLoad()"
             />
@@ -275,6 +288,14 @@ const isResponsiveEnabled = computed(() => !props.variant.responsiveDisabled)
 </template>
 
 <style scoped>
+.preview-fit-width {
+  width: fit-content;
+}
+
+.preview-fit-height {
+  height: fit-content;
+}
+
 .bind-preview-bg {
   background-color: v-bind('settings.backgroundColor');
 }
