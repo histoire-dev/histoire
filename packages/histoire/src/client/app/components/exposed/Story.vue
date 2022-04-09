@@ -52,6 +52,11 @@ export default defineComponent({
           if (!vnode.props.initState && !vnode.props['init-state']) {
             vnode.props.initState = this.initState
           }
+          for (const attr in this.$attrs) {
+            if (typeof vnode.props[attr] === 'undefined') {
+              vnode.props[attr] = this.$attrs[attr]
+            }
+          }
           index++
         } else if (vnode.children?.length) {
           applyAttrs(vnode.children as VNode[])
