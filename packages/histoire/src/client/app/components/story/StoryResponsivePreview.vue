@@ -222,9 +222,6 @@ const finalHeight = computed(() => props.settings.rotate ? props.settings.respon
 // Disabled responsive
 
 const isResponsiveEnabled = computed(() => !props.variant.responsiveDisabled)
-watch(isResponsiveEnabled, value => {
-  console.log('isResponsiveEnabled', value, JSON.stringify(props.variant))
-})
 </script>
 
 <template>
