@@ -3,12 +3,14 @@ import HstCheckboxVue from './components/checkbox/HstCheckbox.vue'
 import HstTextVue from './components/text/HstText.vue'
 import HstNumberVue from './components/number/HstNumber.vue'
 import HstTextareaVue from './components/textarea/HstTextarea.vue'
+import HstColorShadesVue from './components/design-tokens/HstColorShades.vue'
 import HstCopyIconVue from './components/HstCopyIcon.vue'
 
 export const HstCheckbox = HstCheckboxVue
 export const HstText = HstTextVue
 export const HstNumber = HstNumberVue
 export const HstTextarea = HstTextareaVue
+export const HstColorShades = HstColorShadesVue
 export const HstCopyIcon = HstCopyIconVue
 
 export function registerVueComponents (app: App) {
