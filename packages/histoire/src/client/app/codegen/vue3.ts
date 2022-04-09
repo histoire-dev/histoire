@@ -140,6 +140,8 @@ async function printVNode (vnode: VNode): Promise<string[]> {
         if (typeof value === 'string' && value.startsWith('{{') && value.endsWith('}}')) {
           // It was formatted from auto building object (slot props)
           serialized = [value.substring(2, value.length - 2).trim()]
+        } else if (typeof value === 'function') {
+          serialized = [value.toString()]
         } else {
           serialized = serializeAndCleanJs(value)
         }
