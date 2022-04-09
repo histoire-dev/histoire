@@ -102,7 +102,7 @@ onKeyboardShortcut(['ctrl+k', 'meta+k'], (event) => {
       class="htw-h-full"
     >
       <template #first>
-        <div class="htw-flex htw-flex-col htw-h-full htw-gap-2">
+        <div class="htw-flex htw-flex-col htw-h-full">
           <AppHeader
             class="htw-flex-none"
             @search="isSearchOpen = true"
