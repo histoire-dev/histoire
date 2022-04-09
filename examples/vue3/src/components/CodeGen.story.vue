@@ -158,5 +158,32 @@ function onClick (event) {
         </template>
       </SlotWithProps>
     </Variant>
+    <Variant
+      title="list"
+      icon="carbon:list"
+      :init-state="() => ({
+        items: [
+          {
+            id: 1,
+            name: 'Foo',
+          },
+          {
+            id: 2,
+            name: 'Bar',
+          },
+        ],
+      })"
+    >
+      <template #default="{ state }">
+        <ul>
+          <li
+            v-for="item of state.items"
+            :key="item.id"
+          >
+            {{ item.name }}
+          </li>
+        </ul>
+      </template>
+    </Variant>
   </Story>
 </template>

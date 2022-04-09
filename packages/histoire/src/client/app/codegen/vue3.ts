@@ -33,7 +33,9 @@ async function printVNode (vnode: VNode): Promise<string[]> {
 
     const attrs: string[][] = []
     let multilineAttrs = false
-    const skipProps: string[] = []
+    const skipProps: string[] = [
+      'key',
+    ]
 
     // Directives
     function genDirective (dirName: string, dir, valueCode: string = null) {
@@ -229,6 +231,10 @@ async function printVNode (vnode: VNode): Promise<string[]> {
       lines.push('/>')
     } else {
       lines.push(`${tag[0]} />`)
+    }
+  } else if (vnode?.shapeFlag & 1 << 4) {
+    for (const child of vnode.children) {
+      lines.push(...await printVNode(child))
     }
   }
 
