@@ -149,10 +149,10 @@ if (import.meta.hot) {
     },
 
     configureServer (server) {
-      server.middlewares.use((req, res, next) => {
+      server.middlewares.use(async (req, res, next) => {
         if (req.url!.startsWith('/__sandbox')) {
           res.statusCode = 200
-          res.end(`
+          let html = `
 <!DOCTYPE html>
 <html>
 <head>
@@ -174,7 +174,11 @@ if (import.meta.hot) {
   </script>
   <script type="module" src="/@fs/${APP_PATH}/sandbox.js"></script>
 </body>
-</html>`)
+</html>`
+          // Apply Vite HTML transforms. This injects the Vite HMR client, and
+          // also applies HTML transforms from Vite plugins
+          html = await server.transformIndexHtml(req.url, html)
+          res.end(html)
           return
         }
         next()
@@ -182,10 +186,11 @@ if (import.meta.hot) {
 
       // serve our index.html after vite history fallback
       return () => {
-        server.middlewares.use((req, res, next) => {
+        server.middlewares.use(async (req, res, next) => {
           if (req.url!.endsWith('.html')) {
             res.statusCode = 200
-            res.end(`
+
+            let html = `
 <!DOCTYPE html>
 <html>
   <head>
@@ -200,7 +205,11 @@ if (import.meta.hot) {
     <div id="app"></div>
     <script type="module" src="/@fs/${APP_PATH}/index.js"></script>
   </body>
-</html>`)
+</html>`
+            // Apply Vite HTML transforms. This injects the Vite HMR client, and
+            // also applies HTML transforms from Vite plugins
+            html = await server.transformIndexHtml(req.url, html)
+            res.end(html)
             return
           }
           next()
