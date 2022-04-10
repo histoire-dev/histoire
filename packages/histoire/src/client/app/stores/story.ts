@@ -3,7 +3,6 @@ import { computed, ref, watch } from 'vue'
 import { router } from '../router'
 import { Story } from '../types'
 import { useStorage } from '@vueuse/core'
-import { PreviewSettings } from '../util/preview-settings'
 
 export const useStoryStore = defineStore('story', () => {
   const stories = ref<Story[]>([])
@@ -52,14 +51,6 @@ export const useStoryStore = defineStore('story', () => {
     openFileFolders(currentStory.value.file.path)
   })
 
-  const previewSettings = useStorage<PreviewSettings>('_histoire-sandbox-settings-v1', {
-    responsiveWidth: 720,
-    responsiveHeight: null,
-    rotate: false,
-    backgroundColor: 'transparent',
-    checkerboard: false,
-  })
-
   return {
     stories,
     setStories,
@@ -67,6 +58,5 @@ export const useStoryStore = defineStore('story', () => {
     currentVariant,
     isFolderOpened,
     toggleFolder,
-    previewSettings,
   }
 })

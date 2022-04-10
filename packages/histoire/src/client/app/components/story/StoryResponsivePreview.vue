@@ -8,15 +8,14 @@ import HatchedPattern from '../misc/HatchedPattern.vue'
 import CheckerboardPattern from '../misc/CheckerboardPattern.vue'
 import { toRawDeep } from '../../util/reactivity'
 import { getSandboxUrl } from '../sandbox/lib'
-import { useStoryStore } from '../../stores/story'
+import { usePreviewSettingsStore } from '../../stores/preview-settings'
 
 const props = defineProps<{
   story: Story
   variant: Variant
 }>()
 
-const storyStore = useStoryStore()
-const settings = storyStore.previewSettings
+const settings = usePreviewSettingsStore().currentSettings
 
 // Iframe
 
@@ -214,10 +213,10 @@ const isResponsiveEnabled = computed(() => !props.variant.responsiveDisabled)
       class="htw-h-full htw-overflow-auto htw-relative"
     >
       <div
-        class="htw-h-full htw-p-4 htw-overflow-hidden htw-bg-white dark:htw-bg-gray-700 htw-rounded-lg htw-relative preview-fit"
+        class="htw-h-full htw-p-4 htw-overflow-hidden htw-bg-white dark:htw-bg-gray-700 htw-rounded-lg htw-relative"
         :class="isResponsiveEnabled ? {
-          'preview-fit-width': !!finalWidth,
-          'preview-fit-height': !!finalHeight
+          'htw-w-fit': !!finalWidth,
+          'htw-h-fit': !!finalHeight
         } : undefined"
       >
         <div class="htw-p-4 htw-h-full htw-relative">

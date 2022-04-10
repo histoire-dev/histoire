@@ -1,12 +1,5 @@
 import { reactive } from 'vue'
-
-export interface PreviewSettings {
-  responsiveWidth: number
-  responsiveHeight: number
-  rotate: boolean
-  backgroundColor: string
-  checkerboard: boolean
-}
+import type { PreviewSettings } from '../types'
 
 export const receivedSettings = reactive<PreviewSettings>({} as PreviewSettings)
 

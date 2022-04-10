@@ -1,11 +1,10 @@
 <script lang="ts" setup>
 import { Icon } from '@iconify/vue'
+import { usePreviewSettingsStore } from '../../../stores/preview-settings'
 import { histoireConfig } from '../../../util/config'
 import BaseCheckbox from '../../base/BaseCheckbox.vue'
-import { useStoryStore } from '../../../stores/story'
 
-const storyStore = useStoryStore()
-const settings = storyStore.previewSettings
+const settings = usePreviewSettingsStore().currentSettings
 </script>
 
 <template>
