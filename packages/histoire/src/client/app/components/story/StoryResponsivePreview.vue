@@ -287,14 +287,6 @@ const isResponsiveEnabled = computed(() => !props.variant.responsiveDisabled)
 </template>
 
 <style scoped>
-.preview-fit-width {
-  width: fit-content;
-}
-
-.preview-fit-height {
-  height: fit-content;
-}
-
 .bind-preview-bg {
   background-color: v-bind('settings.backgroundColor');
 }
