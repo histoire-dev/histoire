@@ -1,3 +1,28 @@
+## [0.2.3](https://github.com/Akryum/histoire/compare/v0.2.2...v0.2.3) (2022-04-10)
+
+
+### Bug Fixes
+
+* missing vite html transforms during dev ([d77c42c](https://github.com/Akryum/histoire/commit/d77c42c71f07d6e60c7eaeedbd4ece5a80ecf700))
+* preview bg not working ([e7d4134](https://github.com/Akryum/histoire/commit/e7d41346f4ebbd7809dfc5f7f7c9276b876d34d5))
+* preview settings not updated ([5691f48](https://github.com/Akryum/histoire/commit/5691f48e40dc114623e95b5a4e8494f9a72138ed))
+* remove unnecessary gap between header and story list ([b319bb5](https://github.com/Akryum/histoire/commit/b319bb5a28d64c78ff9df4837d00122dcec6520d))
+* **story:** inherit props to variants ([23fa903](https://github.com/Akryum/histoire/commit/23fa903ce2920ef8e26ee7714a1c4d86966db8ba))
+* **vue3:** codegen function as prop value ([5ec9955](https://github.com/Akryum/histoire/commit/5ec9955a0ed78b443f57a6f9f5e25cb6e9c82341))
+
+
+### Features
+
+* HstColorShades ([cc5be5e](https://github.com/Akryum/histoire/commit/cc5be5eb2de542d03c26e9671396c4e4f8cc851a))
+* HstCopyIcon ([3ff66ae](https://github.com/Akryum/histoire/commit/3ff66ae6ac061cb8fbf4420d6e3a62056a6b1c8f))
+* icon style improvements ([d7afeee](https://github.com/Akryum/histoire/commit/d7afeee72f5f9e0c1b55905120bdec814cb2fb92))
+* Preview snap (fix [#54](https://github.com/Akryum/histoire/issues/54)) ([#65](https://github.com/Akryum/histoire/issues/65)) ([c53cc5c](https://github.com/Akryum/histoire/commit/c53cc5cb41ec34b9b948b4a80a5d23975ceb821c))
+* **story:** reponsiveDisabled ([44ebf15](https://github.com/Akryum/histoire/commit/44ebf15d2381217ebce02ad1292ec95c7c69fc30))
+* ugprade deps ([71948e3](https://github.com/Akryum/histoire/commit/71948e38d1ae87a4c0bbedf17d5d34f5a511ed8f))
+* **vue3:** codegen v-for support ([e1c5d0e](https://github.com/Akryum/histoire/commit/e1c5d0edf79b3362911a5c0a6aee45bef128db5d))
+
+
+
 ## [0.2.2](https://github.com/Akryum/histoire/compare/v0.2.1...v0.2.2) (2022-04-04)
 
 
