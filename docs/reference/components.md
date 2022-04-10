@@ -97,6 +97,18 @@ const source = `<h1>Toto</h1>
 </template>
 ```
 
+### `responsiveDisabled`
+
+Disables the responsive menu, preview resize handles and makes the preview laways fit the available space.
+
+```vue
+<template>
+  <Story responsive-disabled>
+    <!-- ... -->
+  </Story>
+</template>
+```
+
 ## Variant
 
 Create different sub stories around the same component by using the `<Variant>` tag multiple times inside the same `<Story>` tag.
@@ -215,6 +227,20 @@ const source = `<h1>Toto</h1>
 <template>
   <Story>
     <Variant :source="source">
+      <!-- ... -->
+    </Variant>
+  </Story>
+</template>
+```
+
+### `responsiveDisabled`
+
+Disables the responsive menu, preview resize handles and makes the preview laways fit the available space.
+
+```vue
+<template>
+  <Story>
+    <Variant responsive-disabled>
       <!-- ... -->
     </Variant>
   </Story>
