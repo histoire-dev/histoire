@@ -2,10 +2,10 @@
 import type { Story, Variant } from '../../types'
 import StoryResponsivePreview from './StoryResponsivePreview.vue'
 import { isMobile } from '../../util/responsive'
-import StoryVariantTitle from './variant/StoryVariantTitle.vue'
-import StoryVariantResponsiveSize from './variant/StoryVariantResponsiveSize.vue'
-import StoryVariantBackground from './variant/StoryVariantBackground.vue'
-import StoryVariantNewTab from './variant/StoryVariantNewTab.vue'
+import StoryVariantTitle from './toolbar/StoryVariantTitle.vue'
+import StoryVariantResponsiveSize from './toolbar/StoryVariantResponsiveSize.vue'
+import StoryVariantBackground from './toolbar/StoryVariantBackground.vue'
+import StoryVariantNewTab from './toolbar/StoryVariantNewTab.vue'
 
 defineProps<{
   variant: Variant
