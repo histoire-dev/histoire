@@ -3,23 +3,19 @@ import { computed, onUnmounted, Ref, ref, toRaw, watch } from 'vue'
 import { useEventListener } from '@vueuse/core'
 import { Icon } from '@iconify/vue'
 import { STATE_SYNC, PREVIEW_SETTINGS_SYNC, SANDBOX_READY } from '../../util/const'
-import { PreviewSettings } from '../../util/preview-settings'
 import type { Story, Variant } from '../../types'
 import HatchedPattern from '../misc/HatchedPattern.vue'
 import CheckerboardPattern from '../misc/CheckerboardPattern.vue'
 import { toRawDeep } from '../../util/reactivity'
-import { Settings } from 'http2'
 import { getSandboxUrl } from '../sandbox/lib'
+import { usePreviewSettingsStore } from '../../stores/preview-settings'
 
 const props = defineProps<{
   story: Story
   variant: Variant
-  settings: PreviewSettings
 }>()
 
-const emit = defineEmits({
-  'update:settings': (settings: PreviewSettings) => true,
-})
+const settings = usePreviewSettingsStore().currentSettings
 
 // Iframe
 
@@ -77,12 +73,12 @@ function syncSettings () {
   if (iframe.value) {
     iframe.value.contentWindow.postMessage({
       type: PREVIEW_SETTINGS_SYNC,
-      settings: toRaw(props.settings),
+      settings: toRaw(settings),
     })
   }
 }
 
-watch(() => props.settings, value => {
+watch(() => settings, () => {
   syncSettings()
 }, {
   deep: true,
@@ -130,8 +126,13 @@ function useDragger (el: Ref<HTMLDivElement>, value: Ref<number>, min: number, m
     ]
 
     function onMouseMove (event: MouseEvent) {
+      const snapTarget = (axis === 'x' ? previewWrapper.value.clientWidth : previewWrapper.value.clientHeight)
       const delta = (axis === 'x' ? event.clientX : event.clientY) - start
       value.value = Math.max(min, Math.min(max, startValue + delta))
+
+      if (Math.abs(value.value - (snapTarget - 67)) < 16) {
+        value.value = null
+      }
     }
 
     function onMouseUp () {
@@ -167,57 +168,29 @@ function useDragger (el: Ref<HTMLDivElement>, value: Ref<number>, min: number, m
   useEventListener(el, 'touchstart', onTouchStart)
 }
 
-// Optimize by batching settings updates to the next frame
-// Prevents sync issues with `useStorage`
-let settingsUpdate: Partial<Settings> = {}
-let settingsUpdateQueued = false
-
-function updateSettings (settings: Partial<PreviewSettings>) {
-  Object.assign(settingsUpdate, settings)
-
-  if (!settingsUpdateQueued) {
-    settingsUpdateQueued = true
-    requestAnimationFrame(() => {
-      emit('update:settings', {
-        ...props.settings,
-        ...settingsUpdate,
-      })
-      settingsUpdate = {}
-      settingsUpdateQueued = false
-    })
-  }
-}
-
 const responsiveWidth = computed({
-  get: () => props.settings[props.settings.rotate ? 'responsiveHeight' : 'responsiveWidth'],
-  set: (value) => {
-    updateSettings({
-      [props.settings.rotate ? 'responsiveHeight' : 'responsiveWidth']: value,
-    })
-  },
+  get: () => settings[settings.rotate ? 'responsiveHeight' : 'responsiveWidth'],
+  set: (value) => { settings[settings.rotate ? 'responsiveHeight' : 'responsiveWidth'] = value },
 })
 const responsiveHeight = computed({
-  get: () => props.settings[props.settings.rotate ? 'responsiveWidth' : 'responsiveHeight'],
-  set: (value) => {
-    updateSettings({
-      [props.settings.rotate ? 'responsiveWidth' : 'responsiveHeight']: value,
-    })
-  },
+  get: () => settings[settings.rotate ? 'responsiveWidth' : 'responsiveHeight'],
+  set: (value) => { settings[settings.rotate ? 'responsiveWidth' : 'responsiveHeight'] = value },
 })
 
 const horizontalDragger = ref<HTMLDivElement>()
 const verticalDragger = ref<HTMLDivElement>()
 const cornerDragger = ref<HTMLDivElement>()
+const previewWrapper = ref<HTMLDivElement>()
 
-useDragger(horizontalDragger, responsiveWidth, 10, 20000, 'x')
-useDragger(verticalDragger, responsiveHeight, 10, 20000, 'y')
-useDragger(cornerDragger, responsiveWidth, 10, 20000, 'x')
-useDragger(cornerDragger, responsiveHeight, 10, 20000, 'y')
+useDragger(horizontalDragger, responsiveWidth, 32, 20000, 'x')
+useDragger(verticalDragger, responsiveHeight, 32, 20000, 'y')
+useDragger(cornerDragger, responsiveWidth, 32, 20000, 'x')
+useDragger(cornerDragger, responsiveHeight, 32, 20000, 'y')
 
 // Handle rotate
 
-const finalWidth = computed(() => props.settings.rotate ? props.settings.responsiveHeight : props.settings.responsiveWidth)
-const finalHeight = computed(() => props.settings.rotate ? props.settings.responsiveWidth : props.settings.responsiveHeight)
+const finalWidth = computed(() => settings.rotate ? settings.responsiveHeight : settings.responsiveWidth)
+const finalHeight = computed(() => settings.rotate ? settings.responsiveWidth : settings.responsiveHeight)
 
 // Disabled responsive
 
@@ -235,12 +208,15 @@ const isResponsiveEnabled = computed(() => !props.variant.responsiveDisabled)
       />
     </div>
 
-    <div class="htw-h-full htw-overflow-auto htw-relative">
+    <div
+      ref="previewWrapper"
+      class="htw-h-full htw-overflow-auto htw-relative"
+    >
       <div
         class="htw-h-full htw-p-4 htw-overflow-hidden htw-bg-white dark:htw-bg-gray-700 htw-rounded-lg htw-relative"
-        :style="isResponsiveEnabled ? {
-          width: finalWidth ? `${finalWidth + 44}px` : null,
-          height: finalHeight ? `${finalHeight + 44}px` : null,
+        :class="isResponsiveEnabled ? {
+          'htw-w-fit': !!finalWidth,
+          'htw-h-fit': !!finalHeight
         } : undefined"
       >
         <div class="htw-p-4 htw-h-full htw-relative">
@@ -260,6 +236,10 @@ const isResponsiveEnabled = computed(() => !props.variant.responsiveDisabled)
                 'htw-invisible': !isIframeLoaded,
                 'htw-pointer-events-none': resizing,
               }"
+              :style="isResponsiveEnabled ? {
+                width: finalWidth ? `${finalWidth}px` : null,
+                height: finalHeight ? `${finalHeight}px` : null,
+              } : undefined"
               data-test-id="preview-iframe"
               @load="onIframeLoad()"
             />

@@ -1,7 +1,5 @@
 <script lang="ts" setup>
-import { PropType } from 'vue'
 import type { Story, Variant } from '../../types'
-import { usePreviewSettings } from '../../util/preview-settings'
 import StoryResponsivePreview from './StoryResponsivePreview.vue'
 import { isMobile } from '../../util/responsive'
 import StoryVariantTitle from './variant/StoryVariantTitle.vue'
@@ -13,8 +11,6 @@ defineProps<{
   variant: Variant
   story: Story
 }>()
-
-const settings = usePreviewSettings()
 </script>
 
 <template>
@@ -42,7 +38,6 @@ const settings = usePreviewSettings()
 
     <!-- Preview -->
     <StoryResponsivePreview
-      v-model:settings="settings"
       :story="story"
       :variant="variant"
     />

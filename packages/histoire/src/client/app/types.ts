@@ -60,3 +60,11 @@ export interface SearchResult {
   icon?: string
   iconColor?: string
 }
+
+export interface PreviewSettings {
+  responsiveWidth: number
+  responsiveHeight: number
+  rotate: boolean
+  backgroundColor: string
+  checkerboard: boolean
+}
