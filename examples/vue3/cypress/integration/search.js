@@ -27,6 +27,7 @@ describe('Search', () => {
     cy.visit('/')
     // Click on backdrop
     cy.get('[data-test-id="search-btn"]').click()
+    cy.get('[data-test-id="search-modal"]').should('be.visible')
     cy.get('body').click(10, 10)
     cy.get('[data-test-id="search-modal"]').should('not.be.visible')
     // Use escape key
