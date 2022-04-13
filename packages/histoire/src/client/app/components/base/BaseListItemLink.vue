@@ -36,7 +36,7 @@ export default defineComponent({
   >
     <a
       :href="href"
-      class="htw-flex htw-items-center htw-gap-2"
+      class="htw-flex htw-items-center htw-gap-2 htw-text-gray-900 dark:htw-text-gray-100"
       :class="[
         $attrs.class,
         (isActive != null ? isActive : linkIsActive)
