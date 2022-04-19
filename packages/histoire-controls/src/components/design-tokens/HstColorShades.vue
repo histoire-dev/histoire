@@ -5,7 +5,8 @@ export default {
 </script>
 
 <script lang="ts" setup>
-import { computed, ref } from 'vue'
+import { computed } from 'vue'
+import { VTooltip as vTooltip } from 'floating-vue'
 import HstCopyIcon from '../HstCopyIcon.vue'
 
 const props = defineProps<{
@@ -42,7 +43,7 @@ const displayedShades = computed(() => {
 <template>
   <div
     v-if="displayedShades.length"
-    class="htw-grid htw-gap-4 htw-grid-cols-[repeat(auto-fill,minmax(100px,1fr))] htw-m-4"
+    class="htw-grid htw-gap-4 htw-grid-cols-[repeat(auto-fill,minmax(200px,1fr))] htw-m-4"
   >
     <div
       v-for="shade of displayedShades"
@@ -61,17 +62,23 @@ const displayedShades = computed(() => {
       </slot>
       <div>
         <div class="htw-flex htw-gap-1">
-          <pre class="htw-my-0">{{ shade.name }}</pre>
+          <pre
+            v-tooltip="shade.name.length > 23 ? shade.name : ''"
+            class="htw-my-0 htw-truncate htw-shrink"
+          >{{ shade.name }}</pre>
           <HstCopyIcon
             :content="shade.name"
-            class="htw-hidden group-hover:htw-block"
+            class="htw-hidden group-hover:htw-block htw-flex-none"
           />
         </div>
         <div class="htw-flex htw-gap-1">
-          <pre class="htw-my-0 htw-opacity-50">{{ shade.color }}</pre>
+          <pre
+            v-tooltip="shade.color.length > 23 ? shade.color : ''"
+            class="htw-my-0 htw-opacity-50 htw-truncate htw-shrink"
+          >{{ shade.color }}</pre>
           <HstCopyIcon
             :content="shade.color"
-            class="htw-hidden group-hover:htw-block"
+            class="htw-hidden group-hover:htw-block htw-flex-none"
           />
         </div>
       </div>

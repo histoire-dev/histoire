@@ -377,5 +377,14 @@ const colors = {
         />
       </template>
     </Variant>
+
+    <Variant title="long names">
+      <HstColorShades
+        v-for="(shades, key) of colors"
+        :key="key"
+        :shades="shades"
+        :get-name="shade => `${'very-'.repeat(5)}long-${key}-${shade}`"
+      />
+    </Variant>
   </Story>
 </template>
