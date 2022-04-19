@@ -1,7 +1,7 @@
 import chokidar from 'chokidar'
 import { globby } from 'globby'
 import Case from 'case'
-import { join } from 'pathe'
+import { join, basename } from 'pathe'
 import { Context } from './context.js'
 import type { StoryFile } from './types.js'
 
@@ -47,10 +47,15 @@ function getAbsoluteFilePath (relativeFilePath: string) {
 function addStory (relativeFilePath: string) {
   const absoluteFilePath = getAbsoluteFilePath(relativeFilePath)
   const fileId = Case.kebab(relativeFilePath)
+  let fileName = basename(relativeFilePath)
+  if (fileName.includes('.')) {
+    fileName = fileName.substring(0, fileName.indexOf('.'))
+  }
 
   const file: StoryFile = {
     id: fileId,
     path: absoluteFilePath,
+    fileName,
     moduleId: `/${relativeFilePath}`,
   }
   context.storyFiles.push(file)

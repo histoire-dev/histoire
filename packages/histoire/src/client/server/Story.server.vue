@@ -8,7 +8,7 @@ export default defineComponent({
   props: {
     title: {
       type: String,
-      required: true,
+      default: null,
     },
 
     layout: {
@@ -36,7 +36,7 @@ export default defineComponent({
 
     const story: Story = {
       id: attrs.data.id,
-      title: props.title,
+      title: props.title ?? attrs.data.fileName,
       layout: props.layout,
       icon: props.icon,
       iconColor: props.iconColor,

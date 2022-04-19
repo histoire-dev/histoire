@@ -5,6 +5,10 @@ export interface StoryFile {
    */
   path: string
   /**
+   * File name without extension
+   */
+  fileName: string
+  /**
    * Generated path for tree UI
    */
   treePath?: string[]
