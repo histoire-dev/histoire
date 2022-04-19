@@ -141,7 +141,7 @@ async function printVNode (vnode: VNode): Promise<string[]> {
           // It was formatted from auto building object (slot props)
           serialized = [value.substring(2, value.length - 2).trim()]
         } else if (typeof value === 'function') {
-          serialized = [value.toString()]
+          serialized = [value.toString().replace(/'/g, '\\\'').replace(/"/g, '\'')]
         } else {
           serialized = serializeAndCleanJs(value)
         }

@@ -383,7 +383,7 @@ const colors = {
         v-for="(shades, key) of colors"
         :key="key"
         :shades="shades"
-        :get-name="shade => `${'very-'.repeat(5)}long-${key}-${shade}`"
+        :get-name="shade => `${'\'very-'.repeat(5)}long-${key}-${shade}`"
       />
     </Variant>
   </Story>
