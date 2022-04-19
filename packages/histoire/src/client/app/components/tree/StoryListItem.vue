@@ -14,7 +14,7 @@ const props = withDefaults(defineProps<{
 })
 
 const filePadding = computed(() => {
-  return (props.depth * 16) + 'px'
+  return (props.depth * 12) + 'px'
 })
 
 const route = useRoute()
@@ -36,9 +36,9 @@ useScrollOnActive(active, el)
           storyId: story.id,
         },
       }"
-      class="htw-pl-0.5 htw-pr-2 htw-py-2 md:htw-py-1.5 htw-m-1 htw-rounded-sm"
+      class="htw-pl-0.5 htw-pr-2 htw-py-2 md:htw-py-1.5 htw-mx-1 htw-rounded-sm"
     >
-      <span class="bind-tree-margin htw-flex htw-items-center htw-gap-2 htw-pl-5 htw-min-w-0">
+      <span class="bind-tree-margin htw-flex htw-items-center htw-gap-2 htw-pl-4 htw-min-w-0">
         <Icon
           :icon="story.icon ?? 'carbon:cube'"
           class="base-list-item-link-icon htw-w-5 htw-h-5 sm:htw-w-4 sm:htw-h-4 htw-flex-none"

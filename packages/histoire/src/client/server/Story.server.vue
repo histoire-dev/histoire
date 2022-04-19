@@ -11,6 +11,11 @@ export default defineComponent({
       default: null,
     },
 
+    group: {
+      type: String,
+      default: null,
+    },
+
     layout: {
       type: Object as PropType<Story['layout']>,
       default: () => ({ type: 'single' }),
@@ -37,6 +42,7 @@ export default defineComponent({
     const story: Story = {
       id: attrs.data.id,
       title: props.title ?? attrs.data.fileName,
+      group: props.group,
       layout: props.layout,
       icon: props.icon,
       iconColor: props.iconColor,

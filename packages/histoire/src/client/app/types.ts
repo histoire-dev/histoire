@@ -11,6 +11,7 @@ export interface StoryFile {
 export interface Story {
   id: string
   title: string
+  group?: string
   variants: Variant[]
   layout?: {
     type: 'single'
@@ -48,7 +49,14 @@ export type TreeFolder = {
   children: (TreeFolder | TreeLeaf)[]
 }
 
-export type Tree = (TreeFolder | TreeLeaf)[]
+export interface TreeGroup {
+  group: true
+  id: string
+  title: string
+  children: (TreeFolder | TreeLeaf)[]
+}
+
+export type Tree = (TreeGroup | TreeFolder | TreeLeaf)[]
 
 export interface SearchResult {
   kind: 'story' | 'variant'

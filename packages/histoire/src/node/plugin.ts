@@ -99,7 +99,7 @@ export async function createVitePlugins (ctx: Context): Promise<VitePlugin[]> {
         return `import { defineAsyncComponent } from 'vue'
 ${resolvedStories.map((file, index) => `const Comp${index} = defineAsyncComponent(() => import('${file.path}'))`).join('\n')}
 export let files = [${files.map((file) => `{${JSON.stringify(file).slice(1, -1)}, component: Comp${file.index}}`).join(',\n')}]
-export let tree = ${JSON.stringify(makeTree(ctx.config, files))}
+export let tree = ${JSON.stringify(makeTree(ctx.config, resolvedStories))}
 const handlers = []
 export function onUpdate (cb) {
   handlers.push(cb)

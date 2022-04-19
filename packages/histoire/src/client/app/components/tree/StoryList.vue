@@ -1,7 +1,8 @@
 <script lang="ts" setup>
-import type { Story, Tree, TreeFolder, TreeLeaf } from '../../types'
+import type { Story, Tree, TreeGroup, TreeFolder, TreeLeaf } from '../../types'
 import StoryListItem from './StoryListItem.vue'
 import StoryListFolder from './StoryListFolder.vue'
+import StoryGroup from './StoryGroup.vue'
 
 const props = defineProps<{
   tree: Tree
@@ -15,8 +16,13 @@ const props = defineProps<{
       v-for="element of tree"
       :key="element.title"
     >
+      <StoryGroup
+        v-if="(element as TreeGroup).group"
+        :group="(element as TreeGroup)"
+        :stories="stories"
+      />
       <StoryListFolder
-        v-if="(element as TreeFolder).children"
+        v-else-if="(element as TreeFolder).children"
         :folder="(element as TreeFolder)"
         :stories="stories"
       />

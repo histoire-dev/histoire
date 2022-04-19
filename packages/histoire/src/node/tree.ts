@@ -1,21 +1,32 @@
-import { HistoireConfig } from './config.js'
 
-export type TreeFile = {
+import { build } from 'esbuild'
+import pc from 'picocolors'
+import type { HistoireConfig, TreeGroupConfig } from './config.js'
+import type { StoryFile } from './types.js'
+
+export interface TreeFile {
   title: string
   path: string
 }
 
-export type TreeLeaf = {
+export interface TreeLeaf {
   title: string
   index: number
 }
 
-export type TreeFolder = {
+export interface TreeFolder {
   title: string
   children: (TreeFolder | TreeLeaf)[]
 }
 
-export type Tree = (TreeFolder | TreeLeaf)[]
+export interface TreeGroup {
+  group: true
+  id: string
+  title: string
+  children: (TreeFolder | TreeLeaf)[]
+}
+
+export type Tree = (TreeGroup | TreeFolder | TreeLeaf)[]
 
 export function createPath (config: HistoireConfig, file: TreeFile) {
   if (config.tree.file === 'title') {
@@ -32,16 +43,29 @@ export function createPath (config: HistoireConfig, file: TreeFile) {
   return config.tree.file(file)
 }
 
-export function makeTree (config: HistoireConfig, files: { path: string[], index: number }[]) {
+export function makeTree (config: HistoireConfig, files: StoryFile[]) {
   interface ITreeObject {
     [index: string]: number | ITreeObject
   }
 
-  const treeObject: ITreeObject = {}
-
-  for (const file of files) {
-    setPath(file.path, file.index, treeObject)
+  interface ITreeGroup {
+    groupConfig?: TreeGroupConfig
+    treeObject: ITreeObject
   }
+
+  const groups: ITreeGroup[] = config.tree?.groups.map(g => ({
+    groupConfig: g,
+    treeObject: {},
+  })) || []
+  const defaultGroup = {
+    treeObject: {},
+  }
+  groups.push(defaultGroup)
+
+  files.forEach((file, index) => {
+    const group = getGroup(file)
+    setPath(file.treePath, index, group.treeObject)
+  })
 
   let sortingFunction = (a: string, b: string) => a.localeCompare(b)
 
@@ -49,7 +73,39 @@ export function makeTree (config: HistoireConfig, files: { path: string[], index
     sortingFunction = config.tree.order
   }
 
-  return buildTree(treeObject)
+  const result: Tree = []
+
+  for (const group of groups) {
+    if (group === defaultGroup) {
+      result.push(...buildTree(group.treeObject))
+    } else {
+      result.push({
+        group: true,
+        id: group.groupConfig.id,
+        title: group.groupConfig.title,
+        children: buildTree(group.treeObject),
+      })
+    }
+  }
+
+  return result
+
+  function getGroup (file: StoryFile): ITreeGroup {
+    if (file.story?.group) {
+      const group = groups.find(g => g.groupConfig?.id === file.story.group)
+      if (group) {
+        return group
+      } else {
+        console.error(pc.red(`Group ${file.story.group} not found for story ${file.path}`))
+      }
+    }
+    for (const group of groups) {
+      if (group.groupConfig?.include && group.groupConfig.include(file.treeFile)) {
+        return group
+      }
+    }
+    return defaultGroup
+  }
 
   function setPath (path: string[], value: unknown, tree: unknown) {
     path.reduce((subtree, key, i) => {

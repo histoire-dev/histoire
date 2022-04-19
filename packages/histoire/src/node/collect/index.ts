@@ -7,7 +7,7 @@ import pc from 'picocolors'
 import Tinypool from 'tinypool'
 import { createBirpc } from 'birpc'
 import type { StoryFile } from '../types.js'
-import { createPath, TreeFile } from '../tree.js'
+import { createPath } from '../tree.js'
 import type { Context } from '../context.js'
 import type { Payload, ReturnData } from './worker.js'
 
@@ -79,11 +79,11 @@ export function useCollectStories (options: UseCollectStoriesOptions, ctx: Conte
         console.warn(pc.yellow(`⚠️  Multiple stories not supported: ${storyFile.path}`))
       }
       storyFile.story = storyData[0]
-      const file: TreeFile = {
+      storyFile.treeFile = {
         title: storyData[0].title,
         path: relative(server.config.root, storyFile.path),
       }
-      storyFile.treePath = createPath(ctx.config, file)
+      storyFile.treePath = createPath(ctx.config, storyFile.treeFile)
       storyFile.story.title = storyFile.treePath[storyFile.treePath.length - 1]
     } catch (e) {
       console.error(pc.red(`Error while collecting story ${storyFile.path}:\n${e.frame ? `${pc.bold(e.message)}\n${e.frame}` : e.stack}`))

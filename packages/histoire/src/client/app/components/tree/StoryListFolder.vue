@@ -25,7 +25,7 @@ function toggleOpen () {
 }
 
 const folderPadding = computed(() => {
-  return (props.depth * 16) + 'px'
+  return (props.depth * 12) + 'px'
 })
 </script>
 
@@ -34,13 +34,13 @@ const folderPadding = computed(() => {
     <div
       role="button"
       tabindex="0"
-      class="htw-px-0.5 htw-py-2 md:htw-py-1.5 htw-m-1 htw-rounded-sm hover:htw-bg-primary-100 dark:hover:htw-bg-primary-900 htw-cursor-pointer htw-select-none htw-flex"
+      class="htw-px-0.5 htw-py-2 md:htw-py-1.5 htw-mx-1 htw-rounded-sm hover:htw-bg-primary-100 dark:hover:htw-bg-primary-900 htw-cursor-pointer htw-select-none htw-flex"
       @click="toggleOpen"
       @keyup.enter="toggleOpen"
       @keyup.space="toggleOpen"
     >
       <span class="bind-tree-padding htw-flex htw-items-center htw-gap-2 htw-min-w-0">
-        <span class="htw-flex htw-gap-1 htw-flex-none htw-items-center">
+        <span class="htw-flex htw-flex-none htw-items-center">
           <Icon
             icon="carbon:caret-right"
             class="htw-w-4 htw-h-4 htw-transition-transform htw-duration-150 htw-opacity-30"
@@ -56,6 +56,8 @@ const folderPadding = computed(() => {
         <span class="htw-truncate">{{ folder.title }}</span>
       </span>
     </div>
+
+    <!-- Children -->
     <div
       v-if="isFolderOpen"
     >
@@ -66,7 +68,7 @@ const folderPadding = computed(() => {
         <StoryListFolder
           v-if="(element as TreeFolder).children"
           :path="folderPath"
-          :folder="element"
+          :folder="(element as TreeFolder)"
           :stories="stories"
           :depth="depth + 1"
         />

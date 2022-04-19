@@ -13,15 +13,21 @@ type CustomizableColors = 'primary' | 'gray'
 type ColorKeys = '50' | '100' | '200' | '300' | '400' | '500' | '600' | '700' | '800' | '900'
 type GrayColorKeys = ColorKeys | '750' | '850' | '950'
 
-interface ResponsivePreset {
+export interface ResponsivePreset {
   label: string
   width: number
   height: number
 }
 
-interface BackgroundPreset {
+export interface BackgroundPreset {
   label: string
   color: string
+}
+
+export interface TreeGroupConfig {
+  title: string
+  id?: string
+  include?: (file: TreeFile) => boolean
 }
 
 export interface HistoireConfig {
@@ -48,6 +54,7 @@ export interface HistoireConfig {
      */
     file?: 'title' | 'path' | ((file: TreeFile) => string[])
     order?: 'asc' | ((a: string, b: string) => number)
+    groups?: TreeGroupConfig[]
   }
   /**
    * Customize the look of the histoire book.

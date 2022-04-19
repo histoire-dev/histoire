@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 // @ts-expect-error virtual module
 import { files as rawFiles, tree as rawTree, onUpdate } from '$histoire-stories'
-import StoryList from './components/story/StoryList.vue'
+import StoryList from './components/tree/StoryList.vue'
 import BaseSplitPane from './components/base/BaseSplitPane.vue'
 import { computed, ref, watch, defineAsyncComponent } from 'vue'
 import AppHeader from './components/app/AppHeader.vue'

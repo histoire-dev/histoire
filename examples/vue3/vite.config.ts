@@ -15,5 +15,22 @@ export default defineConfig({
     theme: {
       logoHref: 'http://histoire.dev',
     },
+
+    tree: {
+      groups: [
+        {
+          id: 'top',
+          title: '',
+        },
+        {
+          title: 'My Group',
+          include: file => /Code gen|Controls|Docs/.test(file.title),
+        },
+        {
+          title: 'Components',
+          include: file => !file.title.includes('Serialize'),
+        },
+      ],
+    },
   },
 })

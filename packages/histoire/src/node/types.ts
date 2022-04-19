@@ -1,3 +1,5 @@
+import type { TreeFile } from './tree.js'
+
 export interface StoryFile {
   id: string
   /**
@@ -20,11 +22,16 @@ export interface StoryFile {
    * Resolved story data from story file execution
    */
   story?: Story
+  /**
+   * Data sent to user tree config functions
+   */
+  treeFile?: TreeFile
 }
 
 export interface Story {
   id: string
   title: string
+  group?: string
   variants: Variant[]
   layout?: {
     type: 'single'

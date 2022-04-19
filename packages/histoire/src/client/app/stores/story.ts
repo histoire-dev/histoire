@@ -23,22 +23,26 @@ export const useStoryStore = defineStore('story', () => {
     return path.join('␜')
   }
 
-  function toggleFolder (path: Array<string>, force?: boolean) {
+  function toggleFolder (path: Array<string>, defaultToggleValue = true) {
     const stringPath = getStringPath(path)
 
-    if (force === undefined) {
-      force = !openedFolders.value.get(stringPath)
-    }
+    const currentValue = openedFolders.value.get(stringPath)
 
-    if (force) {
-      openedFolders.value.set(stringPath, true)
+    if (currentValue == null) {
+      openedFolders.value.set(stringPath, defaultToggleValue)
+    } else if (currentValue) {
+      openedFolders.value.set(stringPath, false)
     } else {
-      openedFolders.value.delete(stringPath)
+      openedFolders.value.set(stringPath, true)
     }
   }
 
-  function isFolderOpened (path: Array<string>) {
-    return openedFolders.value.get(getStringPath(path))
+  function isFolderOpened (path: Array<string>, defaultValue = false) {
+    const value = openedFolders.value.get(getStringPath(path))
+    if (value == null) {
+      return defaultValue
+    }
+    return value
   }
 
   function openFileFolders (path: Array<string>) {
