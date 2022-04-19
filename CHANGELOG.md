@@ -1,3 +1,13 @@
+## [0.2.4](https://github.com/Akryum/histoire/compare/v0.2.3...v0.2.4) (2022-04-19)
+
+
+### Bug Fixes
+
+* Lock link color with tailwind class (fix [#66](https://github.com/Akryum/histoire/issues/66)) ([#67](https://github.com/Akryum/histoire/issues/67)) ([ef2ceea](https://github.com/Akryum/histoire/commit/ef2ceea1015ed59cac942997140a801bb45da35f))
+* **search:** performance issues, fix [#68](https://github.com/Akryum/histoire/issues/68) ([62232e7](https://github.com/Akryum/histoire/commit/62232e7b0266224dcf371948eb1f7b18d7625af5))
+
+
+
 ## [0.2.3](https://github.com/Akryum/histoire/compare/v0.2.2...v0.2.3) (2022-04-10)
 
 
