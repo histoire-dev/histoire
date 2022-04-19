@@ -27,6 +27,8 @@
     "alwaysStrict": true,
     "strictBindCallApply": true,
     "strictFunctionTypes": true,
+    // Volar
+    "jsx": "preserve",
   },
   "include": [
     "src"
