@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { useFocus } from '@vueuse/core'
+import { useFocus, useDebounce } from '@vueuse/core'
 import { computed, ref, watch } from 'vue'
 import { Icon } from '@iconify/vue'
 import { useStoryStore } from '../../stores/story'
@@ -40,7 +40,8 @@ watch(() => props.shown, value => {
 
 // Search
 
-const search = ref('')
+const searchInputText = ref('')
+const rateLimitedSearch = useDebounce(searchInputText, 300)
 
 const storyStore = useStoryStore()
 
@@ -85,8 +86,8 @@ function variantResultFactory (story: Story, variant: Variant, rank: number): Se
 
 const results = computed(() => {
   const list: SearchResult[] = []
-  if (search.value) {
-    const s = search.value.toLowerCase()
+  if (rateLimitedSearch.value) {
+    const s = rateLimitedSearch.value.toLowerCase()
     for (const story of storyStore.stories) {
       const storyMatched = story.title.toLowerCase().includes(s)
       let storyPathMatched = false
@@ -149,7 +150,7 @@ function selectPrevious () {
 
         <input
           ref="input"
-          v-model="search"
+          v-model="searchInputText"
           placeholder="Search for stories, variants..."
           class="htw-bg-transparent htw-w-full htw-flex-1 htw-pl-0 htw-pr-6 htw-py-4 htw-outline-none"
           @keydown.down.prevent="selectNext()"
@@ -158,7 +159,7 @@ function selectPrevious () {
         >
       </div>
 
-      <BaseEmpty v-if="search && !results.length">
+      <BaseEmpty v-if="rateLimitedSearch && !results.length">
         No results
       </BaseEmpty>
 
