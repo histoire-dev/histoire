@@ -51,6 +51,7 @@ const kindLabels = {
   <div
     ref="el"
     data-test-id="search-item"
+    :data-selected="selected ? '' : undefined"
   >
     <BaseListItemLink
       :to="result.route"
