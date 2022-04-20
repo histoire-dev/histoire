@@ -75,7 +75,7 @@ You can define groups in your configuration with the `groups` property. It's an 
 
 The stories are distributed in groups according to the following rules in this order:
 - `group` prop of the `<Story>`
-- `include` function of the group
+- `include` function of the groups, respecting the order in the `groups` array (a story may only appear in one group maximum)
 
 Files not included in a group are always displayed after the last group.
 
