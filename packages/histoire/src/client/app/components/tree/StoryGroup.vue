@@ -4,7 +4,7 @@ import StoryListItem from './StoryListItem.vue'
 import StoryListFolder from './StoryListFolder.vue'
 import { Icon } from '@iconify/vue'
 import { computed, withDefaults } from 'vue'
-import { useStoryStore } from '../../stores/story'
+import { useFolderStore } from '../../stores/folder'
 
 const props = withDefaults(defineProps<{
   path?: Array<string>
@@ -14,13 +14,13 @@ const props = withDefaults(defineProps<{
   path: () => [],
 })
 
-const storyStore = useStoryStore()
+const folderStore = useFolderStore()
 
 const folderPath = computed(() => [...props.path, props.group.title])
-const isFolderOpen = computed(() => storyStore.isFolderOpened(folderPath.value, true))
+const isFolderOpen = computed(() => folderStore.isFolderOpened(folderPath.value, true))
 
 function toggleOpen () {
-  storyStore.toggleFolder(folderPath.value, false)
+  folderStore.toggleFolder(folderPath.value, false)
 }
 </script>
 
