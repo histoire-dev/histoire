@@ -1,6 +1,17 @@
 # How to write stories?
 
-Stories are vue files ending with `.story.vue`. You just need to use the `<Story>` tag at the root of your template. The title of the story is provided with the `title` prop.
+Stories are vue files ending with `.story.vue`. You just need to use the `<Story>` tag at the root of your template.
+
+```vue
+<!-- Meow.story.vue -->
+<template>
+  <Story>
+    🐱
+  </Story>
+</template>
+```
+
+The title of the story is provided with the (optional) `title` prop:
 
 ```vue
 <template>
