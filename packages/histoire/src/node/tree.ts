@@ -1,5 +1,3 @@
-
-import { build } from 'esbuild'
 import pc from 'picocolors'
 import type { HistoireConfig, TreeGroupConfig } from './config.js'
 import type { StoryFile } from './types.js'
