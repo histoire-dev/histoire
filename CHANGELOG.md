@@ -1,3 +1,21 @@
+## [0.2.5](https://github.com/Akryum/histoire/compare/v0.2.4...v0.2.5) (2022-04-20)
+
+
+### Bug Fixes
+
+* **HstColorShades:** handle long names ([03974ea](https://github.com/Akryum/histoire/commit/03974eaba315c905aa265e8e8fcf7a8f19710826))
+* remove outline on dropdowns ([67cb60d](https://github.com/Akryum/histoire/commit/67cb60d7df02dc7d3ebdd037dad43590f8a6a051))
+* **vue3:** codegen: convert " to ' in function props ([0a7b0ae](https://github.com/Akryum/histoire/commit/0a7b0aefe1ca43ede9879506fcc27d9cfb45d062))
+
+
+### Features
+
+* HstTokenList + HstTokenGrid ([f1db6d1](https://github.com/Akryum/histoire/commit/f1db6d16d33029e8cec50419c09bcb6e4d396cb4))
+* Story title is now optional ([e2e3921](https://github.com/Akryum/histoire/commit/e2e3921bc35c3e530351c92052ce97419883d050))
+* **tree:** groups ([aec7673](https://github.com/Akryum/histoire/commit/aec7673f5e934a62eece93cd6eea974353d6a6f5))
+
+
+
 ## [0.2.4](https://github.com/Akryum/histoire/compare/v0.2.3...v0.2.4) (2022-04-19)
 
 
