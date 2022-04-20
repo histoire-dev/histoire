@@ -53,3 +53,67 @@ export default defineConfig({
   }
 })
 ```
+
+## Groups
+
+Sometimes, you might have additional organization needs for the stories. Besides folders, Histoire also provides groups, which are little different:
+
+- expanded by default
+- only root level
+- manual order
+- independant from the hierarchy defined thanks to `tree.file` (see above)
+
+You can define groups in your configuration with the `groups` property. It's an array of group objects with the following properties:
+
+- `title`: the title of the group (use an empty string to have an untoggable group)
+- `id` (optional): the id of the group, useful to reference it using the `Story` `group` prop
+- `include` (optional): function that takes a file object [1] and returns a boolean, true if the file should be included in the group.
+
+[1]: the file objects have the following properties:
+- `title`: the title of the story
+- `path`: the path of the story file
+
+The stories are distributed in groups according to the following rules in this order:
+- `group` prop of the `<Story>`
+- `include` function of the group
+
+Files not included in a group are always displayed after the last group.
+
+Example:
+
+```ts
+// histoire.config.ts
+
+export default defineConfig({ 
+  tree: {
+    groups: [
+      {
+        id: 'top',
+        title: '', // No toggle
+      },
+      {
+        title: 'My Group',
+        include: file => /Code gen|Controls|Docs/.test(file.title),
+      },
+      {
+        title: 'Components',
+        include: file => !file.title.includes('Serialize'),
+      },
+      {
+        title: 'Others',
+        include: file => true,
+      },
+    ],
+  },
+})
+```
+
+You can use the `group` prop to reference a group in your stories using its `id`.
+
+```vue{2}
+<template>
+  <Story group="top">
+    This is a demo book using Vue 3.
+  </Story>
+</template>
+```

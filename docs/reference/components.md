@@ -52,6 +52,20 @@ function initState () {
 
 [Learn more](../guide/controls.md)
 
+### `group`
+
+The id of a group to include the story in.
+
+```vue
+<template>
+  <Story group="my-group">
+    Hello world
+  </Story>
+</template>
+```
+
+[Learn more](../guide/hierarchy.md#groups)
+
 ### `icon`
 
 An [Iconify id](https://icones.js.org/) to customize the story icon in the tree.
