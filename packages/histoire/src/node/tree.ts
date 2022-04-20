@@ -51,7 +51,7 @@ export function makeTree (config: HistoireConfig, files: StoryFile[]) {
     treeObject: ITreeObject
   }
 
-  const groups: ITreeGroup[] = config.tree?.groups.map(g => ({
+  const groups: ITreeGroup[] = config.tree?.groups?.map(g => ({
     groupConfig: g,
     treeObject: {},
   })) || []
