@@ -36,7 +36,7 @@
     "build:types": "vue-tsc --declaration --emitDeclarationOnly",
     "watch": "concurrently \"vite build --watch\" \"pnpm run build:types -- --watch\"",
     "watch:full": "concurrently \"vite build --watch\" \"pnpm run build:css -- --watch\" \"pnpm run build:types -- --watch\"",
-    "test:open": "peeky open",
+    "test:open": "peeky open --port 5010",
     "test": "peeky run",
     "story:dev": "histoire dev",
     "story:build": "histoire build"
