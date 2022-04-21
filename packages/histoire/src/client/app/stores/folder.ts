@@ -19,12 +19,17 @@ export const useFolderStore = defineStore('folder', () => {
     const currentValue = openedFolders.value.get(stringPath)
 
     if (currentValue == null) {
-      openedFolders.value.set(stringPath, defaultToggleValue)
+      setFolderOpen(stringPath, defaultToggleValue)
     } else if (currentValue) {
-      openedFolders.value.set(stringPath, false)
+      setFolderOpen(stringPath, false)
     } else {
-      openedFolders.value.set(stringPath, true)
+      setFolderOpen(stringPath, true)
     }
+  }
+
+  function setFolderOpen (path: Array<string> | string, value: boolean) {
+    const stringPath = typeof path === 'string' ? path : getStringPath(path)
+    openedFolders.value.set(stringPath, value)
   }
 
   function isFolderOpened (path: Array<string>, defaultValue = false) {
@@ -37,7 +42,7 @@ export const useFolderStore = defineStore('folder', () => {
 
   function openFileFolders (path: Array<string>) {
     for (let pathLength = 1; pathLength < path.length; pathLength++) {
-      toggleFolder(path.slice(0, pathLength), true)
+      setFolderOpen(path.slice(0, pathLength), true)
     }
   }
 
