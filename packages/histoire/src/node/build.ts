@@ -115,5 +115,5 @@ async function writeHtml (jsEntryFile: string, cssEntryFile: string, htmlFileNam
 }
 
 function generateScriptLinks (prefetchScripts: string[], rel: string) {
-  return prefetchScripts.map(s => `<link rel="${rel}" href="${s}" as="script" crossOrigin="anonymous">`).join('')
+  return prefetchScripts.map(s => `<link rel="${rel}" href="/${s}" as="script" crossOrigin="anonymous">`).join('')
 }
