@@ -49,8 +49,8 @@ export async function build (ctx: Context) {
     build: {
       rollupOptions: {
         input: [
-          join(APP_PATH, 'index.ts'),
-          join(APP_PATH, 'sandbox.ts'),
+          join(APP_PATH, 'index.js'),
+          join(APP_PATH, 'sandbox.js'),
         ],
         output: {
           manualChunks (id) {
