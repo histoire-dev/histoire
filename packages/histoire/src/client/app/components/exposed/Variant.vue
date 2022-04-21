@@ -1,5 +1,5 @@
 <script lang="ts">
-import { defineComponent, getCurrentInstance, PropType, useAttrs } from 'vue'
+import { defineComponent, getCurrentInstance, inject, PropType, useAttrs, watch } from 'vue'
 import { Variant } from '../../types'
 
 export default defineComponent({
@@ -30,6 +30,16 @@ export default defineComponent({
     }
 
     const vm = getCurrentInstance()
+
+    const implicitState = inject('implicitState')
+
+    watch(() => implicitState, value => {
+      if (typeof props.initState !== 'function') {
+        attrs.variant.state = value
+      }
+    }, {
+      immediate: true,
+    })
 
     function updateVariant () {
       Object.assign(attrs.variant, {

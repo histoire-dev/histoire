@@ -49,7 +49,9 @@ Object.assign(props.variant, {
 useEventListener(window, 'message', (event) => {
   if (event.data.type === STATE_SYNC) {
     synced = true
-    Object.assign(props.variant.state, event.data.state)
+    if (props.variant.state) {
+      Object.assign(props.variant.state, event.data.state)
+    }
   } else if (event.data.type === SANDBOX_READY) {
     Object.assign(props.variant, {
       previewReady: true,

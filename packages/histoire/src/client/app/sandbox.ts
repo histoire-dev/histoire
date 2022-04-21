@@ -29,7 +29,9 @@ const app = createApp({
       if (event.data?.type === STATE_SYNC) {
         if (!mounted) return
         synced = true
-        Object.assign(variant.value.state, event.data.state)
+        if (variant.value.state) {
+          Object.assign(variant.value.state, event.data.state)
+        }
       } else if (event.data?.type === PREVIEW_SETTINGS_SYNC) {
         applyPreviewSettings(event.data.settings)
       }

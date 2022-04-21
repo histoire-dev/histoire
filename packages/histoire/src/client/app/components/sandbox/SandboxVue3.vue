@@ -37,7 +37,7 @@ async function mountVariant () {
   app = createApp({
     render: () => {
       return props.variant.slots()?.[props.slotName]?.({
-        state: props.variant.state,
+        state: props.variant.state ?? {},
       })
     },
   })

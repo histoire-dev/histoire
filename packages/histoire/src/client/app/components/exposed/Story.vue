@@ -1,5 +1,5 @@
 <script lang="ts">
-import { computed, defineComponent, provide, useAttrs, VNode, h, PropType } from 'vue'
+import { computed, defineComponent, provide, useAttrs, VNode, h, PropType, getCurrentInstance } from 'vue'
 import { Story } from '../../types.js'
 import Variant from './Variant.vue'
 
@@ -24,6 +24,11 @@ export default defineComponent({
 
     const story = computed(() => attrs.story)
     provide('story', story)
+
+    const storyComponent: any = getCurrentInstance().parent
+    // Allows tracking reactivity with watchers to sync state
+    const implicitState = storyComponent.proxy.state
+    provide('implicitState', implicitState)
 
     return {
       story,

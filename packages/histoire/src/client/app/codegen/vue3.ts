@@ -9,7 +9,7 @@ import { serializeJs } from './serialize-js'
 import type { Variant } from '../types'
 
 export async function generateSourceCode (variant: Variant) {
-  const vnode = variant.slots().default?.({ state: variant.state }) ?? []
+  const vnode = variant.slots().default?.({ state: variant.state ?? {} }) ?? []
   const list = Array.isArray(vnode) ? vnode : [vnode]
   const lines: string[] = []
   for (const vnode of list) {
@@ -48,6 +48,10 @@ async function printVNode (vnode: VNode): Promise<string[]> {
       let arg = ''
       if (dir.arg) {
         arg = `:${dir.arg}`
+      }
+      if (valueCode) {
+        // Cleanup render code
+        valueCode = valueCode.replace(/^\$(setup|props|data)\./g, '')
       }
       const valueLines = valueCode ? [valueCode] : serializeAndCleanJs(dir.value)
       const attr: string[] = []

@@ -21,7 +21,7 @@ export function mapFile (file: StoryFile, existingFile?: StoryFile): StoryFile {
         for (const key in existingVariant) {
           if (typeof existingVariant[key] !== 'undefined') {
             if (key === 'state') {
-              Object.assign(variant.state, existingVariant.state)
+              variant.state = existingVariant.state
               continue
             }
             variant[key] = existingVariant[key]
@@ -40,7 +40,7 @@ export function mapFile (file: StoryFile, existingFile?: StoryFile): StoryFile {
 export function mapVariant (variant: Variant): Variant {
   return {
     ...variant,
-    state: {},
+    state: null,
     initState: null,
     slots: () => ({}),
     previewReady: false,

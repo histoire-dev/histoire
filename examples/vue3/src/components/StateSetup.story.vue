@@ -1,32 +1,24 @@
 <script lang="ts" setup>
-function initState () {
-  return {
-    count: 0,
-    text: '',
-  }
-}
+import { reactive, ref } from 'vue'
 
-function initState2 () {
-  return {
-    meow: {
-      foo: 'bar',
-    },
-  }
-}
+const state = reactive({
+  count: 0,
+  text: 'Meow',
+})
+
+const count2 = ref(42)
 </script>
 
 <template>
-  <Story
-    title="State"
-  >
+  <Story>
     <Variant
       title="default"
-      :init-state="initState"
     >
-      <template #default="{ state }">
+      <template #default>
         <h1>State</h1>
         <div>
           <pre>{{ state }}</pre>
+          <pre>{{ { count2 } }}</pre>
           <input
             v-model.number="state.count"
             type="number"
@@ -34,10 +26,14 @@ function initState2 () {
           <input
             v-model="state.text"
           >
+          <input
+            v-model.number="count2"
+            type="number"
+          >
         </div>
       </template>
 
-      <template #controls="{ state }">
+      <template #controls>
         <div class="controls">
           <button @click="state.count--">
             -1
@@ -51,22 +47,6 @@ function initState2 () {
         <HstText
           v-model="state.text"
           title="Text"
-        />
-      </template>
-    </Variant>
-
-    <Variant
-      title="Nested state object"
-      :init-state="initState2"
-    >
-      <template #default="{ state }">
-        <input v-model="state.meow.foo">
-      </template>
-
-      <template #controls="{ state }">
-        <HstText
-          v-model="state.meow.foo"
-          title="meow.foo"
         />
       </template>
     </Variant>
