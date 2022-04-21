@@ -6,7 +6,7 @@ const state = reactive({
   text: 'Meow',
 })
 
-const count2 = ref(42)
+const notSynced = ref(42)
 </script>
 
 <template>
@@ -14,24 +14,22 @@ const count2 = ref(42)
     <Variant
       title="default"
     >
-      <template #default>
-        <h1>State</h1>
-        <div>
-          <pre>{{ state }}</pre>
-          <pre>{{ { count2 } }}</pre>
-          <input
-            v-model.number="state.count"
-            type="number"
-          >
-          <input
-            v-model="state.text"
-          >
-          <input
-            v-model.number="count2"
-            type="number"
-          >
-        </div>
-      </template>
+      <h1>State</h1>
+      <div>
+        <pre>{{ state }}</pre>
+        <pre>{{ { notSynced } }}</pre>
+        <input
+          v-model.number="state.count"
+          type="number"
+        >
+        <input
+          v-model="state.text"
+        >
+        <input
+          v-model.number="notSynced"
+          type="number"
+        >
+      </div>
 
       <template #controls>
         <div class="controls">
