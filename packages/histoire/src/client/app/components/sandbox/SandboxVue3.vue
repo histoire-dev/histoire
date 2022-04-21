@@ -35,6 +35,8 @@ async function mountVariant () {
   await props.variant.initState()
 
   app = createApp({
+    name: 'SandboxVue3',
+
     render: () => {
       return props.variant.slots()?.[props.slotName]?.({
         state: props.variant.state ?? {},

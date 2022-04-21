@@ -1,3 +1,9 @@
+<script lang="ts">
+export default {
+  name: 'HistoireApp',
+}
+</script>
+
 <script lang="ts" setup>
 // @ts-expect-error virtual module
 import { files as rawFiles, tree as rawTree, onUpdate } from '$histoire-stories'

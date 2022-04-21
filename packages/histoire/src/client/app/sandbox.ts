@@ -18,6 +18,8 @@ const query = parseQuery(window.location.search)
 const file = ref<StoryFile>(mapFile(files.find(f => f.id === query.storyId)))
 
 const app = createApp({
+  name: 'SandboxApp',
+
   setup () {
     const story = computed(() => file.value.story)
     const variant = computed(() => story.value?.variants.find(v => v.id === query.variantId))
