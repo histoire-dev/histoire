@@ -172,7 +172,11 @@ async function printVNode (vnode: VNode): Promise<string[]> {
     // Children
     const childLines: string[] = []
     if (typeof vnode.children === 'string') {
-      childLines.push(vnode.children)
+      if (tagName === 'pre') {
+        childLines.push(vnode.children)
+      } else {
+        childLines.push(...vnode.children.split('\n'))
+      }
     } else if (Array.isArray(vnode.children)) {
       for (const child of vnode.children) {
         childLines.push(...await printVNode(child))
@@ -229,9 +233,13 @@ async function printVNode (vnode: VNode): Promise<string[]> {
     }
 
     if (childLines.length > 0) {
-      lines.push(...tag)
-      lines.push(...indent(childLines))
-      lines.push(`</${tagName}>`)
+      if (childLines.length === 1 && tag.length === 1) {
+        lines.push(`${tag[0]}${childLines[0]}</${tagName}>`)
+      } else {
+        lines.push(...tag)
+        lines.push(...indent(childLines))
+        lines.push(`</${tagName}>`)
+      }
     } else if (tag.length > 1) {
       lines.push(...tag)
       lines.push('/>')

@@ -17,7 +17,7 @@ const notSynced = ref(42)
       <h1>State</h1>
       <div>
         <pre>{{ state }}</pre>
-        <pre>{{ { notSynced } }}</pre>
+        <div>{{ { notSynced } }}</div>
         <input
           v-model.number="state.count"
           type="number"
