@@ -82,11 +82,12 @@ async function printVNode (vnode: VNode): Promise<string[]> {
             }
           }
           genDirective('model', dir, valueCode)
-        } else {
+        } else if (dir.instance._ || dir.instance.$) {
+          const target = dir.instance.$ ?? dir.instance._
           let dirName: string
-          for (const directives of [dir.instance._.directives, dir.instance._.appContext.directives]) {
+          for (const directives of [target.directives, target.appContext.directives]) {
             for (const key in directives) {
-              if (dir.instance._.directives[key] === dir.dir) {
+              if (target.directives[key] === dir.dir) {
                 dirName = key
                 break
               }
