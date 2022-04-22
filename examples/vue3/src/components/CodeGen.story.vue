@@ -35,6 +35,7 @@ function onClick (event) {
     icon-color="#8B5CF6"
   >
     <Variant
+      id="html"
       title="html"
       icon="carbon:code"
       :init-state="() => ({
@@ -64,6 +65,7 @@ function onClick (event) {
       </template>
     </Variant>
     <Variant
+      id="props"
       title="props"
       :init-state="initState"
     >
@@ -85,10 +87,14 @@ function onClick (event) {
       </template>
     </Variant>
     <Variant
+      id="click-events"
       title="click event"
       icon="carbon:cursor-1"
     >
       <button @click="onClick">
+        Click me
+      </button>
+      <button @click="onClick($event)">
         Click me
       </button>
       <button @click="(event) => onClick(event)">
@@ -96,6 +102,7 @@ function onClick (event) {
       </button>
     </Variant>
     <Variant
+      id="v-model"
       title="v-model input"
       icon="carbon:text-selection"
       icon-color="#EAB308"
@@ -123,6 +130,7 @@ function onClick (event) {
       </template>
     </Variant>
     <Variant
+      id="custom-directive"
       title="custom directive"
     >
       <button v-tooltip="'Info'">
@@ -139,6 +147,7 @@ function onClick (event) {
       </button>
     </Variant>
     <Variant
+      id="slots"
       title="slots"
     >
       <ModalWithSlots>
@@ -154,6 +163,7 @@ function onClick (event) {
       </modalwithslots>
     </Variant>
     <Variant
+      id="slot-with-props"
       title="slots props (default slot)"
     >
       <SlotWithProps>
@@ -171,6 +181,7 @@ function onClick (event) {
       </SlotWithProps>
     </Variant>
     <Variant
+      id="slot-with-props-named"
       title="slots props (named slot)"
     >
       <SlotWithProps>
@@ -188,6 +199,7 @@ function onClick (event) {
       </SlotWithProps>
     </Variant>
     <Variant
+      id="list"
       title="list"
       icon="carbon:list"
       :init-state="() => ({
@@ -213,6 +225,16 @@ function onClick (event) {
           </li>
         </ul>
       </template>
+    </Variant>
+    <Variant
+      id="function"
+      title="function"
+      icon="carbon:function-math"
+    >
+      <div
+        :hello="(arg1, arg2, arg3) => 'meow'.repeat(arg3)"
+        :get-name="shade => `${'\'very-'.repeat(5)}long-${shade}`"
+      />
     </Variant>
   </Story>
 </template>
