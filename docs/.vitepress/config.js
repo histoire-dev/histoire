@@ -39,8 +39,8 @@ module.exports = {
           link: '/reference/config',
         },
         {
-          text: 'Builtin components',
-          link: '/reference/components',
+          text: 'Story components (Vue 3)',
+          link: '/reference/components-vue3',
         },
       ],
       '/': [

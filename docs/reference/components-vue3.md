@@ -1,4 +1,4 @@
-# Builtin Components
+# Story Components
 
 ## Story
 
@@ -23,7 +23,7 @@ Layout of the story. Object with the following properties:
   - with `type: 'grid'` you can specify:
     - `width`: Column size. Can be number (pixels) or string (like `'100%'`).
 
-[Learn more](../guide/stories.md#layout)
+[Learn more](../guide/vue3/stories.md#layout)
 
 ### `initState`
 
@@ -50,7 +50,7 @@ function initState () {
 </template>
 ```
 
-[Learn more](../guide/controls.md)
+[Learn more](../guide/vue3/controls.md#init-state)
 
 ### `group`
 
@@ -64,7 +64,7 @@ The id of a group to include the story in.
 </template>
 ```
 
-[Learn more](../guide/hierarchy.md#groups)
+[Learn more](../guide/vue3/hierarchy.md#groups)
 
 ### `icon`
 
@@ -194,7 +194,7 @@ function initState () {
 </template>
 ```
 
-[Learn more](../guide/controls.md)
+[Learn more](../guide/vue3/controls.md#init-state)
 
 ### `icon`
 
@@ -301,7 +301,7 @@ Props:
 </template>
 ```
 
-[Learn more](../guide/controls.md)
+[Learn more](../guide/vue3/controls.md#controls-panel)
 
 ### Slot: `source`
 
@@ -326,4 +326,4 @@ Manual copiable source code.
 </template>
 ```
 
-[Learn more](../guide/docs.md#source-code)
+[Learn more](../guide/vue3/docs.md#source-code)

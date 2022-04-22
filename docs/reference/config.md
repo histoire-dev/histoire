@@ -49,7 +49,7 @@ export default defineConfig({
 
 How to generate the story tree.
 
-[Learn more](../guide/hierarchy.md)
+Learn more: [Vue 3](../guide/vue3/hierarchy.md)
 
 Properties:
 
