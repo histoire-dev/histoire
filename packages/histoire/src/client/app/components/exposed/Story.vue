@@ -1,5 +1,5 @@
 <script lang="ts">
-import { computed, defineComponent, provide, useAttrs, VNode, h, PropType, getCurrentInstance, proxyRefs, markRaw, isRef } from 'vue'
+import { computed, defineComponent, provide, useAttrs, VNode, h, PropType, getCurrentInstance } from 'vue'
 import { Story } from '../../types.js'
 import Variant from './Variant.vue'
 
@@ -30,13 +30,19 @@ export default defineComponent({
     const implicitState = {
       $data: storyComponent.data,
     }
+    function addImplicitState (key, value) {
+      if (typeof value === 'function' || (value && value.__file)) {
+        return
+      }
+      implicitState[key] = value
+    }
     // From `<script setup>`'s `defineExpose`
     for (const key in storyComponent.exposed) {
-      implicitState[key] = storyComponent.exposed[key]
+      addImplicitState(key, storyComponent.exposed[key])
     }
     // We needs __VUE_PROD_DEVTOOLS__ flag set to `true` to enable `devtoolsRawSetupState`
     for (const key in storyComponent.devtoolsRawSetupState) {
-      implicitState[key] = storyComponent.devtoolsRawSetupState[key]
+      addImplicitState(key, storyComponent.devtoolsRawSetupState[key])
     }
     provide('implicitState', () => implicitState)
 

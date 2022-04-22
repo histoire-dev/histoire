@@ -54,6 +54,7 @@ useEventListener(window, 'message', (event) => {
         if (typeof props.variant.state[key] === 'object') {
           Object.assign(props.variant.state[key], event.data.state[key])
         } else {
+          // eslint-disable-next-line vue/no-mutating-props
           props.variant.state[key] = event.data.state[key]
         }
       }

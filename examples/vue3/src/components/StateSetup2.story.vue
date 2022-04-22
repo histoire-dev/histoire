@@ -14,7 +14,7 @@ export default {
       state,
       synced,
     }
-  }
+  },
 }
 </script>
 

@@ -13,6 +13,7 @@ module.exports = {
   },
   globals: {
     name: 'off',
+    defineExpose: false,
   },
   rules: {
     'vue/html-closing-bracket-newline': [
