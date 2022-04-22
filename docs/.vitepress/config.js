@@ -53,23 +53,23 @@ module.exports = {
           link: '/guide/config',
         },
         {
-          text: 'Writing Stories',
+          text: 'Using with Vue 3',
           children: [
             {
               text: 'Stories',
-              link: '/guide/stories',
+              link: '/guide/vue3/stories',
             },
             {
               text: 'State & Controls',
-              link: '/guide/controls',
+              link: '/guide/vue3/controls',
             },
             {
               text: 'Documentation',
-              link: '/guide/docs',
+              link: '/guide/vue3/docs',
             },
             {
               text: 'Hierarchy',
-              link: '/guide/hierarchy',
+              link: '/guide/vue3/hierarchy',
             },
           ],
         },
