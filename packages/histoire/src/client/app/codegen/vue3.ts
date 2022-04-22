@@ -148,9 +148,9 @@ async function printVNode (vnode: VNode): Promise<{ lines: string[], isText?: bo
         let serialized: string[]
         if (typeof value === 'string' && value.startsWith('{{') && value.endsWith('}}')) {
           // It was formatted from auto building object (slot props)
-          serialized = [value.substring(2, value.length - 2).trim()]
+          serialized = [cleanupExpression(value.substring(2, value.length - 2).trim())]
         } else if (typeof value === 'function') {
-          serialized = [value.toString().replace(/'/g, '\\\'').replace(/"/g, '\'')]
+          serialized = [cleanupExpression(value.toString().replace(/'/g, '\\\'').replace(/"/g, '\''))]
         } else {
           serialized = serializeAndCleanJs(value)
         }
@@ -312,8 +312,12 @@ function serializeAndCleanJs (value: any) {
   const isAutoBuildingObject = !!value?.__autoBuildingObject
   const result = serializeJs(value)
   if (isAutoBuildingObject) {
-    return [result.__autoBuildingObjectGetKey]
+    return [cleanupExpression(result.__autoBuildingObjectGetKey)]
   } else {
-    return result.replace(/\$setup\./g, '').split('\n')
+    return cleanupExpression(result).split('\n')
   }
+}
+
+function cleanupExpression (expr: string) {
+  return expr.replace(/\$setup\./g, '')
 }
