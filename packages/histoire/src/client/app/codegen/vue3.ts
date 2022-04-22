@@ -22,7 +22,7 @@ export async function generateSourceCode (variant: Variant) {
 async function printVNode (vnode: VNode): Promise<{ lines: string[], isText?: boolean }> {
   if (vnode.type === Text) {
     return {
-      lines: [vnode.children.trim()],
+      lines: [vnode.children],
       isText: true,
     }
   }
@@ -185,12 +185,28 @@ async function printVNode (vnode: VNode): Promise<{ lines: string[], isText?: bo
       }
       isChildText = true
     } else if (Array.isArray(vnode.children)) {
+      let isAllChildText = undefined
       for (const child of vnode.children) {
         const result = await printVNode(child)
-          childLines.push(...result.lines)
         if (result.isText) {
-          isChildText = true
+          if (isAllChildText === undefined) {
+            isAllChildText = true
+          }
+          const text = result.lines[0]
+          if (!childLines.length || /^\s/.test(text)) {
+            childLines.push(text.trim())
+          } else {
+            childLines[childLines.length - 1] += text
+          }
+        } else {
+          if (isAllChildText === undefined) {
+            isAllChildText = false
+          }
+          childLines.push(...result.lines)
         }
+      }
+      if (isAllChildText !== undefined) {
+        isChildText = isAllChildText
       }
     }
 

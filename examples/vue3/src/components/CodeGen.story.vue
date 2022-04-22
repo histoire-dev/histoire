@@ -56,6 +56,11 @@ function onClick (event) {
         <p>
           <span>Next to it:</span>****
         </p>
+        <p>
+          <span>Not next to it:</span>
+          ****
+        </p>
+        <button> Spaces </button>
       </template>
     </Variant>
     <Variant
