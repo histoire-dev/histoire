@@ -1,17 +1,21 @@
-<script lang="ts" setup>
+<script lang="ts">
 import { reactive, ref } from 'vue'
 
-const state = reactive({
-  count: 0,
-  text: 'Meow',
-})
+export default {
+  setup () {
+    const state = reactive({
+      count: 0,
+      text: 'Meow',
+    })
 
-const synced = ref('hello')
+    const synced = ref('hello')
 
-defineExpose({
-  state,
-  synced,
-})
+    return {
+      state,
+      synced,
+    }
+  }
+}
 </script>
 
 <template>

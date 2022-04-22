@@ -31,11 +31,11 @@ export default defineComponent({
 
     const vm = getCurrentInstance()
 
-    const implicitState = inject('implicitState')
+    const implicitState = inject<() => any>('implicitState')
 
     watch(() => implicitState, value => {
       if (typeof props.initState !== 'function') {
-        attrs.variant.state = value
+        attrs.variant.state = value()
       }
     }, {
       immediate: true,

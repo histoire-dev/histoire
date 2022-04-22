@@ -1,6 +1,6 @@
 import './style/sandbox.css'
 import { parseQuery } from 'vue-router'
-import { computed, createApp, h, onMounted, ref, watch } from 'vue'
+import { computed, createApp, h, onMounted, ref, watch, isRef } from 'vue'
 import { createPinia } from 'pinia'
 import { registerGlobalComponents } from './global-components'
 import SandboxVue3 from './components/sandbox/SandboxVue3.vue'
@@ -32,7 +32,13 @@ const app = createApp({
         if (!mounted) return
         synced = true
         if (variant.value.state) {
-          Object.assign(variant.value.state, event.data.state)
+          for (const key in event.data.state) {
+            if (typeof variant.value.state[key] === 'object') {
+              Object.assign(variant.value.state[key], event.data.state[key])
+            } else {
+              variant.value.state[key] = event.data.state[key]
+            }
+          }
         }
       } else if (event.data?.type === PREVIEW_SETTINGS_SYNC) {
         applyPreviewSettings(event.data.settings)

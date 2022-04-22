@@ -4,16 +4,29 @@ Controls give you the ability to interact with your components arguments.
 
 ## Defining a state
 
-The first step is to define the state that will be share to your story. You need to create a `state` data property or reactive object that will be automatically be picked up by Histoire. Then you can proceed using it as usual:
+The first step is to define the state that will be share to your story. Histoire will automatically synchronize the `data` or reactive data returned in your `setup`. Then you can proceed using your state as usual.
 
-```vue{5-8,14-15}
+Example with Option API:
+
+```vue{10-17}
 <script lang="ts" setup>
-import { reactive } from 'vue'
 import MyButton from './MyButton.vue'
 
-const state = reactive({
-  disabled: false,
-  content: "Hello world"
+export default defineComponent({
+  components: {
+    MyButton,
+  },
+
+  data () {
+    // Histoire will inspect and synchronize this
+    return {
+      state: {
+        disabled: false,
+        content: "Hello world"
+      },
+      message: 'Meow!',
+    }
+  },
 })
 </script>
 
@@ -23,38 +36,94 @@ const state = reactive({
       <MyButton :disabled="state.disabled">
         {{ state.content }}
       </MyButton>
+
+      <input v-model.number="message">
     </Variant>
   </Story>
 </template>
 ```
 
-::: tip
-The reason you need to use the `state` name is that the preview might be rendered in a different context than the control pane, for example in an iframe. Therefore Histoire needs to handle the state and synchronize it between the different contexts. Currently, Histoire only detects the `state` property of your story component. If you use a different name, if will not be synchronized between the preview, the controls and the source code panes.
-:::
+Example with Composition API:
 
-In the following example, since we are not using `state` as the name of our data, it won't be handled by Histoire:
-
-```vue{5-6}
+```vue{18-22}
 <script lang="ts" setup>
-import { ref } from 'vue'
+import { reactive, count } from 'vue'
 import MyButton from './MyButton.vue'
 
-// This is not named `state` therefore it will not be synchronized
-const notSynced = ref('Meow')
+export default defineComponent({
+  components: {
+    MyButton,
+  },
+
+  setup () {
+    const state = reactive({
+      disabled: false,
+      content: "Hello world"
+    })
+
+    const message = ref('Meow!')
+
+    // Histoire will inspect and synchronize this
+    return {
+      state,
+      message,
+    }
+  }
+})
 </script>
 
 <template>
   <Story>
     <Variant>
-      <input v-model="notSynced">
+      <MyButton :disabled="state.disabled">
+        {{ state.content }}
+      </MyButton>
+
+      <input v-model.number="message">
     </Variant>
   </Story>
 </template>
 ```
 
-It can however be useful to declare some data that isn't going to be reactive, for example some fixture data or configuration:
+If you are using the `<script setup>` syntax, the component is closed by default - meaning no properties can be accessed from the outside. We need to use [defineExpose](https://vuejs.org/api/sfc-script-setup.html#defineexpose) so that Histoire is able to access your state properties.
 
-```vue{10-15}
+Example with Composition API (Script Setup):
+
+```vue{12-16}
+<script lang="ts" setup>
+import { reactive, count } from 'vue'
+import MyButton from './MyButton.vue'
+
+const state = reactive({
+  disabled: false,
+  content: "Hello world"
+})
+
+const message = ref('Meow!')
+
+// Histoire will inspect and synchronize this
+defineExpose({
+  state,
+  message,
+})
+</script>
+
+<template>
+  <Story>
+    <Variant>
+      <MyButton :disabled="state.disabled">
+        {{ state.content }}
+      </MyButton>
+
+      <input v-model.number="message">
+    </Variant>
+  </Story>
+</template>
+```
+
+It can also be useful to declare some data that isn't going to be reactive, for example some fixture data or configuration:
+
+```vue{14-19}
 <script lang="ts" setup>
 import { reactive } from 'vue'
 import MyButton from './MyButton.vue'
@@ -62,6 +131,10 @@ import MyButton from './MyButton.vue'
 // Main reactive state of the stories
 const state = reactive({
   colorId: 'primary',
+})
+
+defineExpose({
+  state,
 })
 
 // Some fixture/configuration data
@@ -96,6 +169,10 @@ const state = reactive({
   disabled: false,
   content: "Hello world"
 })
+
+defineExpose({
+  state,
+})
 </script>
 
 <template>
@@ -118,7 +195,7 @@ const state = reactive({
 
 To build a control panel a bit more easily, Histoire provides builtin controls with design that fits the rest of the UI.
 
-```vue{19-20}
+```vue{23-24}
 <script lang="ts" setup>
 import { reactive } from 'vue'
 import MyButton from './MyButton.vue'
@@ -126,6 +203,10 @@ import MyButton from './MyButton.vue'
 const state = reactive({
   disabled: false,
   content: "Hello world"
+})
+
+defineExpose({
+  state,
 })
 </script>
 

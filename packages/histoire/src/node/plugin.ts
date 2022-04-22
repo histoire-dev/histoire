@@ -60,6 +60,10 @@ export async function createVitePlugins (ctx: Context): Promise<VitePlugin[]> {
             allow: [DIST_CLIENT_PATH, viteConfig.root, process.cwd()],
           },
         },
+        define: {
+          // We need to force this to be able to use `devtoolsRawSetupState`
+          __VUE_PROD_DEVTOOLS__: 'true',
+        },
       }
     },
 

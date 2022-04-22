@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, onUnmounted, Ref, ref, toRaw, watch } from 'vue'
+import { computed, isRef, onUnmounted, Ref, ref, toRaw, watch } from 'vue'
 import { useEventListener } from '@vueuse/core'
 import { Icon } from '@iconify/vue'
 import { STATE_SYNC, PREVIEW_SETTINGS_SYNC, SANDBOX_READY } from '../../util/const'
@@ -50,7 +50,13 @@ useEventListener(window, 'message', (event) => {
   if (event.data.type === STATE_SYNC) {
     synced = true
     if (props.variant.state) {
-      Object.assign(props.variant.state, event.data.state)
+      for (const key in event.data.state) {
+        if (typeof props.variant.state[key] === 'object') {
+          Object.assign(props.variant.state[key], event.data.state[key])
+        } else {
+          props.variant.state[key] = event.data.state[key]
+        }
+      }
     }
   } else if (event.data.type === SANDBOX_READY) {
     Object.assign(props.variant, {
