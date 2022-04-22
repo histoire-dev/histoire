@@ -63,6 +63,7 @@ export async function build (ctx: Context) {
       outDir: ctx.config.outDir,
       emptyOutDir: true,
       cssCodeSplit: false,
+      minify: false,
     },
   })
   const result = Array.isArray(results) ? results[0] : results as RollupOutput
