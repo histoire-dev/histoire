@@ -234,7 +234,7 @@ async function printVNode (vnode: VNode): Promise<string[]> {
     }
 
     if (childLines.length > 0) {
-      if (childLines.length === 1 && tag.length === 1) {
+      if (childLines.length === 1 && tag.length === 1 && !attrs.length) {
         lines.push(`${tag[0]}${childLines[0]}</${tagName}>`)
       } else {
         lines.push(...tag)

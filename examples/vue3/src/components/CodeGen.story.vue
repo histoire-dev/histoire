@@ -35,6 +35,29 @@ function onClick (event) {
     icon-color="#8B5CF6"
   >
     <Variant
+      title="html"
+      :init-state="() => ({
+        object: { foo: 'bar' },
+      })"
+    >
+      <template #default="{ state }">
+        <h1>Title</h1>
+        <hr>
+        <pre>{{ state }}</pre>
+        <div data-test-id="object">{{ state }}</div>
+        <button>A button</button>
+        <button class="btn btn-primary">A button</button>
+        <button class="btn btn-primary" style="color: red;">A button</button>
+        <input type="phone" placeholder="Enter your phone number">
+        <ul>
+          <li>Single</li>
+        </ul>
+        <p>
+          <span>Next to it:</span>****
+        </p>
+      </template>
+    </Variant>
+    <Variant
       title="props"
       :init-state="initState"
     >
