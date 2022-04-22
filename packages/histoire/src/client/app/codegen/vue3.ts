@@ -148,9 +148,20 @@ async function printVNode (vnode: VNode): Promise<{ lines: string[], isText?: bo
         let serialized: string[]
         if (typeof value === 'string' && value.startsWith('{{') && value.endsWith('}}')) {
           // It was formatted from auto building object (slot props)
-          serialized = [cleanupExpression(value.substring(2, value.length - 2).trim())]
+          serialized = cleanupExpression(value.substring(2, value.length - 2).trim()).split('\n')
         } else if (typeof value === 'function') {
-          serialized = [cleanupExpression(value.toString().replace(/'/g, '\\\'').replace(/"/g, '\''))]
+          let code = cleanupExpression(value.toString().replace(/'/g, '\\\'').replace(/"/g, '\''))
+          const testResult = /function ([^\s]+)\(/.exec(code)
+          if (testResult) {
+            // Function name only
+            serialized = [testResult[1]]
+          } else {
+            if (code.startsWith('($event) => ')) {
+              // Remove unnecessary `($event) => `
+              code = code.substring('($event) => '.length)
+            }
+            serialized = code.split('\n')
+          }
         } else {
           serialized = serializeAndCleanJs(value)
         }
