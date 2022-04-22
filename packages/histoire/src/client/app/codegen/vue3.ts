@@ -270,7 +270,7 @@ function getTagName (vnode: VNode) {
 }
 
 function getNameFromFile (file: string) {
-  const parts = /\/([^/]+)\.vue$/.exec(file)
+  const parts = /([^/]+)\.vue$/.exec(file)
   if (parts) {
     return pascal(parts[1])
   }
