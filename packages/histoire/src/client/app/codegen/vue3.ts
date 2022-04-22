@@ -13,14 +13,17 @@ export async function generateSourceCode (variant: Variant) {
   const list = Array.isArray(vnode) ? vnode : [vnode]
   const lines: string[] = []
   for (const vnode of list) {
-    lines.push(...await printVNode(vnode))
+    lines.push(...(await printVNode(vnode)).lines)
   }
   return lines.join('\n')
 }
 
-async function printVNode (vnode: VNode): Promise<string[]> {
+async function printVNode (vnode: VNode): Promise<{ lines: string[], isText?: boolean }> {
   if (vnode.type === Text) {
-    return [vnode.children.trim()]
+    return {
+      lines: [vnode.children.trim()],
+      isText: true,
+    }
   }
 
   const lines: string[] = []
@@ -171,6 +174,7 @@ async function printVNode (vnode: VNode): Promise<string[]> {
     const tagName = getTagName(vnode)
 
     // Children
+    let isChildText = false
     const childLines: string[] = []
     if (typeof vnode.children === 'string') {
       if (tagName === 'pre') {
@@ -178,9 +182,14 @@ async function printVNode (vnode: VNode): Promise<string[]> {
       } else {
         childLines.push(...vnode.children.split('\n'))
       }
+      isChildText = true
     } else if (Array.isArray(vnode.children)) {
       for (const child of vnode.children) {
-        childLines.push(...await printVNode(child))
+        const result = await printVNode(child)
+        childLines.push(...result.lines)
+        if (result.isText) {
+          isChildText = true
+        }
       }
     }
 
@@ -197,7 +206,7 @@ async function printVNode (vnode: VNode): Promise<string[]> {
           const children = vnode.children[key](autoObject.proxy)
           const slotLines: string[] = []
           for (const child of children) {
-            slotLines.push(...await printVNode(child))
+            slotLines.push(...(await printVNode(child)).lines)
           }
           const slotProps = Object.keys(autoObject.cache)
           if (slotProps.length) {
@@ -234,7 +243,7 @@ async function printVNode (vnode: VNode): Promise<string[]> {
     }
 
     if (childLines.length > 0) {
-      if (childLines.length === 1 && tag.length === 1 && !attrs.length) {
+      if (childLines.length === 1 && tag.length === 1 && !attrs.length && isChildText) {
         lines.push(`${tag[0]}${childLines[0]}</${tagName}>`)
       } else {
         lines.push(...tag)
@@ -249,11 +258,13 @@ async function printVNode (vnode: VNode): Promise<string[]> {
     }
   } else if (vnode?.shapeFlag & 1 << 4) {
     for (const child of vnode.children) {
-      lines.push(...await printVNode(child))
+      lines.push(...(await printVNode(child)).lines)
     }
   }
 
-  return lines
+  return {
+    lines,
+  }
 }
 
 function getTagName (vnode: VNode) {
