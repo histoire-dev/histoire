@@ -185,7 +185,7 @@ async function printVNode (vnode: VNode): Promise<{ lines: string[], isText?: bo
       }
       isChildText = true
     } else if (Array.isArray(vnode.children)) {
-      let isAllChildText = undefined
+      let isAllChildText
       for (const child of vnode.children) {
         const result = await printVNode(child)
         if (result.isText) {
