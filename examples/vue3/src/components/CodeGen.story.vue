@@ -36,6 +36,7 @@ function onClick (event) {
   >
     <Variant
       title="html"
+      icon="carbon:code"
       :init-state="() => ({
         object: { foo: 'bar' },
       })"

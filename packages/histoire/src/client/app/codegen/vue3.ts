@@ -7,6 +7,7 @@ import { pascal } from 'case'
 import { createAutoBuildingObject, indent } from './util'
 import { serializeJs } from './serialize-js'
 import type { Variant } from '../types'
+import { voidElements } from './const'
 
 export async function generateSourceCode (variant: Variant) {
   const vnode = variant.slots().default?.({ state: variant.state ?? {} }) ?? []
@@ -186,7 +187,7 @@ async function printVNode (vnode: VNode): Promise<{ lines: string[], isText?: bo
     } else if (Array.isArray(vnode.children)) {
       for (const child of vnode.children) {
         const result = await printVNode(child)
-        childLines.push(...result.lines)
+          childLines.push(...result.lines)
         if (result.isText) {
           isChildText = true
         }
@@ -242,6 +243,8 @@ async function printVNode (vnode: VNode): Promise<{ lines: string[], isText?: bo
       }
     }
 
+    const isVoid = voidElements.includes(tagName.toLowerCase())
+
     if (childLines.length > 0) {
       if (childLines.length === 1 && tag.length === 1 && !attrs.length && isChildText) {
         lines.push(`${tag[0]}${childLines[0]}</${tagName}>`)
@@ -252,9 +255,9 @@ async function printVNode (vnode: VNode): Promise<{ lines: string[], isText?: bo
       }
     } else if (tag.length > 1) {
       lines.push(...tag)
-      lines.push('/>')
+      lines.push(isVoid ? '>' : '/>')
     } else {
-      lines.push(`${tag[0]} />`)
+      lines.push(`${tag[0]}${isVoid ? '' : ' /'}>`)
     }
   } else if (vnode?.shapeFlag & 1 << 4) {
     for (const child of vnode.children) {
