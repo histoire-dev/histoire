@@ -58,6 +58,9 @@ useEventListener(window, 'message', (event) => {
           props.variant.state[key] = event.data.state[key]
         }
       }
+    } else {
+      // eslint-disable-next-line vue/no-mutating-props
+      props.variant.state = event.data.state
     }
   } else if (event.data.type === SANDBOX_READY) {
     Object.assign(props.variant, {
