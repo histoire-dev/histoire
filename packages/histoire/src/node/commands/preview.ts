@@ -45,6 +45,6 @@ export async function previewCommand (options: PreviewOptions) {
 
   httpServer.listen(port, () => {
     httpServer.off('error', onError)
-    console.log(`Preview server listening on ${pc.cyan(`http://localhost:${port}`)}`)
+    console.log(`Preview server listening on ${pc.cyan(`http://localhost:${port}${viteConfig.base}`)}`)
   })
 }

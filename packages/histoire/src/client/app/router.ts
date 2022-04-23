@@ -1,7 +1,10 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
+// @ts-expect-error env not defined
+export const base = import.meta.env.BASE_URL
+
 export const router = createRouter({
-  history: createWebHistory(),
+  history: createWebHistory(base),
   routes: [
     {
       path: '/',

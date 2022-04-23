@@ -2,7 +2,7 @@ import { createRequire } from 'module'
 import { relative, dirname } from 'pathe'
 import { resolveConfig as resolveViteConfig, Plugin as VitePlugin } from 'vite'
 import { lookup as lookupMime } from 'mrmime'
-import { APP_PATH, DIST_CLIENT_PATH } from './alias.js'
+import { APP_PATH, DIST_PATH } from './alias.js'
 import { Context } from './context.js'
 import { notifyStoryChange } from './stories.js'
 import { makeTree } from './tree.js'
@@ -57,7 +57,7 @@ export async function createVitePlugins (ctx: Context): Promise<VitePlugin[]> {
         },
         server: {
           fs: {
-            allow: [DIST_CLIENT_PATH, viteConfig.root, process.cwd()],
+            allow: [DIST_PATH, viteConfig.root, process.cwd()],
           },
         },
         define: {
@@ -154,7 +154,7 @@ if (import.meta.hot) {
 
     configureServer (server) {
       server.middlewares.use(async (req, res, next) => {
-        if (req.url!.startsWith('/__sandbox')) {
+        if (req.url!.startsWith(`${server.config.base}__sandbox`)) {
           res.statusCode = 200
           let html = `
 <!DOCTYPE html>
@@ -203,7 +203,7 @@ if (import.meta.hot) {
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="description" content="">
-    ${ctx.config.theme?.favicon ? `<link rel="icon" type="${lookupMime(ctx.config.theme.favicon)}" href="${ctx.config.theme.favicon}"/>` : ''}
+    ${ctx.config.theme?.favicon ? `<link rel="icon" type="${lookupMime(ctx.config.theme.favicon)}" href="/${ctx.config.theme.favicon}"/>` : ''}
   </head>
   <body>
     <div id="app"></div>

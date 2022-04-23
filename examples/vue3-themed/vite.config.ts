@@ -10,7 +10,7 @@ export default defineConfig({
   histoire: {
     theme: {
       title: 'Acme Design System',
-      favicon: '/my-favicon.svg',
+      favicon: 'my-favicon.svg',
       logo: {
         square: '/src/img/logo-square.svg',
         light: '/src/img/logo-light.svg',

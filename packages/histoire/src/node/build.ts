@@ -1,5 +1,5 @@
 import { join } from 'pathe'
-import { build as viteBuild, createServer as createViteServer } from 'vite'
+import { build as viteBuild, createServer as createViteServer, ResolvedConfig as ViteConfig, resolveConfig as resolveViteConfig } from 'vite'
 import fs from 'fs-extra'
 import { lookup as lookupMime } from 'mrmime'
 import pc from 'picocolors'
@@ -68,25 +68,29 @@ export async function build (ctx: Context) {
   })
   const result = Array.isArray(results) ? results[0] : results as RollupOutput
 
+  const resolvedViteConfig = await resolveViteConfig({
+    plugins: await createVitePlugins(ctx),
+  }, 'build')
+
   const styleOutput = result.output.find(o => o.name === 'style.css' && o.type === 'asset')
 
   // Preload
   const preloadOutputs = result.output.filter(o => PRELOAD_MODULES.includes(o.name) && o.type === 'chunk')
-  const preloadHtml = generateScriptLinks(preloadOutputs.map(o => o.fileName), 'preload')
+  const preloadHtml = generateScriptLinks(preloadOutputs.map(o => o.fileName), 'preload', ctx, resolvedViteConfig)
 
   // Prefetch
   const prefetchOutputs = result.output.filter(o => PREFETCHED_MODULES.includes(o.name) && o.type === 'chunk')
-  const prefetchHtml = generateScriptLinks(prefetchOutputs.map(o => o.fileName), 'prefetch')
+  const prefetchHtml = generateScriptLinks(prefetchOutputs.map(o => o.fileName), 'prefetch', ctx, resolvedViteConfig)
 
   // Index
   const indexOutput = result.output.find(o => o.name === 'index' && o.type === 'chunk')
   await writeHtml(indexOutput.fileName, styleOutput.fileName, 'index.html', {
     HEAD: `${preloadHtml}${prefetchHtml}`,
-  }, ctx)
+  }, ctx, resolvedViteConfig)
 
   // Sandbox
   const sandboxOutput = result.output.find(o => o.name === 'sandbox' && o.type === 'chunk')
-  await writeHtml(sandboxOutput.fileName, styleOutput.fileName, '__sandbox.html', {}, ctx)
+  await writeHtml(sandboxOutput.fileName, styleOutput.fileName, '__sandbox.html', {}, ctx, resolvedViteConfig)
 
   const duration = performance.now() - startTime
   if (emptyStoryCount) {
@@ -95,7 +99,7 @@ export async function build (ctx: Context) {
   console.log(pc.green(`✅ Built ${storyCount} stories (${variantCount} variants) in ${Math.round(duration / 1000 * 100) / 100}s`))
 }
 
-async function writeHtml (jsEntryFile: string, cssEntryFile: string, htmlFileName: string, variables: { HEAD?: string }, ctx: Context) {
+async function writeHtml (jsEntryFile: string, cssEntryFile: string, htmlFileName: string, variables: { HEAD?: string }, ctx: Context, resolvedViteConfig: ViteConfig) {
   const code = `<!DOCTYPE html>
 <html>
 <head>
@@ -103,18 +107,18 @@ async function writeHtml (jsEntryFile: string, cssEntryFile: string, htmlFileNam
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="">
-  <link rel="stylesheet" href="/${cssEntryFile}">
+  <link rel="stylesheet" href="${resolvedViteConfig.base}${cssEntryFile}">
   ${ctx.config.theme?.favicon ? `<link rel="icon" type="${lookupMime(ctx.config.theme.favicon)}" href="${ctx.config.theme.favicon}"/>` : ''}
   ${variables.HEAD ?? ''}
 </head>
 <body>
   <div id="app"></div>
-  <script type="module" src="/${jsEntryFile}"></script>
+  <script type="module" src="${resolvedViteConfig.base}${jsEntryFile}"></script>
 </body>
 </html>`
   await fs.writeFile(join(ctx.config.outDir, htmlFileName), code, 'utf8')
 }
 
-function generateScriptLinks (prefetchScripts: string[], rel: string) {
-  return prefetchScripts.map(s => `<link rel="${rel}" href="/${s}" as="script" crossOrigin="anonymous">`).join('')
+function generateScriptLinks (prefetchScripts: string[], rel: string, ctx: Context, resolvedViteConfig: ViteConfig) {
+  return prefetchScripts.map(s => `<link rel="${rel}" href="${resolvedViteConfig.base}${s}" as="script" crossOrigin="anonymous">`).join('')
 }
