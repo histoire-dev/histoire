@@ -4,7 +4,7 @@ import connect from 'connect'
 import sirv from 'sirv'
 import pc from 'picocolors'
 import { createContext } from '../context.js'
-import { createVitePlugins } from '../plugin.js'
+import { createVitePlugins } from '../vite.js'
 
 export interface PreviewOptions {
   port?: number
