@@ -11,6 +11,11 @@ export default defineComponent({
       default: null,
     },
 
+    id: {
+      type: String,
+      default: null,
+    },
+
     group: {
       type: String,
       default: null,
@@ -40,7 +45,7 @@ export default defineComponent({
     // Story
 
     const story: Story = {
-      id: attrs.data.id,
+      id: props.id ?? attrs.data.id,
       title: props.title ?? attrs.data.fileName,
       group: props.group,
       layout: props.layout,

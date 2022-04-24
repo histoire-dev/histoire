@@ -79,6 +79,7 @@ export function useCollectStories (options: UseCollectStoriesOptions, ctx: Conte
       } else if (storyData.length > 1) {
         console.warn(pc.yellow(`⚠️  Multiple stories not supported: ${storyFile.path}`))
       }
+      storyFile.id = storyData[0].id
       storyFile.story = storyData[0]
       storyFile.treeFile = {
         title: storyData[0].title,

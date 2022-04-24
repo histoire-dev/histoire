@@ -16,6 +16,18 @@ Title of the story.
 </template>
 ```
 
+### `id`
+
+Id of the story used in the URL. By default, the id is automatically generated from the file path. Setting an id manually will ensure the URL parameter doesn't change with the order of the variants in the story.
+
+```vue
+<template>
+  <Story id="my-story">
+    Hello world
+  </Story>
+</template>
+```
+
 ### `layout`
 
 Layout of the story. Object with the following properties:
