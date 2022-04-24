@@ -62,9 +62,24 @@ const sourceHtml = computed(() => highlighter.value?.codeToHtml(sourceCode.value
 
 <template>
   <div
-    class="htw-bg-gray-100 dark:htw-bg-gray-800 htw-h-full htw-overflow-hidden htw-relative"
+    class="htw-bg-gray-100 dark:htw-bg-gray-800 htw-h-full htw-overflow-hidden htw-flex htw-flex-col"
     data-test-id="story-source-code"
   >
+    <!-- Toolbar -->
+    <div
+      v-if="!error"
+      class="htw-h-10 htw-flex-none htw-border-b htw-border-solid htw-border-gray-150 dark:htw-border-gray-850 htw-px-4 htw-flex htw-items-center"
+    >
+      <div class="htw-text-gray-900 dark:htw-text-gray-100">
+        Source
+      </div>
+      <div class="htw-flex-1" />
+      <HstCopyIcon
+        :content="sourceCode"
+        class="htw-flex-none"
+      />
+    </div>
+
     <div
       v-if="error"
       class="htw-text-red-500 htw-h-full htw-p-2 htw-overflow-auto htw-font-mono htw-text-sm"
@@ -74,27 +89,21 @@ const sourceHtml = computed(() => highlighter.value?.codeToHtml(sourceCode.value
 
     <textarea
       v-else-if="!sourceHtml"
-      class="__histoire-code-placeholder htw-w-full htw-h-full htw-p-2.5 htw-outline-none htw-bg-transparent htw-resize-none htw-m-0"
+      class="__histoire-code-placeholder htw-w-full htw-h-full htw-p-4 htw-outline-none htw-bg-transparent htw-resize-none htw-m-0"
       :value="sourceCode"
       readonly
     />
     <!-- eslint-disable vue/no-v-html -->
     <div
       v-else
-      class="__histoire-code htw-w-full htw-h-full htw-p-2.5 htw-overflow-auto"
-      v-html="sourceHtml"
-    />
-    <!-- eslint-enable vue/no-v-html -->
-
-    <!-- Toolbar -->
-    <div
-      v-if="!error"
-      class="htw-absolute htw-top-2 htw-right-6 htw-p-1 htw-bg-gray-100 dark:htw-bg-gray-800"
+      class="htw-w-full htw-h-full htw-overflow-auto"
     >
-      <HstCopyIcon
-        :content="sourceCode"
+      <div
+        class="__histoire-code htw-p-4 htw-w-fit"
+        v-html="sourceHtml"
       />
     </div>
+    <!-- eslint-enable vue/no-v-html -->
   </div>
 </template>
 
