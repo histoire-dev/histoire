@@ -37,7 +37,7 @@ export async function generateSearchData (ctx: Context) {
         searchIndex.add({
           id: `${storyFile.story.id}:${variant.id}`,
           kind: 'variant',
-          title: variant.title,
+          title: `${storyFile.story.title} ${variant.title}`,
           docs: '', // @TODO
         })
       }
