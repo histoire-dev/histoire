@@ -39,7 +39,12 @@ const hover = ref<string>(null)
 </script>
 
 <template>
-  <div class="htw-bind-col-size htw-grid htw-gap-4 htw-m-4">
+  <div
+    class="htw-bind-col-size htw-grid htw-gap-4 htw-m-4"
+    :style="{
+      '--histoire-col-size': colSizePx,
+    }"
+  >
     <div
       v-for="token of processedTokens"
       :key="token.key"
@@ -80,6 +85,6 @@ const hover = ref<string>(null)
 
 <style>
 .htw-bind-col-size {
-  grid-template-columns: repeat(auto-fill, minmax(v-bind(colSizePx), 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(var(--histoire-col-size), 1fr));
 }
 </style>
