@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { Icon } from '@iconify/vue'
 import { useStoryStore } from '../../stores/story'
 
 import BaseSplitPane from '../base/BaseSplitPane.vue'
@@ -8,6 +9,7 @@ import BaseEmpty from '../base/BaseEmpty.vue'
 import { isMobile } from '../../util/responsive'
 import StoryViewer from './StoryViewer.vue'
 import StorySidePanel from './StorySidePanel.vue'
+import StoryDocs from './StoryDocs.vue'
 
 const storyStore = useStoryStore()
 
@@ -52,14 +54,26 @@ function setVariant (variantId: string) {
 
 <template>
   <BaseEmpty v-if="!storyStore.currentStory">
-    <span>Story not found</span>
+    <Icon
+      icon="carbon:software-resource-resource"
+      class="htw-w-16 htw-h-16 htw-opacity-50"
+    />
   </BaseEmpty>
 
   <div
     v-else
     class="htw-h-full"
   >
-    <template v-if="isMobile">
+    <div
+      v-if="storyStore.currentStory.docsOnly"
+      class="htw-h-full htw-overflow-auto"
+    >
+      <StoryDocs
+        :story="storyStore.currentStory"
+        class="md:htw-p-12 htw-w-full md:htw-max-w-[600px] lg:htw-max-w-[800px] xl:htw-max-w-[900px]"
+      />
+    </div>
+    <template v-else-if="isMobile">
       <StoryViewer />
     </template>
     <BaseSplitPane

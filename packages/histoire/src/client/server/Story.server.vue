@@ -35,6 +35,11 @@ export default defineComponent({
       type: String,
       default: null,
     },
+
+    docsOnly: {
+      type: Boolean,
+      default: false,
+    },
   },
 
   setup (props) {
@@ -51,6 +56,7 @@ export default defineComponent({
       layout: props.layout,
       icon: props.icon,
       iconColor: props.iconColor,
+      docsOnly: props.docsOnly,
       variants: [],
     }
     const addStory = inject('addStory', null)
@@ -81,7 +87,7 @@ export default defineComponent({
   render () {
     let suppressError = false
     try {
-      return this.$slots.default({
+      return this.$slots.default?.({
         get state () {
           // No variant tags
           suppressError = true

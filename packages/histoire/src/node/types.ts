@@ -41,6 +41,7 @@ export interface Story {
   }
   icon?: string
   iconColor?: string
+  docsOnly?: boolean
 }
 
 export interface Variant {

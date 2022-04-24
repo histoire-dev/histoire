@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { PropType, ref, watchEffect } from 'vue'
+import { Icon } from '@iconify/vue'
 import type { Story } from '../../types'
 import BaseEmpty from '../base/BaseEmpty.vue'
 
@@ -24,15 +25,21 @@ watchEffect(async () => {
 </script>
 
 <template>
-  <BaseEmpty
-    v-if="!renderedDoc"
-  >
-    No documentation available
-  </BaseEmpty>
-  <div
-    v-else
-    class="htw-prose dark:htw-prose-invert htw-p-4 htw-max-w-none"
-    data-test-id="story-docs"
-    v-html="renderedDoc"
-  />
+  <div>
+    <BaseEmpty
+      v-if="!renderedDoc"
+    >
+      <Icon
+        icon="carbon:document-unknown"
+        class="htw-w-8 htw-h-8 htw-opacity-50 htw-mb-6"
+      />
+      No documentation available
+    </BaseEmpty>
+    <div
+      v-else
+      class="htw-prose dark:htw-prose-invert htw-p-4 htw-max-w-none"
+      data-test-id="story-docs"
+      v-html="renderedDoc"
+    />
+  </div>
 </template>

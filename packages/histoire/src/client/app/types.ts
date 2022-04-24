@@ -21,6 +21,7 @@ export interface Story {
   }
   icon?: string
   iconColor?: string
+  docsOnly?: boolean
   file?: StoryFile
   lastSelectedVariant?: Variant
 }
