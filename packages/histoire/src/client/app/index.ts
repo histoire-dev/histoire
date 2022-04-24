@@ -1,5 +1,4 @@
 import '$histoire-theme'
-import '@histoire/controls/dist/style.css'
 import '../../style.css'
 
 import { createApp } from 'vue'

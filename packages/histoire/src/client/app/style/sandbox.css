@@ -1,3 +1,5 @@
+@import '@histoire/controls/dist/style.css';
+
 html,
 body {
   background: transparent !important;
