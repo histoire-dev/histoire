@@ -490,7 +490,7 @@ defineExpose({
 }
 
 .dark .drop-shadow {
-  background: black;
+  background: #4e4e57;
 }
 
 .border-radius {
