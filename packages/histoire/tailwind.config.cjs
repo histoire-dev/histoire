@@ -93,6 +93,7 @@ module.exports.theme.extend.typography = (theme) => ({
       },
 
       '--tw-prose-invert-quote-borders': theme('colors.gray-800'),
+      '--tw-prose-invert-hr': theme('colors.gray-800'),
 
       blockquote: {
         marginLeft: 0,
