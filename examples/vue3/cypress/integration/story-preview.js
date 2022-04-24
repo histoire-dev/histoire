@@ -12,7 +12,7 @@ describe('Story preview', () => {
     cy.get('[data-test-id="story-variant-list-item"]').contains('untitled').click()
     cy.get('[data-test-id="story-variant-single-view"]').contains('untitled')
     getIframeBody().contains('Hello world!')
-    cy.get('[data-test-id="story-source-code"]').contains('<Demo message="Hello world!" />')
+    cy.get('[data-test-id="story-source-code"]').should('have.text', '<Demo message="Hello world!" />')
   })
 
   it('should display the second variant', () => {
@@ -22,6 +22,6 @@ describe('Story preview', () => {
     cy.get('[data-test-id="story-variant-list-item"]').contains('Variant 2').click()
     cy.get('[data-test-id="story-variant-single-view"]').contains('Variant 2')
     getIframeBody().contains('Meow!')
-    cy.get('[data-test-id="story-source-code"]').contains('<Demo message="Meow!" />')
+    cy.get('[data-test-id="story-source-code"]').should('have.text', '<Demo message="Meow!" />')
   })
 })

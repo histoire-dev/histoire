@@ -63,7 +63,6 @@ const sourceHtml = computed(() => highlighter.value?.codeToHtml(sourceCode.value
 <template>
   <div
     class="htw-bg-gray-100 dark:htw-bg-gray-800 htw-h-full htw-overflow-hidden htw-flex htw-flex-col"
-    data-test-id="story-source-code"
   >
     <!-- Toolbar -->
     <div
@@ -92,11 +91,13 @@ const sourceHtml = computed(() => highlighter.value?.codeToHtml(sourceCode.value
       class="__histoire-code-placeholder htw-w-full htw-h-full htw-p-4 htw-outline-none htw-bg-transparent htw-resize-none htw-m-0"
       :value="sourceCode"
       readonly
+      data-test-id="story-source-code"
     />
     <!-- eslint-disable vue/no-v-html -->
     <div
       v-else
       class="htw-w-full htw-h-full htw-overflow-auto"
+      data-test-id="story-source-code"
     >
       <div
         class="__histoire-code htw-p-4 htw-w-fit"
