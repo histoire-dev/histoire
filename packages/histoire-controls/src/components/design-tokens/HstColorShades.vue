@@ -5,7 +5,7 @@ export default {
 </script>
 
 <script lang="ts" setup>
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { VTooltip as vTooltip } from 'floating-vue'
 import HstCopyIcon from '../HstCopyIcon.vue'
 
@@ -38,6 +38,8 @@ const displayedShades = computed(() => {
   }
   return list
 })
+
+const hover = ref<string>(null)
 </script>
 
 <template>
@@ -48,7 +50,9 @@ const displayedShades = computed(() => {
     <div
       v-for="shade of displayedShades"
       :key="shade.key"
-      class="htw-flex htw-flex-col htw-gap-2 htw-group"
+      class="htw-flex htw-flex-col htw-gap-2"
+      @mouseenter="hover = shade.key"
+      @mouseleave="hover = null"
     >
       <slot
         :color="shade.color"
@@ -67,8 +71,9 @@ const displayedShades = computed(() => {
             class="htw-my-0 htw-truncate htw-shrink"
           >{{ shade.name }}</pre>
           <HstCopyIcon
+            v-if="hover === shade.key"
             :content="shade.name"
-            class="htw-hidden group-hover:htw-block htw-flex-none"
+            class="htw-flex-none"
           />
         </div>
         <div class="htw-flex htw-gap-1">
@@ -77,8 +82,9 @@ const displayedShades = computed(() => {
             class="htw-my-0 htw-opacity-50 htw-truncate htw-shrink"
           >{{ shade.color }}</pre>
           <HstCopyIcon
+            v-if="hover === shade.key"
             :content="shade.color"
-            class="htw-hidden group-hover:htw-block htw-flex-none"
+            class="htw-flex-none"
           />
         </div>
       </div>

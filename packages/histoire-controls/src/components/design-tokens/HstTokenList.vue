@@ -5,14 +5,14 @@ export default {
 </script>
 
 <script lang="ts" setup>
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import HstCopyIcon from '../HstCopyIcon.vue'
 
 const props = defineProps<{
   tokens: Record<string, string | number | any[] | Record<string, any>>
   // @TODO report eslint bug
   // eslint-disable-next-line func-call-spacing
-  getName?: (key: string, value: string | number) => string
+  getName?: (key: string, value: string | number | any[] | Record<string, any>) => string
 }>()
 
 const processedTokens = computed(() => {
@@ -27,13 +27,17 @@ const processedTokens = computed(() => {
     }
   })
 })
+
+const hover = ref<string>(null)
 </script>
 
 <template>
   <div
     v-for="token of processedTokens"
     :key="token.key"
-    class="htw-flex htw-flex-col htw-gap-2 htw-group htw-my-8"
+    class="htw-flex htw-flex-col htw-gap-2 htw-my-8"
+    @mouseenter="hover = token.key"
+    @mouseleave="hover = null"
   >
     <slot
       :token="token"
@@ -42,15 +46,17 @@ const processedTokens = computed(() => {
       <div class="htw-flex htw-gap-1">
         <pre class="htw-my-0 htw-truncate htw-shrink">{{ token.name }}</pre>
         <HstCopyIcon
+          v-if="hover === token.key"
           :content="token.name"
-          class="htw-hidden group-hover:htw-block htw-flex-none"
+          class="htw-flex-none"
         />
       </div>
       <div class="htw-flex htw-gap-1">
         <pre class="htw-my-0 htw-opacity-50 htw-truncate htw-shrink">{{ token.value }}</pre>
         <HstCopyIcon
+          v-if="hover === token.key"
           :content="typeof token.value === 'string' ? token.value : JSON.stringify(token.value)"
-          class="htw-hidden group-hover:htw-block htw-flex-none"
+          class="htw-flex-none"
         />
       </div>
     </div>
