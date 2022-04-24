@@ -4,6 +4,7 @@ import SearchLoading from './SearchLoading.vue'
 const SearchPane = defineAsyncComponent({
   loader: () => import('./SearchPane.vue'),
   loadingComponent: SearchLoading,
+  delay: 0,
 })
 
 defineProps({
