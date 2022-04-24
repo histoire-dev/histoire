@@ -1,13 +1,21 @@
 import path from 'pathe'
-import fs from 'fs'
-import defu from 'defu'
-import { createServer, resolveConfig as resolveViteConfig, UserConfig as ViteConfig, ConfigEnv as ViteConfigEnv } from 'vite'
+import { createDefu } from 'defu'
+import {
+  createServer,
+  resolveConfig as resolveViteConfig,
+  UserConfig as ViteConfig,
+  ConfigEnv as ViteConfigEnv,
+  mergeConfig as mergeViteConfig,
+} from 'vite'
 import { ViteNodeServer } from 'vite-node/server'
 import { ViteNodeRunner } from 'vite-node/client'
 import pc from 'picocolors'
+import type MarkdownIt from 'markdown-it'
 import { TreeFile } from './tree.js'
 import { defaultColors } from './colors.js'
-import type MarkdownIt from 'markdown-it'
+import { Plugin } from './plugin.js'
+import { findUp } from './util/find-up.js'
+import { tailwindTokens } from './builtin-plugins/tailwind-tokens.js'
 
 type CustomizableColors = 'primary' | 'gray'
 type ColorKeys = '50' | '100' | '200' | '300' | '400' | '500' | '600' | '700' | '800' | '900'
@@ -31,6 +39,7 @@ export interface TreeGroupConfig {
 }
 
 export interface HistoireConfig {
+  plugins: Plugin[]
   /**
    * Output directory.
    */
@@ -138,8 +147,13 @@ export interface HistoireConfig {
   vite?: ViteConfig | ((config: ViteConfig, env: ViteConfigEnv) => void | ViteConfig | Promise<void | ViteConfig>)
 }
 
+export type ConfigMode = 'build' | 'dev'
+
 export function getDefaultConfig (): HistoireConfig {
   return {
+    plugins: [
+      tailwindTokens(),
+    ],
     outDir: 'histoire-dist',
     storyMatch: ['**/*.story.vue'],
     storyIgnored: [
@@ -233,25 +247,7 @@ export const configFileNames = [
 ]
 
 export function resolveConfigFile (cwd: string = process.cwd()): string {
-  let { root } = path.parse(cwd)
-  let dir = cwd
-
-  // Fix for windows, waiting for pathe to fix this: https://github.com/unjs/pathe/issues/5
-  if (root === '' && dir[1] === ':') {
-    root = dir.substring(0, 2)
-  }
-
-  while (dir !== root) {
-    for (const fileName of configFileNames) {
-      const searchPath = path.join(dir, fileName)
-      if (fs.existsSync(searchPath)) {
-        return searchPath
-      }
-    }
-    dir = path.dirname(dir)
-  }
-
-  return null
+  return findUp(cwd, configFileNames)
 }
 
 export async function loadConfigFile (configFile: string): Promise<Partial<HistoireConfig>> {
@@ -286,7 +282,29 @@ export async function loadConfigFile (configFile: string): Promise<Partial<Histo
   }
 }
 
-export async function resolveConfig (cwd: string = process.cwd()): Promise<HistoireConfig> {
+export const mergeConfig = createDefu((obj: any, key, value) => {
+  if (obj[key] && key === 'vite') {
+    obj[key] = mergeViteConfig(obj[key], value)
+    return true
+  }
+
+  if (obj[key] && key === 'plugins') {
+    const initialValue = obj[key] as Plugin[]
+    const newValue = obj[key] = [...value]
+    const nameMap = newValue.reduce((map, plugin) => {
+      map[plugin.name] = true
+      return map
+    }, {})
+    for (const plugin of initialValue) {
+      if (!nameMap[plugin.name]) {
+        newValue.unshift(plugin)
+      }
+    }
+    return true
+  }
+})
+
+export async function resolveConfig (cwd: string = process.cwd(), mode: ConfigMode): Promise<HistoireConfig> {
   let result: Partial<HistoireConfig>
   const configFile = resolveConfigFile(cwd)
   if (configFile) {
@@ -294,10 +312,18 @@ export async function resolveConfig (cwd: string = process.cwd()): Promise<Histo
   }
   const viteConfig = await resolveViteConfig({}, 'serve')
   const viteHistoireConfig = (viteConfig.histoire ?? {}) as HistoireConfig
-  return processConfig(defu(result, viteHistoireConfig, getDefaultConfig()))
+  return processConfig(mergeConfig(result, viteHistoireConfig, getDefaultConfig()), mode)
 }
 
-export function processConfig (config: HistoireConfig): HistoireConfig {
+export async function processConfig (config: HistoireConfig, mode: ConfigMode): Promise<HistoireConfig> {
+  for (const plugin of config.plugins) {
+    if (plugin.config) {
+      const result = await plugin.config(config, mode)
+      if (result) {
+        config = mergeConfig(result, config)
+      }
+    }
+  }
   config.outDir = path.resolve(process.cwd(), config.outDir)
   return config
 }

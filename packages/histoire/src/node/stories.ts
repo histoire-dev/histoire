@@ -1,7 +1,7 @@
 import chokidar from 'chokidar'
 import { globby } from 'globby'
 import Case from 'case'
-import { join, basename } from 'pathe'
+import { resolve, basename } from 'pathe'
 import { Context } from './context.js'
 import type { StoryFile } from './types.js'
 
@@ -41,10 +41,10 @@ export function notifyStoryChange (file?: StoryFile) {
 }
 
 function getAbsoluteFilePath (relativeFilePath: string) {
-  return join(context.root, relativeFilePath)
+  return resolve(context.root, relativeFilePath)
 }
 
-function addStory (relativeFilePath: string) {
+export function addStory (relativeFilePath: string) {
   const absoluteFilePath = getAbsoluteFilePath(relativeFilePath)
   const fileId = Case.kebab(relativeFilePath)
   let fileName = basename(relativeFilePath)
@@ -62,7 +62,7 @@ function addStory (relativeFilePath: string) {
   return file
 }
 
-function removeStory (relativeFilePath: string) {
+export function removeStory (relativeFilePath: string) {
   const fileId = Case.kebab(relativeFilePath)
   const index = context.storyFiles.findIndex((file) => file.id === fileId)
   if (index !== -1) context.storyFiles.splice(index, 1)

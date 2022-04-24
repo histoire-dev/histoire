@@ -1,3 +1,4 @@
+import '@histoire/controls/dist/style.css'
 import './style/sandbox.css'
 import { parseQuery } from 'vue-router'
 import { computed, createApp, h, onMounted, ref, watch, isRef } from 'vue'

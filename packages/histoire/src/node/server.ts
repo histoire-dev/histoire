@@ -4,10 +4,10 @@ import { createVitePlugins, RESOLVED_STORIES_ID } from './vite.js'
 import { notifyStoryChange, onStoryChange, watchStories } from './stories.js'
 import { useCollectStories } from './collect/index.js'
 import type { StoryFile } from './types.js'
+import { DevPluginApi } from './plugin.js'
+import { useModuleLoader } from './load.js'
 
 export async function createServer (ctx: Context, port: number) {
-  await watchStories(ctx)
-
   const server = await createViteServer({
     plugins: await createVitePlugins(ctx),
     server: {
@@ -17,6 +17,24 @@ export async function createServer (ctx: Context, port: number) {
     },
   })
   await server.pluginContainer.buildStart({})
+
+  const moduleLoader = useModuleLoader({
+    server,
+  })
+
+  const pluginOnCleanups: (() => void | Promise<void>)[] = []
+  for (const plugin of ctx.config.plugins) {
+    if (plugin.onDev) {
+      const api = new DevPluginApi(ctx, plugin, moduleLoader)
+      const onCleanup = (cb: () => void | Promise<void>) => {
+        pluginOnCleanups.push(cb)
+      }
+      await plugin.onDev(api, onCleanup)
+    }
+  }
+
+  await watchStories(ctx)
+
   // Wait for pre-bundling (in `listen()`)
   await server.listen(port)
 
@@ -93,6 +111,9 @@ export async function createServer (ctx: Context, port: number) {
   })
 
   async function close () {
+    for (const cb of pluginOnCleanups) {
+      await cb()
+    }
     await server.close()
     await destroyCollectStories()
   }

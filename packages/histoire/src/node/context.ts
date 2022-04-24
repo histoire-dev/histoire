@@ -1,11 +1,11 @@
 import { resolveConfig as resolveViteConfig } from 'vite'
-import { resolveConfig, HistoireConfig } from './config.js'
+import { resolveConfig, HistoireConfig, ConfigMode } from './config.js'
 import type { StoryFile } from './types.js'
 
 export interface Context {
   root: string
   config: HistoireConfig
-  mode: 'dev' | 'build'
+  mode: ConfigMode
   storyFiles: StoryFile[]
 }
 
@@ -14,7 +14,7 @@ export interface CreateContextOptions {
 }
 
 export async function createContext (options: CreateContextOptions) {
-  const config = await resolveConfig()
+  const config = await resolveConfig(process.cwd(), options.mode)
   const viteConfig = await resolveViteConfig({}, 'build')
   return {
     root: viteConfig.root,

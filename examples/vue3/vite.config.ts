@@ -9,12 +9,25 @@ export default defineConfig({
   ],
 
   histoire: {
+    plugins: [
+      {
+        name: 'test',
+        config () {
+          return {
+            theme: {
+              logoHref: 'http://histoire.dev',
+            },
+          }
+        },
+      },
+    ],
+
     // Alternative way of specifying histoire config
     setupFile: '/src/histoire.setup.ts',
 
-    theme: {
-      logoHref: 'http://histoire.dev',
-    },
+    // theme: {
+    //   logoHref: 'http://histoire.dev',
+    // },
 
     tree: {
       groups: [

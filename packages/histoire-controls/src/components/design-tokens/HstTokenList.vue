@@ -1,6 +1,6 @@
 <script lang="ts">
 export default {
-  name: 'HstDesignTokens',
+  name: 'HstTokenList',
 }
 </script>
 
@@ -9,7 +9,7 @@ import { computed } from 'vue'
 import HstCopyIcon from '../HstCopyIcon.vue'
 
 const props = defineProps<{
-  tokens: Record<string, string | number>
+  tokens: Record<string, string | number | any[] | Record<string, any>>
   // @TODO report eslint bug
   // eslint-disable-next-line func-call-spacing
   getName?: (key: string, value: string | number) => string
@@ -23,7 +23,7 @@ const processedTokens = computed(() => {
     return {
       key,
       name,
-      value: typeof value === 'string' ? value : value.toString(),
+      value: typeof value === 'number' ? value.toString() : value,
     }
   })
 })
@@ -49,7 +49,7 @@ const processedTokens = computed(() => {
       <div class="htw-flex htw-gap-1">
         <pre class="htw-my-0 htw-opacity-50 htw-truncate htw-shrink">{{ token.value }}</pre>
         <HstCopyIcon
-          :content="token.value"
+          :content="typeof token.value === 'string' ? token.value : JSON.stringify(token.value)"
           class="htw-hidden group-hover:htw-block htw-flex-none"
         />
       </div>

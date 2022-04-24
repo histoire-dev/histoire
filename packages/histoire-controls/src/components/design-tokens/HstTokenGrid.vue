@@ -1,6 +1,6 @@
 <script lang="ts">
 export default {
-  name: 'HstDesignTokens',
+  name: 'HstTokenGrid',
 }
 </script>
 
@@ -10,7 +10,7 @@ import { VTooltip as vTooltip } from 'floating-vue'
 import HstCopyIcon from '../HstCopyIcon.vue'
 
 const props = withDefaults(defineProps<{
-  tokens: Record<string, string | number>
+  tokens: Record<string, string | number | any[] | Record<string, any>>
   colSize?: number
   // @TODO report eslint bug
   // eslint-disable-next-line func-call-spacing
@@ -28,7 +28,7 @@ const processedTokens = computed(() => {
     return {
       key,
       name,
-      value: typeof value === 'string' ? value : value.toString(),
+      value: typeof value === 'number' ? value.toString() : value,
     }
   })
 })
@@ -63,7 +63,7 @@ const colSizePx = computed(() => `${props.colSize}px`)
             class="htw-my-0 htw-opacity-50 htw-truncate htw-shrink"
           >{{ token.value }}</pre>
           <HstCopyIcon
-            :content="token.value"
+            :content="typeof token.value === 'string' ? token.value : JSON.stringify(token.value)"
             class="htw-hidden group-hover:htw-block htw-flex-none"
           />
         </div>
@@ -72,7 +72,7 @@ const colSizePx = computed(() => `${props.colSize}px`)
   </div>
 </template>
 
-<style scoped>
+<style>
 .htw-bind-col-size {
   grid-template-columns: repeat(auto-fill, minmax(v-bind(colSizePx), 1fr));
 }

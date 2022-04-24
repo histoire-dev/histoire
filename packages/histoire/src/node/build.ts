@@ -10,6 +10,8 @@ import { createVitePlugins } from './vite.js'
 import { findAllStories } from './stories.js'
 import type { RollupOutput } from 'rollup'
 import { useCollectStories } from './collect/index.js'
+import { BuildPluginApi } from './plugin.js'
+import { useModuleLoader } from './load.js'
 
 const PRELOAD_MODULES = [
   'vendor',
@@ -25,11 +27,23 @@ export async function build (ctx: Context) {
   const startTime = performance.now()
   await findAllStories(ctx)
 
-  // Collect story data
   const server = await createViteServer({
     plugins: await createVitePlugins(ctx),
   })
   await server.pluginContainer.buildStart({})
+
+  const moduleLoader = useModuleLoader({
+    server,
+    throws: true,
+  })
+  for (const plugin of ctx.config.plugins) {
+    if (plugin.onBuild) {
+      const api = new BuildPluginApi(ctx, plugin, moduleLoader)
+      await plugin.onBuild(api)
+    }
+  }
+
+  // Collect story data
   const { executeStoryFile, destroy: destroyCollectStories } = useCollectStories({
     server,
     throws: true,
@@ -37,7 +51,6 @@ export async function build (ctx: Context) {
   for (const storyFile of ctx.storyFiles) {
     await executeStoryFile(storyFile)
   }
-  await server.close()
   await destroyCollectStories()
 
   const storyCount = ctx.storyFiles.reduce((sum, file) => sum + (file.story?.variants.length ? 1 : 0), 0)
@@ -97,6 +110,8 @@ export async function build (ctx: Context) {
     console.warn(pc.yellow(`⚠️  ${emptyStoryCount} empty story file`))
   }
   console.log(pc.green(`✅ Built ${storyCount} stories (${variantCount} variants) in ${Math.round(duration / 1000 * 100) / 100}s`))
+
+  await server.close()
 }
 
 async function writeHtml (jsEntryFile: string, cssEntryFile: string, htmlFileName: string, variables: { HEAD?: string }, ctx: Context, resolvedViteConfig: ViteConfig) {
