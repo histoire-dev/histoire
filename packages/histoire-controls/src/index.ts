@@ -1,4 +1,3 @@
-import '../node_modules/.temp/style.css'
 import type { App } from 'vue'
 import HstCheckboxVue from './components/checkbox/HstCheckbox.vue'
 import HstTextVue from './components/text/HstText.vue'
