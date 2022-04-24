@@ -50,7 +50,10 @@ useScrollOnActive(active, el)
         <span class="htw-truncate">{{ story.title }}</span>
       </span>
 
-      <span class="htw-opacity-40 htw-text-sm">
+      <span
+        v-if="!story.docsOnly"
+        class="htw-opacity-40 htw-text-sm"
+      >
         {{ story.variants.length }}
       </span>
     </BaseListItemLink>
