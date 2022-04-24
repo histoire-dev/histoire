@@ -1,5 +1,5 @@
 <template>
-  <Story title="🐱 Meow">
+  <Story title="🐱 Meow Waf Piou Meuh">
     <Variant
       title="default"
     >

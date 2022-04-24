@@ -1,6 +1,6 @@
 import { createServer as createViteServer } from 'vite'
 import { Context } from './context.js'
-import { createVitePlugins, RESOLVED_STORIES_ID } from './vite.js'
+import { createVitePlugins, RESOLVED_SEARCH_DATA_ID, RESOLVED_STORIES_ID } from './vite.js'
 import { notifyStoryChange, onStoryChange, watchStories } from './stories.js'
 import { useCollectStories } from './collect/index.js'
 import type { StoryFile } from './types.js'
@@ -87,27 +87,32 @@ export async function createServer (ctx: Context, port: number) {
     queuedFiles = []
     queueResolve()
 
-    // Invalidate stories data module
-    const mod = server.moduleGraph.getModuleById(RESOLVED_STORIES_ID)
-    if (!mod) {
-      return
-    }
-    server.moduleGraph.invalidateModule(mod)
+    // Invalidate modules
+    function invalidateModule (id: string) {
+      const mod = server.moduleGraph.getModuleById(id)
+      if (!mod) {
+        return
+      }
+      server.moduleGraph.invalidateModule(mod)
 
-    // Send stories data HMR update
-    const timestamp = Date.now()
-    mod.lastHMRTimestamp = timestamp
-    server.ws.send({
-      type: 'update',
-      updates: [
-        {
-          type: 'js-update',
-          acceptedPath: mod.url,
-          path: mod.url,
-          timestamp: timestamp,
-        },
-      ],
-    })
+      // Send HMR update
+      const timestamp = Date.now()
+      mod.lastHMRTimestamp = timestamp
+      server.ws.send({
+        type: 'update',
+        updates: [
+          {
+            type: 'js-update',
+            acceptedPath: mod.url,
+            path: mod.url,
+            timestamp: timestamp,
+          },
+        ],
+      })
+    }
+
+    invalidateModule(RESOLVED_STORIES_ID)
+    invalidateModule(RESOLVED_SEARCH_DATA_ID)
   })
 
   async function close () {

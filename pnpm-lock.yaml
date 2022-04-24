@@ -86,6 +86,7 @@ importers:
       '@iconify/vue': ^3.2.1
       '@peeky/test': ^0.13.5
       '@tailwindcss/typography': ^0.5.2
+      '@types/flexsearch': ^0.7.3
       '@types/fs-extra': ^9.0.13
       '@types/markdown-it': ^12.2.3
       '@types/node': ^17.0.23
@@ -99,6 +100,7 @@ importers:
       connect: ^3.7.0
       defu: ^6.0.0
       diacritics: ^1.3.0
+      flexsearch: ^0.7.21
       floating-vue: ^2.0.0-beta.14
       fs-extra: ^10.0.1
       globby: ^13.1.1
@@ -135,6 +137,7 @@ importers:
       connect: 3.7.0
       defu: 6.0.0
       diacritics: 1.3.0
+      flexsearch: 0.7.21
       floating-vue: 2.0.0-beta.15_vue@3.2.33
       fs-extra: 10.1.0
       globby: 13.1.1
@@ -157,6 +160,7 @@ importers:
     devDependencies:
       '@peeky/test': 0.13.5_eslint@8.13.0
       '@tailwindcss/typography': 0.5.2_tailwindcss@3.0.24
+      '@types/flexsearch': 0.7.3
       '@types/fs-extra': 9.0.13
       '@types/markdown-it': 12.2.3
       '@types/node': 17.0.25
@@ -925,6 +929,10 @@ packages:
       '@types/express-serve-static-core': 4.17.28
       '@types/qs': 6.9.7
       '@types/serve-static': 1.13.10
+    dev: true
+
+  /@types/flexsearch/0.7.3:
+    resolution: {integrity: sha512-HXwADeHEP4exXkCIwy2n1+i0f1ilP1ETQOH5KDOugjkTFZPntWo0Gr8stZOaebkxsdx+k0X/K6obU/+it07ocg==}
     dev: true
 
   /@types/form-data/0.0.33:
@@ -3811,6 +3819,10 @@ packages:
   /flatted/3.2.5:
     resolution: {integrity: sha512-WIWGi2L3DyTUvUrwRKgGi9TwxQMUEqPOPQBVi71R96jZXJdFskXEmf54BoZaS1kknGODoIGASGEzBUYdyMCBJg==}
     dev: true
+
+  /flexsearch/0.7.21:
+    resolution: {integrity: sha512-W7cHV7Hrwjid6lWmy0IhsWDFQboWSng25U3VVywpHOTJnnAZNPScog67G+cVpeX9f7yDD21ih0WDrMMT+JoaYg==}
+    dev: false
 
   /floating-vue/2.0.0-beta.15:
     resolution: {integrity: sha512-Aj0uEPIGG4cGgM4ma9SjJTVQqvQ7efbktuf2O7snfEP4jrHst/H3CTJggbnmz+ql8QwqRFwDP995b6xlRHyX0A==}

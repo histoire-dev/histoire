@@ -15,6 +15,8 @@ export interface ModuleLoader {
   destroy: () => void
 }
 
+let _load: ModuleLoader['loadModule']
+
 export function useModuleLoader (options: UseModuleLoaderOptions): ModuleLoader {
   const { server } = options
 
@@ -45,6 +47,8 @@ export function useModuleLoader (options: UseModuleLoaderOptions): ModuleLoader 
     }
   }
 
+  _load = loadModule
+
   async function destroy () {
     // Noop
   }
@@ -55,3 +59,5 @@ export function useModuleLoader (options: UseModuleLoaderOptions): ModuleLoader 
     destroy,
   }
 }
+
+export const loadModule: ModuleLoader['loadModule'] = (...args) => _load?.(...args)

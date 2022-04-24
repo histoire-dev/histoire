@@ -9,7 +9,7 @@ export default {
 import { files as rawFiles, tree as rawTree, onUpdate } from '$histoire-stories'
 import StoryList from './components/tree/StoryList.vue'
 import BaseSplitPane from './components/base/BaseSplitPane.vue'
-import { computed, ref, watch, defineAsyncComponent } from 'vue'
+import { computed, ref, watch } from 'vue'
 import AppHeader from './components/app/AppHeader.vue'
 import type { StoryFile, Tree } from './types'
 import { useStoryStore } from './stores/story'
@@ -19,8 +19,7 @@ import { histoireConfig } from './util/config.js'
 import { onKeyboardShortcut } from './util/keyboard.js'
 import { isMobile } from './util/responsive'
 import Breadcrumb from './components/app/Breadcrumb.vue'
-
-const SearchModal = defineAsyncComponent(() => import('./components/search/SearchModal.vue'))
+import SearchModal from './components/search/SearchModal.vue'
 
 const files = ref<StoryFile[]>(rawFiles.map(file => mapFile(file)))
 const tree = ref<Tree>(rawTree)

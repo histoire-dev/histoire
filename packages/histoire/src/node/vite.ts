@@ -8,6 +8,7 @@ import { notifyStoryChange } from './stories.js'
 import { makeTree } from './tree.js'
 import { parseColor } from './colors.js'
 import { createMarkdownRenderer } from './markdown.js'
+import { generateSearchData } from './search.js'
 
 const require = createRequire(import.meta.url)
 
@@ -19,6 +20,8 @@ export const CONFIG_ID = '$histoire-config'
 export const RESOLVED_CONFIG_ID = `/${CONFIG_ID}-resolved`
 export const THEME_ID = '$histoire-theme'
 export const RESOLVED_THEME_ID = `/${THEME_ID}-resolved.css`
+export const SEARCH_DATA_ID = '$histoire-search-data'
+export const RESOLVED_SEARCH_DATA_ID = `/${SEARCH_DATA_ID}-resolved`
 
 export async function createVitePlugins (ctx: Context): Promise<VitePlugin[]> {
   const viteConfig = await resolveViteConfig({}, ctx.mode === 'dev' ? 'serve' : 'build')
@@ -86,9 +89,12 @@ export async function createVitePlugins (ctx: Context): Promise<VitePlugin[]> {
       if (id.startsWith(THEME_ID)) {
         return RESOLVED_THEME_ID
       }
+      if (id.startsWith(SEARCH_DATA_ID)) {
+        return RESOLVED_SEARCH_DATA_ID
+      }
     },
 
-    load (id) {
+    async load (id) {
       if (id === RESOLVED_STORIES_ID) {
         const resolvedStories = ctx.storyFiles.filter(s => !!s.story)
         const files = resolvedStories.map((file, index) => {
@@ -142,6 +148,22 @@ if (import.meta.hot) {
         }
         css += '}'
         return css
+      }
+      if (id === RESOLVED_SEARCH_DATA_ID) {
+        return `export let searchData = ${JSON.stringify(await generateSearchData(ctx))}
+const handlers = []
+export function onUpdate (cb) {
+  handlers.push(cb)
+}
+if (import.meta.hot) {
+  import.meta.hot.accept(newModule => {
+    searchData = newModule.searchData
+    handlers.forEach(h => {
+      h(newModule.searchData)
+      newModule.onUpdate(h)
+    })
+  })
+}`
       }
     },
 
