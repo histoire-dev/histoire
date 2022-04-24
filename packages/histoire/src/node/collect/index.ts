@@ -30,10 +30,11 @@ export function useCollectStories (options: UseCollectStoriesOptions, ctx: Conte
   const threadPool = new Tinypool({
     filename: new URL('./worker.js', import.meta.url).href,
     // WebContainer compatibility (Stackblitz)
-    useAtomics: false,
+    useAtomics: typeof process.versions.webcontainer !== 'string',
   })
 
   function clearCache () {
+    server.moduleGraph.invalidateAll()
     node.fetchCache.clear()
   }
 
