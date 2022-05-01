@@ -1,14 +1,15 @@
 <script lang="ts" setup>
-import { computed, isRef, onUnmounted, Ref, ref, toRaw, watch } from 'vue'
+import { computed, onUnmounted, Ref, ref, toRaw, watch } from 'vue'
 import { useEventListener } from '@vueuse/core'
 import { Icon } from '@iconify/vue'
-import { STATE_SYNC, PREVIEW_SETTINGS_SYNC, SANDBOX_READY } from '../../util/const'
+import { STATE_SYNC, PREVIEW_SETTINGS_SYNC, SANDBOX_READY, EVENT_SEND } from '../../util/const'
 import type { Story, Variant } from '../../types'
 import HatchedPattern from '../misc/HatchedPattern.vue'
 import CheckerboardPattern from '../misc/CheckerboardPattern.vue'
 import { toRawDeep } from '../../util/reactivity'
 import { getSandboxUrl } from '../sandbox/lib'
 import { usePreviewSettingsStore } from '../../stores/preview-settings'
+import { HstEvent, useEventsStore } from '../../stores/events'
 
 const props = defineProps<{
   story: Story
@@ -46,28 +47,48 @@ watch(() => props.variant.state, () => {
 Object.assign(props.variant, {
   previewReady: false,
 })
+
 useEventListener(window, 'message', (event) => {
-  if (event.data.type === STATE_SYNC) {
-    synced = true
-    if (props.variant.state) {
-      for (const key in event.data.state) {
-        if (typeof props.variant.state[key] === 'object') {
-          Object.assign(props.variant.state[key], event.data.state[key])
-        } else {
-          // eslint-disable-next-line vue/no-mutating-props
-          props.variant.state[key] = event.data.state[key]
-        }
-      }
-    } else {
-      // eslint-disable-next-line vue/no-mutating-props
-      props.variant.state = event.data.state
-    }
-  } else if (event.data.type === SANDBOX_READY) {
-    Object.assign(props.variant, {
-      previewReady: true,
-    })
+  switch (event.data.type) {
+    case STATE_SYNC:
+      updateVariantState(event.data.state)
+      break
+    case EVENT_SEND:
+      logEvent(event.data.event)
+      break
+    case SANDBOX_READY:
+      setPreviewReady()
+      break
   }
 })
+
+function updateVariantState (state: any) {
+  synced = true
+  if (props.variant.state) {
+    for (const key in state) {
+      if (typeof props.variant.state[key] === 'object') {
+        Object.assign(props.variant.state[key], state[key])
+      } else {
+        // eslint-disable-next-line vue/no-mutating-props
+        props.variant.state[key] = state[key]
+      }
+    }
+  } else {
+    // eslint-disable-next-line vue/no-mutating-props
+    props.variant.state = state
+  }
+}
+
+function logEvent (event: HstEvent) {
+  const eventsStore = useEventsStore()
+  eventsStore.addEvent(event)
+}
+
+function setPreviewReady () {
+  Object.assign(props.variant, {
+    previewReady: true,
+  })
+}
 
 const sandboxUrl = computed(() => {
   return getSandboxUrl(props.story, props.variant)
