@@ -5,7 +5,8 @@ import { hstEvent } from 'histoire/client'
 
 <template>
   <Story
-    title="events/EventButton"
+    title="events/EventButtonGrid"
+    :layout="{ type: 'grid', width: 500 }"
   >
     <EventButton @myEvent="hstEvent('My event', $event)" /><br>
     <button @click="hstEvent('Click', $event)">

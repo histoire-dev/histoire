@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
-import { ref, reactive } from 'vue'
+import { ref, reactive, watch } from 'vue'
+import { useStoryStore } from './story.js'
 
 export type HstEvent = {
   name: string
@@ -7,6 +8,8 @@ export type HstEvent = {
 }
 
 export const useEventsStore = defineStore('events', () => {
+  const storyStore = useStoryStore()
+
   const events = reactive<Array<HstEvent>>([])
   const unseen = ref(0)
 
@@ -15,8 +18,18 @@ export const useEventsStore = defineStore('events', () => {
     unseen.value++
   }
 
+  function reset () {
+    events.length = 0
+    unseen.value = 0
+  }
+
+  watch(() => storyStore.currentVariant, () => {
+    reset()
+  })
+
   return {
     addEvent,
+    reset,
     events,
     unseen,
   }
