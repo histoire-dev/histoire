@@ -12,8 +12,6 @@ import HstCopyIcon from '../HstCopyIcon.vue'
 const props = withDefaults(defineProps<{
   tokens: Record<string, string | number | any[] | Record<string, any>>
   colSize?: number
-  // @TODO report eslint bug
-  // eslint-disable-next-line func-call-spacing
   getName?: (key: string, value: string | number | any[] | Record<string, any>) => string
 }>(), {
   colSize: 180,

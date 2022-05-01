@@ -11,8 +11,6 @@ import HstCopyIcon from '../HstCopyIcon.vue'
 
 const props = defineProps<{
   shades: Record<string, string>
-  // @TODO report eslint bug
-  // eslint-disable-next-line func-call-spacing
   getName?: (key: string, color: string) => string
   search?: string
 }>()

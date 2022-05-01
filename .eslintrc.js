@@ -45,6 +45,8 @@ module.exports = {
     quotes: ['error', 'single', { allowTemplateLiterals: true }],
     'vue/multi-word-component-names': 'warn',
     '@typescript-eslint/type-annotation-spacing': ['error'],
+    'func-call-spacing': 'off',
+    '@typescript-eslint/func-call-spacing': ['error'],
   },
   overrides: [
     {
