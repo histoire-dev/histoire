@@ -1,5 +1,6 @@
 import type { App } from 'vue'
 import type { Story, Variant } from './app/types.js'
+export { hstEvent } from './app/util/events'
 
 export type Vue3StorySetupHandler = (payload: {
   app: App
