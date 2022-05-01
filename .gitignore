@@ -1,6 +1,7 @@
 node_modules/
 dist/
 histoire-dist/
+.histoire/dist/
 .idea
 **/cypress/screenshots/
 **/cypress/videos/

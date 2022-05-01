@@ -154,7 +154,7 @@ export function getDefaultConfig (): HistoireConfig {
     plugins: [
       tailwindTokens(),
     ],
-    outDir: 'histoire-dist',
+    outDir: '.histoire/dist',
     storyMatch: ['**/*.story.vue'],
     storyIgnored: [
       '**/node_modules/**',
