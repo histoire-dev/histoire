@@ -3,10 +3,11 @@ import path from 'pathe'
 import fs from 'fs-extra'
 import pc from 'picocolors'
 import { TEMP_PATH } from './alias.js'
-import { ConfigMode, HistoireConfig } from './config.js'
-import { Context } from './context.js'
-import { ModuleLoader } from './load.js'
+import type { ConfigMode, HistoireConfig } from './config.js'
+import type { Context } from './context.js'
+import type { ModuleLoader } from './load.js'
 import { addStory, removeStory } from './stories.js'
+import type { Story, Variant } from './types.js'
 
 export interface Plugin {
   /**
@@ -75,6 +76,12 @@ export class DevPluginApi extends BasePluginApi {
   watcher = chokidar
 }
 
-export class BuildPluginApi extends BasePluginApi {
+export type PreviewStoryCallback = (payload: { file: string, story: Story, variant: Variant, url: string }) => Promise<void> | void
 
+export class BuildPluginApi extends BasePluginApi {
+  previewStoryCallbacks: PreviewStoryCallback[] = []
+
+  onPreviewStory (cb: PreviewStoryCallback) {
+    this.previewStoryCallbacks.push(cb)
+  }
 }

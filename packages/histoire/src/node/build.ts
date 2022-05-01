@@ -10,8 +10,9 @@ import { createVitePlugins } from './vite.js'
 import { findAllStories } from './stories.js'
 import type { RollupOutput } from 'rollup'
 import { useCollectStories } from './collect/index.js'
-import { BuildPluginApi } from './plugin.js'
+import { BuildPluginApi, PreviewStoryCallback } from './plugin.js'
 import { useModuleLoader } from './load.js'
+import { startPreview } from './preview.js'
 
 const PRELOAD_MODULES = [
   'vendor',
@@ -36,10 +37,12 @@ export async function build (ctx: Context) {
     server,
     throws: true,
   })
+  const renderStoryCallbacks: PreviewStoryCallback[] = []
   for (const plugin of ctx.config.plugins) {
     if (plugin.onBuild) {
       const api = new BuildPluginApi(ctx, plugin, moduleLoader)
       await plugin.onBuild(api)
+      renderStoryCallbacks.push(...api.previewStoryCallbacks)
     }
   }
 
@@ -97,13 +100,15 @@ export async function build (ctx: Context) {
 
   // Index
   const indexOutput = result.output.find(o => o.name === 'index' && o.type === 'chunk')
-  await writeHtml(indexOutput.fileName, styleOutput.fileName, 'index.html', {
+  const indexHtml = generateEntryHtml(indexOutput.fileName, styleOutput.fileName, {
     HEAD: `${preloadHtml}${prefetchHtml}`,
   }, ctx, resolvedViteConfig)
+  await writeFile('index.html', indexHtml, ctx)
 
   // Sandbox
   const sandboxOutput = result.output.find(o => o.name === 'sandbox' && o.type === 'chunk')
-  await writeHtml(sandboxOutput.fileName, styleOutput.fileName, '__sandbox.html', {}, ctx, resolvedViteConfig)
+  const sandboxHtml = generateEntryHtml(sandboxOutput.fileName, styleOutput.fileName, {}, ctx, resolvedViteConfig)
+  await writeFile('__sandbox.html', sandboxHtml, ctx)
 
   const duration = performance.now() - startTime
   if (emptyStoryCount) {
@@ -111,27 +116,61 @@ export async function build (ctx: Context) {
   }
   console.log(pc.green(`✅ Built ${storyCount} stories (${variantCount} variants) in ${Math.round(duration / 1000 * 100) / 100}s`))
 
+  // Render
+  if (renderStoryCallbacks.length) {
+    const { baseUrl, close } = await startPreview(resolvedViteConfig, null, ctx)
+    for (const storyFile of ctx.storyFiles) {
+      const story = storyFile.story
+      for (const variant of story.variants) {
+        const query = new URLSearchParams()
+        query.append('storyId', story.id)
+        query.append('variantId', variant.id)
+        const url = `${baseUrl}__sandbox?${query.toString()}`
+        for (const fn of renderStoryCallbacks) {
+          await fn({
+            file: storyFile.path,
+            story,
+            variant,
+            url,
+          })
+        }
+      }
+    }
+    await close()
+  }
+
   await server.close()
 }
 
-async function writeHtml (jsEntryFile: string, cssEntryFile: string, htmlFileName: string, variables: { HEAD?: string }, ctx: Context, resolvedViteConfig: ViteConfig) {
-  const code = `<!DOCTYPE html>
+function generateBaseHtml (head: string, body: string, ctx: Context) {
+  return `<!DOCTYPE html>
 <html>
 <head>
   <title>${ctx.config.theme.title}</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="">
-  <link rel="stylesheet" href="${resolvedViteConfig.base}${cssEntryFile}">
-  ${ctx.config.theme?.favicon ? `<link rel="icon" type="${lookupMime(ctx.config.theme.favicon)}" href="${ctx.config.theme.favicon}"/>` : ''}
-  ${variables.HEAD ?? ''}
+  ${head}
 </head>
 <body>
-  <div id="app"></div>
-  <script type="module" src="${resolvedViteConfig.base}${jsEntryFile}"></script>
+  ${body}
 </body>
 </html>`
-  await fs.writeFile(join(ctx.config.outDir, htmlFileName), code, 'utf8')
+}
+
+function generateEntryHtml (jsEntryFile: string, cssEntryFile: string, variables: { HEAD?: string }, ctx: Context, resolvedViteConfig: ViteConfig) {
+  return generateBaseHtml(
+    `<link rel="stylesheet" href="${resolvedViteConfig.base}${cssEntryFile}">
+    ${ctx.config.theme?.favicon ? `<link rel="icon" type="${lookupMime(ctx.config.theme.favicon)}" href="${ctx.config.theme.favicon}"/>` : ''}
+    ${variables.HEAD ?? ''}`,
+    `<div id="app"></div>
+    <script type="module" src="${resolvedViteConfig.base}${jsEntryFile}"></script>`,
+    ctx,
+  )
+}
+
+async function writeFile (fileName: string, content: string, ctx: Context) {
+  await fs.writeFile(join(ctx.config.outDir, fileName), content, 'utf8')
 }
 
 function generateScriptLinks (prefetchScripts: string[], rel: string, ctx: Context, resolvedViteConfig: ViteConfig) {
