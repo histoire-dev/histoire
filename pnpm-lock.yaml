@@ -67,6 +67,21 @@ importers:
       start-server-and-test: 1.14.0
       vite: 2.9.5_sass@1.50.1
 
+  examples/vue3-percy:
+    specifiers:
+      '@histoire/plugin-percy': workspace:*
+      '@vitejs/plugin-vue': ^2.3.1
+      histoire: workspace:*
+      vite: ^2.9.1
+      vue: ^3.2.31
+    dependencies:
+      vue: 3.2.33
+    devDependencies:
+      '@histoire/plugin-percy': link:../../packages/histoire-plugin-percy
+      '@vitejs/plugin-vue': 2.3.1_vite@2.9.5+vue@3.2.33
+      histoire: link:../../packages/histoire
+      vite: 2.9.5
+
   examples/vue3-screenshot:
     specifiers:
       '@histoire/plugin-screenshot': workspace:*
@@ -226,6 +241,25 @@ importers:
       vite: 2.9.5
       vue: 3.2.33
       vue-tsc: 0.34.10_typescript@4.6.3
+
+  packages/histoire-plugin-percy:
+    specifiers:
+      '@percy/sdk-utils': ^1.1.0
+      defu: ^6.0.0
+      fs-extra: ^10.1.0
+      histoire: workspace:*
+      pathe: ^0.2.0
+      puppeteer: ^13.7.0
+      typescript: ^4.6.3
+    dependencies:
+      '@percy/sdk-utils': 1.1.0
+      defu: 6.0.0
+      fs-extra: 10.1.0
+      pathe: 0.2.0
+      puppeteer: 13.7.0
+    devDependencies:
+      histoire: link:../histoire
+      typescript: 4.6.3
 
   packages/histoire-plugin-screenshot:
     specifiers:
@@ -842,6 +876,18 @@ packages:
       merge-source-map: 1.1.0
       pathe: 0.2.0
     dev: true
+
+  /@percy/logger/1.1.0:
+    resolution: {integrity: sha512-bAlxBcdnViTpGQZtjs361vXSlaxEj6Zt4Wt1Mo7EdPwv/zya2cBpLFNNcRycWto4mdb5Qnpht+IPXf7RFXJ/nw==}
+    engines: {node: '>=14'}
+    dev: false
+
+  /@percy/sdk-utils/1.1.0:
+    resolution: {integrity: sha512-pSUtOv/nJvpKNbnsRPmgRhBrT+BA3ANCBQjT6swlwY7+hbd60A2cHiC9E9KoqSpyblPIijM9LAHHf3A09agtnA==}
+    engines: {node: '>=14'}
+    dependencies:
+      '@percy/logger': 1.1.0
+    dev: false
 
   /@polka/url/1.0.0-next.21:
     resolution: {integrity: sha512-a5Sab1C4/icpTZVzZc5Ghpz88yQtGOyNqYXcZgOssB2uuAr+wF/MvN6bgtW32q7HHrvBki+BsZ0OuNv6EV3K9g==}
