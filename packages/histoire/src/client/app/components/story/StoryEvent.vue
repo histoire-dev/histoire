@@ -7,7 +7,6 @@ const props = defineProps<{
 }>()
 
 const formattedArgument = computed(() => {
-  console.log(typeof props.event.argument)
   switch (typeof props.event.argument) {
     case 'string':
       return `"${props.event.argument}"`
@@ -17,22 +16,38 @@ const formattedArgument = computed(() => {
       return props.event.argument
   }
 })
-
-function printToConsole () {
-  console.log(JSON.parse(JSON.stringify(props.event))) // Remove the proxy and log to the console
-}
 </script>
 
 <template>
-  <div
-    class="htw-cursor-pointer odd:htw-bg-gray-100 dark:odd:htw-bg-gray-750 htw-py-2 htw-px-4"
-    title="Click to print the event in the console"
-    @click="printToConsole"
+  <VDropdown
+    class="htw-group"
+    placement="right"
   >
-    {{ event.name }}
-    <span
-      v-if="event.argument"
-      class="htw-text-xs htw-opacity-50 htw-pl-2"
-    >{{ formattedArgument }}</span>
-  </div>
+    <template #default="{ shown }">
+      <div
+        class="group-hover:htw-bg-primary-100 dark:group-hover:htw-bg-primary-700 htw-cursor-pointer htw-py-2 htw-px-4 htw-flex htw-items-baseline htw-gap-1 htw-leading-normal"
+        :class="[
+          shown ? 'htw-bg-primary-50 dark:htw-bg-primary-600' : 'group-odd:htw-bg-gray-100/50 dark:group-odd:htw-bg-gray-750/40',
+        ]"
+      >
+        <span
+          :class="{
+            'htw-text-primary-500': shown,
+          }"
+        >
+          {{ event.name }}
+        </span>
+        <span
+          v-if="event.argument"
+          class="htw-text-xs htw-opacity-50 htw-truncate"
+        >{{ formattedArgument }}</span>
+      </div>
+    </template>
+
+    <template #popper>
+      <div class="htw-overflow-auto htw-max-w-[400px] htw-max-h-[400px]">
+        <pre class="htw-p-4">{{ event.argument }}</pre>
+      </div>
+    </template>
+  </VDropdown>
 </template>
