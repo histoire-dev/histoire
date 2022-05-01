@@ -49,7 +49,7 @@ export function HstScreenshot (options: ScreenshotPluginOptions = {}): Plugin {
       const { default: captureWebsite } = await import('capture-website')
       await fs.ensureDir(finalOptions.saveFolder)
 
-      api.onRenderStory(async ({ file, story, variant, url }) => {
+      api.onPreviewStory(async ({ file, story, variant, url }) => {
         if (finalOptions.ignored?.({
           file,
           story: {
