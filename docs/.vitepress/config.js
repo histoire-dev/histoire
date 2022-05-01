@@ -1,6 +1,18 @@
 module.exports = {
   title: 'Histoire',
   description: 'Fast stories powered by Vite',
+  head: [
+    ['meta', { property: 'og:title', content: 'Histoire' }],
+    ['meta', { property: 'og:site_name', content: 'Histoire' }],
+    ['meta', { property: 'og:type', content: 'website' }],
+    ['meta', { property: 'og:description', content: 'Fast stories powered by Vite' }],
+    ['meta', { property: 'og:url', content: 'https://histoire.dev/' }],
+    ['meta', { property: 'og:image', content: 'https://histoire.dev/opengraph.png' }],
+    ['meta', { property: 'og:image:width', content: '600' }],
+    ['meta', { property: 'og:image:height', content: '315' }],
+    ['meta', { name: 'twitter:card', content: 'summary_large_image' }],
+    ['meta', { name: 'twitter:site', content: '@histoire_dev' }],
+  ],
 
   themeConfig: {
     repo: 'histoire-dev/histoire',
