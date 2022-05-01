@@ -1,0 +1,42 @@
+{
+  "name": "@histoire/plugin-screenshot",
+  "version": "0.2.5",
+  "description": "Histoire plugin to take screenshots for visual regression testing",
+  "license": "MIT",
+  "author": {
+    "name": "Guillaume Chau"
+  },
+  "repository": {
+    "url": "https://github.com/Akryum/histoire.git",
+    "type": "git",
+    "directory": "packages/histoire-plugin-screenshot"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "type": "module",
+  "exports": {
+    ".": "./dist/index.js",
+    "./*": "./*"
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "rimraf dist && tsc -d",
+    "watch": "tsc -d -w --sourceMap"
+  },
+  "dependencies": {
+    "capture-website": "^2.3.0",
+    "defu": "^6.0.0",
+    "fs-extra": "^10.1.0",
+    "pathe": "^0.2.0"
+  },
+  "devDependencies": {
+    "histoire": "workspace:*",
+    "typescript": "^4.6.3"
+  },
+  "peerDependencies": {
+    "histoire": "^0.2.5"
+  }
+}
