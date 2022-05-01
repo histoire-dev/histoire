@@ -2,7 +2,7 @@
 import { App, createApp, onMounted, onUnmounted, PropType, ref, watch } from 'vue'
 import { Story, Variant } from '../../types'
 // @ts-expect-error virtual module id
-import setup from '$histoire-setup'
+import * as setup from '$histoire-setup'
 
 const props = defineProps({
   variant: {
@@ -44,8 +44,8 @@ async function mountVariant () {
     },
   })
 
-  if (typeof setup === 'function') {
-    await setup({
+  if (typeof setup?.setupVue3 === 'function') {
+    await setup.setupVue3({
       app,
       story: props.story,
       variant: props.variant,

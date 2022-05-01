@@ -59,17 +59,31 @@ export default defineConfig({
 })
 ```
 
-Histoire provides a `defineVue3StorySetup` function to access the current app, story and variant for your convenience. You can use it inside your setup file like this:
+In this file, you can import global CSS files or JS files.
 
 ```ts
 // src/histoire.setup.ts
 
 import './histoire.css' // Import global CSS
+```
+
+You can also tell Histoire to configure the sandbox application using the corresponding setup function (more details afterwards).
+
+| Framework | Setup function |
+| --------- | -------------- |
+| Vue 3 | `setupVue3` |
+
+### Vue 3 setup
+
+Inside your setup file, you can export a `setupVue3` function that will be called by Histoire allowing you to configure the Vue 3 sanbox application. Histoire provides an optional `defineSetupVue3` helper to have better types in your IDE :
+
+```ts
+// src/histoire.setup.ts
 
 import { createPinia } from "pinia";
-import { defineVue3StorySetup } from 'histoire/client'
+import { defineSetupVue3 } from 'histoire/client'
 
-export default defineVue3StorySetup(({ app, story, variant }) => {
+export const setupVue3 = defineSetupVue3(({ app, story, variant }) => {
   const pinia = createPinia();
   app.use(pinia); // Add Pinia store
 })

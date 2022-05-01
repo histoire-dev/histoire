@@ -7,6 +7,6 @@ export type Vue3StorySetupHandler = (payload: {
   variant: Variant
 }) => Promise<void> | void
 
-export function defineVue3StorySetup (handler: Vue3StorySetupHandler): Vue3StorySetupHandler {
+export function defineSetupVue3 (handler: Vue3StorySetupHandler): Vue3StorySetupHandler {
   return handler
 }

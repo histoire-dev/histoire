@@ -1,6 +1,6 @@
 import './histoire.css'
-import { defineVue3StorySetup } from 'histoire/client'
+import { defineSetupVue3 } from 'histoire/client'
 
-export default defineVue3StorySetup(({ app }) => {
+export const setupVue3 = defineSetupVue3(({ app }) => {
   app.provide('demo', 42)
 })
