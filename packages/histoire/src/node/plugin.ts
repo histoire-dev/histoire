@@ -76,10 +76,16 @@ export class DevPluginApi extends BasePluginApi {
   watcher = chokidar
 }
 
+export type BuildEndCallback = () => Promise<void> | void
 export type PreviewStoryCallback = (payload: { file: string, story: Story, variant: Variant, url: string }) => Promise<void> | void
 
 export class BuildPluginApi extends BasePluginApi {
+  buildEndCallbacks: BuildEndCallback[] = []
   previewStoryCallbacks: PreviewStoryCallback[] = []
+
+  onBuildEnd (cb: BuildEndCallback) {
+    this.buildEndCallbacks.push(cb)
+  }
 
   onPreviewStory (cb: PreviewStoryCallback) {
     this.previewStoryCallbacks.push(cb)

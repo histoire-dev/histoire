@@ -10,7 +10,7 @@ import { createVitePlugins } from './vite.js'
 import { findAllStories } from './stories.js'
 import type { RollupOutput } from 'rollup'
 import { useCollectStories } from './collect/index.js'
-import { BuildPluginApi, PreviewStoryCallback } from './plugin.js'
+import { BuildEndCallback, BuildPluginApi, PreviewStoryCallback } from './plugin.js'
 import { useModuleLoader } from './load.js'
 import { startPreview } from './preview.js'
 
@@ -37,12 +37,14 @@ export async function build (ctx: Context) {
     server,
     throws: true,
   })
-  const renderStoryCallbacks: PreviewStoryCallback[] = []
+  const buildEndCallbacks: BuildEndCallback[] = []
+  const previewStoryCallbacks: PreviewStoryCallback[] = []
   for (const plugin of ctx.config.plugins) {
     if (plugin.onBuild) {
       const api = new BuildPluginApi(ctx, plugin, moduleLoader)
       await plugin.onBuild(api)
-      renderStoryCallbacks.push(...api.previewStoryCallbacks)
+      buildEndCallbacks.push(...api.buildEndCallbacks)
+      previewStoryCallbacks.push(...api.previewStoryCallbacks)
     }
   }
 
@@ -117,7 +119,7 @@ export async function build (ctx: Context) {
   console.log(pc.green(`✅ Built ${storyCount} stories (${variantCount} variants) in ${Math.round(duration / 1000 * 100) / 100}s`))
 
   // Render
-  if (renderStoryCallbacks.length) {
+  if (previewStoryCallbacks.length) {
     const { baseUrl, close } = await startPreview(resolvedViteConfig, null, ctx)
     for (const storyFile of ctx.storyFiles) {
       const story = storyFile.story
@@ -126,7 +128,7 @@ export async function build (ctx: Context) {
         query.append('storyId', story.id)
         query.append('variantId', variant.id)
         const url = `${baseUrl}__sandbox?${query.toString()}`
-        for (const fn of renderStoryCallbacks) {
+        for (const fn of previewStoryCallbacks) {
           await fn({
             file: storyFile.path,
             story,
@@ -140,6 +142,10 @@ export async function build (ctx: Context) {
   }
 
   await server.close()
+
+  for (const fn of buildEndCallbacks) {
+    await fn()
+  }
 }
 
 function generateBaseHtml (head: string, body: string, ctx: Context) {
