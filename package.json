@@ -48,11 +48,17 @@
       "ignoreMissing": [
         "@algolia/client-search",
         "@types/react",
+        "eslint",
         "react",
         "react-dom",
         "vue",
         "webpack"
-      ]
+      ],
+      "allowedVersions": {
+        "eslint": "*",
+        "eslint-plugin-promise": "*",
+        "eslint-plugin-vue": "*"
+      }
     }
   }
 }
