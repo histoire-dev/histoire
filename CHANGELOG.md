@@ -1,5 +1,31 @@
 # [0.3.0](https://github.com/Akryum/histoire/compare/v0.2.5...v0.3.0) (2022-05-02)
 
+### Migrating from v0.2
+
+- The default dist folder is now `.histoire/dist` from `histoire-dist`
+  -> If you didn't customize it: either takes this into account or add `outDir: 'histoire-dist'` to your config.
+
+- The setup function export for Vue 3 has been changed from `default` to `setupVue3` and the type handler has been renamed from `defineVue3StorySetup` to `defineSetupVue3`
+
+Before:
+
+```ts
+import { defineVue3StorySetup } from 'histoire/client'
+
+export default defineVue3StorySetup(({ app }) => {
+  app.provide('demo', 42)
+})
+```
+
+After:
+
+```ts
+import { defineSetupVue3 } from 'histoire/client'
+
+export const setupVue3 = defineSetupVue3(({ app }) => {
+  app.provide('demo', 42)
+})
+```
 
 ### Bug Fixes
 
