@@ -112,7 +112,7 @@ importers:
 
   packages/histoire:
     specifiers:
-      '@histoire/controls': ^0.2.5
+      '@histoire/controls': ^0.3.0
       '@iconify/vue': ^3.2.1
       '@peeky/test': ^0.13.5
       '@tailwindcss/typography': ^0.5.2

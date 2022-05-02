@@ -1,3 +1,60 @@
+# [0.3.0](https://github.com/Akryum/histoire/compare/v0.2.5...v0.3.0) (2022-05-02)
+
+
+### Bug Fixes
+
+* add names to apps ([28f3448](https://github.com/Akryum/histoire/commit/28f3448f844ee81503be45d74695201643cc74b9))
+* build preload links ([ebcf1d3](https://github.com/Akryum/histoire/commit/ebcf1d3c55f25f07e164f3d13d8c8774e2e8ea2f))
+* **build:** disable minify to preserve function/variable names ([db84feb](https://github.com/Akryum/histoire/commit/db84feb00378faa97a9c2a3dcc68edd8d52d9d3c))
+* collect story loader not clearing vite cache ([a6bbc53](https://github.com/Akryum/histoire/commit/a6bbc538588fe32e07c297c6f404ecc6da4cf2a6))
+* controls css missing component style ([921073a](https://github.com/Akryum/histoire/commit/921073aedc59d061aac31d3f3b32f5c19166d735))
+* **dev:** favicon respects base ([439f5fb](https://github.com/Akryum/histoire/commit/439f5fbf529d9084adf7c2852ea4cb04799e64d0))
+* **docs:** dark: hr ([351e4dd](https://github.com/Akryum/histoire/commit/351e4ddfa1ee3c02bbc512245ccc8b3121a093aa))
+* folder issue when selecting nested story ([e24357a](https://github.com/Akryum/histoire/commit/e24357ae15d9f61bd7957e460e2152a64079d966))
+* grid, use manual CSS var ([a3accb0](https://github.com/Akryum/histoire/commit/a3accb006829ccbf263c3be4b1edbb5928a09de6))
+* handle viteConfig.base, fix [#69](https://github.com/Akryum/histoire/issues/69) ([959d06c](https://github.com/Akryum/histoire/commit/959d06c3758dd286b473133cf80c243d3634dc38))
+* init host variant state ([a752bcc](https://github.com/Akryum/histoire/commit/a752bcc58d0a3c65ada0d64803a991c2f1aa70de))
+* renamed api ([da5e34a](https://github.com/Akryum/histoire/commit/da5e34af938de43310f96548beb764f63c8afa50))
+* **search:** loading ux ([9348009](https://github.com/Akryum/histoire/commit/9348009d13823ce8f96f38bb9dff23cb70f361a2))
+* **search:** new search didn't include story title for variants ([95943d5](https://github.com/Akryum/histoire/commit/95943d5949b09859116823c3df3614a078c30b16))
+* split controls dist style in two ([4c248ec](https://github.com/Akryum/histoire/commit/4c248ecff1a9a3e1e9a20ca0f07d1646102c424b))
+* **Story:** docsOnly shouldn't display variant number ([4fe00e6](https://github.com/Akryum/histoire/commit/4fe00e6b4cce40bf17ac45daf31c15998906fb65))
+* **tailwind:** dark: better drop shadow design ([3993802](https://github.com/Akryum/histoire/commit/3993802b5e09abf5984688cdd3b842022d1cb3bd))
+* **vue:** Anonymous components ([a81fef6](https://github.com/Akryum/histoire/commit/a81fef6222f017cfba7e94f3f16a0bfe806d122e))
+* **vue:** codegen append text with no leading space to previous line ([f0f4816](https://github.com/Akryum/histoire/commit/f0f4816aa234d3df6d8a56b5746389f6985b59e4))
+* **vue:** codegen cleanup `$setup.` more ([b234c9e](https://github.com/Akryum/histoire/commit/b234c9e8e1894518fc14f8ba5427886e56e5e691))
+* **vue:** codegen content on new line if at least one attribute ([9c89037](https://github.com/Akryum/histoire/commit/9c8903775b2f48dc226129171179ab8f1f09ec70))
+* **vue:** codegen: improved event listeners ([fee85a0](https://github.com/Akryum/histoire/commit/fee85a0981101b035823a7b916db3e79caa20922))
+* **vue:** codegen: only put content on same line if it's text ([ca13bc5](https://github.com/Akryum/histoire/commit/ca13bc549c714ca6e02a13a6358269513596c0aa))
+* **vue:** godegen custom directives ([be1b287](https://github.com/Akryum/histoire/commit/be1b2877d9214ae6a235fb927d6a1465c3c5faa1))
+
+
+### Features
+
+* Add events (fix [#32](https://github.com/Akryum/histoire/issues/32)) ([#72](https://github.com/Akryum/histoire/issues/72)) ([60bd8ae](https://github.com/Akryum/histoire/commit/60bd8ae2b50ae71218d9e425d4c48d8bacba46b6))
+* Add opengraph and metadata to documentation ([#71](https://github.com/Akryum/histoire/issues/71)) ([4ba4e76](https://github.com/Akryum/histoire/commit/4ba4e76ffacc1884571b71b13c32c380a654bba0))
+* basic plugin api and tailwind builtin plugin ([2a76d9d](https://github.com/Akryum/histoire/commit/2a76d9da4178f5bcc16955578f1783823e61e898))
+* basic screenshot plugin, related [#34](https://github.com/Akryum/histoire/issues/34) ([aed2219](https://github.com/Akryum/histoire/commit/aed2219dc538678b0d21565e2cb526532b0b3a84))
+* **config:** default output is now `.histoire/dist` ([ee4c399](https://github.com/Akryum/histoire/commit/ee4c3996a1cc76cb8c8847027fad70d6d103d32a))
+* export plugin api ([a8fe26d](https://github.com/Akryum/histoire/commit/a8fe26dd48b3456da5fb14809a6a7ebd78fa045d))
+* implicit `state` ([48037d5](https://github.com/Akryum/histoire/commit/48037d5cd63c1282aa845ccfad37a4ed995b4ab4))
+* improved source code pane ([7111b5d](https://github.com/Akryum/histoire/commit/7111b5d9ec4c1b5d1708024b1c727ef4f482cfb5))
+* percy plugin ([c31ccb8](https://github.com/Akryum/histoire/commit/c31ccb802d8e91864be9aec32abae829e9a67d70))
+* **plugin:** onBuildEnd ([bd85b18](https://github.com/Akryum/histoire/commit/bd85b186daff8ed766e46f0797edd514fe7fe3fa))
+* **search:** more performant and fuzzy ([02707af](https://github.com/Akryum/histoire/commit/02707af4f3a88ce2021169ad046e620357ac57a3))
+* **Story:** docsOnly ([a18ccb1](https://github.com/Akryum/histoire/commit/a18ccb1e9c8511ab239adc6c246cedd42b080ea1))
+* **Story:** id prop ([4cb6edc](https://github.com/Akryum/histoire/commit/4cb6edc219a0b98312f417aeda0af930a5c42dc2))
+* support all state props + options API ([1e1b1fc](https://github.com/Akryum/histoire/commit/1e1b1fc78f4e087b11f765b94e284252f69ea8c4))
+* **vue:** codegen handles void elements ([9b324ea](https://github.com/Akryum/histoire/commit/9b324ea349129603c13388e280a70546cc68d78e))
+* **vue:** improved codegen ([9021605](https://github.com/Akryum/histoire/commit/9021605a272571b661a3a7ce882264f7b31f11ca))
+
+
+### Performance Improvements
+
+* faster design tokens initial render ([c18d457](https://github.com/Akryum/histoire/commit/c18d4573b1c9a509190eab564504d811ba059645))
+
+
+
 ## [0.2.5](https://github.com/Akryum/histoire/compare/v0.2.4...v0.2.5) (2022-04-20)
 
 
