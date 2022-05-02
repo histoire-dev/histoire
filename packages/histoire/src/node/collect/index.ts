@@ -2,7 +2,7 @@ import { MessageChannel } from 'worker_threads'
 import type { ViteDevServer } from 'vite'
 import { ViteNodeServer } from 'vite-node/server'
 import type { FetchFunction, ResolveIdFunction } from 'vite-node'
-import { relative } from 'pathe'
+import path, { relative } from 'pathe'
 import pc from 'picocolors'
 import Tinypool from 'tinypool'
 import { createBirpc } from 'birpc'
@@ -62,10 +62,13 @@ export function useCollectStories (options: UseCollectStoriesOptions, ctx: Conte
 
   async function executeStoryFile (storyFile: StoryFile) {
     try {
+      const setupFilePath = server.config.histoire?.setupFile ? path.normalize(server.config.root + server.config.histoire.setupFile) : ''
+
       const { workerPort } = createChannel()
       const { storyData } = await threadPool.run({
         root: server.config.root,
         base: server.config.base,
+        setupFilePath,
         storyFile,
         port: workerPort,
       } as Payload, {
