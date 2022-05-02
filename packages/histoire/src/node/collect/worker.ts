@@ -12,7 +12,6 @@ const __dirname = dirname(fileURLToPath(import.meta.url))
 export interface Payload {
   root: string
   base: string
-  setupFilePath: string
   port: MessagePort
   storyFile: StoryFile
 }
@@ -52,7 +51,7 @@ export default async (payload: Payload): Promise<ReturnData> => {
   // Mount app to collect stories/variants
   const { run } = await runner.executeFile(resolve(__dirname, '../../client/server/index.js'))
   const storyData: Story[] = []
-  await run(payload.storyFile, storyData, el, payload.setupFilePath)
+  await run(payload.storyFile, storyData, el)
 
   destroyDomEnv()
 

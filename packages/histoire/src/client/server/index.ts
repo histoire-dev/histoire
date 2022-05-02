@@ -3,8 +3,10 @@ import { registerVueComponents } from '@histoire/controls'
 import type { StoryFile } from '../../node/types'
 import Story from './Story.server.vue'
 import Variant from './Variant.server.vue'
+// @ts-expect-error virtual module id
+import * as setup from '$histoire-setup'
 
-export async function run (file: StoryFile, storyData, el, setupFilePath: string) {
+export async function run (file: StoryFile, storyData, el) {
   const { default: Comp } = await import(file.moduleId)
   const app = createApp({
     provide: {
@@ -20,12 +22,8 @@ export async function run (file: StoryFile, storyData, el, setupFilePath: string
     },
   })
 
-  if (setupFilePath) {
-    const setup = await import('file://' + setupFilePath)
-
-    if (typeof setup?.setupVue3 === 'function') {
-      await setup.setupVue3({ app })
-    }
+  if (typeof setup?.setupVue3 === 'function') {
+    await setup.setupVue3({ app })
   }
 
   // eslint-disable-next-line vue/multi-word-component-names
