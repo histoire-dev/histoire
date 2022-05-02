@@ -1,3 +1,12 @@
+## [0.3.1](https://github.com/Akryum/histoire/compare/v0.3.0...v0.3.1) (2022-05-02)
+
+
+### Bug Fixes
+
+* Trigger setupVue3 in worker (fix [#76](https://github.com/Akryum/histoire/issues/76)) ([#77](https://github.com/Akryum/histoire/issues/77)) ([323e535](https://github.com/Akryum/histoire/commit/323e535877c63c588a14630c54693578be49b1bb))
+
+
+
 # [0.3.0](https://github.com/Akryum/histoire/compare/v0.2.5...v0.3.0) (2022-05-02)
 
 ### Migrating from v0.2
