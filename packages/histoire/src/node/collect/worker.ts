@@ -6,6 +6,7 @@ import type { FetchFunction, ResolveIdFunction } from 'vite-node'
 import { dirname, resolve } from 'pathe'
 import { createDomEnv } from '../dom/env.js'
 import type { StoryFile, Story } from '../types.js'
+import type { ServerRunPayload } from '../../client/server/index.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
@@ -49,9 +50,13 @@ export default async (payload: Payload): Promise<ReturnData> => {
   const el = window.document.createElement('div')
 
   // Mount app to collect stories/variants
-  const { run } = await runner.executeFile(resolve(__dirname, '../../client/server/index.js'))
+  const { run } = (await runner.executeFile(resolve(__dirname, '../../client/server/index.js'))) as { run: (payload: ServerRunPayload) => Promise<any> }
   const storyData: Story[] = []
-  await run(payload.storyFile, storyData, el)
+  await run({
+    file: payload.storyFile,
+    storyData,
+    el,
+  })
 
   destroyDomEnv()
 

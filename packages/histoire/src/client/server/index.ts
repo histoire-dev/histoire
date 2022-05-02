@@ -1,38 +1,19 @@
-import { createApp, h } from 'vue'
-import { registerVueComponents } from '@histoire/controls'
-import type { StoryFile } from '../../node/types'
-import Story from './Story.server.vue'
-import Variant from './Variant.server.vue'
-// @ts-expect-error virtual module id
-import * as setup from '$histoire-setup'
+import type { StoryFile, Story } from '../../node/types'
 
-export async function run (file: StoryFile, storyData, el) {
-  const { default: Comp } = await import(file.moduleId)
-  const app = createApp({
-    provide: {
-      addStory (data) {
-        storyData.push(data)
-      },
-    },
-    render () {
-      return h(Comp, {
-        ref: 'comp',
-        data: file,
-      })
-    },
-  })
+export interface ServerRunPayload {
+  file: StoryFile
+  storyData: Story[]
+  el: HTMLElement
+}
 
-  if (typeof setup?.setupVue3 === 'function') {
-    await setup.setupVue3({ app })
+export async function run (payload: ServerRunPayload) {
+  let result: any
+
+  // @TODO if (vue3)
+  {
+    const { run } = await import('./vue3/run.js')
+    result = await run(payload)
   }
 
-  // eslint-disable-next-line vue/multi-word-component-names
-  app.component('Story', Story)
-  // eslint-disable-next-line vue/multi-word-component-names
-  app.component('Variant', Variant)
-
-  registerVueComponents(app)
-
-  app.mount(el)
-  app.unmount()
+  return result
 }
