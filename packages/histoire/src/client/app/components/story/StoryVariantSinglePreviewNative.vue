@@ -8,6 +8,14 @@ const props = defineProps<{
   variant: Variant
 }>()
 
+Object.assign(props.variant, {
+  previewReady: false,
+})
+function onReady () {
+  Object.assign(props.variant, {
+    previewReady: true,
+  })
+}
 </script>
 
 <template>
@@ -24,6 +32,7 @@ const props = defineProps<{
       <SandboxVue3
         :variant="variant"
         :story="story"
+        @ready="onReady"
       />
     </div>
   </StoryResponsivePreview>
