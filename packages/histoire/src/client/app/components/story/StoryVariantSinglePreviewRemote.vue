@@ -131,7 +131,7 @@ function onIframeLoad () {
 
 <template>
   <StoryResponsivePreview
-    v-slot="{isResponsiveEnabled, finalWidth, finalHeight, resizing }"
+    v-slot="{ isResponsiveEnabled, finalWidth, finalHeight, resizing }"
     :variant="variant"
   >
     <iframe
