@@ -9,7 +9,7 @@ const myParameter = [
 <template>
   <Story
     title="ComplexParameter"
-    :layout="{type: 'single', native: true}"
+    :layout="{type: 'single', iframe: false}"
   >
     <ComplexParameter :complex-parameter="myParameter" />
   </Story>
