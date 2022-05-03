@@ -37,7 +37,7 @@ function useDragger (el: Ref<HTMLDivElement>, value: Ref<number>, min: number, m
     event.preventDefault()
     event.stopPropagation()
     const start = axis === 'x' ? event.clientX : event.clientY
-    const startValue = value.value || (axis === 'x' ? iframe.value.offsetWidth : iframe.value.offsetHeight)
+    const startValue = value.value
     resizing.value = true
 
     const removeListeners = [
@@ -66,7 +66,7 @@ function useDragger (el: Ref<HTMLDivElement>, value: Ref<number>, min: number, m
     event.preventDefault()
     event.stopPropagation()
     const start = axis === 'x' ? event.touches[0].clientX : event.touches[0].clientY
-    const startValue = value.value || (axis === 'x' ? iframe.value.offsetWidth : iframe.value.offsetHeight)
+    const startValue = value.value
     resizing.value = true
 
     const removeListeners = [
