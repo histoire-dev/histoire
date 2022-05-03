@@ -5,7 +5,7 @@ export default {
 </script>
 
 <script lang="ts" setup>
-import { ref, computed, ComputedRef } from 'vue'
+import { ref, computed, ComputedRef, PropType } from 'vue'
 import HstWrapper from '../HstWrapper.vue'
 
 interface HstSelectOptions {
@@ -23,7 +23,7 @@ const props = defineProps({
     default: null,
   },
   options: {
-    type: Array,
+    type: Array as PropType<HstSelectOptions[]>,
     required: true,
     default: () => [],
   },
