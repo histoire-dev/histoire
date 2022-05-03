@@ -1,130 +1,17 @@
 <script lang="ts" setup>
-import { computed, onUnmounted, Ref, ref, toRaw, watch } from 'vue'
+import { computed, onUnmounted, Ref, ref } from 'vue'
 import { useEventListener } from '@vueuse/core'
 import { Icon } from '@iconify/vue'
-import { STATE_SYNC, PREVIEW_SETTINGS_SYNC, SANDBOX_READY, EVENT_SEND } from '../../util/const'
-import type { Story, Variant } from '../../types'
 import HatchedPattern from '../misc/HatchedPattern.vue'
 import CheckerboardPattern from '../misc/CheckerboardPattern.vue'
-import { toRawDeep } from '../../util/reactivity'
-import { getSandboxUrl } from '../sandbox/lib'
 import { usePreviewSettingsStore } from '../../stores/preview-settings'
-import { HstEvent, useEventsStore } from '../../stores/events'
+import { Variant } from '../../types'
 
 const props = defineProps<{
-  story: Story
   variant: Variant
 }>()
 
 const settings = usePreviewSettingsStore().currentSettings
-
-// Iframe
-
-const iframe = ref<HTMLIFrameElement>()
-
-function syncState () {
-  if (iframe.value && props.variant.previewReady) {
-    iframe.value.contentWindow.postMessage({
-      type: STATE_SYNC,
-      state: toRawDeep(props.variant.state),
-    })
-  }
-}
-
-let synced = false
-
-watch(() => props.variant.state, () => {
-  if (synced) {
-    synced = false
-    return
-  }
-  syncState()
-}, {
-  deep: true,
-  immediate: true,
-})
-
-Object.assign(props.variant, {
-  previewReady: false,
-})
-
-useEventListener(window, 'message', (event) => {
-  switch (event.data.type) {
-    case STATE_SYNC:
-      updateVariantState(event.data.state)
-      break
-    case EVENT_SEND:
-      logEvent(event.data.event)
-      break
-    case SANDBOX_READY:
-      setPreviewReady()
-      break
-  }
-})
-
-function updateVariantState (state: any) {
-  synced = true
-  if (props.variant.state) {
-    for (const key in state) {
-      if (typeof props.variant.state[key] === 'object') {
-        Object.assign(props.variant.state[key], state[key])
-      } else {
-        // eslint-disable-next-line vue/no-mutating-props
-        props.variant.state[key] = state[key]
-      }
-    }
-  } else {
-    // eslint-disable-next-line vue/no-mutating-props
-    props.variant.state = state
-  }
-}
-
-function logEvent (event: HstEvent) {
-  const eventsStore = useEventsStore()
-  eventsStore.addEvent(event)
-}
-
-function setPreviewReady () {
-  Object.assign(props.variant, {
-    previewReady: true,
-  })
-}
-
-const sandboxUrl = computed(() => {
-  return getSandboxUrl(props.story, props.variant)
-})
-
-const isIframeLoaded = ref(false)
-
-watch(sandboxUrl, () => {
-  isIframeLoaded.value = false
-})
-
-// Settings
-
-function syncSettings () {
-  if (iframe.value) {
-    iframe.value.contentWindow.postMessage({
-      type: PREVIEW_SETTINGS_SYNC,
-      settings: toRaw(settings),
-    })
-  }
-}
-
-watch(() => settings, () => {
-  syncSettings()
-}, {
-  deep: true,
-  immediate: true,
-})
-
-// Iframe load
-
-function onIframeLoad () {
-  isIframeLoaded.value = true
-  syncState()
-  syncSettings()
-}
 
 // Resize
 
@@ -150,7 +37,7 @@ function useDragger (el: Ref<HTMLDivElement>, value: Ref<number>, min: number, m
     event.preventDefault()
     event.stopPropagation()
     const start = axis === 'x' ? event.clientX : event.clientY
-    const startValue = value.value || (axis === 'x' ? iframe.value.offsetWidth : iframe.value.offsetHeight)
+    const startValue = value.value
     resizing.value = true
 
     const removeListeners = [
@@ -179,7 +66,7 @@ function useDragger (el: Ref<HTMLDivElement>, value: Ref<number>, min: number, m
     event.preventDefault()
     event.stopPropagation()
     const start = axis === 'x' ? event.touches[0].clientX : event.touches[0].clientY
-    const startValue = value.value || (axis === 'x' ? iframe.value.offsetWidth : iframe.value.offsetHeight)
+    const startValue = value.value
     resizing.value = true
 
     const removeListeners = [
@@ -261,20 +148,11 @@ const isResponsiveEnabled = computed(() => !props.variant.responsiveDisabled)
               class="htw-absolute htw-inset-0 htw-w-full htw-h-full htw-text-gray-500/20"
             />
 
-            <iframe
-              ref="iframe"
-              :src="sandboxUrl"
-              class="htw-w-full htw-h-full htw-relative"
-              :class="{
-                'htw-invisible': !isIframeLoaded,
-                'htw-pointer-events-none': resizing,
-              }"
-              :style="isResponsiveEnabled ? {
-                width: finalWidth ? `${finalWidth}px` : null,
-                height: finalHeight ? `${finalHeight}px` : null,
-              } : undefined"
-              data-test-id="preview-iframe"
-              @load="onIframeLoad()"
+            <slot
+              :is-responsive-enabled="isResponsiveEnabled"
+              :final-width="finalWidth"
+              :final-height="finalHeight"
+              :resizing="resizing"
             />
           </div>
 

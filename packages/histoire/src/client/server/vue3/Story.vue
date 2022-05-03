@@ -23,7 +23,7 @@ export default defineComponent({
 
     layout: {
       type: Object as PropType<Story['layout']>,
-      default: () => ({ type: 'single' }),
+      default: () => ({ type: 'single', iframe: true }),
     },
 
     icon: {

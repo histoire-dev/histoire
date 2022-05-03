@@ -32,6 +32,8 @@ Id of the story used in the URL. By default, the id is automatically generated f
 
 Layout of the story. Object with the following properties:
   - `type`: `'single'` or `'grid'`
+  - with `type: 'single'` you can specify:
+    - `iframe`: Whether to isolate the story in an iframe. You might want to disable it if you want to pass complexe parameters that can't be serialized.
   - with `type: 'grid'` you can specify:
     - `width`: Column size. Can be number (pixels) or string (like `'100%'`).
 

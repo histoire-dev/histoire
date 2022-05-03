@@ -49,13 +49,13 @@ You can change the layout of the variant by using the `layout` prop with an obje
 
 ### Single layout
 
-This is the default layout, displaying one variant at a time.
+This is the default layout, displaying one variant at a time. The default behavior is to isolate the story with an iframe. 
 
 ```vue{4}
 <template>
   <Story
     title="Cars"
-    :layout="{ type: 'single' }"
+    :layout="{ type: 'single', iframe: true }"
   >
     <Variant title="default">
       🚗
