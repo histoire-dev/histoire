@@ -8,7 +8,7 @@ export default {
 import { ref, computed, ComputedRef, PropType } from 'vue'
 import HstWrapper from '../HstWrapper.vue'
 
-interface HstSelectOptions {
+export interface HstSelectOptions {
   label: string
   value: string
 }
