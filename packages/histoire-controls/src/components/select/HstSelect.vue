@@ -23,7 +23,7 @@ const props = defineProps({
     default: null,
   },
   options: {
-    type: Array as PropType<HstSelectOptions[]>,
+    type: Array as PropType<HstSelectOptions[] | string[]>,
     required: true,
     default: () => [],
   },

@@ -70,7 +70,7 @@ function initState () {
       :init-state="initState"
     >
       <template #default="{ state }">
-        <pre class="htw-text-xs htw-bg-gray-50 htw-p-4">{{ options }}</pre>
+        <pre class="htw-text-xs htw-bg-gray-50 dark:htw-bg-gray-600 htw-rounded htw-p-4">{{ options }}</pre>
         <HstSelect
           v-model="state.select"
           title="Games"
@@ -91,7 +91,7 @@ function initState () {
       :init-state="initState"
     >
       <template #default="{ state }">
-        <pre class="htw-text-xs htw-bg-gray-50 htw-p-4">{{ flatOptions }}</pre>
+        <pre class="htw-text-xs htw-bg-gray-50 dark:htw-bg-gray-600 htw-rounded htw-p-4">{{ flatOptions }}</pre>
         <HstSelect
           v-model="state.select"
           title="Select"
