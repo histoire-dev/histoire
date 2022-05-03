@@ -20,7 +20,7 @@ function onReady () {
 
 <template>
   <StoryResponsivePreview
-    v-slot="{isResponsiveEnabled, finalWidth, finalHeight }"
+    v-slot="{ isResponsiveEnabled, finalWidth, finalHeight }"
     :variant="variant"
   >
     <div
