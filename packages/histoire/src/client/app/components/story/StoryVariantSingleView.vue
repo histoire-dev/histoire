@@ -39,12 +39,12 @@ defineProps<{
     </div>
 
     <!-- Preview -->
-    <StoryVariantSinglePreviewRemote
-      v-if="story.layout.iframe"
+    <StoryVariantSinglePreviewNative
+      v-if="story.layout.iframe === false"
       :story="story"
       :variant="variant"
     />
-    <StoryVariantSinglePreviewNative
+    <StoryVariantSinglePreviewRemote
       v-else
       :story="story"
       :variant="variant"
