@@ -6,6 +6,8 @@ import StoryVariantTitle from './toolbar/StoryVariantTitle.vue'
 import StoryVariantResponsiveSize from './toolbar/StoryVariantResponsiveSize.vue'
 import StoryVariantBackground from './toolbar/StoryVariantBackground.vue'
 import StoryVariantNewTab from './toolbar/StoryVariantNewTab.vue'
+import StoryVariantSinglePreviewNative from './StoryVariantSinglePreviewNative.vue'
+import StoryVariantSinglePreviewRemote from './StoryVariantSinglePreviewRemote.vue'
 
 defineProps<{
   variant: Variant
@@ -37,7 +39,13 @@ defineProps<{
     </div>
 
     <!-- Preview -->
-    <StoryResponsivePreview
+    <StoryVariantSinglePreviewNative
+      v-if="story.layout.native"
+      :story="story"
+      :variant="variant"
+    />
+    <StoryVariantSinglePreviewRemote
+      v-else
       :story="story"
       :variant="variant"
     />

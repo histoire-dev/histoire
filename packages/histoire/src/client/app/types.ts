@@ -15,6 +15,7 @@ export interface Story {
   variants: Variant[]
   layout?: {
     type: 'single'
+    native?: boolean
   } | {
     type: 'grid'
     width?: number | string

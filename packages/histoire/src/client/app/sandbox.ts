@@ -1,6 +1,6 @@
 import './style/sandbox.css'
 import { parseQuery } from 'vue-router'
-import { computed, createApp, h, onMounted, ref, watch, isRef } from 'vue'
+import { computed, createApp, h, onMounted, ref, watch } from 'vue'
 import { createPinia } from 'pinia'
 import { registerGlobalComponents } from './global-components'
 import SandboxVue3 from './components/sandbox/SandboxVue3.vue'
