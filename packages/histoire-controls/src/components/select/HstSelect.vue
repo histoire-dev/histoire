@@ -57,6 +57,7 @@ const select = ref<HTMLInputElement>()
         v-for="{ label, value } in formattedOtions"
         v-bind="{ ...$attrs, class: null, style: null }"
         :key="label"
+        class="dark:htw-bg-gray-600"
         :value="value"
       >
         {{ label }}
