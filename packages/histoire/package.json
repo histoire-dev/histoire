@@ -51,7 +51,7 @@
     "defu": "^6.0.0",
     "diacritics": "^1.3.0",
     "flexsearch": "^0.7.21",
-    "floating-vue": "^2.0.0-beta.14",
+    "floating-vue": "^2.0.0-beta.16",
     "fs-extra": "^10.0.1",
     "globby": "^13.1.1",
     "happy-dom": "^2.55.0",

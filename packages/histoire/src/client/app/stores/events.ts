@@ -23,7 +23,7 @@ export const useEventsStore = defineStore('events', () => {
     unseen.value = 0
   }
 
-  watch(() => storyStore.currentVariant, () => {
+  watch(() => storyStore.currentVariant?.id, () => {
     reset()
   })
 

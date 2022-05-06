@@ -36,7 +36,7 @@
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^6.0.0",
     "eslint-plugin-vue": "^8.6.0",
-    "floating-vue": "^2.0.0-beta.14",
+    "floating-vue": "^2.0.0-beta.16",
     "postcss": "^8.4.12",
     "rimraf": "^3.0.2",
     "tailwindcss": "^3.0.23",

@@ -44,7 +44,7 @@
   "dependencies": {
     "@iconify/vue": "^3.2.1",
     "@vueuse/core": "^8.2.5",
-    "floating-vue": "^2.0.0-beta.14"
+    "floating-vue": "^2.0.0-beta.16"
   },
   "devDependencies": {
     "@peeky/test": "^0.13.5",
@@ -54,7 +54,7 @@
     "@vueuse/core": "^8.2.5",
     "autoprefixer": "^10.4.4",
     "concurrently": "^7.1.0",
-    "floating-vue": "^2.0.0-beta.14",
+    "floating-vue": "^2.0.0-beta.16",
     "histoire": "workspace:*",
     "postcss": "^8.4.12",
     "postcss-import": "^14.1.0",
