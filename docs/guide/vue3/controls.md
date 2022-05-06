@@ -160,7 +160,7 @@ const colors = {
 
 To create the control panel, Histoire provides a `controls` slot. You are free to render any element or components inside the slot.
 
-```vue{18-21}
+```vue{22-25}
 <script lang="ts" setup>
 import { reactive } from 'vue'
 import MyButton from './MyButton.vue'
@@ -190,6 +190,35 @@ defineExpose({
   </Story>
 </template>
 ```
+
+You can also share the same default controls for all variants by putting the slot directly under the `<Story>` component:
+
+```vue{3-6}
+<template>
+  <Story>
+    <template #controls>
+      Content: <input type="text" v-model="state.content" />
+      Disabled: <input type="checkbox" v-model="state.disabled" />
+    </template>
+
+    <Variant>
+      <MyButton :disabled="state.disabled">
+        {{ state.content }}
+      </MyButton>
+      <!-- Reusing controls -->
+    </Variant>
+
+    <Variant>
+      <MyButton :disabled="state.disabled">
+        {{ state.content }}
+      </MyButton>
+      <!-- Reusing controls -->
+    </Variant>
+  </Story>
+</template>
+```
+
+A variant can then override the slot if needed.
 
 ## Builtin controls
 
