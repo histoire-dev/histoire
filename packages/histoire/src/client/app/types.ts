@@ -1,3 +1,4 @@
+import { App } from 'vue'
 import type { RouteLocationRaw } from 'vue-router'
 
 export interface StoryFile {
@@ -34,6 +35,7 @@ export interface Variant {
   icon?: string
   iconColor?: string
   initState?: () => any
+  setupApp?: (payload: any) => unknown
   slots?: () => Readonly<any>
   state?: any
   source?: string

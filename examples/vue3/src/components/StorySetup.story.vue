@@ -4,7 +4,16 @@ import InjectDemo from './InjectDemo.vue'
 
 <template>
   <Story title="Story setup">
-    <Variant>
+    <Variant title="Global setup">
+      <InjectDemo />
+    </Variant>
+
+    <Variant
+      title="Local setup"
+      :setup-app="({ app }) => {
+        app.provide('demo', 'meow')
+      }"
+    >
       <InjectDemo />
     </Variant>
   </Story>

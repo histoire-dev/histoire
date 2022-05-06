@@ -43,6 +43,7 @@ export function mapVariant (variant: Variant): Variant {
     ...variant,
     state: null,
     initState: null,
+    setupApp: null,
     slots: () => ({}),
     previewReady: false,
   }

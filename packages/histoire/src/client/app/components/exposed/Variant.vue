@@ -24,6 +24,11 @@ export default defineComponent({
       type: Boolean,
       default: false,
     },
+
+    setupApp: {
+      type: Function,
+      default: null,
+    },
   },
 
   setup (props) {
@@ -53,6 +58,7 @@ export default defineComponent({
         slots: () => vm.proxy.$slots,
         source: props.source,
         responsiveDisabled: props.responsiveDisabled,
+        setupApp: props.setupApp,
         configReady: true,
       })
     }

@@ -54,6 +54,14 @@ async function mountVariant () {
     })
   }
 
+  if (typeof props.variant.setupApp === 'function') {
+    await props.variant.setupApp({
+      app,
+      story: props.story,
+      variant: props.variant,
+    })
+  }
+
   const target = document.createElement('div')
   sandbox.value.appendChild(target)
   app.mount(target)

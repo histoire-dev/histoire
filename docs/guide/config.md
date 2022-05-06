@@ -80,14 +80,16 @@ Inside your setup file, you can export a `setupVue3` function that will be calle
 ```ts
 // src/histoire.setup.ts
 
-import { createPinia } from "pinia";
+import { createPinia } from 'pinia'
 import { defineSetupVue3 } from 'histoire/client'
 
 export const setupVue3 = defineSetupVue3(({ app, story, variant }) => {
-  const pinia = createPinia();
-  app.use(pinia); // Add Pinia store
+  const pinia = createPinia()
+  app.use(pinia) // Add Pinia store
 })
 ```
+
+[Learn more](./vue3/app-setup.md)
 
 ## Theming
 
@@ -98,14 +100,14 @@ Histoire can be white-labeled to match your brand guidelines. Here are the avail
 
 export default defineConfig({ 
   theme: {
-    title: "Acme Inc.",
+    title: 'Acme Inc.',
     logo: {
-      square: "./img/square.png",
-      light: "./img/light.png",
-      dark: "./img/dark.png"
+      square: './img/square.png',
+      light: './img/light.png',
+      dark: './img/dark.png'
     },
-    logoHref: "https://acme.com",
-    favicon: "./favicon.ico",
+    logoHref: 'https://acme.com',
+    favicon: './favicon.ico',
   }
 })
 ```

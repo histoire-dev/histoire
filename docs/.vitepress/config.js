@@ -76,6 +76,10 @@ module.exports = {
               link: '/guide/vue3/controls',
             },
             {
+              text: 'App setup',
+              link: '/guide/vue3/app-setup',
+            },
+            {
               text: 'Documentation',
               link: '/guide/vue3/docs',
             },
