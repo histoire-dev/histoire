@@ -22,7 +22,7 @@ defineProps({
   <div data-test-id="story-controls">
     <!-- Custom controls -->
     <SandboxVue3
-      v-if="variant.slots().controls"
+      v-if="variant.slots().controls || story.slots().controls"
       slot-name="controls"
       :variant="variant"
       :story="story"

@@ -18,6 +18,8 @@ export default defineComponent({
   },
 
   setup () {
+    const vm = getCurrentInstance()
+
     const attrs = useAttrs() as {
       story: Story
     }
@@ -25,7 +27,7 @@ export default defineComponent({
     const story = computed(() => attrs.story)
     provide('story', story)
 
-    const storyComponent: any = getCurrentInstance().parent
+    const storyComponent: any = vm.parent
     // Allows tracking reactivity with watchers to sync state
     const implicitState = {
       $data: storyComponent.data,
@@ -46,12 +48,21 @@ export default defineComponent({
     }
     provide('implicitState', () => implicitState)
 
+    function updateStory () {
+      Object.assign(attrs.story, {
+        slots: () => vm.proxy.$slots,
+      })
+    }
+
     return {
       story,
+      updateStory,
     }
   },
 
   render () {
+    this.updateStory()
+
     const [firstVariant] = this.story.variants
     if (firstVariant.id === '_default') {
       return h(Variant, {

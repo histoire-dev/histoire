@@ -10,6 +10,7 @@ export function mapFile (file: StoryFile, existingFile?: StoryFile): StoryFile {
       title: file.story.title,
       file: markRaw(file),
       variants: file.story.variants.map(v => mapVariant(v)),
+      slots: () => ({}),
     },
   }
 

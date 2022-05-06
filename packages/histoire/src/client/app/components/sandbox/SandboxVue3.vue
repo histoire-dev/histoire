@@ -40,6 +40,8 @@ async function mountVariant () {
     render: () => {
       return props.variant.slots()?.[props.slotName]?.({
         state: props.variant.state ?? {},
+      }) ?? props.story.slots()?.[props.slotName]?.({
+        state: props.variant.state ?? {},
       })
     },
   })

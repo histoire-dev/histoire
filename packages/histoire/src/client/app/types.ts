@@ -25,6 +25,7 @@ export interface Story {
   docsOnly?: boolean
   file?: StoryFile
   lastSelectedVariant?: Variant
+  slots?: () => Readonly<any>
 }
 
 export interface Variant {
