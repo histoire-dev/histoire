@@ -1,3 +1,16 @@
+## [0.3.2](https://github.com/Akryum/histoire/compare/v0.3.1...v0.3.2) (2022-05-06)
+
+
+### Features
+
+* Add iframe parameter for single layout (fix [#80](https://github.com/Akryum/histoire/issues/80)) ([#81](https://github.com/Akryum/histoire/issues/81)) ([7f2d4b4](https://github.com/Akryum/histoire/commit/7f2d4b4641dfa59031503e4d5c5c807fcad40362))
+* select control ([#78](https://github.com/Akryum/histoire/issues/78)) ([c9668db](https://github.com/Akryum/histoire/commit/c9668dba7180e6b251824ed7629e5d6f8cd8a6de))
+* shared controls, fix [#75](https://github.com/Akryum/histoire/issues/75) ([a2488cf](https://github.com/Akryum/histoire/commit/a2488cfa1f35aac6fdc18b3330c57d8450f5e25a))
+* tabs overflow menu, fix [#73](https://github.com/Akryum/histoire/issues/73) ([d42f438](https://github.com/Akryum/histoire/commit/d42f438c11711146405fc0a3a4ff8be7f2f7bdd6))
+* **Variant:** setupApp prop ([0190cb0](https://github.com/Akryum/histoire/commit/0190cb071e56bc3a2b09585efb196e273bd16873))
+
+
+
 ## [0.3.1](https://github.com/Akryum/histoire/compare/v0.3.0...v0.3.1) (2022-05-02)
 
 
