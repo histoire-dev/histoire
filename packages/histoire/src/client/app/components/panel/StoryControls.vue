@@ -1,9 +1,9 @@
 <script lang="ts" setup>
 import { PropType } from 'vue'
 import { Icon } from '@iconify/vue'
-import type { Story, Variant } from '../../../types'
-import SandboxVue3 from '../../sandbox/SandboxVue3.vue'
-import BaseEmpty from '../../base/BaseEmpty.vue'
+import type { Story, Variant } from '../../types'
+import SandboxVue3 from '../sandbox/SandboxVue3.vue'
+import BaseEmpty from '../base/BaseEmpty.vue'
 
 defineProps({
   variant: {

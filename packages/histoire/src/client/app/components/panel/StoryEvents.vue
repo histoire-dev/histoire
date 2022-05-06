@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 import { ref, computed, watch, onMounted, nextTick } from 'vue'
 import { Icon } from '@iconify/vue'
-import BaseEmpty from '../../base/BaseEmpty.vue'
-import { useEventsStore } from '../../../stores/events'
+import BaseEmpty from '../base/BaseEmpty.vue'
+import { useEventsStore } from '../../stores/events'
 import StoryEvent from './StoryEvent.vue'
 
 const eventsStore = useEventsStore()

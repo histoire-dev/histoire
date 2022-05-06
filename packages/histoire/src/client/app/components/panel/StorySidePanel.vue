@@ -1,12 +1,12 @@
 <script lang="ts" setup>
 import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { useStoryStore } from '../../../stores/story'
-import { useEventsStore } from '../../../stores/events'
+import { useStoryStore } from '../../stores/story'
+import { useEventsStore } from '../../stores/events'
 
-import BaseSplitPane from '../../base/BaseSplitPane.vue'
-import BaseEmpty from '../../base/BaseEmpty.vue'
-import BaseTab from '../../base/BaseTab.vue'
+import BaseSplitPane from '../base/BaseSplitPane.vue'
+import BaseEmpty from '../base/BaseEmpty.vue'
+import BaseTab from '../base/BaseTab.vue'
 import StoryControls from './StoryControls.vue'
 import StoryDocs from './StoryDocs.vue'
 import StoryEvents from './StoryEvents.vue'

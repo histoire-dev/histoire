@@ -8,8 +8,8 @@ import BaseSplitPane from '../base/BaseSplitPane.vue'
 import BaseEmpty from '../base/BaseEmpty.vue'
 import { isMobile } from '../../util/responsive'
 import StoryViewer from './StoryViewer.vue'
-import StorySidePanel from './panel/StorySidePanel.vue'
-import StoryDocs from './panel/StoryDocs.vue'
+import StorySidePanel from '../panel/StorySidePanel.vue'
+import StoryDocs from '../panel/StoryDocs.vue'
 
 const storyStore = useStoryStore()
 

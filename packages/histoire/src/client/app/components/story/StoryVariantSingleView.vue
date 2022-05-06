@@ -1,11 +1,10 @@
 <script lang="ts" setup>
 import type { Story, Variant } from '../../types'
-import StoryResponsivePreview from './StoryResponsivePreview.vue'
 import { isMobile } from '../../util/responsive'
-import StoryVariantTitle from './toolbar/StoryVariantTitle.vue'
-import StoryVariantResponsiveSize from './toolbar/StoryVariantResponsiveSize.vue'
-import StoryVariantBackground from './toolbar/StoryVariantBackground.vue'
-import StoryVariantNewTab from './toolbar/StoryVariantNewTab.vue'
+import StoryVariantTitle from '../toolbar/StoryVariantTitle.vue'
+import StoryVariantResponsiveSize from '../toolbar/StoryVariantResponsiveSize.vue'
+import StoryVariantBackground from '../toolbar/StoryVariantBackground.vue'
+import StoryVariantNewTab from '../toolbar/StoryVariantNewTab.vue'
 import StoryVariantSinglePreviewNative from './StoryVariantSinglePreviewNative.vue'
 import StoryVariantSinglePreviewRemote from './StoryVariantSinglePreviewRemote.vue'
 

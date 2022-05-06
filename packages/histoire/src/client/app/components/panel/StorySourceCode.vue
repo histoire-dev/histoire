@@ -2,10 +2,10 @@
 import { computed, onMounted, PropType, ref, shallowRef, watch } from 'vue'
 import { getHighlighter, Highlighter, setCDN } from 'shiki'
 import { HstCopyIcon } from '@histoire/controls'
-import { generateSourceCode } from '../../../codegen/vue3'
-import type { Variant } from '../../../types'
-import { isDark } from '../../../util/dark'
-import { unindent } from '../../../codegen/util'
+import { generateSourceCode } from '../../codegen/vue3'
+import type { Variant } from '../../types'
+import { isDark } from '../../util/dark'
+import { unindent } from '../../codegen/util'
 
 const props = defineProps({
   variant: {

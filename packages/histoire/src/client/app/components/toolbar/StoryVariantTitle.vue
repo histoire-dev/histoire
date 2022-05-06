@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { Icon } from '@iconify/vue'
-import type { Variant } from '../../../types'
+import type { Variant } from '../../types'
 
 defineProps<{
   variant: Variant

@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 import { Icon } from '@iconify/vue'
-import type { Story, Variant } from '../../../types'
+import type { Story, Variant } from '../../types'
 import { computed } from 'vue'
-import { getSandboxUrl } from '../../sandbox/lib'
+import { getSandboxUrl } from '../sandbox/lib'
 
 const props = defineProps<{
   variant: Variant
