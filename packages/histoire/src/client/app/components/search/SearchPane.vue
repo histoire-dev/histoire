@@ -191,7 +191,10 @@ function selectPrevious () {
     >
   </div>
 
-  <BaseEmpty v-if="rateLimitedSearch && !results.length">
+  <BaseEmpty
+    v-if="rateLimitedSearch && !results.length"
+    class="no-animation"
+  >
     No results
   </BaseEmpty>
 

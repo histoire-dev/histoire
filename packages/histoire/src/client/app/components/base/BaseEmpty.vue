@@ -5,7 +5,7 @@
 </template>
 
 <style scoped>
-.htw-base-empty {
+.htw-base-empty:not(.no-animation) {
   animation: htw-base-empty .3s 1s both;
 }
 
