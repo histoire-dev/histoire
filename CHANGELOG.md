@@ -1,3 +1,19 @@
+## [0.3.3](https://github.com/Akryum/histoire/compare/v0.3.2...v0.3.3) (2022-05-08)
+
+
+### Bug Fixes
+
+* don't optimize histoire/client, fix [#79](https://github.com/Akryum/histoire/issues/79) ([ea22d1b](https://github.com/Akryum/histoire/commit/ea22d1bb14b36c35df6802e111d0546744b0e414))
+* **search:** duplicate keys ([d94c778](https://github.com/Akryum/histoire/commit/d94c77897e3e088fbf8dd329bc9407e1e4db8e08))
+* **search:** remove no result animation ([649490e](https://github.com/Akryum/histoire/commit/649490e488cfb176ef72a3d7e109cd949496c425))
+
+
+### Features
+
+* **search:** greatly reduce index download size ([305e560](https://github.com/Akryum/histoire/commit/305e560ad247ba745e4545d23030dc0eea814b63))
+
+
+
 ## [0.3.2](https://github.com/Akryum/histoire/compare/v0.3.1...v0.3.2) (2022-05-06)
 
 
