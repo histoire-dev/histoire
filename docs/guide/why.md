@@ -1,6 +1,5 @@
 ---
-sidebar: false
-title: 'Early access'
+sidebarDepth: 2
 ---
 
 <script setup>
@@ -17,7 +16,9 @@ function playAudio () {
   <img src="/logo.svg" alt="Histoire logo" class="htw-max-h-[256px]">
 </div>
 
-## What is Histoire?
+# Why Histoire
+
+## Overview
 
 > Histoire is the French word for "Story" and is pronounced `/is.twaʁ/`, like "is·twar" <button class="htw-btn htw-p-1 htw-leading-none" v-on:click="playAudio"><Icon icon="carbon:volume-up-filled" class="htw-w-4 htw-h-4 htw-align-middle"/></button>
 
@@ -108,27 +109,4 @@ Histoire will automatically detect your Tailwind CSS configuration and generate 
 
 ### :mag: Fast fuzzy search
 
-A real search index is built in your book! Search for your stories or even text in your documentation without the need for a dedicated service. Plus it's really fast!
-
-## Early access
-
-Histoire is currently in early access - [the repository](https://github.com/Akryum/histoire) can only be accessed by our sponsors.
-
-<div class="htw-flex htw-justify-center htw-my-12">
-  <SponsorButton/>
-</div>
-
-You support will helps us build the best stories app based on [Vite](https://vitejs.dev)!
-
-The early access will last a few weeks until we finish polishing the documentation and when we will feel it's ready to be tested by more people.
-
-## Supported frameworks
-
-| Framework | Versions | Support | Auto CodeGen | Auto Docs |
-| --------- | -------- | ------- | ------------ | ---- |
-| [Vue](https://vuejs.org/) | 3.2+ | ✅ | ✅ | Todo |
-| [Svelte](https://svelte.dev/) | - | Planned | - | - |
-| [Solid](https://www.solidjs.com/) | - | Planned | - | - |
-| [Angular](https://angular.io/) | - | TBD | - | - |
-| [React](https://reactjs.org/) | - | TBD ([Alternative](https://www.ladle.dev)) | - | - |
-
+A real search index is built in your book! Search for your stories or even text in your documentation without the need for an external service. Plus it's really fast!

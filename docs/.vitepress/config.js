@@ -57,6 +57,10 @@ module.exports = {
       ],
       '/': [
         {
+          text: 'Why Histoire',
+          link: '/guide/why',
+        },
+        {
           text: 'Getting Started',
           link: '/guide/getting-started',
         },
