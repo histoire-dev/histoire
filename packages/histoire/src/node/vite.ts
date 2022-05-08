@@ -57,6 +57,9 @@ export async function createVitePlugins (ctx: Context): Promise<VitePlugin[]> {
             dirname(require.resolve('vscode-oniguruma/package.json')),
             dirname(require.resolve('case/package.json')),
           ],
+          exclude: [
+            'histoire/client',
+          ],
         },
         server: {
           fs: {
