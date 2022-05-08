@@ -1,10 +1,28 @@
+<script lang="ts" setup>
+import { withDefaults } from 'vue'
+
+withDefaults(defineProps<{
+  look?: 'button' | 'link'
+}>(), {
+  look: 'button',
+})
+</script>
+
 <template>
   <VDropdown>
     <button
-      class="htw-inline-flex htw-items-center htw-gap-2 htw-px-4 htw-py-2 htw-btn"
+      class="htw-inline-flex htw-items-center htw-gap-2"
+      :class="{
+        'htw-px-4 htw-py-2 htw-btn': look === 'button',
+        'htw-border-none htw-bg-transparent htw-cursor-pointer htw-leading-6 htw-mt-[6px] htw-text-xl md:htw-text-sm': look === 'link',
+      }"
     >
       <span>💚</span>
-      <span>Become a sponsor</span>
+      <span
+        :class="{
+          'htw-hidden md:htw-inline': look === 'link',
+        }"
+      >Become a sponsor</span>
     </button>
 
     <template #popper>
