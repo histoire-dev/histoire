@@ -8,6 +8,7 @@ import * as setup from '$histoire-setup'
 
 export async function run ({ file, storyData, el }: ServerRunPayload) {
   const { default: Comp } = await import(file.moduleId)
+
   const app = createApp({
     provide: {
       addStory (data) {
@@ -34,5 +35,15 @@ export async function run ({ file, storyData, el }: ServerRunPayload) {
   registerVueComponents(app)
 
   app.mount(el)
+
+  if (Comp.doc) {
+    const el = document.createElement('div')
+    el.innerHTML = Comp.doc
+    const text = el.textContent
+    storyData.forEach(s => {
+      s.docsText = text
+    })
+  }
+
   app.unmount()
 }

@@ -1,6 +1,6 @@
 import { createServer as createViteServer } from 'vite'
 import { Context } from './context.js'
-import { createVitePlugins, RESOLVED_SEARCH_DATA_ID, RESOLVED_STORIES_ID } from './vite.js'
+import { createVitePlugins, RESOLVED_SEARCH_TITLE_DATA_ID, RESOLVED_STORIES_ID } from './vite.js'
 import { notifyStoryChange, onStoryChange, watchStories } from './stories.js'
 import { useCollectStories } from './collect/index.js'
 import type { StoryFile } from './types.js'
@@ -112,7 +112,7 @@ export async function createServer (ctx: Context, port: number) {
     }
 
     invalidateModule(RESOLVED_STORIES_ID)
-    invalidateModule(RESOLVED_SEARCH_DATA_ID)
+    invalidateModule(RESOLVED_SEARCH_TITLE_DATA_ID)
   })
 
   async function close () {

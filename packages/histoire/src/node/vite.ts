@@ -8,7 +8,7 @@ import { notifyStoryChange } from './stories.js'
 import { makeTree } from './tree.js'
 import { parseColor } from './colors.js'
 import { createMarkdownRenderer } from './markdown.js'
-import { generateSearchData } from './search.js'
+import { getSearchDataJS, generateDocSearchData, generateTitleSearchData } from './search.js'
 
 const require = createRequire(import.meta.url)
 
@@ -20,8 +20,10 @@ export const CONFIG_ID = '$histoire-config'
 export const RESOLVED_CONFIG_ID = `/${CONFIG_ID}-resolved`
 export const THEME_ID = '$histoire-theme'
 export const RESOLVED_THEME_ID = `/${THEME_ID}-resolved.css`
-export const SEARCH_DATA_ID = '$histoire-search-data'
-export const RESOLVED_SEARCH_DATA_ID = `/${SEARCH_DATA_ID}-resolved`
+export const SEARCH_TITLE_DATA_ID = '$histoire-search-title-data'
+export const RESOLVED_SEARCH_TITLE_DATA_ID = `/${SEARCH_TITLE_DATA_ID}-resolved`
+export const SEARCH_DOCS_DATA_ID = '$histoire-search-docs-data'
+export const RESOLVED_SEARCH_DOCS_DATA_ID = `/${SEARCH_DOCS_DATA_ID}-resolved`
 
 export async function createVitePlugins (ctx: Context): Promise<VitePlugin[]> {
   const viteConfig = await resolveViteConfig({}, ctx.mode === 'dev' ? 'serve' : 'build')
@@ -92,8 +94,11 @@ export async function createVitePlugins (ctx: Context): Promise<VitePlugin[]> {
       if (id.startsWith(THEME_ID)) {
         return RESOLVED_THEME_ID
       }
-      if (id.startsWith(SEARCH_DATA_ID)) {
-        return RESOLVED_SEARCH_DATA_ID
+      if (id.startsWith(SEARCH_TITLE_DATA_ID)) {
+        return RESOLVED_SEARCH_TITLE_DATA_ID
+      }
+      if (id.startsWith(SEARCH_DOCS_DATA_ID)) {
+        return RESOLVED_SEARCH_DOCS_DATA_ID
       }
     },
 
@@ -104,7 +109,10 @@ export async function createVitePlugins (ctx: Context): Promise<VitePlugin[]> {
           return {
             id: file.id,
             path: file.treePath,
-            story: file.story,
+            story: {
+              ...file.story,
+              docsText: undefined,
+            },
             framework: 'vue3',
             index,
           }
@@ -152,21 +160,11 @@ if (import.meta.hot) {
         css += '}'
         return css
       }
-      if (id === RESOLVED_SEARCH_DATA_ID) {
-        return `export let searchData = ${JSON.stringify(await generateSearchData(ctx))}
-const handlers = []
-export function onUpdate (cb) {
-  handlers.push(cb)
-}
-if (import.meta.hot) {
-  import.meta.hot.accept(newModule => {
-    searchData = newModule.searchData
-    handlers.forEach(h => {
-      h(newModule.searchData)
-      newModule.onUpdate(h)
-    })
-  })
-}`
+      if (id === RESOLVED_SEARCH_TITLE_DATA_ID) {
+        return getSearchDataJS(await generateTitleSearchData(ctx))
+      }
+      if (id === RESOLVED_SEARCH_DOCS_DATA_ID) {
+        return getSearchDataJS(await generateDocSearchData(ctx))
       }
     },
 

@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { useFocus, useDebounce } from '@vueuse/core'
-import { ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { Icon } from '@iconify/vue'
 import flexsearch from 'flexsearch'
 import charset from 'flexsearch/dist/module/lang/latin/advanced.js'
@@ -9,7 +9,10 @@ import { useStoryStore } from '../../stores/story'
 import BaseEmpty from '../base/BaseEmpty.vue'
 import type { SearchResult, Story, Variant } from '../../types'
 import SearchItem from './SearchItem.vue'
-import { searchData, onUpdate, SearchData } from './search-data.js'
+import { searchData, onUpdate } from './search-title-data.js'
+import type { SearchData } from './types.js'
+
+const DocSearchData = () => import('./search-docs-data.js')
 
 const props = defineProps({
   shown: {
@@ -42,37 +45,40 @@ watch(() => props.shown, value => {
   }
 })
 
-// Search
+// Index
 
 const searchInputText = ref('')
 const rateLimitedSearch = useDebounce(searchInputText, 50)
 
 const storyStore = useStoryStore()
 
-let searchIndex: flexsearch.Document<any, any>
-let idMap: SearchData['idMap']
+let titleSearchIndex: flexsearch.Document<any, any>
+let titleIdMap: SearchData['idMap']
 
-async function loadSearchIndex (data: SearchData) {
-  searchIndex = new flexsearch.Document({
+function createIndex () {
+  return new flexsearch.Document({
     preset: 'match',
     document: {
       id: 'id',
       index: [
-        'title',
-        'docs',
+        'text',
       ],
     },
     worker: true,
     charset,
     language,
-    tokenize: 'full',
+    tokenize: 'forward',
   })
+}
+
+async function loadSearchIndex (data: SearchData) {
+  titleSearchIndex = createIndex()
 
   for (const key of Object.keys(data.index)) {
-    await searchIndex.import(key, data.index[key])
+    await titleSearchIndex.import(key, data.index[key])
   }
 
-  idMap = data.idMap
+  titleIdMap = data.idMap
 }
 
 loadSearchIndex(searchData)
@@ -81,17 +87,46 @@ onUpdate(searchData => {
   loadSearchIndex(searchData)
 })
 
-const results = ref<SearchResult[]>([])
+let docSearchIndex: flexsearch.Document<any, any>
+let docIdMap: SearchData['idMap']
+
+async function loadDocSearchIndex () {
+  async function load (data: SearchData) {
+    docSearchIndex = createIndex()
+
+    for (const key of Object.keys(data.index)) {
+      await docSearchIndex.import(key, data.index[key])
+    }
+
+    docIdMap = data.idMap
+
+    if (rateLimitedSearch.value) {
+      searchOnDocField(rateLimitedSearch.value)
+    }
+  }
+
+  const searchDataModule = await DocSearchData()
+
+  load(searchDataModule.searchData)
+  // Handle HMR
+  searchDataModule.onUpdate(searchData => {
+    load(searchData)
+  })
+}
+
+loadDocSearchIndex()
+
+// Search
+
+const titleResults = ref<SearchResult[]>([])
 
 watch(rateLimitedSearch, async value => {
   const list: SearchResult[] = []
-  const raw = await searchIndex.search(value, {
-    enrich: true,
-  })
+  const raw = await titleSearchIndex.search(value)
   let rank = 0
   for (const field of raw) {
     for (const id of field.result) {
-      const idMapData = idMap[id]
+      const idMapData = titleIdMap[id]
       if (!idMapData) continue
       switch (idMapData.kind) {
         case 'story': {
@@ -110,14 +145,40 @@ watch(rateLimitedSearch, async value => {
       }
     }
   }
-  results.value = list
+  titleResults.value = list
 })
+
+const docsResults = ref<SearchResult[]>([])
+
+async function searchOnDocField (query: string) {
+  if (docSearchIndex) {
+    const list: SearchResult[] = []
+    const raw = await docSearchIndex.search(query)
+    let rank = 0
+    for (const field of raw) {
+      for (const id of field.result) {
+        const idMapData = docIdMap[id]
+        if (!idMapData) continue
+        switch (idMapData.kind) {
+          case 'story': {
+            list.push(storyResultFactory(storyStore.getStoryById(idMapData.id), rank))
+            rank++
+            break
+          }
+        }
+      }
+    }
+    docsResults.value = list
+  }
+}
+
+watch(rateLimitedSearch, searchOnDocField)
 
 function storyResultFactory (story: Story, rank: number): SearchResult {
   return {
     kind: 'story',
     rank,
-    id: story.id,
+    id: `story:${story.id}`,
     title: story.title,
     route: {
       name: 'story',
@@ -135,7 +196,7 @@ function variantResultFactory (story: Story, variant: Variant, rank: number): Se
   return {
     kind: 'variant',
     rank,
-    id: `${story.id}:${variant.id}`,
+    id: `variant:${story.id}:${variant.id}`,
     title: variant.title,
     route: {
       name: 'story',
@@ -151,6 +212,20 @@ function variantResultFactory (story: Story, variant: Variant, rank: number): Se
     iconColor: variant.iconColor,
   }
 }
+
+const results = computed(() => {
+  const list = [...titleResults.value]
+  const seen = {}
+  for (const r of titleResults.value) {
+    seen[r.id] = true
+  }
+  for (const r of docsResults.value) {
+    if (!seen[r.id]) {
+      list.push(r)
+    }
+  }
+  return list
+})
 
 // Selection
 
@@ -209,7 +284,7 @@ function selectPrevious () {
   >
     <SearchItem
       v-for="(result, index) of results"
-      :key="`${result.kind}-${result.id}`"
+      :key="result.id"
       :result="result"
       :selected="index === selectedIndex"
       @close="close()"
