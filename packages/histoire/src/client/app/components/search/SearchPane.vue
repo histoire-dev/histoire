@@ -9,7 +9,7 @@ import { useStoryStore } from '../../stores/story'
 import BaseEmpty from '../base/BaseEmpty.vue'
 import type { SearchResult, Story, Variant } from '../../types'
 import SearchItem from './SearchItem.vue'
-import { searchData, onUpdate } from './search-data.js'
+import { searchData, onUpdate, SearchData } from './search-data.js'
 
 const props = defineProps({
   shown: {
@@ -50,8 +50,9 @@ const rateLimitedSearch = useDebounce(searchInputText, 50)
 const storyStore = useStoryStore()
 
 let searchIndex: flexsearch.Document<any, any>
+let idMap: SearchData['idMap']
 
-async function loadSearchIndex (data) {
+async function loadSearchIndex (data: SearchData) {
   searchIndex = new flexsearch.Document({
     preset: 'match',
     document: {
@@ -67,9 +68,11 @@ async function loadSearchIndex (data) {
     tokenize: 'full',
   })
 
-  for (const key of Object.keys(data)) {
-    await searchIndex.import(key, data[key])
+  for (const key of Object.keys(data.index)) {
+    await searchIndex.import(key, data.index[key])
   }
+
+  idMap = data.idMap
 }
 
 loadSearchIndex(searchData)
@@ -87,17 +90,19 @@ watch(rateLimitedSearch, async value => {
   })
   let rank = 0
   for (const field of raw) {
-    for (const item of field.result as any[]) {
-      switch (item.doc.kind) {
+    for (const id of field.result) {
+      const idMapData = idMap[id]
+      if (!idMapData) continue
+      switch (idMapData.kind) {
         case 'story': {
-          list.push(storyResultFactory(storyStore.getStoryById(item.id), rank))
+          list.push(storyResultFactory(storyStore.getStoryById(idMapData.id), rank))
           rank++
           break
         }
         case 'variant': {
-          const [storyId] = item.id.split(':')
+          const [storyId] = idMapData.id.split(':')
           const story = storyStore.getStoryById(storyId)
-          const variant = storyStore.getVariantById(item.id)
+          const variant = storyStore.getVariantById(idMapData.id)
           list.push(variantResultFactory(story, variant, rank))
           rank++
           break
