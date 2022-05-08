@@ -130,7 +130,7 @@ function variantResultFactory (story: Story, variant: Variant, rank: number): Se
   return {
     kind: 'variant',
     rank,
-    id: variant.id,
+    id: `${story.id}:${variant.id}`,
     title: variant.title,
     route: {
       name: 'story',
