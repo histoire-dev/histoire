@@ -25,19 +25,6 @@ module.exports = {
     nav: [
       // { text: 'Guide', link: '/guide/' },
       { text: 'Early access', link: '/guide/' },
-      // {
-      //   text: '💚 Sponsor',
-      //   items: [
-      //     {
-      //       text: 'Guillaume Chau',
-      //       link: 'https://github.com/sponsors/Akryum',
-      //     },
-      //     {
-      //       text: 'Hugo Attal',
-      //       link: 'https://github.com/sponsors/hugoattal',
-      //     },
-      //   ],
-      // },
       {
         text: 'Changelog',
         link: 'https://github.com/Akryum/histoire/blob/master/CHANGELOG.md',
@@ -53,6 +40,10 @@ module.exports = {
         {
           text: 'Story components (Vue 3)',
           link: '/reference/components-vue3',
+        },
+        {
+          text: 'Plugin API',
+          link: '/reference/plugin-api',
         },
       ],
       '/': [
@@ -92,6 +83,10 @@ module.exports = {
               link: '/guide/vue3/hierarchy',
             },
           ],
+        },
+        {
+          text: 'Plugins',
+          link: '/guide/plugins',
         },
       ],
     },
