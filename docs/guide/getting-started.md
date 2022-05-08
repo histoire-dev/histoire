@@ -79,8 +79,9 @@ yarn add -D histoire
 ## Command Line Interface
 
 Histoire provides two commands:
-- `histoire dev`: start a server with hot-reload
-- `histoire build`: build the app for production
+- `histoire dev`: starts a development server with hot-reload
+- `histoire build`: builds the app for production
+- `histoire preview`: starts an HTTP server that serves the built app
 
 You can add these to your `package.json` like this:
 
@@ -88,7 +89,8 @@ You can add these to your `package.json` like this:
 {
   "scripts": {
     "story:dev": "histoire dev",
-    "story:build": "histoire build"
+    "story:build": "histoire build",
+    "story:preview": "histoire preview"
   }
 }
 ```
