@@ -1,3 +1,20 @@
+## [0.4.5](https://github.com/Akryum/histoire/compare/v0.4.4...v0.4.5) (2022-05-09)
+
+
+### Bug Fixes
+
+* chunk not found errors on first dev ([b06eab4](https://github.com/Akryum/histoire/commit/b06eab4b45227666b9e18cc1103e65a110bb23ef))
+* HMR on variant props not working ([3b4eaf5](https://github.com/Akryum/histoire/commit/3b4eaf5f41f88efd3ff00e0153862f69080ee4e5))
+* preserve import.meta in bundled client ([3c0dbea](https://github.com/Akryum/histoire/commit/3c0dbeadf91b472b414b169756138c595b8d6d2a))
+
+
+### Features
+
+* less unnecessary scanning ([60f565c](https://github.com/Akryum/histoire/commit/60f565cb9c9fd6f8d341ae968c900e08d3bca4be))
+* update vite-node ([475c97e](https://github.com/Akryum/histoire/commit/475c97e1ab7fa509a539d27f33c1553e8e0282fa))
+
+
+
 ## [0.4.4](https://github.com/Akryum/histoire/compare/v0.4.3...v0.4.4) (2022-05-09)
 
 
