@@ -70,7 +70,7 @@ const ChildWrapper = {
  */
 const ChildrenRender = (props, { slots }) => {
   const [fragment] = slots.default()
-  return fragment.children.map((vnode, index) => h(ChildWrapper, { index }, [vnode]))
+  return fragment.children.map((vnode, index) => h(ChildWrapper, { index }, () => [vnode]))
 }
 
 /**
