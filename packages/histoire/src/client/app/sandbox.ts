@@ -1,4 +1,3 @@
-import './style/sandbox.css'
 import { parseQuery } from 'vue-router'
 import { computed, createApp, h, onMounted, ref, watch } from 'vue'
 import { createPinia } from 'pinia'
