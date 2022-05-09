@@ -1,6 +1,17 @@
 import { markRaw } from 'vue'
 import type { StoryFile, Variant } from '../types'
 
+const copiedFromExistingVariant = [
+  'state',
+  'slots',
+  'initState',
+  'source',
+  'responsiveDisabled',
+  'setupApp',
+  'configReady',
+  'previewReady',
+]
+
 export function mapFile (file: StoryFile, existingFile?: StoryFile): StoryFile {
   const result: StoryFile = {
     ...file,
@@ -19,7 +30,7 @@ export function mapFile (file: StoryFile, existingFile?: StoryFile): StoryFile {
       const variant = result.story.variants[index]
       const existingVariant = existingFile.story.variants[index]
       if (existingVariant) {
-        for (const key in existingVariant) {
+        for (const key of copiedFromExistingVariant) {
           if (typeof existingVariant[key] !== 'undefined') {
             if (key === 'state') {
               variant.state = existingVariant.state
