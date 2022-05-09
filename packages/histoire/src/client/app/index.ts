@@ -3,8 +3,6 @@
 // export * from 'vue'
 
 import '$histoire-theme'
-// import '../../style.css'
-
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import FloatingVue from 'floating-vue'
