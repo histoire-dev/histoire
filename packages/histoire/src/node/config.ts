@@ -302,6 +302,12 @@ export const mergeConfig = createDefu((obj: any, key, value) => {
     }
     return true
   }
+
+  // By default, arrays should be replaced
+  if (obj[key] && Array.isArray(obj[key])) {
+    obj[key] = value
+    return true
+  }
 })
 
 export async function resolveConfig (cwd: string = process.cwd(), mode: ConfigMode): Promise<HistoireConfig> {
