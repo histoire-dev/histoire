@@ -11,6 +11,7 @@ const props = defineProps<{
 Object.assign(props.variant, {
   previewReady: false,
 })
+
 function onReady () {
   Object.assign(props.variant, {
     previewReady: true,
@@ -25,13 +26,15 @@ function onReady () {
   >
     <div
       :style="isResponsiveEnabled ? {
-        width: finalWidth ? `${finalWidth}px` : null,
-        height: finalHeight ? `${finalHeight}px` : null,
-      } : undefined"
+        width: finalWidth ? `${finalWidth}px` : '100%',
+        height: finalHeight ? `${finalHeight}px` : '100%',
+      } : { width: '100%', height: '100%' }"
     >
       <SandboxVue3
+        :key="`${story.id}-${variant.id}`"
         :variant="variant"
         :story="story"
+        class="htw-h-full"
         @ready="onReady"
       />
     </div>
