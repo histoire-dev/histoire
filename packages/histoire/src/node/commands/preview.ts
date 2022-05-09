@@ -13,7 +13,7 @@ export async function previewCommand (options: PreviewOptions) {
     mode: 'build',
   })
   const viteConfig = await resolveViteConfig({
-    plugins: await createVitePlugins(ctx),
+    plugins: await createVitePlugins(false, ctx),
   }, 'build')
 
   const { baseUrl } = await startPreview(viteConfig, options.port, ctx)

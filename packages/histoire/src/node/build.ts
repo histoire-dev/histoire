@@ -29,7 +29,7 @@ export async function build (ctx: Context) {
   await findAllStories(ctx)
 
   const server = await createViteServer({
-    plugins: await createVitePlugins(ctx),
+    plugins: await createVitePlugins(true, ctx),
   })
   await server.pluginContainer.buildStart({})
 
@@ -63,7 +63,7 @@ export async function build (ctx: Context) {
   const emptyStoryCount = ctx.storyFiles.length - storyCount
 
   const results = await viteBuild({
-    plugins: await createVitePlugins(ctx),
+    plugins: await createVitePlugins(false, ctx),
     build: {
       rollupOptions: {
         input: [
@@ -87,7 +87,7 @@ export async function build (ctx: Context) {
   const result = Array.isArray(results) ? results[0] : results as RollupOutput
 
   const resolvedViteConfig = await resolveViteConfig({
-    plugins: await createVitePlugins(ctx),
+    plugins: await createVitePlugins(false, ctx),
   }, 'build')
 
   const styleOutput = result.output.find(o => o.name === 'style.css' && o.type === 'asset')

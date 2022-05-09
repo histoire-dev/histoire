@@ -34,10 +34,6 @@ export default async (payload: Payload): Promise<ReturnData> => {
     root: payload.root,
     base: payload.base,
     fetchModule (id) {
-      // Alias
-      if (id.endsWith('vue.runtime.esm-bundler.js')) {
-        id = 'vue'
-      }
       return rpc.fetchModule(id)
     },
     resolveId (id, importer) {

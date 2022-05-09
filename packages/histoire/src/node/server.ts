@@ -9,17 +9,17 @@ import { useModuleLoader } from './load.js'
 
 export async function createServer (ctx: Context, port: number) {
   const server = await createViteServer({
-    plugins: await createVitePlugins(ctx),
-    server: {
-      watch: {
-        usePolling: true,
-      },
-    },
+    plugins: await createVitePlugins(false, ctx),
   })
   await server.pluginContainer.buildStart({})
 
+  const nodeServer = await createViteServer({
+    plugins: await createVitePlugins(true, ctx),
+  })
+  await nodeServer.pluginContainer.buildStart({})
+
   const moduleLoader = useModuleLoader({
-    server,
+    server: nodeServer,
   })
 
   const pluginOnCleanups: (() => void | Promise<void>)[] = []
@@ -43,7 +43,7 @@ export async function createServer (ctx: Context, port: number) {
     executeStoryFile,
     destroy: destroyCollectStories,
   } = useCollectStories({
-    server,
+    server: nodeServer,
   }, ctx)
 
   // onStoryChange debouncing
@@ -120,6 +120,7 @@ export async function createServer (ctx: Context, port: number) {
       await cb()
     }
     await server.close()
+    await nodeServer.close()
     await destroyCollectStories()
   }
 

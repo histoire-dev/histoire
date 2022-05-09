@@ -25,7 +25,7 @@ export const RESOLVED_SEARCH_TITLE_DATA_ID = `/${SEARCH_TITLE_DATA_ID}-resolved`
 export const SEARCH_DOCS_DATA_ID = '$histoire-search-docs-data'
 export const RESOLVED_SEARCH_DOCS_DATA_ID = `/${SEARCH_DOCS_DATA_ID}-resolved`
 
-export async function createVitePlugins (ctx: Context): Promise<VitePlugin[]> {
+export async function createVitePlugins (server: boolean, ctx: Context): Promise<VitePlugin[]> {
   const viteConfig = await resolveViteConfig({}, ctx.mode === 'dev' ? 'serve' : 'build')
 
   const plugins: VitePlugin[] = []
@@ -45,7 +45,12 @@ export async function createVitePlugins (ctx: Context): Promise<VitePlugin[]> {
     config () {
       return {
         optimizeDeps: {
-          // force include vue to avoid duplicated copies when linked + optimized
+          disabled: server,
+          entries: [
+            `${APP_PATH}/bundle-main.js`,
+            `${APP_PATH}/bundle-sandbox.js`,
+            `${APP_PATH}/server/index.js`,
+          ],
           include: [
             'vue',
             dirname(require.resolve('@vue/runtime-core/package.json')),
