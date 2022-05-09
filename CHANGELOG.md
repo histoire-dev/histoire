@@ -1,3 +1,13 @@
+## [0.4.3](https://github.com/Akryum/histoire/compare/v0.4.2...v0.4.3) (2022-05-09)
+
+
+### Bug Fixes
+
+* **config:** replace arrays by default instead of merging ([95c29dd](https://github.com/Akryum/histoire/commit/95c29dd3772ac529455f6c820331600cb2b6be00))
+* mark all vue packages as external ([4d31997](https://github.com/Akryum/histoire/commit/4d31997c8e16dba7059ee2079f85d9399f465991))
+
+
+
 ## [0.4.2](https://github.com/Akryum/histoire/compare/v0.4.1...v0.4.2) (2022-05-09)
 
 
