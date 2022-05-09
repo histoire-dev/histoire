@@ -1,9 +1,34 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
+import fs from 'fs-extra'
+import path from 'pathe'
 
 export default defineConfig({
   plugins: [
     vue(),
+    {
+      name: 'histoire:preserve:import.meta',
+      enforce: 'pre',
+      transform (code) {
+        if (code.includes('import.meta')) {
+          return {
+            code: code.replace(/import\.meta/g, 'import__meta'),
+          }
+        }
+      },
+      closeBundle () {
+        const files = fs.readdirSync('./dist/bundled')
+        for (const file of files) {
+          if (file.endsWith('.js')) {
+            const filePath = path.join('./dist/bundled', file)
+            const content = fs.readFileSync(filePath, 'utf-8')
+            if (content.includes('import__meta')) {
+              fs.writeFileSync(filePath, content.replace(/import__meta/g, 'import.meta'), 'utf-8')
+            }
+          }
+        }
+      },
+    },
   ],
 
   build: {
