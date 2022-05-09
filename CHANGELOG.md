@@ -1,3 +1,23 @@
+# [0.4.0](https://github.com/Akryum/histoire/compare/v0.3.3...v0.4.0) (2022-05-09)
+
+
+### Bug Fixes
+
+* remove import to @vue/runtime-core ([e8e81c9](https://github.com/Akryum/histoire/commit/e8e81c923f6103faf084f52a415a02e0e47afb17))
+* sandbox style included in main app ([bce793d](https://github.com/Akryum/histoire/commit/bce793dea3336901fe46305c2798227b585a48bf))
+* single layout no iframe  => couldn't scroll ([6afdd25](https://github.com/Akryum/histoire/commit/6afdd2578f0a6c7295d1aefd576788c951d95743))
+* slot optimization in overflow menu ([0b11e00](https://github.com/Akryum/histoire/commit/0b11e0034735c666b969c35ce6a57019a868ed62))
+
+
+### Features
+
+* full text search in markdown docs, fix [#70](https://github.com/Akryum/histoire/issues/70) ([d6e23ce](https://github.com/Akryum/histoire/commit/d6e23ce34b8d15fa68221a29a4865d5cd76087a8))
+* initial work to pre-bundle the client ([#87](https://github.com/Akryum/histoire/issues/87)) ([9e8cba9](https://github.com/Akryum/histoire/commit/9e8cba94f9bc1b18ff5c14b551279c5f9242bda7))
+* remove mandatory vue3 vite plugin ([fde0929](https://github.com/Akryum/histoire/commit/fde09295a15fadf0d88b2aff24b361724e8a8ae9))
+* **tailwind:** disable iframe ([08401bd](https://github.com/Akryum/histoire/commit/08401bd8c88146f09a973c993d4f28b29621e4e6))
+
+
+
 ## [0.3.3](https://github.com/Akryum/histoire/compare/v0.3.2...v0.3.3) (2022-05-08)
 
 
