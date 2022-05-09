@@ -1,3 +1,12 @@
+## [0.4.1](https://github.com/Akryum/histoire/compare/v0.4.0...v0.4.1) (2022-05-09)
+
+
+### Bug Fixes
+
+* missing @types/markdown-it peer dep ([549e5bf](https://github.com/Akryum/histoire/commit/549e5bf857bc1888b975a7e80a802aa3eab593dd))
+
+
+
 # [0.4.0](https://github.com/Akryum/histoire/compare/v0.3.3...v0.4.0) (2022-05-09)
 
 
