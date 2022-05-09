@@ -94,7 +94,7 @@ defineExpose({
 })
 </script>
 <template>
-  <Story id="tailwind" title="Tailwind" group="design-system" icon="mdi:tailwind" responsiveDisabled>
+  <Story id="tailwind" title="Tailwind" group="design-system" icon="mdi:tailwind" responsiveDisabled :layout="{ type: 'single', iframe: false }">
     <Variant id="background-color" title="Background Color" icon="carbon:color-palette">
       <HstColorShades
         v-for="(shades, key) of config.theme.backgroundColor"
