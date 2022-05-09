@@ -5,7 +5,7 @@ export default {
 </script>
 
 <script lang="ts" setup>
-import { ref, onMounted, computed, watch, reactive } from 'vue'
+import { computed, watch } from 'vue'
 import HstWrapper from '../HstWrapper.vue'
 import CustomSelect from '../select/CustomSelect.vue'
 import { Icon } from '@iconify/vue'
@@ -23,12 +23,12 @@ const props = defineProps<{
 const defaultState = cloneDeep(props.state)
 
 const selectedOption = useStorage<string>(
-  '_histoire-presets/' + props.id + '/selected',
+  `_histoire-presets/${props.id}/selected`,
   DEFAULT_ID,
 )
 
-const presetStates = useStorage<Map<string, { state: unknown, label: string }>>(
-  '_histoire-presets/' + props.id + '/states',
+const presetStates = useStorage<Map<string, { state: Record<string, unknown>, label: string }>>(
+  `_histoire-presets/${props.id}/states`,
   new Map(),
 )
 
@@ -50,8 +50,6 @@ watch(() => selectedOption.value, () => {
   }
 }, { immediate: true })
 
-const input = ref<HTMLInputElement>()
-
 const canDelete = computed(() => selectedOption.value !== DEFAULT_ID)
 
 function savePreset () {
@@ -62,11 +60,10 @@ function savePreset () {
   const id = (new Date()).getTime().toString()
 
   presetStates.value.set(id, { state: cloneDeep(props.state), label })
-
   selectedOption.value = id
 }
 
-function deleteSelected () {
+function deletePreset () {
   if (!canDelete.value) {
     return
   }
@@ -76,7 +73,6 @@ function deleteSelected () {
   }
 
   presetStates.value.delete(selectedOption.value)
-
   selectedOption.value = DEFAULT_ID
 }
 </script>
@@ -103,7 +99,7 @@ function deleteSelected () {
         icon="carbon:trash-can"
         class="htw-w-[16px] htw-h-[16px] htw-text-gray-900 dark:htw-text-gray-100"
         :class="canDelete ? 'htw-cursor-pointer hover:htw-text-primary-500 dark:hover:htw-text-primary-400 hover:htw-opacity-100 htw-opacity-50' : 'htw-opacity-20'"
-        @click="deleteSelected"
+        @click="deletePreset"
       />
     </div>
   </HstWrapper>
