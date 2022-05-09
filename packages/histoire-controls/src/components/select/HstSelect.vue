@@ -5,8 +5,10 @@ export default {
 </script>
 
 <script lang="ts" setup>
+import { Dropdown as VDropdown } from 'floating-vue'
 import { ref, computed, ComputedRef, PropType } from 'vue'
 import HstWrapper from '../HstWrapper.vue'
+import { Icon } from '@iconify/vue'
 
 export interface HstSelectOptions {
   label: string
@@ -29,10 +31,18 @@ const props = defineProps({
   },
 })
 
-const formattedOtions: ComputedRef<HstSelectOptions[]> =
+const formattedOptions: ComputedRef<HstSelectOptions[]> =
   computed(() => props.options.map(option => typeof option === 'string' ? { label: option, value: option } as HstSelectOptions : option as HstSelectOptions))
 
-const emit = defineEmits({
+const dropdown = ref<HTMLElement>()
+const selectedLabel = computed(() => formattedOptions.value.find((value) => value.value === props.modelValue)?.label)
+const computedStyle = computed(() => {
+  return {
+    width: dropdown.value.scrollWidth + 'px',
+  }
+})
+
+const emits = defineEmits({
   'update:modelValue': (newValue: string) => true,
 })
 
@@ -45,23 +55,34 @@ const select = ref<HTMLInputElement>()
     class="htw-cursor-text htw-items-center"
     :class="$attrs.class"
     :style="$attrs.style"
-    @click="select.focus()"
   >
-    <select
-      ref="select"
-      class="htw-text-inherit htw-bg-transparent htw-w-full htw-outline-none htw-px-2 htw-py-1 -htw-my-1 htw-border htw-border-solid htw-border-black/25 dark:htw-border-white/25 focus:htw-border-primary-500 dark:focus:htw-border-primary-500 htw-rounded-sm"
-      :value="modelValue"
-      @input="emit('update:modelValue', ($event.target as HTMLInputElement).value)"
-    >
-      <option
-        v-for="{ label, value } in formattedOtions"
-        v-bind="{ ...$attrs, class: null, style: null }"
-        :key="label"
-        class="dark:htw-bg-gray-600"
-        :value="value"
+    <VDropdown>
+      <div
+        ref="dropdown"
+        class="htw-cursor-pointer htw-w-full htw-outline-none htw-px-2 htw-py-1 -htw-my-1 htw-border htw-border-solid htw-border-black/25 dark:htw-border-white/25 hover:htw-border-primary-500 dark:hover:htw-border-primary-500 htw-rounded-sm htw-flex htw-gap-2 htw-flex-wrap htw-w-full htw-items-center"
       >
-        {{ label }}
-      </option>
-    </select>
+        {{ selectedLabel }}
+        <Icon
+          icon="carbon:chevron-sort"
+          class="htw-w-4 htw-h-4 htw-shrink-0 htw-ml-auto"
+        />
+      </div>
+      <template #popper="{ hide }">
+        <div
+          :style="computedStyle"
+          class="htw-flex htw-flex-col"
+        >
+          <div
+            v-for="{ label, value } in formattedOptions"
+            v-bind="{ ...$attrs, class: null, style: null }"
+            :key="label"
+            class="htw-px-2 htw-py-1 htw-cursor-pointer hover:htw-bg-primary-100 dark:hover:htw-bg-primary-700"
+            @click="emits('update:modelValue', value)"
+          >
+            {{ label }}
+          </div>
+        </div>
+      </template>
+    </VDropdown>
   </HstWrapper>
 </template>
