@@ -1,7 +1,6 @@
-import { useEventsStore } from '../stores/events.js'
 import { EVENT_SEND } from './const'
 
-export function hstEvent (name: string, argument) {
+export async function hstEvent (name: string, argument) {
   console.log('[histoire] Event fired', { name, argument })
   const event = {
     name,
@@ -13,6 +12,7 @@ export function hstEvent (name: string, argument) {
       event,
     })
   } else {
+    const { useEventsStore } = await import('../stores/events.js')
     useEventsStore().addEvent(event)
   }
 }

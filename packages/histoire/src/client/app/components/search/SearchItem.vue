@@ -3,7 +3,7 @@ import { PropType, ref, toRefs } from 'vue'
 import { useRouter } from 'vue-router'
 import { Icon } from '@iconify/vue'
 import { SearchResult } from '../../types'
-import { onKeyboardShortcut } from '../../util/keyboard.js'
+import { onKeyboardShortcut } from '../../util/keyboard'
 import BaseListItemLink from '../base/BaseListItemLink.vue'
 import { useScrollOnActive } from '../../util/scroll'
 

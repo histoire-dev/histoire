@@ -67,8 +67,8 @@ export async function build (ctx: Context) {
     build: {
       rollupOptions: {
         input: [
-          join(APP_PATH, 'index.js'),
-          join(APP_PATH, 'sandbox.js'),
+          join(APP_PATH, 'bundle-main.js'),
+          join(APP_PATH, 'bundle-sandbox.js'),
         ],
         output: {
           manualChunks (id) {
@@ -101,14 +101,14 @@ export async function build (ctx: Context) {
   const prefetchHtml = generateScriptLinks(prefetchOutputs.map(o => o.fileName), 'prefetch', ctx, resolvedViteConfig)
 
   // Index
-  const indexOutput = result.output.find(o => o.name === 'index' && o.type === 'chunk')
+  const indexOutput = result.output.find(o => o.name === 'bundle-main' && o.type === 'chunk')
   const indexHtml = generateEntryHtml(indexOutput.fileName, styleOutput.fileName, {
     HEAD: `${preloadHtml}${prefetchHtml}`,
   }, ctx, resolvedViteConfig)
   await writeFile('index.html', indexHtml, ctx)
 
   // Sandbox
-  const sandboxOutput = result.output.find(o => o.name === 'sandbox' && o.type === 'chunk')
+  const sandboxOutput = result.output.find(o => o.name === 'bundle-sandbox' && o.type === 'chunk')
   const sandboxHtml = generateEntryHtml(sandboxOutput.fileName, styleOutput.fileName, {}, ctx, resolvedViteConfig)
   await writeFile('__sandbox.html', sandboxHtml, ctx)
 

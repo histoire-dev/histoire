@@ -16,7 +16,7 @@ export default defineConfig({
           return {
             theme: {
               logoHref: 'http://histoire.dev',
-              favicon: '/histoire.svg',
+              favicon: 'histoire.svg',
             },
           }
         },

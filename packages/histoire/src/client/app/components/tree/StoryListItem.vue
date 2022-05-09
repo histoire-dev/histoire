@@ -4,7 +4,7 @@ import BaseListItemLink from '../base/BaseListItemLink.vue'
 import { Icon } from '@iconify/vue'
 import { computed, ref, withDefaults } from 'vue'
 import { useRoute } from 'vue-router'
-import { useScrollOnActive } from '../../util/scroll.js'
+import { useScrollOnActive } from '../../util/scroll'
 
 const props = withDefaults(defineProps<{
   story: Story

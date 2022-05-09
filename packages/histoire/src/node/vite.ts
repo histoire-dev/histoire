@@ -60,7 +60,7 @@ export async function createVitePlugins (ctx: Context): Promise<VitePlugin[]> {
             dirname(require.resolve('case/package.json')),
           ],
           exclude: [
-            'histoire/client',
+            'histoire',
           ],
         },
         server: {
@@ -199,7 +199,7 @@ if (import.meta.hot) {
     }
   }
   </script>
-  <script type="module" src="/@fs/${APP_PATH}/sandbox.js"></script>
+  <script type="module" src="/@fs/${APP_PATH}/bundle-sandbox.js"></script>
 </body>
 </html>`
           // Apply Vite HTML transforms. This injects the Vite HMR client, and
@@ -230,7 +230,7 @@ if (import.meta.hot) {
   </head>
   <body>
     <div id="app"></div>
-    <script type="module" src="/@fs/${APP_PATH}/index.js"></script>
+    <script type="module" src="/@fs/${APP_PATH}/bundle-main.js"></script>
   </body>
 </html>`
             // Apply Vite HTML transforms. This injects the Vite HMR client, and

@@ -6,7 +6,7 @@ import { useResizeObserver } from '@vueuse/core'
 import { useCurrentVariantRoute } from '../../util/variant'
 import type { Story, Variant } from '../../types'
 import SandboxVue3 from '../sandbox/SandboxVue3.vue'
-import { useScrollOnActive } from '../../util/scroll.js'
+import { useScrollOnActive } from '../../util/scroll'
 
 const props = defineProps({
   variant: {

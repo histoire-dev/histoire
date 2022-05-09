@@ -9,10 +9,10 @@ import { useStoryStore } from '../../stores/story'
 import BaseEmpty from '../base/BaseEmpty.vue'
 import type { SearchResult, Story, Variant } from '../../types'
 import SearchItem from './SearchItem.vue'
-import { searchData, onUpdate } from './search-title-data.js'
-import type { SearchData } from './types.js'
+import { searchData, onUpdate } from './search-title-data'
+import type { SearchData } from './types'
 
-const DocSearchData = () => import('./search-docs-data.js')
+const DocSearchData = () => import('./search-docs-data')
 
 const props = defineProps({
   shown: {

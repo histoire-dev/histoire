@@ -4,7 +4,7 @@ import { useCurrentVariantRoute } from '../../util/variant'
 import type { Variant } from '../../types'
 import BaseListItemLink from '../base/BaseListItemLink.vue'
 import { Icon } from '@iconify/vue'
-import { useScrollOnActive } from '../../util/scroll.js'
+import { useScrollOnActive } from '../../util/scroll'
 
 const props = defineProps({
   variant: {

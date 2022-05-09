@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { isDark } from '../../util/dark'
 import { computed } from 'vue'
-import { histoireConfig, customLogos } from '../../util/config.js'
+import { histoireConfig, customLogos } from '../../util/config'
 
 import HistoireLogoDark from '../../assets/histoire-text-dark.svg'
 import HistoireLogoLight from '../../assets/histoire-text.svg'
