@@ -19,7 +19,7 @@ describe('Codegen (Vue 3)', () => {
 </div>
 <button>A button</button>
 <button class="btn btn-primary">
-  A button
+   A button 
 </button>
 <button
   class="btn btn-primary"
@@ -27,7 +27,7 @@ describe('Codegen (Vue 3)', () => {
     color: 'red',
   }"
 >
-  A button
+   A button 
 </button>
 <input
   type="phone"
