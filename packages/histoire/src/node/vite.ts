@@ -27,13 +27,8 @@ export const RESOLVED_SEARCH_DOCS_DATA_ID = `/${SEARCH_DOCS_DATA_ID}-resolved`
 
 export async function createVitePlugins (ctx: Context): Promise<VitePlugin[]> {
   const viteConfig = await resolveViteConfig({}, ctx.mode === 'dev' ? 'serve' : 'build')
-  const hasVuePlugin = viteConfig.plugins.find(p => p.name === 'vite:vue')
 
   const plugins: VitePlugin[] = []
-
-  if (!hasVuePlugin) {
-    plugins.push((await import('@vitejs/plugin-vue')).default())
-  }
 
   if (ctx.config.vite) {
     plugins.push({
