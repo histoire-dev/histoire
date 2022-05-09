@@ -176,6 +176,10 @@ if (import.meta.hot) {
     },
 
     configureServer (server) {
+      server.ws.on('histoire:mount', () => {
+        notifyStoryChange()
+      })
+
       server.middlewares.use(async (req, res, next) => {
         if (req.url!.startsWith(`${server.config.base}__sandbox`)) {
           res.statusCode = 200

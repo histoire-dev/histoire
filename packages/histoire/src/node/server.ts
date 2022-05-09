@@ -51,11 +51,44 @@ export async function createServer (ctx: Context, port: number) {
   let queueResolve: () => void
   let queued = false
   let queuedFiles: StoryFile[] = []
+  let queuedAll = false
+  let didAllStoriesYet = false
+
+  // Invalidate modules
+  const invalidateModule = (id: string) => {
+    const mod = server.moduleGraph.getModuleById(id)
+    if (!mod) {
+      return
+    }
+    server.moduleGraph.invalidateModule(mod)
+
+    // Send HMR update
+    const timestamp = Date.now()
+    mod.lastHMRTimestamp = timestamp
+    server.ws.send({
+      type: 'update',
+      updates: [
+        {
+          type: 'js-update',
+          acceptedPath: mod.url,
+          path: mod.url,
+          timestamp: timestamp,
+        },
+      ],
+    })
+  }
 
   onStoryChange(async (changedFile) => {
+    if (changedFile && !didAllStoriesYet) {
+      return
+    }
     if (queue) {
-      if (queued && changedFile) {
-        queuedFiles.push(changedFile)
+      if (queued) {
+        if (changedFile) {
+          queuedFiles.push(changedFile)
+        } else {
+          queuedAll = true
+        }
         return
       } else {
         queued = true
@@ -70,46 +103,28 @@ export async function createServer (ctx: Context, port: number) {
 
     clearCache()
 
-    if (changedFile) {
+    console.log('Collect stories start', changedFile?.path ?? 'all')
+    const time = Date.now()
+    if (changedFile && !queuedAll) {
       // Granular update
       await executeStoryFile(changedFile)
+
+      // Queued updates
+      for (const storyFile of queuedFiles) {
+        await executeStoryFile(storyFile)
+      }
     } else {
       // Full update
       for (const storyFile of ctx.storyFiles) {
         await executeStoryFile(storyFile)
       }
+      didAllStoriesYet = true
     }
-    // Queued updates
-    for (const storyFile of queuedFiles) {
-      await executeStoryFile(storyFile)
-    }
+    console.log('Collect stories end', Date.now() - time, 'ms')
 
     queuedFiles = []
+    queuedAll = false
     queueResolve()
-
-    // Invalidate modules
-    function invalidateModule (id: string) {
-      const mod = server.moduleGraph.getModuleById(id)
-      if (!mod) {
-        return
-      }
-      server.moduleGraph.invalidateModule(mod)
-
-      // Send HMR update
-      const timestamp = Date.now()
-      mod.lastHMRTimestamp = timestamp
-      server.ws.send({
-        type: 'update',
-        updates: [
-          {
-            type: 'js-update',
-            acceptedPath: mod.url,
-            path: mod.url,
-            timestamp: timestamp,
-          },
-        ],
-      })
-    }
 
     invalidateModule(RESOLVED_STORIES_ID)
     invalidateModule(RESOLVED_SEARCH_TITLE_DATA_ID)
@@ -123,14 +138,6 @@ export async function createServer (ctx: Context, port: number) {
     await nodeServer.close()
     await destroyCollectStories()
   }
-
-  // On page refresh, refresh stories
-  // Useful when vite optimizes new dependencies
-  server.ws.on('connection', (socket) => {
-    if (socket.protocol === 'vite-hmr') {
-      notifyStoryChange()
-    }
-  })
 
   return {
     server,
