@@ -69,11 +69,11 @@
     "sirv": "^2.0.2",
     "tinypool": "^0.1.2",
     "vite-node": "0.7.6",
-    "vue-router": "^4.0.14"
+    "vue-router": "^4.0.14",
+    "vue": "^3.2.31"
   },
   "peerDependencies": {
-    "vite": "^2.9.0",
-    "vue": "^3.2.31"
+    "vite": "^2.9.0"
   },
   "devDependencies": {
     "@peeky/test": "^0.13.5",
