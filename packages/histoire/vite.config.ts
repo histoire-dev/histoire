@@ -16,6 +16,7 @@ export default defineConfig({
     rollupOptions: {
       external: [
         /\$histoire/,
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
         ...Object.keys(require('./package.json').dependencies),
       ],
 

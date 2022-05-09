@@ -46,11 +46,23 @@ function onClick (event) {
         <h1>Title</h1>
         <hr>
         <pre>{{ state }}</pre>
-        <div data-test-id="object">{{ state }}</div>
+        <div data-test-id="object">
+          {{ state }}
+        </div>
         <button>A button</button>
-        <button class="btn btn-primary">A button</button>
-        <button class="btn btn-primary" style="color: red;">A button</button>
-        <input type="phone" placeholder="Enter your phone number">
+        <button class="btn btn-primary">
+          A button
+        </button>
+        <button
+          class="btn btn-primary"
+          style="color: red;"
+        >
+          A button
+        </button>
+        <input
+          type="phone"
+          placeholder="Enter your phone number"
+        >
         <ul>
           <li>Single</li>
         </ul>
