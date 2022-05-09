@@ -14,6 +14,7 @@ const state = reactive({
     title="HstPresets"
   >
     <HstPresets
+      id="hst-preset"
       :state="state"
     />
     <HstText

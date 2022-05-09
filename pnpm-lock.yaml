@@ -213,7 +213,7 @@ importers:
       '@types/node': ^17.0.23
       '@vitejs/plugin-vue': ^2.3.1
       '@vue/test-utils': ^2.0.0-rc.19
-      '@vueuse/core': ^8.2.5
+      '@vueuse/core': ^8.3.1
       autoprefixer: ^10.4.4
       concurrently: ^7.1.0
       floating-vue: ^2.0.0-beta.16
@@ -1645,7 +1645,6 @@ packages:
       '@vueuse/shared': 8.3.1_vue@3.2.33
       vue: 3.2.33
       vue-demi: 0.12.5_vue@3.2.33
-    dev: false
 
   /@vueuse/metadata/8.3.1:
     resolution: {integrity: sha512-1aZaFL44HzXXkfN6Q7KMDOXBFKTHDClHlOJBxtN8rTBXIIScoGOrJCpxWiQ4kuVg95MzG/pHrd3P4wd8poL9XQ==}

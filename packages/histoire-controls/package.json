@@ -43,7 +43,7 @@
   },
   "dependencies": {
     "@iconify/vue": "^3.2.1",
-    "@vueuse/core": "^8.2.5",
+    "@vueuse/core": "^8.3.1",
     "floating-vue": "^2.0.0-beta.16",
     "lodash": "^4.17.21"
   },

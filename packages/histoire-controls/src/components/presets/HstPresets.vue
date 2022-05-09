@@ -11,31 +11,48 @@ import CustomSelect from '../select/CustomSelect.vue'
 import { Icon } from '@iconify/vue'
 import cloneDeep from 'lodash/cloneDeep'
 import assign from 'lodash/assign'
+import { useStorage } from '@vueuse/core'
+
+const DEFAULT_ID = 'default'
 
 const props = defineProps<{
+  id: string
   state: Record<string, unknown>
 }>()
 
-const presetsOptions = reactive<Record<string, string>>({ default: 'Default' })
-const presetStates = reactive<Record<string, Record<string, unknown>>>({})
-const selectedOption = ref('default')
+const defaultState = cloneDeep(props.state)
 
-let defaultState
+const selectedOption = useStorage<string>(
+  '_histoire-presets/' + props.id + '/selected',
+  DEFAULT_ID,
+)
 
-onMounted(() => {
-  defaultState = cloneDeep(props.state)
-  presetStates.default = defaultState
+const presetStates = useStorage<Map<string, { state: unknown, label: string }>>(
+  '_histoire-presets/' + props.id + '/states',
+  new Map(),
+)
+
+const presetsOptions = computed(() => {
+  const options = { [DEFAULT_ID]: 'Default' }
+  presetStates.value.forEach((value, key) => {
+    options[key] = value.label
+  })
+  return options
 })
 
 watch(() => selectedOption.value, () => {
-  if (presetStates[selectedOption.value]) {
-    assign(props.state, presetStates[selectedOption.value])
+  if (selectedOption.value === DEFAULT_ID) {
+    assign(props.state, defaultState)
+    return
   }
-})
+  if (presetStates.value.has(selectedOption.value)) {
+    assign(props.state, presetStates.value.get(selectedOption.value).state)
+  }
+}, { immediate: true })
 
 const input = ref<HTMLInputElement>()
 
-const canDelete = computed(() => selectedOption.value !== 'default')
+const canDelete = computed(() => selectedOption.value !== DEFAULT_ID)
 
 function savePreset () {
   const label = prompt('Name your preset')
@@ -44,10 +61,23 @@ function savePreset () {
   }
   const id = (new Date()).getTime().toString()
 
-  presetsOptions[id] = label
-  presetStates[id] = cloneDeep(props.state)
+  presetStates.value.set(id, { state: cloneDeep(props.state), label })
 
   selectedOption.value = id
+}
+
+function deleteSelected () {
+  if (!canDelete.value) {
+    return
+  }
+
+  if (!confirm('Are you sure you want to delete this preset?')) {
+    return
+  }
+
+  presetStates.value.delete(selectedOption.value)
+
+  selectedOption.value = DEFAULT_ID
 }
 </script>
 
@@ -73,6 +103,7 @@ function savePreset () {
         icon="carbon:trash-can"
         class="htw-w-[16px] htw-h-[16px] htw-text-gray-900 dark:htw-text-gray-100"
         :class="canDelete ? 'htw-cursor-pointer hover:htw-text-primary-500 dark:hover:htw-text-primary-400 hover:htw-opacity-100 htw-opacity-50' : 'htw-opacity-20'"
+        @click="deleteSelected"
       />
     </div>
   </HstWrapper>
