@@ -1,3 +1,12 @@
+## [0.4.4](https://github.com/Akryum/histoire/compare/v0.4.3...v0.4.4) (2022-05-09)
+
+
+### Bug Fixes
+
+* resolveComponent can only be used in render() or setup() ([70f44c3](https://github.com/Akryum/histoire/commit/70f44c3c0503a9390dc95be2bfc576c0b64a2aab))
+
+
+
 ## [0.4.3](https://github.com/Akryum/histoire/compare/v0.4.2...v0.4.3) (2022-05-09)
 
 
