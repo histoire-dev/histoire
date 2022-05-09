@@ -1,3 +1,12 @@
+## [0.4.2](https://github.com/Akryum/histoire/compare/v0.4.1...v0.4.2) (2022-05-09)
+
+
+### Bug Fixes
+
+* revert vue back to peer dep ([737fa16](https://github.com/Akryum/histoire/commit/737fa16fe599a7d3d00472773fa5c53d4213fd97))
+
+
+
 ## [0.4.1](https://github.com/Akryum/histoire/compare/v0.4.0...v0.4.1) (2022-05-09)
 
 
