@@ -9,37 +9,29 @@ import { Dropdown as VDropdown } from 'floating-vue'
 import { ref, computed, ComputedRef } from 'vue'
 import { Icon } from '@iconify/vue'
 
-export type CustomSelectOptions = {
-  label: string
-  value: string
-}
-
 const props = defineProps<{
   modelValue: string
-  options: Array<CustomSelectOptions> | Array<string>
+  options: Record<string, string> | Array<string>
 }>()
 
 const emits = defineEmits<{
   (e: 'update:modelValue', value: string): void
 }>()
 
-const formattedOptions: ComputedRef<CustomSelectOptions[]> =
-  computed(() => props.options.map(option => typeof option === 'string'
-    ? {
-      label: option,
-      value: option,
-    } as CustomSelectOptions
-    : option as CustomSelectOptions))
+const formattedOptions: ComputedRef<Record<string, string>> = computed(() => {
+  if (Array.isArray(props.options)) {
+    return Object.fromEntries(props.options.map((value) => [value, value]))
+  }
+  return props.options
+})
 
 const dropdown = ref<HTMLElement>()
-const selectedLabel = computed(() => formattedOptions.value.find((value) => value.value === props.modelValue)?.label)
+const selectedLabel = computed(() => formattedOptions.value[props.modelValue])
 const computedStyle = computed(() => {
   return {
     width: dropdown.value.scrollWidth + 'px',
   }
 })
-
-const select = ref<HTMLInputElement>()
 
 function selectValue (value: string, hide: () => void) {
   emits('update:modelValue', value)
@@ -67,7 +59,7 @@ function selectValue (value: string, hide: () => void) {
         class="htw-flex htw-flex-col htw-bg-gray-50 dark:htw-bg-gray-700"
       >
         <div
-          v-for="{ label, value } in formattedOptions"
+          v-for="( label, value ) in formattedOptions"
           v-bind="{ ...$attrs, class: null, style: null }"
           :key="label"
           class="htw-px-2 htw-py-1 htw-cursor-pointer hover:htw-bg-primary-100 dark:hover:htw-bg-primary-700"

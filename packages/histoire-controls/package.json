@@ -44,10 +44,12 @@
   "dependencies": {
     "@iconify/vue": "^3.2.1",
     "@vueuse/core": "^8.2.5",
-    "floating-vue": "^2.0.0-beta.16"
+    "floating-vue": "^2.0.0-beta.16",
+    "lodash": "^4.17.21"
   },
   "devDependencies": {
     "@peeky/test": "^0.13.5",
+    "@types/lodash": "^4.14.182",
     "@types/node": "^17.0.23",
     "@vitejs/plugin-vue": "^2.3.1",
     "@vue/test-utils": "^2.0.0-rc.19",
