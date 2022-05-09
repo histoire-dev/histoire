@@ -1,8 +1,7 @@
 // @ts-nocheck
 // @TODO remove no-check and fix vnode type errors
 
-import { VNode, vModelText, vModelCheckbox, vModelSelect, vModelRadio, vModelDynamic } from 'vue'
-import { Text } from '@vue/runtime-core'
+import { VNode, vModelText, vModelCheckbox, vModelSelect, vModelRadio, vModelDynamic, Text } from 'vue'
 import { pascal } from 'case'
 import { createAutoBuildingObject, indent } from './util'
 import { serializeJs } from './serialize-js'

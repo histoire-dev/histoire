@@ -53,7 +53,6 @@ export async function createVitePlugins (ctx: Context): Promise<VitePlugin[]> {
           // force include vue to avoid duplicated copies when linked + optimized
           include: [
             'vue',
-            dirname(require.resolve('@vue/runtime-core/package.json')),
             dirname(require.resolve('shiki/package.json')),
             dirname(require.resolve('vscode-textmate/package.json')),
             dirname(require.resolve('vscode-oniguruma/package.json')),

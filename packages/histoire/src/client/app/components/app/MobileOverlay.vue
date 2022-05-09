@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import { Icon } from '@iconify/vue'
-import { defineEmits } from '@vue/runtime-core'
 
 const props = defineProps<{
   title: string
