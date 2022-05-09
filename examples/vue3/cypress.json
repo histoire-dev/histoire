@@ -2,5 +2,9 @@
   "baseUrl": "http://localhost:4567",
   "viewportWidth": 1280,
   "viewportHeight": 768,
-  "chromeWebSecurity": false
+  "chromeWebSecurity": false,
+  "retries": {
+    "runMode": 2,
+    "openMode": 0
+  }
 }
