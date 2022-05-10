@@ -1,32 +1,33 @@
 <script lang="ts" setup>
-import { reactive } from 'vue'
-
 const options = {
   'crash-bandicoot': 'Crash Bandicoot',
   'the-last-of-us': 'The Last of Us',
   'ghost-of-tsushima': 'Ghost of Tsushima',
 }
 
-const state = reactive({
-  text: 'Hello',
-  checkbox: false,
-  number: 20,
-  longText: 'Longer text...',
-  select: 'crash-bandicoot',
-})
+function initState () {
+  return {
+    text: 'Hello',
+    checkbox: false,
+    number: 20,
+    longText: 'Longer text...',
+    select: 'crash-bandicoot',
+  }
+}
 </script>
 
 <template>
   <Story title="Controls">
     <Variant
       title="default"
+      :init-state="initState"
     >
-      <template #default>
+      <template #default="{ state }">
         <h1>State</h1>
         <pre>{{ state }}</pre>
       </template>
 
-      <template #controls>
+      <template #controls="{ state }">
         <HstPresets
           id="controls"
           :state="state"
