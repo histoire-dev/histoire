@@ -1,3 +1,12 @@
+## [0.4.6](https://github.com/Akryum/histoire/compare/v0.4.5...v0.4.6) (2022-05-11)
+
+
+### Features
+
+* Add presets (fix [#53](https://github.com/Akryum/histoire/issues/53)) ([#88](https://github.com/Akryum/histoire/issues/88)) ([71ba456](https://github.com/Akryum/histoire/commit/71ba456a7000fa19e10fd327ccba5a96de5ea82c))
+
+
+
 ## [0.4.5](https://github.com/Akryum/histoire/compare/v0.4.4...v0.4.5) (2022-05-09)
 
 

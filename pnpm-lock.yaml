@@ -114,7 +114,7 @@ importers:
 
   packages/histoire:
     specifiers:
-      '@histoire/controls': ^0.4.5
+      '@histoire/controls': ^0.4.6
       '@iconify/vue': ^3.2.1
       '@peeky/test': ^0.13.5
       '@tailwindcss/typography': ^0.5.2
@@ -159,7 +159,7 @@ importers:
       vue: ^3.2.31
       vue-router: ^4.0.14
     dependencies:
-      '@histoire/controls': 0.4.5_vue@3.2.33
+      '@histoire/controls': link:../histoire-controls
       '@iconify/vue': 3.2.1_vue@3.2.33
       '@types/markdown-it': 12.2.3
       '@vueuse/core': 8.3.1_vue@3.2.33
@@ -641,17 +641,6 @@ packages:
     dependencies:
       '@hapi/hoek': 9.2.1
     dev: true
-
-  /@histoire/controls/0.4.5_vue@3.2.33:
-    resolution: {integrity: sha512-hicOfvIYIN+Ad8vk2/5qHCUthVXv/xqWSBZkS7x0II3PV7KMrAl0UOcxyMFf4AVKSMwmM1DtClkOMGXKQ/jxjw==}
-    dependencies:
-      '@iconify/vue': 3.2.1_vue@3.2.33
-      '@vueuse/core': 8.3.1_vue@3.2.33
-      floating-vue: 2.0.0-beta.16_vue@3.2.33
-    transitivePeerDependencies:
-      - '@vue/composition-api'
-      - vue
-    dev: false
 
   /@humanwhocodes/config-array/0.9.5:
     resolution: {integrity: sha512-ObyMyWxZiCu/yTisA7uzx81s40xR2fD5Cg/2Kq7G02ajkNubJf6BopgDTmDyc3U7sXpNKM8cYOw7s7Tyr+DnCw==}
