@@ -9,6 +9,11 @@ const options = {
 
 const flatOptions = Object.keys(options)
 
+const objectOptions = Object.keys(options).map(key => ({
+  label: options[key],
+  value: key,
+}))
+
 function initState () {
   return {
     label: 'My really long label',
@@ -66,7 +71,7 @@ function initState () {
     </Variant>
 
     <Variant
-      title="options-as-array-of-objects"
+      title="options-as-object"
       :init-state="initState"
     >
       <template #default="{ state }">
@@ -82,6 +87,27 @@ function initState () {
           v-model="state.select"
           title="Games"
           :options="options"
+        />
+      </template>
+    </Variant>
+
+    <Variant
+      title="options-as-array-of-objects"
+      :init-state="initState"
+    >
+      <template #default="{ state }">
+        <pre class="htw-text-xs htw-bg-gray-50 dark:htw-bg-gray-600 htw-rounded htw-p-4">{{ objectOptions }}</pre>
+        <HstSelect
+          v-model="state.select"
+          title="Games"
+          :options="objectOptions"
+        />
+      </template>
+      <template #controls="{ state }">
+        <HstSelect
+          v-model="state.select"
+          title="Games"
+          :options="objectOptions"
         />
       </template>
     </Variant>

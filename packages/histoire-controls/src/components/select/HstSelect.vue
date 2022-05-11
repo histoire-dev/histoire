@@ -2,17 +2,19 @@
 export default {
   name: 'HstSelect',
 }
+
+export type { SelectOption as HstSelectOption } from './CustomSelect.vue'
 </script>
 
 <script lang="ts" setup>
 import { ref } from 'vue'
 import HstWrapper from '../HstWrapper.vue'
-import CustomSelect from './CustomSelect.vue'
+import CustomSelect, { SelectOption } from './CustomSelect.vue'
 
 const props = defineProps<{
   title?: string
   modelValue: string
-  options: Record<string, string> | Array<string>
+  options: Record<string, string> | string[] | SelectOption[]
 }>()
 
 const emits = defineEmits<{
