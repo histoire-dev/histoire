@@ -81,7 +81,7 @@
     "@types/flexsearch": "^0.7.3",
     "@types/fs-extra": "^9.0.13",
     "@types/markdown-it": "^12.2.3",
-    "@types/node": "^17.0.23",
+    "@types/node": "^17.0.32",
     "@vitejs/plugin-vue": "^2.3.1",
     "autoprefixer": "^10.4.4",
     "concurrently": "^7.1.0",

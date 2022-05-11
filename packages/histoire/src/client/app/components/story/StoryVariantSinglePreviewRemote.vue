@@ -6,11 +6,11 @@ import { STATE_SYNC, PREVIEW_SETTINGS_SYNC, SANDBOX_READY, EVENT_SEND } from '..
 import type { Story, Variant } from '../../types'
 import HatchedPattern from '../misc/HatchedPattern.vue'
 import CheckerboardPattern from '../misc/CheckerboardPattern.vue'
-import { toRawDeep } from '../../util/reactivity'
 import { getSandboxUrl } from '../sandbox/lib'
 import { usePreviewSettingsStore } from '../../stores/preview-settings'
 import { HstEvent, useEventsStore } from '../../stores/events'
 import StoryResponsivePreview from './StoryResponsivePreview.vue'
+import { applyStateToVariant, toRawDeep } from '../../util/state'
 
 const props = defineProps<{
   story: Story
@@ -65,19 +65,7 @@ useEventListener(window, 'message', (event) => {
 
 function updateVariantState (state: any) {
   synced = true
-  if (props.variant.state) {
-    for (const key in state) {
-      if (typeof props.variant.state[key] === 'object') {
-        Object.assign(props.variant.state[key], state[key])
-      } else {
-        // eslint-disable-next-line vue/no-mutating-props
-        props.variant.state[key] = state[key]
-      }
-    }
-  } else {
-    // eslint-disable-next-line vue/no-mutating-props
-    props.variant.state = state
-  }
+  applyStateToVariant(props.variant, state)
 }
 
 function logEvent (event: HstEvent) {

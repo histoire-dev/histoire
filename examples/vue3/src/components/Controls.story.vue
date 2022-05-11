@@ -1,9 +1,10 @@
 <script lang="ts" setup>
-const options = [
-  { label: 'Crash Bandicoot', value: 'crash-bandicoot' },
-  { label: 'The Last of Us', value: 'the-last-of-us' },
-  { label: 'Ghost of Tsushima', value: 'ghost-of-tsushima' },
-]
+const options = {
+  'crash-bandicoot': 'Crash Bandicoot',
+  'the-last-of-us': 'The Last of Us',
+  'ghost-of-tsushima': 'Ghost of Tsushima',
+}
+
 function initState () {
   return {
     text: 'Hello',

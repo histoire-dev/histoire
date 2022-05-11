@@ -4,6 +4,7 @@ import { Icon } from '@iconify/vue'
 import type { Story, Variant } from '../../types'
 import SandboxVue3 from '../sandbox/SandboxVue3.vue'
 import BaseEmpty from '../base/BaseEmpty.vue'
+import StatePresets from './StatePresets.vue'
 
 defineProps({
   variant: {
@@ -19,7 +20,20 @@ defineProps({
 </script>
 
 <template>
-  <div data-test-id="story-controls">
+  <div
+    data-test-id="story-controls"
+    class="htw-flex htw-flex-col"
+  >
+    <!-- Toolbar -->
+    <div
+      class="htw-h-9 htw-flex-none htw-border-b htw-border-solid htw-border-gray-100 dark:htw-border-gray-750 htw-px-2 htw-flex htw-items-center"
+    >
+      <StatePresets
+        :story="story"
+        :variant="variant"
+      />
+    </div>
+
     <!-- Custom controls -->
     <SandboxVue3
       v-if="variant.slots().controls || story.slots().controls"
