@@ -1,86 +1,101 @@
-<script lang="ts">
-export default {
-  name: 'HstPresets',
-}
-</script>
-
 <script lang="ts" setup>
-import { ref, computed, watch, nextTick } from 'vue'
-import HstWrapper from '../HstWrapper.vue'
-import CustomSelect from '../select/CustomSelect.vue'
+import { ref, computed, nextTick, onMounted } from 'vue'
 import { Icon } from '@iconify/vue'
-import cloneDeep from 'lodash/cloneDeep'
-import assign from 'lodash/assign'
-import { useStorage, onClickOutside } from '@vueuse/core'
-import { VTooltip as vTooltip } from 'floating-vue'
+import { useStorage, onClickOutside, useTimeoutFn } from '@vueuse/core'
+import BaseSelect from '../base/BaseSelect.vue'
+import { applyStateToVariant, clone, toRawDeep } from '../../util/state'
+import type { Story, Variant } from '../../types'
 
 const DEFAULT_ID = 'default'
 
 const props = defineProps<{
-  id: string
-  state: Record<string, unknown>
+  story: Story
+  variant: Variant
 }>()
 
-const defaultState = cloneDeep(props.state)
+const saveId = computed(() => `${props.story.id}:${props.variant.id}`)
+
+const defaultState = clone(toRawDeep(props.variant.state))
 
 const selectedOption = useStorage<string>(
-  `_histoire-presets/${props.id}/selected`,
+  `_histoire-presets/${saveId.value}/selected`,
   DEFAULT_ID,
 )
 
 const presetStates = useStorage<Map<string, { state: Record<string, unknown>, label: string }>>(
-  `_histoire-presets/${props.id}/states`,
+  `_histoire-presets/${saveId.value}/states`,
   new Map(),
 )
 
 const presetsOptions = computed(() => {
-  const options = { [DEFAULT_ID]: 'Default' }
+  const options = { [DEFAULT_ID]: 'Initial state' }
   presetStates.value.forEach((value, key) => {
     options[key] = value.label
   })
   return options
 })
 
-watch(() => selectedOption.value, () => {
-  if (selectedOption.value === DEFAULT_ID) {
-    assign(props.state, defaultState)
-    return
+function resetState () {
+  selectedOption.value = DEFAULT_ID
+  applyStateToVariant(props.variant, defaultState)
+}
+
+function applyPreset (id) {
+  if (id === DEFAULT_ID) {
+    resetState()
+  } else if (presetStates.value.has(id)) {
+    applyStateToVariant(props.variant, presetStates.value.get(id).state)
   }
-  if (presetStates.value.has(selectedOption.value)) {
-    assign(props.state, presetStates.value.get(selectedOption.value).state)
+}
+
+onMounted(() => {
+  if (selectedOption.value !== DEFAULT_ID) {
+    applyPreset(selectedOption.value)
   }
-}, { immediate: true })
+})
 
 const input = ref<HTMLInputElement>()
 const select = ref<HTMLInputElement>()
-const canDelete = computed(() => selectedOption.value !== DEFAULT_ID)
+const canEdit = computed(() => selectedOption.value !== DEFAULT_ID)
 const isEditing = ref(false)
 
-async function savePreset () {
+async function createPreset () {
   const id = (new Date()).getTime().toString()
 
-  presetStates.value.set(id, { state: cloneDeep(props.state), label: 'New preset' })
+  presetStates.value.set(id, { state: clone(toRawDeep(props.variant.state)), label: 'New preset' })
   selectedOption.value = id
   isEditing.value = true
   await nextTick()
   input.value.select()
 }
 
-function deletePreset () {
-  if (!canDelete.value) {
-    return
-  }
+const savedNotif = ref(false)
+const savedTimeout = useTimeoutFn(() => {
+  savedNotif.value = false
+}, 1000)
 
+async function savePreset () {
+  if (!canEdit.value) return
+
+  const preset = presetStates.value.get(selectedOption.value)
+  preset.state = clone(toRawDeep(props.variant.state))
+  savedNotif.value = true
+  savedTimeout.start()
+}
+
+function deletePreset (id) {
   if (!confirm('Are you sure you want to delete this preset?')) {
     return
   }
 
-  presetStates.value.delete(selectedOption.value)
-  selectedOption.value = DEFAULT_ID
+  if (selectedOption.value === id) {
+    resetState()
+  }
+  presetStates.value.delete(id)
 }
 
 async function startEditing () {
-  if (!canDelete.value) {
+  if (!canEdit.value) {
     return
   }
 
@@ -97,46 +112,82 @@ onClickOutside(select, stopEditing)
 </script>
 
 <template>
-  <HstWrapper
-    title="Presets"
-    class="htw-cursor-text htw-items-center"
-    :class="$attrs.class"
-    :style="$attrs.style"
-  >
-    <div class="htw-flex htw-gap-2 htw-w-full htw-items-center">
-      <div
-        ref="select"
-        class="htw-flex-grow"
+  <div class="htw-flex htw-gap-2 htw-w-full htw-items-center">
+    <div
+      ref="select"
+      class="htw-flex-1 htw-min-w-0"
+    >
+      <BaseSelect
+        v-model="selectedOption"
+        :options="presetsOptions"
+        @dblclick="startEditing()"
+        @keydown.enter="stopEditing()"
+        @keydown.escape="stopEditing()"
+        @select="id => applyPreset(id)"
       >
-        <CustomSelect
-          v-model="selectedOption"
-          :options="presetsOptions"
-          @dblclick="startEditing"
-          @keydown.enter="stopEditing"
-        >
+        <template #default="{ label }">
           <input
             v-if="isEditing"
             ref="input"
             v-model="presetStates.get(selectedOption).label"
             type="text"
-            class="htw-text-inherit htw-bg-transparent htw-w-full htw-outline-none"
+            class="htw-text-inherit htw-bg-transparent htw-w-full htw-h-full htw-outline-none"
             @click.stop.prevent
           >
-        </CustomSelect>
-      </div>
-      <Icon
-        v-tooltip="'Create new preset'"
-        icon="carbon:save"
-        class="htw-cursor-pointer htw-w-[16px] htw-h-[16px] hover:htw-text-primary-500 htw-opacity-50 hover:htw-opacity-100 dark:hover:htw-text-primary-400 htw-text-gray-900 dark:htw-text-gray-100"
-        @click="savePreset"
-      />
-      <Icon
-        v-tooltip="canDelete ? 'Delete this preset' : null"
-        icon="carbon:trash-can"
-        class="htw-w-[16px] htw-h-[16px] htw-text-gray-900 dark:htw-text-gray-100"
-        :class="canDelete ? 'htw-cursor-pointer hover:htw-text-primary-500 dark:hover:htw-text-primary-400 hover:htw-opacity-100 htw-opacity-50' : 'htw-opacity-20'"
-        @click="deletePreset"
-      />
+
+          <div
+            v-else
+            class="htw-flex htw-items-center htw-gap-2"
+          >
+            <span class="htw-flex-1 htw-truncate">
+              {{ label }}
+            </span>
+            <Icon
+              v-if="canEdit"
+              v-tooltip="'Rename this preset'"
+              icon="carbon:edit"
+              class="htw-flex-none htw-cursor-pointer htw-w-4 htw-h-4 hover:htw-text-primary-500 htw-opacity-50 hover:htw-opacity-100 dark:hover:htw-text-primary-400 htw-text-gray-900 dark:htw-text-gray-100"
+              @click.stop="startEditing()"
+            />
+          </div>
+        </template>
+
+        <template #option="{ label, value }">
+          <div class="htw-flex htw-gap-2 htw-items-center">
+            <span
+              class="htw-flex-1 htw-truncate"
+            >{{ label }}</span>
+            <Icon
+              v-if="value !== DEFAULT_ID"
+              v-tooltip="'Delete this preset'"
+              icon="carbon:trash-can"
+              class="htw-flex-none htw-cursor-pointer htw-w-4 htw-h-4 hover:htw-text-primary-500 htw-opacity-50 hover:htw-opacity-100 dark:hover:htw-text-primary-400 htw-text-gray-900 dark:htw-text-gray-100"
+              @click.stop="deletePreset(value)"
+            />
+          </div>
+        </template>
+      </BaseSelect>
     </div>
-  </HstWrapper>
+    <Icon
+      v-tooltip="savedNotif ? 'Saved!' : canEdit ? 'Save to preset' : null"
+      :icon="savedNotif ? 'carbon:checkmark' : 'carbon:save'"
+      class="htw-cursor-pointer htw-w-4 htw-h-4 hover:htw-text-primary-500 dark:hover:htw-text-primary-400 htw-text-gray-900 dark:htw-text-gray-100"
+      :class="[
+        canEdit ? 'htw-opacity-50 hover:htw-opacity-100' : 'htw-opacity-25 htw-pointer-events-none',
+      ]"
+      @click="savePreset()"
+    />
+    <Icon
+      v-tooltip="'Create new preset'"
+      icon="carbon:add-alt"
+      class="htw-cursor-pointer htw-w-4 htw-h-4 hover:htw-text-primary-500 htw-opacity-50 hover:htw-opacity-100 dark:hover:htw-text-primary-400 htw-text-gray-900 dark:htw-text-gray-100"
+      @click="createPreset()"
+    />
+    <Icon
+      v-tooltip="'Reset to initial state'"
+      icon="carbon:reset"
+      class="htw-cursor-pointer htw-w-4 htw-h-4 hover:htw-text-primary-500 htw-opacity-50 hover:htw-opacity-100 dark:hover:htw-text-primary-400 htw-text-gray-900 dark:htw-text-gray-100"
+      @click="resetState()"
+    />
+  </div>
 </template>

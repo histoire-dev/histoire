@@ -1,9 +1,3 @@
-<script lang="ts">
-export default {
-  name: 'CustomSelect',
-}
-</script>
-
 <script lang="ts" setup>
 import { Dropdown as VDropdown } from 'floating-vue'
 import { computed, ComputedRef } from 'vue'
@@ -16,6 +10,7 @@ const props = defineProps<{
 
 const emits = defineEmits<{
   (e: 'update:modelValue', value: string): void
+  (e: 'select', value: string): void
 }>()
 
 const formattedOptions: ComputedRef<Record<string, string>> = computed(() => {
@@ -29,6 +24,7 @@ const selectedLabel = computed(() => formattedOptions.value[props.modelValue])
 
 function selectValue (value: string, hide: () => void) {
   emits('update:modelValue', value)
+  emits('select', value)
   hide()
 }
 </script>
@@ -38,7 +34,7 @@ function selectValue (value: string, hide: () => void) {
     auto-size
   >
     <div
-      class="htw-cursor-pointer htw-w-full htw-outline-none htw-px-2 htw-py-1 -htw-my-1 htw-border htw-border-solid htw-border-black/25 dark:htw-border-white/25 hover:htw-border-primary-500 dark:hover:htw-border-primary-500 htw-rounded-sm htw-flex htw-gap-2 htw-items-center"
+      class="htw-cursor-pointer htw-w-full htw-outline-none htw-px-2 htw-h-[27px] -htw-my-1 htw-border htw-border-solid htw-border-black/25 dark:htw-border-white/25 hover:htw-border-primary-500 dark:hover:htw-border-primary-500 htw-rounded-sm htw-flex htw-gap-2 htw-items-center htw-leading-normal"
     >
       <div class="htw-flex-1 htw-truncate">
         <slot :label="selectedLabel">
@@ -62,47 +58,15 @@ function selectValue (value: string, hide: () => void) {
           }"
           @click="selectValue(value, hide)"
         >
-          {{ label }}
+          <slot
+            name="option"
+            :label="label"
+            :value="value"
+          >
+            {{ label }}
+          </slot>
         </div>
       </div>
     </template>
   </VDropdown>
 </template>
-
-<style lang="postcss">
-/* @TODO custom themes */
-
-.v-popper {
-  line-height: 0;
-}
-
-.v-popper--theme-dropdown {
-  .htw-dark & {
-    .v-popper__inner {
-      @apply htw-bg-gray-700 htw-border-gray-850 htw-text-gray-100;
-    }
-
-    .v-popper__arrow-inner {
-      @apply htw-border-gray-700;
-    }
-
-    .v-popper__arrow-outer {
-      @apply htw-border-gray-850;
-    }
-  }
-
-  &.v-popper__popper--show-from .v-popper__wrapper {
-    transform: scale(.75);
-  }
-
-  &.v-popper__popper--show-to .v-popper__wrapper {
-    transform: none;
-    transition: transform .15s cubic-bezier(0, 1, .5, 1);
-  }
-}
-
-.v-popper__popper:focus-visible {
-  outline: none;
-}
-
-</style>

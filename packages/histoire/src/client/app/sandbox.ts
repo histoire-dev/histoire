@@ -11,7 +11,7 @@ import { PREVIEW_SETTINGS_SYNC, STATE_SYNC, SANDBOX_READY } from './util/const.j
 import { applyPreviewSettings } from './util/preview-settings.js'
 import { isDark } from './util/dark.js'
 import { histoireConfig } from './util/config.js'
-import { toRawDeep } from './util/reactivity'
+import { applyStateToVariant, toRawDeep } from './util/state'
 
 const query = parseQuery(window.location.search)
 const file = ref<StoryFile>(mapFile(files.find(f => f.id === query.storyId)))
@@ -30,15 +30,7 @@ const app = createApp({
       if (event.data?.type === STATE_SYNC) {
         if (!mounted) return
         synced = true
-        if (variant.value.state) {
-          for (const key in event.data.state) {
-            if (typeof variant.value.state[key] === 'object') {
-              Object.assign(variant.value.state[key], event.data.state[key])
-            } else {
-              variant.value.state[key] = event.data.state[key]
-            }
-          }
-        }
+        applyStateToVariant(variant.value, event.data.state)
       } else if (event.data?.type === PREVIEW_SETTINGS_SYNC) {
         applyPreviewSettings(event.data.settings)
       }
