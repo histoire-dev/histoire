@@ -28,10 +28,6 @@ function initState () {
       </template>
 
       <template #controls="{ state }">
-        <HstPresets
-          id="controls"
-          :state="state"
-        />
         <HstText
           v-model="state.text"
           title="HstText"
