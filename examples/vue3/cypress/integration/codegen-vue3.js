@@ -1,7 +1,7 @@
 /// <reference types="cypress" />
 
 describe('Codegen (Vue 3)', () => {
-  it.only('html', () => {
+  it('html', () => {
     cy.visit('/story/src-components-codegen-story-vue?variantId=html')
     cy.get('[data-test-id="story-source-code"]').should('have.text', `<h1>Title</h1>
 <hr>
