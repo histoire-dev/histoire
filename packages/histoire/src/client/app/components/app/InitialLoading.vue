@@ -30,6 +30,7 @@ if (import.meta.hot) {
       >
         <div
           v-for="n in progress.total"
+          :key="n"
           class="htw-bg-primary-500/10 htw-rounded-full"
         >
           <div
@@ -37,7 +38,7 @@ if (import.meta.hot) {
             :class="{
               'htw-transition-transform htw-scale-0': n >= progress.loaded,
             }"
-          ></div>
+          />
         </div>
       </div>
     </transition>

@@ -125,13 +125,13 @@ export async function createServer (ctx: Context, port: number) {
       }
 
       sendProgress()
-    
+
       await Promise.all(ctx.storyFiles.map(async storyFile => {
         await executeStoryFile(storyFile)
         loadedFilesCount++
         sendProgress()
       }))
-  
+
       didAllStoriesYet = true
       server.ws.send('histoire:all-stories-loaded', {})
     }
