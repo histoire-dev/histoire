@@ -110,15 +110,12 @@ export async function createServer (ctx: Context, port: number) {
       await executeStoryFile(changedFile)
 
       // Queued updates
-      for (const storyFile of queuedFiles) {
-        await executeStoryFile(storyFile)
-      }
+      await Promise.all(queuedFiles.map(storyFile => executeStoryFile(storyFile)))
     } else {
       // Full update
-      for (const storyFile of ctx.storyFiles) {
-        await executeStoryFile(storyFile)
-      }
+      await Promise.all(ctx.storyFiles.map(storyFile => executeStoryFile(storyFile)))
       didAllStoriesYet = true
+      server.ws.send('histoire:all-stories-loaded', {})
     }
     console.log('Collect stories end', Date.now() - time, 'ms')
 

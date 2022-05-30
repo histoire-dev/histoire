@@ -53,9 +53,7 @@ export async function build (ctx: Context) {
     server,
     throws: true,
   }, ctx)
-  for (const storyFile of ctx.storyFiles) {
-    await executeStoryFile(storyFile)
-  }
+  await Promise.all(ctx.storyFiles.map(storyFile => executeStoryFile(storyFile)))
   await destroyCollectStories()
 
   const storyCount = ctx.storyFiles.reduce((sum, file) => sum + (file.story?.variants.length ? 1 : 0), 0)
