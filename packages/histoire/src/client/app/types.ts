@@ -81,3 +81,16 @@ export interface PreviewSettings {
   backgroundColor: string
   checkerboard: boolean
 }
+
+export interface PropDefinition {
+  name: string
+  types?: string[]
+  required?: boolean
+  default?: any
+}
+
+export interface AutoPropComponentDefinition {
+  name: string
+  index: number
+  props: PropDefinition[]
+}

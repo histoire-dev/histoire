@@ -3,7 +3,7 @@ import { ref, computed, nextTick, onMounted } from 'vue'
 import { Icon } from '@iconify/vue'
 import { useStorage, onClickOutside, useTimeoutFn } from '@vueuse/core'
 import BaseSelect from '../base/BaseSelect.vue'
-import { applyStateToVariant, clone, toRawDeep } from '../../util/state'
+import { applyStateToVariant, clone, omit, toRawDeep } from '../../util/state'
 import type { Story, Variant } from '../../types'
 
 const DEFAULT_ID = 'default'
@@ -15,7 +15,9 @@ const props = defineProps<{
 
 const saveId = computed(() => `${props.story.id}:${props.variant.id}`)
 
-const defaultState = clone(toRawDeep(props.variant.state))
+const omitKeys = ['_hPropDefs']
+
+const defaultState = clone(omit(toRawDeep(props.variant.state), omitKeys))
 
 const selectedOption = useStorage<string>(
   `_histoire-presets/${saveId.value}/selected`,
@@ -62,7 +64,7 @@ const isEditing = ref(false)
 async function createPreset () {
   const id = (new Date()).getTime().toString()
 
-  presetStates.value.set(id, { state: clone(toRawDeep(props.variant.state)), label: 'New preset' })
+  presetStates.value.set(id, { state: clone(omit(toRawDeep(props.variant.state), omitKeys)), label: 'New preset' })
   selectedOption.value = id
   isEditing.value = true
   await nextTick()
@@ -78,7 +80,7 @@ async function savePreset () {
   if (!canEdit.value) return
 
   const preset = presetStates.value.get(selectedOption.value)
-  preset.state = clone(toRawDeep(props.variant.state))
+  preset.state = clone(omit(toRawDeep(props.variant.state), omitKeys))
   savedNotif.value = true
   savedTimeout.start()
 }

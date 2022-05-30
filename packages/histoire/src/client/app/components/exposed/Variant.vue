@@ -1,6 +1,7 @@
 <script lang="ts">
 import { defineComponent, getCurrentInstance, inject, PropType, useAttrs, watch } from 'vue'
 import { Variant } from '../../types'
+import { applyStateToVariant } from '../../util/state'
 
 // const logLocation = location.href.includes('__sandbox') ? '[Sandbox]' : '[Host]'
 
@@ -41,9 +42,7 @@ export default defineComponent({
     const implicitState = inject<() => any>('implicitState')
 
     watch(() => implicitState, value => {
-      if (typeof props.initState !== 'function') {
-        attrs.variant.state = value()
-      }
+      applyStateToVariant(attrs.variant, value())
     }, {
       immediate: true,
     })
@@ -52,7 +51,8 @@ export default defineComponent({
       Object.assign(attrs.variant, {
         initState: async () => {
           if (typeof props.initState === 'function') {
-            attrs.variant.state = await props.initState()
+            const state = await props.initState()
+            applyStateToVariant(attrs.variant, state)
           }
         },
         slots: () => vm.proxy.$slots,

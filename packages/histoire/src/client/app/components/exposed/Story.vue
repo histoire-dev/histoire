@@ -46,7 +46,8 @@ export default defineComponent({
     for (const key in storyComponent.devtoolsRawSetupState) {
       addImplicitState(key, storyComponent.devtoolsRawSetupState[key])
     }
-    provide('implicitState', () => implicitState)
+    // Shallow copy to prevent sharing object with different variants
+    provide('implicitState', () => ({ ...implicitState }))
 
     function updateStory () {
       Object.assign(attrs.story, {

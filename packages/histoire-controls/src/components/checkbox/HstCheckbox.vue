@@ -76,5 +76,9 @@ watch(path, value => {
         />
       </svg>
     </div>
+
+    <template #actions>
+      <slot name="actions" />
+    </template>
   </HstWrapper>
 </template>

@@ -24,8 +24,11 @@ const props = defineProps<{
     >
       {{ title }}
     </span>
-    <span class="htw-block htw-grow">
-      <slot />
+    <span class="htw-grow htw-flex htw-items-center htw-gap-1">
+      <span class="htw-block htw-grow">
+        <slot />
+      </span>
+      <slot name="actions" />
     </span>
   </label>
 </template>

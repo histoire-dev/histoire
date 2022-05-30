@@ -26,7 +26,7 @@ export function clone (data) {
   try {
     return structuredClone(data)
   } catch (e) {
-    console.error(e)
+    console.warn(e, `Fallback to JSON cloning`)
     try {
       return JSON.parse(JSON.stringify(data))
     } catch (e) {
@@ -36,10 +36,20 @@ export function clone (data) {
   }
 }
 
+export function omit (data, keys: string[]) {
+  const copy = {}
+  for (const key in data) {
+    if (!keys.includes(key)) {
+      copy[key] = data[key]
+    }
+  }
+  return copy
+}
+
 export function applyStateToVariant (variant: Variant, state: any) {
   if (variant.state) {
     for (const key in state) {
-      if (typeof variant.state[key] === 'object') {
+      if (variant.state[key] && !key.startsWith('_h') && typeof variant.state[key] === 'object' && !Array.isArray(variant.state[key])) {
         Object.assign(variant.state[key], state[key])
       } else {
         variant.state[key] = state[key]

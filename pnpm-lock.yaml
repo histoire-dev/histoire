@@ -244,25 +244,6 @@ importers:
       vue: 3.2.36
       vue-tsc: 0.34.17_typescript@4.7.2
 
-  packages/histoire-plugin-nuxt:
-    specifiers:
-      '@percy/sdk-utils': ^1.1.0
-      defu: ^6.0.0
-      fs-extra: ^10.1.0
-      histoire: workspace:*
-      pathe: ^0.2.0
-      puppeteer: ^13.7.0
-      typescript: ^4.6.3
-    dependencies:
-      '@percy/sdk-utils': 1.2.1
-      defu: 6.0.0
-      fs-extra: 10.1.0
-      pathe: 0.2.0
-      puppeteer: 13.7.0
-    devDependencies:
-      histoire: link:../histoire
-      typescript: 4.7.2
-
   packages/histoire-plugin-percy:
     specifiers:
       '@percy/sdk-utils': ^1.1.0

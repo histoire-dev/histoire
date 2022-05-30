@@ -36,5 +36,9 @@ const select = ref<HTMLInputElement>()
       :model-value="modelValue"
       @update:model-value="emits('update:modelValue', $event)"
     />
+
+    <template #actions>
+      <slot name="actions" />
+    </template>
   </HstWrapper>
 </template>
