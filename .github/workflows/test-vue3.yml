@@ -16,10 +16,12 @@ jobs:
       - name: Cache pnpm modules
         uses: actions/cache@v2
         with:
-          path: ~/.pnpm-store
-          key: ${{ runner.os }}-${{ hashFiles('**/pnpm-lock.yaml') }}
+          path: |
+            ~/.pnpm-store
+            ~/.cache/Cypress
+          key: v2-${{ runner.os }}-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
-            ${{ runner.os }}-
+            v2-${{ runner.os }}-
 
       - name: Install pnpm
         uses: pnpm/action-setup@v2.0.1
