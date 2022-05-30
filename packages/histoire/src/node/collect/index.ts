@@ -6,6 +6,7 @@ import { relative } from 'pathe'
 import pc from 'picocolors'
 import Tinypool from 'tinypool'
 import { createBirpc } from 'birpc'
+import { cpus } from 'os'
 import type { StoryFile } from '../types.js'
 import { createPath } from '../tree.js'
 import type { Context } from '../context.js'
@@ -27,10 +28,16 @@ export function useCollectStories (options: UseCollectStoriesOptions, ctx: Conte
     },
   })
 
+  const threadsCount = ctx.mode === 'dev'
+    ? Math.max(cpus().length / 2, 1)
+    : Math.max(cpus().length - 1, 1)
+
   const threadPool = new Tinypool({
     filename: new URL('./worker.js', import.meta.url).href,
     // WebContainer compatibility (Stackblitz)
     useAtomics: typeof process.versions.webcontainer !== 'string',
+    maxThreads: threadsCount,
+    minThreads: threadsCount,
   })
 
   function clearCache () {
