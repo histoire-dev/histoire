@@ -37,14 +37,14 @@ const presetsOptions = computed(() => {
 
 function resetState () {
   selectedOption.value = DEFAULT_ID
-  applyStateToVariant(props.variant, defaultState)
+  applyStateToVariant(props.variant, clone(defaultState))
 }
 
 function applyPreset (id) {
   if (id === DEFAULT_ID) {
     resetState()
   } else if (presetStates.value.has(id)) {
-    applyStateToVariant(props.variant, presetStates.value.get(id).state)
+    applyStateToVariant(props.variant, clone(presetStates.value.get(id).state))
   }
 }
 
