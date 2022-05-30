@@ -1,3 +1,27 @@
+# [0.5.0](https://github.com/Akryum/histoire/compare/v0.4.6...v0.5.0) (2022-05-30)
+
+
+### Bug Fixes
+
+* **serialize js:** 1 object in array ([d2abaad](https://github.com/Akryum/histoire/commit/d2abaadcfc1357199ab889bc6f39b619e9dd4042))
+* **state preset:** clone when applying ([479da6d](https://github.com/Akryum/histoire/commit/479da6dea3bc35ae293e38fa99cbf3104d6a63f8))
+* **vue3:** filter out auto components without props ([75640e0](https://github.com/Akryum/histoire/commit/75640e07a80dd7dfc5351135cc9a4c4650381e31))
+
+
+### Features
+
+* initial loading screen ([ae9fa7a](https://github.com/Akryum/histoire/commit/ae9fa7a303286487033c16b6fbb418a7996a1bdd))
+* opaque loading bg ([6bb379e](https://github.com/Akryum/histoire/commit/6bb379e22d6afd442925b1049fcd4ed04ed9af50))
+* **vue3:** auto props, fix [#31](https://github.com/Akryum/histoire/issues/31) ([144f320](https://github.com/Akryum/histoire/commit/144f320676847fad1429ce3efe251aec75108d5c))
+
+
+### Performance Improvements
+
+* better max thread count logic ([6b565de](https://github.com/Akryum/histoire/commit/6b565de2ca65ca0c8fd4535c8a8a58af09182a50))
+* collection was not done in parallel ([4a0c22a](https://github.com/Akryum/histoire/commit/4a0c22a860a8ff65acb34c5f1764a8840efa1728))
+
+
+
 ## [0.4.6](https://github.com/Akryum/histoire/compare/v0.4.5...v0.4.6) (2022-05-11)
 
 
