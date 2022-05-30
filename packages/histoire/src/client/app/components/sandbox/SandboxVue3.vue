@@ -94,7 +94,7 @@ async function mountVariant () {
             index,
             props: propDefs,
           } as AutoPropComponentDefinition
-        })
+        }).filter(def => def.props.length)
 
         const snapshot = JSON.stringify(propsTypes)
         if (!lastPropsTypesSnapshot || lastPropsTypesSnapshot !== snapshot) {
