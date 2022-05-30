@@ -20,6 +20,7 @@ import { onKeyboardShortcut } from './util/keyboard'
 import { isMobile } from './util/responsive'
 import Breadcrumb from './components/app/Breadcrumb.vue'
 import SearchModal from './components/search/SearchModal.vue'
+import InitialLoading from './components/app/InitialLoading.vue'
 
 const files = ref<StoryFile[]>(rawFiles.map(file => mapFile(file)))
 const tree = ref<Tree>(rawTree)
@@ -72,6 +73,17 @@ onKeyboardShortcut(['ctrl+k', 'meta+k'], (event) => {
   isSearchOpen.value = true
   event.preventDefault()
 })
+
+const loading = ref(false)
+
+// @ts-expect-error vite hot api
+if (import.meta.hot && !rawFiles.length) {
+  loading.value = true
+  // @ts-expect-error vite hot api
+  import.meta.hot.on('histoire:all-stories-loaded', () => {
+    loading.value = false
+  })
+}
 </script>
 
 <template>
@@ -130,5 +142,11 @@ onKeyboardShortcut(['ctrl+k', 'meta+k'], (event) => {
       :shown="isSearchOpen"
       @close="isSearchOpen = false"
     />
+
+    <transition name="__histoire-fade">
+      <InitialLoading
+        v-if="loading"
+      />
+    </transition>
   </div>
 </template>

@@ -10,7 +10,7 @@ const emits = defineEmits<{(e: 'close'): void}>()
 </script>
 
 <template>
-  <transition name="__histoire-fade">
+  <transition name="__histoire-fade-bottom">
     <div
       v-if="opened"
       class="htw-absolute htw-z-10 htw-bg-white dark:htw-bg-gray-700 htw-w-screen htw-h-screen htw-inset-0 htw-overflow-hidden htw-flex htw-flex-col"

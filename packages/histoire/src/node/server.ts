@@ -113,7 +113,25 @@ export async function createServer (ctx: Context, port: number) {
       await Promise.all(queuedFiles.map(storyFile => executeStoryFile(storyFile)))
     } else {
       // Full update
-      await Promise.all(ctx.storyFiles.map(storyFile => executeStoryFile(storyFile)))
+
+      // Progress tracking
+      const fileCount = ctx.storyFiles.length
+      let loadedFilesCount = 0
+      const sendProgress = () => {
+        server.ws.send('histoire:stories-loading-progress', {
+          loadedFileCount: loadedFilesCount,
+          totalFileCount: fileCount,
+        })
+      }
+
+      sendProgress()
+    
+      await Promise.all(ctx.storyFiles.map(async storyFile => {
+        await executeStoryFile(storyFile)
+        loadedFilesCount++
+        sendProgress()
+      }))
+  
       didAllStoriesYet = true
       server.ws.send('histoire:all-stories-loaded', {})
     }
