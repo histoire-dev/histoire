@@ -1,20 +1,26 @@
 /// <reference types="cypress" />
 
 describe('Codegen (Vue 3)', () => {
-  it('html', () => {
+  it.only('html', () => {
     cy.visit('/story/src-components-codegen-story-vue?variantId=html')
     cy.get('[data-test-id="story-source-code"]').should('have.text', `<h1>Title</h1>
 <hr>
 <pre>{
+  "$data": {},
   "object": {
     "foo": "bar"
-  }
+  },
+  "_hPropDefs": [],
+  "_hPropState": {}
 }</pre>
 <div data-test-id="object">
   {
+    "$data": {},
     "object": {
       "foo": "bar"
-    }
+    },
+    "_hPropDefs": [],
+    "_hPropState": {}
   }
 </div>
 <button>A button</button>

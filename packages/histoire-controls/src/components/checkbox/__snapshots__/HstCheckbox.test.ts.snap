@@ -9,26 +9,28 @@ exports[`HstCheckbox toggle to checked 1`] = `
   <span class="htw-w-28 htw-whitespace-nowrap htw-text-ellipsis htw-overflow-hidden htw-shrink-0 v-popper--has-tooltip">
     Label
   </span>
-  <span class="htw-block htw-grow">
-    <div class="htw-text-white htw-w-[16px] htw-h-[16px] htw-relative">
-      <div class="htw-border htw-border-solid group-active:htw-bg-gray-500/20 htw-rounded-sm htw-box-border htw-absolute htw-inset-0 htw-transition-border htw-duration-150 htw-ease-out htw-border-black/25 dark:htw-border-white/25 htw-delay-150">
-      </div>
-      <svg
-        width="16"
-        height="16"
-        viewbox="0 0 24 24"
-        class="htw-relative htw-z-10"
-      >
-        <path
-          d="m 4 12 l 5 5 l 10 -10"
-          fill="none"
-          class="htw-stroke-white htw-stroke-2 htw-duration-200 htw-ease-in-out htw-transition-all"
-          stroke-dasharray="21.21"
-          stroke-dashoffset="21.21"
+  <span class="htw-grow htw-flex htw-items-center htw-gap-1">
+    <span class="htw-block htw-grow">
+      <div class="htw-text-white htw-w-[16px] htw-h-[16px] htw-relative">
+        <div class="htw-border htw-border-solid group-active:htw-bg-gray-500/20 htw-rounded-sm htw-box-border htw-absolute htw-inset-0 htw-transition-border htw-duration-150 htw-ease-out htw-border-black/25 dark:htw-border-white/25 htw-delay-150">
+        </div>
+        <svg
+          width="16"
+          height="16"
+          viewbox="0 0 24 24"
+          class="htw-relative htw-z-10"
         >
-        </path>
-      </svg>
-    </div>
+          <path
+            d="m 4 12 l 5 5 l 10 -10"
+            fill="none"
+            class="htw-stroke-white htw-stroke-2 htw-duration-200 htw-ease-in-out htw-transition-all"
+            stroke-dasharray="21.21"
+            stroke-dashoffset="21.21"
+          >
+          </path>
+        </svg>
+      </div>
+    </span>
   </span>
 </label>
 `;
@@ -42,26 +44,28 @@ exports[`HstCheckbox toggle to unchecked 1`] = `
   <span class="htw-w-28 htw-whitespace-nowrap htw-text-ellipsis htw-overflow-hidden htw-shrink-0 v-popper--has-tooltip">
     Label
   </span>
-  <span class="htw-block htw-grow">
-    <div class="htw-text-white htw-w-[16px] htw-h-[16px] htw-relative">
-      <div class="htw-border htw-border-solid group-active:htw-bg-gray-500/20 htw-rounded-sm htw-box-border htw-absolute htw-inset-0 htw-transition-border htw-duration-150 htw-ease-out htw-border-primary-500 htw-border-8">
-      </div>
-      <svg
-        width="16"
-        height="16"
-        viewbox="0 0 24 24"
-        class="htw-relative htw-z-10"
-      >
-        <path
-          d="m 4 12 l 5 5 l 10 -10"
-          fill="none"
-          class="htw-stroke-white htw-stroke-2 htw-duration-200 htw-ease-in-out htw-transition-all htw-delay-150"
-          stroke-dasharray="21.21"
-          stroke-dashoffset="0"
+  <span class="htw-grow htw-flex htw-items-center htw-gap-1">
+    <span class="htw-block htw-grow">
+      <div class="htw-text-white htw-w-[16px] htw-h-[16px] htw-relative">
+        <div class="htw-border htw-border-solid group-active:htw-bg-gray-500/20 htw-rounded-sm htw-box-border htw-absolute htw-inset-0 htw-transition-border htw-duration-150 htw-ease-out htw-border-primary-500 htw-border-8">
+        </div>
+        <svg
+          width="16"
+          height="16"
+          viewbox="0 0 24 24"
+          class="htw-relative htw-z-10"
         >
-        </path>
-      </svg>
-    </div>
+          <path
+            d="m 4 12 l 5 5 l 10 -10"
+            fill="none"
+            class="htw-stroke-white htw-stroke-2 htw-duration-200 htw-ease-in-out htw-transition-all htw-delay-150"
+            stroke-dasharray="21.21"
+            stroke-dashoffset="0"
+          >
+          </path>
+        </svg>
+      </div>
+    </span>
   </span>
 </label>
 `;
