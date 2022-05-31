@@ -85,6 +85,23 @@ module.exports = {
           ],
         },
         {
+          text: 'Examples',
+          children: [
+            {
+              text: 'Single stories',
+              link: '/guide/examples/single-stories',
+            },
+            {
+              text: 'Variant stories',
+              link: '/guide/examples/variant-stories',
+            },
+            {
+              text: 'Controlled stories',
+              link: '/guide/examples/controlled-stories',
+            },
+          ],
+        },
+        {
           text: 'Plugins',
           link: '/guide/plugins',
         },
