@@ -1,3 +1,12 @@
+## [0.5.2](https://github.com/Akryum/histoire/compare/v0.5.1...v0.5.2) (2022-05-31)
+
+
+### Bug Fixes
+
+* typo in types import ([47004e1](https://github.com/Akryum/histoire/commit/47004e19a454741518aa59272f1be50dde883c55))
+
+
+
 ## [0.5.1](https://github.com/Akryum/histoire/compare/v0.5.0...v0.5.1) (2022-05-31)
 
 
