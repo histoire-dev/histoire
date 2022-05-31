@@ -1,3 +1,12 @@
+## [0.5.1](https://github.com/Akryum/histoire/compare/v0.5.0...v0.5.1) (2022-05-31)
+
+
+### Features
+
+* register global components types, fix [#94](https://github.com/Akryum/histoire/issues/94) ([56971fb](https://github.com/Akryum/histoire/commit/56971fb0b95151099781e626cd95be4071a04696))
+
+
+
 # [0.5.0](https://github.com/Akryum/histoire/compare/v0.4.6...v0.5.0) (2022-05-30)
 
 
