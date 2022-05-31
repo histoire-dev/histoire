@@ -9,7 +9,7 @@ export default {
 import { files as rawFiles, tree as rawTree, onUpdate } from '$histoire-stories'
 import StoryList from './components/tree/StoryList.vue'
 import BaseSplitPane from './components/base/BaseSplitPane.vue'
-import { computed, ref, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import AppHeader from './components/app/AppHeader.vue'
 import type { StoryFile, Tree } from './types'
 import { useStoryStore } from './stores/story'
@@ -84,6 +84,11 @@ if (import.meta.hot && !rawFiles.length) {
     loading.value = false
   })
 }
+
+const mounted = ref(false)
+onMounted(() => {
+  mounted.value = true
+})
 </script>
 
 <template>
@@ -97,7 +102,13 @@ if (import.meta.hot && !rawFiles.length) {
     />
   </div>
 
-  <div class="htw-h-screen htw-bg-white dark:htw-bg-gray-700 dark:htw-text-gray-100">
+  <div
+    class="htw-h-screen htw-bg-white dark:htw-bg-gray-700 dark:htw-text-gray-100"
+    :style="{
+      // Prevent flash of content
+      opacity: mounted && !loading ? 1 : 0,
+    }"
+  >
     <div
       v-if="isMobile"
       class="htw-h-full htw-flex htw-flex-col htw-divide-y htw-divide-gray-100 dark:htw-divide-gray-800"
@@ -142,11 +153,11 @@ if (import.meta.hot && !rawFiles.length) {
       :shown="isSearchOpen"
       @close="isSearchOpen = false"
     />
-
-    <transition name="__histoire-fade">
-      <InitialLoading
-        v-if="loading"
-      />
-    </transition>
   </div>
+
+  <transition name="__histoire-fade">
+    <InitialLoading
+      v-if="loading"
+    />
+  </transition>
 </template>
