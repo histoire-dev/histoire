@@ -15,6 +15,8 @@ import type {
   HstColorShades,
 } from '@histoire/controls'
 
+// Utils
+
 declare type NonUndefinedable<T> = T extends undefined ? never : T
 declare type TypePropsToRuntimeProps<T> = {
   [K in keyof T]-?: {} extends Pick<T, K> ? {
@@ -24,6 +26,8 @@ declare type TypePropsToRuntimeProps<T> = {
     required: true
   }
 }
+
+// <Story>
 
 interface VueStoryProps {
   /**
@@ -78,6 +82,8 @@ declare const VueStoryComponent: import('vue').DefineComponent<
 TypePropsToRuntimeProps<VueStoryProps>, {}, unknown, {}, {}, import('vue').ComponentOptionsMixin, import('vue').ComponentOptionsMixin, {}, string, import('vue').VNodeProps & import('vue').AllowedComponentProps & import('vue').ComponentCustomProps, Readonly<import('vue').ExtractPropTypes<TypePropsToRuntimeProps<VueStoryProps>>> & {}, {}
 >
 
+// <Variant>
+
 interface VueVariantProps {
   /**
    * Title of the variant.
@@ -118,6 +124,8 @@ interface VueVariantProps {
 declare const VueVariantComponent: import('vue').DefineComponent<
 TypePropsToRuntimeProps<VueVariantProps>, {}, unknown, {}, {}, import('vue').ComponentOptionsMixin, import('vue').ComponentOptionsMixin, {}, string, import('vue').VNodeProps & import('vue').AllowedComponentProps & import('vue').ComponentCustomProps, Readonly<import('vue').ExtractPropTypes<TypePropsToRuntimeProps<VueVariantProps>>> & {}, {}
 >
+
+// Register global components
 
 declare module '@vue/runtime-core' {
   export interface GlobalComponents {
