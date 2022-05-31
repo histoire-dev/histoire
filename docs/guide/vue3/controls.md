@@ -46,7 +46,7 @@ export default defineComponent({
 Example with Composition API:
 
 ```vue{18-22}
-<script lang="ts" setup>
+<script lang="ts">
 import { reactive, count } from 'vue'
 import MyButton from './MyButton.vue'
 
