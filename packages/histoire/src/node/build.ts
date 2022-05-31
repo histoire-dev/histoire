@@ -61,6 +61,7 @@ export async function build (ctx: Context) {
   const emptyStoryCount = ctx.storyFiles.length - storyCount
 
   const results = await viteBuild({
+    mode: 'development',
     plugins: await createVitePlugins(false, ctx),
     build: {
       rollupOptions: {
