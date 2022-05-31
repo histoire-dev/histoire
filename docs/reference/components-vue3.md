@@ -208,7 +208,7 @@ Id of the variant used in the URL. By default, the id is automatically generated
 
 ### `initState`
 
-Function that returns the intial state. Will be used as default value for variants.
+Function that returns the intial state.
 
 ```vue
 <script setup>
@@ -237,7 +237,7 @@ function initState () {
 
 ### `icon`
 
-An [Iconify id](https://icones.js.org/) to customize the story icon in the tree.
+An [Iconify id](https://icones.js.org/) to customize the variant icon in the UI.
 
 ```vue
 <template>
