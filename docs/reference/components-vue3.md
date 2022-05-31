@@ -66,6 +66,32 @@ function initState () {
 
 [Learn more](../guide/vue3/controls.md#init-state)
 
+### `setupApp`
+
+A function to configure the Vue application. This will be the default for the variants in the story.
+
+It receives a payload object as parameter with the following properties:
+
+- `app`: The Vue application instance.
+- `story`: The story object.
+- `variant`: The variant object.
+
+```vue
+<script setup>
+function mySetupApp ({ app, story, variant }) {
+  app.provide('demo', 'meow')
+}
+</script>
+
+<template>
+  <Story :setup-app="mySetupApp">
+    <!-- ... -->
+  </Story>
+</template>
+```
+
+[Learn more](../guide/vue3/app-setup.md#local-setup)
+
 ### `group`
 
 The id of a group to include the story in.
@@ -234,6 +260,34 @@ function initState () {
 ```
 
 [Learn more](../guide/vue3/controls.md#init-state)
+
+### `setupApp`
+
+A function to configure the Vue application.
+
+It receives a payload object as parameter with the following properties:
+
+- `app`: The Vue application instance.
+- `story`: The story object.
+- `variant`: The variant object.
+
+```vue
+<script setup>
+function mySetupApp ({ app, story, variant }) {
+  app.provide('demo', 'meow')
+}
+</script>
+
+<template>
+  <Story>
+    <Variant :setup-app="mySetupApp">
+      <!-- ... -->
+    </Variant>
+  </Story>
+</template>
+```
+
+[Learn more](../guide/vue3/app-setup.md#local-setup)
 
 ### `icon`
 
