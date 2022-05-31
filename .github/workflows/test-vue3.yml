@@ -13,27 +13,33 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Cache pnpm modules
-        uses: actions/cache@v2
+      - name: Install node
+        uses: actions/setup-node@v2
         with:
-          path: |
-            ~/.pnpm-store
-            ~/.cache/Cypress
-          key: v2-${{ runner.os }}-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            v2-${{ runner.os }}-
+          node-version: 16
 
       - name: Install pnpm
         uses: pnpm/action-setup@v2.0.1
         with:
           version: 7.1.7
 
-      - name: Set node version to 16
-        uses: actions/setup-node@v2
-        with:
-          node-version: 16
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        run: |
+          echo "::set-output name=pnpm_cache_dir::$(pnpm store path)"
 
-      - run: pnpm install
+      - name: Cache pnpm modules
+        uses: actions/cache@v2
+        with:
+          path: |
+            ${{ steps.pnpm-cache.outputs.pnpm_cache_dir }}
+            ~/.cache/Cypress
+          key: v2-${{ runner.os }}-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            v2-${{ runner.os }}-
+
+      - name: Install dependencies
+        run: pnpm install
 
       - name: Build
         run: pnpm run build
