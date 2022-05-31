@@ -4,7 +4,7 @@ import type {
   StoryLayout,
   Story,
   Variant,
-} from './dist/client/app/types'
+} from './client/app/types'
 import type {
   HstCheckbox,
   HstText,
