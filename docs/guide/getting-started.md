@@ -51,3 +51,36 @@ You can add these to your `package.json` like this:
 And then run them with `npm run story:dev` or `npm run story:build`.
 
 You can specify additional CLI options like `--port`. For a full list of CLI options, run `npx histoire --help` in your project.
+
+## TypeScript
+
+To enable the global components types in your project, create an `env.d.ts` file at the root of your project if it doesn't already exist.
+
+```ts
+/// <reference types="histoire" />
+```
+
+And add it in the `include` field of your `tsconfig.json`.
+
+Example:
+
+```json
+{
+  "compilerOptions": {
+    "target": "es2017",
+    "module": "esnext",
+    "lib": ["esnext"],
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "strict": true,
+    "strictNullChecks": true,
+    "resolveJsonModule": true,
+    "jsx": "preserve"
+  },
+  "include": [
+    "env.d.ts",
+    "src/**/*",
+    "src/**/*.vue"
+  ]
+}
+```
