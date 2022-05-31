@@ -1,3 +1,13 @@
+## [0.5.4](https://github.com/Akryum/histoire/compare/v0.5.3...v0.5.4) (2022-05-31)
+
+
+### Bug Fixes
+
+* reduce flash of content when initial loading is shown ([a796e1b](https://github.com/Akryum/histoire/commit/a796e1bb7bbcde712fea8c9399d828387e2202c5))
+* use vite mode = 'development' to prevent production optimizations ([bf0fc7e](https://github.com/Akryum/histoire/commit/bf0fc7ea2f38b99a9a04ebb6da580348f42557ef))
+
+
+
 ## [0.5.3](https://github.com/Akryum/histoire/compare/v0.5.2...v0.5.3) (2022-05-31)
 
 
