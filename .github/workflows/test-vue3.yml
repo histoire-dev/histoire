@@ -34,9 +34,9 @@ jobs:
           path: |
             ${{ steps.pnpm-cache.outputs.pnpm_cache_dir }}
             ~/.cache/Cypress
-          key: v2-${{ runner.os }}-${{ hashFiles('**/pnpm-lock.yaml') }}
+          key: pnpm-v1-${{ runner.os }}-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
-            v2-${{ runner.os }}-
+            pnpm-v1-${{ runner.os }}-
 
       - name: Install dependencies
         run: pnpm install
