@@ -9,18 +9,20 @@ export interface StoryFile {
   path: string[]
 }
 
+export type StoryLayout = {
+  type: 'single'
+  iframe?: boolean
+} | {
+  type: 'grid'
+  width?: number | string
+}
+
 export interface Story {
   id: string
   title: string
   group?: string
   variants: Variant[]
-  layout?: {
-    type: 'single'
-    iframe?: boolean
-  } | {
-    type: 'grid'
-    width?: number | string
-  }
+  layout?: StoryLayout
   icon?: string
   iconColor?: string
   docsOnly?: boolean
