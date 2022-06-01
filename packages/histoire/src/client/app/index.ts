@@ -31,7 +31,6 @@ export function mountMainApp () {
   app.mount('#app')
 
   if (import.meta.hot) {
-    // @ts-expect-error vite hot api
     import.meta.hot.send('histoire:mount', {})
   }
 }

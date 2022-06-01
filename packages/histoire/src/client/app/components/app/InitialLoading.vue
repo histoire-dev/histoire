@@ -8,9 +8,7 @@ const progress = reactive({
 
 const maxCols = window.innerWidth / 20
 
-// @ts-expect-error vite hot api
 if (import.meta.hot) {
-  // @ts-expect-error vite hot api
   import.meta.hot.on('histoire:stories-loading-progress', (data) => {
     progress.loaded = data.loadedFileCount
     progress.total = data.totalFileCount

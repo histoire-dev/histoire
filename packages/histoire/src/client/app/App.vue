@@ -76,10 +76,8 @@ onKeyboardShortcut(['ctrl+k', 'meta+k'], (event) => {
 
 const loading = ref(false)
 
-// @ts-expect-error vite hot api
 if (import.meta.hot && !rawFiles.length) {
   loading.value = true
-  // @ts-expect-error vite hot api
   import.meta.hot.on('histoire:all-stories-loaded', () => {
     loading.value = false
   })

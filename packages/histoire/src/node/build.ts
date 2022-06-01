@@ -1,12 +1,17 @@
 import { join } from 'pathe'
-import { build as viteBuild, createServer as createViteServer, ResolvedConfig as ViteConfig, resolveConfig as resolveViteConfig } from 'vite'
+import {
+  build as viteBuild,
+  createServer as createViteServer,
+  ResolvedConfig as ViteConfig,
+  mergeConfig as mergeViteConfig,
+} from 'vite'
 import fs from 'fs-extra'
 import { lookup as lookupMime } from 'mrmime'
 import pc from 'picocolors'
 import { performance } from 'perf_hooks'
 import { APP_PATH } from './alias.js'
 import { Context } from './context.js'
-import { createVitePlugins } from './vite.js'
+import { getViteConfigWithPlugins } from './vite.js'
 import { findAllStories } from './stories.js'
 import type { RollupOutput } from 'rollup'
 import { useCollectStories } from './collect/index.js'
@@ -28,9 +33,9 @@ export async function build (ctx: Context) {
   const startTime = performance.now()
   await findAllStories(ctx)
 
-  const server = await createViteServer({
-    plugins: await createVitePlugins(true, ctx),
-  })
+  const resolvedViteConfig = (await getViteConfigWithPlugins(false, ctx)) as unknown as ViteConfig
+
+  const server = await createViteServer(await getViteConfigWithPlugins(true, ctx))
   await server.pluginContainer.buildStart({})
 
   const moduleLoader = useModuleLoader({
@@ -60,9 +65,8 @@ export async function build (ctx: Context) {
   const variantCount = ctx.storyFiles.reduce((sum, file) => sum + (file.story?.variants.length ?? 0), 0)
   const emptyStoryCount = ctx.storyFiles.length - storyCount
 
-  const results = await viteBuild({
+  const results = await viteBuild(mergeViteConfig(resolvedViteConfig, {
     mode: 'development',
-    plugins: await createVitePlugins(false, ctx),
     build: {
       rollupOptions: {
         input: [
@@ -82,12 +86,8 @@ export async function build (ctx: Context) {
       cssCodeSplit: false,
       minify: false,
     },
-  })
+  }))
   const result = Array.isArray(results) ? results[0] : results as RollupOutput
-
-  const resolvedViteConfig = await resolveViteConfig({
-    plugins: await createVitePlugins(false, ctx),
-  }, 'build')
 
   const styleOutput = result.output.find(o => o.name === 'style.css' && o.type === 'asset')
 

@@ -8,6 +8,7 @@
     "story:preview": "histoire preview --port 4567"
   },
   "devDependencies": {
+    "@histoire/plugin-nuxt": "workspace:*",
     "histoire": "workspace:*",
     "nuxt": "3.0.0-rc.3"
   }
