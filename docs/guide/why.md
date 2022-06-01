@@ -32,7 +32,7 @@ Histoire is a tool to generate stories applications (or "books").
 A story is a scenario where you showcase in your browser one or more components for specific use cases.
 
 Stories are useful for several reasons:
-- Organize and document components for other developpers
+- Organize and document components for other developers
 - Showcase different use cases covered by your components
 - Develop components in isolation
 - Test visual regressions by taking screenshots
