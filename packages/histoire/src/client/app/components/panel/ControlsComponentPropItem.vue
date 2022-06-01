@@ -71,7 +71,7 @@ const canReset = computed(() => props.variant.state?._hPropState?.[props.compone
     :is="comp"
     v-if="comp"
     v-model="model"
-    :title="definition.name"
+    :title="`${definition.name}${canReset ? ' *' : ''}`"
     :placeholder="isJSON ? 'Enter JSON' : null"
   >
     <template #actions>
