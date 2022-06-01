@@ -7,6 +7,8 @@ const __dirname = dirname(fileURLToPath(import.meta.url))
 
 const { version } = JSON.parse(fs.readFileSync(resolve(__dirname, '../../package.json'), 'utf8'))
 
+process.env.NODE_ENV = 'development'
+
 const program = sade('histoire')
 program.version(version)
 
