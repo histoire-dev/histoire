@@ -11,7 +11,7 @@ import pc from 'picocolors'
 import { performance } from 'perf_hooks'
 import { APP_PATH } from './alias.js'
 import { Context } from './context.js'
-import { getViteConfigWithPlugins } from './vite.js'
+import { getViteConfigWithPlugins, resolveViteConfig } from './vite.js'
 import { findAllStories } from './stories.js'
 import type { RollupOutput } from 'rollup'
 import { useCollectStories } from './collect/index.js'
@@ -33,7 +33,7 @@ export async function build (ctx: Context) {
   const startTime = performance.now()
   await findAllStories(ctx)
 
-  const resolvedViteConfig = (await getViteConfigWithPlugins(false, ctx)) as unknown as ViteConfig
+  const resolvedViteConfig = await resolveViteConfig(ctx)
 
   const server = await createViteServer(await getViteConfigWithPlugins(true, ctx))
   await server.pluginContainer.buildStart({})
@@ -65,7 +65,7 @@ export async function build (ctx: Context) {
   const variantCount = ctx.storyFiles.reduce((sum, file) => sum + (file.story?.variants.length ?? 0), 0)
   const emptyStoryCount = ctx.storyFiles.length - storyCount
 
-  const results = await viteBuild(mergeViteConfig(resolvedViteConfig, {
+  const results = await viteBuild(mergeViteConfig(await getViteConfigWithPlugins(false, ctx), {
     mode: 'development',
     build: {
       rollupOptions: {
