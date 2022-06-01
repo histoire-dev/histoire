@@ -57,7 +57,8 @@
       "allowedVersions": {
         "eslint": "*",
         "eslint-plugin-promise": "*",
-        "eslint-plugin-vue": "*"
+        "eslint-plugin-vue": "*",
+        "vue": "*"
       }
     }
   }
