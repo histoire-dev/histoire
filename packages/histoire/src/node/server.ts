@@ -1,7 +1,7 @@
 import { createServer as createViteServer } from 'vite'
 import { Context } from './context.js'
 import { createVitePlugins, RESOLVED_SEARCH_TITLE_DATA_ID, RESOLVED_STORIES_ID } from './vite.js'
-import { notifyStoryChange, onStoryChange, watchStories } from './stories.js'
+import { onStoryChange, watchStories } from './stories.js'
 import { useCollectStories } from './collect/index.js'
 import type { StoryFile } from './types.js'
 import { DevPluginApi } from './plugin.js'
