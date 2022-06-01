@@ -258,13 +258,11 @@ importers:
     specifiers:
       '@nuxt/kit': ^3.0.0-rc.3
       '@nuxt/schema': ^3.0.0-rc.3
-      '@vitejs/plugin-vue': ^2.3.3
       histoire: workspace:*
       typescript: ^4.6.3
       vite: ^2.9.1
     dependencies:
       '@nuxt/kit': 3.0.0-rc.3_vite@2.9.9
-      '@vitejs/plugin-vue': 2.3.3_vite@2.9.9
     devDependencies:
       '@nuxt/schema': 3.0.0-rc.3_vite@2.9.9
       histoire: link:../histoire
@@ -2167,19 +2165,6 @@ packages:
       - supports-color
     dev: true
 
-  /@vitejs/plugin-vue/2.3.3_vite@2.9.9:
-    resolution: {integrity: sha512-SmQLDyhz+6lGJhPELsBdzXGc+AcaT8stgkbiTFGpXPe8Tl1tJaBw1A6pxDqDuRsVkD8uscrkx3hA7QDOoKYtyw==}
-    engines: {node: '>=12.0.0'}
-    peerDependencies:
-      vite: ^2.5.10
-      vue: '*'
-    peerDependenciesMeta:
-      vue:
-        optional: true
-    dependencies:
-      vite: 2.9.9
-    dev: false
-
   /@vitejs/plugin-vue/2.3.3_vite@2.9.9+vue@3.2.36:
     resolution: {integrity: sha512-SmQLDyhz+6lGJhPELsBdzXGc+AcaT8stgkbiTFGpXPe8Tl1tJaBw1A6pxDqDuRsVkD8uscrkx3hA7QDOoKYtyw==}
     engines: {node: '>=12.0.0'}
@@ -2190,7 +2175,7 @@ packages:
       vue:
         optional: true
     dependencies:
-      vite: 2.9.9
+      vite: 2.9.9_sass@1.52.1
       vue: 3.2.36
     dev: true
 
