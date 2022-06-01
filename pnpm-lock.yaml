@@ -52,7 +52,7 @@ importers:
     specifiers:
       '@histoire/plugin-nuxt': workspace:*
       histoire: workspace:*
-      nuxt: 3.0.0-rc.3
+      nuxt: ^3.0.0-rc.3
     devDependencies:
       '@histoire/plugin-nuxt': link:../../packages/histoire-plugin-nuxt
       histoire: link:../../packages/histoire
@@ -2190,7 +2190,7 @@ packages:
       vue:
         optional: true
     dependencies:
-      vite: 2.9.9_sass@1.52.1
+      vite: 2.9.9
       vue: 3.2.36
     dev: true
 

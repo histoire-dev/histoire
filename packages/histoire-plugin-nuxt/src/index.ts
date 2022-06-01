@@ -1,7 +1,6 @@
 import type { Plugin } from 'histoire'
 import type { Nuxt } from '@nuxt/schema'
 import type { UserConfig as ViteConfig } from 'vite'
-// import vue from '@vitejs/plugin-vue'
 
 const ignorePlugins = [
   'nuxt:vite-node-server',
@@ -9,13 +8,7 @@ const ignorePlugins = [
   'nuxt:vite-relative-asset',
   'nuxt:cache-dir',
   'nuxt:dynamic-base-path',
-  // 'virtual',
-  // 'nuxt:import-protection',
-  // 'unctx:transfrom',
-  // 'nuxt:auto-imports-transform',
-  // 'vite:vue',
-  // 'vite:vue-jsx',
-  // 'nuxt:components-loader',
+  'nuxt:import-protection',
 ]
 
 export function HstNuxt (): Plugin {
@@ -23,13 +16,20 @@ export function HstNuxt (): Plugin {
   return {
     name: '@histoire/plugin-nuxt',
 
-    async config () {
+    async config (config, mode) {
       const nuxtConfig = await useNuxtViteConfig()
       nuxt = nuxtConfig.nuxt
       const plugins = nuxtConfig.viteConfig.plugins.filter((p: any) => !ignorePlugins.includes(p?.name))
-      console.log(plugins.length, nuxtConfig.viteConfig.plugins.length)
-      console.log(plugins.map((p: any) => p?.name))
-      // plugins.push(vue())
+
+      // Disable devServer integration from vue plugin
+      if (mode === 'build') {
+        const vuePlugin = plugins.find((p: any) => p.name === 'vite:vue')
+        if (vuePlugin) {
+          // @ts-expect-error override method
+          vuePlugin.configureServer = () => { /* noop */ }
+        }
+      }
+
       return {
         vite: {
           resolve: {

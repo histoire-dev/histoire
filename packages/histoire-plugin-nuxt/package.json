@@ -27,8 +27,7 @@
     "watch": "tsc -d -w --sourceMap"
   },
   "dependencies": {
-    "@nuxt/kit": "^3.0.0-rc.3",
-    "@vitejs/plugin-vue": "^2.3.3"
+    "@nuxt/kit": "^3.0.0-rc.3"
   },
   "devDependencies": {
     "@nuxt/schema": "^3.0.0-rc.3",
