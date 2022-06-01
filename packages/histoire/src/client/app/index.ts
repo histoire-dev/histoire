@@ -30,9 +30,7 @@ export function mountMainApp () {
   registerGlobalComponents(app)
   app.mount('#app')
 
-  // @ts-expect-error vite hot api
   if (import.meta.hot) {
-    // @ts-expect-error vite hot api
     import.meta.hot.send('histoire:mount', {})
   }
 }
