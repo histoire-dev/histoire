@@ -1,0 +1,14 @@
+{
+  "name": "histoire-example-nuxt3",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "story:dev": "histoire dev",
+    "story:build": "histoire build",
+    "story:preview": "histoire preview --port 4567"
+  },
+  "devDependencies": {
+    "histoire": "workspace:*",
+    "nuxt": "3.0.0-rc.3"
+  }
+}

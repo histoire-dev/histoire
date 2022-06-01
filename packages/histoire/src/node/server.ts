@@ -6,15 +6,23 @@ import { useCollectStories } from './collect/index.js'
 import type { StoryFile } from './types.js'
 import { DevPluginApi } from './plugin.js'
 import { useModuleLoader } from './load.js'
+import { getNuxtViteConfig } from './nuxt.js'
 
 export async function createServer (ctx: Context, port: number) {
+  const viteNuxtConfig = await getNuxtViteConfig()
   const server = await createViteServer({
-    plugins: await createVitePlugins(false, ctx),
+    resolve: {
+      alias: viteNuxtConfig.resolve.alias,
+    },
+    plugins: [...viteNuxtConfig.plugins, ...await createVitePlugins(false, ctx)],
   })
   await server.pluginContainer.buildStart({})
 
   const nodeServer = await createViteServer({
-    plugins: await createVitePlugins(true, ctx),
+    resolve: {
+      alias: viteNuxtConfig.resolve.alias,
+    },
+    plugins: [...viteNuxtConfig.plugins, ...await createVitePlugins(true, ctx)],
   })
   await nodeServer.pluginContainer.buildStart({})
 
