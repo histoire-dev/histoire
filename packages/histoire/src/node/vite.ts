@@ -1,6 +1,13 @@
 import { createRequire } from 'module'
 import { relative, dirname } from 'pathe'
-import { resolveConfig as resolveViteConfig, Plugin as VitePlugin } from 'vite'
+import {
+  resolveConfig as resolveViteConfigInternal,
+  Plugin as VitePlugin,
+  UserConfig as ViteConfig,
+  ResolvedConfig,
+  InlineConfig,
+  mergeConfig as mergeViteConfig,
+} from 'vite'
 import { lookup as lookupMime } from 'mrmime'
 import { APP_PATH, DIST_PATH, TEMP_PATH } from './alias.js'
 import { Context } from './context.js'
@@ -25,19 +32,34 @@ export const RESOLVED_SEARCH_TITLE_DATA_ID = `/${SEARCH_TITLE_DATA_ID}-resolved`
 export const SEARCH_DOCS_DATA_ID = '$histoire-search-docs-data'
 export const RESOLVED_SEARCH_DOCS_DATA_ID = `/${SEARCH_DOCS_DATA_ID}-resolved`
 
-export async function createVitePlugins (server: boolean, ctx: Context): Promise<VitePlugin[]> {
-  const viteConfig = await resolveViteConfig({}, ctx.mode === 'dev' ? 'serve' : 'build')
+export async function resolveViteConfig (ctx: Context): Promise<ResolvedConfig> {
+  const command = ctx.mode === 'dev' ? 'serve' : 'build'
+  let viteConfig = (await resolveViteConfigInternal({}, command)) as unknown
+  viteConfig = mergeHistoireViteConfig(viteConfig, ctx)
+  return viteConfig as ResolvedConfig
+}
 
-  const plugins: VitePlugin[] = []
-
+async function mergeHistoireViteConfig (viteConfig: InlineConfig, ctx: Context) {
   if (ctx.config.vite) {
-    plugins.push({
-      name: 'histoire-vite-config-override',
-      config (config, env) {
-        return typeof ctx.config.vite === 'function' ? ctx.config.vite(config, env) : ctx.config.vite
-      },
-    })
+    const command = ctx.mode === 'dev' ? 'serve' : 'build'
+    const overrides = typeof ctx.config.vite === 'function'
+      ? await ctx.config.vite(viteConfig as ViteConfig, {
+        mode: ctx.mode,
+        command,
+      })
+      : ctx.config.vite
+    if (overrides) {
+      viteConfig = mergeViteConfig(viteConfig, overrides)
+    }
   }
+  return viteConfig
+}
+
+export async function getViteConfigWithPlugins (server: boolean, ctx: Context): Promise<InlineConfig> {
+  const resolvedViteConfig = await resolveViteConfig(ctx)
+
+  const inlineConfig = await mergeHistoireViteConfig({}, ctx)
+  const plugins: VitePlugin[] = []
 
   plugins.push({
     name: 'histoire-vite-plugin',
@@ -65,7 +87,7 @@ export async function createVitePlugins (server: boolean, ctx: Context): Promise
         },
         server: {
           fs: {
-            allow: [DIST_PATH, TEMP_PATH, viteConfig.root, process.cwd()],
+            allow: [DIST_PATH, TEMP_PATH, resolvedViteConfig.root, process.cwd()],
           },
         },
         define: {
@@ -263,7 +285,7 @@ if (import.meta.hot) {
       transform (code, id) {
         if (exclude.some(r => r.test(id))) return
         if (include.some(r => r.test(id))) {
-          const file = relative(viteConfig.root, id)
+          const file = relative(resolvedViteConfig.root, id)
           const index = code.indexOf('export default')
           const result = `${code.substring(0, index)}_sfc_main.__file = '${file}'\n${code.substring(index)}`
           return result
@@ -272,7 +294,9 @@ if (import.meta.hot) {
     })
   }
 
-  return plugins
+  return mergeViteConfig(inlineConfig, {
+    plugins,
+  }) as InlineConfig
 }
 
 async function createCustomBlocksPlugins (ctx) {

@@ -1,6 +1,6 @@
 import { createServer as createViteServer } from 'vite'
 import { Context } from './context.js'
-import { createVitePlugins, RESOLVED_SEARCH_TITLE_DATA_ID, RESOLVED_STORIES_ID } from './vite.js'
+import { getViteConfigWithPlugins, RESOLVED_SEARCH_TITLE_DATA_ID, RESOLVED_STORIES_ID } from './vite.js'
 import { onStoryChange, watchStories } from './stories.js'
 import { useCollectStories } from './collect/index.js'
 import type { StoryFile } from './types.js'
@@ -8,14 +8,10 @@ import { DevPluginApi } from './plugin.js'
 import { useModuleLoader } from './load.js'
 
 export async function createServer (ctx: Context, port: number) {
-  const server = await createViteServer({
-    plugins: await createVitePlugins(false, ctx),
-  })
+  const server = await createViteServer(await getViteConfigWithPlugins(false, ctx))
   await server.pluginContainer.buildStart({})
 
-  const nodeServer = await createViteServer({
-    plugins: await createVitePlugins(true, ctx),
-  })
+  const nodeServer = await createViteServer(await getViteConfigWithPlugins(true, ctx))
   await nodeServer.pluginContainer.buildStart({})
 
   const moduleLoader = useModuleLoader({
