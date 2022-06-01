@@ -23,6 +23,21 @@ The title of the story is provided with the (optional) `title` prop:
 
 You can of course add `<style>` and/or `<script>` elements just like you would with any `.vue` file.
 
+For example, you will usually import and use a component in your story:
+
+```vue
+<!-- Meow.story.vue -->
+<script setup>
+import Meow from './Meow.vue'
+</script>
+
+<template>
+  <Story>
+    <Meow/>
+  </Story>
+</template>
+```
+
 ## Variants
 
 Stories can have different variants representing the same component. You can define variants using the `<Variant>` tag. Similar to the story, you can provide a title to your variant with the `title` prop.
