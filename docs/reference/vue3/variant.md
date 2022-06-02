@@ -170,7 +170,7 @@ Content of the variant.
 
 Props:
 
-- `state`: Object with the current state of the variant.
+- `state`: Object with the current state of the variant (if you are using `initState`).
 
 ```vue
 <template>
@@ -190,7 +190,7 @@ Content of the 'Controls' pane used to interact with the story.
 
 Props:
 
-- `state`: Object with the current state of the variant.
+- `state`: Object with the current state of the variant (if you are using `initState`).
 
 ```vue
 <template>

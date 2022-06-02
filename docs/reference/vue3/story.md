@@ -185,3 +185,25 @@ Disables the responsive menu, preview resize handles and makes the preview laway
   </Story>
 </template>
 ```
+
+## Slot: `controls`
+
+Content of the 'Controls' pane used to interact with the story. This will be the default content for variants of the story but you can override it by defining a `controls` slot in a variant.
+
+Props:
+
+- `state`: Object with the current state of the variant (if you are using `initState`).
+
+```vue
+<template>
+  <Story>
+    <Variant>
+      <template #controls="{ state }">
+        <!-- Interact with state here -->
+      </template>
+    </Variant>
+  </Story>
+</template>
+```
+
+[Learn more](../guide/vue3/controls.md#controls-panel)
