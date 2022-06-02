@@ -75,7 +75,7 @@ export async function build (ctx: Context) {
         ],
         output: {
           manualChunks (id) {
-            if (!id.includes('histoire/dist/client') && id.includes('node_modules')) {
+            if (!id.includes('histoire/dist/client') && !id.includes('histoire/dist/bundled') && id.includes('node_modules')) {
               return 'vendor'
             }
           },
