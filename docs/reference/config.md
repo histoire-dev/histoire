@@ -18,13 +18,13 @@ export default defineConfig({
 
 ## `outDir`
 
-`string` - Default: `'histoire-dist'`
+`string` - Default: `'.histoire/dist'`
 
 Output directory.
 
 ```ts
 export default defineConfig({
-  outDir: './histoire-dist',
+  outDir: '.histoire/dist',
 })
 ```
 
