@@ -2,6 +2,20 @@
 
 Learn more about configuring Histoire [here](../guide/config.md).
 
+## `plugins`
+
+Array of plugins. Learn more about them [here](../guide/plugins.md).
+
+```ts
+import { HstNuxt } from '@histoire/plugin-nuxt'
+
+export default defineConfig({
+  plugins: [
+    HstNuxt(),
+  ],
+})
+```
+
 ## `outDir`
 
 `string` - Default: `'histoire-dist'`
