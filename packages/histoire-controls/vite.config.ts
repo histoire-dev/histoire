@@ -30,8 +30,14 @@ export default defineConfig({
   histoire: {
     setupFile: '/src/histoire-setup.ts',
     vite: (config) => {
-      config.build.lib = false
-      config.build.rollupOptions.external = []
+      config.plugins = [{
+        name: 'my-vite-config',
+        enforce: 'post',
+        config (config) {
+          config.build.lib = false
+          config.build.rollupOptions.external = []
+        }
+      }]
     },
     theme: {
       title: 'Histoire controls',
