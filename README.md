@@ -6,8 +6,6 @@
 
 # Histoire
 
-**⚠️ Histoire is in Early Access: the repository is currently only available to our [sponsors](https://github.com/sponsors/Akryum).**
-
 > Fast and beautiful interactive component playgrounds
 
 ⚡️ Lightning fast development and instant HMR thanks to [Vite](http://vitejs.dev)  
