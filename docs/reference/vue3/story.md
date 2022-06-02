@@ -35,7 +35,7 @@ Layout of the story. Object with the following properties:
   - with `type: 'grid'` you can specify:
     - `width`: Column size. Can be number (pixels) or string (like `'100%'`).
 
-[Learn more](../guide/vue3/stories.md#layout)
+[Learn more](../../guide/vue3/stories.md#layout)
 
 ## `initState`
 
@@ -62,7 +62,7 @@ function initState () {
 </template>
 ```
 
-[Learn more](../guide/vue3/controls.md#init-state)
+[Learn more](../../guide/vue3/controls.md#init-state)
 
 ## `setupApp`
 
@@ -88,7 +88,7 @@ function mySetupApp ({ app, story, variant }) {
 </template>
 ```
 
-[Learn more](../guide/vue3/app-setup.md#local-setup)
+[Learn more](../../guide/vue3/app-setup.md#local-setup)
 
 ## `group`
 
@@ -102,7 +102,7 @@ The id of a group to include the story in.
 </template>
 ```
 
-[Learn more](../guide/vue3/hierarchy.md#groups)
+[Learn more](../../guide/vue3/hierarchy.md#groups)
 
 ## `icon`
 
@@ -206,4 +206,4 @@ Props:
 </template>
 ```
 
-[Learn more](../guide/vue3/controls.md#controls-panel)
+[Learn more](../../guide/vue3/controls.md#controls-panel)

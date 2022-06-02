@@ -69,7 +69,7 @@ function initState () {
 </template>
 ```
 
-[Learn more](../guide/vue3/controls.md#init-state)
+[Learn more](../../guide/vue3/controls.md#init-state)
 
 ## `setupApp`
 
@@ -97,7 +97,7 @@ function mySetupApp ({ app, story, variant }) {
 </template>
 ```
 
-[Learn more](../guide/vue3/app-setup.md#local-setup)
+[Learn more](../../guide/vue3/app-setup.md#local-setup)
 
 ## `icon`
 
@@ -204,7 +204,7 @@ Props:
 </template>
 ```
 
-[Learn more](../guide/vue3/controls.md#controls-panel)
+[Learn more](../../guide/vue3/controls.md#controls-panel)
 
 ## Slot: `source`
 
@@ -229,4 +229,4 @@ Manual copiable source code.
 </template>
 ```
 
-[Learn more](../guide/vue3/docs.md#source-code)
+[Learn more](../../guide/vue3/docs.md#source-code)
