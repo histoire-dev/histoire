@@ -73,5 +73,6 @@ module.exports = {
     'histoire-dist/',
     'generated/',
     '!.*',
+    '.nuxt/',
   ],
 }
