@@ -18,6 +18,8 @@
 
 *(work-in-progress screenshot)*
 
+[Documentation](https://histoire.dev)
+
 ## Supported frameworks
 
 | Framework | Versions | Support | Auto CodeGen | Auto Docs |
