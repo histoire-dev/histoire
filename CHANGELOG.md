@@ -1,3 +1,12 @@
+## [0.6.1](https://github.com/Akryum/histoire/compare/v0.6.0...v0.6.1) (2022-06-02)
+
+
+### Bug Fixes
+
+* **build:** don't include histoire/dist/bundlded in vendor chunk ([ee1a8f3](https://github.com/Akryum/histoire/commit/ee1a8f3dea4795cbe630d5dfd1e06153b2305391))
+
+
+
 # [0.6.0](https://github.com/Akryum/histoire/compare/v0.5.4...v0.6.0) (2022-06-02)
 
 
