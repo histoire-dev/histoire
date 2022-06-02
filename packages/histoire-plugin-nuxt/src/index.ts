@@ -36,9 +36,13 @@ export function HstNuxt (): Plugin {
             alias: nuxtConfig.viteConfig.resolve.alias,
           },
           plugins,
+          css: nuxtConfig.viteConfig.css,
           // @ts-expect-error Vue-specific config
           vue: nuxtConfig.viteConfig.vue,
         },
+        setupCode: [
+          `${nuxt.options.css.map(file => `import '${file}'`).join('\n')}`,
+        ],
       }
     },
 

@@ -5,6 +5,8 @@ import { getTagName } from '../../codegen/vue3'
 import { applyStateToVariant } from '../../util/state'
 // @ts-expect-error virtual module id
 import * as setup from '$histoire-setup'
+// @ts-expect-error virtual module id
+import * as generatedSetup from '$histoire-generated-global-setup'
 
 const props = defineProps({
   variant: {
@@ -113,6 +115,14 @@ async function mountVariant () {
       return vnodes
     },
   })
+
+  if (typeof generatedSetup?.setupVue3 === 'function') {
+    await generatedSetup.setupVue3({
+      app,
+      story: props.story,
+      variant: props.variant,
+    })
+  }
 
   if (typeof setup?.setupVue3 === 'function') {
     await setup.setupVue3({

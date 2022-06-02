@@ -126,6 +126,10 @@ export interface HistoireConfig {
    */
   setupFile?: string
   /**
+   * Setup code created by plugins
+   */
+  setupCode?: string[]
+  /**
    * Predefined responsive sizes for story playgrounds.
    */
   responsivePresets?: ResponsivePreset[]
@@ -300,6 +304,11 @@ export const mergeConfig = createDefu((obj: any, key, value) => {
         newValue.unshift(plugin)
       }
     }
+    return true
+  }
+
+  if (obj[key] && key === 'setupCode') {
+    obj[key] = [...obj[key], ...value]
     return true
   }
 

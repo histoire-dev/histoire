@@ -9,6 +9,7 @@
   },
   "devDependencies": {
     "@histoire/plugin-nuxt": "workspace:*",
+    "@nuxtjs/tailwindcss": "^5.1.2",
     "histoire": "workspace:*",
     "nuxt": "^3.0.0-rc.3"
   }

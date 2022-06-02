@@ -31,6 +31,8 @@ export const SEARCH_TITLE_DATA_ID = '$histoire-search-title-data'
 export const RESOLVED_SEARCH_TITLE_DATA_ID = `/${SEARCH_TITLE_DATA_ID}-resolved`
 export const SEARCH_DOCS_DATA_ID = '$histoire-search-docs-data'
 export const RESOLVED_SEARCH_DOCS_DATA_ID = `/${SEARCH_DOCS_DATA_ID}-resolved`
+export const GENERATED_GLOBAL_SETUP = '$histoire-generated-global-setup'
+export const RESOLVED_GENERATED_GLOBAL_SETUP = `/${GENERATED_GLOBAL_SETUP}-resolved`
 
 export async function resolveViteConfig (ctx: Context): Promise<ResolvedConfig> {
   const command = ctx.mode === 'dev' ? 'serve' : 'build'
@@ -122,6 +124,9 @@ export async function getViteConfigWithPlugins (server: boolean, ctx: Context): 
       if (id.startsWith(SEARCH_DOCS_DATA_ID)) {
         return RESOLVED_SEARCH_DOCS_DATA_ID
       }
+      if (id.startsWith(GENERATED_GLOBAL_SETUP)) {
+        return RESOLVED_GENERATED_GLOBAL_SETUP
+      }
     },
 
     async load (id) {
@@ -187,6 +192,9 @@ if (import.meta.hot) {
       }
       if (id === RESOLVED_SEARCH_DOCS_DATA_ID) {
         return getSearchDataJS(await generateDocSearchData(ctx))
+      }
+      if (id === RESOLVED_GENERATED_GLOBAL_SETUP) {
+        return ctx.config.setupCode?.join('\n;')
       }
     },
 

@@ -5,6 +5,8 @@ import Story from './Story.vue'
 import Variant from './Variant.vue'
 // @ts-expect-error virtual module id
 import * as setup from '$histoire-setup'
+// @ts-expect-error virtual module id
+import * as generatedSetup from '$histoire-generated-global-setup'
 
 export async function run ({ file, storyData, el }: ServerRunPayload) {
   const { default: Comp } = await import(file.moduleId)
@@ -22,6 +24,10 @@ export async function run ({ file, storyData, el }: ServerRunPayload) {
       })
     },
   })
+
+  if (typeof generatedSetup?.setupVue3 === 'function') {
+    await generatedSetup.setupVue3({ app })
+  }
 
   if (typeof setup?.setupVue3 === 'function') {
     await setup.setupVue3({ app })

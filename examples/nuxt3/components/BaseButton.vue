@@ -20,7 +20,7 @@ defineProps({
 <template>
   <button
     :disabled="disabled"
-    class="btn"
+    class="btn text-red-500"
     :class="{
       [`btn-color-${color}`]: color,
       [`btn-size-${size}`]: size,
@@ -31,7 +31,7 @@ defineProps({
   </button>
 </template>
 
-<style scoped>
+<style lang="pcss" scoped>
 .btn {
   border-radius: 4px;
   padding: 4px 8px;
