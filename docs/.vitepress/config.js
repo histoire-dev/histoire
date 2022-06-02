@@ -34,7 +34,7 @@ module.exports = {
     nav: [
       { text: 'Guide', link: '/guide/' },
       { text: 'Examples', link: '/examples/vue3/single-stories' },
-      { text: 'API Reference', link: '/reference/' },
+      { text: 'API Reference', link: '/reference/config' },
       {
         text: 'Changelog',
         link: 'https://github.com/Akryum/histoire/blob/master/CHANGELOG.md',
