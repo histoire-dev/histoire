@@ -69,12 +69,22 @@ module.exports = {
               link: '/reference/config',
             },
             {
-              text: 'Story components (Vue 3)',
-              link: '/reference/components-vue3',
-            },
-            {
               text: 'Plugin API',
               link: '/reference/plugin-api',
+            },
+          ],
+        },
+        {
+          text: 'Story components (Vue 3)',
+          collapsible: true,
+          items: [
+            {
+              text: 'Story',
+              link: '/reference/vue3/story',
+            },
+            {
+              text: 'Variant',
+              link: '/reference/vue3/variant',
             },
           ],
         },
