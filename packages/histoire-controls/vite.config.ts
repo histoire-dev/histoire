@@ -36,7 +36,7 @@ export default defineConfig({
         config (config) {
           config.build.lib = false
           config.build.rollupOptions.external = []
-        }
+        },
       }]
     },
     theme: {
