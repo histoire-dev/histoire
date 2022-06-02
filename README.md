@@ -44,11 +44,13 @@ In your Vite project, create a `MyComponent.story.vue` file inside your `src` di
 <script setup>
 import MyComponent from './MyComponent.vue'
 
-function initState () {
-  return {
-    disabled: false,
-  }
-}
+const state = reactive({
+  disabled: false,
+})
+
+defineExpose({
+  state,
+})
 </script>
 
 <template>
@@ -59,11 +61,8 @@ function initState () {
       width: 200,
     } */"
   >
-    <Variant
-      title="playground"
-      :init-state="initState"
-    >
-      <template #default="{ state }">
+    <Variant>
+      <template #default>
         <MyComponent
           :disabled="state.disabled"
         >
@@ -71,7 +70,7 @@ function initState () {
         </MyComponent>
       </template>
 
-      <template #controls="{ state }">
+      <template #controls>
         <HstCheckbox v-model="state.disabled">
           Disabled
         </HstCheckbox>
