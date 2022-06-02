@@ -1,3 +1,19 @@
+# [0.6.0](https://github.com/Akryum/histoire/compare/v0.5.4...v0.6.0) (2022-06-02)
+
+
+### Bug Fixes
+
+* build with undefined base ([53ca34e](https://github.com/Akryum/histoire/commit/53ca34e7e3cdd67eeeb529984a3522b08e6a9acc))
+
+
+### Features
+
+* **auto prop:** add * on modified props ([a3210ca](https://github.com/Akryum/histoire/commit/a3210cad9c37f723883afa3f399b9913153390b7))
+* nuxt plugin, fix [#84](https://github.com/Akryum/histoire/issues/84) ([#97](https://github.com/Akryum/histoire/issues/97)) ([4c7880b](https://github.com/Akryum/histoire/commit/4c7880b93876d58692b02d4a3453ac834db19390))
+* **plugin:** allow adding new vite plugins ([19279ee](https://github.com/Akryum/histoire/commit/19279eed8d24f6683e8f912e99e92be773ce00c3))
+
+
+
 ## [0.5.4](https://github.com/Akryum/histoire/compare/v0.5.3...v0.5.4) (2022-05-31)
 
 
