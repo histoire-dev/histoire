@@ -101,6 +101,7 @@ This mono-repo contains the following packages:
 | ------- | ----------- |
 | [histoire](https://github.com/Akryum/histoire/tree/main/packages/histoire) | Main package |
 | [@histoire/controls](https://github.com/Akryum/histoire/tree/main/packages/histoire-controls) | Builtin controls components |
+| [@histoire/plugin-nuxt](https://github.com/Akryum/histoire/tree/main/packages/histoire-plugin-nuxt) | Nuxt 3 integration |
 | [@histoire/plugin-percy](https://github.com/Akryum/histoire/tree/main/packages/histoire-plugin-percy) | Visual regression testing with Percy |
 | [@histoire/plugin-screenshot](https://github.com/Akryum/histoire/tree/main/packages/histoire-plugin-screenshot) | Visual regression testing with simple screenshots |
 
