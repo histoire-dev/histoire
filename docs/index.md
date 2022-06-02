@@ -1,11 +1,23 @@
 ---
-home: true
-sidebar: false
-heroImage: /logo.svg
-tagline: Fast stories powered by Vite
+layout: home
 
-actionText: Get Started
-actionLink: /guide/
+hero:
+  name: Histoire
+  text: A new way to write stories
+  tagline: Powered by Vite
+  image:
+    src: /logo.svg
+    alt: Histoire logo
+  actions:
+    - theme: brand
+      text: Get Started
+      link: /guide/getting-started
+    - theme: alt
+      text: Why Histoire?
+      link: /guide/
+    - theme: alt
+      text: View on GitHub
+      link: https://github.com/histoire-dev/histoire
 
 features:
   - title: 📖 Stories
@@ -20,30 +32,4 @@ features:
     details: Automatically generates dynamic template source code!
   - title: 🌙 Dark mode
     details: Enjoy a more pleasing experience during night.
-
-footer: MIT Licensed | Copyright © 2022-present Guillaume Chau & Histoire Contributors
 ---
-
-<DemoPreview class="htw-mb-12" />
-
-<MeetTeam class="htw-mb-24" />
-
-<h2 class="htw-text-center htw-text-3xl">
-  Sponsored by
-</h2>
-
-<p align="center">
-  <a href="https://guillaume-chau.info/sponsors/" target="_blank">
-    <img src='https://akryum.netlify.app/sponsors.svg'/>
-  </a>
-</p>
-
-<div class="htw-flex htw-justify-center htw-mb-12">
-  <SponsorButton/>
-</div>
-
-<div class="htw-text-center htw-my-4">
-  <a href="https://www.netlify.com">
-    <img src="https://www.netlify.com/img/global/badges/netlify-color-accent.svg" alt="Deploys by Netlify" />
-  </a>
-</div>

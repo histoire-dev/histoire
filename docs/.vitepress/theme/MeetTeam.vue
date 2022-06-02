@@ -30,10 +30,6 @@ const teamMembers: TeamMember[] = [
 
 <template>
   <div class="htw-my-12 htw-flex htw-flex-col htw-items-stretch htw-gap-12">
-    <h2 class="htw-text-center htw-text-3xl">
-      Meet the team
-    </h2>
-
     <div class="htw-grid htw-gap-4 md:htw-grid-cols-2 htw-w-full htw-max-w-[500px] htw-mx-auto">
       <div
         v-for="(tm, index) of teamMembers"

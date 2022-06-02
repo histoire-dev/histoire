@@ -14,54 +14,94 @@ module.exports = {
     ['meta', { name: 'twitter:site', content: '@histoire_dev' }],
   ],
 
+  lastUpdated: true,
+
   themeConfig: {
-    repo: 'histoire-dev/histoire',
-    docsDir: 'docs',
-    docsBranch: 'main',
-    editLinks: true,
-    editLinkText: 'Suggest changes to this page',
-    logo: 'logo.svg',
+    logo: '/logo.svg',
+
+    editLink: {
+      repo: 'histoire-dev/histoire',
+      branch: 'main',
+      dir: 'docs',
+      text: 'Edit this page on GitHub',
+    },
+
+    footer: {
+      message: 'Released under the MIT License.',
+      copyright: 'Copyright © 2022-present Guillaume Chau',
+    },
 
     nav: [
-      // { text: 'Guide', link: '/guide/' },
-      { text: 'Early access', link: '/guide/' },
+      { text: 'Guide', link: '/guide/' },
+      { text: 'Examples', link: '/examples/vue3/single-stories' },
+      { text: 'API Reference', link: '/reference/' },
       {
         text: 'Changelog',
         link: 'https://github.com/Akryum/histoire/blob/master/CHANGELOG.md',
       },
+      {
+        text: 'Sponsor',
+        items: [
+          {
+            text: 'Guillaume Chau',
+            link: 'https://github.com/sponsors/Akryum',
+          },
+          {
+            text: 'Hugo Attal',
+            link: 'https://github.com/sponsors/hugoattal',
+          },
+        ],
+      },
+    ],
+
+    socialLinks: [
+      { icon: 'github', link: 'https://github.com/histoire-dev/histoire' },
+      { icon: 'twitter', link: 'https://twitter.com/histoire_dev' },
     ],
 
     sidebar: {
       '/reference/': [
         {
-          text: 'Configuration reference',
-          link: '/reference/config',
-        },
-        {
-          text: 'Story components (Vue 3)',
-          link: '/reference/components-vue3',
-        },
-        {
-          text: 'Plugin API',
-          link: '/reference/plugin-api',
+          text: 'API Reference',
+          items: [
+            {
+              text: 'Configuration reference',
+              link: '/reference/config',
+            },
+            {
+              text: 'Story components (Vue 3)',
+              link: '/reference/components-vue3',
+            },
+            {
+              text: 'Plugin API',
+              link: '/reference/plugin-api',
+            },
+          ],
         },
       ],
-      '/': [
+      '/guide/': [
         {
-          text: 'Why Histoire',
-          link: '/guide/why',
-        },
-        {
-          text: 'Getting Started',
-          link: '/guide/getting-started',
-        },
-        {
-          text: 'Configuration',
-          link: '/guide/config',
+          text: 'Guide',
+          collapsible: true,
+          items: [
+            {
+              text: 'Why Histoire',
+              link: '/guide/index',
+            },
+            {
+              text: 'Getting Started',
+              link: '/guide/getting-started',
+            },
+            {
+              text: 'Configuration',
+              link: '/guide/config',
+            },
+          ],
         },
         {
           text: 'Using with Vue 3',
-          children: [
+          collapsible: true,
+          items: [
             {
               text: 'Stories',
               link: '/guide/vue3/stories',
@@ -69,6 +109,10 @@ module.exports = {
             {
               text: 'State & Controls',
               link: '/guide/vue3/controls',
+            },
+            {
+              text: 'Events',
+              link: '/guide/vue3/events',
             },
             {
               text: 'App setup',
@@ -85,25 +129,37 @@ module.exports = {
           ],
         },
         {
-          text: 'Examples',
-          children: [
+          text: 'Plugins',
+          items: [
             {
-              text: 'Single stories',
-              link: '/guide/examples/single-stories',
+              text: 'Official plugins',
+              link: '/guide/plugins#official',
             },
             {
-              text: 'Variant stories',
-              link: '/guide/examples/variant-stories',
-            },
-            {
-              text: 'Controlled stories',
-              link: '/guide/examples/controlled-stories',
+              text: 'Plugin development guide',
+              link: '/guide/plugins#plugin-development',
             },
           ],
         },
+      ],
+      '/examples/': [
         {
-          text: 'Plugins',
-          link: '/guide/plugins',
+          text: 'Vue 3 examples',
+          collapsible: true,
+          items: [
+            {
+              text: 'Single stories',
+              link: '/examples/vue3/single-stories',
+            },
+            {
+              text: 'Variant stories',
+              link: '/examples/vue3/variant-stories',
+            },
+            {
+              text: 'Controlled stories',
+              link: '/examples/vue3/controlled-stories',
+            },
+          ],
         },
       ],
     },

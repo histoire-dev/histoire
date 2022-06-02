@@ -24,7 +24,7 @@ importers:
       rimraf: ^3.0.2
       tailwindcss: ^3.0.23
       typescript: ^4.6.3
-      vitepress: ^0.22.3
+      vitepress: ^1.0.0-alpha.1
     devDependencies:
       '@akryum/sheep': 0.3.3
       '@iconify/vue': 3.2.1
@@ -46,7 +46,7 @@ importers:
       rimraf: 3.0.2
       tailwindcss: 3.0.24
       typescript: 4.7.2
-      vitepress: 0.22.4
+      vitepress: 1.0.0-alpha.1
 
   examples/nuxt3:
     specifiers:
@@ -2402,7 +2402,6 @@ packages:
       '@vueuse/shared': 8.5.0_vue@3.2.36
       vue: 3.2.36
       vue-demi: 0.12.5_vue@3.2.36
-    dev: false
 
   /@vueuse/head/0.7.6_vue@3.2.36:
     resolution: {integrity: sha512-cOWqCkT3WiF5oEpw+VVEWUJd9RLD5rc7DmnFp3cePsejp+t7686uKD9Z9ZU7Twb7R/BI8iexKTmXo9D/F3v6UA==}
@@ -2445,7 +2444,6 @@ packages:
     dependencies:
       vue: 3.2.36
       vue-demi: 0.12.5_vue@3.2.36
-    dev: false
 
   /@wry/equality/0.1.11:
     resolution: {integrity: sha512-mwEVBDUVODlsQQ5dfuLUS5/Tf7jqUKyhKYHmVi4fPB6bDMOfWvUPJmKgS1Z7Za/sOI3vzWt4+O7yCiL/70MogA==}
@@ -3074,6 +3072,10 @@ packages:
       unpipe: 1.0.0
     transitivePeerDependencies:
       - supports-color
+    dev: true
+
+  /body-scroll-lock/4.0.0-beta.0:
+    resolution: {integrity: sha512-a7tP5+0Mw3YlUJcGAKUqIBkYYGlYxk2fnCasq/FUph1hadxlTRjF+gAcZksxANnaMnALjxEddmSi/H3OR8ugcQ==}
     dev: true
 
   /boolbase/1.0.0:
@@ -8324,11 +8326,6 @@ packages:
       react-is: 17.0.2
     dev: true
 
-  /prismjs/1.28.0:
-    resolution: {integrity: sha512-8aaXdYvl1F7iC7Xm1spqSaY/OJBpYW3v+KJ+F17iYxvdc8sfjW194COK5wVhMZX45tGteiBQgdvD/nhxcRwylw==}
-    engines: {node: '>=6'}
-    dev: true
-
   /process-nextick-args/2.0.1:
     resolution: {integrity: sha512-3ouUOpQhtgrbOa17J7+uxOTpITYWaGP7/AhoR3+A+/1e9skrzelGi/dXzEYyvbxubEF6Wn2ypscTKiKJFFn1ag==}
 
@@ -8888,7 +8885,6 @@ packages:
       jsonc-parser: 3.0.0
       vscode-oniguruma: 1.6.2
       vscode-textmate: 5.2.0
-    dev: false
 
   /side-channel/1.0.4:
     resolution: {integrity: sha512-q5XPytqFEIKHkGdiMIrY10mvLRvnQh42/+GoBlFW3b2LXLE2xxJpZFdm94we0BaoV3RwJyGqg5wS7epxTv0Zvw==}
@@ -10111,19 +10107,22 @@ packages:
       fsevents: 2.3.2
     dev: true
 
-  /vitepress/0.22.4:
-    resolution: {integrity: sha512-oZUnLO/SpYdThaBKefDeOiVlr0Rie4Ppx3FzMnMyLtJnI5GlBMNjqYqMy/4+umm/iC+ZDJfI+IlDKxv5fZnYzA==}
-    engines: {node: '>=14.0.0'}
+  /vitepress/1.0.0-alpha.1:
+    resolution: {integrity: sha512-yA0QIl+mB3fQ2j+keQVa0DTT0waP2AeWM/p9VYfUAT9vOkQEGass4/oYmMGPCQrBwCaO3cpOxJL3ZFVooyvybQ==}
+    engines: {node: '>=14.6.0'}
     hasBin: true
     dependencies:
       '@docsearch/css': 3.1.0
       '@docsearch/js': 3.1.0
       '@vitejs/plugin-vue': 2.3.3_vite@2.9.9+vue@3.2.36
-      prismjs: 1.28.0
+      '@vueuse/core': 8.5.0_vue@3.2.36
+      body-scroll-lock: 4.0.0-beta.0
+      shiki: 0.10.1
       vite: 2.9.9
       vue: 3.2.36
     transitivePeerDependencies:
       - '@types/react'
+      - '@vue/composition-api'
       - less
       - react
       - react-dom
@@ -10169,11 +10168,9 @@ packages:
 
   /vscode-oniguruma/1.6.2:
     resolution: {integrity: sha512-KH8+KKov5eS/9WhofZR8M8dMHWN2gTxjMsG4jd04YhpbPR91fUj7rYQ2/XjeHCJWbg7X++ApRIU9NUwM2vTvLA==}
-    dev: false
 
   /vscode-textmate/5.2.0:
     resolution: {integrity: sha512-Uw5ooOQxRASHgu6C7GVvUxisKXfSgW4oFlO+aa+PAkgmH89O3CXxEEzNRNtHSqtXFTl0nAC1uYj0GMSH27uwtQ==}
-    dev: false
 
   /vscode-uri/3.0.3:
     resolution: {integrity: sha512-EcswR2S8bpR7fD0YPeS7r2xXExrScVMxg4MedACaWHEtx9ftCF/qHG1xGkolzTPcEmjTavCQgbVzHUIdTMzFGA==}
@@ -10215,7 +10212,6 @@ packages:
         optional: true
     dependencies:
       vue: 3.2.36
-    dev: false
 
   /vue-eslint-parser/8.3.0_eslint@8.16.0:
     resolution: {integrity: sha512-dzHGG3+sYwSf6zFBa0Gi9ZDshD7+ad14DGOdTLjruRVgZXe2J+DcZ9iUhyR48z5g1PqRa20yt3Njna/veLJL/g==}
