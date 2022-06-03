@@ -9,11 +9,9 @@ body {
   margin: 0;
 }
 
-html,
-body,
-#app {
-  font-family: 'Lato', sans-serif;
+html {
   font-size: 14px;
+  font-family: 'Lato', sans-serif;
 }
 
 .htw-sandbox-hidden {
