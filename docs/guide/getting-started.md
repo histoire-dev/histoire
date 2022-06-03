@@ -1,9 +1,37 @@
+<script setup>
+function playAudio () {
+  document.querySelector('#histoire-audio').play()
+}
+</script>
+
+<audio id="histoire-audio">
+  <source src="/histoire.mp3" type="audio/mpeg">
+</audio>
+
 # Getting started with Histoire
+
+## Overview
+
+> Histoire is the French word for "Story" and is pronounced `/is.twaʁ/`, like "is·twar" <button class="htw-btn htw-p-1 htw-leading-none" v-on:click="playAudio"><Icon icon="carbon:volume-up-filled" class="htw-w-4 htw-h-4 htw-align-middle"/></button>
+
+Histoire is a tool to generate stories applications (or "books").
+
+[Learn more about Histoire here &raquo;](./index.md)
+
+<DemoLinks />
+
+## Sponsors
 
 Histoire is an Open-Source project supported by our sponsors - thank you!
 
-<div class="htw-flex htw-justify-center htw-mt-6 htw-mb-12">
+<div class="htw-flex htw-justify-center htw-mt-6 htw-mb-12 htw-gap-2">
   <SponsorButton/>
+  <a
+    href="./index.html#sponsors"
+    class="htw-px-4 htw-py-2 htw-btn htw-inline-flex htw-items-center htw-gap-2 !htw-font-normal"
+  >
+    See our sponsors &raquo;
+  </a>
 </div>
 
 ## Supported frameworks

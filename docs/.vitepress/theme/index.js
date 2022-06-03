@@ -7,6 +7,7 @@ import './style/index.pcss'
 import SponsorButton from './SponsorButton.vue'
 import MeetTeam from './MeetTeam.vue'
 import DemoPreview from './DemoPreview.vue'
+import DemoLinks from './DemoLinks.vue'
 
 export default {
   ...DefaultTheme,
@@ -22,5 +23,6 @@ export default {
     app.component('SponsorButton', SponsorButton)
     app.component('MeetTeam', MeetTeam)
     app.component('DemoPreview', DemoPreview)
+    app.component('DemoLinks', DemoLinks)
   },
 }
