@@ -7,17 +7,15 @@ import BaseSplitPane from '../base/BaseSplitPane.vue'
 import StoryVariantListItem from './StoryVariantListItem.vue'
 import StoryVariantSingleView from './StoryVariantSingleView.vue'
 
+defineEmits({
+  'open-variant-menu': () => true,
+})
+
 const storyStore = useStoryStore()
 
 const hasSingleVariant = computed(() => (storyStore.currentStory?.variants.length === 1))
 
 const variant = computed(() => storyStore.currentVariant)
-
-const isMenuOpened = ref(false)
-
-function openMenu () {
-  isMenuOpened.value = true
-}
 </script>
 
 <template>
@@ -37,8 +35,8 @@ function openMenu () {
       class="htw-divide-y htw-divide-gray-100 dark:htw-divide-gray-800 htw-h-full htw-flex htw-flex-col"
     >
       <a
-        class="htw-px-6 htw-h-12 hover:htw-text-primary-500 dark:hover:htw-text-primary-400 htw-cursor-pointer htw-flex htw-gap-2 htw-flex-wrap htw-w-full htw-items-center"
-        @click="openMenu"
+        class="htw-px-6 htw-h-12 hover:htw-text-primary-500 dark:hover:htw-text-primary-400 htw-cursor-pointer htw-flex htw-gap-2 htw-flex-wrap htw-w-full htw-items-center htw-flex-none"
+        @click="$emit('open-variant-menu')"
       >
         <template v-if="variant">
           <Icon

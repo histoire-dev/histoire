@@ -27,7 +27,10 @@ watch(variant, () => {
     <StoryVariantGrid
       v-if="storyStore.currentStory.layout.type === 'grid'"
     />
-    <StoryVariantSingle v-else-if="storyStore.currentStory.layout.type === 'single'" />
+    <StoryVariantSingle
+      v-else-if="storyStore.currentStory.layout.type === 'single'"
+      @open-variant-menu="isMenuOpened = true"
+    />
   </div>
 
   <MobileOverlay
