@@ -1,3 +1,12 @@
+## [0.6.3](https://github.com/Akryum/histoire/compare/v0.6.2...v0.6.3) (2022-06-03)
+
+
+### Bug Fixes
+
+* prop override when no props are passed from the template ([bcfd8ff](https://github.com/Akryum/histoire/commit/bcfd8ff53b76f705dd6e842f6045784b58a640a2))
+
+
+
 ## [0.6.2](https://github.com/Akryum/histoire/compare/v0.6.1...v0.6.2) (2022-06-03)
 
 
