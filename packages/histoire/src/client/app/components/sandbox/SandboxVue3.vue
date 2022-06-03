@@ -88,6 +88,12 @@ async function mountVariant () {
             // Props overrides
             if (props.variant.state?._hPropState?.[index]?.[key]) {
               vnode.props[key] = props.variant.state._hPropState[index][key]
+              if (!vnode.dynamicProps) {
+                vnode.dynamicProps = []
+              }
+              if (!vnode.dynamicProps.includes(key)) {
+                vnode.dynamicProps.push(key)
+              }
             }
           }
 
