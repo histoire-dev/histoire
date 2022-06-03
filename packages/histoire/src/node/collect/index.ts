@@ -25,6 +25,7 @@ export function useCollectStories (options: UseCollectStoriesOptions, ctx: Conte
       inline: [
         /histoire\/dist/,
         /@vue\/devtools-api/,
+        ...ctx.config.viteNodeInlineDeps,
       ],
     },
   })

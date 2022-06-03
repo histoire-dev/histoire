@@ -149,6 +149,10 @@ export interface HistoireConfig {
    * Vite config override
    */
   vite?: ViteConfig | ((config: ViteConfig, env: ViteConfigEnv) => void | ViteConfig | Promise<void | ViteConfig>)
+  /**
+   * Transpile dependencies when collecting stories on Node.js
+   */
+  viteNodeInlineDeps?: RegExp[]
 }
 
 export type ConfigMode = 'build' | 'dev'

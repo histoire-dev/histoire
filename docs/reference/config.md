@@ -276,3 +276,32 @@ export default defineConfig({
   },
 })
 ```
+
+## `viteNodeInlineDeps`
+
+`RegExp[]`
+
+Transpile dependencies when collecting stories on Node.js.
+
+For example, if you have a dependency that contains ESM code but Node tries to load it in CommonJS context, you might have this kind of error:
+
+<pre class="htw-text-red-500 htw-overflow-auto htw-bg-gray-100 htw-rounded dark:htw-bg-gray-800 htw-p-4">
+/Users/akryum/Projects/histoire/node_modules/.pnpm/some-library@1.0.0/lib/esm/index.js:3
+export function foo() {
+^^^^^^
+
+SyntaxError: Unexpected token 'export'
+    at Object.compileFunction (node:vm:352:18)
+    at wrapSafe (node:internal/modules/cjs/loader:1031:15)
+    ...
+</pre>
+
+We can see that the `some-library` (made-up name) is misconfigured and Node treats it as CommonJS code (the `cjs/loader` is being used) but it contains ESM code. Hence the error.
+
+```ts
+export default defineConfig({
+  viteNodeInlineDeps: [
+    /some-library/,
+  ],
+})
+```
