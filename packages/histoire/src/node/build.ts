@@ -65,7 +65,7 @@ export async function build (ctx: Context) {
   const variantCount = ctx.storyFiles.reduce((sum, file) => sum + (file.story?.variants.length ?? 0), 0)
   const emptyStoryCount = ctx.storyFiles.length - storyCount
 
-  const results = await viteBuild(mergeViteConfig(await getViteConfigWithPlugins(false, ctx), {
+  const buildViteConfig = mergeViteConfig(await getViteConfigWithPlugins(false, ctx), {
     mode: 'development',
     build: {
       rollupOptions: {
@@ -86,7 +86,36 @@ export async function build (ctx: Context) {
       cssCodeSplit: false,
       minify: false,
     },
-  }))
+  })
+
+  // For @vite/plugin-vue: Always put our vite server
+  // Disable template inlining
+  // (so that we no longer need defineExpose)
+  // Nuxt: replaces the Nuxt vite dev server
+  buildViteConfig.plugins.push({
+    name: 'histoire-vue-plugin-override',
+    config (config) {
+      const vuePlugin = config.plugins.find((p: any) => p.name === 'vite:vue')
+      if (vuePlugin) {
+        const original = vuePlugin.configureServer.bind(vuePlugin)
+        vuePlugin.configureServer = () => {
+          original({
+            ...server,
+            config: {
+              ...server.config,
+              server: {
+                ...server.config.server,
+                hmr: false,
+              },
+            },
+          })
+        }
+        vuePlugin.configureServer()
+      }
+    },
+  })
+
+  const results = await viteBuild(buildViteConfig)
   const result = Array.isArray(results) ? results[0] : results as RollupOutput
 
   const styleOutput = result.output.find(o => o.name === 'style.css' && o.type === 'asset')

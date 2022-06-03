@@ -7,11 +7,6 @@ const state = reactive({
 })
 
 const synced = ref('hello')
-
-defineExpose({
-  state,
-  synced,
-})
 </script>
 
 <template>

@@ -14,10 +14,6 @@ import MyComponent from './MyComponent.vue'
 const state = reactive({
   text: "Hello world"
 })
-
-defineExpose({
-  state
-})
 </script>
 
 <template>
@@ -41,10 +37,6 @@ import MyComponent from './MyComponent.vue'
 
 const state = reactive({
   text: "Hello world"
-})
-
-defineExpose({
-  state
 })
 </script>
 
@@ -74,10 +66,6 @@ import MyComponent from './MyComponent.vue'
 
 const state = reactive({
   text: "Hello world"
-})
-
-defineExpose({
-  state
 })
 </script>
 

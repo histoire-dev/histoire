@@ -16,20 +16,10 @@ export function HstNuxt (): Plugin {
   return {
     name: '@histoire/plugin-nuxt',
 
-    async config (config, mode) {
+    async config () {
       const nuxtConfig = await useNuxtViteConfig()
       nuxt = nuxtConfig.nuxt
       const plugins = nuxtConfig.viteConfig.plugins.filter((p: any) => !ignorePlugins.includes(p?.name))
-
-      // Disable devServer integration from vue plugin
-      if (mode === 'build') {
-        const vuePlugin = plugins.find((p: any) => p.name === 'vite:vue')
-        if (vuePlugin) {
-          // @ts-expect-error override method
-          vuePlugin.configureServer = () => { /* noop */ }
-        }
-      }
-
       return {
         vite: {
           resolve: {

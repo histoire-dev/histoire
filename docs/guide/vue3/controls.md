@@ -85,11 +85,9 @@ export default defineComponent({
 </template>
 ```
 
-If you are using the `<script setup>` syntax, the component is closed by default - meaning no properties can be accessed from the outside. We need to use [defineExpose](https://vuejs.org/api/sfc-script-setup.html#defineexpose) so that Histoire is able to access your state properties.
-
 Example with Composition API (Script Setup):
 
-```vue{12-16}
+```vue
 <script lang="ts" setup>
 import { reactive, count } from 'vue'
 import MyButton from './MyButton.vue'
@@ -100,12 +98,6 @@ const state = reactive({
 })
 
 const message = ref('Meow!')
-
-// Histoire will inspect and synchronize this
-defineExpose({
-  state,
-  message,
-})
 </script>
 
 <template>
@@ -131,10 +123,6 @@ import MyButton from './MyButton.vue'
 // Main reactive state of the stories
 const state = reactive({
   colorId: 'primary',
-})
-
-defineExpose({
-  state,
 })
 
 // Some fixture/configuration data
@@ -168,10 +156,6 @@ import MyButton from './MyButton.vue'
 const state = reactive({
   disabled: false,
   content: "Hello world"
-})
-
-defineExpose({
-  state,
 })
 </script>
 
@@ -232,10 +216,6 @@ import MyButton from './MyButton.vue'
 const state = reactive({
   disabled: false,
   content: "Hello world"
-})
-
-defineExpose({
-  state,
 })
 </script>
 
