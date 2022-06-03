@@ -194,7 +194,7 @@ if (import.meta.hot) {
         return getSearchDataJS(await generateDocSearchData(ctx))
       }
       if (id === RESOLVED_GENERATED_GLOBAL_SETUP) {
-        return ctx.config.setupCode?.join('\n;')
+        return ctx.config.setupCode?.join('\n;') ?? ''
       }
     },
 
