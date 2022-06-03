@@ -1,3 +1,12 @@
+# [0.7.0](https://github.com/Akryum/histoire/compare/v0.6.6...v0.7.0) (2022-06-03)
+
+
+### Features
+
+* **vue3:** defineExpose is no longer needed ([ad6e6b9](https://github.com/Akryum/histoire/commit/ad6e6b99229fc04f288d9c956e6e626bfe059d52))
+
+
+
 ## [0.6.6](https://github.com/Akryum/histoire/compare/v0.6.5...v0.6.6) (2022-06-03)
 
 
