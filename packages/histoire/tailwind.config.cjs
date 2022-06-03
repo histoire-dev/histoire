@@ -56,6 +56,7 @@ const colors = {
 
 module.exports = {
   ...inheritedConfig,
+  prefix: 'htw-',
   content: [
     './src/**/*.{vue,js,ts,jsx,tsx,md}',
     // Include controls CSS directly

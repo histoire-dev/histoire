@@ -5,7 +5,6 @@ const defaultTheme = require('tailwindcss/defaultTheme')
 const colors = require('tailwindcss/colors')
 
 module.exports = {
-  prefix: 'htw-',
   theme: {
     extend: {
       colors: {

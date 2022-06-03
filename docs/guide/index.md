@@ -12,15 +12,15 @@ function playAudio () {
   <source src="/histoire.mp3" type="audio/mpeg">
 </audio>
 
-<div class="htw-flex htw-justify-center htw-mt-12">
-  <img src="/logo.svg" alt="Histoire logo" class="htw-max-h-[256px]">
+<div class="flex justify-center mt-12">
+  <img src="/logo.svg" alt="Histoire logo" class="max-h-[256px]">
 </div>
 
 # Why Histoire
 
 ## Overview
 
-> Histoire is the French word for "Story" and is pronounced `/is.twaʁ/`, like "is·twar" <button class="htw-btn htw-p-1 htw-leading-none" v-on:click="playAudio"><Icon icon="carbon:volume-up-filled" class="htw-w-4 htw-h-4 htw-align-middle"/></button>
+> Histoire is the French word for "Story" and is pronounced `/is.twaʁ/`, like "is·twar" <button class="btn p-1 leading-none" v-on:click="playAudio"><Icon icon="carbon:volume-up-filled" class="w-4 h-4 align-middle"/></button>
 
 Histoire is a tool to generate stories applications (or "books").
 
@@ -110,7 +110,7 @@ A real search index is built in your book! Search for your stories or even text 
 
 ## Meet the team
 
-<MeetTeam class="htw-mb-24" />
+<MeetTeam class="mb-24" />
 
 ## Sponsors
 
@@ -120,11 +120,11 @@ A real search index is built in your book! Search for your stories or even text 
   </a>
 </p>
 
-<div class="htw-flex htw-justify-center htw-mb-12">
+<div class="flex justify-center mb-12">
   <SponsorButton/>
 </div>
 
-<div class="htw-text-center htw-my-4">
+<div class="text-center my-4">
   <a href="https://www.netlify.com">
     <img src="https://www.netlify.com/img/global/badges/netlify-color-accent.svg" alt="Deploys by Netlify" />
   </a>

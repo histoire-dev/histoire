@@ -29,49 +29,49 @@ const teamMembers: TeamMember[] = [
 </script>
 
 <template>
-  <div class="htw-my-12 htw-flex htw-flex-col htw-items-stretch htw-gap-12">
-    <div class="htw-grid htw-gap-4 md:htw-grid-cols-2 htw-w-full htw-max-w-[500px] htw-mx-auto">
+  <div class="my-12 flex flex-col items-stretch gap-12">
+    <div class="grid gap-4 md:grid-cols-2 w-full max-w-[500px] mx-auto">
       <div
         v-for="(tm, index) of teamMembers"
         :key="index"
-        class="htw-flex htw-flex-col htw-items-center htw-gap-2 htw-text-center"
+        class="flex flex-col items-center gap-2 text-center"
       >
         <img
           :src="tm.avatar"
           alt="Avatar"
-          class="htw-rounded-full htw-w-24 htw-h-24 htw-border htw-border-solid htw-border-gray-200"
+          class="rounded-full w-24 h-24 border border-solid border-gray-200"
         >
 
-        <div class="htw-flex-1">
-          <div class="htw-text-xl">
+        <div class="flex-1">
+          <div class="text-xl">
             {{ tm.name }}
           </div>
 
           <div
-            class="htw-text-gray-500 htw-whitespace-pre"
+            class="text-gray-500 whitespace-pre"
             v-text="tm.description"
           />
         </div>
 
-        <div class="htw-flex htw-gap-2">
+        <div class="flex gap-2">
           <a
             :href="tm.github"
             target="_blank"
-            class="htw-text-gray-500 hover:htw-text-primary-500"
+            class="text-gray-500 hover:text-primary-500"
           >
             <Icon
               icon="mdi:github"
-              class="htw-w-6 htw-h-6"
+              class="w-6 h-6"
             />
           </a>
           <a
             :href="tm.twitter"
             target="_blank"
-            class="htw-text-gray-500 hover:htw-text-primary-500"
+            class="text-gray-500 hover:text-primary-500"
           >
             <Icon
               icon="mdi:twitter"
-              class="htw-w-6 htw-h-6"
+              class="w-6 h-6"
             />
           </a>
         </div>
@@ -79,7 +79,7 @@ const teamMembers: TeamMember[] = [
         <a
           :href="tm.sponsor"
           target="_blank"
-          class="htw-inline-flex htw-items-center htw-gap-2 htw-px-4 htw-py-2 hover:htw-no-underline htw-btn"
+          class="inline-flex items-center gap-2 px-4 py-2 hover:no-underline btn"
         >
           <span>💚</span>
           <span>Sponsor</span>

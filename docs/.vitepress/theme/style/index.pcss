@@ -7,24 +7,24 @@ button {
 
 @tailwind utilities;
 
-.htw-btn {
-  @apply htw-border htw-border-solid htw-border-gray-200 htw-rounded hover:htw-bg-primary-100 hover:htw-border-primary-200 !htw-text-primary-500 htw-cursor-pointer hover:htw-no-underline;
+.btn {
+  @apply border border-solid border-gray-200 rounded hover:bg-primary-100 hover:border-primary-200 !text-primary-500 cursor-pointer hover:no-underline;
   .dark & {
-    @apply htw-bg-gray-850 htw-border-gray-700 hover:htw-bg-primary-900 hover:htw-border-primary-600;
+    @apply bg-gray-850 border-gray-700 hover:bg-primary-900 hover:border-primary-600;
   }
 }
 
-.htw-btn-blue {
-  @apply htw-border htw-border-solid htw-border-gray-200 htw-rounded hover:htw-bg-blue-100 hover:htw-border-blue-200 !htw-text-blue-500 htw-cursor-pointer hover:htw-no-underline;
+.btn-blue {
+  @apply border border-solid border-gray-200 rounded hover:bg-blue-100 hover:border-blue-200 !text-blue-500 cursor-pointer hover:no-underline;
   .dark & {
-    @apply htw-bg-gray-850 htw-border-gray-700 hover:htw-bg-blue-900 hover:htw-border-blue-600;
+    @apply bg-gray-850 border-gray-700 hover:bg-blue-900 hover:border-blue-600;
   }
 }
 
-.htw-btn-flat {
-  @apply hover:htw-no-underline htw-rounded hover:htw-bg-primary-100 htw-border htw-border-solid htw-border-transparent hover:htw-border-primary-200;
+.btn-flat {
+  @apply hover:no-underline rounded hover:bg-primary-100 border border-solid border-transparent hover:border-primary-200;
   .dark & {
-    @apply hover:htw-bg-primary-900 hover:htw-border-primary-600;
+    @apply hover:bg-primary-900 hover:border-primary-600;
   }
 }
 
@@ -38,22 +38,22 @@ button {
 
 .home-features {
   .wrapper {
-    @apply htw-pt-0 htw-border-t-0 !important;
+    @apply pt-0 border-t-0 !important;
   }
 }
 
 .v-popper--theme-dropdown {
   .dark & {
     .v-popper__inner {
-      @apply htw-bg-gray-850 htw-border-gray-750 htw-text-gray-100;
+      @apply bg-gray-850 border-gray-750 text-gray-100;
     }
 
     .v-popper__arrow-inner {
-      @apply htw-border-gray-850;
+      @apply border-gray-850;
     }
 
     .v-popper__arrow-outer {
-      @apply htw-border-gray-750;
+      @apply border-gray-750;
     }
   }
 
