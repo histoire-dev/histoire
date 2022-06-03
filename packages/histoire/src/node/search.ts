@@ -94,7 +94,7 @@ const exportKeys = new Set([
 
 async function exportSearchIndex (index) {
   // eslint-disable-next-line no-async-promise-executor
-  return new Promise(async (resolve, reject) => {
+  return new Promise(async (resolve) => {
     const exportedData: Record<string, any> = {}
     const exportedKeys = new Set<string>()
     await index.export((key, data) => {
