@@ -4,7 +4,7 @@ Histoire can display a list of events emitted from your story. To register new e
 
 The first parameter is the name of the event, and the second one is a data object you want to display when clicking on the event.
 
-```vue
+```vue{3,10,11}
 <script lang="ts" setup>
 import EventButton from './EventButton.vue'
 import { hstEvent } from 'histoire/client'

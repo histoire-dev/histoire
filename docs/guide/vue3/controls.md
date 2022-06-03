@@ -115,7 +115,7 @@ const message = ref('Meow!')
 
 It can also be useful to declare some data that isn't going to be reactive, for example some fixture data or configuration:
 
-```vue{14-19}
+```vue{10-15}
 <script lang="ts" setup>
 import { reactive } from 'vue'
 import MyButton from './MyButton.vue'
@@ -148,7 +148,7 @@ const colors = {
 
 To create the control panel, Histoire provides a `controls` slot. You are free to render any element or components inside the slot.
 
-```vue{22-25}
+```vue{18-21}
 <script lang="ts" setup>
 import { reactive } from 'vue'
 import MyButton from './MyButton.vue'
@@ -208,7 +208,7 @@ A variant can then override the slot if needed.
 
 To build a control panel a bit more easily, Histoire provides builtin controls with design that fits the rest of the UI.
 
-```vue{23-24}
+```vue{19-20}
 <script lang="ts" setup>
 import { reactive } from 'vue'
 import MyButton from './MyButton.vue'
