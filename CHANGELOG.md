@@ -1,3 +1,12 @@
+## [0.6.4](https://github.com/Akryum/histoire/compare/v0.6.3...v0.6.4) (2022-06-03)
+
+
+### Bug Fixes
+
+* remove unused imports, fix [#104](https://github.com/Akryum/histoire/issues/104) ([a82628d](https://github.com/Akryum/histoire/commit/a82628d86006dc47f2ce942460e40e252852541d))
+
+
+
 ## [0.6.3](https://github.com/Akryum/histoire/compare/v0.6.2...v0.6.3) (2022-06-03)
 
 
