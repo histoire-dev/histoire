@@ -1,3 +1,18 @@
+## [0.6.6](https://github.com/Akryum/histoire/compare/v0.6.5...v0.6.6) (2022-06-03)
+
+
+### Bug Fixes
+
+* handle undefined viteNodeInlineDeps ([1425599](https://github.com/Akryum/histoire/commit/1425599a1706d1e613256710774ea2cd8cd4b2ea))
+* inline @vue/devtools-api in vite-node, fix [#99](https://github.com/Akryum/histoire/issues/99) ([8c83692](https://github.com/Akryum/histoire/commit/8c83692ba604b69590f69c24abfb5abc62cad099))
+
+
+### Features
+
+* **config:** viteNodeInlineDeps ([0ad6f33](https://github.com/Akryum/histoire/commit/0ad6f3357160eb091bf097048c5ada5c4c4192d8))
+
+
+
 ## [0.6.5](https://github.com/Akryum/histoire/compare/v0.6.4...v0.6.5) (2022-06-03)
 
 

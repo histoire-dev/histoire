@@ -128,7 +128,7 @@ importers:
 
   packages/histoire:
     specifiers:
-      '@histoire/controls': ^0.6.5
+      '@histoire/controls': ^0.6.6
       '@iconify/vue': ^3.2.1
       '@peeky/test': ^0.13.5
       '@tailwindcss/typography': ^0.5.2
@@ -2308,7 +2308,7 @@ packages:
       vue:
         optional: true
     dependencies:
-      vite: 2.9.9_sass@1.52.1
+      vite: 2.9.9
       vue: 3.2.36
     dev: true
 
