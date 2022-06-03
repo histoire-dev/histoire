@@ -1,3 +1,12 @@
+## [0.6.5](https://github.com/Akryum/histoire/compare/v0.6.4...v0.6.5) (2022-06-03)
+
+
+### Bug Fixes
+
+* mobile select variant select not working ([cd37575](https://github.com/Akryum/histoire/commit/cd375752f9df2c3694a6898a50cf28133b53e0b7))
+
+
+
 ## [0.6.4](https://github.com/Akryum/histoire/compare/v0.6.3...v0.6.4) (2022-06-03)
 
 
