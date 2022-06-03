@@ -33,6 +33,8 @@ export const SEARCH_DOCS_DATA_ID = '$histoire-search-docs-data'
 export const RESOLVED_SEARCH_DOCS_DATA_ID = `/${SEARCH_DOCS_DATA_ID}-resolved`
 export const GENERATED_GLOBAL_SETUP = '$histoire-generated-global-setup'
 export const RESOLVED_GENERATED_GLOBAL_SETUP = `/${GENERATED_GLOBAL_SETUP}-resolved`
+export const GENERATED_SETUP_CODE = '$histoire-generated-setup-code'
+export const RESOLVED_GENERATED_SETUP_CODE = `/${GENERATED_SETUP_CODE}-resolved`
 
 export async function resolveViteConfig (ctx: Context): Promise<ResolvedConfig> {
   const command = ctx.mode === 'dev' ? 'serve' : 'build'
@@ -127,6 +129,10 @@ export async function getViteConfigWithPlugins (server: boolean, ctx: Context): 
       if (id.startsWith(GENERATED_GLOBAL_SETUP)) {
         return RESOLVED_GENERATED_GLOBAL_SETUP
       }
+      if (id.startsWith(GENERATED_SETUP_CODE)) {
+        const [, index] = id.split('__')
+        return `${RESOLVED_GENERATED_SETUP_CODE}__${index}`
+      }
     },
 
     async load (id) {
@@ -194,7 +200,28 @@ if (import.meta.hot) {
         return getSearchDataJS(await generateDocSearchData(ctx))
       }
       if (id === RESOLVED_GENERATED_GLOBAL_SETUP) {
-        return ctx.config.setupCode?.join('\n;') ?? ''
+        if (ctx.config.setupCode) {
+          return [
+            // Import
+            `${ctx.config.setupCode.map((c, index) => `import * as setup_${index} from '${GENERATED_SETUP_CODE}__${index}'`).join('\n')}`,
+            // List
+            `const setupList = [${ctx.config.setupCode.map((c, index) => `setup_${index}`).join(', ')}]`,
+            // Setups
+            ['setupVue3'].map(fnName => `export async function ${fnName} (payload) {
+              for (const setup of setupList) {
+                if (setup?.${fnName}) {
+                  await setup.${fnName}(payload)
+                }
+              }
+            }`),
+          ].join('\n')
+        } else {
+          return ''
+        }
+      }
+      if (id.startsWith(RESOLVED_GENERATED_SETUP_CODE)) {
+        const [, index] = id.split('__')
+        return ctx.config.setupCode?.[index] ?? ''
       }
     },
 
