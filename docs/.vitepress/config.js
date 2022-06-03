@@ -37,7 +37,7 @@ module.exports = {
       { text: 'API Reference', link: '/reference/config' },
       {
         text: 'Changelog',
-        link: 'https://github.com/Akryum/histoire/blob/master/CHANGELOG.md',
+        link: 'https://github.com/histoire-dev/histoire/blob/main/CHANGELOG.md',
       },
       {
         text: 'Sponsor',
