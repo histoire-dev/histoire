@@ -1,5 +1,5 @@
 import { createRequire } from 'module'
-import { relative, dirname } from 'pathe'
+import { relative, dirname, resolve } from 'pathe'
 import {
   resolveConfig as resolveViteConfigInternal,
   Plugin as VitePlugin,
@@ -107,7 +107,7 @@ export async function getViteConfigWithPlugins (server: boolean, ctx: Context): 
       }
       if (id.startsWith(SETUP_ID)) {
         if (ctx.config.setupFile) {
-          return this.resolve(ctx.config.setupFile, importer, {
+          return this.resolve(resolve(ctx.root, ctx.config.setupFile), importer, {
             skipSelf: true,
           })
         } else {
