@@ -22,11 +22,15 @@ export function HstNuxt (): Plugin {
       const plugins = nuxtConfig.viteConfig.plugins.filter((p: any) => !ignorePlugins.includes(p?.name))
       return {
         vite: {
+          define: nuxtConfig.viteConfig.define,
           resolve: {
             alias: nuxtConfig.viteConfig.resolve.alias,
+            extensions: nuxtConfig.viteConfig.resolve.extensions,
           },
           plugins,
           css: nuxtConfig.viteConfig.css,
+          publicDir: nuxtConfig.viteConfig.publicDir,
+          optimizeDeps: nuxtConfig.viteConfig.optimizeDeps,
           // @ts-expect-error Vue-specific config
           vue: nuxtConfig.viteConfig.vue,
         },
