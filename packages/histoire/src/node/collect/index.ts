@@ -28,6 +28,7 @@ export function useCollectStories (options: UseCollectStoriesOptions, ctx: Conte
         ...ctx.config.viteNodeInlineDeps ?? [],
       ],
     },
+    transformMode: ctx.config.viteNodeTransformMode,
   })
 
   const threadsCount = ctx.mode === 'dev'

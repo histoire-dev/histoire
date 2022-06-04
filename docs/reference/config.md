@@ -288,6 +288,36 @@ export default defineConfig({
 })
 ```
 
+## `viteNodeTransformMode`
+
+`{ web?, ssr? }`
+
+Determine the transform method of modules
+
+### `viteNodeTransformMode.ssr`
+
+`RegExp[]` - Default: `[/\.([cm]?[jt]sx?|json)$/]`
+
+Use SSR transform pipeline for the specified files.<br>
+Vite plugins will receive `ssr: true` flag when processing those files.
+
+### `viteNodeTransformMode.web`
+
+`RegExp[]` - Default: *modules other than those specified in `transformMode.ssr`*
+
+First do a normal transform pipeline (targeting browser), then do a SSR rewrite to run the code in Node.<br>
+Vite plugins will receive `ssr: false` flag when processing those files.
+
+When you use JSX as component models other than React (e.g. Vue JSX or SolidJS), you might want to config as following to make `.tsx` / `.jsx` transformed as client-side components:
+
+```ts
+export default defineConfig({
+  viteNodeTransformMode: {
+    web: [/\.[jt]sx$/],
+  },
+})
+```
+
 ## `viteNodeInlineDeps`
 
 `RegExp[]`
