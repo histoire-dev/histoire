@@ -3,6 +3,7 @@ import { App, createApp, onMounted, onUnmounted, PropType, ref, watch } from 'vu
 import { Story, Variant, PropDefinition, AutoPropComponentDefinition } from '../../types'
 import { getTagName } from '../../codegen/vue3'
 import { applyStateToVariant } from '../../util/state'
+import { RouterLinkStub } from './RouterLinkStub'
 // @ts-expect-error virtual module id
 import * as setup from '$histoire-setup'
 // @ts-expect-error virtual module id
@@ -124,6 +125,9 @@ async function mountVariant () {
       return vnodes
     },
   })
+
+  // Stubs
+  app.component('RouterLink', RouterLinkStub)
 
   if (typeof generatedSetup?.setupVue3 === 'function') {
     await generatedSetup.setupVue3({
