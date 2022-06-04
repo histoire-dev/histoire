@@ -41,6 +41,7 @@ export const RouterLinkStub = defineComponent({
       href: computed(() => route.value.href),
       isActive: computed(() => false),
       isExactActive: computed(() => false),
+      // eslint-disable-next-line @typescript-eslint/no-empty-function
       navigate: async () => {},
     })
     return this.custom ? children : h('a', undefined, children)

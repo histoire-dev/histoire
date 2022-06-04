@@ -20,6 +20,7 @@ const props = defineProps<{
   variant: 'primary' | 'secondary'
 }>()
 
+// eslint-disable-next-line no-undef
 const computedClasses = computed(() => ({
   'btn-base': true,
   'btn-primary': props.variant === 'primary',
