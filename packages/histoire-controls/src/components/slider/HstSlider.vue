@@ -1,0 +1,93 @@
+<script lang="ts">
+export default {
+  name: 'HstSlider',
+  inheritAttrs: false,
+}
+</script>
+
+<script lang="ts" setup>
+import { computed, ref } from 'vue'
+import type { CSSProperties } from 'vue'
+import HstWrapper from '../HstWrapper.vue'
+import { VTooltip as vTooltip } from 'floating-vue'
+
+const props = defineProps<{
+  title?: string
+  modelValue: number
+  min: number
+  max: number
+}>()
+
+const emit = defineEmits({
+  'update:modelValue': (newValue: number) => true,
+})
+
+const showTooltip = ref(false)
+const input = ref<HTMLInputElement>(null)
+
+const numberModel = computed({
+  get: () => props.modelValue,
+  set: value => {
+    emit('update:modelValue', value)
+  },
+})
+
+const percentage = computed(() => {
+  return (props.modelValue - props.min) / (props.max - props.min)
+})
+
+const tooltipStyle = computed<CSSProperties>(() => {
+  const gap = 8
+  if (input.value) {
+    const position = gap + ((input.value.clientWidth - 2 * gap) * percentage.value)
+    return {
+      left: position + 'px',
+    }
+  }
+  return {}
+})
+</script>
+
+<template>
+  <HstWrapper
+    class="htw-items-center"
+    :title="title"
+    :class="$attrs.class"
+    :style="$attrs.style"
+  >
+    <div class="htw-relative htw-w-full htw-flex htw-items-center">
+      <div class="htw-absolute htw-inset-0 htw-flex htw-items-center">
+        <div class="htw-bg-gray-300 dark:htw-bg-gray-500 htw-h-1 htw-w-full htw-rounded-full" />
+      </div>
+      <input
+        ref="input"
+        v-model.number="numberModel"
+        class="range-input htw-appearance-none htw-border-0 htw-bg-transparent htw-cursor-pointer htw-relative htw-w-full htw-m-0 htw-text-gray-700"
+        type="range"
+        v-bind="{ ...$attrs, class: null, style: null }"
+        @mouseover="showTooltip = true"
+        @mouseleave="showTooltip = false"
+      >
+      <div
+        v-if="showTooltip"
+        v-tooltip="{content: modelValue.toString(), shown: true, distance: 16}"
+        class="htw-absolute"
+        :style="tooltipStyle"
+      />
+    </div>
+  </HstWrapper>
+</template>
+
+<style scoped lang="postcss">
+input {
+  &::-webkit-slider-thumb, &::-moz-range-thumb {
+    @apply htw-appearance-none htw-h-3 htw-w-3 htw-bg-gray-300 dark:htw-bg-gray-500 htw-border-4 htw-border-white dark:htw-border-gray-700 htw-rounded-full;
+  }
+
+  &:hover {
+    &::-webkit-slider-thumb, &::-moz-range-thumb {
+      @apply htw-bg-primary-500 dark:htw-bg-primary-500 htw-border-primary-100 dark:htw-border-primary-800;
+    }
+  }
+}
+</style>
