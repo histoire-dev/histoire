@@ -1,3 +1,12 @@
+## [0.7.2](https://github.com/Akryum/histoire/compare/v0.7.1...v0.7.2) (2022-06-05)
+
+
+### Bug Fixes
+
+* **a11y:** make font-size follow user brower settings ([#115](https://github.com/Akryum/histoire/issues/115)) ([e525332](https://github.com/Akryum/histoire/commit/e525332cdbb0c35065c77034410bcc0fe91aafb7))
+
+
+
 ## [0.7.1](https://github.com/Akryum/histoire/compare/v0.7.0...v0.7.1) (2022-06-05)
 
 
