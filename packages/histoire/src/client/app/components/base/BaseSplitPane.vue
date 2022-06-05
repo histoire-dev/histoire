@@ -206,11 +206,11 @@ onUnmounted(() => {
 
 <style lang="postcss" scoped>
 .landscape > div > .dragger {
-  width: 10px;
+  width: .625rem;
 }
 
 .portrait > div > .dragger {
-  height: 10px;
+  height: .625rem;
 }
 
 .landscape > div > .dragger.dragger-offset-before {
@@ -222,18 +222,18 @@ onUnmounted(() => {
 }
 
 .landscape > div > .dragger.dragger-offset-center {
-  right: -5px;
+  right: -.3125rem;
 }
 
 .portrait > div > .dragger.dragger-offset-center {
-  bottom: -5px;
+  bottom: -.3125rem;
 }
 
 .landscape > div > .dragger.dragger-offset-after {
-  right: -10px;
+  right: -.625rem;
 }
 
 .portrait > div > .dragger.dragger-offset-after {
-  bottom: -10px;
+  bottom: -.625rem;
 }
 </style>
