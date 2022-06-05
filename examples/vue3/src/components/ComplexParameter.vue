@@ -3,6 +3,7 @@ import { defineProps } from 'vue'
 
 const props = defineProps<{
   complexParameter: Array<{action: () => void}>
+  recursiveParameter: {name: string} & Record<string, unknown>
 }>()
 </script>
 
@@ -12,5 +13,8 @@ const props = defineProps<{
     @click="complexParameter[0].action"
   >
     Custom click
+  </div>
+  <div>
+    {{ recursiveParameter.name }}
   </div>
 </template>

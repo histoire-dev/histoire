@@ -7,6 +7,12 @@ interface Line {
 }
 
 export function serializeJs (value: any): string {
+  try {
+    JSON.stringify(value)
+  } catch (e) {
+    return '{}'
+  }
+
   if (value === undefined) {
     return 'undefined'
   }

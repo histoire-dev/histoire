@@ -3,6 +3,15 @@ import type { Variant } from '../types'
 
 const isObject = (val) => val !== null && typeof val === 'object'
 
+export function toSafeRawDeep (val) {
+  try {
+    JSON.stringify(val)
+    return toRawDeep(val)
+  } catch (e) {
+    return {}
+  }
+}
+
 export function toRawDeep (val) {
   const unwrappedValue = isRef(val) ? unref(val) : val
 
