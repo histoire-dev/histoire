@@ -26,6 +26,7 @@ const files = ref<StoryFile[]>(rawFiles.map(file => mapFile(file)))
 const tree = ref<Tree>(rawTree)
 
 onUpdate((newFiles: StoryFile[], newTree: Tree) => {
+  loading.value = false
   files.value = newFiles.map(file => {
     const existingFile = files.value.find(f => f.id === file.id)
     return mapFile(file, existingFile)
@@ -78,6 +79,7 @@ const loading = ref(false)
 
 if (import.meta.hot && !rawFiles.length) {
   loading.value = true
+  console.log('loading...')
   import.meta.hot.on('histoire:all-stories-loaded', () => {
     loading.value = false
   })

@@ -93,6 +93,9 @@ export async function getViteConfigWithPlugins (server: boolean, ctx: Context): 
           fs: {
             allow: [DIST_PATH, TEMP_PATH, resolvedViteConfig.root, process.cwd()],
           },
+          watch: {
+            ignored: [`!**/node_modules/.histoire/**`],
+          },
         },
         define: {
           // We need to force this to be able to use `devtoolsRawSetupState`
