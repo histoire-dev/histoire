@@ -1,0 +1,7 @@
+{
+  "tailwindCSS.experimental.configFile": {
+    "tailwind.config.cjs": "docs/**",
+    "packages/histoire/tailwind.config.cjs": "packages/histoire/**",
+    "packages/histoire-controls/tailwind.config.cjs": "packages/histoire-controls/**",
+  }
+}
