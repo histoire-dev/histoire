@@ -100,9 +100,11 @@ export default defineComponent({
       })
 
       // Auto stub components
-      for (const vnode of vnodes) {
-        if (typeof vnode.type === 'object' && (vnode.type as any).name !== 'HistoireVariant') {
-          vnode.type = stub
+      if (Array.isArray(vnodes)) {
+        for (const vnode of vnodes) {
+          if (typeof vnode.type === 'object' && (vnode.type as any).name !== 'HistoireVariant') {
+            vnode.type = stub
+          }
         }
       }
 
