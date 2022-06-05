@@ -1,6 +1,6 @@
 {
   "name": "@histoire/plugin-percy",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "description": "Histoire plugin to take screenshots with Percy for visual regression testing",
   "license": "MIT",
   "author": {
@@ -38,6 +38,6 @@
     "typescript": "^4.6.3"
   },
   "peerDependencies": {
-    "histoire": "^0.7.0"
+    "histoire": "^0.7.1"
   }
 }

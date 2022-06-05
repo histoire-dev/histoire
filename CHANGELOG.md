@@ -1,3 +1,22 @@
+## [0.7.1](https://github.com/Akryum/histoire/compare/v0.7.0...v0.7.1) (2022-06-05)
+
+
+### Bug Fixes
+
+* **nuxt:** add additional sections of nuxt vite config ([#109](https://github.com/Akryum/histoire/issues/109)) ([e31f543](https://github.com/Akryum/histoire/commit/e31f543c3f583290f70d34f91195267b129aefa6)), closes [#107](https://github.com/Akryum/histoire/issues/107)
+* **plugin:** removeStory not working, fix [#110](https://github.com/Akryum/histoire/issues/110) ([b7c9171](https://github.com/Akryum/histoire/commit/b7c9171b87b4485e9bac818d78196843dd1670f1))
+* tailwind tokens Story not invalidated in the cache ([5032945](https://github.com/Akryum/histoire/commit/503294559c82594d4874421a4a276a5c6a6c897d))
+* **vue3:** stub RouterLink, fix [#107](https://github.com/Akryum/histoire/issues/107) ([95e3f73](https://github.com/Akryum/histoire/commit/95e3f73a7fa4683ae2d68afc59bd305a2746881a))
+* **vue3:** auto stub components on node Story ([8c27265](https://github.com/Akryum/histoire/commit/8c27265a42b0de4c5ecca988091c6a2c9d6a3268))
+* **vue3:** check if vnodes is an array ([3a49ffa](https://github.com/Akryum/histoire/commit/3a49ffa50533f12ae389343c56c93ff3f1214c1d))
+
+
+### Features
+
+* add viteNodeTransformMode config option, fix [#108](https://github.com/Akryum/histoire/issues/108) ([#111](https://github.com/Akryum/histoire/issues/111)) ([5c0d279](https://github.com/Akryum/histoire/commit/5c0d279f2b32845269b075fef3e49b421035e1bf))
+
+
+
 # [0.7.0](https://github.com/Akryum/histoire/compare/v0.6.6...v0.7.0) (2022-06-03)
 
 
