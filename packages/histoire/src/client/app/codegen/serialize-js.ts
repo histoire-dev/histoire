@@ -7,11 +7,7 @@ interface Line {
 }
 
 export function serializeJs (value: any): string {
-  try {
-    JSON.stringify(value)
-  } catch (e) {
-    return '{}'
-  }
+  const seen = new Set()
 
   if (value === undefined) {
     return 'undefined'
@@ -26,10 +22,10 @@ export function serializeJs (value: any): string {
     return value ? 'true' : 'false'
   }
   if (Array.isArray(value)) {
-    return printLines(arrayToSourceLines(value))
+    return printLines(arrayToSourceLines(value, seen))
   }
   if (typeof value === 'object') {
-    return printLines(objectToSourceLines(value))
+    return printLines(objectToSourceLines(value, seen))
   }
   if (value?.__autoBuildingObject) {
     return value
@@ -44,7 +40,13 @@ function printLines (lines: Line[]) {
   return lines.map(line => '  '.repeat(line.spaces) + line.line).join('\n')
 }
 
-function objectToSourceLines (object, indentCount = 0) {
+function objectToSourceLines (object, seen: Set<unknown>, indentCount = 0) {
+  if (seen.has(object)) {
+    object = {}
+  } else {
+    seen.add(object)
+  }
+
   return createLines(indentCount, lines => {
     lines.push('{')
     lines.push(...createLines(1, lines => {
@@ -56,18 +58,24 @@ function objectToSourceLines (object, indentCount = 0) {
           printedKey = `'${printedKey}'`
         }
 
-        addLinesFromValue(lines, value, `${printedKey}: `, ',')
+        addLinesFromValue(lines, value, `${printedKey}: `, ',', seen)
       }
     }))
     lines.push('}')
   })
 }
 
-function arrayToSourceLines (array: any[], indentCount = 0) {
+function arrayToSourceLines (array: any[], seen: Set<unknown>, indentCount = 0): Array<Line> {
+  if (seen.has(array)) {
+    array = []
+  } else {
+    seen.add(array)
+  }
+
   return createLines(indentCount, lines => {
     const contentLines = createLines(1, lines => {
       for (const value of array) {
-        addLinesFromValue(lines, value, '', ',')
+        addLinesFromValue(lines, value, '', ',', seen)
       }
     })
     if (contentLines.length === 0) {
@@ -84,7 +92,7 @@ function arrayToSourceLines (array: any[], indentCount = 0) {
   })
 }
 
-function createLines (indentCount: number, handler: (lines: any[]) => unknown) {
+function createLines (indentCount: number, handler: (lines: any[]) => unknown): Array<Line> {
   const lines: any[] = []
   handler(lines)
   return lines.map(line => {
@@ -96,13 +104,13 @@ function createLines (indentCount: number, handler: (lines: any[]) => unknown) {
   })
 }
 
-function addLinesFromValue (lines: Line[], value, before, after) {
+function addLinesFromValue (lines: Line[], value, before, after, seen) {
   let result
   if (Array.isArray(value)) {
-    lines.push(...wrap(arrayToSourceLines(value), before, after))
+    lines.push(...wrap(arrayToSourceLines(value, seen), before, after))
     return
   } else if (value && typeof value === 'object') {
-    lines.push(...wrap(objectToSourceLines(value), before, after))
+    lines.push(...wrap(objectToSourceLines(value, seen), before, after))
     return
   } else if (typeof value === 'string') {
     result = value.includes('\'') ? `\`${value}\`` : `'${value}'`
