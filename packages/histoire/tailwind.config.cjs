@@ -100,7 +100,7 @@ module.exports.theme.extend.typography = (theme) => ({
         marginLeft: 0,
         marginRight: 0,
         backgroundColor: theme('colors.gray-100'),
-        padding: '4px 6px',
+        padding: '.25rem .375rem',
 
         '& p:first-child': {
           marginTop: 0,
