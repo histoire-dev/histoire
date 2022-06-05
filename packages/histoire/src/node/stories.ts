@@ -53,7 +53,7 @@ export function addStory (relativeFilePath: string) {
   }
 
   const file: StoryFile = {
-    id: fileId,
+    id: fileId, // The file id will be changed by the story id after it is collected
     path: absoluteFilePath,
     fileName,
     moduleId: `/${relativeFilePath}`,
@@ -63,8 +63,8 @@ export function addStory (relativeFilePath: string) {
 }
 
 export function removeStory (relativeFilePath: string) {
-  const fileId = Case.kebab(relativeFilePath)
-  const index = context.storyFiles.findIndex((file) => file.id === fileId)
+  const absoluteFilePath = getAbsoluteFilePath(relativeFilePath)
+  const index = context.storyFiles.findIndex((file) => file.path === absoluteFilePath)
   if (index !== -1) context.storyFiles.splice(index, 1)
 }
 
