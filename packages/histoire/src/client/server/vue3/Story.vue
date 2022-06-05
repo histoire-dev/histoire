@@ -1,8 +1,12 @@
 <script lang="ts">
 import { defineComponent, inject, onMounted, PropType, provide, useAttrs } from 'vue'
-import type { StoryFile, Story, Variant } from '../../node/types'
+import type { StoryFile, Story, Variant } from '../../../node/types'
+
+const stub = { name: 'StubbedComponent', render: () => null }
 
 export default defineComponent({
+  name: 'HistoireStory',
+
   inheritAttrs: false,
 
   props: {
@@ -87,13 +91,22 @@ export default defineComponent({
   render () {
     let suppressError = false
     try {
-      return this.$slots.default?.({
+      const vnodes = this.$slots.default?.({
         get state () {
           // No variant tags
           suppressError = true
           return {}
         },
       })
+
+      // Auto stub components
+      for (const vnode of vnodes) {
+        if (typeof vnode.type === 'object' && (vnode.type as any).name !== 'HistoireVariant') {
+          vnode.type = stub
+        }
+      }
+
+      return vnodes
     } catch (e) {
       if (!suppressError) {
         console.error(e)
