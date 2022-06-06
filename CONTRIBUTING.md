@@ -15,6 +15,18 @@ Contributing doesn't necessarily mean you need to write code and open Pull Reque
   - [Hugo](https://github.com/sponsors/hugoattal)
 - Do you like Histoire? Spread the love on social media!
 
+## Packages
+
+This mono-repo contains the following packages:
+
+| Package | Description |
+| ------- | ----------- |
+| [histoire](https://github.com/Akryum/histoire/tree/main/packages/histoire) | Main package |
+| [@histoire/controls](https://github.com/Akryum/histoire/tree/main/packages/histoire-controls) | Builtin controls components |
+| [@histoire/plugin-nuxt](https://github.com/Akryum/histoire/tree/main/packages/histoire-plugin-nuxt) | Nuxt 3 integration |
+| [@histoire/plugin-percy](https://github.com/Akryum/histoire/tree/main/packages/histoire-plugin-percy) | Visual regression testing with Percy |
+| [@histoire/plugin-screenshot](https://github.com/Akryum/histoire/tree/main/packages/histoire-plugin-screenshot) | Visual regression testing with simple screenshots |
+
 ## Local dev setup
 
 1. Install dependencies with [pnpm](https://pnpm.io/):
