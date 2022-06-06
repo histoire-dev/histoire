@@ -9,7 +9,7 @@ The first step is to define the state that will be share to your story. Histoire
 Example with Option API:
 
 ```vue{10-17}
-<script lang="ts" setup>
+<script lang="ts">
 import MyButton from './MyButton.vue'
 
 export default defineComponent({
