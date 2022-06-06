@@ -21,9 +21,13 @@ const state = reactive({
       :max="state.max"
       title="Slide"
     />
+    <pre>{{ state }}</pre>
     <template #controls>
-      <HstNumber
+      <HstSlider
         v-model="state.value"
+        :step="state.step"
+        :min="state.min"
+        :max="state.max"
         title="Value"
       />
     </template>
