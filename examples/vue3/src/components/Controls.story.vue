@@ -40,6 +40,12 @@ function initState () {
           v-model="state.number"
           title="HstNumber"
         />
+        <HstSlider
+          v-model="state.number"
+          :min="0"
+          :max="100"
+          title="HstNumber"
+        />
         <HstTextarea
           v-model="state.longText"
           title="HstTextarea"
