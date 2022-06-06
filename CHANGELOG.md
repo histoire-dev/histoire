@@ -1,3 +1,17 @@
+## [0.7.3](https://github.com/Akryum/histoire/compare/v0.7.2...v0.7.3) (2022-06-06)
+
+
+### Bug Fixes
+
+* recursive object analysis (fix [#118](https://github.com/Akryum/histoire/issues/118)) ([#119](https://github.com/Akryum/histoire/issues/119)) ([88ecbbf](https://github.com/Akryum/histoire/commit/88ecbbf790832711307b9a0604337e11105cfae0))
+
+
+### Features
+
+* add slider control, [#30](https://github.com/Akryum/histoire/issues/30) ([#117](https://github.com/Akryum/histoire/issues/117)) ([e7024e2](https://github.com/Akryum/histoire/commit/e7024e20d6b918b25cd05aa23251f6414c6cb96c))
+
+
+
 ## [0.7.2](https://github.com/Akryum/histoire/compare/v0.7.1...v0.7.2) (2022-06-05)
 
 
