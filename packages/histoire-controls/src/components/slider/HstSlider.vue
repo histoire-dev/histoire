@@ -78,16 +78,26 @@ const tooltipStyle = computed<CSSProperties>(() => {
   </HstWrapper>
 </template>
 
-<style lang="postcss">
+<style lang="pcss">
 .htw-range-input {
-  &::-webkit-slider-thumb, &::-moz-range-thumb {
-    @apply htw-appearance-none htw-h-3 htw-w-3 htw-bg-white dark:htw-bg-gray-700 htw-border htw-border-black/25 dark:htw-border-white/25 htw-rounded-full;
+  &::-webkit-slider-thumb {
+    @apply htw-appearance-none htw-h-3 htw-w-3 htw-bg-white dark:htw-bg-gray-700 htw-border htw-border-solid htw-border-black/25 dark:htw-border-white/25 htw-rounded-full;
   }
 
-  &:hover {
-    &::-webkit-slider-thumb, &::-moz-range-thumb {
-      @apply !htw-bg-primary-500  !htw-border-primary-500;
-    }
+  &:hover::-webkit-slider-thumb {
+    @apply !htw-bg-primary-500  !htw-border-primary-500;
+  }
+}
+
+/* Separate rules for -moz-range-thumb to prevent a bug with Safari that causes it to ignore custom style */
+
+.htw-range-input {
+  &::-moz-range-thumb {
+    @apply htw-appearance-none htw-h-3 htw-w-3 htw-bg-white dark:htw-bg-gray-700 htw-border htw-border-solid htw-border-black/25 dark:htw-border-white/25 htw-rounded-full;
+  }
+
+  &:hover::-moz-range-thumb {
+    @apply !htw-bg-primary-500  !htw-border-primary-500;
   }
 }
 </style>
