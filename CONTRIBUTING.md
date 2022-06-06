@@ -43,6 +43,12 @@ pnpm run watch
 
 Wait before the initial build is done and the terminal output stabilizes.
 
+If you do not intend to make changes to the histoire main packages, you can use this script instead:
+
+```sh
+pnpm run build
+```
+
 3. In the `examples` directory, you can run `story:dev` scripts to start Histoire on an example project.
 
 ```sh
@@ -55,6 +61,62 @@ pnpm run story:dev
 ```sh
 pnpm run story:build
 pnpm run story:preview
+```
+
+## Running tests
+
+### Linting
+
+We use ESLint to check for code quality and style.
+
+```sh
+# Root of the mono-repo
+pnpm run lint
+```
+
+### Unit tests
+
+We use [Peeky](https://peeky.dev/) to run unit tests on workspaces listed under the `packages` folder.
+
+For developping:
+
+```sh
+# Root of the mono-repo
+pnpm run test:open
+```
+
+For running all tests in the terminal:
+
+```sh
+# Root of the mono-repo
+pnpm run test
+```
+
+### Example projects tests
+
+Examples projects found in the `examples` can also have tests. To run them all:
+
+```sh
+# Root of the mono-repo
+pnpm run test:examples
+```
+
+In an example project, you can run the following script if there are tests:
+
+```sh
+cd examples/vue3
+
+pnpm run test:examples
+```
+
+To develop new tests in an example project, you can use:
+
+```sh
+cd examples/vue3
+
+pnpm run story:dev
+# In another terminal
+pnpm run test:dev
 ```
 
 ## Pull Request Guidelines
@@ -73,6 +135,8 @@ pnpm run story:preview
   - Add appropriate test coverage if applicable.
 
 - It's OK to have multiple small commits as you work on the PR - GitHub can automatically squash them before merging.
+
+- Make sure to follow the code style of the project.
 
 - Make sure tests pass!
 

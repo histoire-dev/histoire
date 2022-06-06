@@ -12,6 +12,7 @@
     "watch": "pnpm run build && pnpm run -r --parallel --filter \"./packages/**\" watch",
     "test": "pnpm run -r --parallel --filter \"./packages/**\" test",
     "test:open": "pnpm run -r --parallel --filter \"./packages/**\" test:open",
+    "test:examples": "pnpm run -r --parallel --filter \"./examples/**\" test:examples",
     "release": "pnpm run lint && pnpm run test && pnpm run build && sheep release -b main",
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
