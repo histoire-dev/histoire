@@ -40,7 +40,7 @@
     "test": "peeky run"
   },
   "dependencies": {
-    "@histoire/controls": "^0.7.3",
+    "@histoire/controls": "workspace:^",
     "@iconify/vue": "^3.2.1",
     "@types/markdown-it": "^12.2.3",
     "@vueuse/core": "^8.2.5",

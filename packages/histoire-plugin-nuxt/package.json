@@ -36,7 +36,8 @@
     "vite": "^2.9.1"
   },
   "peerDependencies": {
-    "histoire": "^0.7.3",
+    "@histoire/plugin-vue": "workspace:^",
+    "histoire": "workspace:^",
     "nuxt": "^3.0.0-rc.3"
   }
 }
