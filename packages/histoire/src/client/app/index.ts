@@ -7,7 +7,6 @@ import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import FloatingVue from 'floating-vue'
 import App from './App.vue'
-import { registerGlobalComponents } from './global-components.js'
 import { router } from './router'
 
 export function mountMainApp () {
@@ -27,7 +26,6 @@ export function mountMainApp () {
     },
   })
   app.use(router)
-  registerGlobalComponents(app)
   app.mount('#app')
 
   if (import.meta.hot) {

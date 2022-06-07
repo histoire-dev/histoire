@@ -1,7 +1,7 @@
 import { App } from 'vue'
 import { registerVueComponents } from '@histoire/controls'
-import Story from './components/exposed/Story.vue'
-import Variant from './components/exposed/Variant.vue'
+import Story from './Story.vue'
+import Variant from './Variant.vue'
 
 export function registerGlobalComponents (app: App) {
   // eslint-disable-next-line vue/multi-word-component-names

@@ -2,7 +2,7 @@
 import { Icon } from '@iconify/vue'
 import type { Story, Variant } from '../../types'
 import { computed } from 'vue'
-import { getSandboxUrl } from '../sandbox/lib'
+import { getSandboxUrl } from '../../util/sandbox'
 
 const props = defineProps<{
   variant: Variant

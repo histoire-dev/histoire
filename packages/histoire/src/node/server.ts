@@ -1,9 +1,9 @@
 import { createServer as createViteServer } from 'vite'
+import type { ServerStoryFile } from '@histoire/shared'
 import { Context } from './context.js'
 import { getViteConfigWithPlugins, RESOLVED_SEARCH_TITLE_DATA_ID, RESOLVED_STORIES_ID } from './vite.js'
 import { onStoryChange, watchStories } from './stories.js'
 import { useCollectStories } from './collect/index.js'
-import type { StoryFile } from './types.js'
 import { DevPluginApi } from './plugin.js'
 import { useModuleLoader } from './load.js'
 
@@ -46,7 +46,7 @@ export async function createServer (ctx: Context, port: number) {
   let queue: Promise<void>
   let queueResolve: () => void
   let queued = false
-  let queuedFiles: StoryFile[] = []
+  let queuedFiles: ServerStoryFile[] = []
   let queuedAll = false
   let didAllStoriesYet = false
 

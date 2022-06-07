@@ -2,10 +2,8 @@
 
 import { VNode, vModelText, vModelCheckbox, vModelSelect, vModelRadio, vModelDynamic, Text } from 'vue'
 import { pascal } from 'case'
-import { createAutoBuildingObject, indent } from './util'
-import { serializeJs } from './serialize-js'
-import type { Variant } from '../types'
-import { voidElements } from './const'
+import { createAutoBuildingObject, indent, serializeJs, voidElements } from '@histoire/shared'
+import type { Variant } from '@histoire/shared'
 
 export async function generateSourceCode (variant: Variant) {
   const vnode = variant.slots().default?.({ state: variant.state ?? {} }) ?? []

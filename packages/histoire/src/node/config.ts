@@ -11,7 +11,7 @@ import { ViteNodeServer } from 'vite-node/server'
 import { ViteNodeRunner } from 'vite-node/client'
 import pc from 'picocolors'
 import type MarkdownIt from 'markdown-it'
-import { TreeFile } from './tree.js'
+import type { ServerTreeFile } from '@histoire/shared'
 import { defaultColors } from './colors.js'
 import { Plugin } from './plugin.js'
 import { findUp } from './util/find-up.js'
@@ -35,7 +35,7 @@ export interface BackgroundPreset {
 export interface TreeGroupConfig {
   title: string
   id?: string
-  include?: (file: TreeFile) => boolean
+  include?: (file: ServerTreeFile) => boolean
 }
 
 export interface HistoireConfig {
@@ -61,7 +61,7 @@ export interface HistoireConfig {
      *
      * Use `'path'` use the real folder structure on your computer.
      */
-    file?: 'title' | 'path' | ((file: TreeFile) => string[])
+    file?: 'title' | 'path' | ((file: ServerTreeFile) => string[])
     order?: 'asc' | ((a: string, b: string) => number)
     groups?: TreeGroupConfig[]
   }

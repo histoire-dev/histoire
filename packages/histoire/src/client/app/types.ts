@@ -1,49 +1,11 @@
 import type { RouteLocationRaw } from 'vue-router'
 
-export interface StoryFile {
-  id: string
-  framework: string
-  component: any
-  story: Story
-  path: string[]
-}
-
-export type StoryLayout = {
-  type: 'single'
-  iframe?: boolean
-} | {
-  type: 'grid'
-  width?: number | string
-}
-
-export interface Story {
-  id: string
-  title: string
-  group?: string
-  variants: Variant[]
-  layout?: StoryLayout
-  icon?: string
-  iconColor?: string
-  docsOnly?: boolean
-  file?: StoryFile
-  lastSelectedVariant?: Variant
-  slots?: () => Readonly<any>
-}
-
-export interface Variant {
-  id: string
-  title: string
-  icon?: string
-  iconColor?: string
-  initState?: () => any
-  setupApp?: (payload: any) => unknown
-  slots?: () => Readonly<any>
-  state?: any
-  source?: string
-  responsiveDisabled?: boolean
-  configReady?: boolean
-  previewReady?: boolean
-}
+export type {
+  StoryFile,
+  StoryLayout,
+  Story,
+  Variant,
+} from '@histoire/shared'
 
 export type TreeLeaf = {
   title: string
@@ -81,17 +43,4 @@ export interface PreviewSettings {
   rotate: boolean
   backgroundColor: string
   checkerboard: boolean
-}
-
-export interface PropDefinition {
-  name: string
-  types?: string[]
-  required?: boolean
-  default?: any
-}
-
-export interface AutoPropComponentDefinition {
-  name: string
-  index: number
-  props: PropDefinition[]
 }

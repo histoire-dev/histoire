@@ -1,6 +1,6 @@
 <script lang="ts">
 import { computed, defineComponent, provide, useAttrs, VNode, h, PropType, getCurrentInstance } from 'vue'
-import type { Story } from '../../types.js'
+import type { Story } from '@histoire/shared'
 import Variant from './Variant.vue'
 
 export default defineComponent({

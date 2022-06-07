@@ -21,6 +21,7 @@ import { isMobile } from './util/responsive'
 import Breadcrumb from './components/app/Breadcrumb.vue'
 import SearchModal from './components/search/SearchModal.vue'
 import InitialLoading from './components/app/InitialLoading.vue'
+import { MountStoryVue3 } from '@histoire/plugin-vue/client'
 
 const files = ref<StoryFile[]>(rawFiles.map(file => mapFile(file)))
 const tree = ref<Tree>(rawTree)
@@ -96,8 +97,7 @@ onMounted(() => {
     v-if="storyStore.currentStory"
     class="htw-hidden"
   >
-    <component
-      :is="storyStore.currentStory.file.component"
+    <MountStoryVue3
       :story="storyStore.currentStory"
     />
   </div>

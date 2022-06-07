@@ -1,6 +1,6 @@
 <script lang="ts" setup>
+import { SandboxVue3 } from '@histoire/plugin-vue/client'
 import type { Story, Variant } from '../../types'
-import SandboxVue3 from '../sandbox/SandboxVue3.vue'
 import StoryResponsivePreview from './StoryResponsivePreview.vue'
 
 const props = defineProps<{

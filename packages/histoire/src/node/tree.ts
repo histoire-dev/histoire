@@ -1,32 +1,8 @@
 import pc from 'picocolors'
+import type { ServerStoryFile, ServerTree, ServerTreeFile } from '@histoire/shared'
 import type { HistoireConfig, TreeGroupConfig } from './config.js'
-import type { StoryFile } from './types.js'
 
-export interface TreeFile {
-  title: string
-  path: string
-}
-
-export interface TreeLeaf {
-  title: string
-  index: number
-}
-
-export interface TreeFolder {
-  title: string
-  children: (TreeFolder | TreeLeaf)[]
-}
-
-export interface TreeGroup {
-  group: true
-  id: string
-  title: string
-  children: (TreeFolder | TreeLeaf)[]
-}
-
-export type Tree = (TreeGroup | TreeFolder | TreeLeaf)[]
-
-export function createPath (config: HistoireConfig, file: TreeFile) {
+export function createPath (config: HistoireConfig, file: ServerTreeFile) {
   if (config.tree.file === 'title') {
     return file.title.split('/')
   }
@@ -41,7 +17,7 @@ export function createPath (config: HistoireConfig, file: TreeFile) {
   return config.tree.file(file)
 }
 
-export function makeTree (config: HistoireConfig, files: StoryFile[]) {
+export function makeTree (config: HistoireConfig, files: ServerStoryFile[]) {
   interface ITreeObject {
     [index: string]: number | ITreeObject
   }
@@ -71,7 +47,7 @@ export function makeTree (config: HistoireConfig, files: StoryFile[]) {
     sortingFunction = config.tree.order
   }
 
-  const result: Tree = []
+  const result: ServerTree = []
 
   for (const group of groups) {
     if (group === defaultGroup) {
@@ -88,7 +64,7 @@ export function makeTree (config: HistoireConfig, files: StoryFile[]) {
 
   return result
 
-  function getGroup (file: StoryFile): ITreeGroup {
+  function getGroup (file: ServerStoryFile): ITreeGroup {
     if (file.story?.group) {
       const group = groups.find(g => g.groupConfig?.id === file.story.group)
       if (group) {
@@ -142,8 +118,8 @@ export function makeTree (config: HistoireConfig, files: StoryFile[]) {
     }
   }
 
-  function buildTree (treeObject: ITreeObject): Tree {
-    const tree: Tree = []
+  function buildTree (treeObject: ITreeObject): ServerTree {
+    const tree: ServerTree = []
 
     for (const [key, element] of Object.entries(treeObject)) {
       if (Number.isInteger(element)) {

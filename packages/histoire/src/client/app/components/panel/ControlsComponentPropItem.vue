@@ -1,7 +1,14 @@
 <script lang="ts" setup>
 import { computed, ref } from 'vue'
 import { Icon } from '@iconify/vue'
-import type { Variant, PropDefinition, AutoPropComponentDefinition } from '../../types'
+import type { PropDefinition, AutoPropComponentDefinition } from '@histoire/shared'
+import {
+  HstText,
+  HstNumber,
+  HstCheckbox,
+  HstTextarea,
+} from '@histoire/controls'
+import type { Variant } from '../../types'
 
 const props = defineProps<{
   variant: Variant
@@ -12,18 +19,18 @@ const props = defineProps<{
 const comp = computed(() => {
   switch (props.definition.types?.[0]) {
     case 'string':
-      return 'HstText'
+      return HstText
     case 'number':
-      return 'HstNumber'
+      return HstNumber
     case 'boolean':
-      return 'HstCheckbox'
+      return HstCheckbox
     case 'object':
     default:
-      return 'HstTextarea'
+      return HstTextarea
   }
 })
 
-const isJSON = computed(() => comp.value === 'HstTextarea')
+const isJSON = computed(() => comp.value === HstTextarea)
 
 const invalidValue = ref('')
 

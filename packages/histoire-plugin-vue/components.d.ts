@@ -4,7 +4,7 @@ import type {
   StoryLayout,
   Story,
   Variant,
-} from './client/app/types'
+} from '@histoire/shared'
 import type {
   HstCheckbox,
   HstText,

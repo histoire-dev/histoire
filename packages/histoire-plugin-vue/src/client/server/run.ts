@@ -1,6 +1,6 @@
 import { createApp, h } from 'vue'
 import { registerVueComponents } from '@histoire/controls'
-import type { ServerRunPayload } from '../index.js'
+import type { ServerRunPayload } from '@histoire/shared'
 import Story from './Story.vue'
 import Variant from './Variant.vue'
 // @ts-expect-error virtual module id
