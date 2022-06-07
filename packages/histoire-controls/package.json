@@ -39,7 +39,8 @@
     "test:open": "peeky open --port 5010",
     "test": "peeky run",
     "story:dev": "histoire dev",
-    "story:build": "histoire build"
+    "story:build": "histoire build",
+    "story:preview": "histoire preview"
   },
   "dependencies": {
     "@iconify/vue": "^3.2.1",
