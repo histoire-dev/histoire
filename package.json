@@ -8,7 +8,7 @@
   },
   "scripts": {
     "lint": "eslint . --ext js,vue,ts",
-    "build": "pnpm run -r --filter @histoire/controls build && pnpm run -r --filter histoire build && pnpm run -r --filter !histoire --filter !@histoire/controls build",
+    "build": "pnpm run -r --filter @histoire/controls build && pnpm run -r --filter !@histoire/controls build",
     "watch": "pnpm run build && pnpm run -r --parallel --filter \"./packages/**\" watch",
     "test": "pnpm run -r --parallel --filter \"./packages/**\" test",
     "test:open": "pnpm run -r --parallel --filter \"./packages/**\" test:open",

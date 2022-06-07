@@ -41,6 +41,7 @@
   },
   "dependencies": {
     "@histoire/controls": "workspace:^",
+    "@histoire/plugin-vue": "workspace:^",
     "@histoire/shared": "workspace:^",
     "@iconify/vue": "^3.2.1",
     "@types/markdown-it": "^12.2.3",
@@ -75,9 +76,6 @@
   },
   "peerDependencies": {
     "vite": "^2.9.0"
-  },
-  "optionalDependencies": {
-    "@histoire/plugin-vue": "workspace:^"
   },
   "devDependencies": {
     "@peeky/test": "^0.13.5",

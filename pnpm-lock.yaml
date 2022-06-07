@@ -176,6 +176,7 @@ importers:
       vue-router: ^4.0.14
     dependencies:
       '@histoire/controls': link:../histoire-controls
+      '@histoire/plugin-vue': link:../histoire-plugin-vue
       '@histoire/shared': link:../histoire-shared
       '@iconify/vue': 3.2.1_vue@3.2.36
       '@types/markdown-it': 12.2.3
@@ -207,8 +208,6 @@ importers:
       vite-node: 0.12.1
       vue: 3.2.36
       vue-router: 4.0.15_vue@3.2.36
-    optionalDependencies:
-      '@histoire/plugin-vue': link:../histoire-plugin-vue
     devDependencies:
       '@peeky/test': 0.13.5
       '@tailwindcss/typography': 0.5.2_tailwindcss@3.0.24
