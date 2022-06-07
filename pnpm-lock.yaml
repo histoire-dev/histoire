@@ -128,7 +128,7 @@ importers:
 
   packages/histoire:
     specifiers:
-      '@histoire/controls': ^0.7.3
+      '@histoire/controls': workspace:^
       '@iconify/vue': ^3.2.1
       '@peeky/test': ^0.13.5
       '@tailwindcss/typography': ^0.5.2
