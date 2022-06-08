@@ -5,6 +5,10 @@ const isObject = (val) => val !== null && typeof val === 'object'
 export function toRawDeep (val, seen = new Set()) {
   const unwrappedValue = isRef(val) ? unref(val) : val
 
+  if (typeof unwrappedValue === 'symbol') {
+    return unwrappedValue.toString()
+  }
+
   if (seen.has(unwrappedValue)) {
     return Array.isArray(unwrappedValue) ? [] : {}
   }
