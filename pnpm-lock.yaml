@@ -126,6 +126,25 @@ importers:
       histoire: link:../../packages/histoire
       vite: 2.9.9
 
+  examples/vue3-vuetify:
+    specifiers:
+      '@mdi/font': ^5.9.55
+      '@vitejs/plugin-vue': ^2.3.1
+      histoire: workspace:*
+      vite: ^2.9.1
+      vite-plugin-vuetify: ^1.0.0-alpha.11
+      vue: ^3.2.31
+      vuetify: ^3.0.0-beta.3
+    dependencies:
+      '@mdi/font': 5.9.55
+      vue: 3.2.36
+      vuetify: 3.0.0-beta.3_vue@3.2.36
+    devDependencies:
+      '@vitejs/plugin-vue': 2.3.3_vite@2.9.9+vue@3.2.36
+      histoire: link:../../packages/histoire
+      vite: 2.9.9
+      vite-plugin-vuetify: 1.0.0-alpha.11_d7glh7dbqtzaahhq645obbmm5a
+
   packages/histoire:
     specifiers:
       '@histoire/controls': workspace:^
@@ -1133,6 +1152,10 @@ packages:
       - encoding
       - supports-color
     dev: true
+
+  /@mdi/font/5.9.55:
+    resolution: {integrity: sha512-jswRF6q3eq8NWpWiqct6q+6Fg/I7nUhrxYJfiEM8JJpap0wVJLQdbKtyS65GdlK7S7Ytnx3TTi/bmw+tBhkGmg==}
+    dev: false
 
   /@netlify/functions/1.0.0:
     resolution: {integrity: sha512-7fnJv3vr8uyyyOYPChwoec6MjzsCw1CoRUO2DhQ1BD6bOyJRlD4DUaOOGlMILB2LCT8P24p5LexEGx8AJb7xdA==}
@@ -2531,6 +2554,16 @@ packages:
         optional: true
     dependencies:
       vue: 3.2.36
+    dev: true
+
+  /@vuetify/loader-shared/1.4.0_vuetify@3.0.0-beta.3:
+    resolution: {integrity: sha512-aBlBuDC40tRRLFXXeOMB2mQiIOI4GTaezxv4RjLE4NzC3g2QIQH6yc51E7vWHHp621Ys4vaU3Yo+HdO5lbfJ9g==}
+    peerDependencies:
+      vuetify: ^3.0.0-alpha.11
+    dependencies:
+      find-cache-dir: 3.3.2
+      upath: 2.0.1
+      vuetify: 3.0.0-beta.3_vue@3.2.36
     dev: true
 
   /@vueuse/core/8.6.0:
@@ -5629,6 +5662,15 @@ packages:
       - supports-color
     dev: true
 
+  /find-cache-dir/3.3.2:
+    resolution: {integrity: sha512-wXZV5emFEjrridIgED11OoUKLxiYjAcqot/NJdAkOhlJ+vGzwhOAfcG5OX1jP+S0PcjEn8bdMJv+g2jwQ3Onig==}
+    engines: {node: '>=8'}
+    dependencies:
+      commondir: 1.0.1
+      make-dir: 3.1.0
+      pkg-dir: 4.2.0
+    dev: true
+
   /find-root/1.1.0:
     resolution: {integrity: sha512-NKfW6bec6GfKc0SGx1e07QZY9PE99u0Bft/0rzSD5k3sO/vwkVUpDUKVm5Gpp5Ue3YfShPFTX2070tDs5kB9Ng==}
     dev: true
@@ -8289,7 +8331,6 @@ packages:
     engines: {node: '>=8'}
     dependencies:
       find-up: 4.1.0
-    dev: false
 
   /pkg-types/0.3.2:
     resolution: {integrity: sha512-eBYzX/7NYsQEOR2alWY4rnQB49G62oHzFpoi9Som56aUr8vB8UGcmcIia9v8fpBeuhH3Ltentuk2OGpp4IQV3Q==}
@@ -10471,6 +10512,11 @@ packages:
     transitivePeerDependencies:
       - supports-color
 
+  /upath/2.0.1:
+    resolution: {integrity: sha512-1uEe95xksV1O0CYKXo8vQvN1JEbtJp7lb7C5U9HMsIp6IVwntkH/oNUzyVNQSd4S1sYk2FpSSW44FqMc8qee5w==}
+    engines: {node: '>=4'}
+    dev: true
+
   /uri-js/4.4.1:
     resolution: {integrity: sha512-7rKUyy33Q1yc98pQ1DAmLtwX109F7TIfWlW1Ydo8Wl1ii1SeHieeh0HHfPeL2fMXK6z0s8ecKs9frCuLJvndBg==}
     dependencies:
@@ -10609,6 +10655,21 @@ packages:
       vscode-languageserver: 7.0.0
       vscode-languageserver-textdocument: 1.0.5
       vscode-uri: 3.0.3
+    dev: true
+
+  /vite-plugin-vuetify/1.0.0-alpha.11_d7glh7dbqtzaahhq645obbmm5a:
+    resolution: {integrity: sha512-YqnirQhGfG1skj1Z41DVh0WqSjoJ/BtcfZvnGVkcBrfRe+pFg4lHV2mI3K5LdjCeBxzHqofxlz6J6ciyRvrqcA==}
+    engines: {node: '>=12'}
+    peerDependencies:
+      vite: ^2.7.0
+      vuetify: ^3.0.0-alpha.11
+    dependencies:
+      '@vuetify/loader-shared': 1.4.0_vuetify@3.0.0-beta.3
+      debug: 4.3.4
+      vite: 2.9.9
+      vuetify: 3.0.0-beta.3_vue@3.2.36
+    transitivePeerDependencies:
+      - supports-color
     dev: true
 
   /vite/2.9.9:
@@ -10851,6 +10912,23 @@ packages:
       '@vue/runtime-dom': 3.2.36
       '@vue/server-renderer': 3.2.36_vue@3.2.36
       '@vue/shared': 3.2.36
+
+  /vuetify/3.0.0-beta.3_vue@3.2.36:
+    resolution: {integrity: sha512-as6G+6S6q4kfioc0wioJ+/DOLhIDGsA/ufaSwE8GHnxnoOmx+Usi+CLAh6UaZr1VEG7HVVtFV+gBXsk8pmljQg==}
+    engines: {node: ^12.20 || >=14.13}
+    peerDependencies:
+      '@formatjs/intl': ^1.0.0 || ^2.0.0
+      vue: '*'
+      vue-i18n: ^9.0.0
+    peerDependenciesMeta:
+      '@formatjs/intl':
+        optional: true
+      vue:
+        optional: true
+      vue-i18n:
+        optional: true
+    dependencies:
+      vue: 3.2.36
 
   /wait-on/6.0.0_debug@4.3.2:
     resolution: {integrity: sha512-tnUJr9p5r+bEYXPUdRseolmz5XqJTTj98JgOsfBn7Oz2dxfE2g3zw1jE+Mo8lopM3j3et/Mq1yW7kKX6qw7RVw==}

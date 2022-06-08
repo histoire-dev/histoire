@@ -1,0 +1,21 @@
+{
+  "name": "histoire-example-vue3-vuetify",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "story:dev": "histoire dev",
+    "story:build": "histoire build",
+    "story:preview": "histoire preview"
+  },
+  "dependencies": {
+    "@mdi/font": "^5.9.55",
+    "vue": "^3.2.31",
+    "vuetify": "^3.0.0-beta.3"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^2.3.1",
+    "histoire": "workspace:*",
+    "vite": "^2.9.1",
+    "vite-plugin-vuetify": "^1.0.0-alpha.11"
+  }
+}
