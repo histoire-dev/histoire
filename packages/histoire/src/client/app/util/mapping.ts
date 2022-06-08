@@ -13,49 +13,62 @@ const copiedFromExistingVariant = [
 ]
 
 export function mapFile (file: StoryFile, existingFile?: StoryFile): StoryFile {
-  const result: StoryFile = {
-    ...file,
-    component: markRaw(file.component),
-    story: {
-      ...file.story,
-      title: file.story.title,
-      file: markRaw(file),
-      variants: file.story.variants.map(v => mapVariant(v)),
-      slots: () => ({}),
-    },
-  }
+  let result: StoryFile
 
   if (existingFile) {
-    for (const index in result.story.variants) {
-      const variant = result.story.variants[index]
-      const existingVariant = existingFile.story.variants[index]
-      if (existingVariant) {
-        for (const key of copiedFromExistingVariant) {
-          if (typeof existingVariant[key] !== 'undefined') {
-            if (key === 'state') {
-              variant.state = existingVariant.state
-              continue
-            }
-            variant[key] = existingVariant[key]
-          }
-        }
+    // Update
+    result = existingFile
+    for (const key in file) {
+      if (key === 'story') {
+        Object.assign(result.story, {
+          ...file.story,
+          file: markRaw(result),
+          variants: file.story.variants.map(v => mapVariant(v, existingFile.story.variants.find(item => item.id === v.id))),
+        })
+      } else if (key !== 'component') {
+        result[key] = file[key]
       }
     }
-    if (existingFile.story.lastSelectedVariant) {
-      result.story.lastSelectedVariant = result.story.variants.find(v => v.id === existingFile.story.lastSelectedVariant.id)
+  } else {
+    // Create
+    result = {
+      ...file,
+      component: markRaw(file.component),
+      story: {
+        ...file.story,
+        title: file.story.title,
+        file: markRaw(file),
+        variants: file.story.variants.map(v => mapVariant(v)),
+        slots: () => ({}),
+      },
     }
   }
 
   return result
 }
 
-export function mapVariant (variant: Variant): Variant {
-  return {
-    ...variant,
-    state: null,
-    initState: null,
-    setupApp: null,
-    slots: () => ({}),
-    previewReady: false,
+export function mapVariant (variant: Variant, existingVariant?: Variant): Variant {
+  let result: Variant
+
+  if (existingVariant) {
+    // Update
+    result = existingVariant
+    for (const key in variant) {
+      if (!copiedFromExistingVariant.includes(key)) {
+        result[key] = variant[key]
+      }
+    }
+  } else {
+    // Create
+    result = {
+      ...variant,
+      state: null,
+      initState: null,
+      setupApp: null,
+      slots: () => ({}),
+      previewReady: false,
+    }
   }
+
+  return result
 }
