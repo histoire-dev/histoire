@@ -129,6 +129,8 @@ importers:
   packages/histoire:
     specifiers:
       '@histoire/controls': workspace:^
+      '@histoire/plugin-vue': workspace:^
+      '@histoire/shared': workspace:^
       '@iconify/vue': ^3.2.1
       '@peeky/test': ^0.13.5
       '@tailwindcss/typography': ^0.5.2
@@ -174,6 +176,8 @@ importers:
       vue-router: ^4.0.14
     dependencies:
       '@histoire/controls': link:../histoire-controls
+      '@histoire/plugin-vue': link:../histoire-plugin-vue
+      '@histoire/shared': link:../histoire-shared
       '@iconify/vue': 3.2.1_vue@3.2.36
       '@types/markdown-it': 12.2.3
       '@vueuse/core': 8.6.0_vue@3.2.36
@@ -307,6 +311,31 @@ importers:
       pathe: 0.2.0
     devDependencies:
       histoire: link:../histoire
+      typescript: 4.7.2
+
+  packages/histoire-plugin-vue:
+    specifiers:
+      '@histoire/controls': workspace:^
+      '@histoire/shared': workspace:^
+      '@vitejs/plugin-vue': ^2.3.1
+      typescript: ^4.6.3
+      vite: ^2.9.1
+      vue: ^3.2.31
+      vue-tsc: ^0.35.2
+    dependencies:
+      '@histoire/controls': link:../histoire-controls
+      '@histoire/shared': link:../histoire-shared
+    devDependencies:
+      '@vitejs/plugin-vue': 2.3.3_vite@2.9.9+vue@3.2.36
+      typescript: 4.7.2
+      vite: 2.9.9
+      vue: 3.2.36
+      vue-tsc: 0.35.2_typescript@4.7.2
+
+  packages/histoire-shared:
+    specifiers:
+      typescript: ^4.6.3
+    devDependencies:
       typescript: 4.7.2
 
 packages:

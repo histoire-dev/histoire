@@ -3,9 +3,9 @@ import { PropType, ref, toRefs } from 'vue'
 import { Icon } from '@iconify/vue'
 import { useRouter } from 'vue-router'
 import { useResizeObserver } from '@vueuse/core'
+import { SandboxVue3 } from '@histoire/plugin-vue/client'
 import { useCurrentVariantRoute } from '../../util/variant'
 import type { Story, Variant } from '../../types'
-import SandboxVue3 from '../sandbox/SandboxVue3.vue'
 import { useScrollOnActive } from '../../util/scroll'
 
 const props = defineProps({

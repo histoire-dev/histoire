@@ -7,7 +7,7 @@ import pc from 'picocolors'
 import Tinypool from 'tinypool'
 import { createBirpc } from 'birpc'
 import { cpus } from 'os'
-import type { StoryFile } from '../types.js'
+import type { ServerStoryFile } from '@histoire/shared'
 import { createPath } from '../tree.js'
 import type { Context } from '../context.js'
 import type { Payload, ReturnData } from './worker.js'
@@ -24,6 +24,8 @@ export function useCollectStories (options: UseCollectStoriesOptions, ctx: Conte
     deps: {
       inline: [
         /histoire\/dist/,
+        /@histoire\/[\w\d-]+\/dist/,
+        /histoire-[\w\d-]+\/dist/,
         /@vue\/devtools-api/,
         ...ctx.config.viteNodeInlineDeps ?? [],
       ],
@@ -70,7 +72,7 @@ export function useCollectStories (options: UseCollectStoriesOptions, ctx: Conte
     }
   }
 
-  async function executeStoryFile (storyFile: StoryFile) {
+  async function executeStoryFile (storyFile: ServerStoryFile) {
     try {
       const { workerPort } = createChannel()
       const { storyData } = await threadPool.run({

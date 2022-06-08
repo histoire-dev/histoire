@@ -1,8 +1,9 @@
 <script lang="ts" setup>
 import { App, createApp, onMounted, onUnmounted, PropType, ref, watch } from 'vue'
-import { Story, Variant, PropDefinition, AutoPropComponentDefinition } from '../../types'
-import { getTagName } from '../../codegen/vue3'
-import { applyStateToVariant } from '../../util/state'
+import { applyStateToVariant } from '@histoire/shared'
+import type { Story, Variant, PropDefinition, AutoPropComponentDefinition } from '@histoire/shared'
+import { getTagName } from '../codegen'
+import { registerGlobalComponents } from './global-components.js'
 import { RouterLinkStub } from './RouterLinkStub'
 // @ts-expect-error virtual module id
 import * as setup from '$histoire-setup'
@@ -125,6 +126,8 @@ async function mountVariant () {
       return vnodes
     },
   })
+
+  registerGlobalComponents(app)
 
   // Stubs
   app.component('RouterLink', RouterLinkStub)

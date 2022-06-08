@@ -1,12 +1,12 @@
 import { resolveConfig as resolveViteConfig } from 'vite'
+import type { ServerStoryFile } from '@histoire/shared'
 import { resolveConfig, HistoireConfig, ConfigMode } from './config.js'
-import type { StoryFile } from './types.js'
 
 export interface Context {
   root: string
   config: HistoireConfig
   mode: ConfigMode
-  storyFiles: StoryFile[]
+  storyFiles: ServerStoryFile[]
 }
 
 export interface CreateContextOptions {

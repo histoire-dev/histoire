@@ -1,6 +1,6 @@
 <script lang="ts">
 import { defineComponent, inject } from 'vue'
-import type { Story, Variant } from '../../../node/types'
+import type { ServerStory, ServerVariant } from '@histoire/shared'
 
 export default defineComponent({
   name: 'HistoireVariant',
@@ -28,20 +28,20 @@ export default defineComponent({
   },
 
   setup (props) {
-    const story = inject<Story>('story')
+    const story = inject<ServerStory>('story')
 
     function generateId () {
       return `${story.id}-${story.variants.length}`
     }
 
-    const variant: Variant = {
+    const variant: ServerVariant = {
       id: props.id ?? generateId(),
       title: props.title,
       icon: props.icon,
       iconColor: props.iconColor,
     }
 
-    const addVariant = inject('addVariant') as (variant: Variant) => void
+    const addVariant = inject('addVariant') as (variant: ServerVariant) => void
     addVariant(variant)
   },
 

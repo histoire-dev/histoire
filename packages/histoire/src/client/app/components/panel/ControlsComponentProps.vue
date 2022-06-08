@@ -1,5 +1,6 @@
 <script lang="ts" setup>
-import type { AutoPropComponentDefinition, Variant } from '../../types'
+import type { AutoPropComponentDefinition } from '@histoire/shared'
+import type { Variant } from '../../types'
 import { Icon } from '@iconify/vue'
 import ControlsComponentPropItem from './ControlsComponentPropItem.vue'
 

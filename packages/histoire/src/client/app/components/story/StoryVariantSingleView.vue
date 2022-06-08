@@ -39,7 +39,7 @@ defineProps<{
 
     <!-- Preview -->
     <StoryVariantSinglePreviewNative
-      v-if="story.layout.iframe === false"
+      v-if="story.layout?.iframe === false"
       :story="story"
       :variant="variant"
     />

@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 import { PropType } from 'vue'
 import { Icon } from '@iconify/vue'
+import { SandboxVue3 } from '@histoire/plugin-vue/client'
 import type { Story, Variant } from '../../types'
-import SandboxVue3 from '../sandbox/SandboxVue3.vue'
 import BaseEmpty from '../base/BaseEmpty.vue'
 import StatePresets from './StatePresets.vue'
 import ControlsComponentProps from './ControlsComponentProps.vue'

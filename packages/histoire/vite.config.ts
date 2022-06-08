@@ -17,15 +17,19 @@ export default defineConfig({
         }
       },
       closeBundle () {
-        const files = fs.readdirSync('./dist/bundled')
-        for (const file of files) {
-          if (file.endsWith('.js')) {
-            const filePath = path.join('./dist/bundled', file)
-            const content = fs.readFileSync(filePath, 'utf-8')
-            if (content.includes('import__meta')) {
-              fs.writeFileSync(filePath, content.replace(/import__meta/g, 'import.meta'), 'utf-8')
+        try {
+          const files = fs.readdirSync('./dist/bundled')
+          for (const file of files) {
+            if (file.endsWith('.js')) {
+              const filePath = path.join('./dist/bundled', file)
+              const content = fs.readFileSync(filePath, 'utf-8')
+              if (content.includes('import__meta')) {
+                fs.writeFileSync(filePath, content.replace(/import__meta/g, 'import.meta'), 'utf-8')
+              }
             }
           }
+        } catch (e) {
+          console.error(e)
         }
       },
     },
@@ -41,6 +45,7 @@ export default defineConfig({
     rollupOptions: {
       external: [
         /\$histoire/,
+        /@histoire/,
         /@vue\/*/,
         // eslint-disable-next-line @typescript-eslint/no-var-requires
         ...Object.keys(require('./package.json').dependencies),

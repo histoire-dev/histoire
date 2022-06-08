@@ -2,8 +2,9 @@
 import { ref, computed, nextTick, onMounted } from 'vue'
 import { Icon } from '@iconify/vue'
 import { useStorage, onClickOutside, useTimeoutFn } from '@vueuse/core'
+import { applyStateToVariant, clone, omit } from '@histoire/shared'
 import BaseSelect from '../base/BaseSelect.vue'
-import { applyStateToVariant, clone, omit, toRawDeep } from '../../util/state'
+import { toRawDeep } from '../../util/state'
 import type { Story, Variant } from '../../types'
 
 const DEFAULT_ID = 'default'

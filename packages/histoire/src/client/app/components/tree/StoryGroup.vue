@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import type { Story, TreeGroup, TreeFolder, TreeLeaf } from '../../types'
+import type { Story, TreeGroup } from '../../types'
 import StoryListItem from './StoryListItem.vue'
 import StoryListFolder from './StoryListFolder.vue'
 import { Icon } from '@iconify/vue'

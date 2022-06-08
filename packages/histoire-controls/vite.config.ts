@@ -22,6 +22,7 @@ export default defineConfig({
 
     rollupOptions: {
       external: [
+        /@histoire/,
         'vue',
       ],
     },

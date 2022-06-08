@@ -2,12 +2,12 @@ import chokidar from 'chokidar'
 import path from 'pathe'
 import fs from 'fs-extra'
 import pc from 'picocolors'
+import type { ServerStory, ServerVariant } from '@histoire/shared'
 import { TEMP_PATH } from './alias.js'
 import type { ConfigMode, HistoireConfig } from './config.js'
 import type { Context } from './context.js'
 import type { ModuleLoader } from './load.js'
 import { addStory, removeStory } from './stories.js'
-import type { Story, Variant } from './types.js'
 
 export interface Plugin {
   /**
@@ -77,7 +77,7 @@ export class DevPluginApi extends BasePluginApi {
 }
 
 export type BuildEndCallback = () => Promise<void> | void
-export type PreviewStoryCallback = (payload: { file: string, story: Story, variant: Variant, url: string }) => Promise<void> | void
+export type PreviewStoryCallback = (payload: { file: string, story: ServerStory, variant: ServerVariant, url: string }) => Promise<void> | void
 
 export class BuildPluginApi extends BasePluginApi {
   buildEndCallbacks: BuildEndCallback[] = []

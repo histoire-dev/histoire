@@ -1,0 +1,49 @@
+{
+  "name": "@histoire/plugin-vue",
+  "version": "0.7.3",
+  "description": "Histoire plugin for Vue.js support",
+  "license": "MIT",
+  "author": {
+    "name": "Guillaume Chau"
+  },
+  "repository": {
+    "url": "https://github.com/Akryum/histoire.git",
+    "type": "git",
+    "directory": "packages/histoire-plugin-vue"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "type": "module",
+  "exports": {
+    "./client": {
+      "import": "./dist/bundled/client.js",
+      "types": "./dist/client/client.d.ts"
+    },
+    "./collect": {
+      "import": "./dist/bundled/server.js",
+      "types": "./dist/client/server.d.ts"
+    },
+    "./*": "./*"
+  },
+  "scripts": {
+    "build": "rimraf dist && vite build && pnpm run build:types",
+    "build:types": "vue-tsc --declaration --emitDeclarationOnly",
+    "watch": "concurrently \"vite build --watch\" \"pnpm run build:types --watch\""
+  },
+  "dependencies": {
+    "@histoire/controls": "workspace:^",
+    "@histoire/shared": "workspace:^"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^2.3.1",
+    "typescript": "^4.6.3",
+    "vite": "^2.9.1",
+    "vue": "^3.2.31",
+    "vue-tsc": "^0.35.2"
+  },
+  "peerDependencies": {
+    "histoire": "workspace:^",
+    "vue": "^3.2.31"
+  }
+}

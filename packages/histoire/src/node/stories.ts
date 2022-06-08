@@ -2,10 +2,10 @@ import chokidar from 'chokidar'
 import { globby } from 'globby'
 import Case from 'case'
 import { resolve, basename } from 'pathe'
+import type { ServerStoryFile } from '@histoire/shared'
 import { Context } from './context.js'
-import type { StoryFile } from './types.js'
 
-type StoryChangeHandler = (file?: StoryFile) => unknown
+type StoryChangeHandler = (file?: ServerStoryFile) => unknown
 const handlers: StoryChangeHandler[] = []
 
 let context: Context
@@ -34,7 +34,7 @@ export async function watchStories (newContext: Context) {
   return watcher
 }
 
-export function notifyStoryChange (file?: StoryFile) {
+export function notifyStoryChange (file?: ServerStoryFile) {
   for (const handler of handlers) {
     handler(file)
   }
@@ -52,7 +52,7 @@ export function addStory (relativeFilePath: string) {
     fileName = fileName.substring(0, fileName.indexOf('.'))
   }
 
-  const file: StoryFile = {
+  const file: ServerStoryFile = {
     id: fileId, // The file id will be changed by the story id after it is collected
     path: absoluteFilePath,
     fileName,

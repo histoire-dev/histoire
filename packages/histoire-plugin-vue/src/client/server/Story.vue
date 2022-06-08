@@ -1,6 +1,6 @@
 <script lang="ts">
 import { defineComponent, inject, onMounted, PropType, provide, useAttrs } from 'vue'
-import type { StoryFile, Story, Variant } from '../../../node/types'
+import type { ServerStoryFile, ServerStory, ServerVariant } from '@histoire/shared'
 
 const stub = { name: 'StubbedComponent', render: () => null }
 
@@ -26,7 +26,7 @@ export default defineComponent({
     },
 
     layout: {
-      type: Object as PropType<Story['layout']>,
+      type: Object as PropType<ServerStory['layout']>,
       default: () => ({ type: 'single', iframe: true }),
     },
 
@@ -48,12 +48,12 @@ export default defineComponent({
 
   setup (props) {
     const attrs = useAttrs() as {
-      data: StoryFile
+      data: ServerStoryFile
     }
 
     // Story
 
-    const story: Story = {
+    const story: ServerStory = {
       id: props.id ?? attrs.data.id,
       title: props.title ?? attrs.data.fileName,
       group: props.group,
@@ -70,7 +70,7 @@ export default defineComponent({
 
     provide('story', story)
 
-    provide('addVariant', (variant: Variant) => {
+    provide('addVariant', (variant: ServerVariant) => {
       story.variants.push(variant)
     })
 

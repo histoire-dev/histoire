@@ -1,8 +1,8 @@
 import { parseQuery } from 'vue-router'
 import { computed, createApp, h, onMounted, ref, watch } from 'vue'
 import { createPinia } from 'pinia'
-import { registerGlobalComponents } from './global-components'
-import SandboxVue3 from './components/sandbox/SandboxVue3.vue'
+import { applyStateToVariant } from '@histoire/shared'
+import { SandboxVue3, MountStoryVue3 } from '@histoire/plugin-vue/client'
 import type { StoryFile } from './types'
 import { mapFile } from './util/mapping'
 // @ts-expect-error virtual module
@@ -11,7 +11,7 @@ import { PREVIEW_SETTINGS_SYNC, STATE_SYNC, SANDBOX_READY } from './util/const.j
 import { applyPreviewSettings } from './util/preview-settings.js'
 import { isDark } from './util/dark.js'
 import { histoireConfig } from './util/config.js'
-import { applyStateToVariant, toRawDeep } from './util/state'
+import { toRawDeep } from './util/state.js'
 
 const query = parseQuery(window.location.search)
 const file = ref<StoryFile>(mapFile(files.find(f => f.id === query.storyId)))
@@ -62,7 +62,7 @@ const app = createApp({
   render () {
     return [
       h('div', { class: 'htw-sandbox-hidden' }, [
-        h(file.value.component, {
+        h(MountStoryVue3, {
           story: file.value.story,
         }),
       ]),
@@ -81,7 +81,6 @@ const app = createApp({
   },
 })
 app.use(createPinia())
-registerGlobalComponents(app)
 app.mount('#app')
 
 watch(isDark, value => {

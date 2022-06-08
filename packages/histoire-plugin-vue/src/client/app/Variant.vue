@@ -1,7 +1,7 @@
 <script lang="ts">
 import { defineComponent, getCurrentInstance, inject, PropType, useAttrs, watch } from 'vue'
-import { Variant } from '../../types'
-import { applyStateToVariant } from '../../util/state'
+import type { Variant } from '@histoire/shared'
+import { applyStateToVariant } from '@histoire/shared'
 
 // const logLocation = location.href.includes('__sandbox') ? '[Sandbox]' : '[Host]'
 
