@@ -41,6 +41,9 @@ export default async (payload: Payload): Promise<ReturnData> => {
   })
 
   const { destroy: destroyDomEnv } = createDomEnv()
+  if (!global.CSS.supports) {
+    global.CSS.supports = () => false
+  }
 
   const el = window.document.createElement('div')
 
