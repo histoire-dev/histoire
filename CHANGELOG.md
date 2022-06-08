@@ -1,3 +1,15 @@
+## [0.7.4](https://github.com/Akryum/histoire/compare/v0.7.3...v0.7.4) (2022-06-08)
+
+
+### Bug Fixes
+
+* **mapping:** reuse existing objects, fix [#128](https://github.com/Akryum/histoire/issues/128) ([81ebe39](https://github.com/Akryum/histoire/commit/81ebe396940497481d995357279d47062b9d9b7d))
+* mock CSS.supports when collecting, fix [#122](https://github.com/Akryum/histoire/issues/122) ([8a7d16f](https://github.com/Akryum/histoire/commit/8a7d16faaf48fa089e15f2dcc0fb5f507919eddf))
+* Symbol can't be cloned ([eba5122](https://github.com/Akryum/histoire/commit/eba512211b064e2213ed890a95908fd7afe8c01e))
+* **vue3:** collect: inline vuetify packages ([8958ac5](https://github.com/Akryum/histoire/commit/8958ac58b72105fbf576e333feb044e137da64d7))
+
+
+
 ## [0.7.3](https://github.com/Akryum/histoire/compare/v0.7.2...v0.7.3) (2022-06-06)
 
 
