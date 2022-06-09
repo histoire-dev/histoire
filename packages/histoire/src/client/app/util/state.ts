@@ -9,15 +9,15 @@ export function toRawDeep (val, seen = new Set()) {
     return unwrappedValue.toString()
   }
 
+  if (!isObject(unwrappedValue)) {
+    return unwrappedValue
+  }
+
   if (seen.has(unwrappedValue)) {
     return Array.isArray(unwrappedValue) ? [] : {}
   }
 
   seen.add(unwrappedValue)
-
-  if (!isObject(unwrappedValue)) {
-    return unwrappedValue
-  }
 
   if (Array.isArray(unwrappedValue)) {
     return unwrappedValue.map(value => toRawDeep(value, seen))
