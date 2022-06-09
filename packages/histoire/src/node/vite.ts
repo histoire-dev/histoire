@@ -70,6 +70,11 @@ export async function getViteConfigWithPlugins (server: boolean, ctx: Context): 
 
     config () {
       return {
+        resolve: {
+          dedupe: [
+            'vue',
+          ],
+        },
         optimizeDeps: {
           disabled: server,
           entries: [
