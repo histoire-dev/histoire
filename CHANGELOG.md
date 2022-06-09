@@ -1,3 +1,13 @@
+## [0.7.6](https://github.com/Akryum/histoire/compare/v0.7.5...v0.7.6) (2022-06-09)
+
+
+### Bug Fixes
+
+* force dedupe vue, fix [#132](https://github.com/Akryum/histoire/issues/132) ([937f07f](https://github.com/Akryum/histoire/commit/937f07fe9610e179890b0451bc14d4269d588beb))
+* toRawDeep checking seen on primitives, fix [#131](https://github.com/Akryum/histoire/issues/131) ([c02ea99](https://github.com/Akryum/histoire/commit/c02ea99a421d45498444f6f42d73c81072cfda1b))
+
+
+
 ## [0.7.5](https://github.com/Akryum/histoire/compare/v0.7.4...v0.7.5) (2022-06-09)
 
 
