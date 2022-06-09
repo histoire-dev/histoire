@@ -87,6 +87,7 @@ export async function getViteConfigWithPlugins (server: boolean, ctx: Context): 
           ],
           exclude: [
             'histoire',
+            '@histoire',
           ],
         },
         server: {
