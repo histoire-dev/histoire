@@ -21,11 +21,13 @@ This mono-repo contains the following packages:
 
 | Package | Description |
 | ------- | ----------- |
-| [histoire](https://github.com/Akryum/histoire/tree/main/packages/histoire) | Main package |
-| [@histoire/controls](https://github.com/Akryum/histoire/tree/main/packages/histoire-controls) | Builtin controls components |
-| [@histoire/plugin-nuxt](https://github.com/Akryum/histoire/tree/main/packages/histoire-plugin-nuxt) | Nuxt 3 integration |
-| [@histoire/plugin-percy](https://github.com/Akryum/histoire/tree/main/packages/histoire-plugin-percy) | Visual regression testing with Percy |
-| [@histoire/plugin-screenshot](https://github.com/Akryum/histoire/tree/main/packages/histoire-plugin-screenshot) | Visual regression testing with simple screenshots |
+| [histoire](./packages/histoire) | Main package |
+| [@histoire/controls](./packages/histoire-controls) | Builtin controls components |
+| [@histoire/plugin-vue](./packages/histoire-plugin-vue) | Vue 3 integration |
+| [@histoire/plugin-nuxt](./packages/histoire-plugin-nuxt) | Nuxt 3 integration |
+| [@histoire/plugin-percy](./packages/histoire-plugin-percy) | Visual regression testing with Percy |
+| [@histoire/plugin-screenshot](./packages/histoire-plugin-screenshot) | Visual regression testing with simple screenshots |
+| [@histoire/plugin-vue](./packages/histoire-shared) | Shared utilities |
 
 ## Local dev setup
 
