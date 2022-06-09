@@ -27,7 +27,7 @@ This mono-repo contains the following packages:
 | [@histoire/plugin-nuxt](./packages/histoire-plugin-nuxt) | Nuxt 3 integration |
 | [@histoire/plugin-percy](./packages/histoire-plugin-percy) | Visual regression testing with Percy |
 | [@histoire/plugin-screenshot](./packages/histoire-plugin-screenshot) | Visual regression testing with simple screenshots |
-| [@histoire/plugin-vue](./packages/histoire-shared) | Shared utilities |
+| [@histoire/shared](./packages/histoire-shared) | Shared utilities |
 
 ## Local dev setup
 
