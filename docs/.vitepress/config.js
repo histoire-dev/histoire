@@ -33,7 +33,7 @@ module.exports = {
 
     nav: [
       { text: 'Guide', link: '/guide/' },
-      { text: 'Examples', link: '/examples/vue3/single-stories' },
+      { text: 'Examples', link: '/examples/' },
       { text: 'API Reference', link: '/reference/config' },
       {
         text: 'Changelog',
