@@ -1,3 +1,12 @@
+## [0.7.5](https://github.com/Akryum/histoire/compare/v0.7.4...v0.7.5) (2022-06-09)
+
+
+### Bug Fixes
+
+* vite deps optimization error, fix [#133](https://github.com/Akryum/histoire/issues/133) ([e9b1ee5](https://github.com/Akryum/histoire/commit/e9b1ee5438a8bc10a2e3a3218cbaf60c20788e5c))
+
+
+
 ## [0.7.4](https://github.com/Akryum/histoire/compare/v0.7.3...v0.7.4) (2022-06-08)
 
 
