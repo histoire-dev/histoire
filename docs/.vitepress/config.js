@@ -173,5 +173,11 @@ module.exports = {
         },
       ],
     },
+
+    algolia: {
+      appId: 'JB9PU89D4X',
+      apiKey: '1c9759220b24c8ccbc064a6df95e2108',
+      indexName: 'histoire',
+    },
   },
 }
