@@ -155,7 +155,7 @@ export async function build (ctx: Context) {
         const query = new URLSearchParams()
         query.append('storyId', story.id)
         query.append('variantId', variant.id)
-        const url = `${baseUrl}__sandbox?${query.toString()}`
+        const url = `${baseUrl}__sandbox.html?${query.toString()}`
         for (const fn of previewStoryCallbacks) {
           await fn({
             file: storyFile.path,
