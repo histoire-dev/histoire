@@ -146,6 +146,12 @@ export interface HistoireConfig {
    */
   markdown?: (md: MarkdownIt) => MarkdownIt | Promise<MarkdownIt>
   /**
+   * Change the router mode.
+   * - history: use HTML history with cleaner URLs
+   * - hash: use hashtag hack in the URL to support more hosting services
+   */
+  routerMode?: 'history' | 'hash'
+  /**
    * Vite config override
    */
   vite?: ViteConfig | ((config: ViteConfig, env: ViteConfigEnv) => void | ViteConfig | Promise<void | ViteConfig>)
@@ -264,6 +270,7 @@ export function getDefaultConfig (): HistoireConfig {
       },
     ],
     sandboxDarkClass: 'dark',
+    routerMode: 'history',
   }
 }
 

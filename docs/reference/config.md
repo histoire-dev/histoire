@@ -272,6 +272,20 @@ export default defineConfig({
 })
 ```
 
+## `routerMode`
+
+`'history' | 'hash'` - Default: `'history'`
+
+Changes the router mode:
+- `'history'`: HTML 5 history mode with cleaner URLs.
+- `'hash'`: Use the hashtag hack in the URL to support more servers and static hosting services.
+
+```ts
+export default defineConfig({
+  routerMode: 'hash',
+})
+```
+
 ## `vite`
 
 `ViteConfig | ((config: ViteConfig, env: ViteConfigEnv) => void | ViteConfig | Promise<void | ViteConfig>)`
