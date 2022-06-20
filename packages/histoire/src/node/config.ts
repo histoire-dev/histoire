@@ -271,6 +271,11 @@ export function getDefaultConfig (): HistoireConfig {
     ],
     sandboxDarkClass: 'dark',
     routerMode: 'history',
+    vite: {
+      build: {
+        lib: false,
+      },
+    },
   }
 }
 
