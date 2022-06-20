@@ -1,3 +1,18 @@
+## [0.7.7](https://github.com/Akryum/histoire/compare/v0.7.6...v0.7.7) (2022-06-20)
+
+
+### Bug Fixes
+
+* disable vite lib mode by default, fix [#137](https://github.com/Akryum/histoire/issues/137) ([2fb86a2](https://github.com/Akryum/histoire/commit/2fb86a248902246eb7d1a1255d3281439c4ad105))
+* use __sandbox.html instead of __sandbox, fix [#141](https://github.com/Akryum/histoire/issues/141) ([#142](https://github.com/Akryum/histoire/issues/142)) ([3e4466e](https://github.com/Akryum/histoire/commit/3e4466e28a3991ce64071071dcf93528d123fc3b))
+
+
+### Features
+
+* routerMode, fix [#143](https://github.com/Akryum/histoire/issues/143) ([1e337e3](https://github.com/Akryum/histoire/commit/1e337e36bbb7c92f5ad5a08867cb1951cd2218d0))
+
+
+
 ## [0.7.6](https://github.com/Akryum/histoire/compare/v0.7.5...v0.7.6) (2022-06-09)
 
 
