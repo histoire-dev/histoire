@@ -38,7 +38,7 @@ export async function devCommand (options: DevOptions) {
   async function restart (source: string) {
     if (stop) {
       console.log(pc.blue(`${source} config changed, restarting...`))
-      stop()
+      await stop()
       stop = null // Don't call stop again until new start() is done
       stop = await start()
     }

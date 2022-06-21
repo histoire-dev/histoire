@@ -6,6 +6,7 @@ import { onStoryChange, watchStories } from './stories.js'
 import { useCollectStories } from './collect/index.js'
 import { DevPluginApi } from './plugin.js'
 import { useModuleLoader } from './load.js'
+import { wrapLogError } from './util/log.js'
 
 export async function createServer (ctx: Context, port: number) {
   const server = await createViteServer(await getViteConfigWithPlugins(false, ctx))
@@ -143,11 +144,11 @@ export async function createServer (ctx: Context, port: number) {
 
   async function close () {
     for (const cb of pluginOnCleanups) {
-      await cb()
+      await wrapLogError('plugin.onDev.onCleanup', () => cb())
     }
-    await server.close()
-    await nodeServer.close()
-    await destroyCollectStories()
+    await wrapLogError('server.close', () => server.close())
+    await wrapLogError('nodeServer', () => nodeServer.close())
+    await wrapLogError('destroyCollectStories', () => destroyCollectStories())
   }
 
   return {

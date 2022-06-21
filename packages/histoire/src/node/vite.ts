@@ -100,7 +100,7 @@ export async function getViteConfigWithPlugins (server: boolean, ctx: Context): 
             allow: [DIST_PATH, TEMP_PATH, resolvedViteConfig.root, process.cwd()],
           },
           watch: {
-            ignored: [`!**/node_modules/.histoire/**`],
+            ignored: [`!**/node_modules/.histoire/**`, '**/vite.config.*'],
           },
         },
         define: {
