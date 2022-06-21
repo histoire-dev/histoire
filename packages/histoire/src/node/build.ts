@@ -2,8 +2,10 @@ import { join } from 'pathe'
 import {
   build as viteBuild,
   createServer as createViteServer,
+  InlineConfig as ViteInlineConfig,
   ResolvedConfig as ViteConfig,
   mergeConfig as mergeViteConfig,
+  Plugin as VitePlugin,
 } from 'vite'
 import fs from 'fs-extra'
 import { lookup as lookupMime } from 'mrmime'
@@ -65,7 +67,7 @@ export async function build (ctx: Context) {
   const variantCount = ctx.storyFiles.reduce((sum, file) => sum + (file.story?.variants.length ?? 0), 0)
   const emptyStoryCount = ctx.storyFiles.length - storyCount
 
-  const buildViteConfig = mergeViteConfig(await getViteConfigWithPlugins(false, ctx), {
+  const buildViteConfig: ViteInlineConfig = mergeViteConfig(await getViteConfigWithPlugins(false, ctx), {
     mode: 'development',
     build: {
       rollupOptions: {
@@ -95,10 +97,10 @@ export async function build (ctx: Context) {
   buildViteConfig.plugins.push({
     name: 'histoire-vue-plugin-override',
     config (config) {
-      const vuePlugin = config.plugins.find((p: any) => p.name === 'vite:vue')
+      const vuePlugin = config.plugins.find((p: any) => p.name === 'vite:vue') as VitePlugin
       if (vuePlugin) {
         const original = vuePlugin.configureServer.bind(vuePlugin)
-        vuePlugin.configureServer = () => {
+        vuePlugin.configureServer = (s) => {
           original({
             ...server,
             config: {
@@ -110,8 +112,16 @@ export async function build (ctx: Context) {
             },
           })
         }
-        vuePlugin.configureServer()
+        vuePlugin.configureServer(server)
       }
+    },
+  })
+
+  buildViteConfig.plugins.push({
+    name: 'histoire-build-config-override',
+    config (config) {
+      // Don't externalize
+      config.build.rollupOptions.external = []
     },
   })
 
