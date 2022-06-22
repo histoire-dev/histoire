@@ -85,7 +85,7 @@ You can specify additional CLI options like `--port`. For a full list of CLI opt
 To enable the global components types in your project, create an `env.d.ts` file at the root of your project if it doesn't already exist.
 
 ```ts
-/// <reference types="histoire" />
+/// <reference types="histoire/vue" />
 ```
 
 And add it in the `include` field of your `tsconfig.json`.
