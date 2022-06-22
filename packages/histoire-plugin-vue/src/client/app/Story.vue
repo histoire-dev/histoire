@@ -33,7 +33,7 @@ export default defineComponent({
       $data: storyComponent.data,
     }
     function addImplicitState (key, value) {
-      if (typeof value === 'function' || (value && value.__file)) {
+      if (typeof value === 'function' || (value?.__file) || typeof value?.render === 'function' || typeof value?.setup === 'function') {
         return
       }
       implicitState[key] = value
