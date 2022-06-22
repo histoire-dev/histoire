@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { App, createApp, onMounted, onUnmounted, PropType, ref, watch } from 'vue'
+import { App, createApp, onBeforeUnmount, onMounted, PropType, ref, watch } from 'vue'
 import { applyStateToVariant } from '@histoire/shared'
 import type { Story, Variant, PropDefinition, AutoPropComponentDefinition } from '@histoire/shared'
 import { getTagName } from '../codegen'
@@ -35,9 +35,18 @@ const sandbox = ref<HTMLDivElement>()
 let app: App
 let mounting = false
 
+function unmountVariant () {
+  if (app) {
+    app.unmount()
+    app = null
+  }
+}
+
 async function mountVariant () {
   if (mounting) return
   mounting = true
+
+  unmountVariant()
 
   await props.variant.initState()
 
@@ -184,14 +193,14 @@ onMounted(async () => {
   }
 })
 
-watch(() => props.variant.initState, value => {
+watch(() => props.variant.initState, async value => {
   if (value && !mounting) {
-    mountVariant()
+    await mountVariant()
   }
 })
 
-onUnmounted(() => {
-  app?.unmount()
+onBeforeUnmount(() => {
+  unmountVariant()
 })
 </script>
 
