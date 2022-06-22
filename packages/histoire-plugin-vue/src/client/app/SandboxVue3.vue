@@ -54,60 +54,7 @@ async function mountVariant () {
 
       // Auto detect props
       if (props.slotName === 'default') {
-        const propsTypes: AutoPropComponentDefinition[] = vnodes.filter(vnode => typeof vnode.type === 'object').map((vnode, index) => {
-          const propDefs: PropDefinition[] = []
-          for (const key in vnode.type.props) {
-            const prop = vnode.type.props[key]
-            let types
-            let defaultValue
-            if (prop) {
-              const rawTypes = Array.isArray(prop.type) ? prop.type : [prop.type]
-              types = rawTypes.map(t => {
-                switch (t) {
-                  case String:
-                    return 'string'
-                  case Number:
-                    return 'number'
-                  case Boolean:
-                    return 'boolean'
-                  case Object:
-                    return 'object'
-                  case Array:
-                    return 'array'
-                  default:
-                    return 'unknown'
-                }
-              })
-              defaultValue = typeof prop.default === 'function' ? prop.default.toString() : prop.default
-            }
-            propDefs.push({
-              name: key,
-              types,
-              required: prop?.required,
-              default: defaultValue,
-            })
-
-            // Props overrides
-            if (props.variant.state?._hPropState?.[index]?.[key]) {
-              if (!vnode.props) {
-                vnode.props = {}
-              }
-              vnode.props[key] = props.variant.state._hPropState[index][key]
-              if (!vnode.dynamicProps) {
-                vnode.dynamicProps = []
-              }
-              if (!vnode.dynamicProps.includes(key)) {
-                vnode.dynamicProps.push(key)
-              }
-            }
-          }
-
-          return {
-            name: getTagName(vnode),
-            index,
-            props: propDefs,
-          } as AutoPropComponentDefinition
-        }).filter(def => def.props.length)
+        const propsTypes: AutoPropComponentDefinition[] = scanForAutoProps(vnodes)
 
         const snapshot = JSON.stringify(propsTypes)
         if (!lastPropsTypesSnapshot || lastPropsTypesSnapshot !== snapshot) {
@@ -161,6 +108,73 @@ async function mountVariant () {
   app.mount(target)
 
   emit('ready')
+}
+
+function scanForAutoProps (vnodes: any[]) {
+  const result: AutoPropComponentDefinition[] = []
+  let index = 0
+  for (const vnode of vnodes) {
+    if (typeof vnode.type === 'object') {
+      const propDefs: PropDefinition[] = []
+      for (const key in vnode.type.props) {
+        const prop = vnode.type.props[key]
+        let types
+        let defaultValue
+        if (prop) {
+          const rawTypes = Array.isArray(prop.type) ? prop.type : [prop.type]
+          types = rawTypes.map(t => {
+            switch (t) {
+              case String:
+                return 'string'
+              case Number:
+                return 'number'
+              case Boolean:
+                return 'boolean'
+              case Object:
+                return 'object'
+              case Array:
+                return 'array'
+              default:
+                return 'unknown'
+            }
+          })
+          defaultValue = typeof prop.default === 'function' ? prop.default.toString() : prop.default
+        }
+        propDefs.push({
+          name: key,
+          types,
+          required: prop?.required,
+          default: defaultValue,
+        })
+
+        // Props overrides
+        if (props.variant.state?._hPropState?.[index]?.[key]) {
+          if (!vnode.props) {
+            vnode.props = {}
+          }
+          vnode.props[key] = props.variant.state._hPropState[index][key]
+          if (!vnode.dynamicProps) {
+            vnode.dynamicProps = []
+          }
+          if (!vnode.dynamicProps.includes(key)) {
+            vnode.dynamicProps.push(key)
+          }
+        }
+      }
+
+      result.push({
+        name: getTagName(vnode),
+        index,
+        props: propDefs,
+      } as AutoPropComponentDefinition)
+      index++
+    }
+
+    if (Array.isArray(vnode.children)) {
+      result.push(...scanForAutoProps(vnode.children))
+    }
+  }
+  return result.filter(def => def.props.length)
 }
 
 onMounted(async () => {
