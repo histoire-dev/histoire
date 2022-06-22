@@ -1,3 +1,24 @@
+## [0.7.8](https://github.com/Akryum/histoire/compare/v0.7.7...v0.7.8) (2022-06-22)
+
+
+### Bug Fixes
+
+* **build:** force no externalize, fix [#137](https://github.com/Akryum/histoire/issues/137) ([a760adf](https://github.com/Akryum/histoire/commit/a760adf3a1997852bbb35b88e1aae4609401fb2e))
+* **collect:** autostub components in child vnodes, fix [#138](https://github.com/Akryum/histoire/issues/138) ([5f6d29b](https://github.com/Akryum/histoire/commit/5f6d29bf02967030d303b4d7cefada67050d02e5))
+* prevent vite from restarting two times when changing vite config ([f00143c](https://github.com/Akryum/histoire/commit/f00143cc28b091307a17aba763dfd73de3503521))
+* **ts:** global component types, fix [#146](https://github.com/Akryum/histoire/issues/146) ([fbec6bf](https://github.com/Akryum/histoire/commit/fbec6bff57d2a20fbae8b32a72e7a1db456a8a59))
+* **vue3:** components not skipped for implicit state, causing clone error ([86e580f](https://github.com/Akryum/histoire/commit/86e580f31343ce02808eb8e6a6f3fa5f2707dc36))
+* **vue3:** double sandbox mounting, fix [#144](https://github.com/Akryum/histoire/issues/144) ([a788feb](https://github.com/Akryum/histoire/commit/a788feb90fda395fcc062ff6fd5eaed1142a3068))
+* **vue3:** improve sandbox mounting logic ([f851658](https://github.com/Akryum/histoire/commit/f85165889cbf728e73dd5302a1e305a58205acff))
+* **vue3:** state sync breaking after loading story 2nd time, fix [#128](https://github.com/Akryum/histoire/issues/128) ([58ecf07](https://github.com/Akryum/histoire/commit/58ecf0713628b818af2643f8c9f19c95aec75ee3))
+
+
+### Features
+
+* **vue3:** scan for auto props in child vnodes, fix [#145](https://github.com/Akryum/histoire/issues/145) ([c39f6a3](https://github.com/Akryum/histoire/commit/c39f6a3fb66de1e79e380f8829a96b8fcdfb7d5b))
+
+
+
 ## [0.7.7](https://github.com/Akryum/histoire/compare/v0.7.6...v0.7.7) (2022-06-20)
 
 
