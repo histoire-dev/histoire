@@ -4,6 +4,17 @@ import type { ServerStoryFile, ServerStory, ServerVariant } from '@histoire/shar
 
 const stub = { name: 'StubbedComponent', render: () => null }
 
+function autoStubComponents (vnodes: any[]) {
+  for (const vnode of vnodes) {
+    if (typeof vnode.type === 'object' && (vnode.type as any).name !== 'HistoireVariant') {
+      vnode.type = stub
+    }
+    if (Array.isArray(vnode.children)) {
+      autoStubComponents(vnode.children)
+    }
+  }
+}
+
 export default defineComponent({
   name: 'HistoireStory',
 
@@ -101,11 +112,7 @@ export default defineComponent({
 
       // Auto stub components
       if (Array.isArray(vnodes)) {
-        for (const vnode of vnodes) {
-          if (typeof vnode.type === 'object' && (vnode.type as any).name !== 'HistoireVariant') {
-            vnode.type = stub
-          }
-        }
+        autoStubComponents(vnodes)
       }
 
       return vnodes
