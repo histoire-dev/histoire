@@ -36,6 +36,7 @@ let app: App
 let mounting = false
 
 async function mountVariant () {
+  if (mounting) return
   mounting = true
 
   await props.variant.initState()
