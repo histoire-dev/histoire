@@ -42,7 +42,7 @@ export default defineComponent({
     const implicitState = inject<() => any>('implicitState')
 
     watch(() => implicitState, value => {
-      applyStateToVariant(attrs.variant, value())
+      applyStateToVariant(attrs.variant, value(), true)
     }, {
       immediate: true,
     })

@@ -24,10 +24,10 @@ export function omit (data, keys: string[]) {
   return copy
 }
 
-export function applyStateToVariant (variant: Variant, state: any) {
+export function applyStateToVariant (variant: Variant, state: any, override = false) {
   if (variant.state) {
     for (const key in state) {
-      if (variant.state[key] && !key.startsWith('_h') && typeof variant.state[key] === 'object' && !Array.isArray(variant.state[key])) {
+      if (!override && variant.state[key] && !key.startsWith('_h') && typeof variant.state[key] === 'object' && !Array.isArray(variant.state[key])) {
         Object.assign(variant.state[key], state[key])
       } else {
         variant.state[key] = state[key]
