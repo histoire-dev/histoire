@@ -59,7 +59,7 @@ function initState () {
         Click me!
       </BaseButton>
     </Variant>
-    <Variant
+    <!-- <Variant
       title="button inside div"
       icon-color="#F43F5E"
     >
@@ -68,6 +68,6 @@ function initState () {
           Click me!
         </BaseButton>
       </div>
-    </Variant>
+    </Variant> -->
   </Story>
 </template>
