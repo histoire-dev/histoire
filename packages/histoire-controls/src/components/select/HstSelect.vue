@@ -11,7 +11,7 @@ import { ref } from 'vue'
 import HstWrapper from '../HstWrapper.vue'
 import CustomSelect, { SelectOption } from './CustomSelect.vue'
 
-const props = defineProps<{
+defineProps<{
   title?: string
   modelValue: string
   options: Record<string, string> | string[] | SelectOption[]
