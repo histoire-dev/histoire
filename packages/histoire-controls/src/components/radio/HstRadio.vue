@@ -67,7 +67,7 @@ const animationEnabled = ref(false)
       <label
         tabindex="0"
         :for="`${value}-radio`"
-        class="htw-cursor-pointer htw-flex htw-items-center htw-relative htw-p-2"
+        class="htw-cursor-pointer htw-flex htw-items-center htw-relative htw-py-2"
         @keydown.enter.prevent="selectOption(value)"
         @keydown.space.prevent="selectOption(value)"
       >
@@ -75,7 +75,12 @@ const animationEnabled = ref(false)
           width="16"
           height="16"
           viewBox="0 0 24 24"
-          class="htw-relative htw-z-10 htw-border htw-border-solid group-active:htw-bg-gray-500/20 htw-text-inherit htw-rounded-full htw-box-border htw-inset-0 htw-transition-border htw-duration-150 htw-ease-out htw-mr-2"
+          class="htw-relative htw-z-10 htw-border htw-border-solid  htw-text-inherit htw-rounded-full htw-box-border htw-inset-0 htw-transition-border htw-duration-150 htw-ease-out htw-mr-2"
+          :class="[
+            modelValue === value
+              ? 'htw-border-primary-500 htw-border-2'
+              : 'htw-border-black/25 dark:htw-border-white/25 htw-delay-150',
+          ]"
         >
           <circle
             cx="12"
