@@ -2,8 +2,6 @@
 export default {
   name: 'HstSelect',
 }
-
-export type { SelectOption as HstSelectOption } from './CustomSelect.vue'
 </script>
 
 <script lang="ts" setup>
