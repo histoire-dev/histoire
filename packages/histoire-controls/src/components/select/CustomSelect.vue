@@ -8,15 +8,11 @@ export default {
 import { Dropdown as VDropdown } from 'floating-vue'
 import { computed, ComputedRef } from 'vue'
 import { Icon } from '@iconify/vue'
-
-export interface SelectOption {
-  label: string
-  value: string
-}
+import { HstControlOption } from '../../types'
 
 const props = defineProps<{
   modelValue: string
-  options: Record<string, string> | string[] | SelectOption[]
+  options: Record<string, string> | string[] | HstControlOption[]
 }>()
 
 const emits = defineEmits<{
@@ -25,7 +21,7 @@ const emits = defineEmits<{
 
 const formattedOptions: ComputedRef<Record<string, string>> = computed(() => {
   if (Array.isArray(props.options)) {
-    return Object.fromEntries(props.options.map((value: string | SelectOption) => {
+    return Object.fromEntries(props.options.map((value: string | HstControlOption) => {
       if (typeof value === 'string') {
         return [value, value]
       } else {

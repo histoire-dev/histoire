@@ -7,21 +7,17 @@ export default {
 <script lang="ts" setup>
 import { computed, ComputedRef, ref } from 'vue'
 import HstWrapper from '../HstWrapper.vue'
-
-export interface RadioOption {
-  label: string
-  value: string
-}
+import { HstControlOption } from '../../types'
 
 const props = defineProps<{
   title?: string
   modelValue: string
-  options: RadioOption[]
+  options: HstControlOption[]
 }>()
 
 const formattedOptions: ComputedRef<Record<string, string>> = computed(() => {
   if (Array.isArray(props.options)) {
-    return Object.fromEntries(props.options.map((value: string | RadioOption) => {
+    return Object.fromEntries(props.options.map((value: string | HstControlOption) => {
       if (typeof value === 'string') {
         return [value, value]
       } else {
