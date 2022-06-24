@@ -14,7 +14,7 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits({
-  'update:modelValue': (newValue: boolean) => true,
+  'update:modelValue': (_newValue: boolean) => true,
 })
 
 function toggle () {
@@ -28,9 +28,11 @@ const path = ref<SVGPathElement>()
 const dasharray = ref(0)
 const progress = computed(() => props.modelValue ? 1 : 0)
 const dashoffset = computed(() => (1 - progress.value) * dasharray.value)
+
+// animationEnabled prevents the animation from triggering on mounted
 const animationEnabled = ref(false)
 
-watch(path, value => {
+watch(path, () => {
   dasharray.value = path.value.getTotalLength?.() ?? 21.21
 })
 </script>

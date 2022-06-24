@@ -39,7 +39,7 @@ function selectOption (value: string) {
   animationEnabled.value = true
 }
 
-// SVG check
+// animationEnabled prevents the animation from triggering on mounted
 const animationEnabled = ref(false)
 </script>
 
