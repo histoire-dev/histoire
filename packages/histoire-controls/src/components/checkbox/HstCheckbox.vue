@@ -14,7 +14,7 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits({
-  'update:modelValue': (_newValue: boolean) => true,
+  'update:modelValue': (newValue: boolean) => true,
 })
 
 function toggle () {
