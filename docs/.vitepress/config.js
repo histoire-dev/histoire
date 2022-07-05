@@ -96,7 +96,7 @@ module.exports = {
           items: [
             {
               text: 'Why Histoire',
-              link: '/guide/index',
+              link: '/guide/',
             },
             {
               text: 'Getting Started',
