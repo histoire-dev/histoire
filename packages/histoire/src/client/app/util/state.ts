@@ -4,8 +4,9 @@ const isObject = (val) => val !== null && typeof val === 'object'
 
 export function toRawDeep (val, seen = new Set()) {
   const unwrappedValue = isRef(val) ? unref(val) : val
+  const valueType = typeof unwrappedValue
 
-  if (typeof unwrappedValue === 'symbol') {
+  if (valueType === 'symbol' || valueType === 'function') {
     return unwrappedValue.toString()
   }
 
