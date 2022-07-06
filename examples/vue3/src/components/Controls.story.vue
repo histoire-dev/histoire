@@ -5,6 +5,12 @@ const options = {
   'ghost-of-tsushima': 'Ghost of Tsushima',
 }
 
+const radioOptions = {
+  'death-stranding': 'Death Stranding',
+  'metal-gear': 'Metal Gear',
+  'elden-ring': 'Elden Ring',
+}
+
 function initState () {
   return {
     text: 'Hello',
@@ -12,6 +18,7 @@ function initState () {
     number: 20,
     longText: 'Longer text...',
     select: 'crash-bandicoot',
+    radio: 'metal-gear',
   }
 }
 </script>
@@ -54,6 +61,11 @@ function initState () {
           v-model="state.select"
           title="HstSelect"
           :options="options"
+        />
+        <HstRadio
+          v-model="state.radio"
+          title="HstRadio"
+          :options="radioOptions"
         />
       </template>
     </Variant>

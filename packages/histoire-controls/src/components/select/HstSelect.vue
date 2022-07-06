@@ -2,26 +2,22 @@
 export default {
   name: 'HstSelect',
 }
-
-export type { SelectOption as HstSelectOption } from './CustomSelect.vue'
 </script>
 
 <script lang="ts" setup>
-import { ref } from 'vue'
 import HstWrapper from '../HstWrapper.vue'
-import CustomSelect, { SelectOption } from './CustomSelect.vue'
+import CustomSelect from './CustomSelect.vue'
+import { HstControlOption } from '../../types'
 
-const props = defineProps<{
+defineProps<{
   title?: string
   modelValue: string
-  options: Record<string, string> | string[] | SelectOption[]
+  options: Record<string, string> | string[] | HstControlOption[]
 }>()
 
 const emits = defineEmits<{
   (e: 'update:modelValue', value: string): void
 }>()
-
-const select = ref<HTMLInputElement>()
 </script>
 
 <template>

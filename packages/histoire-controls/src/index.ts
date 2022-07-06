@@ -9,6 +9,7 @@ import HstColorShadesVue from './components/design-tokens/HstColorShades.vue'
 import HstTokenListVue from './components/design-tokens/HstTokenList.vue'
 import HstTokenGridVue from './components/design-tokens/HstTokenGrid.vue'
 import HstCopyIconVue from './components/HstCopyIcon.vue'
+import HstRadioVue from './components/radio/HstRadio.vue'
 
 export const HstCheckbox = HstCheckboxVue
 export const HstText = HstTextVue
@@ -19,6 +20,7 @@ export const HstColorShades = HstColorShadesVue
 export const HstTokenList = HstTokenListVue
 export const HstTokenGrid = HstTokenGridVue
 export const HstCopyIcon = HstCopyIconVue
+export const HstRadio = HstRadioVue
 
 export function registerVueComponents (app: App) {
   app.component('HstCheckbox', HstCheckboxVue)
@@ -30,4 +32,5 @@ export function registerVueComponents (app: App) {
   app.component('HstColorShades', HstColorShadesVue)
   app.component('HstTokenList', HstTokenListVue)
   app.component('HstTokenGrid', HstTokenGridVue)
+  app.component('HstRadio', HstRadioVue)
 }
