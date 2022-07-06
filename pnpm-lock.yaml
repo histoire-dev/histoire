@@ -147,9 +147,9 @@ importers:
 
   packages/histoire:
     specifiers:
-      '@histoire/controls': ^0.7.8
-      '@histoire/plugin-vue': ^0.7.8
-      '@histoire/shared': ^0.7.8
+      '@histoire/controls': ^0.7.9
+      '@histoire/plugin-vue': ^0.7.9
+      '@histoire/shared': ^0.7.9
       '@iconify/vue': ^3.2.1
       '@peeky/test': ^0.13.5
       '@tailwindcss/typography': ^0.5.2
@@ -334,8 +334,8 @@ importers:
 
   packages/histoire-plugin-vue:
     specifiers:
-      '@histoire/controls': ^0.7.8
-      '@histoire/shared': ^0.7.8
+      '@histoire/controls': ^0.7.9
+      '@histoire/shared': ^0.7.9
       '@vitejs/plugin-vue': ^2.3.1
       typescript: ^4.6.3
       vite: ^2.9.1
@@ -1001,7 +1001,6 @@ packages:
         optional: true
     dependencies:
       vue: 3.2.36
-    dev: false
 
   /@intlify/core-base/9.1.10:
     resolution: {integrity: sha512-So9CNUavB/IsZ+zBmk2Cv6McQp6vc2wbGi1S0XQmJ8Vz+UFcNn9MFXAe9gY67PreIHrbLsLxDD0cwo1qsxM1Nw==}
@@ -5740,7 +5739,6 @@ packages:
       '@floating-ui/dom': 0.1.10
       vue: 3.2.36
       vue-resize: 2.0.0-alpha.1_vue@3.2.36
-    dev: false
 
   /follow-redirects/1.15.1:
     resolution: {integrity: sha512-yLAMQs+k0b2m7cVxpS1VKJVvoz7SS9Td1zss3XRwXj+ZDH00RJgnuLx7E44wx02kQLrdM3aOOy+FpzS7+8OizA==}

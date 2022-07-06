@@ -1,3 +1,17 @@
+## [0.7.9](https://github.com/Akryum/histoire/compare/v0.7.8...v0.7.9) (2022-07-06)
+
+
+### Bug Fixes
+
+* stringify functions in `toRawDeep` ([#152](https://github.com/Akryum/histoire/issues/152)) ([30077c0](https://github.com/Akryum/histoire/commit/30077c0b20ee23ef97462acba2776cd4c467296f))
+
+
+### Features
+
+* added radio controls ([#153](https://github.com/Akryum/histoire/issues/153)) ([bef7bc2](https://github.com/Akryum/histoire/commit/bef7bc2679eff830cf49fc34cade9c633a7c0248))
+
+
+
 ## [0.7.8](https://github.com/Akryum/histoire/compare/v0.7.7...v0.7.8) (2022-06-22)
 
 
