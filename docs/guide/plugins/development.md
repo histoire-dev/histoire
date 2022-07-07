@@ -1,12 +1,4 @@
-# Plugins
-
-## Official
-
-- Nuxt 3 [@histoire/plugin-nuxt](https://github.com/histoire-dev/histoire/tree/main/packages/histoire-plugin-nuxt)
-- Visual regression testing with Percy [@histoire/plugin-percy](https://github.com/histoire-dev/histoire/tree/main/packages/histoire-plugin-percy)
-- Visual regression testing (simple) [@histoire/plugin-screenshot](https://github.com/histoire-dev/histoire/tree/main/packages/histoire-plugin-screenshot)
-
-## Plugin development
+# Plugin development
 
 ::: warning
 This doc and the Plugin API are work-in-progress. Expect changes.

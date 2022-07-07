@@ -143,11 +143,11 @@ module.exports = {
           items: [
             {
               text: 'Official plugins',
-              link: '/guide/plugins#official',
+              link: '/guide/plugins/official',
             },
             {
               text: 'Plugin development guide',
-              link: '/guide/plugins#plugin-development',
+              link: '/guide/plugins/development',
             },
           ],
         },
