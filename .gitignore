@@ -5,3 +5,4 @@ histoire-dist/
 .idea
 **/cypress/screenshots/
 **/cypress/videos/
+.DS_Store
