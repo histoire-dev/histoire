@@ -131,7 +131,7 @@ function scanForAutoProps (vnodes: any[]) {
         let types
         let defaultValue
         if (prop) {
-          const rawTypes = Array.isArray(prop.type) ? prop.type : [prop.type]
+          const rawTypes = Array.isArray(prop.type) ? prop.type : typeof prop === 'function' ? [prop] : [prop.type]
           types = rawTypes.map(t => {
             switch (t) {
               case String:
