@@ -64,7 +64,7 @@ const tooltipStyle = computed<CSSProperties>(() => {
         v-model.number="numberModel"
         class="htw-range-input htw-appearance-none htw-border-0 htw-bg-transparent htw-cursor-pointer htw-relative htw-w-full htw-m-0 htw-text-gray-700"
         type="range"
-        v-bind="{ ...$attrs, class: null, style: null }"
+        v-bind="{ ...$attrs, class: null, style: null, min, max }"
         @mouseover="showTooltip = true"
         @mouseleave="showTooltip = false"
       >
