@@ -135,4 +135,4 @@ export default defineConfig({
 })
 ```
 
-See the [plugin API reference](../reference/plugin-api.md).
+See the [plugin API reference](../../reference/plugin-api.md).

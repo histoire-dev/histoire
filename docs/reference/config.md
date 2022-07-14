@@ -15,7 +15,7 @@ Learn more about configuring Histoire [here](../guide/config.md).
 
 ## `plugins`
 
-Array of plugins. Learn more about them [here](../guide/plugins.md).
+Array of plugins. Learn more about [official plugins](../guide/plugins/official.md) and [how to develop them](../guide/plugins/development.md).
 
 ```ts
 import { HstNuxt } from '@histoire/plugin-nuxt'
