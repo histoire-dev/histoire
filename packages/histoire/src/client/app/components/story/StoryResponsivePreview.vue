@@ -46,12 +46,12 @@ function useDragger (el: Ref<HTMLDivElement>, value: Ref<number>, min: number, m
     ]
 
     function onMouseMove (event: MouseEvent) {
-      const snapTarget = (axis === 'x' ? previewWrapper.value.clientWidth : previewWrapper.value.clientHeight)
+      const snapTarget = (axis === 'x' ? previewWrapper.value.clientWidth - 67 : previewWrapper.value.clientHeight - 70)
       const delta = (axis === 'x' ? event.clientX : event.clientY) - start
       value.value = Math.max(min, Math.min(max, startValue + delta))
 
-      if (Math.abs(value.value - (snapTarget - 67)) < 16) {
-        value.value = null
+      if (Math.abs(value.value - (snapTarget)) < 16) {
+        value.value = snapTarget
       }
     }
 
