@@ -6,8 +6,9 @@ module.exports = {
   extends: [
     'plugin:vue/vue3-recommended',
     '@vue/standard',
-    '@vue/eslint-config-typescript/recommended',
+    '@vue/typescript/recommended',
   ],
+  parser: 'vue-eslint-parser',
   parserOptions: {
     ecmaVersion: 2020,
   },
@@ -52,7 +53,6 @@ module.exports = {
     {
       files: ['*.vue'],
       rules: {
-        '@typescript-eslint/no-unused-vars': 'off',
         'import/first': 'off',
       },
       globals: {

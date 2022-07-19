@@ -21,6 +21,7 @@ const props = defineProps({
 })
 
 const emit = defineEmits({
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   resize: (width: number, height: number) => true,
 })
 

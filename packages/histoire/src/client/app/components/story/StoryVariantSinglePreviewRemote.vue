@@ -1,12 +1,9 @@
 <script lang="ts" setup>
-import { computed, onUnmounted, Ref, ref, toRaw, watch } from 'vue'
+import { computed, ref, toRaw, watch } from 'vue'
 import { useEventListener } from '@vueuse/core'
-import { Icon } from '@iconify/vue'
 import { applyState } from '@histoire/shared'
 import { STATE_SYNC, PREVIEW_SETTINGS_SYNC, SANDBOX_READY, EVENT_SEND } from '../../util/const'
 import type { Story, Variant } from '../../types'
-import HatchedPattern from '../misc/HatchedPattern.vue'
-import CheckerboardPattern from '../misc/CheckerboardPattern.vue'
 import { getSandboxUrl } from '../../util/sandbox'
 import { usePreviewSettingsStore } from '../../stores/preview-settings'
 import { HstEvent, useEventsStore } from '../../stores/events'

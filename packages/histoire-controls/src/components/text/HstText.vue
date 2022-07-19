@@ -8,7 +8,7 @@ export default {
 import { ref } from 'vue'
 import HstWrapper from '../HstWrapper.vue'
 
-const props = defineProps<{
+defineProps<{
   title?: string
   modelValue: string
 }>()

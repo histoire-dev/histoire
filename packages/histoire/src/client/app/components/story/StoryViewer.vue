@@ -39,9 +39,9 @@ watch(variant, () => {
     @close="closeMenu"
   >
     <StoryVariantListItem
-      v-for="(variant, index) of storyStore.currentStory.variants"
+      v-for="(v, index) of storyStore.currentStory.variants"
       :key="index"
-      :variant="variant"
+      :variant="v"
     />
   </MobileOverlay>
 </template>

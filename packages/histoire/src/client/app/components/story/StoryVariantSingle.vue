@@ -77,9 +77,9 @@ const variant = computed(() => storyStore.currentVariant)
       <template #first>
         <div class="htw-h-full htw-overflow-y-auto">
           <StoryVariantListItem
-            v-for="(variant, index) of storyStore.currentStory.variants"
+            v-for="(v, index) of storyStore.currentStory.variants"
             :key="index"
-            :variant="variant"
+            :variant="v"
           />
         </div>
       </template>

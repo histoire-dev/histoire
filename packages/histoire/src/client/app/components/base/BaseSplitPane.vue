@@ -48,6 +48,7 @@ const props = defineProps({
 })
 
 const emit = defineEmits({
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   'update:split': (value: number) => true,
 })
 

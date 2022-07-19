@@ -100,7 +100,7 @@ export async function build (ctx: Context) {
       const vuePlugin = config.plugins.find((p: any) => p.name === 'vite:vue') as VitePlugin
       if (vuePlugin) {
         const original = vuePlugin.configureServer.bind(vuePlugin)
-        vuePlugin.configureServer = (s) => {
+        vuePlugin.configureServer = () => {
           original({
             ...server,
             config: {

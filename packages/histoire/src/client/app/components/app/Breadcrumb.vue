@@ -6,7 +6,7 @@ import { Story, Tree } from '../../types'
 import MobileOverlay from './MobileOverlay.vue'
 import StoryList from '../tree/StoryList.vue'
 
-const props = defineProps<{
+defineProps<{
   tree: Tree
   stories: Story[]
 }>()

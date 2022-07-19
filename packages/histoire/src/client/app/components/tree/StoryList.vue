@@ -4,7 +4,7 @@ import StoryListItem from './StoryListItem.vue'
 import StoryListFolder from './StoryListFolder.vue'
 import StoryGroup from './StoryGroup.vue'
 
-const props = defineProps<{
+defineProps<{
   tree: Tree
   stories: Story[]
 }>()

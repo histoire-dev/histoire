@@ -1,5 +1,3 @@
-import type { Variant } from './types'
-
 export function clone (data) {
   try {
     return structuredClone(data)

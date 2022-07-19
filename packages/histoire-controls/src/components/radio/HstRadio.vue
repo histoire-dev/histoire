@@ -32,8 +32,6 @@ const emit = defineEmits<{
   (e: 'update:modelValue', value: string): void
 }>()
 
-const input = ref<HTMLInputElement>()
-
 function selectOption (value: string) {
   emit('update:modelValue', value)
   animationEnabled.value = true

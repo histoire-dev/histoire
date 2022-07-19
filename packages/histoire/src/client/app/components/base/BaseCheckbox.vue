@@ -9,6 +9,7 @@ const props = defineProps({
 })
 
 const emit = defineEmits({
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   'update:modelValue': (newValue: boolean) => true,
 })
 
@@ -25,7 +26,7 @@ const progress = computed(() => props.modelValue ? 1 : 0)
 const dashoffset = computed(() => (1 - progress.value) * dasharray.value)
 const animationEnabled = ref(false)
 
-watch(path, value => {
+watch(path, () => {
   dasharray.value = path.value.getTotalLength?.() ?? 21.21
 })
 </script>

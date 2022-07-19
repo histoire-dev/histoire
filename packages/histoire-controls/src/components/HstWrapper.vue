@@ -7,7 +7,7 @@ export default {
 <script lang="ts" setup>
 import { VTooltip as vTooltip } from 'floating-vue'
 
-const props = defineProps<{
+defineProps<{
   title?: string
 }>()
 </script>
