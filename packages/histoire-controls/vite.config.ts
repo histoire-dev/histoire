@@ -1,4 +1,3 @@
-/// <reference types="@peeky/test"/>
 /// <reference types="histoire"/>
 
 import { defineConfig } from 'vite'
@@ -56,12 +55,5 @@ export default defineConfig({
       title: 'Histoire controls',
       favicon: '/histoire.svg',
     },
-  },
-
-  test: {
-    runtimeEnv: 'dom',
-    previewSetupFiles: [
-      'src/peeky-preview.ts',
-    ],
   },
 })
