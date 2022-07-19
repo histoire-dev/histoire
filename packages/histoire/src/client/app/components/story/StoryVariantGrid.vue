@@ -99,16 +99,13 @@ watch(() => storyStore.currentVariant, () => {
           gridTemplateColumns: `repeat(auto-fill, ${gridTemplateWidth})`,
         }"
       >
-        <template
+        <StoryVariantGridItem
           v-for="(variant, index) of storyStore.currentStory.variants.slice(0, maxCount)"
           :key="index"
-        >
-          <StoryVariantGridItem
-            :variant="variant"
-            :story="storyStore.currentStory"
-            @resize="onItemResize"
-          />
-        </template>
+          :variant="variant"
+          :story="storyStore.currentStory"
+          @resize="onItemResize"
+        />
       </div>
     </div>
   </div>
