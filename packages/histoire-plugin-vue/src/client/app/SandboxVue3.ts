@@ -10,7 +10,7 @@ import {
   watch as _watch,
   h as _h,
 } from '@histoire/vendors/dist/client/vue'
-import { applyStateToVariant } from '@histoire/shared'
+import { applyState } from '@histoire/shared'
 import type { Story, Variant, PropDefinition, AutoPropComponentDefinition } from '@histoire/shared'
 import { getTagName } from '../codegen'
 import { registerGlobalComponents } from './global-components.js'
@@ -91,11 +91,11 @@ export default _defineComponent({
 
             const snapshot = JSON.stringify(propsTypes)
             if (!lastPropsTypesSnapshot || lastPropsTypesSnapshot !== snapshot) {
-              applyStateToVariant(props.variant, {
+              applyState(props.variant.state, {
                 _hPropDefs: propsTypes,
               })
               if (!props.variant.state._hPropState) {
-                applyStateToVariant(props.variant, {
+                applyState(props.variant.state, {
                   _hPropState: {},
                 })
               }

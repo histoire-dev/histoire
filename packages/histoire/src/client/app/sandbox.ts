@@ -1,7 +1,7 @@
 import { parseQuery } from 'vue-router'
 import { computed, createApp, h, onMounted, ref, watch } from 'vue'
 import { createPinia } from 'pinia'
-import { applyStateToVariant } from '@histoire/shared'
+import { applyState } from '@histoire/shared'
 import { SandboxVue3, MountStoryVue3 } from '@histoire/plugin-vue/client'
 import type { StoryFile } from './types'
 import { mapFile } from './util/mapping'
@@ -31,7 +31,7 @@ const app = createApp({
       if (event.data?.type === STATE_SYNC) {
         if (!mounted) return
         synced = true
-        applyStateToVariant(variant.value, event.data.state)
+        applyState(variant.value.state, event.data.state)
       } else if (event.data?.type === PREVIEW_SETTINGS_SYNC) {
         applyPreviewSettings(event.data.settings)
       }

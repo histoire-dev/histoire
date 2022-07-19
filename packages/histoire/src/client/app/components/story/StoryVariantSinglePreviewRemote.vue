@@ -2,7 +2,7 @@
 import { computed, onUnmounted, Ref, ref, toRaw, watch } from 'vue'
 import { useEventListener } from '@vueuse/core'
 import { Icon } from '@iconify/vue'
-import { applyStateToVariant } from '@histoire/shared'
+import { applyState } from '@histoire/shared'
 import { STATE_SYNC, PREVIEW_SETTINGS_SYNC, SANDBOX_READY, EVENT_SEND } from '../../util/const'
 import type { Story, Variant } from '../../types'
 import HatchedPattern from '../misc/HatchedPattern.vue'
@@ -66,7 +66,7 @@ useEventListener(window, 'message', (event) => {
 
 function updateVariantState (state: any) {
   synced = true
-  applyStateToVariant(props.variant, state)
+  applyState(props.variant.state, state)
 }
 
 function logEvent (event: HstEvent) {

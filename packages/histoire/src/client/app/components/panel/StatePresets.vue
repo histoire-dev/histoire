@@ -2,7 +2,7 @@
 import { ref, computed, nextTick, onMounted } from 'vue'
 import { Icon } from '@iconify/vue'
 import { useStorage, onClickOutside, useTimeoutFn } from '@vueuse/core'
-import { applyStateToVariant, clone, omit } from '@histoire/shared'
+import { applyState, clone, omit } from '@histoire/shared'
 import BaseSelect from '../base/BaseSelect.vue'
 import { toRawDeep } from '../../util/state'
 import type { Story, Variant } from '../../types'
@@ -40,14 +40,14 @@ const presetsOptions = computed(() => {
 
 function resetState () {
   selectedOption.value = DEFAULT_ID
-  applyStateToVariant(props.variant, clone(defaultState))
+  applyState(props.variant.state, clone(defaultState))
 }
 
 function applyPreset (id) {
   if (id === DEFAULT_ID) {
     resetState()
   } else if (presetStates.value.has(id)) {
-    applyStateToVariant(props.variant, clone(presetStates.value.get(id).state))
+    applyState(props.variant.state, clone(presetStates.value.get(id).state))
   }
 }
 

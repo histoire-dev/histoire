@@ -33,11 +33,3 @@ export function applyState (target: any, state: any, override = false) {
     }
   }
 }
-
-export function applyStateToVariant (variant: Variant, state: any, override = false) {
-  if (variant.state) {
-    applyState(variant.state, state, override)
-  } else {
-    variant.state = state
-  }
-}
