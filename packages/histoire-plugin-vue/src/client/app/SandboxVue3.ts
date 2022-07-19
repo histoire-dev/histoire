@@ -148,7 +148,6 @@ export default _defineComponent({
       let index = 0
       for (const vnode of vnodes) {
         if (typeof vnode.type === 'object') {
-          console.log(vnode.type)
           const propDefs: PropDefinition[] = []
           for (const key in vnode.type.props) {
             const prop = vnode.type.props[key]
