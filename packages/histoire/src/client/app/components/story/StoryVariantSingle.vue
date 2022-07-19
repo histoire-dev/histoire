@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, ref } from 'vue'
+import { computed } from 'vue'
 import { useStoryStore } from '../../stores/story'
 import { Icon } from '@iconify/vue'
 import { isMobile } from '../../util/responsive'
@@ -20,12 +20,11 @@ const variant = computed(() => storyStore.currentVariant)
 
 <template>
   <div
-    v-if="hasSingleVariant && storyStore.currentVariant"
+    v-if="hasSingleVariant && variant"
     class="htw-p-2 htw-h-full"
   >
     <StoryVariantSingleView
-      v-if="storyStore.currentVariant.configReady"
-      :variant="storyStore.currentVariant"
+      :variant="variant"
       :story="storyStore.currentStory"
     />
   </div>
@@ -63,7 +62,6 @@ const variant = computed(() => storyStore.currentVariant)
         class="htw-p-2 htw-h-full"
       >
         <StoryVariantSingleView
-          v-if="storyStore.currentVariant.configReady"
           :variant="storyStore.currentVariant"
           :story="storyStore.currentStory"
         />

@@ -9,6 +9,19 @@ export default defineConfig({
     vue(),
   ],
 
+  resolve: {
+    alias: {
+      'floating-vue': '@histoire/vendors/dist/client/floating-vue.js',
+      '@iconify/vue': '@histoire/vendors/dist/client/iconify.js',
+      pinia: '@histoire/vendors/dist/client/pinia.js',
+      'scroll-into-view-if-needed': '@histoire/vendors/dist/client/scroll.js',
+      shiki: '@histoire/vendors/dist/client/shiki.js',
+      'vue-router': '@histoire/vendors/dist/client/vue-router.js',
+      '@vueuse/core': '@histoire/vendors/dist/client/vue-use.js',
+      vue: '@histoire/vendors/dist/client/vue.js',
+    },
+  },
+
   build: {
     emptyOutDir: false,
 
@@ -23,7 +36,6 @@ export default defineConfig({
     rollupOptions: {
       external: [
         /@histoire/,
-        'vue',
       ],
     },
   },

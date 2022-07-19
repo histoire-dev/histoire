@@ -59,7 +59,7 @@ async function mergeHistoireViteConfig (viteConfig: InlineConfig, ctx: Context) 
   return viteConfig
 }
 
-export async function getViteConfigWithPlugins (server: boolean, ctx: Context): Promise<InlineConfig> {
+export async function getViteConfigWithPlugins (isServer: boolean, ctx: Context): Promise<InlineConfig> {
   const resolvedViteConfig = await resolveViteConfig(ctx)
 
   const inlineConfig = await mergeHistoireViteConfig({}, ctx)
@@ -76,7 +76,7 @@ export async function getViteConfigWithPlugins (server: boolean, ctx: Context): 
           ],
         },
         optimizeDeps: {
-          disabled: server,
+          disabled: isServer,
           entries: [
             `${APP_PATH}/bundle-main.js`,
             `${APP_PATH}/bundle-sandbox.js`,
@@ -106,6 +106,8 @@ export async function getViteConfigWithPlugins (server: boolean, ctx: Context): 
         define: {
           // We need to force this to be able to use `devtoolsRawSetupState`
           __VUE_PROD_DEVTOOLS__: 'true',
+          // Disable warnings
+          'process.env.NODE_ENV': JSON.stringify(isServer ? 'production' : process.env.NODE_ENV ?? 'development'),
         },
       }
     },

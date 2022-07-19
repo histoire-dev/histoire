@@ -1,4 +1,3 @@
-<script lang="ts">
 import { defineComponent, inject } from 'vue'
 import type { ServerStory, ServerVariant } from '@histoire/shared'
 
@@ -49,4 +48,3 @@ export default defineComponent({
     return null
   },
 })
-</script>

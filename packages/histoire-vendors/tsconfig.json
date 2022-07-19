@@ -1,0 +1,36 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "outDir": "dist",
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "removeComments": false,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "declaration": true,
+    "types": [
+      "node",
+      "@peeky/test"
+    ],
+    "lib": [
+      "ESNext",
+      "DOM"
+    ],
+    "sourceMap": false,
+    "preserveWatchOutput": true,
+    "preserveSymlinks": true,
+    // Strict
+    "noImplicitAny": false,
+    "noImplicitThis": true,
+    "alwaysStrict": true,
+    "strictBindCallApply": true,
+    "strictFunctionTypes": true,
+    // Volar
+    "jsx": "preserve",
+  },
+  "include": [
+    "src"
+  ]
+}

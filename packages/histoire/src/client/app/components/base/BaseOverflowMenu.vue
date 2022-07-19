@@ -41,6 +41,7 @@ const visibleChildrenCount = computed(() => {
  * Watches for the size of each child and automatically hide them
  */
 const ChildWrapper = {
+  name: 'ChildWrapper',
   props: ['index'],
   setup (props, { slots }) {
     const el = ref<HTMLDivElement>()

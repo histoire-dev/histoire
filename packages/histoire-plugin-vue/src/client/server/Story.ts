@@ -1,4 +1,3 @@
-<script lang="ts">
 import { defineComponent, inject, onMounted, PropType, provide, useAttrs } from 'vue'
 import type { ServerStoryFile, ServerStory, ServerVariant } from '@histoire/shared'
 
@@ -124,4 +123,3 @@ export default defineComponent({
     }
   },
 })
-</script>

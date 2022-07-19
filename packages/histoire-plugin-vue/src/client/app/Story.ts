@@ -1,7 +1,6 @@
-<script lang="ts">
 import { computed, defineComponent, provide, useAttrs, VNode, h, PropType, getCurrentInstance } from 'vue'
 import type { Story } from '@histoire/shared'
-import Variant from './Variant.vue'
+import Variant from './Variant'
 
 export default defineComponent({
   // eslint-disable-next-line vue/multi-word-component-names
@@ -47,7 +46,7 @@ export default defineComponent({
       addImplicitState(key, storyComponent.devtoolsRawSetupState[key])
     }
     // Shallow copy to prevent sharing object with different variants
-    provide('implicitState', () => ({ ...implicitState }))
+    provide('implicitState', { ...implicitState })
 
     function updateStory () {
       Object.assign(attrs.story, {
@@ -103,4 +102,3 @@ export default defineComponent({
     return vnodes
   },
 })
-</script>

@@ -1,11 +1,6 @@
 import { defineConfig } from 'vite'
-import vue from '@vitejs/plugin-vue'
 
 export default defineConfig({
-  plugins: [
-    vue(),
-  ],
-
   build: {
     emptyOutDir: false,
     outDir: 'dist/bundled',
@@ -34,7 +29,9 @@ export default defineConfig({
         entryFileNames: '[name].js',
         chunkFileNames: '[name].js',
         assetFileNames: '[name][extname]',
-        hoistTransitiveImports: false,
+        // hoistTransitiveImports: false,
+        preserveModules: true,
+        preserveModulesRoot: 'src/client',
       },
       treeshake: false,
       preserveEntrySignatures: 'strict',

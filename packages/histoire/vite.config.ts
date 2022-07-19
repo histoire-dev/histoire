@@ -1,7 +1,7 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import fs from 'fs-extra'
-import path from 'pathe'
+import { globbySync } from 'globby'
 
 export default defineConfig({
   plugins: [
@@ -18,14 +18,11 @@ export default defineConfig({
       },
       closeBundle () {
         try {
-          const files = fs.readdirSync('./dist/bundled')
+          const files = globbySync('./dist/bundled/**/*.js')
           for (const file of files) {
-            if (file.endsWith('.js')) {
-              const filePath = path.join('./dist/bundled', file)
-              const content = fs.readFileSync(filePath, 'utf-8')
-              if (content.includes('import__meta')) {
-                fs.writeFileSync(filePath, content.replace(/import__meta/g, 'import.meta'), 'utf-8')
-              }
+            const content = fs.readFileSync(file, 'utf-8')
+            if (content.includes('import__meta')) {
+              fs.writeFileSync(file, content.replace(/import__meta/g, 'import.meta'), 'utf-8')
             }
           }
         } catch (e) {
@@ -34,6 +31,19 @@ export default defineConfig({
       },
     },
   ],
+
+  resolve: {
+    alias: {
+      'floating-vue': '@histoire/vendors/dist/client/floating-vue.js',
+      '@iconify/vue': '@histoire/vendors/dist/client/iconify.js',
+      pinia: '@histoire/vendors/dist/client/pinia.js',
+      'scroll-into-view-if-needed': '@histoire/vendors/dist/client/scroll.js',
+      shiki: '@histoire/vendors/dist/client/shiki.js',
+      'vue-router': '@histoire/vendors/dist/client/vue-router.js',
+      '@vueuse/core': '@histoire/vendors/dist/client/vue-use.js',
+      vue: '@histoire/vendors/dist/client/vue.js',
+    },
+  },
 
   build: {
     emptyOutDir: false,
@@ -46,7 +56,6 @@ export default defineConfig({
       external: [
         /\$histoire/,
         /@histoire/,
-        /@vue\/*/,
         // eslint-disable-next-line @typescript-eslint/no-var-requires
         ...Object.keys(require('./package.json').dependencies),
       ],
@@ -66,7 +75,9 @@ export default defineConfig({
         entryFileNames: '[name].js',
         chunkFileNames: '[name].js',
         assetFileNames: '[name][extname]',
-        hoistTransitiveImports: false,
+        // hoistTransitiveImports: false,
+        preserveModules: true,
+        preserveModulesRoot: 'src/client/app',
       },
       treeshake: false,
       preserveEntrySignatures: 'strict',

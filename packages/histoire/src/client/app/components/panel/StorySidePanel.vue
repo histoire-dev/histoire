@@ -32,7 +32,7 @@ const panelContentComponent = computed(() => {
     <span>Select a variant</span>
   </BaseEmpty>
 
-  <BaseEmpty v-else-if="!storyStore.currentVariant.previewReady">
+  <BaseEmpty v-else-if="!storyStore.currentVariant.configReady || !storyStore.currentVariant.previewReady">
     <span>Loading...</span>
   </BaseEmpty>
 

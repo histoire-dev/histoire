@@ -80,7 +80,6 @@ const loading = ref(false)
 
 if (import.meta.hot && !rawFiles.length) {
   loading.value = true
-  console.log('loading...')
   import.meta.hot.on('histoire:all-stories-loaded', () => {
     loading.value = false
   })

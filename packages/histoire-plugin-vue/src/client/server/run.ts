@@ -1,8 +1,7 @@
 import { createApp, h } from 'vue'
-import { registerVueComponents } from '@histoire/controls'
 import type { ServerRunPayload } from '@histoire/shared'
-import Story from './Story.vue'
-import Variant from './Variant.vue'
+import Story from './Story'
+import Variant from './Variant'
 
 export async function run ({ file, storyData, el }: ServerRunPayload) {
   const { default: Comp } = await import(file.moduleId)
@@ -25,8 +24,6 @@ export async function run ({ file, storyData, el }: ServerRunPayload) {
   app.component('Story', Story)
   // eslint-disable-next-line vue/multi-word-component-names
   app.component('Variant', Variant)
-
-  registerVueComponents(app)
 
   app.mount(el)
 

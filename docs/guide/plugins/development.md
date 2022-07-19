@@ -41,7 +41,7 @@ Create a new npm package. Example `package.json`:
   "devDependencies": {
     "histoire": "^0.3.3",
     "rimraf": "^3.0.0",
-    "typescript": "^4.6.3"
+    "typescript": "^4.7.4"
   },
   "peerDependencies": {
     "histoire": "^0.3.3"

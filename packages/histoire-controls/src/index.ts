@@ -1,4 +1,3 @@
-import type { App } from 'vue'
 import HstCheckboxVue from './components/checkbox/HstCheckbox.vue'
 import HstTextVue from './components/text/HstText.vue'
 import HstNumberVue from './components/number/HstNumber.vue'
@@ -16,21 +15,23 @@ export const HstText = HstTextVue
 export const HstNumber = HstNumberVue
 export const HstSlider = HstSliderVue
 export const HstTextarea = HstTextareaVue
+export const HstSelect = HstSelectVue
 export const HstColorShades = HstColorShadesVue
 export const HstTokenList = HstTokenListVue
 export const HstTokenGrid = HstTokenGridVue
 export const HstCopyIcon = HstCopyIconVue
 export const HstRadio = HstRadioVue
 
-export function registerVueComponents (app: App) {
-  app.component('HstCheckbox', HstCheckboxVue)
-  app.component('HstText', HstTextVue)
-  app.component('HstNumber', HstNumberVue)
-  app.component('HstSlider', HstSliderVue)
-  app.component('HstSelect', HstSelectVue)
-  app.component('HstTextarea', HstTextareaVue)
-  app.component('HstColorShades', HstColorShadesVue)
-  app.component('HstTokenList', HstTokenListVue)
-  app.component('HstTokenGrid', HstTokenGridVue)
-  app.component('HstRadio', HstRadioVue)
+export const components = {
+  HstCheckbox,
+  HstText,
+  HstNumber,
+  HstSlider,
+  HstTextarea,
+  HstSelect,
+  HstColorShades,
+  HstTokenList,
+  HstTokenGrid,
+  HstCopyIcon,
+  HstRadio,
 }

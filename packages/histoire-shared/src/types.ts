@@ -33,10 +33,9 @@ export interface Variant {
   title: string
   icon?: string
   iconColor?: string
-  initState?: () => any
   setupApp?: (payload: any) => unknown
   slots?: () => Readonly<any>
-  state?: any
+  state: any
   source?: string
   responsiveDisabled?: boolean
   configReady?: boolean

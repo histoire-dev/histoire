@@ -27,6 +27,7 @@ const app = createApp({
     let mounted = false
 
     window.addEventListener('message', event => {
+      // console.log('[sandbox] received message', event.data)
       if (event.data?.type === STATE_SYNC) {
         if (!mounted) return
         synced = true

@@ -6,19 +6,19 @@ describe('Codegen (Vue 3)', () => {
     cy.get('[data-test-id="story-source-code"]').should('have.text', `<h1>Title</h1>
 <hr>
 <pre>{
-  "$data": {},
   "object": {
     "foo": "bar"
   },
+  "$data": {},
   "_hPropDefs": [],
   "_hPropState": {}
 }</pre>
 <div data-test-id="object">
   {
-    "$data": {},
     "object": {
       "foo": "bar"
     },
+    "$data": {},
     "_hPropDefs": [],
     "_hPropState": {}
   }

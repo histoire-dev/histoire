@@ -29,6 +29,17 @@
     "strictFunctionTypes": true,
     // Volar
     "jsx": "preserve",
+    // Alias
+    "paths": {
+      "floating-vue": ["./node_modules/@histoire/vendors/dist/client/floating-vue"],
+      "@iconify/vue": ["./node_modules/@histoire/vendors/dist/client/iconify"],
+      "pinia": ["./node_modules/@histoire/vendors/dist/client/pinia"],
+      "scroll-into-view-if-needed": ["./node_modules/@histoire/vendors/dist/client/scroll"],
+      "shiki": ["./node_modules/@histoire/vendors/dist/client/shiki"],
+      "vue-router": ["./node_modules/@histoire/vendors/dist/client/vue-router"],
+      "@vueuse/core": ["./node_modules/@histoire/vendors/dist/client/vue-use"],
+      "vue": ["./node_modules/@histoire/vendors/dist/client/vue"]
+    }
   },
   "include": [
     "src"

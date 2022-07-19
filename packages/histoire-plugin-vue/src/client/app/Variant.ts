@@ -1,7 +1,7 @@
-<script lang="ts">
-import { defineComponent, getCurrentInstance, inject, PropType, useAttrs, watch } from 'vue'
+import { defineComponent, getCurrentInstance, inject, PropType, useAttrs } from 'vue'
 import type { Variant } from '@histoire/shared'
-import { applyStateToVariant } from '@histoire/shared'
+import { applyState } from '@histoire/shared'
+import { syncStateBundledAndExternal, toRawDeep } from './util.js'
 
 // const logLocation = location.href.includes('__sandbox') ? '[Sandbox]' : '[Host]'
 
@@ -32,35 +32,33 @@ export default defineComponent({
     },
   },
 
-  setup (props) {
+  async setup (props) {
     const attrs = useAttrs() as {
       variant: Variant
     }
 
     const vm = getCurrentInstance()
 
-    const implicitState = inject<() => any>('implicitState')
+    let lastSlots
 
-    watch(() => implicitState, value => {
-      applyStateToVariant(attrs.variant, value(), true)
-    }, {
-      immediate: true,
-    })
+    const implicitState = inject('implicitState')
+
+    if (typeof props.initState === 'function') {
+      const state = await props.initState()
+      applyState(attrs.variant.state, toRawDeep(state))
+    }
+
+    syncStateBundledAndExternal(attrs.variant.state, implicitState)
 
     function updateVariant () {
       Object.assign(attrs.variant, {
-        initState: async () => {
-          if (typeof props.initState === 'function') {
-            const state = await props.initState()
-            applyStateToVariant(attrs.variant, state)
-          }
-        },
-        slots: () => vm.proxy.$slots,
+        slots: lastSlots !== vm.proxy.$slots ? () => vm.proxy.$slots : attrs.variant.slots,
         source: props.source,
         responsiveDisabled: props.responsiveDisabled,
         setupApp: props.setupApp,
         configReady: true,
       })
+      lastSlots = vm.proxy.$slots
     }
     updateVariant()
 
@@ -75,4 +73,3 @@ export default defineComponent({
     return null
   },
 })
-</script>
