@@ -186,6 +186,18 @@ Disables the responsive menu, preview resize handles and makes the preview laway
 </template>
 ```
 
+## `autoPropsDisabled`
+
+Disables the automatic detection of props of the components in the story.
+
+```vue
+<template>
+  <Story auto-props-disabled>
+    <!-- ... -->
+  </Story>
+</template>
+```
+
 ## Slot: `controls`
 
 Content of the 'Controls' pane used to interact with the story. This will be the default content for variants of the story but you can override it by defining a `controls` slot in a variant.

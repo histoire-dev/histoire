@@ -86,7 +86,7 @@ export default _defineComponent({
           })
 
           // Auto detect props
-          if (props.slotName === 'default') {
+          if (props.slotName === 'default' && !props.variant.autoPropsDisabled) {
             const propsTypes: AutoPropComponentDefinition[] = scanForAutoProps(vnodes)
 
             const snapshot = JSON.stringify(propsTypes)

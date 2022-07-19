@@ -38,6 +38,7 @@ export interface Variant {
   state: any
   source?: string
   responsiveDisabled?: boolean
+  autoPropsDisabled?: boolean
   configReady?: boolean
   previewReady?: boolean
 }

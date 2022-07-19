@@ -26,6 +26,11 @@ export default defineComponent({
       default: false,
     },
 
+    autoPropsDisabled: {
+      type: Boolean,
+      default: false,
+    },
+
     setupApp: {
       type: Function,
       default: null,
@@ -55,6 +60,7 @@ export default defineComponent({
         slots: lastSlots !== vm.proxy.$slots ? () => vm.proxy.$slots : attrs.variant.slots,
         source: props.source,
         responsiveDisabled: props.responsiveDisabled,
+        autoPropsDisabled: props.autoPropsDisabled,
         setupApp: props.setupApp,
         configReady: true,
       })

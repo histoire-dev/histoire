@@ -3,7 +3,9 @@ import Demo from './Demo.vue'
 </script>
 
 <template>
-  <Story title="Demo">
+  <Story
+    title="Demo"
+  >
     <Variant>
       <Demo message="Hello world!" />
     </Variant>
@@ -12,6 +14,7 @@ import Demo from './Demo.vue'
       title="Variant 2"
       icon="carbon:accessibility-alt"
       icon-color="#00bebe"
+      auto-props-disabled
     >
       <Demo message="Meow!" />
     </Variant>

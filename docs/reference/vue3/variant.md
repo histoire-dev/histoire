@@ -164,6 +164,20 @@ Disables the responsive menu, preview resize handles and makes the preview laway
 </template>
 ```
 
+## `autoPropsDisabled`
+
+Disables the automatic detection of props of the components in the story.
+
+```vue
+<template>
+  <Story>
+    <Variant auto-props-disabled>
+      <!-- ... -->
+    </Variant>
+  </Story>
+</template>
+```
+
 ## Slot: `default`
 
 Content of the variant.
