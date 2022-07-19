@@ -50,7 +50,7 @@ export default _defineComponent({
     let app: App
     let mounting = false
 
-    const externalState = reactive({})
+    const externalState = reactive<Variant['state']>({})
 
     syncStateBundledAndExternal(props.variant.state, externalState)
 
@@ -181,11 +181,11 @@ export default _defineComponent({
             })
 
             // Props overrides
-            if (props.variant.state?._hPropState?.[index]?.[key]) {
+            if (externalState?._hPropState?.[index]?.[key]) {
               if (!vnode.props) {
                 vnode.props = {}
               }
-              vnode.props[key] = props.variant.state._hPropState[index][key]
+              vnode.props[key] = externalState._hPropState[index][key]
               if (!vnode.dynamicProps) {
                 vnode.dynamicProps = []
               }
