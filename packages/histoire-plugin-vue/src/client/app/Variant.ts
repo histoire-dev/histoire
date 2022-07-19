@@ -44,8 +44,6 @@ export default defineComponent({
 
     const vm = getCurrentInstance()
 
-    let lastSlots
-
     const implicitState = inject('implicitState')
 
     if (typeof props.initState === 'function') {
@@ -57,14 +55,13 @@ export default defineComponent({
 
     function updateVariant () {
       Object.assign(attrs.variant, {
-        slots: lastSlots !== vm.proxy.$slots ? () => vm.proxy.$slots : attrs.variant.slots,
+        slots: () => vm.proxy.$slots,
         source: props.source,
         responsiveDisabled: props.responsiveDisabled,
         autoPropsDisabled: props.autoPropsDisabled,
         setupApp: props.setupApp,
         configReady: true,
       })
-      lastSlots = vm.proxy.$slots
     }
     updateVariant()
 

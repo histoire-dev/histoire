@@ -216,13 +216,12 @@ export default _defineComponent({
       }
     })
 
-    _watch(() => props.variant.configReady, async value => {
-      if (value && !mounting) {
+    _watch(() => props.variant, async value => {
+      if (value.configReady && !mounting) {
         if (!app) {
           await mountVariant()
         } else {
-          // @TODO check if still necessary
-          // app._instance.proxy.$forceUpdate()
+          app._instance.proxy.$forceUpdate()
         }
       }
     }, {
