@@ -1,3 +1,22 @@
+# [0.8.0](https://github.com/Akryum/histoire/compare/v0.7.9...v0.8.0) (2022-07-19)
+
+
+### Bug Fixes
+
+* add min and max attrs to the input ([#173](https://github.com/Akryum/histoire/issues/173)) ([cc5ead5](https://github.com/Akryum/histoire/commit/cc5ead5679ad4c8c139e6b6053d811f92ce25821))
+* auto props value override not working after vendor bundling ([a663735](https://github.com/Akryum/histoire/commit/a663735312f6c9fb26c1c7901322fde914cffe56))
+* skip app setups while collecting ([5fff544](https://github.com/Akryum/histoire/commit/5fff54427f0b445fda22ee6fa34160c40cf49f11))
+* **vue3:** detect type of shorthand prop def, fix [#155](https://github.com/Akryum/histoire/issues/155) ([cc8e06a](https://github.com/Akryum/histoire/commit/cc8e06a947dc347f5d8e7163d5e984afd1cec01e))
+* **vue3:** hot reload not triggered ([c747458](https://github.com/Akryum/histoire/commit/c747458c648936bb52348bd418a5a0799f15b2ef))
+
+
+### Features
+
+*  autoPropsDisabled, fix [#177](https://github.com/Akryum/histoire/issues/177) ([22d5a10](https://github.com/Akryum/histoire/commit/22d5a10a5d04103b3e65b29bd2ca6515353cf176))
+* bundle dependencies (vue, etc.), closes [#87](https://github.com/Akryum/histoire/issues/87) ([c019c9d](https://github.com/Akryum/histoire/commit/c019c9d8d26c606cb0ac84c275da679572ccfd5c))
+
+
+
 ## [0.7.9](https://github.com/Akryum/histoire/compare/v0.7.8...v0.7.9) (2022-07-06)
 
 

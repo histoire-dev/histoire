@@ -149,10 +149,10 @@ importers:
 
   packages/histoire:
     specifiers:
-      '@histoire/controls': ^0.7.9
-      '@histoire/plugin-vue': ^0.7.9
-      '@histoire/shared': ^0.7.9
-      '@histoire/vendors': ^0.7.9
+      '@histoire/controls': ^0.8.0
+      '@histoire/plugin-vue': ^0.8.0
+      '@histoire/shared': ^0.8.0
+      '@histoire/vendors': ^0.8.0
       '@peeky/test': ^0.13.5
       '@tailwindcss/typography': ^0.5.2
       '@types/flexsearch': ^0.7.3
@@ -234,7 +234,7 @@ importers:
 
   packages/histoire-controls:
     specifiers:
-      '@histoire/vendors': ^0.7.9
+      '@histoire/vendors': ^0.8.0
       '@peeky/test': ^0.13.5
       '@types/node': ^17.0.32
       '@vitejs/plugin-vue': ^2.3.1
@@ -324,9 +324,9 @@ importers:
 
   packages/histoire-plugin-vue:
     specifiers:
-      '@histoire/controls': ^0.7.9
-      '@histoire/shared': ^0.7.9
-      '@histoire/vendors': ^0.7.9
+      '@histoire/controls': ^0.8.0
+      '@histoire/shared': ^0.8.0
+      '@histoire/vendors': ^0.8.0
       typescript: ^4.7.4
       vite: ^2.9.1
       vue: ^3.2.31
