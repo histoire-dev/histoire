@@ -277,6 +277,7 @@ if (import.meta.hot) {
           // Apply Vite HTML transforms. This injects the Vite HMR client, and
           // also applies HTML transforms from Vite plugins
           html = await server.transformIndexHtml(req.url, html)
+          res.setHeader('content-type', 'text/html; charset=UTF-8')
           res.end(html)
           return
         }
@@ -308,6 +309,7 @@ if (import.meta.hot) {
             // Apply Vite HTML transforms. This injects the Vite HMR client, and
             // also applies HTML transforms from Vite plugins
             html = await server.transformIndexHtml(req.url, html)
+            res.setHeader('content-type', 'text/html; charset=UTF-8')
             res.end(html)
             return
           }
