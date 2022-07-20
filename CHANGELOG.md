@@ -1,3 +1,13 @@
+## [0.8.1](https://github.com/Akryum/histoire/compare/v0.8.0...v0.8.1) (2022-07-20)
+
+
+### Bug Fixes
+
+* **server:** set content-type on html during dev ([d805861](https://github.com/Akryum/histoire/commit/d80586142cfb112aa97f88f40cd9208422818157))
+* shiki not found ([6a71d64](https://github.com/Akryum/histoire/commit/6a71d6400959a879cb00cc3efccd14d5cf69dba0))
+
+
+
 # [0.8.0](https://github.com/Akryum/histoire/compare/v0.7.9...v0.8.0) (2022-07-19)
 
 
