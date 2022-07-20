@@ -29,8 +29,8 @@ export default defineConfig({
 
   server: {
     hmr: {
-      clientPort: process.env.CODESPACES ? 443 : undefined
-    }
+      clientPort: process.env.CODESPACES ? 443 : undefined,
+    },
   },
 
   plugins: [
