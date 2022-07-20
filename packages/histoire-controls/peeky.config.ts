@@ -12,7 +12,6 @@ export default defineConfig({
         '@iconify/vue': '@iconify/vue',
         pinia: 'pinia',
         'scroll-into-view-if-needed': 'scroll-into-view-if-needed',
-        shiki: 'shiki',
         'vue-router': 'vue-router',
         '@vueuse/core': '@vueuse/core',
         vue: 'vue',
