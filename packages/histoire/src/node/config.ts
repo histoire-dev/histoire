@@ -271,10 +271,21 @@ export function getDefaultConfig (): HistoireConfig {
     ],
     sandboxDarkClass: 'dark',
     routerMode: 'history',
-    vite: {
-      build: {
-        lib: false,
-      },
+    vite: (config) => {
+      // Remove vite:legacy plugins https://github.com/histoire-dev/histoire/issues/156
+      const index = config.plugins?.findIndex(plugin => Array.isArray(plugin) &&
+        typeof plugin[0] === 'object' &&
+        !Array.isArray(plugin[0]) &&
+        plugin[0].name.startsWith('vite:legacy'))
+      if (index !== -1) {
+        config.plugins?.splice(index, 1)
+      }
+
+      return {
+        build: {
+          lib: false,
+        },
+      }
     },
   }
 }
