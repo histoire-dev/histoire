@@ -1,4 +1,4 @@
-import { computed, defineComponent, provide, useAttrs, VNode, h, PropType, getCurrentInstance } from 'vue'
+import { computed, defineComponent, provide, useAttrs, VNode, h, PropType, getCurrentInstance, reactive } from 'vue'
 import type { Story } from '@histoire/shared'
 import Variant from './Variant'
 
@@ -46,7 +46,8 @@ export default defineComponent({
       addImplicitState(key, storyComponent.devtoolsRawSetupState[key])
     }
     // Shallow copy to prevent sharing object with different variants
-    provide('implicitState', { ...implicitState })
+    // Wrap with reactive to unwrap refs
+    provide('implicitState', reactive({ ...implicitState }))
 
     function updateStory () {
       Object.assign(attrs.story, {
