@@ -19,7 +19,7 @@ const highlighter = shallowRef<Highlighter>()
 const error = ref<string>(null)
 
 onMounted(async () => {
-  setCDN('https://unpkg.com/shiki/')
+  setCDN('https://unpkg.com/shiki@0.10.1/')
   highlighter.value = await getHighlighter({
     langs: [
       'html',
