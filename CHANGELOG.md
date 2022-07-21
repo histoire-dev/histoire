@@ -1,3 +1,22 @@
+## [0.8.2](https://github.com/Akryum/histoire/compare/v0.8.1...v0.8.2) (2022-07-21)
+
+
+### Bug Fixes
+
+* **config:** disable vite internal config file loading ([8ca4362](https://github.com/Akryum/histoire/commit/8ca4362ce1ee8ed6832b09928b29404f0d168adb))
+* **config:** merge function `vite` ([f52c05c](https://github.com/Akryum/histoire/commit/f52c05cf97eddf121e72e617ba2c6c766c937282))
+* **config:** remove vite:legacy, fix [#156](https://github.com/Akryum/histoire/issues/156) ([f057330](https://github.com/Akryum/histoire/commit/f05733069b36491685301d84aa9740ba9c223ac7))
+* **HstSelect:** allow any type of value ([1e198a8](https://github.com/Akryum/histoire/commit/1e198a80d8c873008d8bee169bdabac84c15ad0e))
+* pin shiki version on cdn ([8f69bbf](https://github.com/Akryum/histoire/commit/8f69bbfe0874fd0739e5809ae67b725f0d6b66fe))
+* **vue3:** codegen: remove undefined props ([b0dc96d](https://github.com/Akryum/histoire/commit/b0dc96da5e9b9bbeacbef1b4a9073f016104a4e7))
+* **vue3:** falsy auto props overrides not applied, fix [#164](https://github.com/Akryum/histoire/issues/164) ([0a53656](https://github.com/Akryum/histoire/commit/0a53656b74c6e76da1b6c37e62ab3322e943d24c))
+* **vue3:** global components not resolved, fix [#158](https://github.com/Akryum/histoire/issues/158) ([855103b](https://github.com/Akryum/histoire/commit/855103b70bcbc96b0a2ad23b8ac7c347e11f7160))
+* **vue3:** script setup refs not synced, fix [#190](https://github.com/Akryum/histoire/issues/190) ([780967d](https://github.com/Akryum/histoire/commit/780967df22b0107e52c930ae916bc2806fcc0fe2))
+* **vue3:** shared auto props ([dbcf87b](https://github.com/Akryum/histoire/commit/dbcf87b3ddad82fca04e7991b3afe0bd6243ce58))
+* **vue3:** toRawDeep emptying duplicate objects/arrays, fix [#183](https://github.com/Akryum/histoire/issues/183) ([bba7711](https://github.com/Akryum/histoire/commit/bba7711360fd8b2286405f5ce8fdb586925253f2))
+
+
+
 ## [0.8.1](https://github.com/Akryum/histoire/compare/v0.8.0...v0.8.1) (2022-07-20)
 
 
