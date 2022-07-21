@@ -145,6 +145,10 @@ async function printVNode (vnode: VNode, propsOverrides: Record<string, any> = n
           return
         }
 
+        if (typeof value === 'undefined') {
+          return
+        }
+
         let serialized: string[]
         if (typeof value === 'string' && value.startsWith('{{') && value.endsWith('}}')) {
           // It was formatted from auto building object (slot props)
