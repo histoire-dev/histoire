@@ -9,8 +9,14 @@ describe('Setup app (vue3)', () => {
     cy.visit('/story/src-components-storysetup-story-vue?variantId=global')
     getIframeBody().contains('42')
   })
+
   it('should handle local setup', () => {
     cy.visit('/story/src-components-storysetup-story-vue?variantId=local')
     getIframeBody().contains('meow')
+  })
+
+  it('should display global components', () => {
+    cy.visit('/story/src-components-storysetup-story-vue?variantId=global-component')
+    getIframeBody().contains('Global component')
   })
 })

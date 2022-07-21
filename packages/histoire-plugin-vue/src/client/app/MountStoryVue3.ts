@@ -11,6 +11,10 @@ import {
   h as _h,
 } from '@histoire/vendors/dist/client/vue'
 import type { Story } from '@histoire/shared'
+// @ts-expect-error virtual module id
+import * as setup from '$histoire-setup'
+// @ts-expect-error virtual module id
+import * as generatedSetup from '$histoire-generated-global-setup'
 import { registerGlobalComponents } from './global-components.js'
 import { RouterLinkStub } from './RouterLinkStub'
 
@@ -45,6 +49,24 @@ export default _defineComponent({
 
       // Stubs
       app.component('RouterLink', RouterLinkStub)
+
+      // Call app setups to resolve global assets such as components
+
+      if (typeof generatedSetup?.setupVue3 === 'function') {
+        await generatedSetup.setupVue3({
+          app,
+          story: props.story,
+          variant: null,
+        })
+      }
+
+      if (typeof setup?.setupVue3 === 'function') {
+        await setup.setupVue3({
+          app,
+          story: props.story,
+          variant: null,
+        })
+      }
 
       const target = document.createElement('div')
       el.value.appendChild(target)

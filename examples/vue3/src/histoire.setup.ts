@@ -2,6 +2,7 @@ import './histoire.css'
 import { defineSetupVue3 } from 'histoire/client'
 import { createPinia } from 'pinia'
 import { createI18n } from 'vue-i18n'
+import GlobalComp from './components/GlobalComp.vue'
 
 export const setupVue3 = defineSetupVue3(({ app }) => {
   app.provide('demo', 42)
@@ -10,4 +11,6 @@ export const setupVue3 = defineSetupVue3(({ app }) => {
 
   const i18n = createI18n()
   app.use(i18n)
+
+  app.component('GlobalComp', GlobalComp)
 })

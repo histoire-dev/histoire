@@ -20,5 +20,12 @@ import InjectDemo from './InjectDemo.vue'
     >
       <InjectDemo />
     </Variant>
+
+    <Variant
+      id="global-component"
+      title="Global component"
+    >
+      <GlobalComp />
+    </Variant>
   </Story>
 </template>
