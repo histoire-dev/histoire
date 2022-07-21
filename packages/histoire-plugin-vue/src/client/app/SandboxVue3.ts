@@ -181,7 +181,7 @@ export default _defineComponent({
             })
 
             // Props overrides
-            if (externalState?._hPropState?.[index]?.[key]) {
+            if (externalState?._hPropState?.[index]?.[key] != null) {
               if (!vnode.props) {
                 vnode.props = {}
               }
