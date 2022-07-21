@@ -7,6 +7,7 @@ import {
   ResolvedConfig,
   InlineConfig,
   mergeConfig as mergeViteConfig,
+  loadConfigFromFile as loadViteConfigFromFile,
 } from 'vite'
 import { lookup as lookupMime } from 'mrmime'
 import { APP_PATH, DIST_PATH, TEMP_PATH } from './alias.js'
@@ -62,7 +63,9 @@ async function mergeHistoireViteConfig (viteConfig: InlineConfig, ctx: Context) 
 export async function getViteConfigWithPlugins (isServer: boolean, ctx: Context): Promise<InlineConfig> {
   const resolvedViteConfig = await resolveViteConfig(ctx)
 
-  const inlineConfig = await mergeHistoireViteConfig({}, ctx)
+  const userViteConfig = await loadViteConfigFromFile({ command: ctx.mode === 'dev' ? 'serve' : 'build', mode: ctx.mode })
+
+  const inlineConfig = await mergeHistoireViteConfig(userViteConfig.config ?? {}, ctx)
   const plugins: VitePlugin[] = []
 
   plugins.push({
@@ -343,6 +346,7 @@ if (import.meta.hot) {
   }
 
   return mergeViteConfig(inlineConfig, {
+    configFile: false,
     plugins,
   }) as InlineConfig
 }
