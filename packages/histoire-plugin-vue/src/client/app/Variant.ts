@@ -44,14 +44,14 @@ export default defineComponent({
 
     const vm = getCurrentInstance()
 
-    const implicitState = inject('implicitState')
+    const implicitState = inject<() => any>('implicitState')
 
     if (typeof props.initState === 'function') {
       const state = await props.initState()
       applyState(attrs.variant.state, toRawDeep(state))
     }
 
-    syncStateBundledAndExternal(attrs.variant.state, implicitState)
+    syncStateBundledAndExternal(attrs.variant.state, implicitState())
 
     function updateVariant () {
       Object.assign(attrs.variant, {

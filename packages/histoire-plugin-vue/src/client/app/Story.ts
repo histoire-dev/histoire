@@ -47,7 +47,7 @@ export default defineComponent({
     }
     // Shallow copy to prevent sharing object with different variants
     // Wrap with reactive to unwrap refs
-    provide('implicitState', reactive({ ...implicitState }))
+    provide('implicitState', () => reactive({ ...implicitState }))
 
     function updateStory () {
       Object.assign(attrs.story, {
