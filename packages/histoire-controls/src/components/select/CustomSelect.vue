@@ -12,29 +12,30 @@ import { HstControlOption } from '../../types'
 
 const props = defineProps<{
   modelValue: string
-  options: Record<string, string> | string[] | HstControlOption[]
+  options: Record<string, any> | string[] | HstControlOption[]
 }>()
 
 const emits = defineEmits<{
   (e: 'update:modelValue', value: string): void
 }>()
 
-const formattedOptions: ComputedRef<Record<string, string>> = computed(() => {
+const formattedOptions: ComputedRef<[any, string][]> = computed(() => {
   if (Array.isArray(props.options)) {
-    return Object.fromEntries(props.options.map((value: string | HstControlOption) => {
-      if (typeof value === 'string') {
-        return [value, value]
+    return props.options.map(option => {
+      if (typeof option === 'string') {
+        return [option, option] as [string, string]
       } else {
-        return [value.value, value.label]
+        return [option.value, option.label] as [any, string]
       }
-    }))
+    })
+  } else {
+    return Object.entries(props.options)
   }
-  return props.options
 })
 
-const selectedLabel = computed(() => formattedOptions.value[props.modelValue])
+const selectedLabel = computed(() => formattedOptions.value.find(([value]) => value === props.modelValue)?.[1])
 
-function selectValue (value: string, hide: () => void) {
+function selectValue (value: any, hide: () => void) {
   emits('update:modelValue', value)
   hide()
 }
@@ -60,7 +61,7 @@ function selectValue (value: string, hide: () => void) {
     <template #popper="{ hide }">
       <div class="htw-flex htw-flex-col htw-bg-gray-50 dark:htw-bg-gray-700">
         <div
-          v-for="( label, value ) in formattedOptions"
+          v-for="[value, label] of formattedOptions"
           v-bind="{ ...$attrs, class: null, style: null }"
           :key="label"
           class="htw-px-2 htw-py-1 htw-cursor-pointer hover:htw-bg-primary-100 dark:hover:htw-bg-primary-700"

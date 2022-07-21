@@ -12,11 +12,11 @@ import { HstControlOption } from '../../types'
 defineProps<{
   title?: string
   modelValue: string
-  options: Record<string, string> | string[] | HstControlOption[]
+  options: Record<string, any> | string[] | HstControlOption[]
 }>()
 
 const emits = defineEmits<{
-  (e: 'update:modelValue', value: string): void
+  (e: 'update:modelValue', value: any): void
 }>()
 </script>
 
