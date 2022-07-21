@@ -4,6 +4,8 @@ import BaseButton from './BaseButton.vue'
 function initState () {
   return {
     disabled: false,
+    color: undefined,
+    size: undefined,
   }
 }
 </script>
@@ -23,6 +25,8 @@ function initState () {
       <template #default="{ state }">
         <BaseButton
           :disabled="state.disabled"
+          :color="state.color"
+          :size="state.size"
         >
           Click me
         </BaseButton>
@@ -32,6 +36,24 @@ function initState () {
         <HstCheckbox
           v-model="state.disabled"
           title="Disabled"
+        />
+        <HstSelect
+          v-model="state.color"
+          title="Color"
+          :options="[
+            { value: undefined, label: 'Default' },
+            { value: 'green', label: 'Green' },
+            { value: 'red', label: 'Red' },
+          ]"
+        />
+        <HstSelect
+          v-model="state.size"
+          title="Size"
+          :options="[
+            { value: undefined, label: 'Default' },
+            { value: 'small', label: 'Small' },
+            { value: 'big', label: 'Big' },
+          ]"
         />
       </template>
     </Variant>
