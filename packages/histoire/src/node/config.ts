@@ -324,7 +324,15 @@ export async function loadConfigFile (configFile: string): Promise<Partial<Histo
 
 export const mergeConfig = createDefu((obj: any, key, value) => {
   if (obj[key] && key === 'vite') {
-    obj[key] = mergeViteConfig(obj[key], value)
+    const initialValue = obj[key]
+    if (typeof value === 'function') {
+      obj[key] = async (...args) => {
+        const result = await value(...args)
+        return mergeViteConfig(initialValue, result)
+      }
+    } else {
+      obj[key] = mergeViteConfig(initialValue, value)
+    }
     return true
   }
 
