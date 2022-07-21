@@ -11,7 +11,7 @@ const isObject = (val) => val !== null && typeof val === 'object'
 /**
  * Using external/user Vue
  */
-export function toRawDeep (val, seen = new Set()) {
+export function toRawDeep (val, seen = new Map()) {
   const unwrappedValue = isRef(val) ? unref(val) : val
 
   if (typeof unwrappedValue === 'symbol') {
@@ -23,19 +23,23 @@ export function toRawDeep (val, seen = new Set()) {
   }
 
   if (seen.has(unwrappedValue)) {
-    return Array.isArray(unwrappedValue) ? [] : {}
+    return seen.get(unwrappedValue)
   }
 
-  seen.add(unwrappedValue)
+  let result
 
   if (Array.isArray(unwrappedValue)) {
-    return unwrappedValue.map(value => toRawDeep(value, seen))
+    result = unwrappedValue.map(value => toRawDeep(value, seen))
+  } else {
+    result = toRawObject(unwrappedValue, seen)
   }
 
-  return toRawObject(unwrappedValue, seen)
+  seen.set(unwrappedValue, result)
+
+  return result
 }
 
-const toRawObject = (obj: Record<any, any>, seen = new Set()) => Object.keys(obj).reduce((raw, key) => {
+const toRawObject = (obj: Record<any, any>, seen = new Map()) => Object.keys(obj).reduce((raw, key) => {
   raw[key] = toRawDeep(obj[key], seen)
   return raw
 }, {})
@@ -43,7 +47,7 @@ const toRawObject = (obj: Record<any, any>, seen = new Set()) => Object.keys(obj
 /**
  * Using bundled Vue
  */
-export function _toRawDeep (val, seen = new Set()) {
+export function _toRawDeep (val, seen = new Map()) {
   const unwrappedValue = _isRef(val) ? _unref(val) : val
 
   if (typeof unwrappedValue === 'symbol') {
@@ -55,19 +59,23 @@ export function _toRawDeep (val, seen = new Set()) {
   }
 
   if (seen.has(unwrappedValue)) {
-    return Array.isArray(unwrappedValue) ? [] : {}
+    return seen.get(unwrappedValue)
   }
 
-  seen.add(unwrappedValue)
+  let result
 
   if (Array.isArray(unwrappedValue)) {
-    return unwrappedValue.map(value => _toRawDeep(value, seen))
+    result = unwrappedValue.map(value => _toRawDeep(value, seen))
+  } else {
+    result = _toRawObject(unwrappedValue, seen)
   }
 
-  return _toRawObject(unwrappedValue, seen)
+  seen.set(unwrappedValue, result)
+
+  return result
 }
 
-const _toRawObject = (obj: Record<any, any>, seen = new Set()) => Object.keys(obj).reduce((raw, key) => {
+const _toRawObject = (obj: Record<any, any>, seen = new Map()) => Object.keys(obj).reduce((raw, key) => {
   raw[key] = _toRawDeep(obj[key], seen)
   return raw
 }, {})
