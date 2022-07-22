@@ -1,3 +1,14 @@
+## [0.8.3](https://github.com/Akryum/histoire/compare/v0.8.2...v0.8.3) (2022-07-22)
+
+
+### Bug Fixes
+
+* mark auto prop internal state as non-enumerable ([20678c8](https://github.com/Akryum/histoire/commit/20678c8d6d93b3be1c21d952a65c96d62bc0c4d8))
+* too much recursion with circular data ([df81aac](https://github.com/Akryum/histoire/commit/df81aac8eff0b1935ab0ec01bf7f60183872aa7d))
+* **vue3:** state sync hang ([7c399fd](https://github.com/Akryum/histoire/commit/7c399fd6f23b806c85b2750a8796a297da9994f2))
+
+
+
 ## [0.8.2](https://github.com/Akryum/histoire/compare/v0.8.1...v0.8.2) (2022-07-21)
 
 
