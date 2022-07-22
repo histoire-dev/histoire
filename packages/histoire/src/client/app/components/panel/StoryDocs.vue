@@ -1,4 +1,7 @@
 <script lang="ts">
+import { PropType, Ref, ref, toRefs, watchEffect } from 'vue'
+import type { Story } from '../../types'
+
 export function useStoryDoc (story: Ref<Story>) {
   const renderedDoc = ref('')
 
@@ -22,9 +25,7 @@ export function useStoryDoc (story: Ref<Story>) {
 </script>
 
 <script lang="ts" setup>
-import { PropType, Ref, ref, toRefs, watchEffect } from 'vue'
 import { Icon } from '@iconify/vue'
-import type { Story } from '../../types'
 import BaseEmpty from '../base/BaseEmpty.vue'
 
 const props = defineProps({
