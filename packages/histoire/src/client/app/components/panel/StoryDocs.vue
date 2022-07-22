@@ -1,5 +1,28 @@
+<script lang="ts">
+export function useStoryDoc (story: Ref<Story>) {
+  const renderedDoc = ref('')
+
+  watchEffect(async () => {
+    let comp = story.value.file?.component
+    console.log(comp)
+    if (comp) {
+      if (comp.__asyncResolved) {
+        comp = comp.__asyncResolved
+      } else if (comp.__asyncLoader) {
+        comp = await comp.__asyncLoader()
+      }
+      renderedDoc.value = comp.doc
+    }
+  })
+
+  return {
+    renderedDoc,
+  }
+}
+</script>
+
 <script lang="ts" setup>
-import { PropType, ref, watchEffect } from 'vue'
+import { PropType, Ref, ref, toRefs, watchEffect } from 'vue'
 import { Icon } from '@iconify/vue'
 import type { Story } from '../../types'
 import BaseEmpty from '../base/BaseEmpty.vue'
@@ -11,17 +34,9 @@ const props = defineProps({
   },
 })
 
-const renderedDoc = ref('')
+const { story } = toRefs(props)
 
-watchEffect(async () => {
-  let comp = props.story.file?.component
-  if (comp.__asyncResolved) {
-    comp = comp.__asyncResolved
-  } else if (comp.__asyncLoader) {
-    comp = await comp.__asyncLoader()
-  }
-  renderedDoc.value = comp.doc
-})
+const { renderedDoc } = useStoryDoc(story)
 </script>
 
 <template>

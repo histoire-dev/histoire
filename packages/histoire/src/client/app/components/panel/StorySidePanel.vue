@@ -45,7 +45,10 @@ const panelContentComponent = computed(() => {
   >
     <template #first>
       <div class="htw-flex htw-flex-col htw-h-full">
-        <PaneTabs />
+        <PaneTabs
+          :story="storyStore.currentStory"
+          :variant="storyStore.currentVariant"
+        />
 
         <component
           :is="panelContentComponent"

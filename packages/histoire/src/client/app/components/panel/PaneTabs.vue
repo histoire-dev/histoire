@@ -1,10 +1,21 @@
 <script lang="ts" setup>
 import BaseTab from '../base/BaseTab.vue'
 import { useEventsStore } from '../../stores/events'
+import type { Story, Variant } from '../../types'
 import BaseOverflowMenu from '../base/BaseOverflowMenu.vue'
 import BaseOverflowTab from '../base/BaseOverflowTab.vue'
+import { useStoryDoc } from './StoryDocs.vue'
+import { toRefs } from 'vue'
+
+const props = defineProps<{
+  story: Story
+  variant: Variant
+}>()
+
+const { story } = toRefs(props)
 
 const eventsStore = useEventsStore()
+const { renderedDoc } = useStoryDoc(story)
 </script>
 
 <template>
@@ -18,6 +29,9 @@ const eventsStore = useEventsStore()
     <BaseTab
       :to="{ ...$route, query: { ...$route.query, tab: 'docs' } }"
       :matched="$route.query.tab === 'docs'"
+      :class="{
+        'htw-opacity-50': !renderedDoc,
+      }"
     >
       Docs
     </BaseTab>
@@ -44,6 +58,9 @@ const eventsStore = useEventsStore()
       <BaseOverflowTab
         :to="{ ...$route, query: { ...$route.query, tab: 'docs' } }"
         :matched="$route.query.tab === 'docs'"
+        :class="{
+          'opacity-50': !renderedDoc,
+        }"
       >
         Docs
       </BaseOverflowTab>
@@ -56,7 +73,7 @@ const eventsStore = useEventsStore()
           v-if="eventsStore.unseen"
           class="htw-text-center htw-text-xs htw-mx-1 htw-px-0.5 htw-h-4 htw-min-w-4 htw-rounded-full active htw-bg-primary-500 htw-text-white dark:htw-text-black"
         >
-          {{ eventsStore.unseen <=99 ? eventsStore.unseen : "99+" }}
+          {{ eventsStore.unseen <= 99 ? eventsStore.unseen : "99+" }}
         </span>
       </BaseOverflowTab>
     </template>
