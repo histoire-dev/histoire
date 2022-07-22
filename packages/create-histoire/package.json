@@ -1,0 +1,36 @@
+{
+  "name": "create-histoire",
+  "type": "module",
+  "version": "0.8.2",
+  "license": "MIT",
+  "author": "Percy Ma",
+  "repository": {
+    "url": "https://github.com/histoire-dev/histoire.git",
+    "type": "git",
+    "directory": "packages/create-histoire"
+  },
+  "bin": {
+    "create-histoire": "bin/create.js"
+  },
+  "files": [
+    "dist",
+    "bin"
+  ],
+  "scripts": {
+    "build": "unbuild"
+  },
+  "dependencies": {
+    "degit": "^2.8.4",
+    "prompts": "^2.4.2",
+    "yargs-parser": "^21.0.1"
+  },
+  "devDependencies": {
+    "@types/degit": "^2.8.3",
+    "@types/prompts": "^2.0.14",
+    "@types/yargs-parser": "^21.0.0",
+    "unbuild": "^0.7.6"
+  },
+  "engines": {
+    "node": "^14.18.0 || >=16.12.0"
+  }
+}
