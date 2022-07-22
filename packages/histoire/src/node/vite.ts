@@ -65,7 +65,7 @@ export async function getViteConfigWithPlugins (isServer: boolean, ctx: Context)
 
   const userViteConfig = await loadViteConfigFromFile({ command: ctx.mode === 'dev' ? 'serve' : 'build', mode: ctx.mode })
 
-  const inlineConfig = await mergeHistoireViteConfig(userViteConfig.config ?? {}, ctx)
+  const inlineConfig = await mergeHistoireViteConfig(userViteConfig?.config ?? {}, ctx)
   const plugins: VitePlugin[] = []
 
   plugins.push({
