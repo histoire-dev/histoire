@@ -91,27 +91,29 @@ export function syncStateBundledAndExternal (bundledState, externalState) {
   let syncing = false
 
   const _stop = _watch(() => bundledState, value => {
-    if (!syncing && value != null) {
+    if (value == null) return
+    if (!syncing) {
       syncing = true
       applyState(externalState, _toRawDeep(value))
+    } else {
       syncing = false
     }
   }, {
     deep: true,
     immediate: true,
-    flush: 'sync',
   })
 
   const stop = watch(() => externalState, value => {
-    if (!syncing && value != null) {
+    if (value == null) return
+    if (!syncing) {
       syncing = true
       applyState(bundledState, toRawDeep(value))
+    } else {
       syncing = false
     }
   }, {
     deep: true,
     immediate: true,
-    flush: 'sync',
   })
 
   return {
