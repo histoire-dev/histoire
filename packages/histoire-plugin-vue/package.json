@@ -1,6 +1,6 @@
 {
   "name": "@histoire/plugin-vue",
-  "version": "0.8.3",
+  "version": "0.8.4",
   "description": "Histoire plugin for Vue.js support",
   "license": "MIT",
   "author": {
@@ -32,9 +32,9 @@
     "watch": "concurrently \"vite build --watch\" \"pnpm run build:types --watch\""
   },
   "dependencies": {
-    "@histoire/controls": "^0.8.3",
-    "@histoire/shared": "^0.8.3",
-    "@histoire/vendors": "^0.8.3"
+    "@histoire/controls": "^0.8.4",
+    "@histoire/shared": "^0.8.4",
+    "@histoire/vendors": "^0.8.4"
   },
   "devDependencies": {
     "typescript": "^4.7.4",
@@ -42,7 +42,7 @@
     "vue": "^3.2.31"
   },
   "peerDependencies": {
-    "histoire": "^0.8.3",
+    "histoire": "^0.8.4",
     "vue": "^3.2.31"
   }
 }

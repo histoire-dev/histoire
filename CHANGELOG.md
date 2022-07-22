@@ -1,3 +1,19 @@
+## [0.8.4](https://github.com/Akryum/histoire/compare/v0.8.3...v0.8.4) (2022-07-22)
+
+
+### Bug Fixes
+
+* Added questionmark to possibly undefined userViteConfig ([#196](https://github.com/Akryum/histoire/issues/196)) ([64e306a](https://github.com/Akryum/histoire/commit/64e306a67149195821c7720cd88343bbdf33e1c9))
+* show empty state faster ([8289eb8](https://github.com/Akryum/histoire/commit/8289eb86a3d13b3d84c10032c149df0894c2a900))
+
+
+### Features
+
+* dim 'Docs' tab if no docs available ([81871a8](https://github.com/Akryum/histoire/commit/81871a8a63d26b25b97d9d088479817511802f63))
+* dim 'Events' tab if empty ([be697e4](https://github.com/Akryum/histoire/commit/be697e421725a87b4c5ced5ba28c10c2cdd8d028))
+
+
+
 ## [0.8.3](https://github.com/Akryum/histoire/compare/v0.8.2...v0.8.3) (2022-07-22)
 
 
