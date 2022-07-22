@@ -1,11 +1,11 @@
 <script lang="ts" setup>
+import { computed, toRefs } from 'vue'
 import BaseTab from '../base/BaseTab.vue'
 import { useEventsStore } from '../../stores/events'
 import type { Story, Variant } from '../../types'
 import BaseOverflowMenu from '../base/BaseOverflowMenu.vue'
 import BaseOverflowTab from '../base/BaseOverflowTab.vue'
 import { useStoryDoc } from './StoryDocs.vue'
-import { toRefs } from 'vue'
 
 const props = defineProps<{
   story: Story
@@ -14,8 +14,10 @@ const props = defineProps<{
 
 const { story } = toRefs(props)
 
-const eventsStore = useEventsStore()
 const { renderedDoc } = useStoryDoc(story)
+
+const eventsStore = useEventsStore()
+const hasEvents = computed(() => eventsStore.events.length)
 </script>
 
 <template>
@@ -38,6 +40,9 @@ const { renderedDoc } = useStoryDoc(story)
     <BaseTab
       :to="{ ...$route, query: { ...$route.query, tab: 'events' } }"
       :matched="$route.query.tab === 'events'"
+      :class="{
+        'htw-opacity-50': !hasEvents,
+      }"
     >
       Events
       <span
@@ -67,6 +72,9 @@ const { renderedDoc } = useStoryDoc(story)
       <BaseOverflowTab
         :to="{ ...$route, query: { ...$route.query, tab: 'events' } }"
         :matched="$route.query.tab === 'events'"
+        :class="{
+          'htw-opacity-50': !hasEvents,
+        }"
       >
         Events
         <span
