@@ -6,7 +6,7 @@
 
 <style scoped>
 .htw-base-empty:not(.no-animation) {
-  animation: htw-base-empty .3s 1s both;
+  animation: htw-base-empty .15s .2s both;
 }
 
 @keyframes htw-base-empty {
