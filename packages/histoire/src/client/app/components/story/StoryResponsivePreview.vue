@@ -37,7 +37,7 @@ function useDragger (el: Ref<HTMLDivElement>, value: Ref<number>, min: number, m
     event.preventDefault()
     event.stopPropagation()
     const start = axis === 'x' ? event.clientX : event.clientY
-    const startValue = value.value
+    const startValue = value.value ?? (axis === 'x' ? previewWrapper.value.clientWidth - 67 : previewWrapper.value.clientHeight - 70)
     resizing.value = true
 
     const removeListeners = [
