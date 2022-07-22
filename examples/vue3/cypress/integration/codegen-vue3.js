@@ -8,19 +8,13 @@ describe('Codegen (Vue 3)', () => {
 <pre>{
   "object": {
     "foo": "bar"
-  },
-  "$data": {},
-  "_hPropDefs": [],
-  "_hPropState": {}
+  }
 }</pre>
 <div data-test-id="object">
   {
     "object": {
       "foo": "bar"
-    },
-    "$data": {},
-    "_hPropDefs": [],
-    "_hPropState": {}
+    }
   }
 </div>
 <button>A button</button>
