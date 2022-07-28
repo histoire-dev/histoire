@@ -63,7 +63,10 @@ export function mapVariant (variant: Variant, existingVariant?: Variant): Varian
     // Create
     result = {
       ...variant,
-      state: _reactive(createVariantState()),
+      state: _reactive({
+        _hPropState: {},
+        _hPropDefs: {},
+      }),
       setupApp: null,
       slots: () => ({}),
       previewReady: false,
@@ -71,21 +74,4 @@ export function mapVariant (variant: Variant, existingVariant?: Variant): Varian
   }
 
   return result
-}
-
-function createVariantState () {
-  const obj = {}
-  Object.defineProperty(obj, '_hPropState', {
-    value: null,
-    writable: true,
-    configurable: true,
-    enumerable: false,
-  })
-  Object.defineProperty(obj, '_hPropDefs', {
-    value: null,
-    writable: true,
-    configurable: true,
-    enumerable: false,
-  })
-  return obj
 }

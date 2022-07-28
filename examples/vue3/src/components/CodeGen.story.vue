@@ -45,9 +45,9 @@ function onClick (event) {
       <template #default="{ state }">
         <h1>Title</h1>
         <hr>
-        <pre>{{ state }}</pre>
+        <pre>{{ { object: state.object } }}</pre>
         <div data-test-id="object">
-          {{ state }}
+          {{ { object: state.object } }}
         </div>
         <button>A button</button>
         <button class="btn btn-primary">
