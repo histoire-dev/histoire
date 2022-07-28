@@ -47,4 +47,4 @@ Histoire is an Open-Source project supported by our sponsors - thank you!
 
 ## Guides
 
-[Vue 3](./vue3/getting-started.md)
+[Vue 3 →](./vue3/getting-started.md)
