@@ -22,7 +22,7 @@ import * as generatedSetup from '$histoire-generated-global-setup'
 import { syncStateBundledAndExternal } from './util.js'
 
 export default _defineComponent({
-  name: 'SandboxVue3',
+  name: 'RenderStory',
 
   props: {
     variant: {
@@ -70,7 +70,7 @@ export default _defineComponent({
       let lastPropsTypesSnapshot: string
 
       app = createApp({
-        name: 'SandboxVue3',
+        name: 'RenderStorySubApp',
 
         setup () {
           onMounted(() => {

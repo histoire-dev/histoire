@@ -1,13 +1,9 @@
 import type { ServerRunPayload } from '@histoire/shared'
+// @ts-expect-error virtual module
+import { collectSupportPlugins } from 'virtual:$histoire-support-plugins-collect'
 
 export async function run (payload: ServerRunPayload) {
-  let result: any
-
-  // @TODO if (vue3)
-  {
-    const { run } = await import('@histoire/plugin-vue/collect')
-    result = await run(payload)
-  }
-
+  const { run } = await collectSupportPlugins[payload.file.supportPluginId]()
+  const result = await run(payload)
   return result
 }

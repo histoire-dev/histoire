@@ -1,6 +1,6 @@
 export interface StoryFile {
   id: string
-  framework: string
+  supportPluginId: string
   component: any
   story: Story
   path: string[]
@@ -68,6 +68,10 @@ export interface ServerStoryFile {
    * File name without extension
    */
   fileName: string
+  /**
+   * Support plugin (Vue, Svelte, etc.)
+   */
+  supportPluginId: string
   /**
    * Generated path for tree UI
    */
@@ -138,4 +142,17 @@ export interface ServerRunPayload {
   file: ServerStoryFile
   storyData: ServerStory[]
   el: HTMLElement
+}
+
+export interface SupportPlugin {
+  id: string
+  moduleName: string
+  setupFn: string
+  importStoriesPrepend?: string
+  importStoryComponent: (file: ServerStoryFile, index: number) => string
+}
+
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface FinalSupportPlugin extends SupportPlugin {
+  // For now, no additional properties
 }

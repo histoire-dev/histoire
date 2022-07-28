@@ -18,6 +18,7 @@ export default defineConfig({
       input: [
         'src/client/client.ts',
         'src/client/server.ts',
+        'src/index.ts',
       ],
 
       output: {
@@ -31,7 +32,7 @@ export default defineConfig({
         assetFileNames: '[name][extname]',
         // hoistTransitiveImports: false,
         preserveModules: true,
-        preserveModulesRoot: 'src/client',
+        preserveModulesRoot: 'src',
       },
       treeshake: false,
       preserveEntrySignatures: 'strict',

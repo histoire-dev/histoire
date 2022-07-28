@@ -3,7 +3,7 @@ import { PropType, ref, toRefs } from 'vue'
 import { Icon } from '@iconify/vue'
 import { useRouter } from 'vue-router'
 import { useResizeObserver } from '@vueuse/core'
-import { SandboxVue3 } from '@histoire/plugin-vue/client'
+import GenericRenderStory from './GenericRenderStory.vue'
 import { useCurrentVariantRoute } from '../../util/variant'
 import type { Story, Variant } from '../../types'
 import { useScrollOnActive } from '../../util/scroll'
@@ -94,7 +94,7 @@ useResizeObserver(el, () => {
       @click.stop.prevent="selectVariant()"
       @keyup="selectVariant()"
     >
-      <SandboxVue3
+      <GenericRenderStory
         :variant="variant"
         :story="story"
         @ready="onReady"

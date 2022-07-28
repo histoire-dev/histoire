@@ -2,6 +2,7 @@ import chokidar from 'chokidar'
 import { globby } from 'globby'
 import Case from 'case'
 import { resolve, basename } from 'pathe'
+import micromatch from 'micromatch'
 import type { ServerStoryFile } from '@histoire/shared'
 import { Context } from './context.js'
 
@@ -52,11 +53,27 @@ export function addStory (relativeFilePath: string) {
     fileName = fileName.substring(0, fileName.indexOf('.'))
   }
 
+  let supportPluginId: string
+
+  for (const p of context.config.supportMatch) {
+    if (micromatch.isMatch(relativeFilePath, p.patterns, {
+      dot: true,
+    })) {
+      supportPluginId = p.pluginIds[0]
+      break
+    }
+  }
+
+  if (!supportPluginId) {
+    throw new Error(`No support plugin found for file ${relativeFilePath}`)
+  }
+
   const file: ServerStoryFile = {
     id: fileId, // The file id will be changed by the story id after it is collected
     path: absoluteFilePath,
     fileName,
     moduleId: `/${relativeFilePath}`,
+    supportPluginId,
   }
   context.storyFiles.push(file)
   return file

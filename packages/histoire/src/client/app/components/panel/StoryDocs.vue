@@ -7,7 +7,6 @@ export function useStoryDoc (story: Ref<Story>) {
 
   watchEffect(async () => {
     let comp = story.value.file?.component
-    console.log(comp)
     if (comp) {
       if (comp.__asyncResolved) {
         comp = comp.__asyncResolved

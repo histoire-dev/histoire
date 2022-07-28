@@ -17,15 +17,21 @@
   "type": "module",
   "exports": {
     "./client": {
-      "import": "./dist/bundled/client.js",
-      "types": "./dist/client/client.d.ts"
+      "types": "./dist/client/client.d.ts",
+      "default": "./dist/bundled/client/client.js"
     },
     "./collect": {
-      "import": "./dist/bundled/server.js",
-      "types": "./dist/client/server.d.ts"
+      "types": "./dist/client/server.d.ts",
+      "default": "./dist/bundled/client/server.js"
+    },
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/bundled/index.js"
     },
     "./*": "./*"
   },
+  "main": "dist/bundled/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "build": "rimraf dist && vite build && pnpm run build:types",
     "build:types": "tsc --declaration --emitDeclarationOnly",
@@ -38,6 +44,7 @@
   },
   "devDependencies": {
     "typescript": "^4.7.4",
+    "histoire": "workspace:*",
     "vite": "^2.9.1",
     "vue": "^3.2.31"
   },

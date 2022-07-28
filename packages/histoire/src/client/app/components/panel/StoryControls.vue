@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { PropType } from 'vue'
 import { Icon } from '@iconify/vue'
-import { SandboxVue3 } from '@histoire/plugin-vue/client'
+import GenericRenderStory from '../story/GenericRenderStory.vue'
 import type { Story, Variant } from '../../types'
 import BaseEmpty from '../base/BaseEmpty.vue'
 import StatePresets from './StatePresets.vue'
@@ -36,7 +36,7 @@ defineProps({
     </div>
 
     <!-- Custom controls -->
-    <SandboxVue3
+    <GenericRenderStory
       v-if="variant.slots().controls || story.slots().controls"
       slot-name="controls"
       :variant="variant"

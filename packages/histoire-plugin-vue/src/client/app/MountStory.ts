@@ -19,7 +19,7 @@ import { registerGlobalComponents } from './global-components.js'
 import { RouterLinkStub } from './RouterLinkStub'
 
 export default _defineComponent({
-  name: 'MountStoryVue3',
+  name: 'MountStory',
 
   props: {
     story: {
@@ -34,7 +34,7 @@ export default _defineComponent({
 
     async function mountStory () {
       app = createApp({
-        name: 'MountStoryVue3',
+        name: 'MountStorySubApp',
 
         render: () => {
           return h(Suspense, [

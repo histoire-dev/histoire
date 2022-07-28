@@ -2,7 +2,8 @@ import { parseQuery } from 'vue-router'
 import { computed, createApp, h, onMounted, ref, watch } from 'vue'
 import { createPinia } from 'pinia'
 import { applyState } from '@histoire/shared'
-import { SandboxVue3, MountStoryVue3 } from '@histoire/plugin-vue/client'
+import GenericMountStory from './components/story/GenericMountStory.vue'
+import GenericRenderStory from './components/story/GenericRenderStory.vue'
 import type { StoryFile } from './types'
 import { mapFile } from './util/mapping'
 // @ts-expect-error virtual module
@@ -63,12 +64,12 @@ const app = createApp({
   render () {
     return [
       h('div', { class: 'htw-sandbox-hidden' }, [
-        h(MountStoryVue3, {
+        h(GenericMountStory, {
           story: file.value.story,
         }),
       ]),
       this.story && this.variant
-        ? h(SandboxVue3, {
+        ? h(GenericRenderStory, {
           story: this.story,
           variant: this.variant,
           onReady: () => {

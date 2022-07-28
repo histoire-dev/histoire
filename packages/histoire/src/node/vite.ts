@@ -36,6 +36,10 @@ export const GENERATED_GLOBAL_SETUP = '$histoire-generated-global-setup'
 export const RESOLVED_GENERATED_GLOBAL_SETUP = `/${GENERATED_GLOBAL_SETUP}-resolved`
 export const GENERATED_SETUP_CODE = '$histoire-generated-setup-code'
 export const RESOLVED_GENERATED_SETUP_CODE = `/${GENERATED_SETUP_CODE}-resolved`
+export const SUPPORT_PLUGINS_CLIENT = 'virtual:$histoire-support-plugins-client'
+export const RESOLVED_SUPPORT_PLUGINS_CLIENT = `\0${SUPPORT_PLUGINS_CLIENT}`
+export const SUPPORT_PLUGINS_COLLECT = 'virtual:$histoire-support-plugins-collect'
+export const RESOLVED_SUPPORT_PLUGINS_COLLECT = `\0${SUPPORT_PLUGINS_COLLECT}`
 
 export async function resolveViteConfig (ctx: Context): Promise<ResolvedConfig> {
   const command = ctx.mode === 'dev' ? 'serve' : 'build'
@@ -147,6 +151,12 @@ export async function getViteConfigWithPlugins (isServer: boolean, ctx: Context)
         const [, index] = id.split('__')
         return `${RESOLVED_GENERATED_SETUP_CODE}__${index}`
       }
+      if (id.startsWith(SUPPORT_PLUGINS_CLIENT)) {
+        return RESOLVED_SUPPORT_PLUGINS_CLIENT
+      }
+      if (id.startsWith(SUPPORT_PLUGINS_COLLECT)) {
+        return RESOLVED_SUPPORT_PLUGINS_COLLECT
+      }
     },
 
     async load (id) {
@@ -160,12 +170,18 @@ export async function getViteConfigWithPlugins (isServer: boolean, ctx: Context)
               ...file.story,
               docsText: undefined,
             },
-            framework: 'vue3',
+            supportPluginId: file.supportPluginId,
             index,
           }
         })
-        return `import { defineAsyncComponent } from 'vue'
-${resolvedStories.map((file, index) => `const Comp${index} = defineAsyncComponent(() => import('${file.path}'))`).join('\n')}
+        return `${ctx.supportPlugins.map(p => p.importStoriesPrepend).filter(Boolean).join('\n')}
+${resolvedStories.map((file, index) => {
+    const supportPlugin = ctx.supportPlugins.find(p => p.id === file.supportPluginId)
+    if (!supportPlugin) {
+      throw new Error(`Could not find support plugin for story ${file.path}: ${file.supportPluginId}`)
+    }
+    return supportPlugin.importStoryComponent(file, index)
+  }).filter(Boolean).join('\n')}
 export let files = [${files.map((file) => `{${JSON.stringify(file).slice(1, -1)}, component: Comp${file.index}}`).join(',\n')}]
 export let tree = ${JSON.stringify(makeTree(ctx.config, resolvedStories))}
 const handlers = []
@@ -183,9 +199,11 @@ if (import.meta.hot) {
   })
 }`
       }
+
       if (id === NOOP_ID) {
         return `export default () => {}`
       }
+
       if (id === RESOLVED_CONFIG_ID) {
         let js = `export const config = ${JSON.stringify(ctx.config)}\n`
         if (ctx.config.theme?.logo) {
@@ -196,6 +214,7 @@ if (import.meta.hot) {
         js += `export const logos = {${Object.keys(ctx.config.theme?.logo ?? {}).map(key => `${key}: Logo_${key}`).join(', ')}}\n`
         return js
       }
+
       if (id === RESOLVED_THEME_ID) {
         let css = '*, ::before, ::after {'
         // Colors
@@ -207,12 +226,15 @@ if (import.meta.hot) {
         css += '}'
         return css
       }
+
       if (id === RESOLVED_SEARCH_TITLE_DATA_ID) {
         return getSearchDataJS(await generateTitleSearchData(ctx))
       }
+
       if (id === RESOLVED_SEARCH_DOCS_DATA_ID) {
         return getSearchDataJS(await generateDocSearchData(ctx))
       }
+
       if (id === RESOLVED_GENERATED_GLOBAL_SETUP) {
         if (ctx.config.setupCode) {
           return [
@@ -221,7 +243,7 @@ if (import.meta.hot) {
             // List
             `const setupList = [${ctx.config.setupCode.map((c, index) => `setup_${index}`).join(', ')}]`,
             // Setups
-            ['setupVue3'].map(fnName => `export async function ${fnName} (payload) {
+            ctx.supportPlugins.map(p => p.setupFn).map(fnName => `export async function ${fnName} (payload) {
               for (const setup of setupList) {
                 if (setup?.${fnName}) {
                   await setup.${fnName}(payload)
@@ -233,9 +255,28 @@ if (import.meta.hot) {
           return ''
         }
       }
+
       if (id.startsWith(RESOLVED_GENERATED_SETUP_CODE)) {
         const [, index] = id.split('__')
         return ctx.config.setupCode?.[index] ?? ''
+      }
+
+      if (id === RESOLVED_SUPPORT_PLUGINS_CLIENT) {
+        const plugins = ctx.supportPlugins.map(p => `'${p.id}': () => import('${require.resolve(`${p.moduleName}/client`, {
+          paths: [ctx.root, import.meta.url],
+        })}')`)
+        return `export const clientSupportPlugins = {
+          ${plugins.join(',\n  ')}
+        }`
+      }
+
+      if (id === RESOLVED_SUPPORT_PLUGINS_COLLECT) {
+        const plugins = ctx.supportPlugins.map(p => `'${p.id}': () => import('${require.resolve(`${p.moduleName}/collect`, {
+          paths: [ctx.root, import.meta.url],
+        })}')`)
+        return `export const collectSupportPlugins = {
+          ${plugins.join(',\n  ')}
+        }`
       }
     },
 

@@ -46,6 +46,7 @@
     "@histoire/vendors": "^0.8.4"
   },
   "devDependencies": {
+    "@histoire/plugin-vue": "workspace:*",
     "@peeky/test": "^0.13.5",
     "@types/node": "^17.0.32",
     "@vitejs/plugin-vue": "^2.3.1",

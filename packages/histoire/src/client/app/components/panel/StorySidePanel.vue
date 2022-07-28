@@ -61,6 +61,7 @@ const panelContentComponent = computed(() => {
 
     <template #last>
       <StorySourceCode
+        :story="storyStore.currentStory"
         :variant="storyStore.currentVariant"
         class="htw-h-full"
       />

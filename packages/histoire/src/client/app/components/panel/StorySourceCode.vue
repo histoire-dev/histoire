@@ -1,17 +1,26 @@
 <script lang="ts" setup>
-import { computed, onMounted, PropType, ref, shallowRef, watch } from 'vue'
+import { computed, markRaw, onMounted, ref, shallowRef, watch, watchEffect } from 'vue'
 import { getHighlighter, Highlighter, setCDN } from 'shiki'
 import { HstCopyIcon } from '@histoire/controls'
 import { unindent } from '@histoire/shared'
-import { generateSourceCode } from '@histoire/plugin-vue/client'
-import type { Variant } from '../../types'
+// @ts-expect-error virtual module
+import { clientSupportPlugins } from 'virtual:$histoire-support-plugins-client'
+import type { Variant, Story } from '../../types'
 import { isDark } from '../../util/dark'
 
-const props = defineProps({
-  variant: {
-    type: Object as PropType<Variant>,
-    required: true,
-  },
+const props = defineProps<{
+  story: Story
+  variant: Variant
+}>()
+
+const generateSourceCodeFn = ref(null)
+
+watchEffect(async () => {
+  const clientPlugin = clientSupportPlugins[props.story.file?.supportPluginId]
+  if (clientPlugin) {
+    const pluginModule = await clientPlugin()
+    generateSourceCodeFn.value = markRaw(pluginModule.generateSourceCode)
+  }
 })
 
 const sourceCode = ref('')
@@ -32,18 +41,19 @@ onMounted(async () => {
   })
 })
 
-watch(() => props.variant, async (value) => {
+watch(() => [props.variant, generateSourceCodeFn.value], async () => {
+  if (!generateSourceCodeFn.value) return
   error.value = null
   try {
-    if (value.source) {
-      sourceCode.value = value.source
-    } else if (value.slots?.().source) {
-      const source = value.slots?.().source()[0].children
+    if (props.variant.source) {
+      sourceCode.value = props.variant.source
+    } else if (props.variant.slots?.().source) {
+      const source = props.variant.slots?.().source()[0].children
       if (source) {
         sourceCode.value = await unindent(source)
       }
     } else {
-      sourceCode.value = await generateSourceCode(value)
+      sourceCode.value = await generateSourceCodeFn.value(props.variant)
     }
   } catch (e) {
     console.error(e)

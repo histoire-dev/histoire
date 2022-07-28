@@ -32,7 +32,23 @@ module.exports = {
     },
 
     nav: [
-      { text: 'Guide', link: '/guide/' },
+      {
+        text: 'Guide',
+        items: [
+          {
+            text: 'About',
+            link: '/guide/',
+          },
+          {
+            text: 'Vue 3',
+            link: '/guide/vue3/getting-started',
+          },
+          {
+            text: 'Plugins',
+            link: '/guide/plugins/official',
+          },
+        ],
+      },
       { text: 'Examples', link: '/examples/' },
       { text: 'API Reference', link: '/reference/config' },
       {
@@ -89,9 +105,9 @@ module.exports = {
           ],
         },
       ],
-      '/guide/': [
+      '/guide/vue3': [
         {
-          text: 'Guide',
+          text: 'Guide - Vue 3',
           collapsible: true,
           items: [
             {
@@ -100,18 +116,12 @@ module.exports = {
             },
             {
               text: 'Getting Started',
-              link: '/guide/getting-started',
+              link: '/guide/vue3/getting-started',
             },
             {
               text: 'Configuration',
               link: '/guide/config',
             },
-          ],
-        },
-        {
-          text: 'Using with Vue 3',
-          collapsible: true,
-          items: [
             {
               text: 'Stories',
               link: '/guide/vue3/stories',
@@ -138,6 +148,8 @@ module.exports = {
             },
           ],
         },
+      ],
+      '/guide/plugins': [
         {
           text: 'Plugins',
           items: [

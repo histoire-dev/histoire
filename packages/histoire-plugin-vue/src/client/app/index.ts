@@ -1,2 +1,2 @@
-export { default as SandboxVue3 } from './SandboxVue3'
-export { default as MountStoryVue3 } from './MountStoryVue3'
+export { default as MountStory } from './MountStory'
+export { default as RenderStory } from './RenderStory'

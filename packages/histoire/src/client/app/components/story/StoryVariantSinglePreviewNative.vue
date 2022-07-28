@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { SandboxVue3 } from '@histoire/plugin-vue/client'
+import GenericRenderStory from './GenericRenderStory.vue'
 import type { Story, Variant } from '../../types'
 import StoryResponsivePreview from './StoryResponsivePreview.vue'
 
@@ -30,7 +30,7 @@ function onReady () {
         height: finalHeight ? `${finalHeight}px` : '100%',
       } : { width: '100%', height: '100%' }"
     >
-      <SandboxVue3
+      <GenericRenderStory
         :key="`${story.id}-${variant.id}`"
         :variant="variant"
         :story="story"

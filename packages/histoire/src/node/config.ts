@@ -17,6 +17,12 @@ import { Plugin } from './plugin.js'
 import { findUp } from './util/find-up.js'
 import { tailwindTokens } from './builtin-plugins/tailwind-tokens.js'
 
+export interface SupportMatchPattern {
+  id: string
+  patterns: string[]
+  pluginIds: string[]
+}
+
 type CustomizableColors = 'primary' | 'gray'
 type ColorKeys = '50' | '100' | '200' | '300' | '400' | '500' | '600' | '700' | '800' | '900'
 type GrayColorKeys = ColorKeys | '750' | '850' | '950'
@@ -52,6 +58,10 @@ export interface HistoireConfig {
    * Glob patterns to ignore files while searching for story files.
    */
   storyIgnored: string[]
+  /**
+   * Patterns to match stories to support plugins automatically.
+   */
+  supportMatch: SupportMatchPattern[]
   /**
    * How to generate the story tree.
    */
@@ -194,6 +204,7 @@ export function getDefaultConfig (): HistoireConfig {
       '**/node_modules/**',
       '**/dist/**',
     ],
+    supportMatch: [],
     tree: {
       file: 'title',
       order: 'asc',
@@ -364,6 +375,19 @@ export const mergeConfig = createDefu((obj: any, key, value) => {
 
   if (obj[key] && key === 'setupCode') {
     obj[key] = [...obj[key], ...value]
+    return true
+  }
+
+  if (obj[key] && key === 'supportMatch') {
+    for (const item of value as SupportMatchPattern[]) {
+      const existing: SupportMatchPattern = obj[key].find(p => p.id === item.id)
+      if (existing) {
+        existing.patterns = [...existing.patterns, ...item.patterns]
+        existing.pluginIds = [...existing.pluginIds, ...item.pluginIds]
+      } else {
+        obj[key].push(item)
+      }
+    }
     return true
   }
 

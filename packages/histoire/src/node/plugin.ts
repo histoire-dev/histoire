@@ -2,7 +2,7 @@ import chokidar from 'chokidar'
 import path from 'pathe'
 import fs from 'fs-extra'
 import pc from 'picocolors'
-import type { ServerStory, ServerVariant } from '@histoire/shared'
+import type { ServerStory, ServerVariant, SupportPlugin } from '@histoire/shared'
 import { TEMP_PATH } from './alias.js'
 import type { ConfigMode, HistoireConfig } from './config.js'
 import type { Context } from './context.js'
@@ -36,6 +36,10 @@ export interface Plugin {
    * Use this hook to do processing during production build.
    */
   onBuild?: (api: BuildPluginApi) => void | Promise<void>
+  /**
+   * This plugin exposes a support plugin (example: Vue, Svelte, etc.)
+   */
+  supportPlugin?: SupportPlugin
 }
 
 export class BasePluginApi {
