@@ -44,6 +44,10 @@ module.exports = {
             link: '/guide/vue3/getting-started',
           },
           {
+            text: 'Configuration',
+            link: '/guide/config',
+          },
+          {
             text: 'Plugins',
             link: '/guide/plugins/official',
           },
@@ -119,10 +123,6 @@ module.exports = {
               link: '/guide/vue3/getting-started',
             },
             {
-              text: 'Configuration',
-              link: '/guide/config',
-            },
-            {
               text: 'Stories',
               link: '/guide/vue3/stories',
             },
@@ -149,7 +149,20 @@ module.exports = {
           ],
         },
       ],
-      '/guide/plugins': [
+      '/guide/': [
+        {
+          text: 'Guide',
+          items: [
+            {
+              text: 'Why Histoire',
+              link: '/guide/',
+            },
+            {
+              text: 'Configuration',
+              link: '/guide/config',
+            },
+          ],
+        },
         {
           text: 'Plugins',
           items: [
