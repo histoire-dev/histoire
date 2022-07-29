@@ -8,6 +8,7 @@ import {
   onMounted,
   onBeforeUpdate,
   onBeforeUnmount,
+  onUpdated,
 } from 'vue'
 import {
   createApp as _createApp,
@@ -36,6 +37,7 @@ function wrapControlComponent (controlComponent) {
     inheritAttrs: false,
     setup (props, { attrs }) {
       const el = ref<HTMLDivElement>()
+      const slotEl = ref<HTMLDivElement>()
 
       // Attrs
 
@@ -50,20 +52,56 @@ function wrapControlComponent (controlComponent) {
         applyState(attrs)
       })
 
+      // Slots
+
+      let newSlotCalls = []
+      const slotCalls = ref([])
+
+      function moveSlotContent () {
+        slotCalls.value.forEach((props, index) => {
+          const renderedEl = slotEl.value.querySelector(`[renderslotid="${index}"]`)
+          if (!renderedEl) return
+          const targetEl = el.value.querySelector(`[slotid="${index}"]`)
+          while (targetEl.firstChild) {
+            targetEl.removeChild(targetEl.lastChild)
+          }
+          targetEl.appendChild(renderedEl)
+        })
+      }
+
       // App
 
       let app: _App
 
       onMounted(() => {
         app = _createApp({
+          mounted () {
+            slotCalls.value = newSlotCalls
+            newSlotCalls = []
+          },
+          updated () {
+            slotCalls.value = newSlotCalls
+            newSlotCalls = []
+          },
           render () {
             return _h(controlComponent, {
               ...state,
               key: 'component',
+            }, {
+              default: props => {
+                newSlotCalls.push(props)
+                return _h('div', {
+                  slotId: newSlotCalls.length - 1,
+                })
+              },
             })
           },
         })
         app.mount(el.value)
+      })
+
+      onUpdated(() => {
+        moveSlotContent()
       })
 
       onBeforeUnmount(() => {
@@ -72,12 +110,21 @@ function wrapControlComponent (controlComponent) {
 
       return {
         el,
+        slotEl,
+        slotCalls,
       }
     },
     render () {
-      return h('div', {
-        ref: 'el',
-      })
+      return [
+        h('div', {
+          ref: 'el',
+        }),
+        h('div', {
+          ref: 'slotEl',
+        }, this.slotCalls.map((props, index) => h('div', {
+          renderSlotId: index,
+        }, this.$slots.default(props)))),
+      ]
     },
   })
 }
