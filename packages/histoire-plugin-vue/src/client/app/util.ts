@@ -3,7 +3,7 @@ import {
   unref as _unref,
   isRef as _isRef,
   watch as _watch,
-} from '@histoire/vendors/dist/client/vue'
+} from '@histoire/vendors/vue'
 import { applyState } from '@histoire/shared'
 
 const isObject = (val) => val !== null && typeof val === 'object'

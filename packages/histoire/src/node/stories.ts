@@ -56,7 +56,7 @@ export function addStory (relativeFilePath: string) {
   let supportPluginId: string
 
   for (const p of context.config.supportMatch) {
-    if (micromatch.isMatch(relativeFilePath, p.patterns, {
+    if (micromatch.isMatch(absoluteFilePath, p.patterns, {
       dot: true,
     })) {
       supportPluginId = p.pluginIds[0]
@@ -65,14 +65,14 @@ export function addStory (relativeFilePath: string) {
   }
 
   if (!supportPluginId) {
-    throw new Error(`No support plugin found for file ${relativeFilePath}`)
+    throw new Error(`No support plugin found for file ${absoluteFilePath}`)
   }
 
   const file: ServerStoryFile = {
     id: fileId, // The file id will be changed by the story id after it is collected
     path: absoluteFilePath,
     fileName,
-    moduleId: `/${relativeFilePath}`,
+    moduleId: absoluteFilePath,
     supportPluginId,
   }
   context.storyFiles.push(file)

@@ -17,6 +17,6 @@
     "@histoire/plugin-vue": "workspace:*",
     "histoire": "workspace:*",
     "vite": "^2.9.1",
-    "vite-plugin-vuetify": "^1.0.0-alpha.11"
+    "vite-plugin-vuetify": "1.0.0-alpha.12"
   }
 }

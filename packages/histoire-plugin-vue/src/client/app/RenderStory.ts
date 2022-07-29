@@ -9,7 +9,7 @@ import {
   ref as _ref,
   watch as _watch,
   h as _h,
-} from '@histoire/vendors/dist/client/vue'
+} from '@histoire/vendors/vue'
 import { applyState } from '@histoire/shared'
 import type { Story, Variant, PropDefinition, AutoPropComponentDefinition } from '@histoire/shared'
 import { getTagName } from '../codegen'

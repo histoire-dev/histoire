@@ -16,13 +16,19 @@
   },
   "type": "module",
   "exports": {
-    "./client/*": "./dist/client/*.js",
+    "./floating-vue": "./dist/client/b-floating-vue.js",
+    "./iconify": "./dist/client/b-iconify.js",
+    "./pinia": "./dist/client/b-pinia.js",
+    "./scroll": "./dist/client/b-scroll.js",
+    "./vue-router": "./dist/client/b-vue-router.js",
+    "./vue-use": "./dist/client/b-vue-use.js",
+    "./vue": "./dist/client/b-vue.js",
     "./*": "./*"
   },
   "sideEffects": false,
   "scripts": {
-    "build": "rimraf dist && rollup -c rollup.config.js",
-    "watch": "rollup -c rollup.config.js"
+    "build": "rimraf dist && rollup -c rollup.config.mjs",
+    "watch": "rollup -c rollup.config.mjs"
   },
   "devDependencies": {
     "@iconify/vue": "^3.2.1",
@@ -30,6 +36,7 @@
     "@rollup/plugin-node-resolve": "^13.3.0",
     "@types/node": "^18.0.3",
     "@vueuse/core": "^8.2.5",
+    "execa": "^6.1.0",
     "floating-vue": "^2.0.0-beta.16",
     "pinia": "^2.0.13",
     "rollup": "^2.75.7",

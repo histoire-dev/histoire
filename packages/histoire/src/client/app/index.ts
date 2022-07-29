@@ -1,7 +1,7 @@
 import '$histoire-theme'
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
-import { FloatingVue } from 'floating-vue'
+import FloatingVue from 'floating-vue'
 import App from './App.vue'
 import { router } from './router'
 

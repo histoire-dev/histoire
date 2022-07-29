@@ -34,13 +34,13 @@ export default defineConfig({
 
   resolve: {
     alias: {
-      'floating-vue': '@histoire/vendors/dist/client/floating-vue.js',
-      '@iconify/vue': '@histoire/vendors/dist/client/iconify.js',
-      pinia: '@histoire/vendors/dist/client/pinia.js',
-      'scroll-into-view-if-needed': '@histoire/vendors/dist/client/scroll.js',
-      'vue-router': '@histoire/vendors/dist/client/vue-router.js',
-      '@vueuse/core': '@histoire/vendors/dist/client/vue-use.js',
-      vue: '@histoire/vendors/dist/client/vue.js',
+      'floating-vue$': '@histoire/vendors/floating-vue',
+      '@iconify/vue': '@histoire/vendors/iconify',
+      pinia: '@histoire/vendors/pinia',
+      'scroll-into-view-if-needed': '@histoire/vendors/scroll',
+      'vue-router': '@histoire/vendors/vue-router',
+      '@vueuse/core': '@histoire/vendors/vue-use',
+      vue: '@histoire/vendors/vue',
     },
   },
 

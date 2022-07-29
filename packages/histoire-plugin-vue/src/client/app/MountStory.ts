@@ -9,7 +9,7 @@ import {
   ref as _ref,
   watch as _watch,
   h as _h,
-} from '@histoire/vendors/dist/client/vue'
+} from '@histoire/vendors/vue'
 import type { Story } from '@histoire/shared'
 // @ts-expect-error virtual module id
 import * as setup from '$histoire-setup'

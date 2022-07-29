@@ -1,5 +1,4 @@
-import { markRaw } from 'vue'
-import { reactive as _reactive } from '@histoire/vendors/dist/client/vue'
+import { markRaw, reactive } from 'vue'
 import type { StoryFile, Variant } from '../types'
 
 const copiedFromExistingVariant = [
@@ -63,7 +62,7 @@ export function mapVariant (variant: Variant, existingVariant?: Variant): Varian
     // Create
     result = {
       ...variant,
-      state: _reactive({
+      state: reactive({
         _hPropState: {},
         _hPropDefs: {},
       }),

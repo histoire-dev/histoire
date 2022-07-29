@@ -14,7 +14,7 @@ import {
   h as _h,
   App as _App,
   reactive as _reactive,
-} from '@histoire/vendors/dist/client/vue'
+} from '@histoire/vendors/vue'
 import { components } from '@histoire/controls'
 import Story from './Story'
 import Variant from './Variant'
