@@ -59,7 +59,7 @@ export default defineConfig({
             }
             // Create entry files in root
             {
-              const content = `export * from './${path.relative(__dirname, file).replace(/\.d\.ts$/, '')}'`
+              const content = `export * from './${path.relative(__dirname, file).replace(/\.d\.ts$/, '')}'\n`
               fs.writeFileSync(path.basename(file).replace(/^b-/, ''), content, 'utf-8')
             }
             // Exports (package.json)

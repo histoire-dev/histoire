@@ -66,6 +66,18 @@ module.exports = {
         'plugin:cypress/recommended',
       ],
     },
+    {
+      files: ['packages/histoire-vendors/*.d.ts'],
+      rules: {
+        'import/export': 'off',
+      },
+    },
+    {
+      files: ['packages/histoire-vendors/src/**/*.ts'],
+      rules: {
+        'import/no-named-default': 'off',
+      },
+    },
   ],
   ignorePatterns: [
     'node_modules/',
