@@ -8,7 +8,7 @@ For Vue 3, it must be called `setupVue3`. Histoire provides an optional `defineS
 
 ```ts
 import { createPinia } from 'pinia'
-import { defineSetupVue3 } from 'histoire/client'
+import { defineSetupVue3 } from '@histoire/plugin-vue'
 
 export const setupVue3 = defineSetupVue3(({ app, story, variant }) => {
   // Vue plugin
@@ -95,7 +95,7 @@ In global setup file:
 
 ```ts{6}
 import { createPinia } from 'pinia'
-import { defineSetupVue3 } from 'histoire/client'
+import { defineSetupVue3 } from '@histoire/plugin-vue'
 
 export const setupVue3 = defineSetupVue3(({ app, story, variant }) => {
   // Vue plugin

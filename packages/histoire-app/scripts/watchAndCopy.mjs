@@ -9,7 +9,7 @@ function toDist (file) {
 // copy non ts files, such as an html or css, to the dist directory whenever
 // they change.
 chokidar
-  .watch('src/client/**/!(*.ts|tsconfig.json)')
+  .watch('src/**/!(*.ts|*.vue|tsconfig.json)')
   .on('change', (file) => fs.copy(file, toDist(file)))
   .on('add', (file) => fs.copy(file, toDist(file)))
   .on('unlink', (file) => fs.remove(toDist(file)))

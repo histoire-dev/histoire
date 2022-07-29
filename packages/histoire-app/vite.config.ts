@@ -60,9 +60,9 @@ export default defineConfig({
       ],
 
       input: [
-        'src/client/app/api.ts',
-        'src/client/app/index.ts',
-        'src/client/app/sandbox.ts',
+        'src/app/api.ts',
+        'src/app/index.ts',
+        'src/app/sandbox.ts',
       ],
 
       output: {
@@ -76,7 +76,7 @@ export default defineConfig({
         assetFileNames: '[name][extname]',
         // hoistTransitiveImports: false,
         preserveModules: true,
-        preserveModulesRoot: 'src/client/app',
+        preserveModulesRoot: 'src/app',
       },
       treeshake: false,
       preserveEntrySignatures: 'strict',

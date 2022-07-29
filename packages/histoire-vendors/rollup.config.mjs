@@ -59,7 +59,9 @@ export default defineConfig({
             }
             // Create entry files in root
             {
-              const content = `export * from './${path.relative(__dirname, file).replace(/\.d\.ts$/, '')}'\n`
+              const content = `import Default from './${path.relative(__dirname, file).replace(/\.d\.ts$/, '')}'
+export default Default
+export * from './${path.relative(__dirname, file).replace(/\.d\.ts$/, '')}'\n`
               fs.writeFileSync(path.basename(file).replace(/^b-/, ''), content, 'utf-8')
             }
             // Exports (package.json)
@@ -81,16 +83,14 @@ export default defineConfig({
             }
           }
           // Update exports field in package.json
-          {
-            pkgExports['./*'] = './*'
-            pkg.exports = pkgExports
-            fs.writeJsonSync('./package.json', pkg, { spaces: 2 })
-          }
+          pkgExports['./*'] = './*'
+          pkg.exports = pkgExports
+          fs.writeJsonSync('./package.json', pkg, { spaces: 2 })
         } catch (e) {
           console.error(e)
         }
-      }
-    }
+      },
+    },
   ],
 
   output: {
@@ -106,5 +106,5 @@ export default defineConfig({
   external: [],
 
   treeshake: false,
-  preserveEntrySignatures: 'strict',  
+  preserveEntrySignatures: 'strict',
 })

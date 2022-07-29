@@ -1,5 +1,5 @@
 import { createRequire } from 'module'
-import { relative, dirname, resolve } from 'pathe'
+import { relative, dirname, resolve, join } from 'pathe'
 import {
   resolveConfig as resolveViteConfigInternal,
   Plugin as VitePlugin,
@@ -10,7 +10,7 @@ import {
   loadConfigFromFile as loadViteConfigFromFile,
 } from 'vite'
 import { lookup as lookupMime } from 'mrmime'
-import { APP_PATH, DIST_PATH, TEMP_PATH } from './alias.js'
+import { APP_PATH, TEMP_PATH } from './alias.js'
 import { Context } from './context.js'
 import { notifyStoryChange } from './stories.js'
 import { makeTree } from './tree.js'
@@ -81,13 +81,16 @@ export async function getViteConfigWithPlugins (isServer: boolean, ctx: Context)
           dedupe: [
             'vue',
           ],
+          alias: {
+            'histoire-style': join(APP_PATH, 'style.css'),
+          },
         },
         optimizeDeps: {
           disabled: isServer,
           entries: [
             `${APP_PATH}/bundle-main.js`,
             `${APP_PATH}/bundle-sandbox.js`,
-            `${APP_PATH}/server/index.js`,
+            // `${APP_PATH}/server/index.js`,
           ],
           include: [
             'vue',
@@ -104,7 +107,7 @@ export async function getViteConfigWithPlugins (isServer: boolean, ctx: Context)
         },
         server: {
           fs: {
-            allow: [DIST_PATH, TEMP_PATH, resolvedViteConfig.root, process.cwd()],
+            allow: [APP_PATH, TEMP_PATH, resolvedViteConfig.root, process.cwd()],
           },
           watch: {
             ignored: [`!**/node_modules/.histoire/**`, '**/vite.config.*'],

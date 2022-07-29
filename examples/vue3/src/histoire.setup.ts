@@ -1,5 +1,5 @@
 import './histoire.css'
-import { defineSetupVue3 } from 'histoire/client'
+import { defineSetupVue3 } from '@histoire/plugin-vue'
 import { createPinia } from 'pinia'
 import { createI18n } from 'vue-i18n'
 import GlobalComp from './components/GlobalComp.vue'

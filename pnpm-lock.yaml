@@ -161,22 +161,19 @@ importers:
 
   packages/histoire:
     specifiers:
+      '@histoire/app': ^0.8.4
       '@histoire/controls': ^0.8.4
       '@histoire/shared': ^0.8.4
       '@histoire/vendors': ^0.8.4
       '@peeky/test': ^0.13.5
-      '@tailwindcss/typography': ^0.5.2
       '@types/flexsearch': ^0.7.3
       '@types/fs-extra': ^9.0.13
       '@types/markdown-it': ^12.2.3
       '@types/micromatch': ^4.0.2
       '@types/node': ^17.0.32
-      '@vitejs/plugin-vue': ^2.3.1
-      autoprefixer: ^10.4.4
       birpc: ^0.1.1
       case: ^1.6.3
       chokidar: ^3.5.3
-      concurrently: ^7.1.0
       connect: ^3.7.0
       defu: ^6.0.0
       diacritics: ^1.3.0
@@ -192,18 +189,15 @@ importers:
       mrmime: ^1.0.0
       pathe: ^0.2.0
       picocolors: ^1.0.0
-      postcss: ^8.4.12
-      postcss-import: ^14.1.0
       sade: ^1.8.1
       shiki: 0.10.1
       sirv: ^2.0.2
-      tailwindcss: ^3.0.23
       tinypool: ^0.1.2
       typescript: ^4.7.4
       vite: ^2.9.1
       vite-node: 0.12.1
-      vue: ^3.2.31
     dependencies:
+      '@histoire/app': link:../histoire-app
       '@histoire/controls': link:../histoire-controls
       '@histoire/shared': link:../histoire-shared
       '@histoire/vendors': link:../histoire-vendors
@@ -234,13 +228,54 @@ importers:
       vite-node: 0.12.1
     devDependencies:
       '@peeky/test': 0.13.5
-      '@tailwindcss/typography': 0.5.4_tailwindcss@3.1.6
       '@types/fs-extra': 9.0.13
       '@types/micromatch': 4.0.2
       '@types/node': 17.0.45
+      typescript: 4.7.4
+      vite: 2.9.14
+
+  packages/histoire-app:
+    specifiers:
+      '@histoire/controls': ^0.8.4
+      '@histoire/shared': ^0.8.4
+      '@histoire/vendors': ^0.8.4
+      '@tailwindcss/typography': ^0.5.2
+      '@types/flexsearch': ^0.7.3
+      '@types/fs-extra': ^9.0.13
+      '@types/node': ^17.0.32
+      '@vitejs/plugin-vue': ^2.3.1
+      autoprefixer: ^10.4.4
+      chokidar: ^3.5.3
+      concurrently: ^7.1.0
+      flexsearch: ^0.7.21
+      fs-extra: ^10.0.1
+      globby: ^13.1.1
+      pathe: ^0.2.0
+      postcss: ^8.4.12
+      postcss-import: ^14.1.0
+      shiki: 0.10.1
+      tailwindcss: ^3.0.23
+      typescript: ^4.7.4
+      vite: ^2.9.1
+      vue: ^3.2.31
+    dependencies:
+      '@histoire/controls': link:../histoire-controls
+      '@histoire/shared': link:../histoire-shared
+      '@histoire/vendors': link:../histoire-vendors
+      '@types/flexsearch': 0.7.3
+      flexsearch: 0.7.21
+      shiki: 0.10.1
+    devDependencies:
+      '@tailwindcss/typography': 0.5.4_tailwindcss@3.1.6
+      '@types/fs-extra': 9.0.13
+      '@types/node': 17.0.45
       '@vitejs/plugin-vue': 2.3.3_vite@2.9.14+vue@3.2.37
       autoprefixer: 10.4.8_postcss@8.4.14
+      chokidar: 3.5.3
       concurrently: 7.3.0
+      fs-extra: 10.1.0
+      globby: 13.1.2
+      pathe: 0.2.0
       postcss: 8.4.14
       postcss-import: 14.1.0_postcss@8.4.14
       tailwindcss: 3.1.6

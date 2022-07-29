@@ -1,9 +1,8 @@
-import { dirname, join } from 'pathe'
-import { fileURLToPath } from 'url'
+import path from 'pathe'
+import { createRequire } from 'module'
 
-const __dirname = dirname(fileURLToPath(import.meta.url))
+const require = createRequire(import.meta.url)
 
-export const DIST_PATH = join(__dirname, '../')
-export const APP_PATH = join(DIST_PATH, 'client')
+export const APP_PATH = path.join(path.dirname(require.resolve('@histoire/app/package.json')), 'dist')
 
-export const TEMP_PATH = join(process.cwd(), 'node_modules', '.histoire')
+export const TEMP_PATH = path.join(process.cwd(), 'node_modules', '.histoire')

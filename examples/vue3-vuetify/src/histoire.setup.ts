@@ -1,4 +1,4 @@
-import { defineSetupVue3 } from 'histoire/client'
+import { defineSetupVue3 } from '@histoire/plugin-vue'
 
 // Styles
 import '@mdi/font/css/materialdesignicons.css'

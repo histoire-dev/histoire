@@ -81,7 +81,7 @@ export function tailwindTokens (options: TailwindTokensOptions = {}): Plugin {
 }
 
 const storyTemplate = (tailwindConfig: any) => `<script setup>
-import 'histoire/dist/style.css'
+import 'histoire-style'
 import { ref } from 'vue'
 const config = ${JSON.stringify(tailwindConfig, null, 2)}
 const search = ref('')

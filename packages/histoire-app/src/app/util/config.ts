@@ -1,4 +1,4 @@
-import type { HistoireConfig } from '../../../node/config'
+import type { HistoireConfig } from '../../../../histoire/src/node/config'
 // @ts-expect-error virtual module
 import { config as configRaw, logos as logosRaw } from '$histoire-config'
 

@@ -20,10 +20,6 @@
       "import": "./dist/node/index.js",
       "types": "./dist/node/index.d.ts"
     },
-    "./client": {
-      "import": "./dist/client/bundle-index.js",
-      "types": "./dist/client/index.d.ts"
-    },
     "./*": "./*"
   },
   "main": "./dist/node/index.js",
@@ -33,13 +29,13 @@
     "histoire": "./bin.mjs"
   },
   "scripts": {
-    "build": "rimraf dist && tsc -d && vite build && pnpm run build:css && node ./scripts/copy.mjs",
-    "build:css": "tailwindcss -i src/client/app/style/main.pcss -o ./dist/style.css -c tailwind.config.cjs --postcss postcss.config.cjs",
-    "watch": "concurrently \"tsc -d -w --sourceMap\" \"vite build --watch\" \"pnpm run build:css --watch\" \"node ./scripts/watchAndCopy.mjs\"",
+    "build": "rimraf dist && tsc -d",
+    "watch": "tsc -d -w --sourceMap",
     "test:open": "peeky open",
     "test": "peeky run"
   },
   "dependencies": {
+    "@histoire/app": "^0.8.4",
     "@histoire/controls": "^0.8.4",
     "@histoire/shared": "^0.8.4",
     "@histoire/vendors": "^0.8.4",
@@ -74,19 +70,11 @@
   },
   "devDependencies": {
     "@peeky/test": "^0.13.5",
-    "@tailwindcss/typography": "^0.5.2",
     "@types/fs-extra": "^9.0.13",
     "@types/markdown-it": "^12.2.3",
     "@types/micromatch": "^4.0.2",
     "@types/node": "^17.0.32",
-    "@vitejs/plugin-vue": "^2.3.1",
-    "autoprefixer": "^10.4.4",
-    "concurrently": "^7.1.0",
-    "postcss": "^8.4.12",
-    "postcss-import": "^14.1.0",
-    "tailwindcss": "^3.0.23",
     "typescript": "^4.7.4",
-    "vite": "^2.9.1",
-    "vue": "^3.2.31"
+    "vite": "^2.9.1"
   }
 }
