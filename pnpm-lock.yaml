@@ -24,7 +24,7 @@ importers:
       rimraf: ^3.0.2
       tailwindcss: ^3.0.23
       typescript: ^4.7.4
-      vitepress: ^1.0.0-alpha.1
+      vitepress: 1.0.0-alpha.1
       vue-eslint-parser: ^9.0.3
     devDependencies:
       '@akryum/sheep': 0.3.3
@@ -47,7 +47,7 @@ importers:
       rimraf: 3.0.2
       tailwindcss: 3.1.6
       typescript: 4.7.4
-      vitepress: 1.0.0-alpha.4
+      vitepress: 1.0.0-alpha.1
       vue-eslint-parser: 9.0.3_eslint@8.20.0
 
   examples/nuxt3:
@@ -10854,15 +10854,14 @@ packages:
       fsevents: 2.3.2
     dev: true
 
-  /vitepress/1.0.0-alpha.4:
-    resolution: {integrity: sha512-bOAA4KW6vYGlkbcrPLZLTKWTgXVroObU+o9xj9EENyEl6yg26WWvfN7DGA4BftjdM5O8nR93Z5khPQ3W/tFE7Q==}
+  /vitepress/1.0.0-alpha.1:
+    resolution: {integrity: sha512-yA0QIl+mB3fQ2j+keQVa0DTT0waP2AeWM/p9VYfUAT9vOkQEGass4/oYmMGPCQrBwCaO3cpOxJL3ZFVooyvybQ==}
     engines: {node: '>=14.6.0'}
     hasBin: true
     dependencies:
       '@docsearch/css': 3.1.1
       '@docsearch/js': 3.1.1
       '@vitejs/plugin-vue': 2.3.3_vite@2.9.14+vue@3.2.37
-      '@vue/devtools-api': 6.2.1
       '@vueuse/core': 8.9.4_vue@3.2.37
       body-scroll-lock: 4.0.0-beta.0
       shiki: 0.10.1
