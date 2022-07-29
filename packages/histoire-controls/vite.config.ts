@@ -1,5 +1,3 @@
-/// <reference types="histoire"/>
-
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 
@@ -35,24 +33,6 @@ export default defineConfig({
       external: [
         /@histoire/,
       ],
-    },
-  },
-
-  histoire: {
-    setupFile: '/src/histoire-setup.ts',
-    vite: (config) => {
-      config.plugins = [{
-        name: 'my-vite-config',
-        enforce: 'post',
-        config (config) {
-          config.build.lib = false
-          config.build.rollupOptions.external = []
-        },
-      }]
-    },
-    theme: {
-      title: 'Histoire controls',
-      favicon: '/histoire.svg',
     },
   },
 })

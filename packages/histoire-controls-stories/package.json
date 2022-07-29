@@ -1,0 +1,30 @@
+{
+  "name": "@histoire/controls-stories",
+  "version": "0.8.4",
+  "private": true,
+  "description": "Stories for the prebuilt controls components",
+  "license": "MIT",
+  "author": {
+    "name": "Guillaume Chau"
+  },
+  "repository": {
+    "url": "https://github.com/Akryum/histoire.git",
+    "type": "git",
+    "directory": "packages/histoire-controls-stories"
+  },
+  "type": "module",
+  "scripts": {
+    "story:dev": "histoire dev",
+    "story:build": "histoire build",
+    "story:preview": "histoire preview"
+  },
+  "dependencies": {
+    "@histoire/controls": "workspace:*"
+  },
+  "devDependencies": {
+    "@histoire/plugin-vue": "workspace:*",
+    "@vitejs/plugin-vue": "^2.3.1",
+    "histoire": "workspace:*",
+    "vite": "^2.9.1"
+  }
+}

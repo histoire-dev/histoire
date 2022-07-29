@@ -37,16 +37,12 @@
     "watch": "concurrently \"vite build --watch\" \"pnpm run build:types --watch\"",
     "watch:full": "concurrently \"vite build --watch\" \"pnpm run build:css --watch\" \"pnpm run build:types --watch\"",
     "test:open": "peeky open --port 5010",
-    "test": "peeky run",
-    "story:dev": "histoire dev",
-    "story:build": "histoire build",
-    "story:preview": "histoire preview"
+    "test": "peeky run"
   },
   "dependencies": {
     "@histoire/vendors": "^0.8.4"
   },
   "devDependencies": {
-    "@histoire/plugin-vue": "workspace:*",
     "@peeky/test": "^0.13.5",
     "@types/node": "^17.0.32",
     "@vitejs/plugin-vue": "^2.3.1",
@@ -55,7 +51,6 @@
     "autoprefixer": "^10.4.4",
     "concurrently": "^7.1.0",
     "floating-vue": "^2.0.0-beta.16",
-    "histoire": "workspace:*",
     "postcss": "^8.4.12",
     "postcss-import": "^14.1.0",
     "tailwindcss": "^3.0.23",
