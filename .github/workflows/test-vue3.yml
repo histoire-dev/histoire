@@ -1,4 +1,4 @@
-name: Continuous tests (Vue 3 example)
+name: Vue 3 tests
 on:
   - push
   - pull_request
