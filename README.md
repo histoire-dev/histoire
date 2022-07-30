@@ -8,6 +8,9 @@
 
 > Fast and beautiful interactive component playgrounds
 
+[![Test status](https://github.com/histoire-dev/histoire/actions/workflows/test.yml/badge.svg)](https://github.com/histoire-dev/histoire/actions/workflows/test.yml)
+[![Test status](https://github.com/histoire-dev/histoire/actions/workflows/test-vue3.yml/badge.svg)](https://github.com/histoire-dev/histoire/actions/workflows/test-vue3.yml)
+
 [Read the Documentation &raquo;](https://histoire.dev)
 
 ⚡️ Lightning fast development and instant HMR thanks to [Vite](http://vitejs.dev)  
