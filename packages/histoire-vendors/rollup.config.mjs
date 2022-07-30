@@ -28,6 +28,12 @@ export default defineConfig({
       },
     }),
     {
+      name: 'define',
+      transform (code) {
+        return code.replace(/__VUE_OPTIONS_API__/g, 'true')
+      },
+    },
+    {
       name: 'process-build',
       closeBundle () {
         try {
