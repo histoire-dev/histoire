@@ -269,14 +269,13 @@ async function printVNode (vnode: VNode, propsOverrides: Record<string, any> = n
   // Slots
   if (vnode.data?.scopedSlots) {
     for (const key in vnode.data.scopedSlots) {
-      if (key.startsWith('$')) continue
+      if (key.startsWith('$') || key.startsWith('_')) continue
       const autoObject = createAutoBuildingObject(key => `{{ ${key} }}`, (target, p) => {
         // Vue 3
         if (p === '__v_isRef') {
           return () => false
         }
       })
-      // @ts-ignore
       const result = vnode.data.scopedSlots[key](autoObject.proxy)
       const children = Array.isArray(result) ? result : [result]
       const slotLines: string[] = []
