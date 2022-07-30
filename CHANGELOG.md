@@ -1,3 +1,53 @@
+# [0.9.0](https://github.com/Akryum/histoire/compare/v0.8.4...v0.9.0) (2022-07-30)
+
+
+### Bug Fixes
+
+* **controls:** design tokens slots not working ([297f62f](https://github.com/Akryum/histoire/commit/297f62fb65fa104dfc5a4cc08f99fa4225a4fb88))
+* floating-vue not bundled ([3b77a87](https://github.com/Akryum/histoire/commit/3b77a87c67e1279bfaffe7a7cbce59f16c9d8ac9))
+* replace __VUE_OPTIONS_API__ in bluded vue ([4f77909](https://github.com/Akryum/histoire/commit/4f77909e5d473db7be2c16cb58399114e1226858))
+* revert non-enumerable internal state props ([645509f](https://github.com/Akryum/histoire/commit/645509f5af9152d2bf927aed756ecdaee65bc0ed))
+* **vue2:** codegen: skip slots key starting with _ ([47ae607](https://github.com/Akryum/histoire/commit/47ae6076a3eb01ac277382d1c3b3e60f8b90f76a))
+* **vue2:** missing moveSlotContent ([38d1f97](https://github.com/Akryum/histoire/commit/38d1f9796fd2b4d4f44057e10b4e47d149aa44cd))
+
+
+### Features
+
+* cleaner histoire package, moved client to `@histoire/app` ([0b788a3](https://github.com/Akryum/histoire/commit/0b788a323f59912283e2c735bb8139a814659e4d))
+* support plugins ([3357c46](https://github.com/Akryum/histoire/commit/3357c46892466144e0d163b120ee4842822dbcb8))
+* Vue 2.7 support ([e54694a](https://github.com/Akryum/histoire/commit/e54694ae00b178bf046661252037baf1c9b8b05a))
+
+### Migrate from v0.8
+
+Install the vue3 plugin:
+
+```shell
+pnpm i -D @histoire/plugin-vue
+# OR
+npm i -D @histoire/plugin-vue
+# OR
+yarn add -D @histoire/plugin-vue
+```
+
+Create or update your histoire config file (`histoire.config.js` or `histoire.config.ts`):
+
+```ts
+import { defineConfig } from 'histoire'
+import { HstVue } from '@histoire/plugin-vue' // New
+
+export default defineConfig({
+  plugins: [
+    HstVue(), // New
+  ],
+})
+```
+
+Update imports:
+
+- `import { defineSetupVue3 } from 'histoire'` => `import { defineSetupVue3 } from '@histoire/plugin-vue'`
+- `/// <reference types="histoire/vue" />` => `/// <reference types="@histoire/plugin-vue/components" />`
+
+
 ## [0.8.4](https://github.com/Akryum/histoire/compare/v0.8.3...v0.8.4) (2022-07-22)
 
 
