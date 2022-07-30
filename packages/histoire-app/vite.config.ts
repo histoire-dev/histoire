@@ -34,7 +34,7 @@ export default defineConfig({
 
   resolve: {
     alias: {
-      'floating-vue$': '@histoire/vendors/floating-vue',
+      'floating-vue': '@histoire/vendors/floating-vue',
       '@iconify/vue': '@histoire/vendors/iconify',
       pinia: '@histoire/vendors/pinia',
       'scroll-into-view-if-needed': '@histoire/vendors/scroll',
