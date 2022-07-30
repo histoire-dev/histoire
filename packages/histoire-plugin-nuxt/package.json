@@ -30,6 +30,7 @@
     "@nuxt/kit": "^3.0.0-rc.3"
   },
   "devDependencies": {
+    "@types/node": "^17.0.32",
     "@nuxt/schema": "^3.0.0-rc.3",
     "histoire": "workspace:*",
     "typescript": "^4.7.4",

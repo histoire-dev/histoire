@@ -10,10 +10,6 @@
     "removeComments": false,
     "resolveJsonModule": true,
     "skipLibCheck": true,
-    "types": [
-      "node",
-      "@peeky/test"
-    ],
     "lib": [
       "ESNext",
       "DOM"

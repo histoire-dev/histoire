@@ -38,6 +38,8 @@
     "@vueuse/core": "^8.2.5",
     "execa": "^6.1.0",
     "floating-vue": "^2.0.0-beta.16",
+    "fs-extra": "^10.0.1",
+    "globby": "^13.1.1",
     "pinia": "^2.0.13",
     "rollup": "^2.75.7",
     "rollup-plugin-typescript2": "^0.32.1",

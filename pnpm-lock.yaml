@@ -189,6 +189,7 @@ importers:
       mrmime: ^1.0.0
       pathe: ^0.2.0
       picocolors: ^1.0.0
+      rollup: ^2.59.0
       sade: ^1.8.1
       shiki: 0.10.1
       sirv: ^2.0.2
@@ -231,6 +232,7 @@ importers:
       '@types/fs-extra': 9.0.13
       '@types/micromatch': 4.0.2
       '@types/node': 17.0.45
+      rollup: 2.77.2
       typescript: 4.7.4
       vite: 2.9.14
 
@@ -339,6 +341,7 @@ importers:
     specifiers:
       '@nuxt/kit': ^3.0.0-rc.3
       '@nuxt/schema': ^3.0.0-rc.3
+      '@types/node': ^17.0.32
       histoire: workspace:*
       typescript: ^4.7.4
       vite: ^2.9.1
@@ -346,6 +349,7 @@ importers:
       '@nuxt/kit': 3.0.0-rc.6_vite@2.9.14
     devDependencies:
       '@nuxt/schema': 3.0.0-rc.6_vite@2.9.14
+      '@types/node': 17.0.45
       histoire: link:../histoire
       typescript: 4.7.4
       vite: 2.9.14
@@ -353,6 +357,7 @@ importers:
   packages/histoire-plugin-percy:
     specifiers:
       '@percy/sdk-utils': ^1.1.0
+      '@types/node': ^17.0.32
       defu: ^6.0.0
       fs-extra: ^10.1.0
       histoire: workspace:*
@@ -366,11 +371,13 @@ importers:
       pathe: 0.2.0
       puppeteer: 13.7.0
     devDependencies:
+      '@types/node': 17.0.45
       histoire: link:../histoire
       typescript: 4.7.4
 
   packages/histoire-plugin-screenshot:
     specifiers:
+      '@types/node': ^17.0.32
       capture-website: ^2.3.0
       defu: ^6.0.0
       fs-extra: ^10.1.0
@@ -383,6 +390,7 @@ importers:
       fs-extra: 10.1.0
       pathe: 0.2.0
     devDependencies:
+      '@types/node': 17.0.45
       histoire: link:../histoire
       typescript: 4.7.4
 
@@ -391,6 +399,9 @@ importers:
       '@histoire/controls': ^0.8.4
       '@histoire/shared': ^0.8.4
       '@histoire/vendors': ^0.8.4
+      '@types/node': ^17.0.32
+      case: ^1.6.3
+      concurrently: ^7.1.0
       histoire: workspace:*
       typescript: ^4.7.4
       vite: ^2.9.1
@@ -400,6 +411,9 @@ importers:
       '@histoire/shared': link:../histoire-shared
       '@histoire/vendors': link:../histoire-vendors
     devDependencies:
+      '@types/node': 17.0.45
+      case: 1.6.3
+      concurrently: 7.3.0
       histoire: link:../histoire
       typescript: 4.7.4
       vite: 2.9.14
@@ -420,6 +434,8 @@ importers:
       '@vueuse/core': ^8.2.5
       execa: ^6.1.0
       floating-vue: ^2.0.0-beta.16
+      fs-extra: ^10.0.1
+      globby: ^13.1.1
       pinia: ^2.0.13
       rollup: ^2.75.7
       rollup-plugin-typescript2: ^0.32.1
@@ -435,6 +451,8 @@ importers:
       '@vueuse/core': 8.9.4_vue@3.2.37
       execa: 6.1.0
       floating-vue: 2.0.0-beta.17_vue@3.2.37
+      fs-extra: 10.1.0
+      globby: 13.1.2
       pinia: 2.0.17_j6bzmzd4ujpabbp5objtwxyjp4
       rollup: 2.77.2
       rollup-plugin-typescript2: 0.32.1_oo3i3f3qmqiztdz5qgxrrjmd5e
@@ -3597,7 +3615,6 @@ packages:
   /case/1.6.3:
     resolution: {integrity: sha512-mzDSXIPaFwVDvZAHqZ9VlbyF4yyXRuX6IvB06WvPYkqJVO24kX1PPhv9bfpKNFZyxYFmmgo03HUiD8iklmJYRQ==}
     engines: {node: '>= 0.8.0'}
-    dev: false
 
   /caseless/0.12.0:
     resolution: {integrity: sha512-4tYFyifaFfGacoiObjJegolkwSU4xQNGbVgUiNYVUxbQ2x2lUsFvY4hVgVzGiIe6WLOPqycWXA40l+PWsxthUw==}

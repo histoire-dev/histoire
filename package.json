@@ -8,7 +8,7 @@
   },
   "scripts": {
     "lint": "eslint . --ext js,vue,ts",
-    "build": "pnpm run -r --filter @histoire/controls build && pnpm run -r --filter !@histoire/controls build",
+    "build": "pnpm run -r build",
     "watch": "pnpm run build && pnpm run -r --parallel --filter \"./packages/**\" watch",
     "test": "pnpm run -r --parallel --filter \"./packages/**\" test",
     "test:open": "pnpm run -r --parallel --filter \"./packages/**\" test:open",
@@ -54,6 +54,7 @@
         "react",
         "react-dom",
         "vue",
+        "vue-template-compiler",
         "webpack"
       ],
       "allowedVersions": {

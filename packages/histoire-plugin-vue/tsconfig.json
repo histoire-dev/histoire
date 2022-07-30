@@ -11,8 +11,7 @@
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "types": [
-      "node",
-      "@peeky/test"
+      "node"
     ],
     "lib": [
       "ESNext",
@@ -20,7 +19,6 @@
     ],
     "sourceMap": false,
     "preserveWatchOutput": true,
-    "preserveSymlinks": true,
     // Strict
     "noImplicitAny": false,
     "noImplicitThis": true,
@@ -28,7 +26,7 @@
     "strictBindCallApply": true,
     "strictFunctionTypes": true,
     // Volar
-    "jsx": "preserve",
+    "jsx": "preserve"
   },
   "include": [
     "src"
