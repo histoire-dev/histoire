@@ -119,6 +119,7 @@ function wrapControlComponent (controlComponent) {
       })
 
       onUpdated(() => {
+        moveSlotContent()
       })
 
       onBeforeUnmount(() => {
