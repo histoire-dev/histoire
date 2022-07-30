@@ -38,13 +38,15 @@ Histoire is an Open-Source project supported by our sponsors - thank you!
 
 | Framework | Versions | Support | Auto CodeGen | Auto Docs |
 | --------- | -------- | ------- | ------------ | ---- |
-| [Vue](https://vuejs.org/) | 3.2+ | ✅ | ✅ | Todo |
-| [Svelte](https://svelte.dev/) | - | Planned | - | - |
-| [Solid](https://www.solidjs.com/) | - | Planned | - | - |
-| [Angular](https://angular.io/) | - | TBD | - | - |
-| [React](https://reactjs.org/) | - | TBD ([Alternative](https://www.ladle.dev)) | - | - |
+| [Vue](https://vuejs.org/) | 3.2+ | ✅ | ✅ | - |
+| [Vue](https://v2.vuejs.org/) | 2.7+ | ✅ | ✅ | - |
+| [Svelte](https://svelte.dev/) | - | - | - | - |
+| [Solid](https://www.solidjs.com/) | - | - | - | - |
+| [Angular](https://angular.io/) | - | - | - | - |
+| [React](https://reactjs.org/) | - | - ([Alternative](https://www.ladle.dev)) | - | - |
 
 
 ## Guides
 
-[Vue 3 →](./vue3/getting-started.md)
+- [Vue 3 →](./vue3/getting-started.md)
+- [Vue 2 →](./vue2/getting-started.md)

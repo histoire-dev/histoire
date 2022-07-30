@@ -1,0 +1,58 @@
+{
+  "name": "@histoire/plugin-vue2",
+  "version": "0.8.2",
+  "description": "Histoire plugin for Vue.js 2 support",
+  "license": "MIT",
+  "author": {
+    "name": "Guillaume Chau"
+  },
+  "repository": {
+    "url": "https://github.com/Akryum/histoire.git",
+    "type": "git",
+    "directory": "packages/histoire-plugin-vue2"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "type": "module",
+  "exports": {
+    "./client": {
+      "types": "./dist/client/client.d.ts",
+      "default": "./dist/bundled/client/client.js"
+    },
+    "./collect": {
+      "types": "./dist/client/server.d.ts",
+      "default": "./dist/bundled/client/server.js"
+    },
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/bundled/index.js"
+    },
+    "./*": "./*"
+  },
+  "main": "dist/bundled/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "rimraf dist && vite build && pnpm run build:types",
+    "build:types": "tsc --declaration --emitDeclarationOnly",
+    "watch": "concurrently \"vite build --watch\" \"pnpm run build:types --watch\""
+  },
+  "dependencies": {
+    "@histoire/controls": "^0.8.2",
+    "@histoire/shared": "^0.8.2",
+    "@histoire/vendors": "^0.8.2"
+  },
+  "devDependencies": {
+    "@types/node": "^17.0.32",
+    "case": "^1.6.3",
+    "concurrently": "^7.1.0",
+    "histoire": "workspace:*",
+    "typescript": "^4.7.4",
+    "vite": "^2.9.1",
+    "vue": "^2.7.8"
+  },
+  "peerDependencies": {
+    "histoire": "^0.8.2",
+    "vue": "^2.7.8"
+  }
+}

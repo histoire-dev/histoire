@@ -80,18 +80,25 @@ export function tailwindTokens (options: TailwindTokensOptions = {}): Plugin {
   }
 }
 
-const storyTemplate = (tailwindConfig: any) => `<script setup>
+const storyTemplate = (tailwindConfig: any) => `<script>
 import 'histoire-style'
-import { ref } from 'vue'
-const config = ${JSON.stringify(tailwindConfig, null, 2)}
-const search = ref('')
-const sampleText = ref('Cat sit like bread eat prawns daintily with a claw then lick paws clean wash down prawns with a lap of carnation milk then retire to the warmest spot on the couch to claw at the fabric before taking a catnap mrow cat cat moo moo lick ears lick paws')
-const fontSize = ref(16)
-defineExpose({
-  search,
-  sampleText,
-  fontSize,
-})
+import { ref, markRaw } from 'vue'
+
+const config = markRaw(${JSON.stringify(tailwindConfig, null, 2)})
+
+export default {
+  setup () {
+    const search = ref('')
+    const sampleText = ref('Cat sit like bread eat prawns daintily with a claw then lick paws clean wash down prawns with a lap of carnation milk then retire to the warmest spot on the couch to claw at the fabric before taking a catnap mrow cat cat moo moo lick ears lick paws')
+    const fontSize = ref(16)
+    return {
+      config,
+      search,
+      sampleText,
+      fontSize,
+    }
+  }
+}
 </script>
 <template>
   <Story id="tailwind" title="Tailwind" group="design-system" icon="mdi:tailwind" responsiveDisabled :layout="{ type: 'single', iframe: false }">

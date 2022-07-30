@@ -1,0 +1,20 @@
+{
+  "name": "histoire-example-vue2",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "story:dev": "histoire dev",
+    "story:build": "histoire build",
+    "story:preview": "histoire preview"
+  },
+  "dependencies": {
+    "vue": "^2.7.8"
+  },
+  "devDependencies": {
+    "@histoire/plugin-vue2": "workspace:*",
+    "@vitejs/plugin-vue2": "^1.1.2",
+    "histoire": "workspace:*",
+    "vite": "^2.9.1",
+    "vue-template-compiler": "^2.7.8"
+  }
+}
