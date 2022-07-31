@@ -265,18 +265,18 @@ if (import.meta.hot) {
       }
 
       if (id === RESOLVED_SUPPORT_PLUGINS_CLIENT) {
-        const plugins = ctx.supportPlugins.map(p => `'${p.id}': () => import('${require.resolve(`${p.moduleName}/client`, {
+        const plugins = ctx.supportPlugins.map(p => `'${p.id}': () => import(${JSON.stringify(require.resolve(`${p.moduleName}/client`, {
           paths: [ctx.root, import.meta.url],
-        })}')`)
+        }))})`)
         return `export const clientSupportPlugins = {
           ${plugins.join(',\n  ')}
         }`
       }
 
       if (id === RESOLVED_SUPPORT_PLUGINS_COLLECT) {
-        const plugins = ctx.supportPlugins.map(p => `'${p.id}': () => import('${require.resolve(`${p.moduleName}/collect`, {
+        const plugins = ctx.supportPlugins.map(p => `'${p.id}': () => import(${JSON.stringify(require.resolve(`${p.moduleName}/collect`, {
           paths: [ctx.root, import.meta.url],
-        })}')`)
+        }))})`)
         return `export const collectSupportPlugins = {
           ${plugins.join(',\n  ')}
         }`
