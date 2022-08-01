@@ -50,7 +50,7 @@ export default defineConfig({
             dependencies: {},
           }
           const pkgExports = {}
-          const files = globbySync('./dist/client/*.d.ts')
+          const files = globbySync('./dist/client/*.d.ts', { cwd: __dirname })
           for (const file of files) {
             // Retrieve imports from dts
             {
@@ -65,9 +65,10 @@ export default defineConfig({
             }
             // Create entry files in root
             {
-              const content = `import Default from './${path.relative(__dirname, file).replace(/\.d\.ts$/, '')}'
+              const filepath = file.replace(/\.d\.ts$/, '')
+              const content = `import Default from '${filepath}'
 export default Default
-export * from './${path.relative(__dirname, file).replace(/\.d\.ts$/, '')}'\n`
+export * from '${filepath}'\n`
               fs.writeFileSync(path.basename(file).replace(/^b-/, ''), content, 'utf-8')
             }
             // Exports (package.json)
