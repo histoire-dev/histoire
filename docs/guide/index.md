@@ -46,7 +46,7 @@ In Histoire, Stories contains one or more Variants, which are different use case
   - Add more variants (optional)
 
 It basically gives you:
-- An interactive preview of the story (or even a grid of several all the variants!)
+- An interactive preview of the story (or even a grid of all the variants!)
 - Copiable code to reproduce the same result in your own code
 - Controls to interact with the preview
 - Documentation rendered from Markdown
