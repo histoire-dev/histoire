@@ -35,7 +35,7 @@ const state = reactive({
           v-model="state.disabled"
           title="Disabled"
         />
-        <!-- <HstSelect
+        <HstSelect
           v-model="state.color"
           title="Color"
           :options="[
@@ -52,7 +52,7 @@ const state = reactive({
             { value: 'small', label: 'Small' },
             { value: 'big', label: 'Big' },
           ]"
-        /> -->
+        />
       </template>
     </Variant>
 

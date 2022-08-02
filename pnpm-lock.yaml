@@ -19,7 +19,7 @@ importers:
       eslint-plugin-node: ^11.1.0
       eslint-plugin-promise: ^6.0.0
       eslint-plugin-vue: ^9.2.0
-      floating-vue: ^2.0.0-beta.16
+      floating-vue: ^2.0.0-beta.19
       postcss: ^8.4.12
       rimraf: ^3.0.2
       tailwindcss: ^3.0.23
@@ -42,7 +42,7 @@ importers:
       eslint-plugin-node: 11.1.0_eslint@8.21.0
       eslint-plugin-promise: 6.0.0_eslint@8.21.0
       eslint-plugin-vue: 9.3.0_eslint@8.21.0
-      floating-vue: 2.0.0-beta.18
+      floating-vue: 2.0.0-beta.19
       postcss: 8.4.14
       rimraf: 3.0.2
       tailwindcss: 3.1.7
@@ -312,7 +312,7 @@ importers:
       '@vueuse/core': ^8.2.5
       autoprefixer: ^10.4.4
       concurrently: ^7.1.0
-      floating-vue: ^2.0.0-beta.16
+      floating-vue: ^2.0.0-beta.19
       postcss: ^8.4.12
       postcss-import: ^14.1.0
       tailwindcss: ^3.0.23
@@ -330,7 +330,7 @@ importers:
       '@vueuse/core': 8.9.4_vue@3.2.37
       autoprefixer: 10.4.8_postcss@8.4.14
       concurrently: 7.3.0
-      floating-vue: 2.0.0-beta.18_vue@3.2.37
+      floating-vue: 2.0.0-beta.19_vue@3.2.37
       postcss: 8.4.14
       postcss-import: 14.1.0_postcss@8.4.14
       tailwindcss: 3.1.7
@@ -475,7 +475,7 @@ importers:
       '@types/node': ^18.0.3
       '@vueuse/core': ^8.2.5
       execa: ^6.1.0
-      floating-vue: ^2.0.0-beta.16
+      floating-vue: ^2.0.0-beta.19
       fs-extra: ^10.0.1
       globby: ^13.1.1
       pinia: ^2.0.13
@@ -492,7 +492,7 @@ importers:
       '@types/node': 18.6.3
       '@vueuse/core': 8.9.4_vue@3.2.37
       execa: 6.1.0
-      floating-vue: 2.0.0-beta.18_vue@3.2.37
+      floating-vue: 2.0.0-beta.19_vue@3.2.37
       fs-extra: 10.1.0
       globby: 13.1.2
       pinia: 2.0.17_j6bzmzd4ujpabbp5objtwxyjp4
@@ -5942,8 +5942,8 @@ packages:
     resolution: {integrity: sha512-W7cHV7Hrwjid6lWmy0IhsWDFQboWSng25U3VVywpHOTJnnAZNPScog67G+cVpeX9f7yDD21ih0WDrMMT+JoaYg==}
     dev: false
 
-  /floating-vue/2.0.0-beta.18:
-    resolution: {integrity: sha512-eo1cX4gWHREeLCqE7APtUBoEomSs3ZTnu9ucaj61spob0dVxZSScq1yeuAxShnyQgwM1nJuXOIoAaM3acvudmQ==}
+  /floating-vue/2.0.0-beta.19:
+    resolution: {integrity: sha512-kWP0/JZM6Cwg959SUnVURDXFFKstGZIXDZJ5Ey77HNOvQete0rJnLntklCJzvLnwla8S3WiApH/EjupxS5ICBg==}
     peerDependencies:
       vue: '*'
     peerDependenciesMeta:
@@ -5954,8 +5954,8 @@ packages:
       vue-resize: 2.0.0-alpha.1
     dev: true
 
-  /floating-vue/2.0.0-beta.18_vue@3.2.37:
-    resolution: {integrity: sha512-eo1cX4gWHREeLCqE7APtUBoEomSs3ZTnu9ucaj61spob0dVxZSScq1yeuAxShnyQgwM1nJuXOIoAaM3acvudmQ==}
+  /floating-vue/2.0.0-beta.19_vue@3.2.37:
+    resolution: {integrity: sha512-kWP0/JZM6Cwg959SUnVURDXFFKstGZIXDZJ5Ey77HNOvQete0rJnLntklCJzvLnwla8S3WiApH/EjupxS5ICBg==}
     peerDependencies:
       vue: '*'
     peerDependenciesMeta:
