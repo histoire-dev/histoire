@@ -70,6 +70,7 @@ export async function build (ctx: Context) {
   const buildViteConfig: ViteInlineConfig = mergeViteConfig(await getViteConfigWithPlugins(false, ctx), {
     mode: 'development',
     build: {
+      lib: false,
       rollupOptions: {
         input: [
           join(APP_PATH, 'bundle-main.js'),
