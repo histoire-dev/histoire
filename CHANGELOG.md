@@ -1,3 +1,23 @@
+## [0.9.1](https://github.com/Akryum/histoire/compare/v0.9.0...v0.9.1) (2022-08-02)
+
+
+### Bug Fixes
+
+* **build:** force external = [] to rollup options, fix [#214](https://github.com/Akryum/histoire/issues/214) ([45f7ba5](https://github.com/Akryum/histoire/commit/45f7ba51309e47b699be645ee1ec8fc1a8b70ea9))
+* **build:** force lib:false, fix [#219](https://github.com/Akryum/histoire/issues/219) ([6cca1e1](https://github.com/Akryum/histoire/commit/6cca1e1da0953888fed592ef518e574f11932b0a))
+* **grid:** remove prevent modifier, fix [#221](https://github.com/Akryum/histoire/issues/221) ([8ca882b](https://github.com/Akryum/histoire/commit/8ca882b58a7c368df8ecd15f7b034e1f24de29bf))
+* resize story responsive preview ([#181](https://github.com/Akryum/histoire/issues/181)) ([0999c54](https://github.com/Akryum/histoire/commit/0999c549b78334523dea59166a26f1fa19e4371c))
+* resolve plugin correctly on windows ([#218](https://github.com/Akryum/histoire/issues/218)) ([3544713](https://github.com/Akryum/histoire/commit/3544713704872abc17d1ecac3f5d4be50f7515fe))
+* update floating-vue, fix [#206](https://github.com/Akryum/histoire/issues/206) ([d3b0061](https://github.com/Akryum/histoire/commit/d3b0061a5e736bdf9084a09aff3b1ae95ec58b8e))
+* **vue2:** HMR adding new variants not updating grid layout ([d8a8b55](https://github.com/Akryum/histoire/commit/d8a8b55bdc1db4773a2464244e9ceb3b90ffe4fd))
+
+
+### Features
+
+* add `process.env.HISTOIRE = 'true'` in cli bin to help adding conditions in vite.config.js ([94339d9](https://github.com/Akryum/histoire/commit/94339d902bb8807a55117428e06aba342bf92445))
+
+
+
 # [0.9.0](https://github.com/Akryum/histoire/compare/v0.8.4...v0.9.0) (2022-07-30)
 
 
