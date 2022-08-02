@@ -91,7 +91,7 @@ useResizeObserver(el, () => {
         'htw-border-gray-100 dark:htw-border-gray-800': !isActive,
         'htw-border-primary-200 dark:htw-border-primary-900': isActive,
       }"
-      @click.stop.prevent="selectVariant()"
+      @click.stop="selectVariant()"
       @keyup="selectVariant()"
     >
       <GenericRenderStory
