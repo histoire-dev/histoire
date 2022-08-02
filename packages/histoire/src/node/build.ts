@@ -83,6 +83,16 @@ export async function build (ctx: Context) {
             }
           },
         },
+        plugins: [
+          {
+            name: 'histoire-build-rollup-options-override',
+            enforce: 'post',
+            options (options) {
+              // Don't externalize
+              options.external = []
+            },
+          },
+        ],
       },
       outDir: ctx.config.outDir,
       emptyOutDir: true,
@@ -120,6 +130,7 @@ export async function build (ctx: Context) {
 
   buildViteConfig.plugins.push({
     name: 'histoire-build-config-override',
+    enforce: 'post',
     config (config) {
       // Don't externalize
       config.build.rollupOptions.external = []
