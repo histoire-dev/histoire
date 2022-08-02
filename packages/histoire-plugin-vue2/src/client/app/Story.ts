@@ -76,13 +76,20 @@ export default Object.assign(defineComponent({
       for (const vnode of vnodes) {
         // @ts-expect-error custom option
         if (vnode.componentOptions?.Ctor?.options?.__histoireType === 'variant') {
+          const variant = this.story.variants[index]
+          if (!vnode.componentOptions.propsData) {
+            vnode.componentOptions.propsData = {}
+          }
+          // @ts-expect-error object type >.<
+          vnode.componentOptions.propsData.variant = variant
+          // // @ts-expect-error object type >.<
+          // vnode.componentOptions.propsData.variantSynced = this.story.variants[index]
           if (!vnode.data) {
             vnode.data = {}
           }
           if (!vnode.data.attrs) {
             vnode.data.attrs = {}
           }
-          vnode.data.attrs.variant = this.story.variants[index]
           if (!vnode.data.attrs.initState && !vnode.data.attrs['init-state']) {
             vnode.data.attrs.initState = this.initState
           }
@@ -91,6 +98,7 @@ export default Object.assign(defineComponent({
               vnode.data.attrs[attr] = this.$attrs[attr]
             }
           }
+          vnode.key = variant ? `variant-${variant.id}` : `null-variant-${index}`
           index++
         } else if (vnode.children?.length) {
           applyAttrs(vnode.children as VNode[])

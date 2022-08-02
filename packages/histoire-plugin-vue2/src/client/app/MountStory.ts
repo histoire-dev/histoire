@@ -1,6 +1,6 @@
 /* eslint-disable vue/one-component-per-file */
 
-import Vue, { h } from 'vue'
+import Vue, { ref, h, provide } from 'vue'
 import {
   defineComponent as _defineComponent,
   PropType as _PropType,
@@ -32,6 +32,8 @@ export default _defineComponent({
     const el = _ref<HTMLDivElement>()
     let app: Vue
 
+    const forceUpdateKey = ref(0)
+
     async function mountStory () {
       // Call app setups to resolve global assets such as components
       const appOptions: Record<string, any> = {}
@@ -59,12 +61,15 @@ export default _defineComponent({
       app = new Vue({
         name: 'MountStorySubApp',
 
-        provide: {
-          hstStory: props.story,
+        setup () {
+          provide('hstStory', props.story)
         },
 
         render: () => {
-          return h(props.story.file.component)
+          if (!props.story.file) return null
+          return h(props.story.file.component, {
+            key: forceUpdateKey.value,
+          })
         },
 
         ...appOptions,
@@ -87,6 +92,13 @@ export default _defineComponent({
     _watch(() => props.story.id, async () => {
       unmountStory()
       await mountStory()
+    })
+
+    // Force update on new variants to render them
+    _watch(() => props.story.variants.map(v => v.id), () => {
+      forceUpdateKey.value++
+    }, {
+      deep: true,
     })
 
     _onMounted(async () => {

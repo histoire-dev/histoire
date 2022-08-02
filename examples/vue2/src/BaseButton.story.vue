@@ -56,7 +56,7 @@ const state = reactive({
       </template>
     </Variant>
 
-    <!-- <Variant
+    <Variant
       title="big green button"
       icon="el:resize-full"
     >
@@ -78,7 +78,7 @@ const state = reactive({
       >
         Click me!
       </BaseButton>
-    </Variant> -->
+    </Variant>
     <!-- <Variant
       title="button inside div"
       icon-color="#F43F5E"

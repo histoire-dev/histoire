@@ -1,4 +1,4 @@
-import { defineComponent, getCurrentInstance, inject, PropType, useAttrs } from 'vue'
+import { defineComponent, getCurrentInstance, inject, PropType } from 'vue'
 import type { Variant } from '@histoire/shared'
 import { applyState } from '@histoire/shared'
 import { syncStateBundledAndExternal, toRawDeep } from './util.js'
@@ -34,26 +34,30 @@ export default Object.assign(defineComponent({
       type: Function,
       default: null,
     },
+
+    variant: {
+      type: Object as PropType<Variant>,
+      default: null,
+    },
   },
 
   setup (props) {
-    const attrs = useAttrs() as {
-      variant: Variant
-    }
-
     const vm = getCurrentInstance()
 
     const implicitState = inject<() => any>('implicitState')
 
-    if (typeof props.initState === 'function') {
-      const state = props.initState()
-      applyState(attrs.variant.state, toRawDeep(state))
+    if (props.variant) {
+      if (typeof props.initState === 'function') {
+        const state = props.initState()
+        applyState(props.variant.state, toRawDeep(state))
+      }
+
+      syncStateBundledAndExternal(props.variant.state, implicitState())
     }
 
-    syncStateBundledAndExternal(attrs.variant.state, implicitState())
-
     function updateVariant () {
-      Object.assign(attrs.variant, {
+      if (!props.variant) return
+      Object.assign(props.variant, {
         slots: () => vm.proxy.$scopedSlots,
         source: props.source,
         responsiveDisabled: props.responsiveDisabled,
