@@ -155,7 +155,7 @@ Learn more about Histoire [here](https://histoire.dev/).
 
 ## `source`
 
-The copiable source code of the story.
+The copyable source code of the story.
 
 ```vue
 <script setup>

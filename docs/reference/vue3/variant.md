@@ -129,7 +129,7 @@ The icon color.
 
 ## `source`
 
-The copiable source code of the variant.
+The copyable source code of the variant.
 
 ```vue
 <script setup>
@@ -222,7 +222,7 @@ Props:
 
 ## Slot: `source`
 
-Manual copiable source code.
+Manual copyable source code.
 
 ```vue
 <template>

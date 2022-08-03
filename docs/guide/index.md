@@ -47,7 +47,7 @@ In Histoire, Stories contains one or more Variants, which are different use case
 
 It basically gives you:
 - An interactive preview of the story (or even a grid of all the variants!)
-- Copiable code to reproduce the same result in your own code
+- Copyable code to reproduce the same result in your own code
 - Controls to interact with the preview
 - Documentation rendered from Markdown
 - Many other features!
@@ -72,7 +72,7 @@ Here are some highlights of our favorite features:
 
 ### :zap: Dynamic source
 
-The copiable source code is an important part of the documentation purpose of stories.  
+The copyable source code is an important part of the documentation purpose of stories.  
 For supported frameworks, Histoire can generate the template/JSX/source code that you can one-click-copy and paste in your project.
 
 ### :bento: Variant grids

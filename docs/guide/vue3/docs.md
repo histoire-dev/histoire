@@ -18,13 +18,13 @@ Checkout this [cool video](https://www.youtube.com/watch?v=dQw4w9WgXcQ)!
 
 ## Source code
 
-By default, Histoire will attempt to generate a copiable source code from the story, dynamically from the current state.
+By default, Histoire will attempt to generate a copyable source code from the story, dynamically from the current state.
 
 Currently automatic source code generation is only supported for:
 
 - Vue 3
 
-To document a copiable source code manually you can use either the `source` prop or the `source` slot.
+To document a copyable source code manually you can use either the `source` prop or the `source` slot.
 
 ```vue{31,55-74}
 <script lang="ts" setup>

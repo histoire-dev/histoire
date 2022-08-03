@@ -69,7 +69,7 @@ interface VueStoryProps {
    */
   docsOnly?: boolean
   /**
-   * The copiable source code of the story.
+   * The copyable source code of the story.
    */
   source?: string
   /**
@@ -112,7 +112,7 @@ interface VueVariantProps {
    */
   iconColor?: string
   /**
-   * The copiable source code of the variant.
+   * The copyable source code of the variant.
    */
   source?: string
   /**
