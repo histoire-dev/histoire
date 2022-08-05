@@ -2,7 +2,7 @@
 import { useFocus, useDebounce } from '@vueuse/core'
 import { computed, ref, watch } from 'vue'
 import { Icon } from '@iconify/vue'
-import flexsearch from 'flexsearch'
+import * as flexsearch from 'flexsearch'
 import charset from 'flexsearch/dist/module/lang/latin/advanced.js'
 import language from 'flexsearch/dist/module/lang/en.js'
 import { useStoryStore } from '../../stores/story'
