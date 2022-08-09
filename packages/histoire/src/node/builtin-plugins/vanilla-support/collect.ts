@@ -32,8 +32,8 @@ export async function run ({ file, storyData }: ServerRunPayload) {
   const variants: ServerVariant[] = rawVariants.map((v, index) => ({
     id: v.id ?? `${story.id}-${index}`,
     title: v.title ?? 'untitled',
-    icon: v.icon,
-    iconColor: v.iconColor,
+    icon: v.icon ?? options.icon,
+    iconColor: v.iconColor ?? options.iconColor,
   }))
 
   story.variants = variants

@@ -35,10 +35,10 @@ export default _defineComponent({
       const rawVariant = rawVariants[index]
       Object.assign(props.story.variants[index], {
         slots: () => ({ default: rawVariant.onMount, controls: rawVariant.onMountControls }),
-        source: rawVariant.source,
-        responsiveDisabled: rawVariant.responsiveDisabled,
-        autoPropsDisabled: rawVariant.autoPropsDisabled,
-        setupApp: rawVariant.setupApp,
+        source: rawVariant.source ?? options.source,
+        responsiveDisabled: rawVariant.responsiveDisabled ?? options.responsiveDisabled,
+        autoPropsDisabled: rawVariant.autoPropsDisabled ?? options.autoPropsDisabled,
+        setupApp: rawVariant.setupApp ?? options.setupApp,
         configReady: true,
       })
     }
