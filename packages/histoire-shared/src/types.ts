@@ -152,7 +152,6 @@ export interface SupportPlugin {
   importStoryComponent: (file: ServerStoryFile, index: number) => string
 }
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface FinalSupportPlugin extends SupportPlugin {
   // For now, no additional properties
 }

@@ -48,6 +48,7 @@ module.exports = {
     '@typescript-eslint/type-annotation-spacing': ['error'],
     'func-call-spacing': 'off',
     '@typescript-eslint/func-call-spacing': ['error'],
+    '@typescript-eslint/no-empty-interface': 'off',
   },
   overrides: [
     {
