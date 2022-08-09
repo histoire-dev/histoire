@@ -19,6 +19,8 @@ export async function createServer (ctx: Context, port: number) {
     server: nodeServer,
   })
 
+  await watchStories(ctx)
+
   const pluginOnCleanups: (() => void | Promise<void>)[] = []
   for (const plugin of ctx.config.plugins) {
     if (plugin.onDev) {
@@ -29,8 +31,6 @@ export async function createServer (ctx: Context, port: number) {
       await plugin.onDev(api, onCleanup)
     }
   }
-
-  await watchStories(ctx)
 
   // Wait for pre-bundling (in `listen()`)
   await server.listen(port)
