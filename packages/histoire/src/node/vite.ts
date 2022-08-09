@@ -90,15 +90,6 @@ export async function getViteConfigWithPlugins (isServer: boolean, ctx: Context)
           entries: [
             `${APP_PATH}/bundle-main.js`,
             `${APP_PATH}/bundle-sandbox.js`,
-            // `${APP_PATH}/server/index.js`,
-          ],
-          include: [
-            'vue',
-            dirname(require.resolve('@vue/runtime-core/package.json')),
-            dirname(require.resolve('shiki/package.json')),
-            dirname(require.resolve('vscode-textmate/package.json')),
-            dirname(require.resolve('vscode-oniguruma/package.json')),
-            dirname(require.resolve('case/package.json')),
           ],
           exclude: [
             'histoire',
