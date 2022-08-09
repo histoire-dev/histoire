@@ -34,7 +34,7 @@ export function tailwindTokens (options: TailwindTokensOptions = {}): Plugin {
   }
 
   return {
-    name: 'tailwind-tokens',
+    name: 'builtin:tailwind-tokens',
 
     config (config) {
       if (tailwindConfigFile) {
