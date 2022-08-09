@@ -16,6 +16,7 @@ import { defaultColors } from './colors.js'
 import { Plugin } from './plugin.js'
 import { findUp } from './util/find-up.js'
 import { tailwindTokens } from './builtin-plugins/tailwind-tokens.js'
+import { vanillaSupport } from './builtin-plugins/vanilla-support/plugin.js'
 
 export interface SupportMatchPattern {
   id: string
@@ -196,6 +197,7 @@ export type ConfigMode = 'build' | 'dev'
 export function getDefaultConfig (): HistoireConfig {
   return {
     plugins: [
+      vanillaSupport(),
       tailwindTokens(),
     ],
     outDir: '.histoire/dist',

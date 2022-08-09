@@ -14,6 +14,30 @@ export type StoryLayout = {
   width?: number | string
 }
 
+export interface CommonProps {
+  id?: string
+  title?: string
+  icon?: string
+  iconColor?: string
+}
+
+export interface InheritedProps {
+  setupApp?: (payload: any) => unknown
+  source?: string
+  responsiveDisabled?: boolean
+  autoPropsDisabled?: boolean
+}
+
+export interface VariantProps extends CommonProps, InheritedProps {
+  // No additional properties
+}
+
+export interface StoryProps extends CommonProps, InheritedProps {
+  group?: string
+  layout?: StoryLayout
+  docsOnly?: boolean
+}
+
 export interface Story {
   id: string
   title: string
@@ -25,7 +49,7 @@ export interface Story {
   docsOnly?: boolean
   file?: StoryFile
   lastSelectedVariant?: Variant
-  slots?: () => Readonly<any>
+  slots?: () => any
 }
 
 export interface Variant {
@@ -34,7 +58,7 @@ export interface Variant {
   icon?: string
   iconColor?: string
   setupApp?: (payload: any) => unknown
-  slots?: () => Readonly<any>
+  slots?: () => { default: any, controls: any }
   state: any
   source?: string
   responsiveDisabled?: boolean
