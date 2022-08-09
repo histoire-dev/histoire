@@ -1,5 +1,5 @@
 import { createRequire } from 'module'
-import { relative, dirname, resolve, join } from 'pathe'
+import { relative, resolve, join } from 'pathe'
 import {
   resolveConfig as resolveViteConfigInternal,
   Plugin as VitePlugin,
@@ -98,7 +98,12 @@ export async function getViteConfigWithPlugins (isServer: boolean, ctx: Context)
         },
         server: {
           fs: {
-            allow: [APP_PATH, TEMP_PATH, resolvedViteConfig.root, process.cwd()],
+            allow: [
+              APP_PATH,
+              TEMP_PATH,
+              resolvedViteConfig.root,
+              process.cwd(),
+            ],
           },
           watch: {
             ignored: [`!**/node_modules/.histoire/**`, '**/vite.config.*'],
