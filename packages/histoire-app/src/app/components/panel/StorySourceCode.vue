@@ -64,10 +64,12 @@ watch(() => [props.variant, generateSourceCodeFn.value], async () => {
   immediate: true,
 })
 
-const sourceHtml = computed(() => highlighter.value?.codeToHtml(sourceCode.value, {
-  lang: 'html',
-  theme: isDark.value ? 'github-dark' : 'github-light',
-}))
+const sourceHtml = computed(() => sourceCode.value
+  ? highlighter.value?.codeToHtml(sourceCode.value, {
+    lang: 'html',
+    theme: isDark.value ? 'github-dark' : 'github-light',
+  })
+  : '')
 </script>
 
 <template>
@@ -95,6 +97,13 @@ const sourceHtml = computed(() => highlighter.value?.codeToHtml(sourceCode.value
     >
       Error: {{ error }}
     </div>
+
+    <i
+      v-else-if="!sourceCode"
+      class="htw-opacity-50 htw-p-4"
+    >
+      Not available
+    </i>
 
     <textarea
       v-else-if="!sourceHtml"
