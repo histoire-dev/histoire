@@ -1,3 +1,9 @@
+<script lang="ts">
+export default {
+  inheritAttrs: false,
+}
+</script>
+
 <script lang="ts" setup>
 // @ts-expect-error virtual module
 import { clientSupportPlugins } from 'virtual:$histoire-support-plugins-client'
@@ -24,5 +30,6 @@ watchEffect(async () => {
     :is="mountComponent"
     v-if="mountComponent"
     :story="story"
+    v-bind="$attrs"
   />
 </template>

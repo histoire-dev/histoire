@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { PropType } from 'vue'
+import { PropType, ref, watch } from 'vue'
 import { Icon } from '@iconify/vue'
 import GenericRenderStory from '../story/GenericRenderStory.vue'
 import type { Story, Variant } from '../../types'
@@ -7,7 +7,7 @@ import BaseEmpty from '../base/BaseEmpty.vue'
 import StatePresets from './StatePresets.vue'
 import ControlsComponentProps from './ControlsComponentProps.vue'
 
-defineProps({
+const props = defineProps({
   variant: {
     type: Object as PropType<Variant>,
     required: true,
@@ -17,6 +17,13 @@ defineProps({
     type: Object as PropType<Story>,
     required: true,
   },
+})
+
+// Wait for controls render before applying presets
+const ready = ref(false)
+
+watch(() => props.variant, () => {
+  ready.value = false
 })
 </script>
 
@@ -30,6 +37,7 @@ defineProps({
       class="htw-h-9 htw-flex-none htw-px-2 htw-flex htw-items-center"
     >
       <StatePresets
+        v-if="ready"
         :story="story"
         :variant="variant"
       />
@@ -43,6 +51,7 @@ defineProps({
       :variant="variant"
       :story="story"
       class="htw-flex-none"
+      @ready="ready = true"
     />
 
     <BaseEmpty v-else-if="!variant.state?._hPropDefs?.length">
