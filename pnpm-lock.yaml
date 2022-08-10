@@ -214,6 +214,8 @@ importers:
       typescript: ^4.7.4
       vite: ^2.9.1
       vite-node: 0.12.1
+      vscode-oniguruma: ^1.6.1
+      vscode-textmate: ^6.0.0
     dependencies:
       '@histoire/app': link:../histoire-app
       '@histoire/controls': link:../histoire-controls
@@ -244,6 +246,8 @@ importers:
       sirv: 2.0.2
       tinypool: 0.1.3
       vite-node: 0.12.1
+      vscode-oniguruma: 1.6.2
+      vscode-textmate: 6.0.0
     devDependencies:
       '@peeky/test': 0.13.5
       '@types/fs-extra': 9.0.13
@@ -11040,6 +11044,10 @@ packages:
 
   /vscode-textmate/5.2.0:
     resolution: {integrity: sha512-Uw5ooOQxRASHgu6C7GVvUxisKXfSgW4oFlO+aa+PAkgmH89O3CXxEEzNRNtHSqtXFTl0nAC1uYj0GMSH27uwtQ==}
+
+  /vscode-textmate/6.0.0:
+    resolution: {integrity: sha512-gu73tuZfJgu+mvCSy4UZwd2JXykjK9zAZsfmDeut5dx/1a7FeTk0XwJsSuqQn+cuMCGVbIBfl+s53X4T19DnzQ==}
+    dev: false
 
   /vscode-uri/3.0.3:
     resolution: {integrity: sha512-EcswR2S8bpR7fD0YPeS7r2xXExrScVMxg4MedACaWHEtx9ftCF/qHG1xGkolzTPcEmjTavCQgbVzHUIdTMzFGA==}

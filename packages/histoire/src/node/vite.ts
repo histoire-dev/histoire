@@ -1,5 +1,5 @@
 import { createRequire } from 'module'
-import { relative, resolve, join } from 'pathe'
+import { relative, resolve, join, dirname } from 'pathe'
 import {
   resolveConfig as resolveViteConfigInternal,
   Plugin as VitePlugin,
@@ -72,6 +72,18 @@ export async function getViteConfigWithPlugins (isServer: boolean, ctx: Context)
   const inlineConfig = await mergeHistoireViteConfig(userViteConfig?.config ?? {}, ctx)
   const plugins: VitePlugin[] = []
 
+  function optimizeDeps (deps: string[]): string[] {
+    const result = []
+    for (const dep of deps) {
+      try {
+        result.push(dirname(require.resolve(`${dep}/package.json`)))
+      } catch (e) {
+        // Noop
+      }
+    }
+    return result
+  }
+
   plugins.push({
     name: 'histoire-vite-plugin',
 
@@ -90,7 +102,15 @@ export async function getViteConfigWithPlugins (isServer: boolean, ctx: Context)
           entries: [
             `${APP_PATH}/bundle-main.js`,
             `${APP_PATH}/bundle-sandbox.js`,
+            // `${APP_PATH}/server/index.js`,
           ],
+          include: optimizeDeps([
+            'case',
+            'shiki',
+            // Shiki dependencies
+            'vscode-oniguruma',
+            'vscode-textmate',
+          ]),
           exclude: [
             'histoire',
             '@histoire',
