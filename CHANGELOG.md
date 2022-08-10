@@ -1,3 +1,12 @@
+## [0.9.3](https://github.com/Akryum/histoire/compare/v0.9.2...v0.9.3) (2022-08-10)
+
+
+### Bug Fixes
+
+* optimize histoire deps ([8de066e](https://github.com/Akryum/histoire/commit/8de066eae29a45786fe604b1558f7aabc8ec074d))
+
+
+
 ## [0.9.2](https://github.com/Akryum/histoire/compare/v0.9.1...v0.9.2) (2022-08-10)
 
 
