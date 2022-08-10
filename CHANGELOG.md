@@ -1,3 +1,12 @@
+## [0.9.5](https://github.com/Akryum/histoire/compare/v0.9.4...v0.9.5) (2022-08-10)
+
+
+### Bug Fixes
+
+* optimize flexsearch ([7babe9b](https://github.com/Akryum/histoire/commit/7babe9be205c56af6f515ceec0e22650abd2ffb2))
+
+
+
 ## [0.9.4](https://github.com/Akryum/histoire/compare/v0.9.3...v0.9.4) (2022-08-10)
 
 
