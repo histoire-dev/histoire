@@ -101,7 +101,6 @@ export async function getViteConfigWithPlugins (isServer: boolean, ctx: Context)
           entries: [
             `${APP_PATH}/bundle-main.js`,
             `${APP_PATH}/bundle-sandbox.js`,
-            // `${APP_PATH}/server/index.js`,
           ],
           include: optimizeDeps([
             'case',
