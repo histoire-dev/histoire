@@ -21,7 +21,7 @@ export async function startPreview (viteConfig: ViteConfig, port: number | null,
     }),
   )
 
-  let finalPort = port ?? 3000
+  let finalPort = port ?? 6006
 
   const httpServer = http.createServer(app)
 

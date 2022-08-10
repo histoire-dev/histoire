@@ -15,7 +15,7 @@ export async function devCommand (options: DevOptions) {
     const ctx = await createContext({
       mode: 'dev',
     })
-    const { server, close } = await createServer(ctx, options.port)
+    const { server, close } = await createServer(ctx, options.port ?? 6006)
     server.printUrls()
 
     // Histoire config watcher
