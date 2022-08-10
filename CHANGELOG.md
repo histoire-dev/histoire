@@ -1,3 +1,15 @@
+## [0.9.6](https://github.com/Akryum/histoire/compare/v0.9.5...v0.9.6) (2022-08-10)
+
+
+### Bug Fixes
+
+* add key to generic render/mount, fix [#231](https://github.com/Akryum/histoire/issues/231) ([203f7a9](https://github.com/Akryum/histoire/commit/203f7a921eaff9e8233cc1c6c19a1ad71ab3b633))
+* **iframe:** variant.previewReady wasn't reeset to false ([4f52b45](https://github.com/Akryum/histoire/commit/4f52b45398cce5cbfc3d66e2380bd138b061bcd9))
+* **state preset:** use structured cloning when applying ([10b1b4b](https://github.com/Akryum/histoire/commit/10b1b4b2f521c966248f81d84e24885286c6e23d))
+* **state preset:** wait for controls render ([e31002d](https://github.com/Akryum/histoire/commit/e31002d534647115d61a6a66a3b68f7909dc9568))
+
+
+
 ## [0.9.5](https://github.com/Akryum/histoire/compare/v0.9.4...v0.9.5) (2022-08-10)
 
 
