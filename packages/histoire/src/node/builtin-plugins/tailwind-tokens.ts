@@ -1,5 +1,12 @@
+import { createRequire } from 'module'
 import { BasePluginApi, Plugin } from '../plugin.js'
 import { findUp } from '../util/find-up.js'
+
+const require = createRequire(import.meta.url)
+
+function resolveImport (request) {
+  return JSON.stringify(require.resolve(request))
+}
 
 export interface TailwindTokensOptions {
   configFile?: string
@@ -22,10 +29,11 @@ export function tailwindTokens (options: TailwindTokensOptions = {}): Plugin {
       await api.fs.ensureDir(api.pluginTempDir)
       await api.fs.emptyDir(api.pluginTempDir)
       api.moduleLoader.clearCache()
+      await api.fs.writeFile(api.path.resolve(api.pluginTempDir, 'style.css'), css)
       const tailwindConfig = await api.moduleLoader.loadModule(tailwindConfigFile)
       const { default: resolveConfig } = await import('tailwindcss/resolveConfig.js')
       const resolvedTailwindConfig = resolveConfig(tailwindConfig)
-      const storyFile = api.path.resolve(api.pluginTempDir, 'Tailwind.story.vue')
+      const storyFile = api.path.resolve(api.pluginTempDir, 'Tailwind.story.js')
       await api.fs.writeFile(storyFile, storyTemplate(resolvedTailwindConfig))
       api.addStoryFile(storyFile)
     } catch (e) {
@@ -80,449 +88,451 @@ export function tailwindTokens (options: TailwindTokensOptions = {}): Plugin {
   }
 }
 
-const storyTemplate = (tailwindConfig: any) => `<script>
-import 'histoire-style'
-import { ref, markRaw } from 'vue'
+const storyTemplate = (tailwindConfig: any) => `import 'histoire-style'
+import './style.css'
+import { createApp, h, markRaw, ref } from ${resolveImport('@histoire/vendors/vue')}
+import {
+  HstColorShades,
+  HstTokenList,
+  HstTokenGrid,
+  HstText,
+  HstTextarea,
+  HstNumber,
+} from ${resolveImport('@histoire/controls')}
 
 const config = markRaw(${JSON.stringify(tailwindConfig, null, 2)})
+const search = ref('')
+const sampleText = ref('Cat sit like bread eat prawns daintily with a claw then lick paws clean wash down prawns with a lap of carnation milk then retire to the warmest spot on the couch to claw at the fabric before taking a catnap mrow cat cat moo moo lick ears lick paws')
+const fontSize = ref(16)
+
+function mountApp ({ el, state, onUnmount }, render) {
+  Object.assign(state, {
+    search,
+    sampleText,
+    fontSize,
+  })
+
+  const app = createApp({
+    render,
+  })
+  app.mount(el)
+
+  onUnmount(() => {
+    app.unmount()
+  })
+}
 
 export default {
-  setup () {
-    const search = ref('')
-    const sampleText = ref('Cat sit like bread eat prawns daintily with a claw then lick paws clean wash down prawns with a lap of carnation milk then retire to the warmest spot on the couch to claw at the fabric before taking a catnap mrow cat cat moo moo lick ears lick paws')
-    const fontSize = ref(16)
-    return {
-      config,
-      search,
-      sampleText,
-      fontSize,
-    }
-  }
-}
-</script>
-<template>
-  <Story id="tailwind" title="Tailwind" group="design-system" icon="mdi:tailwind" responsiveDisabled :layout="{ type: 'single', iframe: false }">
-    <Variant id="background-color" title="Background Color" icon="carbon:color-palette">
-      <HstColorShades
-        v-for="(shades, key) of config.theme.backgroundColor"
-        :key="key"
-        :shades="typeof shades === 'object' ? shades : { DEFAULT: shades }"
-        :get-name="shade => (config.prefix ?? '') + (shade === 'DEFAULT' ? \`bg-\${key}\` : \`bg-\${key}-\${shade}\`)"
-        :search="search"
-      >
-        <template #default="{ color }">
-          <div
-            class="shade"
-            :style="{
-              backgroundColor: color,
-            }"
-          />
-        </template>
-      </HstColorShades>
-      <template #controls>
-        <HstText
-          v-model="search"
-          title="Filter..."
-        />
-      </template>
-    </Variant>
-    <Variant id="text-color" title="Text Color" icon="carbon:text-color">
-      <HstColorShades
-        v-for="(shades, key) of config.theme.textColor"
-        :key="key"
-        :shades="typeof shades === 'object' ? shades : { DEFAULT: shades }"
-        :get-name="shade => (config.prefix ?? '') + (shade === 'DEFAULT' ? \`text-\${key}\` : \`text-\${key}-\${shade}\`)"
-        :search="search"
-      >
-        <template #default="{ color }">
-          <div
-            class="shade text"
-            :style="{
-              color: color,
-            }"
-          >
-            Aa
-          </div>
-        </template>
-      </HstColorShades>
-      <template #controls>
-        <HstText
-          v-model="search"
-          title="Filter..."
-        />
-      </template>
-    </Variant>
-    <Variant id="border-color" title="Border Color" icon="carbon:color-palette">
-      <HstColorShades
-        v-for="(shades, key) of config.theme.borderColor"
-        :key="key"
-        :shades="typeof shades === 'object' ? shades : { DEFAULT: shades }"
-        :get-name="shade => (config.prefix ?? '') + (shade === 'DEFAULT' ? \`border-\${key}\` : \`border-\${key}-\${shade}\`)"
-        :search="search"
-      >
-        <template #default="{ color }">
-          <div
-            class="shade border"
-            :style="{
-              borderColor: color,
-            }"
-          />
-        </template>
-      </HstColorShades>
-      <template #controls>
-        <HstText
-          v-model="search"
-          title="Filter..."
-        />
-      </template>
-    </Variant>
-    <Variant id="padding" title="Padding" icon="carbon:area">
-      <HstTokenList
-        :tokens="config.theme.padding"
-        :get-name="key => \`\${config.prefix ?? ''}p-\${key}\`"
-      >
-        <template #default="{ token }">
-          <div class="padding"
-            :style="{
-              padding: token.value,
-            }"
-          >
-            <div
-              class="padding-box"
-            />
-          </div>
-        </template>
-      </HstTokenList>
-    </Variant>
-    <Variant id="margin" title="Margin" icon="carbon:area">
-      <HstTokenList
-        :tokens="config.theme.margin"
-        :get-name="key => \`\${config.prefix ?? ''}m-\${key}\`"
-      >
-        <template #default="{ token }">
-          <div class="margin"
-            :style="{
-              padding: token.value,
-            }"
-          >
-            <div
-              class="margin-box"
-            />
-          </div>
-        </template>
-      </HstTokenList>
-    </Variant>
-    <Variant id="font-size" title="Font Size" icon="carbon:text-font">
-      <HstTokenList
-        :tokens="config.theme.fontSize"
-        :get-name="key => \`\${config.prefix ?? ''}text-\${key}\`"
-      >
-        <template #default="{ token }">
-          <div
-            class="truncate"
-            :style="{
-              fontSize: token.value[0],
-              ...token.value[1],
-            }"
-          >
-            {{ sampleText }}
-          </div>
-        </template>
-      </HstTokenList>
-      <template #controls>
-        <HstTextarea
-          v-model="sampleText"
-          title="Sample text"
-          rows="5"
-        />
-      </template>
-    </Variant>
-    <Variant id="font-weight" title="Font Weight" icon="carbon:text-font">
-      <HstTokenList
-        :tokens="config.theme.fontWeight"
-        :get-name="key => \`\${config.prefix ?? ''}font-\${key}\`"
-      >
-        <template #default="{ token }">
-          <div
-            class="truncate"
-            :style="{
-              fontWeight: token.value,
-              fontSize: \`\${fontSize}px\`,
-            }"
-          >
-            {{ sampleText }}
-          </div>
-        </template>
-      </HstTokenList>
-      <template #controls>
-        <HstTextarea
-          v-model="sampleText"
-          title="Sample text"
-          rows="5"
-        />
-        <HstNumber
-          v-model="fontSize"
-          title="Font size"
-          min="1"
-        />
-      </template>
-    </Variant>
-    <Variant id="font-family" title="Font Family" icon="carbon:text-font">
-      <HstTokenList
-        :tokens="config.theme.fontFamily"
-        :get-name="key => \`\${config.prefix ?? ''}font-\${key}\`"
-      >
-        <template #default="{ token }">
-          <div
-            class="truncate"
-            :style="{
-              fontFamily: token.value,
-              fontSize: \`\${fontSize}px\`,
-            }"
-          >
-            {{ sampleText }}
-          </div>
-        </template>
-      </HstTokenList>
-      <template #controls>
-        <HstTextarea
-          v-model="sampleText"
-          title="Sample text"
-          rows="5"
-        />
-        <HstNumber
-          v-model="fontSize"
-          title="Font size"
-          min="1"
-        />
-      </template>
-    </Variant>
-    <Variant id="letter-spacing" title="Letter Spacing" icon="carbon:text-font">
-      <HstTokenList
-        :tokens="config.theme.letterSpacing"
-        :get-name="key => \`\${config.prefix ?? ''}tracking-\${key}\`"
-      >
-        <template #default="{ token }">
-          <div
-            class="truncate"
-            :style="{
-              letterSpacing: token.value,
-              fontSize: \`\${fontSize}px\`,
-            }"
-          >
-            {{ sampleText }}
-          </div>
-        </template>
-      </HstTokenList>
-      <template #controls>
-        <HstTextarea
-          v-model="sampleText"
-          title="Sample text"
-          rows="5"
-        />
-        <HstNumber
-          v-model="fontSize"
-          title="Font size"
-          min="1"
-        />
-      </template>
-    </Variant>
-    <Variant id="line-height" title="Line Height" icon="carbon:text-font">
-      <HstTokenList
-        :tokens="config.theme.lineHeight"
-        :get-name="key => \`\${config.prefix ?? ''}leading-\${key}\`"
-      >
-        <template #default="{ token }">
-          <div
-            :style="{
-              lineHeight: token.value,
-              fontSize: \`\${fontSize}px\`,
-            }"
-          >
-            {{ sampleText }}
-          </div>
-        </template>
-      </HstTokenList>
-      <template #controls>
-        <HstTextarea
-          v-model="sampleText"
-          title="Sample text"
-          rows="5"
-        />
-        <HstNumber
-          v-model="fontSize"
-          title="Font size"
-          min="1"
-        />
-      </template>
-    </Variant>
-    <Variant id="drop-shadow" title="Drop Shadow" icon="carbon:shape-except">
-      <HstTokenGrid
-        :tokens="config.theme.dropShadow"
-        :get-name="key => (config.prefix ?? '') + (key === 'DEFAULT' ? 'drop-shadow' : \`drop-shadow-\${key}\`)"
-        :col-size="180"
-      >
-        <template #default="{ token }">
-          <div
-            class="drop-shadow"
-            :style="{
-              filter: \`\${(Array.isArray(token.value) ? token.value : [token.value]).map(v => \`drop-shadow(\${v})\`).join(' ')}\`,
-            }"
-          />
-        </template>
-      </HstTokenGrid>
-    </Variant>
-    <Variant id="border-radius" title="Border Radius" icon="carbon:condition-wait-point">
-      <HstTokenGrid
-        :tokens="config.theme.borderRadius"
-        :get-name="key => (config.prefix ?? '') + (key === 'DEFAULT' ? 'rounded' : \`rounded-\${key}\`)"
-        :col-size="180"
-      >
-        <template #default="{ token }">
-          <div
-            class="border-radius"
-            :style="{
-              borderRadius: token.value,
-            }"
-          />
-        </template>
-      </HstTokenGrid>
-    </Variant>
-    <Variant id="border-width" title="Border Width" icon="carbon:checkbox">
-      <HstTokenGrid
-        :tokens="config.theme.borderWidth"
-        :get-name="key => (config.prefix ?? '') + (key === 'DEFAULT' ? 'border' : \`border-\${key}\`)"
-        :col-size="180"
-      >
-        <template #default="{ token }">
-          <div
-            class="border-width"
-            :style="{
-              borderWidth: token.value,
-            }"
-          />
-        </template>
-      </HstTokenGrid>
-    </Variant>
-    <Variant id="width" title="Width" icon="carbon:pan-horizontal">
-      <HstTokenList
-        :tokens="config.theme.width"
-        :get-name="key => (config.prefix ?? '') + (key === 'DEFAULT' ? 'w' : \`w-\${key}\`)"
-      >
-        <template #default="{ token }">
-          <div class="width">
-            <div
-              class="width-box"
-              :style="{
-                width: token.value,
-              }"
-            />
-          </div>
-        </template>
-      </HstTokenList>
-    </Variant>
-    <Variant id="height" title="Height" icon="carbon:pan-vertical">
-      <HstTokenList
-        :tokens="config.theme.height"
-        :get-name="key => (config.prefix ?? '') + (key === 'DEFAULT' ? 'h' : \`h-\${key}\`)"
-      >
-        <template #default="{ token }">
-          <div
-            class="height"
-            :style="{
-              height: token.value,
-            }"
-          />
-        </template>
-      </HstTokenList>
-    </Variant>
-    <Variant id="full-config" title="Full Config" icon="carbon:code">
-      <pre>{{ config }}</pre>
-    </Variant>
-  </Story>
-</template>
-<style scoped>
-.shade {
+  id: 'tailwind',
+  title: 'Tailwind',
+  group: 'design-system',
+  icon: 'mdi:tailwind',
+  responsiveDisabled: true,
+  layout: { type: 'single', iframe: false },
+  variants: [
+    {
+      id: 'background-color',
+      title: 'Background Color',
+      icon: 'carbon:color-palette',
+      onMount: (api) => mountApp(api, () => Object.entries(config.theme.backgroundColor).map(([key, shades]) => h(HstColorShades, {
+        key,
+        shades: typeof shades === 'object' ? shades : { DEFAULT: shades },
+        getName: shade => (config.prefix ?? '') + (shade === 'DEFAULT' ? \`bg-\${key}\` : \`bg-\${key}-\${shade}\`),
+        search: search.value,
+      }, ({ color}) => h('div', {
+        class: '__hst-shade',
+        style: {
+          backgroundColor: color,
+        },
+      })))),
+      onMountControls: (api) => mountApp(api, () => [
+        h(HstText, {
+          title: 'Filter...',
+          modelValue: search.value,
+          'onUpdate:modelValue': value => { search.value = value },
+        }),
+      ]),
+    },
+    {
+      id: 'text-color',
+      title: 'Text Color',
+      icon: 'carbon:text-color',
+      onMount: (api) => mountApp(api, () => Object.entries(config.theme.textColor).map(([key, shades]) => h(HstColorShades, {
+        key,
+        shades: typeof shades === 'object' ? shades : { DEFAULT: shades },
+        getName: shade => (config.prefix ?? '') + (shade === 'DEFAULT' ? \`text-\${key}\` : \`text-\${key}-\${shade}\`),
+        search: search.value,
+      }, ({ color}) => h('div', {
+        class: '__hst-shade __hst-text',
+        style: {
+          color,
+        },
+      }, 'Aa')))),
+      onMountControls: (api) => mountApp(api, () => [
+        h(HstText, {
+          title: 'Filter...',
+          modelValue: search.value,
+          'onUpdate:modelValue': value => { search.value = value },
+        }),
+      ]),
+    },
+    {
+      id: 'border-color',
+      title: 'Border Color',
+      icon: 'carbon:color-palette',
+      onMount: (api) => mountApp(api, () => Object.entries(config.theme.borderColor).map(([key, shades]) => h(HstColorShades, {
+        key,
+        shades: typeof shades === 'object' ? shades : { DEFAULT: shades },
+        getName: shade => (config.prefix ?? '') + (shade === 'DEFAULT' ? \`border-\${key}\` : \`border-\${key}-\${shade}\`),
+        search: search.value,
+      }, ({ color}) => h('div', {
+        class: '__hst-shade __hst-border',
+        style: {
+          borderColor: color,
+        },
+      })))),
+      onMountControls: (api) => mountApp(api, () => [
+        h(HstText, {
+          title: 'Filter...',
+          modelValue: search.value,
+          'onUpdate:modelValue': value => { search.value = value },
+        }),
+      ]),
+    },
+    {
+      id: 'padding',
+      title: 'Padding',
+      icon: 'carbon:area',
+      onMount: (api) => mountApp(api, () => h(HstTokenList, {
+        tokens: config.theme.padding,
+        getName: key => \`\${config.prefix ?? ''}p-\${key}\`,
+      }, ({ token }) => h('div', {
+        class: '__hst-padding',
+        style: {
+          padding: token.value,
+        },
+      }, [
+        h('div', {
+          class: '__hst-padding-box',
+        }),
+      ]))),
+    },
+    {
+      id: 'margin',
+      title: 'Margin',
+      icon: 'carbon:area',
+      onMount: (api) => mountApp(api, () => h(HstTokenList, {
+        tokens: config.theme.margin,
+        getName: key => \`\${config.prefix ?? ''}m-\${key}\`,
+      }, ({ token }) => h('div', {
+        class: '__hst-margin',
+      }, [
+        h('div', {
+          class: '__hst-margin-box',
+          style: {
+            margin: token.value,
+          },
+        }),
+      ]))),
+    },
+    {
+      id: 'font-size',
+      title: 'Font Size',
+      icon: 'carbon:text-font',
+      onMount: (api) => mountApp(api, () => h(HstTokenList, {
+        tokens: config.theme.fontSize,
+        getName: key => \`\${config.prefix ?? ''}text-\${key}\`,
+      }, ({ token }) => h('div', {
+        class: '__hst-truncate',
+        style: {
+          fontSize: token.value[0],
+          ...token.value[1],
+        },
+      }, sampleText.value))),
+      onMountControls: (api) => mountApp(api, () => [
+        h(HstTextarea, {
+          title: 'Sample text',
+          modelValue: sampleText.value,
+          'onUpdate:modelValue': value => { sampleText.value = value },
+          rows: 5,
+        }),
+      ]),
+    },
+    {
+      id: 'font-weight',
+      title: 'Font Weight',
+      icon: 'carbon:text-font',
+      onMount: (api) => mountApp(api, () => h(HstTokenList, {
+        tokens: config.theme.fontWeight,
+        getName: key => \`\${config.prefix ?? ''}font-\${key}\`,
+      }, ({ token }) => h('div', {
+        class: '__hst-truncate',
+        style: {
+          fontWeight: token.value,
+          fontSize: \`\${fontSize.value}px\`,
+        },
+      }, sampleText.value))),
+      onMountControls: (api) => mountApp(api, () => [
+        h(HstTextarea, {
+          title: 'Sample text',
+          modelValue: sampleText.value,
+          'onUpdate:modelValue': value => { sampleText.value = value },
+          rows: 5,
+        }),
+        h(HstNumber, {
+          title: 'Font size',
+          modelValue: fontSize.value,
+          'onUpdate:modelValue': value => { fontSize.value = value },
+          min: 1,
+        }),
+      ]),
+    },
+    {
+      id: 'font-family',
+      title: 'Font Family',
+      icon: 'carbon:text-font',
+      onMount: (api) => mountApp(api, () => h(HstTokenList, {
+        tokens: config.theme.fontFamily,
+        getName: key => \`\${config.prefix ?? ''}font-\${key}\`,
+      }, ({ token }) => h('div', {
+        class: '__hst-truncate',
+        style: {
+          fontFamily: token.value,
+          fontSize: \`\${fontSize.value}px\`,
+        },
+      }, sampleText.value))),
+      onMountControls: (api) => mountApp(api, () => [
+        h(HstTextarea, {
+          title: 'Sample text',
+          modelValue: sampleText.value,
+          'onUpdate:modelValue': value => { sampleText.value = value },
+          rows: 5,
+        }),
+        h(HstNumber, {
+          title: 'Font size',
+          modelValue: fontSize.value,
+          'onUpdate:modelValue': value => { fontSize.value = value },
+          min: 1,
+        }),
+      ]),
+    },
+    {
+      id: 'letter-spacing',
+      title: 'Letter Spacing',
+      icon: 'carbon:text-font',
+      onMount: (api) => mountApp(api, () => h(HstTokenList, {
+        tokens: config.theme.letterSpacing,
+        getName: key => \`\${config.prefix ?? ''}tracking-\${key}\`,
+      }, ({ token }) => h('div', {
+        class: '__hst-truncate',
+        style: {
+          letterSpacing: token.value,
+          fontSize: \`\${fontSize.value}px\`,
+        },
+      }, sampleText.value))),
+      onMountControls: (api) => mountApp(api, () => [
+        h(HstTextarea, {
+          title: 'Sample text',
+          modelValue: sampleText.value,
+          'onUpdate:modelValue': value => { sampleText.value = value },
+          rows: 5,
+        }),
+        h(HstNumber, {
+          title: 'Font size',
+          modelValue: fontSize.value,
+          'onUpdate:modelValue': value => { fontSize.value = value },
+          min: 1,
+        }),
+      ]),
+    },
+    {
+      id: 'line-height',
+      title: 'Line Height',
+      icon: 'carbon:text-font',
+      onMount: (api) => mountApp(api, () => h(HstTokenList, {
+        tokens: config.theme.lineHeight,
+        getName: key => \`\${config.prefix ?? ''}leading-\${key}\`,
+      }, ({ token }) => h('div', {
+        style: {
+          lineHeight: token.value,
+        },
+      }, sampleText.value))),
+      onMountControls: (api) => mountApp(api, () => [
+        h(HstTextarea, {
+          title: 'Sample text',
+          modelValue: sampleText.value,
+          'onUpdate:modelValue': value => { sampleText.value = value },
+          rows: 5,
+        }),
+        // @TODO select font size
+      ]),
+    },
+    {
+      id: 'drop-shadow',
+      title: 'Drop Shadow',
+      icon: 'carbon:shape-except',
+      onMount: (api) => mountApp(api, () => h(HstTokenGrid, {
+        tokens: config.theme.dropShadow,
+        getName: key => (config.prefix ?? '') + (key === 'DEFAULT' ? 'drop-shadow' : \`drop-shadow-\${key}\`),
+        colSize: 180,
+      }, ({ token }) => h('div', {
+        class: '__hst-drop-shadow',
+        style: {
+          filter: \`\${(Array.isArray(token.value) ? token.value : [token.value]).map(v => \`drop-shadow(\${v})\`).join(' ')}\`,
+        },
+      }))),
+    },
+    {
+      id: 'border-radius',
+      title: 'Border Radius',
+      icon: 'carbon:condition-wait-point',
+      onMount: (api) => mountApp(api, () => h(HstTokenGrid, {
+        tokens: config.theme.borderRadius,
+        getName: key => (config.prefix ?? '') + (key === 'DEFAULT' ? 'rounded' : \`rounded-\${key}\`),
+        colSize: 180,
+      }, ({ token }) => h('div', {
+        class: '__hst-border-radius',
+        style: {
+          borderRadius: token.value,
+        },
+      }))),
+    },
+    {
+      id: 'border-width',
+      title: 'Border Width',
+      icon: 'carbon:checkbox',
+      onMount: (api) => mountApp(api, () => h(HstTokenGrid, {
+        tokens: config.theme.borderWidth,
+        getName: key => (config.prefix ?? '') + (key === 'DEFAULT' ? 'border' : \`border-\${key}\`),
+        colSize: 180,
+      }, ({ token }) => h('div', {
+        class: '__hst-border-width',
+        style: {
+          borderWidth: token.value,
+        },
+      }))),
+    },
+    {
+      id: 'width',
+      title: 'Width',
+      icon: 'carbon:pan-horizontal',
+      onMount: (api) => mountApp(api, () => h(HstTokenList, {
+        tokens: config.theme.width,
+        getName: key => (config.prefix ?? '') + (key === 'DEFAULT' ? 'w' : \`w-\${key}\`),
+      }, ({ token }) => h('div', {
+        class: '__hst-width',
+      }, [
+        h('div', {
+          class: '__hst-width-box',
+          style: {
+            width: token.value,
+          },
+        }),
+      ]))),
+    },
+    {
+      id: 'height',
+      title: 'Height',
+      icon: 'carbon:pan-vertical',
+      onMount: (api) => mountApp(api, () => h(HstTokenList, {
+        tokens: config.theme.height,
+        getName: key => (config.prefix ?? '') + (key === 'DEFAULT' ? 'h' : \`h-\${key}\`),
+      }, ({ token }) => h('div', {
+        class: '__hst-height',
+        style: {
+          height: token.value,
+        },
+      }))),
+    },
+    {
+      id: 'full-config',
+      title: 'Full Config',
+      icon: 'carbon:code',
+      onMount: (api) => mountApp(api, () => h('pre', JSON.stringify(config, null, 2))),
+    },
+  ],
+}`
+
+const css = `.__hst-shade {
   height: 80px;
   border-radius: 4px;
 }
 
-.text {
+.__hst-text {
   font-size: 4rem;
   display: flex;
   align-items: flex-end;
 }
 
-.border {
+.__hst-border {
   border-style: solid;
   border-width: 2px;
 }
 
-.padding {
+.__hst-padding {
   background-color: rgb(113 113 122 / 0.1);
   width: min-content;
 }
 
-.margin {
+.__hst-margin {
   border: dashed 1px rgb(113 113 122 / 0.5);
   width: min-content;
 }
 
-.padding-box,
-.margin-box {
+.__hst-padding-box,
+.__hst-margin-box {
   width: 5rem;
   height: 5rem;
   background-color: rgb(113 113 122 / 0.5);
 }
 
-.padding,
-.padding-box,
-.margin,
-.margin-box,
-.drop-shadow {
+.__hst-padding,
+.__hst-padding-box,
+.__hst-margin,
+.__hst-margin-box,
+.__hst-drop-shadow {
   border-radius: 4px;
 }
 
-.truncate {
+.__hst-truncate {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.drop-shadow {
+.__hst-drop-shadow {
   width: 8rem;
   height: 8rem;
   background: white;
   margin-bottom: 0.5rem;
 }
 
-.dark .drop-shadow {
+.__hst-drop-shadow {
   background: #4e4e57;
 }
 
-.border-radius {
+.__hst-border-radius {
   width: 8rem;
   height: 8rem;
   background-color: rgb(113 113 122 / 0.5);
 }
 
-.border-width {
+.__hst-border-width {
   width: 8rem;
   height: 8rem;
   border-color: rgb(113 113 122 / 0.5);
   background-color: rgb(113 113 122 / 0.1);
 }
 
-.width {
+.__hst-width {
   background-color: rgb(113 113 122 / 0.1);
 }
 
-.width-box,
-.height {
+.__hst-width-box,
+.__hst-height {
   background-color: rgb(113 113 122 / 0.5);
 }
 
-.width-box {
+.__hst-width-box {
   height: 5rem;
-}
-</style>`
+}`
