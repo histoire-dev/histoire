@@ -97,6 +97,7 @@ onMounted(() => {
     class="htw-hidden"
   >
     <GenericMountStory
+      :key="storyStore.currentStory.id"
       :story="storyStore.currentStory"
     />
   </div>

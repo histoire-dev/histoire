@@ -95,6 +95,7 @@ useResizeObserver(el, () => {
       @keyup="selectVariant()"
     >
       <GenericRenderStory
+        :key="`${story.id}-${variant.id}`"
         :variant="variant"
         :story="story"
         @ready="onReady"

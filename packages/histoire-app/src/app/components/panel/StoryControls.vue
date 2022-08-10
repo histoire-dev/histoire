@@ -38,6 +38,7 @@ defineProps({
     <!-- Custom controls -->
     <GenericRenderStory
       v-if="variant.slots().controls || story.slots().controls"
+      :key="`${story.id}-${variant.id}`"
       slot-name="controls"
       :variant="variant"
       :story="story"

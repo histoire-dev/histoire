@@ -65,6 +65,7 @@ const app = createApp({
     return [
       h('div', { class: 'htw-sandbox-hidden' }, [
         h(GenericMountStory, {
+          key: file.value.story.id,
           story: file.value.story,
         }),
       ]),
