@@ -85,6 +85,9 @@ const isIframeLoaded = ref(false)
 
 watch(sandboxUrl, () => {
   isIframeLoaded.value = false
+  Object.assign(props.variant, {
+    previewReady: false,
+  })
 })
 
 // Settings
