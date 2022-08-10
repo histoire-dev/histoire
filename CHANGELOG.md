@@ -1,3 +1,23 @@
+## [0.9.2](https://github.com/Akryum/histoire/compare/v0.9.1...v0.9.2) (2022-08-10)
+
+
+### Bug Fixes
+
+* allow require.resolve @histoire/controls ([2717442](https://github.com/Akryum/histoire/commit/27174425f86e19c294d8d39bca372016745a15db))
+* import of flexsearch, fix [#227](https://github.com/Akryum/histoire/issues/227) ([1b44bb6](https://github.com/Akryum/histoire/commit/1b44bb66b7086ea7e2625de8890624a6919b8a01))
+* **plugin:** initialize context before calling onDev ([ed0d5b8](https://github.com/Akryum/histoire/commit/ed0d5b8b60428f587d4f87749e4818424edb1327))
+* remove forced deps optimize ([234c8c1](https://github.com/Akryum/histoire/commit/234c8c1777e4b56e446c9f06ee22c9fae81fd267))
+* rename tailwind plugin with builtin: prefix ([295fc59](https://github.com/Akryum/histoire/commit/295fc59528ecc8ccafb37744d293eb44a023f513))
+* sourcecode pane crashing if no generated source code ([1517832](https://github.com/Akryum/histoire/commit/15178321c771d11d77e66fe3c7731d61cfd9f5fa))
+* **vanilla:** inherit options ([55162e0](https://github.com/Akryum/histoire/commit/55162e0b58b9d1872dce48a6dfd22e4e263c3a20))
+
+
+### Features
+
+* vanilla js (no-framework) support plugin ([31f1bce](https://github.com/Akryum/histoire/commit/31f1bce779609778a7ca91982240f7645dc9284f))
+
+
+
 ## [0.9.1](https://github.com/Akryum/histoire/compare/v0.9.0...v0.9.1) (2022-08-02)
 
 
