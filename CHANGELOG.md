@@ -1,3 +1,12 @@
+## [0.9.4](https://github.com/Akryum/histoire/compare/v0.9.3...v0.9.4) (2022-08-10)
+
+
+### Bug Fixes
+
+* remove shiki deps from direct deps ([70f36c9](https://github.com/Akryum/histoire/commit/70f36c9ac801544b71efe09e511abd11b7362b3f))
+
+
+
 ## [0.9.3](https://github.com/Akryum/histoire/compare/v0.9.2...v0.9.3) (2022-08-10)
 
 
