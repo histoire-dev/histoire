@@ -289,7 +289,8 @@ export function getDefaultConfig (): HistoireConfig {
       const index = config.plugins?.findIndex(plugin => Array.isArray(plugin) &&
         typeof plugin[0] === 'object' &&
         !Array.isArray(plugin[0]) &&
-        plugin[0].name.startsWith('vite:legacy'))
+        // @ts-expect-error could have no property 'name'
+        plugin[0].name?.startsWith('vite:legacy'))
       if (index !== -1) {
         config.plugins?.splice(index, 1)
       }

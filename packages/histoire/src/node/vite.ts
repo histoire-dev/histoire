@@ -98,7 +98,6 @@ export async function getViteConfigWithPlugins (isServer: boolean, ctx: Context)
           },
         },
         optimizeDeps: {
-          disabled: isServer,
           entries: [
             `${APP_PATH}/bundle-main.js`,
             `${APP_PATH}/bundle-sandbox.js`,

@@ -13,8 +13,8 @@
   "devDependencies": {
     "@histoire/plugin-screenshot": "workspace:*",
     "@histoire/plugin-vue": "workspace:*",
-    "@vitejs/plugin-vue": "^2.3.1",
+    "@vitejs/plugin-vue": "^3.0.1",
     "histoire": "workspace:*",
-    "vite": "^2.9.1"
+    "vite": "^3.0.5"
   }
 }

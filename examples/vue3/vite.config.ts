@@ -8,7 +8,7 @@ export default defineConfig({
   // Example build config for a component library
   build: {
     lib: {
-      entry: path.resolve(__dirname, './src/main.js'),
+      entry: path.resolve(__dirname, './src/main.ts'),
       name: 'histoire-kit',
       fileName: (format) => `histoire-kit.${format}.js`,
     },

@@ -11,9 +11,9 @@
     "vue": "^3.2.31"
   },
   "devDependencies": {
-    "@vitejs/plugin-vue": "^2.3.1",
+    "@vitejs/plugin-vue": "^3.0.1",
     "@histoire/plugin-vue": "workspace:*",
     "histoire": "workspace:*",
-    "vite": "^2.9.1"
+    "vite": "^3.0.5"
   }
 }

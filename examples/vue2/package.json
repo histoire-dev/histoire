@@ -14,7 +14,7 @@
     "@histoire/plugin-vue2": "workspace:*",
     "@vitejs/plugin-vue2": "^1.1.2",
     "histoire": "workspace:*",
-    "vite": "^2.9.1",
+    "vite": "^3.0.5",
     "vue-template-compiler": "^2.7.8"
   }
 }
