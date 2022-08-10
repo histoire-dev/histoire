@@ -47,7 +47,7 @@ function applyPreset (id) {
   if (id === DEFAULT_ID) {
     resetState()
   } else if (presetStates.value.has(id)) {
-    applyState(props.variant.state, clone(presetStates.value.get(id).state))
+    applyState(props.variant.state, clone(toRawDeep(presetStates.value.get(id).state)))
   }
 }
 
