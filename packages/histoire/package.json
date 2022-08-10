@@ -63,9 +63,7 @@
     "shiki": "0.10.1",
     "sirv": "^2.0.2",
     "tinypool": "^0.1.2",
-    "vite-node": "0.12.1",
-    "vscode-oniguruma": "^1.6.1",
-    "vscode-textmate": "^6.0.0"
+    "vite-node": "0.12.1"
   },
   "peerDependencies": {
     "vite": "^2.9.0"
