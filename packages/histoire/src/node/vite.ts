@@ -106,6 +106,7 @@ export async function getViteConfigWithPlugins (isServer: boolean, ctx: Context)
           ],
           include: optimizeDeps([
             'case',
+            'flexsearch',
             'shiki',
             // Shiki dependencies
             'vscode-oniguruma',
