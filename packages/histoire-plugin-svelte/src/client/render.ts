@@ -17,6 +17,7 @@ import * as setup from '$histoire-setup'
 import * as generatedSetup from '$histoire-generated-global-setup'
 import RenderStorySvelte from './RenderStory.svelte'
 import RenderVariantSvelte from './RenderVariant.svelte'
+import { syncState } from './util'
 
 export default _defineComponent({
   name: 'RenderStory',
@@ -43,6 +44,8 @@ export default _defineComponent({
     let app: SvelteComponent
     let target: HTMLDivElement
 
+    let tearDownHandlers: (() => void)[] = []
+
     async function mountStory () {
       target = document.createElement('div')
       el.value.appendChild(target)
@@ -64,6 +67,34 @@ export default _defineComponent({
           __hstSlot: props.slotName,
         })),
       })
+
+      let appComponent = (app.$$ as any).hmr_cmp
+
+      // Svelte on_hrm callbacks are buggy so we patch the hmr replace instead
+      function patchReplace () {
+        const origReplace = appComponent.$replace
+        appComponent.$replace = (...args) => {
+          const result = origReplace.apply(appComponent, args)
+          appComponent = result
+          watchState()
+          patchReplace()
+          return result
+        }
+      }
+      patchReplace()
+
+      const { apply, stop } = syncState(props.variant.state, (value) => {
+        appComponent.$inject_state(value)
+      })
+      tearDownHandlers.push(stop)
+
+      function watchState () {
+        appComponent.$$.after_update.push(() => {
+          apply(appComponent.$capture_state())
+        })
+      }
+      watchState()
+      apply(appComponent.$capture_state())
 
       // Call app setups to resolve global assets such as components
 
@@ -100,6 +131,8 @@ export default _defineComponent({
         target.parentNode?.removeChild(target)
         target = null
       }
+      tearDownHandlers.forEach(fn => fn())
+      tearDownHandlers = []
     }
 
     _watch(() => props.story.id, async () => {
