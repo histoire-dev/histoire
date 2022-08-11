@@ -15,6 +15,15 @@ export interface Plugin {
    */
   name: string
   /**
+   * Modify histoire default config. The hook can either mutate the passed config or
+   * return a partial config object that will be deeply merged into the existing
+   * config. User config will have higher priority than default config.
+   *
+   * Note: User plugins are resolved before running this hook so injecting other
+   * plugins inside  the `config` hook will have no effect.
+   */
+  defaultConfig?: (defaultConfig: HistoireConfig, mode: ConfigMode) => Partial<HistoireConfig> | null | void | Promise<Partial<HistoireConfig> | null | void>
+  /**
    * Modify histoire config. The hook can either mutate the passed config or
    * return a partial config object that will be deeply merged into the existing
    * config.

@@ -409,7 +409,11 @@ export async function resolveConfig (cwd: string = process.cwd(), mode: ConfigMo
   }
   const viteConfig = await resolveViteConfig({}, 'serve')
   const viteHistoireConfig = (viteConfig.histoire ?? {}) as HistoireConfig
-  return processConfig(mergeConfig(result, viteHistoireConfig, getDefaultConfig()), mode)
+
+  const preUserConfig = mergeConfig(result, viteHistoireConfig)
+  const processedDefaultConfig = await processDefaultConfig(getDefaultConfig(), preUserConfig, mode)
+
+  return processConfig(mergeConfig(preUserConfig, processedDefaultConfig), mode)
 }
 
 export async function processConfig (config: HistoireConfig, mode: ConfigMode): Promise<HistoireConfig> {
@@ -423,6 +427,18 @@ export async function processConfig (config: HistoireConfig, mode: ConfigMode): 
   }
   config.outDir = path.resolve(process.cwd(), config.outDir)
   return config
+}
+
+export async function processDefaultConfig (defaultConfig: HistoireConfig, preUserConfig: HistoireConfig, mode: ConfigMode): Promise<HistoireConfig> {
+  for (const plugin of [...defaultConfig.plugins, ...preUserConfig.plugins]) {
+    if (plugin.defaultConfig) {
+      const result = await plugin.defaultConfig(defaultConfig, mode)
+      if (result) {
+        defaultConfig = mergeConfig(result, defaultConfig)
+      }
+    }
+  }
+  return defaultConfig
 }
 
 export function defineConfig (config: Partial<HistoireConfig>) {

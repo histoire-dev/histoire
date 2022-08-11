@@ -6,7 +6,7 @@ export function HstVue (): Plugin {
   return {
     name: '@histoire/plugin-vue',
 
-    config () {
+    defaultConfig () {
       return {
         supportMatch: [
           {

@@ -8,7 +8,7 @@ export function vanillaSupport (): Plugin {
   return {
     name: 'builtin:vanilla-support',
 
-    config () {
+    defaultConfig () {
       return {
         supportMatch: [
           {

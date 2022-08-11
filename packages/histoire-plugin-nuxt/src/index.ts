@@ -17,7 +17,7 @@ export function HstNuxt (): Plugin {
     name: '@histoire/plugin-nuxt',
 
     // @ts-expect-error Different versions of Vite in devDependencies @TODO update when Nuxt switches to Vite 3
-    async config () {
+    async defaultConfig () {
       const nuxtConfig = await useNuxtViteConfig()
       nuxt = nuxtConfig.nuxt
       const plugins = nuxtConfig.viteConfig.plugins.filter((p: any) => !ignorePlugins.includes(p?.name))
@@ -68,6 +68,7 @@ async function useNuxtViteConfig () {
   return {
     viteConfig: await new Promise<ViteConfig>((resolve) => {
       nuxt.hook('vite:extendConfig', (config, { isClient }) => {
+        // @ts-expect-error Different versions of Vite in devDependencies @TODO update when Nuxt switches to Vite 3
         if (isClient) resolve({ ...config })
       })
       nuxt.ready().then(async () => {
