@@ -36,7 +36,7 @@ export async function createMarkdownRenderer () {
       const hrefIndex = tokens[idx].attrIndex('href')
       const classIndex = tokens[idx].attrIndex('class')
 
-      if (hrefIndex >= 0 && !tokens[idx].attrs[hrefIndex][1].startsWith('/') && (classIndex < 0 || !tokens[idx].attrs[classIndex][1].includes('header-anchor'))) {
+      if (hrefIndex >= 0 && !tokens[idx].attrs[hrefIndex][1].startsWith('/') && !tokens[idx].attrs[hrefIndex][1].startsWith('#') && (classIndex < 0 || !tokens[idx].attrs[classIndex][1].includes('header-anchor'))) {
         // If you are sure other plugins can't add `target` - drop check below
         const aIndex = tokens[idx].attrIndex('target')
 
