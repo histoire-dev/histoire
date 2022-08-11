@@ -1,0 +1,19 @@
+{
+  "name": "histoire-example-svelte3",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "story:dev": "histoire dev",
+    "story:build": "histoire build",
+    "story:preview": "histoire preview"
+  },
+  "dependencies": {
+    "svelte": "^3.49.0"
+  },
+  "devDependencies": {
+    "@histoire/plugin-svelte": "workspace:*",
+    "@sveltejs/vite-plugin-svelte": "^1.0.1",
+    "histoire": "workspace:*",
+    "vite": "^3.0.5"
+  }
+}
