@@ -68,7 +68,6 @@ async function useNuxtViteConfig () {
   return {
     viteConfig: await new Promise<ViteConfig>((resolve) => {
       nuxt.hook('vite:extendConfig', (config, { isClient }) => {
-        // @ts-expect-error Different versions of Vite in devDependencies @TODO update when Nuxt switches to Vite 3
         if (isClient) resolve({ ...config })
       })
       nuxt.ready().then(async () => {
