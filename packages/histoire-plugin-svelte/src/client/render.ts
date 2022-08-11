@@ -46,9 +46,24 @@ export default _defineComponent({
 
     let tearDownHandlers: (() => void)[] = []
 
+    function documentOn (event, cb) {
+      document.addEventListener(event, cb)
+      const off = () => document.removeEventListener(event, cb)
+      tearDownHandlers.push(off)
+      return {
+        off,
+      }
+    }
+
     async function mountStory () {
       target = document.createElement('div')
       el.value.appendChild(target)
+
+      let components = []
+      const { off: registerComponentOff } = documentOn('SvelteRegisterComponent', e => {
+        const { component } = e.detail
+        components.push(component)
+      })
 
       // eslint-disable-next-line new-cap
       app = new props.story.file.component({
@@ -68,11 +83,14 @@ export default _defineComponent({
         })),
       })
 
-      let appComponent = (app.$$ as any).hmr_cmp
+      let appComponent = components.find(c => c.$$ === app.$$)
+      registerComponentOff()
+      components = []
 
       // Svelte on_hrm callbacks are buggy so we patch the hmr replace instead
       function patchReplace () {
         const origReplace = appComponent.$replace
+        if (!origReplace) return
         appComponent.$replace = (...args) => {
           const result = origReplace.apply(appComponent, args)
           appComponent = result
