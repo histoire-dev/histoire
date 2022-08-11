@@ -37,6 +37,7 @@ export default _defineComponent({
       target = document.createElement('div')
       el.value.appendChild(target)
 
+      // eslint-disable-next-line new-cap
       app = new props.story.file.component({
         target,
         props: {

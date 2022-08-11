@@ -23,7 +23,7 @@ export function HstSvelte (): Plugin {
             square: '@histoire/plugin-svelte/assets/histoire-svelte.svg',
             light: '@histoire/plugin-svelte/assets/histoire-svelte-text.svg',
             dark: '@histoire/plugin-svelte/assets/histoire-svelte-text.svg',
-          }
+          },
         },
       }
     },
