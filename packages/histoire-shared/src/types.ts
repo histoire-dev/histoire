@@ -119,12 +119,7 @@ export interface ServerStory {
   title: string
   group?: string
   variants: ServerVariant[]
-  layout?: {
-    type: 'single'
-  } | {
-    type: 'grid'
-    width?: number | string
-  }
+  layout?: StoryLayout
   icon?: string
   iconColor?: string
   docsOnly?: boolean
