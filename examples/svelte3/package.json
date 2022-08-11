@@ -7,6 +7,7 @@
     "story:build": "histoire build",
     "story:preview": "histoire preview"
   },
+  "type": "module",
   "dependencies": {
     "svelte": "^3.49.0"
   },
@@ -14,6 +15,7 @@
     "@histoire/plugin-svelte": "workspace:*",
     "@sveltejs/vite-plugin-svelte": "^1.0.1",
     "histoire": "workspace:*",
+    "svelte-preprocess": "^4.10.7",
     "vite": "^3.0.5"
   }
 }
