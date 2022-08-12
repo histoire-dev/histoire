@@ -1,4 +1,6 @@
 <script>
+  import BaseButton from './BaseButton.svelte'
+
   export let Hst
 
   let disabled = false
@@ -7,19 +9,19 @@
 
 <Hst.Story>
   <svelte:fragment slot="controls">
-    Content: <input type="text" bind:value={content} />
-    Disabled: <input type="checkbox" bind:checked={disabled} />
+    <Hst.Text bind:value={content} title="Content" />
+    <Hst.Checkbox bind:value={disabled} title="Disabled" />
   </svelte:fragment>
 
   <Hst.Variant title="Variant 1">
-    <button {disabled}>
+    <BaseButton {disabled}>
       {content}
-    </button>
+    </BaseButton>
   </Hst.Variant>
 
   <Hst.Variant title="Variant 2">
-    <button {disabled}>
+    <BaseButton {disabled}>
       {content}
-    </button>
+    </BaseButton>
   </Hst.Variant>
 </Hst.Story>

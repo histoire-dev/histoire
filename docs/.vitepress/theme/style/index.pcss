@@ -1,6 +1,12 @@
 @tailwind base;
 @tailwind components;
 
+body {
+  font-family: 'Fira Sans', Inter, -apple-system,
+    BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell,
+    'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+}
+
 button {
   font-size: inherit;
 }
@@ -77,6 +83,10 @@ table {
       background-color: #1a1e23;
     }
   }
+}
+
+em {
+  @apply italic;
 }
 
 /* Vitepress fixes */

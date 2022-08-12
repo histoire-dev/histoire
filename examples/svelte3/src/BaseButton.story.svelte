@@ -1,14 +1,15 @@
 <script>
-import BaseButton from './BaseButton.svelte'
+  import { hstEvent } from 'histoire/client'
+  import BaseButton from './BaseButton.svelte'
 
-export let Hst
+  export let Hst
 
-let disabled = false
-let size = 'medium'
+  let disabled = false
+  let size = 'medium'
 </script>
   
 <Hst.Story title="BaseButton">
-  <BaseButton {disabled} {size}>
+  <BaseButton {disabled} {size} on:click={event => hstEvent('click', event)}>
     Click me!
   </BaseButton>
   <div style="margin-top: 6px;">

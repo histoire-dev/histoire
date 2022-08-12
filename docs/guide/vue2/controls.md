@@ -4,7 +4,7 @@ Controls give you the ability to interact with your components arguments.
 
 ## Defining a state
 
-The first step is to define the state that will be share to your story. Histoire will automatically synchronize the `data` or reactive data returned in your `setup`. Then you can proceed using your state as usual.
+The first step is to define the state that will be shared to your story. Histoire will automatically synchronize the `data` or reactive data returned in your `setup`. Then you can proceed using your state as usual.
 
 Example with Option API:
 
@@ -22,7 +22,7 @@ export default defineComponent({
     return {
       state: {
         disabled: false,
-        content: "Hello world"
+        content: 'Hello world',
       },
       message: 'Meow!',
     }
@@ -58,7 +58,7 @@ export default defineComponent({
   setup () {
     const state = reactive({
       disabled: false,
-      content: "Hello world"
+      content: 'Hello world',
     })
 
     const message = ref('Meow!')
@@ -94,7 +94,7 @@ import MyButton from './MyButton.vue'
 
 const state = reactive({
   disabled: false,
-  content: "Hello world"
+  content: 'Hello world',
 })
 
 const message = ref('Meow!')
@@ -155,7 +155,7 @@ import MyButton from './MyButton.vue'
 
 const state = reactive({
   disabled: false,
-  content: "Hello world"
+  content: 'Hello world',
 })
 </script>
 
@@ -215,7 +215,7 @@ import MyButton from './MyButton.vue'
 
 const state = reactive({
   disabled: false,
-  content: "Hello world"
+  content: 'Hello world',
 })
 </script>
 

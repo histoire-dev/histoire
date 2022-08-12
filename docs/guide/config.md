@@ -2,6 +2,8 @@
 
 To customize your experience, you can configure several parts of Histoire.
 
+[See the full configuration reference →](../reference/config.md)
+
 ## Config file
 
 ### Standalone file

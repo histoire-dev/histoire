@@ -6,12 +6,10 @@ You can customize the story explorer tree.
 
 By default, Histoire uses the title of your stories to create the hierarchy. If you want to put a story in a specific folder or subfolder, just write the path as the title of your Story.
 
-```vue{2}
-<template>
-  <Story title="Folder/Sub Folder/My story" >
-    <!-- Your story goes here -->
-  </Story>
-</template>
+```svelte{1}
+<Hst.Story title="Folder/Sub Folder/My story" >
+  <!-- Your story goes here -->
+</Hst.Story>
 ```
 
 ## Using the file path
@@ -112,10 +110,8 @@ export default defineConfig({
 
 You can use the `group` prop to reference a group in your stories using its `id`.
 
-```vue{2}
-<template>
-  <Story group="top">
-    This is a demo book using Vue 3.
-  </Story>
-</template>
+```svelte{1}
+<Hst.Story group="top">
+  This is a demo book using Svelte 3.
+</Hst.Story>
 ```

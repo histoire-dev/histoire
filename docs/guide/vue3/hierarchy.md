@@ -1,5 +1,7 @@
 # Hierarchy
 
+You can customize the story explorer tree.
+
 ## Using the title
 
 By default, Histoire uses the title of your stories to create the hierarchy. If you want to put a story in a specific folder or subfolder, just write the path as the title of your Story.
@@ -21,8 +23,8 @@ If you want to use the real path of your story files, you can change that in you
 
 export default defineConfig({ 
   tree: {
-    file: "path"
-  }
+    file: 'path',
+  },
 })
 ```
 
@@ -35,8 +37,8 @@ If you want a custom hierarchy, you can define your own function that takes an o
 
 export default defineConfig({ 
   tree: {
-    file: ({ title, path }) => title.split("/") // equivalent to default behavior
-  }
+    file: ({ title, path }) => title.split('/'), // equivalent to default behavior
+  },
 })
 ```
 
@@ -49,8 +51,8 @@ By default, files and stories are sorted by ascending order. But you might want 
 
 export default defineConfig({ 
   tree: {
-    order: (a, b) => a.localeCompare(b) // equivalent to default behavior
-  }
+    order: (a, b) => a.localeCompare(b), // equivalent to default behavior
+  },
 })
 ```
 

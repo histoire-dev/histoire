@@ -1,9 +1,9 @@
 <script lang="ts">
-export let disabled: boolean = false
-export let size: 'small' | 'medium' | 'large' = 'medium'
+  export let disabled: boolean = false
+  export let size: 'small' | 'medium' | 'large' = 'medium'
 </script>
 
-<button class:disabled class={size}>
+<button class:disabled class={size} on:click>
   <slot />
 </button>
 
