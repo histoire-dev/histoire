@@ -1,3 +1,25 @@
+# [0.10.0](https://github.com/Akryum/histoire/compare/v0.9.6...v0.10.0) (2022-08-12)
+
+
+### Bug Fixes
+
+* do not add target blank to urls that start with # in markdown ([#235](https://github.com/Akryum/histoire/issues/235)) ([4abb77f](https://github.com/Akryum/histoire/commit/4abb77f778f5bd282bb6f02f69b5b8d8e3a90d63))
+* escape paths on Windows ([976eae8](https://github.com/Akryum/histoire/commit/976eae8922c3f483da6b1a53173355a2768bc6ab))
+* **types:** ServerStory.layout ([6eaf15c](https://github.com/Akryum/histoire/commit/6eaf15cea911de6bc087eb3ff4edc0e355950876))
+
+
+### Features
+
+* change default port to 6006 ([54241e3](https://github.com/Akryum/histoire/commit/54241e3553eee63a82fbc00fae39cd68e017ecf6))
+* index markdown files into search ([e6529a5](https://github.com/Akryum/histoire/commit/e6529a5ec5ba588eff2e677b2a6e04c52698137f))
+* markdown files, fix [#237](https://github.com/Akryum/histoire/issues/237) ([c92a382](https://github.com/Akryum/histoire/commit/c92a3828a2866092de7ffcf4e39837171d806216))
+* **plugin:** defaultConfig hook ([c31bc74](https://github.com/Akryum/histoire/commit/c31bc749796640a21cbef77b558a6455c3d67dc0))
+* **search:** auto open docs tab if search result is from docs ([0d0d02f](https://github.com/Akryum/histoire/commit/0d0d02f2eb670ad30b149cd9d633f2093fb613f3))
+* svelte support ([#232](https://github.com/Akryum/histoire/issues/232)) ([d160204](https://github.com/Akryum/histoire/commit/d160204f31d6a5486359b74a7babbf59502cdf66))
+* upgrade to vite 3 ([bdff4a4](https://github.com/Akryum/histoire/commit/bdff4a471ee8fcbb86a78fdfe7eccdecabe0bdae))
+
+
+
 ## [0.9.6](https://github.com/Akryum/histoire/compare/v0.9.5...v0.9.6) (2022-08-10)
 
 
