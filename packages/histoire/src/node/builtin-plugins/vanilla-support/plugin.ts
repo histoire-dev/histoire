@@ -24,7 +24,7 @@ export function vanillaSupport (): Plugin {
       id: 'vanilla',
       moduleName: __dirname,
       setupFn: 'setupVanilla',
-      importStoryComponent: (file, index) => `import Comp${index} from ${JSON.stringify(file.path)}`, // @TODO code-splitting
+      importStoryComponent: (file, index) => `import Comp${index} from ${JSON.stringify(file.moduleId)}`, // @TODO code-splitting
     },
 
     // onDev (api) {

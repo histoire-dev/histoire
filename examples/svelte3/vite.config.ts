@@ -12,5 +12,13 @@ export default defineConfig({
     plugins: [
       HstSvelte(),
     ],
+    tree: {
+      groups: [
+        {
+          id: 'top',
+          title: '',
+        },
+      ],
+    },
   },
 })

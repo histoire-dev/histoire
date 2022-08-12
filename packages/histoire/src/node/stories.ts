@@ -45,7 +45,7 @@ function getAbsoluteFilePath (relativeFilePath: string) {
   return resolve(context.root, relativeFilePath)
 }
 
-export function addStory (relativeFilePath: string) {
+export function addStory (relativeFilePath: string, virtualModuleCode?: string) {
   const absoluteFilePath = getAbsoluteFilePath(relativeFilePath)
   const fileId = Case.kebab(relativeFilePath)
   let fileName = basename(relativeFilePath)
@@ -71,9 +71,12 @@ export function addStory (relativeFilePath: string) {
   const file: ServerStoryFile = {
     id: fileId, // The file id will be changed by the story id after it is collected
     path: absoluteFilePath,
+    relativePath: relativeFilePath,
     fileName,
-    moduleId: absoluteFilePath,
+    moduleId: virtualModuleCode ? `virtual:story:${absoluteFilePath}` : absoluteFilePath,
     supportPluginId,
+    virtual: !!virtualModuleCode,
+    moduleCode: virtualModuleCode,
   }
   context.storyFiles.push(file)
   return file

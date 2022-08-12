@@ -50,6 +50,7 @@
     "flexsearch": "^0.7.21",
     "fs-extra": "^10.0.1",
     "globby": "^13.1.1",
+    "gray-matter": "^4.0.3",
     "happy-dom": "^2.55.0",
     "markdown-it": "^12.3.2",
     "markdown-it-anchor": "^8.6.2",

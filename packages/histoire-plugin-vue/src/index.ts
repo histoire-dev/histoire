@@ -23,7 +23,7 @@ export function HstVue (): Plugin {
       moduleName: '@histoire/plugin-vue',
       setupFn: 'setupVue3',
       importStoriesPrepend: `import { defineAsyncComponent as defineAsyncComponentVue3 } from 'vue'`,
-      importStoryComponent: (file, index) => `const Comp${index} = defineAsyncComponentVue3(() => import(${JSON.stringify(file.path)}))`,
+      importStoryComponent: (file, index) => `const Comp${index} = defineAsyncComponentVue3(() => import(${JSON.stringify(file.moduleId)}))`,
     },
   }
 }

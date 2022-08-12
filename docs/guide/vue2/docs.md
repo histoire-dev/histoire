@@ -2,7 +2,9 @@
 
 ## Markdown
 
-Histoire lets you write markdown documentation for your stories. You just have to use the `docs` tag in your story file.
+### Custom block
+
+Histoire lets you write markdown documentation for your stories using Vue custom blocks. Add a `docs` tag in your story file:
 
 ```vue{5-9}
 <template>
@@ -14,6 +16,43 @@ Histoire lets you write markdown documentation for your stories. You just have t
 
 Checkout this [cool video](https://www.youtube.com/watch?v=dQw4w9WgXcQ)!
 </docs>
+```
+
+### Sibling markdown
+
+To add documentation to a story, you can also create a file with the same name next to it, with the `.md` extension.
+
+For example, if your story is `BaseButton.story.vue`, create a `BaseButton.story.md` file.
+
+Sibling markdown files are higher priority than custom blocks.
+
+### Standalone page
+
+If you create a markdown file ending with `.story.md` that isn't related to a sibling story file, it will automatically create a virtual story that renders the markdown as a page.
+
+You can add a frontmatter to the markdown to customize the virtual story with the following properties:
+
+- `id` ([reference](../../reference/vue3/story.md#id))
+- `title` ([reference](../../reference/vue3/story.md#title))
+- `icon` ([reference](../../reference/vue3/story.md#icon))
+- `iconColor` ([reference](../../reference/vue3/story.md#iconcolor))
+- `group` ([reference](../../reference/vue3/story.md#group))
+
+Example `Introduction.story.md` file:
+
+```md
+---
+group: 'top'
+icon: 'carbon:bookmark'
+---
+
+# Welcome
+
+This is a demo book using Vue 2.
+
+---
+
+Learn more about Histoire [here](https://histoire.dev/).
 ```
 
 ## Source code

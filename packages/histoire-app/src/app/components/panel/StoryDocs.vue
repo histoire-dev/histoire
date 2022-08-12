@@ -1,11 +1,23 @@
 <script lang="ts">
 import { PropType, Ref, ref, toRefs, watchEffect } from 'vue'
 import type { Story } from '../../types'
+// @ts-expect-error virtual module
+import { markdownFiles } from 'virtual:$histoire-markdown-files'
 
 export function useStoryDoc (story: Ref<Story>) {
   const renderedDoc = ref('')
 
   watchEffect(async () => {
+    // Markdown file
+    const mdKey = story.value.file.filePath.replace(/\.(\w*?)$/, '.md')
+    if (markdownFiles[mdKey]) {
+      const md = await markdownFiles[mdKey]()
+      renderedDoc.value = md.html
+      return
+    }
+
+    // Custom blocks (Vue 3)
+    // @TODO extract
     let comp = story.value.file?.component
     if (comp) {
       if (comp.__asyncResolved) {

@@ -20,6 +20,7 @@ import { useCollectStories } from './collect/index.js'
 import { BuildEndCallback, BuildPluginApi, PreviewStoryCallback } from './plugin.js'
 import { useModuleLoader } from './load.js'
 import { startPreview } from './preview.js'
+import { createMarkdownFilesWatcher } from './markdown.js'
 
 const PRELOAD_MODULES = [
   'vendor',
@@ -34,6 +35,12 @@ const PREFETCHED_MODULES = [
 export async function build (ctx: Context) {
   const startTime = performance.now()
   await findAllStories(ctx)
+
+  // Scan for markdown files
+  {
+    const { stop } = await createMarkdownFilesWatcher(ctx)
+    await stop()
+  }
 
   const resolvedViteConfig = await resolveViteConfig(ctx)
 

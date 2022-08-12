@@ -7,6 +7,7 @@ import { useCollectStories } from './collect/index.js'
 import { DevPluginApi } from './plugin.js'
 import { useModuleLoader } from './load.js'
 import { wrapLogError } from './util/log.js'
+import { createMarkdownFilesWatcher } from './markdown.js'
 
 export async function createServer (ctx: Context, port: number) {
   const server = await createViteServer(await getViteConfigWithPlugins(false, ctx))
@@ -20,6 +21,8 @@ export async function createServer (ctx: Context, port: number) {
   })
 
   await watchStories(ctx)
+
+  const { stop: stopMdFileWatcher } = await createMarkdownFilesWatcher(ctx)
 
   const pluginOnCleanups: (() => void | Promise<void>)[] = []
   for (const plugin of ctx.config.plugins) {
@@ -149,6 +152,7 @@ export async function createServer (ctx: Context, port: number) {
     await wrapLogError('server.close', () => server.close())
     await wrapLogError('nodeServer', () => nodeServer.close())
     await wrapLogError('destroyCollectStories', () => destroyCollectStories())
+    await wrapLogError('stopMdFileWatcher', () => stopMdFileWatcher())
   }
 
   return {

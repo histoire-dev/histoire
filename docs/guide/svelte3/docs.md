@@ -2,9 +2,40 @@
 
 ## Markdown
 
-::: warning
-Not available for Svelte yet.
-:::
+### Sibling markdown
+
+To add documentation to a story, create a file with the same name next to it, with the `.md` extension.
+
+For example, if your story is `BaseButton.story.svelte`, create a `BaseButton.story.md` file.
+
+### Standalone page
+
+If you create a markdown file ending with `.story.md` that isn't related to a sibling story file, it will automatically create a virtual story that renders the markdown as a page.
+
+You can add a frontmatter to the markdown to customize the virtual story with the following properties:
+
+- `id` ([reference](../../reference/svelte3/story.md#id))
+- `title` ([reference](../../reference/svelte3/story.md#title))
+- `icon` ([reference](../../reference/svelte3/story.md#icon))
+- `iconColor` ([reference](../../reference/svelte3/story.md#iconcolor))
+- `group` ([reference](../../reference/svelte3/story.md#group))
+
+Example `Introduction.story.md` file:
+
+```md
+---
+group: 'top'
+icon: 'carbon:bookmark'
+---
+
+# Welcome
+
+This is a demo book using Svelte 3.
+
+---
+
+Learn more about Histoire [here](https://histoire.dev/).
+```
 
 ## Source code
 

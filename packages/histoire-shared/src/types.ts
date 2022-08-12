@@ -4,6 +4,7 @@ export interface StoryFile {
   component: any
   story: Story
   path: string[]
+  filePath: string
 }
 
 export type StoryLayout = {
@@ -89,6 +90,10 @@ export interface ServerStoryFile {
    */
   path: string
   /**
+   * Relative path
+   */
+  relativePath: string
+  /**
    * File name without extension
    */
   fileName: string
@@ -112,6 +117,14 @@ export interface ServerStoryFile {
    * Data sent to user tree config functions
    */
   treeFile?: ServerTreeFile
+  /**
+   * Is virtual module
+   */
+  virtual?: boolean
+  /**
+   * Virtual module code
+   */
+  moduleCode?: string
 }
 
 export interface ServerStory {

@@ -32,7 +32,7 @@ export function HstSvelte (): Plugin {
       id: 'svelte3',
       moduleName: '@histoire/plugin-svelte',
       setupFn: 'setupSvelte3',
-      importStoryComponent: (file, index) => `import Comp${index} from ${JSON.stringify(file.path)}`,
+      importStoryComponent: (file, index) => `import Comp${index} from ${JSON.stringify(file.moduleId)}`,
     },
   }
 }

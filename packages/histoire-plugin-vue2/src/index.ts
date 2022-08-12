@@ -21,7 +21,7 @@ export function HstVue (): Plugin {
       id: 'vue2',
       moduleName: '@histoire/plugin-vue2',
       setupFn: 'setupVue2',
-      importStoryComponent: (file, index) => `const Comp${index} = () => import(${JSON.stringify(file.path)})`,
+      importStoryComponent: (file, index) => `const Comp${index} = () => import(${JSON.stringify(file.moduleId)})`,
     },
   }
 }

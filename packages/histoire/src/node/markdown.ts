@@ -1,9 +1,17 @@
 import MarkdownIt from 'markdown-it'
+import matter from 'gray-matter'
 import shiki from 'shiki'
 import anchor from 'markdown-it-anchor'
 import attrs from 'markdown-it-attrs'
 import emoji from 'markdown-it-emoji'
+import type { Plugin as VitePlugin } from 'vite'
+import chokidar from 'chokidar'
+import fs from 'fs-extra'
+import path from 'pathe'
+import type { ServerStoryFile } from '@histoire/shared'
 import { slugify } from './util/slugify.js'
+import type { Context } from './context.js'
+import { addStory, notifyStoryChange, removeStory } from './stories.js'
 
 export async function createMarkdownRenderer () {
   const highlighter = await shiki.getHighlighter({
@@ -54,3 +62,142 @@ export async function createMarkdownRenderer () {
 
   return md
 }
+
+async function createMarkdownRendererWithPlugins (ctx: Context) {
+  let md = await createMarkdownRenderer()
+  if (ctx.config.markdown) {
+    const result = await ctx.config.markdown(md)
+    if (result) {
+      md = result
+    }
+  }
+  return md
+}
+
+export async function createMarkdownPlugins (ctx: Context) {
+  const plugins: VitePlugin[] = []
+  const md = await createMarkdownRendererWithPlugins(ctx)
+
+  // @TODO extract
+  plugins.push({
+    name: 'histoire-vue-docs-block',
+    transform (code, id) {
+      if (!id.includes('?vue&type=docs')) return
+      if (!id.includes('lang.md')) return
+      const html = md.render(code)
+      return `export default Comp => {
+        Comp.doc = ${JSON.stringify(html)}
+      }`
+    },
+  })
+
+  plugins.push({
+    name: 'histoire-markdown-files',
+    transform (code, id) {
+      if (id.endsWith('.story.md')) {
+        const relativePath = path.relative(ctx.root, id)
+        const { content, data: frontmatter } = matter(code)
+        const html = md.render(content)
+        return `export const html = ${JSON.stringify(html)}
+export const frontmatter = ${JSON.stringify(frontmatter)}
+export const relativePath = ${JSON.stringify(relativePath)}
+
+if (import.meta.hot) {
+  import.meta.hot.accept(newModule => {
+    window.__hst_md_hmr(newModule)
+  })
+}`
+      }
+    },
+  })
+
+  return plugins
+}
+
+export interface MarkdownFile {
+  relativePath: string
+  absolutePath: string
+  isRelatedToStory: boolean
+  frontmatter?: any
+  storyFile?: ServerStoryFile
+}
+
+export async function createMarkdownFilesWatcher (ctx: Context) {
+  const watcher = chokidar.watch(['**/*.story.md'], {
+    cwd: ctx.root,
+    ignored: ctx.config.storyIgnored,
+  })
+
+  async function addFile (relativePath: string) {
+    const absolutePath = path.resolve(ctx.root, relativePath)
+    const dirFiles = await fs.readdir(path.dirname(absolutePath))
+    const truncatedName = path.basename(absolutePath, '.md')
+    const isRelatedToStory = dirFiles.some((file) => !file.endsWith('.md') && file.startsWith(truncatedName))
+
+    let frontmatter: any
+
+    if (!isRelatedToStory) {
+      const { data } = matter(await fs.readFile(absolutePath, 'utf8'))
+      frontmatter = data
+    }
+
+    const file: MarkdownFile = {
+      relativePath,
+      absolutePath,
+      isRelatedToStory,
+      frontmatter,
+    }
+    ctx.markdownFiles.push(file)
+
+    if (!isRelatedToStory) {
+      const storyRelativePath = relativePath.replace(/\.md$/, '.js')
+      const storyFile = addStory(storyRelativePath, `export default ${JSON.stringify({
+        id: frontmatter.id,
+        title: frontmatter.title,
+        icon: frontmatter.icon,
+        iconColor: frontmatter.iconColor,
+        group: frontmatter.group,
+        docsOnly: true,
+        variants: [],
+      })}`)
+      file.storyFile = storyFile
+      notifyStoryChange(storyFile)
+    }
+
+    return file
+  }
+
+  function removeFile (relativePath: string) {
+    const index = ctx.markdownFiles.findIndex((file) => file.relativePath === relativePath)
+    if (index !== -1) {
+      const file = ctx.markdownFiles[index]
+      if (!file.isRelatedToStory) {
+        removeStory(file.storyFile.relativePath)
+        notifyStoryChange()
+      }
+      ctx.markdownFiles.splice(index, 1)
+    }
+  }
+
+  async function stop () {
+    await watcher.close()
+  }
+
+  watcher
+    .on('add', async (relativePath) => {
+      await addFile(relativePath)
+    })
+    .on('unlink', (relativePath) => {
+      removeFile(relativePath)
+    })
+
+  await new Promise(resolve => {
+    watcher.once('ready', resolve)
+  })
+
+  return {
+    stop,
+  }
+}
+
+export type MarkdownFilesWatcher = ReturnType<typeof createMarkdownFilesWatcher>

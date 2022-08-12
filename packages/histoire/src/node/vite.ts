@@ -15,7 +15,7 @@ import { Context } from './context.js'
 import { notifyStoryChange } from './stories.js'
 import { makeTree } from './tree.js'
 import { parseColor } from './colors.js'
-import { createMarkdownRenderer } from './markdown.js'
+import { createMarkdownPlugins } from './markdown.js'
 import { getSearchDataJS, generateDocSearchData, generateTitleSearchData } from './search.js'
 
 const require = createRequire(import.meta.url)
@@ -40,6 +40,8 @@ export const SUPPORT_PLUGINS_CLIENT = 'virtual:$histoire-support-plugins-client'
 export const RESOLVED_SUPPORT_PLUGINS_CLIENT = `\0${SUPPORT_PLUGINS_CLIENT}`
 export const SUPPORT_PLUGINS_COLLECT = 'virtual:$histoire-support-plugins-collect'
 export const RESOLVED_SUPPORT_PLUGINS_COLLECT = `\0${SUPPORT_PLUGINS_COLLECT}`
+export const MARKDOWN_FILES = 'virtual:$histoire-markdown-files'
+export const RESOLVED_MARKDOWN_FILES = `\0${MARKDOWN_FILES}`
 
 export async function resolveViteConfig (ctx: Context): Promise<ResolvedConfig> {
   const command = ctx.mode === 'dev' ? 'serve' : 'build'
@@ -175,6 +177,12 @@ export async function getViteConfigWithPlugins (isServer: boolean, ctx: Context)
       if (id.startsWith(SUPPORT_PLUGINS_COLLECT)) {
         return RESOLVED_SUPPORT_PLUGINS_COLLECT
       }
+      if (id.startsWith(MARKDOWN_FILES)) {
+        return RESOLVED_MARKDOWN_FILES
+      }
+      if (id.startsWith('virtual:story:')) {
+        return `\0${id}`
+      }
     },
 
     async load (id) {
@@ -184,6 +192,7 @@ export async function getViteConfigWithPlugins (isServer: boolean, ctx: Context)
           return {
             id: file.id,
             path: file.treePath,
+            filePath: file.relativePath,
             story: {
               ...file.story,
               docsText: undefined,
@@ -296,6 +305,25 @@ if (import.meta.hot) {
           ${plugins.join(',\n  ')}
         }`
       }
+
+      if (id === RESOLVED_MARKDOWN_FILES) {
+        const filesJs = ctx.markdownFiles.map(f => `${JSON.stringify(f.relativePath)}: () => import(${JSON.stringify(`./${f.relativePath}`)})`).join(',')
+        return `import { reactive } from ${JSON.stringify(require.resolve('@histoire/vendors/vue'))}
+        export const markdownFiles = reactive({${filesJs}})
+        if (import.meta.hot) {
+          window.__hst_md_hmr = (newModule) => {
+            markdownFiles[newModule.relativePath] = () => newModule
+          }
+        }`
+      }
+
+      if (id.startsWith('\0virtual:story:')) {
+        const moduleId = id.replace('\0', '')
+        const storyFile = ctx.storyFiles.find(f => f.moduleId === moduleId && f.virtual)
+        if (storyFile) {
+          return storyFile.moduleCode
+        }
+      }
     },
 
     handleHotUpdate (updateContext) {
@@ -381,8 +409,8 @@ if (import.meta.hot) {
     },
   })
 
-  // Custom blocks
-  plugins.push(...await createCustomBlocksPlugins(ctx))
+  // Markdown
+  plugins.push(...await createMarkdownPlugins(ctx))
 
   if (ctx.mode === 'build') {
     // Add file name in build mode to have components names instead of <Anonymous>
@@ -408,29 +436,4 @@ if (import.meta.hot) {
     configFile: false,
     plugins,
   }) as InlineConfig
-}
-
-async function createCustomBlocksPlugins (ctx) {
-  const plugins: VitePlugin[] = []
-
-  let md = await createMarkdownRenderer()
-  if (ctx.config.markdown) {
-    const result = await ctx.config.markdown(md)
-    if (result) {
-      md = result
-    }
-  }
-  plugins.push({
-    name: 'histoire-vue-docs-block',
-    transform (code, id) {
-      if (!id.includes('?vue&type=docs')) return
-      if (!id.includes('lang.md')) return
-      const html = md.render(code)
-      return `export default Comp => {
-        Comp.doc = ${JSON.stringify(html)}
-      }`
-    },
-  })
-
-  return plugins
 }
