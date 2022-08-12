@@ -6,6 +6,7 @@ import MountVariant from './MountVariant.svelte'
 const story: Story = getContext('__hstStory')
 let index = { value: 0 }
 setContext('__hstIndex', index)
+setContext('__hstSlots', $$slots)
 </script>
 
 <slot />
