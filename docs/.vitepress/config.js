@@ -21,9 +21,7 @@ module.exports = {
     logo: '/logo.svg',
 
     editLink: {
-      repo: 'histoire-dev/histoire',
-      branch: 'main',
-      dir: 'docs',
+      pattern: 'https://github.com/histoire-dev/histoire/edit/main/docs/:path',
       text: 'Edit this page on GitHub',
     },
 
