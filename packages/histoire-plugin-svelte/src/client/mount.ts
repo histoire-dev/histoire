@@ -11,12 +11,14 @@ import {
   h as _h,
 } from '@histoire/vendors/vue'
 import type { Story } from '@histoire/shared'
+import { components } from '@histoire/controls'
 // @ts-expect-error virtual module id
 import * as setup from '$histoire-setup'
 // @ts-expect-error virtual module id
 import * as generatedSetup from '$histoire-generated-global-setup'
 import MountStorySvelte from './MountStory.svelte'
 import MountVariantSvelte from './MountVariant.svelte'
+import StubComponent from './Stub.svelte'
 
 export default _defineComponent({
   name: 'MountStory',
@@ -46,6 +48,7 @@ export default _defineComponent({
             Story: MountStorySvelte,
             // @ts-ignore
             Variant: MountVariantSvelte,
+            ...getControls(),
           },
         },
         context: new Map(Object.entries({
@@ -104,3 +107,11 @@ export default _defineComponent({
     })
   },
 })
+
+function getControls () {
+  const result: Record<string, any> = {}
+  for (const key in components) {
+    result[key.substring(3)] = StubComponent
+  }
+  return result
+}

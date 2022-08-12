@@ -11,12 +11,14 @@ import {
   h as _h,
 } from '@histoire/vendors/vue'
 import type { Story, Variant } from '@histoire/shared'
+import { components } from '@histoire/controls'
 // @ts-expect-error virtual module id
 import * as setup from '$histoire-setup'
 // @ts-expect-error virtual module id
 import * as generatedSetup from '$histoire-generated-global-setup'
 import RenderStorySvelte from './RenderStory.svelte'
 import RenderVariantSvelte from './RenderVariant.svelte'
+import Wrap from './Wrap.svelte'
 import { syncState } from './util'
 
 export default _defineComponent({
@@ -74,6 +76,7 @@ export default _defineComponent({
             Story: RenderStorySvelte,
             // @ts-ignore
             Variant: RenderVariantSvelte,
+            ...getControls(),
           },
         },
         context: new Map(Object.entries({
@@ -177,3 +180,24 @@ export default _defineComponent({
     })
   },
 })
+
+function getControls () {
+  const result: Record<string, any> = {}
+  for (const key in components) {
+    result[key.substring(3)] = wrapComponent(components[key])
+  }
+  return result
+}
+
+function wrapComponent (controlComponent) {
+  function ProxyWrap (options) {
+    return new Wrap({
+      ...options,
+      props: {
+        ...options.props,
+        controlComponent,
+      },
+    })
+  }
+  return ProxyWrap
+}
