@@ -114,7 +114,7 @@ export async function getViteConfigWithPlugins (isServer: boolean, ctx: Context)
           ]),
           exclude: [
             'histoire',
-            '@histoire',
+            '@histoire/vendors',
           ],
         },
         server: {
