@@ -98,6 +98,7 @@ module.exports = {
     socialLinks: [
       { icon: 'github', link: 'https://github.com/histoire-dev/histoire' },
       { icon: 'twitter', link: 'https://twitter.com/histoire_dev' },
+      { icon: 'discord', link: 'https://discord.gg/KpCnT72rJk' },
     ],
 
     sidebar: {
