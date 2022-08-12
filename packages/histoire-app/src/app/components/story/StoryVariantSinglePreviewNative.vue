@@ -29,6 +29,7 @@ function onReady () {
         width: finalWidth ? `${finalWidth}px` : '100%',
         height: finalHeight ? `${finalHeight}px` : '100%',
       } : { width: '100%', height: '100%' }"
+      class="htw-relative"
     >
       <GenericRenderStory
         :key="`${story.id}-${variant.id}`"
