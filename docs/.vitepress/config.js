@@ -12,6 +12,7 @@ module.exports = {
     ['meta', { property: 'og:image:height', content: '315' }],
     ['meta', { name: 'twitter:card', content: 'summary_large_image' }],
     ['meta', { name: 'twitter:site', content: '@histoire_dev' }],
+    ['link', { rel: 'stylesheet', href: 'https://fonts.bunny.net/css?family=fira-sans:400,400i,600,600i' }],
   ],
 
   lastUpdated: true,
@@ -46,6 +47,10 @@ module.exports = {
           {
             text: 'Vue 2.7',
             link: '/guide/vue2/getting-started',
+          },
+          {
+            text: 'Svelte 3',
+            link: '/guide/svelte3/getting-started',
           },
           {
             text: 'Configuration',
@@ -99,7 +104,7 @@ module.exports = {
           ],
         },
         {
-          text: 'Story components (Vue 3)',
+          text: 'Story components (Vue)',
           collapsible: true,
           items: [
             {
@@ -112,16 +117,26 @@ module.exports = {
             },
           ],
         },
+        {
+          text: 'Story components (Svelte)',
+          collapsible: true,
+          items: [
+            {
+              text: 'Hst.Story',
+              link: '/reference/svelte3/story',
+            },
+            {
+              text: 'Hst.Variant',
+              link: '/reference/svelte3/variant',
+            },
+          ],
+        },
       ],
       '/guide/vue3/': [
         {
           text: 'Guide - Vue 3',
           collapsible: true,
           items: [
-            {
-              text: 'Why Histoire',
-              link: '/guide/',
-            },
             {
               text: 'Getting Started',
               link: '/guide/vue3/getting-started',
@@ -152,16 +167,30 @@ module.exports = {
             },
           ],
         },
+        {
+          text: 'Learn more',
+          collapsible: true,
+          items: [
+            {
+              text: 'About Histoire ⮌',
+              link: '/guide/',
+            },
+            {
+              text: 'Configuration ⮌',
+              link: '/guide/config',
+            },
+            {
+              text: 'Plugins ⮌',
+              link: '/guide/plugins/official',
+            },
+          ],
+        },
       ],
       '/guide/vue2/': [
         {
           text: 'Guide - Vue 2',
           collapsible: true,
           items: [
-            {
-              text: 'Why Histoire',
-              link: '/guide/',
-            },
             {
               text: 'Getting Started',
               link: '/guide/vue2/getting-started',
@@ -192,14 +221,86 @@ module.exports = {
             },
           ],
         },
+        {
+          text: 'Learn more',
+          collapsible: true,
+          items: [
+            {
+              text: 'About Histoire ⮌',
+              link: '/guide/',
+            },
+            {
+              text: 'Configuration ⮌',
+              link: '/guide/config',
+            },
+            {
+              text: 'Plugins ⮌',
+              link: '/guide/plugins/official',
+            },
+          ],
+        },
+      ],
+      '/guide/svelte3/': [
+        {
+          text: 'Guide - Svelte 3',
+          collapsible: true,
+          items: [
+            {
+              text: 'Getting Started',
+              link: '/guide/svelte3/getting-started',
+            },
+            {
+              text: 'Stories',
+              link: '/guide/svelte3/stories',
+            },
+            {
+              text: 'State & Controls',
+              link: '/guide/svelte3/controls',
+            },
+            {
+              text: 'Events',
+              link: '/guide/svelte3/events',
+            },
+            {
+              text: 'Documentation',
+              link: '/guide/svelte3/docs',
+            },
+            {
+              text: 'Hierarchy',
+              link: '/guide/svelte3/hierarchy',
+            },
+          ],
+        },
+        {
+          text: 'Learn more',
+          collapsible: true,
+          items: [
+            {
+              text: 'About Histoire ⮌',
+              link: '/guide/',
+            },
+            {
+              text: 'Configuration ⮌',
+              link: '/guide/config',
+            },
+            {
+              text: 'Plugins ⮌',
+              link: '/guide/plugins/official',
+            },
+          ],
+        },
       ],
       '/guide/': [
         {
-          text: 'Guide',
+          text: 'About',
           items: [
             {
               text: 'Why Histoire',
               link: '/guide/',
+            },
+            {
+              text: 'Getting Started',
+              link: '/guide/getting-started',
             },
             {
               text: 'Configuration',

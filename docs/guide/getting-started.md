@@ -36,17 +36,27 @@ Histoire is an Open-Source project supported by our sponsors - thank you!
 
 ## Supported frameworks
 
-| Framework | Versions | Support | Auto CodeGen | Auto Docs |
+[Vite](https://vitejs.dev) currently supported versions:
+- `2.9+`
+- `3.0+`
+
+---
+
+| Framework | Version | Support* | Auto-CodeGen* | Auto-Docs* |
 | --------- | -------- | ------- | ------------ | ---- |
-| [Vue](https://vuejs.org/) | 3.2+ | ✅ | ✅ | - |
-| [Vue](https://v2.vuejs.org/) | 2.7+ | ✅ | ✅ | - |
-| [Svelte](https://svelte.dev/) | - | - | - | - |
-| [Solid](https://www.solidjs.com/) | - | - | - | - |
-| [Angular](https://angular.io/) | - | - | - | - |
-| [React](https://reactjs.org/) | - | - ([Alternative](https://www.ladle.dev)) | - | - |
+| [Vue →](./vue3/getting-started.md) | `3.2+` | ✅ | ✅ | 🏗️ |
+| [Vue →](./vue2/getting-started.md) | `2.7+` | ✅ | ✅ | - |
+| [Svelte →](./svelte3/getting-started.md) | `3+` | ✅ | - | - |
+| Solid | - | - | - | - |
+| Angular | - | - | - | - |
+| React | - | - ([Alternative](https://www.ladle.dev)) | - | - |
 
+**<u>Support</u> means*:
+- Collect and render stories
+- Render controls pane content with state sync
+- Builtin controls wrappers
+- *Static source (soon)*
 
-## Guides
+*<u>*Auto-CodeGen*</u>: Generates copiable source code dynamically from the current story state.
 
-- [Vue 3 →](./vue3/getting-started.md)
-- [Vue 2 →](./vue2/getting-started.md)
+*<u>*Auto-Docs*</u>: Generates documentation and controls automatically by analyzing the imported components.

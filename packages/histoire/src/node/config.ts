@@ -201,7 +201,10 @@ export function getDefaultConfig (): HistoireConfig {
       tailwindTokens(),
     ],
     outDir: '.histoire/dist',
-    storyMatch: ['**/*.story.vue'],
+    storyMatch: [
+      '**/*.story.vue',
+      '**/*.story.svelte',
+    ],
     storyIgnored: [
       '**/node_modules/**',
       '**/dist/**',

@@ -209,10 +209,12 @@ Props:
 ```vue
 <template>
   <Story>
+    <template #controls="{ state }">
+      <!-- Interact with state here -->
+    </template>
+
     <Variant>
-      <template #controls="{ state }">
-        <!-- Interact with state here -->
-      </template>
+      <!-- Controls reused here -->
     </Variant>
   </Story>
 </template>
