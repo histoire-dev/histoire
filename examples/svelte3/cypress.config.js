@@ -1,4 +1,4 @@
-import { defineConfig } from "cypress";
+import { defineConfig } from 'cypress'
 
 export default defineConfig({
   viewportWidth: 1280,
@@ -11,8 +11,9 @@ export default defineConfig({
   },
 
   e2e: {
-    setupNodeEvents(on, config) {
+    baseUrl: 'http://localhost:4567',
+    setupNodeEvents (on, config) {
       // implement node event listeners here
     },
   },
-});
+})
