@@ -26,12 +26,15 @@ export interface TreeGroup {
 
 export type Tree = (TreeGroup | TreeFolder | TreeLeaf)[]
 
+export type SearchResultType = 'title' | 'docs'
+
 export interface SearchResult {
   kind: 'story' | 'variant'
   rank: number
   id: string
   title: string
   route: RouteLocationRaw
+  type: SearchResultType
   path?: string[]
   icon?: string
   iconColor?: string

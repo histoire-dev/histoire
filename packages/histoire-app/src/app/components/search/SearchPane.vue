@@ -7,7 +7,7 @@ import charset from 'flexsearch/dist/module/lang/latin/advanced.js'
 import language from 'flexsearch/dist/module/lang/en.js'
 import { useStoryStore } from '../../stores/story'
 import BaseEmpty from '../base/BaseEmpty.vue'
-import type { SearchResult, Story, Variant } from '../../types'
+import type { SearchResult, SearchResultType, Story, Variant } from '../../types'
 import SearchItem from './SearchItem.vue'
 import { searchData, onUpdate } from './search-title-data'
 import type { SearchData } from './types'
@@ -161,7 +161,7 @@ async function searchOnDocField (query: string) {
         if (!idMapData) continue
         switch (idMapData.kind) {
           case 'story': {
-            list.push(storyResultFactory(storyStore.getStoryById(idMapData.id), rank))
+            list.push(storyResultFactory(storyStore.getStoryById(idMapData.id), rank, 'docs'))
             rank++
             break
           }
@@ -174,7 +174,7 @@ async function searchOnDocField (query: string) {
 
 watch(rateLimitedSearch, searchOnDocField)
 
-function storyResultFactory (story: Story, rank: number): SearchResult {
+function storyResultFactory (story: Story, rank: number, type: SearchResultType = 'title'): SearchResult {
   return {
     kind: 'story',
     rank,
@@ -185,14 +185,20 @@ function storyResultFactory (story: Story, rank: number): SearchResult {
       params: {
         storyId: story.id,
       },
+      query: {
+        ...type === 'docs'
+          ? { tab: 'docs' }
+          : {},
+      },
     },
     path: story.file.path.slice(0, -1),
     icon: story.icon,
     iconColor: story.iconColor,
+    type,
   }
 }
 
-function variantResultFactory (story: Story, variant: Variant, rank: number): SearchResult {
+function variantResultFactory (story: Story, variant: Variant, rank: number, type: SearchResultType = 'title'): SearchResult {
   return {
     kind: 'variant',
     rank,
@@ -205,11 +211,15 @@ function variantResultFactory (story: Story, variant: Variant, rank: number): Se
       },
       query: {
         variantId: variant.id,
+        ...type === 'docs'
+          ? { tab: 'docs' }
+          : {},
       },
     },
     path: [...story.file.path ?? [], story.title],
     icon: variant.icon,
     iconColor: variant.iconColor,
+    type,
   }
 }
 
