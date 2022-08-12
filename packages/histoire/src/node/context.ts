@@ -1,7 +1,6 @@
 import { resolveConfig as resolveViteConfig } from 'vite'
-import type { ServerStoryFile, FinalSupportPlugin } from '@histoire/shared'
+import type { ServerStoryFile, FinalSupportPlugin, ServerMarkdownFile } from '@histoire/shared'
 import { resolveConfig, HistoireConfig, ConfigMode } from './config.js'
-import type { MarkdownFile } from './markdown.js'
 
 export interface Context {
   root: string
@@ -9,7 +8,7 @@ export interface Context {
   mode: ConfigMode
   storyFiles: ServerStoryFile[]
   supportPlugins: FinalSupportPlugin[]
-  markdownFiles: MarkdownFile[]
+  markdownFiles: ServerMarkdownFile[]
 }
 
 export interface CreateContextOptions {

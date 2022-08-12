@@ -8,7 +8,7 @@ import type { Plugin as VitePlugin } from 'vite'
 import chokidar from 'chokidar'
 import fs from 'fs-extra'
 import path from 'pathe'
-import type { ServerStoryFile } from '@histoire/shared'
+import type { ServerMarkdownFile } from '@histoire/shared'
 import { slugify } from './util/slugify.js'
 import type { Context } from './context.js'
 import { addStory, notifyStoryChange, removeStory } from './stories.js'
@@ -114,15 +114,9 @@ if (import.meta.hot) {
   return plugins
 }
 
-export interface MarkdownFile {
-  relativePath: string
-  absolutePath: string
-  isRelatedToStory: boolean
-  frontmatter?: any
-  storyFile?: ServerStoryFile
-}
-
 export async function createMarkdownFilesWatcher (ctx: Context) {
+  const md = await createMarkdownRendererWithPlugins(ctx)
+
   const watcher = chokidar.watch(['**/*.story.md'], {
     cwd: ctx.root,
     ignored: ctx.config.storyIgnored,
@@ -134,18 +128,15 @@ export async function createMarkdownFilesWatcher (ctx: Context) {
     const truncatedName = path.basename(absolutePath, '.md')
     const isRelatedToStory = dirFiles.some((file) => !file.endsWith('.md') && file.startsWith(truncatedName))
 
-    let frontmatter: any
+    const { data: frontmatter, content } = matter(await fs.readFile(absolutePath, 'utf8'))
+    const html = md.render(content)
 
-    if (!isRelatedToStory) {
-      const { data } = matter(await fs.readFile(absolutePath, 'utf8'))
-      frontmatter = data
-    }
-
-    const file: MarkdownFile = {
+    const file: ServerMarkdownFile = {
       relativePath,
       absolutePath,
       isRelatedToStory,
       frontmatter,
+      html,
     }
     ctx.markdownFiles.push(file)
 
@@ -161,7 +152,16 @@ export async function createMarkdownFilesWatcher (ctx: Context) {
         variants: [],
       })}`)
       file.storyFile = storyFile
+      storyFile.markdownFile = file
       notifyStoryChange(storyFile)
+    } else {
+      const searchPath = path.join(path.dirname(relativePath), truncatedName)
+      const storyFile = ctx.storyFiles.find(f => f.relativePath.startsWith(searchPath))
+      if (storyFile) {
+        file.storyFile = storyFile
+        storyFile.markdownFile = file
+        notifyStoryChange(storyFile)
+      }
     }
 
     return file

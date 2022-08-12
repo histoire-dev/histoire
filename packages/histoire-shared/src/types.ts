@@ -125,6 +125,19 @@ export interface ServerStoryFile {
    * Virtual module code
    */
   moduleCode?: string
+  /**
+   * Related markdown docs
+   */
+  markdownFile?: ServerMarkdownFile
+}
+
+export interface ServerMarkdownFile {
+  relativePath: string
+  absolutePath: string
+  isRelatedToStory: boolean
+  frontmatter?: any
+  html?: string
+  storyFile?: ServerStoryFile
 }
 
 export interface ServerStory {

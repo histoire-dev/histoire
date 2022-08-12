@@ -56,6 +56,15 @@ export default async (payload: Payload): Promise<ReturnData> => {
     el,
   })
 
+  if (payload.storyFile.markdownFile) {
+    const el = document.createElement('div')
+    el.innerHTML = payload.storyFile.markdownFile.html
+    const text = el.textContent
+    storyData.forEach(s => {
+      s.docsText = text
+    })
+  }
+
   destroyDomEnv()
 
   return {
