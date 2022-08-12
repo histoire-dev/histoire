@@ -48,7 +48,7 @@ describe('Search', () => {
     cy.visit('/')
     cy.get('[data-test-id="search-btn"]').click()
     cy.get('[data-test-id="search-modal"] input').type('welcome')
-    cy.get('[data-test-id="search-item"]').should('have.length', 1)
+    cy.get('[data-test-id="search-item"]').should('have.length', 2)
     cy.get('[data-test-id="search-item"]').contains('Introduction')
   })
 })
