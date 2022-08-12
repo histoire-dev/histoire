@@ -18,7 +18,7 @@ Histoire is a tool to generate stories applications (or "books").
 
 [Learn more about Histoire here &raquo;](../index.md)
 
-<DemoLinks />
+<DemoLinks framework="svelte3" />
 
 ## Sponsors
 

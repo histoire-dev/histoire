@@ -1,7 +1,28 @@
+<script lang="ts" setup>
+import { computed } from 'vue'
+
+const props = defineProps<{
+  framework: string
+}>()
+
+const allLinks = {
+  vue3: {
+    demo: 'https://vue3.examples.histoire.dev/',
+    stackblitz: 'https://stackblitz.com/edit/histoire-vue3-starter',
+  },
+  svelte3: {
+    demo: 'https://svelte3.examples.histoire.dev/',
+    stackblitz: 'https://stackblitz.com/edit/histoire-svelte3-starter',
+  },
+}
+
+const links = computed(() => allLinks[props.framework])
+</script>
+
 <template>
-  <div class="space-y-2">
+  <div class="demo-links space-y-2">
     <a
-      href="https://vue3.examples.histoire.dev/"
+      :href="links.demo"
       target="_blank"
       class="btn flex items-center gap-4 p-4 hover:no-underline"
     >
@@ -14,7 +35,8 @@
     </a>
 
     <a
-      href="https://stackblitz.com/edit/histoire-vue3-starter"
+      v-if="links.stackblitz"
+      :href="links.stackblitz"
       target="_blank"
       class="btn-blue flex items-center gap-4 p-4 hover:no-underline"
     >

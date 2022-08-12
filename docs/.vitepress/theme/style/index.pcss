@@ -89,6 +89,14 @@ em {
   @apply italic;
 }
 
+.demo-links-box {
+  @apply flex !md:flex-col !md:items-center gap-4 md:gap-6 p-4 md:p-6 rounded border border-solid my-6;
+
+  .demo-links {
+    @apply md:flex-1 !md:w-full;
+  }
+}
+
 /* Vitepress fixes */
 
 .VPNavBar.has-sidebar .content {

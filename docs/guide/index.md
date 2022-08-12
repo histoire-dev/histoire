@@ -24,7 +24,15 @@ function playAudio () {
 
 Histoire is a tool to generate stories applications (or "books").
 
-<DemoLinks />
+<div class="demo-links-box border-green-200 dark:border-green-900">
+  <img src="/vue.svg" class="w-10 h-10 mt-3" />
+  <DemoLinks framework="vue3" />
+</div>
+
+<div class="demo-links-box border-orange-200 dark:border-orange-900">
+  <img src="/svelte.svg" class="w-10 h-10 mt-3" />
+  <DemoLinks framework="svelte3" />
+</div>
 
 A story is a scenario where you showcase in your browser one or more components for specific use cases.
 
