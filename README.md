@@ -10,8 +10,10 @@
 
 [![Test status](https://github.com/histoire-dev/histoire/actions/workflows/test.yml/badge.svg)](https://github.com/histoire-dev/histoire/actions/workflows/test.yml)
 [![Test status](https://github.com/histoire-dev/histoire/actions/workflows/test-vue3.yml/badge.svg)](https://github.com/histoire-dev/histoire/actions/workflows/test-vue3.yml)
+[![Test status](https://github.com/histoire-dev/histoire/actions/workflows/test-svelte3.yml/badge.svg)](https://github.com/histoire-dev/histoire/actions/workflows/test-svelte3.yml)
 
-[Read the Documentation &raquo;](https://histoire.dev)
+[Read the Documentation](https://histoire.dev) |
+[Discord server](https://discord.gg/KpCnT72rJk) | [Discussions board](https://github.com/histoire-dev/histoire/discussions)
 
 ⚡️ Lightning fast development and instant HMR thanks to [Vite](http://vitejs.dev)  
 👓 Build and visually test your components in isolation  
