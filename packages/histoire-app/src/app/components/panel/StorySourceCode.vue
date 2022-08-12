@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { computed, markRaw, onMounted, ref, shallowRef, watch, watchEffect } from 'vue'
+import { Icon } from '@iconify/vue'
 import { getHighlighter, Highlighter, setCDN } from 'shiki'
 import { HstCopyIcon } from '@histoire/controls'
 import { unindent } from '@histoire/shared'
@@ -7,6 +8,7 @@ import { unindent } from '@histoire/shared'
 import { clientSupportPlugins } from 'virtual:$histoire-support-plugins-client'
 import type { Variant, Story } from '../../types'
 import { isDark } from '../../util/dark'
+import BaseEmpty from '../base/BaseEmpty.vue'
 
 const props = defineProps<{
   story: Story
@@ -98,12 +100,13 @@ const sourceHtml = computed(() => sourceCode.value
       Error: {{ error }}
     </div>
 
-    <i
-      v-else-if="!sourceCode"
-      class="htw-opacity-50 htw-p-4"
-    >
-      Not available
-    </i>
+    <BaseEmpty v-else-if="!sourceCode">
+      <Icon
+        icon="carbon:code-hide"
+        class="htw-w-8 htw-h-8 htw-opacity-50 htw-mb-6"
+      />
+      <span>Not available</span>
+    </BaseEmpty>
 
     <textarea
       v-else-if="!sourceHtml"
