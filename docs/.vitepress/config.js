@@ -37,28 +37,42 @@ module.exports = {
         text: 'Guide',
         items: [
           {
+            text: 'Frameworks',
+            items: [
+              {
+                text: 'Vue 3',
+                link: '/guide/vue3/getting-started',
+              },
+              {
+                text: 'Vue 2.7',
+                link: '/guide/vue2/getting-started',
+              },
+              {
+                text: 'Svelte 3',
+                link: '/guide/svelte3/getting-started',
+              },
+            ],
+          },
+          {
             text: 'About',
-            link: '/guide/',
-          },
-          {
-            text: 'Vue 3',
-            link: '/guide/vue3/getting-started',
-          },
-          {
-            text: 'Vue 2.7',
-            link: '/guide/vue2/getting-started',
-          },
-          {
-            text: 'Svelte 3',
-            link: '/guide/svelte3/getting-started',
-          },
-          {
-            text: 'Configuration',
-            link: '/guide/config',
-          },
-          {
-            text: 'Plugins',
-            link: '/guide/plugins/official',
+            items: [
+              {
+                text: 'Why Histoire?',
+                link: '/guide/',
+              },
+              {
+                text: 'Getting started',
+                link: '/guide/getting-started',
+              },
+              {
+                text: 'Configuration',
+                link: '/guide/config',
+              },
+              {
+                text: 'Plugins',
+                link: '/guide/plugins/official',
+              },
+            ],
           },
         ],
       },
