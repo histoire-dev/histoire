@@ -62,7 +62,7 @@ module.exports = {
       },
     },
     {
-      files: ['**/cypress/integration/**'],
+      files: ['**/cypress/**'],
       extends: [
         'plugin:cypress/recommended',
       ],

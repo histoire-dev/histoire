@@ -9,11 +9,11 @@ setContext('__hstIndex', index)
 setContext('__hstSlots', $$slots)
 </script>
 
-<slot />
-
 {#if story.variants.length === 1 && story.variants[0].id === '_default'}
   <MountVariant {...$$restProps}>
     <slot />
     <slot name="controls" slot="controls" />
   </MountVariant>
+{:else}
+  <slot />
 {/if}

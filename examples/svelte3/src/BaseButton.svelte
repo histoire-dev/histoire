@@ -13,6 +13,7 @@ button {
   color: white;
   border-radius: 6px;
   cursor: pointer;
+  transition: opacity .15s;
 }
 
 button.small {

@@ -5,7 +5,11 @@
   "scripts": {
     "story:dev": "histoire dev",
     "story:build": "histoire build",
-    "story:preview": "histoire preview"
+    "story:preview": "histoire preview --port 4567",
+    "ci": "start-server-and-test story:preview http://localhost:4567/ test",
+    "test": "cypress run",
+    "test:dev": "cypress open --config baseUrl=http://localhost:6006",
+    "test:examples": "pnpm run story:build && pnpm run ci"
   },
   "type": "module",
   "dependencies": {
@@ -14,7 +18,9 @@
   "devDependencies": {
     "@histoire/plugin-svelte": "workspace:*",
     "@sveltejs/vite-plugin-svelte": "^1.0.1",
+    "cypress": "^10.4.0",
     "histoire": "workspace:*",
+    "start-server-and-test": "^1.14.0",
     "svelte-preprocess": "^4.10.7",
     "vite": "^3.0.5"
   }

@@ -30,6 +30,7 @@ function onReady () {
         height: finalHeight ? `${finalHeight}px` : '100%',
       } : { width: '100%', height: '100%' }"
       class="htw-relative"
+      data-test-id="sandbox-render"
     >
       <GenericRenderStory
         :key="`${story.id}-${variant.id}`"

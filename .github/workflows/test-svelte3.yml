@@ -1,10 +1,14 @@
-name: Continuous tests
+name: Svelte 3 tests
 on:
   - push
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
     name: Build and test
+
+    env:
+      dir: ./examples/svelte3
+
     steps:
       - uses: actions/checkout@v2
 
@@ -26,7 +30,9 @@ jobs:
       - name: Cache pnpm modules
         uses: actions/cache@v2
         with:
-          path: ${{ steps.pnpm-cache.outputs.pnpm_cache_dir }}
+          path: |
+            ${{ steps.pnpm-cache.outputs.pnpm_cache_dir }}
+            ~/.cache/Cypress
           key: pnpm-v1-${{ runner.os }}-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
             pnpm-v1-${{ runner.os }}-
@@ -34,11 +40,25 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: Lint
-        run: pnpm run lint
-
       - name: Build
         run: pnpm run build
 
+      - name: Build book
+        working-directory: ${{env.dir}}
+        run: pnpm run story:build
+
       - name: Run tests
-        run: pnpm run test
+        working-directory: ${{env.dir}}
+        run: pnpm run ci
+      
+      - uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: cypress-screenshots
+          path: ${{env.dir}}/cypress/screenshots
+
+      - uses: actions/upload-artifact@v2
+        if: always()
+        with:
+          name: cypress-videos
+          path: ${{env.dir}}/cypress/videos
