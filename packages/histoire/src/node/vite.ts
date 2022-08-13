@@ -17,6 +17,7 @@ import { makeTree } from './tree.js'
 import { parseColor } from './colors.js'
 import { createMarkdownPlugins } from './markdown.js'
 import { getSearchDataJS, generateDocSearchData, generateTitleSearchData } from './search.js'
+import { getInjectedImport } from './util/deps.js'
 
 const require = createRequire(import.meta.url)
 
@@ -308,7 +309,7 @@ if (import.meta.hot) {
 
       if (id === RESOLVED_MARKDOWN_FILES) {
         const filesJs = ctx.markdownFiles.map(f => `${JSON.stringify(f.relativePath)}: () => import(${JSON.stringify(`./${f.relativePath}`)})`).join(',')
-        return `import { reactive } from ${JSON.stringify(require.resolve('@histoire/vendors/vue'))}
+        return `import { reactive } from ${getInjectedImport('@histoire/vendors/vue')}
         export const markdownFiles = reactive({${filesJs}})
         if (import.meta.hot) {
           window.__hst_md_hmr = (newModule) => {

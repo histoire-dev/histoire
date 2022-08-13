@@ -1,12 +1,6 @@
-import { createRequire } from 'module'
 import { BasePluginApi, Plugin } from '../plugin.js'
+import { getInjectedImport } from '../util/deps.js'
 import { findUp } from '../util/find-up.js'
-
-const require = createRequire(import.meta.url)
-
-function resolveImport (request) {
-  return JSON.stringify(require.resolve(request))
-}
 
 export interface TailwindTokensOptions {
   configFile?: string
@@ -90,7 +84,7 @@ export function tailwindTokens (options: TailwindTokensOptions = {}): Plugin {
 
 const storyTemplate = (tailwindConfig: any) => `import 'histoire-style'
 import './style.css'
-import { createApp, h, markRaw, ref } from ${resolveImport('@histoire/vendors/vue')}
+import { createApp, h, markRaw, ref } from ${getInjectedImport('@histoire/vendors/vue')}
 import {
   HstColorShades,
   HstTokenList,
@@ -98,7 +92,7 @@ import {
   HstText,
   HstTextarea,
   HstNumber,
-} from ${resolveImport('@histoire/controls')}
+} from ${getInjectedImport('@histoire/controls')}
 
 const config = markRaw(${JSON.stringify(tailwindConfig, null, 2)})
 const search = ref('')
