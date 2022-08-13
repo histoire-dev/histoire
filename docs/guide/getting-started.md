@@ -68,3 +68,7 @@ Histoire is an Open-Source project supported by our sponsors - thank you!
 *<u>*Auto-CodeGen*</u>: Generates copiable source code dynamically from the current story state.
 
 *<u>*Auto-Docs*</u>: Generates documentation and controls automatically by analyzing the imported components.
+
+## Community
+
+If you have questions or need help, reach out to the community at [Discord](https://discord.gg/KpCnT72rJk) and [GitHub Discussions](https://github.com/histoire-dev/histoire/discussions).

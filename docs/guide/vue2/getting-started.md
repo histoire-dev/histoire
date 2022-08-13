@@ -81,3 +81,7 @@ You can add these to your `package.json` like this:
 And then run them with `npm run story:dev` or `npm run story:build`.
 
 You can specify additional CLI options like `--port`. For a full list of CLI options, run `npx histoire --help` in your project.
+
+## Community
+
+If you have questions or need help, reach out to the community at [Discord](https://discord.gg/KpCnT72rJk) and [GitHub Discussions](https://github.com/histoire-dev/histoire/discussions).
