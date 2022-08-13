@@ -137,6 +137,7 @@ export async function getViteConfigWithPlugins (isServer: boolean, ctx: Context)
           // Disable warnings
           'process.env.NODE_ENV': JSON.stringify(isServer ? 'production' : process.env.NODE_ENV ?? 'development'),
         },
+        cacheDir: isServer ? 'node_modules/.hst-vite-server' : 'node_modules/.hst-vite',
       }
     },
 
