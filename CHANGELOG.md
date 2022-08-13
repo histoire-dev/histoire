@@ -1,3 +1,13 @@
+## [0.10.2](https://github.com/Akryum/histoire/compare/v0.10.1...v0.10.2) (2022-08-13)
+
+
+### Bug Fixes
+
+* re-export vendors, fix [#239](https://github.com/Akryum/histoire/issues/239) ([2f3e49a](https://github.com/Akryum/histoire/commit/2f3e49ad16c40fca905b3e626734cc97fd651a85))
+* use a specific cache folder for histoire, fix [#96](https://github.com/Akryum/histoire/issues/96) ([c0c874e](https://github.com/Akryum/histoire/commit/c0c874e6785014a25232b2574e29eaa745f21d13))
+
+
+
 ## [0.10.1](https://github.com/Akryum/histoire/compare/v0.10.0...v0.10.1) (2022-08-13)
 
 
