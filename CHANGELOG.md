@@ -1,3 +1,13 @@
+## [0.10.1](https://github.com/Akryum/histoire/compare/v0.10.0...v0.10.1) (2022-08-13)
+
+
+### Bug Fixes
+
+* broken tailwind tokens ([626176a](https://github.com/Akryum/histoire/commit/626176afaf1cbf8657bddd105bee4dc26092de77))
+* exclude @histoire/vendors from optimize ([a9171d4](https://github.com/Akryum/histoire/commit/a9171d48aadc54b03ced2eb8988d274b56037cc0))
+
+
+
 # [0.10.0](https://github.com/Akryum/histoire/compare/v0.9.6...v0.10.0) (2022-08-12)
 
 
