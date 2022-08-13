@@ -17,7 +17,7 @@ import { makeTree } from './tree.js'
 import { parseColor } from './colors.js'
 import { createMarkdownPlugins } from './markdown.js'
 import { getSearchDataJS, generateDocSearchData, generateTitleSearchData } from './search.js'
-import { getInjectedImport } from './util/deps.js'
+import { getInjectedImport } from './util/vendors.js'
 
 const require = createRequire(import.meta.url)
 

@@ -1,5 +1,5 @@
 import { BasePluginApi, Plugin } from '../plugin.js'
-import { getInjectedImport } from '../util/deps.js'
+import { getInjectedImport } from '../util/vendors.js'
 import { findUp } from '../util/find-up.js'
 
 export interface TailwindTokensOptions {
