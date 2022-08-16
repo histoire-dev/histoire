@@ -117,6 +117,8 @@ Example:
 
 ## Nuxt
 
+<DemoLinks framework="nuxt3" />
+
 Histoire supports Nuxt 3 with the `@histoire/plugin-nuxt` package.
 
 ```bash

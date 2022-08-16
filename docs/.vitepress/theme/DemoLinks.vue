@@ -10,6 +10,10 @@ const allLinks = {
     demo: 'https://vue3.examples.histoire.dev/',
     stackblitz: 'https://stackblitz.com/edit/histoire-vue3-starter',
   },
+  nuxt3: {
+    demo: '',
+    stackblitz: 'https://stackblitz.com/edit/histoire-nuxt3-starter',
+  },
   svelte3: {
     demo: 'https://svelte3.examples.histoire.dev/',
     stackblitz: 'https://stackblitz.com/edit/histoire-svelte3-starter',
@@ -22,6 +26,7 @@ const links = computed(() => allLinks[props.framework])
 <template>
   <div class="demo-links space-y-2">
     <a
+      v-if="links.demo"
       :href="links.demo"
       target="_blank"
       class="btn flex items-center gap-4 p-4 hover:no-underline"
