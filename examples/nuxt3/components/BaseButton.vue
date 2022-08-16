@@ -27,7 +27,6 @@ defineProps({
     }"
   >
     <slot />
-    <Meow />
   </button>
 </template>
 
