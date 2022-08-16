@@ -1,3 +1,13 @@
+## [0.10.3](https://github.com/Akryum/histoire/compare/v0.10.2...v0.10.3) (2022-08-16)
+
+
+### Bug Fixes
+
+* global setup token `,` error, fix [#244](https://github.com/Akryum/histoire/issues/244) ([ca080ad](https://github.com/Akryum/histoire/commit/ca080ad7b94083e94ac7496dcfaa0c1613421f41))
+* **types:** shim @histoire/app, fix [#226](https://github.com/Akryum/histoire/issues/226) ([6250b85](https://github.com/Akryum/histoire/commit/6250b853f53348b9fdf3db6d96ad6803e6647b74))
+
+
+
 ## [0.10.2](https://github.com/Akryum/histoire/compare/v0.10.1...v0.10.2) (2022-08-13)
 
 

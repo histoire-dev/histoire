@@ -1,6 +1,6 @@
 {
   "name": "histoire",
-  "version": "0.10.2",
+  "version": "0.10.3",
   "description": "A fast story book powered by Vite",
   "license": "MIT",
   "author": {
@@ -35,10 +35,10 @@
     "test": "peeky run"
   },
   "dependencies": {
-    "@histoire/app": "^0.10.2",
-    "@histoire/controls": "^0.10.2",
-    "@histoire/shared": "^0.10.2",
-    "@histoire/vendors": "^0.10.2",
+    "@histoire/app": "^0.10.3",
+    "@histoire/controls": "^0.10.3",
+    "@histoire/shared": "^0.10.3",
+    "@histoire/vendors": "^0.10.3",
     "@types/flexsearch": "^0.7.3",
     "@types/markdown-it": "^12.2.3",
     "birpc": "^0.1.1",
