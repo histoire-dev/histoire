@@ -12,6 +12,7 @@
     "@histoire/plugin-vue": "workspace:*",
     "@nuxtjs/tailwindcss": "^5.1.2",
     "histoire": "workspace:*",
-    "nuxt": "^3.0.0-rc.3"
+    "nuxt": "^3.0.0-rc.8",
+    "vue": "^3.2.37"
   }
 }

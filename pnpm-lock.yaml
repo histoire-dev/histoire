@@ -62,13 +62,15 @@ importers:
       '@histoire/plugin-vue': workspace:*
       '@nuxtjs/tailwindcss': ^5.1.2
       histoire: workspace:*
-      nuxt: ^3.0.0-rc.3
+      nuxt: ^3.0.0-rc.8
+      vue: ^3.2.37
     devDependencies:
       '@histoire/plugin-nuxt': link:../../packages/histoire-plugin-nuxt
       '@histoire/plugin-vue': link:../../packages/histoire-plugin-vue
       '@nuxtjs/tailwindcss': 5.3.1
       histoire: link:../../packages/histoire
       nuxt: 3.0.0-rc.8
+      vue: 3.2.37
 
   examples/svelte3:
     specifiers:
