@@ -19,6 +19,7 @@
     "cypress": "^10.4.0",
     "histoire": "workspace:*",
     "nuxt": "^3.0.0-rc.8",
+    "start-server-and-test": "^1.14.0",
     "vue": "^3.2.37"
   }
 }
