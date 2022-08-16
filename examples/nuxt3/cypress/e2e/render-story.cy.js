@@ -9,4 +9,9 @@ describe('Story render', () => {
     cy.visit('/story/components-simple-story-vue?variantId=_default')
     getIframeBody().contains('Simple story in Nuxt NuxtLink')
   })
+
+  it('should render auto-imported components', () => {
+    cy.visit('/story/components-autoimport-story-vue?variantId=_default')
+    getIframeBody().contains('Meow')
+  })
 })
