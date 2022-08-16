@@ -3,16 +3,11 @@ import { ViteNodeServer } from 'vite-node/server'
 import { ViteNodeRunner } from 'vite-node/client'
 import pc from 'picocolors'
 import { resolve } from 'pathe'
+import type { ModuleLoader } from '@histoire/shared'
 
 export interface UseModuleLoaderOptions {
   server: ViteDevServer
   throws?: boolean
-}
-
-export interface ModuleLoader {
-  clearCache: () => void
-  loadModule: (file: string) => Promise<any>
-  destroy: () => void
 }
 
 let _load: ModuleLoader['loadModule']

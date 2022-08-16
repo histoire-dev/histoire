@@ -1,6 +1,11 @@
 import pc from 'picocolors'
-import type { ServerStoryFile, ServerTree, ServerTreeFile } from '@histoire/shared'
-import type { HistoireConfig, TreeGroupConfig } from './config.js'
+import type {
+  ServerStoryFile,
+  ServerTree,
+  ServerTreeFile,
+  HistoireConfig,
+  TreeGroupConfig,
+} from '@histoire/shared'
 
 export function createPath (config: HistoireConfig, file: ServerTreeFile) {
   if (config.tree.file === 'title') {

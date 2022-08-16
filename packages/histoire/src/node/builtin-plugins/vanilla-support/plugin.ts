@@ -1,6 +1,6 @@
 import { dirname } from 'pathe'
 import { fileURLToPath } from 'url'
-import { Plugin } from '../../plugin.js'
+import type { Plugin } from '@histoire/shared'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 

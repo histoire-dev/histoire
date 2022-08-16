@@ -28,8 +28,18 @@
     "build": "rimraf dist && tsc -d",
     "watch": "tsc -d -w --sourceMap"
   },
-  "dependencies": {},
+  "dependencies": {
+    "@types/fs-extra": "^9.0.13",
+    "@types/markdown-it": "^12.2.3",
+    "chokidar": "^3.5.3",
+    "pathe": "^0.2.0",
+    "picocolors": "^1.0.0"
+  },
+  "peerDependencies": {
+    "vite": "^2.9.0 || ^3.0.0"
+  },
   "devDependencies": {
-    "typescript": "^4.7.4"
+    "typescript": "^4.7.4",
+    "vite": "^3.0.5"
   }
 }

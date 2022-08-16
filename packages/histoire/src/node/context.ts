@@ -1,6 +1,12 @@
 import { resolveConfig as resolveViteConfig } from 'vite'
-import type { ServerStoryFile, FinalSupportPlugin, ServerMarkdownFile } from '@histoire/shared'
-import { resolveConfig, HistoireConfig, ConfigMode } from './config.js'
+import type {
+  ServerStoryFile,
+  FinalSupportPlugin,
+  ServerMarkdownFile,
+  HistoireConfig,
+  ConfigMode,
+} from '@histoire/shared'
+import { resolveConfig } from './config.js'
 
 export interface Context {
   root: string

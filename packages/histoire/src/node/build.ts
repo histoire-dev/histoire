@@ -11,13 +11,17 @@ import fs from 'fs-extra'
 import { lookup as lookupMime } from 'mrmime'
 import pc from 'picocolors'
 import { performance } from 'perf_hooks'
+import type {
+  BuildEndCallback,
+  PreviewStoryCallback,
+} from '@histoire/shared'
 import { APP_PATH } from './alias.js'
 import { Context } from './context.js'
 import { getViteConfigWithPlugins, resolveViteConfig } from './vite.js'
 import { findAllStories } from './stories.js'
 import type { RollupOutput } from 'rollup'
 import { useCollectStories } from './collect/index.js'
-import { BuildEndCallback, BuildPluginApi, PreviewStoryCallback } from './plugin.js'
+import { BuildPluginApi } from './plugin.js'
 import { useModuleLoader } from './load.js'
 import { startPreview } from './preview.js'
 import { createMarkdownFilesWatcher } from './markdown.js'

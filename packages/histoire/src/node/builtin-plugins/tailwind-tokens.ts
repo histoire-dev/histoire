@@ -1,4 +1,4 @@
-import { BasePluginApi, Plugin } from '../plugin.js'
+import type { Plugin, PluginApiBase } from '@histoire/shared'
 import { getInjectedImport } from '../util/vendors.js'
 import { findUp } from '../util/find-up.js'
 
@@ -18,7 +18,7 @@ export function tailwindTokens (options: TailwindTokensOptions = {}): Plugin {
     'tailwind-config.ts',
   ])
 
-  async function generate (api: BasePluginApi) {
+  async function generate (api: PluginApiBase) {
     try {
       await api.fs.ensureDir(api.pluginTempDir)
       await api.fs.emptyDir(api.pluginTempDir)
