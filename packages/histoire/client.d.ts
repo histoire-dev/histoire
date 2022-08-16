@@ -1,2 +1,1 @@
-// https://github.com/microsoft/TypeScript/issues/33079
-export * from '@histoire/app'
+export function hstEvent (name: string, argument): void
