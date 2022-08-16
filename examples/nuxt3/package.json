@@ -5,12 +5,18 @@
   "scripts": {
     "story:dev": "histoire dev",
     "story:build": "histoire build",
-    "story:preview": "histoire preview --port 4567"
+    "story:preview": "histoire preview --port 4567",
+    "ci": "start-server-and-test story:preview http://localhost:4567/ test",
+    "test": "cypress run",
+    "test:dev": "cypress open --config baseUrl=http://localhost:6006",
+    "test:examples": "pnpm run story:build && pnpm run ci"
   },
+  "type": "module",
   "devDependencies": {
     "@histoire/plugin-nuxt": "workspace:*",
     "@histoire/plugin-vue": "workspace:*",
     "@nuxtjs/tailwindcss": "^5.1.2",
+    "cypress": "^10.4.0",
     "histoire": "workspace:*",
     "nuxt": "^3.0.0-rc.8",
     "vue": "^3.2.37"

@@ -1,0 +1,64 @@
+name: Nuxt 3 tests
+on:
+  - push
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    name: Build and test
+
+    env:
+      dir: ./examples/nuxt3
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install node
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2.0.1
+        with:
+          version: 7.1.7
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        run: |
+          echo "::set-output name=pnpm_cache_dir::$(pnpm store path)"
+
+      - name: Cache pnpm modules
+        uses: actions/cache@v2
+        with:
+          path: |
+            ${{ steps.pnpm-cache.outputs.pnpm_cache_dir }}
+            ~/.cache/Cypress
+          key: pnpm-v1-${{ runner.os }}-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            pnpm-v1-${{ runner.os }}-
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Build
+        run: pnpm run build
+
+      - name: Build book
+        working-directory: ${{env.dir}}
+        run: pnpm run story:build
+
+      - name: Run tests
+        working-directory: ${{env.dir}}
+        run: pnpm run ci
+      
+      - uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: cypress-screenshots
+          path: ${{env.dir}}/cypress/screenshots
+
+      - uses: actions/upload-artifact@v2
+        if: always()
+        with:
+          name: cypress-videos
+          path: ${{env.dir}}/cypress/videos
