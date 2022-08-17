@@ -1,3 +1,13 @@
+## [0.10.4](https://github.com/Akryum/histoire/compare/v0.10.3...v0.10.4) (2022-08-17)
+
+
+### Bug Fixes
+
+* **nuxt:** resolve vite config after all modules have injected plugins ([#246](https://github.com/Akryum/histoire/issues/246)) ([cefa4f9](https://github.com/Akryum/histoire/commit/cefa4f91ecca2efa6fd8720c1295e40aff943b95))
+* postMessage error, fix [#250](https://github.com/Akryum/histoire/issues/250) ([0f5b400](https://github.com/Akryum/histoire/commit/0f5b40047efd15bda2946af1647a4563a38cebf3))
+
+
+
 ## [0.10.3](https://github.com/Akryum/histoire/compare/v0.10.2...v0.10.3) (2022-08-16)
 
 
