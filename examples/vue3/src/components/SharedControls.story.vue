@@ -13,6 +13,7 @@ const state = reactive({
   number: 20,
   longText: 'Longer text...',
   select: 'crash-bandicoot',
+  fn: () => { /* noop */ },
 })
 
 defineExpose({

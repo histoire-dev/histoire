@@ -45,7 +45,7 @@ const app = createApp({
       }
       window.parent?.postMessage({
         type: STATE_SYNC,
-        state: toRawDeep(value),
+        state: toRawDeep(value, true),
       })
     }, {
       deep: true,

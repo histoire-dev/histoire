@@ -25,7 +25,7 @@ function syncState () {
   if (iframe.value && props.variant.previewReady) {
     iframe.value.contentWindow.postMessage({
       type: STATE_SYNC,
-      state: toRawDeep(props.variant.state),
+      state: toRawDeep(props.variant.state, true),
     })
   }
 }
