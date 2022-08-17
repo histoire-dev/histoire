@@ -67,9 +67,11 @@ async function useNuxtViteConfig () {
   }
   return {
     viteConfig: await new Promise<ViteConfig>((resolve) => {
-      nuxt.hook('vite:extendConfig', (config, { isClient }) => {
-        // @ts-ignore
-        if (isClient) resolve({ ...config })
+      nuxt.hook('modules:done', () => {
+        nuxt.hook('vite:extendConfig', (config, { isClient }) => {
+          // @ts-ignore
+          if (isClient) resolve({ ...config })
+        })
       })
       nuxt.ready().then(async () => {
         buildNuxt(nuxt)
