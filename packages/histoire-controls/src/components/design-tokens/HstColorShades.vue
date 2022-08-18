@@ -10,15 +10,24 @@ import { VTooltip as vTooltip } from 'floating-vue'
 import HstCopyIcon from '../HstCopyIcon.vue'
 
 const props = defineProps<{
-  shades: Record<string, string>
+  shades: Record<string, any>
   getName?: (key: string, color: string) => string
   search?: string
 }>()
 
+const flattenShades = (shades: Record<string, any>, path = ''): Record<string, string> => {
+  return Object.entries(shades).reduce((acc, [key, color]) => {
+    const nextPath = path ? key === 'DEFAULT' ? path : `${path}-${key}` : key
+    const obj = typeof color === 'object' ? flattenShades(color, nextPath) : { [nextPath]: color }
+    return { ...acc, ...obj }
+  }, {})
+}
+
 const shadesWithName = computed(() => {
   const shades = props.shades
   const getName = props.getName
-  return Object.entries(shades).map(([key, color]) => {
+  const flatShades = flattenShades(shades)
+  return Object.entries(flatShades).map(([key, color]) => {
     const name = getName ? getName(key, color) : key
     return {
       key,
