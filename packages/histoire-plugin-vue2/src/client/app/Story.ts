@@ -64,6 +64,7 @@ export default Object.assign(defineComponent({
       return h(Variant, {
         props: {
           variant: firstVariant,
+          // @ts-ignore
           initState: this.initState,
           ...this.$attrs,
         },

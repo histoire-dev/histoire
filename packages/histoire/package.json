@@ -64,7 +64,7 @@
     "shiki": "0.10.1",
     "sirv": "^2.0.2",
     "tinypool": "^0.1.2",
-    "vite-node": "0.21.1"
+    "vite-node": "0.22.1"
   },
   "peerDependencies": {
     "vite": "^2.9.0 || ^3.0.0"

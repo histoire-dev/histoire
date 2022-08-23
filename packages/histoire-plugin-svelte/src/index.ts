@@ -25,6 +25,9 @@ export function HstSvelte (): Plugin {
             dark: '@histoire/plugin-svelte/assets/histoire-svelte-text.svg',
           },
         },
+        viteIgnorePlugins: [
+          'vite-plugin-svelte-kit',
+        ],
       }
     },
 
