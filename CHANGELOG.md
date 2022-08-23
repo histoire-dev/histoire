@@ -1,3 +1,13 @@
+## [0.10.5](https://github.com/Akryum/histoire/compare/v0.10.4...v0.10.5) (2022-08-23)
+
+
+### Bug Fixes
+
+* compatible with nested tailwind color (fix [#200](https://github.com/Akryum/histoire/issues/200)) ([#253](https://github.com/Akryum/histoire/issues/253)) ([fb23942](https://github.com/Akryum/histoire/commit/fb23942c3913ad317d31dc48e02c814a0f841d4d))
+* **plugin:** replace `:` with `_` to prevent issue on Windows, fix [#256](https://github.com/Akryum/histoire/issues/256) ([69c41c5](https://github.com/Akryum/histoire/commit/69c41c5c37aff7684d5201f6fd63e001f01f400c))
+
+
+
 ## [0.10.4](https://github.com/Akryum/histoire/compare/v0.10.3...v0.10.4) (2022-08-17)
 
 
