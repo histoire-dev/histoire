@@ -16,7 +16,7 @@ export function useStoryDoc (story: Ref<Story>) {
       return
     }
 
-    // Custom blocks (Vue 3)
+    // Custom blocks (Vue)
     // @TODO extract
     let comp = story.value.file?.component
     if (comp) {
@@ -24,6 +24,11 @@ export function useStoryDoc (story: Ref<Story>) {
         comp = comp.__asyncResolved
       } else if (comp.__asyncLoader) {
         comp = await comp.__asyncLoader()
+      } else if (typeof comp === 'function') {
+        comp = await comp()
+      }
+      if (comp?.default) {
+        comp = comp.default
       }
       renderedDoc.value = comp.doc
     }
