@@ -1,3 +1,21 @@
+## [0.10.6](https://github.com/Akryum/histoire/compare/v0.10.5...v0.10.6) (2022-08-23)
+
+
+### Bug Fixes
+
+* supress 'dynamic import cannot be analyzed' warning ([4f8b422](https://github.com/Akryum/histoire/commit/4f8b42273eec17cf67401b43071b183dc52dc61d))
+* **svelte3:** Class constructors cannot be invoked without 'new' ([fc10cd8](https://github.com/Akryum/histoire/commit/fc10cd87548d2b2ef604b62f520e0fb570c7f464))
+* **vue2:** syncing refs ([29ac9a1](https://github.com/Akryum/histoire/commit/29ac9a116bb96309b32edc2572cb7a868db2fa6a))
+* **vue:** vue 2 docs custom blocks, fix [#251](https://github.com/Akryum/histoire/issues/251) ([709d0b8](https://github.com/Akryum/histoire/commit/709d0b8c1b70e85f9ed0925c6b1f1f8216c05cb4))
+
+
+### Features
+
+* **config:** viteIgnorePlugins ([f5ac175](https://github.com/Akryum/histoire/commit/f5ac175998ab86cfd77a53a9dc4232b50005db6d))
+* support sveltekit, fix [#241](https://github.com/Akryum/histoire/issues/241) ([59f00c2](https://github.com/Akryum/histoire/commit/59f00c2cf8735b31dd510668c33a411fd0b58aa5))
+
+
+
 ## [0.10.5](https://github.com/Akryum/histoire/compare/v0.10.4...v0.10.5) (2022-08-23)
 
 
