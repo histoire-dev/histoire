@@ -13,7 +13,7 @@ export const setupVue3 = defineSetupVue3(({ app }) => {
   app.use(i18n)
 
   app.component('GlobalComp', GlobalComp)
-  
+
   app.directive('dashed-border', {
     beforeMount: (el, { value }) => {
       el.style.border = `1px dashed ${value}`

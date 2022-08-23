@@ -157,7 +157,9 @@ function onClick (event) {
       <button v-tooltip="{ content: 'Info', html: true }">
         A button
       </button>
-      <div v-dashed-border="'#f00'">This is a test</div>
+      <div v-dashed-border="'#f00'">
+        This is a test
+      </div>
     </Variant>
     <Variant
       id="slots"
