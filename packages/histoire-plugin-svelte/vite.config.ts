@@ -23,7 +23,7 @@ export default defineConfig({
           for (const file of files) {
             const content = fs.readFileSync(file, 'utf-8')
             if (content.includes('import__dyn')) {
-              fs.writeFileSync(file, content.replace(/import__dyn/g, 'import'), 'utf-8')
+              fs.writeFileSync(file, content.replace(/import__dyn\(/g, 'import(/* @vite-ignore */'), 'utf-8')
             }
           }
         } catch (e) {

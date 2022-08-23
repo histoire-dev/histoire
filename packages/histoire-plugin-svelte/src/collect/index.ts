@@ -5,7 +5,7 @@ import Story from './Story.svelte'
 import Variant from './Variant.svelte'
 
 export async function run ({ file, el, storyData }: ServerRunPayload) {
-  const { default: Comp } = await import(file.moduleId)
+  const { default: Comp } = await import(/* @vite-ignore */ file.moduleId)
 
   const app: SvelteComponent = new Comp({
     target: el,
