@@ -37,9 +37,8 @@ export default Object.assign(defineComponent({
       addImplicitState(key, storyComponent.exposed[key])
     }
     // We needs __VUE_PROD_DEVTOOLS__ flag set to `true` to enable `devtoolsRawSetupState`
-    const setupState = storyComponent._setupProxy || storyComponent
     for (const key in storyComponent._setupState) {
-      addImplicitState(key, setupState[key])
+      addImplicitState(key, storyComponent._setupState[key])
     }
     // Shallow copy to prevent sharing object with different variants
     // Wrap with reactive to unwrap refs
