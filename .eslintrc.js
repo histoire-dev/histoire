@@ -87,5 +87,6 @@ module.exports = {
     'generated/',
     '!.*',
     '.nuxt/',
+    'examples/sveltekit',
   ],
 }
