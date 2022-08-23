@@ -129,6 +129,7 @@ export function getDefaultConfig (): HistoireConfig {
         },
       }
     },
+    viteIgnorePlugins: [],
   }
 }
 

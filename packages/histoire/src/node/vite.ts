@@ -64,6 +64,25 @@ async function mergeHistoireViteConfig (viteConfig: InlineConfig, ctx: Context) 
       viteConfig = mergeViteConfig(viteConfig, overrides)
     }
   }
+
+  let flatPlugins = []
+  if (viteConfig.plugins) {
+    for (const pluginOption of viteConfig.plugins) {
+      if (Array.isArray(pluginOption)) {
+        flatPlugins.push(...await Promise.all(pluginOption))
+      } else {
+        flatPlugins.push(await pluginOption)
+      }
+    }
+    flatPlugins = flatPlugins.filter(Boolean)
+  }
+
+  if (ctx.config.viteIgnorePlugins) {
+    flatPlugins = flatPlugins.filter(plugin => !ctx.config.viteIgnorePlugins.includes(plugin.name))
+  }
+
+  viteConfig.plugins = flatPlugins
+
   return viteConfig
 }
 

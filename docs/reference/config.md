@@ -302,6 +302,20 @@ export default defineConfig({
 })
 ```
 
+## `viteIgnorePlugins`
+
+`string[]`
+
+List of Vite plugin names to exclude for Histoire.
+
+```ts
+export default defineConfig({
+  viteIgnorePlugins: [
+    'vite-plugin-svelte-kit',
+  ],
+})
+```
+
 ## `viteNodeTransformMode`
 
 `{ web?, ssr? }`

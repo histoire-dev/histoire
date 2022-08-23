@@ -155,6 +155,10 @@ export interface HistoireConfig {
    */
   vite?: ViteConfig | ((config: ViteConfig, env: ViteConfigEnv) => void | ViteConfig | Promise<void | ViteConfig>)
   /**
+   * Remove those plugins from the Vite configuration
+   */
+  viteIgnorePlugins?: string[]
+  /**
    * Transpile dependencies when collecting stories on Node.js
    */
   viteNodeInlineDeps?: RegExp[]
