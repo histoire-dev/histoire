@@ -1,3 +1,12 @@
+## [0.10.7](https://github.com/Akryum/histoire/compare/v0.10.6...v0.10.7) (2022-08-23)
+
+
+### Bug Fixes
+
+* **vue3:** codegen: custom directive breaking, fix [#258](https://github.com/Akryum/histoire/issues/258) ([37d983a](https://github.com/Akryum/histoire/commit/37d983a382c65aca7f8fd312ee79df86937d7cf2))
+
+
+
 ## [0.10.6](https://github.com/Akryum/histoire/compare/v0.10.5...v0.10.6) (2022-08-23)
 
 
