@@ -25,7 +25,12 @@ export function useStoryDoc (story: Ref<Story>) {
       } else if (comp.__asyncLoader) {
         comp = await comp.__asyncLoader()
       } else if (typeof comp === 'function') {
-        comp = await comp()
+        try {
+          comp = await comp()
+        } catch (e) {
+          // Noop
+          // Could be a class that requires `new com()`
+        }
       }
       if (comp?.default) {
         comp = comp.default
