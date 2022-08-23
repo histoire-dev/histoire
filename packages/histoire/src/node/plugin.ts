@@ -28,7 +28,7 @@ export class BasePluginApi implements PluginApiBase {
   ) { }
 
   get pluginTempDir () {
-    return path.resolve(TEMP_PATH, 'plugins', this.plugin.name)
+    return path.resolve(TEMP_PATH, 'plugins', this.plugin.name.replace(/:/g, '_'))
   }
 
   log (...msg) {
