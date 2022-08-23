@@ -93,7 +93,7 @@ async function printVNode (vnode: VNode, propsOverrides: Record<string, any> = n
           let dirName: string
           for (const directives of [target.directives, target.appContext.directives]) {
             for (const key in directives) {
-              if (target.directives[key] === dir.dir) {
+              if (directives[key] === dir.dir) {
                 dirName = key
                 break
               }

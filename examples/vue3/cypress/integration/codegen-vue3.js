@@ -111,7 +111,10 @@ describe('Codegen (Vue 3)', () => {
   }"
 >
   A button
-</button>`)
+</button>
+<div v-dashed-border="'#f00'">
+  This is a test
+</div>`)
   })
 
   it('slots', () => {
