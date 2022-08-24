@@ -1,6 +1,8 @@
 <script lang="ts" setup>
 import GenericRenderStory from './GenericRenderStory.vue'
 import type { Story, Variant } from '../../types'
+import { isDark } from '../../util/dark'
+import { histoireConfig } from '../../util/config'
 import StoryResponsivePreview from './StoryResponsivePreview.vue'
 
 const props = defineProps<{
@@ -37,6 +39,7 @@ function onReady () {
         :variant="variant"
         :story="story"
         class="htw-h-full"
+        :class="[ isDark ? histoireConfig.sandboxDarkClass : undefined ]"
         @ready="onReady"
       />
     </div>
