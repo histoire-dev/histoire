@@ -20,6 +20,7 @@ Detected files:
 Example:
 
 ```ts
+// histoire.config.js
 import { defineConfig } from 'histoire'
 
 export default defineConfig({
@@ -38,6 +39,7 @@ The second option is to provide the Histoire config object directly in your Vite
 Here's what your vite config file should look like:
 
 ```ts
+// vite.config.js
 /// <reference types="histoire" />
 
 import { defineConfig } from 'vite'
@@ -48,6 +50,72 @@ export default defineConfig({
   },
 })
 ```
+
+You can use the `process.env.HISTOIRE` environment variable in conditions to modify the vite configuration for Histoire.
+
+## Overriding Vite configuration
+
+Sometimes you need to change some Vite configuration specifically for Histoire. You can do this with the `vite` object inside the Histoire configuration:
+
+```ts
+// histoire.config.js
+import { defineConfig } from 'histoire'
+
+export default defineConfig({
+  vite: {
+    // Any Vite configuration
+  },
+})
+```
+
+```ts
+// vite.config.js
+/// <reference types="histoire" />
+
+import { defineConfig } from 'vite'
+
+export default defineConfig({
+  // ...
+  histoire: {
+    vite: {
+      // Any Vite configuration
+    },
+  },
+})
+```
+
+### Conditions in Vite config
+
+It might be more convenient to toggle some values in the Vite config using conditions instead, with the `process.env.HISTOIRE` environment variable.
+
+```ts
+// vite.config.js
+import { defineConfig } from 'vite'
+
+export default defineConfig({
+  server: {
+    port: process.env.HISTOIRE ? 6006 : 3000,
+  },
+})
+```
+
+### Ignoring plugins
+
+Some Vite plugins may not work well with Histoire - you can disabled them with the `viteIgnorePlugins` option which is an array for Vite plugin **names**:
+
+```ts
+// histoire.config.js
+import { defineConfig } from 'histoire'
+
+export default defineConfig({
+  viteIgnorePlugins: [
+    'vite:html',
+    'vite-plugin-some-stuff',
+  ],
+})
+```
+
+You can get the name of the plugins with `console.log(somePlugin().name)` or by looking at its source code ([example](https://github.com/ElMassimo/vite-plugin-full-reload/blob/bfabc4720a04b8c75d4d17f6f4876fdf822cad22/src/index.ts#L43)).
 
 ## Global JS and CSS
 
@@ -74,10 +142,11 @@ You can also tell Histoire to configure the sandbox application using the corres
 | Framework | Setup function |
 | --------- | -------------- |
 | Vue 3 | `setupVue3` |
+| Vue 2 | `setupVue2` |
 
-### Vue 3 setup
+### Vue setup
 
-Inside your setup file, you can export a `setupVue3` function that will be called by Histoire allowing you to configure the Vue 3 sandbox application. Histoire provides an optional `defineSetupVue3` helper to have better types in your IDE :
+Inside your setup file, you can export a `setupVue3` (or `setupVue2` for Vue 2) function that will be called by Histoire allowing you to configure the Vue 3 sandbox application. Histoire provides an optional `defineSetupVue3` helper to have better types in your IDE :
 
 ```ts
 // src/histoire.setup.ts
