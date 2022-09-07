@@ -1,6 +1,6 @@
 import { error } from '@sveltejs/kit';
 import { api } from './api';
-import type { PageServerLoad, Action } from './$types';
+import type { PageServerLoad, Actions } from './$types';
 
 type Todo = {
 	uid: string;
@@ -31,25 +31,31 @@ export const load: PageServerLoad = async ({ locals }) => {
 	throw error(response.status);
 };
 
-export const POST: Action = async ({ request, locals }) => {
-	const form = await request.formData();
+export const actions: Actions = {
+	add: async ({ request, locals }) => {
+		const form = await request.formData();
 
-	await api('POST', `todos/${locals.userid}`, {
-		text: form.get('text')
-	});
-};
+		await api('POST', `todos/${locals.userid}`, {
+			text: form.get('text')
+		});
+	},
+	edit: async ({ request, locals }) => {
+		const form = await request.formData();
 
-export const PATCH: Action = async ({ request, locals }) => {
-	const form = await request.formData();
+		await api('PATCH', `todos/${locals.userid}/${form.get('uid')}`, {
+			text: form.get('text')
+		});
+	},
+	toggle: async ({ request, locals }) => {
+		const form = await request.formData();
 
-	await api('PATCH', `todos/${locals.userid}/${form.get('uid')}`, {
-		text: form.has('text') ? form.get('text') : undefined,
-		done: form.has('done') ? !!form.get('done') : undefined
-	});
-};
+		await api('PATCH', `todos/${locals.userid}/${form.get('uid')}`, {
+			done: !!form.get('done')
+		});
+	},
+	delete: async ({ request, locals }) => {
+		const form = await request.formData();
 
-export const DELETE: Action = async ({ request, locals }) => {
-	const form = await request.formData();
-
-	await api('DELETE', `todos/${locals.userid}/${form.get('uid')}`);
+		await api('DELETE', `todos/${locals.userid}/${form.get('uid')}`);
+	}
 };
