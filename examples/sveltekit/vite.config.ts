@@ -1,18 +1,13 @@
 /// <reference types="histoire" />
 
-import { defineConfig } from 'vite'
-// @ts-ignore
-import { sveltekit } from '@sveltejs/kit/vite'
-import { HstSvelte } from '@histoire/plugin-svelte'
+import { HstSvelte } from '@histoire/plugin-svelte';
+import { sveltekit } from '@sveltejs/kit/vite';
+import type { UserConfig } from 'vite';
 
-export default defineConfig({
-  plugins: [
-    sveltekit(),
-  ],
+const config: UserConfig = {
+  plugins: [sveltekit()],
   histoire: {
-    plugins: [
-      HstSvelte(),
-    ],
+    plugins: [HstSvelte()],
     setupFile: './src/histoire.setup.ts',
     tree: {
       groups: [
@@ -22,5 +17,7 @@ export default defineConfig({
         },
       ],
     },
-  },
-})
+  }
+};
+
+export default config;

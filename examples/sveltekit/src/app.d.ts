@@ -6,9 +6,7 @@ declare namespace App {
 		userid: string;
 	}
 
+	// interface PageData {}
+
 	// interface Platform {}
-
-	// interface PrivateEnv {}
-
-	// interface PublicEnv {}
 }
