@@ -7,7 +7,7 @@ import GenericRenderStory from './components/story/GenericRenderStory.vue'
 import type { StoryFile } from './types'
 import { mapFile } from './util/mapping'
 // @ts-expect-error virtual module
-import { files } from '$histoire-stories'
+import { files } from 'virtual:$histoire-stories'
 import { PREVIEW_SETTINGS_SYNC, STATE_SYNC, SANDBOX_READY } from './util/const.js'
 import { applyPreviewSettings } from './util/preview-settings.js'
 import { isDark } from './util/dark.js'

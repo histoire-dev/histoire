@@ -480,7 +480,7 @@ Update imports:
 
 ### Bug Fixes
 
-* Failed to load /$histoire-generated-global-setup-resolved ([e147acd](https://github.com/Akryum/histoire/commit/e147acd55555ecf230785fa7d1ed46a36b4fb766))
+* Failed to load /virtual:$histoire-generated-global-setup-resolved ([e147acd](https://github.com/Akryum/histoire/commit/e147acd55555ecf230785fa7d1ed46a36b4fb766))
 * leaking histoire styling in sandbox, fix [#101](https://github.com/Akryum/histoire/issues/101) ([c068a5d](https://github.com/Akryum/histoire/commit/c068a5d542806dec45eee2b594a68b2108442a82))
 * prop overriding not working in built version ([5323b70](https://github.com/Akryum/histoire/commit/5323b70354ce45038f3101d1ae13bb9d437e175a))
 * setupFile not found, fix [#102](https://github.com/Akryum/histoire/issues/102) ([66c70f0](https://github.com/Akryum/histoire/commit/66c70f05086bc4c5a86ac13b1b907d99012d7de9))

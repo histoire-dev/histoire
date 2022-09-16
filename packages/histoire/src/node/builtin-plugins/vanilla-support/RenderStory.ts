@@ -11,9 +11,9 @@ import {
 } from '@histoire/vendors/vue'
 import type { Story, Variant } from '@histoire/shared'
 // @ts-expect-error virtual module id
-import * as setup from '$histoire-setup'
+import * as setup from 'virtual:$histoire-setup'
 // @ts-expect-error virtual module id
-import * as generatedSetup from '$histoire-generated-global-setup'
+import * as generatedSetup from 'virtual:$histoire-generated-global-setup'
 import type { App, MountApi, VanillaApi } from './types'
 
 export default _defineComponent({

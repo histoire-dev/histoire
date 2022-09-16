@@ -13,9 +13,9 @@ import {
 import type { Story, Variant } from '@histoire/shared'
 import { components } from '@histoire/controls'
 // @ts-expect-error virtual module id
-import * as setup from '$histoire-setup'
+import * as setup from 'virtual:$histoire-setup'
 // @ts-expect-error virtual module id
-import * as generatedSetup from '$histoire-generated-global-setup'
+import * as generatedSetup from 'virtual:$histoire-generated-global-setup'
 import RenderStorySvelte from './RenderStory.svelte'
 import RenderVariantSvelte from './RenderVariant.svelte'
 import Wrap from './Wrap.svelte'
