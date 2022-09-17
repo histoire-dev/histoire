@@ -55,6 +55,8 @@ export const MARKDOWN_FILES = 'virtual:$histoire-markdown-files'
 export const RESOLVED_MARKDOWN_FILES = `/__resolved__${MARKDOWN_FILES}`
 // export const RESOLVED_MARKDOWN_FILES = `\0${MARKDOWN_FILES}`
 
+const ID_SEPARATOR = '__-__'
+
 export async function resolveViteConfig (ctx: Context): Promise<ResolvedConfig> {
   const command = ctx.mode === 'dev' ? 'serve' : 'build'
   let viteConfig = (await resolveViteConfigInternal({}, command)) as unknown
@@ -200,8 +202,8 @@ export async function getViteConfigWithPlugins (isServer: boolean, ctx: Context)
         return RESOLVED_GENERATED_GLOBAL_SETUP
       }
       if (id.startsWith(GENERATED_SETUP_CODE)) {
-        const [, index] = id.split('__')
-        return `${RESOLVED_GENERATED_SETUP_CODE}__${index}`
+        const [, index] = id.split(ID_SEPARATOR)
+        return `${RESOLVED_GENERATED_SETUP_CODE}${ID_SEPARATOR}${index}`
       }
       if (id.startsWith(SUPPORT_PLUGINS_CLIENT)) {
         return RESOLVED_SUPPORT_PLUGINS_CLIENT
@@ -298,7 +300,7 @@ if (import.meta.hot) {
         if (ctx.config.setupCode) {
           return [
             // Import
-            `${ctx.config.setupCode.map((c, index) => `import * as setup_${index} from '${GENERATED_SETUP_CODE}__${index}'`).join('\n')}`,
+            `${ctx.config.setupCode.map((c, index) => `import * as setup_${index} from '${GENERATED_SETUP_CODE}${ID_SEPARATOR}${index}'`).join('\n')}`,
             // List
             `const setupList = [${ctx.config.setupCode.map((c, index) => `setup_${index}`).join(', ')}]`,
             // Setups
@@ -316,7 +318,7 @@ if (import.meta.hot) {
       }
 
       if (id.startsWith(RESOLVED_GENERATED_SETUP_CODE)) {
-        const [, index] = id.split('__')
+        const [, index] = id.split(ID_SEPARATOR)
         return ctx.config.setupCode?.[index] ?? ''
       }
 
