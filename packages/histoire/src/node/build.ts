@@ -121,6 +121,7 @@ export async function build (ctx: Context) {
     config (config) {
       const vuePlugin = config.plugins.find((p: any) => p.name === 'vite:vue') as VitePlugin
       if (vuePlugin) {
+        // @ts-expect-error vue plugin use function form
         const original = vuePlugin.configureServer.bind(vuePlugin)
         vuePlugin.configureServer = () => {
           original({
