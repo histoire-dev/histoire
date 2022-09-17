@@ -18,7 +18,7 @@
   "devDependencies": {
     "@histoire/plugin-svelte": "workspace:*",
     "@sveltejs/vite-plugin-svelte": "^1.0.1",
-    "cypress": "^10.4.0",
+    "cypress": "^10.8.0",
     "histoire": "workspace:*",
     "start-server-and-test": "^1.14.0",
     "svelte-preprocess": "^4.10.7",
