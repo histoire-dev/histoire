@@ -21,28 +21,39 @@ import { getInjectedImport } from './util/vendors.js'
 
 const require = createRequire(import.meta.url)
 
+// @TODO switch back to virtual convention after https://github.com/vitejs/vite/pull/10144 is released
 export const STORIES_ID = 'virtual:$histoire-stories'
-export const RESOLVED_STORIES_ID = `\0${STORIES_ID}`
+export const RESOLVED_STORIES_ID = `/__resolved__${STORIES_ID}`
+// export const RESOLVED_STORIES_ID = `\0${STORIES_ID}`
 export const SETUP_ID = 'virtual:$histoire-setup'
 export const NOOP_ID = 'virtual:$histoire-noop'
 export const CONFIG_ID = 'virtual:$histoire-config'
-export const RESOLVED_CONFIG_ID = `\0${CONFIG_ID}`
+export const RESOLVED_CONFIG_ID = `/__resolved__${CONFIG_ID}`
+// export const RESOLVED_CONFIG_ID = `\0${CONFIG_ID}`
 export const THEME_ID = 'virtual:$histoire-theme'
-export const RESOLVED_THEME_ID = `\0${THEME_ID}.css`
+export const RESOLVED_THEME_ID = `/__resolved__${THEME_ID}.css`
+// export const RESOLVED_THEME_ID = `\0${THEME_ID}.css`
 export const SEARCH_TITLE_DATA_ID = 'virtual:$histoire-search-title-data'
-export const RESOLVED_SEARCH_TITLE_DATA_ID = `\0${SEARCH_TITLE_DATA_ID}`
+export const RESOLVED_SEARCH_TITLE_DATA_ID = `/__resolved__${SEARCH_TITLE_DATA_ID}`
+// export const RESOLVED_SEARCH_TITLE_DATA_ID = `\0${SEARCH_TITLE_DATA_ID}`
 export const SEARCH_DOCS_DATA_ID = 'virtual:$histoire-search-docs-data'
-export const RESOLVED_SEARCH_DOCS_DATA_ID = `\0${SEARCH_DOCS_DATA_ID}`
+export const RESOLVED_SEARCH_DOCS_DATA_ID = `/__resolved__${SEARCH_DOCS_DATA_ID}`
+// export const RESOLVED_SEARCH_DOCS_DATA_ID = `\0${SEARCH_DOCS_DATA_ID}`
 export const GENERATED_GLOBAL_SETUP = 'virtual:$histoire-generated-global-setup'
-export const RESOLVED_GENERATED_GLOBAL_SETUP = `\0${GENERATED_GLOBAL_SETUP}`
+export const RESOLVED_GENERATED_GLOBAL_SETUP = `/__resolved__${GENERATED_GLOBAL_SETUP}`
+// export const RESOLVED_GENERATED_GLOBAL_SETUP = `\0${GENERATED_GLOBAL_SETUP}`
 export const GENERATED_SETUP_CODE = 'virtual:$histoire-generated-setup-code'
-export const RESOLVED_GENERATED_SETUP_CODE = `\0${GENERATED_SETUP_CODE}`
+export const RESOLVED_GENERATED_SETUP_CODE = `/__resolved__${GENERATED_SETUP_CODE}`
+// export const RESOLVED_GENERATED_SETUP_CODE = `\0${GENERATED_SETUP_CODE}`
 export const SUPPORT_PLUGINS_CLIENT = 'virtual:$histoire-support-plugins-client'
-export const RESOLVED_SUPPORT_PLUGINS_CLIENT = `\0${SUPPORT_PLUGINS_CLIENT}`
+export const RESOLVED_SUPPORT_PLUGINS_CLIENT = `/__resolved__${SUPPORT_PLUGINS_CLIENT}`
+// export const RESOLVED_SUPPORT_PLUGINS_CLIENT = `\0${SUPPORT_PLUGINS_CLIENT}`
 export const SUPPORT_PLUGINS_COLLECT = 'virtual:$histoire-support-plugins-collect'
-export const RESOLVED_SUPPORT_PLUGINS_COLLECT = `\0${SUPPORT_PLUGINS_COLLECT}`
+export const RESOLVED_SUPPORT_PLUGINS_COLLECT = `/__resolved__${SUPPORT_PLUGINS_COLLECT}`
+// export const RESOLVED_SUPPORT_PLUGINS_COLLECT = `\0${SUPPORT_PLUGINS_COLLECT}`
 export const MARKDOWN_FILES = 'virtual:$histoire-markdown-files'
-export const RESOLVED_MARKDOWN_FILES = `\0${MARKDOWN_FILES}`
+export const RESOLVED_MARKDOWN_FILES = `/__resolved__${MARKDOWN_FILES}`
+// export const RESOLVED_MARKDOWN_FILES = `\0${MARKDOWN_FILES}`
 
 export async function resolveViteConfig (ctx: Context): Promise<ResolvedConfig> {
   const command = ctx.mode === 'dev' ? 'serve' : 'build'
