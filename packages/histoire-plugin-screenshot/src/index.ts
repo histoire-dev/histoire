@@ -64,7 +64,7 @@ export function HstScreenshot (options: ScreenshotPluginOptions = {}): Plugin {
         }
         console.log('Rendering screenshot for', file, 'title:', story.title, 'variant:', variant.id, 'title:', variant.title)
         for (const preset of finalOptions.presets) {
-          await captureWebsite.file(url, path.join(finalOptions.saveFolder, `${story.id}-${variant.id}.png`), {
+          await captureWebsite.file(url, path.join(finalOptions.saveFolder, `${story.id}-${variant.id}-${preset.width}x${preset.height}.png`), {
             overwrite: true,
             width: preset.width,
             height: preset.height,
