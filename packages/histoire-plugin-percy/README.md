@@ -1,6 +1,6 @@
 # Histoire Screenshot with Percy for visual regression testing
 
-You need the [Perci CLI](https://docs.percy.io/docs/cli-overview) installed to be able to send snapshots to Percy.
+You need the [Percy CLI](https://docs.percy.io/docs/cli-overview) installed to be able to send snapshots to Percy.
 
 
 ```bash
