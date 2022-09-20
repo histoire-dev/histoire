@@ -1,4 +1,4 @@
-import '$histoire-theme'
+import 'virtual:$histoire-theme'
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import FloatingVue from 'floating-vue'

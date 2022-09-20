@@ -6,7 +6,7 @@ export default {
 
 <script lang="ts" setup>
 // @ts-expect-error virtual module
-import { files as rawFiles, tree as rawTree, onUpdate } from '$histoire-stories'
+import { files as rawFiles, tree as rawTree, onUpdate } from 'virtual:$histoire-stories'
 import StoryList from './components/tree/StoryList.vue'
 import BaseSplitPane from './components/base/BaseSplitPane.vue'
 import { computed, onMounted, ref, watch } from 'vue'

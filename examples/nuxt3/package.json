@@ -16,7 +16,7 @@
     "@histoire/plugin-nuxt": "workspace:*",
     "@histoire/plugin-vue": "workspace:*",
     "@nuxtjs/tailwindcss": "^5.1.2",
-    "cypress": "^10.4.0",
+    "cypress": "^10.8.0",
     "histoire": "workspace:*",
     "nuxt": "^3.0.0-rc.8",
     "start-server-and-test": "^1.14.0",
