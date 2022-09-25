@@ -70,7 +70,8 @@
     "vite": "^2.9.0 || ^3.0.0"
   },
   "devDependencies": {
-    "@peeky/test": "^0.13.5",
+    "@peeky/server": "^0.14.0",
+    "@peeky/test": "^0.14.1",
     "@types/fs-extra": "^9.0.13",
     "@types/markdown-it": "^12.2.3",
     "@types/micromatch": "^4.0.2",
