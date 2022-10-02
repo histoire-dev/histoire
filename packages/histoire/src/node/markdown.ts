@@ -116,7 +116,9 @@ export const relativePath = ${JSON.stringify(relativePath)}
 
 if (import.meta.hot) {
   import.meta.hot.accept(newModule => {
-    window.__hst_md_hmr(newModule)
+    if (newModule) {
+      window.__hst_md_hmr(newModule)
+    }
   })
 }`
       }
@@ -190,6 +192,7 @@ export async function createMarkdownFilesWatcher (ctx: Context) {
         notifyStoryChange()
       }
       ctx.markdownFiles.splice(index, 1)
+      notifyMarkdownListChange()  
     }
   }
 

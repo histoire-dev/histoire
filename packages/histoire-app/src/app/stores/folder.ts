@@ -49,7 +49,9 @@ export const useFolderStore = defineStore('folder', () => {
   const storyStore = useStoryStore()
 
   watch(() => storyStore.currentStory, (story) => {
-    openFileFolders(story.file.path)
+    if (story) {
+      openFileFolders(story.file.path)
+    }
   })
 
   return {
