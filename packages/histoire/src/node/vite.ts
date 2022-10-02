@@ -21,7 +21,8 @@ import { getInjectedImport } from './util/vendors.js'
 
 const require = createRequire(import.meta.url)
 
-// @TODO switch back to virtual convention after https://github.com/vitejs/vite/pull/10144 is released
+// @TODO wait for virtual modules HMR to work in vite to use `virtual:` and `\0` prefix
+// https://github.com/vitejs/vite/pull/10313
 export const STORIES_ID = 'virtual:$histoire-stories'
 export const RESOLVED_STORIES_ID = `/__resolved__${STORIES_ID}`
 // export const RESOLVED_STORIES_ID = `\0${STORIES_ID}`
