@@ -1,6 +1,6 @@
 import chokidar from 'chokidar'
 import { globby } from 'globby'
-import Case from 'case'
+import { paramCase } from 'change-case'
 import { resolve, basename } from 'pathe'
 import micromatch from 'micromatch'
 import type { ServerStoryFile } from '@histoire/shared'
@@ -47,7 +47,7 @@ function getAbsoluteFilePath (relativeFilePath: string) {
 
 export function addStory (relativeFilePath: string, virtualModuleCode?: string) {
   const absoluteFilePath = getAbsoluteFilePath(relativeFilePath)
-  const fileId = Case.kebab(relativeFilePath)
+  const fileId = paramCase(relativeFilePath)
   let fileName = basename(relativeFilePath)
   if (fileName.includes('.')) {
     fileName = fileName.substring(0, fileName.indexOf('.'))

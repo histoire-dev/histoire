@@ -44,7 +44,7 @@
   },
   "devDependencies": {
     "@types/node": "^17.0.32",
-    "case": "^1.6.3",
+    "change-case": "^4.1.2",
     "concurrently": "^7.1.0",
     "typescript": "^4.7.4",
     "histoire": "workspace:*",

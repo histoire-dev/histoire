@@ -42,7 +42,7 @@
     "@types/flexsearch": "^0.7.3",
     "@types/markdown-it": "^12.2.3",
     "birpc": "^0.1.1",
-    "case": "^1.6.3",
+    "change-case": "^4.1.2",
     "chokidar": "^3.5.3",
     "connect": "^3.7.0",
     "defu": "^6.0.0",

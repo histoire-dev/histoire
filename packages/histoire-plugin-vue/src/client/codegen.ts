@@ -1,7 +1,7 @@
 // @TODO remove @ts-ignore
 
 import { VNode, vModelText, vModelCheckbox, vModelSelect, vModelRadio, vModelDynamic, Text } from 'vue'
-import { pascal } from 'case'
+import { pascalCase } from 'change-case'
 import { createAutoBuildingObject, indent, serializeJs, voidElements } from '@histoire/shared'
 import type { Variant } from '@histoire/shared'
 
@@ -342,7 +342,7 @@ export function getTagName (vnode: VNode) {
 function getNameFromFile (file: string) {
   const parts = /([^/]+)\.vue$/.exec(file)
   if (parts) {
-    return pascal(parts[1])
+    return pascalCase(parts[1])
   }
   return 'Anonymous'
 }

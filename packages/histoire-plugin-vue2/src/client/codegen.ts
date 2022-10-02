@@ -2,7 +2,7 @@
 // @TODO remove @ts-ignore
 
 import { VNode } from 'vue'
-import { pascal, kebab } from 'case'
+import { pascalCase, paramCase } from 'change-case'
 import { createAutoBuildingObject, indent, serializeJs, voidElements } from '@histoire/shared'
 import type { Variant } from '@histoire/shared'
 
@@ -205,7 +205,7 @@ async function printVNode (vnode: VNode, propsOverrides: Record<string, any> = n
     const objectValue = vnode.data.staticStyle
     const stringValues = []
     for (const key in objectValue) {
-      stringValues.push(`${kebab(key)}: ${objectValue[key]};`)
+      stringValues.push(`${paramCase(key)}: ${objectValue[key]};`)
     }
     addAttr('style', stringValues.join(' '))
   }
@@ -357,7 +357,7 @@ export function getTagName (vnode: VNode) {
 function getNameFromFile (file: string) {
   const parts = /([^/]+)\.vue$/.exec(file)
   if (parts) {
-    return pascal(parts[1])
+    return pascalCase(parts[1])
   }
   return 'Anonymous'
 }

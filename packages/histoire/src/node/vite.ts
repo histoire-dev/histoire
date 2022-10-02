@@ -138,7 +138,6 @@ export async function getViteConfigWithPlugins (isServer: boolean, ctx: Context)
             `${APP_PATH}/bundle-sandbox.js`,
           ],
           include: optimizeDeps([
-            'case',
             'flexsearch',
             'shiki',
             // Shiki dependencies

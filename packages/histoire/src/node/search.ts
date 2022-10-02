@@ -1,7 +1,7 @@
 import { createRequire } from 'module'
 import flexsearch from 'flexsearch'
 import path from 'pathe'
-import Case from 'case'
+import { noCase } from 'change-case'
 import { Context } from './context.js'
 import { loadModule } from './load.js'
 
@@ -108,7 +108,7 @@ async function exportSearchIndex (index) {
 }
 
 function convertTitleToSentence (text: string) {
-  return text.split(' ').map(str => Case.lower(str)).join(' ')
+  return text.split(' ').map(str => noCase(str)).join(' ')
 }
 
 // @TODO clear handlers when SearchPane unmounts
