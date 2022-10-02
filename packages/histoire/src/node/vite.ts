@@ -345,9 +345,15 @@ if (import.meta.hot) {
         return `import { reactive } from ${getInjectedImport('@histoire/vendors/vue')}
         export const markdownFiles = reactive({${filesJs}})
         if (import.meta.hot) {
-          window.__hst_md_hmr = (newModule) => {
-            markdownFiles[newModule.relativePath] = () => newModule
+          if (!window.__hst_md_hmr) {
+            window.__hst_md_hmr = (newModule) => {
+              markdownFiles[newModule.relativePath] = () => newModule
+            }
           }
+
+          import.meta.hot.accept(newModule => {
+            Object.assign(markdownFiles, newModule.markdownFiles)
+          })
         }`
       }
 

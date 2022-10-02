@@ -13,6 +13,18 @@ import { slugify } from './util/slugify.js'
 import type { Context } from './context.js'
 import { addStory, notifyStoryChange, removeStory } from './stories.js'
 
+const onMarkdownListChangeHandlers: (() => unknown)[] = []
+
+export function onMarkdownListChange (handler: () => unknown) {
+  onMarkdownListChangeHandlers.push(handler)
+}
+
+function notifyMarkdownListChange () {
+  for (const handler of onMarkdownListChangeHandlers) {
+    handler()
+  }
+}
+
 export async function createMarkdownRenderer () {
   const highlighter = await shiki.getHighlighter({
     theme: 'github-dark',
@@ -163,6 +175,8 @@ export async function createMarkdownFilesWatcher (ctx: Context) {
         notifyStoryChange(storyFile)
       }
     }
+    
+    notifyMarkdownListChange()
 
     return file
   }

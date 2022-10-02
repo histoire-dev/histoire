@@ -1,13 +1,13 @@
 import { createServer as createViteServer } from 'vite'
 import type { ServerStoryFile } from '@histoire/shared'
 import { Context } from './context.js'
-import { getViteConfigWithPlugins, RESOLVED_SEARCH_TITLE_DATA_ID, RESOLVED_STORIES_ID } from './vite.js'
+import { getViteConfigWithPlugins, RESOLVED_MARKDOWN_FILES, RESOLVED_SEARCH_TITLE_DATA_ID, RESOLVED_STORIES_ID } from './vite.js'
 import { onStoryChange, watchStories } from './stories.js'
 import { useCollectStories } from './collect/index.js'
 import { DevPluginApi } from './plugin.js'
 import { useModuleLoader } from './load.js'
 import { wrapLogError } from './util/log.js'
-import { createMarkdownFilesWatcher } from './markdown.js'
+import { createMarkdownFilesWatcher, onMarkdownListChange } from './markdown.js'
 
 export async function createServer (ctx: Context, port: number) {
   const server = await createViteServer(await getViteConfigWithPlugins(false, ctx))
@@ -143,6 +143,10 @@ export async function createServer (ctx: Context, port: number) {
 
     invalidateModule(RESOLVED_STORIES_ID)
     invalidateModule(RESOLVED_SEARCH_TITLE_DATA_ID)
+  })
+
+  onMarkdownListChange(() => {
+    invalidateModule(RESOLVED_MARKDOWN_FILES)
   })
 
   async function close () {
