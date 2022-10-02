@@ -1,3 +1,5 @@
+import { fileURLToPath } from 'node:url'
+import { join } from 'node:path'
 import type { Plugin } from 'histoire'
 import type { Nuxt } from '@nuxt/schema'
 import type { UserConfig as ViteConfig } from 'vite'
@@ -27,6 +29,7 @@ export function HstNuxt (): Plugin {
           resolve: {
             alias: nuxtConfig.viteConfig.resolve.alias,
             extensions: nuxtConfig.viteConfig.resolve.extensions,
+            dedupe: nuxtConfig.viteConfig.resolve.dedupe,
           },
           plugins,
           css: nuxtConfig.viteConfig.css,
@@ -65,9 +68,31 @@ async function useNuxtViteConfig () {
   if (nuxt.options.builder as string !== '@nuxt/vite-builder') {
     throw new Error(`Histoire only supports Vite bundler, but Nuxt builder is currently set to '${nuxt.options.builder}'.`)
   }
+  const runtimeDir = fileURLToPath(new URL('../runtime', import.meta.url))
+  nuxt.options.build.templates.push(
+    { src: join(runtimeDir, 'composables.mjs'), filename: 'histoire/composables.mjs' },
+    { src: join(runtimeDir, 'components.mjs'), filename: 'histoire/components.mjs' },
+  )
+  nuxt.hook('imports:sources', presets => {
+    const stubbedComposables = ['useNuxtApp']
+    const appPreset = presets.find(p => p.from === '#app')
+    appPreset.imports = appPreset.imports.filter(i => typeof i !== 'string' || !stubbedComposables.includes(i))
+    presets.push({
+      from: '#build/histoire/composables.mjs',
+      imports: stubbedComposables,
+    })
+  })
   return {
     viteConfig: await new Promise<ViteConfig>((resolve) => {
       nuxt.hook('modules:done', () => {
+        nuxt.hook('components:extend', (components) => {
+          for (const name of ['NuxtLink']) {
+            Object.assign(components.find(c => c.pascalName === name) || {}, {
+              export: name,
+              filePath: '#build/histoire/components.mjs',
+            })
+          }
+        })
         nuxt.hook('vite:extendConfig', (config, { isClient }) => {
           // @ts-ignore
           if (isClient) resolve({ ...config })
