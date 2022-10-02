@@ -11,7 +11,7 @@ const storyChangeHandlers: StoryChangeHandler[] = []
 
 /**
  * Called when a new story is added or modified. Collecting should be done.
- * @param handler 
+ * @param handler
  */
 export function onStoryChange (handler: StoryChangeHandler) {
   storyChangeHandlers.push(handler)
@@ -28,7 +28,7 @@ const storyListChangeHandlers: StoryListChangeHandler[] = []
 
 /**
  * Called when the story list has changed (ex: removed a story). No collecting should be needed.
- * @param handler 
+ * @param handler
  */
 export function onStoryListChange (handler: StoryListChangeHandler) {
   storyListChangeHandlers.push(handler)

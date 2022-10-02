@@ -177,7 +177,7 @@ export async function createMarkdownFilesWatcher (ctx: Context) {
         notifyStoryChange(storyFile)
       }
     }
-    
+
     notifyMarkdownListChange()
 
     return file
@@ -192,7 +192,7 @@ export async function createMarkdownFilesWatcher (ctx: Context) {
         notifyStoryChange()
       }
       ctx.markdownFiles.splice(index, 1)
-      notifyMarkdownListChange()  
+      notifyMarkdownListChange()
     }
   }
 
