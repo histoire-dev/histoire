@@ -2,7 +2,7 @@ import { createServer as createViteServer } from 'vite'
 import type { ServerStoryFile } from '@histoire/shared'
 import { Context } from './context.js'
 import { getViteConfigWithPlugins, RESOLVED_MARKDOWN_FILES, RESOLVED_SEARCH_TITLE_DATA_ID, RESOLVED_STORIES_ID } from './vite.js'
-import { onStoryChange, watchStories } from './stories.js'
+import { onStoryChange, onStoryListChange, watchStories } from './stories.js'
 import { useCollectStories } from './collect/index.js'
 import { DevPluginApi } from './plugin.js'
 import { useModuleLoader } from './load.js'
@@ -85,10 +85,14 @@ export async function createServer (ctx: Context, port: number) {
     if (queue) {
       if (queued) {
         if (changedFile) {
-          queuedFiles.push(changedFile)
+          if (!queuedFiles.includes(changedFile)) {
+            queuedFiles.push(changedFile)
+          }
         } else {
           queuedAll = true
         }
+        return
+      } else if (queuedFiles.includes(changedFile)) {
         return
       } else {
         queued = true
@@ -96,6 +100,7 @@ export async function createServer (ctx: Context, port: number) {
         await queue
       }
     }
+    queuedFiles.unshift(changedFile)
     queued = false
     queue = new Promise(resolve => {
       queueResolve = resolve
@@ -106,10 +111,6 @@ export async function createServer (ctx: Context, port: number) {
     console.log('Collect stories start', changedFile?.path ?? 'all')
     const time = Date.now()
     if (changedFile && !queuedAll) {
-      // Granular update
-      await executeStoryFile(changedFile)
-
-      // Queued updates
       await Promise.all(queuedFiles.map(storyFile => executeStoryFile(storyFile)))
     } else {
       // Full update
@@ -141,6 +142,11 @@ export async function createServer (ctx: Context, port: number) {
     queuedAll = false
     queueResolve()
 
+    invalidateModule(RESOLVED_STORIES_ID)
+    invalidateModule(RESOLVED_SEARCH_TITLE_DATA_ID)
+  })
+
+  onStoryListChange(() => {
     invalidateModule(RESOLVED_STORIES_ID)
     invalidateModule(RESOLVED_SEARCH_TITLE_DATA_ID)
   })

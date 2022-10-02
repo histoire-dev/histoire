@@ -7,13 +7,40 @@ import type { ServerStoryFile } from '@histoire/shared'
 import { Context } from './context.js'
 
 type StoryChangeHandler = (file?: ServerStoryFile) => unknown
-const handlers: StoryChangeHandler[] = []
+const storyChangeHandlers: StoryChangeHandler[] = []
+
+/**
+ * Called when a new story is added or modified. Collecting should be done.
+ * @param handler 
+ */
+export function onStoryChange (handler: StoryChangeHandler) {
+  storyChangeHandlers.push(handler)
+}
+
+export function notifyStoryChange (file?: ServerStoryFile) {
+  for (const handler of storyChangeHandlers) {
+    handler(file)
+  }
+}
+
+type StoryListChangeHandler = () => unknown
+const storyListChangeHandlers: StoryListChangeHandler[] = []
+
+/**
+ * Called when the story list has changed (ex: removed a story). No collecting should be needed.
+ * @param handler 
+ */
+export function onStoryListChange (handler: StoryListChangeHandler) {
+  storyListChangeHandlers.push(handler)
+}
+
+export function notifyStoryListChange () {
+  for (const handler of storyListChangeHandlers) {
+    handler()
+  }
+}
 
 let context: Context
-
-export function onStoryChange (handler: StoryChangeHandler) {
-  handlers.push(handler)
-}
 
 export async function watchStories (newContext: Context) {
   context = newContext
@@ -29,16 +56,10 @@ export async function watchStories (newContext: Context) {
     })
     .on('unlink', (file) => {
       removeStory(file)
-      notifyStoryChange()
+      notifyStoryListChange()
     })
 
   return watcher
-}
-
-export function notifyStoryChange (file?: ServerStoryFile) {
-  for (const handler of handlers) {
-    handler(file)
-  }
 }
 
 function getAbsoluteFilePath (relativeFilePath: string) {
