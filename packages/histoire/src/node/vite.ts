@@ -18,6 +18,7 @@ import { parseColor } from './colors.js'
 import { createMarkdownPlugins } from './markdown.js'
 import { getSearchDataJS, generateDocSearchData, generateTitleSearchData } from './search.js'
 import { getInjectedImport } from './util/vendors.js'
+import { findUp } from './util/find-up.js'
 
 const require = createRequire(import.meta.url)
 
@@ -108,9 +109,14 @@ export async function getViteConfigWithPlugins (isServer: boolean, ctx: Context)
   const inlineConfig = await mergeHistoireViteConfig(userViteConfig?.config ?? {}, ctx)
   const plugins: VitePlugin[] = []
 
+  const hasPnpm = !!(await findUp(ctx.root, ['pnpm-lock.yaml']))
+
   function optimizeDeps (deps: string[]): string[] {
     const result = []
     for (const dep of deps) {
+      if (!hasPnpm) {
+        result.push(dep)
+      }
       try {
         result.push(dirname(require.resolve(`${dep}/package.json`)))
       } catch (e) {
