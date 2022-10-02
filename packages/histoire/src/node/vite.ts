@@ -1,4 +1,4 @@
-import { createRequire } from 'module'
+import { createRequire } from 'node:module'
 import { relative, resolve, join, dirname } from 'pathe'
 import {
   resolveConfig as resolveViteConfigInternal,

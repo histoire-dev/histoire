@@ -1,5 +1,5 @@
-import { fileURLToPath } from 'url'
-import type { MessagePort } from 'worker_threads'
+import { fileURLToPath } from 'node:url'
+import type { MessagePort } from 'node:worker_threads'
 import { ViteNodeRunner } from 'vite-node/client'
 import { createBirpc } from 'birpc'
 import type { FetchFunction, ResolveIdFunction } from 'vite-node'

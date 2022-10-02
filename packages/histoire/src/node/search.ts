@@ -1,4 +1,4 @@
-import { createRequire } from 'module'
+import { createRequire } from 'node:module'
 import flexsearch from 'flexsearch'
 import path from 'pathe'
 import { noCase } from 'change-case'

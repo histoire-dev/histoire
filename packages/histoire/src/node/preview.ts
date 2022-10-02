@@ -1,4 +1,4 @@
-import http from 'http'
+import http from 'node:http'
 import connect from 'connect'
 import sirv from 'sirv'
 import type { ResolvedConfig as ViteConfig } from 'vite'

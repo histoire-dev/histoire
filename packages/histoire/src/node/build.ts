@@ -10,7 +10,7 @@ import {
 import fs from 'fs-extra'
 import { lookup as lookupMime } from 'mrmime'
 import pc from 'picocolors'
-import { performance } from 'perf_hooks'
+import { performance } from 'node:perf_hooks'
 import type {
   BuildEndCallback,
   PreviewStoryCallback,

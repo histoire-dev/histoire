@@ -1,8 +1,8 @@
 import type { Plugin } from 'histoire'
 import { defu } from 'defu'
 import path from 'pathe'
-import { fileURLToPath } from 'url'
-import { createRequire } from 'module'
+import { fileURLToPath } from 'node:url'
+import { createRequire } from 'node:module'
 import { isPercyEnabled, fetchPercyDOM, postSnapshot } from '@percy/sdk-utils'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
