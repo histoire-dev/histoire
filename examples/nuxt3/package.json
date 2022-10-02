@@ -18,7 +18,7 @@
     "@nuxtjs/tailwindcss": "^5.1.2",
     "cypress": "^10.8.0",
     "histoire": "workspace:*",
-    "nuxt": "^3.0.0-rc.8",
+    "nuxt": "^3.0.0-rc.11",
     "start-server-and-test": "^1.14.0",
     "vue": "^3.2.37"
   }
