@@ -21,7 +21,6 @@
     ],
     "sourceMap": false,
     "preserveWatchOutput": true,
-    "preserveSymlinks": true,
     "declaration": true,
     // Strict
     "noImplicitAny": false,

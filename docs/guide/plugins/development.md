@@ -75,7 +75,6 @@ Example `tsconfig.json`:
     ],
     "sourceMap": false,
     "preserveWatchOutput": true,
-    "preserveSymlinks": true,
     // Strict
     "noImplicitAny": false,
     "noImplicitThis": true,
