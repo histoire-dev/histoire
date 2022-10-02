@@ -17,8 +17,8 @@
   "type": "module",
   "exports": {
     ".": {
-      "import": "./dist/node/index.js",
-      "types": "./dist/node/index.d.ts"
+      "types": "./dist/node/index.d.ts",
+      "default": "./dist/node/index.js"
     },
     "./*": "./*"
   },
@@ -52,6 +52,7 @@
     "globby": "^13.1.1",
     "gray-matter": "^4.0.3",
     "happy-dom": "^2.55.0",
+    "jiti": "^1.16.0",
     "markdown-it": "^12.3.2",
     "markdown-it-anchor": "^8.6.2",
     "markdown-it-attrs": "^4.1.3",
@@ -64,7 +65,7 @@
     "shiki": "0.10.1",
     "sirv": "^2.0.2",
     "tinypool": "^0.1.2",
-    "vite-node": "0.22.1"
+    "vite-node": "0.23.4"
   },
   "peerDependencies": {
     "vite": "^2.9.0 || ^3.0.0"
