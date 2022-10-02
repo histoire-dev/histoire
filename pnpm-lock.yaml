@@ -151,6 +151,7 @@ importers:
       '@vitejs/plugin-vue': ^3.0.1
       cypress: ^9.5.3
       histoire: workspace:*
+      lottie-web: ^5.9.6
       pinia: ^2.0.13
       sass: ^1.50.0
       start-server-and-test: ^1.14.0
@@ -158,6 +159,7 @@ importers:
       vue: ^3.2.31
       vue-i18n: ^9.1.10
     dependencies:
+      lottie-web: 5.9.6
       pinia: 2.0.22_vue@3.2.40
       vue: 3.2.40
       vue-i18n: 9.2.2_vue@3.2.40
@@ -7896,6 +7898,10 @@ packages:
   /long/4.0.0:
     resolution: {integrity: sha512-XsP+KhQif4bjX1kbuSiySJFNAehNxgLb6hPRGJ9QsUr8ajHkuXGdrHmFUTUUXhDwVX2R5bY4JNZEwbUiMhV+MA==}
     dev: true
+
+  /lottie-web/5.9.6:
+    resolution: {integrity: sha512-JFs7KsHwflugH5qIXBpB4905yC1Sub2MZWtl/elvO/QC6qj1ApqbUZJyjzJseJUtVpgiDaXQLjBlIJGS7UUUXA==}
+    dev: false
 
   /lower-case/2.0.2:
     resolution: {integrity: sha512-7fm3l3NAF9WfN6W3JOmf5drwpVqX78JtoGJ3A6W0a6ZnldM41w2fV5D490psKFTpMds8TJse/eHLFFsNHHjHgg==}

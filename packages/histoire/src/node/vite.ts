@@ -168,6 +168,8 @@ export async function getViteConfigWithPlugins (isServer: boolean, ctx: Context)
           __VUE_PROD_DEVTOOLS__: 'true',
           // Disable warnings
           'process.env.NODE_ENV': JSON.stringify(isServer ? 'production' : process.env.NODE_ENV ?? 'development'),
+          // Collect flag
+          'process.env.HST_COLLECT': 'false',
         },
         cacheDir: isServer ? 'node_modules/.hst-vite-server' : 'node_modules/.hst-vite',
       }

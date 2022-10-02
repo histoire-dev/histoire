@@ -21,6 +21,8 @@ export interface ReturnData {
 }
 
 export default async (payload: Payload): Promise<ReturnData> => {
+  process.env.HST_COLLECT = 'true'
+
   const rpc = createBirpc<{
     fetchModule: FetchFunction
     resolveId: ResolveIdFunction
