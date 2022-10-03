@@ -130,7 +130,7 @@ onMounted(() => {
       class="htw-h-full"
     >
       <template #first>
-        <div class="htw-flex htw-flex-col htw-h-full">
+        <div class="htw-flex htw-flex-col htw-h-full htw-bg-gray-100 dark:htw-bg-gray-750 __histoire-pane-shadow-from-right">
           <AppHeader
             class="htw-flex-none"
             @search="isSearchOpen = true"

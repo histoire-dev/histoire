@@ -118,13 +118,13 @@ const isResponsiveEnabled = computed(() => !props.variant.responsiveDisabled)
 </script>
 
 <template>
-  <div class="htw-w-full htw-h-full htw-flex-1 htw-border htw-border-gray-100 dark:htw-border-gray-800 htw-rounded-lg htw-relative htw-overflow-hidden">
+  <div class="htw-w-full htw-h-full htw-flex-1 htw-rounded-lg htw-relative htw-overflow-hidden">
     <div
       v-if="isResponsiveEnabled"
-      class="htw-absolute htw-inset-0 htw-w-full htw-h-full htw-bg-gray-200 dark:htw-bg-gray-850 htw-rounded-r-lg htw-border-l-2 htw-border-gray-500/10 dark:htw-border-gray-700/30 htw-overflow-hidden"
+      class="htw-absolute htw-inset-0 htw-w-full htw-h-full htw-bg-gray-100 dark:htw-bg-gray-750 htw-rounded-r-lg htw-border-l-2 htw-border-gray-500/10 dark:htw-border-gray-700/30 htw-overflow-hidden"
     >
       <HatchedPattern
-        class="htw-w-full htw-h-full htw-text-black/[2%] dark:htw-text-white/[2%]"
+        class="htw-w-full htw-h-full htw-text-black/[1%] dark:htw-text-white/[1%]"
       />
     </div>
 
@@ -133,65 +133,66 @@ const isResponsiveEnabled = computed(() => !props.variant.responsiveDisabled)
       class="htw-h-full htw-overflow-auto htw-relative"
     >
       <div
-        class="htw-h-full htw-p-4 htw-overflow-hidden htw-bg-white dark:htw-bg-gray-700 htw-rounded-lg htw-relative"
+        class="htw-h-full htw-overflow-hidden htw-bg-white dark:htw-bg-gray-700 htw-rounded-lg htw-relative"
         :class="isResponsiveEnabled ? {
           'htw-w-fit': !!finalWidth,
           'htw-h-fit': !!finalHeight
         } : undefined"
       >
-        <div class="htw-p-4 htw-h-full htw-relative">
-          <div class="htw-w-full htw-h-full htw-border htw-border-gray-100 dark:htw-border-gray-800 htw-rounded-sm htw-relative">
-            <div class="bind-preview-bg htw-absolute htw-inset-0" />
-
-            <CheckerboardPattern
-              v-if="settings.checkerboard"
-              class="htw-absolute htw-inset-0 htw-w-full htw-h-full htw-text-gray-500/20"
-            />
-
-            <slot
-              :is-responsive-enabled="isResponsiveEnabled"
-              :final-width="finalWidth"
-              :final-height="finalHeight"
-              :resizing="resizing"
-            />
-          </div>
-
-          <!-- Markers -->
-          <div class="htw-absolute htw-top-1 htw-left-4 htw-h-2 htw-w-px htw-bg-gray-200 dark:htw-bg-gray-800" />
-          <div class="htw-absolute htw-top-1 htw-right-4 htw-h-2 htw-w-px htw-bg-gray-200 dark:htw-bg-gray-800" />
-          <div class="htw-absolute htw-bottom-1 htw-left-4 htw-h-2 htw-w-px htw-bg-gray-200 dark:htw-bg-gray-800" />
-          <div class="htw-absolute htw-bottom-1 htw-right-4 htw-h-2 htw-w-px htw-bg-gray-200 dark:htw-bg-gray-800" />
-          <div class="htw-absolute htw-left-1 htw-top-4 htw-w-2 htw-h-px htw-bg-gray-200 dark:htw-bg-gray-800" />
-          <div class="htw-absolute htw-left-1 htw-bottom-4 htw-w-2 htw-h-px htw-bg-gray-200 dark:htw-bg-gray-800" />
-          <div class="htw-absolute htw-right-1 htw-top-4 htw-w-2 htw-h-px htw-bg-gray-200 dark:htw-bg-gray-800" />
-          <div class="htw-absolute htw-right-1 htw-bottom-4 htw-w-2 htw-h-px htw-bg-gray-200 dark:htw-bg-gray-800" />
-        </div>
-
-        <!-- Resize Dragger -->
-        <template v-if="isResponsiveEnabled">
-          <div
-            ref="horizontalDragger"
-            class="htw-absolute htw-w-4 htw-top-0 htw-bottom-4 htw-right-0 hover:htw-bg-primary-100 dark:hover:htw-bg-primary-800 htw-flex htw-items-center htw-justify-center htw-cursor-ew-resize htw-group hover:htw-text-primary-500"
-          >
-            <Icon
-              icon="mdi:drag-vertical-variant"
-              class="htw-w-4 htw-h-4 htw-opacity-20 group-hover:htw-opacity-90"
-            />
-          </div>
-          <div
-            ref="verticalDragger"
-            class="htw-absolute htw-h-4 htw-left-0 htw-right-4 htw-bottom-0 hover:htw-bg-primary-100 dark:hover:htw-bg-primary-800 htw-flex htw-items-center htw-justify-center htw-cursor-ns-resize htw-group hover:htw-text-primary-500"
-          >
-            <Icon
-              icon="mdi:drag-horizontal-variant"
-              class="htw-w-4 htw-h-4 htw-opacity-20 group-hover:htw-opacity-90"
-            />
-          </div>
-          <div
-            ref="cornerDragger"
-            class="htw-absolute htw-w-4 htw-h-4 htw-right-0 htw-bottom-0 hover:htw-bg-primary-100 dark:hover:htw-bg-primary-800 htw-flex htw-items-center htw-justify-center htw-cursor-nwse-resize htw-group hover:htw-text-primary-500"
+        <div class="bind-preview-bg htw-rounded-lg htw-h-full">
+          <CheckerboardPattern
+            v-if="settings.checkerboard"
+            class="htw-absolute htw-inset-0 htw-w-full htw-h-full htw-text-gray-500/20"
           />
-        </template>
+          <div class="htw-p-8 htw-h-full htw-relative">
+            <div class="htw-w-full htw-h-full htw-relative">
+              <div class="htw-absolute htw-inset-0" />
+
+              <slot
+                :is-responsive-enabled="isResponsiveEnabled"
+                :final-width="finalWidth"
+                :final-height="finalHeight"
+                :resizing="resizing"
+              />
+            </div>
+
+            <!-- Markers -->
+            <div class="htw-absolute htw-top-5 htw-left-8 htw-h-2 htw-w-px htw-bg-gray-400/25" />
+            <div class="htw-absolute htw-top-5 htw-right-8 htw-h-2 htw-w-px htw-bg-gray-400/25" />
+            <div class="htw-absolute htw-bottom-5 htw-left-8 htw-h-2 htw-w-px htw-bg-gray-400/25" />
+            <div class="htw-absolute htw-bottom-5 htw-right-8 htw-h-2 htw-w-px htw-bg-gray-400/25" />
+            <div class="htw-absolute htw-left-5 htw-top-8 htw-w-2 htw-h-px htw-bg-gray-400/25" />
+            <div class="htw-absolute htw-left-5 htw-bottom-8 htw-w-2 htw-h-px htw-bg-gray-400/25" />
+            <div class="htw-absolute htw-right-5 htw-top-8 htw-w-2 htw-h-px htw-bg-gray-400/25" />
+            <div class="htw-absolute htw-right-5 htw-bottom-8 htw-w-2 htw-h-px htw-bg-gray-400/25" />
+          </div>
+
+          <!-- Resize Dragger -->
+          <template v-if="isResponsiveEnabled">
+            <div
+              ref="horizontalDragger"
+              class="htw-absolute htw-w-4 htw-top-0 htw-bottom-4 htw-right-0 hover:htw-bg-primary-500/30 htw-flex htw-items-center htw-justify-center htw-cursor-ew-resize htw-group hover:htw-text-primary-500"
+            >
+              <Icon
+                icon="mdi:drag-vertical-variant"
+                class="htw-w-4 htw-h-4 htw-opacity-20 group-hover:htw-opacity-90"
+              />
+            </div>
+            <div
+              ref="verticalDragger"
+              class="htw-absolute htw-h-4 htw-left-0 htw-right-4 htw-bottom-0 hover:htw-bg-primary-500/30 htw-flex htw-items-center htw-justify-center htw-cursor-ns-resize htw-group hover:htw-text-primary-500"
+            >
+              <Icon
+                icon="mdi:drag-horizontal-variant"
+                class="htw-w-4 htw-h-4 htw-opacity-20 group-hover:htw-opacity-90"
+              />
+            </div>
+            <div
+              ref="cornerDragger"
+              class="htw-absolute htw-w-4 htw-h-4 htw-right-0 htw-bottom-0 hover:htw-bg-primary-500/30 htw-flex htw-items-center htw-justify-center htw-cursor-nwse-resize htw-group hover:htw-text-primary-500"
+            />
+          </template>
+        </div>
       </div>
     </div>
   </div>

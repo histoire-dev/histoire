@@ -131,12 +131,12 @@ watch(sourceHtml, async () => {
 
 <template>
   <div
-    class="htw-bg-gray-100 dark:htw-bg-gray-800 htw-h-full htw-overflow-hidden htw-flex htw-flex-col"
+    class="htw-bg-gray-50 dark:htw-bg-gray-750 htw-h-full htw-overflow-hidden htw-flex htw-flex-col"
   >
     <!-- Toolbar -->
     <div
       v-if="!error"
-      class="htw-h-10 htw-flex-none htw-border-b htw-border-solid htw-border-gray-150 dark:htw-border-gray-850 htw-px-4 htw-flex htw-items-center htw-gap-2"
+      class="htw-h-10 htw-flex-none htw-border-b htw-border-solid htw-border-gray-500/5 htw-px-4 htw-flex htw-items-center htw-gap-2"
     >
       <div class="htw-text-gray-900 dark:htw-text-gray-100">
         Source
