@@ -11,7 +11,7 @@ describe('Story render', () => {
   })
 
   it('should render auto-imported components', () => {
-    cy.visit('/story/components-auto-import-story-vue?variantId=_default')
+    cy.visit('/story/components-autoimport-story-vue?variantId=_default')
     getIframeBody().contains('Meow')
   })
 })
