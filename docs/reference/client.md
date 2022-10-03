@@ -1,5 +1,6 @@
 # Client API Reference
 
+You can access various APIs meant to be used inside stories from the `histoire/client` module.
 
 ## `logEvent`
 
