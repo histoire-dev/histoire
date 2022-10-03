@@ -121,6 +121,18 @@ module.exports.theme.extend.typography = (theme) => ({
         marginTop: '0.1rem',
         marginBottom: '0.1rem',
       },
+
+      code: {
+        backgroundColor: theme('colors.gray-500 / 20%'),
+        fontWeight: 'normal',
+        padding: '0.05rem 0.5rem',
+        borderRadius: '0.25rem',
+        fontSize: '0.8rem',
+
+        '&::before, &::after': {
+          display: 'none',
+        },
+      },
     },
   },
 })
