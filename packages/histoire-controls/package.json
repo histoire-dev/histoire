@@ -1,6 +1,6 @@
 {
   "name": "@histoire/controls",
-  "version": "0.10.7",
+  "version": "0.11.0",
   "description": "Prebuilt controls components",
   "license": "MIT",
   "author": {
@@ -40,7 +40,7 @@
     "test": "peeky run"
   },
   "dependencies": {
-    "@histoire/vendors": "^0.10.7"
+    "@histoire/vendors": "^0.11.0"
   },
   "devDependencies": {
     "@peeky/server": "^0.14.0",

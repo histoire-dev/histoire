@@ -1,3 +1,46 @@
+# [0.11.0](https://github.com/Akryum/histoire/compare/v0.10.7...v0.11.0) (2022-10-03)
+
+
+### Bug Fixes
+
+* add client exports to histoire package ([b2547ce](https://github.com/Akryum/histoire/commit/b2547ce0a6b2ec6b3f1808f8b455b3d95acdb1c1))
+* changed generated id because of switch to change-case ([710f0dd](https://github.com/Akryum/histoire/commit/710f0dd19ea5f6d81e50037299bfe0588a11a2c3))
+* **config:** enable ESM resolve for jiti ([0ce9796](https://github.com/Akryum/histoire/commit/0ce97964d4adbb3436947d431ca58bc3a3d102d3))
+* **config:** handle plugins undefined ([5b03c05](https://github.com/Akryum/histoire/commit/5b03c051904c0bd3c6f441532894b18dd28893af))
+* force optimize vscode-textmate, fix [#285](https://github.com/Akryum/histoire/issues/285) ([84f6467](https://github.com/Akryum/histoire/commit/84f64670ac0aa8bb6a8d64dbcc7e655af4a8474b))
+* improve story/md deletion handling ([e85af38](https://github.com/Akryum/histoire/commit/e85af38e8c7b4d623b34dd71024cc8be8adff418))
+* **md:** adding new markdown files HMR ([709ee34](https://github.com/Akryum/histoire/commit/709ee34d911ce0c458c9d0359e5af544c25bfb75))
+* **md:** cannot resolve markdown file ([b92641c](https://github.com/Akryum/histoire/commit/b92641cd08e8ea0803ffffea33139a4eede33715))
+* screenshot overwritten, use size in filename ([#299](https://github.com/Akryum/histoire/issues/299)) ([d50608a](https://github.com/Akryum/histoire/commit/d50608a2bd43dcc37628c7278455b98a17f37ab0))
+* use jitsi to load config ([e819ce4](https://github.com/Akryum/histoire/commit/e819ce4d467b37afb8799fc8b16c15e16e1b3f80))
+
+
+### Features
+
+* call setupFile on server + auto-inline deps in vite-node ([49546dc](https://github.com/Akryum/histoire/commit/49546dc0faacbc2dcc6ff6e66413d1150b073e41))
+* **config:** allow different setupFile for server-side ([3103374](https://github.com/Akryum/histoire/commit/3103374d6d28e6a2c5af33c41a8fe4d924c461a7))
+* **config:** defaultStoryProps ([c7e39b8](https://github.com/Akryum/histoire/commit/c7e39b87029743a752b5abdbb194f7b3080d63ec))
+* isCollecting(), fix [#233](https://github.com/Akryum/histoire/issues/233) ([e3cd92a](https://github.com/Akryum/histoire/commit/e3cd92a034ad5557d130f2c612d8ad4257892ca1))
+* **md:** change default md file icon ([a3894cd](https://github.com/Akryum/histoire/commit/a3894cd9d94d9f41ed497c8d00772c8cf508205b))
+* **md:** improved inline code style ([b9a1e82](https://github.com/Akryum/histoire/commit/b9a1e8268b672e7f59cfac83e14e27d12bc53d12))
+* **nuxt:** add stubs for `useNuxtApp` and `NuxtLink` ([#307](https://github.com/Akryum/histoire/issues/307)) ([8aca3c2](https://github.com/Akryum/histoire/commit/8aca3c2dfdf3446957c9876ba1b40537cd1fd4e2))
+* rename hstEvent to logEvent ([b1cb7d0](https://github.com/Akryum/histoire/commit/b1cb7d092716e15d0e74724c67afac50dfcc3615))
+* static source code, fix [#238](https://github.com/Akryum/histoire/issues/238) ([8887c70](https://github.com/Akryum/histoire/commit/8887c70332dfc38a8d9a37bd62621a7c318e18d7))
+* **svelte:** Hst prop typing ([287193b](https://github.com/Akryum/histoire/commit/287193b69812dbd07ae66f81ea0d04c23572a293)), closes [#289](https://github.com/Akryum/histoire/issues/289)
+* updated design ([afcb244](https://github.com/Akryum/histoire/commit/afcb244ab373f8dfda34e57529e869c188a95f25))
+
+
+### Performance Improvements
+
+* improve story list updates speed ([5c4347d](https://github.com/Akryum/histoire/commit/5c4347db765c2c7a81a7a7b0d4fe6b7f8b382365))
+
+
+### Reverts
+
+* switch back to non-conventional virtual ids ([dc4e83b](https://github.com/Akryum/histoire/commit/dc4e83bd415b462133542065b2df88be59b071f0))
+
+
+
 ## [0.10.7](https://github.com/Akryum/histoire/compare/v0.10.6...v0.10.7) (2022-08-23)
 
 
