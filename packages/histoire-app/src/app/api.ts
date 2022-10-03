@@ -1,1 +1,1 @@
-export { hstEvent } from './util/events.js'
+export { logEvent } from './util/events.js'

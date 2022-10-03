@@ -1,14 +1,14 @@
 # Client API Reference
 
 
-## `hstEvent`
+## `logEvent`
 
 Logs an event in the `Events` sidepane.
 
 ```js
-import { hstEvent } from 'histoire/client'
+import { logEvent } from 'histoire/client'
 
-hstEvent('click', { some: 'data' })
+logEvent('click', { some: 'data' })
 ```
 
 ## `isCollecting`

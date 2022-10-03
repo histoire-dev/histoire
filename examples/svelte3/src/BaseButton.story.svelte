@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { hstEvent } from 'histoire/client'
+  import { logEvent } from 'histoire/client'
   import type { Hst } from '@histoire/plugin-svelte'
   import BaseButton from './BaseButton.svelte'
 
@@ -10,7 +10,7 @@
 </script>
   
 <Hst.Story title="BaseButton">
-  <BaseButton {disabled} {size} on:click={event => hstEvent('click', event)}>
+  <BaseButton {disabled} {size} on:click={event => logEvent('click', event)}>
     Click me!
   </BaseButton>
   <div style="margin-top: 6px;">

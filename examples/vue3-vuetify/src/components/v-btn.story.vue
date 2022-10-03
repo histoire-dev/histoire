@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from 'vue'
-import { hstEvent } from 'histoire/client'
+import { logEvent } from 'histoire/client'
 
 const text = ref('Click me!')
 </script>
@@ -8,7 +8,7 @@ const text = ref('Click me!')
 <template>
   <Story>
     <v-btn
-      @click="hstEvent('click', $event)"
+      @click="logEvent('click', $event)"
     >
       {{ text }}
     </v-btn>

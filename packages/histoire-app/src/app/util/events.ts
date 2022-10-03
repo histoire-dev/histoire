@@ -1,6 +1,6 @@
 import { EVENT_SEND } from './const'
 
-export async function hstEvent (name: string, argument) {
+export async function logEvent (name: string, argument) {
   console.log('[histoire] Event fired', { name, argument })
   const event = {
     name,

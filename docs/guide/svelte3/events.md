@@ -1,13 +1,13 @@
 # Events
 
-Histoire can display a list of events emitted from your story. To register new events, use the `hstEvent` function from `histoire/client`.
+Histoire can display a list of events emitted from your story. To register new events, use the `logEvent` function from `histoire/client`.
 
 The first parameter is the name of the event, and the second one is a data object you want to display when clicking on the event.
 
 ```svelte{3,11-12}
 <script>
   import EventButton from './EventButton.svelte'
-  import { hstEvent } from 'histoire/client'
+  import { logEvent } from 'histoire/client'
 
   export let Hst
 </script>
@@ -15,8 +15,8 @@ The first parameter is the name of the event, and the second one is a data objec
 <Hst.Story
   title="events/EventButton"
 >
-  <EventButton on:myEvent={arg => hstEvent('My event', arg)} /><br>
-  <button on:click={event => hstEvent('Click', event)}>
+  <EventButton on:myEvent={arg => logEvent('My event', arg)} /><br>
+  <button on:click={event => logEvent('Click', event)}>
     Click
   </button>
 </Hst.Story>
