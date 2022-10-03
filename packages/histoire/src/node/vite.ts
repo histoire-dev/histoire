@@ -18,6 +18,7 @@ import { parseColor } from './colors.js'
 import { createMarkdownPlugins } from './markdown.js'
 import { getSearchDataJS, generateDocSearchData, generateTitleSearchData } from './search.js'
 import { getInjectedImport } from './util/vendors.js'
+import { findUp } from './util/find-up.js'
 
 const require = createRequire(import.meta.url)
 
@@ -108,9 +109,14 @@ export async function getViteConfigWithPlugins (isServer: boolean, ctx: Context)
   const inlineConfig = await mergeHistoireViteConfig(userViteConfig?.config ?? {}, ctx)
   const plugins: VitePlugin[] = []
 
+  const hasPnpm = !!(await findUp(ctx.root, ['pnpm-lock.yaml']))
+
   function optimizeDeps (deps: string[]): string[] {
     const result = []
     for (const dep of deps) {
+      if (!hasPnpm) {
+        result.push(dep)
+      }
       try {
         result.push(dirname(require.resolve(`${dep}/package.json`)))
       } catch (e) {
@@ -168,6 +174,8 @@ export async function getViteConfigWithPlugins (isServer: boolean, ctx: Context)
           __VUE_PROD_DEVTOOLS__: 'true',
           // Disable warnings
           'process.env.NODE_ENV': JSON.stringify(isServer ? 'production' : process.env.NODE_ENV ?? 'development'),
+          // Collect flag
+          'process.env.HST_COLLECT': 'false',
         },
         cacheDir: isServer ? 'node_modules/.hst-vite-server' : 'node_modules/.hst-vite',
       }
@@ -178,8 +186,17 @@ export async function getViteConfigWithPlugins (isServer: boolean, ctx: Context)
         return RESOLVED_STORIES_ID
       }
       if (id.startsWith(SETUP_ID)) {
-        if (ctx.config.setupFile) {
-          return this.resolve(resolve(ctx.root, ctx.config.setupFile), importer, {
+        const setupFileConfig = ctx.config.setupFile
+        if (setupFileConfig) {
+          let file: string
+          if (typeof setupFileConfig === 'string') {
+            file = setupFileConfig
+          } else if (isServer) {
+            file = setupFileConfig.server
+          } else {
+            file = setupFileConfig.browser
+          }
+          return this.resolve(resolve(ctx.root, file), importer, {
             skipSelf: true,
           })
         } else {

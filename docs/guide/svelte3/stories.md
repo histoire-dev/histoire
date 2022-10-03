@@ -44,6 +44,21 @@ For example, you will usually import and use a component in your story:
 </Hst.Story>
 ```
 
+## TypeScript
+
+To get typings for the `Hst` prop, you can import the `Hst` type from `@histoire/plugin-svelte`:
+
+```svelte
+<script lang="ts">
+  import type { Hst } from '@histoire/plugin-svelte'
+  export let Hst: Hst
+</script>
+
+<Hst.Story> <!-- Typed! -->
+  🐱
+</Hst.Story>
+```
+
 ## Variants
 
 Stories can have different variants representing the same component. You can define variants using the `<Hst.Variant>` tag. Similar to the story, you can provide a title to your variant with the `title` prop.

@@ -1,8 +1,9 @@
-<script>
+<script lang="ts">
   import { hstEvent } from 'histoire/client'
+  import { Hst } from '@histoire/plugin-svelte'
   import BaseButton from './BaseButton.svelte'
 
-  export let Hst
+  export let Hst: Hst
 
   let disabled = false
   let size = 'medium'

@@ -1,12 +1,11 @@
 import path from 'pathe'
 import { createDefu } from 'defu'
 import {
-  createServer,
   resolveConfig as resolveViteConfig,
   mergeConfig as mergeViteConfig,
 } from 'vite'
-import { ViteNodeServer } from 'vite-node/server'
-import { ViteNodeRunner } from 'vite-node/client'
+import jiti from 'jiti'
+import { fileURLToPath } from 'node:url'
 import pc from 'picocolors'
 import type {
   HistoireConfig,
@@ -18,6 +17,8 @@ import { defaultColors } from './colors.js'
 import { findUp } from './util/find-up.js'
 import { tailwindTokens } from './builtin-plugins/tailwind-tokens.js'
 import { vanillaSupport } from './builtin-plugins/vanilla-support/plugin.js'
+
+const __filename = fileURLToPath(import.meta.url)
 
 export function getDefaultConfig (): HistoireConfig {
   return {
@@ -146,26 +147,9 @@ export function resolveConfigFile (cwd: string = process.cwd()): string {
 
 export async function loadConfigFile (configFile: string): Promise<Partial<HistoireConfig>> {
   try {
-    const server = await createServer()
-    await server.pluginContainer.buildStart({})
-    const node = new ViteNodeServer(server, {
-      deps: {
-        inline: [
-          /histoire\/dist/,
-        ],
-      },
-    })
-    const runner = new ViteNodeRunner({
-      root: path.dirname(configFile),
-      fetchModule (id) {
-        return node.fetchModule(id)
-      },
-      resolveId (id, importer) {
-        return node.resolveId(id, importer)
-      },
-    })
-    const result: { default: Partial<HistoireConfig> } = await runner.executeFile(configFile)
-    await server.close()
+    const result = jiti(__filename, {
+      esmResolve: true,
+    })(configFile)
     if (!result.default) {
       throw new Error(`Expected default export in ${configFile}`)
     }
@@ -240,7 +224,7 @@ export async function resolveConfig (cwd: string = process.cwd(), mode: ConfigMo
   const viteHistoireConfig = (viteConfig.histoire ?? {}) as HistoireConfig
 
   const preUserConfig = mergeConfig(result, viteHistoireConfig)
-  const processedDefaultConfig = await processDefaultConfig(getDefaultConfig(), preUserConfig, mode)
+  const processedDefaultConfig = await processDefaultConfig(getDefaultConfig(), preUserConfig, mode, cwd)
 
   return processConfig(mergeConfig(preUserConfig, processedDefaultConfig), mode)
 }
@@ -258,8 +242,19 @@ export async function processConfig (config: HistoireConfig, mode: ConfigMode): 
   return config
 }
 
-export async function processDefaultConfig (defaultConfig: HistoireConfig, preUserConfig: HistoireConfig, mode: ConfigMode): Promise<HistoireConfig> {
-  for (const plugin of [...defaultConfig.plugins, ...preUserConfig.plugins]) {
+export async function processDefaultConfig (defaultConfig: HistoireConfig, preUserConfig: HistoireConfig, mode: ConfigMode, cwd: string): Promise<HistoireConfig> {
+  // Automatically inline dependencies in vite-node
+  const pkgFile = await findUp(cwd, ['package.json'])
+  const fs = (await import('fs-extra')).default
+  if (pkgFile) {
+    const pkg = await fs.readJSON(pkgFile)
+    if (pkg.dependencies) {
+      defaultConfig.viteNodeInlineDeps = Object.keys(pkg.dependencies).map(d => new RegExp(d))
+    }
+  }
+
+  // Apply plugins
+  for (const plugin of [...defaultConfig.plugins, ...preUserConfig.plugins ?? []]) {
     if (plugin.defaultConfig) {
       const result = await plugin.defaultConfig(defaultConfig, mode)
       if (result) {

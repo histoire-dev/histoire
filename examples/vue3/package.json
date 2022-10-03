@@ -12,13 +12,15 @@
     "test:examples": "pnpm run story:build && pnpm run ci"
   },
   "dependencies": {
+    "lottie-web": "^5.9.6",
     "pinia": "^2.0.13",
+    "vant": "^3.6.3",
     "vue": "^3.2.31",
     "vue-i18n": "^9.1.10"
   },
   "devDependencies": {
-    "@vitejs/plugin-vue": "^3.0.1",
     "@histoire/plugin-vue": "workspace:*",
+    "@vitejs/plugin-vue": "^3.0.1",
     "cypress": "^9.5.3",
     "histoire": "workspace:*",
     "sass": "^1.50.0",

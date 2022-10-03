@@ -123,7 +123,16 @@ export interface HistoireConfig {
    *
    * Example: `'/src/histoire-setup.ts'`
    */
-  setupFile?: string
+  setupFile?: string | {
+    /**
+     * Only loaded in the browser client.
+     */
+    browser: string
+    /**
+     * Only loaded while collecting stories in the node server.
+     */
+    server: string
+  }
   /**
    * Setup code created by plugins
    */

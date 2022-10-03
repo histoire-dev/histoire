@@ -133,7 +133,7 @@ export default defineConfig({
 
 ## `setupFile`
 
-`string`
+`string | { browser: string, server: string }`
 
 Setup file exporting a default function executed when setting up each story preview.
 
@@ -146,6 +146,19 @@ export default defineConfig({
   setupFile: '/src/histoire-setup.ts',
 })
 ```
+
+If you need a different version for the NodeJS server (while collecting stories), you can use an object:
+
+```ts
+export default defineConfig({
+  setupFile: {
+    browser: '/src/histoire-setup.ts',
+    server: '/src/histoire-setup.server.ts',
+  },
+})
+```
+
+This can be useful if you need to exclude some imported libraries that only works in the browser.
 
 ## `responsivePresets`
 

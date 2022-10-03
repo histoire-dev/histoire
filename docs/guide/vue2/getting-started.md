@@ -20,6 +20,8 @@ Histoire is a tool to generate stories applications (or "books").
 
 <DemoLinks framework="vue3" />
 
+*(Demo links currently only available for Vue 3)*
+
 ## Sponsors
 
 Histoire is an Open-Source project supported by our sponsors - thank you!

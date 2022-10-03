@@ -1,4 +1,8 @@
 import type { ServerRunPayload } from '@histoire/shared'
+// @ts-expect-error virtual module id
+import * as setup from 'virtual:$histoire-setup'
+// @ts-expect-error virtual module id
+import * as generatedSetup from 'virtual:$histoire-generated-global-setup'
 import { tick } from 'svelte'
 import { SvelteComponent } from 'svelte/internal'
 import Story from './Story.svelte'
@@ -24,6 +28,24 @@ export async function run ({ file, el, storyData }: ServerRunPayload) {
       __hstStoryFile: file,
     })),
   })
+
+  // Call app setups to resolve global assets such as components
+
+  if (typeof generatedSetup?.setupSvelte3 === 'function') {
+    await generatedSetup.setupSvelte3({
+      app,
+      story: null,
+      variant: null,
+    })
+  }
+
+  if (typeof setup?.setupSvelte3 === 'function') {
+    await setup.setupSvelte3({
+      app,
+      story: null,
+      variant: null,
+    })
+  }
 
   await tick()
 
