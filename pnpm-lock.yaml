@@ -336,7 +336,7 @@ importers:
       '@types/flexsearch': ^0.7.3
       '@types/fs-extra': ^9.0.13
       '@types/node': ^17.0.32
-      '@vitejs/plugin-vue': ^2.3.1
+      '@vitejs/plugin-vue': ^3.1.2
       autoprefixer: ^10.4.4
       chokidar: ^3.5.3
       concurrently: ^7.1.0
@@ -349,7 +349,7 @@ importers:
       shiki: 0.10.1
       tailwindcss: ^3.0.23
       typescript: ^4.7.4
-      vite: ^2.9.1
+      vite: ^3.1.4
       vue: ^3.2.31
     dependencies:
       '@histoire/controls': link:../histoire-controls
@@ -362,7 +362,7 @@ importers:
       '@tailwindcss/typography': 0.5.7_tailwindcss@3.1.8
       '@types/fs-extra': 9.0.13
       '@types/node': 17.0.45
-      '@vitejs/plugin-vue': 2.3.4_vite@2.9.15+vue@3.2.40
+      '@vitejs/plugin-vue': 3.1.2_vite@3.1.4+vue@3.2.40
       autoprefixer: 10.4.12_postcss@8.4.17
       chokidar: 3.5.3
       concurrently: 7.4.0
@@ -373,7 +373,7 @@ importers:
       postcss-import: 14.1.0_postcss@8.4.17
       tailwindcss: 3.1.8_postcss@8.4.17
       typescript: 4.8.4
-      vite: 2.9.15
+      vite: 3.1.4
       vue: 3.2.40
 
   packages/histoire-controls:
@@ -392,7 +392,7 @@ importers:
       postcss-import: ^14.1.0
       tailwindcss: ^3.0.23
       typescript: ^4.7.4
-      vite: ^2.9.1
+      vite: ^3.1.4
       vue: ^3.2.31
       vue-tsc: ^0.35.2
     dependencies:
@@ -401,7 +401,7 @@ importers:
       '@peeky/server': 0.14.0
       '@peeky/test': 0.14.1_@peeky+server@0.14.0
       '@types/node': 17.0.45
-      '@vitejs/plugin-vue': 2.3.4_vite@2.9.15+vue@3.2.40
+      '@vitejs/plugin-vue': 2.3.4_vite@3.1.4+vue@3.2.40
       '@vue/test-utils': 2.1.0_vue@3.2.40
       '@vueuse/core': 8.9.4_vue@3.2.40
       autoprefixer: 10.4.12_postcss@8.4.17
@@ -411,7 +411,7 @@ importers:
       postcss-import: 14.1.0_postcss@8.4.17
       tailwindcss: 3.1.8_postcss@8.4.17
       typescript: 4.8.4
-      vite: 2.9.15
+      vite: 3.1.4
       vue: 3.2.40
       vue-tsc: 0.35.2_typescript@4.8.4
 
@@ -419,16 +419,18 @@ importers:
     specifiers:
       '@histoire/controls': workspace:*
       '@histoire/plugin-vue': workspace:*
-      '@vitejs/plugin-vue': ^2.3.1
+      '@vitejs/plugin-vue': ^3.1.2
       histoire: workspace:*
-      vite: ^2.9.1
+      vite: ^3.1.4
+      vue: ^3.2.31
     dependencies:
       '@histoire/controls': link:../histoire-controls
+      vue: 3.2.40
     devDependencies:
       '@histoire/plugin-vue': link:../histoire-plugin-vue
-      '@vitejs/plugin-vue': 2.3.4_vite@2.9.15
+      '@vitejs/plugin-vue': 3.1.2_vite@3.1.4+vue@3.2.40
       histoire: link:../histoire
-      vite: 2.9.15
+      vite: 3.1.4
 
   packages/histoire-plugin-nuxt:
     specifiers:
@@ -528,7 +530,7 @@ importers:
       concurrently: ^7.1.0
       histoire: workspace:*
       typescript: ^4.7.4
-      vite: ^2.9.1
+      vite: ^3.1.4
       vue: ^3.2.31
     dependencies:
       '@histoire/controls': link:../histoire-controls
@@ -540,7 +542,7 @@ importers:
       concurrently: 7.4.0
       histoire: link:../histoire
       typescript: 4.8.4
-      vite: 2.9.15
+      vite: 3.1.4
       vue: 3.2.40
 
   packages/histoire-plugin-vue2:
@@ -553,7 +555,7 @@ importers:
       concurrently: ^7.1.0
       histoire: workspace:*
       typescript: ^4.7.4
-      vite: ^2.9.1
+      vite: ^3.1.4
       vue: ^2.7.8
     dependencies:
       '@histoire/controls': link:../histoire-controls
@@ -565,7 +567,7 @@ importers:
       concurrently: 7.4.0
       histoire: link:../histoire
       typescript: 4.8.4
-      vite: 2.9.15
+      vite: 3.1.4
       vue: 2.7.10
 
   packages/histoire-shared:
@@ -2778,19 +2780,6 @@ packages:
       - supports-color
     dev: true
 
-  /@vitejs/plugin-vue/2.3.4_vite@2.9.15:
-    resolution: {integrity: sha512-IfFNbtkbIm36O9KB8QodlwwYvTEsJb4Lll4c2IwB3VHc2gie2mSPtSzL0eYay7X2jd/2WX02FjSGTWR6OPr/zg==}
-    engines: {node: '>=12.0.0'}
-    peerDependencies:
-      vite: ^2.5.10 || ^2.9.0 || ^3.0.0
-      vue: '*'
-    peerDependenciesMeta:
-      vue:
-        optional: true
-    dependencies:
-      vite: 2.9.15
-    dev: true
-
   /@vitejs/plugin-vue/2.3.4_vite@2.9.15+vue@3.2.40:
     resolution: {integrity: sha512-IfFNbtkbIm36O9KB8QodlwwYvTEsJb4Lll4c2IwB3VHc2gie2mSPtSzL0eYay7X2jd/2WX02FjSGTWR6OPr/zg==}
     engines: {node: '>=12.0.0'}
@@ -2805,6 +2794,20 @@ packages:
       vue: 3.2.40
     dev: true
 
+  /@vitejs/plugin-vue/2.3.4_vite@3.1.4+vue@3.2.40:
+    resolution: {integrity: sha512-IfFNbtkbIm36O9KB8QodlwwYvTEsJb4Lll4c2IwB3VHc2gie2mSPtSzL0eYay7X2jd/2WX02FjSGTWR6OPr/zg==}
+    engines: {node: '>=12.0.0'}
+    peerDependencies:
+      vite: ^2.5.10 || ^2.9.0 || ^3.0.0
+      vue: '*'
+    peerDependenciesMeta:
+      vue:
+        optional: true
+    dependencies:
+      vite: 3.1.4
+      vue: 3.2.40
+    dev: true
+
   /@vitejs/plugin-vue/3.1.2_vite@3.1.4+vue@3.2.40:
     resolution: {integrity: sha512-3zxKNlvA3oNaKDYX0NBclgxTQ1xaFdL7PzwF6zj9tGFziKwmBa3Q/6XcJQxudlT81WxDjEhHmevvIC4Orc1LhQ==}
     engines: {node: ^14.18.0 || >=16.0.0}
@@ -2815,7 +2818,7 @@ packages:
       vue:
         optional: true
     dependencies:
-      vite: 3.1.4_sass@1.55.0
+      vite: 3.1.4
       vue: 3.2.40
     dev: true
 

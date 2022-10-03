@@ -19,12 +19,13 @@
     "story:preview": "histoire preview"
   },
   "dependencies": {
-    "@histoire/controls": "workspace:*"
+    "@histoire/controls": "workspace:*",
+    "vue": "^3.2.31"
   },
   "devDependencies": {
     "@histoire/plugin-vue": "workspace:*",
-    "@vitejs/plugin-vue": "^2.3.1",
+    "@vitejs/plugin-vue": "^3.1.2",
     "histoire": "workspace:*",
-    "vite": "^2.9.1"
+    "vite": "^3.1.4"
   }
 }

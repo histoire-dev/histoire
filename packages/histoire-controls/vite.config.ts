@@ -26,7 +26,7 @@ export default defineConfig({
       formats: [
         'es',
       ],
-      fileName: 'index',
+      fileName: 'index.es',
     },
 
     rollupOptions: {
