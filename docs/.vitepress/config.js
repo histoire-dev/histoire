@@ -111,6 +111,10 @@ module.exports = {
               link: '/reference/config',
             },
             {
+              text: 'Client API',
+              link: '/reference/client',
+            },
+            {
               text: 'Plugin API',
               link: '/reference/plugin-api',
             },
