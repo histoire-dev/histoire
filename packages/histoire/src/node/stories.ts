@@ -68,7 +68,7 @@ function getAbsoluteFilePath (relativeFilePath: string) {
 
 export function addStory (relativeFilePath: string, virtualModuleCode?: string) {
   const absoluteFilePath = getAbsoluteFilePath(relativeFilePath)
-  const fileId = paramCase(relativeFilePath)
+  const fileId = paramCase(relativeFilePath.toLowerCase())
   let fileName = basename(relativeFilePath)
   if (fileName.includes('.')) {
     fileName = fileName.substring(0, fileName.indexOf('.'))
