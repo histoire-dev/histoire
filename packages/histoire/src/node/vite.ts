@@ -186,8 +186,17 @@ export async function getViteConfigWithPlugins (isServer: boolean, ctx: Context)
         return RESOLVED_STORIES_ID
       }
       if (id.startsWith(SETUP_ID)) {
-        if (ctx.config.setupFile) {
-          return this.resolve(resolve(ctx.root, ctx.config.setupFile), importer, {
+        const setupFileConfig = ctx.config.setupFile
+        if (setupFileConfig) {
+          let file: string
+          if (typeof setupFileConfig === 'string') {
+            file = setupFileConfig
+          } else if (isServer) {
+            file = setupFileConfig.server
+          } else {
+            file = setupFileConfig.browser
+          }
+          return this.resolve(resolve(ctx.root, file), importer, {
             skipSelf: true,
           })
         } else {
