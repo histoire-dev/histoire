@@ -20,6 +20,10 @@
       "types": "./dist/node/index.d.ts",
       "default": "./dist/node/index.js"
     },
+    "./client": {
+      "types": "./client.d.ts",
+      "default": "./client.js"
+    },
     "./*": "./*"
   },
   "main": "./dist/node/index.js",
