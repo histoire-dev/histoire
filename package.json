@@ -46,9 +46,6 @@
     "vue-eslint-parser": "^9.0.3"
   },
   "pnpm": {
-    "overrides": {
-      "vite": "^3.1.0"
-    },
     "peerDependencyRules": {
       "ignoreMissing": [
         "@algolia/client-search",
