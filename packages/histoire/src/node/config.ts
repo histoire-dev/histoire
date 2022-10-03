@@ -147,7 +147,9 @@ export function resolveConfigFile (cwd: string = process.cwd()): string {
 
 export async function loadConfigFile (configFile: string): Promise<Partial<HistoireConfig>> {
   try {
-    const result = jiti(__filename)(configFile)
+    const result = jiti(__filename, {
+      esmResolve: true,
+    })(configFile)
     if (!result.default) {
       throw new Error(`Expected default export in ${configFile}`)
     }
