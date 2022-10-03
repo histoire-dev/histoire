@@ -252,7 +252,7 @@ export async function processDefaultConfig (defaultConfig: HistoireConfig, preUs
   }
 
   // Apply plugins
-  for (const plugin of [...defaultConfig.plugins, ...preUserConfig.plugins]) {
+  for (const plugin of [...defaultConfig.plugins, ...preUserConfig.plugins ?? []]) {
     if (plugin.defaultConfig) {
       const result = await plugin.defaultConfig(defaultConfig, mode)
       if (result) {
