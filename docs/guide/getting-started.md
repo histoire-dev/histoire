@@ -53,19 +53,19 @@ Histoire is an Open-Source project supported by our sponsors - thank you!
 | Framework | Version | Support* | Auto-CodeGen* | Auto-Docs* |
 | --------- | -------- | ------- | ------------ | ---- |
 | [Vue →](./vue3/getting-started.md) | `3.2+` | ✅ | ✅ | 🏗️ |
-| [Vue →](./vue2/getting-started.md) | `2.7+` | ✅ | ✅ | - |
-| [Svelte →](./svelte3/getting-started.md) | `3+` | ✅ | - | - |
+| [Vue →](./vue2/getting-started.md) | `2.7+` | ✅ | ✅ | 🏗️ |
+| [Svelte →](./svelte3/getting-started.md) | `3+` | ✅ | - | 🏗️ |
 | Solid | - | - | - | - |
 | Angular | - | - | - | - |
 | React | - | - ([Alternative](https://www.ladle.dev)) | - | - |
 
-**<u>Support</u> means*:
+**<u>Support</u> means the following is available*:
 - Collect and render stories
 - Render controls pane content with state sync
 - Builtin controls wrappers
-- *Static source (soon)*
+- Static source
 
-*<u>*Auto-CodeGen*</u>: Generates copiable source code dynamically from the current story state.
+*<u>*Auto-CodeGen*</u>: Generates copiable source code dynamically from the current story state. Generally requires a Virtual DOM.
 
 *<u>*Auto-Docs*</u>: Generates documentation and controls automatically by analyzing the imported components.
 
