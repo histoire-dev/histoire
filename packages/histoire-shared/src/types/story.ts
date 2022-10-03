@@ -5,6 +5,7 @@ export interface StoryFile {
   story: Story
   path: string[]
   filePath: string
+  source: () => Promise<{ default: string }>
 }
 
 export type StoryLayout = {
@@ -59,7 +60,7 @@ export interface Variant {
   icon?: string
   iconColor?: string
   setupApp?: (payload: any) => unknown
-  slots?: () => { default: any, controls: any }
+  slots?: () => { default: any, controls: any, source: any }
   state: any
   source?: string
   responsiveDisabled?: boolean

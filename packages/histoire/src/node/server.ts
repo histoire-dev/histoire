@@ -111,7 +111,12 @@ export async function createServer (ctx: Context, port: number) {
     console.log('Collect stories start', changedFile?.path ?? 'all')
     const time = Date.now()
     if (changedFile && !queuedAll) {
-      await Promise.all(queuedFiles.map(storyFile => executeStoryFile(storyFile)))
+      await Promise.all(queuedFiles.map(async storyFile => {
+        await executeStoryFile(storyFile)
+        if (storyFile.story) {
+          await invalidateModule(`/__resolved__virtual:story-source:${storyFile.story.id}`)
+        }
+      }))
     } else {
       // Full update
 

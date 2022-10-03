@@ -10,6 +10,7 @@ import {
   loadConfigFromFile as loadViteConfigFromFile,
 } from 'vite'
 import { lookup as lookupMime } from 'mrmime'
+import fs from 'fs-extra'
 import { APP_PATH, TEMP_PATH } from './alias.js'
 import { Context } from './context.js'
 import { notifyStoryChange } from './stories.js'
@@ -234,6 +235,11 @@ export async function getViteConfigWithPlugins (isServer: boolean, ctx: Context)
       if (id.startsWith('virtual:story:')) {
         return `\0${id}`
       }
+      if (id.startsWith('virtual:story-source:')) {
+        return `/__resolved__${id}`
+        // @TODO
+        // return `\0${id}`
+      }
     },
 
     async load (id) {
@@ -260,7 +266,7 @@ ${resolvedStories.map((file, index) => {
     }
     return supportPlugin.importStoryComponent(file, index)
   }).filter(Boolean).join('\n')}
-export let files = [${files.map((file) => `{${JSON.stringify(file).slice(1, -1)}, component: Comp${file.index}}`).join(',\n')}]
+export let files = [${files.map((file) => `{${JSON.stringify(file).slice(1, -1)}, component: Comp${file.index}, source: () => import('virtual:story-source:${file.story.id}')}`).join(',\n')}]
 export let tree = ${JSON.stringify(makeTree(ctx.config, resolvedStories))}
 const handlers = []
 export function onUpdate (cb) {
@@ -379,6 +385,20 @@ if (import.meta.hot) {
         const storyFile = ctx.storyFiles.find(f => f.moduleId === moduleId && f.virtual)
         if (storyFile) {
           return storyFile.moduleCode
+        }
+      }
+
+      if (id.startsWith('/__resolved__virtual:story-source:')) {
+        const storyId = id.slice('/__resolved__virtual:story-source:'.length)
+        const storyFile = ctx.storyFiles.find(f => f.story?.id === storyId)
+        if (storyFile) {
+          let source: string
+          if (storyFile.virtual) {
+            source = storyFile.moduleCode
+          } else {
+            source = await fs.readFile(resolve(ctx.root, storyFile.relativePath), 'utf-8')
+          }
+          return `export default ${JSON.stringify(source)}`
         }
       }
     },

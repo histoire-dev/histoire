@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, markRaw, onMounted, ref, shallowRef, watch, watchEffect } from 'vue'
+import { computed, markRaw, nextTick, onMounted, ref, shallowRef, watch, watchEffect } from 'vue'
 import { Icon } from '@iconify/vue'
 import { getHighlighter, Highlighter, setCDN } from 'shiki'
 import { HstCopyIcon } from '@histoire/controls'
@@ -25,9 +25,63 @@ watchEffect(async () => {
   }
 })
 
-const sourceCode = ref('')
 const highlighter = shallowRef<Highlighter>()
+
+const dynamicSourceCode = ref('')
 const error = ref<string>(null)
+
+watch(() => [props.variant, generateSourceCodeFn.value], async () => {
+  if (!generateSourceCodeFn.value) return
+  error.value = null
+  dynamicSourceCode.value = ''
+  try {
+    if (props.variant.source) {
+      dynamicSourceCode.value = props.variant.source
+    } else if (props.variant.slots?.().source) {
+      const source = props.variant.slots?.().source()[0].children
+      if (source) {
+        dynamicSourceCode.value = await unindent(source)
+      }
+    } else {
+      dynamicSourceCode.value = await generateSourceCodeFn.value(props.variant)
+    }
+  } catch (e) {
+    console.error(e)
+    error.value = e.message
+  }
+
+  // Auto-switch
+  if (!dynamicSourceCode.value) {
+    displayedSource.value = 'static'
+  }
+}, {
+  deep: true,
+  immediate: true,
+})
+
+// Static file source
+
+const staticSourceCode = ref('')
+watch(() => [props.story, props.story?.file?.source], async () => {
+  staticSourceCode.value = ''
+  const sourceLoader = props.story.file?.source
+  if (sourceLoader) {
+    staticSourceCode.value = (await sourceLoader()).default
+  }
+}, {
+  immediate: true,
+})
+
+const displayedSource = ref<'dynamic' | 'static'>('dynamic')
+
+const displayedSourceCode = computed(() => {
+  if (displayedSource.value === 'dynamic') {
+    return dynamicSourceCode.value
+  }
+  return staticSourceCode.value
+})
+
+// HTML render
 
 onMounted(async () => {
   setCDN('https://unpkg.com/shiki@0.10.1/')
@@ -43,35 +97,36 @@ onMounted(async () => {
   })
 })
 
-watch(() => [props.variant, generateSourceCodeFn.value], async () => {
-  if (!generateSourceCodeFn.value) return
-  error.value = null
-  try {
-    if (props.variant.source) {
-      sourceCode.value = props.variant.source
-    } else if (props.variant.slots?.().source) {
-      const source = props.variant.slots?.().source()[0].children
-      if (source) {
-        sourceCode.value = await unindent(source)
-      }
-    } else {
-      sourceCode.value = await generateSourceCodeFn.value(props.variant)
-    }
-  } catch (e) {
-    console.error(e)
-    error.value = e.message
-  }
-}, {
-  deep: true,
-  immediate: true,
-})
-
-const sourceHtml = computed(() => sourceCode.value
-  ? highlighter.value?.codeToHtml(sourceCode.value, {
+const sourceHtml = computed(() => displayedSourceCode.value
+  ? highlighter.value?.codeToHtml(displayedSourceCode.value, {
     lang: 'html',
     theme: isDark.value ? 'github-dark' : 'github-light',
   })
   : '')
+
+// Scrolling
+
+let lastScroll = 0
+
+// Reset
+watch(() => props.variant, () => {
+  lastScroll = 0
+})
+
+const scroller = ref<HTMLElement>()
+
+function onScroll (event) {
+  if (sourceHtml.value) {
+    lastScroll = event.target.scrollTop
+  }
+}
+
+watch(sourceHtml, async () => {
+  await nextTick()
+  if (scroller.value) {
+    scroller.value.scrollTop = lastScroll
+  }
+})
 </script>
 
 <template>
@@ -81,14 +136,63 @@ const sourceHtml = computed(() => sourceCode.value
     <!-- Toolbar -->
     <div
       v-if="!error"
-      class="htw-h-10 htw-flex-none htw-border-b htw-border-solid htw-border-gray-150 dark:htw-border-gray-850 htw-px-4 htw-flex htw-items-center"
+      class="htw-h-10 htw-flex-none htw-border-b htw-border-solid htw-border-gray-150 dark:htw-border-gray-850 htw-px-4 htw-flex htw-items-center htw-gap-2"
     >
       <div class="htw-text-gray-900 dark:htw-text-gray-100">
         Source
       </div>
       <div class="htw-flex-1" />
+
+      <!-- Display source modes -->
+      <div class="htw-flex htw-flex-none htw-gap-px htw-h-full htw-py-2">
+        <button
+          v-tooltip="!dynamicSourceCode ? 'Dynamic source code is not available' : displayedSource !== 'dynamic' ? 'Switch to dynamic source' : null"
+          class="htw-flex htw-items-center htw-gap-1 htw-h-full htw-px-1 htw-bg-gray-500/10 htw-rounded-l htw-transition-all htw-ease-[cubic-bezier(0,1,.6,1)] htw-duration-300 htw-overflow-hidden"
+          :class="[
+            displayedSource !== 'dynamic' ? 'htw-max-w-6 htw-opacity-70' : 'htw-max-w-[82px] htw-text-primary-600 dark:htw-text-primary-400',
+            dynamicSourceCode ? 'htw-cursor-pointer hover:htw-bg-gray-500/30 active:htw-bg-gray-600/50' : 'htw-opacity-50',
+          ]"
+          @click="dynamicSourceCode && (displayedSource = 'dynamic')"
+        >
+          <Icon
+            icon="carbon:flash"
+            class="htw-w-4 htw-h-4 htw-flex-none"
+          />
+          <span
+            class="transition-opacity duration-300"
+            :class="{
+              'opacity-0': displayedSource !== 'dynamic',
+            }"
+          >
+            Dynamic
+          </span>
+        </button>
+        <button
+          v-tooltip="!staticSourceCode ? 'Static source code is not available' : displayedSource !== 'static' ? 'Switch to static source' : null"
+          class="htw-flex htw-items-center htw-gap-1 htw-h-full htw-px-1 htw-bg-gray-500/10 htw-rounded-r htw-transition-all htw-ease-[cubic-bezier(0,1,.6,1)] htw-duration-300 htw-overflow-hidden"
+          :class="[
+            displayedSource !== 'static' ? 'htw-max-w-6 htw-opacity-70' : 'htw-max-w-[63px] htw-text-primary-600 dark:htw-text-primary-400',
+            staticSourceCode ? 'htw-cursor-pointer hover:htw-bg-gray-500/30 active:htw-bg-gray-600/50' : 'htw-opacity-50',
+          ]"
+          @click="staticSourceCode && (displayedSource = 'static')"
+        >
+          <Icon
+            icon="carbon:document"
+            class="htw-w-4 htw-h-4 htw-flex-none"
+          />
+          <span
+            class="transition-opacity duration-300"
+            :class="{
+              'opacity-0': displayedSource !== 'static',
+            }"
+          >
+            Static
+          </span>
+        </button>
+      </div>
+
       <HstCopyIcon
-        :content="sourceCode"
+        :content="displayedSourceCode"
         class="htw-flex-none"
       />
     </div>
@@ -100,7 +204,7 @@ const sourceHtml = computed(() => sourceCode.value
       Error: {{ error }}
     </div>
 
-    <BaseEmpty v-else-if="!sourceCode">
+    <BaseEmpty v-else-if="!displayedSourceCode">
       <Icon
         icon="carbon:code-hide"
         class="htw-w-8 htw-h-8 htw-opacity-50 htw-mb-6"
@@ -110,16 +214,20 @@ const sourceHtml = computed(() => sourceCode.value
 
     <textarea
       v-else-if="!sourceHtml"
+      ref="scroller"
       class="__histoire-code-placeholder htw-w-full htw-h-full htw-p-4 htw-outline-none htw-bg-transparent htw-resize-none htw-m-0"
-      :value="sourceCode"
+      :value="displayedSourceCode"
       readonly
       data-test-id="story-source-code"
+      @scroll="onScroll"
     />
     <!-- eslint-disable vue/no-v-html -->
     <div
       v-else
+      ref="scroller"
       class="htw-w-full htw-h-full htw-overflow-auto"
       data-test-id="story-source-code"
+      @scroll="onScroll"
     >
       <div
         class="__histoire-code htw-p-4 htw-w-fit"
