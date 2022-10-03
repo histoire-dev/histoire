@@ -35,3 +35,5 @@ export const components = {
   HstCopyIcon,
   HstRadio,
 }
+
+export * from './types'
