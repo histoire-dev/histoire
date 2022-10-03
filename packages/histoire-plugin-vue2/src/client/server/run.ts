@@ -1,10 +1,37 @@
 import Vue, { h } from 'vue'
 import type { ServerRunPayload } from '@histoire/shared'
+// @ts-expect-error virtual module id
+import * as setup from 'virtual:$histoire-setup'
+// @ts-expect-error virtual module id
+import * as generatedSetup from 'virtual:$histoire-generated-global-setup'
 import Story from './Story'
 import Variant from './Variant'
 
 export async function run ({ file, storyData, el }: ServerRunPayload) {
   const { default: Comp } = await import(/* @vite-ignore */ file.moduleId)
+
+  // Call app setups to resolve global assets such as components
+  const appOptions: Record<string, any> = {}
+
+  if (typeof generatedSetup?.setupVue2 === 'function') {
+    const result = await generatedSetup.setupVue2({
+      story: null,
+      variant: null,
+    })
+    if (result) {
+      Object.assign(appOptions, result)
+    }
+  }
+
+  if (typeof setup?.setupVue2 === 'function') {
+    const result = await setup.setupVue2({
+      story: null,
+      variant: null,
+    })
+    if (result) {
+      Object.assign(appOptions, result)
+    }
+  }
 
   const app = new Vue({
     provide: {
@@ -18,6 +45,7 @@ export async function run ({ file, storyData, el }: ServerRunPayload) {
         ref: 'comp',
       })
     },
+    ...appOptions,
   })
 
   // eslint-disable-next-line vue/multi-word-component-names
