@@ -159,7 +159,7 @@ export async function createMarkdownFilesWatcher (ctx: Context) {
       const storyFile = addStory(storyRelativePath, `export default ${JSON.stringify({
         id: frontmatter.id,
         title: frontmatter.title,
-        icon: frontmatter.icon,
+        icon: frontmatter.icon ?? 'carbon:document-blank',
         iconColor: frontmatter.iconColor,
         group: frontmatter.group,
         docsOnly: true,
