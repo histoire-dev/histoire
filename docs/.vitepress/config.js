@@ -70,6 +70,10 @@ module.exports = {
                 text: 'Plugins',
                 link: '/guide/plugins/official',
               },
+              {
+                text: 'Builtin controls',
+                link: 'https://controls.histoire.dev/',
+              },
             ],
           },
         ],
