@@ -14,4 +14,9 @@ describe('Story render', () => {
     cy.visit('/story/components-autoimport-story-vue?variantId=_default')
     getIframeBody().contains('Meow')
   })
+
+  it('should render NuxtLink', () => {
+    cy.visit('/story/components-basebuttonlink-story-vue?variantId=_default')
+    cy.get('.__histoire-sandbox a').contains('Hello world')
+  })
 })
