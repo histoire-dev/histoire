@@ -13,7 +13,6 @@ import type {
   ConfigMode,
   Plugin,
 } from '@histoire/shared'
-import fs from 'fs-extra'
 import { defaultColors } from './colors.js'
 import { findUp } from './util/find-up.js'
 import { tailwindTokens } from './builtin-plugins/tailwind-tokens.js'
@@ -244,6 +243,7 @@ export async function processConfig (config: HistoireConfig, mode: ConfigMode): 
 export async function processDefaultConfig (defaultConfig: HistoireConfig, preUserConfig: HistoireConfig, mode: ConfigMode, cwd: string): Promise<HistoireConfig> {
   // Automatically inline dependencies in vite-node
   const pkgFile = await findUp(cwd, ['package.json'])
+  const fs = (await import('fs-extra')).default
   if (pkgFile) {
     const pkg = await fs.readJSON(pkgFile)
     if (pkg.dependencies) {
