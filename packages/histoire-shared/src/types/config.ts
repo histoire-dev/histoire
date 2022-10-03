@@ -3,7 +3,7 @@ import type {
   ConfigEnv as ViteConfigEnv,
 } from 'vite'
 import type MarkdownIt from 'markdown-it'
-import type { ServerTreeFile } from './story.js'
+import type { ServerTreeFile, StoryProps } from './story.js'
 import type { Plugin } from './plugin.js'
 
 export interface SupportMatchPattern {
@@ -149,6 +149,10 @@ export interface HistoireConfig {
    * Class added to the html root of the story preview when dark mode is enabled.
    */
   sandboxDarkClass?: string
+  /**
+   * Default props for stories.
+   */
+  defaultStoryProps?: Omit<StoryProps, 'id' | 'setupApp' | 'title' | 'source'>
   /**
    * Customize the markdown-it renderer
    */

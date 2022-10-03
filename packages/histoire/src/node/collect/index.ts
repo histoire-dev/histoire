@@ -92,10 +92,26 @@ export function useCollectStories (options: UseCollectStoriesOptions, ctx: Conte
       } else if (storyData.length > 1) {
         console.warn(pc.yellow(`⚠️  Multiple stories not supported: ${storyFile.path}`))
       }
-      storyFile.id = storyData[0].id
-      storyFile.story = storyData[0]
+
+      const finalData = storyData[0]
+
+      // Default props
+      if (ctx.config.defaultStoryProps) {
+        for (const key in ctx.config.defaultStoryProps) {
+          if (finalData[key] == null) {
+            finalData[key] = ctx.config.defaultStoryProps[key]
+          }
+        }
+      }
+
+      if (!finalData.layout) {
+        finalData.layout = { type: 'single', iframe: true }
+      }
+
+      storyFile.id = finalData.id
+      storyFile.story = finalData
       storyFile.treeFile = {
-        title: storyData[0].title,
+        title: finalData.title,
         path: relative(server.config.root, storyFile.path),
       }
       storyFile.treePath = createPath(ctx.config, storyFile.treeFile)

@@ -160,6 +160,27 @@ export default defineConfig({
 
 This can be useful if you need to exclude some imported libraries that only works in the browser.
 
+## `defaultStoryProps`
+
+`Object`
+
+Default values for story props.
+
+```ts
+export default defineConfig({
+  defaultStoryProps: {
+    icon: 'carbon:assembly-reference',
+    iconColor: '#00c5a5',
+    layout: {
+      type: 'grid',
+      width: 300,
+    },
+    responsiveDisabled: true,
+    autoPropsDisabled: true,
+  },
+})
+```
+
 ## `responsivePresets`
 
 `Array`

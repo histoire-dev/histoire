@@ -5,7 +5,7 @@ import { getContext, setContext } from 'svelte'
 export let title: string = null
 export let id: string = null
 export let group: string = null
-export let layout: ServerStory['layout'] = { type: 'single', iframe: true }
+export let layout: ServerStory['layout'] = null
 export let icon: string = null
 export let iconColor: string = null
 export let docsOnly: boolean = false

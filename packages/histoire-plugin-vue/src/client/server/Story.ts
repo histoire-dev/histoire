@@ -37,7 +37,7 @@ export default defineComponent({
 
     layout: {
       type: Object as PropType<ServerStory['layout']>,
-      default: () => ({ type: 'single', iframe: true }),
+      default: null,
     },
 
     icon: {

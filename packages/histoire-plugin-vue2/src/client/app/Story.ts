@@ -1,5 +1,5 @@
 import { defineComponent, provide, VNode, h, PropType, getCurrentInstance, reactive, inject } from 'vue'
-import type { Story } from '@histoire/shared'
+import { Story, omitInheritStoryProps } from '@histoire/shared'
 import Variant from './Variant'
 
 export default Object.assign(defineComponent({
@@ -96,6 +96,11 @@ export default Object.assign(defineComponent({
           for (const attr in this.$attrs) {
             if (typeof vnode.data.attrs[attr] === 'undefined') {
               vnode.data.attrs[attr] = this.$attrs[attr]
+            }
+          }
+          for (const attr in this.story) {
+            if (!omitInheritStoryProps.includes(attr) && typeof vnode.data.attrs[attr] === 'undefined') {
+              vnode.data.attrs[attr] = this.story[attr]
             }
           }
           vnode.key = variant ? `variant-${variant.id}` : `null-variant-${index}`

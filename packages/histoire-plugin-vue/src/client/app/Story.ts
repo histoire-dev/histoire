@@ -1,5 +1,5 @@
 import { computed, defineComponent, provide, useAttrs, VNode, h, PropType, getCurrentInstance, reactive } from 'vue'
-import type { Story } from '@histoire/shared'
+import { Story, omitInheritStoryProps } from '@histoire/shared'
 import Variant from './Variant'
 
 export default defineComponent({
@@ -88,6 +88,11 @@ export default defineComponent({
           for (const attr in this.$attrs) {
             if (typeof vnode.props[attr] === 'undefined') {
               vnode.props[attr] = this.$attrs[attr]
+            }
+          }
+          for (const attr in this.story) {
+            if (!omitInheritStoryProps.includes(attr) && typeof vnode.props[attr] === 'undefined') {
+              vnode.props[attr] = this.story[attr]
             }
           }
           index++
