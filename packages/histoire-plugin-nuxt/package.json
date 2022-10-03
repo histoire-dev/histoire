@@ -27,11 +27,11 @@
     "watch": "tsc -d -w --sourceMap"
   },
   "dependencies": {
-    "@nuxt/kit": "^3.0.0-rc.3"
+    "@nuxt/kit": "^3.0.0-rc.11"
   },
   "devDependencies": {
     "@types/node": "^17.0.32",
-    "@nuxt/schema": "^3.0.0-rc.3",
+    "@nuxt/schema": "^3.0.0-rc.11",
     "histoire": "workspace:*",
     "typescript": "^4.7.4",
     "vite": "^2.9.1"
@@ -39,6 +39,6 @@
   "peerDependencies": {
     "@histoire/plugin-vue": "^0.10.7",
     "histoire": "^0.10.7",
-    "nuxt": "^3.0.0-rc.3"
+    "nuxt": "^3.0.0-rc.11"
   }
 }

@@ -18,7 +18,6 @@ export function HstNuxt (): Plugin {
   return {
     name: '@histoire/plugin-nuxt',
 
-    // @ts-expect-error Different versions of Vite in devDependencies @TODO update when Nuxt switches to Vite 3
     async defaultConfig () {
       const nuxtConfig = await useNuxtViteConfig()
       nuxt = nuxtConfig.nuxt
