@@ -10,7 +10,7 @@ function initState () {
 
 <template>
   <Story
-    title="checkbox/HstSimpleCheckbox"
+    title="internals/HstSimpleCheckbox"
     :layout="{ type: 'single', iframe: false }"
   >
     <Variant

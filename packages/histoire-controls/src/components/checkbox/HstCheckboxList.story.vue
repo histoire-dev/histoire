@@ -21,7 +21,7 @@ function initState () {
 
 <template>
   <Story
-    title="checkbox/HstCheckboxList"
+    title="HstCheckboxList"
     :layout="{ type: 'single', iframe: false }"
   >
     <Variant
