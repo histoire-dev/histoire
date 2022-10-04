@@ -14,11 +14,6 @@ html {
   font-family: 'Lato', sans-serif;
 }
 
-input, button, textarea {
-  font-size: inherit;
-  font-family: inherit;
-}
-
 .htw-sandbox-hidden {
   display: none;
 }
