@@ -40,7 +40,7 @@ function selectOption (value: string) {
 
 <template>
   <HstWrapper
-    :label="false"
+    tag="div"
     role="group"
     :title="title"
     class="htw-flex-nowrap"

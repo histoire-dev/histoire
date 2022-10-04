@@ -10,17 +10,16 @@ import { VTooltip as vTooltip } from 'floating-vue'
 
 const props = withDefaults(defineProps<{
   title?: string
-  label?: boolean
+  tag?: string
 }>(), {
-  label: true,
+  tag: 'label',
 })
 
-const componentType = computed(() => props.label ? 'label' : 'div')
 </script>
 
 <template>
   <component
-    :is="componentType"
+    :is="tag"
     class="htw-p-2 hover:htw-bg-primary-100 dark:hover:htw-bg-primary-800 htw-flex htw-gap-2 htw-flex-wrap"
   >
     <span
