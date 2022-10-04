@@ -25,6 +25,7 @@ function initState () {
 <template>
   <Story
     title="HstSelect"
+    group="controls"
     :layout="{
       type: 'grid',
       width: '100%',

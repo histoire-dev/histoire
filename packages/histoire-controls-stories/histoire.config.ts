@@ -4,6 +4,9 @@ import { HstVue } from '@histoire/plugin-vue'
 export default defineConfig({
   plugins: [
     HstVue(),
+    {
+      name: 'builtin:tailwind-tokens',
+    },
   ],
 
   storyMatch: ['../histoire-controls/src/**/*.story.vue'],
@@ -13,6 +16,23 @@ export default defineConfig({
   theme: {
     title: 'Histoire controls',
     favicon: 'histoire.svg',
+  },
+
+  tree: {
+    groups: [
+      {
+        id: 'top',
+        title: '',
+      },
+      {
+        id: 'controls',
+        title: 'Controls',
+      },
+      {
+        id: 'design-system',
+        title: 'Design System',
+      },
+    ],
   },
 
   vite: {

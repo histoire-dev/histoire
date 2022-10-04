@@ -13,6 +13,7 @@ const state = reactive({
 <template>
   <Story
     title="HstSlider"
+    group="controls"
   >
     <HstSlider
       v-model="state.value"

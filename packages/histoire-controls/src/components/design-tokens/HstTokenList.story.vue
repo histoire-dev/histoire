@@ -55,7 +55,8 @@ const tokens = {
 
 <template>
   <Story
-    title="design-tokens/HstTokenList"
+    title="HstTokenList"
+    group="design-system"
     responsive-disabled
   >
     <Variant title="default">

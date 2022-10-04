@@ -14,7 +14,8 @@ const tokens = {
 
 <template>
   <Story
-    title="design-tokens/HstTokenGrid"
+    title="HstTokenGrid"
+    group="design-system"
     responsive-disabled
   >
     <Variant title="default">

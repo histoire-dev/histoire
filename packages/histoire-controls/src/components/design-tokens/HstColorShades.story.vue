@@ -286,7 +286,8 @@ const colors = {
 
 <template>
   <Story
-    title="design-tokens/HstColorShades"
+    title="HstColorShades"
+    group="design-system"
     responsive-disabled
   >
     <Variant title="default">

@@ -12,6 +12,7 @@ function initState () {
 <template>
   <Story
     title="HstNumber"
+    group="controls"
   >
     <Variant
       title="default"

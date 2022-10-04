@@ -9,7 +9,10 @@ function initState () {
 </script>
 
 <template>
-  <Story title="HstTextarea">
+  <Story
+    title="HstTextarea"
+    group="controls"
+  >
     <Variant
       title="default"
       :init-state="initState"

@@ -12,6 +12,7 @@ function initState () {
 <template>
   <Story
     title="HstText"
+    group="controls"
     :layout="{
       type: 'grid',
       width: '100%',
