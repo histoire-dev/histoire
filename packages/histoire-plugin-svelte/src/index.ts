@@ -57,6 +57,12 @@ export interface Hst {
   Story: typeof SvelteComponentTyped<StoryProps>
   Variant: typeof SvelteComponentTyped<VariantProps>
   // Controls
+  Button: typeof SvelteComponentTyped
+  ButtonGroup: typeof SvelteComponentTyped<{
+    value: string
+    options: HstControlOption[]
+    title?: string
+  }>
   Checkbox: typeof SvelteComponentTyped<{
     value: boolean
     title: string

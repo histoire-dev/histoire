@@ -1,7 +1,6 @@
 <script lang="ts">
 export default {
   name: 'HstNumber',
-
   inheritAttrs: false,
 }
 </script>
@@ -86,7 +85,7 @@ onUnmounted(() => {
       :class="{
         'htw-select-none': isDragging,
       }"
-      class="htw-text-inherit htw-bg-transparent htw-w-full htw-outline-none htw-pl-2 htw-py-1 -htw-my-1 htw-border htw-border-solid htw-border-black/25 dark:htw-border-white/25 focus:htw-border-primary-500 dark:focus:htw-border-primary-500 htw-rounded-sm htw-cursor-ew-resize"
+      class="htw-text-inherit htw-bg-transparent htw-w-full htw-outline-none htw-pl-2 htw-py-1 -htw-my-1 htw-border htw-border-solid htw-border-black/25 dark:htw-border-white/25 focus:htw-border-primary-500 dark:focus:htw-border-primary-500 htw-rounded-sm htw-cursor-ew-resize htw-box-border"
     >
 
     <template #actions>
