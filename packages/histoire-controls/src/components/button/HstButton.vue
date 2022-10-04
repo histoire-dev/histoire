@@ -20,7 +20,7 @@ const computedClasses = computed(() => {
   if (props.primary) {
     classes += 'htw-bg-primary-500 hover:htw-bg-primary-600 htw-text-white dark:htw-text-black'
   } else {
-    classes += 'htw-bg-gray-100 dark:htw-bg-gray-800 htw-text-gray-900 dark:htw-text-gray-100 hover:htw-bg-primary-100 dark:hover:htw-bg-primary-900'
+    classes += 'htw-bg-gray-100 dark:htw-bg-gray-800 htw-text-gray-900 dark:htw-text-gray-100 hover:htw-bg-primary-200 dark:hover:htw-bg-primary-900'
   }
 
   if (props.rounded) {
