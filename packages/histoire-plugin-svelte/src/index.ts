@@ -61,6 +61,11 @@ export interface Hst {
     value: boolean
     title: string
   }>
+  CheckboxList: typeof SvelteComponentTyped<{
+    value: string[]
+    options: HstControlOption[]
+    title?: string
+  }>
   Text: typeof SvelteComponentTyped<{
     value: string
     title: string

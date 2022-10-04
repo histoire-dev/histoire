@@ -1,4 +1,5 @@
 import HstCheckboxVue from './components/checkbox/HstCheckbox.vue'
+import HstCheckboxListVue from './components/checkbox/HstCheckboxList.vue'
 import HstTextVue from './components/text/HstText.vue'
 import HstNumberVue from './components/number/HstNumber.vue'
 import HstSliderVue from './components/slider/HstSlider.vue'
@@ -11,6 +12,7 @@ import HstCopyIconVue from './components/HstCopyIcon.vue'
 import HstRadioVue from './components/radio/HstRadio.vue'
 
 export const HstCheckbox = HstCheckboxVue
+export const HstCheckboxList = HstCheckboxListVue
 export const HstText = HstTextVue
 export const HstNumber = HstNumberVue
 export const HstSlider = HstSliderVue
@@ -24,6 +26,7 @@ export const HstRadio = HstRadioVue
 
 export const components = {
   HstCheckbox,
+  HstCheckboxList,
   HstText,
   HstNumber,
   HstSlider,

@@ -1,13 +1,11 @@
 <script lang="ts" setup>
-import HstRadio from './HstRadio.vue'
+import HstCheckboxList from './HstCheckboxList.vue'
 
 const options = {
   'crash-bandicoot': 'Crash Bandicoot',
   'the-last-of-us': 'The Last of Us',
   'ghost-of-tsushima': 'Ghost of Tsushima',
 }
-
-const flatOptions = Object.keys(options)
 
 const objectOptions = Object.keys(options).map(key => ({
   label: options[key],
@@ -16,14 +14,14 @@ const objectOptions = Object.keys(options).map(key => ({
 
 function initState () {
   return {
-    character: flatOptions[0],
+    characters: [],
   }
 }
 </script>
 
 <template>
   <Story
-    title="HstRadio"
+    title="HstCheckboxList"
     :layout="{ type: 'single', iframe: false }"
   >
     <Variant
@@ -31,16 +29,16 @@ function initState () {
       :init-state="initState"
     >
       <template #default="{ state }">
-        <HstRadio
-          v-model="state.character"
+        <HstCheckboxList
+          v-model="state.characters"
           title="Label"
           :options="objectOptions"
         />
       </template>
 
       <template #controls="{ state }">
-        <HstRadio
-          v-model="state.character"
+        <HstCheckboxList
+          v-model="state.characters"
           title="Label"
           :options="objectOptions"
         />

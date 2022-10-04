@@ -1,16 +1,16 @@
 <script lang="ts" setup>
-import HstCheckbox from './HstCheckbox.vue'
+import HstSimpleCheckbox from './HstSimpleCheckbox.vue'
 
 function initState () {
   return {
-    checked: false,
+    checked: true,
   }
 }
 </script>
 
 <template>
   <Story
-    title="HstCheckbox"
+    title="internals/HstSimpleCheckbox"
     :layout="{ type: 'single', iframe: false }"
   >
     <Variant
@@ -18,16 +18,9 @@ function initState () {
       :init-state="initState"
     >
       <template #default="{ state }">
-        <HstCheckbox
+        <HstSimpleCheckbox
           v-model="state.checked"
-          title="Label"
-        />
-      </template>
-
-      <template #controls="{ state }">
-        <HstCheckbox
-          v-model="state.checked"
-          title="Label"
+          with-toggle
         />
       </template>
     </Variant>
