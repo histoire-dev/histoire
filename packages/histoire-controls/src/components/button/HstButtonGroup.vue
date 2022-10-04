@@ -49,7 +49,7 @@ function selectOption (value: string) {
       <HstButton
         v-for="( label, value ) in formattedOptions"
         :key="value"
-        class="htw-px-1 htw-h-[22px] htw-flex-1"
+        class="htw-px-1 htw-h-[22px] htw-flex-1 !htw-rounded-[3px]"
         :color="value === modelValue ? 'primary' : 'flat'"
         :rounded="false"
         @click="selectOption(value)"
