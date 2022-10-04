@@ -5,36 +5,21 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { computed, withDefaults } from 'vue'
+const colors = {
+  default: 'htw-bg-gray-200 dark:htw-bg-gray-750 htw-text-gray-900 dark:htw-text-gray-100 hover:htw-bg-primary-200 dark:hover:htw-bg-primary-900',
+  primary: 'htw-bg-primary-500 hover:htw-bg-primary-600 htw-text-white dark:htw-text-black',
+  flat: 'htw-bg-transparent hover:htw-bg-gray-500/20 htw-text-gray-900 dark:htw-text-gray-100',
+}
 
-const props = withDefaults(defineProps<{
-  primary?: boolean
-  rounded?: boolean
-}>(), {
-  rounded: true,
-})
-
-const computedClasses = computed(() => {
-  let classes = ''
-
-  if (props.primary) {
-    classes += 'htw-bg-primary-500 hover:htw-bg-primary-600 htw-text-white dark:htw-text-black'
-  } else {
-    classes += 'htw-bg-gray-200 dark:htw-bg-gray-750 htw-text-gray-900 dark:htw-text-gray-100 hover:htw-bg-primary-200 dark:hover:htw-bg-primary-900'
-  }
-
-  if (props.rounded) {
-    classes += ' htw-rounded-sm'
-  }
-
-  return classes
-})
+defineProps<{
+  color?: keyof typeof colors
+}>()
 </script>
 
 <template>
   <button
-    class="htw-p-2 htw-cursor-pointer"
-    :class="computedClasses"
+    class="htw-cursor-pointer htw-rounded-sm"
+    :class="colors[color ?? 'default']"
   >
     <slot />
   </button>

@@ -43,16 +43,14 @@ function selectOption (value: string) {
     tag="div"
     role="group"
     :title="title"
-    class="htw-flex-nowrap"
-    :class="$attrs.class"
-    :style="$attrs.style"
+    class="htw-flex-nowrap htw-items-center"
   >
-    <div class="htw-flex">
+    <div class="htw-flex htw-gap-px htw-border htw-border-solid htw-border-black/25 dark:htw-border-white/25 htw-rounded-sm htw-p-px">
       <HstButton
         v-for="( label, value ) in formattedOptions"
         :key="value"
-        class="htw-p-1 htw-flex-1 first:htw-rounded-l-sm last:htw-rounded-r-sm"
-        :primary="value === modelValue"
+        class="htw-px-1 htw-h-[22px] htw-flex-1"
+        :color="value === modelValue ? 'primary' : 'flat'"
         :rounded="false"
         @click="selectOption(value)"
       >

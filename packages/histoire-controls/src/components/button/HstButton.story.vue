@@ -3,7 +3,8 @@ import HstButton from './HstButton.vue'
 
 const variants: Array<{name: string, bind?: unknown}> = [
   { name: 'Default' },
-  { name: 'Primary', bind: { primary: true } },
+  { name: 'Primary', bind: { color: 'primary' } },
+  { name: 'Flat', bind: { color: 'flat' } },
 ]
 </script>
 
@@ -18,7 +19,10 @@ const variants: Array<{name: string, bind?: unknown}> = [
       :key="key"
       :title="variant.name"
     >
-      <HstButton v-bind="variant.bind">
+      <HstButton
+        v-bind="variant.bind"
+        class="htw-p-2"
+      >
         Click me!
       </HstButton>
     </Variant>
