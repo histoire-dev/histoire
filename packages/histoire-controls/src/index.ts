@@ -1,3 +1,5 @@
+import HstButtonVue from './components/button/HstButton.vue'
+import HstButtonGroupVue from './components/button/HstButtonGroup.vue'
 import HstCheckboxVue from './components/checkbox/HstCheckbox.vue'
 import HstCheckboxListVue from './components/checkbox/HstCheckboxList.vue'
 import HstTextVue from './components/text/HstText.vue'
@@ -11,6 +13,8 @@ import HstTokenGridVue from './components/design-tokens/HstTokenGrid.vue'
 import HstCopyIconVue from './components/HstCopyIcon.vue'
 import HstRadioVue from './components/radio/HstRadio.vue'
 
+export const HstButton = HstButtonVue
+export const HstButtonGroup = HstButtonGroupVue
 export const HstCheckbox = HstCheckboxVue
 export const HstCheckboxList = HstCheckboxListVue
 export const HstText = HstTextVue
@@ -25,6 +29,8 @@ export const HstCopyIcon = HstCopyIconVue
 export const HstRadio = HstRadioVue
 
 export const components = {
+  HstButton,
+  HstButtonGroup,
   HstCheckbox,
   HstCheckboxList,
   HstText,
