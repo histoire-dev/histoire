@@ -5,15 +5,24 @@ export default {
 </script>
 
 <script lang="ts" setup>
+import { withDefaults, computed } from 'vue'
 import { VTooltip as vTooltip } from 'floating-vue'
 
-defineProps<{
+const props = withDefaults(defineProps<{
   title?: string
-}>()
+  label?: boolean
+}>(), {
+  label: true,
+})
+
+const componentType = computed(() => props.label ? 'label' : 'div')
 </script>
 
 <template>
-  <label class="htw-p-2 hover:htw-bg-primary-100 dark:hover:htw-bg-primary-800 htw-flex htw-gap-2 htw-flex-wrap">
+  <component
+    :is="componentType"
+    class="htw-p-2 hover:htw-bg-primary-100 dark:hover:htw-bg-primary-800 htw-flex htw-gap-2 htw-flex-wrap"
+  >
     <span
       v-tooltip="{
         content: title,
@@ -30,5 +39,5 @@ defineProps<{
       </span>
       <slot name="actions" />
     </span>
-  </label>
+  </component>
 </template>
