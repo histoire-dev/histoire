@@ -7,6 +7,7 @@ import GenericRenderStory from './GenericRenderStory.vue'
 import { useCurrentVariantRoute } from '../../util/variant'
 import type { Story, Variant } from '../../types'
 import { useScrollOnActive } from '../../util/scroll'
+import StoryVariantNewTab from '../toolbar/StoryVariantNewTab.vue'
 
 const props = defineProps({
   variant: {
@@ -60,13 +61,14 @@ useResizeObserver(el, () => {
 <template>
   <div
     ref="el"
-    class="htw-cursor-default htw-flex htw-flex-col htw-gap-y-1"
+    class="htw-cursor-default htw-flex htw-flex-col htw-gap-y-1 htw-group"
   >
     <!-- Header -->
     <div class="htw-flex-none htw-flex htw-items-center">
       <RouterLink
+        v-tooltip="variant.title"
         :to="targetRoute"
-        class="htw-rounded htw-w-max htw-px-2 htw-py-0.5 htw-min-w-16 htw-cursor-pointer htw-flex htw-items-center htw-gap-1"
+        class="htw-rounded htw-w-max htw-px-2 htw-py-0.5 htw-min-w-16 htw-cursor-pointer htw-flex htw-items-center htw-gap-1 htw-flex-shrink"
         :class="{
           'hover:htw-bg-gray-200 htw-text-gray-500 dark:hover:htw-bg-gray-800': !isActive,
           'htw-bg-primary-200 hover:htw-bg-primary-300 htw-text-primary-800 dark:htw-bg-primary-700 dark:hover:htw-bg-primary-800 dark:htw-text-primary-200': isActive,
@@ -80,13 +82,21 @@ useResizeObserver(el, () => {
             'bind-icon-color': !isActive && variant.iconColor,
           }"
         />
-        <span>{{ variant.title }}</span>
+        <span class="htw-truncate htw-flex-1">{{ variant.title }}</span>
       </RouterLink>
+
+      <!-- Toolbar -->
+      <div class="htw-flex-none htw-ml-auto htw-hidden group-hover:htw-flex htw-items-center htw-gap-1">
+        <StoryVariantNewTab
+          :variant="variant"
+          :story="story"
+        />
+      </div>
     </div>
 
     <!-- Body -->
     <div
-      class="htw-border htw-bg-white dark:htw-bg-gray-700 htw-rounded-lg htw-flex-1 htw-p-4"
+      class="htw-border htw-bg-white dark:htw-bg-gray-700 htw-rounded htw-flex-1 htw-p-4"
       :class="{
         'htw-border-gray-100 dark:htw-border-gray-800': !isActive,
         'htw-border-primary-200 dark:htw-border-primary-900': isActive,
