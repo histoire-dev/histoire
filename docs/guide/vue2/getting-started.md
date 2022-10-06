@@ -84,6 +84,10 @@ And then run them with `npm run story:dev` or `npm run story:build`.
 
 You can specify additional CLI options like `--port`. For a full list of CLI options, run `npx histoire --help` in your project.
 
+## Configuration
+
+Learn more about configuring Histoire [here](../config.md).
+
 ## Community
 
 If you have questions or need help, reach out to the community at [Discord](https://discord.gg/KpCnT72rJk) and [GitHub Discussions](https://github.com/histoire-dev/histoire/discussions).

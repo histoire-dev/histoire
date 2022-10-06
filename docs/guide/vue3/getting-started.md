@@ -140,6 +140,10 @@ export default defineConfig({
 })
 ```
 
+## Configuration
+
+Learn more about configuring Histoire [here](../config.md).
+
 ## Community
 
 If you have questions or need help, reach out to the community at [Discord](https://discord.gg/KpCnT72rJk) and [GitHub Discussions](https://github.com/histoire-dev/histoire/discussions).
