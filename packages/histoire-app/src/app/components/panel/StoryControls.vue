@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { PropType, ref, watch } from 'vue'
+import { computed, PropType, ref, watch } from 'vue'
 import { Icon } from '@iconify/vue'
 import GenericRenderStory from '../story/GenericRenderStory.vue'
 import type { Story, Variant } from '../../types'
@@ -25,6 +25,8 @@ const ready = ref(false)
 watch(() => props.variant, () => {
   ready.value = false
 })
+
+const hasCustomControls = computed(() => props.variant.slots().controls || props.story.slots().controls)
 </script>
 
 <template>
@@ -37,7 +39,7 @@ watch(() => props.variant, () => {
       class="htw-h-9 htw-flex-none htw-px-2 htw-flex htw-items-center"
     >
       <StatePresets
-        v-if="ready"
+        v-if="ready || !hasCustomControls"
         :story="story"
         :variant="variant"
       />
@@ -45,7 +47,7 @@ watch(() => props.variant, () => {
 
     <!-- Custom controls -->
     <GenericRenderStory
-      v-if="variant.slots().controls || story.slots().controls"
+      v-if="hasCustomControls"
       :key="`${story.id}-${variant.id}`"
       slot-name="controls"
       :variant="variant"
