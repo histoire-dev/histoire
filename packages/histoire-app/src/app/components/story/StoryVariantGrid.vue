@@ -85,7 +85,7 @@ watch(() => storyStore.currentVariant, () => {
 <template>
   <div
     ref="el"
-    class="htw-h-full htw-overflow-y-auto"
+    class="htw-h-full htw-overflow-y-auto __histoire-pane-shadow-from-right"
     @scroll="updateMaxCount()"
   >
     <div
