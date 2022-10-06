@@ -110,7 +110,7 @@ const columnCount = computed(() => Math.min(storyStore.currentStory.variants.len
 </script>
 
 <template>
-  <div class="htw-flex htw-flex-col htw-items-stretch htw-h-full">
+  <div class="htw-flex htw-flex-col htw-items-stretch htw-h-full __histoire-pane-shadow-from-right">
     <!-- Toolbar -->
     <div
       v-if="!isMobile"
@@ -121,7 +121,7 @@ const columnCount = computed(() => Math.min(storyStore.currentStory.variants.len
 
     <div
       ref="el"
-      class="htw-overflow-y-auto __histoire-pane-shadow-from-right htw-flex htw-flex-1"
+      class="htw-overflow-y-auto htw-flex htw-flex-1"
       @scroll="updateMaxCount()"
     >
       <div
