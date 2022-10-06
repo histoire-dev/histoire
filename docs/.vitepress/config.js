@@ -345,6 +345,16 @@ module.exports = {
       ],
       '/examples/': [
         {
+          text: 'General examples',
+          collapsible: true,
+          items: [
+            {
+              text: 'Tailwind CSS',
+              link: '/examples/tailwind',
+            },
+          ],
+        },
+        {
           text: 'Vue 3 examples',
           collapsible: true,
           items: [
