@@ -1,3 +1,22 @@
+## [0.11.1](https://github.com/Akryum/histoire/compare/v0.11.0...v0.11.1) (2022-10-06)
+
+
+### Bug Fixes
+
+* **controls:** display toolbar when no custom controls ([51d0f26](https://github.com/Akryum/histoire/commit/51d0f260990103831e12c650ce098f0ef92115b4))
+* missing gradient in grid view ([d6431de](https://github.com/Akryum/histoire/commit/d6431dedc382145880b40e140d5926e9541d37e1))
+
+
+### Features
+
+* add buttons controls ([#312](https://github.com/Akryum/histoire/issues/312)) ([7bc1b60](https://github.com/Akryum/histoire/commit/7bc1b6030bd344c23bb95b91d8bc3210708143e3))
+* add checkbox list ([#310](https://github.com/Akryum/histoire/issues/310)) ([ad39f96](https://github.com/Akryum/histoire/commit/ad39f96a9dfe15a49e59591d01e3fb2c8abf3dbf)), closes [#30](https://github.com/Akryum/histoire/issues/30)
+* center grids ([527f285](https://github.com/Akryum/histoire/commit/527f28550aad139b146d45f11a6cac01568b1efd))
+* **grid:** open in new tab ([e828f8c](https://github.com/Akryum/histoire/commit/e828f8cbcdee2dd0201f407c95d9a63bb9d569ff))
+* **grid:** preview background ([b2b0583](https://github.com/Akryum/histoire/commit/b2b05836fb0ebbd39c4e1a73bb72cc1baec1c6ce))
+
+
+
 # [0.11.0](https://github.com/Akryum/histoire/compare/v0.10.7...v0.11.0) (2022-10-03)
 
 
