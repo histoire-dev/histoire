@@ -2,7 +2,9 @@
 import { useResizeObserver } from '@vueuse/core'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useStoryStore } from '../../stores/story'
+import { isMobile } from '../../util/responsive'
 import StoryVariantGridItem from './StoryVariantGridItem.vue'
+import StoryVariantBackground from '../toolbar/StoryVariantBackground.vue'
 
 const storyStore = useStoryStore()
 
@@ -108,31 +110,41 @@ const columnCount = computed(() => Math.min(storyStore.currentStory.variants.len
 </script>
 
 <template>
-  <div
-    ref="el"
-    class="htw-h-full htw-overflow-y-auto __histoire-pane-shadow-from-right htw-flex"
-    @scroll="updateMaxCount()"
-  >
+  <div class="htw-flex htw-flex-col htw-items-stretch htw-h-full">
+    <!-- Toolbar -->
     <div
-      class="htw-m-auto"
-      :style="{
-        minHeight: `${(storyStore.currentStory.variants.length / countPerRow) * (maxItemHeight + gap) - gap}px`,
-      }"
+      v-if="!isMobile"
+      class="htw-flex-none htw-flex htw-items-center htw-justify-end htw-h-8 htw-mx-2 htw-mt-1"
+    >
+      <StoryVariantBackground />
+    </div>
+
+    <div
+      ref="el"
+      class="htw-overflow-y-auto __histoire-pane-shadow-from-right htw-flex htw-flex-1"
+      @scroll="updateMaxCount()"
     >
       <div
-        ref="gridEl"
-        class="htw-grid htw-gap-4 htw-m-4"
+        class="htw-m-auto"
         :style="{
-          gridTemplateColumns: `repeat(${columnCount}, ${gridTemplateWidth})`,
+          minHeight: `${(storyStore.currentStory.variants.length / countPerRow) * (maxItemHeight + gap) - gap}px`,
         }"
       >
-        <StoryVariantGridItem
-          v-for="(variant, index) of storyStore.currentStory.variants.slice(0, maxCount)"
-          :key="index"
-          :variant="variant"
-          :story="storyStore.currentStory"
-          @resize="onItemResize"
-        />
+        <div
+          ref="gridEl"
+          class="htw-grid htw-gap-4 htw-m-4"
+          :style="{
+            gridTemplateColumns: `repeat(${columnCount}, ${gridTemplateWidth})`,
+          }"
+        >
+          <StoryVariantGridItem
+            v-for="(variant, index) of storyStore.currentStory.variants.slice(0, maxCount)"
+            :key="index"
+            :variant="variant"
+            :story="storyStore.currentStory"
+            @resize="onItemResize"
+          />
+        </div>
       </div>
     </div>
   </div>

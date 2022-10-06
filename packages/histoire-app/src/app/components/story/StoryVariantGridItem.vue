@@ -3,11 +3,13 @@ import { PropType, ref, toRefs } from 'vue'
 import { Icon } from '@iconify/vue'
 import { useRouter } from 'vue-router'
 import { useResizeObserver } from '@vueuse/core'
-import GenericRenderStory from './GenericRenderStory.vue'
 import { useCurrentVariantRoute } from '../../util/variant'
 import type { Story, Variant } from '../../types'
 import { useScrollOnActive } from '../../util/scroll'
+import { usePreviewSettingsStore } from '../../stores/preview-settings'
+import GenericRenderStory from './GenericRenderStory.vue'
 import StoryVariantNewTab from '../toolbar/StoryVariantNewTab.vue'
+import CheckerboardPattern from '../misc/CheckerboardPattern.vue'
 
 const props = defineProps({
   variant: {
@@ -56,6 +58,8 @@ useResizeObserver(el, () => {
     }
   }
 })
+
+const settings = usePreviewSettingsStore().currentSettings
 </script>
 
 <template>
@@ -86,7 +90,7 @@ useResizeObserver(el, () => {
       </RouterLink>
 
       <!-- Toolbar -->
-      <div class="htw-flex-none htw-ml-auto htw-hidden group-hover:htw-flex htw-items-center htw-gap-1">
+      <div class="htw-flex-none htw-ml-auto htw-hidden group-hover:htw-flex htw-items-center">
         <StoryVariantNewTab
           :variant="variant"
           :story="story"
@@ -96,7 +100,7 @@ useResizeObserver(el, () => {
 
     <!-- Body -->
     <div
-      class="htw-border htw-bg-white dark:htw-bg-gray-700 htw-rounded htw-flex-1 htw-p-4"
+      class="htw-border htw-bg-white dark:htw-bg-gray-700 htw-rounded htw-flex-1 htw-p-4 htw-relative"
       :class="{
         'htw-border-gray-100 dark:htw-border-gray-800': !isActive,
         'htw-border-primary-200 dark:htw-border-primary-900': isActive,
@@ -105,12 +109,21 @@ useResizeObserver(el, () => {
       @click.stop="selectVariant()"
       @keyup="selectVariant()"
     >
-      <GenericRenderStory
-        :key="`${story.id}-${variant.id}`"
-        :variant="variant"
-        :story="story"
-        @ready="onReady"
+      <div class="htw-absolute htw-inset-0 htw-rounded bind-preview-bg" />
+
+      <CheckerboardPattern
+        v-if="settings.checkerboard"
+        class="htw-absolute htw-inset-0 htw-w-full htw-h-full htw-text-gray-500/20"
       />
+
+      <div class="htw-relative htw-h-full">
+        <GenericRenderStory
+          :key="`${story.id}-${variant.id}`"
+          :variant="variant"
+          :story="story"
+          @ready="onReady"
+        />
+      </div>
     </div>
   </div>
 </template>
@@ -118,5 +131,9 @@ useResizeObserver(el, () => {
 <style scoped>
 .bind-icon-color {
   color: v-bind('variant.iconColor');
+}
+
+.bind-preview-bg {
+  background-color: v-bind('settings.backgroundColor');
 }
 </style>
