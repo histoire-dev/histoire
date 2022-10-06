@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { useResizeObserver } from '@vueuse/core'
-import { computed, ref, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useStoryStore } from '../../stores/story'
 import StoryVariantGridItem from './StoryVariantGridItem.vue'
 
@@ -37,6 +37,7 @@ const el = ref<HTMLDivElement>(null)
 
 useResizeObserver(el, () => {
   updateMaxCount()
+  updateSize()
 })
 
 function updateMaxCount () {
@@ -80,23 +81,49 @@ function onItemResize (w: number, h: number) {
 watch(() => storyStore.currentVariant, () => {
   updateMaxCount()
 })
+
+// Grid size
+
+const gridEl = ref<HTMLDivElement>(null)
+const gridColumnWidth = ref(1)
+const viewWidth = ref(1)
+
+function updateSize () {
+  if (!el.value) return
+  viewWidth.value = el.value.clientWidth
+
+  if (!gridEl.value) return
+
+  const firstCellEl = gridEl.value.children[0] as HTMLDivElement
+  if (!firstCellEl) return
+
+  gridColumnWidth.value = firstCellEl.clientWidth
+}
+
+onMounted(() => {
+  updateSize()
+})
+
+const columnCount = computed(() => Math.min(storyStore.currentStory.variants.length, Math.floor((viewWidth.value + gap) / (gridColumnWidth.value + gap))))
 </script>
 
 <template>
   <div
     ref="el"
-    class="htw-h-full htw-overflow-y-auto __histoire-pane-shadow-from-right"
+    class="htw-h-full htw-overflow-y-auto __histoire-pane-shadow-from-right htw-flex"
     @scroll="updateMaxCount()"
   >
     <div
+      class="htw-m-auto"
       :style="{
         minHeight: `${(storyStore.currentStory.variants.length / countPerRow) * (maxItemHeight + gap) - gap}px`,
       }"
     >
       <div
+        ref="gridEl"
         class="htw-grid htw-gap-4 htw-m-4"
         :style="{
-          gridTemplateColumns: `repeat(auto-fill, ${gridTemplateWidth})`,
+          gridTemplateColumns: `repeat(${columnCount}, ${gridTemplateWidth})`,
         }"
       >
         <StoryVariantGridItem
