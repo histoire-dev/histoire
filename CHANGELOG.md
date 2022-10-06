@@ -1,3 +1,12 @@
+## [0.11.2](https://github.com/Akryum/histoire/compare/v0.11.1...v0.11.2) (2022-10-06)
+
+
+### Bug Fixes
+
+* **grid:** gradient is cut off ([7aa006a](https://github.com/Akryum/histoire/commit/7aa006a123900cd6215fef7f20ac0a712ffca931))
+
+
+
 ## [0.11.1](https://github.com/Akryum/histoire/compare/v0.11.0...v0.11.1) (2022-10-06)
 
 
