@@ -9,7 +9,7 @@ import { useModuleLoader } from './load.js'
 import { wrapLogError } from './util/log.js'
 import { createMarkdownFilesWatcher, onMarkdownListChange } from './markdown.js'
 
-export async function createServer (ctx: Context, port: number) {
+export async function createServer (ctx: Context, config: {port?: number} = {}) {
   const server = await createViteServer(await getViteConfigWithPlugins(false, ctx))
   await server.pluginContainer.buildStart({})
 
@@ -36,7 +36,7 @@ export async function createServer (ctx: Context, port: number) {
   }
 
   // Wait for pre-bundling (in `listen()`)
-  await server.listen(port)
+  await server.listen(config.port ?? server.config.server?.port ?? 6006)
 
   const {
     clearCache,
