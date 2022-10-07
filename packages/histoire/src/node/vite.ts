@@ -105,9 +105,10 @@ async function mergeHistoireViteConfig (viteConfig: InlineConfig, ctx: Context) 
 export async function getViteConfigWithPlugins (isServer: boolean, ctx: Context): Promise<InlineConfig> {
   const resolvedViteConfig = await resolveViteConfig(ctx)
 
-  const userViteConfig = await loadViteConfigFromFile({ command: ctx.mode === 'dev' ? 'serve' : 'build', mode: ctx.mode })
+  const userViteConfigFile = await loadViteConfigFromFile({ command: ctx.mode === 'dev' ? 'serve' : 'build', mode: ctx.mode })
+  const userViteConfig = mergeViteConfig(userViteConfigFile.config ?? {}, { server: { port: 6006 } })
 
-  const inlineConfig = await mergeHistoireViteConfig(userViteConfig?.config ?? {}, ctx)
+  const inlineConfig = await mergeHistoireViteConfig(userViteConfig, ctx)
   const plugins: VitePlugin[] = []
 
   const hasPnpm = !!(await findUp(ctx.root, ['pnpm-lock.yaml']))

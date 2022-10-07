@@ -40,7 +40,7 @@ export async function createServer (ctx: Context, options: CreateServerOptions =
   }
 
   // Wait for pre-bundling (in `listen()`)
-  await server.listen(options.port ?? server.config.server?.port ?? 6006)
+  await server.listen(options.port ?? server.config.server?.port)
 
   const {
     clearCache,
