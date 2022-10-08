@@ -100,6 +100,10 @@ export interface Hst {
     options: HstControlOption[]
     title?: string
   }>
+  Json: typeof SvelteComponentTyped<{
+    value: unknown
+    title: string
+  }>
   Shades: typeof SvelteComponentTyped<{
     shades: Record<string, any>
     getName?: (key: string, color: string) => string

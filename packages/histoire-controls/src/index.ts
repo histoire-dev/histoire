@@ -12,6 +12,7 @@ import HstTokenListVue from './components/design-tokens/HstTokenList.vue'
 import HstTokenGridVue from './components/design-tokens/HstTokenGrid.vue'
 import HstCopyIconVue from './components/HstCopyIcon.vue'
 import HstRadioVue from './components/radio/HstRadio.vue'
+import HstJsonVue from './components/json/HstJson.vue'
 
 export const HstButton = HstButtonVue
 export const HstButtonGroup = HstButtonGroupVue
@@ -27,6 +28,7 @@ export const HstTokenList = HstTokenListVue
 export const HstTokenGrid = HstTokenGridVue
 export const HstCopyIcon = HstCopyIconVue
 export const HstRadio = HstRadioVue
+export const HstJson = HstJsonVue
 
 export const components = {
   HstButton,
@@ -43,6 +45,7 @@ export const components = {
   HstTokenGrid,
   HstCopyIcon,
   HstRadio,
+  HstJson,
 }
 
 export * from './types'
