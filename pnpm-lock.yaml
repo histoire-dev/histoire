@@ -118,7 +118,7 @@ importers:
     devDependencies:
       '@histoire/plugin-svelte': link:../../packages/histoire-plugin-svelte
       '@sveltejs/adapter-auto': 1.0.0-next.80
-      '@sveltejs/kit': 1.0.0-next.510_svelte@3.50.1+vite@3.1.4
+      '@sveltejs/kit': 1.0.0-next.511_svelte@3.50.1+vite@3.1.4
       '@types/cookie': 0.5.1
       histoire: link:../../packages/histoire
       svelte: 3.50.1
@@ -285,6 +285,7 @@ importers:
       typescript: ^4.7.4
       vite: ^3.0.5
       vite-node: 0.23.4
+      vite-plugin-inspect: ^0.7.5
     dependencies:
       '@histoire/app': link:../histoire-app
       '@histoire/controls': link:../histoire-controls
@@ -317,6 +318,7 @@ importers:
       sirv: 2.0.2
       tinypool: 0.1.3
       vite-node: 0.23.4
+      vite-plugin-inspect: 0.7.5_vite@3.1.4
     devDependencies:
       '@peeky/server': 0.14.0
       '@peeky/test': 0.14.1_@peeky+server@0.14.0
@@ -2268,8 +2270,8 @@ packages:
       - supports-color
     dev: true
 
-  /@sveltejs/kit/1.0.0-next.510_svelte@3.50.1+vite@3.1.4:
-    resolution: {integrity: sha512-i96sRqEzNP1dOaQQ2aR38H6emdQJhc1qr5KqNyjqi3Wb0sDAG49cQxMRUOdydkVKZkG/o7PvC5qdyblVfalAdA==}
+  /@sveltejs/kit/1.0.0-next.511_svelte@3.50.1+vite@3.1.4:
+    resolution: {integrity: sha512-A/fxd4qHWDD07Mjo6qEEEfsBEkoj5C4/dPSzx6xPUoWmPvRPhU8t+P0oMc8BOn5YHOhPDq3coH8bmafbh73zKg==}
     engines: {node: '>=16.14'}
     hasBin: true
     requiresBuild: true
@@ -7676,7 +7678,6 @@ packages:
 
   /kolorist/1.6.0:
     resolution: {integrity: sha512-dLkz37Ab97HWMx9KTes3Tbi3D1ln9fCAy2zr2YVExJasDRPGRaKcoE4fycWNtnCAJfjFqe0cnY+f8KT2JePEXQ==}
-    dev: true
 
   /launch-editor/2.6.0:
     resolution: {integrity: sha512-JpDCcQnyAAzZZaZ7vEiSqL690w7dAEyLao+KC96zBplnYbJS7TYNjvM3M7y3dGz+v7aIsJk3hllWuc0kWAjyRQ==}
@@ -11332,6 +11333,23 @@ packages:
       vscode-languageserver-textdocument: 1.0.7
       vscode-uri: 3.0.6
     dev: true
+
+  /vite-plugin-inspect/0.7.5_vite@3.1.4:
+    resolution: {integrity: sha512-O8xq6dbvD1G7le75u6BfQTXJDUMXcRYlMVPzUpRjSB6hLyqH6BNnNkNrb/cVgCNNmKwk7dX+H2I+XVU2xpJk9Q==}
+    engines: {node: '>=14'}
+    peerDependencies:
+      vite: ^3.1.0 || ^2.9.0 || ^3.0.0
+    dependencies:
+      '@rollup/pluginutils': 4.2.1
+      debug: 4.3.4
+      fs-extra: 10.1.0
+      kolorist: 1.6.0
+      sirv: 2.0.2
+      ufo: 0.8.5
+      vite: 3.1.4
+    transitivePeerDependencies:
+      - supports-color
+    dev: false
 
   /vite-plugin-vuetify/1.0.0-alpha.12_tacspt2dmukucclm75di65rrdy:
     resolution: {integrity: sha512-DMb7oY6F67P1RTEU28xQePUnyZdm+sbeGgIF3exBrA5yLL8NKKPIahqJN4+MAWMXCJVwNKy7nsS6zVgOLtcoQg==}

@@ -1,5 +1,5 @@
 import { watch as _watch } from '@histoire/vendors/vue'
-import { applyState } from '@histoire/shared'
+import { applyState, clone } from '@histoire/shared'
 
 function cleanupState (state: Record<string, any>): Record<string, any> {
   const result = {}
@@ -32,7 +32,7 @@ export function syncState (variantState, onChange: (state) => unknown) {
     if (value == null) return
     if (!syncing) {
       syncing = true
-      applyState(variantState, cleanupState(value))
+      applyState(variantState, clone(cleanupState(value)))
     } else {
       syncing = false
     }

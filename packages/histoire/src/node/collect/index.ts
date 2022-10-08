@@ -11,14 +11,16 @@ import type { ServerStoryFile } from '@histoire/shared'
 import { createPath } from '../tree.js'
 import type { Context } from '../context.js'
 import type { Payload, ReturnData } from './worker.js'
+import { slash } from '../util/fs.js'
 
 export interface UseCollectStoriesOptions {
   server: ViteDevServer
+  mainServer?: ViteDevServer
   throws?: boolean
 }
 
 export function useCollectStories (options: UseCollectStoriesOptions, ctx: Context) {
-  const { server } = options
+  const { server, mainServer } = options
 
   const node = new ViteNodeServer(server, {
     deps: {
@@ -35,8 +37,9 @@ export function useCollectStories (options: UseCollectStoriesOptions, ctx: Conte
   })
 
   const threadsCount = ctx.mode === 'dev'
-    ? Math.max(cpus().length / 2, 1)
+    ? Math.max(Math.min(cpus().length / 2, 4), 1)
     : Math.max(cpus().length - 1, 1)
+  console.log(pc.blue(`Using ${threadsCount} threads for story collection`))
 
   const threadPool = new Tinypool({
     filename: new URL('./worker.js', import.meta.url).href,
@@ -73,15 +76,31 @@ export function useCollectStories (options: UseCollectStoriesOptions, ctx: Conte
     }
   }
 
+  const invalidates = new Set<string>()
+
+  if (mainServer) {
+    mainServer.watcher.on('change', (file) => {
+      file = slash(file)
+      if (invalidates.has(file)) return
+      invalidates.add(file)
+    })
+  }
+
+  function clearInvalidates () {
+    invalidates.clear()
+  }
+
   async function executeStoryFile (storyFile: ServerStoryFile) {
     try {
       const { workerPort } = createChannel()
-      const { storyData } = await threadPool.run({
+      const payload: Payload = {
         root: server.config.root,
         base: server.config.base,
         storyFile,
         port: workerPort,
-      } as Payload, {
+        invalidates: Array.from(invalidates),
+      }
+      const { storyData } = await threadPool.run(payload, {
         transferList: [
           workerPort,
         ],
@@ -132,5 +151,6 @@ export function useCollectStories (options: UseCollectStoriesOptions, ctx: Conte
     clearCache,
     executeStoryFile,
     destroy,
+    clearInvalidates,
   }
 }

@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import BaseButton from './BaseButton.vue'
+import { count } from './huge-grid'
 </script>
 
 <template>
@@ -11,7 +12,7 @@ import BaseButton from './BaseButton.vue'
     }"
   >
     <Variant
-      v-for="n in 1000"
+      v-for="n in count"
       :key="n"
       :title="`Variant ${n}`"
     >
