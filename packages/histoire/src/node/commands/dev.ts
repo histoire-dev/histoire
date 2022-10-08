@@ -1,8 +1,8 @@
+import chokidar from 'chokidar'
+import pc from 'picocolors'
 import { resolveConfigFile } from '../config.js'
 import { createContext } from '../context.js'
 import { createServer } from '../server.js'
-import chokidar from 'chokidar'
-import pc from 'picocolors'
 
 export interface DevOptions {
   port: number

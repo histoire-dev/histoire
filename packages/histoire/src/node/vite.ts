@@ -415,8 +415,12 @@ if (import.meta.hot) {
     },
 
     configureServer (server) {
+      let firstMount = true
       server.ws.on('histoire:mount', () => {
-        notifyStoryChange()
+        if (!firstMount) {
+          notifyStoryChange()
+        }
+        firstMount = false
       })
 
       server.middlewares.use(async (req, res, next) => {
