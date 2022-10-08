@@ -84,7 +84,7 @@ async function emitInput () {
           v-bind="{ ...$attrs, class: null, style: null }"
           v-model="internalValue"
           placeholder="Enter JSON"
-          class="htw-bg-transparent htw-text-transparent htw-caret-black dark:htw-caret-white htw-w-full htw-min-h-full htw-font-inherit htw-text-xs htw-outline-none htw-resize-none htw-overflow-hidden htw-m-0 htw-p-0"
+          class="htw-bg-transparent htw-text-transparent htw-caret-black dark:htw-caret-white htw-w-full htw-min-h-full htw-font-inherit htw-text-xs htw-outline-none htw-resize-none htw-overflow-hidden htw-m-0 htw-p-0 placeholder:htw-text-gray-300 placeholder:dark:htw-text-gray-400"
         />
         <div
           ref="preview"
