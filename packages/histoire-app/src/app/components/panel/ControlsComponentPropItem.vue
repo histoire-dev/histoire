@@ -12,7 +12,6 @@ const props = defineProps<{
 }>()
 
 const comp = computed(() => {
-  console.log(props.definition.types?.[0])
   switch (props.definition.types?.[0]) {
     case 'string':
       return HstText
@@ -21,7 +20,6 @@ const comp = computed(() => {
     case 'boolean':
       return HstCheckbox
     case 'object':
-    case 'unknown':
     default:
       return HstJson
   }
