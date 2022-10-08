@@ -40,7 +40,8 @@
     "test": "peeky run"
   },
   "dependencies": {
-    "@histoire/vendors": "^0.11.2"
+    "@histoire/vendors": "^0.11.2",
+    "shiki": "0.10.1"
   },
   "devDependencies": {
     "@peeky/server": "^0.14.0",
