@@ -133,6 +133,7 @@ export interface ServerStoryFile {
 }
 
 export interface ServerMarkdownFile {
+  id: string
   relativePath: string
   absolutePath: string
   isRelatedToStory: boolean

@@ -16,19 +16,27 @@ export interface CreateServerOptions {
 }
 
 export async function createServer (ctx: Context, options: CreateServerOptions = {}) {
-  const server = await createViteServer(await getViteConfigWithPlugins(false, ctx))
-  await server.pluginContainer.buildStart({})
+  const getViteServer = async (collecting: boolean) => {
+    const server = await createViteServer(await getViteConfigWithPlugins(collecting, ctx))
+    await server.pluginContainer.buildStart({})
+    return server
+  }
 
-  const nodeServer = await createViteServer(await getViteConfigWithPlugins(true, ctx))
-  await nodeServer.pluginContainer.buildStart({})
+  const [
+    server,
+    nodeServer,
+    ,
+    { stop: stopMdFileWatcher },
+  ] = await Promise.all([
+    getViteServer(false),
+    getViteServer(true),
+    watchStories(ctx),
+    createMarkdownFilesWatcher(ctx),
+  ] as const)
 
   const moduleLoader = useModuleLoader({
     server: nodeServer,
   })
-
-  await watchStories(ctx)
-
-  const { stop: stopMdFileWatcher } = await createMarkdownFilesWatcher(ctx)
 
   const pluginOnCleanups: (() => void | Promise<void>)[] = []
   for (const plugin of ctx.config.plugins) {
@@ -182,6 +190,8 @@ export async function createServer (ctx: Context, options: CreateServerOptions =
     await wrapLogError('destroyCollectStories', () => destroyCollectStories())
     await wrapLogError('stopMdFileWatcher', () => stopMdFileWatcher())
   }
+
+  collect()
 
   return {
     server,

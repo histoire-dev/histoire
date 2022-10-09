@@ -8,6 +8,7 @@ import type { Plugin as VitePlugin } from 'vite'
 import chokidar from 'chokidar'
 import fs from 'fs-extra'
 import path from 'pathe'
+import { paramCase } from 'change-case'
 import type { ServerMarkdownFile } from '@histoire/shared'
 import { slugify } from './util/slugify.js'
 import type { Context } from './context.js'
@@ -103,28 +104,6 @@ export async function createMarkdownPlugins (ctx: Context) {
     },
   })
 
-  plugins.push({
-    name: 'histoire-markdown-files',
-    transform (code, id) {
-      if (id.endsWith('.story.md')) {
-        const relativePath = path.relative(ctx.root, id)
-        const { content, data: frontmatter } = matter(code)
-        const html = md.render(content)
-        return `export const html = ${JSON.stringify(html)}
-export const frontmatter = ${JSON.stringify(frontmatter)}
-export const relativePath = ${JSON.stringify(relativePath)}
-
-if (import.meta.hot) {
-  import.meta.hot.accept(newModule => {
-    if (newModule) {
-      window.__hst_md_hmr(newModule)
-    }
-  })
-}`
-      }
-    },
-  })
-
   return plugins
 }
 
@@ -146,6 +125,7 @@ export async function createMarkdownFilesWatcher (ctx: Context) {
     const html = md.render(content)
 
     const file: ServerMarkdownFile = {
+      id: paramCase(relativePath.toLowerCase()),
       relativePath,
       absolutePath,
       isRelatedToStory,

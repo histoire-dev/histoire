@@ -37,7 +37,7 @@ export function useCollectStories (options: UseCollectStoriesOptions, ctx: Conte
   })
 
   const threadsCount = ctx.mode === 'dev'
-    ? Math.max(Math.min(cpus().length / 2, 4), 1)
+    ? Math.max(cpus().length / 2, 1)
     : Math.max(cpus().length - 1, 1)
   console.log(pc.blue(`Using ${threadsCount} threads for story collection`))
 
@@ -45,8 +45,8 @@ export function useCollectStories (options: UseCollectStoriesOptions, ctx: Conte
     filename: new URL('./worker.js', import.meta.url).href,
     // WebContainer compatibility (Stackblitz)
     useAtomics: typeof process.versions.webcontainer !== 'string',
-    maxThreads: threadsCount,
     minThreads: threadsCount,
+    maxThreads: threadsCount,
   })
 
   function clearCache () {
