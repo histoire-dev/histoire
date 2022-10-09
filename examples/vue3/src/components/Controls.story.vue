@@ -19,6 +19,7 @@ function initState () {
     longText: 'Longer text...',
     select: 'crash-bandicoot',
     radio: 'metal-gear',
+    object: { foo: 'bar' },
   }
 }
 </script>
@@ -66,6 +67,10 @@ function initState () {
           v-model="state.radio"
           title="HstRadio"
           :options="radioOptions"
+        />
+        <HstJson
+          v-model="state.object"
+          title="HstJson"
         />
       </template>
     </Variant>

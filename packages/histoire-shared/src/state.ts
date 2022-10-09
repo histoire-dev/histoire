@@ -22,12 +22,8 @@ export function omit (data, keys: string[]) {
   return copy
 }
 
-export function applyState (target: any, state: any, override = false) {
+export function applyState (target: any, state: any) {
   for (const key in state) {
-    if (!override && target[key] && !key.startsWith('_h') && typeof target[key] === 'object' && !Array.isArray(target[key])) {
-      Object.assign(target[key], state[key])
-    } else {
-      target[key] = state[key]
-    }
+    target[key] = state[key]
   }
 }

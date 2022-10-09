@@ -40,6 +40,13 @@
     "test": "peeky run"
   },
   "dependencies": {
+    "@codemirror/commands": "^6.1.1",
+    "@codemirror/lang-json": "^6.0.0",
+    "@codemirror/language": "^6.2.1",
+    "@codemirror/lint": "^6.0.0",
+    "@codemirror/state": "^6.1.2",
+    "@codemirror/theme-one-dark": "^6.1.0",
+    "@codemirror/view": "^6.3.0",
     "@histoire/vendors": "^0.11.2"
   },
   "devDependencies": {
