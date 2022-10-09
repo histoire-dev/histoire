@@ -40,8 +40,14 @@
     "test": "peeky run"
   },
   "dependencies": {
-    "@histoire/vendors": "^0.11.2",
-    "shiki": "0.10.1"
+    "@codemirror/commands": "^6.1.1",
+    "@codemirror/lang-json": "^6.0.0",
+    "@codemirror/language": "^6.2.1",
+    "@codemirror/lint": "^6.0.0",
+    "@codemirror/state": "^6.1.2",
+    "@codemirror/theme-one-dark": "^6.1.0",
+    "@codemirror/view": "^6.3.0",
+    "@histoire/vendors": "^0.11.2"
   },
   "devDependencies": {
     "@peeky/server": "^0.14.0",

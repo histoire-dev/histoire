@@ -9,8 +9,28 @@ export default {
 import { ref, onMounted, watch } from 'vue'
 import { Icon } from '@iconify/vue'
 import HstWrapper from '../HstWrapper.vue'
-import { getHighlighter, Highlighter, setCDN } from 'shiki'
 import { VTooltip as vTooltip } from 'floating-vue'
+import { EditorState } from '@codemirror/state'
+import {
+  EditorView,
+  keymap,
+  highlightActiveLineGutter,
+  highlightActiveLine,
+  highlightSpecialChars,
+  ViewUpdate,
+} from '@codemirror/view'
+import { defaultKeymap } from '@codemirror/commands'
+import { json } from '@codemirror/lang-json'
+import {
+  defaultHighlightStyle,
+  syntaxHighlighting,
+  indentOnInput,
+  bracketMatching,
+  foldGutter,
+  foldKeymap,
+} from '@codemirror/language'
+import { lintKeymap } from '@codemirror/lint'
+import { oneDark } from '@codemirror/theme-one-dark'
 import { isDark } from '../../utils'
 
 const props = defineProps<{
@@ -22,48 +42,69 @@ const emits = defineEmits({
   'update:modelValue': (newValue: unknown) => true,
 })
 
+let editorView: EditorView
 const internalValue = ref('')
-const internalCode = ref('')
 const invalidValue = ref(false)
-const highlighter = ref<Highlighter>()
-const input = ref<HTMLInputElement>()
+const editorElement = ref<HTMLInputElement>()
 
-onMounted(async () => {
-  setCDN('https://unpkg.com/shiki@0.10.1/')
-  highlighter.value = await getHighlighter({
-    langs: ['json'],
-    theme: isDark ? 'github-dark' : 'github-light',
-  })
-  updateInternalValue()
-})
+const extensions = [
+  highlightActiveLineGutter(),
+  highlightActiveLine(),
+  highlightSpecialChars(),
+  json(),
+  bracketMatching(),
+  indentOnInput(),
+  foldGutter(),
+  syntaxHighlighting(defaultHighlightStyle, { fallback: true }),
+  keymap.of([
+    ...defaultKeymap,
+    ...foldKeymap,
+    ...lintKeymap,
+  ]),
+  EditorView.updateListener.of((viewUpdate: ViewUpdate) => {
+    internalValue.value = viewUpdate.view.state.doc.toString()
+  }),
+]
 
-function updateInternalValue () {
-  internalValue.value = JSON.stringify(props.modelValue, null, 2)
+if (isDark) {
+  extensions.push(oneDark)
 }
 
+onMounted(async () => {
+  const state = EditorState.create({
+    doc: JSON.stringify(props.modelValue, null, 2),
+    extensions,
+  })
+
+  editorView = new EditorView({
+    state,
+    parent: editorElement.value,
+  })
+})
+
 watch(() => props.modelValue, () => {
-  if (!highlighter.value) {
-    return
+  let sameDocument
+
+  try {
+    sameDocument = (JSON.stringify(JSON.parse(internalValue.value)) === JSON.stringify(props.modelValue))
+  } catch (e) {
+    sameDocument = false
   }
 
-  if (invalidValue.value || JSON.stringify(JSON.parse(internalValue.value)) !== JSON.stringify(props.modelValue)) {
-    updateInternalValue()
+  if (!sameDocument) {
+    editorView.dispatch({ changes: [{ from: 0, to: editorView.state.doc.length, insert: JSON.stringify(props.modelValue, null, 2) }] })
   }
 }, { deep: true })
 
 watch(() => internalValue.value, () => {
-  internalCode.value = highlighter.value?.codeToHtml(internalValue.value, { lang: 'json' })
-  emitInput()
-})
-
-async function emitInput () {
   invalidValue.value = false
   try {
     emits('update:modelValue', JSON.parse(internalValue.value))
   } catch (e) {
     invalidValue.value = true
   }
-}
+})
+
 </script>
 
 <template>
@@ -72,27 +113,12 @@ async function emitInput () {
     class="htw-cursor-text"
     :class="$attrs.class"
     :style="$attrs.style"
-    @click="input.focus()"
   >
     <div
-      class="__histoire-json-code htw-w-full htw-px-2 htw-py-1 -htw-my-1 htw-border htw-border-solid htw-border-black/25 dark:htw-border-white/25 focus-within:htw-border-primary-500 dark:focus-within:htw-border-primary-500 htw-rounded-sm htw-box-border htw-overflow-y-auto htw-resize-y htw-min-h-[26px] htw-relative htw-h-16"
+      ref="editorElement"
+      class="__histoire-json-code htw-w-full htw-border htw-border-solid htw-border-black/25 dark:htw-border-white/25 focus-within:htw-border-primary-500 dark:focus-within:htw-border-primary-500 htw-rounded-sm htw-box-border htw-overflow-y-auto htw-resize-y htw-min-h-[26px] htw-relative htw-h-16"
       v-bind="{ ...$attrs, class: null, style: null }"
-    >
-      <div class="htw-grid htw-min-h-full">
-        <textarea
-          ref="input"
-          v-bind="{ ...$attrs, class: null, style: null }"
-          v-model="internalValue"
-          placeholder="Enter JSON"
-          class="htw-bg-transparent htw-text-transparent htw-caret-black dark:htw-caret-white htw-w-full htw-min-h-full htw-font-inherit htw-text-xs htw-outline-none htw-resize-none htw-overflow-hidden htw-m-0 htw-p-0 placeholder:htw-text-gray-300 placeholder:dark:htw-text-gray-400"
-        />
-        <div
-          ref="preview"
-          class="__histoire-json-preview htw-text-xs htw-pointer-events-none"
-          v-html="internalCode"
-        />
-      </div>
-    </div>
+    />
 
     <template #actions>
       <Icon
@@ -108,16 +134,7 @@ async function emitInput () {
 </template>
 
 <style scoped>
-.__histoire-json-code {
-  color: inherit;
-  font-size: inherit;
-}
-
-.__histoire-json-code ::v-deep(.shiki) {
-  background: transparent !important;
-}
-
-.__histoire-json-code textarea, .__histoire-json-preview {
-  grid-area: 1 / 1 / 2 / 2;
+.__histoire-json-code ::v-deep(.cm-editor) {
+  min-height: 100%;
 }
 </style>
