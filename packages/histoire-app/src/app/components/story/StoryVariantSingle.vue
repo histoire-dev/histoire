@@ -40,7 +40,7 @@ const variant = computed(() => storyStore.currentVariant)
         <template v-if="variant">
           <Icon
             :icon="variant.icon ?? 'carbon:cube'"
-            class="base-list-item-link-icon htw-w-5 htw-h-5 htw-flex-none"
+            class="htw-w-5 htw-h-5 htw-flex-none"
             :class="{
               'htw-text-gray-500': !variant.iconColor,
               'bind-icon-color': variant.iconColor,

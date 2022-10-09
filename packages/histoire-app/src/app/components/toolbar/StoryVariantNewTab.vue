@@ -23,7 +23,7 @@ const sandboxUrl = computed(() => {
   >
     <Icon
       icon="carbon:launch"
-      class="base-list-item-link-icon htw-w-4 htw-h-4"
+      class="htw-w-4 htw-h-4"
     />
   </a>
 </template>

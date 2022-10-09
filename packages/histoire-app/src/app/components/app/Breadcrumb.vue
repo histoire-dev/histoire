@@ -55,7 +55,7 @@ watch(story, () => {
         <span class="htw-flex htw-items-center htw-gap-2">
           <Icon
             :icon="story.icon ?? 'carbon:cube'"
-            class="base-list-item-link-icon htw-w-5 htw-h-5 htw-flex-none"
+            class="htw-w-5 htw-h-5 htw-flex-none"
             :class="{
               'htw-text-primary-500': !story.iconColor,
               'bind-icon-color': story.iconColor,

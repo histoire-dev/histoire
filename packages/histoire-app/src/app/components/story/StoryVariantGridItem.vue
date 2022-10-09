@@ -80,7 +80,7 @@ const settings = usePreviewSettingsStore().currentSettings
       >
         <Icon
           :icon="variant.icon ?? 'carbon:cube'"
-          class="base-list-item-link-icon htw-w-4 htw-h-4 htw-opacity-50"
+          class="htw-w-4 htw-h-4 htw-opacity-50"
           :class="{
             'htw-text-gray-500': !isActive && !variant.iconColor,
             'bind-icon-color': !isActive && variant.iconColor,
