@@ -1,3 +1,29 @@
+## [0.11.3](https://github.com/Akryum/histoire/compare/v0.11.2...v0.11.3) (2022-10-09)
+
+
+### Bug Fixes
+
+* config dev port (fix [#317](https://github.com/Akryum/histoire/issues/317)) ([#318](https://github.com/Akryum/histoire/issues/318)) ([095d516](https://github.com/Akryum/histoire/commit/095d51655891e091af5e5fbc93db725d9050682d))
+* missing dark class when layout.iframe option is false ([#267](https://github.com/Akryum/histoire/issues/267)) ([e0d1854](https://github.com/Akryum/histoire/commit/e0d1854b59434de11703726ec6a5f7ebabc50ec6))
+* **sveltekit:** md file broken rendering, fix [#321](https://github.com/Akryum/histoire/issues/321) ([082ad07](https://github.com/Akryum/histoire/commit/082ad07959eb4312996fb909ebdce27a8e232ca4))
+* **svelte:** variantState should not be modified by component internal state ([#271](https://github.com/Akryum/histoire/issues/271)) ([af78b46](https://github.com/Akryum/histoire/commit/af78b463405c1fa43980242d9bd83ee6008be421))
+
+
+### Features
+
+* add JSON control ([#319](https://github.com/Akryum/histoire/issues/319)) ([a9d9701](https://github.com/Akryum/histoire/commit/a9d97017250262de1ccae9107e074181bfc53c5f)), closes [#30](https://github.com/Akryum/histoire/issues/30)
+* add vite-plugin-inspect ([3cb13d0](https://github.com/Akryum/histoire/commit/3cb13d0ffb4a3f60cf6ef78e4478d8b523c3754a))
+* button to change text direction, fix [#236](https://github.com/Akryum/histoire/issues/236) ([d7fe643](https://github.com/Akryum/histoire/commit/d7fe643f404e43563d6d1e7efea89f952e5395db))
+* **config:** allow only setupFile.browser or .server ([79f2bd4](https://github.com/Akryum/histoire/commit/79f2bd4d3fb65d93014b579bb12be09d4c3dd0bf))
+
+
+### Performance Improvements
+
+* collect performance improvements ([e39d958](https://github.com/Akryum/histoire/commit/e39d958cc700ea3218b9aa93a757a3ae83604f0c))
+* improve startup time ([19e9309](https://github.com/Akryum/histoire/commit/19e930994e263000512842a7c15782f2a0ae7700))
+
+
+
 ## [0.11.2](https://github.com/Akryum/histoire/compare/v0.11.1...v0.11.2) (2022-10-06)
 
 
