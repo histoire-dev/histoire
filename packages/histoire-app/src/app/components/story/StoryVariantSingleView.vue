@@ -1,13 +1,13 @@
 <script lang="ts" setup>
 import type { Story, Variant } from '../../types'
 import { isMobile } from '../../util/responsive'
-import StoryVariantTitle from '../toolbar/StoryVariantTitle.vue'
-import StoryVariantResponsiveSize from '../toolbar/StoryVariantResponsiveSize.vue'
-import StoryVariantBackground from '../toolbar/StoryVariantBackground.vue'
-import StoryVariantNewTab from '../toolbar/StoryVariantNewTab.vue'
+import ToolbarTitle from '../toolbar/ToolbarTitle.vue'
+import ToolbarResponsiveSize from '../toolbar/ToolbarResponsiveSize.vue'
+import ToolbarBackground from '../toolbar/ToolbarBackground.vue'
+import ToolbarTextDirection from '../toolbar/ToolbarTextDirection.vue'
+import ToolbarNewTab from '../toolbar/ToolbarNewTab.vue'
 import StoryVariantSinglePreviewNative from './StoryVariantSinglePreviewNative.vue'
 import StoryVariantSinglePreviewRemote from './StoryVariantSinglePreviewRemote.vue'
-import ToolbarTextDirection from '../toolbar/ToolbarTextDirection.vue'
 
 defineProps<{
   variant: Variant
@@ -25,15 +25,15 @@ defineProps<{
       v-if="!isMobile"
       class="htw-flex-none htw-flex htw-items-center htw-h-8 -htw-mt-1"
     >
-      <StoryVariantTitle
+      <ToolbarTitle
         :variant="variant"
       />
-      <StoryVariantResponsiveSize
+      <ToolbarResponsiveSize
         v-if="!variant.responsiveDisabled"
       />
-      <StoryVariantBackground />
+      <ToolbarBackground />
       <ToolbarTextDirection />
-      <StoryVariantNewTab
+      <ToolbarNewTab
         :variant="variant"
         :story="story"
       />

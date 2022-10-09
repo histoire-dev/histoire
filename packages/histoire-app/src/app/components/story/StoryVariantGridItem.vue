@@ -8,7 +8,7 @@ import type { Story, Variant } from '../../types'
 import { useScrollOnActive } from '../../util/scroll'
 import { usePreviewSettingsStore } from '../../stores/preview-settings'
 import GenericRenderStory from './GenericRenderStory.vue'
-import StoryVariantNewTab from '../toolbar/StoryVariantNewTab.vue'
+import ToolbarNewTab from '../toolbar/ToolbarNewTab.vue'
 import CheckerboardPattern from '../misc/CheckerboardPattern.vue'
 
 const props = defineProps({
@@ -91,7 +91,7 @@ const settings = usePreviewSettingsStore().currentSettings
 
       <!-- Toolbar -->
       <div class="htw-flex-none htw-ml-auto htw-hidden group-hover:htw-flex htw-items-center">
-        <StoryVariantNewTab
+        <ToolbarNewTab
           :variant="variant"
           :story="story"
         />
