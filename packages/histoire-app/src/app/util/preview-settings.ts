@@ -5,4 +5,6 @@ export const receivedSettings = reactive<PreviewSettings>({} as PreviewSettings)
 
 export function applyPreviewSettings (settings: PreviewSettings) {
   Object.assign(receivedSettings, settings)
+
+  document.documentElement.setAttribute('dir', settings.textDirection)
 }

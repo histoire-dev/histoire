@@ -5,6 +5,7 @@ import { useStoryStore } from '../../stores/story'
 import { isMobile } from '../../util/responsive'
 import StoryVariantGridItem from './StoryVariantGridItem.vue'
 import StoryVariantBackground from '../toolbar/StoryVariantBackground.vue'
+import ToolbarTextDirection from '../toolbar/ToolbarTextDirection.vue'
 
 const storyStore = useStoryStore()
 
@@ -117,6 +118,7 @@ const columnCount = computed(() => Math.min(storyStore.currentStory.variants.len
       class="htw-flex-none htw-flex htw-items-center htw-justify-end htw-h-8 htw-mx-2 htw-mt-1"
     >
       <StoryVariantBackground />
+      <ToolbarTextDirection />
     </div>
 
     <div

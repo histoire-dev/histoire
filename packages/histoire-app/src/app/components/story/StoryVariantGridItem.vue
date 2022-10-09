@@ -121,6 +121,7 @@ const settings = usePreviewSettingsStore().currentSettings
           :key="`${story.id}-${variant.id}`"
           :variant="variant"
           :story="story"
+          :dir="settings.textDirection"
           @ready="onReady"
         />
       </div>

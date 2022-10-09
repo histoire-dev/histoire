@@ -46,4 +46,5 @@ export interface PreviewSettings {
   rotate: boolean
   backgroundColor: string
   checkerboard: boolean
+  textDirection: 'ltr' | 'rtl'
 }

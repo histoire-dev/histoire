@@ -7,6 +7,7 @@ import StoryVariantBackground from '../toolbar/StoryVariantBackground.vue'
 import StoryVariantNewTab from '../toolbar/StoryVariantNewTab.vue'
 import StoryVariantSinglePreviewNative from './StoryVariantSinglePreviewNative.vue'
 import StoryVariantSinglePreviewRemote from './StoryVariantSinglePreviewRemote.vue'
+import ToolbarTextDirection from '../toolbar/ToolbarTextDirection.vue'
 
 defineProps<{
   variant: Variant
@@ -31,6 +32,7 @@ defineProps<{
         v-if="!variant.responsiveDisabled"
       />
       <StoryVariantBackground />
+      <ToolbarTextDirection />
       <StoryVariantNewTab
         :variant="variant"
         :story="story"
