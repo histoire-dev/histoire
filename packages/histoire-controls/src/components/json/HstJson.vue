@@ -6,11 +6,11 @@ export default {
 </script>
 
 <script lang="ts" setup>
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, watch, watchEffect } from 'vue'
 import { Icon } from '@iconify/vue'
 import HstWrapper from '../HstWrapper.vue'
 import { VTooltip as vTooltip } from 'floating-vue'
-import { EditorState } from '@codemirror/state'
+import { Compartment } from '@codemirror/state'
 import {
   EditorView,
   keymap,
@@ -30,7 +30,7 @@ import {
   foldKeymap,
 } from '@codemirror/language'
 import { lintKeymap } from '@codemirror/lint'
-import { oneDark } from '@codemirror/theme-one-dark'
+import { oneDarkTheme, oneDarkHighlightStyle } from '@codemirror/theme-one-dark'
 import { isDark } from '../../utils'
 
 const props = defineProps<{
@@ -47,6 +47,13 @@ const internalValue = ref('')
 const invalidValue = ref(false)
 const editorElement = ref<HTMLInputElement>()
 
+const themes = {
+  light: [EditorView.baseTheme({}), syntaxHighlighting(defaultHighlightStyle)],
+  dark: [oneDarkTheme, syntaxHighlighting(oneDarkHighlightStyle)],
+}
+
+const themeConfig = new Compartment()
+
 const extensions = [
   highlightActiveLineGutter(),
   highlightActiveLine(),
@@ -55,7 +62,6 @@ const extensions = [
   bracketMatching(),
   indentOnInput(),
   foldGutter(),
-  syntaxHighlighting(defaultHighlightStyle, { fallback: true }),
   keymap.of([
     ...defaultKeymap,
     ...foldKeymap,
@@ -64,21 +70,22 @@ const extensions = [
   EditorView.updateListener.of((viewUpdate: ViewUpdate) => {
     internalValue.value = viewUpdate.view.state.doc.toString()
   }),
+  themeConfig.of(themes.light),
 ]
 
-if (isDark) {
-  extensions.push(oneDark)
-}
-
-onMounted(async () => {
-  const state = EditorState.create({
+onMounted(() => {
+  editorView = new EditorView({
     doc: JSON.stringify(props.modelValue, null, 2),
     extensions,
+    parent: editorElement.value,
   })
 
-  editorView = new EditorView({
-    state,
-    parent: editorElement.value,
+  watchEffect(() => {
+    editorView.dispatch({
+      effects: [
+        themeConfig.reconfigure(themes[isDark.value ? 'dark' : 'light']),
+      ],
+    })
   })
 })
 

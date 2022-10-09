@@ -27,7 +27,7 @@ function initState () {
           v-model="state.film"
           title="Textarea"
         />
-        {{ state.film }}
+        <pre>{{ state.film }}</pre>
       </template>
 
       <template #controls="{ state }">
