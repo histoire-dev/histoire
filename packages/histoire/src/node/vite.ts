@@ -244,6 +244,12 @@ export async function getViteConfigWithPlugins (isServer: boolean, ctx: Context)
         // @TODO
         // return `\0${id}`
       }
+
+      if (id.startsWith('virtual:md:')) {
+        return `/__resolved__${id}`
+        // @TODO
+        // return `\0${id}`
+      }
     },
 
     async load (id) {
@@ -368,7 +374,7 @@ if (import.meta.hot) {
       }
 
       if (id === RESOLVED_MARKDOWN_FILES) {
-        const filesJs = ctx.markdownFiles.map(f => `${JSON.stringify(f.relativePath)}: () => import(${JSON.stringify(`/${f.relativePath}`)})`).join(',')
+        const filesJs = ctx.markdownFiles.map(f => `${JSON.stringify(f.relativePath)}: () => import(${JSON.stringify(`virtual:md:${f.id}`)})`).join(',')
         return `import { reactive } from ${getInjectedImport('@histoire/vendors/vue')}
         export const markdownFiles = reactive({${filesJs}})
         if (import.meta.hot) {
@@ -404,6 +410,26 @@ if (import.meta.hot) {
           }
           return `export default ${JSON.stringify(source)}`
         }
+      }
+
+      if (id.startsWith('/__resolved__virtual:md:')) {
+        const fileId = id.slice('/__resolved__virtual:md:'.length)
+        const file = ctx.markdownFiles.find(f => f.id === fileId)
+        if (!file) {
+          throw new Error(`Markdown file not found: ${fileId}`)
+        }
+        const { html, frontmatter, relativePath } = file
+        return `export const html = ${JSON.stringify(html)}
+export const frontmatter = ${JSON.stringify(frontmatter)}
+export const relativePath = ${JSON.stringify(relativePath)}
+
+if (import.meta.hot) {
+  import.meta.hot.accept(newModule => {
+    if (newModule) {
+      window.__hst_md_hmr(newModule)
+    }
+  })
+}`
       }
     },
 
