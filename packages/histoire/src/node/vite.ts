@@ -196,17 +196,18 @@ export async function getViteConfigWithPlugins (isServer: boolean, ctx: Context)
           let file: string
           if (typeof setupFileConfig === 'string') {
             file = setupFileConfig
-          } else if (isServer) {
+          } else if (isServer && 'server' in setupFileConfig) {
             file = setupFileConfig.server
-          } else {
+          } else if ('browser' in setupFileConfig) {
             file = setupFileConfig.browser
           }
-          return this.resolve(resolve(ctx.root, file), importer, {
-            skipSelf: true,
-          })
-        } else {
-          return NOOP_ID
+          if (file) {
+            return this.resolve(resolve(ctx.root, file), importer, {
+              skipSelf: true,
+            })
+          }
         }
+        return NOOP_ID
       }
       if (id.startsWith(CONFIG_ID)) {
         return RESOLVED_CONFIG_ID

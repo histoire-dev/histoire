@@ -128,6 +128,16 @@ export interface HistoireConfig {
      * Only loaded in the browser client.
      */
     browser: string
+  } | {
+    /**
+     * Only loaded while collecting stories in the node server.
+     */
+    server: string
+  } | {
+    /**
+     * Only loaded in the browser client.
+     */
+    browser: string
     /**
      * Only loaded while collecting stories in the node server.
      */
