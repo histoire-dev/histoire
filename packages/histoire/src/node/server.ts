@@ -1,4 +1,6 @@
+import { performance } from 'node:perf_hooks'
 import { createServer as createViteServer } from 'vite'
+import pc from 'picocolors'
 import type { ServerStoryFile } from '@histoire/shared'
 import { Context } from './context.js'
 import { getViteConfigWithPlugins, RESOLVED_MARKDOWN_FILES, RESOLVED_SEARCH_TITLE_DATA_ID, RESOLVED_STORIES_ID } from './vite.js'
@@ -9,7 +11,11 @@ import { useModuleLoader } from './load.js'
 import { wrapLogError } from './util/log.js'
 import { createMarkdownFilesWatcher, onMarkdownListChange } from './markdown.js'
 
-export async function createServer (ctx: Context, port: number) {
+export interface CreateServerOptions {
+  port?: number
+}
+
+export async function createServer (ctx: Context, options: CreateServerOptions = {}) {
   const server = await createViteServer(await getViteConfigWithPlugins(false, ctx))
   await server.pluginContainer.buildStart({})
 
@@ -36,22 +42,23 @@ export async function createServer (ctx: Context, port: number) {
   }
 
   // Wait for pre-bundling (in `listen()`)
-  await server.listen(port)
+  await server.listen(options.port ?? server.config.server?.port)
 
   const {
     clearCache,
     executeStoryFile,
     destroy: destroyCollectStories,
+    clearInvalidates,
   } = useCollectStories({
     server: nodeServer,
+    mainServer: server,
   }, ctx)
 
   // onStoryChange debouncing
-  let queue: Promise<void>
-  let queueResolve: () => void
   let queued = false
   let queuedFiles: ServerStoryFile[] = []
-  let queuedAll = false
+  let queueTimer
+  let collecting = false
   let didAllStoriesYet = false
 
   // Invalidate modules
@@ -82,36 +89,38 @@ export async function createServer (ctx: Context, port: number) {
     if (changedFile && !didAllStoriesYet) {
       return
     }
-    if (queue) {
-      if (queued) {
-        if (changedFile) {
-          if (!queuedFiles.includes(changedFile)) {
-            queuedFiles.push(changedFile)
-          }
-        } else {
-          queuedAll = true
-        }
-        return
-      } else if (queuedFiles.includes(changedFile)) {
-        return
-      } else {
-        queued = true
-        // Next call
-        await queue
+
+    if (changedFile) {
+      if (!queuedFiles.includes(changedFile)) {
+        queuedFiles.push(changedFile)
+      }
+    } else {
+      queuedFiles = []
+    }
+
+    if (!queued) {
+      queued = true
+      if (!collecting) {
+        clearTimeout(queueTimer)
+        // Debounce
+        queueTimer = setTimeout(collect, 100)
       }
     }
-    queuedFiles.unshift(changedFile)
-    queued = false
-    queue = new Promise(resolve => {
-      queueResolve = resolve
-    })
+  })
+
+  async function collect () {
+    collecting = true
 
     clearCache()
 
-    console.log('Collect stories start', changedFile?.path ?? 'all')
-    const time = Date.now()
-    if (changedFile && !queuedAll) {
-      await Promise.all(queuedFiles.map(async storyFile => {
+    const currentFiles = queuedFiles.slice()
+    queuedFiles = []
+    queued = false
+
+    console.log('Collect stories start', currentFiles.length ? currentFiles.map(f => f.fileName).join(', ') : 'all')
+    const time = performance.now()
+    if (currentFiles.length) {
+      await Promise.all(currentFiles.map(async storyFile => {
         await executeStoryFile(storyFile)
         if (storyFile.story) {
           await invalidateModule(`/__resolved__virtual:story-source:${storyFile.story.id}`)
@@ -141,15 +150,19 @@ export async function createServer (ctx: Context, port: number) {
       didAllStoriesYet = true
       server.ws.send('histoire:all-stories-loaded', {})
     }
-    console.log('Collect stories end', Date.now() - time, 'ms')
+    console.log(`Collect stories end ${pc.bold(pc.blue(Math.round(performance.now() - time)))}ms`)
 
-    queuedFiles = []
-    queuedAll = false
-    queueResolve()
+    clearInvalidates()
 
     invalidateModule(RESOLVED_STORIES_ID)
     invalidateModule(RESOLVED_SEARCH_TITLE_DATA_ID)
-  })
+
+    collecting = false
+
+    if (queued) {
+      await collect()
+    }
+  }
 
   onStoryListChange(() => {
     invalidateModule(RESOLVED_STORIES_ID)

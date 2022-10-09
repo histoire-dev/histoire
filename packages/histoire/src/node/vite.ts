@@ -11,6 +11,7 @@ import {
 } from 'vite'
 import { lookup as lookupMime } from 'mrmime'
 import fs from 'fs-extra'
+import ViteInspect from 'vite-plugin-inspect'
 import { APP_PATH, TEMP_PATH } from './alias.js'
 import { Context } from './context.js'
 import { notifyStoryChange } from './stories.js'
@@ -105,9 +106,10 @@ async function mergeHistoireViteConfig (viteConfig: InlineConfig, ctx: Context) 
 export async function getViteConfigWithPlugins (isServer: boolean, ctx: Context): Promise<InlineConfig> {
   const resolvedViteConfig = await resolveViteConfig(ctx)
 
-  const userViteConfig = await loadViteConfigFromFile({ command: ctx.mode === 'dev' ? 'serve' : 'build', mode: ctx.mode })
+  const userViteConfigFile = await loadViteConfigFromFile({ command: ctx.mode === 'dev' ? 'serve' : 'build', mode: ctx.mode })
+  const userViteConfig = mergeViteConfig(userViteConfigFile?.config ?? {}, { server: { port: 6006 } })
 
-  const inlineConfig = await mergeHistoireViteConfig(userViteConfig?.config ?? {}, ctx)
+  const inlineConfig = await mergeHistoireViteConfig(userViteConfig, ctx)
   const plugins: VitePlugin[] = []
 
   const hasPnpm = !!(await findUp(ctx.root, ['pnpm-lock.yaml']))
@@ -126,6 +128,8 @@ export async function getViteConfigWithPlugins (isServer: boolean, ctx: Context)
     }
     return result
   }
+
+  plugins.push(ViteInspect())
 
   plugins.push({
     name: 'histoire-vite-plugin',
