@@ -5,13 +5,14 @@ export default {
 </script>
 
 <script lang="ts" setup>
-import { withDefaults, computed } from 'vue'
+import { withDefaults } from 'vue'
 import { VTooltip as vTooltip } from 'floating-vue'
 
-const props = withDefaults(defineProps<{
+withDefaults(defineProps<{
   title?: string
   tag?: string
 }>(), {
+  title: undefined,
   tag: 'label',
 })
 
@@ -32,8 +33,8 @@ const props = withDefaults(defineProps<{
     >
       {{ title }}
     </span>
-    <span class="htw-grow htw-flex htw-items-center htw-gap-1">
-      <span class="htw-block htw-grow">
+    <span class="htw-grow htw-max-w-full htw-flex htw-items-center htw-gap-1">
+      <span class="htw-block htw-grow htw-max-w-full">
         <slot />
       </span>
       <slot name="actions" />

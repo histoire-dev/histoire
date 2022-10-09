@@ -116,7 +116,7 @@ watch(() => internalValue.value, () => {
   >
     <div
       ref="editorElement"
-      class="__histoire-json-code htw-w-full htw-border htw-border-solid htw-border-black/25 dark:htw-border-white/25 focus-within:htw-border-primary-500 dark:focus-within:htw-border-primary-500 htw-rounded-sm htw-box-border htw-overflow-y-auto htw-resize-y htw-min-h-[26px] htw-relative htw-h-16"
+      class="__histoire-json-code htw-w-full htw-border htw-border-solid htw-border-black/25 dark:htw-border-white/25 focus-within:htw-border-primary-500 dark:focus-within:htw-border-primary-500 htw-rounded-sm htw-box-border htw-overflow-auto htw-resize-y htw-min-h-32 htw-h-48 htw-relative"
       v-bind="{ ...$attrs, class: null, style: null }"
     />
 
@@ -134,7 +134,8 @@ watch(() => internalValue.value, () => {
 </template>
 
 <style scoped>
-.__histoire-json-code ::v-deep(.cm-editor) {
-  min-height: 100%;
+.__histoire-json-code :deep(.cm-editor) {
+  height: 100%;
+  min-width: 280px;
 }
 </style>
