@@ -263,7 +263,7 @@ importers:
       connect: ^3.7.0
       defu: ^6.0.0
       diacritics: ^1.3.0
-      flexsearch: ^0.7.21
+      flexsearch: 0.7.21
       fs-extra: ^10.0.1
       globby: ^13.1.1
       gray-matter: ^4.0.3
@@ -342,7 +342,7 @@ importers:
       autoprefixer: ^10.4.4
       chokidar: ^3.5.3
       concurrently: ^7.1.0
-      flexsearch: ^0.7.21
+      flexsearch: 0.7.21
       fs-extra: ^10.0.1
       globby: ^13.1.1
       pathe: ^0.2.0

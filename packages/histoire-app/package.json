@@ -33,7 +33,7 @@
     "@histoire/shared": "^0.11.3",
     "@histoire/vendors": "^0.11.3",
     "@types/flexsearch": "^0.7.3",
-    "flexsearch": "^0.7.21",
+    "flexsearch": "0.7.21",
     "shiki": "0.10.1"
   },
   "devDependencies": {
