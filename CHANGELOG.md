@@ -1,3 +1,12 @@
+## [0.11.4](https://github.com/Akryum/histoire/compare/v0.11.3...v0.11.4) (2022-10-12)
+
+
+### Bug Fixes
+
+* pin flexsearch version, fix [#322](https://github.com/Akryum/histoire/issues/322) ([ec5d3cb](https://github.com/Akryum/histoire/commit/ec5d3cb8ba1cb204323411b4e3727b679c1fad9f))
+
+
+
 ## [0.11.3](https://github.com/Akryum/histoire/compare/v0.11.2...v0.11.3) (2022-10-09)
 
 

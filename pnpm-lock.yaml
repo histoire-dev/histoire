@@ -117,8 +117,8 @@ importers:
       cookie: 0.4.2
     devDependencies:
       '@histoire/plugin-svelte': link:../../packages/histoire-plugin-svelte
-      '@sveltejs/adapter-auto': 1.0.0-next.80
-      '@sveltejs/kit': 1.0.0-next.511_svelte@3.50.1+vite@3.1.4
+      '@sveltejs/adapter-auto': 1.0.0-next.83
+      '@sveltejs/kit': 1.0.0-next.515_svelte@3.50.1+vite@3.1.4
       '@types/cookie': 0.5.1
       histoire: link:../../packages/histoire
       svelte: 3.50.1
@@ -246,10 +246,10 @@ importers:
 
   packages/histoire:
     specifiers:
-      '@histoire/app': ^0.11.3
-      '@histoire/controls': ^0.11.3
-      '@histoire/shared': ^0.11.3
-      '@histoire/vendors': ^0.11.3
+      '@histoire/app': ^0.11.4
+      '@histoire/controls': ^0.11.4
+      '@histoire/shared': ^0.11.4
+      '@histoire/vendors': ^0.11.4
       '@peeky/server': ^0.14.0
       '@peeky/test': ^0.14.1
       '@types/flexsearch': ^0.7.3
@@ -331,9 +331,9 @@ importers:
 
   packages/histoire-app:
     specifiers:
-      '@histoire/controls': ^0.11.3
-      '@histoire/shared': ^0.11.3
-      '@histoire/vendors': ^0.11.3
+      '@histoire/controls': ^0.11.4
+      '@histoire/shared': ^0.11.4
+      '@histoire/vendors': ^0.11.4
       '@tailwindcss/typography': ^0.5.2
       '@types/flexsearch': ^0.7.3
       '@types/fs-extra': ^9.0.13
@@ -387,7 +387,7 @@ importers:
       '@codemirror/state': ^6.1.2
       '@codemirror/theme-one-dark': ^6.1.0
       '@codemirror/view': ^6.3.0
-      '@histoire/vendors': ^0.11.3
+      '@histoire/vendors': ^0.11.4
       '@peeky/server': ^0.14.0
       '@peeky/test': ^0.14.1
       '@types/node': ^17.0.32
@@ -507,9 +507,9 @@ importers:
 
   packages/histoire-plugin-svelte:
     specifiers:
-      '@histoire/controls': ^0.11.3
-      '@histoire/shared': ^0.11.3
-      '@histoire/vendors': ^0.11.3
+      '@histoire/controls': ^0.11.4
+      '@histoire/shared': ^0.11.4
+      '@histoire/vendors': ^0.11.4
       '@sveltejs/vite-plugin-svelte': ^1.0.1
       '@types/node': ^17.0.32
       concurrently: ^7.1.0
@@ -538,9 +538,9 @@ importers:
 
   packages/histoire-plugin-vue:
     specifiers:
-      '@histoire/controls': ^0.11.3
-      '@histoire/shared': ^0.11.3
-      '@histoire/vendors': ^0.11.3
+      '@histoire/controls': ^0.11.4
+      '@histoire/shared': ^0.11.4
+      '@histoire/vendors': ^0.11.4
       '@types/node': ^17.0.32
       change-case: ^4.1.2
       concurrently: ^7.1.0
@@ -563,9 +563,9 @@ importers:
 
   packages/histoire-plugin-vue2:
     specifiers:
-      '@histoire/controls': ^0.11.3
-      '@histoire/shared': ^0.11.3
-      '@histoire/vendors': ^0.11.3
+      '@histoire/controls': ^0.11.4
+      '@histoire/shared': ^0.11.4
+      '@histoire/vendors': ^0.11.4
       '@types/node': ^17.0.32
       change-case: ^4.1.2
       concurrently: ^7.1.0
@@ -2324,35 +2324,35 @@ packages:
     resolution: {integrity: sha512-sXXKG+uL9IrKqViTtao2Ws6dy0znu9sOaP1di/jKGW1M6VssO8vlpXCQcpZ+jisQ1tTFAC5Jo/EOzFbggBagFQ==}
     dev: true
 
-  /@sveltejs/adapter-auto/1.0.0-next.80:
-    resolution: {integrity: sha512-352WoZr9fQgxJqgNENvxRr2gsA+wTF6V9AVaQaaatDYd3RVEBaXTYOOalFaRLSa25mRUJaLYP2aaliqczMl23g==}
+  /@sveltejs/adapter-auto/1.0.0-next.83:
+    resolution: {integrity: sha512-6Km4x792PjHaN0H0odsy7JOj3jdDZqN1tA58B1b96xWUUUj87tw6XYC7VWRBjwo2wZqWkRat94IegrtAAhYVaA==}
     dependencies:
-      '@sveltejs/adapter-cloudflare': 1.0.0-next.38
-      '@sveltejs/adapter-netlify': 1.0.0-next.78
-      '@sveltejs/adapter-vercel': 1.0.0-next.77
+      '@sveltejs/adapter-cloudflare': 1.0.0-next.39
+      '@sveltejs/adapter-netlify': 1.0.0-next.81
+      '@sveltejs/adapter-vercel': 1.0.0-next.79
     transitivePeerDependencies:
       - encoding
       - supports-color
     dev: true
 
-  /@sveltejs/adapter-cloudflare/1.0.0-next.38:
-    resolution: {integrity: sha512-N6jdTomRZkdKlcNoguwYD7lpdXSt0beIyUJsp0MS/YLm/4gI83y698zFYInFKJ9t5e6DAnuEBSAXcg568z2oFA==}
+  /@sveltejs/adapter-cloudflare/1.0.0-next.39:
+    resolution: {integrity: sha512-95iRY3+mFVqEp4BqTJQGAyga7gSovIsm4SvhqsfBE/IQLkb2MnwLq2usRkXm9R6nby4w/jzEwgQM2ohsZD2HHA==}
     dependencies:
       '@cloudflare/workers-types': 3.16.0
       esbuild: 0.15.10
       worktop: 0.8.0-next.14
     dev: true
 
-  /@sveltejs/adapter-netlify/1.0.0-next.78:
-    resolution: {integrity: sha512-Yyn/j/0QcLK3Db442ducLUZmyvkO74j7Gdcwu9xN0fQN3kBlCJP9Itx5o4SySrPFGc4Q8cLJ5ELNg+mWduLBAA==}
+  /@sveltejs/adapter-netlify/1.0.0-next.81:
+    resolution: {integrity: sha512-jWZHw2uqUMJk8lFPzRm0xxmBZoDc430tbeCU9EtYhG+ypze2B6pJAlNTtcN3/J7wapHq19TgEK5oNt4LqORfNg==}
     dependencies:
       '@iarna/toml': 2.2.5
       esbuild: 0.15.10
       set-cookie-parser: 2.5.1
     dev: true
 
-  /@sveltejs/adapter-vercel/1.0.0-next.77:
-    resolution: {integrity: sha512-r4MqtP+lzx83HfcvI8PU0Yxzmxt6WQq9nzZETLboJouJzhSBUFIN5RmNZfEn6nNIlUwZbGQUEK/FxsRnnxI/Ig==}
+  /@sveltejs/adapter-vercel/1.0.0-next.79:
+    resolution: {integrity: sha512-Mitw34vS+wR/qxZm6qOUltf910N8gcekYZHaEVxO6HaE/9LyEZ/O03e9rRKwo4LAWrHXOkHMdUxvv1VcS9BqmQ==}
     dependencies:
       '@vercel/nft': 0.22.1
       esbuild: 0.15.10
@@ -2361,8 +2361,8 @@ packages:
       - supports-color
     dev: true
 
-  /@sveltejs/kit/1.0.0-next.511_svelte@3.50.1+vite@3.1.4:
-    resolution: {integrity: sha512-A/fxd4qHWDD07Mjo6qEEEfsBEkoj5C4/dPSzx6xPUoWmPvRPhU8t+P0oMc8BOn5YHOhPDq3coH8bmafbh73zKg==}
+  /@sveltejs/kit/1.0.0-next.515_svelte@3.50.1+vite@3.1.4:
+    resolution: {integrity: sha512-Ck+T16bci7VWc4CNP61xvfMrbDHX1Q8aPZWgthnrSH8hsdx9w1MP80D9V4A98WX0cyhCQ02JzlTmxgf2UpYRbQ==}
     engines: {node: '>=16.14'}
     hasBin: true
     requiresBuild: true
