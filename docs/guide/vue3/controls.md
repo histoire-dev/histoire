@@ -227,7 +227,7 @@ const state = reactive({
       </MyButton>
 
       <template #controls>
-        <HstText v-model="state.text" title="Content" />
+        <HstText v-model="state.content" title="Content" />
         <HstCheckbox v-model="state.disabled" title="Disabled" />
       </template>
     </Variant>
