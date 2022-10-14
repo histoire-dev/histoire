@@ -1,3 +1,12 @@
+## [0.11.5](https://github.com/Akryum/histoire/compare/v0.11.4...v0.11.5) (2022-10-14)
+
+
+### Bug Fixes
+
+* add optimize shiki in case of pnpm shamefully hoist ([a1014ab](https://github.com/Akryum/histoire/commit/a1014ab2b0a54243b0742f3dbe059c278f669ca0))
+
+
+
 ## [0.11.4](https://github.com/Akryum/histoire/compare/v0.11.3...v0.11.4) (2022-10-12)
 
 
