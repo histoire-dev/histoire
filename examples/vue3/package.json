@@ -14,7 +14,6 @@
   "dependencies": {
     "lottie-web": "^5.9.6",
     "pinia": "^2.0.13",
-    "vant": "^3.6.3",
     "vue": "^3.2.31",
     "vue-i18n": "^9.1.10"
   },

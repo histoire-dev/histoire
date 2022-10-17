@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Lato&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Display&display=swap');
 @import 'floating-vue/dist/style.css';
 @import '@histoire/controls/dist/style.css';
 
@@ -37,61 +37,63 @@ button {
 @tailwind components;
 @tailwind utilities;
 
-body,
-pre {
-  margin: 0;
-}
-
-html,
-body,
-#app {
-  height: 100%;
-}
-
-html {
-  font-family: 'Lato', sans-serif;
-  font-size: 1rem;
-}
-
-body {
-  font-size: 1.125rem;
-}
-
-@media (min-width: 640px) {
-  body {
-    font-size: .875rem;
+@layer base {
+  body,
+  pre {
+    margin: 0;
   }
-}
 
-.__histoire-sandbox {
-  contain: content;
-}
+  html,
+  body,
+  #app {
+    height: 100%;
+  }
 
-.__histoire-code .shiki {
-  background: transparent !important;
-}
+  html {
+    font-family: 'Noto Sans Display', system-ui, sans-serif;
+    font-size: 1rem;
+  }
 
-.htw-prose {
-  h1, h2, h3, h4 {
-    &:not(:hover) {
-      .header-anchor[aria-hidden="true"] {
-        visibility: hidden;
-      }
+  body {
+    font-size: 1.125rem;
+  }
+
+  @media (min-width: 640px) {
+    body {
+      font-size: .875rem;
     }
   }
 
-  hr {
-    margin: 1rem 0;
+  .__histoire-sandbox {
+    contain: content;
   }
-}
 
-.__histoire-pane-shadow-from-right {
-  background-image: linear-gradient(to left, rgba(0, 0, 0, 0.02), rgba(0, 0, 0, 0));
-  background-size: 24px;
-  background-repeat: no-repeat;
-  background-position: right;
+  .__histoire-code .shiki {
+    background: transparent !important;
+  }
 
-  .htw-dark & {
-    background-image: linear-gradient(to left, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0));
+  .htw-prose {
+    h1, h2, h3, h4 {
+      &:not(:hover) {
+        .header-anchor[aria-hidden="true"] {
+          visibility: hidden;
+        }
+      }
+    }
+
+    hr {
+      margin: 1rem 0;
+    }
+  }
+
+  .__histoire-pane-shadow-from-right {
+    background-image: linear-gradient(to left, rgba(0, 0, 0, 0.02), rgba(0, 0, 0, 0));
+    background-size: 24px;
+    background-repeat: no-repeat;
+    background-position: right;
+
+    .htw-dark & {
+      background-image: linear-gradient(to left, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0));
+    }
   }
 }
