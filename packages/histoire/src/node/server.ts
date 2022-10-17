@@ -65,6 +65,7 @@ export async function createServer (ctx: Context, options: CreateServerOptions =
   // onStoryChange debouncing
   let queued = false
   let queuedFiles: ServerStoryFile[] = []
+  let currentFiles: ServerStoryFile[] = []
   let queueTimer
   let collecting = false
   let didAllStoriesYet = false
@@ -112,6 +113,9 @@ export async function createServer (ctx: Context, options: CreateServerOptions =
         clearTimeout(queueTimer)
         // Debounce
         queueTimer = setTimeout(collect, 100)
+      } else if (!changedFile && !currentFiles.length) {
+        // Full collect in progress
+        queued = false
       }
     }
   })
@@ -121,7 +125,7 @@ export async function createServer (ctx: Context, options: CreateServerOptions =
 
     clearCache()
 
-    const currentFiles = queuedFiles.slice()
+    currentFiles = queuedFiles.slice()
     queuedFiles = []
     queued = false
 
