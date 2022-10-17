@@ -12,4 +12,8 @@
 # Welcome
 
 This is just a link to [Histoire.dev](https://histoire.dev/){id="link-to-history"}.
+
+- [Go to Introduction](./Introduction.story.vue)
+- [Go to CodeGen > Slots](./CodeGen.story.vue?variantId=slots)
+- [Go to Markdown file](../MarkdownFile.story.md)
 </docs>

@@ -9,6 +9,7 @@ import chokidar from 'chokidar'
 import fs from 'fs-extra'
 import path from 'pathe'
 import { paramCase } from 'change-case'
+import pc from 'picocolors'
 import type { ServerMarkdownFile } from '@histoire/shared'
 import { slugify } from './util/slugify.js'
 import type { Context } from './context.js'
@@ -26,7 +27,7 @@ function notifyMarkdownListChange () {
   }
 }
 
-export async function createMarkdownRenderer () {
+export async function createMarkdownRenderer (ctx: Context) {
   const highlighter = await shiki.getHighlighter({
     theme: 'github-dark',
   })
@@ -54,17 +55,38 @@ export async function createMarkdownRenderer () {
     }
 
     md.renderer.rules.link_open = function (tokens, idx, options, env, self) {
-      const hrefIndex = tokens[idx].attrIndex('href')
-      const classIndex = tokens[idx].attrIndex('class')
+      const token = tokens[idx]
+      const hrefIndex = token.attrIndex('href')
+      const classIndex = token.attrIndex('class')
 
-      if (hrefIndex >= 0 && !tokens[idx].attrs[hrefIndex][1].startsWith('/') && !tokens[idx].attrs[hrefIndex][1].startsWith('#') && (classIndex < 0 || !tokens[idx].attrs[classIndex][1].includes('header-anchor'))) {
-        // If you are sure other plugins can't add `target` - drop check below
-        const aIndex = tokens[idx].attrIndex('target')
+      if (hrefIndex >= 0) {
+        const href = token.attrs[hrefIndex][1]
+        if (href.startsWith('.')) {
+          const queryIndex = href.indexOf('?')
+          const pathname = queryIndex >= 0 ? href.slice(0, queryIndex) : href
+          const query = queryIndex >= 0 ? href.slice(queryIndex) : ''
 
-        if (aIndex < 0) {
-          tokens[idx].attrPush(['target', '_blank']) // add new attribute
-        } else {
-          tokens[idx].attrs[aIndex][1] = '_blank' // replace value of existing attr
+          // File lookup
+          const file = path.resolve(path.dirname(env.file), pathname)
+          const storyFile = ctx.storyFiles.find(f => f.path === file)
+          const mdFile = ctx.markdownFiles.find(f => f.absolutePath === file)
+          if (!storyFile && !mdFile?.storyFile) {
+            throw new Error(pc.red(`[md] Cannot find story file: ${pathname} from ${env.file}`))
+          }
+
+          // Add attributes
+          const newHref = `${ctx.resolvedViteConfig.base}story/${encodeURIComponent(storyFile?.id ?? mdFile.storyFile.id)}${query}`
+          token.attrSet('href', newHref)
+          token.attrSet('data-route', 'true')
+        } else if (!href.startsWith('/') && !href.startsWith('#') && (classIndex < 0 || !token.attrs[classIndex][1].includes('header-anchor'))) {
+          // Add target="_blank" to external links
+          const aIndex = token.attrIndex('target')
+
+          if (aIndex < 0) {
+            token.attrPush(['target', '_blank']) // add new attribute
+          } else {
+            token.attrs[aIndex][1] = '_blank' // replace value of existing attr
+          }
         }
       }
 
@@ -77,7 +99,7 @@ export async function createMarkdownRenderer () {
 }
 
 async function createMarkdownRendererWithPlugins (ctx: Context) {
-  let md = await createMarkdownRenderer()
+  let md = await createMarkdownRenderer(ctx)
   if (ctx.config.markdown) {
     const result = await ctx.config.markdown(md)
     if (result) {
@@ -97,7 +119,10 @@ export async function createMarkdownPlugins (ctx: Context) {
     transform (code, id) {
       if (!id.includes('?vue&type=docs')) return
       if (!id.includes('lang.md')) return
-      const html = md.render(code)
+      const file = id.substring(0, id.indexOf('?vue'))
+      const html = md.render(code, {
+        file,
+      })
       return `export default Comp => {
         Comp.doc = ${JSON.stringify(html)}
       }`
@@ -122,7 +147,9 @@ export async function createMarkdownFilesWatcher (ctx: Context) {
     const isRelatedToStory = dirFiles.some((file) => !file.endsWith('.md') && file.startsWith(truncatedName))
 
     const { data: frontmatter, content } = matter(await fs.readFile(absolutePath, 'utf8'))
-    const html = md.render(content)
+    const html = md.render(content, {
+      file: absolutePath,
+    })
 
     const file: ServerMarkdownFile = {
       id: paramCase(relativePath.toLowerCase()),
