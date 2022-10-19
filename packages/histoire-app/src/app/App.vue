@@ -22,8 +22,7 @@ import Breadcrumb from './components/app/Breadcrumb.vue'
 import SearchModal from './components/search/SearchModal.vue'
 import InitialLoading from './components/app/InitialLoading.vue'
 import GenericMountStory from './components/story/GenericMountStory.vue'
-import { usePreviewSettingsStore } from './stores/preview-settings'
-import { setContrastColor } from './util/contrastColor'
+import { useContrastColor } from './util/contrastColor'
 
 const files = ref<StoryFile[]>(rawFiles.map(file => mapFile(file)))
 const tree = ref<Tree>(rawTree)
@@ -43,8 +42,7 @@ const stories = computed(() => files.value.reduce((acc, file) => {
 }, []))
 
 // contrast color
-const settings = usePreviewSettingsStore().currentSettings
-watch(settings, () => setContrastColor(settings), { immediate: true })
+useContrastColor(document.documentElement)
 
 // Store
 
