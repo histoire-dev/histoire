@@ -17,7 +17,7 @@ defineProps<{
 
 <template>
   <div
-    class="histoire-story-variant-single htw-h-full htw-flex htw-flex-col"
+    class="histoire-story-variant-single-view htw-h-full htw-flex htw-flex-col"
     data-test-id="story-variant-single-view"
   >
     <!-- Toolbar -->
