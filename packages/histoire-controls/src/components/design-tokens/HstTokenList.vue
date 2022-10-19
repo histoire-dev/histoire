@@ -33,7 +33,7 @@ const hover = ref<string>(null)
   <div
     v-for="token of processedTokens"
     :key="token.key"
-    class="htw-flex htw-flex-col htw-gap-2 htw-my-8"
+    class="histoire-token-list htw-flex htw-flex-col htw-gap-2 htw-my-8"
     @mouseenter="hover = token.key"
     @mouseleave="hover = null"
   >

@@ -24,7 +24,10 @@ const eventsElement = ref<HTMLDivElement>()
 </script>
 
 <template>
-  <div ref="eventsElement">
+  <div
+    ref="eventsElement"
+    class="histoire-story-events"
+  >
     <BaseEmpty
       v-if="!hasEvents"
     >

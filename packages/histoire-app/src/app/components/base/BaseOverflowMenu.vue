@@ -86,7 +86,7 @@ const ChildrenSlice = (props, { slots }) => {
 <template>
   <div
     ref="el"
-    class="htw-flex htw-overflow-hidden htw-relative"
+    class="histoire-base-overflow-menu htw-flex htw-overflow-hidden htw-relative"
   >
     <ChildrenRender>
       <slot />

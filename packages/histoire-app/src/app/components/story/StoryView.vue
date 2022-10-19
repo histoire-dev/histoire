@@ -53,7 +53,10 @@ function setVariant (variantId: string) {
 </script>
 
 <template>
-  <BaseEmpty v-if="!storyStore.currentStory">
+  <BaseEmpty
+    v-if="!storyStore.currentStory"
+    class="histoire-story-view histoire-no-story"
+  >
     <Icon
       icon="carbon:software-resource-resource"
       class="htw-w-16 htw-h-16 htw-opacity-50"
@@ -62,7 +65,7 @@ function setVariant (variantId: string) {
 
   <div
     v-else
-    class="htw-h-full"
+    class="histoire-story-view histoire-with-story htw-h-full"
   >
     <div
       v-if="storyStore.currentStory.docsOnly"

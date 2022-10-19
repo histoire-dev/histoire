@@ -88,7 +88,10 @@ function onClick (e: MouseEvent) {
 </script>
 
 <template>
-  <div @click.capture="onClick">
+  <div
+    class="histoire-story-docs"
+    @click.capture="onClick"
+  >
     <BaseEmpty
       v-if="!renderedDoc"
     >

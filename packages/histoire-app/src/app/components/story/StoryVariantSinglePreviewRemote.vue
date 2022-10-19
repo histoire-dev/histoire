@@ -121,6 +121,7 @@ function onIframeLoad () {
 <template>
   <StoryResponsivePreview
     v-slot="{ isResponsiveEnabled, finalWidth, finalHeight, resizing }"
+    class="histoire-story-variant-single-preview-remote"
     :variant="variant"
   >
     <iframe

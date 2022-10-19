@@ -27,6 +27,7 @@ const settings = usePreviewSettingsStore().currentSettings
 <template>
   <StoryResponsivePreview
     v-slot="{ isResponsiveEnabled, finalWidth, finalHeight }"
+    class="histoire-story-variant-single-preview-native"
     :variant="variant"
   >
     <div

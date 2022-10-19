@@ -35,7 +35,7 @@ watch(path, () => {
   <div
     role="checkbox"
     tabindex="0"
-    class="htw-flex htw-items-center htw-gap-2 htw-select-none htw-px-4 htw-py-3 htw-cursor-pointer hover:htw-bg-primary-100 dark:hover:htw-bg-primary-700"
+    class="histoire-base-checkbox htw-flex htw-items-center htw-gap-2 htw-select-none htw-px-4 htw-py-3 htw-cursor-pointer hover:htw-bg-primary-100 dark:hover:htw-bg-primary-700"
     @click="toggle()"
     @keydown.enter.prevent="toggle()"
     @keydown.space.prevent="toggle()"

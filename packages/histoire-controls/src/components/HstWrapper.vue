@@ -21,7 +21,7 @@ withDefaults(defineProps<{
 <template>
   <component
     :is="tag"
-    class="htw-p-2 hover:htw-bg-primary-100 dark:hover:htw-bg-primary-800 htw-flex htw-gap-2 htw-flex-wrap"
+    class="histoire-wrapper htw-p-2 hover:htw-bg-primary-100 dark:hover:htw-bg-primary-800 htw-flex htw-gap-2 htw-flex-wrap"
   >
     <span
       v-tooltip="{

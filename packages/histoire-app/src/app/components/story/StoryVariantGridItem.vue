@@ -65,7 +65,7 @@ const settings = usePreviewSettingsStore().currentSettings
 <template>
   <div
     ref="el"
-    class="htw-cursor-default htw-flex htw-flex-col htw-gap-y-1 htw-group"
+    class="histoire-story-variant-grid-item htw-cursor-default htw-flex htw-flex-col htw-gap-y-1 htw-group"
   >
     <!-- Header -->
     <div class="htw-flex-none htw-flex htw-items-center">

@@ -118,7 +118,7 @@ const isResponsiveEnabled = computed(() => !props.variant.responsiveDisabled)
 </script>
 
 <template>
-  <div class="htw-w-full htw-h-full htw-flex-1 htw-rounded-lg htw-relative htw-overflow-hidden">
+  <div class="histoire-story-responsive-preview htw-w-full htw-h-full htw-flex-1 htw-rounded-lg htw-relative htw-overflow-hidden">
     <div
       v-if="isResponsiveEnabled"
       class="htw-absolute htw-inset-0 htw-w-full htw-h-full htw-bg-gray-100 dark:htw-bg-gray-750 htw-rounded-r-lg htw-border-l-2 htw-border-gray-500/10 dark:htw-border-gray-700/30 htw-overflow-hidden"
