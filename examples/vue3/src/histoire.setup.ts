@@ -3,7 +3,6 @@ import { defineSetupVue3 } from '@histoire/plugin-vue'
 import { createPinia } from 'pinia'
 import { createI18n } from 'vue-i18n'
 import GlobalComp from './components/GlobalComp.vue'
-import 'vant/es/toast/style'
 
 export const setupVue3 = defineSetupVue3(({ app }) => {
   app.provide('demo', 42)

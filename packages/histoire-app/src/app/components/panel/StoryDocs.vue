@@ -47,6 +47,7 @@ export function useStoryDoc (story: Ref<Story>) {
 
 <script lang="ts" setup>
 import { Icon } from '@iconify/vue'
+import { useRouter } from '@histoire/vendors/vue-router'
 import BaseEmpty from '../base/BaseEmpty.vue'
 
 const props = defineProps({
@@ -59,10 +60,35 @@ const props = defineProps({
 const { story } = toRefs(props)
 
 const { renderedDoc } = useStoryDoc(story)
+
+// Markdown links to other stories
+const router = useRouter()
+
+// we are just using URL to parse the pathname and hash - the base doesn't
+// matter and is only passed to support same-host hrefs.
+const fakeHost = `http://a.com`
+
+function onClick (e: MouseEvent) {
+  const link = (e.target as Element).closest('a')
+  if (
+    link &&
+    link.getAttribute('data-route') &&
+    !e.ctrlKey &&
+    !e.shiftKey &&
+    !e.altKey &&
+    !e.metaKey &&
+    link.target !== `_blank`
+  ) {
+    e.preventDefault()
+    const url = new URL(link.href, fakeHost)
+    const targetHref = url.pathname + url.search + url.hash
+    router.push(targetHref)
+  }
+}
 </script>
 
 <template>
-  <div>
+  <div @click.capture="onClick">
     <BaseEmpty
       v-if="!renderedDoc"
     >

@@ -37,6 +37,16 @@ This is a demo book using Svelte 3.
 Learn more about Histoire [here](https://histoire.dev/).
 ```
 
+### Links
+
+You can link to other stories using a relative path to the story file:
+
+```md
+- [Go to Story](./BaseButton.story.svelte)
+- [Go to CodeGen > Slots](./CodeGen.story.svelte?variantId=slots)
+- [Go to Markdown file](./MarkdownFile.story.md)
+```
+
 ## Source code
 
 ::: warning

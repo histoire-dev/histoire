@@ -55,6 +55,16 @@ This is a demo book using Vue 3.
 Learn more about Histoire [here](https://histoire.dev/).
 ```
 
+### Links
+
+You can link to other stories using a relative path to the story file:
+
+```md
+- [Go to Story](./BaseButton.story.vue)
+- [Go to CodeGen > Slots](./CodeGen.story.vue?variantId=slots)
+- [Go to Markdown file](./MarkdownFile.story.md)
+```
+
 ## Source code
 
 By default, Histoire will attempt to generate a copyable source code from the story, dynamically from the current state.
