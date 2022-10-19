@@ -3,7 +3,6 @@ import {
   build as viteBuild,
   createServer as createViteServer,
   InlineConfig as ViteInlineConfig,
-  ResolvedConfig as ViteConfig,
   mergeConfig as mergeViteConfig,
   Plugin as VitePlugin,
 } from 'vite'
@@ -17,7 +16,7 @@ import type {
 } from '@histoire/shared'
 import { APP_PATH } from './alias.js'
 import { Context } from './context.js'
-import { getViteConfigWithPlugins, resolveViteConfig } from './vite.js'
+import { getViteConfigWithPlugins } from './vite.js'
 import { findAllStories } from './stories.js'
 import type { RollupOutput } from 'rollup'
 import { useCollectStories } from './collect/index.js'
@@ -45,8 +44,6 @@ export async function build (ctx: Context) {
     const { stop } = await createMarkdownFilesWatcher(ctx)
     await stop()
   }
-
-  const resolvedViteConfig = await resolveViteConfig(ctx)
 
   const server = await createViteServer(await getViteConfigWithPlugins(true, ctx))
   await server.pluginContainer.buildStart({})
@@ -156,22 +153,22 @@ export async function build (ctx: Context) {
 
   // Preload
   const preloadOutputs = result.output.filter(o => PRELOAD_MODULES.includes(o.name) && o.type === 'chunk')
-  const preloadHtml = generateScriptLinks(preloadOutputs.map(o => o.fileName), 'preload', ctx, resolvedViteConfig)
+  const preloadHtml = generateScriptLinks(preloadOutputs.map(o => o.fileName), 'preload', ctx)
 
   // Prefetch
   const prefetchOutputs = result.output.filter(o => PREFETCHED_MODULES.includes(o.name) && o.type === 'chunk')
-  const prefetchHtml = generateScriptLinks(prefetchOutputs.map(o => o.fileName), 'prefetch', ctx, resolvedViteConfig)
+  const prefetchHtml = generateScriptLinks(prefetchOutputs.map(o => o.fileName), 'prefetch', ctx)
 
   // Index
   const indexOutput = result.output.find(o => o.name === 'bundle-main' && o.type === 'chunk')
   const indexHtml = generateEntryHtml(indexOutput.fileName, styleOutput.fileName, {
     HEAD: `${preloadHtml}${prefetchHtml}`,
-  }, ctx, resolvedViteConfig)
+  }, ctx)
   await writeFile('index.html', indexHtml, ctx)
 
   // Sandbox
   const sandboxOutput = result.output.find(o => o.name === 'bundle-sandbox' && o.type === 'chunk')
-  const sandboxHtml = generateEntryHtml(sandboxOutput.fileName, styleOutput.fileName, {}, ctx, resolvedViteConfig)
+  const sandboxHtml = generateEntryHtml(sandboxOutput.fileName, styleOutput.fileName, {}, ctx)
   await writeFile('__sandbox.html', sandboxHtml, ctx)
 
   const duration = performance.now() - startTime
@@ -182,7 +179,7 @@ export async function build (ctx: Context) {
 
   // Render
   if (previewStoryCallbacks.length) {
-    const { baseUrl, close } = await startPreview(resolvedViteConfig, null, ctx)
+    const { baseUrl, close } = await startPreview(null, ctx)
     for (const storyFile of ctx.storyFiles) {
       const story = storyFile.story
       for (const variant of story.variants) {
@@ -226,13 +223,13 @@ function generateBaseHtml (head: string, body: string, ctx: Context) {
 </html>`
 }
 
-function generateEntryHtml (jsEntryFile: string, cssEntryFile: string, variables: { HEAD?: string }, ctx: Context, resolvedViteConfig: ViteConfig) {
+function generateEntryHtml (jsEntryFile: string, cssEntryFile: string, variables: { HEAD?: string }, ctx: Context) {
   return generateBaseHtml(
-    `<link rel="stylesheet" href="${resolvedViteConfig.base}${cssEntryFile}">
+    `<link rel="stylesheet" href="${ctx.resolvedViteConfig.base}${cssEntryFile}">
     ${ctx.config.theme?.favicon ? `<link rel="icon" type="${lookupMime(ctx.config.theme.favicon)}" href="${ctx.config.theme.favicon}"/>` : ''}
     ${variables.HEAD ?? ''}`,
     `<div id="app"></div>
-    <script type="module" src="${resolvedViteConfig.base}${jsEntryFile}"></script>`,
+    <script type="module" src="${ctx.resolvedViteConfig.base}${jsEntryFile}"></script>`,
     ctx,
   )
 }
@@ -241,6 +238,6 @@ async function writeFile (fileName: string, content: string, ctx: Context) {
   await fs.writeFile(join(ctx.config.outDir, fileName), content, 'utf8')
 }
 
-function generateScriptLinks (prefetchScripts: string[], rel: string, ctx: Context, resolvedViteConfig: ViteConfig) {
-  return prefetchScripts.map(s => `<link rel="${rel}" href="${resolvedViteConfig.base}${s}" as="script" crossOrigin="anonymous">`).join('')
+function generateScriptLinks (prefetchScripts: string[], rel: string, ctx: Context) {
+  return prefetchScripts.map(s => `<link rel="${rel}" href="${ctx.resolvedViteConfig.base}${s}" as="script" crossOrigin="anonymous">`).join('')
 }

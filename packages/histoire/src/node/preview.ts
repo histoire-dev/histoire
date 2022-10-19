@@ -1,7 +1,6 @@
 import http from 'node:http'
 import connect from 'connect'
 import sirv from 'sirv'
-import type { ResolvedConfig as ViteConfig } from 'vite'
 import type { Context } from './context.js'
 
 interface ReturnPayload {
@@ -9,11 +8,11 @@ interface ReturnPayload {
   close: () => Promise<void>
 }
 
-export async function startPreview (viteConfig: ViteConfig, port: number | null, ctx: Context): Promise<ReturnPayload> {
+export async function startPreview (port: number | null, ctx: Context): Promise<ReturnPayload> {
   const app = connect()
 
   app.use(
-    viteConfig.base,
+    ctx.resolvedViteConfig.base,
     sirv(ctx.config.outDir, {
       dev: true,
       etag: true,
@@ -38,7 +37,7 @@ export async function startPreview (viteConfig: ViteConfig, port: number | null,
 
     httpServer.listen(finalPort, () => {
       httpServer.off('error', onError)
-      const baseUrl = `http://localhost:${finalPort}${viteConfig.base}`
+      const baseUrl = `http://localhost:${finalPort}${ctx.resolvedViteConfig.base}`
       resolve({
         baseUrl,
         close: () => new Promise((resolve, reject) => {

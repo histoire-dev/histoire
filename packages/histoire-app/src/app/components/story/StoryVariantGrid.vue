@@ -107,6 +107,10 @@ onMounted(() => {
   updateSize()
 })
 
+useResizeObserver(gridEl, () => {
+  updateSize()
+})
+
 const columnCount = computed(() => Math.min(storyStore.currentStory.variants.length, Math.floor((viewWidth.value + gap) / (gridColumnWidth.value + gap))))
 </script>
 

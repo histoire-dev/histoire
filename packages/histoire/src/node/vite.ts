@@ -1,10 +1,8 @@
 import { createRequire } from 'node:module'
 import { relative, resolve, join, dirname } from 'pathe'
 import {
-  resolveConfig as resolveViteConfigInternal,
   Plugin as VitePlugin,
   UserConfig as ViteConfig,
-  ResolvedConfig,
   InlineConfig,
   mergeConfig as mergeViteConfig,
   loadConfigFromFile as loadViteConfigFromFile,
@@ -60,14 +58,7 @@ export const RESOLVED_MARKDOWN_FILES = `/__resolved__${MARKDOWN_FILES}`
 
 const ID_SEPARATOR = '__-__'
 
-export async function resolveViteConfig (ctx: Context): Promise<ResolvedConfig> {
-  const command = ctx.mode === 'dev' ? 'serve' : 'build'
-  let viteConfig = (await resolveViteConfigInternal({}, command)) as unknown
-  viteConfig = mergeHistoireViteConfig(viteConfig, ctx)
-  return viteConfig as ResolvedConfig
-}
-
-async function mergeHistoireViteConfig (viteConfig: InlineConfig, ctx: Context) {
+export async function mergeHistoireViteConfig (viteConfig: InlineConfig, ctx: Context) {
   if (ctx.config.vite) {
     const command = ctx.mode === 'dev' ? 'serve' : 'build'
     const overrides = typeof ctx.config.vite === 'function'
@@ -103,8 +94,6 @@ async function mergeHistoireViteConfig (viteConfig: InlineConfig, ctx: Context) 
 }
 
 export async function getViteConfigWithPlugins (isServer: boolean, ctx: Context): Promise<InlineConfig> {
-  const resolvedViteConfig = await resolveViteConfig(ctx)
-
   const userViteConfigFile = await loadViteConfigFromFile({ command: ctx.mode === 'dev' ? 'serve' : 'build', mode: ctx.mode })
   const userViteConfig = mergeViteConfig(userViteConfigFile?.config ?? {}, { server: { port: 6006 } })
 
@@ -161,7 +150,7 @@ export async function getViteConfigWithPlugins (isServer: boolean, ctx: Context)
             allow: [
               APP_PATH,
               TEMP_PATH,
-              resolvedViteConfig.root,
+              ctx.resolvedViteConfig.root,
               process.cwd(),
             ],
           },
@@ -530,7 +519,7 @@ if (import.meta.hot) {
       transform (code, id) {
         if (exclude.some(r => r.test(id))) return
         if (include.some(r => r.test(id))) {
-          const file = relative(resolvedViteConfig.root, id)
+          const file = relative(ctx.resolvedViteConfig.root, id)
           const index = code.indexOf('export default')
           const result = `${code.substring(0, index)}_sfc_main.__file = '${file}'\n${code.substring(index)}`
           return result
