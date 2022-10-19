@@ -397,7 +397,6 @@ importers:
       floating-vue: ^2.0.0-beta.19
       postcss: ^8.4.12
       postcss-import: ^14.1.0
-      shiki: 0.10.1
       tailwindcss: ^3.0.23
       typescript: ^4.7.4
       vite: ^3.1.4
@@ -412,7 +411,6 @@ importers:
       '@codemirror/theme-one-dark': 6.1.0
       '@codemirror/view': 6.3.0
       '@histoire/vendors': link:../histoire-vendors
-      shiki: 0.10.1
     devDependencies:
       '@peeky/server': 0.14.0
       '@peeky/test': 0.14.1_@peeky+server@0.14.0
