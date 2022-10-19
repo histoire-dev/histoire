@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, onUnmounted, Ref, ref, reactive } from 'vue'
+import { computed, onUnmounted, Ref, ref } from 'vue'
 import { useEventListener } from '@vueuse/core'
 import { Icon } from '@iconify/vue'
 import HatchedPattern from '../misc/HatchedPattern.vue'
