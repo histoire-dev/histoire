@@ -47,7 +47,7 @@ const settings = usePreviewSettingsStore().currentSettings
             step="16"
             placeholder="Auto"
           >
-          <span class="htw-opacity-50">x</span>
+          <span class="htw-opacity-50">×</span>
           <input
             v-model.number="settings.responsiveHeight"
             v-tooltip="'Responsive height (px)'"
