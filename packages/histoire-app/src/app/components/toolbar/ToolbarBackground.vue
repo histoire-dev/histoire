@@ -13,6 +13,7 @@ const settings = usePreviewSettingsStore().currentSettings
     placement="bottom-end"
     :skidding="6"
     class="htw-h-full htw-flex-none"
+    data-test-id="toolbar-background"
   >
     <div
       v-tooltip="'Background color'"
@@ -28,7 +29,10 @@ const settings = usePreviewSettingsStore().currentSettings
     </div>
 
     <template #popper="{ hide }">
-      <div class="htw-flex htw-flex-col htw-items-stretch">
+      <div
+        class="htw-flex htw-flex-col htw-items-stretch"
+        data-test-id="background-popper"
+      >
         <BaseCheckbox v-model="settings.checkerboard">
           Checkerboard
         </BaseCheckbox>
