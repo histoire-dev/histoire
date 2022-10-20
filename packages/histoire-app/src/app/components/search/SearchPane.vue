@@ -262,7 +262,7 @@ function selectPrevious () {
 
 <template>
   <div
-    class="htw-flex htw-items-center htw-gap-4 htw-pl-6 htw-border htw-border-transparent focus-visible:htw-border-primary-500"
+    class="histoire-search-pane htw-flex htw-items-center htw-gap-4 htw-pl-6 htw-border htw-border-transparent focus-visible:htw-border-primary-500"
     @click="focused = true"
   >
     <Icon

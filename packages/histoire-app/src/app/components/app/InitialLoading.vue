@@ -17,7 +17,7 @@ if (import.meta.hot) {
 </script>
 
 <template>
-  <div class="htw-fixed htw-inset-0 htw-bg-white dark:htw-bg-gray-700 htw-flex htw-flex-col htw-gap-6 htw-items-center htw-justify-center">
+  <div class="histoire-initial-loading htw-fixed htw-inset-0 htw-bg-white dark:htw-bg-gray-700 htw-flex htw-flex-col htw-gap-6 htw-items-center htw-justify-center">
     <transition name="__histoire-fade">
       <div
         v-if="progress.total > 0"

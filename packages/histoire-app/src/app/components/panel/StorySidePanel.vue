@@ -28,11 +28,17 @@ const panelContentComponent = computed(() => {
 </script>
 
 <template>
-  <BaseEmpty v-if="!storyStore.currentVariant">
+  <BaseEmpty
+    v-if="!storyStore.currentVariant"
+    class="histoire-story-side-panel histoire-selection"
+  >
     <span>Select a variant</span>
   </BaseEmpty>
 
-  <BaseEmpty v-else-if="!storyStore.currentVariant.configReady || !storyStore.currentVariant.previewReady">
+  <BaseEmpty
+    v-else-if="!storyStore.currentVariant.configReady || !storyStore.currentVariant.previewReady"
+    class="histoire-story-side-panel histoire-loading"
+  >
     <span>Loading...</span>
   </BaseEmpty>
 
@@ -40,7 +46,7 @@ const panelContentComponent = computed(() => {
     v-else
     save-id="story-sidepane"
     orientation="portrait"
-    class="htw-h-full"
+    class="histoire-story-side-panel histoire-loaded htw-h-full"
     data-test-id="story-side-panel"
   >
     <template #first>

@@ -31,6 +31,7 @@ function selectValue (value: string, hide: () => void) {
 
 <template>
   <VDropdown
+    class="histoire-base-select"
     auto-size
   >
     <div

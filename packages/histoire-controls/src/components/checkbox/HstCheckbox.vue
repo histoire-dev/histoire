@@ -26,7 +26,7 @@ function toggle () {
   <HstWrapper
     role="checkbox"
     tabindex="0"
-    class="htw-cursor-pointer htw-items-center"
+    class="histoire-checkbox htw-cursor-pointer htw-items-center"
     :title="title"
     @click="toggle()"
     @keydown.enter.prevent="toggle()"

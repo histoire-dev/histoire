@@ -12,7 +12,7 @@ const settings = usePreviewSettingsStore().currentSettings
     v-if="histoireConfig.backgroundPresets.length"
     placement="bottom-end"
     :skidding="6"
-    class="htw-h-full htw-flex-none"
+    class="histoire-toolbar-background htw-h-full htw-flex-none"
   >
     <div
       v-tooltip="'Background color'"

@@ -27,7 +27,7 @@ function toggleOpen () {
 <template>
   <div
     data-test-id="story-group"
-    class="htw-my-2 first:htw-mt-0 last:htw-mb-0"
+    class="histoire-story-group htw-my-2 first:htw-mt-0 last:htw-mb-0"
   >
     <div
       v-if="group.title"

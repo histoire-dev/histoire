@@ -21,6 +21,7 @@ export default defineComponent({
 <template>
   <router-link
     v-slot="{ isActive, isExactActive, href, navigate }"
+    class="histoire-base-tab"
     v-bind="$attrs"
     custom
   >

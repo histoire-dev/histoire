@@ -161,7 +161,7 @@ onUnmounted(() => {
 <template>
   <div
     ref="el"
-    class="htw-flex htw-h-full htw-isolate htw-overflow-auto"
+    class="histoire-base-split-pane htw-flex htw-h-full htw-isolate htw-overflow-auto"
     :class="{
       'htw-flex-col': orientation === 'portrait',
       'htw-cursor-ew-resize': dragging && orientation === 'landscape',

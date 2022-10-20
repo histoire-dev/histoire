@@ -22,7 +22,7 @@ const hasEvents = computed(() => eventsStore.events.length)
 </script>
 
 <template>
-  <BaseOverflowMenu class="htw-h-10 htw-flex-none htw-border-b htw-border-gray-100 dark:htw-border-gray-750">
+  <BaseOverflowMenu class="histoire-pane-tabs htw-h-10 htw-flex-none htw-border-b htw-border-gray-100 dark:htw-border-gray-750">
     <BaseTab
       :to="{ ...$route, query: { ...$route.query, tab: '' } }"
       :matched="!$route.query.tab"

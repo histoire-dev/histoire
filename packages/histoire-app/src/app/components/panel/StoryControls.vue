@@ -32,7 +32,7 @@ const hasCustomControls = computed(() => props.variant.slots().controls || props
 <template>
   <div
     data-test-id="story-controls"
-    class="htw-flex htw-flex-col htw-divide-y htw-divide-gray-100 dark:htw-divide-gray-750"
+    class="histoire-story-controls htw-flex htw-flex-col htw-divide-y htw-divide-gray-100 dark:htw-divide-gray-750"
   >
     <!-- Toolbar -->
     <div

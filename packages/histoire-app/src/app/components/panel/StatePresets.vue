@@ -115,7 +115,7 @@ onClickOutside(select, stopEditing)
 </script>
 
 <template>
-  <div class="htw-flex htw-gap-2 htw-w-full htw-items-center">
+  <div class="histoire-state-presets htw-flex htw-gap-2 htw-w-full htw-items-center">
     <div
       ref="select"
       class="htw-flex-1 htw-min-w-0"
