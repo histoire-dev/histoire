@@ -52,7 +52,7 @@ const hover = ref<string>(null)
 <template>
   <div
     v-if="displayedShades.length"
-    class="htw-grid htw-gap-4 htw-grid-cols-[repeat(auto-fill,minmax(200px,1fr))] htw-m-4"
+    class="histoire-color-shades htw-grid htw-gap-4 htw-grid-cols-[repeat(auto-fill,minmax(200px,1fr))] htw-m-4"
   >
     <div
       v-for="shade of displayedShades"

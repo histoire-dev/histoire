@@ -50,6 +50,7 @@ const kindLabels = {
 <template>
   <div
     ref="el"
+    class="histoire-search-item"
     data-test-id="search-item"
     :data-selected="selected ? '' : undefined"
   >

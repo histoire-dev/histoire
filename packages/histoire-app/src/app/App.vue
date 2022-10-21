@@ -98,7 +98,7 @@ onMounted(() => {
 <template>
   <div
     v-if="storyStore.currentStory"
-    class="htw-hidden"
+    class="histoire-app htw-hidden"
   >
     <GenericMountStory
       :key="storyStore.currentStory.id"

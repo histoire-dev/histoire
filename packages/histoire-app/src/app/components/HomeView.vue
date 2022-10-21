@@ -7,7 +7,7 @@ const logoUrl = computed(() => histoireConfig.theme?.logo?.square ? customLogos.
 </script>
 
 <template>
-  <div class="htw-flex htw-items-center htw-justify-center htw-h-full">
+  <div class="histoire-home-view htw-flex htw-items-center htw-justify-center htw-h-full">
     <img
       :src="logoUrl"
       alt="Logo"

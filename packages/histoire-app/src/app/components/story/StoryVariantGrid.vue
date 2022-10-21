@@ -115,7 +115,7 @@ const columnCount = computed(() => Math.min(storyStore.currentStory.variants.len
 </script>
 
 <template>
-  <div class="htw-flex htw-flex-col htw-items-stretch htw-h-full __histoire-pane-shadow-from-right">
+  <div class="histoire-story-variant-grid htw-flex htw-flex-col htw-items-stretch htw-h-full __histoire-pane-shadow-from-right">
     <!-- Toolbar -->
     <div
       v-if="!isMobile"

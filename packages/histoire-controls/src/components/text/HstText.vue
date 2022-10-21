@@ -23,7 +23,7 @@ const input = ref<HTMLInputElement>()
 <template>
   <HstWrapper
     :title="title"
-    class="htw-cursor-text htw-items-center"
+    class="histoire-text htw-cursor-text htw-items-center"
     :class="$attrs.class"
     :style="$attrs.style"
     @click="input.focus()"

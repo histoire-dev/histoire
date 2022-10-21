@@ -18,6 +18,7 @@ const altText = computed(() => histoireConfig.theme.title + ' logo')
 
 <template>
   <img
+    class="histoire-app-logo"
     :src="logoUrl"
     :alt="altText"
   >

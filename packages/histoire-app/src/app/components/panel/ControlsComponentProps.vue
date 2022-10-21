@@ -11,7 +11,7 @@ defineProps<{
 </script>
 
 <template>
-  <div>
+  <div class="histoire-controls-component-props">
     <div class="htw-font-mono htw-p-2 htw-flex htw-items-center htw-gap-1">
       <Icon
         v-tooltip="'Auto-detected props'"

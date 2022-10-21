@@ -29,6 +29,7 @@ watchEffect(async () => {
   <component
     :is="mountComponent"
     v-if="mountComponent"
+    class="histoire-generic-mount-story"
     :story="story"
     v-bind="$attrs"
   />

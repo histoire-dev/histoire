@@ -38,7 +38,7 @@ const hover = ref<string>(null)
 
 <template>
   <div
-    class="htw-bind-col-size htw-grid htw-gap-4 htw-m-4"
+    class="histoire-token-grid htw-bind-col-size htw-grid htw-gap-4 htw-m-4"
     :style="{
       '--histoire-col-size': colSizePx,
     }"
