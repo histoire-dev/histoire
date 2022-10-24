@@ -62,6 +62,8 @@ cd examples/vue3
 pnpm run story:dev
 ```
 
+> For the `vue3` example, you can use the `pnpm run dev:hst` command to start the app with a special configuration enabling HMR for the Histoire UI. Especially useful when working on the UI!
+
 4. After you have tested your changes in development mode, build the story apps and test them using the `story:build` and `story:preview` scripts:
 
 ```sh
