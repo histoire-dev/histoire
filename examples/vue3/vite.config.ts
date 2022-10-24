@@ -37,10 +37,6 @@ export default defineConfig({
     vue(),
   ],
 
-  define: {
-    'process.env.HISTOIRE_DEV': process.env.HISTOIRE_DEV ? 'true' : 'false',
-  },
-
   histoire: {
     plugins: [
       {
