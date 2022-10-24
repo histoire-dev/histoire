@@ -3,7 +3,8 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "story:dev": "HISTOIRE_DEV=true histoire dev",
+    "dev:hst": "HISTOIRE_DEV=true histoire dev",
+    "story:dev": "histoire dev",
     "story:build": "histoire build",
     "story:preview": "histoire preview --port 4567",
     "ci": "start-server-and-test story:preview http://localhost:4567/ test",

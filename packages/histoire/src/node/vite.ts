@@ -58,6 +58,10 @@ export const RESOLVED_MARKDOWN_FILES = `/__resolved__${MARKDOWN_FILES}`
 
 const ID_SEPARATOR = '__-__'
 
+const PLUGINS_HAVE_DEV = [
+  '@histoire/plugin-vue',
+]
+
 export async function mergeHistoireViteConfig (viteConfig: InlineConfig, ctx: Context) {
   if (ctx.config.vite) {
     const command = ctx.mode === 'dev' ? 'serve' : 'build'
@@ -125,7 +129,7 @@ export async function getViteConfigWithPlugins (isServer: boolean, ctx: Context)
             'vue',
           ],
           alias: {
-            'histoire-style': join(APP_PATH, 'style.css'),
+            'histoire-style': join(APP_PATH, process.env.HISTOIRE_DEV ? 'app/style/main.pcss' : 'style.css'),
           },
         },
         optimizeDeps: {
@@ -346,7 +350,7 @@ if (import.meta.hot) {
       }
 
       if (id === RESOLVED_SUPPORT_PLUGINS_CLIENT) {
-        const plugins = ctx.supportPlugins.map(p => `'${p.id}': () => import(${JSON.stringify(require.resolve(`${p.moduleName}/client`, {
+        const plugins = ctx.supportPlugins.map(p => `'${p.id}': () => import(${JSON.stringify(require.resolve(`${p.moduleName}/client${process.env.HISTOIRE_DEV && PLUGINS_HAVE_DEV.includes(p.moduleName) ? '-dev' : ''}`, {
           paths: [ctx.root, import.meta.url],
         }))})`)
         return `export const clientSupportPlugins = {
@@ -355,7 +359,7 @@ if (import.meta.hot) {
       }
 
       if (id === RESOLVED_SUPPORT_PLUGINS_COLLECT) {
-        const plugins = ctx.supportPlugins.map(p => `'${p.id}': () => import(${JSON.stringify(require.resolve(`${p.moduleName}/collect`, {
+        const plugins = ctx.supportPlugins.map(p => `'${p.id}': () => import(${JSON.stringify(require.resolve(`${p.moduleName}/collect${process.env.HISTOIRE_DEV && PLUGINS_HAVE_DEV.includes(p.moduleName) ? '-dev' : ''}`, {
           paths: [ctx.root, import.meta.url],
         }))})`)
         return `export const collectSupportPlugins = {
@@ -538,23 +542,29 @@ if (import.meta.hot) {
       name: 'histoire-dev-plugin',
       config () {
         // Examples context
-        const folder = '../../packages/histoire-vendors/node_modules'
         return {
           resolve: {
             alias: [
               ...[
-                // 'floating-vue/dist/style.css',
-                'floating-vue',
-                '@iconify/vue',
-                'pinia',
-                'scroll-into-view-if-needed',
-                'vue-router',
-                '@vueuse/core',
-                'vue',
-              ].map((name) => ({
-                find: name,
-                replacement: resolve(process.cwd(), folder, name),
-              })),
+                ['floating-vue/dist/style.css', 'node_modules/floating-vue/dist/style.css'],
+                ['floating-vue', 'floating-vue'],
+                ['@iconify/vue', 'iconify'],
+                ['pinia', 'pinia'],
+                ['scroll-into-view-if-needed', 'scroll'],
+                ['vue-router', 'vue-router'],
+                ['@vueuse/core', 'vue-use'],
+                ['vue', 'vue'],
+              ].reduce((acc, [name, entry]) => {
+                acc.push({
+                  find: new RegExp(`^${name.replace(/\//g, '\\/')}$`),
+                  replacement: `@histoire/vendors/${entry}`,
+                })
+                acc.push({
+                  find: new RegExp(`^${name.replace(/\//g, '\\/')}\\/`),
+                  replacement: `@histoire/vendors/${entry}/`,
+                })
+                return acc
+              }, [] as any[]),
 
               { find: /@histoire\/controls$/, replacement: '@histoire/controls/src/index.ts' },
             ],

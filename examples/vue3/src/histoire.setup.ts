@@ -9,8 +9,10 @@ export const setupVue3 = defineSetupVue3(({ app }) => {
   const pinia = createPinia()
   app.use(pinia)
 
-  const i18n = createI18n()
-  app.use(i18n)
+  if (!process.env.HISTOIRE_DEV) {
+    const i18n = createI18n({})
+    app.use(i18n)
+  }
 
   app.component('GlobalComp', GlobalComp)
 
