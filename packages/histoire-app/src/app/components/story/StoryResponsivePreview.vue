@@ -115,6 +115,9 @@ const finalHeight = computed(() => settings.rotate ? settings.responsiveWidth : 
 // Disabled responsive
 
 const isResponsiveEnabled = computed(() => !props.variant.responsiveDisabled)
+
+// Size toast
+const displaySizeToast = ref(true)
 </script>
 
 <template>

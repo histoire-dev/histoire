@@ -152,6 +152,11 @@ export async function getViteConfigWithPlugins (isServer: boolean, ctx: Context)
               TEMP_PATH,
               ctx.resolvedViteConfig.root,
               process.cwd(),
+              ...process.env.HISTOIRE_DEV
+                ? [
+                  '../../packages/histoire-vendors',
+                ]
+                : [],
             ],
           },
           watch: {
@@ -360,7 +365,7 @@ if (import.meta.hot) {
 
       if (id === RESOLVED_MARKDOWN_FILES) {
         const filesJs = ctx.markdownFiles.map(f => `${JSON.stringify(f.relativePath)}: () => import(${JSON.stringify(`virtual:md:${f.id}`)})`).join(',')
-        return `import { reactive } from ${getInjectedImport('@histoire/vendors/vue')}
+        return `import { reactive } from ${process.env.HISTOIRE_DEV ? `'vue'` : getInjectedImport('@histoire/vendors/vue')}
         export const markdownFiles = reactive({${filesJs}})
         if (import.meta.hot) {
           if (!window.__hst_md_hmr) {
@@ -457,7 +462,7 @@ if (import.meta.hot) {
     }
   }
   </script>
-  <script type="module" src="/@fs/${APP_PATH}/bundle-sandbox.js"></script>
+  <script type="module" src="/@fs/${APP_PATH}/bundle-sandbox${process.env.HISTOIRE_DEV ? '-dev' : ''}.js"></script>
 </body>
 </html>`
           // Apply Vite HTML transforms. This injects the Vite HMR client, and
@@ -489,7 +494,7 @@ if (import.meta.hot) {
   </head>
   <body>
     <div id="app"></div>
-    <script type="module" src="/@fs/${APP_PATH}/bundle-main.js"></script>
+    <script type="module" src="/@fs/${APP_PATH}/bundle-main${process.env.HISTOIRE_DEV ? '-dev' : ''}.js"></script>
   </body>
 </html>`
             // Apply Vite HTML transforms. This injects the Vite HMR client, and
@@ -523,6 +528,37 @@ if (import.meta.hot) {
           const index = code.indexOf('export default')
           const result = `${code.substring(0, index)}_sfc_main.__file = '${file}'\n${code.substring(index)}`
           return result
+        }
+      },
+    })
+  }
+
+  if (process.env.HISTOIRE_DEV && !isServer) {
+    plugins.push({
+      name: 'histoire-dev-plugin',
+      config () {
+        // Examples context
+        const folder = '../../packages/histoire-vendors/node_modules'
+        return {
+          resolve: {
+            alias: [
+              ...[
+                // 'floating-vue/dist/style.css',
+                'floating-vue',
+                '@iconify/vue',
+                'pinia',
+                'scroll-into-view-if-needed',
+                'vue-router',
+                '@vueuse/core',
+                'vue',
+              ].map((name) => ({
+                find: name,
+                replacement: resolve(process.cwd(), folder, name),
+              })),
+
+              { find: /@histoire\/controls$/, replacement: '@histoire/controls/src/index.ts' },
+            ],
+          },
         }
       },
     })

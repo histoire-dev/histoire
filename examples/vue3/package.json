@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "story:dev": "histoire dev",
+    "story:dev": "HISTOIRE_DEV=true histoire dev",
     "story:build": "histoire build",
     "story:preview": "histoire preview --port 4567",
     "ci": "start-server-and-test story:preview http://localhost:4567/ test",
@@ -18,7 +18,9 @@
     "vue-i18n": "^9.1.10"
   },
   "devDependencies": {
+    "@histoire/app": "workspace:*",
     "@histoire/plugin-vue": "workspace:*",
+    "@histoire/vendors": "workspace:*",
     "@vitejs/plugin-vue": "^3.0.1",
     "cypress": "^9.5.3",
     "histoire": "workspace:*",

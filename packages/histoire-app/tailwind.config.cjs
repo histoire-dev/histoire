@@ -58,7 +58,7 @@ module.exports = {
   ...inheritedConfig,
   prefix: 'htw-',
   content: [
-    './src/**/*.{vue,js,ts,jsx,tsx,md}',
+    path.resolve(__dirname, './src/**/*.{vue,js,ts,jsx,tsx,md}'),
     // Include controls CSS directly
     path.resolve(__dirname, '../histoire-controls/src/**/*.{vue,js,ts,jsx,tsx,md}'),
   ],
