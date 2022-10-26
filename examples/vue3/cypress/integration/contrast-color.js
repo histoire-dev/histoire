@@ -8,10 +8,10 @@ describe('contrast color', () => {
   const colorShouldBe = [
     'rgb(51, 51, 51)',
     'rgb(51, 51, 51)',
-    'rgb(238, 238, 238)',
+    'rgb(0, 0, 0)',
+    'rgb(255, 255, 255)',
     'rgb(204, 204, 204)',
-    'rgb(255, 255, 255)',
-    'rgb(255, 255, 255)',
+    'rgb(0, 81, 66)',
   ]
 
   it('should provide contrast color (no iframe)', () => {
