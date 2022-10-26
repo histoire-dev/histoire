@@ -287,7 +287,14 @@ export default defineConfig({
   ],
 })
 ```
-You can use current contrast color via the css variable `--histoire-contrast-color`.
+
+You can use current contrast color via the css variable `--histoire-contrast-color`:
+
+```css
+.my-class {
+  color: var(--histoire-contrast-color);
+}
+```
 
 ## `sandboxDarkClass`
 
