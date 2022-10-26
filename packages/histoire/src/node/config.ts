@@ -93,22 +93,27 @@ export function getDefaultConfig (): HistoireConfig {
       {
         label: 'Transparent',
         color: 'transparent',
+        contrastColor: '#333',
       },
       {
         label: 'White',
         color: '#fff',
+        contrastColor: '#333',
       },
       {
         label: 'Light gray',
         color: '#aaa',
+        contrastColor: '#000',
       },
       {
         label: 'Dark gray',
         color: '#333',
+        contrastColor: '#fff',
       },
       {
         label: 'Black',
         color: '#000',
+        contrastColor: '#eee',
       },
     ],
     sandboxDarkClass: 'dark',

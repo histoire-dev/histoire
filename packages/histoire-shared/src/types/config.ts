@@ -25,6 +25,7 @@ export interface ResponsivePreset {
 export interface BackgroundPreset {
   label: string
   color: string
+  contrastColor?: string
 }
 
 export interface TreeGroupConfig {
