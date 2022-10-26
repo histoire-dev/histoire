@@ -7,7 +7,15 @@
     }"
   >
     <Variant title="default">
-      <p>This is a sub story</p>
+      <p class="text">
+        This is a sub story
+      </p>
     </Variant>
   </Story>
 </template>
+
+<style scoped>
+.text {
+  color: var(--histoire-contrast-color);
+}
+</style>

@@ -139,7 +139,10 @@ const isResponsiveEnabled = computed(() => !props.variant.responsiveDisabled)
           'htw-h-fit': !!finalHeight
         } : undefined"
       >
-        <div class="bind-preview-bg htw-rounded-lg htw-h-full">
+        <div
+          class="bind-preview-bg htw-rounded-lg htw-h-full"
+          data-test-id="responsive-preview-bg"
+        >
           <CheckerboardPattern
             v-if="settings.checkerboard"
             class="htw-absolute htw-inset-0 htw-w-full htw-h-full htw-text-gray-500/20"
