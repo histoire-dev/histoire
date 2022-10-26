@@ -117,7 +117,7 @@ const finalHeight = computed(() => settings.rotate ? settings.responsiveWidth : 
 
 const isResponsiveEnabled = computed(() => !props.variant.responsiveDisabled)
 
-const vTooltipContent = computed(() => responsiveWidth.value + ' × ' + responsiveHeight.value)
+const vTooltipContent = computed(() => (responsiveWidth.value ?? 'Auto') + ' × ' + (responsiveHeight.value ?? 'Auto'))
 </script>
 
 <template>
