@@ -117,7 +117,7 @@ const finalHeight = computed(() => settings.rotate ? settings.responsiveWidth : 
 
 const isResponsiveEnabled = computed(() => !props.variant.responsiveDisabled)
 
-const vTooltipContent = computed(() => (responsiveWidth.value ?? 'Auto') + ' × ' + (responsiveHeight.value ?? 'Auto'))
+const sizeTooltip = computed(() => (responsiveWidth.value ?? 'Auto') + ' × ' + (responsiveHeight.value ?? 'Auto'))
 </script>
 
 <template>
@@ -177,7 +177,7 @@ const vTooltipContent = computed(() => (responsiveWidth.value ?? 'Auto') + ' × 
           <template v-if="isResponsiveEnabled">
             <div
               ref="horizontalDragger"
-              v-tooltip.right="vTooltipContent"
+              v-tooltip.right="sizeTooltip"
               class="htw-absolute htw-w-4 htw-top-0 htw-bottom-4 htw-right-0 hover:htw-bg-primary-500/30 htw-flex htw-items-center htw-justify-center htw-cursor-ew-resize htw-group hover:htw-text-primary-500"
             >
               <Icon
@@ -187,7 +187,7 @@ const vTooltipContent = computed(() => (responsiveWidth.value ?? 'Auto') + ' × 
             </div>
             <div
               ref="verticalDragger"
-              v-tooltip.bottom="vTooltipContent"
+              v-tooltip.bottom="sizeTooltip"
               class="htw-absolute htw-h-4 htw-left-0 htw-right-4 htw-bottom-0 hover:htw-bg-primary-500/30 htw-flex htw-items-center htw-justify-center htw-cursor-ns-resize htw-group hover:htw-text-primary-500"
             >
               <Icon
@@ -197,7 +197,7 @@ const vTooltipContent = computed(() => (responsiveWidth.value ?? 'Auto') + ' × 
             </div>
             <div
               ref="cornerDragger"
-              v-tooltip.bottom="vTooltipContent"
+              v-tooltip.bottom="sizeTooltip"
               class="htw-absolute htw-w-4 htw-h-4 htw-right-0 htw-bottom-0 hover:htw-bg-primary-500/30 htw-flex htw-items-center htw-justify-center htw-cursor-nwse-resize htw-group hover:htw-text-primary-500"
             />
           </template>
