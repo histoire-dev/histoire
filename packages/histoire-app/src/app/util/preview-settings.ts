@@ -11,7 +11,11 @@ export function applyPreviewSettings (settings: PreviewSettings) {
   document.documentElement.setAttribute('dir', settings.textDirection)
 
   // Contrast color
-  document.documentElement.style.setProperty('--histoire-contrast-color', getContrastColor(settings))
+  const contrastColor = getContrastColor(settings)
+  document.documentElement.style.setProperty('--histoire-contrast-color', contrastColor)
+  if (histoireConfig.autoApplyContrastColor) {
+    document.documentElement.style.color = contrastColor
+  }
 }
 
 export function getContrastColor (setting: PreviewSettings) {

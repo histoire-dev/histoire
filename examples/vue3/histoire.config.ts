@@ -14,4 +14,5 @@ export default defineConfig({
       contrastColor: '#005142',
     },
   ],
+  // autoApplyContrastColor: true,
 })

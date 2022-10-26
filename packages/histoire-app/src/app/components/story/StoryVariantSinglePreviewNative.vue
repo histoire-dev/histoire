@@ -1,11 +1,12 @@
 <script lang="ts" setup>
-import GenericRenderStory from './GenericRenderStory.vue'
+import { computed } from 'vue'
 import type { Story, Variant } from '../../types'
 import { isDark } from '../../util/dark'
 import { histoireConfig } from '../../util/config'
 import { usePreviewSettingsStore } from '../../stores/preview-settings'
-import StoryResponsivePreview from './StoryResponsivePreview.vue'
 import { getContrastColor } from '../../util/preview-settings'
+import GenericRenderStory from './GenericRenderStory.vue'
+import StoryResponsivePreview from './StoryResponsivePreview.vue'
 
 const props = defineProps<{
   story: Story
@@ -23,6 +24,9 @@ function onReady () {
 }
 
 const settings = usePreviewSettingsStore().currentSettings
+
+const contrastColor = computed(() => getContrastColor(settings))
+const autoApplyContrastColor = computed(() => !!histoireConfig.autoApplyContrastColor)
 </script>
 
 <template>
@@ -38,7 +42,8 @@ const settings = usePreviewSettingsStore().currentSettings
           height: finalHeight ? `${finalHeight}px` : '100%',
         } : { width: '100%', height: '100%' },
         {
-          '--histoire-contrast-color': getContrastColor(settings),
+          '--histoire-contrast-color': contrastColor,
+          color: autoApplyContrastColor ? contrastColor : undefined,
         },
       ]"
       class="htw-relative"

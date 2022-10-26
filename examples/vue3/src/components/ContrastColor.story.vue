@@ -1,6 +1,9 @@
 <template>
   <Story>
-    <span class="contrast-color">Contrast color</span>
+    <p class="contrast-color">
+      Contrast color
+    </p>
+    <p>Other text</p>
   </Story>
 </template>
 

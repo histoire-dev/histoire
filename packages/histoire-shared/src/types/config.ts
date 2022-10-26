@@ -157,6 +157,10 @@ export interface HistoireConfig {
    */
   backgroundPresets?: BackgroundPreset[]
   /**
+   * Automatically apply the current background preset's contrast color to the story preview text.
+   */
+  autoApplyContrastColor?: boolean
+  /**
    * Class added to the html root of the story preview when dark mode is enabled.
    */
   sandboxDarkClass?: string

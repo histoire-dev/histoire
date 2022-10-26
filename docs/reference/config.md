@@ -296,6 +296,18 @@ You can use current contrast color via the css variable `--histoire-contrast-col
 }
 ```
 
+## `autoApplyContrastColor`
+
+`boolean` - Default: `false`
+
+Automatically apply the contrast color to the story preview text.
+
+```ts
+export default defineConfig({
+  autoApplyContrastColor: true,
+})
+```
+
 ## `sandboxDarkClass`
 
 `string` - Default: `'dark'`

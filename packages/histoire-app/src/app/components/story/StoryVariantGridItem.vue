@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { PropType, ref, toRefs } from 'vue'
+import { computed, PropType, ref, toRefs } from 'vue'
 import { Icon } from '@iconify/vue'
 import { useRouter } from 'vue-router'
 import { useResizeObserver } from '@vueuse/core'
@@ -7,10 +7,11 @@ import { useCurrentVariantRoute } from '../../util/variant'
 import type { Story, Variant } from '../../types'
 import { useScrollOnActive } from '../../util/scroll'
 import { usePreviewSettingsStore } from '../../stores/preview-settings'
+import { getContrastColor } from '../../util/preview-settings'
+import { histoireConfig } from '../../util/config'
 import GenericRenderStory from './GenericRenderStory.vue'
 import ToolbarNewTab from '../toolbar/ToolbarNewTab.vue'
 import CheckerboardPattern from '../misc/CheckerboardPattern.vue'
-import { getContrastColor } from '../../util/preview-settings'
 
 const props = defineProps({
   variant: {
@@ -61,6 +62,9 @@ useResizeObserver(el, () => {
 })
 
 const settings = usePreviewSettingsStore().currentSettings
+
+const contrastColor = computed(() => getContrastColor(settings))
+const autoApplyContrastColor = computed(() => !!histoireConfig.autoApplyContrastColor)
 </script>
 
 <template>
@@ -123,7 +127,8 @@ const settings = usePreviewSettingsStore().currentSettings
       <div
         class="htw-relative htw-h-full"
         :style="{
-          '--histoire-contrast-color': getContrastColor(settings),
+          '--histoire-contrast-color': contrastColor,
+          color: autoApplyContrastColor ? contrastColor : undefined,
         }"
       >
         <GenericRenderStory
