@@ -10,6 +10,7 @@ import { usePreviewSettingsStore } from '../../stores/preview-settings'
 import GenericRenderStory from './GenericRenderStory.vue'
 import ToolbarNewTab from '../toolbar/ToolbarNewTab.vue'
 import CheckerboardPattern from '../misc/CheckerboardPattern.vue'
+import { getContrastColor } from '../../util/preview-settings'
 
 const props = defineProps({
   variant: {
@@ -109,14 +110,22 @@ const settings = usePreviewSettingsStore().currentSettings
       @click.stop="selectVariant()"
       @keyup="selectVariant()"
     >
-      <div class="htw-absolute htw-inset-0 htw-rounded bind-preview-bg" />
+      <div
+        class="htw-absolute htw-inset-0 htw-rounded bind-preview-bg"
+        data-test-id="responsive-preview-bg"
+      />
 
       <CheckerboardPattern
         v-if="settings.checkerboard"
         class="htw-absolute htw-inset-0 htw-w-full htw-h-full htw-text-gray-500/20"
       />
 
-      <div class="htw-relative htw-h-full">
+      <div
+        class="htw-relative htw-h-full"
+        :style="{
+          '--histoire-contrast-color': getContrastColor(settings),
+        }"
+      >
         <GenericRenderStory
           :key="`${story.id}-${variant.id}`"
           :variant="variant"
