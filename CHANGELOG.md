@@ -1,3 +1,24 @@
+## [0.11.6](https://github.com/Akryum/histoire/compare/v0.11.5...v0.11.6) (2022-10-26)
+
+
+### Bug Fixes
+
+* **grid:** update column count when content size changes ([0786a57](https://github.com/Akryum/histoire/commit/0786a57ea2019d6bee9285d4d18f54b67e5cd1dc))
+* prevent collecting loop ([ad6c652](https://github.com/Akryum/histoire/commit/ad6c6526e6aab6de11ab3e1dcf42485377c7604f))
+* **svelte:** controls not rendering in variant > controls slot ([c88c5d8](https://github.com/Akryum/histoire/commit/c88c5d83828d599684bf3e4fe52fbd4604303d64))
+
+
+### Features
+
+* add components class (fix [#203](https://github.com/Akryum/histoire/issues/203)) ([#337](https://github.com/Akryum/histoire/issues/337)) ([c85126e](https://github.com/Akryum/histoire/commit/c85126efea5744cc9bb830b5059e2d436cc991b1))
+* add size hint, fix [#329](https://github.com/Akryum/histoire/issues/329) ([#336](https://github.com/Akryum/histoire/issues/336)) ([df859a9](https://github.com/Akryum/histoire/commit/df859a98716fe2e45614fe4917b06216d1186969))
+* backgroundPresets: add contrast color ([#335](https://github.com/Akryum/histoire/issues/335)) ([c7ced23](https://github.com/Akryum/histoire/commit/c7ced23e16c950cc2f6202edfad6dc7337ff81b8))
+* change default font to Noto Sans Display ([23be901](https://github.com/Akryum/histoire/commit/23be901f559ed8db9eb9e1ab98d6fa16d9fb7bfe))
+* **config:** autoApplyContrastColor ([f045444](https://github.com/Akryum/histoire/commit/f045444fe475bcf8c2fe4c9d39632fd74596214f))
+* **md:** links to other stories, fix [#265](https://github.com/Akryum/histoire/issues/265) ([c73792c](https://github.com/Akryum/histoire/commit/c73792c7b8c19562e6adecdddee41d59e030e930))
+
+
+
 ## [0.11.5](https://github.com/Akryum/histoire/compare/v0.11.4...v0.11.5) (2022-10-14)
 
 
