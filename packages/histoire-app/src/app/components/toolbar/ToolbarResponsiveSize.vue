@@ -38,7 +38,7 @@ const settings = usePreviewSettingsStore().currentSettings
           Rotate
         </BaseCheckbox>
 
-        <div class="htw-flex htw-gap-2 htw-px-4 htw-py-3">
+        <div class="htw-flex htw-items-center htw-gap-2 htw-px-4 htw-py-3">
           <input
             v-model.number="settings.responsiveWidth"
             v-tooltip="'Responsive width (px)'"
