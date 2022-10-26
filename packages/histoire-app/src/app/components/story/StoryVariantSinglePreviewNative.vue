@@ -5,6 +5,7 @@ import { isDark } from '../../util/dark'
 import { histoireConfig } from '../../util/config'
 import { usePreviewSettingsStore } from '../../stores/preview-settings'
 import StoryResponsivePreview from './StoryResponsivePreview.vue'
+import { getContrastColor } from '../../util/preview-settings'
 
 const props = defineProps<{
   story: Story
@@ -31,10 +32,15 @@ const settings = usePreviewSettingsStore().currentSettings
     :variant="variant"
   >
     <div
-      :style="isResponsiveEnabled ? {
-        width: finalWidth ? `${finalWidth}px` : '100%',
-        height: finalHeight ? `${finalHeight}px` : '100%',
-      } : { width: '100%', height: '100%' }"
+      :style="[
+        isResponsiveEnabled ? {
+          width: finalWidth ? `${finalWidth}px` : '100%',
+          height: finalHeight ? `${finalHeight}px` : '100%',
+        } : { width: '100%', height: '100%' },
+        {
+          '--histoire-contrast-color': getContrastColor(settings),
+        },
+      ]"
       class="htw-relative"
       data-test-id="sandbox-render"
     >

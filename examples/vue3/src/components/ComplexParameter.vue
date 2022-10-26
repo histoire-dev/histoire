@@ -21,6 +21,6 @@ const props = defineProps<{
 
 <style scoped>
 .native-story{
-  color: var(--contrast-color)
+  color: var(--histoire-contrast-color)
 }
 </style>

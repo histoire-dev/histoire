@@ -287,7 +287,7 @@ export default defineConfig({
   ],
 })
 ```
-You can use current contrast color via the css variable `--contrast-color`.
+You can use current contrast color via the css variable `--histoire-contrast-color`.
 
 ## `sandboxDarkClass`
 

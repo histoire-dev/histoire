@@ -103,17 +103,17 @@ export function getDefaultConfig (): HistoireConfig {
       {
         label: 'Light gray',
         color: '#aaa',
-        contrastColor: '#eee',
+        contrastColor: '#000',
       },
       {
         label: 'Dark gray',
         color: '#333',
-        contrastColor: '#ccc',
+        contrastColor: '#fff',
       },
       {
         label: 'Black',
         color: '#000',
-        contrastColor: '#fff',
+        contrastColor: '#ccc',
       },
     ],
     sandboxDarkClass: 'dark',

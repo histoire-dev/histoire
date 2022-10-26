@@ -1,6 +1,3 @@
-<script setup lang="ts">
-</script>
-
 <template>
   <Story>
     <span class="contrast-color">Contrast color</span>
@@ -9,6 +6,6 @@
 
 <style scoped>
 .contrast-color{
-    color: var(--contrast-color)
+  color: var(--histoire-contrast-color)
 }
 </style>

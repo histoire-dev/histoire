@@ -9,7 +9,6 @@ import { usePreviewSettingsStore } from '../../stores/preview-settings'
 import { HstEvent, useEventsStore } from '../../stores/events'
 import StoryResponsivePreview from './StoryResponsivePreview.vue'
 import { toRawDeep } from '../../util/state'
-import { useContrastColor } from '../../util/contrastColor'
 
 const props = defineProps<{
   story: Story
@@ -30,6 +29,7 @@ function syncState () {
     })
   }
 }
+
 let synced = false
 
 watch(() => props.variant.state, () => {
@@ -114,7 +114,6 @@ function onIframeLoad () {
   isIframeLoaded.value = true
   syncState()
   syncSettings()
-  useContrastColor(iframe.value.contentDocument.documentElement)
 }
 
 </script>

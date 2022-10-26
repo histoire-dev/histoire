@@ -10,8 +10,8 @@ export default defineConfig({
     ...(getDefaultConfig().backgroundPresets || []),
     {
       label: 'Custom gray',
-      color: '#bbb',
-      contrastColor: '#fff',
+      color: '#cafff5',
+      contrastColor: '#005142',
     },
   ],
 })
