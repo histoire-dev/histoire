@@ -52,6 +52,7 @@ export interface Story {
   file?: StoryFile
   lastSelectedVariant?: Variant
   slots?: () => any
+  meta?: any
 }
 
 export interface Variant {
@@ -67,6 +68,7 @@ export interface Variant {
   autoPropsDisabled?: boolean
   configReady?: boolean
   previewReady?: boolean
+  meta?: any
 }
 
 export interface PropDefinition {

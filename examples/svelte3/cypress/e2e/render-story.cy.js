@@ -29,6 +29,7 @@ describe('Controls render', () => {
     cy.get('[data-test-id="story-controls"]').contains('Disabled')
     cy.get('[data-test-id="story-controls"] [role="checkbox"]').should('be.visible')
     cy.get('[data-test-id="story-controls"]').contains('Size')
+    cy.get('[data-test-id="story-controls"]').should('not.contain', 'Click me!')
   })
 
   it('should display the controls content (shared controls slot)', () => {
@@ -37,6 +38,17 @@ describe('Controls render', () => {
     cy.get('[data-test-id="story-controls"] [role="checkbox"]').should('be.visible')
     cy.visit('/story/src-sharecontrols-story-svelte?variantId=src-sharecontrols-story-svelte-1')
     cy.get('[data-test-id="story-controls"]').contains('Disabled')
+    cy.get('[data-test-id="story-controls"] [role="checkbox"]').should('be.visible')
+  })
+
+  it('should display the controls content (variant controls slot)', () => {
+    cy.visit('/story/src-controlsvariant-story-svelte?variantId=src-controlsvariant-story-svelte-0')
+    cy.get('[data-test-id="story-controls"]').contains('Content 1')
+    cy.get('[data-test-id="story-controls"]').contains('Disabled 1')
+    cy.get('[data-test-id="story-controls"] [role="checkbox"]').should('be.visible')
+    cy.visit('/story/src-controlsvariant-story-svelte?variantId=src-controlsvariant-story-svelte-1')
+    cy.get('[data-test-id="story-controls"]').contains('Content 2')
+    cy.get('[data-test-id="story-controls"]').contains('Disabled 2')
     cy.get('[data-test-id="story-controls"] [role="checkbox"]').should('be.visible')
   })
 })

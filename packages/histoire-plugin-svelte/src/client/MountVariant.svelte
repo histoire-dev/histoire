@@ -6,6 +6,7 @@ export let source: string = null
 export let responsiveDisabled: boolean = false
 export let autoPropsDisabled: boolean = false
 export let setupApp: Function = null
+export let implicit: boolean = false
 
 const story: Story = getContext('__hstStory')
 const index: { value: number } = getContext('__hstIndex')
@@ -26,6 +27,14 @@ function updateVariant () {
     setupApp,
     configReady: true,
   })
+
+  if (!implicit && !story.meta?.hasVariantChildComponents) {
+    Object.assign(story, {
+      meta: {
+        hasVariantChildComponents: true,
+      },
+    })
+  }
 }
 updateVariant()
 

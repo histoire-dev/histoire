@@ -15,7 +15,7 @@ $: inheritedFromStory = Object.keys(story).filter(key => !omitInheritStoryProps.
 </script>
 
 {#if story.variants.length === 1 && story.variants[0].id === '_default'}
-  <MountVariant {...inheritedFromStory} {...$$restProps}>
+  <MountVariant {...inheritedFromStory} {...$$restProps} implicit>
     <slot />
     <slot name="controls" slot="controls" />
   </MountVariant>
