@@ -113,7 +113,7 @@ export function getDefaultConfig (): HistoireConfig {
       {
         label: 'Black',
         color: '#000',
-        contrastColor: '#ccc',
+        contrastColor: '#eee',
       },
     ],
     sandboxDarkClass: 'dark',
