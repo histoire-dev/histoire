@@ -25,6 +25,7 @@ export interface ResponsivePreset {
 export interface BackgroundPreset {
   label: string
   color: string
+  contrastColor?: string
 }
 
 export interface TreeGroupConfig {
@@ -155,6 +156,10 @@ export interface HistoireConfig {
    * Background color of the story preview.
    */
   backgroundPresets?: BackgroundPreset[]
+  /**
+   * Automatically apply the current background preset's contrast color to the story preview text.
+   */
+  autoApplyContrastColor?: boolean
   /**
    * Class added to the html root of the story preview when dark mode is enabled.
    */

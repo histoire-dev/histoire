@@ -21,7 +21,7 @@ const variant = computed(() => storyStore.currentVariant)
 <template>
   <div
     v-if="hasSingleVariant && variant"
-    class="htw-p-2 htw-h-full __histoire-pane-shadow-from-right"
+    class="histoire-story-variant-single htw-p-2 htw-h-full __histoire-pane-shadow-from-right"
   >
     <StoryVariantSingleView
       :variant="variant"

@@ -117,7 +117,7 @@ watch(() => internalValue.value, () => {
 <template>
   <HstWrapper
     :title="title"
-    class="htw-cursor-text"
+    class="histoire-json htw-cursor-text"
     :class="$attrs.class"
     :style="$attrs.style"
   >

@@ -18,3 +18,9 @@ const props = defineProps<{
     {{ recursiveParameter.name }}
   </div>
 </template>
+
+<style scoped>
+.native-story{
+  color: var(--histoire-contrast-color)
+}
+</style>

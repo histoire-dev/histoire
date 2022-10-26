@@ -121,7 +121,7 @@ const vTooltipContent = computed(() => responsiveWidth.value + ' × ' + responsi
 </script>
 
 <template>
-  <div class="htw-w-full htw-h-full htw-flex-1 htw-rounded-lg htw-relative htw-overflow-hidden">
+  <div class="histoire-story-responsive-preview htw-w-full htw-h-full htw-flex-1 htw-rounded-lg htw-relative htw-overflow-hidden">
     <div
       v-if="isResponsiveEnabled"
       class="htw-absolute htw-inset-0 htw-w-full htw-h-full htw-bg-gray-100 dark:htw-bg-gray-750 htw-rounded-r-lg htw-border-l-2 htw-border-gray-500/10 dark:htw-border-gray-700/30 htw-overflow-hidden"
@@ -142,7 +142,10 @@ const vTooltipContent = computed(() => responsiveWidth.value + ' × ' + responsi
           'htw-h-fit': !!finalHeight
         } : undefined"
       >
-        <div class="bind-preview-bg htw-rounded-lg htw-h-full">
+        <div
+          class="bind-preview-bg htw-rounded-lg htw-h-full"
+          data-test-id="responsive-preview-bg"
+        >
           <CheckerboardPattern
             v-if="settings.checkerboard"
             class="htw-absolute htw-inset-0 htw-w-full htw-h-full htw-text-gray-500/20"

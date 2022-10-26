@@ -13,7 +13,7 @@ const settings = usePreviewSettingsStore().currentSettings
     placement="bottom-end"
     :skidding="6"
     :disabled="!histoireConfig.responsivePresets?.length"
-    class="htw-h-full htw-flex-none"
+    class="histoire-toolbar-responsive-size htw-h-full htw-flex-none"
   >
     <div
       v-tooltip="'Responsive sizes'"

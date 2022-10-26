@@ -35,7 +35,7 @@ watch(story, () => {
 </script>
 
 <template>
-  <div>
+  <div class="histoire-breadcrumb">
     <a
       class="htw-px-6 htw-h-12 hover:htw-text-primary-500 dark:hover:htw-text-primary-400 htw-cursor-pointer htw-flex htw-gap-2 htw-flex-wrap htw-w-full htw-items-center"
       @click="openMenu"

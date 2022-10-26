@@ -131,7 +131,7 @@ watch(sourceHtml, async () => {
 
 <template>
   <div
-    class="htw-bg-gray-50 dark:htw-bg-gray-750 htw-h-full htw-overflow-hidden htw-flex htw-flex-col"
+    class="histoire-story-source-code htw-bg-gray-50 dark:htw-bg-gray-750 htw-h-full htw-overflow-hidden htw-flex htw-flex-col"
   >
     <!-- Toolbar -->
     <div

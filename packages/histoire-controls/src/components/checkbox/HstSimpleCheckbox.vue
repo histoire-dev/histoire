@@ -45,7 +45,7 @@ watch(path, () => {
 
 <template>
   <div
-    class="htw-group htw-text-white htw-w-[16px] htw-h-[16px] htw-relative"
+    class="histoire-simple-checkbox htw-group htw-text-white htw-w-[16px] htw-h-[16px] htw-relative"
     :class="{'htw-cursor-pointer': withToggle}"
     @click="toggle"
   >

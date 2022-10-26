@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { PropType, ref, toRefs } from 'vue'
+import { computed, PropType, ref, toRefs } from 'vue'
 import { Icon } from '@iconify/vue'
 import { useRouter } from 'vue-router'
 import { useResizeObserver } from '@vueuse/core'
@@ -7,6 +7,8 @@ import { useCurrentVariantRoute } from '../../util/variant'
 import type { Story, Variant } from '../../types'
 import { useScrollOnActive } from '../../util/scroll'
 import { usePreviewSettingsStore } from '../../stores/preview-settings'
+import { getContrastColor } from '../../util/preview-settings'
+import { histoireConfig } from '../../util/config'
 import GenericRenderStory from './GenericRenderStory.vue'
 import ToolbarNewTab from '../toolbar/ToolbarNewTab.vue'
 import CheckerboardPattern from '../misc/CheckerboardPattern.vue'
@@ -60,12 +62,15 @@ useResizeObserver(el, () => {
 })
 
 const settings = usePreviewSettingsStore().currentSettings
+
+const contrastColor = computed(() => getContrastColor(settings))
+const autoApplyContrastColor = computed(() => !!histoireConfig.autoApplyContrastColor)
 </script>
 
 <template>
   <div
     ref="el"
-    class="htw-cursor-default htw-flex htw-flex-col htw-gap-y-1 htw-group"
+    class="histoire-story-variant-grid-item htw-cursor-default htw-flex htw-flex-col htw-gap-y-1 htw-group"
   >
     <!-- Header -->
     <div class="htw-flex-none htw-flex htw-items-center">
@@ -109,14 +114,23 @@ const settings = usePreviewSettingsStore().currentSettings
       @click.stop="selectVariant()"
       @keyup="selectVariant()"
     >
-      <div class="htw-absolute htw-inset-0 htw-rounded bind-preview-bg" />
+      <div
+        class="htw-absolute htw-inset-0 htw-rounded bind-preview-bg"
+        data-test-id="responsive-preview-bg"
+      />
 
       <CheckerboardPattern
         v-if="settings.checkerboard"
         class="htw-absolute htw-inset-0 htw-w-full htw-h-full htw-text-gray-500/20"
       />
 
-      <div class="htw-relative htw-h-full">
+      <div
+        class="htw-relative htw-h-full"
+        :style="{
+          '--histoire-contrast-color': contrastColor,
+          color: autoApplyContrastColor ? contrastColor : undefined,
+        }"
+      >
         <GenericRenderStory
           :key="`${story.id}-${variant.id}`"
           :variant="variant"

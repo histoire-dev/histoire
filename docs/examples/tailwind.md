@@ -16,7 +16,7 @@ Make sure your projet has a style file with the [Tailwind directives](https://ta
 
 ## Setup file
 
-Histoire allows us to execute a setup file automatically when redering the stories. This is useful to add global CSS files. [Learn more](../guide/config.md#global-js-and-css)
+Histoire allows us to execute a setup file automatically when rendering the stories. This is useful to add global CSS files. [Learn more](../guide/config.md#global-js-and-css)
 
 ```js
 // src/histoire-setup.js

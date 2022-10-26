@@ -252,6 +252,7 @@ Each object in the array is a preset with the following properties:
 
 - `label: string`: Label for the preset.
 - `color: string`: Color of the preset.
+- `contrastColor?: string`: Contrast color of preset
 
 Default values are shown in the example below:
 
@@ -261,24 +262,49 @@ export default defineConfig({
     {
       label: 'Transparent',
       color: 'transparent',
+      contrastColor: '#333'
     },
     {
       label: 'White',
       color: '#fff',
+      contrastColor: '#333'
     },
     {
       label: 'Light gray',
       color: '#aaa',
+      contrastColor: '#eee'
     },
     {
       label: 'Dark gray',
       color: '#333',
+      contrastColor: '#ccc'
     },
     {
       label: 'Black',
       color: '#000',
+      contrastColor: '#fff'
     },
   ],
+})
+```
+
+You can use current contrast color via the css variable `--histoire-contrast-color`:
+
+```css
+.my-class {
+  color: var(--histoire-contrast-color);
+}
+```
+
+## `autoApplyContrastColor`
+
+`boolean` - Default: `false`
+
+Automatically apply the contrast color to the story preview text.
+
+```ts
+export default defineConfig({
+  autoApplyContrastColor: true,
 })
 ```
 
