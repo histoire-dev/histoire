@@ -6,6 +6,7 @@ import HatchedPattern from '../misc/HatchedPattern.vue'
 import CheckerboardPattern from '../misc/CheckerboardPattern.vue'
 import { usePreviewSettingsStore } from '../../stores/preview-settings'
 import { Variant } from '../../types'
+import { VTooltip as vTooltip } from 'floating-vue'
 
 const props = defineProps<{
   variant: Variant
@@ -115,6 +116,8 @@ const finalHeight = computed(() => settings.rotate ? settings.responsiveWidth : 
 // Disabled responsive
 
 const isResponsiveEnabled = computed(() => !props.variant.responsiveDisabled)
+
+const sizeTooltip = computed(() => (responsiveWidth.value ?? 'Auto') + ' × ' + (responsiveHeight.value ?? 'Auto'))
 </script>
 
 <template>
@@ -174,6 +177,7 @@ const isResponsiveEnabled = computed(() => !props.variant.responsiveDisabled)
           <template v-if="isResponsiveEnabled">
             <div
               ref="horizontalDragger"
+              v-tooltip.right="sizeTooltip"
               class="htw-absolute htw-w-4 htw-top-0 htw-bottom-4 htw-right-0 hover:htw-bg-primary-500/30 htw-flex htw-items-center htw-justify-center htw-cursor-ew-resize htw-group hover:htw-text-primary-500"
             >
               <Icon
@@ -183,6 +187,7 @@ const isResponsiveEnabled = computed(() => !props.variant.responsiveDisabled)
             </div>
             <div
               ref="verticalDragger"
+              v-tooltip.bottom="sizeTooltip"
               class="htw-absolute htw-h-4 htw-left-0 htw-right-4 htw-bottom-0 hover:htw-bg-primary-500/30 htw-flex htw-items-center htw-justify-center htw-cursor-ns-resize htw-group hover:htw-text-primary-500"
             >
               <Icon
@@ -192,6 +197,7 @@ const isResponsiveEnabled = computed(() => !props.variant.responsiveDisabled)
             </div>
             <div
               ref="cornerDragger"
+              v-tooltip.bottom="sizeTooltip"
               class="htw-absolute htw-w-4 htw-h-4 htw-right-0 htw-bottom-0 hover:htw-bg-primary-500/30 htw-flex htw-items-center htw-justify-center htw-cursor-nwse-resize htw-group hover:htw-text-primary-500"
             />
           </template>
