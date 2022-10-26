@@ -58,6 +58,10 @@ export const RESOLVED_MARKDOWN_FILES = `/__resolved__${MARKDOWN_FILES}`
 
 const ID_SEPARATOR = '__-__'
 
+const PLUGINS_HAVE_DEV = [
+  '@histoire/plugin-vue',
+]
+
 export async function mergeHistoireViteConfig (viteConfig: InlineConfig, ctx: Context) {
   if (ctx.config.vite) {
     const command = ctx.mode === 'dev' ? 'serve' : 'build'
@@ -125,7 +129,7 @@ export async function getViteConfigWithPlugins (isServer: boolean, ctx: Context)
             'vue',
           ],
           alias: {
-            'histoire-style': join(APP_PATH, 'style.css'),
+            'histoire-style': join(APP_PATH, process.env.HISTOIRE_DEV ? 'app/style/main.pcss' : 'style.css'),
           },
         },
         optimizeDeps: {
@@ -152,6 +156,11 @@ export async function getViteConfigWithPlugins (isServer: boolean, ctx: Context)
               TEMP_PATH,
               ctx.resolvedViteConfig.root,
               process.cwd(),
+              ...process.env.HISTOIRE_DEV
+                ? [
+                  '../../packages/histoire-vendors',
+                ]
+                : [],
             ],
           },
           watch: {
@@ -341,7 +350,7 @@ if (import.meta.hot) {
       }
 
       if (id === RESOLVED_SUPPORT_PLUGINS_CLIENT) {
-        const plugins = ctx.supportPlugins.map(p => `'${p.id}': () => import(${JSON.stringify(require.resolve(`${p.moduleName}/client`, {
+        const plugins = ctx.supportPlugins.map(p => `'${p.id}': () => import(${JSON.stringify(require.resolve(`${p.moduleName}/client${process.env.HISTOIRE_DEV && PLUGINS_HAVE_DEV.includes(p.moduleName) ? '-dev' : ''}`, {
           paths: [ctx.root, import.meta.url],
         }))})`)
         return `export const clientSupportPlugins = {
@@ -350,7 +359,7 @@ if (import.meta.hot) {
       }
 
       if (id === RESOLVED_SUPPORT_PLUGINS_COLLECT) {
-        const plugins = ctx.supportPlugins.map(p => `'${p.id}': () => import(${JSON.stringify(require.resolve(`${p.moduleName}/collect`, {
+        const plugins = ctx.supportPlugins.map(p => `'${p.id}': () => import(${JSON.stringify(require.resolve(`${p.moduleName}/collect${process.env.HISTOIRE_DEV && PLUGINS_HAVE_DEV.includes(p.moduleName) ? '-dev' : ''}`, {
           paths: [ctx.root, import.meta.url],
         }))})`)
         return `export const collectSupportPlugins = {
@@ -360,7 +369,7 @@ if (import.meta.hot) {
 
       if (id === RESOLVED_MARKDOWN_FILES) {
         const filesJs = ctx.markdownFiles.map(f => `${JSON.stringify(f.relativePath)}: () => import(${JSON.stringify(`virtual:md:${f.id}`)})`).join(',')
-        return `import { reactive } from ${getInjectedImport('@histoire/vendors/vue')}
+        return `import { reactive } from ${process.env.HISTOIRE_DEV ? `'vue'` : getInjectedImport('@histoire/vendors/vue')}
         export const markdownFiles = reactive({${filesJs}})
         if (import.meta.hot) {
           if (!window.__hst_md_hmr) {
@@ -457,7 +466,7 @@ if (import.meta.hot) {
     }
   }
   </script>
-  <script type="module" src="/@fs/${APP_PATH}/bundle-sandbox.js"></script>
+  <script type="module" src="/@fs/${APP_PATH}/bundle-sandbox${process.env.HISTOIRE_DEV ? '-dev' : ''}.js"></script>
 </body>
 </html>`
           // Apply Vite HTML transforms. This injects the Vite HMR client, and
@@ -489,7 +498,7 @@ if (import.meta.hot) {
   </head>
   <body>
     <div id="app"></div>
-    <script type="module" src="/@fs/${APP_PATH}/bundle-main.js"></script>
+    <script type="module" src="/@fs/${APP_PATH}/bundle-main${process.env.HISTOIRE_DEV ? '-dev' : ''}.js"></script>
   </body>
 </html>`
             // Apply Vite HTML transforms. This injects the Vite HMR client, and
@@ -523,6 +532,43 @@ if (import.meta.hot) {
           const index = code.indexOf('export default')
           const result = `${code.substring(0, index)}_sfc_main.__file = '${file}'\n${code.substring(index)}`
           return result
+        }
+      },
+    })
+  }
+
+  if (process.env.HISTOIRE_DEV && !isServer) {
+    plugins.push({
+      name: 'histoire-dev-plugin',
+      config () {
+        // Examples context
+        return {
+          resolve: {
+            alias: [
+              ...[
+                ['floating-vue/dist/style.css', 'node_modules/floating-vue/dist/style.css'],
+                ['floating-vue', 'floating-vue'],
+                ['@iconify/vue', 'iconify'],
+                ['pinia', 'pinia'],
+                ['scroll-into-view-if-needed', 'scroll'],
+                ['vue-router', 'vue-router'],
+                ['@vueuse/core', 'vue-use'],
+                ['vue', 'vue'],
+              ].reduce((acc, [name, entry]) => {
+                acc.push({
+                  find: new RegExp(`^${name.replace(/\//g, '\\/')}$`),
+                  replacement: `@histoire/vendors/${entry}`,
+                })
+                acc.push({
+                  find: new RegExp(`^${name.replace(/\//g, '\\/')}\\/`),
+                  replacement: `@histoire/vendors/${entry}/`,
+                })
+                return acc
+              }, [] as any[]),
+
+              { find: /@histoire\/controls$/, replacement: '@histoire/controls/src/index.ts' },
+            ],
+          },
         }
       },
     })

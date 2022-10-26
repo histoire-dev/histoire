@@ -23,6 +23,7 @@
   },
   "devDependencies": {
     "@akryum/sheep": "^0.3.3",
+    "@histoire/vendors": "workspace:*",
     "@iconify/vue": "^3.2.1",
     "@typescript-eslint/eslint-plugin": "^5.18.0",
     "@typescript-eslint/parser": "^5.18.0",

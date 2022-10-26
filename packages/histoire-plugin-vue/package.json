@@ -24,6 +24,12 @@
       "types": "./dist/client/server.d.ts",
       "default": "./dist/bundled/client/server.js"
     },
+    "./client-dev": {
+      "default": "./src/client/client.ts"
+    },
+    "./collect-dev": {
+      "default": "./src/client/server.ts"
+    },
     ".": {
       "types": "./dist/index.d.ts",
       "default": "./dist/bundled/index.js"
