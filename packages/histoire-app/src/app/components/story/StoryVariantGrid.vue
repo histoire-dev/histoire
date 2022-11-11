@@ -82,6 +82,7 @@ function onItemResize (w: number, h: number) {
 }
 
 watch(() => storyStore.currentVariant, () => {
+  maxItemHeight.value = 0 // Reset max height
   updateMaxCount()
 })
 
