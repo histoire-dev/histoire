@@ -154,6 +154,7 @@ export async function loadConfigFile (configFile: string): Promise<Partial<Histo
   try {
     const result = jiti(__filename, {
       esmResolve: true,
+      requireCache: false,
     })(configFile)
     if (!result.default) {
       throw new Error(`Expected default export in ${configFile}`)
