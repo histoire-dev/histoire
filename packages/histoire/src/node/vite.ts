@@ -9,7 +9,6 @@ import {
 } from 'vite'
 import { lookup as lookupMime } from 'mrmime'
 import fs from 'fs-extra'
-import ViteInspect from 'vite-plugin-inspect'
 import { APP_PATH, TEMP_PATH } from './alias.js'
 import { Context } from './context.js'
 import { notifyStoryChange } from './stories.js'
@@ -116,8 +115,6 @@ export async function getViteConfigWithPlugins (isServer: boolean, ctx: Context)
     }
     return result
   }
-
-  plugins.push(ViteInspect())
 
   plugins.push({
     name: 'histoire-vite-plugin',
