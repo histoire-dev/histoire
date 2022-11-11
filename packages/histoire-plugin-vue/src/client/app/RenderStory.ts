@@ -240,7 +240,6 @@ export default _defineComponent({
   render () {
     return _h('div', {
       ref: 'sandbox',
-      class: '__histoire-sandbox htw-overflow-auto',
     })
   },
 })

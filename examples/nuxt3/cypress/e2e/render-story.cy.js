@@ -17,6 +17,6 @@ describe('Story render', () => {
 
   it('should render NuxtLink', () => {
     cy.visit('/story/components-basebuttonlink-story-vue?variantId=_default')
-    cy.get('.__histoire-sandbox a').contains('Hello world')
+    cy.get('.histoire-generic-render-story a').contains('Hello world')
   })
 })

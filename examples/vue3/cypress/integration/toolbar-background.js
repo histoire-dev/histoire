@@ -50,7 +50,7 @@ describe('background color', () => {
     cy.get('[data-test-id="background-popper"]').should('be.visible').find('button').should('have.length', 6).each(($el, index) => {
       cy.wrap($el).click()
       cy.get('[data-test-id="responsive-preview-bg"]').should('have.css', 'background-color', backgroundColorShouldBe[index])
-      cy.get('.__histoire-sandbox .text').should('have.css', 'color', contrastColorShouldBe[index])
+      cy.get('.histoire-generic-render-story .text').should('have.css', 'color', contrastColorShouldBe[index])
       cy.get('[data-test-id="toolbar-background"]').click()
     })
   })

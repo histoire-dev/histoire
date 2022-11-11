@@ -17,3 +17,7 @@ html {
 .htw-sandbox-hidden {
   display: none;
 }
+
+.htw-sandbox-contain {
+  contain: content;
+}
