@@ -45,7 +45,8 @@ export async function build (ctx: Context) {
     await stop()
   }
 
-  const server = await createViteServer(await getViteConfigWithPlugins(true, ctx))
+  const { viteConfig } = await getViteConfigWithPlugins(true, ctx)
+  const server = await createViteServer(viteConfig)
   await server.pluginContainer.buildStart({})
 
   const moduleLoader = useModuleLoader({

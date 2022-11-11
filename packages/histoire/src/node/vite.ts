@@ -96,7 +96,12 @@ export async function mergeHistoireViteConfig (viteConfig: InlineConfig, ctx: Co
   return viteConfig
 }
 
-export async function getViteConfigWithPlugins (isServer: boolean, ctx: Context): Promise<InlineConfig> {
+export interface ViteConfigWithPlugins {
+  viteConfig: InlineConfig
+  viteConfigFile: string | null
+}
+
+export async function getViteConfigWithPlugins (isServer: boolean, ctx: Context): Promise<ViteConfigWithPlugins> {
   const userViteConfigFile = await loadViteConfigFromFile({ command: ctx.mode === 'dev' ? 'serve' : 'build', mode: ctx.mode })
   const userViteConfig = mergeViteConfig(userViteConfigFile?.config ?? {}, { server: { port: 6006 } })
 
@@ -571,8 +576,13 @@ if (import.meta.hot) {
     })
   }
 
-  return mergeViteConfig(inlineConfig, {
+  const viteConfig = mergeViteConfig(inlineConfig, {
     configFile: false,
     plugins,
   }) as InlineConfig
+
+  return {
+    viteConfig,
+    viteConfigFile: userViteConfigFile?.path ?? null,
+  }
 }

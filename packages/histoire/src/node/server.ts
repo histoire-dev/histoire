@@ -17,14 +17,18 @@ export interface CreateServerOptions {
 
 export async function createServer (ctx: Context, options: CreateServerOptions = {}) {
   const getViteServer = async (collecting: boolean) => {
-    const server = await createViteServer(await getViteConfigWithPlugins(collecting, ctx))
+    const { viteConfig, viteConfigFile } = await getViteConfigWithPlugins(collecting, ctx)
+    const server = await createViteServer(viteConfig)
     await server.pluginContainer.buildStart({})
-    return server
+    return {
+      server,
+      viteConfigFile,
+    }
   }
 
   const [
-    server,
-    nodeServer,
+    { server, viteConfigFile },
+    { server: nodeServer },
     ,
     { stop: stopMdFileWatcher },
   ] = await Promise.all([
@@ -199,6 +203,7 @@ export async function createServer (ctx: Context, options: CreateServerOptions =
 
   return {
     server,
+    viteConfigFile,
     close,
   }
 }

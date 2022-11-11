@@ -15,13 +15,13 @@ export async function devCommand (options: DevOptions) {
     const ctx = await createContext({
       mode: 'dev',
     })
-    const { server, close } = await createServer(ctx, { port: options.port })
+    const { server, viteConfigFile, close } = await createServer(ctx, { port: options.port })
     server.printUrls()
 
     // Histoire config watcher
     let watcher: chokidar.FSWatcher
-    if (server.config.configFile) {
-      watcher = chokidar.watch(server.config.configFile, {
+    if (viteConfigFile) {
+      watcher = chokidar.watch(viteConfigFile, {
         ignoreInitial: true,
       })
       watcher.on('change', () => {
