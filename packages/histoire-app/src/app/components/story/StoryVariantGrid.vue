@@ -97,10 +97,11 @@ function updateSize () {
 
   if (!gridEl.value) return
 
-  const firstCellEl = gridEl.value.children[0] as HTMLDivElement
-  if (!firstCellEl) return
-
-  gridColumnWidth.value = firstCellEl.clientWidth
+  if (gridTemplateWidth.value.endsWith('%')) {
+    gridColumnWidth.value = viewWidth.value * parseInt(gridTemplateWidth.value) / 100 - gap
+  } else {
+    gridColumnWidth.value = parseInt(gridTemplateWidth.value)
+  }
 }
 
 onMounted(() => {
@@ -125,31 +126,33 @@ const columnCount = computed(() => Math.min(storyStore.currentStory.variants.len
       <ToolbarTextDirection />
     </div>
 
-    <div
-      ref="el"
-      class="htw-overflow-y-auto htw-flex htw-flex-1"
-      @scroll="updateMaxCount()"
-    >
+    <div class="htw-overflow-y-auto htw-flex htw-flex-1">
       <div
-        class="htw-m-auto"
-        :style="{
-          minHeight: `${(storyStore.currentStory.variants.length / countPerRow) * (maxItemHeight + gap) - gap}px`,
-        }"
+        ref="el"
+        class="htw-flex htw-w-0 htw-flex-1 htw-mx-4"
+        @scroll="updateMaxCount()"
       >
         <div
-          ref="gridEl"
-          class="htw-grid htw-gap-4 htw-m-4"
+          class="htw-m-auto"
           :style="{
-            gridTemplateColumns: `repeat(${columnCount}, ${gridTemplateWidth})`,
+            minHeight: `${(storyStore.currentStory.variants.length / countPerRow) * (maxItemHeight + gap) - gap}px`,
           }"
         >
-          <StoryVariantGridItem
-            v-for="(variant, index) of storyStore.currentStory.variants.slice(0, maxCount)"
-            :key="index"
-            :variant="variant"
-            :story="storyStore.currentStory"
-            @resize="onItemResize"
-          />
+          <div
+            ref="gridEl"
+            class="htw-grid htw-gap-4 htw-my-4"
+            :style="{
+              gridTemplateColumns: `repeat(${columnCount}, ${gridColumnWidth}px)`,
+            }"
+          >
+            <StoryVariantGridItem
+              v-for="(variant, index) of storyStore.currentStory.variants.slice(0, maxCount)"
+              :key="index"
+              :variant="variant"
+              :story="storyStore.currentStory"
+              @resize="onItemResize"
+            />
+          </div>
         </div>
       </div>
     </div>
