@@ -7,9 +7,19 @@
 
   let disabled = false
   let size = 'medium'
+
+  let source;
+
+  $: {
+    source = `<BaseButton`;
+    if (disabled) {
+      source += ` disabled`;
+    }
+    source += `>Click me !</BaseButton>`;
+  }
 </script>
   
-<Hst.Story title="BaseButton">
+<Hst.Story title="BaseButton" {source}>
   <BaseButton {disabled} {size} on:click={event => logEvent('click', event)}>
     Click me!
   </BaseButton>

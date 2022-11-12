@@ -1,7 +1,6 @@
 <script lang="ts">
-import { Story } from '@histoire/shared'
+import type { Story, Variant } from '@histoire/shared'
 import { getContext } from 'svelte'
-import Variant from '../collect/Variant.svelte';
 
 const story: Story = getContext('__hstStory')
 const currentVariant: Variant = getContext('__hstVariant')
@@ -12,6 +11,16 @@ const variant = story.variants[index.value]
 index.value++
 
 $: shouldRender = currentVariant.id === variant.id
+
+export let source: string = null
+
+$: {
+  if (source != null) {
+    Object.assign(currentVariant, {
+      source,
+    })
+  }
+}
 </script>
 
 {#if shouldRender}
