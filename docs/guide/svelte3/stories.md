@@ -29,7 +29,7 @@ The title of the story is provided with the (optional) `title` prop:
 </Hst.Story>
 ```
 
-You can of course add `<style>` sections just like you would with any `.svelte` file.
+You can of course add `<script>` sections just like you would with any `.svelte` file.
 
 For example, you will usually import and use a component in your story:
 
