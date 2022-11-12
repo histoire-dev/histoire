@@ -3,7 +3,6 @@
 
   let disabled = false;
   let button = undefined;
-  let checkbox = undefined;
 </script>
   
 <Hst.Story title="BindThisVsControls">
@@ -13,7 +12,6 @@
 
   <section>
     button={button}
-    checkbox={checkbox}
   </section>
 
   <label>
@@ -23,11 +21,6 @@
     />
     Disabled
   </label>
-
-  <Hst.Checkbox
-    bind:this={checkbox}
-    title="Checkbox"
-  />
 
   <svelte:fragment slot="controls">
     <Hst.Checkbox
