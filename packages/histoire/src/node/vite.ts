@@ -193,7 +193,7 @@ export async function getViteConfigWithPlugins (isServer: boolean, ctx: Context)
             file = setupFileConfig
           } else if (isServer && 'server' in setupFileConfig) {
             file = setupFileConfig.server
-          } else if ('browser' in setupFileConfig) {
+          } else if (!isServer && 'browser' in setupFileConfig) {
             file = setupFileConfig.browser
           }
           if (file) {
