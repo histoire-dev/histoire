@@ -33,7 +33,7 @@ export function HstPercy (options: PercyPluginOptions = {}): Plugin {
         return
       }
 
-      const { default: puppeteer } = await import('puppeteer')
+      const puppeteer = await import('puppeteer')
       const browser = await puppeteer.launch()
 
       // Collect client and env info
