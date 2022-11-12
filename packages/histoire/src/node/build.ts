@@ -76,7 +76,8 @@ export async function build (ctx: Context) {
   const variantCount = ctx.storyFiles.reduce((sum, file) => sum + (file.story?.variants.length ?? 0), 0)
   const emptyStoryCount = ctx.storyFiles.length - storyCount
 
-  const buildViteConfig: ViteInlineConfig = mergeViteConfig(await getViteConfigWithPlugins(false, ctx), {
+  const { viteConfig: buildViteConfigRaw } = await getViteConfigWithPlugins(false, ctx)
+  const buildViteConfig: ViteInlineConfig = mergeViteConfig(buildViteConfigRaw, {
     mode: 'development',
     build: {
       lib: false,
