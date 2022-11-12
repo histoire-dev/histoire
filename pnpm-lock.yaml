@@ -120,7 +120,7 @@ importers:
     devDependencies:
       '@histoire/plugin-svelte': link:../../packages/histoire-plugin-svelte
       '@sveltejs/adapter-auto': 1.0.0-next.87
-      '@sveltejs/kit': 1.0.0-next.543_svelte@3.50.1+vite@3.1.4
+      '@sveltejs/kit': 1.0.0-next.544_svelte@3.50.1+vite@3.1.4
       '@types/cookie': 0.5.1
       histoire: link:../../packages/histoire
       svelte: 3.50.1
@@ -248,10 +248,10 @@ importers:
 
   packages/histoire:
     specifiers:
-      '@histoire/app': ^0.11.6
-      '@histoire/controls': ^0.11.6
-      '@histoire/shared': ^0.11.6
-      '@histoire/vendors': ^0.11.6
+      '@histoire/app': ^0.11.7
+      '@histoire/controls': ^0.11.7
+      '@histoire/shared': ^0.11.7
+      '@histoire/vendors': ^0.11.7
       '@peeky/server': ^0.14.0
       '@peeky/test': ^0.14.1
       '@types/flexsearch': ^0.7.3
@@ -331,9 +331,9 @@ importers:
 
   packages/histoire-app:
     specifiers:
-      '@histoire/controls': ^0.11.6
-      '@histoire/shared': ^0.11.6
-      '@histoire/vendors': ^0.11.6
+      '@histoire/controls': ^0.11.7
+      '@histoire/shared': ^0.11.7
+      '@histoire/vendors': ^0.11.7
       '@tailwindcss/typography': ^0.5.2
       '@types/flexsearch': ^0.7.3
       '@types/fs-extra': ^9.0.13
@@ -387,7 +387,7 @@ importers:
       '@codemirror/state': ^6.1.2
       '@codemirror/theme-one-dark': ^6.1.0
       '@codemirror/view': ^6.3.0
-      '@histoire/vendors': ^0.11.6
+      '@histoire/vendors': ^0.11.7
       '@peeky/server': ^0.14.0
       '@peeky/test': ^0.14.1
       '@types/node': ^17.0.32
@@ -507,9 +507,9 @@ importers:
 
   packages/histoire-plugin-svelte:
     specifiers:
-      '@histoire/controls': ^0.11.6
-      '@histoire/shared': ^0.11.6
-      '@histoire/vendors': ^0.11.6
+      '@histoire/controls': ^0.11.7
+      '@histoire/shared': ^0.11.7
+      '@histoire/vendors': ^0.11.7
       '@sveltejs/vite-plugin-svelte': ^1.0.1
       '@types/node': ^17.0.32
       concurrently: ^7.1.0
@@ -538,9 +538,9 @@ importers:
 
   packages/histoire-plugin-vue:
     specifiers:
-      '@histoire/controls': ^0.11.6
-      '@histoire/shared': ^0.11.6
-      '@histoire/vendors': ^0.11.6
+      '@histoire/controls': ^0.11.7
+      '@histoire/shared': ^0.11.7
+      '@histoire/vendors': ^0.11.7
       '@types/node': ^17.0.32
       change-case: ^4.1.2
       concurrently: ^7.1.0
@@ -563,9 +563,9 @@ importers:
 
   packages/histoire-plugin-vue2:
     specifiers:
-      '@histoire/controls': ^0.11.6
-      '@histoire/shared': ^0.11.6
-      '@histoire/vendors': ^0.11.6
+      '@histoire/controls': ^0.11.7
+      '@histoire/shared': ^0.11.7
+      '@histoire/vendors': ^0.11.7
       '@types/node': ^17.0.32
       change-case: ^4.1.2
       concurrently: ^7.1.0
@@ -2341,8 +2341,8 @@ packages:
       - supports-color
     dev: true
 
-  /@sveltejs/kit/1.0.0-next.543_svelte@3.50.1+vite@3.1.4:
-    resolution: {integrity: sha512-aOd5SX+LPUqe8isXQV7c+XDbi/499Elw2D2igVOya51j26nISptnLmY9KsMBD48Tjl6Va3kUfsa1R1U87vZJRA==}
+  /@sveltejs/kit/1.0.0-next.544_svelte@3.50.1+vite@3.1.4:
+    resolution: {integrity: sha512-zgQHiSvxiTDjJJROj9mPwIEoT6sAopagDroh89cHKarKc2eK/1nISA2dascKz/atGF8mghOn7RXZPnPofr01fQ==}
     engines: {node: '>=16.14'}
     hasBin: true
     requiresBuild: true

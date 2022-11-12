@@ -1,3 +1,22 @@
+## [0.11.7](https://github.com/Akryum/histoire/compare/v0.11.6...v0.11.7) (2022-11-12)
+
+
+### Bug Fixes
+
+* build error ([91b48a1](https://github.com/Akryum/histoire/commit/91b48a152ad637149420621452b7d05233a1ff49))
+* config changes not applied on auto restart ([a54efad](https://github.com/Akryum/histoire/commit/a54efadcdc4bc0dda5f2f853608475768360fb00))
+* grid scroll height not being reset when switcing story ([875cf7d](https://github.com/Akryum/histoire/commit/875cf7d45afe4573dd2ec9d2df969b1c22ccb68e))
+* grid with % size glitching ([ef51ccc](https://github.com/Akryum/histoire/commit/ef51ccc3f01ced96608a51b9964f60bdd7e832b6))
+* not restarting on vite config change ([c5fb953](https://github.com/Akryum/histoire/commit/c5fb95300fe240804febc23ab93bec89cb962a59))
+* **percy:** puppeteer import, fix [#330](https://github.com/Akryum/histoire/issues/330) ([c199ad4](https://github.com/Akryum/histoire/commit/c199ad4b21af725283ff014491cdc9a2bd4f1243))
+* remove overflow tailwind classes from sandbox, fix [#351](https://github.com/Akryum/histoire/issues/351) ([a326a6a](https://github.com/Akryum/histoire/commit/a326a6a9522fd8437f0abfb6280590b0d404a05e))
+* remove vite-plugin-inspect ([df6a7fb](https://github.com/Akryum/histoire/commit/df6a7fbb0b45abd09e80511f24cf859ae431c99d))
+* setupFile.browser only being also applied to server, related to [#323](https://github.com/Akryum/histoire/issues/323) ([833d086](https://github.com/Akryum/histoire/commit/833d0862de5d5b456e8024264ef94a99d87ee202))
+* **svelte:** dynamic source, fix [#344](https://github.com/Akryum/histoire/issues/344) ([11e0432](https://github.com/Akryum/histoire/commit/11e04323f346c0fc0ca4c9d1874b32945261f490))
+* **svelte:** state sync: ignore undefined, HTMLElement and SvelteComponents, fix [#346](https://github.com/Akryum/histoire/issues/346) ([755ac0d](https://github.com/Akryum/histoire/commit/755ac0d846bde9547031f30bceb26b079ccc8067))
+
+
+
 ## [0.11.6](https://github.com/Akryum/histoire/compare/v0.11.5...v0.11.6) (2022-10-26)
 
 
