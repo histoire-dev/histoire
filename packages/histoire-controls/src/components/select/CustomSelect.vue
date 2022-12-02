@@ -44,6 +44,7 @@ function selectValue (value: any, hide: () => void) {
 <template>
   <VDropdown
     auto-size
+    auto-boundary-max-size
   >
     <div
       class="htw-cursor-pointer htw-w-full htw-outline-none htw-px-2 htw-h-[27px] -htw-my-1 htw-border htw-border-solid htw-border-black/25 dark:htw-border-white/25 hover:htw-border-primary-500 dark:hover:htw-border-primary-500 htw-rounded-sm htw-flex htw-gap-2 htw-items-center htw-leading-normal"
