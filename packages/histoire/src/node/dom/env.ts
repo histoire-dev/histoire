@@ -1,22 +1,29 @@
-import { Window } from 'happy-dom'
-import { KEYS } from './dom-keys.js'
+import {
+  JSDOM,
+  VirtualConsole,
+} from 'jsdom'
+import { populateGlobal } from './util.js'
 
 export function createDomEnv () {
-  // @ts-ignore
-  const window = global.window = new Window()
-  const globalKeys = KEYS.concat(Object.getOwnPropertyNames(window))
-    .filter(k => !k.startsWith('_'))
-    .filter(k => !(k in global))
+  const dom = new JSDOM(
+    '<!DOCTYPE html>',
+    {
+      pretendToBeVisual: true,
+      runScripts: 'dangerously',
+      url: 'http://localhost:3000',
+      virtualConsole: console && global.console ? new VirtualConsole().sendTo(global.console) : undefined,
+      includeNodeLocations: false,
+      contentType: 'text/html',
+    },
+  )
 
-  for (const key of globalKeys) {
-    global[key] = window[key]
-  }
+  const { keys, originals } = populateGlobal(global, dom.window, { bindFunctions: true })
 
   function destroy () {
-    globalKeys.forEach(key => delete global[key])
-    globalKeys.length = 0
-    window.happyDOM.cancelAsync()
-    delete global.window
+    keys.forEach(key => delete global[key])
+    originals.forEach((v, k) => {
+      global[k] = v
+    })
   }
 
   return {

@@ -24,6 +24,7 @@ const LIVING_KEYS = [
   'Comment',
   'DocumentType',
   'NodeList',
+  'RadioNodeList',
   'HTMLCollection',
   'HTMLOptionsCollection',
   'DOMStringMap',
@@ -100,6 +101,7 @@ const LIVING_KEYS = [
   'HTMLVideoElement',
   'HTMLAudioElement',
   'HTMLTrackElement',
+  'HTMLFormControlsCollection',
   'SVGElement',
   'SVGGraphicsElement',
   'SVGSVGElement',
@@ -130,6 +132,7 @@ const LIVING_KEYS = [
   'Location',
   'History',
   'Screen',
+  'Crypto',
   'Performance',
   'Navigator',
   'PluginArray',
@@ -163,6 +166,12 @@ const LIVING_KEYS = [
   'Headers',
   'AbortController',
   'AbortSignal',
+  'ArrayBuffer',
+
+  // not specified in docs, but is available
+  'Image',
+  'Audio',
+  'Option',
 ]
 
 const OTHER_KEYS = [
@@ -171,6 +180,7 @@ const OTHER_KEYS = [
   'atob',
   'blur',
   'btoa',
+  'cancelAnimationFrame',
   /* 'clearInterval', */
   /* 'clearTimeout', */
   'close',
@@ -187,6 +197,7 @@ const OTHER_KEYS = [
   'innerWidth',
   'length',
   'location',
+  'matchMedia',
   'moveBy',
   'moveTo',
   'name',
@@ -201,6 +212,7 @@ const OTHER_KEYS = [
   'print',
   'prompt',
   'removeEventListener',
+  'requestAnimationFrame',
   'resizeBy',
   'resizeTo',
   'screen',
@@ -221,6 +233,7 @@ const OTHER_KEYS = [
   'stop',
   /* 'toString', */
   'top',
+  'Window',
   'window',
 ]
 
