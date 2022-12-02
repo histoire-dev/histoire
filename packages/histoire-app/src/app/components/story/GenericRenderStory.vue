@@ -29,7 +29,7 @@ watchEffect(async () => {
   <component
     :is="mountComponent"
     v-if="mountComponent"
-    class="histoire-generic-render-story htw-sandbox-contain"
+    class="histoire-generic-render-story __histoire-render-story"
     :story="story"
     v-bind="$attrs"
   />

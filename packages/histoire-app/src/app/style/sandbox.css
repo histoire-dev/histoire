@@ -18,6 +18,7 @@ html {
   display: none;
 }
 
-.htw-sandbox-contain {
-  contain: content;
+.__histoire-render-story {
+  overflow: auto;
+  min-height: 100%;
 }
