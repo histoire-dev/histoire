@@ -249,16 +249,6 @@ export async function processConfig (config: HistoireConfig, mode: ConfigMode): 
 }
 
 export async function processDefaultConfig (defaultConfig: HistoireConfig, preUserConfig: HistoireConfig, mode: ConfigMode, cwd: string): Promise<HistoireConfig> {
-  // Automatically inline dependencies in vite-node
-  const pkgFile = await findUp(cwd, ['package.json'])
-  const fs = (await import('fs-extra')).default
-  if (pkgFile) {
-    const pkg = await fs.readJSON(pkgFile)
-    if (pkg.dependencies) {
-      defaultConfig.viteNodeInlineDeps = Object.keys(pkg.dependencies).map(d => new RegExp(d))
-    }
-  }
-
   // Apply plugins
   for (const plugin of [...defaultConfig.plugins, ...preUserConfig.plugins ?? []]) {
     if (plugin.defaultConfig) {
