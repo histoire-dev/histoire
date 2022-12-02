@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { defineProps } from 'vue'
-
 const props = defineProps<{
   complexParameter: Array<{action: () => void}>
   recursiveParameter: {name: string} & Record<string, unknown>
