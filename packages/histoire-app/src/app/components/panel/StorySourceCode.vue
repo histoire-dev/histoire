@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { computed, markRaw, nextTick, onMounted, ref, shallowRef, watch, watchEffect } from 'vue'
 import { Icon } from '@iconify/vue'
-import { getHighlighter, Highlighter, setCDN } from 'shiki'
+import { getHighlighter, Highlighter } from 'shiki-es'
 import { HstCopyIcon } from '@histoire/controls'
 import { unindent } from '@histoire/shared'
 // @ts-expect-error virtual module
@@ -84,7 +84,6 @@ const displayedSourceCode = computed(() => {
 // HTML render
 
 onMounted(async () => {
-  setCDN('https://unpkg.com/shiki@0.10.1/')
   highlighter.value = await getHighlighter({
     langs: [
       'html',

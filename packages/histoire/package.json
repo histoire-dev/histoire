@@ -66,7 +66,7 @@
     "pathe": "^0.2.0",
     "picocolors": "^1.0.0",
     "sade": "^1.8.1",
-    "shiki": "0.10.1",
+    "shiki": "0.11.1",
     "sirv": "^2.0.2",
     "tinypool": "^0.1.2",
     "vite-node": "0.23.4"
