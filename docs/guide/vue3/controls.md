@@ -8,7 +8,7 @@ The first step is to define the state that will be shared to your story. Histoir
 
 Example with Option API:
 
-```vue{10-17}
+```vue{11-18}
 <script lang="ts">
 import { defineComponent } from 'vue'
 import MyButton from './MyButton.vue'
