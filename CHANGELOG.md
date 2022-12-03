@@ -1,3 +1,14 @@
+## [0.11.9](https://github.com/Akryum/histoire/compare/v0.11.8...v0.11.9) (2022-12-03)
+
+
+### Bug Fixes
+
+* **grid:** scroll not loading additional variants ([58fe7e5](https://github.com/Akryum/histoire/commit/58fe7e5c890a9f01c8964028d417581c44dcaa80))
+* state not syncing in iframe mode, fix [#361](https://github.com/Akryum/histoire/issues/361) ([4b7fe0c](https://github.com/Akryum/histoire/commit/4b7fe0c8bdfad405dce6e74e548ce34eb34e4bf9))
+* switch to shiki-es ([2a63502](https://github.com/Akryum/histoire/commit/2a6350233bd0b6ba47e90bb5f122813f4b5d5a32))
+
+
+
 ## [0.11.8](https://github.com/Akryum/histoire/compare/v0.11.7...v0.11.8) (2022-12-03)
 
 
