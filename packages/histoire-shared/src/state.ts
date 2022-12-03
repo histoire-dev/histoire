@@ -22,8 +22,13 @@ export function omit (data, keys: string[]) {
   return copy
 }
 
-export function applyState (target: any, state: any) {
+export function applyState (target: any, state: any, override = false) {
   for (const key in state) {
-    target[key] = state[key]
+    // iframe sync needs to update properties without overriding them
+    if (!override && target[key] && !key.startsWith('_h') && typeof target[key] === 'object' && !Array.isArray(target[key])) {
+      Object.assign(target[key], state[key])
+    } else {
+      target[key] = state[key]
+    }
   }
 }

@@ -13,7 +13,7 @@ export default {
     <Variant>
       <h1>State</h1>
       <div>
-        <pre>{{ { optionApiData } }}</pre>
+        <pre class="state-output">{{ { optionApiData } }}</pre>
         <input
           v-model="optionApiData"
         >
