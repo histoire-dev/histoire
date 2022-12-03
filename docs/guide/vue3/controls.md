@@ -8,8 +8,9 @@ The first step is to define the state that will be shared to your story. Histoir
 
 Example with Option API:
 
-```vue{10-17}
+```vue{11-18}
 <script lang="ts">
+import { defineComponent } from 'vue'
 import MyButton from './MyButton.vue'
 
 export default defineComponent({
@@ -47,7 +48,7 @@ Example with Composition API:
 
 ```vue{18-22}
 <script lang="ts">
-import { reactive, count } from 'vue'
+import { reactive, ref, defineComponent } from 'vue'
 import MyButton from './MyButton.vue'
 
 export default defineComponent({
@@ -89,7 +90,7 @@ Example with Composition API (Script Setup):
 
 ```vue
 <script lang="ts" setup>
-import { reactive, count } from 'vue'
+import { reactive, ref } from 'vue'
 import MyButton from './MyButton.vue'
 
 const state = reactive({
@@ -136,9 +137,9 @@ const colors = {
 <template>
   <Story>
     <Variant>
-      <MyButtons :color="colors[state.colorId]">
+      <MyButton :color="colors[state.colorId]">
         {{ state.colorId }}
-      </MyButtons>
+      </MyButton>
     </Variant>
   </Story>
 </template>
