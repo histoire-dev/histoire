@@ -1,3 +1,23 @@
+## [0.11.8](https://github.com/Akryum/histoire/compare/v0.11.7...v0.11.8) (2022-12-03)
+
+
+### Bug Fixes
+
+* non-iframe scrolling, fix [#386](https://github.com/Akryum/histoire/issues/386) ([2c3981c](https://github.com/Akryum/histoire/commit/2c3981cc084e2b9a8e253d7b3767933498e94d47))
+* select overflowing the screen, fix [#374](https://github.com/Akryum/histoire/issues/374) ([2e22c18](https://github.com/Akryum/histoire/commit/2e22c18fa41207d6f35c1f05be3312f47de22069))
+
+
+### Features
+
+* use jsdom instead of happydom ([e4213d3](https://github.com/Akryum/histoire/commit/e4213d3ffb25c40c395c531dea9a5094bff1973b)), closes [#355](https://github.com/Akryum/histoire/issues/355)
+
+
+### Reverts
+
+* vite-node auto-inline, fix [#353](https://github.com/Akryum/histoire/issues/353) ([edf46b3](https://github.com/Akryum/histoire/commit/edf46b3bc9b912100de60508f217796316eba6f4))
+
+
+
 ## [0.11.7](https://github.com/Akryum/histoire/compare/v0.11.6...v0.11.7) (2022-11-12)
 
 
