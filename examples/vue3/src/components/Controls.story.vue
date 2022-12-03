@@ -32,7 +32,7 @@ function initState () {
     >
       <template #default="{ state }">
         <h1>State</h1>
-        <pre>{{ state }}</pre>
+        <pre class="state-output">{{ state }}</pre>
       </template>
 
       <template #controls="{ state }">

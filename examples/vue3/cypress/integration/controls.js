@@ -1,9 +1,7 @@
 /// <reference types="cypress" />
 
 describe('Controls', () => {
-  const getIframeBody = () => cy.get('iframe[data-test-id="preview-iframe"]')
-    .its('0.contentDocument.body').should('not.be.empty')
-    .then(cy.wrap)
+  const getIframeBody = () => cy.get('iframe[data-test-id="preview-iframe"]').iframe()
 
   beforeEach(() => {
     cy.visit('/')
@@ -11,28 +9,28 @@ describe('Controls', () => {
   })
 
   it('HstText', () => {
-    getIframeBody().get('pre').contains('"text": "Hello"')
-    cy.get('[data-test-id="story-controls"]').get('input[type="text"]').clear().type('Foo')
-    getIframeBody().get('pre').contains('"text": "Foo"')
+    getIframeBody().find('.state-output').contains('"text": "Hello"')
+    cy.get('[data-test-id="story-controls"] input[type="text"]').clear().type('Foo')
+    getIframeBody().find('.state-output').contains('"text": "Foo"')
   })
 
   it('HstCheckbox', () => {
-    getIframeBody().get('pre').contains('"checkbox": false')
+    getIframeBody().find('.state-output').contains('"checkbox": false')
     cy.get('[data-test-id="story-controls"]').contains('HstCheckbox').click()
-    getIframeBody().get('pre').contains('"checkbox": true')
+    getIframeBody().find('.state-output').contains('"checkbox": true')
     cy.get('[data-test-id="story-controls"]').contains('HstCheckbox').click()
-    getIframeBody().get('pre').contains('"checkbox": false')
+    getIframeBody().find('.state-output').contains('"checkbox": false')
   })
 
   it('HstNumber', () => {
-    getIframeBody().get('pre').contains('"number": 20')
-    cy.get('[data-test-id="story-controls"]').get('input[type="number"]').clear().type('42')
-    getIframeBody().get('pre').contains('"number": 42')
+    getIframeBody().find('.state-output').contains('"number": 20')
+    cy.get('[data-test-id="story-controls"] input[type="number"]').clear().type('42')
+    getIframeBody().find('.state-output').contains('"number": 42')
   })
 
   it('HstTextarea', () => {
-    getIframeBody().get('pre').contains('"longText": "Longer text..."')
-    cy.get('[data-test-id="story-controls"]').get('textarea').clear().type('Meow meow meow')
-    getIframeBody().get('pre').contains('"longText": "Meow meow meow"')
+    getIframeBody().find('.state-output').contains('"longText": "Longer text..."')
+    cy.get('[data-test-id="story-controls"] textarea').clear().type('Meow meow meow')
+    getIframeBody().find('.state-output').contains('"longText": "Meow meow meow"')
   })
 })
