@@ -127,12 +127,12 @@ const columnCount = computed(() => Math.min(storyStore.currentStory.variants.len
       <ToolbarTextDirection />
     </div>
 
-    <div class="htw-overflow-y-auto htw-flex htw-flex-1">
-      <div
-        ref="el"
-        class="htw-flex htw-w-0 htw-flex-1 htw-mx-4"
-        @scroll="updateMaxCount()"
-      >
+    <div
+      ref="el"
+      class="htw-overflow-y-auto htw-flex htw-flex-1"
+      @scroll="updateMaxCount()"
+    >
+      <div class="htw-flex htw-w-0 htw-flex-1 htw-mx-4">
         <div
           class="htw-m-auto"
           :style="{
