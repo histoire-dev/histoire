@@ -122,7 +122,7 @@ import { reactive } from 'vue'
 import MyButton from './MyButton.vue'
 
 // Main reactive state of the stories
-const state: { colorId: keyof typeof colors } = reactive({
+const state = reactive({
   colorId: 'primary',
 })
 
