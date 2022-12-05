@@ -15,6 +15,6 @@
     "@histoire/plugin-vue": "workspace:*",
     "@vitejs/plugin-vue": "^3.0.1",
     "histoire": "workspace:*",
-    "vite": "^3.0.5"
+    "vite": "^4.0.0-alpha.6"
   }
 }

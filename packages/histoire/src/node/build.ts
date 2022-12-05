@@ -14,11 +14,11 @@ import type {
   BuildEndCallback,
   PreviewStoryCallback,
 } from '@histoire/shared'
+import type { RollupOutput } from 'rollup'
 import { APP_PATH } from './alias.js'
 import { Context } from './context.js'
 import { getViteConfigWithPlugins } from './vite.js'
 import { findAllStories } from './stories.js'
-import type { RollupOutput } from 'rollup'
 import { useCollectStories } from './collect/index.js'
 import { BuildPluginApi } from './plugin.js'
 import { useModuleLoader } from './load.js'

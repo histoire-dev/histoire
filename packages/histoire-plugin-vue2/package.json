@@ -48,7 +48,7 @@
     "concurrently": "^7.1.0",
     "histoire": "workspace:*",
     "typescript": "^4.7.4",
-    "vite": "^3.1.4",
+    "vite": "^4.0.0-alpha.6",
     "vue": "^2.7.8"
   },
   "peerDependencies": {
