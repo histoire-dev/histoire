@@ -9,7 +9,7 @@ function cleanupState (state: Record<string, any>): Record<string, any> {
     if (typeof value === 'function') continue
     if (typeof value === 'undefined') continue
     if (value instanceof HTMLElement) continue
-    if (typeof value === 'object' && value.$$) continue
+    if (typeof value === 'object' && value?.$$) continue
     result[key] = value
   }
   return result
