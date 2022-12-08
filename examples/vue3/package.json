@@ -21,7 +21,7 @@
     "@histoire/app": "workspace:*",
     "@histoire/plugin-vue": "workspace:*",
     "@histoire/vendors": "workspace:*",
-    "@vitejs/plugin-vue": "^3.0.1",
+    "@vitejs/plugin-vue": "^4.0.0-beta.0",
     "cypress": "^9.5.3",
     "histoire": "workspace:*",
     "sass": "^1.50.0",

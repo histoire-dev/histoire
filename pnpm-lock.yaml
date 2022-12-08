@@ -155,7 +155,7 @@ importers:
       '@histoire/app': workspace:*
       '@histoire/plugin-vue': workspace:*
       '@histoire/vendors': workspace:*
-      '@vitejs/plugin-vue': ^3.0.1
+      '@vitejs/plugin-vue': ^3.1.4
       cypress: ^9.5.3
       histoire: workspace:*
       lottie-web: ^5.9.6
@@ -183,7 +183,7 @@ importers:
     specifiers:
       '@histoire/plugin-percy': workspace:*
       '@histoire/plugin-vue': workspace:*
-      '@vitejs/plugin-vue': ^3.0.1
+      '@vitejs/plugin-vue': ^4.0.0-beta.0
       histoire: workspace:*
       vite: ^4.0.0-beta.5
       vue: ^3.2.31
@@ -192,7 +192,7 @@ importers:
     devDependencies:
       '@histoire/plugin-percy': link:../../packages/histoire-plugin-percy
       '@histoire/plugin-vue': link:../../packages/histoire-plugin-vue
-      '@vitejs/plugin-vue': 3.2.0_52n6m3tculxsdye4oufjkspuma
+      '@vitejs/plugin-vue': 4.0.0-beta.0_52n6m3tculxsdye4oufjkspuma
       histoire: link:../../packages/histoire
       vite: 4.0.0-beta.5
 
@@ -200,7 +200,7 @@ importers:
     specifiers:
       '@histoire/plugin-screenshot': workspace:*
       '@histoire/plugin-vue': workspace:*
-      '@vitejs/plugin-vue': ^3.0.1
+      '@vitejs/plugin-vue': ^4.0.0-beta.0
       histoire: workspace:*
       vite: ^4.0.0-beta.5
       vue: ^3.2.31
@@ -209,14 +209,14 @@ importers:
     devDependencies:
       '@histoire/plugin-screenshot': link:../../packages/histoire-plugin-screenshot
       '@histoire/plugin-vue': link:../../packages/histoire-plugin-vue
-      '@vitejs/plugin-vue': 3.2.0_52n6m3tculxsdye4oufjkspuma
+      '@vitejs/plugin-vue': 4.0.0-beta.0_52n6m3tculxsdye4oufjkspuma
       histoire: link:../../packages/histoire
       vite: 4.0.0-beta.5
 
   examples/vue3-themed:
     specifiers:
       '@histoire/plugin-vue': workspace:*
-      '@vitejs/plugin-vue': ^3.0.1
+      '@vitejs/plugin-vue': ^4.0.0-beta.0
       histoire: workspace:*
       vite: ^4.0.0-beta.5
       vue: ^3.2.31
@@ -224,7 +224,7 @@ importers:
       vue: 3.2.45
     devDependencies:
       '@histoire/plugin-vue': link:../../packages/histoire-plugin-vue
-      '@vitejs/plugin-vue': 3.2.0_52n6m3tculxsdye4oufjkspuma
+      '@vitejs/plugin-vue': 4.0.0-beta.0_52n6m3tculxsdye4oufjkspuma
       histoire: link:../../packages/histoire
       vite: 4.0.0-beta.5
 
@@ -341,7 +341,7 @@ importers:
       '@types/flexsearch': ^0.7.3
       '@types/fs-extra': ^9.0.13
       '@types/node': ^17.0.32
-      '@vitejs/plugin-vue': ^3.1.2
+      '@vitejs/plugin-vue': ^4.0.0-beta.0
       autoprefixer: ^10.4.4
       chokidar: ^3.5.3
       concurrently: ^7.1.0
@@ -367,7 +367,7 @@ importers:
       '@tailwindcss/typography': 0.5.8_tailwindcss@3.2.4
       '@types/fs-extra': 9.0.13
       '@types/node': 17.0.45
-      '@vitejs/plugin-vue': 3.2.0_52n6m3tculxsdye4oufjkspuma
+      '@vitejs/plugin-vue': 4.0.0-beta.0_52n6m3tculxsdye4oufjkspuma
       autoprefixer: 10.4.13_postcss@8.4.19
       chokidar: 3.5.3
       concurrently: 7.6.0
@@ -438,7 +438,7 @@ importers:
     specifiers:
       '@histoire/controls': workspace:*
       '@histoire/plugin-vue': workspace:*
-      '@vitejs/plugin-vue': ^3.1.2
+      '@vitejs/plugin-vue': ^4.0.0-beta.0
       histoire: workspace:*
       vite: ^4.0.0-beta.5
       vue: ^3.2.31
@@ -447,7 +447,7 @@ importers:
       vue: 3.2.45
     devDependencies:
       '@histoire/plugin-vue': link:../histoire-plugin-vue
-      '@vitejs/plugin-vue': 3.2.0_52n6m3tculxsdye4oufjkspuma
+      '@vitejs/plugin-vue': 4.0.0-beta.0_52n6m3tculxsdye4oufjkspuma
       histoire: link:../histoire
       vite: 4.0.0-beta.5
 
@@ -3186,6 +3186,20 @@ packages:
         optional: true
     dependencies:
       vite: 4.0.0-beta.5_sass@1.56.1
+      vue: 3.2.45
+    dev: true
+
+  /@vitejs/plugin-vue/4.0.0-beta.0_52n6m3tculxsdye4oufjkspuma:
+    resolution: {integrity: sha512-ip9aE0C3lyjwVCdM8Wa2oVhXOCRJPauNUrfftkipeud3xVHXUYI4akCIamMIMgXorqpd16ms7zLckfO1rU9i6g==}
+    engines: {node: ^14.18.0 || >=16.0.0}
+    peerDependencies:
+      vite: ^4.0.0-alpha.0 || ^2.9.0 || ^3.0.0 || ^4.0.0
+      vue: '*'
+    peerDependenciesMeta:
+      vue:
+        optional: true
+    dependencies:
+      vite: 4.0.0-beta.5
       vue: 3.2.45
     dev: true
 
