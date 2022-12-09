@@ -46,6 +46,7 @@
     "@types/node": "^17.0.32",
     "change-case": "^4.1.2",
     "concurrently": "^7.1.0",
+    "globby": "^13.1.1",
     "histoire": "workspace:*",
     "typescript": "^4.7.4",
     "vite": "^4.0.0-alpha.6",
