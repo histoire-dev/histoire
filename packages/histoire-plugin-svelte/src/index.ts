@@ -28,7 +28,9 @@ export function HstSvelte (): Plugin {
           },
         },
         viteIgnorePlugins: [
-          'vite-plugin-svelte-kit',
+          // svelte-kit vite plugins
+          // reference: https://github.com/sveltejs/kit/blob/master/packages/kit/src/exports/vite/index.js
+          'vite-plugin-sveltekit-compile',
         ],
       }
     },
