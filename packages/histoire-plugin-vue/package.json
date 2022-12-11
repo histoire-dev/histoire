@@ -46,7 +46,8 @@
   "dependencies": {
     "@histoire/controls": "^0.11.9",
     "@histoire/shared": "^0.11.9",
-    "@histoire/vendors": "^0.11.9"
+    "@histoire/vendors": "^0.11.9",
+    "vue-docgen-api": "^4.56.0"
   },
   "devDependencies": {
     "@types/node": "^17.0.32",
