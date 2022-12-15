@@ -28,7 +28,7 @@ export function HstSvelte (): Plugin {
           },
         },
         viteIgnorePlugins: [
-          'vite-plugin-svelte-kit',
+          'vite-plugin-sveltekit-compile',
         ],
       }
     },
