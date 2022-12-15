@@ -49,7 +49,7 @@
     "globby": "^13.1.1",
     "histoire": "workspace:*",
     "typescript": "^4.7.4",
-    "vite": "^4.0.0-alpha.6",
+    "vite": "^4.0.0",
     "vue": "^2.7.8"
   },
   "peerDependencies": {

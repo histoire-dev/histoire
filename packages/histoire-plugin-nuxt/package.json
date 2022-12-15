@@ -34,7 +34,7 @@
     "@nuxt/schema": "^3.0.0-rc.11",
     "histoire": "workspace:*",
     "typescript": "^4.7.4",
-    "vite": "^4.0.0-alpha.6"
+    "vite": "^4.0.0"
   },
   "peerDependencies": {
     "@histoire/plugin-vue": "^0.11.9",
