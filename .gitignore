@@ -6,3 +6,4 @@ histoire-dist/
 **/cypress/screenshots/
 **/cypress/videos/
 .DS_Store
+.eslintcache

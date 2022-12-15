@@ -7,7 +7,7 @@
     "type": "git"
   },
   "scripts": {
-    "lint": "eslint . --ext js,vue,ts",
+    "lint": "eslint . --ext js,vue,ts --cache",
     "build": "pnpm run -r build",
     "watch": "pnpm run build && pnpm run -r --parallel --filter \"./packages/**\" watch",
     "test": "pnpm run -r --parallel --filter \"./packages/**\" test",
