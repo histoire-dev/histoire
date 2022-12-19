@@ -210,6 +210,11 @@ export interface HistoireConfig {
      */
     web?: RegExp[]
   }
+  /**
+   * Maximum number of threads used to collect stories.
+   * By default based on available number of cores.
+   */
+  collectMaxThreads?: number
 }
 
 export type ConfigMode = 'build' | 'dev'

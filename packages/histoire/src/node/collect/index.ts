@@ -36,9 +36,11 @@ export function useCollectStories (options: UseCollectStoriesOptions, ctx: Conte
     transformMode: ctx.config.viteNodeTransformMode,
   })
 
+  const maxThreads = ctx.config.collectMaxThreads ?? cpus().length
+
   const threadsCount = ctx.mode === 'dev'
-    ? Math.max(cpus().length / 2, 1)
-    : Math.max(cpus().length - 1, 1)
+    ? Math.max(Math.min(maxThreads, cpus().length / 2), 1)
+    : Math.max(Math.min(maxThreads, cpus().length - 1), 1)
   console.log(pc.blue(`Using ${threadsCount} threads for story collection`))
 
   const threadPool = new Tinypool({
