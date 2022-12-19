@@ -1,3 +1,26 @@
+# [0.12.0](https://github.com/Akryum/histoire/compare/v0.11.9...v0.12.0) (2022-12-19)
+
+
+### Bug Fixes
+
+* builtin controls component types ([98d0713](https://github.com/Akryum/histoire/commit/98d07132af24135e2d2678a72d484adc6a0a32c7))
+* **config:** throw -> warn for file check ([2d0f8dd](https://github.com/Akryum/histoire/commit/2d0f8dd3151f07748d7f1ae44dc012f829ed163d))
+* missing null check [#389](https://github.com/Akryum/histoire/issues/389) ([#390](https://github.com/Akryum/histoire/issues/390)) ([62b3fd5](https://github.com/Akryum/histoire/commit/62b3fd5c8edd8201294dd8aa7b71b03874906e16))
+* missing types components in global components ([#366](https://github.com/Akryum/histoire/issues/366)) ([041922c](https://github.com/Akryum/histoire/commit/041922c6fbd3ff62ebb2bf2137bf41b29ca73266))
+* **vue2:** shared controls not working, fix [#266](https://github.com/Akryum/histoire/issues/266) ([2210c51](https://github.com/Akryum/histoire/commit/2210c5103e8b4102d2d978536d80291b5e8e7afc))
+
+
+### Features
+
+* complete transition to shiki-es ([7c2133d](https://github.com/Akryum/histoire/commit/7c2133d0b96cd156d863e2326fc1cec5513afff6))
+* **config:** collectMaxThreads ([5008ecb](https://github.com/Akryum/histoire/commit/5008ecb8a352e8d186a4e88c9e368c59754514bd))
+* **config:** resolve theme files + check exist ([3e85496](https://github.com/Akryum/histoire/commit/3e854966b00b8fb3306423197784f880a98aed0b))
+* **sveltekit:** upgraded sveltekit support to svelltekit v1.0.0 (fix [#392](https://github.com/Akryum/histoire/issues/392), [#397](https://github.com/Akryum/histoire/issues/397)) ([#402](https://github.com/Akryum/histoire/issues/402)) ([e7e5993](https://github.com/Akryum/histoire/commit/e7e5993d2abfa71821b3584694bd3af8f87feec6))
+* **tree:** new folder and group design ([afa305e](https://github.com/Akryum/histoire/commit/afa305ec98920fbec02ffae5484d36227c66b04b))
+* upgrade to rollup 3 and vite 4 ([#404](https://github.com/Akryum/histoire/issues/404)) ([e389cb0](https://github.com/Akryum/histoire/commit/e389cb07667c88077792e47fbfa2f0b61e5de511))
+
+
+
 ## [0.11.9](https://github.com/Akryum/histoire/compare/v0.11.8...v0.11.9) (2022-12-03)
 
 
