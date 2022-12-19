@@ -275,8 +275,8 @@ export async function processConfig (ctx: Context) {
   }
 
   const fileCheck = (file: string, resolvedFile: string, configPathForError: string) => {
-    if (!file.startsWith('http') && !fs.existsSync(resolvedFile)) {
-      throw new Error(pc.red(`Histoire config: ${configPathForError} file ${file} does not exist (resolved to ${resolvedFile}), check for typos in the paths`))
+    if (!file.startsWith('http') && !file.startsWith('@') && !fs.existsSync(resolvedFile)) {
+      console.warn(pc.yellow(`Histoire config: ${configPathForError} file ${file} does not exist (resolved to ${resolvedFile}), check for typos in the paths`))
     }
   }
 
