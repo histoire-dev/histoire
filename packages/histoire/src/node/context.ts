@@ -6,7 +6,7 @@ import type {
   HistoireConfig,
   ConfigMode,
 } from '@histoire/shared'
-import { resolveConfig } from './config.js'
+import { processConfig, resolveConfig } from './config.js'
 import { mergeHistoireViteConfig } from './vite.js'
 
 export interface Context {
@@ -41,6 +41,8 @@ export async function createContext (options: CreateContextOptions): Promise<Con
   }
 
   ctx.resolvedViteConfig = await mergeHistoireViteConfig(viteConfig as unknown, ctx)
+
+  await processConfig(ctx)
 
   return ctx
 }

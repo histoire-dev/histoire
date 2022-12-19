@@ -228,7 +228,7 @@ function generateBaseHtml (head: string, body: string, ctx: Context) {
 function generateEntryHtml (jsEntryFile: string, cssEntryFile: string, variables: { HEAD?: string }, ctx: Context) {
   return generateBaseHtml(
     `<link rel="stylesheet" href="${ctx.resolvedViteConfig.base}${cssEntryFile}">
-    ${ctx.config.theme?.favicon ? `<link rel="icon" type="${lookupMime(ctx.config.theme.favicon)}" href="${ctx.config.theme.favicon}"/>` : ''}
+    ${ctx.config.theme?.favicon ? `<link rel="icon" type="${lookupMime(ctx.config.theme.favicon)}" href="${ctx.resolvedViteConfig.base}${ctx.config.theme.favicon}"/>` : ''}
     ${variables.HEAD ?? ''}`,
     `<div id="app"></div>
     <script type="module" src="${ctx.resolvedViteConfig.base}${jsEntryFile}"></script>`,

@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "story:dev": "histoire dev",
-    "story:build": "histoire build"
+    "story:build": "histoire build",
+    "story:preview": "histoire preview"
   },
   "dependencies": {
     "vue": "^3.2.31"
