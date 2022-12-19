@@ -40,12 +40,12 @@ export const components = {
   HstSlider,
   HstTextarea,
   HstSelect,
+  HstRadio,
+  HstJson,
   HstColorShades,
   HstTokenList,
   HstTokenGrid,
   HstCopyIcon,
-  HstRadio,
-  HstJson,
 }
 
 export * from './types'

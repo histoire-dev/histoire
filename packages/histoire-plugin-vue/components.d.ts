@@ -6,19 +6,21 @@ import type {
   Variant,
 } from '@histoire/shared'
 import type {
-  HstCheckbox,
-  HstText,
-  HstTextarea,
-  HstNumber,
-  HstTokenGrid,
-  HstTokenList,
-  HstColorShades,
-  HstSelect,
   HstButton,
   HstButtonGroup,
+  HstCheckbox,
   HstCheckboxList,
-  HstJson,
+  HstText,
+  HstNumber,
   HstSlider,
+  HstTextarea,
+  HstSelect,
+  HstRadio,
+  HstJson,
+  HstColorShades,
+  HstTokenList,
+  HstTokenGrid,
+  HstCopyIcon,
 } from '@histoire/controls'
 
 // Utils
@@ -138,18 +140,20 @@ declare module '@vue/runtime-core' {
     Story: typeof VueStoryComponent
     Variant: typeof VueVariantComponent
     // Controls
-    HstCheckbox: typeof HstCheckbox
-    HstText: typeof HstText
-    HstTextarea: typeof HstTextarea
-    HstNumber: typeof HstNumber
-    HstTokenGrid: typeof HstTokenGrid
-    HstTokenList: typeof HstTokenList
-    HstColorShades: typeof HstColorShades
-    HstSelect: typeof HstSelect
     HstButton: typeof HstButton
     HstButtonGroup: typeof HstButtonGroup
+    HstCheckbox: typeof HstCheckbox
     HstCheckboxList: typeof HstCheckboxList
-    HstJson: typeof HstJson
+    HstText: typeof HstText
+    HstNumber: typeof HstNumber
     HstSlider: typeof HstSlider
+    HstTextarea: typeof HstTextarea
+    HstSelect: typeof HstSelect
+    HstRadio: typeof HstRadio
+    HstJson: typeof HstJson
+    HstColorShades: typeof HstColorShades
+    HstTokenList: typeof HstTokenList
+    HstTokenGrid: typeof HstTokenGrid
+    HstCopyIcon: typeof HstCopyIcon
   }
 }

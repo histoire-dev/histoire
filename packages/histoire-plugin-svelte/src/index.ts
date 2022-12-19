@@ -60,7 +60,7 @@ export interface Hst {
   Button: typeof SvelteComponentTyped
   ButtonGroup: typeof SvelteComponentTyped<{
     value: string
-    options: HstControlOption[]
+    options: (string | HstControlOption)[]
     title?: string
   }>
   Checkbox: typeof SvelteComponentTyped<{
@@ -69,7 +69,7 @@ export interface Hst {
   }>
   CheckboxList: typeof SvelteComponentTyped<{
     value: string[]
-    options: HstControlOption[]
+    options: (string | HstControlOption)[]
     title?: string
   }>
   Text: typeof SvelteComponentTyped<{
