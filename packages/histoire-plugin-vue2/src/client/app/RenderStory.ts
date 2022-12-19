@@ -111,9 +111,19 @@ export default _defineComponent({
         },
 
         render: () => {
-          const vnodes = props.variant.slots()?.[props.slotName]?.({
+          const ensureFn = (fn: any) => {
+            if (typeof fn === 'function') {
+              return fn
+            } else if (fn != null) {
+              return () => fn
+            } else {
+              return null
+            }
+          }
+
+          const vnodes = ensureFn(props.variant.slots()?.[props.slotName])?.({
             state: externalState,
-          }) ?? props.story.slots()?.[props.slotName]?.({
+          }) ?? ensureFn(props.story.slots()?.[props.slotName])?.({
             state: externalState,
           })
 
