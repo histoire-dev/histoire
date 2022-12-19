@@ -24,11 +24,11 @@
 		"@sveltejs/kit": "next",
 		"@types/cookie": "^0.5.1",
     "histoire": "workspace:*",
-    "svelte": "^3.49.0",
+    "svelte": "^3.54.0",
 		"svelte-check": "^2.7.1",
     "svelte-preprocess": "^4.10.7",
 		"tslib": "^2.3.1",
     "typescript": "^4.7.4",
-    "vite": "^3.0.5"
+    "vite": "^4.0.0"
 	}
 }

@@ -13,8 +13,8 @@
   "devDependencies": {
     "@histoire/plugin-percy": "workspace:*",
     "@histoire/plugin-vue": "workspace:*",
-    "@vitejs/plugin-vue": "^3.0.1",
+    "@vitejs/plugin-vue": "^4.0.0",
     "histoire": "workspace:*",
-    "vite": "^3.0.5"
+    "vite": "^4.0.0"
   }
 }
