@@ -1,6 +1,6 @@
 import MarkdownIt from 'markdown-it'
 import matter from 'gray-matter'
-import shiki from 'shiki'
+import { getHighlighter } from 'shiki-es'
 import anchor from 'markdown-it-anchor'
 import attrs from 'markdown-it-attrs'
 import emoji from 'markdown-it-emoji'
@@ -28,7 +28,7 @@ function notifyMarkdownListChange () {
 }
 
 export async function createMarkdownRenderer (ctx: Context) {
-  const highlighter = await shiki.getHighlighter({
+  const highlighter = await getHighlighter({
     theme: 'github-dark',
   })
 

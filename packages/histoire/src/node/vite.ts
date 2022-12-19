@@ -141,7 +141,7 @@ export async function getViteConfigWithPlugins (isServer: boolean, ctx: Context)
           ],
           include: optimizeDeps([
             'flexsearch',
-            'shiki',
+            'shiki-es',
             // Shiki dependencies
             'vscode-oniguruma',
             'vscode-textmate',
