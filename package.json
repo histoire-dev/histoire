@@ -62,7 +62,7 @@
         "eslint": "*",
         "eslint-plugin-promise": "*",
         "eslint-plugin-vue": "*",
-        "vite": "^2.9.0 || ^3.0.0",
+        "vite": "^2.9.0 || ^3.0.0 || ^4.0.0",
         "vue": "*"
       }
     }

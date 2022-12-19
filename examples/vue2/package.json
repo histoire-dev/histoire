@@ -12,9 +12,9 @@
   },
   "devDependencies": {
     "@histoire/plugin-vue2": "workspace:*",
-    "@vitejs/plugin-vue2": "^1.1.2",
+    "@vitejs/plugin-vue2": "^2.1.0",
     "histoire": "workspace:*",
-    "vite": "^3.0.5",
+    "vite": "^4.0.0",
     "vue-template-compiler": "^2.7.8"
   }
 }
