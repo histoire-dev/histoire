@@ -78,10 +78,11 @@ export async function mergeHistoireViteConfig (viteConfig: InlineConfig, ctx: Co
   let flatPlugins = []
   if (viteConfig.plugins) {
     for (const pluginOption of viteConfig.plugins) {
-      if (Array.isArray(pluginOption)) {
-        flatPlugins.push(...await Promise.all(pluginOption))
+      const resolvedPluginOption = await pluginOption
+      if (Array.isArray(resolvedPluginOption)) {
+        flatPlugins.push(...await Promise.all(resolvedPluginOption))
       } else {
-        flatPlugins.push(await pluginOption)
+        flatPlugins.push(resolvedPluginOption)
       }
     }
     flatPlugins = flatPlugins.filter(Boolean)
