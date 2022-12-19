@@ -27,27 +27,25 @@ function toggleOpen () {
 <template>
   <div
     data-test-id="story-group"
-    class="histoire-story-group htw-my-2 first:htw-mt-0 last:htw-mb-0"
+    class="histoire-story-group htw-my-2 first:htw-mt-0 last:htw-mb-0 htw-group"
   >
-    <div
-      v-if="group.title"
-      role="button"
-      tabindex="0"
-      class="htw-px-0.5 htw-py-2 md:htw-py-1.5 htw-mx-1 htw-rounded-sm hover:htw-bg-primary-100 dark:hover:htw-bg-primary-900 htw-cursor-pointer htw-select-none htw-flex htw-items-center htw-gap-1 htw-min-w-0"
-      @click="toggleOpen"
-      @keyup.enter="toggleOpen"
-      @keyup.space="toggleOpen"
-    >
-      <Icon
-        icon="carbon:caret-right"
-        class="htw-w-4 htw-h-4 htw-transition-transform htw-duration-150 htw-opacity-30 htw-flex-none"
-        :class="{
-          'htw-rotate-90': isFolderOpen,
-        }"
-      />
-      <span class="htw-truncate htw-opacity-50">{{ group.title }}</span>
-      <span class="htw-h-[1px] htw-flex-1 htw-bg-gray-500/10 htw-mx-2" />
-    </div>
+    <template v-if="group.title">
+      <div class="htw-h-[1px] htw-bg-gray-500/10 htw-mx-6 htw-mb-2 group-first:htw-hidden" />
+      <div
+        role="button"
+        tabindex="0"
+        class="htw-px-0.5 htw-py-2 md:htw-py-1.5 htw-mx-1 htw-rounded-sm hover:htw-bg-primary-100 dark:hover:htw-bg-primary-900 htw-cursor-pointer htw-select-none htw-flex htw-items-center htw-gap-2 htw-min-w-0 htw-opacity-50 hover:htw-opacity-100"
+        @click="toggleOpen"
+        @keyup.enter="toggleOpen"
+        @keyup.space="toggleOpen"
+      >
+        <Icon
+          :icon="isFolderOpen ? 'carbon:subtract' : 'carbon:add'"
+          class="htw-w-4 htw-h-4 htw-ml-4 htw-rounded-sm htw-border htw-border-gray-500/40"
+        />
+        <span class="htw-truncate">{{ group.title }}</span>
+      </div>
+    </template>
 
     <!-- Children -->
     <div
