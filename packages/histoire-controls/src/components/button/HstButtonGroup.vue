@@ -13,7 +13,7 @@ import HstButton from './HstButton.vue'
 const props = defineProps<{
   title?: string
   modelValue: string
-  options: HstControlOption[]
+  options: string[] | HstControlOption[]
 }>()
 
 const formattedOptions: ComputedRef<Record<string, string>> = computed(() => {

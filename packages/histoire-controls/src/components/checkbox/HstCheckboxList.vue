@@ -13,7 +13,7 @@ import HstSimpleCheckbox from './HstSimpleCheckbox.vue'
 const props = defineProps<{
   title?: string
   modelValue: Array<string>
-  options: HstControlOption[]
+  options: string[] | HstControlOption[]
 }>()
 
 const formattedOptions: ComputedRef<Record<string, string>> = computed(() => {
