@@ -5,7 +5,7 @@ describe('Search', () => {
     cy.visit('/')
     cy.get('[data-test-id="search-btn"]').click()
     cy.get('[data-test-id="search-modal"] input').type('Demo')
-    cy.get('[data-test-id="search-item"]').should('have.length', 4)
+    cy.get('[data-test-id="search-item"]').should('have.length', 5)
     cy.get('[data-test-id="search-item"]').contains('untitled').click()
     cy.get('[data-test-id="story-variant-single-view"]').contains('untitled')
     cy.get('[data-test-id="search-btn"]').click()
