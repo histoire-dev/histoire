@@ -43,10 +43,10 @@ const folderPadding = computed(() => {
       @keyup.space="toggleOpen"
     >
       <span class="bind-tree-padding htw-flex htw-items-center htw-gap-2 htw-min-w-0">
-        <span class="htw-flex htw-flex-none htw-items-center htw-opacity-30 [.histoire-story-list-folder-button:hover_&]:htw-opacity-100 htw-ml-4 htw-rounded-sm htw-border htw-border-gray-500/40">
+        <span class="htw-flex htw-flex-none htw-items-center htw-opacity-30 [.histoire-story-list-folder-button:hover_&]:htw-opacity-100 htw-ml-4 htw-w-4 htw-h-4 htw-rounded-sm htw-border htw-border-gray-500/40">
           <Icon
             icon="carbon:caret-right"
-            class="htw-w-4 htw-h-4 htw-transition-transform htw-duration-150"
+            class="htw-w-full htw-h-full htw-transition-transform htw-duration-150"
             :class="{
               'htw-rotate-90': isFolderOpen,
             }"
