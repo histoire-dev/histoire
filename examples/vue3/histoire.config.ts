@@ -15,4 +15,5 @@ export default defineConfig({
     },
   ],
   // autoApplyContrastColor: true,
+  // routerMode: 'hash',
 })

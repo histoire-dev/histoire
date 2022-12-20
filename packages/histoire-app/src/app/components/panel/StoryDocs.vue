@@ -3,6 +3,7 @@ import { nextTick, PropType, Ref, ref, toRefs, watch, watchEffect } from 'vue'
 import type { Story } from '../../types'
 // @ts-expect-error virtual module
 import { markdownFiles } from 'virtual:$histoire-markdown-files'
+import { histoireConfig } from '../../util/config.js'
 
 export function useStoryDoc (story: Ref<Story>) {
   const renderedDoc = ref('')
@@ -47,7 +48,7 @@ export function useStoryDoc (story: Ref<Story>) {
 
 <script lang="ts" setup>
 import { Icon } from '@iconify/vue'
-import { useRouter } from '@histoire/vendors/vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import BaseEmpty from '../base/BaseEmpty.vue'
 
 const props = defineProps({
@@ -91,10 +92,25 @@ function onClick (e: MouseEvent) {
 }
 
 // Handle URL anchor
+
+function getHash () {
+  const hash = location.hash
+  if (histoireConfig.routerMode === 'hash') {
+    const index = hash.indexOf('#', 1)
+    if (index !== -1) {
+      return hash.slice(index)
+    } else {
+      return undefined
+    }
+  }
+  return hash
+}
+
 async function scrollToAnchor () {
   await nextTick()
-  if (location.hash) {
-    const anchor = document.querySelector(location.hash)
+  const hash = getHash()
+  if (hash) {
+    const anchor = document.querySelector(hash)
     if (anchor) {
       anchor.scrollIntoView()
       return
@@ -105,6 +121,30 @@ async function scrollToAnchor () {
 
 watch(renderedDoc, () => {
   scrollToAnchor()
+}, {
+  immediate: true,
+})
+
+// Fix anchor links with router mode 'hash'
+
+const renderedEl = ref<HTMLElement>()
+const route = useRoute()
+
+async function patchAnchorLinks () {
+  await nextTick()
+  if (histoireConfig.routerMode === 'hash' && renderedEl.value) {
+    const links = renderedEl.value.querySelectorAll('a.header-anchor')
+    for (const link of links) {
+      const href = link.getAttribute('href')
+      if (href) {
+        link.setAttribute('href', `#${route.path + href}`)
+      }
+    }
+  }
+}
+
+watch(renderedDoc, () => {
+  patchAnchorLinks()
 }, {
   immediate: true,
 })
@@ -126,6 +166,7 @@ watch(renderedDoc, () => {
     </BaseEmpty>
     <div
       v-else
+      ref="renderedEl"
       class="htw-prose dark:htw-prose-invert htw-p-4 htw-max-w-none"
       data-test-id="story-docs"
       v-html="renderedDoc"

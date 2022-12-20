@@ -16,7 +16,8 @@
     ],
     "lib": [
       "ESNext",
-      "DOM"
+      "DOM",
+      "DOM.Iterable",
     ],
     "sourceMap": false,
     "preserveWatchOutput": true,
