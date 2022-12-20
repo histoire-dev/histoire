@@ -1,3 +1,14 @@
+## [0.12.1](https://github.com/Akryum/histoire/compare/v0.12.0...v0.12.1) (2022-12-20)
+
+
+### Bug Fixes
+
+* **docs:** header anchors with routerMode hash ([c729f6b](https://github.com/Akryum/histoire/commit/c729f6ba0e40774dbc5c155ff0b29d772516a154))
+* **docs:** scroll to top ([18b0353](https://github.com/Akryum/histoire/commit/18b0353b35f6dfa6a03457a2e3e6b15ddf2c71d1))
+* **docs:** scroll to URL anchor ([68de7e2](https://github.com/Akryum/histoire/commit/68de7e2266684364d016eb04f4dde3e598480458))
+
+
+
 # [0.12.0](https://github.com/Akryum/histoire/compare/v0.11.9...v0.12.0) (2022-12-19)
 
 
