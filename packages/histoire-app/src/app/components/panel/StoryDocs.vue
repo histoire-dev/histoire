@@ -1,5 +1,5 @@
 <script lang="ts">
-import { onMounted, onUpdated, PropType, Ref, ref, toRefs, watchEffect } from 'vue'
+import { nextTick, PropType, Ref, ref, toRefs, watch, watchEffect } from 'vue'
 import type { Story } from '../../types'
 // @ts-expect-error virtual module
 import { markdownFiles } from 'virtual:$histoire-markdown-files'
@@ -57,6 +57,10 @@ const props = defineProps({
   },
 })
 
+const emit = defineEmits<{
+  (e: 'scroll-top'): void
+}>()
+
 const { story } = toRefs(props)
 
 const { renderedDoc } = useStoryDoc(story)
@@ -87,22 +91,22 @@ function onClick (e: MouseEvent) {
 }
 
 // Handle URL anchor
-function scrollToAnchor () {
+async function scrollToAnchor () {
+  await nextTick()
   if (location.hash) {
     const anchor = document.querySelector(location.hash)
     if (anchor) {
       anchor.scrollIntoView()
-      return true
+      return
     }
   }
+  emit('scroll-top')
 }
 
-onMounted(() => {
+watch(renderedDoc, () => {
   scrollToAnchor()
-})
-
-onUpdated(() => {
-  scrollToAnchor()
+}, {
+  immediate: true,
 })
 </script>
 

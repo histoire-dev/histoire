@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { watch } from 'vue'
+import { ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { Icon } from '@iconify/vue'
 import { useStoryStore } from '../../stores/story'
@@ -50,6 +50,14 @@ function setVariant (variantId: string) {
     },
   })
 }
+
+// Docs auto-scroll to top
+
+const docsOnlyScroller = ref<HTMLElement>(null)
+
+function scrollDocsToTop () {
+  docsOnlyScroller.value?.scrollTo(0, 0)
+}
 </script>
 
 <template>
@@ -69,11 +77,13 @@ function setVariant (variantId: string) {
   >
     <div
       v-if="storyStore.currentStory.docsOnly"
+      ref="docsOnlyScroller"
       class="htw-h-full htw-overflow-auto"
     >
       <StoryDocs
         :story="storyStore.currentStory"
         class="md:htw-p-12 htw-w-full md:htw-max-w-[600px] lg:htw-max-w-[800px] xl:htw-max-w-[900px]"
+        @scroll-top="scrollDocsToTop()"
       />
     </div>
     <template v-else-if="isMobile">
