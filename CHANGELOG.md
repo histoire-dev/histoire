@@ -1,3 +1,13 @@
+## [0.12.2](https://github.com/Akryum/histoire/compare/v0.12.1...v0.12.2) (2022-12-20)
+
+
+### Bug Fixes
+
+* folder icon size ([118dc47](https://github.com/Akryum/histoire/commit/118dc4732baf6a6a9e6dd8d4cf6df5957f34e20e))
+* vite client resolve error (temporary fix) ([155ac88](https://github.com/Akryum/histoire/commit/155ac881861484fdcb07ee700fabaee74914d4d2)), closes [#409](https://github.com/Akryum/histoire/issues/409)
+
+
+
 ## [0.12.1](https://github.com/Akryum/histoire/compare/v0.12.0...v0.12.1) (2022-12-20)
 
 
