@@ -1,5 +1,5 @@
 <script lang="ts">
-import { PropType, Ref, ref, toRefs, watchEffect } from 'vue'
+import { onMounted, onUpdated, PropType, Ref, ref, toRefs, watchEffect } from 'vue'
 import type { Story } from '../../types'
 // @ts-expect-error virtual module
 import { markdownFiles } from 'virtual:$histoire-markdown-files'
@@ -85,6 +85,25 @@ function onClick (e: MouseEvent) {
     router.push(targetHref)
   }
 }
+
+// Handle URL anchor
+function scrollToAnchor () {
+  if (location.hash) {
+    const anchor = document.querySelector(location.hash)
+    if (anchor) {
+      anchor.scrollIntoView()
+      return true
+    }
+  }
+}
+
+onMounted(() => {
+  scrollToAnchor()
+})
+
+onUpdated(() => {
+  scrollToAnchor()
+})
 </script>
 
 <template>
