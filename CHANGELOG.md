@@ -1,3 +1,12 @@
+## [0.12.4](https://github.com/Akryum/histoire/compare/v0.12.3...v0.12.4) (2022-12-23)
+
+
+### Bug Fixes
+
+* custom controls taking too much space ([59d1153](https://github.com/Akryum/histoire/commit/59d11533848701a1ae6030413d58317ffd9715f2))
+
+
+
 ## [0.12.3](https://github.com/Akryum/histoire/compare/v0.12.2...v0.12.3) (2022-12-23)
 
 
