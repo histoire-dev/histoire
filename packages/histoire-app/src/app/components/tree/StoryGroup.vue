@@ -40,7 +40,7 @@ function toggleOpen () {
         @keyup.space="toggleOpen"
       >
         <Icon
-          :icon="isFolderOpen ? 'carbon:subtract' : 'carbon:add'"
+          :icon="isFolderOpen ? 'ri:subtract-line' : 'ri:add-line'"
           class="htw-w-4 htw-h-4 htw-ml-4 htw-rounded-sm htw-border htw-border-gray-500/40"
         />
         <span class="htw-truncate">{{ group.title }}</span>
