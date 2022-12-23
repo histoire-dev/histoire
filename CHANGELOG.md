@@ -1,3 +1,12 @@
+## [0.12.3](https://github.com/Akryum/histoire/compare/v0.12.2...v0.12.3) (2022-12-23)
+
+
+### Bug Fixes
+
+* **tree:** minus icon not displayed on Firefox ([e12c81f](https://github.com/Akryum/histoire/commit/e12c81f1cdd6083f3e13b21b148d8797fcec394c))
+
+
+
 ## [0.12.2](https://github.com/Akryum/histoire/compare/v0.12.1...v0.12.2) (2022-12-20)
 
 
