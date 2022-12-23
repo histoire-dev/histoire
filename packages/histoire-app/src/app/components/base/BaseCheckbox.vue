@@ -53,7 +53,7 @@ watch(path, () => {
         width="16"
         height="16"
         viewBox="0 0 24 24"
-        class="htw-relative htw-z-10"
+        class="htw-relative htw-z-10 htw-block"
       >
         <path
           ref="path"
