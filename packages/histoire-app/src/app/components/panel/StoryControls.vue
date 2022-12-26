@@ -52,7 +52,7 @@ const hasCustomControls = computed(() => props.variant.slots().controls || props
       slot-name="controls"
       :variant="variant"
       :story="story"
-      class="htw-flex-none"
+      class="__histoire-render-custom-controls htw-flex-none"
       @ready="ready = true"
     />
 
