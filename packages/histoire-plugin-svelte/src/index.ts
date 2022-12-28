@@ -86,7 +86,7 @@ export interface Hst {
     min: number
     max: number
   }>
-  TextArea: typeof SvelteComponentTyped<{
+  Textarea: typeof SvelteComponentTyped<{
     value: string
     title: string
   }>
