@@ -23,7 +23,7 @@ The first step is to define the state that will be shared to your story. Histoir
       {content}
     </MyButton>
 
-    <input bind:value={text}>
+    <input bind:value={text} />
   </Hst.Variant>
 </Hst.Story>
 ```
