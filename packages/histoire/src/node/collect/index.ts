@@ -34,6 +34,7 @@ export function useCollectStories (options: UseCollectStoriesOptions, ctx: Conte
         /vite\w*\/dist\/client\/(client|env).mjs/,
         ...ctx.config.viteNodeInlineDeps ?? [],
       ],
+      fallbackCJS: true,
     },
     transformMode: ctx.config.viteNodeTransformMode,
   })
