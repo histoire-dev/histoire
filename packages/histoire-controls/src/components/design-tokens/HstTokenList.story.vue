@@ -69,7 +69,7 @@ const tokens = {
             <div
               class="htw-h-20 htw-bg-gray-500/50"
               :style="{
-                width: token.value,
+                width: token.value as string,
               }"
             />
           </div>

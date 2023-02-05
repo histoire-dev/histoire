@@ -20,6 +20,6 @@
     "histoire": "workspace:*",
     "nuxt": "^3.0.0-rc.11",
     "start-server-and-test": "^1.14.0",
-    "vue": "^3.2.37"
+    "vue": "^3.2.47"
   }
 }
