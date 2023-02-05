@@ -196,6 +196,12 @@ export async function getViteConfigWithPlugins (isServer: boolean, ctx: Context)
       }
     },
 
+    options () {
+      this.meta.histoire = {
+        isCollecting: isServer,
+      }
+    },
+
     async resolveId (id, importer) {
       if (id.startsWith(STORIES_ID)) {
         return RESOLVED_STORIES_ID
