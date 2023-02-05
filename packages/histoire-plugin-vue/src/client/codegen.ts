@@ -1,7 +1,7 @@
 // @TODO remove @ts-ignore
 
 import { VNode, vModelText, vModelCheckbox, vModelSelect, vModelRadio, vModelDynamic, Text } from 'vue'
-import { pascalCase } from 'change-case'
+import { pascalCase, camelCase } from 'change-case'
 import { createAutoBuildingObject, indent, serializeJs, voidElements } from '@histoire/shared'
 import type { Variant } from '@histoire/shared'
 
@@ -74,7 +74,8 @@ async function printVNode (vnode: VNode, propsOverrides: Record<string, any> = n
       for (const dir of vnode.dirs) {
         // Vmodel
         if (dir.dir === vModelText || dir.dir === vModelSelect || dir.dir === vModelRadio || dir.dir === vModelCheckbox || dir.dir === vModelDynamic) {
-          const listenerKey = `onUpdate:${dir.arg ?? 'modelValue'}`
+          const listenerKeys = [`onUpdate:${dir.arg ?? 'modelValue'}`, `onUpdate:${camelCase(dir.arg ?? 'modelValue')}`]
+          const listenerKey = listenerKeys.find(key => vnode.props[key])
           const listener = vnode.props[listenerKey]
           let valueCode: string = null
           if (listener) {
@@ -118,9 +119,10 @@ async function printVNode (vnode: VNode, propsOverrides: Record<string, any> = n
         const arg = directive === '@' ? `${prop[2].toLowerCase()}${prop.slice(3)}` : prop
 
         // v-model on component
-        const vmodelListener = `onUpdate:${prop}`
+        const vmodelListeners = [`onUpdate:${prop}`, `onUpdate:${camelCase(prop)}`]
         // @ts-ignore
-        if (directive === ':' && vnode.dynamicProps?.includes(vmodelListener)) {
+        const vmodelListener = vmodelListeners.find(key => vnode.dynamicProps?.includes(key))
+        if (directive === ':' && vmodelListener) {
           // Listener
           skipProps.push(vmodelListener)
           const listener = vnode.props[vmodelListener]
