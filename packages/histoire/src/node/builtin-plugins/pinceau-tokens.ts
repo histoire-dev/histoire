@@ -8,7 +8,7 @@ export interface PinceauTokensOptions {
   configFileName?: string
 }
 
-export function pinceauTokens(options: PinceauTokensOptions = {}): Plugin {
+export function pinceauTokens (options: PinceauTokensOptions = {}): Plugin {
   const themePath = join(process.cwd(), 'node_modules/.vite/pinceau/index.js')
 
   async function generate (api: PluginApiBase) {
@@ -30,36 +30,36 @@ export function pinceauTokens(options: PinceauTokensOptions = {}): Plugin {
     name: 'builtin:pinceau-tokens',
 
     config (config) {
-        // Add 'design-system' group
-        if (!config.tree) {
-          config.tree = {}
+      // Add 'design-system' group
+      if (!config.tree) {
+        config.tree = {}
+      }
+      if (!config.tree.groups) {
+        config.tree.groups = []
+      }
+      if (!config.tree.groups.some(g => g.id === 'design-system')) {
+        let index = 0
+        // After 'top' group
+        const topIndex = config.tree.groups.findIndex(g => g.id === 'top')
+        if (topIndex > -1) {
+          index = topIndex + 1
         }
-        if (!config.tree.groups) {
-          config.tree.groups = []
-        }
-        if (!config.tree.groups.some(g => g.id === 'design-system')) {
-          let index = 0
-          // After 'top' group
-          const topIndex = config.tree.groups.findIndex(g => g.id === 'top')
-          if (topIndex > -1) {
-            index = topIndex + 1
-          }
-          // Insert group
-          config.tree.groups.splice(index, 0, {
-            id: 'design-system',
-            title: 'Design System',
-          })
-        }
+        // Insert group
+        config.tree.groups.splice(index, 0, {
+          id: 'design-system',
+          title: 'Design System',
+        })
+      }
     },
 
     onDev (api, onCleanup) {
-        const watcher = api.watcher.watch(themePath)
-          .on('change', () => generate(api))
-          .on('add', () => generate(api))
+      const watcher = api.watcher.watch(themePath)
+        .on('change', () => generate(api))
+        .on('add', () => generate(api))
 
-        onCleanup(() => {
-          watcher.close()
-        })
+      onCleanup(() => {
+        watcher.close()
+      })
     },
 
     async onBuild (api) {
