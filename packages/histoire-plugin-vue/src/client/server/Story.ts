@@ -1,18 +1,6 @@
 import { defineComponent, inject, onMounted, PropType, provide, useAttrs } from 'vue'
 import type { ServerStoryFile, ServerStory, ServerVariant } from '@histoire/shared'
-
-const stub = { name: 'StubbedComponent', render: () => null }
-
-function autoStubComponents (vnodes: any[]) {
-  for (const vnode of vnodes) {
-    if (typeof vnode.type === 'object' && (vnode.type as any).name !== 'HistoireVariant') {
-      vnode.type = stub
-    }
-    if (Array.isArray(vnode.children)) {
-      autoStubComponents(vnode.children)
-    }
-  }
-}
+import { autoStubComponents } from './stub'
 
 export default defineComponent({
   name: 'HistoireStory',
