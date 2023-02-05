@@ -248,10 +248,10 @@ importers:
 
   packages/histoire:
     specifiers:
-      '@histoire/app': ^0.12.4
-      '@histoire/controls': ^0.12.4
-      '@histoire/shared': ^0.12.4
-      '@histoire/vendors': ^0.12.4
+      '@histoire/app': ^0.13.0
+      '@histoire/controls': ^0.13.0
+      '@histoire/shared': ^0.13.0
+      '@histoire/vendors': ^0.13.0
       '@peeky/server': ^0.14.0
       '@peeky/test': ^0.14.1
       '@types/flexsearch': ^0.7.3
@@ -331,9 +331,9 @@ importers:
 
   packages/histoire-app:
     specifiers:
-      '@histoire/controls': ^0.12.4
-      '@histoire/shared': ^0.12.4
-      '@histoire/vendors': ^0.12.4
+      '@histoire/controls': ^0.13.0
+      '@histoire/shared': ^0.13.0
+      '@histoire/vendors': ^0.13.0
       '@tailwindcss/typography': ^0.5.2
       '@types/flexsearch': ^0.7.3
       '@types/fs-extra': ^9.0.13
@@ -387,7 +387,7 @@ importers:
       '@codemirror/state': ^6.1.2
       '@codemirror/theme-one-dark': ^6.1.0
       '@codemirror/view': ^6.3.0
-      '@histoire/vendors': ^0.12.4
+      '@histoire/vendors': ^0.13.0
       '@peeky/server': ^0.14.0
       '@peeky/test': ^0.14.1
       '@types/node': ^17.0.32
@@ -507,9 +507,9 @@ importers:
 
   packages/histoire-plugin-svelte:
     specifiers:
-      '@histoire/controls': ^0.12.4
-      '@histoire/shared': ^0.12.4
-      '@histoire/vendors': ^0.12.4
+      '@histoire/controls': ^0.13.0
+      '@histoire/shared': ^0.13.0
+      '@histoire/vendors': ^0.13.0
       '@sveltejs/vite-plugin-svelte': ^1.0.1
       '@types/node': ^17.0.32
       concurrently: ^7.1.0
@@ -538,9 +538,9 @@ importers:
 
   packages/histoire-plugin-vue:
     specifiers:
-      '@histoire/controls': ^0.12.4
-      '@histoire/shared': ^0.12.4
-      '@histoire/vendors': ^0.12.4
+      '@histoire/controls': ^0.13.0
+      '@histoire/shared': ^0.13.0
+      '@histoire/vendors': ^0.13.0
       '@types/node': ^17.0.32
       change-case: ^4.1.2
       concurrently: ^7.1.0
@@ -565,9 +565,9 @@ importers:
 
   packages/histoire-plugin-vue2:
     specifiers:
-      '@histoire/controls': ^0.12.4
-      '@histoire/shared': ^0.12.4
-      '@histoire/vendors': ^0.12.4
+      '@histoire/controls': ^0.13.0
+      '@histoire/shared': ^0.13.0
+      '@histoire/vendors': ^0.13.0
       '@types/node': ^17.0.32
       change-case: ^4.1.2
       concurrently: ^7.1.0

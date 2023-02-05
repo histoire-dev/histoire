@@ -1,3 +1,26 @@
+# [0.13.0](https://github.com/Akryum/histoire/compare/v0.12.4...v0.13.0) (2023-02-05)
+
+
+### Bug Fixes
+
+* **build:** Cannot read properties of undefined (reading 'isCollecting') ([2208e31](https://github.com/Akryum/histoire/commit/2208e310adbc59e3fa5e53a757cbf470603c077a))
+* **HstButtonGroup:** not respecting options order ([2bbfc1d](https://github.com/Akryum/histoire/commit/2bbfc1de8845be66b8c4ba6fdff567e031d2212a))
+* **HstSelect:** support array of numbers, fix [#423](https://github.com/Akryum/histoire/issues/423) ([b7cc168](https://github.com/Akryum/histoire/commit/b7cc1684bb136127f70a5201be81d6804d1dc3cc))
+* isCollecting not working ([4f6427c](https://github.com/Akryum/histoire/commit/4f6427cd5ed19f53688eee823596ba55f1faad13))
+* **svelte-control-elements:** textarea capitalization typo on interface ([#413](https://github.com/Akryum/histoire/issues/413)) ([fbbc58f](https://github.com/Akryum/histoire/commit/fbbc58f2700b7ba437c5846032b65239d1c7306c))
+* tailwind tokens not working with pnpm, fix [#282](https://github.com/Akryum/histoire/issues/282) ([f155491](https://github.com/Akryum/histoire/commit/f15549195a193b62c6dd10c9055297243c676fcf))
+* **vue3:** codegen v-model on prop with dash in name ([c53ea61](https://github.com/Akryum/histoire/commit/c53ea61579d24295a135444ca612a282186ad6ea))
+
+
+### Features
+
+* **pinceau:** support Pinceau as Design System ([#309](https://github.com/Akryum/histoire/issues/309)) ([d23a541](https://github.com/Akryum/histoire/commit/d23a541f3528f355be2857c8325b98750cfb9025))
+* update to vite 4.1, fix [#434](https://github.com/Akryum/histoire/issues/434) ([86e08d1](https://github.com/Akryum/histoire/commit/86e08d1b001e6368fe97541e55bc3ea09da78c84))
+* **vite-node:** enable CJS fallback ([71be82a](https://github.com/Akryum/histoire/commit/71be82ae33167714b326d58ec5e3ce22834ddf31))
+* **vue:** remove unknown components warnings ([47517f8](https://github.com/Akryum/histoire/commit/47517f81a9bbfe0f34d9566a05d3a233b080f6d9))
+
+
+
 ## [0.12.4](https://github.com/Akryum/histoire/compare/v0.12.3...v0.12.4) (2022-12-23)
 
 
