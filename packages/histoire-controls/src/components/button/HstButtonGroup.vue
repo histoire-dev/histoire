@@ -13,20 +13,24 @@ import HstButton from './HstButton.vue'
 const props = defineProps<{
   title?: string
   modelValue: string
-  options: string[] | HstControlOption[]
+  options: string[] | HstControlOption[] | Record<string, string>
 }>()
 
-const formattedOptions: ComputedRef<Record<string, string>> = computed(() => {
+const formattedOptions: ComputedRef<HstControlOption[]> = computed(() => {
   if (Array.isArray(props.options)) {
-    return Object.fromEntries(props.options.map((value: string | HstControlOption) => {
+    return props.options.map((value: string | HstControlOption) => {
       if (typeof value === 'string') {
-        return [value, value]
+        return { value, label: value }
       } else {
-        return [value.value, value.label]
+        return value
       }
+    })
+  } else {
+    return Object.keys(props.options).map((value: string) => ({
+      value,
+      label: props.options[value],
     }))
   }
-  return props.options
 })
 
 const emit = defineEmits<{
@@ -47,7 +51,7 @@ function selectOption (value: string) {
   >
     <div class="htw-flex htw-gap-px htw-border htw-border-solid htw-border-black/25 dark:htw-border-white/25 htw-rounded-sm htw-p-px">
       <HstButton
-        v-for="( label, value ) in formattedOptions"
+        v-for="{ label, value } of formattedOptions"
         :key="value"
         class="htw-px-1 htw-h-[22px] htw-flex-1 !htw-rounded-[3px]"
         :color="value === modelValue ? 'primary' : 'flat'"

@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { ref } from 'vue'
 import HstButtonGroup from './HstButtonGroup.vue'
 
 const options = {
@@ -19,6 +20,8 @@ function initState () {
     speed: flatOptions[0],
   }
 }
+
+const count = ref('0')
 </script>
 
 <template>
@@ -32,6 +35,7 @@ function initState () {
       :init-state="initState"
     >
       <template #default="{ state }">
+        <pre>{{ { speed: state.speed } }}</pre>
         <HstButtonGroup
           v-model="state.speed"
           title="Label"
@@ -46,6 +50,30 @@ function initState () {
           :options="objectOptions"
         />
       </template>
+    </Variant>
+
+    <Variant
+      title="Object options"
+      :init-state="initState"
+    >
+      <template #default="{ state }">
+        <pre>{{ { speed: state.speed } }}</pre>
+        <HstButtonGroup
+          v-model="state.speed"
+          title="Label"
+          :options="options"
+        />
+      </template>
+    </Variant>
+
+    <Variant
+      title="Should retain order"
+    >
+      <pre>{{ { count } }}</pre>
+      <HstButtonGroup
+        v-model="count"
+        :options="[{label: 'Low', value: '-25'},{label: 'Regular', value: '0'},{label: 'High', value: '200'}]"
+      />
     </Variant>
   </Story>
 </template>
