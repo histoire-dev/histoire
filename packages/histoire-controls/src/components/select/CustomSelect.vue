@@ -12,7 +12,7 @@ import { HstControlOption } from '../../types'
 
 const props = defineProps<{
   modelValue: string
-  options: Record<string, any> | string[] | HstControlOption[]
+  options: Record<string, any> | string[] | number[] | HstControlOption[]
 }>()
 
 const emits = defineEmits<{
@@ -22,8 +22,8 @@ const emits = defineEmits<{
 const formattedOptions: ComputedRef<[any, string][]> = computed(() => {
   if (Array.isArray(props.options)) {
     return props.options.map(option => {
-      if (typeof option === 'string') {
-        return [option, option] as [string, string]
+      if (typeof option === 'string' || typeof option === 'number') {
+        return [option, String(option)] as [any, string]
       } else {
         return [option.value, option.label] as [any, string]
       }

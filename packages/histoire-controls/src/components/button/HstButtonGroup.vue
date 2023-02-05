@@ -13,14 +13,14 @@ import HstButton from './HstButton.vue'
 const props = defineProps<{
   title?: string
   modelValue: string
-  options: string[] | HstControlOption[] | Record<string, string>
+  options: string[] | number[] | HstControlOption[] | Record<string, string | number>
 }>()
 
 const formattedOptions: ComputedRef<HstControlOption[]> = computed(() => {
   if (Array.isArray(props.options)) {
-    return props.options.map((value: string | HstControlOption) => {
-      if (typeof value === 'string') {
-        return { value, label: value }
+    return props.options.map((value: string | number | HstControlOption) => {
+      if (typeof value === 'string' || typeof value === 'number') {
+        return { value, label: String(value) }
       } else {
         return value
       }

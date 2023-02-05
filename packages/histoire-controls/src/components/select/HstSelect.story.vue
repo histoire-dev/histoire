@@ -14,10 +14,13 @@ const objectOptions = Object.keys(options).map(key => ({
   value: key,
 }))
 
+const numberOptions = [0, 1, 2, 3, 4, 5]
+
 function initState () {
   return {
     label: 'My really long label',
     select: 'crash-bandicoot',
+    count: 0,
   }
 }
 </script>
@@ -130,6 +133,27 @@ function initState () {
           v-model="state.select"
           title="Select"
           :options="flatOptions"
+        />
+      </template>
+    </Variant>
+
+    <Variant
+      title="options-as-array-of-numbers"
+      :init-state="initState"
+    >
+      <template #default="{ state }">
+        <pre class="htw-text-xs htw-bg-gray-50 dark:htw-bg-gray-600 htw-rounded htw-p-4">{{ numberOptions }}</pre>
+        <HstSelect
+          v-model="state.count"
+          title="Select"
+          :options="numberOptions"
+        />
+      </template>
+      <template #controls="{ state }">
+        <HstSelect
+          v-model="state.count"
+          title="Select"
+          :options="numberOptions"
         />
       </template>
     </Variant>
