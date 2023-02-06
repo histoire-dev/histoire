@@ -3,7 +3,8 @@ import { createServer as createViteServer } from 'vite'
 import pc from 'picocolors'
 import type { ServerStoryFile } from '@histoire/shared'
 import { Context } from './context.js'
-import { getViteConfigWithPlugins, RESOLVED_MARKDOWN_FILES, RESOLVED_SEARCH_TITLE_DATA_ID, RESOLVED_STORIES_ID } from './vite.js'
+import { getViteConfigWithPlugins } from './vite.js'
+import * as VirtualFiles from './virtual/index.js'
 import { onStoryChange, onStoryListChange, watchStories } from './stories.js'
 import { useCollectStories } from './collect/index.js'
 import { DevPluginApi } from './plugin.js'
@@ -170,8 +171,8 @@ export async function createServer (ctx: Context, options: CreateServerOptions =
 
     clearInvalidates()
 
-    invalidateModule(RESOLVED_STORIES_ID)
-    invalidateModule(RESOLVED_SEARCH_TITLE_DATA_ID)
+    invalidateModule(VirtualFiles.RESOLVED_STORIES_ID)
+    invalidateModule(VirtualFiles.RESOLVED_SEARCH_TITLE_DATA_ID)
 
     collecting = false
 
@@ -181,12 +182,12 @@ export async function createServer (ctx: Context, options: CreateServerOptions =
   }
 
   onStoryListChange(() => {
-    invalidateModule(RESOLVED_STORIES_ID)
-    invalidateModule(RESOLVED_SEARCH_TITLE_DATA_ID)
+    invalidateModule(VirtualFiles.RESOLVED_STORIES_ID)
+    invalidateModule(VirtualFiles.RESOLVED_SEARCH_TITLE_DATA_ID)
   })
 
   onMarkdownListChange(() => {
-    invalidateModule(RESOLVED_MARKDOWN_FILES)
+    invalidateModule(VirtualFiles.RESOLVED_MARKDOWN_FILES)
   })
 
   async function close () {
