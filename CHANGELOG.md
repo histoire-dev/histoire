@@ -1,3 +1,14 @@
+## [0.13.2](https://github.com/Akryum/histoire/compare/v0.13.1...v0.13.2) (2023-02-08)
+
+
+### Features
+
+* **build:** output story data in histoire.json ([7ce2088](https://github.com/Akryum/histoire/commit/7ce208869ae9102023bfd2b46113d5d50d922e42))
+* **cli:** add --open to dev command, fix [#257](https://github.com/Akryum/histoire/issues/257) ([876161b](https://github.com/Akryum/histoire/commit/876161b47579130cd9443dfa5e65d9289089fd6a))
+* Dark mode API and config, fix [#388](https://github.com/Akryum/histoire/issues/388) ([#438](https://github.com/Akryum/histoire/issues/438) ([683e6ba](https://github.com/Akryum/histoire/commit/683e6bae8c8fc9eb19d380fedc76dbdd8994df8b))
+
+
+
 ## [0.13.1](https://github.com/Akryum/histoire/compare/v0.13.0...v0.13.1) (2023-02-08)
 
 
