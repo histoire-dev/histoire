@@ -116,6 +116,10 @@ export interface HistoireConfig {
      * Add a link to the main logo
      */
     logoHref?: string
+    /**
+     * Default color scheme for the app.
+     */
+    defaultColorScheme?: 'light' | 'dark'
   }
   /**
    * Setup file exporting a default function executed when setting up each story preview.
