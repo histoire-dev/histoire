@@ -79,7 +79,7 @@ export * from '${filepath}'\n`
           {
             const tempPkgFile = path.resolve(tempDir, 'package.json')
             fs.writeJsonSync(tempPkgFile, tempPkg)
-            execaSync('npm', ['install'], { cwd: tempDir })
+            execaSync('npm', ['install', '--prefer-offline'], { cwd: tempDir })
             const dtsFiles = globbySync(['**/*.d.ts', '**/package.json'], {
               cwd: path.join(tempDir, 'node_modules'),
               dot: true,
