@@ -145,6 +145,8 @@ export async function build (ctx: Context) {
     config (config) {
       // Don't externalize
       config.build.rollupOptions.external = []
+      // Don't build in SSR mode
+      config.build.ssr = false
     },
   })
 
