@@ -1,3 +1,14 @@
+## [0.13.1](https://github.com/Akryum/histoire/compare/v0.13.0...v0.13.1) (2023-02-08)
+
+
+### Bug Fixes
+
+* **build:** force disable ssr, fix [#427](https://github.com/Akryum/histoire/issues/427) ([3d72efd](https://github.com/Akryum/histoire/commit/3d72efd121098ba0c13ac3d59f3e4900a51269c3))
+* **build:** force manualChunks option, fix [#427](https://github.com/Akryum/histoire/issues/427) ([bd9296e](https://github.com/Akryum/histoire/commit/bd9296e267dfa8678532f10b00ab575f98aa9018))
+* **dev:** HMR can be caught by node server, fix [#436](https://github.com/Akryum/histoire/issues/436) ([2d5b3c8](https://github.com/Akryum/histoire/commit/2d5b3c81cad143a18967a61cbf540686f0861b33))
+
+
+
 # [0.13.0](https://github.com/Akryum/histoire/compare/v0.12.4...v0.13.0) (2023-02-05)
 
 
