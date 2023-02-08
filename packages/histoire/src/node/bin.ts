@@ -16,6 +16,7 @@ program.version(version)
 program.command('dev')
   .describe('open the stories in your browser for development')
   .option('-p, --port <port>', 'Listening port of the server')
+  .option('--open', 'Open in your default browser')
   .action(async (options) => {
     const { devCommand } = await import('./commands/dev.js')
     return devCommand(options)

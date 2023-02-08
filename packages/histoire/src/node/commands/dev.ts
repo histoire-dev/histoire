@@ -6,6 +6,7 @@ import { createServer } from '../server.js'
 
 export interface DevOptions {
   port: number
+  open?: boolean
 }
 
 export async function devCommand (options: DevOptions) {
@@ -15,7 +16,10 @@ export async function devCommand (options: DevOptions) {
     const ctx = await createContext({
       mode: 'dev',
     })
-    const { server, viteConfigFile, close } = await createServer(ctx, { port: options.port })
+    const { server, viteConfigFile, close } = await createServer(ctx, {
+      port: options.port,
+      open: options.open,
+    })
     server.printUrls()
 
     // Histoire config watcher

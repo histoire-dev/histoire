@@ -14,11 +14,17 @@ import { createMarkdownFilesWatcher, onMarkdownListChange } from './markdown.js'
 
 export interface CreateServerOptions {
   port?: number
+  open?: boolean
 }
 
 export async function createServer (ctx: Context, options: CreateServerOptions = {}) {
   const getViteServer = async (collecting: boolean) => {
     const { viteConfig, viteConfigFile } = await getViteConfigWithPlugins(collecting, ctx)
+
+    if (!collecting && options.open) {
+      viteConfig.server.open = true
+    }
+
     const server = await createViteServer(viteConfig)
     await server.pluginContainer.buildStart({})
     return {
