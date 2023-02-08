@@ -48,6 +48,8 @@ export function getDefaultConfig (): HistoireConfig {
         primary: defaultColors.emerald,
         gray: defaultColors.zinc,
       },
+      defaultColorScheme: 'auto',
+      storeColorScheme: true,
     },
     responsivePresets: [
       {

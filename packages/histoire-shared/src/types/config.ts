@@ -119,7 +119,15 @@ export interface HistoireConfig {
     /**
      * Default color scheme for the app.
      */
-    defaultColorScheme?: 'light' | 'dark'
+    defaultColorScheme?: 'light' | 'dark' | 'auto'
+    /**
+     * Hides the dark mode button in the toolbar.
+     */
+    hideColorSchemeSwitch?: boolean
+    /**
+     * Enable persistence of the color scheme in the browser.
+     */
+    storeColorScheme?: boolean
   }
   /**
    * Setup file exporting a default function executed when setting up each story preview.

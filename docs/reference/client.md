@@ -23,3 +23,27 @@ if (!isCollecting()) {
   // do something only in the browser
 }
 ```
+
+## `isDark`
+
+Returns `true` if dark mode is enabled.
+
+```js
+import { isDark } from 'histoire/client'
+
+if (isDark()) {
+  // do something only in dark mode
+}
+```
+
+## `toggleDark`
+
+`toggleDark(value?: boolean): boolean`
+
+Toggles dark mode. If `value` is provided, it will be used instead of toggling. Returns the new value.
+
+```js
+import { toggleDark } from 'histoire/client'
+
+toggleDark(true)
+```
