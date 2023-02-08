@@ -6,6 +6,7 @@ import { isMobile } from '../../util/responsive'
 import StoryVariantGridItem from './StoryVariantGridItem.vue'
 import ToolbarBackground from '../toolbar/ToolbarBackground.vue'
 import ToolbarTextDirection from '../toolbar/ToolbarTextDirection.vue'
+import DevOnlyToolbarOpenInEditor from '../toolbar/DevOnlyToolbarOpenInEditor.vue'
 
 const storyStore = useStoryStore()
 
@@ -125,6 +126,12 @@ const columnCount = computed(() => Math.min(storyStore.currentStory.variants.len
     >
       <ToolbarBackground />
       <ToolbarTextDirection />
+
+      <DevOnlyToolbarOpenInEditor
+        v-if="__HISTOIRE_DEV__"
+        :variant="storyStore.currentVariant"
+        :story="storyStore.currentStory"
+      />
     </div>
 
     <div

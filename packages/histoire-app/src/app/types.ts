@@ -48,3 +48,11 @@ export interface PreviewSettings {
   checkerboard: boolean
   textDirection: 'ltr' | 'rtl'
 }
+
+declare module 'vue' {
+  interface ComponentCustomProperties {
+    __HISTOIRE_DEV__: boolean
+  }
+}
+
+declare const __HISTOIRE_DEV__: boolean

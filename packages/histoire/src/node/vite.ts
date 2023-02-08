@@ -251,6 +251,25 @@ export async function getViteConfigWithPlugins (isServer: boolean, ctx: Context)
 
   plugins.push(createVirtualFilesPlugin(ctx, isServer))
 
+  // Replace dev flag
+  const flags = {
+    '_ctx.__HISTOIRE_DEV__': JSON.stringify(ctx.mode === 'dev'),
+    __HISTOIRE_DEV__: JSON.stringify(ctx.mode === 'dev'),
+  }
+  plugins.push({
+    name: 'histoire:flags',
+    enforce: 'pre',
+    transform (code, id) {
+      if (id.match(/\.(vue|js)($|\?)/)) {
+        const original = code
+        for (const flag in flags) {
+          code = code.replace(new RegExp(flag, 'g'), flags[flag])
+        }
+        if (original !== code) { return code }
+      }
+    },
+  })
+
   // Markdown
   plugins.push(...await createMarkdownPlugins(ctx))
 
