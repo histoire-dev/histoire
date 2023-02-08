@@ -24,6 +24,7 @@ import { BuildPluginApi } from './plugin.js'
 import { useModuleLoader } from './load.js'
 import { startPreview } from './preview.js'
 import { createMarkdownFilesWatcher } from './markdown.js'
+import { getSerializedStoryData } from './build-serialize.js'
 
 const PRELOAD_MODULES = [
   'vendor',
@@ -180,6 +181,8 @@ export async function build (ctx: Context) {
   const sandboxOutput = result.output.find(o => o.name === 'bundle-sandbox' && o.type === 'chunk')
   const sandboxHtml = generateEntryHtml(sandboxOutput.fileName, styleOutput.fileName, {}, ctx)
   await writeFile('__sandbox.html', sandboxHtml, ctx)
+
+  await writeFile('histoire.json', JSON.stringify(getSerializedStoryData(ctx), null, 2), ctx)
 
   const duration = performance.now() - startTime
   if (emptyStoryCount) {
