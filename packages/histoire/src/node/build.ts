@@ -86,13 +86,6 @@ export async function build (ctx: Context) {
           join(APP_PATH, 'bundle-main.js'),
           join(APP_PATH, 'bundle-sandbox.js'),
         ],
-        output: {
-          manualChunks (id) {
-            if (!id.includes('@histoire/app') && id.includes('node_modules')) {
-              return 'vendor'
-            }
-          },
-        },
         plugins: [
           {
             name: 'histoire-build-rollup-options-override',
@@ -104,10 +97,6 @@ export async function build (ctx: Context) {
           },
         ],
       },
-      outDir: ctx.config.outDir,
-      emptyOutDir: true,
-      cssCodeSplit: false,
-      minify: false,
     },
   })
 
@@ -145,8 +134,25 @@ export async function build (ctx: Context) {
     config (config) {
       // Don't externalize
       config.build.rollupOptions.external = []
-      // Don't build in SSR mode
-      config.build.ssr = false
+
+      // Force chunk strategy
+      config.build.rollupOptions.output = {
+        manualChunks (id) {
+          if (!id.includes('@histoire/app') && id.includes('node_modules')) {
+            return 'vendor'
+          }
+        },
+      }
+
+      // Force vite build options
+      Object.assign(config.build, {
+        outDir: ctx.config.outDir,
+        emptyOutDir: true,
+        cssCodeSplit: false,
+        minify: false,
+        // Don't build in SSR mode
+        ssr: false,
+      })
     },
   })
 
