@@ -61,7 +61,7 @@ export default defineConfig({
 
 ## Command Line Interface
 
-Histoire provides two commands:
+Histoire provides three commands:
 - `histoire dev`: starts a development server with hot-reload
 - `histoire build`: builds the app for production
 - `histoire preview`: starts an HTTP server that serves the built app
