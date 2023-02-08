@@ -50,6 +50,7 @@ onKeyboardShortcut(['ctrl+shift+d', 'meta+shift+d'], (event) => {
       </a>
 
       <a
+        v-if="!histoireConfig.theme.hideColorSchemeSwitch"
         v-tooltip="makeTooltip('Toggle dark mode', ({ isMac }) => isMac ? 'meta+shift+d' : 'ctrl+shift+d')"
         class="htw-p-2 sm:htw-p-1 hover:htw-text-primary-500 dark:hover:htw-text-primary-400 htw-cursor-pointer htw-text-gray-900 dark:htw-text-gray-100"
         @click="toggleDark()"

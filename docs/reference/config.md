@@ -110,6 +110,9 @@ Properties:
 - `favicon: string`: Href to the favicon file (**not** processed by Vite). Put the file in the `public` directory.
 - `colors: Object`: Customize the colors. Each color should be an object with shades as keys.
 - `logoHref: string`: Add a link to the main logo
+- `defaultColorScheme: 'light' | 'dark' | 'auto'`: Default color scheme for the app. `'auto'` will use the system preference.
+- `hideColorSchemeSwitch: boolean`: Hides the dark mode button in the toolbar.
+- `storeColorScheme: boolean`: Enable persistence of the color scheme in the browser's local storage.
 
 ```ts
 import { defaultColors } from 'histoire'
@@ -127,6 +130,9 @@ export default defineConfig({
       primary: defaultColors.cyan,
     },
     logoHref: 'https://acme.com',
+    defaultColorScheme: 'light',
+    hideColorSchemeSwitch: true,
+    storeColorScheme: false,
   },
 })
 ```

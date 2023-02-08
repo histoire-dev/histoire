@@ -14,3 +14,6 @@ export function logEvent (name: string, argument): void
  * Returns `true` when in the NodeJS server while collecting stories.
  */
 export function isCollecting (): boolean
+
+export function toggleDark (value?: boolean): boolean
+export function isDark (): boolean
