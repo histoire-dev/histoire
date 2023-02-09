@@ -82,7 +82,7 @@ function selectIndex (index: number) {
 </script>
 
 <template>
-  <div class="htw-relative htw-group">
+  <div class="histoire-prompt-select htw-relative htw-group">
     <input
       v-model="model"
       :required="prompt.required"

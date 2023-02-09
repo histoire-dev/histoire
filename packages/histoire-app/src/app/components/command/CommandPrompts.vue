@@ -61,7 +61,7 @@ onMounted(() => {
 
 <template>
   <form
-    class="htw-flex htw-flex-col"
+    class="histoire-command-prompts htw-flex htw-flex-col"
     @submit.prevent="submit()"
     @keyup.escape="$emit('close')"
   >

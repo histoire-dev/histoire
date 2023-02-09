@@ -24,8 +24,7 @@ const commandStore = useCommandStore()
 <template>
   <div
     v-if="shown"
-    class="histoire-search-modal htw-fixed htw-inset-0 htw-bg-white/80 dark:htw-bg-gray-900/80 htw-z-20"
-    data-test-id="search-modal"
+    class="histoire-command-prompts-modal htw-fixed htw-inset-0 htw-bg-white/80 dark:htw-bg-gray-900/80 htw-z-20"
   >
     <div
       class="htw-absolute htw-inset-0"

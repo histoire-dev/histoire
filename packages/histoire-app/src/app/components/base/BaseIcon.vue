@@ -15,10 +15,12 @@ const isUrl = computed(() => props.icon.startsWith('http') || props.icon.startsW
     v-if="isUrl"
     :src="icon"
     :alt="icon"
+    class="histoire-base-icon"
   >
   <Icon
     v-else
     :icon="icon"
+    class="histoire-base-icon"
   />
 </template>
 
