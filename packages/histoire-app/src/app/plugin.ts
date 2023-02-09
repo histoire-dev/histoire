@@ -1,3 +1,5 @@
+import { router } from './router.js'
+
 export function setupPluginApi () {
   if (!import.meta.hot) return
 
@@ -47,6 +49,10 @@ export function setupPluginApi () {
           })
         }
       })
+    },
+
+    openStory: (storyId: string) => {
+      router.push({ name: 'story', params: { storyId } })
     },
   }
 }

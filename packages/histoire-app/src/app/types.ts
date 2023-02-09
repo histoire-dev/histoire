@@ -66,6 +66,7 @@ declare global {
   interface Window {
     __HST_PLUGIN_API__: {
       sendEvent: (event: string, payload: any) => Promise<any>
+      openStory: (storyId: string) => void
     }
   }
 }

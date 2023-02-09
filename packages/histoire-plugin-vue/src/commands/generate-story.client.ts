@@ -1,5 +1,6 @@
 import type { ClientCommandOptions } from 'histoire'
-import { sendEvent } from 'histoire/plugin'
+import { sendEvent, openStory } from 'histoire/plugin'
+import { paramCase } from 'change-case'
 
 export default {
   prompts: [
@@ -18,4 +19,11 @@ export default {
       defaultValue: (answers) => answers.component?.replace(/.+\/(.+?)\.vue$/, '$1.story.vue'),
     },
   ],
+  clientAction: (params) => {
+    const index = params.component.lastIndexOf('/')
+    const dirname = params.component.substring(0, index + 1)
+    const file = `${dirname}${params.fileName}`
+    const storyId = paramCase(file).toLowerCase()
+    openStory(storyId)
+  },
 } as ClientCommandOptions
