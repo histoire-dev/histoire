@@ -5,7 +5,6 @@ export default {
 </script>
 
 <script lang="ts" setup>
-// @ts-expect-error virtual module
 import { clientSupportPlugins } from 'virtual:$histoire-support-plugins-client'
 import { ref, watchEffect, markRaw } from 'vue'
 import type { Story } from '../../types'

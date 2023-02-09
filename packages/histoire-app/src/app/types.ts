@@ -1,5 +1,4 @@
-import type { RouteLocationRaw, RouteLocationNormalizedLoaded } from 'vue-router'
-import type { Command } from '@histoire/shared'
+import type { RouteLocationRaw } from 'vue-router'
 
 export type {
   StoryFile,
@@ -55,17 +54,6 @@ export interface PreviewSettings {
   textDirection: 'ltr' | 'rtl'
 }
 
-export interface SearchCommand extends Command {
-  icon?: string
-  showIf?: (ctx: SearchCommandContext) => boolean
-  getParams?: (ctx: SearchCommandContext) => Record<string, any>
-  clientAction?: (params: Record<string, any>) => unknown
-}
-
-export interface SearchCommandContext {
-  route: RouteLocationNormalizedLoaded
-}
-
 declare module 'vue' {
   interface ComponentCustomProperties {
     __HISTOIRE_DEV__: boolean
@@ -74,4 +62,10 @@ declare module 'vue' {
 
 declare global {
   const __HISTOIRE_DEV__: boolean
+
+  interface Window {
+    __HST_PLUGIN_API__: {
+      sendEvent: (event: string, payload: any) => Promise<any>
+    }
+  }
 }

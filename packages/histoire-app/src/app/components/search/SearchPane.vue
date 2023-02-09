@@ -5,14 +5,16 @@ import { Icon } from '@iconify/vue'
 import * as flexsearch from 'flexsearch'
 import charset from 'flexsearch/dist/module/lang/latin/advanced.js'
 import language from 'flexsearch/dist/module/lang/en.js'
-import { useRoute } from 'vue-router'
+import type { ClientCommand } from '@histoire/shared'
+import { registeredCommands } from 'virtual:$histoire-commands'
 import { useStoryStore } from '../../stores/story'
 import BaseEmpty from '../base/BaseEmpty.vue'
-import type { SearchCommand, SearchResult, SearchResultType, Story, Variant } from '../../types'
+import type { SearchResult, SearchResultType, Story, Variant } from '../../types'
 import SearchItem from './SearchItem.vue'
 import { searchData, onUpdate } from './search-title-data'
 import type { SearchData } from './types'
-import { devCommands, executeCommand } from './dev-commands.js'
+import { builtinCommands, getCommandContext } from '../../util/commands.js'
+import { useCommandStore } from '../../stores/command.js'
 
 const DocSearchData = () => import('./search-docs-data')
 
@@ -225,23 +227,26 @@ function variantResultFactory (story: Story, variant: Variant, rank: number, typ
 
 // Commands
 
-const route = useRoute()
+const allCommands = [
+  ...builtinCommands,
+  ...registeredCommands,
+]
 
 const commandResults = computed(() => {
   if (__HISTOIRE_DEV__) {
-    const showIfCtx = {
-      route,
-    }
+    const commandCtx = getCommandContext()
     const searchText = searchInputText.value.toLowerCase()
-    return devCommands
-      .filter(command => !command.showIf || command.showIf(showIfCtx))
-      .filter(command => command.label.toLowerCase().includes(searchText) || command.id.toLowerCase().includes(searchText))
+    return allCommands
+      .filter(command => !command.showIf || command.showIf(commandCtx))
+      .filter(command => command.label.toLowerCase().includes(searchText) || command.searchText?.toLowerCase().includes(searchText))
       .map((command) => commandResultFactory(command, 0))
   }
   return []
 })
 
-function commandResultFactory (command: SearchCommand, rank: number): SearchResult {
+const commandStore = useCommandStore()
+
+function commandResultFactory (command: ClientCommand, rank: number): SearchResult {
   return {
     kind: 'command',
     rank,
@@ -249,10 +254,7 @@ function commandResultFactory (command: SearchCommand, rank: number): SearchResu
     title: command.label,
     icon: command.icon ?? 'carbon:chevron-right',
     onActivate: () => {
-      const params = command.getParams?.({
-        route,
-      }) ?? {}
-      executeCommand(command, params)
+      commandStore.activateCommand(command)
     },
   }
 }

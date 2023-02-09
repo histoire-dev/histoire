@@ -95,5 +95,8 @@ export function formatKey (key: string) {
   if (key === 'meta') {
     return '⌘'
   }
+  if (key === 'enter') {
+    return '⏎'
+  }
   return key.charAt(0).toUpperCase() + key.substring(1).toLowerCase()
 }

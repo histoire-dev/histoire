@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "dev:hst": "HISTOIRE_DEV=true histoire dev",
+    "dev:hst": "nodemon --watch ../../packages/histoire/dist --watch ../../packages/histoire-plugin-vue/dist --exec \"rm -rf ./node_modules/.hst* && HISTOIRE_DEV=true histoire dev\"",
     "story:dev": "histoire dev",
     "story:build": "histoire build",
     "story:preview": "histoire preview --port 4567",
@@ -24,6 +24,7 @@
     "@vitejs/plugin-vue": "^4.0.0",
     "cypress": "^9.5.3",
     "histoire": "workspace:*",
+    "nodemon": "^2.0.20",
     "sass": "^1.50.0",
     "start-server-and-test": "^1.14.0",
     "vite": "^4.1.0"

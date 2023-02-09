@@ -24,6 +24,10 @@
       "types": "./client.d.ts",
       "default": "./client.js"
     },
+    "./plugin": {
+      "types": "./plugin.d.ts",
+      "default": "./plugin.js"
+    },
     "./*": "./*"
   },
   "main": "./dist/node/index.js",

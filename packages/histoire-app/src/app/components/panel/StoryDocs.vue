@@ -1,7 +1,6 @@
 <script lang="ts">
 import { nextTick, PropType, Ref, ref, toRefs, watch, watchEffect, computed } from 'vue'
 import type { Story } from '../../types'
-// @ts-expect-error virtual module
 import { markdownFiles } from 'virtual:$histoire-markdown-files'
 import { histoireConfig } from '../../util/config.js'
 import DevOnlyToolbarOpenInEditor from '../toolbar/DevOnlyToolbarOpenInEditor.vue'

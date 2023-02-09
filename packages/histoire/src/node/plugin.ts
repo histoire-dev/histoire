@@ -10,6 +10,9 @@ import type {
   BuildEndCallback,
   PreviewStoryCallback,
   ModuleLoader,
+  ServerStory,
+  PluginApiDevEvent,
+  HistoireConfig,
 } from '@histoire/shared'
 import { TEMP_PATH } from './alias.js'
 import type { Context } from './context.js'
@@ -47,6 +50,14 @@ export class BasePluginApi implements PluginApiBase {
     removeStory(file)
     addStory(file)
   }
+
+  getStories (): ServerStory[] {
+    return this.ctx.storyFiles.map(f => f.story).filter(Boolean)
+  }
+
+  getConfig (): HistoireConfig {
+    return this.ctx.config
+  }
 }
 
 export class DevPluginApi extends BasePluginApi implements PluginApiDev {
@@ -63,5 +74,17 @@ export class BuildPluginApi extends BasePluginApi implements PluginApiBuild {
 
   onPreviewStory (cb: PreviewStoryCallback) {
     this.previewStoryCallbacks.push(cb)
+  }
+}
+
+export class DevEventPluginApi extends BasePluginApi implements PluginApiDevEvent {
+  constructor (
+    ctx: Context,
+    plugin: Plugin,
+    moduleLoader: ModuleLoader,
+    public event: string,
+    public payload: any,
+  ) {
+    super(ctx, plugin, moduleLoader)
   }
 }
