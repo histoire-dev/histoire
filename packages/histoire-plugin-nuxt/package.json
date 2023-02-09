@@ -27,7 +27,10 @@
     "watch": "tsc -d -w --sourceMap"
   },
   "dependencies": {
-    "@nuxt/kit": "^3.0.0-rc.11"
+    "@nuxt/kit": "^3.0.0-rc.11",
+    "h3": "^1.4.0",
+    "ofetch": "^1.0.0",
+    "unenv": "^1.1.1"
   },
   "devDependencies": {
     "@types/node": "^17.0.32",

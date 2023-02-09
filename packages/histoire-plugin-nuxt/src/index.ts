@@ -24,21 +24,28 @@ export function HstNuxt (): Plugin {
       const plugins = nuxtConfig.viteConfig.plugins.filter((p: any) => !ignorePlugins.includes(p?.name))
       return {
         vite: {
-          define: nuxtConfig.viteConfig.define,
-          resolve: {
-            alias: nuxtConfig.viteConfig.resolve.alias,
-            extensions: nuxtConfig.viteConfig.resolve.extensions,
-            dedupe: nuxtConfig.viteConfig.resolve.dedupe,
+          ...nuxtConfig.viteConfig,
+          server: {
+            ...nuxtConfig.viteConfig.server,
+            middlewareMode: false,
           },
-          plugins,
-          css: nuxtConfig.viteConfig.css,
-          publicDir: nuxtConfig.viteConfig.publicDir,
-          optimizeDeps: nuxtConfig.viteConfig.optimizeDeps,
-          // @ts-expect-error Vue-specific config
-          vue: nuxtConfig.viteConfig.vue,
+          // define: nuxtConfig.viteConfig.define,
+          // resolve: {
+          //   alias: nuxtConfig.viteConfig.resolve.alias,
+          //   extensions: nuxtConfig.viteConfig.resolve.extensions,
+          //   dedupe: nuxtConfig.viteConfig.resolve.dedupe,
+          // },
+          // plugins,
+          // css: nuxtConfig.viteConfig.css,
+          // publicDir: nuxtConfig.viteConfig.publicDir,
+          // optimizeDeps: nuxtConfig.viteConfig.optimizeDeps,
+          // // @ts-expect-error Vue-specific config
+          // vue: nuxtConfig.viteConfig.vue,
         },
         setupCode: [
           `${nuxt.options.css.map(file => `import '${file}'`).join('\n')}`,
+          `import { setupNuxtApp } from '@histoire/plugin-nuxt/dist/runtime/app-setup.js'
+          setupNuxtApp()`,
         ],
       }
     },
@@ -62,6 +69,9 @@ async function useNuxtViteConfig () {
     dev: true,
     overrides: {
       ssr: false,
+      app: {
+        rootId: 'nuxt-test',
+      },
     },
   })
   if (nuxt.options.builder as string !== '@nuxt/vite-builder') {
@@ -81,8 +91,9 @@ async function useNuxtViteConfig () {
       imports: stubbedComposables,
     })
   })
+
   return {
-    viteConfig: await new Promise<ViteConfig>((resolve) => {
+    viteConfig: await new Promise<ViteConfig>((resolve, reject) => {
       nuxt.hook('modules:done', () => {
         nuxt.hook('components:extend', (components) => {
           for (const name of ['NuxtLink']) {
@@ -94,12 +105,22 @@ async function useNuxtViteConfig () {
         })
         nuxt.hook('vite:extendConfig', (config, { isClient }) => {
           // @ts-ignore
-          if (isClient) resolve({ ...config })
+          if (isClient) {
+            resolve({ ...config })
+            throw new Error('_stop_')
+          }
         })
       })
-      nuxt.ready().then(async () => {
-        buildNuxt(nuxt)
-      })
+      nuxt.ready()
+        .then(() => buildNuxt(nuxt))
+        .catch(err => {
+          if (!err.toString().includes('_stop_')) {
+            reject(err)
+          }
+        })
+        .finally(() => {
+          nuxt.close()
+        })
     }),
     nuxt,
   }
