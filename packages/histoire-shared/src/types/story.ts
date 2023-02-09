@@ -5,6 +5,7 @@ export interface StoryFile {
   story: Story
   path: string[]
   filePath: string
+  docsFilePath?: string
   source: () => Promise<{ default: string }>
 }
 

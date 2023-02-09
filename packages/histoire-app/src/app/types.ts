@@ -1,4 +1,5 @@
-import type { RouteLocationRaw } from 'vue-router'
+import type { RouteLocationRaw, RouteLocationNormalizedLoaded } from 'vue-router'
+import type { Command } from '@histoire/shared'
 
 export type {
   StoryFile,
@@ -28,17 +29,22 @@ export type Tree = (TreeGroup | TreeFolder | TreeLeaf)[]
 
 export type SearchResultType = 'title' | 'docs'
 
-export interface SearchResult {
-  kind: 'story' | 'variant'
+export interface SearchResultBase {
+  kind: 'story' | 'variant' | 'command'
   rank: number
   id: string
   title: string
-  route: RouteLocationRaw
-  type: SearchResultType
   path?: string[]
   icon?: string
   iconColor?: string
+  type?: SearchResultType
 }
+
+export type SearchResult = SearchResultBase & ({
+  route: RouteLocationRaw
+} | {
+  onActivate: () => unknown
+})
 
 export interface PreviewSettings {
   responsiveWidth: number
@@ -49,10 +55,23 @@ export interface PreviewSettings {
   textDirection: 'ltr' | 'rtl'
 }
 
+export interface SearchCommand extends Command {
+  icon?: string
+  showIf?: (ctx: SearchCommandContext) => boolean
+  getParams?: (ctx: SearchCommandContext) => Record<string, any>
+  clientAction?: (params: Record<string, any>) => unknown
+}
+
+export interface SearchCommandContext {
+  route: RouteLocationNormalizedLoaded
+}
+
 declare module 'vue' {
   interface ComponentCustomProperties {
     __HISTOIRE_DEV__: boolean
   }
 }
 
-declare const __HISTOIRE_DEV__: boolean
+declare global {
+  const __HISTOIRE_DEV__: boolean
+}

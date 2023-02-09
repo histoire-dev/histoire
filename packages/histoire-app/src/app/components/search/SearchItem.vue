@@ -1,11 +1,12 @@
 <script lang="ts" setup>
 import { PropType, ref, toRefs } from 'vue'
 import { useRouter } from 'vue-router'
-import { Icon } from '@iconify/vue'
 import { SearchResult } from '../../types'
 import { onKeyboardShortcut } from '../../util/keyboard'
-import BaseListItemLink from '../base/BaseListItemLink.vue'
 import { useScrollOnActive } from '../../util/scroll'
+import BaseListItemLink from '../base/BaseListItemLink.vue'
+import BaseListItem from '../base/BaseListItem.vue'
+import SearchItemContent from './SearchItemContent.vue'
 
 const props = defineProps({
   result: {
@@ -32,18 +33,17 @@ const router = useRouter()
 
 onKeyboardShortcut(['enter'], () => {
   if (!props.selected) return
-  router.push(props.result.route)
-  emit('close')
+  action()
 })
 
-const defaultIcons = {
-  story: 'carbon:cube',
-  variant: 'carbon:cube',
-}
-
-const kindLabels = {
-  story: 'Story',
-  variant: 'Variant',
+function action (fromClick = false) {
+  if ('route' in props.result && !fromClick) {
+    router.push(props.result.route)
+  }
+  if ('onActivate' in props.result) {
+    props.result.onActivate()
+  }
+  emit('close')
 }
 </script>
 
@@ -55,52 +55,28 @@ const kindLabels = {
     :data-selected="selected ? '' : undefined"
   >
     <BaseListItemLink
+      v-if="'route' in result"
       :to="result.route"
       :is-active="selected"
       class="htw-px-6 htw-py-4 htw-gap-4"
-      @navigate="$emit('close')"
+      @navigate="action(true)"
     >
-      <Icon
-        :icon="result.icon ?? defaultIcons[result.kind]"
-        class="htw-w-4 htw-h-4"
-        :class="[
-          !selected ? [
-            result.iconColor
-              ?'bind-icon-color'
-              : {
-                'htw-text-primary-500': result.kind === 'story',
-                'htw-text-gray-500': result.kind === 'variant',
-              }
-          ] : [],
-        ]"
+      <SearchItemContent
+        :result="result"
+        :selected="selected"
       />
-      <div class="htw-flex-1">
-        <div class="htw-flex">
-          {{ result.title }}
-          <span class="htw-ml-auto htw-opacity-40">
-            {{ kindLabels[result.kind] }}
-          </span>
-        </div>
-
-        <div
-          v-if="result.path?.length"
-          class="htw-flex htw-items-center htw-gap-0.5 htw-opacity-60"
-        >
-          <div
-            v-for="(p, index) of result.path"
-            :key="index"
-            class="htw-flex htw-items-center htw-gap-0.5"
-          >
-            <Icon
-              v-if="index > 0"
-              icon="carbon:chevron-right"
-              class="htw-w-4 htw-h-4 htw-mt-0.5 htw-opacity-50"
-            />
-            <span>{{ p }}</span>
-          </div>
-        </div>
-      </div>
     </BaseListItemLink>
+
+    <BaseListItem
+      v-if="'onActivate' in result"
+      class="htw-px-6 htw-py-4 htw-gap-4"
+      @navigate="action(true)"
+    >
+      <SearchItemContent
+        :result="result"
+        :selected="selected"
+      />
+    </BaseListItem>
   </div>
 </template>
 

@@ -5,12 +5,14 @@ import { Icon } from '@iconify/vue'
 import * as flexsearch from 'flexsearch'
 import charset from 'flexsearch/dist/module/lang/latin/advanced.js'
 import language from 'flexsearch/dist/module/lang/en.js'
+import { useRoute } from 'vue-router'
 import { useStoryStore } from '../../stores/story'
 import BaseEmpty from '../base/BaseEmpty.vue'
-import type { SearchResult, SearchResultType, Story, Variant } from '../../types'
+import type { SearchCommand, SearchResult, SearchResultType, Story, Variant } from '../../types'
 import SearchItem from './SearchItem.vue'
 import { searchData, onUpdate } from './search-title-data'
 import type { SearchData } from './types'
+import { devCommands, executeCommand } from './dev-commands.js'
 
 const DocSearchData = () => import('./search-docs-data')
 
@@ -194,7 +196,6 @@ function storyResultFactory (story: Story, rank: number, type: SearchResultType 
     path: story.file.path.slice(0, -1),
     icon: story.icon,
     iconColor: story.iconColor,
-    type,
   }
 }
 
@@ -219,12 +220,50 @@ function variantResultFactory (story: Story, variant: Variant, rank: number, typ
     path: [...story.file.path ?? [], story.title],
     icon: variant.icon,
     iconColor: variant.iconColor,
-    type,
   }
 }
 
+// Commands
+
+const route = useRoute()
+
+const commandResults = computed(() => {
+  if (__HISTOIRE_DEV__) {
+    const showIfCtx = {
+      route,
+    }
+    const searchText = searchInputText.value.toLowerCase()
+    return devCommands
+      .filter(command => !command.showIf || command.showIf(showIfCtx))
+      .filter(command => command.label.toLowerCase().includes(searchText) || command.id.toLowerCase().includes(searchText))
+      .map((command) => commandResultFactory(command, 0))
+  }
+  return []
+})
+
+function commandResultFactory (command: SearchCommand, rank: number): SearchResult {
+  return {
+    kind: 'command',
+    rank,
+    id: `_command:${command.id}`,
+    title: command.label,
+    icon: command.icon ?? 'carbon:chevron-right',
+    onActivate: () => {
+      const params = command.getParams?.({
+        route,
+      }) ?? {}
+      executeCommand(command, params)
+    },
+  }
+}
+
+// Results
+
 const results = computed(() => {
-  const list = [...titleResults.value]
+  const list = [
+    ...commandResults.value,
+    ...titleResults.value,
+  ]
   const seen = {}
   for (const r of titleResults.value) {
     seen[r.id] = true

@@ -270,6 +270,16 @@ export async function getViteConfigWithPlugins (isServer: boolean, ctx: Context)
     },
   })
 
+  // Dev commands
+  plugins.push({
+    name: 'histoire:dev-commands',
+    configureServer (server) {
+      server.ws.on('histoire:dev-command', ({ id, params }) => {
+        // console.log('dev command', id, params)
+      })
+    },
+  })
+
   // Markdown
   plugins.push(...await createMarkdownPlugins(ctx))
 
