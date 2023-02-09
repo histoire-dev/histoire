@@ -1,10 +1,11 @@
 <script lang="ts" setup>
 import type { TextPrompt } from '@histoire/shared'
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 
 const props = defineProps<{
   modelValue?: string
   prompt: TextPrompt
+  answers: Record<string, any>
 }>()
 
 const emit = defineEmits<{
@@ -25,6 +26,20 @@ function focus () {
 
 defineExpose({
   focus,
+})
+
+// Default value
+
+const defaultValue = computed(() => {
+  if (typeof props.prompt.defaultValue === 'function') {
+    return props.prompt.defaultValue(props.answers)
+  } else {
+    return props.prompt.defaultValue
+  }
+})
+
+watch(defaultValue, (value) => {
+  model.value = value
 })
 </script>
 

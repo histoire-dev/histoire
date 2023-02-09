@@ -1,9 +1,11 @@
 <script lang="ts" setup>
-import { defineAsyncComponent, reactive, ref } from 'vue'
+import { reactive, ref, nextTick, onMounted } from 'vue'
 import type { ClientCommand } from '@histoire/shared'
 import { getCommandContext, executeCommand } from '../../util/commands.js'
 import BaseButton from '../base/BaseButton.vue'
 import BaseKeyboardShortcut from '../base/BaseKeyboardShortcut.vue'
+import PromptText from './PromptText.vue'
+import PromptSelect from './PromptSelect.vue'
 
 const props = defineProps<{
   command: ClientCommand
@@ -14,13 +16,21 @@ const emit = defineEmits<{
 }>()
 
 const promptTypes = {
-  text: defineAsyncComponent(() => import('./PromptText.vue')),
+  text: PromptText,
+  select: PromptSelect,
 }
 
 const answers = reactive<Record<string, any>>({})
 
+// Initial default values
 for (const prompt of props.command.prompts) {
-  answers[prompt.field] = prompt.defaultValue
+  let defaultValue
+  if (typeof prompt.defaultValue === 'function') {
+    defaultValue = prompt.defaultValue(answers)
+  } else {
+    defaultValue = prompt.defaultValue
+  }
+  answers[prompt.field] = defaultValue
 }
 
 function submit () {
@@ -38,59 +48,50 @@ function submit () {
 
 const promptComps = ref<any[]>([])
 
-function focusFirstPrompt () {
-  requestAnimationFrame(() => {
-    promptComps.value[0]?.focus?.()
+function focusPrompt (index: number) {
+  nextTick(() => {
+    promptComps.value[index]?.focus?.()
   })
 }
+
+onMounted(() => {
+  focusPrompt(0)
+})
 </script>
 
 <template>
-  <div>
-    <Suspense
-      :timeout="0"
-      @resolve="focusFirstPrompt()"
-    >
-      <form
-        class="htw-flex htw-flex-col"
-        @submit.prevent="submit()"
-        @keyup.escape="$emit('close')"
+  <form
+    class="htw-flex htw-flex-col"
+    @submit.prevent="submit()"
+    @keyup.escape="$emit('close')"
+  >
+    <div class="htw-p-4 htw-opacity-70">
+      {{ command.label }}
+    </div>
+
+    <component
+      :is="promptTypes[prompt.type]"
+      v-for="(prompt, index) of command.prompts"
+      :key="prompt.field"
+      ref="promptComps"
+      v-model="answers[prompt.field]"
+      :prompt="prompt"
+      :answers="answers"
+      :index="index"
+      class="hover:htw-bg-gray-500/10 focus-within:htw-bg-gray-500/5"
+      @next="focusPrompt(index + 1)"
+    />
+
+    <div class="htw-flex htw-justify-end htw-gap-2 htw-p-2">
+      <BaseButton
+        type="submit"
+        class="htw-px-4 htw-py-2 htw-flex htw-items-start htw-gap-2"
       >
-        <div class="htw-p-4 htw-opacity-70">
-          {{ command.label }}
-        </div>
-
-        <div
-          v-for="prompt of command.prompts"
-          :key="prompt.field"
-          class="hover:htw-bg-gray-500/10 focus-within:htw-bg-gray-500/10"
-        >
-          <component
-            :is="promptTypes[prompt.type]"
-            ref="promptComps"
-            v-model="answers[prompt.field]"
-            :prompt="prompt"
-          />
-        </div>
-
-        <div class="htw-flex htw-justify-end htw-gap-2 htw-p-2">
-          <BaseButton
-            type="submit"
-            class="htw-px-4 htw-py-2 htw-flex htw-items-start htw-gap-2"
-          >
-            <BaseKeyboardShortcut
-              shortcut="Enter"
-            />
-            <span>Submit</span>
-          </BaseButton>
-        </div>
-      </form>
-
-      <template #fallback>
-        <div class="htw-p-4">
-          Loading...
-        </div>
-      </template>
-    </Suspense>
-  </div>
+        <BaseKeyboardShortcut
+          shortcut="Enter"
+        />
+        <span>Submit</span>
+      </BaseButton>
+    </div>
+  </form>
 </template>

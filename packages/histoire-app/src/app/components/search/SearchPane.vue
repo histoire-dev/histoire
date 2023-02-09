@@ -15,6 +15,7 @@ import { searchData, onUpdate } from './search-title-data'
 import type { SearchData } from './types'
 import { builtinCommands, getCommandContext } from '../../util/commands.js'
 import { useCommandStore } from '../../stores/command.js'
+import { useSelection } from '../../util/select.js'
 
 const DocSearchData = () => import('./search-docs-data')
 
@@ -280,25 +281,11 @@ const results = computed(() => {
 
 // Selection
 
-const selectedIndex = ref(0)
-
-watch(results, () => {
-  selectedIndex.value = 0
-})
-
-function selectNext () {
-  selectedIndex.value++
-  if (selectedIndex.value > results.value.length - 1) {
-    selectedIndex.value = 0
-  }
-}
-
-function selectPrevious () {
-  selectedIndex.value--
-  if (selectedIndex.value < 0) {
-    selectedIndex.value = results.value.length - 1
-  }
-}
+const {
+  selectedIndex,
+  selectNext,
+  selectPrevious,
+} = useSelection(results)
 </script>
 
 <template>

@@ -5,14 +5,17 @@ export default {
   prompts: [
     {
       field: 'component',
-      label: 'Component',
+      label: 'Choose a component',
       type: 'select',
       options: async (search) => sendEvent('listVueComponents', { search }),
+      required: true,
     },
     {
-      field: 'title',
-      label: 'Story title',
+      field: 'fileName',
+      label: 'File name',
       type: 'text',
+      required: true,
+      defaultValue: (answers) => answers.component?.replace(/.+\/(.+?)\.vue$/, '$1.story.vue'),
     },
   ],
 } as ClientCommandOptions

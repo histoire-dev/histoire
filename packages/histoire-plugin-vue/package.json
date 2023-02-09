@@ -48,7 +48,9 @@
     "@histoire/controls": "^0.13.2",
     "@histoire/shared": "^0.13.2",
     "@histoire/vendors": "^0.13.2",
-    "globby": "^13.1.1"
+    "globby": "^13.1.1",
+    "launch-editor": "^2.6.0",
+    "pathe": "^0.2.0"
   },
   "devDependencies": {
     "@types/node": "^17.0.32",
