@@ -1,23 +1,19 @@
 <script lang="ts" setup>
 import { Icon } from '@iconify/vue'
-import type { Variant, Story } from '../../types'
+import { openInEditor } from '../../util/open-in-editor.js'
 
-const props = defineProps<{
-  variant: Variant
-  story: Story
+defineProps<{
+  file: string
+  tooltip: string
 }>()
-
-function openInEditor () {
-  fetch(`${import.meta.env.BASE_URL}__open-in-editor?file=${encodeURIComponent(props.story.file?.filePath)}`)
-}
 </script>
 
 <template>
   <a
-    v-tooltip="'Edit story in editor'"
+    v-tooltip="tooltip"
     target="_blank"
     class="histoire-toolbar-open-in-editor htw-flex htw-items-center htw-gap-1 htw-h-full htw-px-2 hover:htw-text-primary-500 htw-opacity-50 hover:htw-opacity-100 dark:hover:htw-text-primary-400 htw-text-gray-900 dark:htw-text-gray-100"
-    @click="openInEditor()"
+    @click="openInEditor(file)"
   >
     <Icon
       icon="carbon:script-reference"
@@ -25,9 +21,3 @@ function openInEditor () {
     />
   </a>
 </template>
-
-<style scoped>
-.histoire-toolbar-open-in-editor {
-  text: red;
-}
-</style>

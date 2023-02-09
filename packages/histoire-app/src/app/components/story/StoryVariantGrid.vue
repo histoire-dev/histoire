@@ -129,8 +129,8 @@ const columnCount = computed(() => Math.min(storyStore.currentStory.variants.len
 
       <DevOnlyToolbarOpenInEditor
         v-if="__HISTOIRE_DEV__"
-        :variant="storyStore.currentVariant"
-        :story="storyStore.currentStory"
+        :file="storyStore.currentStory.file?.filePath"
+        tooltip="Edit story in editor"
       />
     </div>
 

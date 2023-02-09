@@ -41,8 +41,8 @@ defineProps<{
 
       <DevOnlyToolbarOpenInEditor
         v-if="__HISTOIRE_DEV__"
-        :variant="variant"
-        :story="story"
+        :file="story.file?.filePath"
+        tooltip="Edit story in editor"
       />
     </div>
 

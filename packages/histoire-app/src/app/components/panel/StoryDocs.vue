@@ -1,9 +1,10 @@
 <script lang="ts">
-import { nextTick, PropType, Ref, ref, toRefs, watch, watchEffect } from 'vue'
+import { nextTick, PropType, Ref, ref, toRefs, watch, watchEffect, computed } from 'vue'
 import type { Story } from '../../types'
 // @ts-expect-error virtual module
 import { markdownFiles } from 'virtual:$histoire-markdown-files'
 import { histoireConfig } from '../../util/config.js'
+import DevOnlyToolbarOpenInEditor from '../toolbar/DevOnlyToolbarOpenInEditor.vue'
 
 export function useStoryDoc (story: Ref<Story>) {
   const renderedDoc = ref('')
@@ -55,6 +56,11 @@ const props = defineProps({
   story: {
     type: Object as PropType<Story>,
     required: true,
+  },
+
+  standalone: {
+    type: Boolean,
+    default: false,
   },
 })
 
@@ -148,6 +154,10 @@ watch(renderedDoc, () => {
 }, {
   immediate: true,
 })
+
+// Open in editor
+
+const filePath = computed(() => story.value.file?.docsFilePath ?? (props.standalone && story.value.file?.filePath))
 </script>
 
 <template>
@@ -155,6 +165,20 @@ watch(renderedDoc, () => {
     class="histoire-story-docs"
     @click.capture="onClick"
   >
+    <div
+      v-if="__HISTOIRE_DEV__ && renderedDoc && filePath"
+      class="htw-flex htw-items-center htw-gap-2 htw-p-2"
+      :class="{
+        'htw-pt-4': !standalone,
+      }"
+    >
+      <DevOnlyToolbarOpenInEditor
+        v-if="filePath"
+        :file="filePath"
+        tooltip="Edit docs in editor"
+      />
+    </div>
+
     <BaseEmpty
       v-if="!renderedDoc"
     >

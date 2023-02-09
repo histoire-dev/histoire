@@ -82,6 +82,7 @@ function scrollDocsToTop () {
     >
       <StoryDocs
         :story="storyStore.currentStory"
+        standalone
         class="md:htw-p-12 htw-w-full md:htw-max-w-[600px] lg:htw-max-w-[800px] xl:htw-max-w-[900px]"
         @scroll-top="scrollDocsToTop()"
       />

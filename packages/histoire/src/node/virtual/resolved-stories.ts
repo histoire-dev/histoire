@@ -13,6 +13,7 @@ export const resolvedStories = (ctx: Context) => {
         docsText: undefined,
       },
       supportPluginId: file.supportPluginId,
+      docsFilePath: file.markdownFile?.relativePath,
       index,
     }
   })
