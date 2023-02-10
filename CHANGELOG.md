@@ -1,19 +1,12 @@
 # [0.14.0](https://github.com/Akryum/histoire/compare/v0.13.2...v0.14.0) (2023-02-10)
 
 
-### Bug Fixes
-
-* open story path ([02de6fb](https://github.com/Akryum/histoire/commit/02de6fb89e0acb9e92abed6b373173e7363ea81e))
-
-
 ### Features
 
-* add unique classe names ([e133c55](https://github.com/Akryum/histoire/commit/e133c551eea443cd980db7d78fdebb9f6157c6a8))
 * docs open in editor button ([b2c6f5d](https://github.com/Akryum/histoire/commit/b2c6f5dad73e61c2532a4f140b565aca73734483))
-* finish on stage ([93d0c39](https://github.com/Akryum/histoire/commit/93d0c391583246e7bd5d2eaaa76d755af136d3bc))
-* open generated story in app ([93316e5](https://github.com/Akryum/histoire/commit/93316e57bcd9bc90b59413313819db525d70dc3c))
 * open in editor button ([da9b4a3](https://github.com/Akryum/histoire/commit/da9b4a3891b58ecc6cb5e9c531d8d2b543232fcf))
 * open in editor command in search ([c161d15](https://github.com/Akryum/histoire/commit/c161d15e2d1fb03e5f865d33a18f82336b9f8e45))
+* **vue3:** auto generate story from component ([162d05f](https://github.com/Akryum/histoire/commit/162d05f193043ead116e39d9e93fb30fd875a92c))
 
 
 
