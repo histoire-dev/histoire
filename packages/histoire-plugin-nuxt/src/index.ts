@@ -4,14 +4,14 @@ import type { Plugin } from 'histoire'
 import type { Nuxt } from '@nuxt/schema'
 import type { UserConfig as ViteConfig } from 'vite'
 
-const ignorePlugins = [
-  'nuxt:vite-node-server',
-  'nuxt:dev-style-ssr',
-  'nuxt:vite-relative-asset',
-  'nuxt:cache-dir',
-  'nuxt:dynamic-base-path',
-  'nuxt:import-protection',
-]
+// const ignorePlugins = [
+//   'nuxt:vite-node-server',
+//   'nuxt:dev-style-ssr',
+//   'nuxt:vite-relative-asset',
+//   'nuxt:cache-dir',
+//   'nuxt:dynamic-base-path',
+//   'nuxt:import-protection',
+// ]
 
 export function HstNuxt (): Plugin {
   let nuxt: Nuxt
@@ -21,7 +21,7 @@ export function HstNuxt (): Plugin {
     async defaultConfig () {
       const nuxtConfig = await useNuxtViteConfig()
       nuxt = nuxtConfig.nuxt
-      const plugins = nuxtConfig.viteConfig.plugins.filter((p: any) => !ignorePlugins.includes(p?.name))
+      // const plugins = nuxtConfig.viteConfig.plugins.filter((p: any) => !ignorePlugins.includes(p?.name))
       return {
         vite: {
           ...nuxtConfig.viteConfig,
@@ -77,20 +77,20 @@ async function useNuxtViteConfig () {
   if (nuxt.options.builder as string !== '@nuxt/vite-builder') {
     throw new Error(`Histoire only supports Vite bundler, but Nuxt builder is currently set to '${nuxt.options.builder}'.`)
   }
-  const runtimeDir = fileURLToPath(new URL('../runtime', import.meta.url))
-  nuxt.options.build.templates.push(
-    { src: join(runtimeDir, 'composables.mjs'), filename: 'histoire/composables.mjs' },
-    { src: join(runtimeDir, 'components.mjs'), filename: 'histoire/components.mjs' },
-  )
-  nuxt.hook('imports:sources', presets => {
-    const stubbedComposables = ['useNuxtApp']
-    const appPreset = presets.find(p => p.from === '#app')
-    appPreset.imports = appPreset.imports.filter(i => typeof i !== 'string' || !stubbedComposables.includes(i))
-    presets.push({
-      from: '#build/histoire/composables.mjs',
-      imports: stubbedComposables,
-    })
-  })
+  // const runtimeDir = fileURLToPath(new URL('../runtime', import.meta.url))
+  // nuxt.options.build.templates.push(
+  //   { src: join(runtimeDir, 'composables.mjs'), filename: 'histoire/composables.mjs' },
+  //   { src: join(runtimeDir, 'components.mjs'), filename: 'histoire/components.mjs' },
+  // )
+  // nuxt.hook('imports:sources', presets => {
+  //   const stubbedComposables = ['useNuxtApp']
+  //   const appPreset = presets.find(p => p.from === '#app')
+  //   appPreset.imports = appPreset.imports.filter(i => typeof i !== 'string' || !stubbedComposables.includes(i))
+  //   presets.push({
+  //     from: '#build/histoire/composables.mjs',
+  //     imports: stubbedComposables,
+  //   })
+  // })
 
   return {
     viteConfig: await new Promise<ViteConfig>((resolve, reject) => {
