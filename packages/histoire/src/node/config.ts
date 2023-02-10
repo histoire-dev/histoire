@@ -50,6 +50,7 @@ export function getDefaultConfig (): HistoireConfig {
       },
       defaultColorScheme: 'auto',
       storeColorScheme: true,
+      darkClass: 'dark',
     },
     responsivePresets: [
       {

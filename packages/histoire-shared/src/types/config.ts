@@ -128,6 +128,10 @@ export interface HistoireConfig {
      * Enable persistence of the color scheme in the browser.
      */
     storeColorScheme?: boolean
+    /**
+     * Class added to the story preview when dark mode is enabled.
+     */
+    darkClass?: string
   }
   /**
    * Setup file exporting a default function executed when setting up each story preview.
@@ -174,6 +178,7 @@ export interface HistoireConfig {
   autoApplyContrastColor?: boolean
   /**
    * Class added to the html root of the story preview when dark mode is enabled.
+   * @deprecated use `theme.darkClass` instead
    */
   sandboxDarkClass?: string
   /**

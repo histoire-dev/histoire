@@ -72,4 +72,8 @@ defineProps({
   font-size: 12px;
   padding: 2px 4px;
 }
+
+.my-dark .btn {
+  color: black;
+}
 </style>
