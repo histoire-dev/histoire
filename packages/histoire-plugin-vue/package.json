@@ -31,14 +31,14 @@
       "default": "./src/client/server.ts"
     },
     ".": {
-      "types": "./dist/index.d.ts",
+      "types": "./dist/index.node.d.ts",
       "node": "./dist/index.node.js",
       "default": "./dist/index.js"
     },
     "./*": "./*"
   },
   "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "types": "dist/index.node.d.ts",
   "scripts": {
     "build": "rimraf dist && vite build && tsc -d -P tsconfig.build.json && pnpm run build:types",
     "build:types": "tsc --declaration --emitDeclarationOnly",
