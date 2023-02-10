@@ -1,6 +1,6 @@
 {
   "name": "@histoire/plugin-svelte",
-  "version": "0.13.2",
+  "version": "0.14.0",
   "description": "Histoire plugin for Svelte support",
   "license": "MIT",
   "author": {
@@ -38,9 +38,9 @@
     "watch": "concurrently \"vite build --watch\" \"pnpm run build:types --watch\""
   },
   "dependencies": {
-    "@histoire/controls": "^0.13.2",
-    "@histoire/shared": "^0.13.2",
-    "@histoire/vendors": "^0.13.2"
+    "@histoire/controls": "^0.14.0",
+    "@histoire/shared": "^0.14.0",
+    "@histoire/vendors": "^0.14.0"
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^1.0.1",
@@ -55,7 +55,7 @@
     "vite": "^4.1.0"
   },
   "peerDependencies": {
-    "histoire": "^0.13.2",
+    "histoire": "^0.14.0",
     "svelte": "^3.0.0"
   }
 }
