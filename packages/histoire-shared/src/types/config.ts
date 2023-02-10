@@ -201,7 +201,7 @@ export interface HistoireConfig {
   /**
    * Transpile dependencies when collecting stories on Node.js
    */
-  viteNodeInlineDeps?: RegExp[]
+  viteNodeInlineDeps?: (string | RegExp)[]
   /**
    * Determine the transform method of modules
    */

@@ -5,6 +5,7 @@ import {
 import type { App } from 'h3'
 import { createApp, toNodeListener } from 'h3'
 import { createFetch } from 'ofetch'
+import { isCollecting } from 'histoire/client'
 
 export async function setupNuxtApp () {
   const win = window as unknown as Window & {
@@ -42,17 +43,19 @@ export async function setupNuxtApp () {
 
   const h3App = createApp()
 
-  // @ts-expect-error TODO: fix in h3
-  const localCall = createCall(toNodeListener(h3App))
-  const localFetch = createLocalFetch(localCall, globalThis.fetch)
-
   const registry = new Set<string>()
 
-  win.fetch = (init: string, options?: any) => {
-    if (typeof init === 'string' && registry.has(init)) {
-      init = '/_' + init
+  if (isCollecting()) {
+    // @ts-expect-error TODO: fix in h3
+    const localCall = createCall(toNodeListener(h3App))
+    const localFetch = createLocalFetch(localCall, globalThis.fetch)
+
+    win.fetch = (init: string, options?: any) => {
+      if (typeof init === 'string' && registry.has(init)) {
+        init = '/_' + init
+      }
+      return localFetch(init, options)
     }
-    return localFetch(init, options)
   }
 
   win.$fetch = createFetch({ fetch: win.fetch, Headers: win.Headers as any })

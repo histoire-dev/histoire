@@ -4,14 +4,14 @@ import type { Plugin } from 'histoire'
 import type { Nuxt } from '@nuxt/schema'
 import type { UserConfig as ViteConfig } from 'vite'
 
-// const ignorePlugins = [
-//   'nuxt:vite-node-server',
-//   'nuxt:dev-style-ssr',
-//   'nuxt:vite-relative-asset',
-//   'nuxt:cache-dir',
-//   'nuxt:dynamic-base-path',
-//   'nuxt:import-protection',
-// ]
+const ignorePlugins = [
+  'nuxt:vite-node-server',
+  'nuxt:dev-style-ssr',
+  'nuxt:vite-relative-asset',
+  'nuxt:cache-dir',
+  'nuxt:dynamic-base-path',
+  'nuxt:import-protection',
+]
 
 export function HstNuxt (): Plugin {
   let nuxt: Nuxt
@@ -19,33 +19,41 @@ export function HstNuxt (): Plugin {
     name: '@histoire/plugin-nuxt',
 
     async defaultConfig () {
-      const nuxtConfig = await useNuxtViteConfig()
-      nuxt = nuxtConfig.nuxt
-      // const plugins = nuxtConfig.viteConfig.plugins.filter((p: any) => !ignorePlugins.includes(p?.name))
+      const { nuxt, viteConfig } = await useNuxtViteConfig()
+      console.log(viteConfig)
+      const plugins = viteConfig.plugins.filter((p: any) => !ignorePlugins.includes(p?.name))
       return {
         vite: {
-          ...nuxtConfig.viteConfig,
+          // ...viteConfig,
           server: {
-            ...nuxtConfig.viteConfig.server,
+            ...viteConfig.server,
             middlewareMode: false,
           },
-          // define: nuxtConfig.viteConfig.define,
-          // resolve: {
-          //   alias: nuxtConfig.viteConfig.resolve.alias,
-          //   extensions: nuxtConfig.viteConfig.resolve.extensions,
-          //   dedupe: nuxtConfig.viteConfig.resolve.dedupe,
-          // },
-          // plugins,
-          // css: nuxtConfig.viteConfig.css,
-          // publicDir: nuxtConfig.viteConfig.publicDir,
-          // optimizeDeps: nuxtConfig.viteConfig.optimizeDeps,
-          // // @ts-expect-error Vue-specific config
-          // vue: nuxtConfig.viteConfig.vue,
+          define: viteConfig.define,
+          resolve: {
+            alias: viteConfig.resolve.alias,
+            extensions: viteConfig.resolve.extensions,
+            dedupe: viteConfig.resolve.dedupe,
+          },
+          plugins,
+          css: viteConfig.css,
+          publicDir: viteConfig.publicDir,
+          optimizeDeps: viteConfig.optimizeDeps,
+          // @ts-expect-error Vue-specific config
+          vue: viteConfig.vue,
+          logLevel: 'info',
         },
         setupCode: [
           `${nuxt.options.css.map(file => `import '${file}'`).join('\n')}`,
           `import { setupNuxtApp } from '@histoire/plugin-nuxt/dist/runtime/app-setup.js'
           setupNuxtApp()`,
+        ],
+        viteNodeInlineDeps: [
+          /\/(nuxt|nuxt3)\//,
+          /^#/,
+          ...(nuxt.options.build.transpile.filter(
+            r => typeof r === 'string' || r instanceof RegExp,
+          ) as Array<string | RegExp>),
         ],
       }
     },
@@ -65,6 +73,7 @@ export function HstNuxt (): Plugin {
 async function useNuxtViteConfig () {
   const { loadNuxt, buildNuxt } = await import('@nuxt/kit')
   const nuxt = await loadNuxt({
+    // cwd: process.cwd(),
     ready: false,
     dev: true,
     overrides: {
@@ -77,20 +86,20 @@ async function useNuxtViteConfig () {
   if (nuxt.options.builder as string !== '@nuxt/vite-builder') {
     throw new Error(`Histoire only supports Vite bundler, but Nuxt builder is currently set to '${nuxt.options.builder}'.`)
   }
-  // const runtimeDir = fileURLToPath(new URL('../runtime', import.meta.url))
-  // nuxt.options.build.templates.push(
-  //   { src: join(runtimeDir, 'composables.mjs'), filename: 'histoire/composables.mjs' },
-  //   { src: join(runtimeDir, 'components.mjs'), filename: 'histoire/components.mjs' },
-  // )
-  // nuxt.hook('imports:sources', presets => {
-  //   const stubbedComposables = ['useNuxtApp']
-  //   const appPreset = presets.find(p => p.from === '#app')
-  //   appPreset.imports = appPreset.imports.filter(i => typeof i !== 'string' || !stubbedComposables.includes(i))
-  //   presets.push({
-  //     from: '#build/histoire/composables.mjs',
-  //     imports: stubbedComposables,
-  //   })
-  // })
+  const runtimeDir = fileURLToPath(new URL('../runtime', import.meta.url))
+  nuxt.options.build.templates.push(
+    { src: join(runtimeDir, 'composables.mjs'), filename: 'histoire/composables.mjs' },
+    { src: join(runtimeDir, 'components.mjs'), filename: 'histoire/components.mjs' },
+  )
+  nuxt.hook('imports:sources', presets => {
+    const stubbedComposables = ['useNuxtApp']
+    const appPreset = presets.find(p => p.from === '#app')
+    appPreset.imports = appPreset.imports.filter(i => typeof i !== 'string' || !stubbedComposables.includes(i))
+    presets.push({
+      from: '#build/histoire/composables.mjs',
+      imports: stubbedComposables,
+    })
+  })
 
   return {
     viteConfig: await new Promise<ViteConfig>((resolve, reject) => {
@@ -107,19 +116,23 @@ async function useNuxtViteConfig () {
           // @ts-ignore
           if (isClient) {
             resolve({ ...config })
-            throw new Error('_stop_')
+            // throw new Error('_stop_')
           }
         })
       })
+      // nuxt.hook('vite:extendConfig', (config, { isClient }) => {
+      //   // @ts-ignore
+      //   if (isClient) {
+      //     resolve({ ...config })
+      //     throw new Error('_stop_')
+      //   }
+      // })
       nuxt.ready()
         .then(() => buildNuxt(nuxt))
         .catch(err => {
           if (!err.toString().includes('_stop_')) {
             reject(err)
           }
-        })
-        .finally(() => {
-          nuxt.close()
         })
     }),
     nuxt,
