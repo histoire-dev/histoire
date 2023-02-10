@@ -23,7 +23,7 @@ export default {
     const index = params.component.lastIndexOf('/')
     const dirname = params.component.substring(0, index + 1)
     const file = `${dirname}${params.fileName}`
-    const storyId = paramCase(file).toLowerCase()
+    const storyId = paramCase(file.toLowerCase())
     openStory(storyId)
   },
 } as ClientCommandOptions
