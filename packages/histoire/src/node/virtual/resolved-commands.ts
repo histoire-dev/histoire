@@ -7,7 +7,6 @@ export const resolvedCommands = (ctx: Context) => {
   const imports: string[] = []
   const commands: string[] = []
 
-  const uid = 0
   for (const command of ctx.registeredCommands) {
     const fields = getCommandFields(command, imports)
     commands.push(`{
