@@ -26,6 +26,7 @@ export function useCollectStories (options: UseCollectStoriesOptions, ctx: Conte
     deps: {
       inline: [
         /histoire\/dist/,
+        /histoire\/client/,
         /@histoire\/[\w\d-]+\/dist/,
         /histoire-[\w\d-]+\/dist/,
         /@vue\/devtools-api/,
