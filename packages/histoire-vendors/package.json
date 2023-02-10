@@ -27,8 +27,7 @@
   },
   "sideEffects": false,
   "scripts": {
-    "build": "rimraf dist && rollup -c rollup.config.mjs",
-    "watch": "rollup -c rollup.config.mjs"
+    "build": "rimraf dist && rollup -c rollup.config.mjs"
   },
   "devDependencies": {
     "@iconify/vue": "^3.2.1",

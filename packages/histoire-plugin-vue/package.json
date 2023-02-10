@@ -32,27 +32,30 @@
     },
     ".": {
       "types": "./dist/index.d.ts",
-      "default": "./dist/bundled/index.js"
+      "node": "./dist/index.node.js",
+      "default": "./dist/index.js"
     },
     "./*": "./*"
   },
-  "main": "dist/bundled/index.js",
+  "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "rimraf dist && vite build && pnpm run build:types",
+    "build": "rimraf dist && vite build && tsc -d -P tsconfig.build.json && pnpm run build:types",
     "build:types": "tsc --declaration --emitDeclarationOnly",
-    "watch": "concurrently \"vite build --watch\" \"pnpm run build:types --watch\""
+    "watch": "concurrently \"vite build --watch\" \"tsc -d -P tsconfig.build.json --watch\" \"pnpm run build:types --watch\""
   },
   "dependencies": {
     "@histoire/controls": "^0.13.2",
     "@histoire/shared": "^0.13.2",
-    "@histoire/vendors": "^0.13.2"
+    "@histoire/vendors": "^0.13.2",
+    "globby": "^13.1.1",
+    "launch-editor": "^2.6.0",
+    "pathe": "^0.2.0"
   },
   "devDependencies": {
     "@types/node": "^17.0.32",
     "change-case": "^4.1.2",
     "concurrently": "^7.1.0",
-    "globby": "^13.1.1",
     "typescript": "^4.9.5",
     "histoire": "workspace:*",
     "vite": "^4.1.0",

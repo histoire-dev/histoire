@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { Icon } from '@iconify/vue'
+import BaseIcon from '../base/BaseIcon.vue'
 import type { SearchResult } from '../../types.js'
 
 defineProps<{
@@ -20,7 +21,7 @@ const kindLabels = {
 </script>
 
 <template>
-  <Icon
+  <BaseIcon
     :icon="result.icon ?? defaultIcons[result.kind]"
     class="htw-w-4 htw-h-4"
     :class="[
@@ -32,6 +33,9 @@ const kindLabels = {
             'htw-text-gray-500': result.kind === 'variant',
           }
       ] : [],
+      {
+        'colorize-black': selected,
+      }
     ]"
   />
   <div class="htw-flex-1">

@@ -7,7 +7,7 @@ import { getViteConfigWithPlugins } from './vite.js'
 import * as VirtualFiles from './virtual/index.js'
 import { onStoryChange, onStoryListChange, watchStories } from './stories.js'
 import { useCollectStories } from './collect/index.js'
-import { DevPluginApi } from './plugin.js'
+import { DevPluginApi, DevEventPluginApi } from './plugin.js'
 import { useModuleLoader } from './load.js'
 import { wrapLogError } from './util/log.js'
 import { createMarkdownFilesWatcher, onMarkdownListChange } from './markdown.js'
@@ -59,6 +59,20 @@ export async function createServer (ctx: Context, options: CreateServerOptions =
       await plugin.onDev(api, onCleanup)
     }
   }
+
+  // Custom dev events
+  server.ws.on(`histoire:dev-event`, async ({ event, payload }) => {
+    for (const plugin of ctx.config.plugins) {
+      if (plugin.onDevEvent) {
+        const api = new DevEventPluginApi(ctx, plugin, moduleLoader, event, payload)
+        const result = await plugin.onDevEvent(api)
+        if (!event.startsWith('on') && result !== undefined) {
+          server.ws.send(`histoire:dev-event-result`, { event, result })
+          break
+        }
+      }
+    }
+  })
 
   // Wait for pre-bundling (in `listen()`)
   await server.listen(options.port ?? server.config.server?.port)

@@ -5,6 +5,7 @@
     "moduleResolution": "node",
     "outDir": "dist",
     "rootDir": "src",
+    "baseUrl": ".",
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "removeComments": false,
@@ -24,6 +25,16 @@
     "strictFunctionTypes": true,
     // Volar
     "jsx": "preserve",
+    // Alias
+    "paths": {
+      "floating-vue": ["node_modules/@histoire/vendors/floating-vue"],
+      "@iconify/vue": ["node_modules/@histoire/vendors/iconify"],
+      "pinia": ["node_modules/@histoire/vendors/pinia"],
+      "scroll-into-view-if-needed": ["node_modules/@histoire/vendors/scroll"],
+      "vue-router": ["node_modules/@histoire/vendors/vue-router"],
+      "@vueuse/core": ["node_modules/@histoire/vendors/vue-use"],
+      "vue": ["node_modules/@histoire/vendors/vue"]
+    }
   },
   "include": [
     "src"

@@ -59,6 +59,9 @@ export const createVirtualFilesPlugin = (ctx: Context, isServer: boolean) => ({
     if (id.startsWith(VirtualFiles.MARKDOWN_FILES)) {
       return VirtualFiles.RESOLVED_MARKDOWN_FILES
     }
+    if (id.startsWith(VirtualFiles.COMMANDS)) {
+      return VirtualFiles.RESOLVED_COMMANDS
+    }
     if (id.startsWith('virtual:story:')) {
       return `\0${id}`
     }
@@ -118,6 +121,10 @@ export const createVirtualFilesPlugin = (ctx: Context, isServer: boolean) => ({
 
     if (id === VirtualFiles.RESOLVED_MARKDOWN_FILES) {
       return VirtualFiles.resolvedMarkdownFiles(ctx)
+    }
+
+    if (id === VirtualFiles.RESOLVED_COMMANDS) {
+      return VirtualFiles.resolvedCommands(ctx)
     }
 
     if (id.startsWith('\0virtual:story:')) {

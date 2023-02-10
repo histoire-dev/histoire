@@ -9,5 +9,5 @@ export function makeTooltip (descriptionHtml: string, keyboardShortcut: ({ isMac
 }
 
 function genKeyboardShortcutHtml (shortcut: string) {
-  return shortcut.split('+').map(k => k.trim()).map(key => `<span class="htw-bg-gray-500 htw-border-b-2 htw-border-gray-600 htw-px-1 htw-rounded-sm">${formatKey(key)}</span>`).join('')
+  return `<span class="htw-border htw-border-gray-600 htw-px-1 htw-rounded-sm htw-text-gray-400">${shortcut.split('+').map(k => formatKey(k.trim())).join(' ')}</span>`
 }

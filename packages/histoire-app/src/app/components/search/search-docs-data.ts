@@ -1,5 +1,4 @@
 import { markRaw } from 'vue'
-// @ts-expect-error virtual module
 import { searchData as _searchData, onUpdate as _onUpdate } from 'virtual:$histoire-search-docs-data'
 import type { SearchData } from './types.js'
 

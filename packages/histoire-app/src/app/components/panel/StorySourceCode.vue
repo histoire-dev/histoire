@@ -4,7 +4,6 @@ import { Icon } from '@iconify/vue'
 import { getHighlighter, Highlighter } from 'shiki-es'
 import { HstCopyIcon } from '@histoire/controls'
 import { unindent } from '@histoire/shared'
-// @ts-expect-error virtual module
 import { clientSupportPlugins } from 'virtual:$histoire-support-plugins-client'
 import type { Variant, Story } from '../../types'
 import { isDark } from '../../util/dark'

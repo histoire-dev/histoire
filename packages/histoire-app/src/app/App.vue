@@ -5,7 +5,6 @@ export default {
 </script>
 
 <script lang="ts" setup>
-// @ts-expect-error virtual module
 import { files as rawFiles, tree as rawTree, onUpdate } from 'virtual:$histoire-stories'
 import StoryList from './components/tree/StoryList.vue'
 import BaseSplitPane from './components/base/BaseSplitPane.vue'
@@ -18,8 +17,10 @@ import { useTitle } from '@vueuse/core'
 import { histoireConfig } from './util/config'
 import { onKeyboardShortcut } from './util/keyboard'
 import { isMobile } from './util/responsive'
+import { useCommandStore } from './stores/command'
 import Breadcrumb from './components/app/Breadcrumb.vue'
 import SearchModal from './components/search/SearchModal.vue'
+import CommandPromptsModal from './components/command/CommandPromptsModal.vue'
 import InitialLoading from './components/app/InitialLoading.vue'
 import GenericMountStory from './components/story/GenericMountStory.vue'
 
@@ -89,6 +90,8 @@ const mounted = ref(false)
 onMounted(() => {
   mounted.value = true
 })
+
+const commandStore = useCommandStore()
 </script>
 
 <template>
@@ -152,6 +155,12 @@ onMounted(() => {
       v-if="loadSearch"
       :shown="isSearchOpen"
       @close="isSearchOpen = false"
+    />
+
+    <CommandPromptsModal
+      v-if="__HISTOIRE_DEV__"
+      :shown="commandStore.showPromptsModal"
+      @close="commandStore.showPromptsModal = false"
     />
   </div>
 

@@ -11,6 +11,10 @@ import type {
   HistoireConfig,
   ConfigMode,
 } from './config.js'
+import type {
+  PluginCommand,
+} from './command.js'
+import type { Awaitable } from '../type-utils.js'
 
 export interface SupportPlugin {
   id: string
@@ -42,7 +46,10 @@ export interface PluginApiBase {
   warn: (...msg) => void
   error: (...msg) => void
 
+  getStories (): ServerStory[]
   addStoryFile: (file: string) => void
+
+  getConfig (): HistoireConfig
 }
 
 export interface PluginApiDev extends PluginApiBase {
@@ -58,6 +65,11 @@ export interface PluginApiBuild extends PluginApiBase {
 
   onBuildEnd: (cb: BuildEndCallback) => void
   onPreviewStory: (cb: PreviewStoryCallback) => void
+}
+
+export interface PluginApiDevEvent extends PluginApiBase {
+  event: string
+  payload: any
 }
 
 export interface Plugin {
@@ -100,4 +112,12 @@ export interface Plugin {
    * This plugin exposes a support plugin (example: Vue, Svelte, etc.)
    */
   supportPlugin?: SupportPlugin
+  /**
+   * This plugin exposes commands that can be executed from the search bar in development mode.
+   */
+  commands?: PluginCommand[]
+  /**
+   * Handle a custom event from the client in development mode.
+   */
+  onDevEvent?: (api: PluginApiDevEvent) => Awaitable<any>
 }

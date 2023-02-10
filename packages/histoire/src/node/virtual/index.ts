@@ -32,9 +32,13 @@ export const RESOLVED_SUPPORT_PLUGINS_COLLECT = `/__resolved__${SUPPORT_PLUGINS_
 export const MARKDOWN_FILES = 'virtual:$histoire-markdown-files'
 export const RESOLVED_MARKDOWN_FILES = `/__resolved__${MARKDOWN_FILES}`
 // export const RESOLVED_MARKDOWN_FILES = `\0${MARKDOWN_FILES}`
+// @TODO virtual module id
+export const COMMANDS = 'virtual:$histoire-commands'
+export const RESOLVED_COMMANDS = `/__resolved__${COMMANDS}`
 
 export * from './markdown.js'
 export * from './noop.js'
+export * from './resolved-commands.js'
 export * from './resolved-config.js'
 export * from './resolved-generated-global-setup.js'
 export * from './resolved-generated-setup-code.js'

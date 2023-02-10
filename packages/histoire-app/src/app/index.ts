@@ -4,8 +4,9 @@ import { createPinia } from 'pinia'
 import FloatingVue from 'floating-vue'
 import App from './App.vue'
 import { router } from './router'
+import { setupPluginApi } from './plugin.js'
 
-export function mountMainApp () {
+export async function mountMainApp () {
   const app = createApp(App)
   app.use(createPinia())
   app.use(FloatingVue, {
@@ -26,5 +27,8 @@ export function mountMainApp () {
 
   if (import.meta.hot) {
     import.meta.hot.send('histoire:mount', {})
+
+    // eslint-disable-next-line spaced-comment
+    /*#__PURE__*/ setupPluginApi()
   }
 }
