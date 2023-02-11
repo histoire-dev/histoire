@@ -48,7 +48,6 @@ export default defineConfig({
       input: [
         'src/client/index.ts',
         'src/collect/index.ts',
-        'src/index.ts',
       ],
 
       output: {

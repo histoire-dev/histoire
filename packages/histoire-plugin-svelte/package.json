@@ -25,22 +25,26 @@
       "default": "./dist/collect/index.js"
     },
     ".": {
-      "types": "./dist/index.d.ts",
+      "types": "./dist/index.node.d.ts",
+      "node": "./dist/index.node.js",
       "default": "./dist/index.js"
     },
     "./*": "./*"
   },
   "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "types": "dist/index.node.d.ts",
   "scripts": {
-    "build": "rimraf dist && vite build && pnpm run build:types",
+    "build": "rimraf dist && vite build && tsc -d -P tsconfig.build.json && pnpm run build:types",
     "build:types": "tsc --declaration --emitDeclarationOnly",
-    "watch": "concurrently \"vite build --watch\" \"pnpm run build:types --watch\""
+    "watch": "concurrently \"vite build --watch\" \"tsc -d -P tsconfig.build.json --watch\" \"pnpm run build:types --watch\""
   },
   "dependencies": {
     "@histoire/controls": "^0.14.1",
     "@histoire/shared": "^0.14.1",
-    "@histoire/vendors": "^0.14.1"
+    "@histoire/vendors": "^0.14.1",
+    "change-case": "^4.1.2",
+    "launch-editor": "^2.6.0",
+    "pathe": "^0.2.0"
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^1.0.1",
