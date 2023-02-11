@@ -1,3 +1,17 @@
+## [0.14.2](https://github.com/Akryum/histoire/compare/v0.14.1...v0.14.2) (2023-02-11)
+
+
+### Bug Fixes
+
+* **vue3:** move change-case to deps ([905d004](https://github.com/Akryum/histoire/commit/905d004da80e1df47168f60814ae81cb980c01d5))
+
+
+### Features
+
+* **svelte:** auto generate story file from component ([007c31c](https://github.com/Akryum/histoire/commit/007c31ccdde3629b7cf78bf36b3bce49251a62b7))
+
+
+
 ## [0.14.1](https://github.com/Akryum/histoire/compare/v0.14.0...v0.14.1) (2023-02-10)
 
 
