@@ -20,7 +20,6 @@ export function HstNuxt (): Plugin {
 
     async defaultConfig () {
       const { nuxt, viteConfig } = await useNuxtViteConfig()
-      console.log(viteConfig)
       const plugins = viteConfig.plugins.filter((p: any) => !ignorePlugins.includes(p?.name))
       return {
         vite: {
