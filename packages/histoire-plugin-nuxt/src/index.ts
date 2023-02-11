@@ -24,9 +24,11 @@ export function HstNuxt (): Plugin {
       const plugins = viteConfig.plugins.filter((p: any) => !ignorePlugins.includes(p?.name))
       return {
         vite: {
-          // ...viteConfig,
           server: {
-            ...viteConfig.server,
+            watch: viteConfig.server.watch,
+            fs: {
+              allow: viteConfig.server.fs.allow,
+            },
             middlewareMode: false,
           },
           define: viteConfig.define,
@@ -46,7 +48,9 @@ export function HstNuxt (): Plugin {
         setupCode: [
           `${nuxt.options.css.map(file => `import '${file}'`).join('\n')}`,
           `import { setupNuxtApp } from '@histoire/plugin-nuxt/dist/runtime/app-setup.js'
-          setupNuxtApp()`,
+export async function setupVue3 () {
+  await setupNuxtApp()
+}`,
         ],
         viteNodeInlineDeps: [
           /\/(nuxt|nuxt3)\//,
@@ -116,17 +120,9 @@ async function useNuxtViteConfig () {
           // @ts-ignore
           if (isClient) {
             resolve({ ...config })
-            // throw new Error('_stop_')
           }
         })
       })
-      // nuxt.hook('vite:extendConfig', (config, { isClient }) => {
-      //   // @ts-ignore
-      //   if (isClient) {
-      //     resolve({ ...config })
-      //     throw new Error('_stop_')
-      //   }
-      // })
       nuxt.ready()
         .then(() => buildNuxt(nuxt))
         .catch(err => {

@@ -1,7 +1,3 @@
-import {
-  createCall,
-  createFetch as createLocalFetch,
-} from 'unenv/runtime/fetch/index'
 import type { App } from 'h3'
 import { createApp, toNodeListener } from 'h3'
 import { createFetch } from 'ofetch'
@@ -46,6 +42,10 @@ export async function setupNuxtApp () {
   const registry = new Set<string>()
 
   if (isCollecting()) {
+    const {
+      createCall,
+      createFetch: createLocalFetch,
+    } = await import('unenv/runtime/fetch/index')
     // @ts-expect-error TODO: fix in h3
     const localCall = createCall(toNodeListener(h3App))
     const localFetch = createLocalFetch(localCall, globalThis.fetch)
