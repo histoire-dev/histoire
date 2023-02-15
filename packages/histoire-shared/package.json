@@ -1,6 +1,6 @@
 {
   "name": "@histoire/shared",
-  "version": "0.15.1",
+  "version": "0.15.2",
   "description": "Shared utilities for Histoire",
   "license": "MIT",
   "author": {
@@ -29,7 +29,7 @@
     "watch": "tsc -d -w --sourceMap"
   },
   "dependencies": {
-    "@histoire/vendors": "^0.15.1",
+    "@histoire/vendors": "^0.15.2",
     "@types/fs-extra": "^9.0.13",
     "@types/markdown-it": "^12.2.3",
     "chokidar": "^3.5.3",

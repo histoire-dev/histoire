@@ -1,3 +1,17 @@
+## [0.15.2](https://github.com/Akryum/histoire/compare/v0.15.1...v0.15.2) (2023-02-15)
+
+
+### Bug Fixes
+
+* **controls:** mark value props as optional ([328f7c6](https://github.com/Akryum/histoire/commit/328f7c629c877f29ddd8b97968122dc5eb1f9039))
+
+
+### Features
+
+* grid copy icon button ([6a3aa4b](https://github.com/Akryum/histoire/commit/6a3aa4b2a070ea67f3bf40a410039c9349286835))
+
+
+
 ## [0.15.1](https://github.com/Akryum/histoire/compare/v0.15.0...v0.15.1) (2023-02-15)
 
 
