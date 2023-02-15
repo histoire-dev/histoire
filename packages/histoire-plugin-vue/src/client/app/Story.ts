@@ -84,16 +84,16 @@ export default defineComponent({
           if (!props.variant) {
             continue
           }
-          if (!vnode.props.initState && !vnode.props['init-state']) {
+          if (!vnode.props?.initState && !vnode.props?.['init-state']) {
             props.initState = this.initState
           }
           for (const attr in this.$attrs) {
-            if (typeof vnode.props[attr] === 'undefined') {
+            if (typeof vnode.props?.[attr] === 'undefined') {
               props[attr] = this.$attrs[attr]
             }
           }
           for (const attr in this.story) {
-            if (!omitInheritStoryProps.includes(attr) && typeof vnode.props[attr] === 'undefined') {
+            if (!omitInheritStoryProps.includes(attr) && typeof vnode.props?.[attr] === 'undefined') {
               props[attr] = this.story[attr]
             }
           }
