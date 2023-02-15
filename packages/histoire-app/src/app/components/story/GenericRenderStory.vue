@@ -17,9 +17,7 @@ const mountComponent = ref(null)
 
 watchEffect(async () => {
   const clientPlugin = clientSupportPlugins[props.story.file?.supportPluginId]
-  console.log(props.story.file?.supportPluginId, clientPlugin)
   if (clientPlugin) {
-    console.log(clientPlugin)
     try {
       const pluginModule = await clientPlugin()
       mountComponent.value = markRaw(pluginModule.RenderStory)
