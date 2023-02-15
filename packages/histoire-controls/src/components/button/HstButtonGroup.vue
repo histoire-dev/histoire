@@ -12,7 +12,7 @@ import HstButton from './HstButton.vue'
 
 const props = defineProps<{
   title?: string
-  modelValue: string
+  modelValue?: string
   options: string[] | number[] | HstControlOption[] | Record<string, string | number>
 }>()
 

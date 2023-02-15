@@ -8,7 +8,7 @@ export default {
 import { computed, ref, watch } from 'vue'
 
 const props = defineProps<{
-  modelValue: boolean
+  modelValue?: boolean
   withToggle?: boolean
 }>()
 

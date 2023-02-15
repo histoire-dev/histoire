@@ -13,7 +13,7 @@ import { VTooltip as vTooltip } from 'floating-vue'
 
 const props = defineProps<{
   title?: string
-  modelValue: number
+  modelValue?: number
   min: number
   max: number
 }>()

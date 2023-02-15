@@ -19,12 +19,12 @@ export interface Hst {
   // Controls
   Button: typeof SvelteComponentTyped
   ButtonGroup: typeof SvelteComponentTyped<{
-    value: string
+    value?: string
     options: (string | HstControlOption)[]
     title?: string
   }>
   Checkbox: typeof SvelteComponentTyped<{
-    value: boolean
+    value?: boolean
     title: string
   }>
   CheckboxList: typeof SvelteComponentTyped<{
@@ -33,30 +33,30 @@ export interface Hst {
     title?: string
   }>
   Text: typeof SvelteComponentTyped<{
-    value: string
+    value?: string
     title: string
   }>
   Number: typeof SvelteComponentTyped<{
-    value: number
+    value?: number
     title: string
   }>
   Slider: typeof SvelteComponentTyped<{
-    value: number
+    value?: number
     title: string
     min: number
     max: number
   }>
   Textarea: typeof SvelteComponentTyped<{
-    value: string
+    value?: string
     title: string
   }>
   Select: typeof SvelteComponentTyped<{
-    value: string
+    value?: string
     title: string
     options: Record<string, any> | string[] | HstControlOption[]
   }>
   Radio: typeof SvelteComponentTyped<{
-    value: string
+    value?: string
     options: HstControlOption[]
     title?: string
   }>
