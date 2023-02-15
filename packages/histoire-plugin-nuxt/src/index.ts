@@ -19,27 +19,52 @@ export function HstNuxt (): Plugin {
     name: '@histoire/plugin-nuxt',
 
     async defaultConfig () {
-      const nuxtConfig = await useNuxtViteConfig()
-      nuxt = nuxtConfig.nuxt
-      const plugins = nuxtConfig.viteConfig.plugins.filter((p: any) => !ignorePlugins.includes(p?.name))
+      const nuxtViteConfig = await useNuxtViteConfig()
+      const { viteConfig } = nuxtViteConfig
+      nuxt = nuxtViteConfig.nuxt // We save it to close it later
+      const plugins = viteConfig.plugins.filter((p: any) => !ignorePlugins.includes(p?.name))
       return {
         vite: {
-          define: nuxtConfig.viteConfig.define,
+          server: {
+            watch: viteConfig.server.watch,
+            fs: {
+              allow: viteConfig.server.fs.allow,
+            },
+            middlewareMode: false,
+          },
+          define: viteConfig.define,
           resolve: {
-            alias: nuxtConfig.viteConfig.resolve.alias,
-            extensions: nuxtConfig.viteConfig.resolve.extensions,
-            dedupe: nuxtConfig.viteConfig.resolve.dedupe,
+            alias: viteConfig.resolve.alias,
+            extensions: viteConfig.resolve.extensions,
+            dedupe: viteConfig.resolve.dedupe,
           },
           plugins,
-          css: nuxtConfig.viteConfig.css,
-          publicDir: nuxtConfig.viteConfig.publicDir,
-          optimizeDeps: nuxtConfig.viteConfig.optimizeDeps,
+          css: viteConfig.css,
+          publicDir: viteConfig.publicDir,
+          optimizeDeps: viteConfig.optimizeDeps,
           // @ts-expect-error Vue-specific config
-          vue: nuxtConfig.viteConfig.vue,
+          vue: viteConfig.vue,
+          logLevel: 'info',
         },
         setupCode: [
           `${nuxt.options.css.map(file => `import '${file}'`).join('\n')}`,
+          `import { setupNuxtApp } from '@histoire/plugin-nuxt/dist/runtime/app-setup.js'
+export async function setupVue3 () {
+  await setupNuxtApp()
+}`,
         ],
+        viteNodeInlineDeps: [
+          /\/(nuxt|nuxt3)\//,
+          /^#/,
+          ...(nuxt.options.build.transpile.filter(
+            r => typeof r === 'string' || r instanceof RegExp,
+          ) as Array<string | RegExp>),
+        ],
+        build: {
+          excludeFromVendorsChunk: [
+            /nuxt\/dist\/app/,
+          ],
+        },
       }
     },
 
@@ -49,7 +74,29 @@ export function HstNuxt (): Plugin {
       })
     },
 
-    onBuild () {
+    onBuild (api) {
+      api.changeViteConfig(config => {
+        const emptyId = 'histoire-nuxt-empty'
+        config.plugins.push({
+          name: 'histoire-nuxt-ignore',
+          enforce: 'pre',
+          resolveId (id) {
+            if (id.includes('unenv')) {
+              return emptyId
+            }
+          },
+          load (id) {
+            if (id === emptyId) {
+              return 'export default {}'
+            }
+          },
+        })
+      })
+
+      nuxt?.close()
+    },
+
+    onPreview () {
       nuxt?.close()
     },
   }
@@ -58,10 +105,14 @@ export function HstNuxt (): Plugin {
 async function useNuxtViteConfig () {
   const { loadNuxt, buildNuxt } = await import('@nuxt/kit')
   const nuxt = await loadNuxt({
+    // cwd: process.cwd(),
     ready: false,
     dev: true,
     overrides: {
       ssr: false,
+      app: {
+        rootId: 'nuxt-test',
+      },
     },
   })
   if (nuxt.options.builder as string !== '@nuxt/vite-builder') {
@@ -81,8 +132,9 @@ async function useNuxtViteConfig () {
       imports: stubbedComposables,
     })
   })
+
   return {
-    viteConfig: await new Promise<ViteConfig>((resolve) => {
+    viteConfig: await new Promise<ViteConfig>((resolve, reject) => {
       nuxt.hook('modules:done', () => {
         nuxt.hook('components:extend', (components) => {
           for (const name of ['NuxtLink']) {
@@ -94,12 +146,18 @@ async function useNuxtViteConfig () {
         })
         nuxt.hook('vite:extendConfig', (config, { isClient }) => {
           // @ts-ignore
-          if (isClient) resolve({ ...config })
+          if (isClient) {
+            resolve({ ...config })
+          }
         })
       })
-      nuxt.ready().then(async () => {
-        buildNuxt(nuxt)
-      })
+      nuxt.ready()
+        .then(() => buildNuxt(nuxt))
+        .catch(err => {
+          if (!err.toString().includes('_stop_')) {
+            reject(err)
+          }
+        })
     }),
     nuxt,
   }

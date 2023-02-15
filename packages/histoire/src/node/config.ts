@@ -123,6 +123,9 @@ export function getDefaultConfig (): HistoireConfig {
     ],
     sandboxDarkClass: 'dark',
     routerMode: 'history',
+    build: {
+      excludeFromVendorsChunk: [],
+    },
     vite: (config) => {
       // Remove vite:legacy plugins https://github.com/histoire-dev/histoire/issues/156
       const index = config.plugins?.findIndex(plugin => Array.isArray(plugin) &&
@@ -171,6 +174,13 @@ export async function loadConfigFile (configFile: string): Promise<Partial<Histo
   }
 }
 
+export const mergeBuildConfig = createDefu((obj: any, key, value) => {
+  if (obj[key] && key === 'excludeFromVendorsChunk') {
+    obj[key] = [...obj[key], ...value]
+    return true
+  }
+})
+
 export const mergeConfig = createDefu((obj: any, key, value) => {
   if (obj[key] && key === 'vite') {
     const initialValue = obj[key]
@@ -215,6 +225,11 @@ export const mergeConfig = createDefu((obj: any, key, value) => {
         obj[key].push(item)
       }
     }
+    return true
+  }
+
+  if (obj[key] && key === 'build') {
+    obj[key] = mergeBuildConfig(obj[key], value)
     return true
   }
 

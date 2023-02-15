@@ -151,6 +151,7 @@ export async function getViteConfigWithPlugins (isServer: boolean, ctx: Context)
               'process.env.HST_COLLECT': 'false',
             }
             : {},
+          __HST_COLLECT__: isServer,
         },
         cacheDir: isServer ? 'node_modules/.hst-vite-server' : 'node_modules/.hst-vite',
       }
