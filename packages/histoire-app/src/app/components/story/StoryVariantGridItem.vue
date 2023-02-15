@@ -3,6 +3,7 @@ import { computed, PropType, ref, toRefs } from 'vue'
 import { Icon } from '@iconify/vue'
 import { useRouter } from 'vue-router'
 import { useResizeObserver } from '@vueuse/core'
+import { HstCopyIcon } from '@histoire/controls'
 import { useCurrentVariantRoute } from '../../util/variant'
 import type { Story, Variant } from '../../types'
 import { useScrollOnActive } from '../../util/scroll'
@@ -10,6 +11,7 @@ import { usePreviewSettingsStore } from '../../stores/preview-settings'
 import { getContrastColor } from '../../util/preview-settings'
 import { histoireConfig } from '../../util/config'
 import { isDark } from '../../util/dark'
+import { getSourceCode } from '../../util/docs'
 import GenericRenderStory from './GenericRenderStory.vue'
 import ToolbarNewTab from '../toolbar/ToolbarNewTab.vue'
 import CheckerboardPattern from '../misc/CheckerboardPattern.vue'
@@ -97,6 +99,9 @@ const autoApplyContrastColor = computed(() => !!histoireConfig.autoApplyContrast
 
       <!-- Toolbar -->
       <div class="htw-flex-none htw-ml-auto htw-hidden group-hover:htw-flex htw-items-center">
+        <HstCopyIcon
+          :content="() => getSourceCode(story, variant)"
+        />
         <ToolbarNewTab
           :variant="variant"
           :story="story"

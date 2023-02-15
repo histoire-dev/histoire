@@ -389,6 +389,7 @@ importers:
       '@codemirror/state': ^6.1.2
       '@codemirror/theme-one-dark': ^6.1.0
       '@codemirror/view': ^6.3.0
+      '@histoire/shared': ^0.15.1
       '@histoire/vendors': ^0.15.1
       '@peeky/server': ^0.14.0
       '@peeky/test': ^0.14.1
@@ -414,6 +415,7 @@ importers:
       '@codemirror/state': 6.2.0
       '@codemirror/theme-one-dark': 6.1.0
       '@codemirror/view': 6.7.3
+      '@histoire/shared': link:../histoire-shared
       '@histoire/vendors': link:../histoire-vendors
     devDependencies:
       '@peeky/server': 0.14.0_@types+node@17.0.45

@@ -8,14 +8,18 @@ export default {
 import { Icon } from '@iconify/vue'
 import { useClipboard } from '@vueuse/core'
 import { VTooltip as vTooltip } from 'floating-vue'
+import type { Awaitable } from '@histoire/shared'
 
 const props = defineProps<{
-  content: string
+  content: string | (() => Awaitable<string>)
 }>()
 
 const { copy, copied } = useClipboard()
 
-const action = () => copy(props.content)
+const action = async () => {
+  const content = typeof props.content === 'function' ? await props.content() : props.content
+  copy(content)
+}
 </script>
 
 <template>

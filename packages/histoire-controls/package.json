@@ -47,6 +47,7 @@
     "@codemirror/state": "^6.1.2",
     "@codemirror/theme-one-dark": "^6.1.0",
     "@codemirror/view": "^6.3.0",
+    "@histoire/shared": "^0.15.1",
     "@histoire/vendors": "^0.15.1"
   },
   "devDependencies": {
