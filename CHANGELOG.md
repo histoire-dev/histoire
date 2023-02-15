@@ -1,3 +1,12 @@
+## [0.15.1](https://github.com/Akryum/histoire/compare/v0.15.0...v0.15.1) (2023-02-15)
+
+
+### Bug Fixes
+
+* remove console.log ([97ee0fb](https://github.com/Akryum/histoire/commit/97ee0fb2390b91e50be4b9ddec9b4ea1c44d77fd))
+
+
+
 # [0.15.0](https://github.com/Akryum/histoire/compare/v0.14.2...v0.15.0) (2023-02-15)
 
 
