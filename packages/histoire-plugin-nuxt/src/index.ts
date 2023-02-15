@@ -67,7 +67,25 @@ export async function setupVue3 () {
       })
     },
 
-    onBuild () {
+    onBuild (api) {
+      api.changeViteConfig(config => {
+        const emptyId = 'histoire-nuxt-empty'
+        config.plugins.push({
+          name: 'histoire-nuxt-ignore',
+          enforce: 'pre',
+          resolveId (id) {
+            if (id.includes('unenv')) {
+              return emptyId
+            }
+          },
+          load (id) {
+            if (id === emptyId) {
+              return 'export default {}'
+            }
+          },
+        })
+      })
+
       nuxt?.close()
     },
   }

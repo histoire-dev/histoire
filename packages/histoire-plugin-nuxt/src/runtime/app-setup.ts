@@ -1,7 +1,6 @@
 import type { App } from 'h3'
-import { createApp, toNodeListener } from 'h3'
+import { createApp } from 'h3'
 import { createFetch } from 'ofetch'
-import { isCollecting } from 'histoire/client'
 
 export async function setupNuxtApp () {
   const win = window as unknown as Window & {
@@ -41,7 +40,10 @@ export async function setupNuxtApp () {
 
   const registry = new Set<string>()
 
-  if (isCollecting()) {
+  if (__HST_COLLECT__) {
+    const {
+      toNodeListener,
+    } = await import('h3')
     const {
       createCall,
       createFetch: createLocalFetch,

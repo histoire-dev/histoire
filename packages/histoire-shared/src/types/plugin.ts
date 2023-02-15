@@ -2,6 +2,7 @@ import type path from 'pathe'
 import type fs from 'fs-extra'
 import type pc from 'picocolors'
 import type chokidar from 'chokidar'
+import type { InlineConfig as ViteInlineConfig } from 'vite'
 import type {
   ServerStoryFile,
   ServerStory,
@@ -56,13 +57,16 @@ export interface PluginApiDev extends PluginApiBase {
   watcher: typeof chokidar
 }
 
-export type BuildEndCallback = () => Promise<void> | void
-export type PreviewStoryCallback = (payload: { file: string, story: ServerStory, variant: ServerVariant, url: string }) => Promise<void> | void
+export type ChangeViteConfigCallback = (config: ViteInlineConfig) => Awaitable<void>
+export type BuildEndCallback = () => Awaitable<void>
+export type PreviewStoryCallback = (payload: { file: string, story: ServerStory, variant: ServerVariant, url: string }) => Awaitable<void>
 
 export interface PluginApiBuild extends PluginApiBase {
+  changeViteConfigCallbacks: ChangeViteConfigCallback[]
   buildEndCallbacks: BuildEndCallback[]
   previewStoryCallbacks: PreviewStoryCallback[]
 
+  changeViteConfig: (cb: ChangeViteConfigCallback) => void
   onBuildEnd: (cb: BuildEndCallback) => void
   onPreviewStory: (cb: PreviewStoryCallback) => void
 }

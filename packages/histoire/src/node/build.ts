@@ -11,6 +11,7 @@ import { lookup as lookupMime } from 'mrmime'
 import pc from 'picocolors'
 import { performance } from 'node:perf_hooks'
 import type {
+  ChangeViteConfigCallback,
   BuildEndCallback,
   PreviewStoryCallback,
 } from '@histoire/shared'
@@ -54,12 +55,14 @@ export async function build (ctx: Context) {
     server,
     throws: true,
   })
+  const changeViteConfigCallbacks: ChangeViteConfigCallback[] = []
   const buildEndCallbacks: BuildEndCallback[] = []
   const previewStoryCallbacks: PreviewStoryCallback[] = []
   for (const plugin of ctx.config.plugins) {
     if (plugin.onBuild) {
       const api = new BuildPluginApi(ctx, plugin, moduleLoader)
       await plugin.onBuild(api)
+      changeViteConfigCallbacks.push(...api.changeViteConfigCallbacks)
       buildEndCallbacks.push(...api.buildEndCallbacks)
       previewStoryCallbacks.push(...api.previewStoryCallbacks)
     }
@@ -154,8 +157,15 @@ export async function build (ctx: Context) {
         // Don't build in SSR mode
         ssr: false,
       })
+
+      config.define.__HST_COLLECT__ = false
     },
   })
+
+  for (const cb of changeViteConfigCallbacks) {
+    console.log('vite config hook', cb)
+    await cb(buildViteConfig)
+  }
 
   const results = await viteBuild(buildViteConfig)
   const result = Array.isArray(results) ? results[0] : results as RollupOutput

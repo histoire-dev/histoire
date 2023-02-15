@@ -7,6 +7,7 @@ import type {
   PluginApiBase,
   PluginApiDev,
   PluginApiBuild,
+  ChangeViteConfigCallback,
   BuildEndCallback,
   PreviewStoryCallback,
   ModuleLoader,
@@ -65,8 +66,13 @@ export class DevPluginApi extends BasePluginApi implements PluginApiDev {
 }
 
 export class BuildPluginApi extends BasePluginApi implements PluginApiBuild {
+  changeViteConfigCallbacks: ChangeViteConfigCallback[] = []
   buildEndCallbacks: BuildEndCallback[] = []
   previewStoryCallbacks: PreviewStoryCallback[] = []
+
+  changeViteConfig (cb: ChangeViteConfigCallback) {
+    this.changeViteConfigCallbacks.push(cb)
+  }
 
   onBuildEnd (cb: BuildEndCallback) {
     this.buildEndCallbacks.push(cb)
