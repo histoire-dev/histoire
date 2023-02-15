@@ -90,6 +90,10 @@ export async function setupVue3 () {
 
       nuxt?.close()
     },
+
+    onPreview () {
+      nuxt?.close()
+    },
   }
 }
 

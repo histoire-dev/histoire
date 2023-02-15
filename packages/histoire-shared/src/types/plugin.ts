@@ -102,16 +102,20 @@ export interface Plugin {
   /**
    * Use this hook to read and store the final resolved histoire config.
    */
-  configResolved?: (config: HistoireConfig) => void | Promise<void>
+  configResolved?: (config: HistoireConfig) => Awaitable<void>
   /**
    * Use this hook to do processing during development. The `onCleanup` hook
    * should handle cleanup tasks when development server is closed.
    */
-  onDev?: (api: PluginApiDev, onCleanup: (cb: () => void | Promise<void>) => void) => void | Promise<void>
+  onDev?: (api: PluginApiDev, onCleanup: (cb: () => Awaitable<void>) => void) => Awaitable<void>
   /**
    * Use this hook to do processing during production build.
    */
-  onBuild?: (api: PluginApiBuild) => void | Promise<void>
+  onBuild?: (api: PluginApiBuild) => Awaitable<void>
+  /**
+   * Use this hook to do processing when preview is started.
+   */
+  onPreview?: () => Awaitable<void>
   /**
    * This plugin exposes a support plugin (example: Vue, Svelte, etc.)
    */
