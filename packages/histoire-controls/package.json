@@ -1,6 +1,6 @@
 {
   "name": "@histoire/controls",
-  "version": "0.14.0",
+  "version": "0.14.2",
   "description": "Prebuilt controls components",
   "license": "MIT",
   "author": {
@@ -47,7 +47,7 @@
     "@codemirror/state": "^6.1.2",
     "@codemirror/theme-one-dark": "^6.1.0",
     "@codemirror/view": "^6.3.0",
-    "@histoire/vendors": "^0.14.0"
+    "@histoire/vendors": "^0.14.2"
   },
   "devDependencies": {
     "@peeky/server": "^0.14.0",

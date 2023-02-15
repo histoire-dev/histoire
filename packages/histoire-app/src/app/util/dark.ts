@@ -5,7 +5,8 @@ import { histoireConfig } from './config.js'
 export const isDark = useDark({
   valueDark: 'htw-dark',
   initialValue: histoireConfig.theme.defaultColorScheme,
-  storageKey: histoireConfig.theme.storeColorScheme ? 'histoire-color-scheme' : null,
+  storageKey: 'histoire-color-scheme',
+  storage: histoireConfig.theme.storeColorScheme ? localStorage : sessionStorage,
 })
 export const toggleDark = useToggle(isDark)
 

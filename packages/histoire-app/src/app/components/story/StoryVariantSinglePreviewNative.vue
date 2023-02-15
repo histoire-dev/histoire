@@ -54,7 +54,10 @@ const autoApplyContrastColor = computed(() => !!histoireConfig.autoApplyContrast
         :variant="variant"
         :story="story"
         class="htw-h-full"
-        :class="[ isDark ? histoireConfig.sandboxDarkClass : undefined ]"
+        :class="{
+          [histoireConfig.sandboxDarkClass]: isDark, // @TODO remove
+          [histoireConfig.theme.darkClass]: isDark,
+        }"
         :dir="settings.textDirection"
         @ready="onReady"
       />

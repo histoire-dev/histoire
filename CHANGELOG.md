@@ -1,3 +1,33 @@
+## [0.14.2](https://github.com/Akryum/histoire/compare/v0.14.1...v0.14.2) (2023-02-11)
+
+
+### Bug Fixes
+
+* **vue3:** move change-case to deps ([905d004](https://github.com/Akryum/histoire/commit/905d004da80e1df47168f60814ae81cb980c01d5))
+
+
+### Features
+
+* **svelte:** auto generate story file from component ([007c31c](https://github.com/Akryum/histoire/commit/007c31ccdde3629b7cf78bf36b3bce49251a62b7))
+
+
+
+## [0.14.1](https://github.com/Akryum/histoire/compare/v0.14.0...v0.14.1) (2023-02-10)
+
+
+### Bug Fixes
+
+* ERR_UNSUPPORTED_ESM_URL_SCHEME, fix [#440](https://github.com/Akryum/histoire/issues/440) ([7d1c2e4](https://github.com/Akryum/histoire/commit/7d1c2e41a32425b40dafea1347ed5ae7120fae27))
+* **types:** HstVue not found in vue plugin, fix [#449](https://github.com/Akryum/histoire/issues/449) ([fd72c48](https://github.com/Akryum/histoire/commit/fd72c480e4a6cce7f0aefee6d7a7a6b6f556513d))
+* use sessionStorage storeColorScheme, fix [#444](https://github.com/Akryum/histoire/issues/444) ([b3c836d](https://github.com/Akryum/histoire/commit/b3c836d9e6ddae564b89464e6910c55af4dbfe54))
+
+
+### Features
+
+* theme.darkClass and deprecate sandboxDarkClass, fix [#442](https://github.com/Akryum/histoire/issues/442) ([6ea5bbe](https://github.com/Akryum/histoire/commit/6ea5bbed0cd0da0bf7afd0b9721c2b2fc2b5738e))
+
+
+
 # [0.14.0](https://github.com/Akryum/histoire/compare/v0.13.2...v0.14.0) (2023-02-10)
 
 

@@ -9,6 +9,7 @@ import { useScrollOnActive } from '../../util/scroll'
 import { usePreviewSettingsStore } from '../../stores/preview-settings'
 import { getContrastColor } from '../../util/preview-settings'
 import { histoireConfig } from '../../util/config'
+import { isDark } from '../../util/dark'
 import GenericRenderStory from './GenericRenderStory.vue'
 import ToolbarNewTab from '../toolbar/ToolbarNewTab.vue'
 import CheckerboardPattern from '../misc/CheckerboardPattern.vue'
@@ -136,6 +137,9 @@ const autoApplyContrastColor = computed(() => !!histoireConfig.autoApplyContrast
           :variant="variant"
           :story="story"
           :dir="settings.textDirection"
+          :class="{
+            [histoireConfig.theme.darkClass]: isDark,
+          }"
           @ready="onReady"
         />
       </div>
