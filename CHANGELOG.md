@@ -1,3 +1,12 @@
+## [0.15.3](https://github.com/Akryum/histoire/compare/v0.15.2...v0.15.3) (2023-02-15)
+
+
+### Features
+
+* **vue3:** codegen: handle boolean props ([22b7456](https://github.com/Akryum/histoire/commit/22b74563afa38f31cd6818a32865cd79d528f16c))
+
+
+
 ## [0.15.2](https://github.com/Akryum/histoire/compare/v0.15.1...v0.15.2) (2023-02-15)
 
 

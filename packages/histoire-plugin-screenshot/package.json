@@ -1,6 +1,6 @@
 {
   "name": "@histoire/plugin-screenshot",
-  "version": "0.15.2",
+  "version": "0.15.3",
   "description": "Histoire plugin to take screenshots for visual regression testing",
   "license": "MIT",
   "author": {
@@ -38,6 +38,6 @@
     "typescript": "^4.9.5"
   },
   "peerDependencies": {
-    "histoire": "^0.15.2"
+    "histoire": "^0.15.3"
   }
 }
