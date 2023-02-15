@@ -1,3 +1,19 @@
+# [0.15.0](https://github.com/Akryum/histoire/compare/v0.14.2...v0.15.0) (2023-02-15)
+
+
+### Bug Fixes
+
+* **vue3:** errors in grid layout when adding new variants ([4f693fb](https://github.com/Akryum/histoire/commit/4f693fb483c54f6ce2f00425dbec209cdbe37997))
+
+
+### Features
+
+* **nuxt:** improve nuxt env stub ([#443](https://github.com/Akryum/histoire/issues/443)) ([b73b2da](https://github.com/Akryum/histoire/commit/b73b2dab7455f245d52d79e659ae1481a60ab492))
+* **config:** `build.excludeFromVendorsChunk`
+* **config:** `viteNodeInlineDeps` now also supports `string` in the array
+
+
+
 ## [0.14.2](https://github.com/Akryum/histoire/compare/v0.14.1...v0.14.2) (2023-02-11)
 
 
