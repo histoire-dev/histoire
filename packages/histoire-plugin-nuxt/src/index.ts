@@ -19,7 +19,9 @@ export function HstNuxt (): Plugin {
     name: '@histoire/plugin-nuxt',
 
     async defaultConfig () {
-      const { nuxt, viteConfig } = await useNuxtViteConfig()
+      const nuxtViteConfig = await useNuxtViteConfig()
+      const { viteConfig } = nuxtViteConfig
+      nuxt = nuxtViteConfig.nuxt // We save it to close it later
       const plugins = viteConfig.plugins.filter((p: any) => !ignorePlugins.includes(p?.name))
       return {
         vite: {
