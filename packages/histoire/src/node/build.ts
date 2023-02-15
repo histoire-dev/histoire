@@ -143,6 +143,16 @@ export async function build (ctx: Context) {
       config.build.rollupOptions.output = {
         manualChunks (id) {
           if (!id.includes('@histoire/app') && id.includes('node_modules')) {
+            for (const test of ctx.config.build?.excludeFromVendorsChunk ?? []) {
+              if ((
+                typeof test === 'string' && id.includes(test)
+              ) || (
+                test instanceof RegExp && test.test(id)
+              )) {
+                // Excluded from vendor chunk
+                return
+              }
+            }
             return 'vendor'
           }
         },

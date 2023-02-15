@@ -60,6 +60,11 @@ export async function setupVue3 () {
             r => typeof r === 'string' || r instanceof RegExp,
           ) as Array<string | RegExp>),
         ],
+        build: {
+          excludeFromVendorsChunk: [
+            /nuxt\/dist\/app/,
+          ],
+        },
       }
     },
 
