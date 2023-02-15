@@ -180,6 +180,9 @@ async function printVNode (vnode: VNode, propsOverrides: Record<string, any> = n
         } else {
           attrs.push([`${directive}${arg}="${serialized[0]}"`])
         }
+        // @ts-ignore
+      } else if (vnode.type?.props?.[prop]?.type === Boolean) {
+        attrs.push([prop])
       } else {
         attrs.push([`${prop}="${value}"`])
       }

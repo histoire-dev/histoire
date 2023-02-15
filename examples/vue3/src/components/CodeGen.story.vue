@@ -15,6 +15,7 @@ export default defineComponent({
 <script lang="ts" setup>
 import ModalWithSlots from './ModalWithSlots.vue'
 import SlotWithProps from './SlotWithProps.vue'
+import BaseButton from './BaseButton.vue'
 
 function initState () {
   return {
@@ -97,6 +98,17 @@ function onClick (event) {
           :items="[1, 2, 3]"
         >
       </template>
+    </Variant>
+    <Variant
+      id="boolean props"
+      title="boolean props"
+    >
+      <BaseButton disabled>
+        Button
+      </BaseButton>
+      <BaseButton :disabled="false">
+        Button
+      </BaseButton>
     </Variant>
     <Variant
       id="click-events"
