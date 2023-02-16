@@ -115,7 +115,7 @@ async function scrollToAnchor () {
   await nextTick()
   const hash = getHash()
   if (hash) {
-    const anchor = document.querySelector(hash)
+    const anchor = document.querySelector(decodeURIComponent(hash))
     if (anchor) {
       anchor.scrollIntoView()
       return
