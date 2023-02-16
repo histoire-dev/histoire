@@ -1,3 +1,14 @@
+## [0.15.4](https://github.com/Akryum/histoire/compare/v0.15.3...v0.15.4) (2023-02-16)
+
+
+### Bug Fixes
+
+* add replaceAll guard ([319f9aa](https://github.com/Akryum/histoire/commit/319f9aadf77793f6e0271ded78246103e3d38f58))
+* dedupe addStory of same file ([9076776](https://github.com/Akryum/histoire/commit/90767765f027bbfcaf4539735139000386938667))
+* **nuxt:** don't optimize @histoire/plugin-nuxt ([07397ed](https://github.com/Akryum/histoire/commit/07397ed5ea8dddbe00c37bb074688a04206aa7e1))
+
+
+
 ## [0.15.3](https://github.com/Akryum/histoire/compare/v0.15.2...v0.15.3) (2023-02-15)
 
 
