@@ -69,9 +69,11 @@ export function HstScreenshot (options: ScreenshotPluginOptions = {}): Plugin {
         }
         console.log('Rendering screenshot for', file, 'title:', story.title, 'variant:', variant.id, 'title:', variant.title)
         for (const preset of finalOptions.presets) {
-          const launchOptions = finalOptions.launchOptionsArgs ? {
-            args: finalOptions.launchOptionsArgs
-          } : {};
+          const launchOptions = finalOptions.launchOptionsArgs
+            ? {
+              args: finalOptions.launchOptionsArgs,
+            }
+            : {}
           const captureWebsiteFileOptions: FileOptions = {
             overwrite: true,
             width: preset.width,
