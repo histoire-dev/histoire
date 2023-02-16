@@ -109,7 +109,7 @@ const commandStore = useCommandStore()
     class="htw-h-screen htw-bg-white dark:htw-bg-gray-700 dark:htw-text-gray-100"
     :style="{
       // Prevent flash of content
-      opacity: mounted && !loading ? 1 : 0,
+      opacity: mounted ? 1 : 0,
     }"
   >
     <div
