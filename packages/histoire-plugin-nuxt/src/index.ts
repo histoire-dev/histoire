@@ -41,7 +41,13 @@ export function HstNuxt (): Plugin {
           plugins,
           css: viteConfig.css,
           publicDir: viteConfig.publicDir,
-          optimizeDeps: viteConfig.optimizeDeps,
+          optimizeDeps: {
+            ...viteConfig.optimizeDeps,
+            exclude: [
+              ...viteConfig.optimizeDeps.exclude,
+              '@histoire/plugin-nuxt',
+            ],
+          },
           // @ts-expect-error Vue-specific config
           vue: viteConfig.vue,
           logLevel: 'info',
