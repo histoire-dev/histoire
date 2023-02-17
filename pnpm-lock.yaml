@@ -250,6 +250,7 @@ importers:
 
   packages/histoire:
     specifiers:
+      '@akryum/tinypool': ^0.3.1
       '@histoire/app': ^0.15.4
       '@histoire/controls': ^0.15.4
       '@histoire/shared': ^0.15.4
@@ -285,11 +286,11 @@ importers:
       sade: ^1.8.1
       shiki-es: ^0.2.0
       sirv: ^2.0.2
-      tinypool: ^0.1.2
       typescript: ^4.9.5
       vite: ^4.1.0
       vite-node: 0.28.4
     dependencies:
+      '@akryum/tinypool': 0.3.1
       '@histoire/app': link:../histoire-app
       '@histoire/controls': link:../histoire-controls
       '@histoire/shared': link:../histoire-shared
@@ -319,7 +320,6 @@ importers:
       sade: 1.8.1
       shiki-es: 0.2.0
       sirv: 2.0.2
-      tinypool: 0.1.3
       vite-node: 0.28.4_@types+node@17.0.45
     devDependencies:
       '@peeky/server': 0.14.0_@types+node@17.0.45
@@ -675,6 +675,11 @@ packages:
     dependencies:
       conventional-changelog-cli: 2.2.2
     dev: true
+
+  /@akryum/tinypool/0.3.1:
+    resolution: {integrity: sha512-nznEC1ZA/m3hQDEnrGQ4c5gkaa9pcaVnw4LFJyzBAaR7E3nfiAPEHS3otnSafpZouVnoKeITl5D+2LsnwlnK8g==}
+    engines: {node: '>=14.0.0'}
+    dev: false
 
   /@algolia/autocomplete-core/1.7.4:
     resolution: {integrity: sha512-daoLpQ3ps/VTMRZDEBfU8ixXd+amZcNJ4QSP3IERGyzqnL5Ch8uSRFt/4G8pUvW9c3o6GA4vtVv4I4lmnkdXyg==}
@@ -11923,11 +11928,6 @@ packages:
   /tiny-invariant/1.3.1:
     resolution: {integrity: sha512-AD5ih2NlSssTCwsMznbvwMZpJ1cbhkGd2uueNxzv2jDlEeZdU04JQfRnggJQ8DrcVBGjAsCKwFBbDlVNtEMlzw==}
     dev: true
-
-  /tinypool/0.1.3:
-    resolution: {integrity: sha512-2IfcQh7CP46XGWGGbdyO4pjcKqsmVqFAPcXfPxcPXmOWt9cYkTP9HcDmGgsfijYoAEc4z9qcpM/BaBz46Y9/CQ==}
-    engines: {node: '>=14.0.0'}
-    dev: false
 
   /tinypool/0.3.1:
     resolution: {integrity: sha512-zLA1ZXlstbU2rlpA4CIeVaqvWq41MTWqLY3FfsAXgC8+f7Pk7zroaJQxDgxn1xNudKW6Kmj4808rPFShUlIRmQ==}

@@ -4,7 +4,7 @@ import { ViteNodeServer } from 'vite-node/server'
 import type { FetchFunction, ResolveIdFunction } from 'vite-node'
 import { relative } from 'pathe'
 import pc from 'picocolors'
-import Tinypool from 'tinypool'
+import Tinypool from '@akryum/tinypool'
 import { createBirpc } from 'birpc'
 import { cpus } from 'node:os'
 import type { ServerStoryFile } from '@histoire/shared'
@@ -82,18 +82,14 @@ export function useCollectStories (options: UseCollectStoriesOptions, ctx: Conte
     }
   }
 
-  const invalidates = new Set<string>()
-
   if (mainServer) {
     mainServer.watcher.on('change', (file) => {
       file = slash(file)
-      if (invalidates.has(file)) return
-      invalidates.add(file)
+      threadPool.broadcastMessage({
+        kind: 'hst:invalidate',
+        file,
+      })
     })
-  }
-
-  function clearInvalidates () {
-    invalidates.clear()
   }
 
   async function executeStoryFile (storyFile: ServerStoryFile) {
@@ -104,7 +100,6 @@ export function useCollectStories (options: UseCollectStoriesOptions, ctx: Conte
         base: server.config.base,
         storyFile,
         port: workerPort,
-        invalidates: Array.from(invalidates),
       }
       const { storyData } = await threadPool.run(payload, {
         transferList: [
@@ -157,6 +152,5 @@ export function useCollectStories (options: UseCollectStoriesOptions, ctx: Conte
     clearCache,
     executeStoryFile,
     destroy,
-    clearInvalidates,
   }
 }

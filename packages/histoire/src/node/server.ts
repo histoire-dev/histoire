@@ -81,7 +81,6 @@ export async function createServer (ctx: Context, options: CreateServerOptions =
     clearCache,
     executeStoryFile,
     destroy: destroyCollectStories,
-    clearInvalidates,
   } = useCollectStories({
     server: nodeServer,
     mainServer: server,
@@ -188,8 +187,6 @@ export async function createServer (ctx: Context, options: CreateServerOptions =
       server.ws.send('histoire:all-stories-loaded', {})
     }
     console.log(`Collect stories end ${pc.bold(pc.blue(Math.round(performance.now() - time)))}ms`)
-
-    clearInvalidates()
 
     invalidateModule(VirtualFiles.RESOLVED_STORIES_ID)
     invalidateModule(VirtualFiles.RESOLVED_SEARCH_TITLE_DATA_ID)

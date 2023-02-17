@@ -1,5 +1,6 @@
 import { fileURLToPath } from 'node:url'
 import type { MessagePort } from 'node:worker_threads'
+import { parentPort } from 'node:worker_threads'
 import { performance } from 'node:perf_hooks'
 import { ModuleCacheMap, ViteNodeRunner } from 'vite-node/client'
 import { createBirpc } from 'birpc'
@@ -16,7 +17,6 @@ export interface Payload {
   base: string
   port: MessagePort
   storyFile: ServerStoryFile
-  invalidates: string[]
 }
 
 export interface ReturnData {
@@ -29,6 +29,13 @@ let _rpc: ReturnType<typeof createBirpc<{
   fetchModule: FetchFunction
   resolveId: ResolveIdFunction
 }>>
+
+// Cleanup module cache
+parentPort.on('message', message => {
+  if (message?.kind === 'hst:invalidate') {
+    _moduleCache.delete(message.file)
+  }
+})
 
 export default async (payload: Payload): Promise<ReturnData> => {
   const startTime = performance.now()
@@ -53,11 +60,6 @@ export default async (payload: Payload): Promise<ReturnData> => {
       return _rpc.resolveId(id, importer)
     },
   }))
-
-  // Cleanup cache
-  for (const file of payload.invalidates) {
-    _moduleCache.delete(file)
-  }
 
   const { destroy: destroyDomEnv } = createDomEnv()
 
