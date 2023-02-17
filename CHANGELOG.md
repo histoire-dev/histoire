@@ -1,3 +1,12 @@
+## [0.15.6](https://github.com/Akryum/histoire/compare/v0.15.5...v0.15.6) (2023-02-17)
+
+
+### Bug Fixes
+
+* new variant not rendering in grid ([6e8ad86](https://github.com/Akryum/histoire/commit/6e8ad862dfd4ad23366308116a7a8aa2b4fbba91))
+
+
+
 ## [0.15.5](https://github.com/Akryum/histoire/compare/v0.15.4...v0.15.5) (2023-02-17)
 
 
