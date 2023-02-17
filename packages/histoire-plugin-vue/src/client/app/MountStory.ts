@@ -50,6 +50,11 @@ export default _defineComponent({
       // Stubs
       app.component('RouterLink', RouterLinkStub)
 
+      // Force update (story is not reactive for user's vue)
+      _watch(() => props.story.variants, () => {
+        app._instance.proxy.$forceUpdate()
+      })
+
       // Call app setups to resolve global assets such as components
 
       if (typeof generatedSetup?.setupVue3 === 'function') {
