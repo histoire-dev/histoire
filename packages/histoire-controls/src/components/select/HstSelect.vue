@@ -11,7 +11,7 @@ import { HstControlOption } from '../../types'
 
 defineProps<{
   title?: string
-  modelValue?: string
+  modelValue?: any
   options: Record<string, any> | string[] | HstControlOption[]
 }>()
 
