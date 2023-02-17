@@ -1,3 +1,13 @@
+## [0.15.7](https://github.com/Akryum/histoire/compare/v0.15.6...v0.15.7) (2023-02-17)
+
+
+### Bug Fixes
+
+* hmr fix ([50bfd61](https://github.com/Akryum/histoire/commit/50bfd61bfb2e15306e8f14ee7dc0773a44eef8ab))
+* load vite config in sequence rather than in parallel ([2a9cda8](https://github.com/Akryum/histoire/commit/2a9cda827a6a06591353b2a73085e72508214928))
+
+
+
 ## [0.15.6](https://github.com/Akryum/histoire/compare/v0.15.5...v0.15.6) (2023-02-17)
 
 
