@@ -1,3 +1,13 @@
+## [0.15.5](https://github.com/Akryum/histoire/compare/v0.15.4...v0.15.5) (2023-02-17)
+
+
+### Bug Fixes
+
+* **collect:** invalidate cache in all workers ([0cbf351](https://github.com/Akryum/histoire/commit/0cbf3517346a6ba5cf350d56a200c613e17ecbc0))
+* sometimes initial page is blank ([14da639](https://github.com/Akryum/histoire/commit/14da6390a4b30ecb658b207fa8a85087f1035628))
+
+
+
 ## [0.15.4](https://github.com/Akryum/histoire/compare/v0.15.3...v0.15.4) (2023-02-16)
 
 
