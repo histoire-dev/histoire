@@ -33,17 +33,10 @@ export async function createServer (ctx: Context, options: CreateServerOptions =
     }
   }
 
-  const [
-    { server, viteConfigFile },
-    { server: nodeServer },
-    ,
-    { stop: stopMdFileWatcher },
-  ] = await Promise.all([
-    getViteServer(false),
-    getViteServer(true),
-    watchStories(ctx),
-    createMarkdownFilesWatcher(ctx),
-  ] as const)
+  const { server, viteConfigFile } = await getViteServer(false)
+  const { server: nodeServer } = await getViteServer(true) // Should be run after the first one to get a fresh vite.config.js
+  await watchStories(ctx)
+  const { stop: stopMdFileWatcher } = await createMarkdownFilesWatcher(ctx)
 
   const moduleLoader = useModuleLoader({
     server: nodeServer,
