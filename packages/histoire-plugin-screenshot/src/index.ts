@@ -2,6 +2,7 @@ import path from 'pathe'
 import fs from 'fs-extra'
 import type { Plugin } from 'histoire'
 import { defu } from 'defu'
+import type { FileOptions } from 'capture-website'
 
 interface ScreenshotPresets {
   /**
@@ -27,6 +28,10 @@ export interface ScreenshotPluginOptions {
    * Presets for each screenshot.
    */
   presets?: ScreenshotPresets[]
+  /**
+   * Args for puppeteer
+   */
+  launchOptionsArgs?: string[]
 }
 
 const defaultOptions: ScreenshotPluginOptions = {
@@ -64,12 +69,19 @@ export function HstScreenshot (options: ScreenshotPluginOptions = {}): Plugin {
         }
         console.log('Rendering screenshot for', file, 'title:', story.title, 'variant:', variant.id, 'title:', variant.title)
         for (const preset of finalOptions.presets) {
-          await captureWebsite.file(url, path.join(finalOptions.saveFolder, `${story.id}-${variant.id}-${preset.width}x${preset.height}.png`), {
+          const launchOptions = finalOptions.launchOptionsArgs
+            ? {
+              args: finalOptions.launchOptionsArgs,
+            }
+            : {}
+          const captureWebsiteFileOptions: FileOptions = {
             overwrite: true,
             width: preset.width,
             height: preset.height,
             fullPage: true,
-          })
+            launchOptions,
+          }
+          await captureWebsite.file(url, path.join(finalOptions.saveFolder, `${story.id}-${variant.id}-${preset.width}x${preset.height}.png`), captureWebsiteFileOptions)
         }
       })
     },
