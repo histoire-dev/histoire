@@ -100,7 +100,8 @@ describe('Codegen (Vue 3)', () => {
 <HstText
   v-model:foo="state.count"
   v-model:my-prop.number="state.count"
-/>`)
+/>
+<HstText v-model="value" />`)
   })
 
   it('custom-directive', () => {

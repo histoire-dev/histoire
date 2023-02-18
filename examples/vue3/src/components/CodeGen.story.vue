@@ -1,5 +1,5 @@
 <script lang="ts">
-import { defineComponent } from 'vue'
+import { defineComponent, ref } from 'vue'
 
 export default defineComponent({
   directives: {
@@ -27,6 +27,8 @@ function initState () {
 function onClick (event) {
   console.log(event)
 }
+
+const value = ref('Foo')
 </script>
 
 <template>
@@ -150,6 +152,9 @@ function onClick (event) {
         <HstText
           v-model:foo="state.count"
           v-model:my-prop.number="state.count"
+        />
+        <HstText
+          v-model="value"
         />
       </template>
     </Variant>
