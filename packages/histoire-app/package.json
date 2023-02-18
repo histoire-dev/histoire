@@ -1,6 +1,6 @@
 {
   "name": "@histoire/app",
-  "version": "0.15.7",
+  "version": "0.15.8",
   "description": "Pre-bundled UI for Histoire",
   "license": "MIT",
   "author": {
@@ -29,9 +29,9 @@
     "watch": "concurrently \"vite build --watch\" \"pnpm run build:css --watch\" \"node ./scripts/watchAndCopy.mjs\""
   },
   "dependencies": {
-    "@histoire/controls": "^0.15.7",
-    "@histoire/shared": "^0.15.7",
-    "@histoire/vendors": "^0.15.7",
+    "@histoire/controls": "^0.15.8",
+    "@histoire/shared": "^0.15.8",
+    "@histoire/vendors": "^0.15.8",
     "@types/flexsearch": "^0.7.3",
     "flexsearch": "0.7.21",
     "shiki-es": "^0.2.0"

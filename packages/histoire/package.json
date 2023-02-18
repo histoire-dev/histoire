@@ -1,6 +1,6 @@
 {
   "name": "histoire",
-  "version": "0.15.7",
+  "version": "0.15.8",
   "description": "A fast story book powered by Vite",
   "license": "MIT",
   "author": {
@@ -44,10 +44,10 @@
   },
   "dependencies": {
     "@akryum/tinypool": "^0.3.1",
-    "@histoire/app": "^0.15.7",
-    "@histoire/controls": "^0.15.7",
-    "@histoire/shared": "^0.15.7",
-    "@histoire/vendors": "^0.15.7",
+    "@histoire/app": "^0.15.8",
+    "@histoire/controls": "^0.15.8",
+    "@histoire/shared": "^0.15.8",
+    "@histoire/vendors": "^0.15.8",
     "@types/flexsearch": "^0.7.3",
     "@types/markdown-it": "^12.2.3",
     "birpc": "^0.1.1",
