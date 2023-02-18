@@ -1,3 +1,12 @@
+## [0.15.8](https://github.com/Akryum/histoire/compare/v0.15.7...v0.15.8) (2023-02-18)
+
+
+### Bug Fixes
+
+* **vue3:** codegen v-model on simple reactive variable ([5701116](https://github.com/Akryum/histoire/commit/5701116c2527d14d23a96e2292e6500cd63033fe))
+
+
+
 ## [0.15.7](https://github.com/Akryum/histoire/compare/v0.15.6...v0.15.7) (2023-02-17)
 
 
