@@ -134,11 +134,7 @@ export async function getViteConfigWithPlugins (isServer: boolean, ctx: Context)
           watch: {
             ignored: [`!**/node_modules/.histoire/**`, '**/vite.config.*'],
           },
-          ...isServer
-            ? {
-              hmr: false,
-            }
-            : {},
+          hmr: !isServer,
         },
         define: {
           // We need to force this to be able to use `devtoolsRawSetupState`
@@ -151,6 +147,7 @@ export async function getViteConfigWithPlugins (isServer: boolean, ctx: Context)
               'process.env.HST_COLLECT': 'false',
             }
             : {},
+          __HST_COLLECT__: isServer,
         },
         cacheDir: isServer ? 'node_modules/.hst-vite-server' : 'node_modules/.hst-vite',
       }

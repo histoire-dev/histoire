@@ -250,10 +250,11 @@ importers:
 
   packages/histoire:
     specifiers:
-      '@histoire/app': ^0.14.2
-      '@histoire/controls': ^0.14.2
-      '@histoire/shared': ^0.14.2
-      '@histoire/vendors': ^0.14.2
+      '@akryum/tinypool': ^0.3.1
+      '@histoire/app': ^0.15.8
+      '@histoire/controls': ^0.15.8
+      '@histoire/shared': ^0.15.8
+      '@histoire/vendors': ^0.15.8
       '@peeky/server': ^0.14.0
       '@peeky/test': ^0.14.1
       '@types/flexsearch': ^0.7.3
@@ -285,11 +286,11 @@ importers:
       sade: ^1.8.1
       shiki-es: ^0.2.0
       sirv: ^2.0.2
-      tinypool: ^0.1.2
       typescript: ^4.9.5
       vite: ^4.1.0
       vite-node: 0.28.4
     dependencies:
+      '@akryum/tinypool': 0.3.1
       '@histoire/app': link:../histoire-app
       '@histoire/controls': link:../histoire-controls
       '@histoire/shared': link:../histoire-shared
@@ -319,7 +320,6 @@ importers:
       sade: 1.8.1
       shiki-es: 0.2.0
       sirv: 2.0.2
-      tinypool: 0.1.3
       vite-node: 0.28.4_@types+node@17.0.45
     devDependencies:
       '@peeky/server': 0.14.0_@types+node@17.0.45
@@ -333,9 +333,9 @@ importers:
 
   packages/histoire-app:
     specifiers:
-      '@histoire/controls': ^0.14.2
-      '@histoire/shared': ^0.14.2
-      '@histoire/vendors': ^0.14.2
+      '@histoire/controls': ^0.15.8
+      '@histoire/shared': ^0.15.8
+      '@histoire/vendors': ^0.15.8
       '@tailwindcss/typography': ^0.5.2
       '@types/flexsearch': ^0.7.3
       '@types/fs-extra': ^9.0.13
@@ -389,7 +389,8 @@ importers:
       '@codemirror/state': ^6.1.2
       '@codemirror/theme-one-dark': ^6.1.0
       '@codemirror/view': ^6.3.0
-      '@histoire/vendors': ^0.14.2
+      '@histoire/shared': ^0.15.8
+      '@histoire/vendors': ^0.15.8
       '@peeky/server': ^0.14.0
       '@peeky/test': ^0.14.1
       '@types/node': ^17.0.32
@@ -414,6 +415,7 @@ importers:
       '@codemirror/state': 6.2.0
       '@codemirror/theme-one-dark': 6.1.0
       '@codemirror/view': 6.7.3
+      '@histoire/shared': link:../histoire-shared
       '@histoire/vendors': link:../histoire-vendors
     devDependencies:
       '@peeky/server': 0.14.0_@types+node@17.0.45
@@ -455,11 +457,17 @@ importers:
       '@nuxt/kit': ^3.0.0-rc.11
       '@nuxt/schema': ^3.0.0-rc.11
       '@types/node': ^17.0.32
+      h3: ^1.4.0
       histoire: workspace:*
+      ofetch: ^1.0.0
       typescript: ^4.9.5
+      unenv: ^1.1.1
       vite: ^4.1.0
     dependencies:
       '@nuxt/kit': 3.1.2
+      h3: 1.4.0
+      ofetch: 1.0.0
+      unenv: 1.1.1
     devDependencies:
       '@nuxt/schema': 3.1.2
       '@types/node': 17.0.45
@@ -509,9 +517,9 @@ importers:
 
   packages/histoire-plugin-svelte:
     specifiers:
-      '@histoire/controls': ^0.14.2
-      '@histoire/shared': ^0.14.2
-      '@histoire/vendors': ^0.14.2
+      '@histoire/controls': ^0.15.8
+      '@histoire/shared': ^0.15.8
+      '@histoire/vendors': ^0.15.8
       '@sveltejs/vite-plugin-svelte': ^1.0.1
       '@types/node': ^17.0.32
       change-case: ^4.1.2
@@ -546,9 +554,9 @@ importers:
 
   packages/histoire-plugin-vue:
     specifiers:
-      '@histoire/controls': ^0.14.2
-      '@histoire/shared': ^0.14.2
-      '@histoire/vendors': ^0.14.2
+      '@histoire/controls': ^0.15.8
+      '@histoire/shared': ^0.15.8
+      '@histoire/vendors': ^0.15.8
       '@types/node': ^17.0.32
       change-case: ^4.1.2
       concurrently: ^7.1.0
@@ -577,9 +585,9 @@ importers:
 
   packages/histoire-plugin-vue2:
     specifiers:
-      '@histoire/controls': ^0.14.2
-      '@histoire/shared': ^0.14.2
-      '@histoire/vendors': ^0.14.2
+      '@histoire/controls': ^0.15.8
+      '@histoire/shared': ^0.15.8
+      '@histoire/vendors': ^0.15.8
       '@types/node': ^17.0.32
       change-case: ^4.1.2
       concurrently: ^7.1.0
@@ -604,7 +612,7 @@ importers:
 
   packages/histoire-shared:
     specifiers:
-      '@histoire/vendors': ^0.14.2
+      '@histoire/vendors': ^0.15.8
       '@types/fs-extra': ^9.0.13
       '@types/markdown-it': ^12.2.3
       chokidar: ^3.5.3
@@ -667,6 +675,11 @@ packages:
     dependencies:
       conventional-changelog-cli: 2.2.2
     dev: true
+
+  /@akryum/tinypool/0.3.1:
+    resolution: {integrity: sha512-nznEC1ZA/m3hQDEnrGQ4c5gkaa9pcaVnw4LFJyzBAaR7E3nfiAPEHS3otnSafpZouVnoKeITl5D+2LsnwlnK8g==}
+    engines: {node: '>=14.0.0'}
+    dev: false
 
   /@algolia/autocomplete-core/1.7.4:
     resolution: {integrity: sha512-daoLpQ3ps/VTMRZDEBfU8ixXd+amZcNJ4QSP3IERGyzqnL5Ch8uSRFt/4G8pUvW9c3o6GA4vtVv4I4lmnkdXyg==}
@@ -2294,7 +2307,7 @@ packages:
       externality: 1.0.0
       fs-extra: 11.1.0
       get-port-please: 3.0.1
-      h3: 1.1.0
+      h3: 1.4.0
       knitwork: 1.0.0
       magic-string: 0.27.0
       mlly: 1.1.0
@@ -3448,7 +3461,7 @@ packages:
       vue:
         optional: true
     dependencies:
-      vite: 4.1.1
+      vite: 4.1.1_sass@1.58.0
       vue: 3.2.47
     dev: true
 
@@ -5044,7 +5057,6 @@ packages:
 
   /cookie-es/0.5.0:
     resolution: {integrity: sha512-RyZrFi6PNpBFbIaQjXDlFIhFVqV42QeKSZX1yQIl6ihImq6vcHNGMtqQ/QzY3RMPuYSkvsRwtnt5M9NeYxKt0g==}
-    dev: true
 
   /cookie-signature/1.0.6:
     resolution: {integrity: sha512-QADzlaHc8icV8I7vbaJXJwod9HWYp8uCqf1xa4OfNu1T7JVxQIrUgOWtHdNDtPiywmFbiS12VjotIXLrKM3orQ==}
@@ -7611,6 +7623,16 @@ packages:
       ufo: 1.0.1
     dev: true
 
+  /h3/1.4.0:
+    resolution: {integrity: sha512-FWG+FUdW6XQnf/54L4AXzZs1KUYwSJk5cbdFvTM4EG96bEQiWDJ5003xW4S3UGgXI0VJJgyY6KCaDmAL75kjbA==}
+    dependencies:
+      cookie-es: 0.5.0
+      destr: 1.2.2
+      iron-webcrypto: 0.4.0
+      radix3: 1.0.0
+      ufo: 1.0.1
+      uncrypto: 0.1.2
+
   /handlebars/4.7.7:
     resolution: {integrity: sha512-aAcXm5OAfE/8IXkcZvCepKU3VzW1/39Fb5ZuqMtgI/hT8X2YgoMvBY5dLhq/cpOvw7Lk1nK/UF71aLG/ZnVYRA==}
     engines: {node: '>=0.4.7'}
@@ -8002,6 +8024,9 @@ packages:
     resolution: {integrity: sha512-0KI/607xoxSToH7GjN1FfSbLoU0+btTicjsQSWQlh/hZykN8KpmMf7uYwPW3R+akZ6R/w18ZlXSHBYXiYUPO3g==}
     engines: {node: '>= 0.10'}
     dev: true
+
+  /iron-webcrypto/0.4.0:
+    resolution: {integrity: sha512-5OG53gJ4dBTq4y3IJqK7MEG9CPZRsYn9EP9J4jjgH4TcP/ywdsSMAmqj9VTSzdXu0/xfUrqjGHU7WLUme2+k5Q==}
 
   /is-array-buffer/3.0.1:
     resolution: {integrity: sha512-ASfLknmY8Xa2XtB4wmbz13Wu202baeA18cJBCeCy0wXUHZF0IPyVEXqKEcd+t2fNSLLL1vC6k7lxZEojNbISXQ==}
@@ -9058,7 +9083,6 @@ packages:
     resolution: {integrity: sha512-jSCU7/VB1loIWBZe14aEYHU/+1UMEHoaO7qxCOVJOw9GgH72VAWppxNcjU+x9a2k3GSIBXNKxXQFqRvvZ7vr3A==}
     engines: {node: '>=10.0.0'}
     hasBin: true
-    dev: true
 
   /mimic-fn/2.1.0:
     resolution: {integrity: sha512-OqbOk5oEQeAZ8WXWydlu9HJjz9WVdEIvamMCcXmuqUYjTknH/sqsWvhQ3vgwKFRR1HpjvNBKQ37nbJgYzGqGcg==}
@@ -9276,7 +9300,7 @@ packages:
       fs-extra: 11.1.0
       globby: 13.1.3
       gzip-size: 7.0.0
-      h3: 1.1.0
+      h3: 1.4.0
       hookable: 5.4.2
       http-proxy: 1.18.1
       is-primitive: 3.0.1
@@ -9304,7 +9328,7 @@ packages:
       source-map-support: 0.5.21
       std-env: 3.3.2
       ufo: 1.0.1
-      unenv: 1.0.3
+      unenv: 1.1.1
       unimport: 2.1.0_rollup@3.14.0
       unstorage: 1.0.1
     transitivePeerDependencies:
@@ -9608,7 +9632,6 @@ packages:
       destr: 1.2.2
       node-fetch-native: 1.0.1
       ufo: 1.0.1
-    dev: true
 
   /ohash/1.0.0:
     resolution: {integrity: sha512-kxSyzq6tt+6EE/xCnD1XaFhCCjUNUaz3X30rJp6mnjGLXAAvuPFqohMdv0aScWzajR45C29HyBaXZ8jXBwnh9A==}
@@ -10667,7 +10690,6 @@ packages:
 
   /radix3/1.0.0:
     resolution: {integrity: sha512-6n3AEXth91ASapMVKiEh2wrbFJmI+NBilrWE0AbiGgfm0xet0QXC8+a3K19r1UVYjUjctUgB053c3V/J6V0kCQ==}
-    dev: true
 
   /randombytes/2.1.0:
     resolution: {integrity: sha512-vYl3iOX+4CKUWuxGi9Ukhie6fsqXqS9FE2Zaic4tNFD2N2QQaXOMFbuKK4QmDHC0JO6B1Zp41J0LpT0oR68amQ==}
@@ -11907,11 +11929,6 @@ packages:
     resolution: {integrity: sha512-AD5ih2NlSssTCwsMznbvwMZpJ1cbhkGd2uueNxzv2jDlEeZdU04JQfRnggJQ8DrcVBGjAsCKwFBbDlVNtEMlzw==}
     dev: true
 
-  /tinypool/0.1.3:
-    resolution: {integrity: sha512-2IfcQh7CP46XGWGGbdyO4pjcKqsmVqFAPcXfPxcPXmOWt9cYkTP9HcDmGgsfijYoAEc4z9qcpM/BaBz46Y9/CQ==}
-    engines: {node: '>=14.0.0'}
-    dev: false
-
   /tinypool/0.3.1:
     resolution: {integrity: sha512-zLA1ZXlstbU2rlpA4CIeVaqvWq41MTWqLY3FfsAXgC8+f7Pk7zroaJQxDgxn1xNudKW6Kmj4808rPFShUlIRmQ==}
     engines: {node: '>=14.0.0'}
@@ -12165,6 +12182,9 @@ packages:
       through: 2.3.8
     dev: false
 
+  /uncrypto/0.1.2:
+    resolution: {integrity: sha512-kuZwRKV615lEw/Xx3Iz56FKk3nOeOVGaVmw0eg+x4Mne28lCotNFbBhDW7dEBCBKyKbRQiCadEZeNAFPVC5cgw==}
+
   /unctx/2.1.1:
     resolution: {integrity: sha512-RffJlpvLOtolWsn0fxXsuSDfwiWcR6cyuykw2e0+zAggvGW1SesXt9WxIWlWpJhwVCZD/WlxxLqKLS50Q0CkWA==}
     dependencies:
@@ -12192,6 +12212,14 @@ packages:
       node-fetch-native: 1.0.1
       pathe: 1.1.0
     dev: true
+
+  /unenv/1.1.1:
+    resolution: {integrity: sha512-AfQ+sKCdeSPX/rp0tL9LZz3cAu1Mt0i9UADuN1MtbsITKDS2PqSx8LQUBMf8lKuziitIWXXwU6JXrmzARFVSRw==}
+    dependencies:
+      defu: 6.1.2
+      mime: 3.0.0
+      node-fetch-native: 1.0.1
+      pathe: 1.1.0
 
   /unhead/1.0.20:
     resolution: {integrity: sha512-eeaI6momdK5dG1qiGtSQbQDE9M+agu/6ovYXnPkCDNjLHnBcv0QkZ/tWef4Xf3trdIYmDNBF7jnvLYNN4wkYfw==}
@@ -12263,7 +12291,7 @@ packages:
       anymatch: 3.1.3
       chokidar: 3.5.3
       destr: 1.2.2
-      h3: 1.1.0
+      h3: 1.4.0
       ioredis: 5.3.0
       listhen: 1.0.2
       mkdir: 0.0.2

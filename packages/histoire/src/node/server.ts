@@ -33,17 +33,10 @@ export async function createServer (ctx: Context, options: CreateServerOptions =
     }
   }
 
-  const [
-    { server, viteConfigFile },
-    { server: nodeServer },
-    ,
-    { stop: stopMdFileWatcher },
-  ] = await Promise.all([
-    getViteServer(false),
-    getViteServer(true),
-    watchStories(ctx),
-    createMarkdownFilesWatcher(ctx),
-  ] as const)
+  const { server, viteConfigFile } = await getViteServer(false)
+  const { server: nodeServer } = await getViteServer(true) // Should be run after the first one to get a fresh vite.config.js
+  await watchStories(ctx)
+  const { stop: stopMdFileWatcher } = await createMarkdownFilesWatcher(ctx)
 
   const moduleLoader = useModuleLoader({
     server: nodeServer,
@@ -81,7 +74,6 @@ export async function createServer (ctx: Context, options: CreateServerOptions =
     clearCache,
     executeStoryFile,
     destroy: destroyCollectStories,
-    clearInvalidates,
   } = useCollectStories({
     server: nodeServer,
     mainServer: server,
@@ -188,8 +180,6 @@ export async function createServer (ctx: Context, options: CreateServerOptions =
       server.ws.send('histoire:all-stories-loaded', {})
     }
     console.log(`Collect stories end ${pc.bold(pc.blue(Math.round(performance.now() - time)))}ms`)
-
-    clearInvalidates()
 
     invalidateModule(VirtualFiles.RESOLVED_STORIES_ID)
     invalidateModule(VirtualFiles.RESOLVED_SEARCH_TITLE_DATA_ID)

@@ -1,3 +1,100 @@
+## [0.15.8](https://github.com/Akryum/histoire/compare/v0.15.7...v0.15.8) (2023-02-18)
+
+
+### Bug Fixes
+
+* **vue3:** codegen v-model on simple reactive variable ([5701116](https://github.com/Akryum/histoire/commit/5701116c2527d14d23a96e2292e6500cd63033fe))
+
+
+
+## [0.15.7](https://github.com/Akryum/histoire/compare/v0.15.6...v0.15.7) (2023-02-17)
+
+
+### Bug Fixes
+
+* hmr fix ([50bfd61](https://github.com/Akryum/histoire/commit/50bfd61bfb2e15306e8f14ee7dc0773a44eef8ab))
+* load vite config in sequence rather than in parallel ([2a9cda8](https://github.com/Akryum/histoire/commit/2a9cda827a6a06591353b2a73085e72508214928))
+
+
+
+## [0.15.6](https://github.com/Akryum/histoire/compare/v0.15.5...v0.15.6) (2023-02-17)
+
+
+### Bug Fixes
+
+* new variant not rendering in grid ([6e8ad86](https://github.com/Akryum/histoire/commit/6e8ad862dfd4ad23366308116a7a8aa2b4fbba91))
+
+
+
+## [0.15.5](https://github.com/Akryum/histoire/compare/v0.15.4...v0.15.5) (2023-02-17)
+
+
+### Bug Fixes
+
+* **collect:** invalidate cache in all workers ([0cbf351](https://github.com/Akryum/histoire/commit/0cbf3517346a6ba5cf350d56a200c613e17ecbc0))
+* sometimes initial page is blank ([14da639](https://github.com/Akryum/histoire/commit/14da6390a4b30ecb658b207fa8a85087f1035628))
+
+
+
+## [0.15.4](https://github.com/Akryum/histoire/compare/v0.15.3...v0.15.4) (2023-02-16)
+
+
+### Bug Fixes
+
+* add replaceAll guard ([319f9aa](https://github.com/Akryum/histoire/commit/319f9aadf77793f6e0271ded78246103e3d38f58))
+* dedupe addStory of same file ([9076776](https://github.com/Akryum/histoire/commit/90767765f027bbfcaf4539735139000386938667))
+* **nuxt:** don't optimize @histoire/plugin-nuxt ([07397ed](https://github.com/Akryum/histoire/commit/07397ed5ea8dddbe00c37bb074688a04206aa7e1))
+
+
+
+## [0.15.3](https://github.com/Akryum/histoire/compare/v0.15.2...v0.15.3) (2023-02-15)
+
+
+### Features
+
+* **vue3:** codegen: handle boolean props ([22b7456](https://github.com/Akryum/histoire/commit/22b74563afa38f31cd6818a32865cd79d528f16c))
+
+
+
+## [0.15.2](https://github.com/Akryum/histoire/compare/v0.15.1...v0.15.2) (2023-02-15)
+
+
+### Bug Fixes
+
+* **controls:** mark value props as optional ([328f7c6](https://github.com/Akryum/histoire/commit/328f7c629c877f29ddd8b97968122dc5eb1f9039))
+
+
+### Features
+
+* grid copy icon button ([6a3aa4b](https://github.com/Akryum/histoire/commit/6a3aa4b2a070ea67f3bf40a410039c9349286835))
+
+
+
+## [0.15.1](https://github.com/Akryum/histoire/compare/v0.15.0...v0.15.1) (2023-02-15)
+
+
+### Bug Fixes
+
+* remove console.log ([97ee0fb](https://github.com/Akryum/histoire/commit/97ee0fb2390b91e50be4b9ddec9b4ea1c44d77fd))
+
+
+
+# [0.15.0](https://github.com/Akryum/histoire/compare/v0.14.2...v0.15.0) (2023-02-15)
+
+
+### Bug Fixes
+
+* **vue3:** errors in grid layout when adding new variants ([4f693fb](https://github.com/Akryum/histoire/commit/4f693fb483c54f6ce2f00425dbec209cdbe37997))
+
+
+### Features
+
+* **nuxt:** improve nuxt env stub ([#443](https://github.com/Akryum/histoire/issues/443)) ([b73b2da](https://github.com/Akryum/histoire/commit/b73b2dab7455f245d52d79e659ae1481a60ab492))
+* **config:** `build.excludeFromVendorsChunk`
+* **config:** `viteNodeInlineDeps` now also supports `string` in the array
+
+
+
 ## [0.14.2](https://github.com/Akryum/histoire/compare/v0.14.1...v0.14.2) (2023-02-11)
 
 

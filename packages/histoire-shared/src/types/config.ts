@@ -206,7 +206,7 @@ export interface HistoireConfig {
   /**
    * Transpile dependencies when collecting stories on Node.js
    */
-  viteNodeInlineDeps?: RegExp[]
+  viteNodeInlineDeps?: (string | RegExp)[]
   /**
    * Determine the transform method of modules
    */
@@ -232,6 +232,16 @@ export interface HistoireConfig {
    * By default based on available number of cores.
    */
   collectMaxThreads?: number
+  /**
+   * Build options
+   */
+  build?: {
+    /**
+     * By default all dependencies in `node_modules` are bundled into a single 'vendors' file.
+     * You can use this option to exclude some dependencies from this file.
+     */
+    excludeFromVendorsChunk?: (string | RegExp)[]
+  }
 }
 
 export type ConfigMode = 'build' | 'dev'

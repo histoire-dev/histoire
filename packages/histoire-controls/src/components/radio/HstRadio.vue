@@ -11,7 +11,7 @@ import { HstControlOption } from '../../types'
 
 const props = defineProps<{
   title?: string
-  modelValue: string
+  modelValue?: string
   options: HstControlOption[]
 }>()
 

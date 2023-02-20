@@ -1,5 +1,5 @@
 <script lang="ts">
-import { defineComponent } from 'vue'
+import { defineComponent, ref } from 'vue'
 
 export default defineComponent({
   directives: {
@@ -15,6 +15,7 @@ export default defineComponent({
 <script lang="ts" setup>
 import ModalWithSlots from './ModalWithSlots.vue'
 import SlotWithProps from './SlotWithProps.vue'
+import BaseButton from './BaseButton.vue'
 
 function initState () {
   return {
@@ -26,6 +27,8 @@ function initState () {
 function onClick (event) {
   console.log(event)
 }
+
+const value = ref('Foo')
 </script>
 
 <template>
@@ -99,6 +102,17 @@ function onClick (event) {
       </template>
     </Variant>
     <Variant
+      id="boolean props"
+      title="boolean props"
+    >
+      <BaseButton disabled>
+        Button
+      </BaseButton>
+      <BaseButton :disabled="false">
+        Button
+      </BaseButton>
+    </Variant>
+    <Variant
       id="click-events"
       title="click event"
       icon="carbon:cursor-1"
@@ -138,6 +152,9 @@ function onClick (event) {
         <HstText
           v-model:foo="state.count"
           v-model:my-prop.number="state.count"
+        />
+        <HstText
+          v-model="value"
         />
       </template>
     </Variant>

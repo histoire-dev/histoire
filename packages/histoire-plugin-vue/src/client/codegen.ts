@@ -121,7 +121,7 @@ async function printVNode (vnode: VNode, propsOverrides: Record<string, any> = n
         // v-model on component
         const vmodelListeners = [`onUpdate:${prop}`, `onUpdate:${camelCase(prop)}`]
         // @ts-ignore
-        const vmodelListener = vmodelListeners.find(key => vnode.dynamicProps?.includes(key))
+        const vmodelListener = vmodelListeners.find(key => vnode.dynamicProps?.includes(key) || key in vnode.props)
         if (directive === ':' && vmodelListener) {
           // Listener
           skipProps.push(vmodelListener)
@@ -180,6 +180,9 @@ async function printVNode (vnode: VNode, propsOverrides: Record<string, any> = n
         } else {
           attrs.push([`${directive}${arg}="${serialized[0]}"`])
         }
+        // @ts-ignore
+      } else if (vnode.type?.props?.[prop]?.type === Boolean) {
+        attrs.push([prop])
       } else {
         attrs.push([`${prop}="${value}"`])
       }

@@ -62,6 +62,16 @@ describe('Codegen (Vue 3)', () => {
 >`)
   })
 
+  it('boolean props', () => {
+    cy.visit('/story/src-components-codegen-story-vue?variantId=boolean+props')
+    cy.get('[data-test-id="story-source-code"]').should('have.text', `<BaseButton disabled>
+   Button 
+</BaseButton>
+<BaseButton :disabled="false">
+   Button 
+</BaseButton>`)
+  })
+
   it('click-events', () => {
     cy.visit('/story/src-components-codegen-story-vue?variantId=click-events')
     cy.get('[data-test-id="story-source-code"]').should('have.text', `<button @click="onClick">
@@ -90,7 +100,8 @@ describe('Codegen (Vue 3)', () => {
 <HstText
   v-model:foo="state.count"
   v-model:my-prop.number="state.count"
-/>`)
+/>
+<HstText v-model="value" />`)
   })
 
   it('custom-directive', () => {

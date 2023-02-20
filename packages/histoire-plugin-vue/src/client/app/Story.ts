@@ -1,4 +1,4 @@
-import { computed, defineComponent, provide, useAttrs, VNode, h, PropType, getCurrentInstance, reactive } from 'vue'
+import { computed, defineComponent, provide, useAttrs, VNode, h, PropType, getCurrentInstance, reactive, cloneVNode } from 'vue'
 import { Story, omitInheritStoryProps } from '@histoire/shared'
 import Variant from './Variant'
 
@@ -75,36 +75,43 @@ export default defineComponent({
 
     let index = 0
     const applyAttrs = (vnodes: VNode[]) => {
+      const result: VNode[] = []
       for (const vnode of vnodes) {
         // @ts-expect-error custom option
         if (vnode.type?.__histoireType === 'variant') {
-          if (!vnode.props) {
-            vnode.props = {}
+          const props: any = {}
+          props.variant = this.story.variants[index]
+          if (!props.variant) {
+            continue
           }
-          vnode.props.variant = this.story.variants[index]
-          if (!vnode.props.initState && !vnode.props['init-state']) {
-            vnode.props.initState = this.initState
+          if (!vnode.props?.initState && !vnode.props?.['init-state']) {
+            props.initState = this.initState
           }
           for (const attr in this.$attrs) {
-            if (typeof vnode.props[attr] === 'undefined') {
-              vnode.props[attr] = this.$attrs[attr]
+            if (typeof vnode.props?.[attr] === 'undefined') {
+              props[attr] = this.$attrs[attr]
             }
           }
           for (const attr in this.story) {
-            if (!omitInheritStoryProps.includes(attr) && typeof vnode.props[attr] === 'undefined') {
-              vnode.props[attr] = this.story[attr]
+            if (!omitInheritStoryProps.includes(attr) && typeof vnode.props?.[attr] === 'undefined') {
+              props[attr] = this.story[attr]
             }
           }
           index++
-        } else if (vnode.children?.length) {
-          applyAttrs(vnode.children as VNode[])
+          result.push(cloneVNode(vnode, props))
+        } else {
+          if (vnode.children?.length) {
+            vnode.children = applyAttrs(vnode.children as VNode[])
+          }
+          result.push(vnode)
         }
       }
+      return result
     }
 
     // Apply variant as attribute to each child vnode (should be `<Variant>` components)
-    const vnodes: VNode[] = this.$slots.default()
-    applyAttrs(vnodes)
+    let vnodes: VNode[] = this.$slots.default()
+    vnodes = applyAttrs(vnodes)
     return vnodes
   },
 })

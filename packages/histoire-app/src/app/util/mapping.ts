@@ -20,11 +20,12 @@ export function mapFile (file: StoryFile, existingFile?: StoryFile): StoryFile {
     result = existingFile
     for (const key in file) {
       if (key === 'story') {
-        Object.assign(result.story, {
+        result.story = {
+          ...result.story,
           ...file.story,
           file: markRaw(result),
           variants: file.story.variants.map(v => mapVariant(v, existingFile.story.variants.find(item => item.id === v.id))),
-        })
+        }
       } else if (key !== 'component') {
         result[key] = file[key]
       }

@@ -9,7 +9,7 @@ import HstWrapper from '../HstWrapper.vue'
 import HstSimpleCheckbox from './HstSimpleCheckbox.vue'
 
 const props = defineProps<{
-  modelValue: boolean
+  modelValue?: boolean
   title?: string
 }>()
 
