@@ -13,14 +13,6 @@ index.value++
 $: shouldRender = currentVariant.id === variant.id
 
 export let source: string = null
-
-$: {
-  if (source != null) {
-    Object.assign(currentVariant, {
-      source,
-    })
-  }
-}
 </script>
 
 {#if shouldRender}
