@@ -52,3 +52,14 @@ describe('Controls render', () => {
     cy.get('[data-test-id="story-controls"] [role="checkbox"]').should('be.visible')
   })
 })
+
+describe('Dynamic source render', () => {
+  it('should render dynamic source in grid-view', () => {
+    cy.visit('/story/src-woff-story-svelte?variantId=src-woff-story-svelte-0')
+    cy.get('[data-test-id="story-source-code"] > div > pre > code > span > span').contains('Dog')
+    cy.visit('/story/src-woff-story-svelte?variantId=src-woff-story-svelte-1')
+    cy.get('[data-test-id="story-source-code"] > div > pre > code > span > span').contains('Big dog')
+    cy.visit('/story/src-woff-story-svelte?variantId=src-woff-story-svelte-2')
+    cy.get('[data-test-id="story-source-code"] > div > pre > code > span > span').contains('Hot dog')
+  })
+})
