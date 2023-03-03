@@ -43,7 +43,7 @@ export function useCollectStories (options: UseCollectStoriesOptions, ctx: Conte
   const maxThreads = ctx.config.collectMaxThreads ?? cpus().length
 
   const threadsCount = ctx.mode === 'dev'
-    ? Math.max(Math.min(maxThreads, cpus().length / 2), 1)
+    ? Math.max(Math.min(maxThreads, Math.floor(cpus().length / 2)), 1)
     : Math.max(Math.min(maxThreads, cpus().length - 1), 1)
   console.log(pc.blue(`Using ${threadsCount} threads for story collection`))
 
