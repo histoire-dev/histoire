@@ -119,6 +119,7 @@ async function useNuxtViteConfig () {
       app: {
         rootId: 'nuxt-test',
       },
+      pages: false,
     },
   })
   if (nuxt.options.builder as string !== '@nuxt/vite-builder') {
@@ -129,6 +130,12 @@ async function useNuxtViteConfig () {
     { src: join(runtimeDir, 'composables.mjs'), filename: 'histoire/composables.mjs' },
     { src: join(runtimeDir, 'components.mjs'), filename: 'histoire/components.mjs' },
   )
+
+  nuxt.hook('app:templates', app => {
+    app.templates = app.templates.filter(template => template.filename !== 'app-component.mjs')
+    app.templates.push({ src: join(runtimeDir, 'app-component.mjs'), filename: 'app-component.mjs' })
+  })
+
   nuxt.hook('imports:sources', presets => {
     const stubbedComposables = ['useNuxtApp']
     const appPreset = presets.find(p => p.from === '#app')
