@@ -22,7 +22,7 @@
     "node": ">14.5.0"
   },
   "devDependencies": {
-    "@akryum/sheep": "^0.3.3",
+    "@akryum/sheep": "^0.5.0",
     "@histoire/vendors": "workspace:*",
     "@iconify/vue": "^3.2.1",
     "@typescript-eslint/eslint-plugin": "^5.18.0",
@@ -31,7 +31,6 @@
     "@vue/eslint-config-typescript": "^10.0.0",
     "@vueuse/core": "^9.12.0",
     "autoprefixer": "^10.4.4",
-    "conventional-changelog-cli": "^2.2.2",
     "eslint": "^8.13.0",
     "eslint-plugin-cypress": "^2.12.1",
     "eslint-plugin-import": "^2.26.0",
