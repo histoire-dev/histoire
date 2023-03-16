@@ -10,6 +10,11 @@ describe('Story render', () => {
     getIframeBody().contains('Simple story in Nuxt NuxtLink')
   })
 
+  it('should render an empty `nuxt-test` app', () => {
+    cy.visit('/story/components-simple-story-vue?variantId=_default')
+    getIframeBody().find('#nuxt-test[data-v-app]').should('be.empty')
+  })
+
   it('should render auto-imported components', () => {
     cy.visit('/story/components-autoimport-story-vue?variantId=_default')
     getIframeBody().contains('Meow')
