@@ -4,7 +4,7 @@ In this example, we will see how to add Tailwind CSS to the stories.
 
 ## CSS file
 
-Make sure your projet has a style file with the [Tailwind directives](https://tailwindcss.com/docs/functions-and-directives#tailwind).
+Make sure your project has a style file with the [Tailwind directives](https://tailwindcss.com/docs/functions-and-directives#tailwind).
 
 ```css
 /* src/tailwind.css */
