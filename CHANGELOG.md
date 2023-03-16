@@ -1,3 +1,41 @@
+## v0.15.9
+
+[compare changes](https://github.com/Akryum/histoire/compare/v0.15.8...v0.15.9)
+
+
+### 🚀 Enhancements
+
+  - **screenshot:** Add launchOptionsArgs to be able to pass args for c… ([#446](https://github.com/Akryum/histoire/pull/446))
+  - **HstSelect:** Change `v-model` type to any ([#454](https://github.com/Akryum/histoire/pull/454))
+
+### 🩹 Fixes
+
+  - **docs:** Header anchors error when hash is chinese. fixes #460 ([#452](https://github.com/Akryum/histoire/pull/452), [#460](https://github.com/Akryum/histoire/issues/460))
+  - **svelte:** Supplement missing member types ([#483](https://github.com/Akryum/histoire/pull/483))
+  - **nuxt:** Do not render app pages alongside stories ([#472](https://github.com/Akryum/histoire/pull/472), [#473](https://github.com/Akryum/histoire/pull/473))
+  - Ensuring that `threadsCount` results in an integer rather than a double when cpus is an odd number. (Fixes #469 ) ([#470](https://github.com/Akryum/histoire/pull/470), [#469](https://github.com/Akryum/histoire/issues/469))
+
+### 📖 Documentation
+
+  - Fix typo ([#447](https://github.com/Akryum/histoire/pull/447))
+
+### 🏡 Chore
+
+  - Add lint cache ([#401](https://github.com/Akryum/histoire/pull/401))
+  - Upgrade to sheep 0.5.0 ([50ccd8e](https://github.com/Akryum/histoire/commit/50ccd8e))
+
+### ❤️  Contributors
+
+- Guillaume Chau ([@Akryum](http://github.com/Akryum))
+- Tom English <tomrenglish@googlemail.com>
+- Mehdi Lahlou ([@medfreeman](http://github.com/medfreeman))
+- Acyza 
+- Fw6 
+- A474516631 <747362746@qq.com>
+- Simon He 
+- Justin Duke <me@jmduke.com>
+- Kodai Nakamura ([@kdnk](http://github.com/kdnk))
+
 ## [0.15.8](https://github.com/Akryum/histoire/compare/v0.15.7...v0.15.8) (2023-02-18)
 
 
