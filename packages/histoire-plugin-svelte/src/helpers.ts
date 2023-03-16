@@ -39,12 +39,14 @@ export interface Hst {
   Number: typeof SvelteComponentTyped<{
     value?: number
     title: string
+    step?: number
   }>
   Slider: typeof SvelteComponentTyped<{
     value?: number
     title: string
     min: number
     max: number
+    step?: number
   }>
   Textarea: typeof SvelteComponentTyped<{
     value?: string
