@@ -14,7 +14,7 @@ const props = withDefaults(defineProps<{
 })
 
 const filePadding = computed(() => {
-  return (props.depth * 12) + 'px'
+  return (props.depth+1) * 24 + 'px'
 })
 
 const route = useRoute()
