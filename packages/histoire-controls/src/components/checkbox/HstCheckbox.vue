@@ -26,7 +26,7 @@ function toggle () {
     return
   }
 
-  emits('update:modelValue', !isTrue.value)
+  emits('update:modelValue', !props.modelValue)
 }
 
 const isTrue = computed(() => {
