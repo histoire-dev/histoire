@@ -1,3 +1,39 @@
+## v0.16.0
+
+[compare changes](https://github.com/Akryum/histoire/compare/v0.15.9...v0.16.0)
+
+
+### 🚀 Enhancements
+
+  - Update to vite 4.2 ([df3067d](https://github.com/Akryum/histoire/commit/df3067d))
+  - Add booleanish checkbox ([#506](https://github.com/Akryum/histoire/pull/506))
+  - Update jiti + update nuxt example ([d830e19](https://github.com/Akryum/histoire/commit/d830e19))
+
+### 🩹 Fixes
+
+  - **MD:** ⚠️  Set breaks to false in Markdown (default behavior) ([#457](https://github.com/Akryum/histoire/pull/457))
+  - Histoire-vendors broken build ([#505](https://github.com/Akryum/histoire/pull/505))
+
+### 🏡 Chore
+
+  - Switch to pnpm-lock v6.0 ([c62fc6a](https://github.com/Akryum/histoire/commit/c62fc6a))
+
+### 🤖 CI
+
+  - Update release-notes workflow ([43b04d7](https://github.com/Akryum/histoire/commit/43b04d7))
+  - Pin release-tag version ([dc26d0d](https://github.com/Akryum/histoire/commit/dc26d0d))
+  - Update pnpm version in GH actions ([a75ffbd](https://github.com/Akryum/histoire/commit/a75ffbd))
+
+#### ⚠️  Breaking Changes
+
+  - **MD:** ⚠️  Set breaks to false in Markdown (default behavior) ([#457](https://github.com/Akryum/histoire/pull/457))
+
+### ❤️  Contributors
+
+- Guillaume Chau ([@Akryum](http://github.com/Akryum))
+- Hugo ATTAL <hugoattal@hotmail.fr>
+- Sam Hulick
+
 ## v0.15.9
 
 [compare changes](https://github.com/Akryum/histoire/compare/v0.15.8...v0.15.9)

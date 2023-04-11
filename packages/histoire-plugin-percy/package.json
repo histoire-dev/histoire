@@ -1,6 +1,6 @@
 {
   "name": "@histoire/plugin-percy",
-  "version": "0.15.8",
+  "version": "0.16.0",
   "description": "Histoire plugin to take screenshots with Percy for visual regression testing",
   "license": "MIT",
   "author": {
