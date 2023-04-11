@@ -3,7 +3,8 @@ import HstCheckbox from './HstCheckbox.vue'
 
 function initState () {
   return {
-    checked: false,
+    booleanChecked: false,
+    stringChecked: 'false',
   }
 }
 </script>
@@ -20,15 +21,25 @@ function initState () {
     >
       <template #default="{ state }">
         <HstCheckbox
-          v-model="state.checked"
-          title="Label"
+          v-model="state.booleanChecked"
+          title="Boolean"
         />
+        {{ { value: state.booleanChecked } }}
+        <HstCheckbox
+          v-model="state.stringChecked"
+          title="String"
+        />
+        {{ { value: state.stringChecked } }}
       </template>
 
       <template #controls="{ state }">
         <HstCheckbox
-          v-model="state.checked"
-          title="Label"
+          v-model="state.booleanChecked"
+          title="Boolean"
+        />
+        <HstCheckbox
+          v-model="state.stringChecked"
+          title="String"
         />
       </template>
     </Variant>
