@@ -60,7 +60,7 @@
     "fs-extra": "^10.0.1",
     "globby": "^13.1.1",
     "gray-matter": "^4.0.3",
-    "jiti": "^1.16.0",
+    "jiti": "^1.18.2",
     "jsdom": "^20.0.3",
     "markdown-it": "^12.3.2",
     "markdown-it-anchor": "^8.6.2",
