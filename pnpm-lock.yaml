@@ -115,7 +115,7 @@ importers:
         version: link:../../packages/histoire-plugin-svelte
       '@sveltejs/vite-plugin-svelte':
         specifier: ^2.0.0
-        version: 2.0.2(svelte@3.55.1)(vite@4.1.1)
+        version: 2.0.2(svelte@3.55.1)(vite@4.2.0)
       cypress:
         specifier: ^10.8.0
         version: 10.11.0
@@ -129,8 +129,8 @@ importers:
         specifier: ^4.10.7
         version: 4.10.7(postcss@8.4.21)(svelte@3.55.1)(typescript@4.9.5)
       vite:
-        specifier: ^4.1.0
-        version: 4.1.1(@types/node@17.0.45)
+        specifier: ^4.2.0
+        version: 4.2.0(@types/node@17.0.45)
 
   examples/sveltekit:
     dependencies:
@@ -149,7 +149,7 @@ importers:
         version: 1.0.2(@sveltejs/kit@1.3.10)
       '@sveltejs/kit':
         specifier: ^1.0.0
-        version: 1.3.10(svelte@3.55.1)(vite@4.1.1)
+        version: 1.3.10(svelte@3.55.1)(vite@4.2.0)
       '@types/cookie':
         specifier: ^0.5.1
         version: 0.5.1
@@ -172,8 +172,8 @@ importers:
         specifier: ^4.9.5
         version: 4.9.5
       vite:
-        specifier: ^4.1.0
-        version: 4.1.1(@types/node@17.0.45)
+        specifier: ^4.2.0
+        version: 4.2.0(@types/node@17.0.45)
 
   examples/vue2:
     dependencies:
@@ -186,13 +186,13 @@ importers:
         version: link:../../packages/histoire-plugin-vue2
       '@vitejs/plugin-vue2':
         specifier: ^2.1.0
-        version: 2.2.0(vite@4.1.1)(vue@2.7.14)
+        version: 2.2.0(vite@4.2.0)(vue@2.7.14)
       histoire:
         specifier: workspace:*
         version: link:../../packages/histoire
       vite:
-        specifier: ^4.1.0
-        version: 4.1.1(@types/node@17.0.45)
+        specifier: ^4.2.0
+        version: 4.2.0(@types/node@17.0.45)
       vue-template-compiler:
         specifier: ^2.7.8
         version: 2.7.14
@@ -220,7 +220,7 @@ importers:
         version: link:../../packages/histoire-vendors
       '@vitejs/plugin-vue':
         specifier: ^4.0.0
-        version: 4.0.0(vite@4.1.1)(vue@3.2.47)
+        version: 4.0.0(vite@4.2.0)(vue@3.2.47)
       cypress:
         specifier: ^9.5.3
         version: 9.7.0
@@ -237,8 +237,8 @@ importers:
         specifier: ^1.14.0
         version: 1.15.3
       vite:
-        specifier: ^4.1.0
-        version: 4.1.1(sass@1.58.0)
+        specifier: ^4.2.0
+        version: 4.2.0(sass@1.58.0)
 
   examples/vue3-percy:
     dependencies:
@@ -254,13 +254,13 @@ importers:
         version: link:../../packages/histoire-plugin-vue
       '@vitejs/plugin-vue':
         specifier: ^4.0.0
-        version: 4.0.0(vite@4.1.1)(vue@3.2.47)
+        version: 4.0.0(vite@4.2.0)(vue@3.2.47)
       histoire:
         specifier: workspace:*
         version: link:../../packages/histoire
       vite:
-        specifier: ^4.1.0
-        version: 4.1.1(@types/node@17.0.45)
+        specifier: ^4.2.0
+        version: 4.2.0(@types/node@17.0.45)
 
   examples/vue3-screenshot:
     dependencies:
@@ -276,13 +276,13 @@ importers:
         version: link:../../packages/histoire-plugin-vue
       '@vitejs/plugin-vue':
         specifier: ^4.0.0
-        version: 4.0.0(vite@4.1.1)(vue@3.2.47)
+        version: 4.0.0(vite@4.2.0)(vue@3.2.47)
       histoire:
         specifier: workspace:*
         version: link:../../packages/histoire
       vite:
-        specifier: ^4.1.0
-        version: 4.1.1(@types/node@17.0.45)
+        specifier: ^4.2.0
+        version: 4.2.0(@types/node@17.0.45)
 
   examples/vue3-themed:
     dependencies:
@@ -295,13 +295,13 @@ importers:
         version: link:../../packages/histoire-plugin-vue
       '@vitejs/plugin-vue':
         specifier: ^4.0.0
-        version: 4.0.0(vite@4.1.1)(vue@3.2.47)
+        version: 4.0.0(vite@4.2.0)(vue@3.2.47)
       histoire:
         specifier: workspace:*
         version: link:../../packages/histoire
       vite:
-        specifier: ^4.1.0
-        version: 4.1.1(@types/node@17.0.45)
+        specifier: ^4.2.0
+        version: 4.2.0(@types/node@17.0.45)
 
   examples/vue3-vuetify:
     dependencies:
@@ -449,8 +449,8 @@ importers:
         specifier: ^4.9.5
         version: 4.9.5
       vite:
-        specifier: ^4.1.0
-        version: 4.1.1(@types/node@17.0.45)
+        specifier: ^4.2.0
+        version: 4.2.0(@types/node@17.0.45)
 
   packages/histoire-app:
     dependencies:
@@ -484,7 +484,7 @@ importers:
         version: 17.0.45
       '@vitejs/plugin-vue':
         specifier: ^4.0.0
-        version: 4.0.0(vite@4.1.1)(vue@3.2.47)
+        version: 4.0.0(vite@4.2.0)(vue@3.2.47)
       autoprefixer:
         specifier: ^10.4.4
         version: 10.4.13(postcss@8.4.21)
@@ -516,8 +516,8 @@ importers:
         specifier: ^4.9.5
         version: 4.9.5
       vite:
-        specifier: ^4.1.0
-        version: 4.1.1(@types/node@17.0.45)
+        specifier: ^4.2.0
+        version: 4.2.0(@types/node@17.0.45)
       vue:
         specifier: ^3.2.47
         version: 3.2.47
@@ -563,7 +563,7 @@ importers:
         version: 17.0.45
       '@vitejs/plugin-vue':
         specifier: ^4.0.0
-        version: 4.0.0(vite@4.1.1)(vue@3.2.47)
+        version: 4.0.0(vite@4.2.0)(vue@3.2.47)
       '@vue/test-utils':
         specifier: ^2.2.10
         version: 2.2.10(vue@3.2.47)
@@ -592,8 +592,8 @@ importers:
         specifier: ^4.9.5
         version: 4.9.5
       vite:
-        specifier: ^4.1.0
-        version: 4.1.1(@types/node@17.0.45)
+        specifier: ^4.2.0
+        version: 4.2.0(@types/node@17.0.45)
       vue:
         specifier: ^3.2.47
         version: 3.2.47
@@ -615,13 +615,13 @@ importers:
         version: link:../histoire-plugin-vue
       '@vitejs/plugin-vue':
         specifier: ^4.0.0
-        version: 4.0.0(vite@4.1.1)(vue@3.2.47)
+        version: 4.0.0(vite@4.2.0)(vue@3.2.47)
       histoire:
         specifier: workspace:*
         version: link:../histoire
       vite:
-        specifier: ^4.1.0
-        version: 4.1.1(@types/node@17.0.45)
+        specifier: ^4.2.0
+        version: 4.2.0(@types/node@17.0.45)
 
   packages/histoire-plugin-nuxt:
     dependencies:
@@ -657,8 +657,8 @@ importers:
         specifier: ^4.9.5
         version: 4.9.5
       vite:
-        specifier: ^4.1.0
-        version: 4.1.1(@types/node@17.0.45)
+        specifier: ^4.2.0
+        version: 4.2.0(@types/node@17.0.45)
 
   packages/histoire-plugin-percy:
     dependencies:
@@ -736,7 +736,7 @@ importers:
     devDependencies:
       '@sveltejs/vite-plugin-svelte':
         specifier: ^1.0.1
-        version: 1.4.0(svelte@3.55.1)(vite@4.1.1)
+        version: 1.4.0(svelte@3.55.1)(vite@4.2.0)
       '@types/node':
         specifier: ^17.0.32
         version: 17.0.45
@@ -762,8 +762,8 @@ importers:
         specifier: ^4.9.5
         version: 4.9.5
       vite:
-        specifier: ^4.1.0
-        version: 4.1.1(@types/node@17.0.45)
+        specifier: ^4.2.0
+        version: 4.2.0(@types/node@17.0.45)
 
   packages/histoire-plugin-vue:
     dependencies:
@@ -802,8 +802,8 @@ importers:
         specifier: ^4.9.5
         version: 4.9.5
       vite:
-        specifier: ^4.1.0
-        version: 4.1.1(@types/node@17.0.45)
+        specifier: ^4.2.0
+        version: 4.2.0(@types/node@17.0.45)
       vue:
         specifier: ^3.2.47
         version: 3.2.47
@@ -839,8 +839,8 @@ importers:
         specifier: ^4.9.5
         version: 4.9.5
       vite:
-        specifier: ^4.1.0
-        version: 4.1.1(@types/node@17.0.45)
+        specifier: ^4.2.0
+        version: 4.2.0(@types/node@17.0.45)
       vue:
         specifier: ^2.7.8
         version: 2.7.14
@@ -870,8 +870,8 @@ importers:
         specifier: ^4.9.5
         version: 4.9.5
       vite:
-        specifier: ^4.1.0
-        version: 4.1.1(@types/node@17.0.45)
+        specifier: ^4.2.0
+        version: 4.2.0(@types/node@17.0.45)
 
   packages/histoire-vendors:
     devDependencies:
@@ -2990,11 +2990,11 @@ packages:
     peerDependencies:
       '@sveltejs/kit': ^1.0.0
     dependencies:
-      '@sveltejs/kit': 1.3.10(svelte@3.55.1)(vite@4.1.1)
+      '@sveltejs/kit': 1.3.10(svelte@3.55.1)(vite@4.2.0)
       import-meta-resolve: 2.2.1
     dev: true
 
-  /@sveltejs/kit@1.3.10(svelte@3.55.1)(vite@4.1.1):
+  /@sveltejs/kit@1.3.10(svelte@3.55.1)(vite@4.2.0):
     resolution: {integrity: sha512-I3DgWCwTYbTz4ZPCJIRkSDrKkMu0bsdk6ghqsOBVNqesf1wBdTdfkXhag3ESWgIEjUV3VUIWPQF7fnt7328mhQ==}
     engines: {node: ^16.14 || >=18}
     hasBin: true
@@ -3003,7 +3003,7 @@ packages:
       svelte: ^3.54.0
       vite: ^4.0.0 || ^2.9.0 || ^3.0.0
     dependencies:
-      '@sveltejs/vite-plugin-svelte': 2.0.2(svelte@3.55.1)(vite@4.1.1)
+      '@sveltejs/vite-plugin-svelte': 2.0.2(svelte@3.55.1)(vite@4.2.0)
       '@types/cookie': 0.5.1
       cookie: 0.5.0
       devalue: 4.2.3
@@ -3017,12 +3017,12 @@ packages:
       svelte: 3.55.1
       tiny-glob: 0.2.9
       undici: 5.16.0
-      vite: 4.1.1(@types/node@17.0.45)
+      vite: 4.2.0(@types/node@17.0.45)
     transitivePeerDependencies:
       - supports-color
     dev: true
 
-  /@sveltejs/vite-plugin-svelte@1.4.0(svelte@3.55.1)(vite@4.1.1):
+  /@sveltejs/vite-plugin-svelte@1.4.0(svelte@3.55.1)(vite@4.2.0):
     resolution: {integrity: sha512-6QupI/jemMfK+yI2pMtJcu5iO2gtgTfcBdGwMZZt+lgbFELhszbDl6Qjh000HgAV8+XUA+8EY8DusOFk8WhOIg==}
     engines: {node: ^14.18.0 || >= 16}
     peerDependencies:
@@ -3035,13 +3035,13 @@ packages:
       magic-string: 0.26.7
       svelte: 3.55.1
       svelte-hmr: 0.15.1(svelte@3.55.1)
-      vite: 4.1.1(@types/node@17.0.45)
-      vitefu: 0.2.4(vite@4.1.1)
+      vite: 4.2.0(@types/node@17.0.45)
+      vitefu: 0.2.4(vite@4.2.0)
     transitivePeerDependencies:
       - supports-color
     dev: true
 
-  /@sveltejs/vite-plugin-svelte@2.0.2(svelte@3.55.1)(vite@4.1.1):
+  /@sveltejs/vite-plugin-svelte@2.0.2(svelte@3.55.1)(vite@4.2.0):
     resolution: {integrity: sha512-xCEan0/NNpQuL0l5aS42FjwQ6wwskdxC3pW1OeFtEKNZwRg7Evro9lac9HesGP6TdFsTv2xMes5ASQVKbCacxg==}
     engines: {node: ^14.18.0 || >= 16}
     peerDependencies:
@@ -3054,8 +3054,8 @@ packages:
       magic-string: 0.27.0
       svelte: 3.55.1
       svelte-hmr: 0.15.1(svelte@3.55.1)
-      vite: 4.1.1(@types/node@17.0.45)
-      vitefu: 0.2.4(vite@4.1.1)
+      vite: 4.2.0(@types/node@17.0.45)
+      vitefu: 0.2.4(vite@4.2.0)
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -3533,7 +3533,7 @@ packages:
     transitivePeerDependencies:
       - supports-color
 
-  /@vitejs/plugin-vue2@2.2.0(vite@4.1.1)(vue@2.7.14):
+  /@vitejs/plugin-vue2@2.2.0(vite@4.2.0)(vue@2.7.14):
     resolution: {integrity: sha512-1km7zEuZ/9QRPvzXSjikbTYGQPG86Mq1baktpC4sXqsXlb02HQKfi+fl8qVS703JM7cgm24Ga9j+RwKmvFn90A==}
     engines: {node: ^14.18.0 || >= 16.0.0}
     peerDependencies:
@@ -3543,7 +3543,7 @@ packages:
       vue:
         optional: true
     dependencies:
-      vite: 4.1.1(@types/node@17.0.45)
+      vite: 4.2.0(@types/node@17.0.45)
       vue: 2.7.14
     dev: true
 
@@ -3585,8 +3585,22 @@ packages:
       vue:
         optional: true
     dependencies:
-      vite: 4.1.1(sass@1.58.0)
+      vite: 4.1.1(@types/node@17.0.45)
       vue: 3.2.47
+
+  /@vitejs/plugin-vue@4.0.0(vite@4.2.0)(vue@3.2.47):
+    resolution: {integrity: sha512-e0X4jErIxAB5oLtDqbHvHpJe/uWNkdpYV83AOG2xo2tEVSzCzewgJMtREZM30wXnM5ls90hxiOtAuVU6H5JgbA==}
+    engines: {node: ^14.18.0 || >=16.0.0}
+    peerDependencies:
+      vite: ^4.0.0 || ^2.9.0 || ^3.0.0
+      vue: '*'
+    peerDependenciesMeta:
+      vue:
+        optional: true
+    dependencies:
+      vite: 4.2.0(sass@1.58.0)
+      vue: 3.2.47
+    dev: true
 
   /@volar/language-core@1.0.24:
     resolution: {integrity: sha512-vTN+alJiWwK0Pax6POqrmevbtFW2dXhjwWiW/MW4f48eDYPLdyURWcr8TixO7EN/nHsUBj2udT7igFKPtjyAKg==}
@@ -7505,6 +7519,7 @@ packages:
 
   /immutable@4.2.3:
     resolution: {integrity: sha512-IHpmvaOIX4VLJwPOuQr1NpeBr2ZG6vpIj3blsLVxXRWJscLioaJRStqC+NcBsLeCDsnGlPpXd5/WZmnE7MbsKA==}
+    dev: true
 
   /import-fresh@3.3.0:
     resolution: {integrity: sha512-veYYhQa+D1QBKznvhUHxb8faxlrwUnxseDAbAp457E0wLNio2bOSKnjYDhMj+YiAq61xrMGhQk9iXVk5FzgQMw==}
@@ -10203,6 +10218,13 @@ packages:
     optionalDependencies:
       fsevents: 2.3.2
 
+  /rollup@3.20.2:
+    resolution: {integrity: sha512-3zwkBQl7Ai7MFYQE0y1MeQ15+9jsi7XxfrqwTb/9EK8D9C9+//EBR4M+CuA1KODRaNbFez/lWxA5vhEGZp4MUg==}
+    engines: {node: '>=14.18.0', npm: '>=8.0.0'}
+    hasBin: true
+    optionalDependencies:
+      fsevents: 2.3.2
+
   /run-async@2.4.1:
     resolution: {integrity: sha512-tvVnVv01b8c1RrA6Ep7JkStj85Guv/YrMcwqYQnwjsAS2cTmmPGBBjAjpCW7RrSodNSoE2/qg9O4bceNvUuDgQ==}
     engines: {node: '>=0.12.0'}
@@ -10257,6 +10279,7 @@ packages:
       chokidar: 3.5.3
       immutable: 4.2.3
       source-map-js: 1.0.2
+    dev: true
 
   /saxes@6.0.0:
     resolution: {integrity: sha512-xAg7SOnEhrm5zI3puOOKyy1OMcMlIJZYNJY7xLBwSze0UjhPLnWfj2GF2EpT0jmzaJKIWKHLsaSSajf35bcYnA==}
@@ -11433,7 +11456,7 @@ packages:
       picocolors: 1.0.0
       source-map: 0.6.1
       source-map-support: 0.5.21
-      vite: 4.1.1(@types/node@17.0.45)
+      vite: 4.2.0(@types/node@17.0.45)
     transitivePeerDependencies:
       - '@types/node'
       - less
@@ -11611,12 +11634,12 @@ packages:
       esbuild: 0.16.17
       postcss: 8.4.21
       resolve: 1.22.1
-      rollup: 3.14.0
+      rollup: 3.20.2
     optionalDependencies:
       fsevents: 2.3.2
 
-  /vite@4.1.1(sass@1.58.0):
-    resolution: {integrity: sha512-LM9WWea8vsxhr782r9ntg+bhSFS06FJgCvvB0+8hf8UWtvaiDagKYWXndjfX6kGl74keHJUcpzrQliDXZlF5yg==}
+  /vite@4.2.0(@types/node@17.0.45):
+    resolution: {integrity: sha512-AbDTyzzwuKoRtMIRLGNxhLRuv1FpRgdIw+1y6AQG73Q5+vtecmvzKo/yk8X/vrHDpETRTx01ABijqUHIzBXi0g==}
     engines: {node: ^14.18.0 || >=16.0.0}
     hasBin: true
     peerDependencies:
@@ -11640,15 +11663,49 @@ packages:
       terser:
         optional: true
     dependencies:
-      esbuild: 0.16.17
+      '@types/node': 17.0.45
+      esbuild: 0.17.5
       postcss: 8.4.21
       resolve: 1.22.1
-      rollup: 3.14.0
-      sass: 1.58.0
+      rollup: 3.20.2
     optionalDependencies:
       fsevents: 2.3.2
 
-  /vitefu@0.2.4(vite@4.1.1):
+  /vite@4.2.0(sass@1.58.0):
+    resolution: {integrity: sha512-AbDTyzzwuKoRtMIRLGNxhLRuv1FpRgdIw+1y6AQG73Q5+vtecmvzKo/yk8X/vrHDpETRTx01ABijqUHIzBXi0g==}
+    engines: {node: ^14.18.0 || >=16.0.0}
+    hasBin: true
+    peerDependencies:
+      '@types/node': '>= 14'
+      less: '*'
+      sass: '*'
+      stylus: '*'
+      sugarss: '*'
+      terser: ^5.4.0
+    peerDependenciesMeta:
+      '@types/node':
+        optional: true
+      less:
+        optional: true
+      sass:
+        optional: true
+      stylus:
+        optional: true
+      sugarss:
+        optional: true
+      terser:
+        optional: true
+    dependencies:
+      esbuild: 0.17.5
+      postcss: 8.4.21
+      resolve: 1.22.1
+      rollup: 3.20.2
+      sass: 1.58.0
+    optionalDependencies:
+      fsevents: 2.3.2
+    dev: true
+
+  /vitefu@0.2.4(vite@4.2.0):
     resolution: {integrity: sha512-fanAXjSaf9xXtOOeno8wZXIhgia+CZury481LsDaV++lSvcU2R9Ch2bPh3PYFyoHW+w9LqAeYRISVQjUIew14g==}
     peerDependencies:
       vite: ^3.0.0 || ^4.0.0 || ^2.9.0
@@ -11656,7 +11713,7 @@ packages:
       vite:
         optional: true
     dependencies:
-      vite: 4.1.1(@types/node@17.0.45)
+      vite: 4.2.0(@types/node@17.0.45)
     dev: true
 
   /vitepress@1.0.0-alpha.10:

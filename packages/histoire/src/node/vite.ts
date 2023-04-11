@@ -154,6 +154,7 @@ export async function getViteConfigWithPlugins (isServer: boolean, ctx: Context)
     },
 
     options () {
+      // @ts-ignore
       this.meta.histoire = {
         isCollecting: isServer,
       }
