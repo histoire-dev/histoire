@@ -38,7 +38,7 @@ export async function createMarkdownRenderer (ctx: Context) {
     })}</div>`,
     linkify: true,
     html: true,
-    breaks: true,
+    breaks: false,
   })
 
   md.use(anchor, {
