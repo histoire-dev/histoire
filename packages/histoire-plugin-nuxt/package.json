@@ -28,13 +28,15 @@
   },
   "dependencies": {
     "@nuxt/kit": "^3.0.0-rc.11",
+    "@vitejs/plugin-vue": "^4.1.0",
+    "@vitejs/plugin-vue-jsx": "^3.0.1",
     "h3": "^1.4.0",
     "ofetch": "^1.0.0",
     "unenv": "^1.1.1"
   },
   "devDependencies": {
-    "@types/node": "^17.0.32",
     "@nuxt/schema": "^3.0.0-rc.11",
+    "@types/node": "^17.0.32",
     "histoire": "workspace:*",
     "typescript": "^4.9.5",
     "vite": "^4.2.0"
