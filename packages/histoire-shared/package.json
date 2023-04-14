@@ -29,7 +29,7 @@
     "watch": "tsc -d -w --sourceMap"
   },
   "dependencies": {
-    "@histoire/vendors": "^0.16.0",
+    "@histoire/vendors": "workspace:^",
     "@types/fs-extra": "^9.0.13",
     "@types/markdown-it": "^12.2.3",
     "chokidar": "^3.5.3",

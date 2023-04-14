@@ -38,9 +38,9 @@
     "watch": "concurrently \"vite build --watch\" \"pnpm run build:types --watch\""
   },
   "dependencies": {
-    "@histoire/controls": "^0.16.0",
-    "@histoire/shared": "^0.16.0",
-    "@histoire/vendors": "^0.16.0"
+    "@histoire/controls": "workspace:^",
+    "@histoire/shared": "workspace:^",
+    "@histoire/vendors": "workspace:^"
   },
   "devDependencies": {
     "@types/node": "^17.0.32",
@@ -53,7 +53,7 @@
     "vue": "^2.7.8"
   },
   "peerDependencies": {
-    "histoire": "^0.16.0",
+    "histoire": "workspace:^",
     "vue": "^2.7.8"
   }
 }

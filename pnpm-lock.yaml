@@ -130,7 +130,7 @@ importers:
         version: 4.10.7(postcss@8.4.21)(svelte@3.55.1)(typescript@4.9.5)
       vite:
         specifier: ^4.2.0
-        version: 4.2.0(sass@1.58.0)
+        version: 4.2.0(@types/node@17.0.45)
 
   examples/sveltekit:
     dependencies:
@@ -173,7 +173,7 @@ importers:
         version: 4.9.5
       vite:
         specifier: ^4.2.0
-        version: 4.2.0(sass@1.58.0)
+        version: 4.2.0(@types/node@17.0.45)
 
   examples/vue2:
     dependencies:
@@ -192,7 +192,7 @@ importers:
         version: link:../../packages/histoire
       vite:
         specifier: ^4.2.0
-        version: 4.2.0(sass@1.58.0)
+        version: 4.2.0(@types/node@17.0.45)
       vue-template-compiler:
         specifier: ^2.7.8
         version: 2.7.14
@@ -260,7 +260,7 @@ importers:
         version: link:../../packages/histoire
       vite:
         specifier: ^4.2.0
-        version: 4.2.0(sass@1.58.0)
+        version: 4.2.0(@types/node@17.0.45)
 
   examples/vue3-screenshot:
     dependencies:
@@ -282,7 +282,7 @@ importers:
         version: link:../../packages/histoire
       vite:
         specifier: ^4.2.0
-        version: 4.2.0(sass@1.58.0)
+        version: 4.2.0(@types/node@17.0.45)
 
   examples/vue3-themed:
     dependencies:
@@ -301,7 +301,7 @@ importers:
         version: link:../../packages/histoire
       vite:
         specifier: ^4.2.0
-        version: 4.2.0(sass@1.58.0)
+        version: 4.2.0(@types/node@17.0.45)
 
   examples/vue3-vuetify:
     dependencies:
@@ -337,16 +337,16 @@ importers:
         specifier: ^0.3.1
         version: 0.3.1
       '@histoire/app':
-        specifier: ^0.16.0
+        specifier: workspace:^
         version: link:../histoire-app
       '@histoire/controls':
-        specifier: ^0.16.0
+        specifier: workspace:^
         version: link:../histoire-controls
       '@histoire/shared':
-        specifier: ^0.16.0
+        specifier: workspace:^
         version: link:../histoire-shared
       '@histoire/vendors':
-        specifier: ^0.16.0
+        specifier: workspace:^
         version: link:../histoire-vendors
       '@types/flexsearch':
         specifier: ^0.7.3
@@ -455,13 +455,13 @@ importers:
   packages/histoire-app:
     dependencies:
       '@histoire/controls':
-        specifier: ^0.16.0
+        specifier: workspace:^
         version: link:../histoire-controls
       '@histoire/shared':
-        specifier: ^0.16.0
+        specifier: workspace:^
         version: link:../histoire-shared
       '@histoire/vendors':
-        specifier: ^0.16.0
+        specifier: workspace:^
         version: link:../histoire-vendors
       '@types/flexsearch':
         specifier: ^0.7.3
@@ -546,10 +546,10 @@ importers:
         specifier: ^6.3.0
         version: 6.7.3
       '@histoire/shared':
-        specifier: ^0.16.0
+        specifier: workspace:^
         version: link:../histoire-shared
       '@histoire/vendors':
-        specifier: ^0.16.0
+        specifier: workspace:^
         version: link:../histoire-vendors
     devDependencies:
       '@peeky/server':
@@ -621,16 +621,16 @@ importers:
         version: link:../histoire
       vite:
         specifier: ^4.2.0
-        version: 4.2.0(sass@1.58.0)
+        version: 4.2.0(@types/node@17.0.45)
 
   packages/histoire-plugin-nuxt:
     dependencies:
       '@histoire/plugin-vue':
-        specifier: ^0.16.0
+        specifier: workspace:^
         version: link:../histoire-plugin-vue
       '@nuxt/kit':
         specifier: ^3.0.0-rc.11
-        version: 3.1.2
+        version: 3.1.2(rollup@3.14.0)
       '@vitejs/plugin-vue':
         specifier: ^4.1.0
         version: 4.1.0(vite@4.2.1)(vue@3.2.47)
@@ -652,7 +652,7 @@ importers:
     devDependencies:
       '@nuxt/schema':
         specifier: ^3.0.0-rc.11
-        version: 3.1.2
+        version: 3.1.2(rollup@3.14.0)
       '@types/node':
         specifier: ^17.0.32
         version: 17.0.45
@@ -722,13 +722,13 @@ importers:
   packages/histoire-plugin-svelte:
     dependencies:
       '@histoire/controls':
-        specifier: ^0.16.0
+        specifier: workspace:^
         version: link:../histoire-controls
       '@histoire/shared':
-        specifier: ^0.16.0
+        specifier: workspace:^
         version: link:../histoire-shared
       '@histoire/vendors':
-        specifier: ^0.16.0
+        specifier: workspace:^
         version: link:../histoire-vendors
       change-case:
         specifier: ^4.1.2
@@ -774,13 +774,13 @@ importers:
   packages/histoire-plugin-vue:
     dependencies:
       '@histoire/controls':
-        specifier: ^0.16.0
+        specifier: workspace:^
         version: link:../histoire-controls
       '@histoire/shared':
-        specifier: ^0.16.0
+        specifier: workspace:^
         version: link:../histoire-shared
       '@histoire/vendors':
-        specifier: ^0.16.0
+        specifier: workspace:^
         version: link:../histoire-vendors
       change-case:
         specifier: ^4.1.2
@@ -817,13 +817,13 @@ importers:
   packages/histoire-plugin-vue2:
     dependencies:
       '@histoire/controls':
-        specifier: ^0.16.0
+        specifier: workspace:^
         version: link:../histoire-controls
       '@histoire/shared':
-        specifier: ^0.16.0
+        specifier: workspace:^
         version: link:../histoire-shared
       '@histoire/vendors':
-        specifier: ^0.16.0
+        specifier: workspace:^
         version: link:../histoire-vendors
     devDependencies:
       '@types/node':
@@ -854,7 +854,7 @@ importers:
   packages/histoire-shared:
     dependencies:
       '@histoire/vendors':
-        specifier: ^0.16.0
+        specifier: workspace:^
         version: link:../histoire-vendors
       '@types/fs-extra':
         specifier: ^9.0.13
@@ -877,7 +877,7 @@ importers:
         version: 4.9.5
       vite:
         specifier: ^4.2.0
-        version: 4.2.0(sass@1.58.0)
+        version: 4.2.0(@types/node@17.0.45)
 
   packages/histoire-vendors:
     devDependencies:
@@ -1323,7 +1323,7 @@ packages:
       '@babel/core': 7.20.12
       '@babel/helper-annotate-as-pure': 7.18.6
       '@babel/helper-environment-visitor': 7.18.9
-      '@babel/helper-function-name': 7.19.0
+      '@babel/helper-function-name': 7.21.0
       '@babel/helper-member-expression-to-functions': 7.20.7
       '@babel/helper-optimise-call-expression': 7.18.6
       '@babel/helper-replace-supers': 7.20.7
@@ -1354,14 +1354,6 @@ packages:
   /@babel/helper-environment-visitor@7.18.9:
     resolution: {integrity: sha512-3r/aACDJ3fhQ/EVgFy0hpj8oHyHpQc+LPtJoY9SzTThAsStm4Ptegq92vqKoE3vD706ZVFWITnMnxucw+S9Ipg==}
     engines: {node: '>=6.9.0'}
-
-  /@babel/helper-function-name@7.19.0:
-    resolution: {integrity: sha512-WAwHBINyrpqywkUH0nTnNgI5ina5TFn85HKS0pbPDfxFfhyR/aNQEn4hGi1P1JyT//I0t4OgXUlofzWILRvS5w==}
-    engines: {node: '>=6.9.0'}
-    dependencies:
-      '@babel/template': 7.20.7
-      '@babel/types': 7.21.4
-    dev: false
 
   /@babel/helper-function-name@7.21.0:
     resolution: {integrity: sha512-HfK1aMRanKHpxemaY2gqBmL04iAPOPRj7DxtNbiDOrJK+gdwkiNRVpCpUJYbUT+aZyemKN8brqTOxzCaG6ExRg==}
@@ -2724,32 +2716,6 @@ packages:
   /@nuxt/devalue@2.0.0:
     resolution: {integrity: sha512-YBI/6o2EBz02tdEJRBK8xkt3zvOFOWlLBf7WKYGBsSYSRtjjgrqPe2skp6VLLmKx5WbHHDNcW+6oACaurxGzeA==}
 
-  /@nuxt/kit@3.1.2:
-    resolution: {integrity: sha512-m8/AF8hBJiG7aTx2CpiDGeLYYz30fUoPbJ9XiSmHqRIXv1goAFWHSkzWfRNEsoAAbMHf76oB917wVUQ3VSSQHg==}
-    engines: {node: ^14.16.0 || ^16.10.0 || ^17.0.0 || ^18.0.0 || ^19.0.0}
-    dependencies:
-      '@nuxt/schema': 3.1.2
-      c12: 1.1.0
-      consola: 2.15.3
-      defu: 6.1.2
-      globby: 13.1.3
-      hash-sum: 2.0.0
-      ignore: 5.2.4
-      jiti: 1.18.2
-      knitwork: 1.0.0
-      lodash.template: 4.5.0
-      mlly: 1.1.0
-      pathe: 1.1.0
-      pkg-types: 1.0.1
-      scule: 1.0.0
-      semver: 7.3.8
-      unctx: 2.1.1
-      unimport: 2.1.0
-      untyped: 1.2.2
-    transitivePeerDependencies:
-      - rollup
-      - supports-color
-
   /@nuxt/kit@3.1.2(rollup@3.14.0):
     resolution: {integrity: sha512-m8/AF8hBJiG7aTx2CpiDGeLYYz30fUoPbJ9XiSmHqRIXv1goAFWHSkzWfRNEsoAAbMHf76oB917wVUQ3VSSQHg==}
     engines: {node: ^14.16.0 || ^16.10.0 || ^17.0.0 || ^18.0.0 || ^19.0.0}
@@ -2775,7 +2741,6 @@ packages:
     transitivePeerDependencies:
       - rollup
       - supports-color
-    dev: false
 
   /@nuxt/kit@3.3.3:
     resolution: {integrity: sha512-8ql3DweT1BNOCM6mmP8st+33NCAHHvmQuOS6Q75kXMZ6Ygqv06hxp5slpLXpT1ZOEoM+vzfkjO2lJ3rnjWYC4Q==}
@@ -2819,27 +2784,6 @@ packages:
       - webpack
     dev: true
 
-  /@nuxt/schema@3.1.2:
-    resolution: {integrity: sha512-wru9LhRXTa6WQlx7c0oYrtvJY7TiVlkBKXY5Rsmfo0StJuWohgZiReu9fu6z6GU4MzZlX25TVjwvq9Q7bNVbSQ==}
-    engines: {node: ^14.16.0 || ^16.10.0 || ^17.0.0 || ^18.0.0 || ^19.0.0}
-    dependencies:
-      c12: 1.1.0
-      create-require: 1.1.1
-      defu: 6.1.2
-      hookable: 5.4.2
-      jiti: 1.18.2
-      pathe: 1.1.0
-      pkg-types: 1.0.1
-      postcss-import-resolver: 2.0.0
-      scule: 1.0.0
-      std-env: 3.3.2
-      ufo: 1.0.1
-      unimport: 2.1.0
-      untyped: 1.2.2
-    transitivePeerDependencies:
-      - rollup
-      - supports-color
-
   /@nuxt/schema@3.1.2(rollup@3.14.0):
     resolution: {integrity: sha512-wru9LhRXTa6WQlx7c0oYrtvJY7TiVlkBKXY5Rsmfo0StJuWohgZiReu9fu6z6GU4MzZlX25TVjwvq9Q7bNVbSQ==}
     engines: {node: ^14.16.0 || ^16.10.0 || ^17.0.0 || ^18.0.0 || ^19.0.0}
@@ -2860,7 +2804,6 @@ packages:
     transitivePeerDependencies:
       - rollup
       - supports-color
-    dev: false
 
   /@nuxt/schema@3.3.3:
     resolution: {integrity: sha512-OxedDFqBJG8bfTEDOH5hVbQLXpFpSmBOM/oC6J4dTqM2GiWxYJysML5Lo7FPSMqFkTtgxVmd75bp+DRPE5XzWA==}
@@ -3016,7 +2959,7 @@ packages:
         optional: true
     dependencies:
       '@nuxt/kit': 3.3.3
-      '@rollup/plugin-replace': 5.0.2(rollup@3.20.2)
+      '@rollup/plugin-replace': 5.0.2(rollup@3.14.0)
       '@vitejs/plugin-vue': 4.1.0(vite@4.2.1)(vue@3.2.47)
       '@vitejs/plugin-vue-jsx': 3.0.1(vite@4.2.1)(vue@3.2.47)
       autoprefixer: 10.4.14(postcss@8.4.21)
@@ -3041,7 +2984,7 @@ packages:
       postcss: 8.4.21
       postcss-import: 15.1.0(postcss@8.4.21)
       postcss-url: 10.1.3(postcss@8.4.21)
-      rollup-plugin-visualizer: 5.9.0(rollup@3.20.2)
+      rollup-plugin-visualizer: 5.9.0(rollup@3.14.0)
       std-env: 3.3.2
       strip-literal: 1.0.1
       ufo: 1.1.1
@@ -3073,7 +3016,7 @@ packages:
   /@nuxtjs/tailwindcss@5.3.5:
     resolution: {integrity: sha512-d6noacVfcN88R6Iqd5/kl7YyumE+EIsz6ky26JvidHtkTeAPxZt8XN/KFEMJ6xwSvhsUndrNW94XYPKv7l79jg==}
     dependencies:
-      '@nuxt/kit': 3.1.2
+      '@nuxt/kit': 3.1.2(rollup@3.14.0)
       '@nuxt/postcss8': 1.1.3
       autoprefixer: 10.4.13(postcss@8.4.21)
       chalk: 5.2.0
@@ -3539,7 +3482,6 @@ packages:
       '@rollup/pluginutils': 5.0.2(rollup@3.14.0)
       magic-string: 0.27.0
       rollup: 3.14.0
-    dev: false
 
   /@rollup/plugin-replace@5.0.2(rollup@3.20.2):
     resolution: {integrity: sha512-M9YXNekv/C/iHHK+cvORzfRYfPbq0RDD8r0G+bMiTXjNGKulPnCT9O3Ss46WfhI6ZOCgApOP7xAdmCQJ+U2LAA==}
@@ -3735,7 +3677,7 @@ packages:
       svelte: 3.55.1
       tiny-glob: 0.2.9
       undici: 5.16.0
-      vite: 4.2.0(sass@1.58.0)
+      vite: 4.2.0(@types/node@17.0.45)
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -3772,7 +3714,7 @@ packages:
       magic-string: 0.27.0
       svelte: 3.55.1
       svelte-hmr: 0.15.1(svelte@3.55.1)
-      vite: 4.2.0(sass@1.58.0)
+      vite: 4.2.0(@types/node@17.0.45)
       vitefu: 0.2.4(vite@4.2.0)
     transitivePeerDependencies:
       - supports-color
@@ -4326,7 +4268,7 @@ packages:
       vue:
         optional: true
     dependencies:
-      vite: 4.2.0(sass@1.58.0)
+      vite: 4.2.0(@types/node@17.0.45)
       vue: 2.7.14
     dev: true
 
@@ -4447,7 +4389,7 @@ packages:
       '@babel/helper-module-imports': 7.18.6
       '@babel/plugin-syntax-jsx': 7.18.6(@babel/core@7.20.12)
       '@babel/template': 7.20.7
-      '@babel/traverse': 7.20.13
+      '@babel/traverse': 7.21.4
       '@babel/types': 7.21.4
       '@vue/babel-helper-vue-transform-on': 1.0.2
       camelcase: 6.3.0
@@ -11799,7 +11741,6 @@ packages:
       rollup: 3.14.0
       source-map: 0.7.4
       yargs: 17.6.2
-    dev: false
 
   /rollup-plugin-visualizer@5.9.0(rollup@3.20.2):
     resolution: {integrity: sha512-bbDOv47+Bw4C/cgs0czZqfm8L82xOZssk4ayZjG40y9zbXclNk7YikrZTDao6p7+HDiGxrN0b65SgZiVm9k1Cg==}
@@ -12968,23 +12909,6 @@ packages:
       hookable: 5.5.3
     dev: true
 
-  /unimport@2.1.0:
-    resolution: {integrity: sha512-GDVIxATluUquX8EqelT6DtnmnZaXGID1jsO9IXwlnxb0OIEqKAxTOnTlnGmHbseoGTh+ZC9kcNDaO18HYQj9KA==}
-    dependencies:
-      '@rollup/pluginutils': 5.0.2(rollup@3.14.0)
-      escape-string-regexp: 5.0.0
-      fast-glob: 3.2.12
-      local-pkg: 0.4.3
-      magic-string: 0.27.0
-      mlly: 1.1.0
-      pathe: 1.1.0
-      pkg-types: 1.0.1
-      scule: 1.0.0
-      strip-literal: 1.0.1
-      unplugin: 1.0.1
-    transitivePeerDependencies:
-      - rollup
-
   /unimport@2.1.0(rollup@3.14.0):
     resolution: {integrity: sha512-GDVIxATluUquX8EqelT6DtnmnZaXGID1jsO9IXwlnxb0OIEqKAxTOnTlnGmHbseoGTh+ZC9kcNDaO18HYQj9KA==}
     dependencies:
@@ -13001,7 +12925,6 @@ packages:
       unplugin: 1.0.1
     transitivePeerDependencies:
       - rollup
-    dev: false
 
   /unimport@3.0.6(rollup@3.20.2):
     resolution: {integrity: sha512-GYxGJ1Bri1oqx8VFDjdgooGzeK7jBk3bvhXmamTIpu3nONOcUMGwZbX7X0L5RA7OWMXpR4vzpSQP7pXUzJg1/Q==}
@@ -13605,7 +13528,7 @@ packages:
       vite:
         optional: true
     dependencies:
-      vite: 4.2.0(sass@1.58.0)
+      vite: 4.2.0(@types/node@17.0.45)
     dev: true
 
   /vitepress@1.0.0-alpha.10:

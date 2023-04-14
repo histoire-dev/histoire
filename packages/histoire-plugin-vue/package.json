@@ -45,9 +45,9 @@
     "watch": "concurrently \"vite build --watch\" \"tsc -d -P tsconfig.build.json --watch\" \"pnpm run build:types --watch\""
   },
   "dependencies": {
-    "@histoire/controls": "^0.16.0",
-    "@histoire/shared": "^0.16.0",
-    "@histoire/vendors": "^0.16.0",
+    "@histoire/controls": "workspace:^",
+    "@histoire/shared": "workspace:^",
+    "@histoire/vendors": "workspace:^",
     "change-case": "^4.1.2",
     "globby": "^13.1.1",
     "launch-editor": "^2.6.0",
@@ -62,7 +62,7 @@
     "vue": "^3.2.47"
   },
   "peerDependencies": {
-    "histoire": "^0.16.0",
+    "histoire": "workspace:^",
     "vue": "^3.2.47"
   }
 }
