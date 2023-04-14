@@ -42,8 +42,8 @@
     "vite": "^4.2.0"
   },
   "peerDependencies": {
-    "@histoire/plugin-vue": "^0.15.8",
-    "histoire": "^0.15.8",
+    "@histoire/plugin-vue": "^0.16.0",
+    "histoire": "^0.16.0",
     "nuxt": "^3.0.0-rc.11"
   }
 }

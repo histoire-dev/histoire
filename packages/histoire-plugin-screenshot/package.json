@@ -38,6 +38,6 @@
     "typescript": "^4.9.5"
   },
   "peerDependencies": {
-    "histoire": "^0.15.8"
+    "histoire": "^0.16.0"
   }
 }
