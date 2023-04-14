@@ -1,3 +1,30 @@
+## v0.16.1
+
+[compare changes](https://github.com/Akryum/histoire/compare/v0.16.0...v0.16.1)
+
+
+### 🩹 Fixes
+
+  - **nuxt:** Add vite vue plugins if they are missing ([#517](https://github.com/Akryum/histoire/pull/517))
+  - Bump histoire dependencies to 0.16.0 ([84a027e](https://github.com/Akryum/histoire/commit/84a027e))
+
+### 🏡 Chore
+
+  - Use workspace protocol more ([17c1347](https://github.com/Akryum/histoire/commit/17c1347))
+
+### 🤖 CI
+
+  - Update release-tag job ([4e3cdee](https://github.com/Akryum/histoire/commit/4e3cdee))
+  - Allow manual release ([3512564](https://github.com/Akryum/histoire/commit/3512564))
+  - Update release-tag ([7510557](https://github.com/Akryum/histoire/commit/7510557))
+  - Fix netlify pnpm version ([1a1cc68](https://github.com/Akryum/histoire/commit/1a1cc68))
+
+### ❤️  Contributors
+
+- Guillaume Chau ([@Akryum](http://github.com/Akryum))
+- Roel Van Hintum 
+- Daniel Roe <daniel@roe.dev>
+
 ## v0.16.0
 
 [compare changes](https://github.com/Akryum/histoire/compare/v0.15.9...v0.16.0)
