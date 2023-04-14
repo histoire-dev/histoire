@@ -1,5 +1,7 @@
 import { fileURLToPath } from 'node:url'
 import { join } from 'node:path'
+import vuePlugin from '@vitejs/plugin-vue'
+import viteJsxPlugin from '@vitejs/plugin-vue-jsx'
 import type { Plugin } from 'histoire'
 import type { Nuxt } from '@nuxt/schema'
 import type { UserConfig as ViteConfig } from 'vite'
@@ -12,6 +14,11 @@ const ignorePlugins = [
   'nuxt:dynamic-base-path',
   'nuxt:import-protection',
 ]
+
+const vuePlugins = {
+  'vite:vue': [vuePlugin, 'vue'],
+  'vite:vue-jsx': [viteJsxPlugin, 'vueJsx'],
+} as const
 
 export function HstNuxt (): Plugin {
   let nuxt: Nuxt
@@ -160,6 +167,13 @@ async function useNuxtViteConfig () {
         nuxt.hook('vite:extendConfig', (config, { isClient }) => {
           // @ts-ignore
           if (isClient) {
+            for (const name in vuePlugins) {
+              if (!config.plugins?.some(p => (p as any)?.name === name)) {
+                const [plugin, key] = vuePlugins[name as keyof typeof vuePlugins]
+                // @ts-expect-error mismatching component options
+                config.plugins.push(plugin(config[key]))
+              }
+            }
             resolve({ ...config })
           }
         })
