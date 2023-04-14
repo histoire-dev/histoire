@@ -65,5 +65,6 @@
         "vue": "*"
       }
     }
-  }
+  },
+  "packageManager": "pnpm@8.2.0"
 }
