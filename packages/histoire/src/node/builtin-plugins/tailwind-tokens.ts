@@ -136,7 +136,7 @@ export default {
       }, ({ color}) => h('div', {
         class: '__hst-shade',
         style: {
-          backgroundColor: color,
+          backgroundColor: color.replace('<alpha-value>', 1),
         },
       })))),
       onMountControls: (api) => mountApp(api, () => [
@@ -159,7 +159,7 @@ export default {
       }, ({ color}) => h('div', {
         class: '__hst-shade __hst-text',
         style: {
-          color,
+          color: color.replace('<alpha-value>', 1),
         },
       }, 'Aa')))),
       onMountControls: (api) => mountApp(api, () => [
@@ -182,7 +182,7 @@ export default {
       }, ({ color}) => h('div', {
         class: '__hst-shade __hst-border',
         style: {
-          borderColor: color,
+          borderColor: color.replace('<alpha-value>', 1),
         },
       })))),
       onMountControls: (api) => mountApp(api, () => [
