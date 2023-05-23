@@ -13,10 +13,8 @@ export function createPath (config: HistoireConfig, file: ServerTreeFile) {
   }
 
   if (config.tree.file === 'path') {
-    const path = file.path.split('/')
-    path.pop()
-    path.push(file.title)
-    return path
+    const paths = file.path.split('/').slice(0, -1)
+    return [...paths, file.title]
   }
 
   return config.tree.file(file)
