@@ -1,14 +1,3 @@
-<script setup>
-const viteNodeInlineDepsError = `.../my-project/node_modules/.pnpm/some-library@1.0.0/lib/esm/index.js:3
-export function foo() {
-^^^^^^
-
-SyntaxError: Unexpected token 'export'
-    at Object.compileFunction (node:vm:352:18)
-    at wrapSafe (node:internal/modules/cjs/loader:1031:15)
-    ...`
-</script>
-
 # Configuration Reference
 
 Learn more about configuring Histoire [here](../guide/config.md).
