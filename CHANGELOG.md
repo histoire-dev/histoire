@@ -1,3 +1,39 @@
+## v0.16.2
+
+[compare changes](https://github.com/Akryum/histoire/compare/v0.16.1...v0.16.2)
+
+
+### 🚀 Enhancements
+
+  - Tailwind tokens support opacity modifier syntax color ([#526](https://github.com/Akryum/histoire/pull/526), [#525](https://github.com/Akryum/histoire/pull/525))
+
+### 🩹 Fixes
+
+  - Vite mergeConfig doesn't accept callback params ([dcd5d9f](https://github.com/Akryum/histoire/commit/dcd5d9f))
+
+### 💅 Refactors
+
+  - More readable code for tree config ([#539](https://github.com/Akryum/histoire/pull/539))
+
+### 📖 Documentation
+
+  - **config:** Add info about ionic binary files error ([#540](https://github.com/Akryum/histoire/pull/540))
+
+### 🏡 Chore
+
+  - Update to pnpm 8.6 ([6c4e4c7](https://github.com/Akryum/histoire/commit/6c4e4c7))
+
+### 🤖 CI
+
+  - Update release-tag action ([4bbaddb](https://github.com/Akryum/histoire/commit/4bbaddb))
+  - Fix ci with vite 4.3 ([9209381](https://github.com/Akryum/histoire/commit/9209381))
+
+### ❤️  Contributors
+
+- Guillaume Chau ([@Akryum](http://github.com/Akryum))
+- SerKo 
+- Reslear <reslear@gmail.com>
+
 ## v0.16.1
 
 [compare changes](https://github.com/Akryum/histoire/compare/v0.16.0...v0.16.1)
