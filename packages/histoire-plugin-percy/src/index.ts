@@ -17,10 +17,22 @@ export interface PercyPluginOptions {
    * Percy options.
    */
   percyOptions?: any
+
+  /**
+   * Delay puppeteer page screenshot after page load
+   */
+  pptrWait?: number
+
+  /**
+   * Navigation Parameter
+   */
+  pptrOptions?: any
 }
 
 const defaultOptions: PercyPluginOptions = {
   percyOptions: {},
+  pptrWait: 0,
+  pptrOptions: {}
 }
 
 export function HstPercy (options: PercyPluginOptions = {}): Plugin {
@@ -57,7 +69,9 @@ export function HstPercy (options: PercyPluginOptions = {}): Plugin {
         }
 
         const page = await browser.newPage()
-        await page.goto(url)
+        await page.goto(url, finalOptions.pptrOptions)
+
+        await new Promise(resolve => setTimeout(resolve, finalOptions.pptrWait));
 
         const name = `${story.title} > ${variant.title}`
         await page.evaluate(await fetchPercyDOM())
