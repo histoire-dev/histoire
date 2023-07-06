@@ -32,7 +32,7 @@ export interface PercyPluginOptions {
 const defaultOptions: PercyPluginOptions = {
   percyOptions: {},
   pptrWait: 0,
-  pptrOptions: {}
+  pptrOptions: {},
 }
 
 export function HstPercy (options: PercyPluginOptions = {}): Plugin {
@@ -71,7 +71,7 @@ export function HstPercy (options: PercyPluginOptions = {}): Plugin {
         const page = await browser.newPage()
         await page.goto(url, finalOptions.pptrOptions)
 
-        await new Promise(resolve => setTimeout(resolve, finalOptions.pptrWait));
+        await new Promise(resolve => setTimeout(resolve, finalOptions.pptrWait))
 
         const name = `${story.title} > ${variant.title}`
         await page.evaluate(await fetchPercyDOM())
