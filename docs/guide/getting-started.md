@@ -28,6 +28,44 @@ Histoire is a tool to generate stories applications (or "books").
   <DemoLinks framework="svelte3" />
 </div>
 
+## To install
+
+To use histoire you can install the `histoire` package
+
+### NPM
+```bash
+npm install --save-dev histoire
+```
+
+### YARN
+```bash
+yarn add -D histoire
+```
+
+### PNPM
+```bash
+pnpm add -D histoire
+```
+
+Then you must install one of the available [plugins](./plugins/official.md).
+
+- @histoire/plugin-vue
+- @histoire/plugin-nuxt
+- @histoire/plugin-svelte
+- @histoire/plugin-percy
+- @histoire/plugin-screenshot
+
+```bash
+# NPM 
+npm install @histoire/plugin-name
+
+# YARN 
+yarn add -D @histoire/plugin-name
+
+# PNPM 
+pnpm add -D @histoire/plugin-name
+```
+
 ## Sponsors
 
 Histoire is an Open-Source project supported by our sponsors - thank you!
