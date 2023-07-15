@@ -1,3 +1,26 @@
+## v0.16.3
+
+[compare changes](https://github.com/Akryum/histoire/compare/v0.16.2...v0.16.3)
+
+
+### 🚀 Enhancements
+
+  - **plugin-percy:** Add option to delay pupeteer screenshot and modif… ([#559](https://github.com/Akryum/histoire/pull/559))
+
+### 🩹 Fixes
+
+  - **svelte:** Missing globby dep, fix #553 ([#553](https://github.com/Akryum/histoire/issues/553))
+
+### 🏡 Chore
+
+  - Fix pnpm version inconsistency ([#550](https://github.com/Akryum/histoire/pull/550))
+
+### ❤️  Contributors
+
+- Guillaume Chau ([@Akryum](http://github.com/Akryum))
+- Noel Schenk ([@noel-schenk](http://github.com/noel-schenk))
+- 翠 / Green <green@sapphi.red>
+
 ## v0.16.2
 
 [compare changes](https://github.com/Akryum/histoire/compare/v0.16.1...v0.16.2)
