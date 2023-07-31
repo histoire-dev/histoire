@@ -28,6 +28,7 @@ export function HstNuxt (): Plugin {
     async defaultConfig () {
       const nuxtViteConfig = await useNuxtViteConfig()
       const { viteConfig } = nuxtViteConfig
+
       nuxt = nuxtViteConfig.nuxt // We save it to close it later
       const plugins = viteConfig.plugins.filter((p: any) => !ignorePlugins.includes(p?.name))
       return {
@@ -63,7 +64,7 @@ export function HstNuxt (): Plugin {
           `${nuxt.options.css.map(file => `import '${file}'`).join('\n')}`,
           `import { setupNuxtApp } from '@histoire/plugin-nuxt/dist/runtime/app-setup.js'
 export async function setupVue3 () {
-  await setupNuxtApp()
+  await setupNuxtApp(${JSON.stringify(nuxt.options.runtimeConfig.public)})
 }`,
         ],
         viteNodeInlineDeps: [

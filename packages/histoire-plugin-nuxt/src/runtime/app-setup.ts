@@ -1,8 +1,9 @@
+import { PublicRuntimeConfig } from '@nuxt/schema'
 import type { App } from 'h3'
 import { createApp } from 'h3'
 import { createFetch } from 'ofetch'
 
-export async function setupNuxtApp () {
+export async function setupNuxtApp (publicConfig: PublicRuntimeConfig) {
   const win = window as unknown as Window & {
     __app: App
     __registry: Set<string>
@@ -16,7 +17,7 @@ export async function setupNuxtApp () {
   win.__NUXT__ = {
     serverRendered: false,
     config: {
-      public: {},
+      public: { ...publicConfig },
       app: { baseURL: '/' },
     },
     data: {},
