@@ -61,6 +61,6 @@
   },
   "peerDependencies": {
     "histoire": "workspace:^",
-    "svelte": "^3.0.0"
+    "svelte": "^3.0.0 || ^4.0.0"
   }
 }
