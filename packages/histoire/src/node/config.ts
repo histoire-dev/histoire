@@ -174,14 +174,18 @@ export async function loadConfigFile (configFile: string): Promise<Partial<Histo
 export const mergeConfig = createDefu((obj: any, key, value) => {
   if (obj[key] && key === 'vite') {
     const initialValue = obj[key]
-    if (typeof value === 'function') {
-      obj[key] = async (...args) => {
-        const result = await value(...args)
-        return mergeViteConfig(initialValue, result)
-      }
-    } else {
-      obj[key] = mergeViteConfig(initialValue, value)
+
+    // Convert to functions
+    const initialFn: (...args: any[]) => Promise<any> = typeof initialValue === 'function' ? initialValue : async () => initialValue
+    const valueFn: (...args: any[]) => Promise<any> = typeof value === 'function' ? value : async () => value
+
+    obj[key] = async (...args) => {
+      // `mergeViteConfig` doesn't accept functions so we need to call them
+      const initialResult = await initialFn(...args)
+      const valueResult = await valueFn(...args)
+      return mergeViteConfig(initialResult, valueResult)
     }
+
     return true
   }
 
