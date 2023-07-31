@@ -12,5 +12,8 @@ console.log('useRuntimeConfig', config)
 
     <h3>Nuxt runtime config</h3>
     <pre>{{ config }}</pre>
+    <p data-testid="config">
+      {{ config.public.configFromNuxt }}
+    </p>
   </Story>
 </template>
