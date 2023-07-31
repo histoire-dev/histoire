@@ -1,0 +1,27 @@
+{
+  "name": "histoire-example-svelte4",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "story:dev": "histoire dev",
+    "story:build": "histoire build",
+    "story:preview": "histoire preview --port 4567",
+    "ci": "start-server-and-test story:preview http://localhost:4567/ test",
+    "test": "cypress run",
+    "test:dev": "cypress open --config baseUrl=http://localhost:6006",
+    "test:examples": "pnpm run story:build && pnpm run ci"
+  },
+  "type": "module",
+  "dependencies": {
+    "svelte": "^4.1.2"
+  },
+  "devDependencies": {
+    "@histoire/plugin-svelte": "workspace:*",
+    "@sveltejs/vite-plugin-svelte": "^2.4.3",
+    "cypress": "^10.8.0",
+    "histoire": "workspace:*",
+    "start-server-and-test": "^1.14.0",
+    "svelte-preprocess": "^5.0.4",
+    "vite": "^4.2.0"
+  }
+}
