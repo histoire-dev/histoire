@@ -55,12 +55,12 @@
     "fs-extra": "^10.0.1",
     "globby": "^13.1.1",
     "histoire": "workspace:*",
-    "svelte": "^3.49.0",
+    "svelte": "^3.49.0 || ^4.0.0",
     "svelte-preprocess": "^4.10.7",
     "vite": "^4.2.0"
   },
   "peerDependencies": {
     "histoire": "workspace:^",
-    "svelte": "^3.0.0"
+    "svelte": "^3.0.0 || ^4.0.0"
   }
 }
