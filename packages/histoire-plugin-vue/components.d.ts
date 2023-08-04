@@ -7,7 +7,6 @@ import type {
 } from '@histoire/shared'
 import type {
   HstButton,
-  HstColorSelect,
   HstButtonGroup,
   HstCheckbox,
   HstCheckboxList,
@@ -22,6 +21,7 @@ import type {
   HstTokenList,
   HstTokenGrid,
   HstCopyIcon,
+  HstColorSelect,
 } from '@histoire/controls'
 
 // Utils
@@ -142,7 +142,6 @@ declare module '@vue/runtime-core' {
     Variant: typeof VueVariantComponent
     // Controls
     HstButton: typeof HstButton
-    HstColorSelect: typeof HstColorSelect
     HstButtonGroup: typeof HstButtonGroup
     HstCheckbox: typeof HstCheckbox
     HstCheckboxList: typeof HstCheckboxList
@@ -157,5 +156,6 @@ declare module '@vue/runtime-core' {
     HstTokenList: typeof HstTokenList
     HstTokenGrid: typeof HstTokenGrid
     HstCopyIcon: typeof HstCopyIcon
+    HstColorSelect: typeof HstColorSelect
   }
 }

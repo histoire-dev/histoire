@@ -3,13 +3,13 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "sk:dev": "vite dev -p 5173",
+    "sk:dev": "vite dev",
     "sk:build": "vite build",
     "sk:package": "svelte-kit package",
     "sk:preview": "vite preview",
     "sk:check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "sk:check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
-    "story:dev": "histoire dev -p 5173",
+    "story:dev": "histoire dev",
     "story:build": "histoire build",
     "story:preview": "histoire preview --port 4567"
   },

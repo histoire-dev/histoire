@@ -6,8 +6,6 @@ function initState () {
     disabled: false,
     color: undefined,
     size: undefined,
-    bgcolorselect: undefined,
-    txtcolorselect: undefined,
   }
 }
 </script>
@@ -28,8 +26,6 @@ function initState () {
         <BaseButton
           :disabled="state.disabled"
           :color="state.color"
-          :bgcolorselect="state.bgcolorselect"
-          :txtcolorselect="state.txtcolorselect"
           :size="state.size"
         >
           Click me
@@ -58,14 +54,6 @@ function initState () {
             { value: 'small', label: 'Small' },
             { value: 'big', label: 'Big' },
           ]"
-        />
-        <HstColorSelect
-          v-model="state.bgcolorselect"
-          title="Background Color Select"
-        />
-        <HstColorSelect
-          v-model="state.txtcolorselect"
-          title="Text Color Select"
         />
       </template>
     </Variant>

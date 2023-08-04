@@ -4,14 +4,7 @@ defineProps({
     type: String,
     default: null,
   },
-  bgcolorselect: {
-    type: String,
-    default: null,
-  },
-  txtcolorselect: {
-    type: String,
-    default: null,
-  },
+
   size: {
     type: String,
     default: null,
@@ -27,7 +20,6 @@ defineProps({
 <template>
   <button
     :disabled="disabled"
-    :style="{background: bgcolorselect, color: txtcolorselect}"
     class="btn"
     :class="{
       [`btn-color-${color}`]: color,

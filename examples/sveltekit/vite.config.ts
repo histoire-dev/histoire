@@ -6,10 +6,6 @@ import { sveltekit } from '@sveltejs/kit/vite'
 import { HstSvelte } from '@histoire/plugin-svelte'
 
 export default defineConfig({
-	server: {
-		port: 5173,
-		host: true
-	},
   plugins: [
     sveltekit(),
   ],
