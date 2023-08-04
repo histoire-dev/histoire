@@ -16,7 +16,7 @@ import HstRadioVue from './components/radio/HstRadio.vue'
 import HstJsonVue from './components/json/HstJson.vue'
 
 export const HstButton = HstButtonVue
-export const HstColorSelect = HstColorSelectVue;
+export const HstColorSelect = HstColorSelectVue
 export const HstButtonGroup = HstButtonGroupVue
 export const HstCheckbox = HstCheckboxVue
 export const HstCheckboxList = HstCheckboxListVue

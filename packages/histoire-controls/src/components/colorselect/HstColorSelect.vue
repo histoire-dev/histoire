@@ -64,16 +64,26 @@ function processChange(inp) {
 </script>
 
 <template>
-  <HstWrapper :title="title" class="histoire-select htw-cursor-text htw-items-center" :class="$attrs.class"
-    :style="$attrs.style">
+  <HstWrapper
+    :title="title"
+    class="histoire-select htw-cursor-text htw-items-center"
+    :class="$attrs.class"
+    :style="$attrs.style"
+  >
     <div class="htw-flex htw-flex-row htw-gap-1">
-      <input ref="input" v-bind="{ ...$attrs, class: null, style: null }" type="text"
+      <input
+        ref="input"
+        v-bind="{ ...$attrs, class: null, style: null }"
+        v-model="stringModel"
+        type="text"
         class="htw-text-inherit htw-bg-transparent htw-w-full htw-outline-none htw-px-2 htw-py-1 -htw-my-1 htw-border htw-border-solid htw-border-black/25 dark:htw-border-white/25 focus:htw-border-primary-500 dark:focus:htw-border-primary-500 htw-rounded-sm"
-        v-model.string="stringModel">
-      <input type="color" :value="modelValue"
-        @input="((e) => processChange((e.target as HTMLInputElement).value as string))" />
+      >
+      <input
+        type="color"
+        :value="modelValue"
+        @input="((e) => processChange((e.target as HTMLInputElement).value as string))"
+      >
     </div>
-
 
     <template #actions>
       <slot name="actions" />
