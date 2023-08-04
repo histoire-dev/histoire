@@ -45,11 +45,6 @@ defineExpose({
         title="HstSelect"
         :options="options"
       />
-      <HstSelect
-        v-model="state.colorselect"
-        title="HstColorSelect"
-        :options="options"
-      />
     </template>
 
     <Variant
