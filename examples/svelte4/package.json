@@ -8,7 +8,7 @@
     "story:preview": "histoire preview --port 4567",
     "ci": "start-server-and-test story:preview http://localhost:4567/ test",
     "test": "cypress run",
-    "test:dev": "cypress open --config baseUrl=http://localhost:5173",
+    "test:dev": "cypress open --config baseUrl=http://localhost:6006",
     "test:examples": "pnpm run story:build && pnpm run ci"
   },
   "type": "module",
