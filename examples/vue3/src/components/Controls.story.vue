@@ -18,6 +18,7 @@ function initState () {
     number: 20,
     longText: 'Longer text...',
     select: 'crash-bandicoot',
+    colorselect: '#000000',
     radio: 'metal-gear',
     object: { foo: 'bar' },
   }
@@ -61,6 +62,11 @@ function initState () {
         <HstSelect
           v-model="state.select"
           title="HstSelect"
+          :options="options"
+        />
+        <HstColorSelect
+          v-model="state.colorselect"
+          title="HstColorSelect"
           :options="options"
         />
         <HstRadio

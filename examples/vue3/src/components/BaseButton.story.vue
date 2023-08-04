@@ -1,83 +1,54 @@
 <script lang="ts" setup>
 import BaseButton from './BaseButton.vue'
 
-function initState () {
+function initState() {
   return {
     disabled: false,
     color: undefined,
     size: undefined,
+    bgcolorselect: undefined,
+    txtcolorselect: undefined,
   }
 }
 </script>
 
 <template>
-  <Story
-    title="BaseButton"
-    :layout="{
-      type: 'grid',
-      width: 200,
-    }"
-  >
-    <Variant
-      title="playground"
-      :init-state="initState"
-    >
+  <Story title="BaseButton" :layout="{
+    type: 'grid',
+    width: 200,
+  }">
+    <Variant title="playground" :init-state="initState">
       <template #default="{ state }">
-        <BaseButton
-          :disabled="state.disabled"
-          :color="state.color"
-          :size="state.size"
-        >
+        <BaseButton :disabled="state.disabled" :color="state.color" :bgcolorselect="state.bgcolorselect" :txtcolorselect="state.txtcolorselect" :size="state.size">
           Click me
         </BaseButton>
       </template>
 
       <template #controls="{ state }">
-        <HstCheckbox
-          v-model="state.disabled"
-          title="Disabled"
-        />
-        <HstSelect
-          v-model="state.color"
-          title="Color"
-          :options="[
-            { value: undefined, label: 'Default' },
-            { value: 'green', label: 'Green' },
-            { value: 'red', label: 'Red' },
-          ]"
-        />
-        <HstSelect
-          v-model="state.size"
-          title="Size"
-          :options="[
-            { value: undefined, label: 'Default' },
-            { value: 'small', label: 'Small' },
-            { value: 'big', label: 'Big' },
-          ]"
-        />
+        <HstCheckbox v-model="state.disabled" title="Disabled" />
+        <HstSelect v-model="state.color" title="Color" :options="[
+          { value: undefined, label: 'Default' },
+          { value: 'green', label: 'Green' },
+          { value: 'red', label: 'Red' },
+        ]" />
+        <HstSelect v-model="state.size" title="Size" :options="[
+          { value: undefined, label: 'Default' },
+          { value: 'small', label: 'Small' },
+          { value: 'big', label: 'Big' },
+        ]" />
+        <HstColorSelect v-model="state.bgcolorselect" title="Background Color Select" />
+        <HstColorSelect v-model="state.txtcolorselect" title="Text Color Select" />
       </template>
     </Variant>
 
-    <Variant
-      title="big green button"
-      icon="el:resize-full"
-    >
-      <BaseButton
-        color="green"
-        size="big"
-      >
+    <Variant title="big green button" icon="el:resize-full">
+      <BaseButton color="green" size="big">
         Click me
       </BaseButton>
     </Variant>
 
-    <Variant
-      title="small red button"
-      icon-color="#F43F5E"
-    >
-      <BaseButton
-        color="red"
-        size="small"
-      >
+    <Variant title="small red button" icon-color="#F43F5E">
+      <BaseButton color="red" size="small">
         Click me!
       </BaseButton>
     </Variant>

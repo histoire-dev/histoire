@@ -7,6 +7,7 @@ import type {
 } from '@histoire/shared'
 import type {
   HstButton,
+  HstColorSelect,
   HstButtonGroup,
   HstCheckbox,
   HstCheckboxList,
@@ -141,6 +142,7 @@ declare module '@vue/runtime-core' {
     Variant: typeof VueVariantComponent
     // Controls
     HstButton: typeof HstButton
+    HstColorSelect: typeof HstColorSelect
     HstButtonGroup: typeof HstButtonGroup
     HstCheckbox: typeof HstCheckbox
     HstCheckboxList: typeof HstCheckboxList

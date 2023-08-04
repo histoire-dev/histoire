@@ -13,6 +13,7 @@ const state = reactive({
   number: 20,
   longText: 'Longer text...',
   select: 'crash-bandicoot',
+  colorselect: '#000000',
   fn: () => { /* noop */ },
 })
 
@@ -43,6 +44,11 @@ defineExpose({
       <HstSelect
         v-model="state.select"
         title="HstSelect"
+        :options="options"
+      />
+      <HstSelect
+        v-model="state.colorselect"
+        title="HstColorSelect"
         :options="options"
       />
     </template>
