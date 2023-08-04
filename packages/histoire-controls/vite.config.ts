@@ -5,11 +5,6 @@ export default defineConfig({
   plugins: [
     vue(),
   ],
-  server: {
-    port: 5173,
-    host: true
-  },
-
   resolve: {
     alias: {
       'floating-vue': '@histoire/vendors/floating-vue',
