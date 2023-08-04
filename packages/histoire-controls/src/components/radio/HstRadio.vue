@@ -55,9 +55,9 @@ const animationEnabled = ref(false)
         :key="value"
       >
         <input
-          :id="`${value}-radio`"
+          :id="`${value}-radio_${title}`"
           type="radio"
-          :name="`${value}-radio`"
+          :name="`${value}-radio_${title}`"
           :value="value"
           :checked="value === modelValue"
           class="htw-hidden"
@@ -65,7 +65,7 @@ const animationEnabled = ref(false)
         >
         <label
           tabindex="0"
-          :for="`${value}-radio`"
+          :for="`${value}-radio_${title}`"
           class="htw-cursor-pointer htw-flex htw-items-center htw-relative htw-py-1 htw-group"
           @keydown.enter.prevent="selectOption(value)"
           @keydown.space.prevent="selectOption(value)"
