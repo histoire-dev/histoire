@@ -8,6 +8,10 @@ export default defineConfig({
   plugins: [
     svelte(),
   ],
+  server: {
+    port: 5173,
+    host: true
+  },
   histoire: {
     plugins: [
       HstSvelte(),
