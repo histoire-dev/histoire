@@ -13,10 +13,10 @@
     "vuetify": "^3.0.0-beta.3"
   },
   "devDependencies": {
-    "@vitejs/plugin-vue": "^2.3.1",
     "@histoire/plugin-vue": "workspace:*",
+    "@vitejs/plugin-vue": "^2.3.1",
     "histoire": "workspace:*",
-    "vite": "^2.9.1",
+    "vite": "^4.4.8",
     "vite-plugin-vuetify": "1.0.0-alpha.12"
   }
 }
