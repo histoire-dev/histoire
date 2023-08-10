@@ -67,7 +67,6 @@ function initState () {
         <HstColorSelect
           v-model="state.colorselect"
           title="HstColorSelect"
-          :options="options"
         />
         <HstRadio
           v-model="state.radio"
