@@ -29,7 +29,7 @@ export default defineConfig({
 
   server: {
     hmr: {
-      clientPort: 5173,
+      clientPort: process.env.CODESPACES ? 443 : undefined,
     },
       port: 5173,
       host: true
