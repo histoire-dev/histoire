@@ -206,9 +206,9 @@ export async function build (ctx: Context) {
 
   const duration = performance.now() - startTime
   if (emptyStoryCount) {
-    console.warn(pc.yellow(`⚠️  ${emptyStoryCount} empty story file${emptyStoryCount === 1 ? '':'s'}`))
+    console.warn(pc.yellow(`⚠️  ${emptyStoryCount} empty story file${emptyStoryCount === 1 ? '' : 's'}`))
   }
-  console.log(pc.green(`✅ Built ${storyCount} stor${storyCount === 1 ? 'y':'ies'} (${variantCount} variant${variantCount === 1 ? '':'s'}) in ${Math.round(duration / 1000 * 100) / 100}s`))
+  console.log(pc.green(`✅ Built ${storyCount} stor${storyCount === 1 ? 'y' : 'ies'} (${variantCount} variant${variantCount === 1 ? '' : 's'}) in ${Math.round(duration / 1000 * 100) / 100}s`))
 
   // Render
   if (previewStoryCallbacks.length) {

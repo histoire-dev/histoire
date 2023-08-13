@@ -45,7 +45,7 @@ export function useCollectStories (options: UseCollectStoriesOptions, ctx: Conte
   const threadsCount = ctx.mode === 'dev'
     ? Math.max(Math.min(maxThreads, Math.floor(cpus().length / 2)), 1)
     : Math.max(Math.min(maxThreads, cpus().length - 1), 1)
-  console.log(pc.blue(`Using ${threadsCount} thread${threadsCount === 1 ? '':'s'} for story collection`))
+  console.log(pc.blue(`Using ${threadsCount} thread${threadsCount === 1 ? '' : 's'} for story collection`))
 
   const threadPool = new Tinypool({
     filename: new URL('./worker.js', import.meta.url).href,
