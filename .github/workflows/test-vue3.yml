@@ -62,7 +62,9 @@ jobs:
         with:
           name: histoire-build
           if-no-files-found: error
-          path: ${{env.dir}}/.histoire/dist
+          path: |
+            ${{env.dir}}/.histoire/dist
+            ./packages/*/dist
           retention-days: 1
 
 
@@ -109,7 +111,6 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: histoire-build
-          path: ${{env.dir}}/.histoire/dist
 
       - name: Run tests
         working-directory: ${{env.dir}}
