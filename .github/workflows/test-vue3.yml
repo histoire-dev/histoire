@@ -17,9 +17,66 @@ env:
   dir: ./examples/vue3
 
 jobs:
-  build:
+  # build:
+  #   runs-on: ubuntu-latest
+  #   name: Build
+
+  #   steps:
+  #     - uses: actions/checkout@v2
+
+  #     - name: Install node
+  #       uses: actions/setup-node@v2
+  #       with:
+  #         node-version: 16
+
+  #     - name: Install pnpm
+  #       uses: pnpm/action-setup@v2.2.4
+
+  #     - name: Get pnpm store directory
+  #       id: pnpm-cache
+  #       run: |
+  #         echo "::set-output name=pnpm_cache_dir::$(pnpm store path)"
+
+  #     - name: Cache pnpm modules
+  #       uses: actions/cache@v2
+  #       with:
+  #         path: |
+  #           ${{ steps.pnpm-cache.outputs.pnpm_cache_dir }}
+  #           ~/.cache/Cypress
+  #         key: pnpm-v1-${{ runner.os }}-${{ hashFiles('**/pnpm-lock.yaml') }}
+  #         restore-keys: |
+  #           pnpm-v1-${{ runner.os }}-
+
+  #     - name: Install dependencies
+  #       run: pnpm install
+
+  #     - name: Build
+  #       run: pnpm run build
+
+  #     - name: Build book
+  #       working-directory: ${{env.dir}}
+  #       run: pnpm run story:build
+
+  #     - name: Save build
+  #       uses: actions/upload-artifact@v3
+  #       with:
+  #         name: histoire-build
+  #         if-no-files-found: error
+  #         path: |
+  #           ${{env.dir}}/.histoire/dist
+  #           ./packages/*/dist
+  #         retention-days: 1
+
+
+  test:
     runs-on: ubuntu-latest
-    name: Build
+    name: Test
+    # needs: build
+
+    strategy:
+      fail-fast: false
+      matrix:
+        containers: [0, 1, 2, 3, 4]
 
     steps:
       - uses: actions/checkout@v2
@@ -57,60 +114,10 @@ jobs:
         working-directory: ${{env.dir}}
         run: pnpm run story:build
 
-      - name: Save build
-        uses: actions/upload-artifact@v3
-        with:
-          name: histoire-build
-          if-no-files-found: error
-          path: |
-            ${{env.dir}}/.histoire/dist
-            ./packages/*/dist
-          retention-days: 1
-
-
-  test:
-    runs-on: ubuntu-latest
-    name: Test
-    needs: build
-
-    strategy:
-      fail-fast: false
-      matrix:
-        containers: [0, 1, 2, 3, 4]
-
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Install node
-        uses: actions/setup-node@v2
-        with:
-          node-version: 16
-
-      - name: Install pnpm
-        uses: pnpm/action-setup@v2.2.4
-
-      - name: Get pnpm store directory
-        id: pnpm-cache
-        run: |
-          echo "::set-output name=pnpm_cache_dir::$(pnpm store path)"
-
-      - name: Cache pnpm modules
-        uses: actions/cache@v2
-        with:
-          path: |
-            ${{ steps.pnpm-cache.outputs.pnpm_cache_dir }}
-            ~/.cache/Cypress
-          key: pnpm-v1-${{ runner.os }}-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            pnpm-v1-${{ runner.os }}-
-
-      - name: Install dependencies
-        run: pnpm install
-
-      - name: Download the build
-        uses: actions/download-artifact@v3
-        with:
-          name: histoire-build
+      # - name: Download the build
+      #   uses: actions/download-artifact@v3
+      #   with:
+      #     name: histoire-build
 
       - name: Run tests
         working-directory: ${{env.dir}}
