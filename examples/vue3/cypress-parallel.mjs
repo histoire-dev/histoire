@@ -2,7 +2,7 @@
 
 import fs from 'fs/promises'
 import { globby } from 'globby'
-import { minimatch } from 'minimatch'
+import minimatch from 'minimatch'
 import { exec } from 'child_process'
 
 const totalRunners = parseInt(process.env.TOTAL_RUNNERS)
