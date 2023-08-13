@@ -14,6 +14,14 @@ export function createPath (config: HistoireConfig, file: ServerTreeFile) {
 
   if (config.tree.file === 'path') {
     const paths = file.path.split('/').slice(0, -1)
+
+    // check if tree file path is a plugin
+    const index = paths.findIndex(p => p.includes('.histoire'))
+
+    if (index !== -1) {
+      return ['plugins', file.title]
+    }
+
     return [...paths, file.title]
   }
 
