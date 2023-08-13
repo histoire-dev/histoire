@@ -1,3 +1,50 @@
+## v0.16.4
+
+[compare changes](https://github.com/Akryum/histoire/compare/v0.16.3...v0.16.4)
+
+
+### 🚀 Enhancements
+
+  - Add a Color Selector Control #30 ([#574](https://github.com/Akryum/histoire/pull/574), [#30](https://github.com/Akryum/histoire/issues/30))
+
+### 🩹 Fixes
+
+  - **svelte:** Add `svelte@^4.0.0` peer dependency option for `svelte` plugin ([#551](https://github.com/Akryum/histoire/pull/551), [#569](https://github.com/Akryum/histoire/pull/569))
+  - **nuxt:** Pass nuxt runtimeConfig into nuxt app stub ([#494](https://github.com/Akryum/histoire/pull/494), [#567](https://github.com/Akryum/histoire/pull/567))
+  - **nuxt:** Nuxt plugin error ([#527](https://github.com/Akryum/histoire/pull/527), [#575](https://github.com/Akryum/histoire/pull/575))
+  - Adjust tree file path if it's a plugin ([#276](https://github.com/Akryum/histoire/pull/276), [#570](https://github.com/Akryum/histoire/pull/570))
+
+### 🏡 Chore
+
+  - Fix ecosystem-ci ([#576](https://github.com/Akryum/histoire/pull/576))
+  - Rename example to svelte4 ([6dc6a3e](https://github.com/Akryum/histoire/commit/6dc6a3e))
+  - Some renaming to svelte 4 ([ec4fdd7](https://github.com/Akryum/histoire/commit/ec4fdd7))
+
+### ✅ Tests
+
+  - **lint:** Fix ([34581fd](https://github.com/Akryum/histoire/commit/34581fd))
+  - Fix nuxt test ([6dfceb0](https://github.com/Akryum/histoire/commit/6dfceb0))
+
+### 🎨 Styles
+
+  - Fixed typos in Console logs ([#577](https://github.com/Akryum/histoire/pull/577))
+
+### 🤖 CI
+
+  - Parallel vue 3 tests ([ab7de69](https://github.com/Akryum/histoire/commit/ab7de69))
+  - Fix build ([9d8e81b](https://github.com/Akryum/histoire/commit/9d8e81b))
+  - Remove build job ([6bbbe22](https://github.com/Akryum/histoire/commit/6bbbe22))
+
+### ❤️  Contributors
+
+- Michael Thomas 
+- Guillaume Chau ([@Akryum](http://github.com/Akryum))
+- Eduard Predescu ([@epr3](http://github.com/epr3))
+- Guilherme Souza 
+- Specialdoom 
+- Hmt 
+- Bjorn Lu <bjornlu.dev@gmail.com>
+
 ## v0.16.3
 
 [compare changes](https://github.com/Akryum/histoire/compare/v0.16.2...v0.16.3)
