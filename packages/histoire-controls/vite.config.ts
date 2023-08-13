@@ -5,7 +5,6 @@ export default defineConfig({
   plugins: [
     vue(),
   ],
-
   resolve: {
     alias: {
       'floating-vue': '@histoire/vendors/floating-vue',

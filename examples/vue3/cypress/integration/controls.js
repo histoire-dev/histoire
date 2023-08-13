@@ -10,7 +10,7 @@ describe('Controls', () => {
 
   it('HstText', () => {
     getIframeBody().find('.state-output').contains('"text": "Hello"')
-    cy.get('[data-test-id="story-controls"] input[type="text"]').clear().type('Foo')
+    cy.get('[data-test-id="story-controls"]').contains('HstText').clear().type('Foo')
     getIframeBody().find('.state-output').contains('"text": "Foo"')
   })
 
@@ -32,5 +32,11 @@ describe('Controls', () => {
     getIframeBody().find('.state-output').contains('"longText": "Longer text..."')
     cy.get('[data-test-id="story-controls"] textarea').clear().type('Meow meow meow')
     getIframeBody().find('.state-output').contains('"longText": "Meow meow meow"')
+  })
+
+  it('HstColorSelect', () => {
+    getIframeBody().find('.state-output').contains('"colorselect": "#000000"')
+    cy.get('[data-test-id="story-controls"]').contains('HstColorSelect').clear().type('#ffffff')
+    getIframeBody().find('.state-output').contains('"colorselect": "#ffffff"')
   })
 })

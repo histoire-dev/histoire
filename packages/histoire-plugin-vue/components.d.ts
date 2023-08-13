@@ -21,6 +21,7 @@ import type {
   HstTokenList,
   HstTokenGrid,
   HstCopyIcon,
+  HstColorSelect,
 } from '@histoire/controls'
 
 // Utils
@@ -155,5 +156,6 @@ declare module '@vue/runtime-core' {
     HstTokenList: typeof HstTokenList
     HstTokenGrid: typeof HstTokenGrid
     HstCopyIcon: typeof HstCopyIcon
+    HstColorSelect: typeof HstColorSelect
   }
 }

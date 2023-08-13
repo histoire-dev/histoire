@@ -83,4 +83,8 @@ export interface Hst {
   CopyIcon: typeof SvelteComponentTyped<{
     content: string
   }>
+  ColorSelect: typeof SvelteComponentTyped<{
+    value?: string
+    title: string
+  }>
 }
