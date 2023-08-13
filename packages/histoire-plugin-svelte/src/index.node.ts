@@ -13,7 +13,7 @@ export function HstSvelte (): Plugin {
           {
             id: 'svelte',
             patterns: ['**/*.svelte'],
-            pluginIds: ['svelte3'],
+            pluginIds: ['svelte4'],
           },
         ],
         theme: {
@@ -33,7 +33,7 @@ export function HstSvelte (): Plugin {
     },
 
     supportPlugin: {
-      id: 'svelte3',
+      id: 'svelte4',
       moduleName: '@histoire/plugin-svelte',
       setupFn: 'setupSvelte3',
       importStoryComponent: (file, index) => `import Comp${index} from ${JSON.stringify(file.moduleId)}`,

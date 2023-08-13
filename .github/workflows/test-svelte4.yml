@@ -1,4 +1,4 @@
-name: Svelte 3 tests
+name: Svelte 4 tests
 
 on:
   push:
@@ -19,7 +19,7 @@ jobs:
     name: Build and test
 
     env:
-      dir: ./examples/svelte3
+      dir: ./examples/svelte4
 
     steps:
       - uses: actions/checkout@v2

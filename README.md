@@ -10,7 +10,7 @@
 
 [![Test status](https://github.com/histoire-dev/histoire/actions/workflows/test.yml/badge.svg)](https://github.com/histoire-dev/histoire/actions/workflows/test.yml)
 [![Test status](https://github.com/histoire-dev/histoire/actions/workflows/test-vue3.yml/badge.svg)](https://github.com/histoire-dev/histoire/actions/workflows/test-vue3.yml)
-[![Test status](https://github.com/histoire-dev/histoire/actions/workflows/test-svelte3.yml/badge.svg)](https://github.com/histoire-dev/histoire/actions/workflows/test-svelte3.yml)
+[![Test status](https://github.com/histoire-dev/histoire/actions/workflows/test-svelte4.yml/badge.svg)](https://github.com/histoire-dev/histoire/actions/workflows/test-svelte4.yml)
 [![Test status](https://github.com/histoire-dev/histoire/actions/workflows/test-nuxt3.yml/badge.svg)](https://github.com/histoire-dev/histoire/actions/workflows/test-nuxt3.yml)
 
 [Read the Documentation](https://histoire.dev) |
