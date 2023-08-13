@@ -27,6 +27,6 @@
     "nodemon": "^2.0.20",
     "sass": "^1.50.0",
     "start-server-and-test": "^1.14.0",
-    "vite": "^4.2.0"
+    "vite": "^4.4.8"
   }
 }
