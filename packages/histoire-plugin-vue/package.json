@@ -49,17 +49,17 @@
     "@histoire/shared": "workspace:^",
     "@histoire/vendors": "workspace:^",
     "change-case": "^4.1.2",
-    "globby": "^13.1.1",
+    "globby": "^13.2.2",
     "launch-editor": "^2.6.0",
     "pathe": "^0.2.0"
   },
   "devDependencies": {
-    "@types/node": "^17.0.32",
-    "concurrently": "^7.1.0",
+    "@types/node": "^17.0.45",
+    "concurrently": "^7.6.0",
     "histoire": "workspace:*",
     "typescript": "^4.9.5",
-    "vite": "^4.4.8",
-    "vue": "^3.2.47"
+    "vite": "^4.4.9",
+    "vue": "^3.3.4"
   },
   "peerDependencies": {
     "histoire": "workspace:^",

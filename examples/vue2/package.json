@@ -8,13 +8,13 @@
     "story:preview": "histoire preview"
   },
   "dependencies": {
-    "vue": "^2.7.8"
+    "vue": "^2.7.14"
   },
   "devDependencies": {
     "@histoire/plugin-vue2": "workspace:*",
-    "@vitejs/plugin-vue2": "^2.1.0",
+    "@vitejs/plugin-vue2": "^2.2.0",
     "histoire": "workspace:*",
-    "vite": "^4.4.8",
-    "vue-template-compiler": "^2.7.8"
+    "vite": "^4.4.9",
+    "vue-template-compiler": "^2.7.14"
   }
 }

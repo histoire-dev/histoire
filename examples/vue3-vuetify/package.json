@@ -9,14 +9,14 @@
   },
   "dependencies": {
     "@mdi/font": "^5.9.55",
-    "vue": "^3.2.47",
-    "vuetify": "^3.0.0-beta.3"
+    "vue": "^3.3.4",
+    "vuetify": "^3.3.12"
   },
   "devDependencies": {
     "@histoire/plugin-vue": "workspace:*",
-    "@vitejs/plugin-vue": "^2.3.1",
+    "@vitejs/plugin-vue": "^2.3.4",
     "histoire": "workspace:*",
-    "vite": "^4.4.8",
+    "vite": "^4.4.9",
     "vite-plugin-vuetify": "1.0.0-alpha.12"
   }
 }

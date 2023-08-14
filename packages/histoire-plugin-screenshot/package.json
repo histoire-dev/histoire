@@ -27,13 +27,13 @@
     "watch": "tsc -d -w --sourceMap"
   },
   "dependencies": {
-    "capture-website": "^2.3.0",
-    "defu": "^6.0.0",
+    "capture-website": "^2.4.1",
+    "defu": "^6.1.2",
     "fs-extra": "^10.1.0",
     "pathe": "^0.2.0"
   },
   "devDependencies": {
-    "@types/node": "^17.0.32",
+    "@types/node": "^17.0.45",
     "histoire": "workspace:*",
     "typescript": "^4.9.5"
   },

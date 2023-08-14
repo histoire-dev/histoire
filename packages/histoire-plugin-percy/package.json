@@ -27,14 +27,14 @@
     "watch": "tsc -d -w --sourceMap"
   },
   "dependencies": {
-    "@percy/sdk-utils": "^1.1.0",
-    "defu": "^6.0.0",
+    "@percy/sdk-utils": "^1.26.3",
+    "defu": "^6.1.2",
     "fs-extra": "^10.1.0",
     "pathe": "^0.2.0",
     "puppeteer": "^13.7.0"
   },
   "devDependencies": {
-    "@types/node": "^17.0.32",
+    "@types/node": "^17.0.45",
     "histoire": "workspace:*",
     "typescript": "^4.9.5"
   },
