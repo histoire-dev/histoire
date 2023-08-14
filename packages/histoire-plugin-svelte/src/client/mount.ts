@@ -1,6 +1,6 @@
 /* eslint-disable vue/one-component-per-file */
 
-import { SvelteComponent } from 'svelte/internal'
+import { SvelteComponent } from 'svelte'
 import {
   defineComponent as _defineComponent,
   PropType as _PropType,

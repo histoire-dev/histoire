@@ -3,8 +3,7 @@ import type { ServerRunPayload } from '@histoire/shared'
 import * as setup from 'virtual:$histoire-setup'
 // @ts-expect-error virtual module id
 import * as generatedSetup from 'virtual:$histoire-generated-global-setup'
-import { tick } from 'svelte'
-import { SvelteComponent } from 'svelte/internal'
+import { tick, SvelteComponent } from 'svelte'
 import Story from './Story.svelte'
 import Variant from './Variant.svelte'
 
