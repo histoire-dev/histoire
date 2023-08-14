@@ -172,7 +172,7 @@ async function useNuxtViteConfig () {
             for (const name in vuePlugins) {
               if (!config.plugins?.some(p => (p as any)?.name === name)) {
                 const [plugin, key] = vuePlugins[name as keyof typeof vuePlugins]
-                plugins.push(plugin(config[key]))
+                plugins.push(plugin(config[key] as any))
               }
             }
 
