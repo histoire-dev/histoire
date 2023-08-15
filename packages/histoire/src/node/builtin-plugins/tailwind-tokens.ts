@@ -239,8 +239,8 @@ export default {
       }, ({ token }) => h('div', {
         class: '__hst-truncate',
         style: {
-          fontSize: token.value[0],
-          ...token.value[1],
+          fontSize: Array.isArray(token.value) ? token.value[0] : token.value,
+          ...(Array.isArray(token.value) && typeof token.value[1] === "object" ? token.value[1] : { lineHeight: token.value[1] })
         },
       }, sampleText.value))),
       onMountControls: (api) => mountApp(api, () => [
