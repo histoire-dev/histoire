@@ -67,6 +67,9 @@ module.exports = {
       extends: [
         'plugin:cypress/recommended',
       ],
+      rules: {
+        'cypress/unsafe-to-chain-command': 'off',
+      },
     },
     {
       files: ['packages/histoire-vendors/*.d.ts'],
