@@ -30,7 +30,7 @@
     "@nuxt/kit": "^3.6.5",
     "@vitejs/plugin-vue": "^4.2.3",
     "@vitejs/plugin-vue-jsx": "^3.0.1",
-    "h3": "^1.7.1",
+    "h3": "npm:h3-nightly",
     "ofetch": "^1.1.1",
     "unenv": "^1.7.1"
   },

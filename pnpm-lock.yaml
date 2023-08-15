@@ -654,8 +654,8 @@ importers:
         specifier: ^3.0.1
         version: 3.0.1(vite@4.4.9)
       h3:
-        specifier: ^1.7.1
-        version: 1.7.1
+        specifier: npm:h3-nightly
+        version: /h3-nightly@1.8.0-1692053509.7cebec2
       nuxt:
         specifier: ^3.0.0-rc.11
         version: 3.6.5(@types/node@17.0.45)(eslint@8.47.0)(typescript@4.9.5)
@@ -2563,7 +2563,6 @@ packages:
       - '@types/node'
       - eslint
       - less
-      - lightningcss
       - meow
       - optionator
       - rollup
@@ -7718,6 +7717,19 @@ packages:
     dependencies:
       duplexer: 0.1.2
 
+  /h3-nightly@1.8.0-1692053509.7cebec2:
+    resolution: {integrity: sha512-iSEG1DygDYL/fgNylkLUsVFujuz8+vv+GVPLUNFK2VvISgs9N25E4n3Mnmhje+yoU6bgZ3GqOYU5geZnLz34mg==}
+    dependencies:
+      cookie-es: 1.0.0
+      defu: 6.1.2
+      destr: 2.0.1
+      iron-webcrypto: 0.8.0
+      radix3: 1.0.1
+      ufo: 1.2.0
+      uncrypto: 0.1.3
+      unenv: 1.7.1
+    dev: false
+
   /h3@1.7.1:
     resolution: {integrity: sha512-A9V2NEDNHet7v1gCg7CMwerSigLi0SRbhTy7C3lGb0N4YKIpPmLDjedTUopqp4dnn7COHfqUjjaz3zbtz4QduA==}
     dependencies:
@@ -9508,7 +9520,6 @@ packages:
       - eslint
       - idb-keyval
       - less
-      - lightningcss
       - meow
       - optionator
       - rollup
@@ -12362,11 +12373,10 @@ packages:
       mlly: 1.4.0
       pathe: 1.1.1
       picocolors: 1.0.0
-      vite: 4.4.9(@types/node@17.0.45)
+      vite: 4.3.9(@types/node@17.0.45)
     transitivePeerDependencies:
       - '@types/node'
       - less
-      - lightningcss
       - sass
       - stylus
       - sugarss
