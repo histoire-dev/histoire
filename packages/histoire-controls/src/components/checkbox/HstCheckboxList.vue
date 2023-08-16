@@ -29,15 +29,15 @@ const formattedOptions: ComputedRef<Record<string, string>> = computed(() => {
   return props.options
 })
 
-const emits = defineEmits<{
+const emit = defineEmits<{
   (e: 'update:modelValue', value: Array<string>): void
 }>()
 
 function toggleOption (value: string) {
   if (props.modelValue.includes(value)) {
-    emits('update:modelValue', props.modelValue.filter(element => element !== value))
+    emit('update:modelValue', props.modelValue.filter(element => element !== value))
   } else {
-    emits('update:modelValue', [...props.modelValue, value])
+    emit('update:modelValue', [...props.modelValue, value])
   }
 }
 </script>

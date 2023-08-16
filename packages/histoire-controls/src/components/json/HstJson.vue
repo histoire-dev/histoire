@@ -38,7 +38,7 @@ const props = defineProps<{
   modelValue: unknown
 }>()
 
-const emits = defineEmits({
+const emit = defineEmits({
   'update:modelValue': (newValue: unknown) => true,
 })
 
@@ -106,7 +106,7 @@ watch(() => props.modelValue, () => {
 watch(() => internalValue.value, () => {
   invalidValue.value = false
   try {
-    emits('update:modelValue', JSON.parse(internalValue.value))
+    emit('update:modelValue', JSON.parse(internalValue.value))
   } catch (e) {
     invalidValue.value = true
   }

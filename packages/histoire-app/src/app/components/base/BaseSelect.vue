@@ -8,7 +8,7 @@ const props = defineProps<{
   options: Record<string, string> | Array<string>
 }>()
 
-const emits = defineEmits<{
+const emit = defineEmits<{
   (e: 'update:modelValue', value: string): void
   (e: 'select', value: string): void
 }>()
@@ -23,8 +23,8 @@ const formattedOptions: ComputedRef<Record<string, string>> = computed(() => {
 const selectedLabel = computed(() => formattedOptions.value[props.modelValue])
 
 function selectValue (value: string, hide: () => void) {
-  emits('update:modelValue', value)
-  emits('select', value)
+  emit('update:modelValue', value)
+  emit('select', value)
   hide()
 }
 </script>

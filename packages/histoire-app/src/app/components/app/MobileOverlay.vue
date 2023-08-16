@@ -6,7 +6,7 @@ defineProps<{
   opened: boolean
 }>()
 
-const emits = defineEmits<{(e: 'close'): void}>()
+const emit = defineEmits<{(e: 'close'): void}>()
 </script>
 
 <template>
@@ -19,7 +19,7 @@ const emits = defineEmits<{(e: 'close'): void}>()
         <span class="htw-text-gray-500">{{ title }}</span>
         <a
           class="htw-p-1 hover:htw-text-primary-500 dark:hover:htw-text-primary-400 htw-cursor-pointer"
-          @click="emits('close')"
+          @click="emit('close')"
         >
           <Icon
             icon="carbon:close"

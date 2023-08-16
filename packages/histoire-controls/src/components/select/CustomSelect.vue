@@ -15,7 +15,7 @@ const props = defineProps<{
   options: Record<string, any> | string[] | number[] | HstControlOption[]
 }>()
 
-const emits = defineEmits<{
+const emit = defineEmits<{
   (e: 'update:modelValue', value: string): void
 }>()
 
@@ -36,7 +36,7 @@ const formattedOptions: ComputedRef<[any, string][]> = computed(() => {
 const selectedLabel = computed(() => formattedOptions.value.find(([value]) => value === props.modelValue)?.[1])
 
 function selectValue (value: any, hide: () => void) {
-  emits('update:modelValue', value)
+  emit('update:modelValue', value)
   hide()
 }
 </script>

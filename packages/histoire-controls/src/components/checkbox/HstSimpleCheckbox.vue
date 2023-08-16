@@ -12,7 +12,7 @@ const props = defineProps<{
   withToggle?: boolean
 }>()
 
-const emits = defineEmits({
+const emit = defineEmits({
   'update:modelValue': (newValue: boolean) => true,
 })
 
@@ -21,7 +21,7 @@ function toggle () {
     return
   }
 
-  emits('update:modelValue', !props.modelValue)
+  emit('update:modelValue', !props.modelValue)
 }
 
 watch(() => props.modelValue, () => {

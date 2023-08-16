@@ -16,17 +16,17 @@ const props = defineProps<{
   title?: string
 }>()
 
-const emits = defineEmits({
+const emit = defineEmits({
   'update:modelValue': (newValue: Booleanish) => true,
 })
 
 function toggle () {
   if (typeof props.modelValue === 'string') {
-    emits('update:modelValue', props.modelValue === 'false' ? 'true' : 'false')
+    emit('update:modelValue', props.modelValue === 'false' ? 'true' : 'false')
     return
   }
 
-  emits('update:modelValue', !props.modelValue)
+  emit('update:modelValue', !props.modelValue)
 }
 
 const isTrue = computed(() => {

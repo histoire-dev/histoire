@@ -15,7 +15,7 @@ defineProps<{
   options: Record<string, any> | string[] | HstControlOption[]
 }>()
 
-const emits = defineEmits<{
+const emit = defineEmits<{
   (e: 'update:modelValue', value: any): void
 }>()
 </script>
@@ -30,7 +30,7 @@ const emits = defineEmits<{
     <CustomSelect
       :options="options"
       :model-value="modelValue"
-      @update:model-value="emits('update:modelValue', $event)"
+      @update:model-value="emit('update:modelValue', $event)"
     />
 
     <template #actions>
