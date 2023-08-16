@@ -1,3 +1,31 @@
+## v0.16.5
+
+[compare changes](https://github.com/Akryum/histoire/compare/v0.16.4...v0.16.5)
+
+
+### 🩹 Fixes
+
+  - **nuxt:** Build ([bb0c0fe](https://github.com/Akryum/histoire/commit/bb0c0fe))
+  - **svelte:** Plugin build ([8d3872d](https://github.com/Akryum/histoire/commit/8d3872d))
+  - **nuxt:** Don't stub out unenv ([#578](https://github.com/Akryum/histoire/pull/578))
+  - **tailwind:** Allow different fontSize configuration values ([#580](https://github.com/Akryum/histoire/pull/580))
+
+### 💅 Refactors
+
+  - Switch to vitest ([772fae1](https://github.com/Akryum/histoire/commit/772fae1))
+
+### 🏡 Chore
+
+  - Update deps ([1fc4788](https://github.com/Akryum/histoire/commit/1fc4788))
+  - Ignore cypress chaining rule ([#579](https://github.com/Akryum/histoire/pull/579))
+  - Rename emits to emit ([dd61b3d](https://github.com/Akryum/histoire/commit/dd61b3d))
+
+### ❤️  Contributors
+
+- Guillaume Chau ([@Akryum](http://github.com/Akryum))
+- László Czöndör <czondi@hotmail.com>
+- Daniel Roe <daniel@roe.dev>
+
 ## v0.16.4
 
 [compare changes](https://github.com/Akryum/histoire/compare/v0.16.3...v0.16.4)
