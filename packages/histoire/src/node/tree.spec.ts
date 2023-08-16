@@ -1,4 +1,4 @@
-import { describe, test, expect } from '@peeky/test'
+import { describe, test, expect } from 'vitest'
 import { makeTree } from './tree'
 import { getDefaultConfig } from './config'
 import type { StoryFile } from './types'

@@ -84,14 +84,16 @@ pnpm run lint
 
 ### Unit tests
 
-We use [Peeky](https://peeky.dev/) to run unit tests on workspaces listed under the `packages` folder.
+We use [Vitest](https://vitest.dev/) to run unit tests on workspaces listed under the `packages` folder.
 
 For developping:
 
 ```sh
 # Root of the mono-repo
-pnpm run test:open
+pnpm run test:dev
 ```
+
+(You can also run this in specific package folders.)
 
 For running all tests in the terminal:
 

@@ -1,3 +1,5 @@
+/// <reference types="vitest" />
+
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 
@@ -6,15 +8,17 @@ export default defineConfig({
     vue(),
   ],
   resolve: {
-    alias: {
-      'floating-vue': '@histoire/vendors/floating-vue',
-      '@iconify/vue': '@histoire/vendors/iconify',
-      pinia: '@histoire/vendors/pinia',
-      'scroll-into-view-if-needed': '@histoire/vendors/scroll',
-      'vue-router': '@histoire/vendors/vue-router',
-      '@vueuse/core': '@histoire/vendors/vue-use',
-      vue: '@histoire/vendors/vue',
-    },
+    alias: process.env.VITEST
+      ? {}
+      : {
+        'floating-vue': '@histoire/vendors/floating-vue',
+        '@iconify/vue': '@histoire/vendors/iconify',
+        pinia: '@histoire/vendors/pinia',
+        'scroll-into-view-if-needed': '@histoire/vendors/scroll',
+        'vue-router': '@histoire/vendors/vue-router',
+        '@vueuse/core': '@histoire/vendors/vue-use',
+        vue: '@histoire/vendors/vue',
+      },
   },
 
   build: {
@@ -33,5 +37,10 @@ export default defineConfig({
         /@histoire/,
       ],
     },
+  },
+
+  test: {
+    environment: 'jsdom',
+    globals: true,
   },
 })

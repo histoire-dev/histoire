@@ -11,8 +11,7 @@
     "skipLibCheck": true,
     "declaration": true,
     "types": [
-      "node",
-      "@peeky/test"
+      "node"
     ],
     "lib": [
       "ESNext",

@@ -39,8 +39,8 @@
   "scripts": {
     "build": "rimraf dist && tsc -d",
     "watch": "tsc -d -w --sourceMap",
-    "test:open": "peeky open",
-    "test": "peeky run"
+    "test": "vitest run",
+    "test:dev": "vitest"
   },
   "dependencies": {
     "@akryum/tinypool": "^0.3.1",
@@ -79,8 +79,6 @@
     "vite": "^2.9.0 || ^3.0.0 || ^4.0.0"
   },
   "devDependencies": {
-    "@peeky/server": "^0.14.0",
-    "@peeky/test": "^0.14.1",
     "@types/fs-extra": "^9.0.13",
     "@types/markdown-it": "^12.2.3",
     "@types/micromatch": "^4.0.2",
@@ -88,6 +86,7 @@
     "esbuild": "^0.18.20",
     "rollup": "^3.28.0",
     "typescript": "^4.9.5",
-    "vite": "^4.4.9"
+    "vite": "^4.4.9",
+    "vitest": "^0.34.1"
   }
 }
