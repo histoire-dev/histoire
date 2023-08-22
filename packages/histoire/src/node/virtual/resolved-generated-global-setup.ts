@@ -10,7 +10,7 @@ export const resolvedGeneratedGlobalSetup = (ctx: Context) => {
       // List
       `const setupList = [${ctx.config.setupCode.map((c, index) => `setup_${index}`).join(', ')}]`,
       // Setups
-      ...ctx.supportPlugins.map(p => p.setupFn).map(fnName => `export async function ${fnName} (payload) {
+      ...ctx.supportPlugins.map(p => p.setupFn).flat().map(fnName => `export async function ${fnName} (payload) {
         for (const setup of setupList) {
           if (setup?.${fnName}) {
             await setup.${fnName}(payload)

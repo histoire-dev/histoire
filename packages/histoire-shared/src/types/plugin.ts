@@ -20,7 +20,7 @@ import type { Awaitable } from '../type-utils.js'
 export interface SupportPlugin {
   id: string
   moduleName: string
-  setupFn: string
+  setupFn: string | string[]
   importStoriesPrepend?: string
   importStoryComponent: (file: ServerStoryFile, index: number) => string
 }

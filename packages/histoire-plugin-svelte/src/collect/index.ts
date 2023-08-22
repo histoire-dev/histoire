@@ -6,6 +6,7 @@ import * as generatedSetup from 'virtual:$histoire-generated-global-setup'
 import { tick, SvelteComponent } from 'svelte'
 import Story from './Story.svelte'
 import Variant from './Variant.svelte'
+import type { SvelteStorySetupApi } from '../helpers.js'
 
 export async function run ({ file, el, storyData }: ServerRunPayload) {
   const { default: Comp } = await import(/* @vite-ignore */ file.moduleId)
@@ -30,20 +31,26 @@ export async function run ({ file, el, storyData }: ServerRunPayload) {
 
   // Call app setups to resolve global assets such as components
 
+  const setupApi: SvelteStorySetupApi = {
+    app,
+    story: null,
+    variant: null,
+  }
+
   if (typeof generatedSetup?.setupSvelte3 === 'function') {
-    await generatedSetup.setupSvelte3({
-      app,
-      story: null,
-      variant: null,
-    })
+    await generatedSetup.setupSvelte3(setupApi)
   }
 
   if (typeof setup?.setupSvelte3 === 'function') {
-    await setup.setupSvelte3({
-      app,
-      story: null,
-      variant: null,
-    })
+    await setup.setupSvelte3(setupApi)
+  }
+
+  if (typeof generatedSetup?.setupSvelte4 === 'function') {
+    await generatedSetup.setupSvelte4(setupApi)
+  }
+
+  if (typeof setup?.setupSvelte4 === 'function') {
+    await setup.setupSvelte4(setupApi)
   }
 
   await tick()

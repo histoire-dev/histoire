@@ -19,6 +19,7 @@ import * as generatedSetup from 'virtual:$histoire-generated-global-setup'
 import MountStorySvelte from './MountStory.svelte'
 import MountVariantSvelte from './MountVariant.svelte'
 import StubComponent from './Stub.svelte'
+import type { SvelteStorySetupApi } from '../helpers.js'
 
 export default _defineComponent({
   name: 'MountStory',
@@ -58,20 +59,26 @@ export default _defineComponent({
 
       // Call app setups to resolve global assets such as components
 
+      const setupApi: SvelteStorySetupApi = {
+        app,
+        story: props.story,
+        variant: null,
+      }
+
       if (typeof generatedSetup?.setupSvelte3 === 'function') {
-        await generatedSetup.setupSvelte3({
-          app,
-          story: props.story,
-          variant: null,
-        })
+        await generatedSetup.setupSvelte3(setupApi)
       }
 
       if (typeof setup?.setupSvelte3 === 'function') {
-        await setup.setupSvelte3({
-          app,
-          story: props.story,
-          variant: null,
-        })
+        await setup.setupSvelte3(setupApi)
+      }
+
+      if (typeof generatedSetup?.setupSvelte4 === 'function') {
+        await generatedSetup.setupSvelte3(setupApi)
+      }
+
+      if (typeof setup?.setupSvelte4 === 'function') {
+        await setup.setupSvelte3(setupApi)
       }
     }
 

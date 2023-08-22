@@ -20,6 +20,7 @@ import RenderStorySvelte from './RenderStory.svelte'
 import RenderVariantSvelte from './RenderVariant.svelte'
 import Wrap from './Wrap.svelte'
 import { syncState } from './util'
+import type { SvelteStorySetupApi } from '../helpers.js'
 
 export default _defineComponent({
   name: 'RenderStory',
@@ -119,28 +120,30 @@ export default _defineComponent({
 
       // Call app setups to resolve global assets such as components
 
+      const setupApi: SvelteStorySetupApi = {
+        app,
+        story: props.story,
+        variant: props.variant,
+      }
+
       if (typeof generatedSetup?.setupSvelte3 === 'function') {
-        await generatedSetup.setupSvelte3({
-          app,
-          story: props.story,
-          variant: props.variant,
-        })
+        await generatedSetup.setupSvelte3(setupApi)
       }
 
       if (typeof setup?.setupSvelte3 === 'function') {
-        await setup.setupSvelte3({
-          app,
-          story: props.story,
-          variant: props.variant,
-        })
+        await setup.setupSvelte3(setupApi)
+      }
+
+      if (typeof generatedSetup?.setupSvelte4 === 'function') {
+        await generatedSetup.setupSvelte4(setupApi)
+      }
+
+      if (typeof setup?.setupSvelte4 === 'function') {
+        await setup.setupSvelte4(setupApi)
       }
 
       if (typeof props.variant.setupApp === 'function') {
-        await props.variant.setupApp({
-          app,
-          story: props.story,
-          variant: props.variant,
-        })
+        await props.variant.setupApp(setupApi)
       }
 
       emit('ready')
