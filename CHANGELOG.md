@@ -1,3 +1,22 @@
+## v0.17.0
+
+[compare changes](https://github.com/Akryum/histoire/compare/v0.16.5...v0.17.0)
+
+
+### 🚀 Enhancements
+
+  - **vue:** AddWrapper ([9f29c19](https://github.com/Akryum/histoire/commit/9f29c19))
+  - **svelte:** Support setupSvelte4 for app setup ([182f7c9](https://github.com/Akryum/histoire/commit/182f7c9))
+
+### ✅ Tests
+
+  - Add wrapper test ([9f69882](https://github.com/Akryum/histoire/commit/9f69882))
+  - Fix search test ([2ca8b12](https://github.com/Akryum/histoire/commit/2ca8b12))
+
+### ❤️  Contributors
+
+- Guillaume Chau ([@Akryum](http://github.com/Akryum))
+
 ## v0.16.5
 
 [compare changes](https://github.com/Akryum/histoire/compare/v0.16.4...v0.16.5)
