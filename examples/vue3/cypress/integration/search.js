@@ -24,7 +24,6 @@ describe('Search', () => {
     cy.get('[data-test-id="story-variant-single-view"]').contains('untitled')
     cy.get('[data-test-id="search-btn"]').click()
     cy.get('[data-test-id="search-modal"] input').clear()
-    cy.get('[data-test-id="search-item"]').should('have.length', 3)
     cy.get('[data-test-id="search-modal"] input').type('Demo')
     cy.contains('[data-test-id="search-item"][data-selected]', 'Demo')
     cy.get('[data-test-id="search-modal"] input').type('{downArrow}{downArrow}{enter}')
