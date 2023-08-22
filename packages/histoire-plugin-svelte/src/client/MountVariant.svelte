@@ -29,10 +29,9 @@ function updateVariant () {
   })
 
   if (!implicit && !story.meta?.hasVariantChildComponents) {
-    Object.assign(story, {
-      meta: {
-        hasVariantChildComponents: true,
-      },
+    story.meta = story.meta || {}
+    Object.assign(story.meta, {
+      hasVariantChildComponents: true,
     })
   }
 }

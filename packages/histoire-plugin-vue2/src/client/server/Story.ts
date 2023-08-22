@@ -22,37 +22,42 @@ export default defineComponent({
   props: {
     title: {
       type: String,
-      default: null,
+      default: undefined,
     },
 
     id: {
       type: String,
-      default: null,
+      default: undefined,
     },
 
     group: {
       type: String,
-      default: null,
+      default: undefined,
     },
 
     layout: {
       type: Object as PropType<ServerStory['layout']>,
-      default: null,
+      default: undefined,
     },
 
     icon: {
       type: String,
-      default: null,
+      default: undefined,
     },
 
     iconColor: {
       type: String,
-      default: null,
+      default: undefined,
     },
 
     docsOnly: {
       type: Boolean,
       default: false,
+    },
+
+    meta: {
+      type: Object as PropType<ServerStory['meta']>,
+      default: undefined,
     },
   },
 
@@ -69,6 +74,7 @@ export default defineComponent({
       icon: props.icon,
       iconColor: props.iconColor,
       docsOnly: props.docsOnly,
+      meta: props.meta,
       variants: [],
     }
     const addStory = inject('addStory', null)

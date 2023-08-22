@@ -1,11 +1,14 @@
 import type { Story, Variant } from '@histoire/shared'
-import type { App } from 'vue'
+import type { App, Component } from 'vue'
 
-export type Vue3StorySetupHandler = (payload: {
+export interface Vue3StorySetupApi {
   app: App
   story?: Story
   variant?: Variant
-}) => Promise<void> | void
+  addWrapper: (wrapper: Component) => void
+}
+
+export type Vue3StorySetupHandler = (api: Vue3StorySetupApi) => Promise<void> | void
 
 export function defineSetupVue3 (handler: Vue3StorySetupHandler): Vue3StorySetupHandler {
   return handler

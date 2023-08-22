@@ -11,11 +11,16 @@ export default Object.assign(defineComponent({
   props: {
     initState: {
       type: Function as PropType<() => any | Promise<any>>,
-      default: null,
+      default: undefined,
+    },
+
+    meta: {
+      type: Object as PropType<Story['meta']>,
+      default: undefined,
     },
   },
 
-  setup () {
+  setup (props) {
     const vm = getCurrentInstance()
 
     const story = inject('hstStory') as Story
@@ -46,6 +51,7 @@ export default Object.assign(defineComponent({
 
     function updateStory () {
       Object.assign(story, {
+        meta: props.meta,
         slots: () => vm.proxy.$slots,
       })
     }

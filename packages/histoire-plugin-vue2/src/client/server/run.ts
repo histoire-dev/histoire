@@ -6,6 +6,7 @@ import * as setup from 'virtual:$histoire-setup'
 import * as generatedSetup from 'virtual:$histoire-generated-global-setup'
 import Story from './Story'
 import Variant from './Variant'
+import type { Vue2StorySetupHandler } from '../../index.js'
 
 export async function run ({ file, storyData, el }: ServerRunPayload) {
   const { default: Comp } = await import(/* @vite-ignore */ file.moduleId)
@@ -14,9 +15,11 @@ export async function run ({ file, storyData, el }: ServerRunPayload) {
   const appOptions: Record<string, any> = {}
 
   if (typeof generatedSetup?.setupVue2 === 'function') {
-    const result = await generatedSetup.setupVue2({
+    const setupFn = generatedSetup.setupVue2 as Vue2StorySetupHandler
+    const result = await setupFn({
       story: null,
       variant: null,
+      addWrapper: () => { /* noop */ },
     })
     if (result) {
       Object.assign(appOptions, result)
@@ -24,9 +27,11 @@ export async function run ({ file, storyData, el }: ServerRunPayload) {
   }
 
   if (typeof setup?.setupVue2 === 'function') {
-    const result = await setup.setupVue2({
+    const setupFn = setup.setupVue2 as Vue2StorySetupHandler
+    const result = await setupFn({
       story: null,
       variant: null,
+      addWrapper: () => { /* noop */ },
     })
     if (result) {
       Object.assign(appOptions, result)

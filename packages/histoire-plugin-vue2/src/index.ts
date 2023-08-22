@@ -28,10 +28,13 @@ export function HstVue (): Plugin {
 
 type Vue2StorySetupReturn = Record<string, any> | void
 
-export type Vue2StorySetupHandler = (payload: {
+export interface Vue2StorySetupApi {
   story?: Story
   variant?: Variant
-}) => Promise<Vue2StorySetupReturn> | Vue2StorySetupReturn
+  addWrapper: (component: any) => void
+}
+
+export type Vue2StorySetupHandler = (api: Vue2StorySetupApi) => Promise<Vue2StorySetupReturn> | Vue2StorySetupReturn
 
 export function defineSetupVue2 (handler: Vue2StorySetupHandler): Vue2StorySetupHandler {
   return handler

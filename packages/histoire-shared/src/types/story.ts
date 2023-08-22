@@ -41,6 +41,10 @@ export interface StoryProps extends CommonProps, InheritedProps {
   docsOnly?: boolean
 }
 
+export interface CommonMeta {}
+
+export interface StoryMeta extends CommonMeta {}
+
 export interface Story {
   id: string
   title: string
@@ -53,8 +57,10 @@ export interface Story {
   file?: StoryFile
   lastSelectedVariant?: Variant
   slots?: () => any
-  meta?: any
+  meta?: StoryMeta
 }
+
+export interface VariantMeta extends CommonMeta {}
 
 export interface Variant {
   id: string
@@ -69,7 +75,7 @@ export interface Variant {
   autoPropsDisabled?: boolean
   configReady?: boolean
   previewReady?: boolean
-  meta?: any
+  meta?: VariantMeta
 }
 
 export interface PropDefinition {
@@ -155,6 +161,7 @@ export interface ServerStory {
   iconColor?: string
   docsOnly?: boolean
   docsText?: string
+  meta?: StoryMeta
 }
 
 export interface ServerVariant {
@@ -162,6 +169,7 @@ export interface ServerVariant {
   title: string
   icon?: string
   iconColor?: string
+  meta?: VariantMeta
 }
 
 export interface ServerTreeFile {

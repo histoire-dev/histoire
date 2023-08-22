@@ -180,6 +180,10 @@ module.exports = {
               link: '/guide/vue3/app-setup',
             },
             {
+              text: 'Wrapper',
+              link: '/guide/vue3/wrapper',
+            },
+            {
               text: 'Documentation',
               link: '/guide/vue3/docs',
             },
@@ -232,6 +236,10 @@ module.exports = {
             {
               text: 'App setup',
               link: '/guide/vue2/app-setup',
+            },
+            {
+              text: 'Wrapper',
+              link: '/guide/vue2/wrapper',
             },
             {
               text: 'Documentation',

@@ -20,6 +20,7 @@ import * as setup from 'virtual:$histoire-setup'
 // @ts-expect-error virtual module id
 import * as generatedSetup from 'virtual:$histoire-generated-global-setup'
 import { syncStateBundledAndExternal } from './util.js'
+import type { Vue2StorySetupApi, Vue2StorySetupHandler } from '../../index.js'
 
 export default _defineComponent({
   name: 'RenderStory',
@@ -69,33 +70,37 @@ export default _defineComponent({
 
       let lastPropsTypesSnapshot: string
 
+      const wrappers: any[] = []
+
       const appOptions: Record<string, any> = {}
 
+      const setupApi: Vue2StorySetupApi = {
+        story: props.story,
+        variant: props.variant,
+        addWrapper: (wrapper) => {
+          wrappers.push(wrapper)
+        },
+      }
+
       if (typeof generatedSetup?.setupVue2 === 'function') {
-        const result = await generatedSetup.setupVue2({
-          story: props.story,
-          variant: props.variant,
-        })
+        const setupFn = generatedSetup.setupVue2 as Vue2StorySetupHandler
+        const result = await setupFn(setupApi)
         if (result) {
           Object.assign(appOptions, result)
         }
       }
 
       if (typeof setup?.setupVue2 === 'function') {
-        const result = await setup.setupVue2({
-          story: props.story,
-          variant: props.variant,
-        })
+        const setupFn = setup.setupVue2 as Vue2StorySetupHandler
+        const result = await setupFn(setupApi)
         if (result) {
           Object.assign(appOptions, result)
         }
       }
 
       if (typeof props.variant.setupApp === 'function') {
-        const result = await props.variant.setupApp({
-          story: props.story,
-          variant: props.variant,
-        })
+        const setupFn = props.variant.setupApp as Vue2StorySetupHandler
+        const result = await setupFn(setupApi)
         if (result) {
           Object.assign(appOptions, result)
         }
@@ -121,7 +126,7 @@ export default _defineComponent({
             }
           }
 
-          const vnodes = ensureFn(props.variant.slots()?.[props.slotName])?.({
+          let vnodes = ensureFn(props.variant.slots()?.[props.slotName])?.({
             state: externalState,
           }) ?? ensureFn(props.story.slots()?.[props.slotName])?.({
             state: externalState,
@@ -145,6 +150,17 @@ export default _defineComponent({
           //     lastPropsTypesSnapshot = snapshot
           //   }
           // }
+
+          for (const wrapper of wrappers) {
+            vnodes = [
+              h(wrapper, {
+                props: {
+                  story: props.story,
+                  variant: props.variant,
+                },
+              }, vnodes),
+            ]
+          }
 
           return h('div', vnodes)
         },

@@ -1,4 +1,4 @@
-import { defineComponent, inject } from 'vue'
+import { defineComponent, inject, type PropType } from 'vue'
 import type { ServerStory, ServerVariant } from '@histoire/shared'
 
 export default defineComponent({
@@ -12,17 +12,22 @@ export default defineComponent({
 
     id: {
       type: String,
-      default: null,
+      default: undefined,
     },
 
     icon: {
       type: String,
-      default: null,
+      default: undefined,
     },
 
     iconColor: {
       type: String,
-      default: null,
+      default: undefined,
+    },
+
+    meta: {
+      type: Object as PropType<ServerVariant['meta']>,
+      default: undefined,
     },
   },
 
@@ -38,6 +43,7 @@ export default defineComponent({
       title: props.title,
       icon: props.icon,
       iconColor: props.iconColor,
+      meta: props.meta,
     }
 
     const addVariant = inject('addVariant') as (variant: ServerVariant) => void

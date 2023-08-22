@@ -12,12 +12,12 @@ export default Object.assign(defineComponent({
   props: {
     initState: {
       type: Function as PropType<() => any | Promise<any>>,
-      default: null,
+      default: undefined,
     },
 
     source: {
       type: String,
-      default: null,
+      default: undefined,
     },
 
     responsiveDisabled: {
@@ -32,12 +32,17 @@ export default Object.assign(defineComponent({
 
     setupApp: {
       type: Function,
-      default: null,
+      default: undefined,
     },
 
     variant: {
       type: Object as PropType<Variant>,
-      default: null,
+      default: undefined,
+    },
+
+    meta: {
+      type: Object as PropType<Variant['meta']>,
+      default: undefined,
     },
   },
 
@@ -63,6 +68,7 @@ export default Object.assign(defineComponent({
         responsiveDisabled: props.responsiveDisabled,
         autoPropsDisabled: props.autoPropsDisabled,
         setupApp: props.setupApp,
+        meta: props.meta,
         configReady: true,
       })
     }

@@ -1,6 +1,6 @@
 /* eslint-disable vue/one-component-per-file */
 
-import { App, createApp, h, Suspense } from 'vue'
+import { App, createApp, h, Suspense, Component } from 'vue'
 import {
   defineComponent as _defineComponent,
   PropType as _PropType,
@@ -17,6 +17,7 @@ import * as setup from 'virtual:$histoire-setup'
 import * as generatedSetup from 'virtual:$histoire-generated-global-setup'
 import { registerGlobalComponents } from './global-components.js'
 import { RouterLinkStub } from './RouterLinkStub'
+import type { Vue3StorySetupHandler, Vue3StorySetupApi } from '../../helpers.js'
 
 export default _defineComponent({
   name: 'MountStory',
@@ -33,14 +34,27 @@ export default _defineComponent({
     let app: App
 
     async function mountStory () {
+      const wrappers: Component[] = []
+
       app = createApp({
         name: 'MountStorySubApp',
 
         render: () => {
-          return h(Suspense, [
-            h(props.story.file.component, {
+          let child = h(props.story.file.component, {
+            story: props.story,
+          })
+
+          for (const wrapper of wrappers) {
+            child = h(wrapper, {
               story: props.story,
-            }),
+              variant: null,
+            }, [
+              child,
+            ])
+          }
+
+          return h(Suspense, [
+            child,
           ])
         },
       })
@@ -57,20 +71,23 @@ export default _defineComponent({
 
       // Call app setups to resolve global assets such as components
 
+      const setupApi: Vue3StorySetupApi = {
+        app,
+        story: props.story,
+        variant: null,
+        addWrapper: (wrapper) => {
+          wrappers.push(wrapper)
+        },
+      }
+
       if (typeof generatedSetup?.setupVue3 === 'function') {
-        await generatedSetup.setupVue3({
-          app,
-          story: props.story,
-          variant: null,
-        })
+        const setupFn = generatedSetup.setupVue3 as Vue3StorySetupHandler
+        await setupFn(setupApi)
       }
 
       if (typeof setup?.setupVue3 === 'function') {
-        await setup.setupVue3({
-          app,
-          story: props.story,
-          variant: null,
-        })
+        const setupFn = setup.setupVue3 as Vue3StorySetupHandler
+        await setupFn(setupApi)
       }
 
       const target = document.createElement('div')

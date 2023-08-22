@@ -4,6 +4,8 @@ import type {
   StoryLayout,
   Story,
   Variant,
+  StoryMeta,
+  VariantMeta,
 } from '@histoire/shared'
 import type {
   HstButton,
@@ -85,11 +87,33 @@ interface VueStoryProps {
    * Disables the responsive menu, preview resize handles and makes the preview laways fit the available space.
    */
   responsiveDisabled?: boolean
+  /**
+   * Free form meta data.
+   *
+   * You can type it with:
+   *
+   * ```ts
+   * declare module 'histoire' {
+   *    // For both Story and Variant
+   *    interface CommonMeta {
+   *     myMeta: string
+   *    }
+   *
+   *   // Only for Story
+   *   interface StoryMeta {
+   *     myMeta: string
+   *   }
+   * }
+   * ```
+   */
+  meta?: StoryMeta
 }
 
 declare const VueStoryComponent: import('vue').DefineComponent<
 TypePropsToRuntimeProps<VueStoryProps>, {}, unknown, {}, {}, import('vue').ComponentOptionsMixin, import('vue').ComponentOptionsMixin, {}, string, import('vue').VNodeProps & import('vue').AllowedComponentProps & import('vue').ComponentCustomProps, Readonly<import('vue').ExtractPropTypes<TypePropsToRuntimeProps<VueStoryProps>>> & {}, {}
 >
+
+declare const MeowVueStoryComponent: import('vue').Component<TypePropsToRuntimeProps<VueStoryProps>>
 
 // <Variant>
 
@@ -128,6 +152,26 @@ interface VueVariantProps {
    * Disables the responsive menu, preview resize handles and makes the preview laways fit the available space.
    */
   responsiveDisabled?: boolean
+  /**
+   * Free form meta data.
+   *
+   * You can type it with:
+   *
+   * ```ts
+   * declare module 'histoire' {
+   *    // For both Story and Variant
+   *    interface CommonMeta {
+   *     myMeta: string
+   *    }
+   *
+   *   // Only for Variant
+   *   interface VariantMeta {
+   *     myMeta: string
+   *   }
+   * }
+   * ```
+   */
+  variant?: VariantMeta
 }
 
 declare const VueVariantComponent: import('vue').DefineComponent<
@@ -136,7 +180,7 @@ TypePropsToRuntimeProps<VueVariantProps>, {}, unknown, {}, {}, import('vue').Com
 
 // Register global components
 
-declare module '@vue/runtime-core' {
+declare module 'vue' {
   export interface GlobalComponents {
     Story: typeof VueStoryComponent
     Variant: typeof VueVariantComponent

@@ -17,6 +17,7 @@ import * as setup from 'virtual:$histoire-setup'
 import * as generatedSetup from 'virtual:$histoire-generated-global-setup'
 import { registerGlobalComponents } from './global-components.js'
 import { RouterLinkStub } from './RouterLinkStub'
+import type { Vue2StorySetupApi, Vue2StorySetupHandler } from '../../index.js'
 
 export default _defineComponent({
   name: 'MountStory',
@@ -35,24 +36,30 @@ export default _defineComponent({
     const forceUpdateKey = ref(0)
 
     async function mountStory () {
+      const wrappers: any[] = []
+
       // Call app setups to resolve global assets such as components
       const appOptions: Record<string, any> = {}
 
+      const setupApi: Vue2StorySetupApi = {
+        story: props.story,
+        variant: null,
+        addWrapper: (wrapper) => {
+          wrappers.push(wrapper)
+        },
+      }
+
       if (typeof generatedSetup?.setupVue2 === 'function') {
-        const result = await generatedSetup.setupVue2({
-          story: props.story,
-          variant: null,
-        })
+        const setupFn = generatedSetup.setupVue2 as Vue2StorySetupHandler
+        const result = await setupFn(setupApi)
         if (result) {
           Object.assign(appOptions, result)
         }
       }
 
       if (typeof setup?.setupVue2 === 'function') {
-        const result = await setup.setupVue2({
-          story: props.story,
-          variant: null,
-        })
+        const setupFn = setup.setupVue2 as Vue2StorySetupHandler
+        const result = await setupFn(setupApi)
         if (result) {
           Object.assign(appOptions, result)
         }
@@ -67,9 +74,21 @@ export default _defineComponent({
 
         render: () => {
           if (!props.story.file) return null
-          return h(props.story.file.component, {
+          let child = h(props.story.file.component, {
             key: forceUpdateKey.value,
           })
+
+          for (const wrapper of wrappers) {
+            child = h(wrapper, {
+              props: {
+                story: props.story,
+              },
+            }, [
+              child,
+            ])
+          }
+
+          return child
         },
 
         ...appOptions,

@@ -2,8 +2,19 @@ import './histoire.css'
 import { defineSetupVue3 } from '@histoire/plugin-vue'
 import { createPinia } from 'pinia'
 import GlobalComp from './components/GlobalComp.vue'
+import WrapperGlobal from './components/WrapperGlobal.vue'
 
-export const setupVue3 = defineSetupVue3(({ app }) => {
+declare module 'histoire' {
+  // Extend the story `meta` prop
+  interface CommonMeta {
+    /**
+     * Set to `false` to disable the `WrapperGlobal` component styling.
+     */
+    wrapper?: boolean
+  }
+}
+
+export const setupVue3 = defineSetupVue3(({ app, addWrapper }) => {
   app.provide('demo', 42)
   const pinia = createPinia()
   app.use(pinia)
@@ -15,4 +26,6 @@ export const setupVue3 = defineSetupVue3(({ app }) => {
       el.style.border = `1px dashed ${value}`
     },
   })
+
+  addWrapper(WrapperGlobal)
 })
