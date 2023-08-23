@@ -1,3 +1,21 @@
+## v0.17.1
+
+[compare changes](https://github.com/Akryum/histoire/compare/v0.17.0...v0.17.1)
+
+
+### 🩹 Fixes
+
+  - **vue:** Reverse wrapper order to that wrapper added first is outside and added last is inside ([70415b4](https://github.com/Akryum/histoire/commit/70415b4))
+
+### 🏡 Chore
+
+  - Example Color Selector being in Svelte 3 not Svelte 4 (fix: #583) ([#584](https://github.com/Akryum/histoire/pull/584), [#583](https://github.com/Akryum/histoire/issues/583))
+
+### ❤️  Contributors
+
+- Guillaume Chau ([@Akryum](http://github.com/Akryum))
+- Michael Thomas
+
 ## v0.17.0
 
 [compare changes](https://github.com/Akryum/histoire/compare/v0.16.5...v0.17.0)
