@@ -90,6 +90,8 @@ export default _defineComponent({
         await setupFn(setupApi)
       }
 
+      wrappers.reverse()
+
       const target = document.createElement('div')
       el.value.appendChild(target)
       app.mount(target)

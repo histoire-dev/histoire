@@ -6,7 +6,7 @@ import * as setup from 'virtual:$histoire-setup'
 import * as generatedSetup from 'virtual:$histoire-generated-global-setup'
 import Story from './Story'
 import Variant from './Variant'
-import type { Vue3StorySetupHandler } from '../../helpers.js'
+import type { Vue3StorySetupApi, Vue3StorySetupHandler } from '../../helpers.js'
 
 export async function run ({ file, storyData, el }: ServerRunPayload) {
   const { default: Comp } = await import(/* @vite-ignore */ file.moduleId)
@@ -32,24 +32,21 @@ export async function run ({ file, storyData, el }: ServerRunPayload) {
 
   // Call app setups to resolve global assets such as components
 
+  const setupApi: Vue3StorySetupApi = {
+    app,
+    story: null,
+    variant: null,
+    addWrapper: () => { /* noop */ },
+  }
+
   if (typeof generatedSetup?.setupVue3 === 'function') {
     const setupFn = generatedSetup.setupVue3 as Vue3StorySetupHandler
-    await setupFn({
-      app,
-      story: null,
-      variant: null,
-      addWrapper: () => { /* noop */ },
-    })
+    await setupFn(setupApi)
   }
 
   if (typeof setup?.setupVue3 === 'function') {
     const setupFn = setup.setupVue3 as Vue3StorySetupHandler
-    await setupFn({
-      app,
-      story: null,
-      variant: null,
-      addWrapper: () => { /* noop */ },
-    })
+    await setupFn(setupApi)
   }
 
   app.mount(el)

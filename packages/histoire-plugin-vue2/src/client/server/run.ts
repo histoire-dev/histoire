@@ -6,7 +6,7 @@ import * as setup from 'virtual:$histoire-setup'
 import * as generatedSetup from 'virtual:$histoire-generated-global-setup'
 import Story from './Story'
 import Variant from './Variant'
-import type { Vue2StorySetupHandler } from '../../index.js'
+import type { Vue2StorySetupApi, Vue2StorySetupHandler } from '../../index.js'
 
 export async function run ({ file, storyData, el }: ServerRunPayload) {
   const { default: Comp } = await import(/* @vite-ignore */ file.moduleId)
@@ -14,13 +14,15 @@ export async function run ({ file, storyData, el }: ServerRunPayload) {
   // Call app setups to resolve global assets such as components
   const appOptions: Record<string, any> = {}
 
+  const setupApi: Vue2StorySetupApi = {
+    story: null,
+    variant: null,
+    addWrapper: () => { /* noop */ },
+  }
+
   if (typeof generatedSetup?.setupVue2 === 'function') {
     const setupFn = generatedSetup.setupVue2 as Vue2StorySetupHandler
-    const result = await setupFn({
-      story: null,
-      variant: null,
-      addWrapper: () => { /* noop */ },
-    })
+    const result = await setupFn(setupApi)
     if (result) {
       Object.assign(appOptions, result)
     }
@@ -28,11 +30,7 @@ export async function run ({ file, storyData, el }: ServerRunPayload) {
 
   if (typeof setup?.setupVue2 === 'function') {
     const setupFn = setup.setupVue2 as Vue2StorySetupHandler
-    const result = await setupFn({
-      story: null,
-      variant: null,
-      addWrapper: () => { /* noop */ },
-    })
+    const result = await setupFn(setupApi)
     if (result) {
       Object.assign(appOptions, result)
     }

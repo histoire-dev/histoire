@@ -65,6 +65,8 @@ export default _defineComponent({
         }
       }
 
+      wrappers.reverse()
+
       app = new Vue({
         name: 'MountStorySubApp',
 
