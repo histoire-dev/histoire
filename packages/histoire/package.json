@@ -73,7 +73,7 @@
     "sade": "^1.8.1",
     "shiki-es": "^0.2.0",
     "sirv": "^2.0.3",
-    "vite-node": "0.28.4"
+    "vite-node": "^0.34.1"
   },
   "peerDependencies": {
     "vite": "^2.9.0 || ^3.0.0 || ^4.0.0"
