@@ -1,3 +1,16 @@
+## v0.17.3
+
+[compare changes](https://github.com/Akryum/histoire/compare/v0.17.2...v0.17.3)
+
+
+### 🩹 Fixes
+
+  - **nuxt:** Don't externalize .nuxt folder ([3ba02bf](https://github.com/Akryum/histoire/commit/3ba02bf))
+
+### ❤️  Contributors
+
+- Guillaume Chau ([@Akryum](http://github.com/Akryum))
+
 ## v0.17.2
 
 [compare changes](https://github.com/Akryum/histoire/compare/v0.17.1...v0.17.2)
