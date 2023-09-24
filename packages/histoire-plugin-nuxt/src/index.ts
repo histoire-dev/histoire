@@ -87,6 +87,7 @@ export async function setupVue3 () {
         viteNodeInlineDeps: [
           /\/(nuxt|nuxt3)\//,
           /^#/,
+          /\.nuxt/,
           ...(nuxt.options.build.transpile.filter(
             r => typeof r === 'string' || r instanceof RegExp,
           ) as Array<string | RegExp>),
