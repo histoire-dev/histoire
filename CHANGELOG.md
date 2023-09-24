@@ -1,3 +1,26 @@
+## v0.17.2
+
+[compare changes](https://github.com/Akryum/histoire/compare/v0.17.1...v0.17.2)
+
+
+### 🩹 Fixes
+
+  - Update `vite-node` version to fix `__vite_ssr_import_meta__ ` error ([#588](https://github.com/Akryum/histoire/pull/588))
+  - **nuxt:** UseNuxtApp error ([d8bb144](https://github.com/Akryum/histoire/commit/d8bb144))
+
+### ✅ Tests
+
+  - Fix ([483efb7](https://github.com/Akryum/histoire/commit/483efb7))
+
+### 🤖 CI
+
+  - Fix ([67ec022](https://github.com/Akryum/histoire/commit/67ec022))
+
+### ❤️  Contributors
+
+- Guillaume Chau ([@Akryum](http://github.com/Akryum))
+- SerKo
+
 ## v0.17.1
 
 [compare changes](https://github.com/Akryum/histoire/compare/v0.17.0...v0.17.1)
