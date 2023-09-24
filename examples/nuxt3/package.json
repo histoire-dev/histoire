@@ -15,10 +15,10 @@
   "devDependencies": {
     "@histoire/plugin-nuxt": "workspace:*",
     "@histoire/plugin-vue": "workspace:*",
-    "@nuxtjs/tailwindcss": "^5.3.5",
+    "@nuxtjs/tailwindcss": "^6.8.0",
     "cypress": "^10.11.0",
     "histoire": "workspace:*",
-    "nuxt": "^3.6.5",
+    "nuxt": "^3.7.3",
     "start-server-and-test": "^1.15.4",
     "vue": "^3.3.4"
   }

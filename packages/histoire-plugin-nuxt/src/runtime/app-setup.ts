@@ -67,5 +67,6 @@ export async function setupNuxtApp (publicConfig: PublicRuntimeConfig) {
   win.__app = h3App
 
   // @ts-ignore
-  await import('#app/entry')
+  const result = await import('#app/entry')
+  await result.default()
 }

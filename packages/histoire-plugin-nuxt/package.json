@@ -28,6 +28,7 @@
   },
   "dependencies": {
     "@nuxt/kit": "^3.6.5",
+    "@rollup/plugin-replace": "^5.0.2",
     "@vitejs/plugin-vue": "^4.2.3",
     "@vitejs/plugin-vue-jsx": "^3.0.1",
     "h3": "^1.7.1",

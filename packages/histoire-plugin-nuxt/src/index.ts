@@ -2,6 +2,7 @@ import { fileURLToPath } from 'node:url'
 import { join } from 'node:path'
 import vuePlugin from '@vitejs/plugin-vue'
 import viteJsxPlugin from '@vitejs/plugin-vue-jsx'
+import replace from '@rollup/plugin-replace'
 import type { Plugin } from 'histoire'
 import type { Nuxt } from '@nuxt/schema'
 import type { UserConfig as ViteConfig } from 'vite'
@@ -40,13 +41,29 @@ export function HstNuxt (): Plugin {
             },
             middlewareMode: false,
           },
-          define: viteConfig.define,
+          define: {
+            ...viteConfig.define,
+            'process.server': false,
+            'process.client': true,
+            'process.browser': true,
+            'process.nitro': false,
+            'process.prerender': false,
+          },
           resolve: {
             alias: viteConfig.resolve.alias,
             extensions: viteConfig.resolve.extensions,
             dedupe: viteConfig.resolve.dedupe,
           },
-          plugins,
+          plugins: [
+            ...plugins,
+            replace({
+              values: {
+                'import.meta.server': 'false',
+                'import.meta.client': 'true',
+              },
+              preventAssignment: true,
+            }),
+          ],
           css: viteConfig.css,
           publicDir: viteConfig.publicDir,
           optimizeDeps: {
