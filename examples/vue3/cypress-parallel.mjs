@@ -90,7 +90,7 @@ export function splitSpecs (specs, totalRunners, thisRunner) {
 
     const specsToRun = splitSpecs(specFilePaths, totalRunners, thisRunner)
 
-    const command = `yarn cypress run --spec "${specsToRun.join(',')}"`
+    const command = `pnpm exec cypress run --spec "${specsToRun.join(',')}"`
 
     console.log(`Running: ${command}`)
 
