@@ -133,6 +133,7 @@ export async function createMarkdownPlugins (ctx: Context) {
 }
 
 export async function createMarkdownFilesWatcher (ctx: Context) {
+  let watcherError
   const md = await createMarkdownRendererWithPlugins(ctx)
 
   const watcher = chokidar.watch(['**/*.story.md'], {
@@ -147,9 +148,9 @@ export async function createMarkdownFilesWatcher (ctx: Context) {
     const isRelatedToStory = dirFiles.some((file) => !file.endsWith('.md') && file.startsWith(truncatedName))
 
     const { data: frontmatter, content } = matter(await fs.readFile(absolutePath, 'utf8'))
-    const html = md.render(content, {
-      file: absolutePath,
-    })
+    // const html = md.render(content, {
+    //   file: absolutePath,
+    // })
 
     const file: ServerMarkdownFile = {
       id: paramCase(relativePath.toLowerCase()),
@@ -157,7 +158,7 @@ export async function createMarkdownFilesWatcher (ctx: Context) {
       absolutePath,
       isRelatedToStory,
       frontmatter,
-      html,
+      content,
     }
     ctx.markdownFiles.push(file)
 
@@ -214,14 +215,29 @@ export async function createMarkdownFilesWatcher (ctx: Context) {
     .on('unlink', (relativePath) => {
       removeFile(relativePath)
     })
+    .on('ready', async () => {
+      // get ctx and md renderer to create HTML.
+      for (const mdFile of ctx.markdownFiles) {
+        try {
+          mdFile.html = md.render(mdFile.content, {
+            file: mdFile.absolutePath,
+          })
+        } catch (e: any) {
+          watcherError = e
+        }
+      }
+    })
 
   await new Promise(resolve => {
     watcher.once('ready', resolve)
   })
 
-  return {
-    stop,
+  if (watcherError === null || watcherError === undefined) {
+    return {
+      stop,
+    }
   }
+  return Promise.reject(watcherError)
 }
 
 export type MarkdownFilesWatcher = ReturnType<typeof createMarkdownFilesWatcher>

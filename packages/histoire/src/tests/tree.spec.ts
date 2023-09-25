@@ -1,7 +1,7 @@
 import { describe, test, expect } from 'vitest'
-import { makeTree } from './tree'
-import { getDefaultConfig } from './config'
-import type { StoryFile } from './types'
+import { makeTree } from '../node/tree'
+import { getDefaultConfig } from '../node/config'
+import type { ServerStoryFile } from '@histoire/shared'
 
 let id = 0
 
@@ -9,13 +9,15 @@ interface StoryFileFactoryOptions {
   treePath: string[]
 }
 
-function storyFileFactory (options: StoryFileFactoryOptions): StoryFile {
+function storyFileFactory (options: StoryFileFactoryOptions): ServerStoryFile {
   return {
     id: `id_${id++}`,
     path: options.treePath.join('/'),
     treePath: options.treePath,
     fileName: 'fileName',
     moduleId: 'moduleId',
+    relativePath: options.treePath.join('/'),
+    supportPluginId: 'supportPluginId',
   }
 }
 
