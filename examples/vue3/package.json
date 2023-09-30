@@ -24,7 +24,7 @@
     "@histoire/plugin-vue": "workspace:*",
     "@histoire/vendors": "workspace:*",
     "@vitejs/plugin-vue": "^4.2.3",
-    "cypress": "^9.7.0",
+    "cypress": "^13.3.0",
     "globby": "^13.2.2",
     "histoire": "workspace:*",
     "minimatch": "^5.1.6",

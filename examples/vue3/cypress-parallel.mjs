@@ -13,7 +13,7 @@ const thisRunner = parseInt(process.env.THIS_RUNNER)
 // import them here and in cypress.config, so that both files use
 // the same values.
 const specPatterns = {
-  specPattern: './cypress/integration/*.{ts,tsx,js,jsx}',
+  specPattern: './**/*.cy.{ts,tsx,js,jsx}',
   excludeSpecPattern: ['tsconfig.json'],
 }
 
