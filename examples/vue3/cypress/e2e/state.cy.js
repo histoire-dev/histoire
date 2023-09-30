@@ -1,7 +1,9 @@
 /// <reference types="cypress" />
 
 describe('State Options API', () => {
-  const getIframeBody = () => cy.get('iframe[data-test-id="preview-iframe"]').iframe()
+  const getIframeBody = () => cy.get('iframe[data-test-id="preview-iframe"]')
+    .its('0.contentDocument.body').should('not.be.empty')
+    .then(cy.wrap)
 
   beforeEach(() => {
     cy.visit('/story/src-components-stateoption-story-vue?variantId=src-components-stateoption-story-vue-0')
@@ -15,7 +17,9 @@ describe('State Options API', () => {
 })
 
 describe('State Setup API', () => {
-  const getIframeBody = () => cy.get('iframe[data-test-id="preview-iframe"]').iframe()
+  const getIframeBody = () => cy.get('iframe[data-test-id="preview-iframe"]')
+    .its('0.contentDocument.body').should('not.be.empty')
+    .then(cy.wrap)
 
   beforeEach(() => {
     cy.visit('/story/src-components-statesetup-story-vue?variantId=src-components-statesetup-story-vue-0')
@@ -32,7 +36,9 @@ describe('State Setup API', () => {
 })
 
 describe('State Setup API (2)', () => {
-  const getIframeBody = () => cy.get('iframe[data-test-id="preview-iframe"]').iframe()
+  const getIframeBody = () => cy.get('iframe[data-test-id="preview-iframe"]')
+    .its('0.contentDocument.body').should('not.be.empty')
+    .then(cy.wrap)
 
   beforeEach(() => {
     cy.visit('/story/src-components-statesetup2-story-vue?variantId=src-components-statesetup2-story-vue-0')
