@@ -124,6 +124,9 @@ async function useNuxtViteConfig () {
     dev: true,
     overrides: {
       ssr: false,
+      experimental: {
+        appManifest: false,
+      },
       app: {
         rootId: 'nuxt-test',
       },
