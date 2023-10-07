@@ -125,6 +125,7 @@ async function useNuxtViteConfig () {
     overrides: {
       ssr: false,
       experimental: {
+        // @ts-expect-error coming in Nuxt v3.8
         appManifest: false,
       },
       app: {
