@@ -10,7 +10,9 @@
     "ci": "start-server-and-test story:preview http://localhost:4567/ test",
     "test": "node ./cypress-parallel.mjs",
     "test:dev": "cypress open --config baseUrl=http://localhost:6006",
-    "test:examples": "pnpm run story:build && pnpm run ci"
+    "test:examples": "pnpm run story:build && pnpm run ci-s",
+    "ci-s": "start-server-and-test story:preview http://localhost:4567/ test-s",
+    "test-s": "cypress run --config baseUrl=http://localhost:4567"
   },
   "dependencies": {
     "lottie-web": "^5.12.2",
@@ -22,7 +24,7 @@
     "@histoire/plugin-vue": "workspace:*",
     "@histoire/vendors": "workspace:*",
     "@vitejs/plugin-vue": "^4.2.3",
-    "cypress": "^9.7.0",
+    "cypress": "^13.3.0",
     "globby": "^13.2.2",
     "histoire": "workspace:*",
     "minimatch": "^5.1.6",

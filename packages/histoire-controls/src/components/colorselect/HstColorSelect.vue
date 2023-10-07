@@ -1,6 +1,6 @@
 <script lang="ts">
 export default {
-  name: 'HstColorSelector',
+  name: 'HstColorSelect',
   inheritAttrs: false,
 }
 </script>

@@ -1,7 +1,9 @@
 /// <reference types="cypress" />
 
 describe('Wrapper', () => {
-  const getIframeBody = () => cy.get('iframe[data-test-id="preview-iframe"]').iframe()
+  const getIframeBody = () => cy.get('iframe[data-test-id="preview-iframe"]')
+    .its('0.contentDocument.body').should('not.be.empty')
+    .then(cy.wrap)
 
   it('should display the wrapper', () => {
     cy.visit('/story/src-components-meow-story-vue?variantId=src-components-meow-story-vue-0')
