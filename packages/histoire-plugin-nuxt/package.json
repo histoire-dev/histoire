@@ -40,7 +40,7 @@
     "@types/node": "^17.0.45",
     "histoire": "workspace:*",
     "typescript": "^4.9.5",
-    "vite": "^4.4.9"
+    "vite": "^4.5.0"
   },
   "peerDependencies": {
     "@histoire/plugin-vue": "workspace:^",
