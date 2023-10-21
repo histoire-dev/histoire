@@ -253,7 +253,6 @@ export async function resolveConfig (cwd: string = process.cwd(), mode: ConfigMo
   let result: Partial<HistoireConfig>
   const resolvedConfigFile = resolveConfigFile(cwd, configFile)
   if (resolvedConfigFile) {
-    console.log('resolvedConfigFile', resolvedConfigFile)
     result = await loadConfigFile(resolvedConfigFile)
   }
   const viteConfig = await resolveViteConfig({}, 'serve')
