@@ -60,7 +60,7 @@ const animationEnabled = ref(false)
           :name="`${value}-radio_${title}`"
           :value="value"
           :checked="value === modelValue"
-          class="htw-hidden"
+          class="!htw-hidden"
           @change="selectOption(value)"
         >
         <label
