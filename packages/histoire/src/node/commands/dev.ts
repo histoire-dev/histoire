@@ -52,7 +52,7 @@ export async function devCommand (options: DevOptions) {
 
   stop = await start()
 
-  const configFile = await resolveConfigFile()
+  const configFile = await resolveConfigFile(undefined, options.config)
   if (configFile) {
     const watcher = chokidar.watch(configFile, {
       ignoreInitial: true,
