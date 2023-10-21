@@ -22,7 +22,7 @@ export interface Context {
 }
 
 export interface CreateContextOptions {
-  mode: Context['mode'],
+  mode: Context['mode']
   configFile?: string
 }
 

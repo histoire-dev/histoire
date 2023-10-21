@@ -155,11 +155,10 @@ export const configFileNames = [
 ]
 
 export function resolveConfigFile (cwd: string = process.cwd(), configFile?: string): string {
-  if(configFile) {
-      // explicit config path is always resolved from cwd
-      return path.resolve(configFile)
-  }
-  else {
+  if (configFile) {
+    // explicit config path is always resolved from cwd
+    return path.resolve(configFile)
+  } else {
     return findUp(cwd, configFileNames)
   }
 }
@@ -250,9 +249,9 @@ export const mergeConfig = createDefu((obj: any, key, value) => {
   }
 })
 
-export async function resolveConfig (cwd: string = process.cwd(), mode: ConfigMode, configFile: string ): Promise<HistoireConfig> {
+export async function resolveConfig (cwd: string = process.cwd(), mode: ConfigMode, configFile: string): Promise<HistoireConfig> {
   let result: Partial<HistoireConfig>
-  const resolvedConfigFile = resolveConfigFile(cwd, configFile) 
+  const resolvedConfigFile = resolveConfigFile(cwd, configFile)
   if (resolvedConfigFile) {
     console.log('resolvedConfigFile', resolvedConfigFile)
     result = await loadConfigFile(resolvedConfigFile)

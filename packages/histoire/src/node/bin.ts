@@ -27,9 +27,9 @@ program.command('build')
   .describe('build the histoire final app you can deploy')
   .option('-c, --config <file>', `[string] use specified config file`)
   .action(async (options) => {
-      const { buildCommand } = await import('./commands/build.js')
-      return buildCommand(options)
-    })
+    const { buildCommand } = await import('./commands/build.js')
+    return buildCommand(options)
+  })
 
 program.command('preview')
   .describe('preview the built directory')
