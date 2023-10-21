@@ -16,6 +16,7 @@ program.version(version)
 program.command('dev')
   .describe('open the stories in your browser for development')
   .option('-p, --port <port>', 'Listening port of the server')
+  .option('-c, --config <file>', `[string] use specified config file`)
   .option('--open', 'Open in your default browser')
   .action(async (options) => {
     const { devCommand } = await import('./commands/dev.js')
@@ -24,10 +25,11 @@ program.command('dev')
 
 program.command('build')
   .describe('build the histoire final app you can deploy')
-  .action(async () => {
-    const { buildCommand } = await import('./commands/build.js')
-    return buildCommand()
-  })
+  .option('-c, --config <file>', `[string] use specified config file`)
+  .action(async (options) => {
+      const { buildCommand } = await import('./commands/build.js')
+      return buildCommand(options)
+    })
 
 program.command('preview')
   .describe('preview the built directory')

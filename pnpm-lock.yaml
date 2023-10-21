@@ -70,7 +70,7 @@ importers:
         version: 4.9.5
       vitepress:
         specifier: 1.0.0-alpha.10
-        version: 1.0.0-alpha.10(search-insights@2.7.0)
+        version: 1.0.0-alpha.10(search-insights@2.9.0)
       vue-eslint-parser:
         specifier: ^9.3.1
         version: 9.3.1(eslint@8.47.0)
@@ -134,7 +134,7 @@ importers:
         version: 5.0.4(postcss@8.4.27)(svelte@4.2.0)(typescript@4.9.5)
       vite:
         specifier: ^4.4.9
-        version: 4.4.9(@types/node@18.17.5)
+        version: 4.4.9(sass@1.65.1)
 
   examples/sveltekit:
     dependencies:
@@ -177,7 +177,7 @@ importers:
         version: 4.9.5
       vite:
         specifier: ^4.4.9
-        version: 4.4.9(@types/node@18.17.5)
+        version: 4.4.9(sass@1.65.1)
 
   examples/vue2:
     dependencies:
@@ -196,7 +196,7 @@ importers:
         version: link:../../packages/histoire
       vite:
         specifier: ^4.4.9
-        version: 4.4.9(@types/node@18.17.5)
+        version: 4.4.9(sass@1.65.1)
       vue-template-compiler:
         specifier: ^2.7.14
         version: 2.7.14
@@ -270,7 +270,7 @@ importers:
         version: link:../../packages/histoire
       vite:
         specifier: ^4.4.9
-        version: 4.4.9(@types/node@18.17.5)
+        version: 4.4.9(sass@1.65.1)
 
   examples/vue3-screenshot:
     dependencies:
@@ -292,7 +292,7 @@ importers:
         version: link:../../packages/histoire
       vite:
         specifier: ^4.4.9
-        version: 4.4.9(@types/node@18.17.5)
+        version: 4.4.9(sass@1.65.1)
 
   examples/vue3-themed:
     dependencies:
@@ -311,7 +311,7 @@ importers:
         version: link:../../packages/histoire
       vite:
         specifier: ^4.4.9
-        version: 4.4.9(@types/node@18.17.5)
+        version: 4.4.9(sass@1.65.1)
 
   examples/vue3-vuetify:
     dependencies:
@@ -336,7 +336,7 @@ importers:
         version: link:../../packages/histoire
       vite:
         specifier: ^4.4.9
-        version: 4.4.9(@types/node@18.17.5)
+        version: 4.4.9(sass@1.65.1)
       vite-plugin-vuetify:
         specifier: 1.0.0-alpha.12
         version: 1.0.0-alpha.12(vite@4.4.9)(vue@3.3.4)(vuetify@3.3.12)
@@ -419,8 +419,8 @@ importers:
         specifier: ^1.0.1
         version: 1.0.1
       pathe:
-        specifier: ^0.2.0
-        version: 0.2.0
+        specifier: ^1.1.1
+        version: 1.1.1
       picocolors:
         specifier: ^1.0.0
         version: 1.0.0
@@ -634,7 +634,7 @@ importers:
         version: link:../histoire
       vite:
         specifier: ^4.4.9
-        version: 4.4.9(@types/node@18.17.5)
+        version: 4.4.9(sass@1.65.1)
 
   packages/histoire-plugin-nuxt:
     dependencies:
@@ -893,7 +893,7 @@ importers:
         version: 4.9.5
       vite:
         specifier: ^4.4.9
-        version: 4.4.9(@types/node@18.17.5)
+        version: 4.4.9(sass@1.65.1)
 
   packages/histoire-vendors:
     devDependencies:
@@ -962,10 +962,10 @@ packages:
     engines: {node: '>=14.0.0'}
     dev: false
 
-  /@algolia/autocomplete-core@1.9.3(algoliasearch@4.19.1)(search-insights@2.7.0):
+  /@algolia/autocomplete-core@1.9.3(algoliasearch@4.19.1)(search-insights@2.9.0):
     resolution: {integrity: sha512-009HdfugtGCdC4JdXUbVJClA0q0zh24yyePn+KUGk3rP7j8FEe/m5Yo/z65gn6nP/cM39PxpzqKrL7A6fP6PPw==}
     dependencies:
-      '@algolia/autocomplete-plugin-algolia-insights': 1.9.3(algoliasearch@4.19.1)(search-insights@2.7.0)
+      '@algolia/autocomplete-plugin-algolia-insights': 1.9.3(algoliasearch@4.19.1)(search-insights@2.9.0)
       '@algolia/autocomplete-shared': 1.9.3(algoliasearch@4.19.1)
     transitivePeerDependencies:
       - '@algolia/client-search'
@@ -973,13 +973,13 @@ packages:
       - search-insights
     dev: true
 
-  /@algolia/autocomplete-plugin-algolia-insights@1.9.3(algoliasearch@4.19.1)(search-insights@2.7.0):
+  /@algolia/autocomplete-plugin-algolia-insights@1.9.3(algoliasearch@4.19.1)(search-insights@2.9.0):
     resolution: {integrity: sha512-a/yTUkcO/Vyy+JffmAnTWbr4/90cLzw+CC3bRbhnULr/EM0fGNvM13oQQ14f2moLMcVDyAx/leczLlAOovhSZg==}
     peerDependencies:
       search-insights: '>= 1 < 3'
     dependencies:
       '@algolia/autocomplete-shared': 1.9.3(algoliasearch@4.19.1)
-      search-insights: 2.7.0
+      search-insights: 2.9.0
     transitivePeerDependencies:
       - '@algolia/client-search'
       - algoliasearch
@@ -1553,10 +1553,10 @@ packages:
     resolution: {integrity: sha512-2Pu9HDg/uP/IT10rbQ+4OrTQuxIWdKVUEdcw9/w7kZJv9NeHS6skJx1xuRiFyoGKwAzcHXnLp7csE99sj+O1YA==}
     dev: true
 
-  /@docsearch/js@3.5.1(search-insights@2.7.0):
+  /@docsearch/js@3.5.1(search-insights@2.9.0):
     resolution: {integrity: sha512-EXi8de5njxgP6TV3N9ytnGRLG9zmBNTEZjR4VzwPcpPLbZxxTLG2gaFyJyKiFVQxHW/DPlMrDJA3qoRRGEkgZw==}
     dependencies:
-      '@docsearch/react': 3.5.1(search-insights@2.7.0)
+      '@docsearch/react': 3.5.1(search-insights@2.9.0)
       preact: 10.17.0
     transitivePeerDependencies:
       - '@algolia/client-search'
@@ -1566,7 +1566,7 @@ packages:
       - search-insights
     dev: true
 
-  /@docsearch/react@3.5.1(search-insights@2.7.0):
+  /@docsearch/react@3.5.1(search-insights@2.9.0):
     resolution: {integrity: sha512-t5mEODdLzZq4PTFAm/dvqcvZFdPDMdfPE5rJS5SC8OUq9mPzxEy6b+9THIqNM9P0ocCb4UC5jqBrxKclnuIbzQ==}
     peerDependencies:
       '@types/react': '>= 16.8.0 < 19.0.0'
@@ -1580,7 +1580,7 @@ packages:
       react-dom:
         optional: true
     dependencies:
-      '@algolia/autocomplete-core': 1.9.3(algoliasearch@4.19.1)(search-insights@2.7.0)
+      '@algolia/autocomplete-core': 1.9.3(algoliasearch@4.19.1)(search-insights@2.9.0)
       '@algolia/autocomplete-preset-algolia': 1.9.3(algoliasearch@4.19.1)
       '@docsearch/css': 3.5.1
       algoliasearch: 4.19.1
@@ -2653,7 +2653,7 @@ packages:
       strip-literal: 1.3.0
       ufo: 1.3.0
       unplugin: 1.4.0
-      vite: 4.4.9(@types/node@18.17.5)
+      vite: 4.4.9(sass@1.65.1)
       vite-node: 0.33.0
       vite-plugin-checker: 0.6.2(eslint@8.47.0)(typescript@4.9.5)(vite@4.4.9)
       vue: 3.3.4
@@ -3351,7 +3351,7 @@ packages:
       sirv: 2.0.3
       svelte: 3.59.2
       undici: 5.23.0
-      vite: 4.4.9(@types/node@18.17.5)
+      vite: 4.4.9(sass@1.65.1)
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -3367,7 +3367,7 @@ packages:
       '@sveltejs/vite-plugin-svelte': 2.4.5(svelte@3.59.2)(vite@4.4.9)
       debug: 4.3.4(supports-color@8.1.1)
       svelte: 3.59.2
-      vite: 4.4.9(@types/node@18.17.5)
+      vite: 4.4.9(sass@1.65.1)
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -3383,7 +3383,7 @@ packages:
       '@sveltejs/vite-plugin-svelte': 2.4.5(svelte@4.2.0)(vite@4.4.9)
       debug: 4.3.4(supports-color@8.1.1)
       svelte: 4.2.0
-      vite: 4.4.9(@types/node@18.17.5)
+      vite: 4.4.9(sass@1.65.1)
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -3421,7 +3421,7 @@ packages:
       magic-string: 0.30.3
       svelte: 3.59.2
       svelte-hmr: 0.15.3(svelte@3.59.2)
-      vite: 4.4.9(@types/node@18.17.5)
+      vite: 4.4.9(sass@1.65.1)
       vitefu: 0.2.4(vite@4.4.9)
     transitivePeerDependencies:
       - supports-color
@@ -3441,7 +3441,7 @@ packages:
       magic-string: 0.30.2
       svelte: 4.2.0
       svelte-hmr: 0.15.3(svelte@4.2.0)
-      vite: 4.4.9(@types/node@18.17.5)
+      vite: 4.4.9(sass@1.65.1)
       vitefu: 0.2.4(vite@4.4.9)
     transitivePeerDependencies:
       - supports-color
@@ -3596,8 +3596,8 @@ packages:
     resolution: {integrity: sha512-oh8q2Zc32S6gd/j50GowEjKLoOVOwHP/bWVjKJInBwQqdOYMdPrf1oVlelTlyfFK3CKxL1uahMDAr+vy8T7yMQ==}
     dev: true
 
-  /@types/yauzl@2.10.0:
-    resolution: {integrity: sha512-Cn6WYCm0tXv8p6k+A8PvbDG763EDpBoTzHdA+Q/MF6H3sapGjCm9NzoaJncJS9tUKSuCoDs9XHxYYsQDgxR6kw==}
+  /@types/yauzl@2.10.2:
+    resolution: {integrity: sha512-Km7XAtUIduROw7QPgvcft0lIupeG8a8rdKL8RiSyKvlE7dYY31fEn41HVuQsRFDuROA8tA4K2UVL+WdfFmErBA==}
     requiresBuild: true
     dependencies:
       '@types/node': 18.17.5
@@ -3918,7 +3918,7 @@ packages:
       '@babel/core': 7.22.10
       '@babel/plugin-transform-typescript': 7.22.10(@babel/core@7.22.10)
       '@vue/babel-plugin-jsx': 1.1.5(@babel/core@7.22.10)
-      vite: 4.4.9(@types/node@18.17.5)
+      vite: 4.4.9(sass@1.65.1)
       vue: 3.3.4
     transitivePeerDependencies:
       - supports-color
@@ -3934,7 +3934,7 @@ packages:
       vue:
         optional: true
     dependencies:
-      vite: 4.4.9(@types/node@18.17.5)
+      vite: 4.4.9(sass@1.65.1)
       vue: 2.7.14
     dev: true
 
@@ -3948,7 +3948,7 @@ packages:
       vue:
         optional: true
     dependencies:
-      vite: 4.4.9(@types/node@18.17.5)
+      vite: 4.4.9(sass@1.65.1)
       vue: 3.3.4
     dev: true
 
@@ -4017,7 +4017,7 @@ packages:
       vue:
         optional: true
     dependencies:
-      vite: 4.4.9(@types/node@18.17.5)
+      vite: 4.4.9(sass@1.65.1)
       vue: 3.3.4
     dev: true
 
@@ -6842,7 +6842,7 @@ packages:
       get-stream: 5.2.0
       yauzl: 2.10.0
     optionalDependencies:
-      '@types/yauzl': 2.10.0
+      '@types/yauzl': 2.10.2
     transitivePeerDependencies:
       - supports-color
 
@@ -7585,7 +7585,6 @@ packages:
 
   /immutable@4.3.2:
     resolution: {integrity: sha512-oGXzbEDem9OOpDWZu88jGiYCvIsLHMvGw+8OXlpsvTFvIQplQbjg1B1cvKg8f7Hoch6+NGjpPsH1Fr+Mc2D1aA==}
-    dev: true
 
   /import-fresh@3.3.0:
     resolution: {integrity: sha512-veYYhQa+D1QBKznvhUHxb8faxlrwUnxseDAbAp457E0wLNio2bOSKnjYDhMj+YiAq61xrMGhQk9iXVk5FzgQMw==}
@@ -10859,7 +10858,6 @@ packages:
       chokidar: 3.5.3
       immutable: 4.3.2
       source-map-js: 1.0.2
-    dev: true
 
   /saxes@6.0.0:
     resolution: {integrity: sha512-xAg7SOnEhrm5zI3puOOKyy1OMcMlIJZYNJY7xLBwSze0UjhPLnWfj2GF2EpT0jmzaJKIWKHLsaSSajf35bcYnA==}
@@ -10885,9 +10883,8 @@ packages:
   /scule@1.0.0:
     resolution: {integrity: sha512-4AsO/FrViE/iDNEPaAQlb77tf0csuq27EsVpy6ett584EcRTp6pTDLoGWVxCD77y5iU5FauOvhsI4o1APwPoSQ==}
 
-  /search-insights@2.7.0:
-    resolution: {integrity: sha512-GLbVaGgzYEKMvuJbHRhLi1qoBFnjXZGZ6l4LxOYPCp4lI2jDRB3jPU9/XNhMwv6kvnA9slTreq6pvK+b3o3aqg==}
-    engines: {node: '>=8.16.0'}
+  /search-insights@2.9.0:
+    resolution: {integrity: sha512-bkWW9nIHOFkLwjQ1xqVaMbjjO5vhP26ERsH9Y3pKr8imthofEFIxlnOabkmGcw6ksRj9jWidcI65vvjJH/nTGg==}
     dev: true
 
   /section-matter@1.0.0:
@@ -12310,7 +12307,7 @@ packages:
       mlly: 1.4.0
       pathe: 1.1.1
       picocolors: 1.0.0
-      vite: 4.4.9(@types/node@18.17.5)
+      vite: 4.4.9(sass@1.65.1)
     transitivePeerDependencies:
       - '@types/node'
       - less
@@ -12487,7 +12484,7 @@ packages:
       strip-ansi: 6.0.1
       tiny-invariant: 1.3.1
       typescript: 4.9.5
-      vite: 4.4.9(@types/node@18.17.5)
+      vite: 4.4.9(sass@1.65.1)
       vscode-languageclient: 7.0.0
       vscode-languageserver: 7.0.0
       vscode-languageserver-textdocument: 1.0.8
@@ -12503,7 +12500,7 @@ packages:
     dependencies:
       '@vuetify/loader-shared': 1.7.1(vue@3.3.4)(vuetify@3.3.12)
       debug: 4.3.4(supports-color@8.1.1)
-      vite: 4.4.9(@types/node@18.17.5)
+      vite: 4.4.9(sass@1.65.1)
       vuetify: 3.3.12(typescript@4.9.5)(vite-plugin-vuetify@1.0.0-alpha.12)(vue@3.3.4)
     transitivePeerDependencies:
       - supports-color
@@ -12644,6 +12641,7 @@ packages:
       rollup: 3.28.0
     optionalDependencies:
       fsevents: 2.3.3
+    dev: true
 
   /vite@4.4.9(sass@1.65.1):
     resolution: {integrity: sha512-2mbUn2LlUmNASWwSCNSJ/EG2HuSRTnVNaydp6vMCm5VIqJsjMfbIWtbH2kDuwUVW5mMUKKZvGPX/rqeqVvv1XA==}
@@ -12679,7 +12677,6 @@ packages:
       sass: 1.65.1
     optionalDependencies:
       fsevents: 2.3.3
-    dev: true
 
   /vitefu@0.2.4(vite@4.4.9):
     resolution: {integrity: sha512-fanAXjSaf9xXtOOeno8wZXIhgia+CZury481LsDaV++lSvcU2R9Ch2bPh3PYFyoHW+w9LqAeYRISVQjUIew14g==}
@@ -12689,15 +12686,15 @@ packages:
       vite:
         optional: true
     dependencies:
-      vite: 4.4.9(@types/node@18.17.5)
+      vite: 4.4.9(sass@1.65.1)
     dev: true
 
-  /vitepress@1.0.0-alpha.10(search-insights@2.7.0):
+  /vitepress@1.0.0-alpha.10(search-insights@2.9.0):
     resolution: {integrity: sha512-RGPU+YApj2jaYplAIJUe+2qlDks9FzPX1QGK+7NdGByeCCVZg6z9eYWjjvfvA/sgCtG3yeJE/4/jCwlv4Y8bVw==}
     hasBin: true
     dependencies:
       '@docsearch/css': 3.5.1
-      '@docsearch/js': 3.5.1(search-insights@2.7.0)
+      '@docsearch/js': 3.5.1(search-insights@2.9.0)
       '@vitejs/plugin-vue': 3.2.0(vite@3.2.7)(vue@3.3.4)
       '@vue/devtools-api': 6.5.0
       '@vueuse/core': 9.13.0(vue@3.3.4)
