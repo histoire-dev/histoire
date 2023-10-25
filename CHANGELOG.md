@@ -1,3 +1,48 @@
+## v0.17.4
+
+[compare changes](https://github.com/Akryum/histoire/compare/v0.17.3...v0.17.4)
+
+
+### 🚀 Enhancements
+
+  - **config:** Enable specifying path for histoire config file ([#612](https://github.com/Akryum/histoire/pull/612))
+  - Story stat counter ([#613](https://github.com/Akryum/histoire/pull/613))
+
+### 🩹 Fixes
+
+  - HstColorSelect wrong name, fix #595 ([#595](https://github.com/Akryum/histoire/issues/595))
+  - **nuxt:** Disable nuxt app manifest ([#602](https://github.com/Akryum/histoire/pull/602))
+  - **nuxt:** Update nuxt version and disable devtools ([#611](https://github.com/Akryum/histoire/pull/611))
+  - Force display none for HstRadio ([#537](https://github.com/Akryum/histoire/pull/537), [#607](https://github.com/Akryum/histoire/pull/607))
+
+### 📖 Documentation
+
+  - Fixed file extension in docs ([#618](https://github.com/Akryum/histoire/pull/618))
+
+### 🏡 Chore
+
+  - **nuxt:** Temporarily move to `@ts-ignore` ([#609](https://github.com/Akryum/histoire/pull/609))
+
+### ✅ Tests
+
+  - Update cypress ([f8e6326](https://github.com/Akryum/histoire/commit/f8e6326))
+  - Fix wrapper test ([967a6fb](https://github.com/Akryum/histoire/commit/967a6fb))
+  - Fix state test ([ea3006a](https://github.com/Akryum/histoire/commit/ea3006a))
+
+### 🤖 CI
+
+  - Disable cypress video recording ([c060854](https://github.com/Akryum/histoire/commit/c060854))
+  - Don't try to upload videos artifacts ([b3831db](https://github.com/Akryum/histoire/commit/b3831db))
+  - Test sequentially for vite ecosystem ci ([dabdc35](https://github.com/Akryum/histoire/commit/dabdc35))
+
+### ❤️  Contributors
+
+- Ilya Artamonov <ilya.sosidka@gmail.com>
+- Soryn <soryngitlan@gmail.com>
+- Peter Budai <peterbudai@hotmail.com>
+- Daniel Roe <daniel@roe.dev>
+- Guillaume Chau ([@Akryum](http://github.com/Akryum))
+
 ## v0.17.3
 
 [compare changes](https://github.com/Akryum/histoire/compare/v0.17.2...v0.17.3)
