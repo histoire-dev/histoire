@@ -123,9 +123,9 @@ async function useNuxtViteConfig () {
     ready: false,
     dev: true,
     overrides: {
+      devtools: { enabled: false },
       ssr: false,
       experimental: {
-        // @ts-ignore coming in Nuxt v3.8
         appManifest: false,
       },
       app: {
