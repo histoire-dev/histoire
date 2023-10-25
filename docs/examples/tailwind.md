@@ -19,7 +19,7 @@ Make sure your project has a style file with the [Tailwind directives](https://t
 Histoire allows us to execute a setup file automatically when rendering the stories. This is useful to add global CSS files. [Learn more](../guide/config.md#global-js-and-css)
 
 ```js
-// src/histoire-setup.js
+// src/histoire-setup.ts
 
 import './tailwind.css'
 ```
@@ -27,7 +27,7 @@ import './tailwind.css'
 We need to tell Histoire to use this file in the configuration file. [Learn more](../reference/config.md#setupfile)
 
 ```js
-// histoire.config.js
+// histoire.config.ts
 
 import { defineConfig } from 'histoire'
 
