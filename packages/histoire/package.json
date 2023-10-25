@@ -68,7 +68,7 @@
     "markdown-it-emoji": "^2.0.2",
     "micromatch": "^4.0.5",
     "mrmime": "^1.0.1",
-    "pathe": "^0.2.0",
+    "pathe": "^1.1.1",
     "picocolors": "^1.0.0",
     "sade": "^1.8.1",
     "shiki-es": "^0.2.0",

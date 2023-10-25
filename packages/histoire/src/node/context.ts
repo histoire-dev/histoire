@@ -23,10 +23,11 @@ export interface Context {
 
 export interface CreateContextOptions {
   mode: Context['mode']
+  configFile?: string
 }
 
 export async function createContext (options: CreateContextOptions): Promise<Context> {
-  const config = await resolveConfig(process.cwd(), options.mode)
+  const config = await resolveConfig(process.cwd(), options.mode, options.configFile)
   const command = options.mode === 'dev' ? 'serve' : 'build'
   const viteConfig = await resolveViteConfig({}, command)
 

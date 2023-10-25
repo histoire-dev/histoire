@@ -7,6 +7,7 @@ import { createServer } from '../server.js'
 export interface DevOptions {
   port: number
   open?: boolean
+  config?: string
 }
 
 export async function devCommand (options: DevOptions) {
@@ -14,6 +15,7 @@ export async function devCommand (options: DevOptions) {
 
   async function start () {
     const ctx = await createContext({
+      configFile: options.config,
       mode: 'dev',
     })
     const { server, viteConfigFile, close } = await createServer(ctx, {
@@ -50,7 +52,7 @@ export async function devCommand (options: DevOptions) {
 
   stop = await start()
 
-  const configFile = await resolveConfigFile()
+  const configFile = await resolveConfigFile(undefined, options.config)
   if (configFile) {
     const watcher = chokidar.watch(configFile, {
       ignoreInitial: true,
