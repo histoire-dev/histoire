@@ -33,8 +33,8 @@ export async function createServer (ctx: Context, options: CreateServerOptions =
     }
   }
 
-  const { server, viteConfigFile } = await getViteServer(false)
   const { server: nodeServer } = await getViteServer(true) // Should be run after the first one to get a fresh vite.config.js
+  const { server, viteConfigFile } = await getViteServer(false)
   await watchStories(ctx)
   const { stop: stopMdFileWatcher } = await createMarkdownFilesWatcher(ctx)
 

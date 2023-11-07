@@ -80,7 +80,7 @@ export async function getViteConfigWithPlugins (isServer: boolean, ctx: Context)
   plugins.push({
     name: 'histoire-vite-plugin',
 
-    config () {
+    config (_, { command }) {
       return {
         resolve: {
           dedupe: [
@@ -134,7 +134,7 @@ export async function getViteConfigWithPlugins (isServer: boolean, ctx: Context)
           watch: {
             ignored: [`!**/node_modules/.histoire/**`, '**/vite.config.*'],
           },
-          hmr: !isServer,
+          hmr: command === 'build' ? false : !isServer,
         },
         define: {
           // We need to force this to be able to use `devtoolsRawSetupState`
