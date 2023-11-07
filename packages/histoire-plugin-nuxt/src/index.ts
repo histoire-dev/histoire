@@ -132,6 +132,9 @@ async function useNuxtViteConfig () {
         rootId: 'nuxt-test',
       },
       pages: false,
+      typescript: {
+        typeCheck: false,
+      },
     },
   })
   if (nuxt.options.builder as string !== '@nuxt/vite-builder') {
