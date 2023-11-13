@@ -381,6 +381,20 @@ module.exports = {
             },
           ],
         },
+        {
+          text: 'Visual regression testing',
+          collapsible: true,
+          items: [
+            {
+              text: 'Lost Pixel',
+              link: '/examples/visual-regression-testing/lost-pixel',
+            },
+            {
+              text: 'Percy',
+              link: '/examples/visual-regression-testing/percy',
+            },
+          ],
+        },
       ],
     },
 
