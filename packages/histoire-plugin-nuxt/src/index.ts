@@ -150,8 +150,9 @@ async function useNuxtViteConfig () {
 
   nuxt.hook('imports:sources', presets => {
     const stubbedComposables = ['useNuxtApp']
-    const appPreset = presets.find(p => p.from === '#app')
-    appPreset.imports = appPreset.imports.filter(i => typeof i !== 'string' || !stubbedComposables.includes(i))
+    for (const appPreset of presets.filter(p => p.from.startsWith('#app'))) {
+      appPreset.imports = appPreset.imports.filter(i => typeof i !== 'string' || !stubbedComposables.includes(i))
+    }
     presets.push({
       from: '#build/histoire/composables.mjs',
       imports: stubbedComposables,
