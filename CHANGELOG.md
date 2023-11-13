@@ -1,3 +1,39 @@
+## v0.17.5
+
+[compare changes](https://github.com/Akryum/histoire/compare/v0.17.4...v0.17.5)
+
+
+### 🩹 Fixes
+
+  - **nuxt:** Support multiple app presets ([#627](https://github.com/Akryum/histoire/pull/627))
+  - **nuxt:** Disable typescript `typeCheck` ([#632](https://github.com/Akryum/histoire/pull/632), [#633](https://github.com/Akryum/histoire/pull/633))
+  - **dev:** Remove dependency on resolve order for linking in markdown … ([#599](https://github.com/Akryum/histoire/pull/599))
+  - **hmr:** Make HMR work with Nuxt ([#631](https://github.com/Akryum/histoire/pull/631))
+  - Fix Vue warning 'Non-function value encountered' ([#615](https://github.com/Akryum/histoire/pull/615))
+
+### 📖 Documentation
+
+  - **github:** Add a link to `Nuxt Stackblitz` to bug report template ([#471](https://github.com/Akryum/histoire/pull/471), [#619](https://github.com/Akryum/histoire/pull/619))
+  - Add visual regression testing section to the examples ([#621](https://github.com/Akryum/histoire/pull/621))
+
+### 🌊 Types
+
+  - Fix keyboardShortcut param ([#628](https://github.com/Akryum/histoire/pull/628))
+  - Add type inference for `Story` and `Variant` slots items ([#622](https://github.com/Akryum/histoire/pull/622), [#623](https://github.com/Akryum/histoire/pull/623))
+
+### 🏡 Chore
+
+  - Vite server comments ([e0c6057](https://github.com/Akryum/histoire/commit/e0c6057))
+
+### ❤️  Contributors
+
+- Peter Budai <peterbudai@hotmail.com>
+- Guillaume Chau ([@Akryum](http://github.com/Akryum))
+- Kane G 
+- Dima Ivashchuk ([@d-ivashchuk](http://github.com/d-ivashchuk))
+- Mehdi Lahlou ([@medfreeman](http://github.com/medfreeman))
+- Daniel Roe ([@danielroe](http://github.com/danielroe))
+
 ## v0.17.4
 
 [compare changes](https://github.com/Akryum/histoire/compare/v0.17.3...v0.17.4)
