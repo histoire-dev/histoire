@@ -1,31 +1,49 @@
-import { describe, test, expect } from 'vitest'
-import { createMarkdownFilesWatcher } from '../node/markdown'
-import { watchStories } from '../node/stories'
-import { createContext } from '../node/context.js'
-import { createWriteStream, unlinkSync } from 'fs'
+import { createWriteStream, unlinkSync } from 'node:fs'
+import { URL } from 'node:url'
+import path from 'node:path'
+import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest'
+import { createMarkdownFilesWatcher } from '../markdown.js'
+import { watchStories } from '../stories.js'
+import { Context, createContext } from '../context.js'
+
+const __dirname = new URL('.', import.meta.url).pathname
 
 describe('markdown', async () => {
-  const ctx = await createContext({
-    mode: 'dev',
+  vi.spyOn(process, 'cwd').mockReturnValue(path.resolve(__dirname, './markdown'))
+
+  let ctx: Context
+  let storyWatcher: Awaited<ReturnType<typeof watchStories>>
+
+  beforeEach(async () => {
+    ctx = await createContext({
+      mode: 'dev',
+    })
+
+    // create watch stories to set context root etc.
+    storyWatcher = await watchStories(ctx)
   })
-  // create watch stories to set context root etc.
-  await watchStories(ctx)
+
+  afterEach(() => {
+    storyWatcher.close()
+  })
 
   test('should not throw error or depend on - resolve order for linking', async () => {
     // FileWatcher should pickup the test markdown files (test1 and test2)
     // test1 links to test2 (issue previously as test1 resolved first)
     // test 2 links to test1
-    await createMarkdownFilesWatcher(ctx)
+    const { stop } = await createMarkdownFilesWatcher(ctx)
     expect(ctx.markdownFiles.length).toEqual(2)
+    stop()
   })
 
   test('should render html from md', async () => {
-    await createMarkdownFilesWatcher(ctx)
+    const { stop } = await createMarkdownFilesWatcher(ctx)
     expect(ctx.markdownFiles[0].html).toContain('<p>')
+    stop()
   })
 
   test('should throw error on missing [md] story file.', async () => {
-    const testFile3 = '/resources/test3.story.md'
+    const testFile3 = '/markdown/test3.story.md'
     const writer = createWriteStream(__dirname.concat(testFile3))
     // link to missing file.
     writer.write(
