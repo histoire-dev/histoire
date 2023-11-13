@@ -148,6 +148,7 @@ export interface ServerMarkdownFile {
   isRelatedToStory: boolean
   frontmatter?: any
   html?: string
+  content?: string
   storyFile?: ServerStoryFile
 }
 

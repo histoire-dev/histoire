@@ -140,16 +140,29 @@ export async function createMarkdownFilesWatcher (ctx: Context) {
     ignored: ctx.config.storyIgnored,
   })
 
-  async function addFile (relativePath: string) {
+  /**
+   * Initial scan is complete.
+   */
+  let watcherIsReady = false
+
+  function addFile (relativePath: string) {
     const absolutePath = path.resolve(ctx.root, relativePath)
-    const dirFiles = await fs.readdir(path.dirname(absolutePath))
+    const dirFiles = fs.readdirSync(path.dirname(absolutePath))
     const truncatedName = path.basename(absolutePath, '.md')
     const isRelatedToStory = dirFiles.some((file) => !file.endsWith('.md') && file.startsWith(truncatedName))
 
-    const { data: frontmatter, content } = matter(await fs.readFile(absolutePath, 'utf8'))
-    const html = md.render(content, {
-      file: absolutePath,
-    })
+    const { data: frontmatter, content } = matter(fs.readFileSync(absolutePath, 'utf8'))
+
+    let html: string | undefined
+
+    // We don't immediately render markdown during initial scanning in case
+    // markdown references other files in links (otherwise they might not
+    // be scanned yet and will throw 'not found' errors).
+    if (watcherIsReady) {
+      html = md.render(content, {
+        file: absolutePath,
+      })
+    }
 
     const file: ServerMarkdownFile = {
       id: paramCase(relativePath.toLowerCase()),
@@ -157,6 +170,7 @@ export async function createMarkdownFilesWatcher (ctx: Context) {
       absolutePath,
       isRelatedToStory,
       frontmatter,
+      content,
       html,
     }
     ctx.markdownFiles.push(file)
@@ -219,8 +233,21 @@ export async function createMarkdownFilesWatcher (ctx: Context) {
     watcher.once('ready', resolve)
   })
 
-  return {
-    stop,
+  try {
+    // Render markdown after initial scan is complete.
+    for (const mdFile of ctx.markdownFiles) {
+      mdFile.html = md.render(mdFile.content, {
+        file: mdFile.absolutePath,
+      })
+    }
+    watcherIsReady = true
+
+    return {
+      stop,
+    }
+  } catch (e) {
+    stop()
+    throw e
   }
 }
 
