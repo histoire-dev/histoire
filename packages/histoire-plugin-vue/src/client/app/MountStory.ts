@@ -1,6 +1,6 @@
 /* eslint-disable vue/one-component-per-file */
 
-import { App, createApp, h, Suspense, Component } from 'vue'
+import { App, createApp, h, Suspense, Component, VNode } from 'vue'
 import {
   defineComponent as _defineComponent,
   PropType as _PropType,
@@ -40,22 +40,26 @@ export default _defineComponent({
         name: 'MountStorySubApp',
 
         render: () => {
-          let child = h(props.story.file.component, {
+          const vnode = h(props.story.file.component, {
             story: props.story,
           })
 
-          for (const wrapper of wrappers) {
-            child = h(wrapper, {
-              story: props.story,
-              variant: null,
-            }, [
-              child,
-            ])
+          const children: VNode[] = []
+          children.push(vnode)
+
+          for (const [index, wrapper] of wrappers.entries()) {
+            children.push(
+              h(wrapper, {
+                story: props.story,
+                variant: null,
+              },
+              () => children[index]),
+            )
           }
 
-          return h(Suspense, [
-            child,
-          ])
+          return h(Suspense, undefined,
+            children.at(-1),
+          )
         },
       })
 

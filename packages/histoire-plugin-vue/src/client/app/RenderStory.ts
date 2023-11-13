@@ -1,6 +1,6 @@
 /* eslint-disable vue/one-component-per-file */
 
-import { App, createApp, onMounted, reactive, Component, h } from 'vue'
+import { App, createApp, onMounted, reactive, Component, h, VNode } from 'vue'
 import {
   defineComponent as _defineComponent,
   onBeforeUnmount as _onBeforeUnmount,
@@ -106,18 +106,19 @@ export default _defineComponent({
             }
           }
 
-          let child = vnodes
+          const children: VNode[] = []
+          children.push(vnodes)
 
-          for (const wrapper of wrappers) {
-            child = [
+          for (const [index, wrapper] of wrappers.entries()) {
+            children.push(
               h(wrapper, {
                 story: props.story,
                 variant: props.variant,
-              }, child),
-            ]
+              }, () => children[index]),
+            )
           }
 
-          return child
+          return children.at(-1)
         },
       })
 
