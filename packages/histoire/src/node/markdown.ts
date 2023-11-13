@@ -228,9 +228,6 @@ export async function createMarkdownFilesWatcher (ctx: Context) {
     .on('unlink', (relativePath) => {
       removeFile(relativePath)
     })
-    .on('ready', () => {
-      console.log('ready meow')
-    })
 
   await new Promise(resolve => {
     watcher.once('ready', resolve)
@@ -248,8 +245,9 @@ export async function createMarkdownFilesWatcher (ctx: Context) {
     return {
       stop,
     }
-  } finally {
+  } catch (e) {
     stop()
+    throw e
   }
 }
 
