@@ -54,10 +54,6 @@ interface VueStoryProps {
    */
   layout?: StoryLayout
   /**
-   * Function that returns the intial state. Will be used as default value for variants.
-   */
-  initState?: () => Record<string, any>
-  /**
    * A function to configure the Vue application. This will be the default for the variants in the story.
    */
   setupApp?: (payload: { app: import('vue').App, story: Story, variant: Variant }) => void | Promise<void>
@@ -109,9 +105,30 @@ interface VueStoryProps {
   meta?: StoryMeta
 }
 
-declare const VueStoryComponent: import('vue').DefineComponent<
-TypePropsToRuntimeProps<VueStoryProps>, {}, unknown, {}, {}, import('vue').ComponentOptionsMixin, import('vue').ComponentOptionsMixin, {}, string, import('vue').VNodeProps & import('vue').AllowedComponentProps & import('vue').ComponentCustomProps, Readonly<import('vue').ExtractPropTypes<TypePropsToRuntimeProps<VueStoryProps>>> & {}, {}
+type VueStoryComponent = import('vue').DefineComponent<
+TypePropsToRuntimeProps<VueStoryProps>, {}, unknown, {}, {}, import('vue').ComponentOptionsMixin, import('vue').ComponentOptionsMixin, {}, string, import('vue').VNodeProps & import('vue').AllowedComponentProps & import('vue').ComponentCustomProps, Readonly<import('vue').ExtractPropTypes<TypePropsToRuntimeProps<VueStoryProps>>> & {}, import('vue').ExtractDefaultPropTypes<TypePropsToRuntimeProps<VueStoryProps>>, import('vue').SlotsType
 >
+
+interface VueStoryPropsGeneric<S extends Record<string, any>> {
+  initState?: () => S
+}
+
+interface VueStoryInternalPropsGeneric<S extends Record<string, any>> {
+  readonly $props: {
+    /**
+     * Function that returns the intial state. Will be used as default value for variants.
+     */
+    initState?: () => S
+  }
+  readonly $slots: {
+    default: import('vue').Slot<{ state: S }>
+    controls: import('vue').Slot<{ state: S }>
+  }
+}
+
+type VueStoryComponentGeneric = new <S extends Record<string, any> = Record<string, any>>(props: VueStoryPropsGeneric<S>) => VueStoryInternalPropsGeneric<S>;
+
+declare const VueStoryComponent: VueStoryComponent & VueStoryComponentGeneric
 
 declare const MeowVueStoryComponent: import('vue').Component<TypePropsToRuntimeProps<VueStoryProps>>
 
@@ -126,10 +143,6 @@ interface VueVariantProps {
    * Id of the variant used in the URL. By default, the id is automatically generated with the index of the variant in the list. Setting an id manually will ensure the URL parameter doesn't change with the order of the variants in the story.
    */
   id?: string
-  /**
-   * Function that returns the intial state.
-   */
-  initState?: () => Record<string, any>
   /**
    * A function to configure the Vue application.
    */
@@ -174,9 +187,30 @@ interface VueVariantProps {
   variant?: VariantMeta
 }
 
-declare const VueVariantComponent: import('vue').DefineComponent<
-TypePropsToRuntimeProps<VueVariantProps>, {}, unknown, {}, {}, import('vue').ComponentOptionsMixin, import('vue').ComponentOptionsMixin, {}, string, import('vue').VNodeProps & import('vue').AllowedComponentProps & import('vue').ComponentCustomProps, Readonly<import('vue').ExtractPropTypes<TypePropsToRuntimeProps<VueVariantProps>>> & {}, {}
+type VueVariantComponent = import('vue').DefineComponent<
+TypePropsToRuntimeProps<VueVariantProps>, {}, unknown, {}, {}, import('vue').ComponentOptionsMixin, import('vue').ComponentOptionsMixin, {}, string, import('vue').VNodeProps & import('vue').AllowedComponentProps & import('vue').ComponentCustomProps, Readonly<import('vue').ExtractPropTypes<TypePropsToRuntimeProps<VueVariantProps>>> & {}, import('vue').ExtractDefaultPropTypes<TypePropsToRuntimeProps<VueStoryProps>>, import('vue').SlotsType
 >
+
+interface VueVariantPropsGeneric<S extends Record<string, any>> {
+  initState?: () => S
+}
+
+interface VueVariantInternalPropsGeneric<S extends Record<string, any>> {
+  readonly $props: {
+    /**
+     * Function that returns the intial state.
+     */
+    initState?: () => S
+  }
+  readonly $slots: {
+    default: import('vue').Slot<{ state: S }>
+    controls: import('vue').Slot<{ state: S }>
+  }
+}
+
+type VueVariantComponentGeneric = new <S extends Record<string, any> = Record<string, any>>(props: VueVariantPropsGeneric<S>) => VueVariantInternalPropsGeneric<S>;
+
+declare const VueVariantComponent: VueVariantComponent & VueVariantComponentGeneric
 
 // Register global components
 
