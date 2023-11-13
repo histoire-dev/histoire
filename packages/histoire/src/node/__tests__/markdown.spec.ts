@@ -1,12 +1,9 @@
 import { createWriteStream, unlinkSync } from 'node:fs'
-import { URL } from 'node:url'
 import path from 'node:path'
 import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest'
 import { createMarkdownFilesWatcher } from '../markdown.js'
 import { watchStories } from '../stories.js'
 import { Context, createContext } from '../context.js'
-
-const __dirname = new URL('.', import.meta.url).pathname
 
 describe('markdown', async () => {
   vi.spyOn(process, 'cwd').mockReturnValue(path.resolve(__dirname, './markdown'))
