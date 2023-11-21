@@ -50,7 +50,7 @@
     "histoire": "workspace:*",
     "typescript": "^4.9.5",
     "vite": "^4.5.0",
-    "vue": "^2.7.14"
+    "vue": "^2.7.15"
   },
   "peerDependencies": {
     "histoire": "workspace:^",

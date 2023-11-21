@@ -28,7 +28,7 @@
   },
   "dependencies": {
     "capture-website": "^2.4.1",
-    "defu": "^6.1.2",
+    "defu": "^6.1.3",
     "fs-extra": "^10.1.0",
     "pathe": "^0.2.0"
   },

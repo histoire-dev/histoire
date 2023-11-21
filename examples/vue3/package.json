@@ -16,20 +16,20 @@
   },
   "dependencies": {
     "lottie-web": "^5.12.2",
-    "pinia": "^2.1.6",
-    "vue": "^3.3.4"
+    "pinia": "^2.1.7",
+    "vue": "^3.3.8"
   },
   "devDependencies": {
     "@histoire/app": "workspace:*",
     "@histoire/plugin-vue": "workspace:*",
     "@histoire/vendors": "workspace:*",
-    "@vitejs/plugin-vue": "^4.2.3",
-    "cypress": "^13.3.0",
+    "@vitejs/plugin-vue": "^4.5.0",
+    "cypress": "^13.5.1",
     "globby": "^13.2.2",
     "histoire": "workspace:*",
     "minimatch": "^5.1.6",
     "nodemon": "^2.0.22",
-    "sass": "^1.65.1",
+    "sass": "^1.69.5",
     "start-server-and-test": "^1.15.4",
     "vite": "^4.5.0"
   }

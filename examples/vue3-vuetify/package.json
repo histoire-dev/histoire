@@ -9,8 +9,8 @@
   },
   "dependencies": {
     "@mdi/font": "^5.9.55",
-    "vue": "^3.3.4",
-    "vuetify": "^3.3.12"
+    "vue": "^3.3.8",
+    "vuetify": "^3.4.2"
   },
   "devDependencies": {
     "@histoire/plugin-vue": "workspace:*",

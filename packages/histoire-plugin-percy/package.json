@@ -27,8 +27,8 @@
     "watch": "tsc -d -w --sourceMap"
   },
   "dependencies": {
-    "@percy/sdk-utils": "^1.26.3",
-    "defu": "^6.1.2",
+    "@percy/sdk-utils": "^1.27.4",
+    "defu": "^6.1.3",
     "fs-extra": "^10.1.0",
     "pathe": "^0.2.0",
     "puppeteer": "^13.7.0"
