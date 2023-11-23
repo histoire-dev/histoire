@@ -8,7 +8,7 @@ export function findUp (cwd: string = process.cwd(), fileNames: string[]): strin
   if (root[1] === ':' && root[2] === undefined) {
     root += '/'
   }
-  
+
   while (dir !== root) {
     for (const fileName of fileNames) {
       const searchPath = path.join(dir, fileName)
