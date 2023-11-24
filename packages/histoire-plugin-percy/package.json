@@ -30,7 +30,7 @@
     "@percy/sdk-utils": "^1.27.4",
     "defu": "^6.1.3",
     "fs-extra": "^10.1.0",
-    "pathe": "^0.2.0",
+    "pathe": "^1.1.1",
     "puppeteer": "^13.7.0"
   },
   "devDependencies": {

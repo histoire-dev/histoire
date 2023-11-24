@@ -33,7 +33,7 @@
     "@types/fs-extra": "^9.0.13",
     "@types/markdown-it": "^12.2.3",
     "chokidar": "^3.5.3",
-    "pathe": "^0.2.0",
+    "pathe": "^1.1.1",
     "picocolors": "^1.0.0"
   },
   "peerDependencies": {
