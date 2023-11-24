@@ -8,6 +8,7 @@ export default {
 import { computed, ref } from 'vue'
 import { VTooltip as vTooltip } from 'floating-vue'
 import HstCopyIcon from '../HstCopyIcon.vue'
+import type { CSSProperties } from 'vue'
 
 const props = defineProps<{
   shades: Record<string, any>
@@ -68,7 +69,7 @@ const hover = ref<string>(null)
           class="htw-rounded-full htw-w-16 htw-h-16"
           :style="{
             backgroundColor: shade.color,
-          }"
+          } as CSSProperties"
         />
       </slot>
       <div>
