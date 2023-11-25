@@ -5,6 +5,7 @@ export function findUp (cwd: string = process.cwd(), fileNames: string[]): strin
   let { root } = path.parse(cwd)
   let dir = cwd
 
+  // On Windows, it will for example return `C:`, we need to add the trailing `/`
   if (root[1] === ':' && root[2] === undefined) {
     root += '/'
   }
