@@ -1,3 +1,28 @@
+## v0.17.6
+
+[compare changes](https://github.com/Akryum/histoire/compare/v0.17.5...v0.17.6)
+
+
+### 🩹 Fixes
+
+  - Fix findUp for Windows ([#640](https://github.com/Akryum/histoire/pull/640))
+  - Update pathe dependencies everywhere ([#641](https://github.com/Akryum/histoire/pull/641))
+
+### 🏡 Chore
+
+  - Update deps ([08c082c](https://github.com/Akryum/histoire/commit/08c082c))
+
+### 🤖 CI
+
+  - Update node and pnpm ([c3d891d](https://github.com/Akryum/histoire/commit/c3d891d))
+  - Fix type errors ([#642](https://github.com/Akryum/histoire/pull/642))
+
+### ❤️  Contributors
+
+- Peter Budai <peterbudai@hotmail.com>
+- Mobyrr 
+- Guillaume Chau ([@Akryum](http://github.com/Akryum))
+
 ## v0.17.5
 
 [compare changes](https://github.com/Akryum/histoire/compare/v0.17.4...v0.17.5)
