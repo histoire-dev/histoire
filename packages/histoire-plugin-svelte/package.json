@@ -45,7 +45,7 @@
     "change-case": "^4.1.2",
     "globby": "^13.2.2",
     "launch-editor": "^2.6.1",
-    "pathe": "^0.2.0"
+    "pathe": "^1.1.1"
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^1.4.0",
