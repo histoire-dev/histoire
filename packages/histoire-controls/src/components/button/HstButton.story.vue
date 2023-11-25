@@ -20,7 +20,7 @@ const variants: Array<{name: string, bind?: unknown}> = [
       :title="variant.name"
     >
       <HstButton
-        v-bind="variant.bind"
+        v-bind="variant.bind as {}"
         class="htw-p-2"
       >
         Click me!

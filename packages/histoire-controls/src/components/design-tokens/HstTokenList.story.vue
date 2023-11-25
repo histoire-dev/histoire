@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import HstTokenList from './HstTokenList.vue'
+import type { CSSProperties } from 'vue'
 
 const tokens = {
   0: 0,
@@ -70,7 +71,7 @@ const tokens = {
               class="htw-h-20 htw-bg-gray-500/50"
               :style="{
                 width: token.value as string,
-              }"
+              } as CSSProperties"
             />
           </div>
         </template>

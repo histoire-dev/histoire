@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import HstColorShades from './HstColorShades.vue'
+import type { CSSProperties } from 'vue'
 
 const colors = {
   slate: {
@@ -311,7 +312,7 @@ const colors = {
             class="htw-rounded htw-h-[100px]"
             :style="{
               backgroundColor: color,
-            }"
+            } as CSSProperties"
           />
         </template>
       </HstColorShades>
@@ -329,7 +330,7 @@ const colors = {
             class="htw-rounded htw-h-[100px] htw-text-5xl htw-flex htw-items-end"
             :style="{
               color: color,
-            }"
+            } as CSSProperties"
           >
             Aa
           </div>
@@ -349,7 +350,7 @@ const colors = {
             class="htw-rounded htw-h-[100px] htw-border-solid htw-border-2"
             :style="{
               borderColor: color,
-            }"
+            } as CSSProperties"
           />
         </template>
       </HstColorShades>
