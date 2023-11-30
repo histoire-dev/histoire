@@ -1,3 +1,16 @@
+## v0.17.7
+
+[compare changes](https://github.com/Akryum/histoire/compare/v0.17.6...v0.17.7)
+
+
+### 🩹 Fixes
+
+  - Nuxt vue vite plugin registration fail ([#590](https://github.com/Akryum/histoire/pull/590), [#643](https://github.com/Akryum/histoire/pull/643))
+
+### ❤️  Contributors
+
+- Gerard Wilkinson <gerard.wilkinson@me.com>
+
 ## v0.17.6
 
 [compare changes](https://github.com/Akryum/histoire/compare/v0.17.5...v0.17.6)
