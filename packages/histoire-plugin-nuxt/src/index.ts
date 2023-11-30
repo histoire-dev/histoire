@@ -1,7 +1,5 @@
 import { fileURLToPath } from 'node:url'
 import { join } from 'node:path'
-import vuePlugin from '@vitejs/plugin-vue'
-import viteJsxPlugin from '@vitejs/plugin-vue-jsx'
 import replace from '@rollup/plugin-replace'
 import type { Plugin } from 'histoire'
 import type { Nuxt } from '@nuxt/schema'
@@ -15,11 +13,6 @@ const ignorePlugins = [
   'nuxt:dynamic-base-path',
   'nuxt:import-protection',
 ]
-
-const vuePlugins = {
-  'vite:vue': [vuePlugin, 'vue'],
-  'vite:vue-jsx': [viteJsxPlugin, 'vueJsx'],
-} as const
 
 export function HstNuxt (): Plugin {
   let nuxt: Nuxt
@@ -173,21 +166,10 @@ async function useNuxtViteConfig () {
             })
           }
         })
-        nuxt.hook('vite:extendConfig', (config, { isClient }) => {
+
+        nuxt.hook('vite:configResolved', (config, { isClient }) => {
           if (isClient) {
-            const plugins = []
-
-            for (const name in vuePlugins) {
-              if (!config.plugins?.some(p => (p as any)?.name === name)) {
-                const [plugin, key] = vuePlugins[name as keyof typeof vuePlugins]
-                plugins.push(plugin(config[key] as any))
-              }
-            }
-
-            resolve({
-              ...config,
-              plugins: [...config.plugins, ...plugins],
-            })
+            resolve(config)
           }
         })
       })
