@@ -94,9 +94,6 @@ export async function getViteConfigWithPlugins (isServer: boolean, ctx: Context)
             ? {
               // Force resolving deps like Node.JS resolution algorithm (in case some modules are not loaded with ssr: true e.g. .vue files)
               conditions: ['node'],
-              // eslint-disable-next-line @typescript-eslint/prefer-ts-expect-error
-              // @ts-ignore we support Vite ^3.0, but browserField is available in Vite ^3.2
-              browserField: false,
             }
             : {}),
         },
