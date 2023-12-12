@@ -2,6 +2,7 @@
   "name": "histoire-example-vue3",
   "version": "0.0.1",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev:hst": "nodemon --watch ../../packages/histoire/dist --watch ../../packages/histoire-plugin-vue/dist --exec \"rm -rf ./node_modules/.hst* && HISTOIRE_DEV=true histoire dev\"",
     "story:dev": "histoire dev",

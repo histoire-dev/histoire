@@ -2,21 +2,22 @@
   "name": "histoire-example-vue3-vuetify",
   "version": "0.0.1",
   "private": true,
+  "type": "module",
   "scripts": {
     "story:dev": "histoire dev",
     "story:build": "histoire build",
     "story:preview": "histoire preview"
   },
   "dependencies": {
-    "@mdi/font": "^5.9.55",
-    "vue": "^3.3.8",
-    "vuetify": "^3.4.2"
+    "@mdi/font": "^7.3.67",
+    "vue": "^3.3.11",
+    "vuetify": "^3.4.6"
   },
   "devDependencies": {
     "@histoire/plugin-vue": "workspace:*",
-    "@vitejs/plugin-vue": "^2.3.4",
+    "@vitejs/plugin-vue": "^4.5.2",
     "histoire": "workspace:*",
     "vite": "^5.0.7",
-    "vite-plugin-vuetify": "1.0.0-alpha.12"
+    "vite-plugin-vuetify": "1.0.2"
   }
 }
