@@ -29,13 +29,13 @@ export default defineConfig({
     }),
     {
       name: 'define',
-      transform (code) {
+      transform(code) {
         return code.replace(/__VUE_OPTIONS_API__/g, 'true')
       },
     },
     {
       name: 'process-build',
-      closeBundle () {
+      closeBundle() {
         try {
           const pkg = fs.readJsonSync('./package.json')
           const tempDir = path.resolve('./node_modules/.temp/histoire-vendors')
@@ -68,7 +68,7 @@ export default defineConfig({
               const filepath = file.replace(/\.d\.ts$/, '')
               const content = `import Default from '${filepath}'
 export default Default
-export * from '${filepath}'\n`
+export * from '${filepath}'\n`.replace(/\n/g, process.platform === 'win32' ? '\r\n' : '\n')
               fs.writeFileSync(path.basename(file).replace(/^b-/, ''), content, 'utf-8')
             }
             // Exports (package.json)
