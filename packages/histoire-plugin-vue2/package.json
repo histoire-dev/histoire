@@ -43,13 +43,13 @@
     "@histoire/vendors": "workspace:^"
   },
   "devDependencies": {
-    "@types/node": "^17.0.45",
+    "@types/node": "^18.11.9",
     "change-case": "^4.1.2",
     "concurrently": "^7.6.0",
     "globby": "^13.2.2",
     "histoire": "workspace:*",
     "typescript": "^4.9.5",
-    "vite": "^4.5.0",
+    "vite": "^5.0.7",
     "vue": "^2.7.15"
   },
   "peerDependencies": {

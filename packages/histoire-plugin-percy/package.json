@@ -34,7 +34,7 @@
     "puppeteer": "^13.7.0"
   },
   "devDependencies": {
-    "@types/node": "^17.0.45",
+    "@types/node": "^18.11.9",
     "histoire": "workspace:*",
     "typescript": "^4.9.5"
   },

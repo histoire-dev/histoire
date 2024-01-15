@@ -54,11 +54,11 @@
     "pathe": "^1.1.1"
   },
   "devDependencies": {
-    "@types/node": "^17.0.45",
+    "@types/node": "^18.11.9",
     "concurrently": "^7.6.0",
     "histoire": "workspace:*",
     "typescript": "^4.9.5",
-    "vite": "^4.5.0",
+    "vite": "^5.0.7",
     "vue": "^3.3.8"
   },
   "peerDependencies": {
