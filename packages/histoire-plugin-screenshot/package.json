@@ -1,6 +1,6 @@
 {
   "name": "@histoire/plugin-screenshot",
-  "version": "0.17.6",
+  "version": "0.17.8",
   "description": "Histoire plugin to take screenshots for visual regression testing",
   "license": "MIT",
   "author": {

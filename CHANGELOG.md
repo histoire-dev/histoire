@@ -1,3 +1,22 @@
+## v0.17.8
+
+[compare changes](https://github.com/Akryum/histoire/compare/v0.17.7...v0.17.8)
+
+
+### 🚀 Enhancements
+
+  - Support Vite 5.0 ([#647](https://github.com/Akryum/histoire/pull/647))
+
+### 🩹 Fixes
+
+  - Fix sandbox URL in getSandboxUrl function ([#652](https://github.com/Akryum/histoire/pull/652))
+  - Fixes #657 ([#658](https://github.com/Akryum/histoire/pull/658), [#657](https://github.com/Akryum/histoire/issues/657))
+
+### ❤️  Contributors
+
+- Filip Joelsson <filip.gberg@gmail.com>
+- Peter Budai <peterbudai@hotmail.com>
+
 ## v0.17.7
 
 [compare changes](https://github.com/Akryum/histoire/compare/v0.17.6...v0.17.7)
