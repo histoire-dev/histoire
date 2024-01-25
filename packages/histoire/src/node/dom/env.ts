@@ -27,10 +27,9 @@ export function createDomEnv () {
   }
 
   window.ResizeObserver = window.ResizeObserver || class ResizeObserver {
-    constructor(cb: ResizeObserverCallback) {}
-    disconnect(): void {}
-    observe(target: Element, options?: ResizeObserverOptions): void {}
-    unobserve(target: Element): void {}
+    disconnect (): void { /* noop */ }
+    observe (target: Element, options?: ResizeObserverOptions): void { /* noop */ }
+    unobserve (target: Element): void { /* noop */ }
   }
 
   return {
