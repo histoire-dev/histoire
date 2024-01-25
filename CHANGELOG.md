@@ -1,3 +1,22 @@
+## v0.17.9
+
+[compare changes](https://github.com/Akryum/histoire/compare/v0.17.8...v0.17.9)
+
+
+### 🩹 Fixes
+
+  - Missing vite 5 in peer deps, fix #662 ([#662](https://github.com/Akryum/histoire/issues/662))
+  - Issue 426, add mock ResizeObserver to dom ([#664](https://github.com/Akryum/histoire/pull/664))
+
+### 🏡 Chore
+
+  - Update vite ([d74416f0](https://github.com/Akryum/histoire/commit/d74416f0))
+
+### ❤️  Contributors
+
+- Filip Joelsson <filip.gberg@gmail.com>
+- Guillaume Chau ([@Akryum](http://github.com/Akryum))
+
 ## v0.17.8
 
 [compare changes](https://github.com/Akryum/histoire/compare/v0.17.7...v0.17.8)

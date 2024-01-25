@@ -1,6 +1,6 @@
 {
   "name": "@histoire/plugin-nuxt",
-  "version": "0.17.8",
+  "version": "0.17.9",
   "description": "Histoire plugin to integrate with Nuxt 3",
   "license": "MIT",
   "author": {
