@@ -28,7 +28,11 @@ export function applyState (target: any, state: any, override = false) {
     if (!override && target[key] && !key.startsWith('_h') && typeof target[key] === 'object' && !Array.isArray(target[key])) {
       Object.assign(target[key], state[key])
     } else {
-      target[key] = state[key]
+      try {
+        target[key] = state[key]
+      } catch (e) {
+        // noop
+      }
     }
   }
 }
