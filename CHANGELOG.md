@@ -1,3 +1,22 @@
+## v0.17.10
+
+[compare changes](https://github.com/Akryum/histoire/compare/v0.17.9...v0.17.10)
+
+
+### 🚀 Enhancements
+
+  - Add auto state controls ([#191](https://github.com/Akryum/histoire/pull/191), [#673](https://github.com/Akryum/histoire/pull/673))
+
+### 🩹 Fixes
+
+  - Silent throw for state sync ([#674](https://github.com/Akryum/histoire/pull/674))
+  - **nuxt:** Import preset access in nuxt ([#672](https://github.com/Akryum/histoire/pull/672))
+
+### ❤️  Contributors
+
+- Hugo ATTAL 
+- Hollis Wu
+
 ## v0.17.9
 
 [compare changes](https://github.com/Akryum/histoire/compare/v0.17.8...v0.17.9)
