@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import Autoprops from './Autoprops.vue'
+import AutoStateProps from './AutoStateProps.vue'
 
 function initState () {
   return {
@@ -10,21 +10,21 @@ function initState () {
 
 <template>
   <Story
-    title="Autoprops"
+    title="Auto State & Props"
     :layout="{
       type: 'grid',
       width: 200,
     }"
   >
     <Variant title="Naked">
-      <Autoprops />
+      <AutoStateProps />
     </Variant>
     <Variant
       title="State"
       :init-state="initState"
     >
       <template #default="{ state }">
-        <Autoprops :name="state.name" />
+        <AutoStateProps :name="state.name" />
       </template>
     </Variant>
   </Story>
