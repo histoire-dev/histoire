@@ -21,13 +21,23 @@ const comp = computed(() => {
       return HstJson
   }
 })
+
+const model = computed({
+  get: () => {
+    return props.variant.state[props.item]
+  },
+  set: (value) => {
+    // eslint-disable-next-line vue/no-mutating-props
+    props.variant.state[props.item] = value
+  },
+})
 </script>
 
 <template>
   <component
     :is="comp"
     v-if="comp"
-    v-model="variant.state[props.item]"
+    v-model="model"
     class="histoire-controls-component-prop-item"
     :title="props.item"
   />
