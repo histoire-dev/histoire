@@ -6,6 +6,7 @@ import type { Story, Variant } from '../../types'
 import BaseEmpty from '../base/BaseEmpty.vue'
 import StatePresets from './StatePresets.vue'
 import ControlsComponentProps from './ControlsComponentProps.vue'
+import ControlsComponentState from './ControlsComponentState.vue'
 
 const props = defineProps({
   variant: {
@@ -27,6 +28,12 @@ watch(() => props.variant, () => {
 })
 
 const hasCustomControls = computed(() => props.variant.slots().controls || props.story.slots().controls)
+
+const hasInitState = computed(() => Object
+  .entries(props.variant.state || {})
+  .filter(([key]) => !key.startsWith('_h'))
+  .length > 0)
+
 </script>
 
 <template>
@@ -55,6 +62,16 @@ const hasCustomControls = computed(() => props.variant.slots().controls || props
       class="__histoire-render-custom-controls htw-flex-none"
       @ready="ready = true"
     />
+
+    <!-- Init state -->
+    <div
+      v-else-if="hasInitState"
+    >
+      <ControlsComponentState
+        class="htw-flex-none htw-my-2"
+        :variant="variant"
+      />
+    </div>
 
     <BaseEmpty v-else-if="!variant.state?._hPropDefs?.length">
       <Icon
