@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, ref } from 'vue'
+import { computed } from 'vue'
 import { Icon } from '@iconify/vue'
 import type { AutoPropComponentDefinition, PropDefinition } from '@histoire/shared'
 import { HstCheckbox, HstJson, HstNumber, HstText } from '@histoire/controls'
@@ -54,6 +54,7 @@ const canReset = computed(() => props.variant.state?._hPropState?.[props.compone
     :is="comp"
     v-if="comp"
     v-model="model"
+    :placeholder="model === undefined ? definition?.default : null"
     class="histoire-controls-component-prop-item"
     :title="`${definition.name}${canReset ? ' *' : ''}`"
   >
