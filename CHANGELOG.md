@@ -1,3 +1,16 @@
+## v0.17.11
+
+[compare changes](https://github.com/Akryum/histoire/compare/v0.17.10...v0.17.11)
+
+
+### 🩹 Fixes
+
+  - **vue3:** Wrap story with Suspense, fix #668 ([#668](https://github.com/Akryum/histoire/issues/668))
+
+### ❤️  Contributors
+
+- Guillaume Chau ([@Akryum](http://github.com/Akryum))
+
 ## v0.17.10
 
 [compare changes](https://github.com/Akryum/histoire/compare/v0.17.9...v0.17.10)
