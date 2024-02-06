@@ -1,6 +1,6 @@
 /* eslint-disable vue/one-component-per-file */
 
-import { App, createApp, onMounted, reactive, Component, h, VNode } from 'vue'
+import { App, createApp, onMounted, reactive, Component, h, VNode, Suspense } from 'vue'
 import {
   defineComponent as _defineComponent,
   onBeforeUnmount as _onBeforeUnmount,
@@ -117,6 +117,9 @@ export default _defineComponent({
               }, () => children[index]),
             )
           }
+
+          // Wrap in Suspense to render async components
+          children.push(h(Suspense, {}, () => children.at(-1)))
 
           return children.at(-1)
         },
