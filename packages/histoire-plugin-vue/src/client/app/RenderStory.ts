@@ -118,8 +118,8 @@ export default _defineComponent({
             )
           }
 
-          // Wrap in Suspense to render async components
-          children.push(h(Suspense, {}, () => children.at(-1)))
+          children.push(h('div', children.at(-1)))
+          children.push(h(Suspense, {}, children.at(-1)))
 
           return children.at(-1)
         },
