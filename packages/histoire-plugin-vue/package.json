@@ -1,6 +1,6 @@
 {
   "name": "@histoire/plugin-vue",
-  "version": "0.17.11",
+  "version": "0.17.12",
   "description": "Histoire plugin for Vue.js support",
   "license": "MIT",
   "author": {

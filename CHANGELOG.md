@@ -1,3 +1,16 @@
+## v0.17.12
+
+[compare changes](https://github.com/Akryum/histoire/compare/v0.17.11...v0.17.12)
+
+
+### 🩹 Fixes
+
+  - Add a story root wrapper for Suspense ([#677](https://github.com/Akryum/histoire/pull/677), [#678](https://github.com/Akryum/histoire/pull/678))
+
+### ❤️  Contributors
+
+- Hugo ATTAL
+
 ## v0.17.11
 
 [compare changes](https://github.com/Akryum/histoire/compare/v0.17.10...v0.17.11)
