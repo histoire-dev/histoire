@@ -121,7 +121,7 @@ async function printVNode (vnode: VNode, propsOverrides: Record<string, any> = n
         // v-model on component
         const vmodelListeners = [`onUpdate:${prop}`, `onUpdate:${camelCase(prop)}`]
         // @ts-ignore
-        const vmodelListener = vmodelListeners.find(key => vnode.dynamicProps?.includes(key) || key in vnode.props)
+        const vmodelListener = vmodelListeners.find(key => vnode.dynamicProps?.includes(key) || (vnode.props && key in vnode.props))
         if (directive === ':' && vmodelListener) {
           // Listener
           skipProps.push(vmodelListener)
