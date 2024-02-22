@@ -46,17 +46,28 @@ npm i -D histoire @histoire/plugin-svelte
 yarn add -D histoire @histoire/plugin-svelte
 ```
 
-Create an `histoire.config.js` or `histoire.config.ts` file in your project root to enable the Svelte plugin:
+Update your `vite.config.js` or `vite.config.ts` file to enable Histoire with the Svelte plugin:
+
 
 ```ts
-import { defineConfig } from 'histoire'
-import { HstSvelte } from '@histoire/plugin-svelte'
+
+import { HstSvelte } from '@histoire/plugin-svelte';
+import { sveltekit } from '@sveltejs/kit/vite';
+import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
-  plugins: [
-    HstSvelte(),
-  ],
-})
+    plugins: [sveltekit()],
+    test: {
+        include: ['src/**/*.{test,spec}.{js,ts}']
+    },
+    histoire: {
+        plugins: [
+            HstSvelte(),
+        ],
+    }
+});
+
+
 ```
 
 ## Command Line Interface
