@@ -1,3 +1,25 @@
+## v0.17.13
+
+[compare changes](https://github.com/Akryum/histoire/compare/v0.17.12...v0.17.13)
+
+
+### 🚀 Enhancements
+
+  - **percy:** Support builder for options and adding types ([#690](https://github.com/Akryum/histoire/pull/690))
+
+### 🩹 Fixes
+
+  - **vue:** Codegen: check before using `in` on nullable object ([#688](https://github.com/Akryum/histoire/pull/688))
+  - Revert "fix: Fix sandbox URL in getSandboxUrl function" ([#698](https://github.com/Akryum/histoire/pull/698))
+  - Consider platform specific CRLF when generating d.ts files ([#648](https://github.com/Akryum/histoire/pull/648))
+
+### ❤️  Contributors
+
+- Peter Budai <peterbudai@hotmail.com>
+- Mobyrr ([@Mobyrr](http://github.com/Mobyrr))
+- Carlos Rodrigues <david-181@hotmail.com>
+- Julian Meinking ([@DrJume](http://github.com/DrJume))
+
 ## v0.17.12
 
 [compare changes](https://github.com/Akryum/histoire/compare/v0.17.11...v0.17.12)
