@@ -1,3 +1,16 @@
+## v0.17.14
+
+[compare changes](https://github.com/Akryum/histoire/compare/v0.17.13...v0.17.14)
+
+
+### 🩹 Fixes
+
+  - Force release all packages ([fec0afd3](https://github.com/Akryum/histoire/commit/fec0afd3))
+
+### ❤️  Contributors
+
+- Guillaume Chau ([@Akryum](http://github.com/Akryum))
+
 ## v0.17.13
 
 [compare changes](https://github.com/Akryum/histoire/compare/v0.17.12...v0.17.13)
