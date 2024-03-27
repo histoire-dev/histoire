@@ -136,7 +136,7 @@ const sizeTooltip = computed(() => (responsiveWidth.value ?? 'Auto') + ' × ' + 
       class="htw-h-full htw-overflow-auto htw-relative"
     >
       <div
-        class="htw-h-full htw-overflow-hidden htw-bg-white dark:htw-bg-gray-700 htw-rounded-lg htw-relative"
+        class="htw-overflow-hidden htw-bg-white dark:htw-bg-gray-700 htw-rounded-lg htw-relative"
         :class="isResponsiveEnabled ? {
           'htw-w-fit': !!finalWidth,
           'htw-h-fit': !!finalHeight
