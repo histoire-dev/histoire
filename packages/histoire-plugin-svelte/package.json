@@ -1,6 +1,6 @@
 {
   "name": "@histoire/plugin-svelte",
-  "version": "0.17.14",
+  "version": "0.17.15",
   "description": "Histoire plugin for Svelte support",
   "license": "MIT",
   "author": {

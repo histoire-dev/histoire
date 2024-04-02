@@ -1,3 +1,16 @@
+## v0.17.15
+
+[compare changes](https://github.com/Akryum/histoire/compare/v0.17.14...v0.17.15)
+
+
+### 🩹 Fixes
+
+  - StoryResponsivePreview vertical resize ([#704](https://github.com/Akryum/histoire/pull/704))
+
+### ❤️  Contributors
+
+- Mobyrr ([@Mobyrr](http://github.com/Mobyrr))
+
 ## v0.17.14
 
 [compare changes](https://github.com/Akryum/histoire/compare/v0.17.13...v0.17.14)
