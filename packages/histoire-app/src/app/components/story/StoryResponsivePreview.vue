@@ -139,8 +139,9 @@ const sizeTooltip = computed(() => (responsiveWidth.value ?? 'Auto') + ' × ' + 
         class="htw-overflow-hidden htw-bg-white dark:htw-bg-gray-700 htw-rounded-lg htw-relative"
         :class="isResponsiveEnabled ? {
           'htw-w-fit': !!finalWidth,
-          'htw-h-fit': !!finalHeight
-        } : undefined"
+          'htw-h-fit': !!finalHeight,
+          'htw-h-full': !finalHeight
+        } : 'htw-h-full'"
       >
         <div
           class="bind-preview-bg htw-rounded-lg htw-h-full"
