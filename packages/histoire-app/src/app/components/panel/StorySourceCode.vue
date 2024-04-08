@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { computed, markRaw, nextTick, onMounted, ref, shallowRef, watch, watchEffect } from 'vue'
 import { Icon } from '@iconify/vue'
-import { getHighlighter, Highlighter } from 'shiki-es'
+import { getHighlighter, Highlighter } from 'shiki'
 import { HstCopyIcon } from '@histoire/controls'
 import { unindent } from '@histoire/shared'
 import { clientSupportPlugins } from 'virtual:$histoire-support-plugins-client'
