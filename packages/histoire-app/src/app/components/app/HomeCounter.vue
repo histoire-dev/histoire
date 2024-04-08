@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { ref, toRefs } from 'vue'
-import { useTransition, syncRefs } from '@vueuse/core'
 import { Icon } from '@iconify/vue'
 
 const props = defineProps({
@@ -17,13 +15,6 @@ const props = defineProps({
     default: 0,
   },
 })
-
-const { count } = toRefs(props)
-const delayedCount = ref(0)
-
-const animatedCount = useTransition(delayedCount, { delay: 100, duration: 700 })
-
-syncRefs(count, delayedCount)
 </script>
 
 <template>
@@ -36,7 +27,7 @@ syncRefs(count, delayedCount)
       <span
         class="htw-text-primary-500 htw-min-w-[80px] htw-font-bold"
       >
-        {{ animatedCount.toFixed() }}
+        {{ count }}
       </span>
       <span
         class="htw-text-sm htw-text-gray-900 dark:htw-text-gray-100"
