@@ -1,3 +1,16 @@
+## v0.17.16
+
+[compare changes](https://github.com/Akryum/histoire/compare/v0.17.15...v0.17.16)
+
+
+### 🩹 Fixes
+
+  - StoryResponsivePreview full height ([#708](https://github.com/Akryum/histoire/pull/708))
+
+### ❤️  Contributors
+
+- Mobyrr ([@Mobyrr](http://github.com/Mobyrr))
+
 ## v0.17.15
 
 [compare changes](https://github.com/Akryum/histoire/compare/v0.17.14...v0.17.15)
