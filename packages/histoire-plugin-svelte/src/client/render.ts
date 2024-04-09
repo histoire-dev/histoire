@@ -1,14 +1,14 @@
-/* eslint-disable vue/one-component-per-file */
-
-import { SvelteComponent } from 'svelte'
+import type { SvelteComponent } from 'svelte'
+import type {
+  PropType as _PropType,
+} from '@histoire/vendors/vue'
 import {
   defineComponent as _defineComponent,
-  PropType as _PropType,
+  h as _h,
   onMounted as _onMounted,
   onUnmounted as _onUnmounted,
   ref as _ref,
   watch as _watch,
-  h as _h,
 } from '@histoire/vendors/vue'
 import type { Story, Variant } from '@histoire/shared'
 import { components } from '@histoire/controls'
@@ -16,11 +16,11 @@ import { components } from '@histoire/controls'
 import * as setup from 'virtual:$histoire-setup'
 // @ts-expect-error virtual module id
 import * as generatedSetup from 'virtual:$histoire-generated-global-setup'
+import type { SvelteStorySetupApi } from '../helpers.js'
 import RenderStorySvelte from './RenderStory.svelte'
 import RenderVariantSvelte from './RenderVariant.svelte'
 import Wrap from './Wrap.svelte'
 import { syncState } from './util'
-import type { SvelteStorySetupApi } from '../helpers.js'
 
 export default _defineComponent({
   name: 'RenderStory',
@@ -42,14 +42,14 @@ export default _defineComponent({
     },
   },
 
-  setup (props, { emit }) {
+  setup(props, { emit }) {
     const el = _ref<HTMLDivElement>()
     let app: SvelteComponent
     let target: HTMLDivElement
 
     let tearDownHandlers: (() => void)[] = []
 
-    function documentOn (event, cb) {
+    function documentOn(event, cb) {
       document.addEventListener(event, cb)
       const off = () => document.removeEventListener(event, cb)
       tearDownHandlers.push(off)
@@ -58,12 +58,12 @@ export default _defineComponent({
       }
     }
 
-    async function mountStory () {
+    async function mountStory() {
       target = document.createElement('div')
       el.value.appendChild(target)
 
       let components = []
-      const { off: registerComponentOff } = documentOn('SvelteRegisterComponent', e => {
+      const { off: registerComponentOff } = documentOn('SvelteRegisterComponent', (e) => {
         const { component } = e.detail
         components.push(component)
       })
@@ -73,9 +73,7 @@ export default _defineComponent({
         target,
         props: {
           Hst: {
-            // @ts-ignore
             Story: RenderStorySvelte,
-            // @ts-ignore
             Variant: RenderVariantSvelte,
             ...getControls(),
           },
@@ -92,7 +90,7 @@ export default _defineComponent({
       components = []
 
       // Svelte on_hrm callbacks are buggy so we patch the hmr replace instead
-      function patchReplace () {
+      function patchReplace() {
         const origReplace = appComponent.$replace
         if (!origReplace) return
         appComponent.$replace = (...args) => {
@@ -110,7 +108,7 @@ export default _defineComponent({
       })
       tearDownHandlers.push(stop)
 
-      function watchState () {
+      function watchState() {
         appComponent.$$.after_update.push(() => {
           apply(appComponent.$capture_state())
         })
@@ -149,7 +147,7 @@ export default _defineComponent({
       emit('ready')
     }
 
-    function unmountStory () {
+    function unmountStory() {
       app?.$destroy()
       if (target) {
         target.parentNode?.removeChild(target)
@@ -177,14 +175,14 @@ export default _defineComponent({
     }
   },
 
-  render () {
+  render() {
     return _h('div', {
       ref: 'el',
     })
   },
 })
 
-function getControls () {
+function getControls() {
   const result: Record<string, any> = {}
   for (const key in components) {
     result[key.substring(3)] = wrapComponent(components[key])
@@ -192,8 +190,8 @@ function getControls () {
   return result
 }
 
-function wrapComponent (controlComponent) {
-  function ProxyWrap (options) {
+function wrapComponent(controlComponent) {
+  function ProxyWrap(options) {
     return new Wrap({
       ...options,
       props: {

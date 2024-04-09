@@ -8,7 +8,7 @@ const emit = defineEmits<{
 const value1 = ref('Hello')
 const value2 = ref('World')
 
-function sendEvent () {
+function sendEvent() {
   emit('myEvent', { a: value1.value, b: value2.value })
 }
 </script>

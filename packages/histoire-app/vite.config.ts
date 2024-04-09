@@ -9,14 +9,14 @@ export default defineConfig({
     {
       name: 'histoire:preserve:import.meta',
       enforce: 'pre',
-      transform (code) {
+      transform(code) {
         if (code.includes('import.meta')) {
           return {
             code: code.replace(/import\.meta/g, 'import__meta'),
           }
         }
       },
-      closeBundle () {
+      closeBundle() {
         try {
           const files = globbySync('./dist/bundled/**/*.js')
           for (const file of files) {
@@ -25,7 +25,8 @@ export default defineConfig({
               fs.writeFileSync(file, content.replace(/import__meta/g, 'import.meta'), 'utf-8')
             }
           }
-        } catch (e) {
+        }
+        catch (e) {
           console.error(e)
         }
       },
@@ -36,11 +37,11 @@ export default defineConfig({
     alias: {
       'floating-vue': '@histoire/vendors/floating-vue',
       '@iconify/vue': '@histoire/vendors/iconify',
-      pinia: '@histoire/vendors/pinia',
+      'pinia': '@histoire/vendors/pinia',
       'scroll-into-view-if-needed': '@histoire/vendors/scroll',
       'vue-router': '@histoire/vendors/vue-router',
       '@vueuse/core': '@histoire/vendors/vue-use',
-      vue: '@histoire/vendors/vue',
+      'vue': '@histoire/vendors/vue',
     },
   },
 
@@ -55,7 +56,7 @@ export default defineConfig({
       external: [
         /\$histoire/,
         /@histoire/,
-        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        // eslint-disable-next-line ts/no-var-requires, ts/no-require-imports
         ...Object.keys(require('./package.json').dependencies),
       ],
 

@@ -2,7 +2,7 @@ import chokidar from 'chokidar'
 import fs from 'fs-extra'
 import { normalizePath } from 'vite'
 
-function toDist (file) {
+function toDist(file) {
   return normalizePath(file).replace(/^src\//, 'dist/')
 }
 
@@ -10,6 +10,6 @@ function toDist (file) {
 // they change.
 chokidar
   .watch('src/**/!(*.ts|*.vue|tsconfig.json)')
-  .on('change', (file) => fs.copy(file, toDist(file)))
-  .on('add', (file) => fs.copy(file, toDist(file)))
-  .on('unlink', (file) => fs.remove(toDist(file)))
+  .on('change', file => fs.copy(file, toDist(file)))
+  .on('add', file => fs.copy(file, toDist(file)))
+  .on('unlink', file => fs.remove(toDist(file)))

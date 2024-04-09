@@ -1,4 +1,4 @@
-import { Awaitable } from '../type-utils.js'
+import type { Awaitable } from '../type-utils.js'
 
 export interface PromptBase<TValue> {
   field: string
@@ -18,5 +18,6 @@ export interface SelectPrompt extends PromptBase<string> {
   options: SelectPromptOption[] | ((search: string, answers: Record<string, any>) => Awaitable<SelectPromptOption[]>)
 }
 
+// eslint-disable-next-line unused-imports/no-unused-vars
 export type Prompt<TValue = any> = TextPrompt
-| SelectPrompt
+  | SelectPrompt

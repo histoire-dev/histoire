@@ -15,8 +15,8 @@ export default defineComponent({
     navigate: () => true,
   },
 
-  setup (props, { emit }) {
-    function handleNavigate (event, navigate: (event) => unknown) {
+  setup(props, { emit }) {
+    function handleNavigate(event, navigate: (event) => unknown) {
       emit('navigate')
       navigate(event)
     }
@@ -42,7 +42,7 @@ export default defineComponent({
         $attrs.class,
         (isActive != null ? isActive : linkIsActive)
           ? 'active htw-bg-primary-500 hover:htw-bg-primary-600 htw-text-white dark:htw-text-black'
-          : 'hover:htw-bg-primary-100 dark:hover:htw-bg-primary-900'
+          : 'hover:htw-bg-primary-100 dark:hover:htw-bg-primary-900',
       ]"
       @click="handleNavigate($event, navigate)"
       @keyup.enter="handleNavigate($event, navigate)"

@@ -1,5 +1,6 @@
 {
   "name": "histoire-example-nuxt3",
+  "type": "module",
   "version": "0.0.1",
   "private": true,
   "scripts": {
@@ -11,7 +12,6 @@
     "test:dev": "cypress open --config baseUrl=http://localhost:6006",
     "test:examples": "pnpm run story:build && pnpm run ci"
   },
-  "type": "module",
   "devDependencies": {
     "@histoire/plugin-nuxt": "workspace:*",
     "@histoire/plugin-vue": "workspace:*",

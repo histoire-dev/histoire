@@ -6,31 +6,33 @@ export default {
 </script>
 
 <script lang="ts" setup>
-import { ref, onMounted, watch, watchEffect } from 'vue'
+import { onMounted, ref, watch, watchEffect } from 'vue'
 import { Icon } from '@iconify/vue'
-import HstWrapper from '../HstWrapper.vue'
 import { VTooltip as vTooltip } from 'floating-vue'
 import { Compartment } from '@codemirror/state'
+import type {
+  ViewUpdate,
+} from '@codemirror/view'
 import {
   EditorView,
-  keymap,
-  highlightActiveLineGutter,
   highlightActiveLine,
+  highlightActiveLineGutter,
   highlightSpecialChars,
-  ViewUpdate,
+  keymap,
 } from '@codemirror/view'
 import { defaultKeymap } from '@codemirror/commands'
 import { json } from '@codemirror/lang-json'
 import {
-  defaultHighlightStyle,
-  syntaxHighlighting,
-  indentOnInput,
   bracketMatching,
+  defaultHighlightStyle,
   foldGutter,
   foldKeymap,
+  indentOnInput,
+  syntaxHighlighting,
 } from '@codemirror/language'
 import { lintKeymap } from '@codemirror/lint'
-import { oneDarkTheme, oneDarkHighlightStyle } from '@codemirror/theme-one-dark'
+import { oneDarkHighlightStyle, oneDarkTheme } from '@codemirror/theme-one-dark'
+import HstWrapper from '../HstWrapper.vue'
 import { isDark } from '../../utils'
 
 const props = defineProps<{
@@ -94,7 +96,8 @@ watch(() => props.modelValue, () => {
 
   try {
     sameDocument = (JSON.stringify(JSON.parse(internalValue.value)) === JSON.stringify(props.modelValue))
-  } catch (e) {
+  }
+  catch (e) {
     sameDocument = false
   }
 
@@ -107,11 +110,11 @@ watch(() => internalValue.value, () => {
   invalidValue.value = false
   try {
     emit('update:modelValue', JSON.parse(internalValue.value))
-  } catch (e) {
+  }
+  catch (e) {
     invalidValue.value = true
   }
 })
-
 </script>
 
 <template>

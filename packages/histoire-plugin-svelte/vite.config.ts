@@ -10,14 +10,14 @@ export default defineConfig({
     {
       name: 'histoire:preserve:import.dynamic',
       enforce: 'pre',
-      transform (code) {
+      transform(code) {
         if (code.includes('import(')) {
           return {
             code: code.replace(/import\(/g, 'import__dyn('),
           }
         }
       },
-      closeBundle () {
+      closeBundle() {
         try {
           const files = globbySync('./dist/**/*.js')
           for (const file of files) {
@@ -26,7 +26,8 @@ export default defineConfig({
               fs.writeFileSync(file, content.replace(/import__dyn\(/g, 'import(/* @vite-ignore */'), 'utf-8')
             }
           }
-        } catch (e) {
+        }
+        catch (e) {
           console.error(e)
         }
       },

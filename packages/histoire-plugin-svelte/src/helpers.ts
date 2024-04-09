@@ -1,4 +1,4 @@
-import type { StoryProps, Story, Variant, VariantProps } from '@histoire/shared'
+import type { Story, StoryProps, Variant, VariantProps } from '@histoire/shared'
 import type { HstControlOption } from '@histoire/controls'
 import type { SvelteComponentTyped } from 'svelte'
 
@@ -10,7 +10,7 @@ export interface SvelteStorySetupApi {
 
 export type SvelteStorySetupHandler = (api: SvelteStorySetupApi) => Promise<void> | void
 
-export function defineSetupSvelte (handler: SvelteStorySetupHandler): SvelteStorySetupHandler {
+export function defineSetupSvelte(handler: SvelteStorySetupHandler): SvelteStorySetupHandler {
   return handler
 }
 

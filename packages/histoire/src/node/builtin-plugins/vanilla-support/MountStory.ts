@@ -1,7 +1,5 @@
-import {
-  defineComponent as _defineComponent,
-  PropType as _PropType,
-} from '@histoire/vendors/vue'
+import type { PropType as _PropType } from '@histoire/vendors/vue'
+import { defineComponent as _defineComponent } from '@histoire/vendors/vue'
 import type { Story } from '@histoire/shared'
 import type { StoryOptions, VariantOptions } from './types'
 
@@ -15,7 +13,7 @@ export default _defineComponent({
     },
   },
 
-  setup (props) {
+  setup(props) {
     const options = props.story.file.component as StoryOptions
 
     let rawVariants: VariantOptions[] = []
@@ -27,7 +25,8 @@ export default _defineComponent({
         onMount: options.onMount,
         onMountControls: options.onMountControls,
       }]
-    } else {
+    }
+    else {
       rawVariants = options.variants
     }
 
@@ -44,7 +43,7 @@ export default _defineComponent({
     }
   },
 
-  render () {
+  render() {
     return null
   },
 })

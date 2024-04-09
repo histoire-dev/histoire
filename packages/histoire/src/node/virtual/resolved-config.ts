@@ -1,6 +1,6 @@
 import type { Context } from '../context.js'
 
-export const resolvedConfig = (ctx: Context) => {
+export function resolvedConfig(ctx: Context) {
   let js = `export const config = ${JSON.stringify(ctx.config)}\n`
   if (ctx.config.theme?.logo) {
     for (const key in ctx.config.theme.logo) {

@@ -43,10 +43,10 @@ Function that returns the intial state. Will be used as default value for varian
 
 ```vue
 <script setup>
-function initState () {
+function initState() {
   return {
     disabled: false,
-    content: "Hello world"
+    content: 'Hello world'
   }
 }
 </script>
@@ -76,7 +76,7 @@ It receives a payload object as parameter with the following properties:
 
 ```vue
 <script setup>
-function mySetupApp ({ app, story, variant }) {
+function mySetupApp({ app, story, variant }) {
   app.provide('demo', 'meow')
 }
 </script>
@@ -150,7 +150,6 @@ This is a demo book using Vue 3.
 
 Learn more about Histoire [here](https://histoire.dev/).
 </docs>
-
 ```
 
 ## `source`
@@ -211,6 +210,7 @@ Props:
   <Story>
     <template #controls="{ state }">
       <!-- Interact with state here -->
+      {{ state }}
     </template>
 
     <Variant>

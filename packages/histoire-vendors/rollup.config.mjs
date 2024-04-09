@@ -1,6 +1,6 @@
-import { createRequire } from 'module'
-import { fileURLToPath } from 'url'
-import path from 'path'
+import { createRequire } from 'node:module'
+import { fileURLToPath } from 'node:url'
+import path from 'node:path'
 import { defineConfig } from 'rollup'
 import ts from 'rollup-plugin-typescript2'
 import resolve from '@rollup/plugin-node-resolve'
@@ -67,6 +67,7 @@ export default defineConfig({
             {
               const filepath = file.replace(/\.d\.ts$/, '')
               const content = `import Default from '${filepath}'
+
 export default Default
 export * from '${filepath}'\n`.replace(/\n/g, process.platform === 'win32' ? '\r\n' : '\n')
               fs.writeFileSync(path.basename(file).replace(/^b-/, ''), content, 'utf-8')
@@ -93,7 +94,8 @@ export * from '${filepath}'\n`.replace(/\n/g, process.platform === 'win32' ? '\r
           pkgExports['./*'] = './*'
           pkg.exports = pkgExports
           fs.writeJsonSync('./package.json', pkg, { spaces: 2 })
-        } catch (e) {
+        }
+        catch (e) {
           console.error(e)
         }
       },

@@ -1,30 +1,16 @@
 {
   "compilerOptions": {
     "target": "ESNext",
-    "module": "ESNext",
-    "moduleResolution": "node",
-    "outDir": "dist",
-    "rootDir": "src",
-    "baseUrl": ".",
-    "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true,
-    "removeComments": false,
-    "resolveJsonModule": true,
-    "skipLibCheck": true,
+    // Volar
+    "jsx": "preserve",
     "lib": [
       "ESNext",
       "DOM"
     ],
-    "sourceMap": false,
-    "preserveWatchOutput": true,
-    // Strict
-    "noImplicitAny": false,
-    "noImplicitThis": true,
-    "alwaysStrict": true,
-    "strictBindCallApply": true,
-    "strictFunctionTypes": true,
-    // Volar
-    "jsx": "preserve",
+    "baseUrl": ".",
+    "rootDir": "src",
+    "module": "ESNext",
+    "moduleResolution": "node",
     // Alias
     "paths": {
       "floating-vue": ["node_modules/@histoire/vendors/floating-vue"],
@@ -34,7 +20,21 @@
       "vue-router": ["node_modules/@histoire/vendors/vue-router"],
       "@vueuse/core": ["node_modules/@histoire/vendors/vue-use"],
       "vue": ["node_modules/@histoire/vendors/vue"]
-    }
+    },
+    "resolveJsonModule": true,
+    "strictBindCallApply": true,
+    "strictFunctionTypes": true,
+    "alwaysStrict": true,
+    // Strict
+    "noImplicitAny": false,
+    "noImplicitThis": true,
+    "outDir": "dist",
+    "removeComments": false,
+    "sourceMap": false,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "preserveWatchOutput": true
   },
   "include": [
     "src"

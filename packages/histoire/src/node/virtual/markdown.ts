@@ -1,6 +1,6 @@
 import type { Context } from '../context.js'
 
-export const markdown = (ctx: Context, id: string) => {
+export function markdown(ctx: Context, id: string) {
   const fileId = id.slice('/__resolved__virtual:md:'.length)
   const file = ctx.markdownFiles.find(f => f.id === fileId)
   if (!file) {

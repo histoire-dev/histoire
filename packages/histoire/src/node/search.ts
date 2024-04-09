@@ -2,12 +2,12 @@ import { createRequire } from 'node:module'
 import flexsearch from 'flexsearch'
 import path from 'pathe'
 import { noCase } from 'change-case'
-import { Context } from './context.js'
+import type { Context } from './context.js'
 import { loadModule } from './load.js'
 
 const require = createRequire(import.meta.url)
 
-export async function generateTitleSearchData (ctx: Context) {
+export async function generateTitleSearchData(ctx: Context) {
   const searchIndex = await createIndex()
   const { idMap, addToIdMap } = createIdMap()
 
@@ -32,7 +32,7 @@ export async function generateTitleSearchData (ctx: Context) {
   }
 }
 
-export async function generateDocSearchData (ctx: Context) {
+export async function generateDocSearchData(ctx: Context) {
   const searchIndex = await createIndex()
   const { idMap, addToIdMap } = createIdMap()
 
@@ -51,7 +51,7 @@ export async function generateDocSearchData (ctx: Context) {
   }
 }
 
-async function createIndex () {
+async function createIndex() {
   const flexsearchRoot = path.dirname(require.resolve('flexsearch/package.json'))
   return new flexsearch.Document({
     preset: 'match',
@@ -67,11 +67,11 @@ async function createIndex () {
   })
 }
 
-function createIdMap () {
+function createIdMap() {
   let uid = 0
   const idMap: Record<number, { id: string, kind: string }> = {}
 
-  function addToIdMap (id: string, kind: string) {
+  function addToIdMap(id: string, kind: string) {
     const n = uid++
     idMap[n] = { id, kind }
     return n
@@ -92,7 +92,7 @@ const exportKeys = new Set([
   'store',
 ])
 
-async function exportSearchIndex (index) {
+async function exportSearchIndex(index) {
   // eslint-disable-next-line no-async-promise-executor
   return new Promise(async (resolve) => {
     const exportedData: Record<string, any> = {}
@@ -107,12 +107,12 @@ async function exportSearchIndex (index) {
   })
 }
 
-function convertTitleToSentence (text: string) {
+function convertTitleToSentence(text: string) {
   return text.split(' ').map(str => noCase(str)).join(' ')
 }
 
 // @TODO clear handlers when SearchPane unmounts
-export function getSearchDataJS (data: any) {
+export function getSearchDataJS(data: any) {
   return `export let searchData = ${JSON.stringify(data)}
 const handlers = []
 export function onUpdate (cb) {

@@ -1,6 +1,6 @@
 import { router } from './router.js'
 
-export function setupPluginApi () {
+export function setupPluginApi() {
   if (!import.meta.hot) return
 
   const listeners: Record<string, Set<(result: any) => unknown>> = {}
@@ -14,7 +14,7 @@ export function setupPluginApi () {
     }
   })
 
-  function addDevEventListener (event: string, listener: (result: any) => unknown) {
+  function addDevEventListener(event: string, listener: (result: any) => unknown) {
     let set = listeners[event]
     if (!set) {
       set = new Set()
@@ -42,7 +42,8 @@ export function setupPluginApi () {
         })
         if (event.startsWith('on')) {
           resolve(undefined)
-        } else {
+        }
+        else {
           const off = addDevEventListener(event, (result: any) => {
             off()
             resolve(result)

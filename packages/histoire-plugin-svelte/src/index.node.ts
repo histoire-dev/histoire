@@ -3,11 +3,11 @@ import type { Plugin } from 'histoire'
 import generateStoryCommand from './commands/generate-story.server.js'
 import { listComponentFiles } from './util/list-components.js'
 
-export function HstSvelte (): Plugin {
+export function HstSvelte(): Plugin {
   return {
     name: '@histoire/plugin-svelte',
 
-    defaultConfig () {
+    defaultConfig() {
       return {
         supportMatch: [
           {
@@ -43,7 +43,7 @@ export function HstSvelte (): Plugin {
       generateStoryCommand,
     ],
 
-    async onDevEvent (api) {
+    async onDevEvent(api) {
       switch (api.event) {
         case 'listSvelteComponents': {
           return listComponentFiles(api.payload.search, api.getConfig().storyMatch)

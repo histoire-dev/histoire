@@ -1,5 +1,5 @@
 import type { ClientCommandOptions } from 'histoire'
-import { sendEvent, openStory } from 'histoire/plugin'
+import { openStory, sendEvent } from 'histoire/plugin'
 import { paramCase } from 'change-case'
 
 export default {
@@ -8,7 +8,7 @@ export default {
       field: 'component',
       label: 'Choose a component',
       type: 'select',
-      options: async (search) => sendEvent('listSvelteComponents', { search }),
+      options: async search => sendEvent('listSvelteComponents', { search }),
       required: true,
     },
     {
@@ -16,7 +16,7 @@ export default {
       label: 'File name',
       type: 'text',
       required: true,
-      defaultValue: (answers) => answers.component?.replace(/.+\/(.+?)\.svelte$/, '$1.story.svelte'),
+      defaultValue: answers => answers.component?.replace(/.+\/(.+?)\.svelte$/, '$1.story.svelte'),
     },
   ],
   clientAction: (params) => {

@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import ColorButton from './ColorButton.vue'
 
-function initState () {
+function initState() {
   return {
     bgcolorselect: '#000000',
     txtcolorselect: '#ffffff',

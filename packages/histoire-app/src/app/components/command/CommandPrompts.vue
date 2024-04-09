@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import { reactive, ref, nextTick, onMounted } from 'vue'
+import { nextTick, onMounted, reactive, ref } from 'vue'
 import type { ClientCommand } from '@histoire/shared'
-import { getCommandContext, executeCommand } from '../../util/commands.js'
+import { executeCommand, getCommandContext } from '../../util/commands.js'
 import BaseButton from '../base/BaseButton.vue'
 import BaseKeyboardShortcut from '../base/BaseKeyboardShortcut.vue'
 import PromptText from './PromptText.vue'
@@ -27,13 +27,14 @@ for (const prompt of props.command.prompts) {
   let defaultValue
   if (typeof prompt.defaultValue === 'function') {
     defaultValue = prompt.defaultValue(answers)
-  } else {
+  }
+  else {
     defaultValue = prompt.defaultValue
   }
   answers[prompt.field] = defaultValue
 }
 
-function submit () {
+function submit() {
   const params = props.command.getParams
     ? props.command.getParams({
       ...getCommandContext(),
@@ -48,7 +49,7 @@ function submit () {
 
 const promptComps = ref<any[]>([])
 
-function focusPrompt (index: number) {
+function focusPrompt(index: number) {
   nextTick(() => {
     promptComps.value[index]?.focus?.()
   })

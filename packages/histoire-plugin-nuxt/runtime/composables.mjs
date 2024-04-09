@@ -1,1 +1,1 @@
-export const useNuxtApp = () => ({ runWithContext: async (fn) => await fn() })
+export const useNuxtApp = () => ({ runWithContext: async fn => await fn() })

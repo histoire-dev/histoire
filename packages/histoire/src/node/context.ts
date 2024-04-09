@@ -1,11 +1,12 @@
-import { resolveConfig as resolveViteConfig, ResolvedConfig } from 'vite'
+import type { ResolvedConfig } from 'vite'
+import { resolveConfig as resolveViteConfig } from 'vite'
 import type {
-  ServerStoryFile,
-  FinalSupportPlugin,
-  ServerMarkdownFile,
-  HistoireConfig,
   ConfigMode,
+  FinalSupportPlugin,
+  HistoireConfig,
   PluginCommand,
+  ServerMarkdownFile,
+  ServerStoryFile,
 } from '@histoire/shared'
 import { processConfig, resolveConfig } from './config.js'
 import { mergeHistoireViteConfig } from './vite.js'
@@ -26,7 +27,7 @@ export interface CreateContextOptions {
   configFile?: string
 }
 
-export async function createContext (options: CreateContextOptions): Promise<Context> {
+export async function createContext(options: CreateContextOptions): Promise<Context> {
   const config = await resolveConfig(process.cwd(), options.mode, options.configFile)
   const command = options.mode === 'dev' ? 'serve' : 'build'
   const viteConfig = await resolveViteConfig({}, command)

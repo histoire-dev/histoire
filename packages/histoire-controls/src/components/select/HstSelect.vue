@@ -6,8 +6,8 @@ export default {
 
 <script lang="ts" setup>
 import HstWrapper from '../HstWrapper.vue'
+import type { HstControlOption } from '../../types'
 import CustomSelect from './CustomSelect.vue'
-import { HstControlOption } from '../../types'
 
 defineProps<{
   title?: string

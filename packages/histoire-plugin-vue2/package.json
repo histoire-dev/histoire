@@ -1,11 +1,12 @@
 {
   "name": "@histoire/plugin-vue2",
+  "type": "module",
   "version": "0.17.16",
   "description": "Histoire plugin for Vue.js 2 support",
-  "license": "MIT",
   "author": {
     "name": "Guillaume Chau"
   },
+  "license": "MIT",
   "repository": {
     "url": "https://github.com/Akryum/histoire.git",
     "type": "git",
@@ -14,7 +15,6 @@
   "publishConfig": {
     "access": "public"
   },
-  "type": "module",
   "exports": {
     "./client": {
       "types": "./dist/client/client.d.ts",
@@ -37,6 +37,10 @@
     "build:types": "tsc --declaration --emitDeclarationOnly",
     "watch": "concurrently \"vite build --watch\" \"pnpm run build:types --watch\""
   },
+  "peerDependencies": {
+    "histoire": "workspace:^",
+    "vue": "^2.7.8"
+  },
   "dependencies": {
     "@histoire/controls": "workspace:^",
     "@histoire/shared": "workspace:^",
@@ -48,12 +52,8 @@
     "concurrently": "^7.6.0",
     "globby": "^13.2.2",
     "histoire": "workspace:*",
-    "typescript": "^4.9.5",
+    "typescript": "^5.4.4",
     "vite": "^5.0.11",
     "vue": "^2.7.15"
-  },
-  "peerDependencies": {
-    "histoire": "workspace:^",
-    "vue": "^2.7.8"
   }
 }

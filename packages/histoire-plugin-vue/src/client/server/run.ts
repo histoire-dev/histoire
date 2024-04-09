@@ -4,20 +4,20 @@ import type { ServerRunPayload } from '@histoire/shared'
 import * as setup from 'virtual:$histoire-setup'
 // @ts-expect-error virtual module id
 import * as generatedSetup from 'virtual:$histoire-generated-global-setup'
+import type { Vue3StorySetupApi, Vue3StorySetupHandler } from '../../helpers.js'
 import Story from './Story'
 import Variant from './Variant'
-import type { Vue3StorySetupApi, Vue3StorySetupHandler } from '../../helpers.js'
 
-export async function run ({ file, storyData, el }: ServerRunPayload) {
+export async function run({ file, storyData, el }: ServerRunPayload) {
   const { default: Comp } = await import(/* @vite-ignore */ file.moduleId)
 
   const app = createApp({
     provide: {
-      addStory (data) {
+      addStory(data) {
         storyData.push(data)
       },
     },
-    render () {
+    render() {
       return h(Comp, {
         ref: 'comp',
         data: file,
@@ -25,9 +25,8 @@ export async function run ({ file, storyData, el }: ServerRunPayload) {
     },
   })
 
-  // eslint-disable-next-line vue/multi-word-component-names
   app.component('Story', Story)
-  // eslint-disable-next-line vue/multi-word-component-names
+
   app.component('Variant', Variant)
 
   // Call app setups to resolve global assets such as components
@@ -55,7 +54,7 @@ export async function run ({ file, storyData, el }: ServerRunPayload) {
     const el = document.createElement('div')
     el.innerHTML = Comp.doc
     const text = el.textContent
-    storyData.forEach(s => {
+    storyData.forEach((s) => {
       s.docsText = text
     })
   }

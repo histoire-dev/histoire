@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import HstText from './HstText.vue'
 
-function initState () {
+function initState() {
   return {
     label: 'My really long label',
     text: '',

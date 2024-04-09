@@ -7,6 +7,6 @@ declare module '@histoire/shared' {
   }
 }
 
-export function generateSourceCode () {
+export function generateSourceCode() {
   // noop
 }

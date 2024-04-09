@@ -1,5 +1,5 @@
-import type { Context } from './context.js'
 import type { ServerStory } from '@histoire/shared'
+import type { Context } from './context.js'
 
 interface SerializedStory extends Omit<ServerStory, 'docsText'> {
   relativePath: string
@@ -21,7 +21,7 @@ interface SerializedStoryData {
   markdownFiles: SerializedMarkdownFile[]
 }
 
-export function getSerializedStoryData (ctx: Context): SerializedStoryData {
+export function getSerializedStoryData(ctx: Context): SerializedStoryData {
   const data: SerializedStoryData = {
     stories: [],
     markdownFiles: [],
@@ -39,11 +39,11 @@ export function getSerializedStoryData (ctx: Context): SerializedStoryData {
         virtual: storyFile.virtual,
         markdownFile: storyFile.markdownFile
           ? {
-            id: storyFile.markdownFile.id,
-            relativePath: storyFile.markdownFile.relativePath,
-            isRelatedToStory: storyFile.markdownFile.isRelatedToStory,
-            frontmatter: storyFile.markdownFile.frontmatter,
-          }
+              id: storyFile.markdownFile.id,
+              relativePath: storyFile.markdownFile.relativePath,
+              isRelatedToStory: storyFile.markdownFile.isRelatedToStory,
+              frontmatter: storyFile.markdownFile.frontmatter,
+            }
           : null,
       })
     }

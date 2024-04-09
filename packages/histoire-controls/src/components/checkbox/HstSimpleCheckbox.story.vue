@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import HstSimpleCheckbox from './HstSimpleCheckbox.vue'
 
-function initState () {
+function initState() {
   return {
     checked: true,
   }

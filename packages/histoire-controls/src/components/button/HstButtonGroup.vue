@@ -5,9 +5,10 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { computed, ComputedRef } from 'vue'
+import type { ComputedRef } from 'vue'
+import { computed } from 'vue'
 import HstWrapper from '../HstWrapper.vue'
-import { HstControlOption } from '../../types'
+import type { HstControlOption } from '../../types'
 import HstButton from './HstButton.vue'
 
 const props = defineProps<{
@@ -21,11 +22,13 @@ const formattedOptions: ComputedRef<HstControlOption[]> = computed(() => {
     return props.options.map((value: string | number | HstControlOption) => {
       if (typeof value === 'string' || typeof value === 'number') {
         return { value, label: String(value) }
-      } else {
+      }
+      else {
         return value
       }
     })
-  } else {
+  }
+  else {
     return Object.keys(props.options).map((value: string) => ({
       value,
       label: props.options[value],
@@ -37,7 +40,7 @@ const emit = defineEmits<{
   (e: 'update:modelValue', value: string): void
 }>()
 
-function selectOption (value: string) {
+function selectOption(value: string) {
   emit('update:modelValue', value)
 }
 </script>

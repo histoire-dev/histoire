@@ -5,9 +5,10 @@ export default {
 </script>
 
 <script lang="ts" setup>
-import { computed, ComputedRef } from 'vue'
+import type { ComputedRef } from 'vue'
+import { computed } from 'vue'
 import HstWrapper from '../HstWrapper.vue'
-import { HstControlOption } from '../../types'
+import type { HstControlOption } from '../../types'
 import HstSimpleCheckbox from './HstSimpleCheckbox.vue'
 
 const props = defineProps<{
@@ -21,7 +22,8 @@ const formattedOptions: ComputedRef<Record<string, string>> = computed(() => {
     return Object.fromEntries(props.options.map((value: string | HstControlOption) => {
       if (typeof value === 'string') {
         return [value, value]
-      } else {
+      }
+      else {
         return [value.value, value.label]
       }
     }))
@@ -33,10 +35,11 @@ const emit = defineEmits<{
   (e: 'update:modelValue', value: Array<string>): void
 }>()
 
-function toggleOption (value: string) {
+function toggleOption(value: string) {
   if (props.modelValue.includes(value)) {
     emit('update:modelValue', props.modelValue.filter(element => element !== value))
-  } else {
+  }
+  else {
     emit('update:modelValue', [...props.modelValue, value])
   }
 }
@@ -52,7 +55,7 @@ function toggleOption (value: string) {
   >
     <div class="-htw-my-1">
       <template
-        v-for="( label, value ) in formattedOptions"
+        v-for="(label, value) in formattedOptions"
         :key="value"
       >
         <label

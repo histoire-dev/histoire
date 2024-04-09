@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, computed, watch, onMounted, nextTick } from 'vue'
+import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import { Icon } from '@iconify/vue'
 import BaseEmpty from '../base/BaseEmpty.vue'
 import { useEventsStore } from '../../stores/events'
@@ -12,7 +12,7 @@ const hasEvents = computed(() => eventsStore.events.length)
 onMounted(resetUnseen)
 watch(() => eventsStore.unseen, resetUnseen)
 
-async function resetUnseen () {
+async function resetUnseen() {
   if (eventsStore.unseen > 0) {
     eventsStore.unseen = 0
   }

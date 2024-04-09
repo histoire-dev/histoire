@@ -1,11 +1,10 @@
-
-const inheritedConfig = require('../../tailwind.config.cjs')
 const defaultColors = require('tailwindcss/colors')
 const path = require('pathe')
+const inheritedConfig = require('../../tailwind.config.cjs')
 
 // Colors
 
-function withOpacityValue (variable) {
+function withOpacityValue(variable) {
   return ({ opacityValue }) => {
     if (opacityValue === undefined) {
       return `rgb(var(${variable}))`
@@ -73,12 +72,12 @@ module.exports.theme.colors = colors
 
 module.exports.plugins.push(require('@tailwindcss/typography'))
 // prose-a:htw-text-primary-500 prose-headings:htw-mb-2 prose-headings:htw-mt-4 first:prose-headings:htw-mt-0 prose-blockquote:htw-ml-0
-module.exports.theme.extend.typography = (theme) => ({
+module.exports.theme.extend.typography = theme => ({
   DEFAULT: {
     css: {
-      a: {
-        color: theme('colors.primary-500'),
-        textDecoration: 'none',
+      'a': {
+        'color': theme('colors.primary-500'),
+        'textDecoration': 'none',
 
         '&:hover': {
           textDecoration: 'underline',
@@ -86,7 +85,7 @@ module.exports.theme.extend.typography = (theme) => ({
       },
 
       'h1, h2, h3, h4, th': {
-        marginBottom: '0.75rem',
+        'marginBottom': '0.75rem',
 
         '&:not(:first-child)': {
           marginTop: '1.25rem',
@@ -96,11 +95,11 @@ module.exports.theme.extend.typography = (theme) => ({
       '--tw-prose-invert-quote-borders': theme('colors.gray-800'),
       '--tw-prose-invert-hr': theme('colors.gray-800'),
 
-      blockquote: {
-        marginLeft: 0,
-        marginRight: 0,
-        backgroundColor: theme('colors.gray-100'),
-        padding: '.25rem .375rem',
+      'blockquote': {
+        'marginLeft': 0,
+        'marginRight': 0,
+        'backgroundColor': theme('colors.gray-100'),
+        'padding': '.25rem .375rem',
 
         '& p:first-child': {
           marginTop: 0,
@@ -117,17 +116,17 @@ module.exports.theme.extend.typography = (theme) => ({
 
       '--tw-prose-invert-bullets': theme('colors.gray-500'),
 
-      li: {
+      'li': {
         marginTop: '0.1rem',
         marginBottom: '0.1rem',
       },
 
-      code: {
-        backgroundColor: theme('colors.gray-500 / 20%'),
-        fontWeight: 'normal',
-        padding: '0.05rem 0.5rem',
-        borderRadius: '0.25rem',
-        fontSize: '0.8rem',
+      'code': {
+        'backgroundColor': theme('colors.gray-500 / 20%'),
+        'fontWeight': 'normal',
+        'padding': '0.05rem 0.5rem',
+        'borderRadius': '0.25rem',
+        'fontSize': '0.8rem',
 
         '&::before, &::after': {
           display: 'none',

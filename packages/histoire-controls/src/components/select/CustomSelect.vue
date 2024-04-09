@@ -6,9 +6,10 @@ export default {
 
 <script lang="ts" setup>
 import { Dropdown as VDropdown } from 'floating-vue'
-import { computed, ComputedRef } from 'vue'
+import type { ComputedRef } from 'vue'
+import { computed } from 'vue'
 import { Icon } from '@iconify/vue'
-import { HstControlOption } from '../../types'
+import type { HstControlOption } from '../../types'
 
 const props = defineProps<{
   modelValue: string
@@ -21,21 +22,23 @@ const emit = defineEmits<{
 
 const formattedOptions: ComputedRef<[any, string][]> = computed(() => {
   if (Array.isArray(props.options)) {
-    return props.options.map(option => {
+    return props.options.map((option) => {
       if (typeof option === 'string' || typeof option === 'number') {
         return [option, String(option)] as [any, string]
-      } else {
+      }
+      else {
         return [option.value, option.label] as [any, string]
       }
     })
-  } else {
+  }
+  else {
     return Object.entries(props.options)
   }
 })
 
 const selectedLabel = computed(() => formattedOptions.value.find(([value]) => value === props.modelValue)?.[1])
 
-function selectValue (value: any, hide: () => void) {
+function selectValue(value: any, hide: () => void) {
   emit('update:modelValue', value)
   hide()
 }
@@ -113,5 +116,4 @@ function selectValue (value: any, hide: () => void) {
 .v-popper__popper:focus-visible {
   outline: none;
 }
-
 </style>

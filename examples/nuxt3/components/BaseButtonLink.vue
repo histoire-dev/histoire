@@ -1,3 +1,15 @@
+<script setup lang="ts">
+const props = defineProps<{
+  to?: string
+  variant: 'primary' | 'secondary'
+}>()
+
+const computedClasses = computed(() => ({
+  'btn-base': true,
+  'btn-primary': props.variant === 'primary',
+}))
+</script>
+
 <template>
   <NuxtLink
     v-if="to"
@@ -13,19 +25,6 @@
     <slot />
   </button>
 </template>
-
-<script setup lang="ts">
-const props = defineProps<{
-  to?: string
-  variant: 'primary' | 'secondary'
-}>()
-
-// eslint-disable-next-line no-undef
-const computedClasses = computed(() => ({
-  'btn-base': true,
-  'btn-primary': props.variant === 'primary',
-}))
-</script>
 
 <style scoped>
 .btn-base {

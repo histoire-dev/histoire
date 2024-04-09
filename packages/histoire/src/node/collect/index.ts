@@ -1,4 +1,5 @@
 import { MessageChannel } from 'node:worker_threads'
+import { cpus } from 'node:os'
 import type { ViteDevServer } from 'vite'
 import { ViteNodeServer } from 'vite-node/server'
 import type { FetchFunction, ResolveIdFunction } from 'vite-node'
@@ -6,12 +7,11 @@ import { relative } from 'pathe'
 import pc from 'picocolors'
 import Tinypool from '@akryum/tinypool'
 import { createBirpc } from 'birpc'
-import { cpus } from 'node:os'
 import type { ServerStoryFile } from '@histoire/shared'
 import { createPath } from '../tree.js'
 import type { Context } from '../context.js'
-import type { Payload, ReturnData } from './worker.js'
 import { slash } from '../util/fs.js'
+import type { Payload, ReturnData } from './worker.js'
 
 export interface UseCollectStoriesOptions {
   server: ViteDevServer
@@ -19,7 +19,7 @@ export interface UseCollectStoriesOptions {
   throws?: boolean
 }
 
-export function useCollectStories (options: UseCollectStoriesOptions, ctx: Context) {
+export function useCollectStories(options: UseCollectStoriesOptions, ctx: Context) {
   const { server, mainServer } = options
 
   const node = new ViteNodeServer(server, {
@@ -55,12 +55,12 @@ export function useCollectStories (options: UseCollectStoriesOptions, ctx: Conte
     maxThreads: threadsCount,
   })
 
-  function clearCache () {
+  function clearCache() {
     server.moduleGraph.invalidateAll()
     node.fetchCache.clear()
   }
 
-  function createChannel () {
+  function createChannel() {
     const channel = new MessageChannel()
     const port = channel.port2
     const workerPort = channel.port1
@@ -69,7 +69,7 @@ export function useCollectStories (options: UseCollectStoriesOptions, ctx: Conte
       fetchModule: FetchFunction
       resolveId: ResolveIdFunction
     }>({
-      fetchModule: (id) => node.fetchModule(id),
+      fetchModule: id => node.fetchModule(id),
       resolveId: (id, importer) => node.resolveId(id, importer),
     }, {
       post: data => port.postMessage(data),
@@ -92,7 +92,7 @@ export function useCollectStories (options: UseCollectStoriesOptions, ctx: Conte
     })
   }
 
-  async function executeStoryFile (storyFile: ServerStoryFile) {
+  async function executeStoryFile(storyFile: ServerStoryFile) {
     try {
       const { workerPort } = createChannel()
       const payload: Payload = {
@@ -109,7 +109,8 @@ export function useCollectStories (options: UseCollectStoriesOptions, ctx: Conte
       if (storyData.length === 0) {
         console.warn(pc.yellow(`⚠️  No story found for ${storyFile.path}`))
         return
-      } else if (storyData.length > 1) {
+      }
+      else if (storyData.length > 1) {
         console.warn(pc.yellow(`⚠️  Multiple stories not supported: ${storyFile.path}`))
       }
 
@@ -136,7 +137,8 @@ export function useCollectStories (options: UseCollectStoriesOptions, ctx: Conte
       }
       storyFile.treePath = createPath(ctx.config, storyFile.treeFile)
       storyFile.story.title = storyFile.treePath[storyFile.treePath.length - 1]
-    } catch (e) {
+    }
+    catch (e) {
       console.error(pc.red(`Error while collecting story ${storyFile.path}:\n${e.frame ? `${pc.bold(e.message)}\n${e.frame}` : e.stack}`))
       if (options.throws) {
         throw e
@@ -144,7 +146,7 @@ export function useCollectStories (options: UseCollectStoriesOptions, ctx: Conte
     }
   }
 
-  async function destroy () {
+  async function destroy() {
     await threadPool.destroy()
   }
 

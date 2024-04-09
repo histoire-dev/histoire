@@ -1,8 +1,8 @@
 import { mount } from '@vue/test-utils'
 import HstCheckbox from './HstCheckbox.vue'
 
-describe('HstCheckbox', () => {
-  test('toggle to checked', async () => {
+describe('hstCheckbox', () => {
+  it('toggle to checked', async () => {
     const wrapper = mount(HstCheckbox, {
       props: {
         modelValue: false,
@@ -14,7 +14,7 @@ describe('HstCheckbox', () => {
     expect(wrapper.html()).toMatchSnapshot()
   })
 
-  test('toggle to unchecked', async () => {
+  it('toggle to unchecked', async () => {
     const wrapper = mount(HstCheckbox, {
       props: {
         modelValue: true,

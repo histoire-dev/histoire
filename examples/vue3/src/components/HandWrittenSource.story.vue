@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-function initState () {
+function initState() {
   return {
     count: 0,
   }

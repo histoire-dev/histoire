@@ -1,11 +1,11 @@
 import type { Plugin } from 'histoire'
 import type { Story, Variant } from '@histoire/shared'
 
-export function HstVue (): Plugin {
+export function HstVue(): Plugin {
   return {
     name: '@histoire/plugin-vue2',
 
-    defaultConfig () {
+    defaultConfig() {
       return {
         supportMatch: [
           {
@@ -36,6 +36,6 @@ export interface Vue2StorySetupApi {
 
 export type Vue2StorySetupHandler = (api: Vue2StorySetupApi) => Promise<Vue2StorySetupReturn> | Vue2StorySetupReturn
 
-export function defineSetupVue2 (handler: Vue2StorySetupHandler): Vue2StorySetupHandler {
+export function defineSetupVue2(handler: Vue2StorySetupHandler): Vue2StorySetupHandler {
   return handler
 }

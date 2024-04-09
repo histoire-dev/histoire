@@ -14,7 +14,7 @@ const objectOptions = Object.keys(options).map(key => ({
   value: key,
 }))
 
-function initState () {
+function initState() {
   return {
     character: flatOptions[0],
   }

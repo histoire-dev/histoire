@@ -1,13 +1,13 @@
 <script lang="ts" setup>
-import EventButton from './EventButton.vue'
 import { logEvent } from 'histoire/client'
+import EventButton from './EventButton.vue'
 </script>
 
 <template>
   <Story
     title="events/EventButton"
   >
-    <EventButton @myEvent="logEvent('My event', $event)" /><br>
+    <EventButton @my-event="logEvent('My event', $event)" /><br>
     <button @click="logEvent('Click', $event)">
       Click
     </button>

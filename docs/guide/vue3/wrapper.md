@@ -26,9 +26,9 @@ const props = defineProps<{
   variant?: Variant
 }>()
 
-function hasWrapper () {
-  return props.story.meta?.wrapper !== false &&
-    props.variant?.meta?.wrapper !== false
+function hasWrapper() {
+  return props.story.meta?.wrapper !== false
+    && props.variant?.meta?.wrapper !== false
 }
 </script>
 

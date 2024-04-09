@@ -150,7 +150,6 @@ pnpm run test:dev
 
 - Make sure tests pass!
 
-
 - Commit messages must follow the [commit message convention](./.github/commit-convention.md) so that changelogs can be automatically generated.<!-- Commit messages are automatically validated before commit (by invoking [Git Hooks](https://git-scm.com/docs/githooks) via [yorkie](https://github.com/yyx990803/yorkie)). -->
 
 <!--

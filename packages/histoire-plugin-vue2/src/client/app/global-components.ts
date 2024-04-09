@@ -1,18 +1,10 @@
-/* eslint-disable vue/one-component-per-file */
-
-import Vue, {
-  defineComponent,
-  ref,
-  h,
-  onMounted,
-  onUpdated,
-  onBeforeUnmount,
-  computed,
-} from 'vue'
+import Vue, { computed, defineComponent, h, onBeforeUnmount, onMounted, onUpdated, ref } from 'vue'
+import type {
+  App as _App,
+} from '@histoire/vendors/vue'
 import {
   createApp as _createApp,
   h as _h,
-  App as _App,
   reactive as _reactive,
 } from '@histoire/vendors/vue'
 import { components } from '@histoire/controls'
@@ -20,12 +12,11 @@ import Story from './Story'
 import Variant from './Variant'
 import { syncStateBundledAndExternal } from './util.js'
 
-export function registerGlobalComponents (app) {
+export function registerGlobalComponents(_app) {
   Vue.config.productionTip = false
 
-  // eslint-disable-next-line vue/multi-word-component-names
   Vue.component('Story', Story)
-  // eslint-disable-next-line vue/multi-word-component-names
+
   Vue.component('Variant', Variant)
 
   for (const key in components) {
@@ -33,11 +24,11 @@ export function registerGlobalComponents (app) {
   }
 }
 
-function wrapControlComponent (controlComponent) {
+function wrapControlComponent(controlComponent) {
   return defineComponent({
     name: controlComponent.name,
     inheritAttrs: false,
-    setup (props, { attrs, listeners }) {
+    setup(props, { attrs, listeners }) {
       const el = ref<HTMLDivElement>()
       const slotEl = ref<HTMLDivElement>()
 
@@ -58,7 +49,7 @@ function wrapControlComponent (controlComponent) {
       let newSlotCalls = []
       const slotCalls = ref([])
 
-      function moveSlotContent () {
+      function moveSlotContent() {
         slotCalls.value.forEach((props, index) => {
           const renderedEl = slotEl.value.querySelector(`[renderslotid="${index}"]`)
           if (!renderedEl) return
@@ -76,15 +67,15 @@ function wrapControlComponent (controlComponent) {
 
       onMounted(() => {
         app = _createApp({
-          mounted () {
+          mounted() {
             slotCalls.value = newSlotCalls
             newSlotCalls = []
           },
-          updated () {
+          updated() {
             slotCalls.value = newSlotCalls
             newSlotCalls = []
           },
-          render () {
+          render() {
             const finalAttrs = {}
             if (state.attrs) {
               for (const key in state.attrs) {
@@ -106,7 +97,7 @@ function wrapControlComponent (controlComponent) {
               ...finalListeners,
               key: 'component',
             }, {
-              default: props => {
+              default: (props) => {
                 newSlotCalls.push(props)
                 return _h('div', {
                   slotId: newSlotCalls.length - 1,
@@ -132,7 +123,7 @@ function wrapControlComponent (controlComponent) {
         slotCalls,
       }
     },
-    render () {
+    render() {
       return h('div', [
         h('div', {
           ref: 'el',
@@ -143,7 +134,7 @@ function wrapControlComponent (controlComponent) {
           attrs: {
             renderSlotId: index,
           },
-        // eslint-disable-next-line vue/no-deprecated-dollar-scopedslots-api
+
         }, this.$scopedSlots.default(props)))),
       ])
     },

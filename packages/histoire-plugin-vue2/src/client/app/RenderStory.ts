@@ -1,26 +1,25 @@
-/* eslint-disable vue/one-component-per-file */
-
-import Vue, { onMounted, reactive, h } from 'vue'
+import Vue, { h, onMounted, reactive } from 'vue'
+import type {
+  PropType as _PropType,
+} from '@histoire/vendors/vue'
 import {
   defineComponent as _defineComponent,
+  h as _h,
   onBeforeUnmount as _onBeforeUnmount,
   onMounted as _onMounted,
-  PropType as _PropType,
   ref as _ref,
   watch as _watch,
-  h as _h,
 } from '@histoire/vendors/vue'
-import { applyState } from '@histoire/shared'
-import type { Story, Variant, PropDefinition, AutoPropComponentDefinition } from '@histoire/shared'
+import type { Story, Variant } from '@histoire/shared'
 // import { getTagName } from '../codegen'
-import { registerGlobalComponents } from './global-components.js'
-import { RouterLinkStub } from './RouterLinkStub'
 // @ts-expect-error virtual module id
 import * as setup from 'virtual:$histoire-setup'
 // @ts-expect-error virtual module id
 import * as generatedSetup from 'virtual:$histoire-generated-global-setup'
-import { syncStateBundledAndExternal } from './util.js'
 import type { Vue2StorySetupApi, Vue2StorySetupHandler } from '../../index.js'
+import { registerGlobalComponents } from './global-components.js'
+import { RouterLinkStub } from './RouterLinkStub'
+import { syncStateBundledAndExternal } from './util.js'
 
 export default _defineComponent({
   name: 'RenderStory',
@@ -46,7 +45,7 @@ export default _defineComponent({
     ready: () => true,
   },
 
-  setup (props, { emit }) {
+  setup(props, { emit }) {
     const sandbox = _ref<HTMLDivElement>()
     let app: Vue
     let mounting = false
@@ -55,20 +54,20 @@ export default _defineComponent({
 
     syncStateBundledAndExternal(props.variant.state, externalState)
 
-    function unmountVariant () {
+    function unmountVariant() {
       if (app) {
         app.$destroy()
         app = null
       }
     }
 
-    async function mountVariant () {
+    async function mountVariant() {
       if (mounting) return
       mounting = true
 
       unmountVariant()
 
-      let lastPropsTypesSnapshot: string
+      // let lastPropsTypesSnapshot: string
 
       const wrappers: any[] = []
 
@@ -111,7 +110,7 @@ export default _defineComponent({
       app = new Vue({
         name: 'RenderStorySubApp',
 
-        setup () {
+        setup() {
           onMounted(() => {
             mounting = false
           })
@@ -121,9 +120,11 @@ export default _defineComponent({
           const ensureFn = (fn: any) => {
             if (typeof fn === 'function') {
               return fn
-            } else if (fn != null) {
+            }
+            else if (fn != null) {
               return () => fn
-            } else {
+            }
+            else {
               return null
             }
           }
@@ -255,11 +256,12 @@ export default _defineComponent({
       }
     })
 
-    _watch(() => props.variant, async value => {
+    _watch(() => props.variant, async (value) => {
       if (value.configReady && !mounting) {
         if (!app) {
           await mountVariant()
-        } else {
+        }
+        else {
           app.$forceUpdate()
         }
       }
@@ -276,7 +278,7 @@ export default _defineComponent({
     }
   },
 
-  render () {
+  render() {
     return _h('div', {
       ref: 'sandbox',
     })

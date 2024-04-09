@@ -1,5 +1,5 @@
-import type { PluginCommand } from 'histoire'
 import fs from 'node:fs'
+import type { PluginCommand } from 'histoire'
 import path from 'pathe'
 import launchEditor from 'launch-editor'
 
@@ -8,7 +8,7 @@ export default {
   label: 'Generate Vue 3 story from component',
   icon: 'https://vuejs.org/logo.svg',
   searchText: 'generate create',
-  async serverAction (params) {
+  async serverAction(params) {
     const targetFile = path.join(path.dirname(params.component), params.fileName)
 
     if (fs.existsSync(targetFile)) {
@@ -37,12 +37,12 @@ import ${componentName} from './${component}'
   clientSetupFile: '@histoire/plugin-vue/dist/commands/generate-story.client.js',
 } as PluginCommand
 
-async function isComponentTs (component: string) {
+async function isComponentTs(component: string) {
   const componentContent = await fs.promises.readFile(component, 'utf-8')
   return componentContent.includes('lang="ts"')
 }
 
-async function getComponentInfo (file: string) {
+async function getComponentInfo(file: string) {
   const component = path.basename(file)
   const componentName = component.replace(path.extname(component), '')
   const isTs = await isComponentTs(file)

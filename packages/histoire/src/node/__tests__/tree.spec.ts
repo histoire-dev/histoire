@@ -1,4 +1,4 @@
-import { describe, test, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import type { ServerStoryFile } from '@histoire/shared'
 import { makeTree } from '../tree.js'
 import { getDefaultConfig } from '../config.js'
@@ -9,7 +9,7 @@ interface StoryFileFactoryOptions {
   treePath: string[]
 }
 
-function storyFileFactory (options: StoryFileFactoryOptions): ServerStoryFile {
+function storyFileFactory(options: StoryFileFactoryOptions): ServerStoryFile {
   return {
     id: `id_${id++}`,
     path: options.treePath.join('/'),
@@ -22,7 +22,7 @@ function storyFileFactory (options: StoryFileFactoryOptions): ServerStoryFile {
 }
 
 describe('makeTree', () => {
-  test('should create an ascending ordered tree', () => {
+  it('should create an ascending ordered tree', () => {
     const config = getDefaultConfig()
     const files = [
       { treePath: ['hi'] },
@@ -46,7 +46,7 @@ describe('makeTree', () => {
     ])
   })
 
-  test('should handle title conflict', () => {
+  it('should handle title conflict', () => {
     const config = getDefaultConfig()
     const files = [
       { treePath: ['hi'] },
@@ -63,7 +63,7 @@ describe('makeTree', () => {
     ])
   })
 
-  test('should handle file-folder conflict when folder in first', () => {
+  it('should handle file-folder conflict when folder in first', () => {
     const config = getDefaultConfig()
     const files = [
       { treePath: ['hi', 'dad'] },
@@ -85,7 +85,7 @@ describe('makeTree', () => {
     ])
   })
 
-  test('should handle file-folder conflict when file in first', () => {
+  it('should handle file-folder conflict when file in first', () => {
     const config = getDefaultConfig()
     const files = [
       { treePath: ['hi'] },

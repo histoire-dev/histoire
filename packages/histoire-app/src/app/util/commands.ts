@@ -1,7 +1,7 @@
 import type { ClientCommand, ClientCommandContext } from '@histoire/shared'
 import { router } from '../router.js'
-import { openInEditor } from './open-in-editor.js'
 import { useStoryStore } from '../stores/story.js'
+import { openInEditor } from './open-in-editor.js'
 
 export const builtinCommands: ClientCommand[] = [
   {
@@ -14,7 +14,8 @@ export const builtinCommands: ClientCommand[] = [
       let file: string
       if (story.docsOnly) {
         file = story.file?.docsFilePath ?? story.file?.filePath
-      } else {
+      }
+      else {
         file = story.file?.filePath
       }
       return {
@@ -35,7 +36,7 @@ export const builtinCommands: ClientCommand[] = [
   },
 ]
 
-export function executeCommand (command: ClientCommand, params: Record<string, any>) {
+export function executeCommand(command: ClientCommand, params: Record<string, any>) {
   if (import.meta.hot) {
     import.meta.hot.send('histoire:dev-command', {
       id: command.id,
@@ -46,7 +47,7 @@ export function executeCommand (command: ClientCommand, params: Record<string, a
   }
 }
 
-export function getCommandContext (): ClientCommandContext {
+export function getCommandContext(): ClientCommandContext {
   const storyStore = useStoryStore()
   return {
     route: router.currentRoute.value,

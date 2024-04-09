@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { Icon } from '@iconify/vue'
 import { computed } from 'vue'
-import AppLogo from './AppLogo.vue'
 import { isDark, toggleDark } from '../../util/dark'
 import { onKeyboardShortcut } from '../../util/keyboard'
 import { makeTooltip } from '../../util/tooltip'
 import { histoireConfig } from '../../util/config'
+import AppLogo from './AppLogo.vue'
 
 defineEmits({
   search: () => true,

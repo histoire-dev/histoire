@@ -1,11 +1,12 @@
 {
   "name": "@histoire/app",
+  "type": "module",
   "version": "0.17.16",
   "description": "Pre-bundled UI for Histoire",
-  "license": "MIT",
   "author": {
     "name": "Guillaume Chau"
   },
+  "license": "MIT",
   "repository": {
     "url": "https://github.com/Akryum/histoire.git",
     "type": "git",
@@ -14,7 +15,6 @@
   "publishConfig": {
     "access": "public"
   },
-  "type": "module",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -50,7 +50,7 @@
     "postcss": "^8.4.31",
     "postcss-import": "^14.1.0",
     "tailwindcss": "^3.3.5",
-    "typescript": "^4.9.5",
+    "typescript": "^5.4.4",
     "vite": "^5.0.11",
     "vue": "^3.3.8"
   }

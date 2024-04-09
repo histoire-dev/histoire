@@ -1,9 +1,9 @@
-import { createRouter, createWebHistory, createWebHashHistory } from 'vue-router'
+import { createRouter, createWebHashHistory, createWebHistory } from 'vue-router'
 import { histoireConfig } from './util/config'
 
 export const base = import.meta.env.BASE_URL as string
 
-function createRouterHistory () {
+function createRouterHistory() {
   switch (histoireConfig.routerMode) {
     case 'hash': return createWebHashHistory(base)
     case 'history':

@@ -1,18 +1,19 @@
-import { defineComponent, inject, onMounted, PropType, provide, useAttrs, h } from 'vue'
-import type { ServerStoryFile, ServerStory, ServerVariant } from '@histoire/shared'
+import type { PropType } from 'vue'
+import { defineComponent, h, inject, onMounted, provide } from 'vue'
+import type { ServerStory, ServerStoryFile, ServerVariant } from '@histoire/shared'
 
-const stub = { name: 'StubbedComponent', render: () => null }
+// const stub = { name: 'StubbedComponent', render: () => null }
 
-function autoStubComponents (vnodes: any[]) {
-  for (const vnode of vnodes) {
-    if (typeof vnode.type === 'object' && (vnode.type as any).name !== 'HistoireVariant') {
-      vnode.type = stub
-    }
-    if (Array.isArray(vnode.children)) {
-      autoStubComponents(vnode.children)
-    }
-  }
-}
+// function autoStubComponents (vnodes: any[]) {
+//   for (const vnode of vnodes) {
+//     if (typeof vnode.type === 'object' && (vnode.type as any).name !== 'HistoireVariant') {
+//       vnode.type = stub
+//     }
+//     if (Array.isArray(vnode.children)) {
+//       autoStubComponents(vnode.children)
+//     }
+//   }
+// }
 
 export default defineComponent({
   name: 'HistoireStory',
@@ -61,7 +62,7 @@ export default defineComponent({
     },
   },
 
-  setup (props) {
+  setup(props) {
     const file = inject('htsFile') as ServerStoryFile
 
     // Story
@@ -102,12 +103,11 @@ export default defineComponent({
     }
   },
 
-  render () {
+  render() {
     let suppressError = false
     try {
-      // eslint-disable-next-line vue/no-deprecated-dollar-scopedslots-api
       const vnodes = this.$scopedSlots.default?.({
-        get state () {
+        get state() {
           // No variant tags
           suppressError = true
           return {}
@@ -121,7 +121,8 @@ export default defineComponent({
       // }
 
       return h('div', vnodes)
-    } catch (e) {
+    }
+    catch (e) {
       if (!suppressError) {
         console.error(e)
       }

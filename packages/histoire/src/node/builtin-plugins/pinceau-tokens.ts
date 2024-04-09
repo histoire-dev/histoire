@@ -1,17 +1,16 @@
 import type { Plugin, PluginApiBase } from '@histoire/shared'
-import { getInjectedImport } from '../util/vendors.js'
-import { findUp } from '../util/find-up.js'
 import { join } from 'pathe'
+import { getInjectedImport } from '../util/vendors.js'
 
 export interface PinceauTokensOptions {
   configOrPaths?: string | string[]
   configFileName?: string
 }
 
-export function pinceauTokens (options: PinceauTokensOptions = {}): Plugin {
+export function pinceauTokens(_options: PinceauTokensOptions = {}): Plugin {
   const themePath = join(process.cwd(), 'node_modules/.vite/pinceau/index.js')
 
-  async function generate (api: PluginApiBase) {
+  async function generate(api: PluginApiBase) {
     try {
       await api.fs.ensureDir(api.pluginTempDir)
       await api.fs.emptyDir(api.pluginTempDir)
@@ -21,7 +20,8 @@ export function pinceauTokens (options: PinceauTokensOptions = {}): Plugin {
       const storyFile = api.path.resolve(api.pluginTempDir, 'Pinceau.story.js')
       await api.fs.writeFile(storyFile, storyTemplate(theme))
       api.addStoryFile(storyFile)
-    } catch (e) {
+    }
+    catch (e) {
       api.error(e.stack ?? e.message)
     }
   }
@@ -29,7 +29,7 @@ export function pinceauTokens (options: PinceauTokensOptions = {}): Plugin {
   return {
     name: 'builtin:pinceau-tokens',
 
-    config (config) {
+    config(config) {
       // Add 'design-system' group
       if (!config.tree) {
         config.tree = {}
@@ -52,7 +52,7 @@ export function pinceauTokens (options: PinceauTokensOptions = {}): Plugin {
       }
     },
 
-    onDev (api, onCleanup) {
+    onDev(api, onCleanup) {
       const watcher = api.watcher.watch(themePath)
         .on('change', () => generate(api))
         .on('add', () => generate(api))
@@ -62,13 +62,13 @@ export function pinceauTokens (options: PinceauTokensOptions = {}): Plugin {
       })
     },
 
-    async onBuild (api) {
+    async onBuild(api) {
       await generate(api)
     },
   }
 }
 
-const storyTemplate = (pinceauConfig: any) => {
+function storyTemplate(pinceauConfig: any) {
   pinceauConfig = pinceauConfig?.theme || pinceauConfig?.default?.theme || {}
 
   return `import 'histoire-style'

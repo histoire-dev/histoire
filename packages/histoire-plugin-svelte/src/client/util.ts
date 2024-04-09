@@ -1,7 +1,7 @@
 import { watch as _watch } from '@histoire/vendors/vue'
 import { applyState, clone } from '@histoire/shared'
 
-function cleanupState (state: Record<string, any>): Record<string, any> {
+function cleanupState(state: Record<string, any>): Record<string, any> {
   const result = {}
   for (const key in state) {
     if (key === 'Hst') continue
@@ -15,15 +15,16 @@ function cleanupState (state: Record<string, any>): Record<string, any> {
   return result
 }
 
-export function syncState (variantState, onChange: (state) => unknown) {
+export function syncState(variantState, onChange: (state) => unknown) {
   let syncing = false
 
-  const _stop = _watch(() => variantState, value => {
+  const _stop = _watch(() => variantState, (value) => {
     if (value == null) return
     if (!syncing) {
       syncing = true
       onChange(cleanupState(value))
-    } else {
+    }
+    else {
       syncing = false
     }
   }, {
@@ -31,19 +32,20 @@ export function syncState (variantState, onChange: (state) => unknown) {
     immediate: true,
   })
 
-  function apply (value) {
+  function apply(value) {
     if (value == null) return
     if (!syncing) {
       syncing = true
       applyState(variantState, clone(cleanupState(value)))
-    } else {
+    }
+    else {
       syncing = false
     }
   }
 
   return {
     apply,
-    stop () {
+    stop() {
       _stop()
     },
   }

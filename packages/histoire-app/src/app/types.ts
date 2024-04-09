@@ -7,12 +7,12 @@ export type {
   Variant,
 } from '@histoire/shared'
 
-export type TreeLeaf = {
+export interface TreeLeaf {
   title: string
   index: number
 }
 
-export type TreeFolder = {
+export interface TreeFolder {
   title: string
   children: (TreeFolder | TreeLeaf)[]
 }

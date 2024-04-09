@@ -2,12 +2,12 @@ import { performance } from 'node:perf_hooks'
 import { createServer as createViteServer } from 'vite'
 import pc from 'picocolors'
 import type { ServerStoryFile } from '@histoire/shared'
-import { Context } from './context.js'
+import type { Context } from './context.js'
 import { getViteConfigWithPlugins } from './vite.js'
 import * as VirtualFiles from './virtual/index.js'
 import { onStoryChange, onStoryListChange, watchStories } from './stories.js'
 import { useCollectStories } from './collect/index.js'
-import { DevPluginApi, DevEventPluginApi } from './plugin.js'
+import { DevEventPluginApi, DevPluginApi } from './plugin.js'
 import { useModuleLoader } from './load.js'
 import { wrapLogError } from './util/log.js'
 import { createMarkdownFilesWatcher, onMarkdownListChange } from './markdown.js'
@@ -17,7 +17,7 @@ export interface CreateServerOptions {
   open?: boolean
 }
 
-export async function createServer (ctx: Context, options: CreateServerOptions = {}) {
+export async function createServer(ctx: Context, options: CreateServerOptions = {}) {
   const getViteServer = async (collecting: boolean) => {
     const { viteConfig, viteConfigFile } = await getViteConfigWithPlugins(collecting, ctx)
 
@@ -106,7 +106,7 @@ export async function createServer (ctx: Context, options: CreateServerOptions =
           type: 'js-update',
           acceptedPath: mod.url,
           path: mod.url,
-          timestamp: timestamp,
+          timestamp,
         },
       ],
     })
@@ -121,7 +121,8 @@ export async function createServer (ctx: Context, options: CreateServerOptions =
       if (!queuedFiles.includes(changedFile)) {
         queuedFiles.push(changedFile)
       }
-    } else {
+    }
+    else {
       queuedFiles = []
     }
 
@@ -131,14 +132,15 @@ export async function createServer (ctx: Context, options: CreateServerOptions =
         clearTimeout(queueTimer)
         // Debounce
         queueTimer = setTimeout(collect, 100)
-      } else if (!changedFile && !currentFiles.length) {
+      }
+      else if (!changedFile && !currentFiles.length) {
         // Full collect in progress
         queued = false
       }
     }
   })
 
-  async function collect () {
+  async function collect() {
     collecting = true
 
     clearCache()
@@ -150,13 +152,14 @@ export async function createServer (ctx: Context, options: CreateServerOptions =
     console.log('Collect stories start', currentFiles.length ? currentFiles.map(f => f.fileName).join(', ') : 'all')
     const time = performance.now()
     if (currentFiles.length) {
-      await Promise.all(currentFiles.map(async storyFile => {
+      await Promise.all(currentFiles.map(async (storyFile) => {
         await executeStoryFile(storyFile)
         if (storyFile.story) {
           await invalidateModule(`/__resolved__virtual:story-source:${storyFile.story.id}`)
         }
       }))
-    } else {
+    }
+    else {
       // Full update
 
       // Progress tracking
@@ -171,7 +174,7 @@ export async function createServer (ctx: Context, options: CreateServerOptions =
 
       sendProgress()
 
-      await Promise.all(ctx.storyFiles.map(async storyFile => {
+      await Promise.all(ctx.storyFiles.map(async (storyFile) => {
         await executeStoryFile(storyFile)
         loadedFilesCount++
         sendProgress()
@@ -201,7 +204,7 @@ export async function createServer (ctx: Context, options: CreateServerOptions =
     invalidateModule(VirtualFiles.RESOLVED_MARKDOWN_FILES)
   })
 
-  async function close () {
+  async function close() {
     for (const cb of pluginOnCleanups) {
       await wrapLogError('plugin.onDev.onCleanup', () => cb())
     }

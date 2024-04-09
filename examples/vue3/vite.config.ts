@@ -1,8 +1,8 @@
 /// <reference types="histoire" />
 
+import path from 'node:path'
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
-import path from 'path'
 
 export default defineConfig({
   // Example build config for a component library
@@ -10,7 +10,7 @@ export default defineConfig({
     lib: {
       entry: path.resolve(__dirname, './src/main.ts'),
       name: 'histoire-kit',
-      fileName: (format) => `histoire-kit.${format}.js`,
+      fileName: format => `histoire-kit.${format}.js`,
     },
 
     rollupOptions: {
@@ -44,7 +44,7 @@ export default defineConfig({
     plugins: [
       {
         name: 'test',
-        config () {
+        config() {
           return {
             theme: {
               logoHref: 'http://histoire.dev',

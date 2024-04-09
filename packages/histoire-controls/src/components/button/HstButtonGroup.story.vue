@@ -15,7 +15,7 @@ const objectOptions = Object.keys(options).map(key => ({
   value: key,
 }))
 
-function initState () {
+function initState() {
   return {
     speed: flatOptions[0],
   }
@@ -72,7 +72,7 @@ const count = ref('0')
       <pre>{{ { count } }}</pre>
       <HstButtonGroup
         v-model="count"
-        :options="[{label: 'Low', value: '-25'},{label: 'Regular', value: '0'},{label: 'High', value: '200'}]"
+        :options="[{ label: 'Low', value: '-25' }, { label: 'Regular', value: '0' }, { label: 'High', value: '200' }]"
       />
     </Variant>
   </Story>

@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import HstColorShades from './HstColorShades.vue'
 import type { CSSProperties } from 'vue'
+import HstColorShades from './HstColorShades.vue'
 
 const colors = {
   slate: {
@@ -329,7 +329,7 @@ const colors = {
           <div
             class="htw-rounded htw-h-[100px] htw-text-5xl htw-flex htw-items-end"
             :style="{
-              color: color,
+              color,
             } as CSSProperties"
           >
             Aa

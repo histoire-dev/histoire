@@ -108,7 +108,7 @@ export interface HistoireConfig {
     colors?: {
       [key in CustomizableColors]?: key extends 'gray' ? {
         [key in GrayColorKeys]?: string
-      } :{
+      } : {
         [key in ColorKeys]?: string
       }
     }

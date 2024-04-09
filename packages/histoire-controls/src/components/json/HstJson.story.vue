@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import HstJson from './HstJson.vue'
 
-function initState () {
+function initState() {
   return {
     film: {
       year: 2017,

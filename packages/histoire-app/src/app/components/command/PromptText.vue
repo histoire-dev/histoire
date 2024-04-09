@@ -14,12 +14,12 @@ const emit = defineEmits<{
 
 const model = computed({
   get: () => props.modelValue,
-  set: (value) => emit('update:modelValue', value),
+  set: value => emit('update:modelValue', value),
 })
 
 const input = ref<HTMLInputElement>()
 
-function focus () {
+function focus() {
   input.value?.focus()
   input.value?.select()
 }
@@ -33,7 +33,8 @@ defineExpose({
 const defaultValue = computed(() => {
   if (typeof props.prompt.defaultValue === 'function') {
     return props.prompt.defaultValue(props.answers)
-  } else {
+  }
+  else {
     return props.prompt.defaultValue
   }
 })

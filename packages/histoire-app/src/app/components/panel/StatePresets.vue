@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import { ref, computed, nextTick, onMounted } from 'vue'
+import { computed, nextTick, onMounted, ref } from 'vue'
 import { Icon } from '@iconify/vue'
-import { useStorage, onClickOutside, useTimeoutFn } from '@vueuse/core'
+import { onClickOutside, useStorage, useTimeoutFn } from '@vueuse/core'
 import { applyState, clone, omit } from '@histoire/shared'
 import BaseSelect from '../base/BaseSelect.vue'
 import { toRawDeep } from '../../util/state'
@@ -38,15 +38,16 @@ const presetsOptions = computed(() => {
   return options
 })
 
-function resetState () {
+function resetState() {
   selectedOption.value = DEFAULT_ID
   applyState(props.variant.state, clone(defaultState))
 }
 
-function applyPreset (id) {
+function applyPreset(id) {
   if (id === DEFAULT_ID) {
     resetState()
-  } else if (presetStates.value.has(id)) {
+  }
+  else if (presetStates.value.has(id)) {
     applyState(props.variant.state, clone(toRawDeep(presetStates.value.get(id).state)))
   }
 }
@@ -62,7 +63,7 @@ const select = ref<HTMLInputElement>()
 const canEdit = computed(() => selectedOption.value !== DEFAULT_ID)
 const isEditing = ref(false)
 
-async function createPreset () {
+async function createPreset() {
   const id = (new Date()).getTime().toString()
 
   presetStates.value.set(id, { state: clone(omit(toRawDeep(props.variant.state), omitKeys)), label: 'New preset' })
@@ -77,7 +78,7 @@ const savedTimeout = useTimeoutFn(() => {
   savedNotif.value = false
 }, 1000)
 
-async function savePreset () {
+async function savePreset() {
   if (!canEdit.value) return
 
   const preset = presetStates.value.get(selectedOption.value)
@@ -86,7 +87,9 @@ async function savePreset () {
   savedTimeout.start()
 }
 
-function deletePreset (id) {
+function deletePreset(id) {
+  // @TODO custom confirm modal UI
+  // eslint-disable-next-line no-alert
   if (!confirm('Are you sure you want to delete this preset?')) {
     return
   }
@@ -97,7 +100,7 @@ function deletePreset (id) {
   presetStates.value.delete(id)
 }
 
-async function startEditing () {
+async function startEditing() {
   if (!canEdit.value) {
     return
   }
@@ -107,7 +110,7 @@ async function startEditing () {
   input.value.select()
 }
 
-function stopEditing () {
+function stopEditing() {
   isEditing.value = false
 }
 

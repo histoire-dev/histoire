@@ -1,9 +1,9 @@
+import { fileURLToPath } from 'node:url'
+import { createRequire } from 'node:module'
 import type { Plugin } from 'histoire'
 import { defu } from 'defu'
 import path from 'pathe'
-import { fileURLToPath } from 'node:url'
-import { createRequire } from 'node:module'
-import { isPercyEnabled, fetchPercyDOM, postSnapshot } from '@percy/sdk-utils'
+import { fetchPercyDOM, isPercyEnabled, postSnapshot } from '@percy/sdk-utils'
 import type { JSONObject, Page, WaitForOptions } from 'puppeteer'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
@@ -32,15 +32,15 @@ export interface PercySnapshotOptions {
   }>
 }
 
-export type PagePayload = {
+export interface PagePayload {
   file: string
   story: { title: string }
   variant: { id: string, title: string }
-};
+}
 
 type ContructorOption<T extends object | number> =
   | T
-  | ((payload: PagePayload) => T);
+  | ((payload: PagePayload) => T)
 
 export interface PercyPluginOptions {
   /**
@@ -61,9 +61,9 @@ export interface PercyPluginOptions {
    * Navigation Parameter
    */
   pptrOptions?: ContructorOption<
-  WaitForOptions & {
-    referer?: string
-  }
+    WaitForOptions & {
+      referer?: string
+    }
   >
 
   /**
@@ -85,14 +85,14 @@ const defaultOptions: PercyPluginOptions = {
   pptrOptions: {},
 }
 
-function resolveOptions<T extends object | number> (
+function resolveOptions<T extends object | number>(
   option: ContructorOption<T>,
   payload: PagePayload,
 ): T {
   return typeof option === 'function' ? option(payload) : option
 }
 
-export function HstPercy (options: PercyPluginOptions = {}): Plugin {
+export function HstPercy(options: PercyPluginOptions = {}): Plugin {
   const finalOptions: PercyPluginOptions = defu(options, defaultOptions)
   return {
     name: '@histoire/plugin-percy',
@@ -134,7 +134,7 @@ export function HstPercy (options: PercyPluginOptions = {}): Plugin {
         const page = await browser.newPage()
         await page.goto(url, pptrOptions)
 
-        await new Promise((resolve) => setTimeout(resolve, pptrWait))
+        await new Promise(resolve => setTimeout(resolve, pptrWait))
 
         if (finalOptions.beforeSnapshot) {
           const result = await finalOptions.beforeSnapshot(page, payload)

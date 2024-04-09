@@ -9,30 +9,32 @@ export const useFolderStore = defineStore('folder', () => {
     new Map(),
   )
 
-  function getStringPath (path: Array<string>) {
+  function getStringPath(path: Array<string>) {
     return path.join('␜')
   }
 
-  function toggleFolder (path: Array<string>, defaultToggleValue = true) {
+  function toggleFolder(path: Array<string>, defaultToggleValue = true) {
     const stringPath = getStringPath(path)
 
     const currentValue = openedFolders.value.get(stringPath)
 
     if (currentValue == null) {
       setFolderOpen(stringPath, defaultToggleValue)
-    } else if (currentValue) {
+    }
+    else if (currentValue) {
       setFolderOpen(stringPath, false)
-    } else {
+    }
+    else {
       setFolderOpen(stringPath, true)
     }
   }
 
-  function setFolderOpen (path: Array<string> | string, value: boolean) {
+  function setFolderOpen(path: Array<string> | string, value: boolean) {
     const stringPath = typeof path === 'string' ? path : getStringPath(path)
     openedFolders.value.set(stringPath, value)
   }
 
-  function isFolderOpened (path: Array<string>, defaultValue = false) {
+  function isFolderOpened(path: Array<string>, defaultValue = false) {
     const value = openedFolders.value.get(getStringPath(path))
     if (value == null) {
       return defaultValue
@@ -40,7 +42,7 @@ export const useFolderStore = defineStore('folder', () => {
     return value
   }
 
-  function openFileFolders (path: Array<string>) {
+  function openFileFolders(path: Array<string>) {
     for (let pathLength = 1; pathLength < path.length; pathLength++) {
       setFolderOpen(path.slice(0, pathLength), true)
     }

@@ -1,22 +1,14 @@
-<script lang="ts">
-import { defineComponent } from 'vue'
-
-export default defineComponent({
-  directives: {
-    tooltip: {
-      bind: (el, { value }) => {
-        el.setAttribute('title', value)
-      },
-    },
-  },
-})
-</script>
-
 <script lang="ts" setup>
 import ModalWithSlots from './ModalWithSlots.vue'
 import SlotWithProps from './SlotWithProps.vue'
 
-function initState () {
+const vTooltip = {
+  bind: (el, { value }) => {
+    el.setAttribute('title', value)
+  },
+}
+
+function initState() {
   return {
     count: 0,
     text: 'Foo',
@@ -24,7 +16,7 @@ function initState () {
   }
 }
 
-function onClick (event) {
+function onClick(event, _arg = '') {
   console.log(event)
 }
 </script>
@@ -56,9 +48,8 @@ function onClick (event) {
           A button
         </button>
         <button
-          class="btn btn-primary"
+          class="btn btn-primary btn-danger"
           :class="[
-            { 'btn-danger': true },
             { 'btn-success': false },
           ]"
           style="color: red; font-weight: bold;"

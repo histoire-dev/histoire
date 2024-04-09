@@ -5,9 +5,10 @@ export default {
 </script>
 
 <script lang="ts" setup>
-import { computed, ComputedRef, ref } from 'vue'
+import type { ComputedRef } from 'vue'
+import { computed, ref } from 'vue'
 import HstWrapper from '../HstWrapper.vue'
-import { HstControlOption } from '../../types'
+import type { HstControlOption } from '../../types'
 
 const props = defineProps<{
   title?: string
@@ -20,7 +21,8 @@ const formattedOptions: ComputedRef<Record<string, string>> = computed(() => {
     return Object.fromEntries(props.options.map((value: string | HstControlOption) => {
       if (typeof value === 'string') {
         return [value, value]
-      } else {
+      }
+      else {
         return [value.value, value.label]
       }
     }))
@@ -32,7 +34,7 @@ const emit = defineEmits<{
   (e: 'update:modelValue', value: string): void
 }>()
 
-function selectOption (value: string) {
+function selectOption(value: string) {
   emit('update:modelValue', value)
   animationEnabled.value = true
 }
@@ -51,7 +53,7 @@ const animationEnabled = ref(false)
   >
     <div class="-htw-my-1">
       <template
-        v-for="( label, value ) in formattedOptions"
+        v-for="(label, value) in formattedOptions"
         :key="value"
       >
         <input

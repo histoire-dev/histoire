@@ -1,5 +1,6 @@
 <script lang="ts" setup>
-import { computed, PropType, ref, toRefs } from 'vue'
+import type { PropType } from 'vue'
+import { computed, ref, toRefs } from 'vue'
 import { Icon } from '@iconify/vue'
 import { useRouter } from 'vue-router'
 import { useResizeObserver } from '@vueuse/core'
@@ -12,9 +13,9 @@ import { getContrastColor } from '../../util/preview-settings'
 import { histoireConfig } from '../../util/config'
 import { isDark } from '../../util/dark'
 import { getSourceCode } from '../../util/docs'
-import GenericRenderStory from './GenericRenderStory.vue'
 import ToolbarNewTab from '../toolbar/ToolbarNewTab.vue'
 import CheckerboardPattern from '../misc/CheckerboardPattern.vue'
+import GenericRenderStory from './GenericRenderStory.vue'
 
 const props = defineProps({
   variant: {
@@ -29,8 +30,7 @@ const props = defineProps({
 })
 
 const emit = defineEmits({
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  resize: (width: number, height: number) => true,
+  resize: (_width: number, _height: number) => true,
 })
 
 const { variant } = toRefs(props)
@@ -39,7 +39,7 @@ const { isActive, targetRoute } = useCurrentVariantRoute(variant)
 Object.assign(props.variant, {
   previewReady: false,
 })
-function onReady () {
+function onReady() {
   Object.assign(props.variant, {
     previewReady: true,
   })
@@ -47,7 +47,7 @@ function onReady () {
 
 const router = useRouter()
 
-function selectVariant () {
+function selectVariant() {
   router.push(targetRoute.value)
 }
 
@@ -134,7 +134,7 @@ const autoApplyContrastColor = computed(() => !!histoireConfig.autoApplyContrast
         class="htw-relative htw-h-full"
         :style="{
           '--histoire-contrast-color': contrastColor,
-          color: autoApplyContrastColor ? contrastColor : undefined,
+          'color': autoApplyContrastColor ? contrastColor : undefined,
         }"
       >
         <GenericRenderStory

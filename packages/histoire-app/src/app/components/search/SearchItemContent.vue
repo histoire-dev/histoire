@@ -27,15 +27,15 @@ const kindLabels = {
     :class="[
       !selected ? [
         result.iconColor
-          ?'bind-icon-color'
+          ? 'bind-icon-color'
           : {
             'htw-text-primary-500': result.kind === 'story',
             'htw-text-gray-500': result.kind === 'variant',
-          }
+          },
       ] : [],
       {
         'colorize-black': selected,
-      }
+      },
     ]"
   />
   <div class="htw-flex-1">

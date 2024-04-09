@@ -1,22 +1,24 @@
 import { createRequire } from 'node:module'
-import { relative, join, dirname } from 'pathe'
-import {
-  Plugin as VitePlugin,
-  UserConfig as ViteConfig,
+import { dirname, join, relative } from 'pathe'
+import type {
   InlineConfig,
-  mergeConfig as mergeViteConfig,
+  UserConfig as ViteConfig,
+  Plugin as VitePlugin,
+} from 'vite'
+import {
   loadConfigFromFile as loadViteConfigFromFile,
+  mergeConfig as mergeViteConfig,
 } from 'vite'
 import { lookup as lookupMime } from 'mrmime'
 import { APP_PATH, TEMP_PATH } from './alias.js'
-import { Context } from './context.js'
+import type { Context } from './context.js'
 import { notifyStoryChange } from './stories.js'
 import { createMarkdownPlugins } from './markdown.js'
 import { createVirtualFilesPlugin } from './virtual/vite-plugin.js'
 
 const require = createRequire(import.meta.url)
 
-export async function mergeHistoireViteConfig (viteConfig: InlineConfig, ctx: Context) {
+export async function mergeHistoireViteConfig(viteConfig: InlineConfig, ctx: Context) {
   if (ctx.config.vite) {
     const command = ctx.mode === 'dev' ? 'serve' : 'build'
     const overrides = typeof ctx.config.vite === 'function'
@@ -36,7 +38,8 @@ export async function mergeHistoireViteConfig (viteConfig: InlineConfig, ctx: Co
       const resolvedPluginOption = await pluginOption
       if (Array.isArray(resolvedPluginOption)) {
         flatPlugins.push(...await Promise.all(resolvedPluginOption))
-      } else {
+      }
+      else {
         flatPlugins.push(resolvedPluginOption)
       }
     }
@@ -57,20 +60,21 @@ export interface ViteConfigWithPlugins {
   viteConfigFile: string | null
 }
 
-export async function getViteConfigWithPlugins (isServer: boolean, ctx: Context): Promise<ViteConfigWithPlugins> {
+export async function getViteConfigWithPlugins(isServer: boolean, ctx: Context): Promise<ViteConfigWithPlugins> {
   const userViteConfigFile = await loadViteConfigFromFile({ command: ctx.mode === 'dev' ? 'serve' : 'build', mode: ctx.mode })
   const userViteConfig = mergeViteConfig(userViteConfigFile?.config ?? {}, { server: { port: 6006 } })
 
   const inlineConfig = await mergeHistoireViteConfig(userViteConfig, ctx)
   const plugins: VitePlugin[] = []
 
-  function optimizeDeps (deps: string[]): string[] {
+  function optimizeDeps(deps: string[]): string[] {
     const result = []
     for (const dep of deps) {
       result.push(dep)
       try {
         result.push(dirname(require.resolve(`${dep}/package.json`)))
-      } catch (e) {
+      }
+      catch (e) {
         // Noop
       }
     }
@@ -80,7 +84,7 @@ export async function getViteConfigWithPlugins (isServer: boolean, ctx: Context)
   plugins.push({
     name: 'histoire-vite-plugin',
 
-    config (_, { command }) {
+    config(_, { command }) {
       return {
         resolve: {
           dedupe: [
@@ -93,8 +97,8 @@ export async function getViteConfigWithPlugins (isServer: boolean, ctx: Context)
           ...(isServer
             ? {
               // Force resolving deps like Node.JS resolution algorithm (in case some modules are not loaded with ssr: true e.g. .vue files)
-              conditions: ['node'],
-            }
+                conditions: ['node'],
+              }
             : {}),
         },
         optimizeDeps: {
@@ -123,8 +127,8 @@ export async function getViteConfigWithPlugins (isServer: boolean, ctx: Context)
               process.cwd(),
               ...process.env.HISTOIRE_DEV
                 ? [
-                  '../../packages/histoire-vendors',
-                ]
+                    '../../packages/histoire-vendors',
+                  ]
                 : [],
             ],
           },
@@ -135,36 +139,35 @@ export async function getViteConfigWithPlugins (isServer: boolean, ctx: Context)
         },
         define: {
           // We need to force this to be able to use `devtoolsRawSetupState`
-          __VUE_PROD_DEVTOOLS__: 'true',
+          '__VUE_PROD_DEVTOOLS__': 'true',
           // Disable warnings
           'process.env.NODE_ENV': JSON.stringify(isServer ? 'production' : process.env.NODE_ENV ?? 'development'),
           ...!isServer
             ? {
               // Collect flag
-              'process.env.HST_COLLECT': 'false',
-            }
+                'process.env.HST_COLLECT': 'false',
+              }
             : {},
-          __HST_COLLECT__: isServer,
+          '__HST_COLLECT__': isServer,
         },
         cacheDir: isServer ? 'node_modules/.hst-vite-server' : 'node_modules/.hst-vite',
       }
     },
 
-    options () {
-      // @ts-ignore
+    options() {
       this.meta.histoire = {
         isCollecting: isServer,
       }
     },
 
-    handleHotUpdate (updateContext) {
+    handleHotUpdate(updateContext) {
       const story = ctx.storyFiles.find(file => file.path === updateContext.file)
       if (story) {
         notifyStoryChange(story)
       }
     },
 
-    configureServer (server) {
+    configureServer(server) {
       let firstMount = true
       server.ws.on('histoire:mount', () => {
         if (!firstMount) {
@@ -249,18 +252,18 @@ export async function getViteConfigWithPlugins (isServer: boolean, ctx: Context)
   // Replace dev flag
   const flags = {
     '_ctx.__HISTOIRE_DEV__': JSON.stringify(ctx.mode === 'dev'),
-    __HISTOIRE_DEV__: JSON.stringify(ctx.mode === 'dev'),
+    '__HISTOIRE_DEV__': JSON.stringify(ctx.mode === 'dev'),
   }
   plugins.push({
     name: 'histoire:flags',
     enforce: 'pre',
-    transform (code, id) {
+    transform(code, id) {
       if (id.match(/\.(vue|js)($|\?)/)) {
         const original = code
         for (const flag in flags) {
           code = code.replace(new RegExp(flag, 'g'), flags[flag])
         }
-        if (original !== code) { return code }
+        if (original !== code) return code
       }
     },
   })
@@ -269,7 +272,7 @@ export async function getViteConfigWithPlugins (isServer: boolean, ctx: Context)
     // Dev commands
     plugins.push({
       name: 'histoire:dev-commands',
-      configureServer (server) {
+      configureServer(server) {
         server.ws.on('histoire:dev-command', ({ id, params }) => {
           const command = ctx.registeredCommands.find(c => c.id === id)
           if (command?.serverAction) {
@@ -291,7 +294,7 @@ export async function getViteConfigWithPlugins (isServer: boolean, ctx: Context)
       name: 'histoire-file-name-plugin',
       enforce: 'post',
 
-      transform (code, id) {
+      transform(code, id) {
         if (exclude.some(r => r.test(id))) return
         if (include.some(r => r.test(id))) {
           const file = relative(ctx.resolvedViteConfig.root, id)
@@ -306,7 +309,7 @@ export async function getViteConfigWithPlugins (isServer: boolean, ctx: Context)
   if (process.env.HISTOIRE_DEV && !isServer) {
     plugins.push({
       name: 'histoire-dev-plugin',
-      config () {
+      config() {
         // Examples context
         return {
           resolve: {

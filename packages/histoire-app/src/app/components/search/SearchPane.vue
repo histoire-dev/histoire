@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { useFocus, useDebounce } from '@vueuse/core'
+import { useDebounce, useFocus } from '@vueuse/core'
 import { computed, ref, watch } from 'vue'
 import { Icon } from '@iconify/vue'
 import * as flexsearch from 'flexsearch'
@@ -10,12 +10,12 @@ import { registeredCommands } from 'virtual:$histoire-commands'
 import { useStoryStore } from '../../stores/story'
 import BaseEmpty from '../base/BaseEmpty.vue'
 import type { SearchResult, SearchResultType, Story, Variant } from '../../types'
-import SearchItem from './SearchItem.vue'
-import { searchData, onUpdate } from './search-title-data'
-import type { SearchData } from './types'
 import { builtinCommands, getCommandContext } from '../../util/commands.js'
 import { useCommandStore } from '../../stores/command.js'
 import { useSelection } from '../../util/select.js'
+import SearchItem from './SearchItem.vue'
+import { onUpdate, searchData } from './search-title-data'
+import type { SearchData } from './types'
 
 const DocSearchData = () => import('./search-docs-data')
 
@@ -30,7 +30,7 @@ const emit = defineEmits({
   close: () => true,
 })
 
-function close () {
+function close() {
   emit('close')
 }
 
@@ -41,7 +41,7 @@ const { focused } = useFocus(input, {
   initialValue: true,
 })
 
-watch(() => props.shown, value => {
+watch(() => props.shown, (value) => {
   if (value) {
     requestAnimationFrame(() => {
       focused.value = true
@@ -60,7 +60,7 @@ const storyStore = useStoryStore()
 let titleSearchIndex: flexsearch.Document<any, any>
 let titleIdMap: SearchData['idMap']
 
-function createIndex () {
+function createIndex() {
   return new flexsearch.Document({
     preset: 'match',
     document: {
@@ -76,7 +76,7 @@ function createIndex () {
   })
 }
 
-async function loadSearchIndex (data: SearchData) {
+async function loadSearchIndex(data: SearchData) {
   titleSearchIndex = createIndex()
 
   for (const key of Object.keys(data.index)) {
@@ -88,15 +88,15 @@ async function loadSearchIndex (data: SearchData) {
 
 loadSearchIndex(searchData)
 // Handle HMR
-onUpdate(searchData => {
+onUpdate((searchData) => {
   loadSearchIndex(searchData)
 })
 
 let docSearchIndex: flexsearch.Document<any, any>
 let docIdMap: SearchData['idMap']
 
-async function loadDocSearchIndex () {
-  async function load (data: SearchData) {
+async function loadDocSearchIndex() {
+  async function load(data: SearchData) {
     docSearchIndex = createIndex()
 
     for (const key of Object.keys(data.index)) {
@@ -114,7 +114,7 @@ async function loadDocSearchIndex () {
 
   load(searchDataModule.searchData)
   // Handle HMR
-  searchDataModule.onUpdate(searchData => {
+  searchDataModule.onUpdate((searchData) => {
     load(searchData)
   })
 }
@@ -125,7 +125,7 @@ loadDocSearchIndex()
 
 const titleResults = ref<SearchResult[]>([])
 
-watch(rateLimitedSearch, async value => {
+watch(rateLimitedSearch, async (value) => {
   const list: SearchResult[] = []
   const raw = await titleSearchIndex.search(value)
   let rank = 0
@@ -155,7 +155,7 @@ watch(rateLimitedSearch, async value => {
 
 const docsResults = ref<SearchResult[]>([])
 
-async function searchOnDocField (query: string) {
+async function searchOnDocField(query: string) {
   if (docSearchIndex) {
     const list: SearchResult[] = []
     const raw = await docSearchIndex.search(query)
@@ -179,7 +179,7 @@ async function searchOnDocField (query: string) {
 
 watch(rateLimitedSearch, searchOnDocField)
 
-function storyResultFactory (story: Story, rank: number, type: SearchResultType = 'title'): SearchResult {
+function storyResultFactory(story: Story, rank: number, type: SearchResultType = 'title'): SearchResult {
   return {
     kind: 'story',
     rank,
@@ -202,7 +202,7 @@ function storyResultFactory (story: Story, rank: number, type: SearchResultType 
   }
 }
 
-function variantResultFactory (story: Story, variant: Variant, rank: number, type: SearchResultType = 'title'): SearchResult {
+function variantResultFactory(story: Story, variant: Variant, rank: number, type: SearchResultType = 'title'): SearchResult {
   return {
     kind: 'variant',
     rank,
@@ -240,14 +240,14 @@ const commandResults = computed(() => {
     return allCommands
       .filter(command => !command.showIf || command.showIf(commandCtx))
       .filter(command => command.label.toLowerCase().includes(searchText) || command.searchText?.toLowerCase().includes(searchText))
-      .map((command) => commandResultFactory(command, 0))
+      .map(command => commandResultFactory(command, 0))
   }
   return []
 })
 
 const commandStore = useCommandStore()
 
-function commandResultFactory (command: ClientCommand, rank: number): SearchResult {
+function commandResultFactory(command: ClientCommand, rank: number): SearchResult {
   return {
     kind: 'command',
     rank,

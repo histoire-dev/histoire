@@ -124,7 +124,7 @@ Your components may be using globally defined CSS (like CSS frameworks) or JS (l
 ```ts
 // histoire.config.ts
 
-export default defineConfig({ 
+export default defineConfig({
   setupFile: '/src/histoire.setup.ts'
 })
 ```
@@ -169,7 +169,7 @@ Histoire can be white-labeled to match your brand guidelines. Here are the avail
 ```ts
 // histoire.config.ts
 
-export default defineConfig({ 
+export default defineConfig({
   theme: {
     title: 'Acme Inc.',
     logo: {
@@ -185,7 +185,6 @@ export default defineConfig({
 
 ### Colors
 
-
 To better match your colors guidelines, you can customize every colors used in the app. Note that Histoire uses Tailwind for its UI, so the colors pattern must match the Tailwind pattern.
 
 #### Builtin colors
@@ -197,7 +196,7 @@ Histoire provides some builtin patterns to easily change the color of the app.
 
 import { defaultColors } from 'histoire'
 
-export default defineConfig({ 
+export default defineConfig({
   theme: {
     colors: {
       gray: defaultColors.zinc,
@@ -238,7 +237,7 @@ You can also define your own colors.
 ```ts
 // histoire.config.ts
 
-export default defineConfig({ 
+export default defineConfig({
   theme: {
     colors: {
       gray: {
@@ -272,4 +271,3 @@ export default defineConfig({
   }
 })
 ```
-

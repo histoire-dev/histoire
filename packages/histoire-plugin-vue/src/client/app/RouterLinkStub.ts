@@ -1,6 +1,6 @@
 // From: https://github.com/vuejs/test-utils/blob/main/src/components/RouterLinkStub.ts
 
-import { defineComponent, h, computed } from 'vue'
+import { computed, defineComponent, h } from 'vue'
 
 // match return type of router.resolve: RouteLocation & { href: string }
 const defaultRoute = {
@@ -33,7 +33,7 @@ export const RouterLinkStub = defineComponent({
     },
   },
 
-  render () {
+  render() {
     const route = computed(() => defaultRoute)
     // mock reasonable return values to mimic vue-router's useLink
     const children = this.$slots?.default?.({
@@ -41,7 +41,6 @@ export const RouterLinkStub = defineComponent({
       href: computed(() => route.value.href),
       isActive: computed(() => false),
       isExactActive: computed(() => false),
-      // eslint-disable-next-line @typescript-eslint/no-empty-function
       navigate: async () => {},
     })
     return this.custom ? children : h('a', undefined, children)

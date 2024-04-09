@@ -1,13 +1,11 @@
-/* eslint-disable vue/one-component-per-file */
-
+import type { PropType as _PropType } from '@histoire/vendors/vue'
 import {
   defineComponent as _defineComponent,
+  h as _h,
   onBeforeUnmount as _onBeforeUnmount,
   onMounted as _onMounted,
-  PropType as _PropType,
   ref as _ref,
   watch as _watch,
-  h as _h,
 } from '@histoire/vendors/vue'
 import type { Story, Variant } from '@histoire/shared'
 // @ts-expect-error virtual module id
@@ -40,13 +38,13 @@ export default _defineComponent({
     ready: () => true,
   },
 
-  setup (props, { emit }) {
+  setup(props, { emit }) {
     const sandbox = _ref<HTMLDivElement>()
     let mounting = false
     let app: App
     let appHooks: Record<'onUpdate' | 'onUnmount', (() => unknown)[]>
 
-    async function unmountVariant () {
+    async function unmountVariant() {
       if (app) {
         await app.onUnmount?.()
         if (appHooks) {
@@ -60,7 +58,7 @@ export default _defineComponent({
       }
     }
 
-    async function mountVariant () {
+    async function mountVariant() {
       if (mounting) return
       mounting = true
 
@@ -126,11 +124,12 @@ export default _defineComponent({
       }
     })
 
-    _watch(() => props.variant, async value => {
+    _watch(() => props.variant, async (value) => {
       if (value.configReady && !mounting) {
         if (!app) {
           await mountVariant()
-        } else {
+        }
+        else {
           // @TODO check if need to refresh here
         }
       }
@@ -157,7 +156,7 @@ export default _defineComponent({
     }
   },
 
-  render () {
+  render() {
     return _h('div', {
       ref: 'sandbox',
     })

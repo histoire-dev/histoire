@@ -55,7 +55,7 @@ When you have a lot of variant to test, it can be easier to auto generated them 
 <script lang="ts" setup>
 import MyComponent from './MyComponent.vue'
 
-const arguments = ["hello", "world", "etc", "..."];
+const args = ['hello', 'world', 'etc', '...']
 </script>
 
 <template>
@@ -64,9 +64,9 @@ const arguments = ["hello", "world", "etc", "..."];
     :layout="{ type: 'grid', width: '200px' }"
   >
     <Variant
-      v-for="(argument, key) of arguments"
+      v-for="(argument, key) of args"
       :key="key"
-      :title="'MyVariant ' + key"
+      :title="`MyVariant ${key}`"
     >
       <MyComponent :argument="argument" />
     </Variant>
@@ -83,10 +83,10 @@ When your variants have a lot of arguments, you can use this pattern.
 import MyComponent from './MyComponent.vue'
 
 const propsVariants = [
-  { argument: "hello", color: "red", count:4 },
-  { argument: "world", color: "blue", count:5 },
-  { argument: "etc", color: "violet", count:6 },
-];
+  { argument: 'hello', color: 'red', count: 4 },
+  { argument: 'world', color: 'blue', count: 5 },
+  { argument: 'etc', color: 'violet', count: 6 },
+]
 </script>
 
 <template>
@@ -97,7 +97,7 @@ const propsVariants = [
     <Variant
       v-for="(props, key) of propsVariants"
       :key="key"
-      :title="'MyVariant ' + key"
+      :title="`MyVariant ${key}`"
     >
       <MyComponent v-bind="props" />
     </Variant>

@@ -5,7 +5,7 @@ export interface BuildOptions {
   config?: string
 }
 
-export async function buildCommand (options: BuildOptions) {
+export async function buildCommand(options: BuildOptions) {
   const ctx = await createContext({
     configFile: options.config,
     mode: 'build',

@@ -11,14 +11,14 @@ export default defineConfig({
     alias: process.env.VITEST
       ? {}
       : {
-        'floating-vue': '@histoire/vendors/floating-vue',
-        '@iconify/vue': '@histoire/vendors/iconify',
-        pinia: '@histoire/vendors/pinia',
-        'scroll-into-view-if-needed': '@histoire/vendors/scroll',
-        'vue-router': '@histoire/vendors/vue-router',
-        '@vueuse/core': '@histoire/vendors/vue-use',
-        vue: '@histoire/vendors/vue',
-      },
+          'floating-vue': '@histoire/vendors/floating-vue',
+          '@iconify/vue': '@histoire/vendors/iconify',
+          'pinia': '@histoire/vendors/pinia',
+          'scroll-into-view-if-needed': '@histoire/vendors/scroll',
+          'vue-router': '@histoire/vendors/vue-router',
+          '@vueuse/core': '@histoire/vendors/vue-use',
+          'vue': '@histoire/vendors/vue',
+        },
   },
 
   build: {

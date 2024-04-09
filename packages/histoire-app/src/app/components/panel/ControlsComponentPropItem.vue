@@ -39,7 +39,7 @@ const model = computed({
   },
 })
 
-function reset () {
+function reset() {
   if (props.variant.state._hPropState[props.component.index]) {
     // eslint-disable-next-line vue/no-mutating-props
     delete props.variant.state._hPropState[props.component.index][props.definition.name]

@@ -16,7 +16,7 @@ const emit = defineEmits({
   'update:modelValue': (newValue: boolean) => true,
 })
 
-function toggle () {
+function toggle() {
   if (!props.withToggle) {
     return
   }
@@ -46,7 +46,7 @@ watch(path, () => {
 <template>
   <div
     class="histoire-simple-checkbox htw-group htw-text-white htw-w-[16px] htw-h-[16px] htw-relative"
-    :class="{'htw-cursor-pointer': withToggle}"
+    :class="{ 'htw-cursor-pointer': withToggle }"
     @click="toggle"
   >
     <div

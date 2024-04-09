@@ -6,8 +6,8 @@ const props = defineProps<{
   icon: string
 }>()
 
-const isUrl = computed(() => props.icon.startsWith('http') || props.icon.startsWith('data:image') ||
-  props.icon.startsWith('.') || props.icon.startsWith('/'))
+const isUrl = computed(() => props.icon.startsWith('http') || props.icon.startsWith('data:image')
+  || props.icon.startsWith('.') || props.icon.startsWith('/'))
 </script>
 
 <template>

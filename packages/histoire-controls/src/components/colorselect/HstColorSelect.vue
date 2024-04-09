@@ -6,7 +6,7 @@ export default {
 </script>
 
 <script lang="ts" setup>
-import { computed, ref } from 'vue'
+import { computed } from 'vue'
 import HstWrapper from '../HstWrapper.vue'
 
 const props = defineProps<{
@@ -17,8 +17,6 @@ const props = defineProps<{
 const emit = defineEmits({
   'update:modelValue': (newValue: string) => true,
 })
-
-const input = ref<HTMLInputElement>(null)
 
 const stringModel = computed({
   get: () => props.modelValue,
@@ -72,7 +70,6 @@ function processChange(inp) {
   >
     <div class="htw-flex htw-flex-row htw-gap-1">
       <input
-        ref="input"
         v-bind="{ ...$attrs, class: null, style: null }"
         v-model="stringModel"
         type="text"

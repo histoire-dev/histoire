@@ -1,11 +1,11 @@
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import { router } from '../router'
-import { Story, Variant } from '../types'
+import type { Story, Variant } from '../types'
 
 export const useStoryStore = defineStore('story', () => {
   const stories = ref<Story[]>([])
-  function setStories (value: Story[]) {
+  function setStories(value: Story[]) {
     stories.value = value
   }
 
@@ -28,11 +28,11 @@ export const useStoryStore = defineStore('story', () => {
     }
   })
 
-  function getStoryById (id: string) {
+  function getStoryById(id: string) {
     return maps.value.stories.get(id)
   }
 
-  function getVariantById (idWithStoryId: string) {
+  function getVariantById(idWithStoryId: string) {
     return maps.value.variants.get(idWithStoryId)
   }
 

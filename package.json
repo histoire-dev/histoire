@@ -2,12 +2,16 @@
   "name": "histoire-monorepo",
   "version": "0.17.16",
   "private": true,
+  "packageManager": "pnpm@8.6.2",
   "repository": {
     "url": "https://github.com/Akryum/histoire.git",
     "type": "git"
   },
+  "engines": {
+    "node": ">14.5.0"
+  },
   "scripts": {
-    "lint": "eslint . --ext js,vue,ts --cache",
+    "lint": "eslint . --cache",
     "build": "pnpm run -r build",
     "watch": "pnpm run build && pnpm run -r --parallel --filter \"./packages/**\" watch",
     "test": "pnpm run -r --parallel --filter \"./packages/**\" test",
@@ -18,30 +22,19 @@
     "docs:build": "vitepress build docs",
     "docs:serve": "vitepress serve docs"
   },
-  "engines": {
-    "node": ">14.5.0"
-  },
   "devDependencies": {
     "@akryum/sheep": "^0.5.0",
+    "@antfu/eslint-config": "^2.13.0",
     "@histoire/vendors": "workspace:*",
     "@iconify/vue": "^3.2.1",
-    "@typescript-eslint/eslint-plugin": "^5.62.0",
-    "@typescript-eslint/parser": "^5.62.0",
-    "@vue/eslint-config-standard": "^6.1.0",
-    "@vue/eslint-config-typescript": "^10.0.0",
     "@vueuse/core": "^9.13.0",
     "autoprefixer": "^10.4.16",
-    "eslint": "^8.54.0",
-    "eslint-plugin-cypress": "^2.15.1",
-    "eslint-plugin-import": "^2.29.0",
-    "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-promise": "^6.1.1",
-    "eslint-plugin-vue": "^9.18.1",
+    "eslint": "^9.0.0",
     "floating-vue": "2.0.0-beta.19",
     "postcss": "^8.4.31",
     "rimraf": "^3.0.2",
     "tailwindcss": "^3.3.5",
-    "typescript": "^4.9.5",
+    "typescript": "^5.4.4",
     "vitepress": "1.0.0-alpha.10",
     "vue-eslint-parser": "^9.3.2"
   },
@@ -65,6 +58,5 @@
         "vue": "*"
       }
     }
-  },
-  "packageManager": "pnpm@8.6.2"
+  }
 }

@@ -10,6 +10,6 @@ export interface Vue3StorySetupApi {
 
 export type Vue3StorySetupHandler = (api: Vue3StorySetupApi) => Promise<void> | void
 
-export function defineSetupVue3 (handler: Vue3StorySetupHandler): Vue3StorySetupHandler {
+export function defineSetupVue3(handler: Vue3StorySetupHandler): Vue3StorySetupHandler {
   return handler
 }

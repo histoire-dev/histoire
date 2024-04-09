@@ -87,7 +87,7 @@ You can change the layout of the variant by using the `layout` prop with an obje
 
 ### Single layout
 
-This is the default layout, displaying one variant at a time. The default behavior is to isolate the story with an iframe. 
+This is the default layout, displaying one variant at a time. The default behavior is to isolate the story with an iframe.
 
 Additional `layout` properties:
 - `iframe`: (default: `true`) enables the iframe, useful when your CSS has media queries for responsive design.

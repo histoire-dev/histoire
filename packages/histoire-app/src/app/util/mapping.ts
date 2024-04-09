@@ -12,7 +12,7 @@ const copiedFromExistingVariant = [
   'previewReady',
 ]
 
-export function mapFile (file: StoryFile, existingFile?: StoryFile): StoryFile {
+export function mapFile(file: StoryFile, existingFile?: StoryFile): StoryFile {
   let result: StoryFile
 
   if (existingFile) {
@@ -26,11 +26,13 @@ export function mapFile (file: StoryFile, existingFile?: StoryFile): StoryFile {
           file: markRaw(result),
           variants: file.story.variants.map(v => mapVariant(v, existingFile.story.variants.find(item => item.id === v.id))),
         }
-      } else if (key !== 'component') {
+      }
+      else if (key !== 'component') {
         result[key] = file[key]
       }
     }
-  } else {
+  }
+  else {
     // Create
     result = {
       ...file,
@@ -48,7 +50,7 @@ export function mapFile (file: StoryFile, existingFile?: StoryFile): StoryFile {
   return result
 }
 
-export function mapVariant (variant: Variant, existingVariant?: Variant): Variant {
+export function mapVariant(variant: Variant, existingVariant?: Variant): Variant {
   let result: Variant
 
   if (existingVariant) {
@@ -59,7 +61,8 @@ export function mapVariant (variant: Variant, existingVariant?: Variant): Varian
         result[key] = variant[key]
       }
     }
-  } else {
+  }
+  else {
     // Create
     result = {
       ...variant,

@@ -16,7 +16,7 @@ const props = defineProps<{
 
 const { copy, copied } = useClipboard()
 
-const action = async () => {
+async function action() {
   const content = typeof props.content === 'function' ? await props.content() : props.content
   copy(content)
 }

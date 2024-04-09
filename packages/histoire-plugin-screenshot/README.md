@@ -24,7 +24,6 @@ export default defineConfig({
 If you get an error like No usable sandbox! or Running as root without --no-sandbox is not supported, you need to properly set up sandboxing on your Linux instance.
 Alternatively, if you completely trust the content, you can disable sandboxing (strongly discouraged):
 
-
 ref. https://github.com/sindresorhus/capture-website#faq
 
 ```
@@ -39,4 +38,3 @@ export default defineConfig({
   ],
 })
 ```
-

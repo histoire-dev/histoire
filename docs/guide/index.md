@@ -80,7 +80,7 @@ Here are some highlights of our favorite features:
 
 ### :zap: Dynamic source
 
-The copyable source code is an important part of the documentation purpose of stories.  
+The copyable source code is an important part of the documentation purpose of stories.
 For supported frameworks, Histoire can generate the template/JSX/source code that you can one-click-copy and paste in your project.
 
 ### :bento: Variant grids
@@ -93,7 +93,7 @@ Add documentation to your stories with (extendable) Markdown with code snippets 
 
 ### :moon: Dark theme
 
-Rest your eyes with the alternative darker theme for your book.  
+Rest your eyes with the alternative darker theme for your book.
 Change the story background (with an optional checkerboard) to test your design in different situations.
 
 ### :iphone: Responsive testing

@@ -10,10 +10,10 @@ export interface DevOptions {
   config?: string
 }
 
-export async function devCommand (options: DevOptions) {
+export async function devCommand(options: DevOptions) {
   let stop: () => Promise<void>
 
-  async function start () {
+  async function start() {
     const ctx = await createContext({
       configFile: options.config,
       mode: 'dev',
@@ -41,7 +41,7 @@ export async function devCommand (options: DevOptions) {
     }
   }
 
-  async function restart (source: string) {
+  async function restart(source: string) {
     if (stop) {
       console.log(pc.blue(`${source} config changed, restarting...`))
       await stop()

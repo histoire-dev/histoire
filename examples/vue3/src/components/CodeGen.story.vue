@@ -1,30 +1,23 @@
-<script lang="ts">
-import { defineComponent, ref } from 'vue'
-
-export default defineComponent({
-  directives: {
-    tooltip: {
-      mounted: (el, { value }) => {
-        el.setAttribute('title', value)
-      },
-    },
-  },
-})
-</script>
-
 <script lang="ts" setup>
+import { ref } from 'vue'
 import ModalWithSlots from './ModalWithSlots.vue'
 import SlotWithProps from './SlotWithProps.vue'
 import BaseButton from './BaseButton.vue'
 
-function initState () {
+const vTooltip = {
+  mounted: (el, { value }) => {
+    el.setAttribute('title', value)
+  },
+}
+
+function initState() {
   return {
     count: 0,
     text: 'Foo',
   }
 }
 
-function onClick (event) {
+function onClick(event) {
   console.log(event)
 }
 

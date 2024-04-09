@@ -3,19 +3,19 @@ import type fs from 'fs-extra'
 import type pc from 'picocolors'
 import type chokidar from 'chokidar'
 import type { InlineConfig as ViteInlineConfig } from 'vite'
+import type { Awaitable } from '../type-utils.js'
 import type {
-  ServerStoryFile,
   ServerStory,
+  ServerStoryFile,
   ServerVariant,
 } from './story.js'
 import type {
-  HistoireConfig,
   ConfigMode,
+  HistoireConfig,
 } from './config.js'
 import type {
   PluginCommand,
 } from './command.js'
-import type { Awaitable } from '../type-utils.js'
 
 export interface SupportPlugin {
   id: string
@@ -47,10 +47,10 @@ export interface PluginApiBase {
   warn: (...msg) => void
   error: (...msg) => void
 
-  getStories (): ServerStory[]
+  getStories: () => ServerStory[]
   addStoryFile: (file: string) => void
 
-  getConfig (): HistoireConfig
+  getConfig: () => HistoireConfig
 }
 
 export interface PluginApiDev extends PluginApiBase {

@@ -2,7 +2,6 @@
 
 You need the [Percy CLI](https://docs.percy.io/docs/cli-overview) installed to be able to send snapshots to Percy.
 
-
 ```bash
 pnpm add -D @histoire/plugin-percy
 ```

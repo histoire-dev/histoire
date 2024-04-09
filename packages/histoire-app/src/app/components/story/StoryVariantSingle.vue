@@ -1,14 +1,14 @@
 <script lang="ts" setup>
 import { computed } from 'vue'
-import { useStoryStore } from '../../stores/story'
 import { Icon } from '@iconify/vue'
+import { useStoryStore } from '../../stores/story'
 import { isMobile } from '../../util/responsive'
 import BaseSplitPane from '../base/BaseSplitPane.vue'
 import StoryVariantListItem from './StoryVariantListItem.vue'
 import StoryVariantSingleView from './StoryVariantSingleView.vue'
 
 defineEmits({
-  'open-variant-menu': () => true,
+  openVariantMenu: () => true,
 })
 
 const storyStore = useStoryStore()
@@ -35,7 +35,7 @@ const variant = computed(() => storyStore.currentVariant)
     >
       <a
         class="htw-px-6 htw-h-12 hover:htw-text-primary-500 dark:hover:htw-text-primary-400 htw-cursor-pointer htw-flex htw-gap-2 htw-flex-wrap htw-w-full htw-items-center htw-flex-none"
-        @click="$emit('open-variant-menu')"
+        @click="$emit('openVariantMenu')"
       >
         <template v-if="variant">
           <Icon

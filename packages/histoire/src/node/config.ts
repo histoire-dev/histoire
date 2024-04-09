@@ -1,19 +1,19 @@
+import { fileURLToPath } from 'node:url'
+import fs from 'node:fs'
 import path from 'pathe'
 import { createDefu } from 'defu'
 import {
-  resolveConfig as resolveViteConfig,
   mergeConfig as mergeViteConfig,
+  resolveConfig as resolveViteConfig,
 } from 'vite'
 import jiti from 'jiti'
-import { fileURLToPath } from 'node:url'
 import pc from 'picocolors'
 import type {
-  HistoireConfig,
-  SupportMatchPattern,
   ConfigMode,
+  HistoireConfig,
   Plugin,
+  SupportMatchPattern,
 } from '@histoire/shared'
-import fs from 'node:fs'
 import { defaultColors } from './colors.js'
 import { findUp } from './util/find-up.js'
 import { tailwindTokens } from './builtin-plugins/tailwind-tokens.js'
@@ -22,7 +22,7 @@ import type { Context } from './context.js'
 
 const __filename = fileURLToPath(import.meta.url)
 
-export function getDefaultConfig (): HistoireConfig {
+export function getDefaultConfig(): HistoireConfig {
   return {
     plugins: [
       vanillaSupport(),
@@ -128,11 +128,11 @@ export function getDefaultConfig (): HistoireConfig {
     },
     vite: (config) => {
       // Remove vite:legacy plugins https://github.com/histoire-dev/histoire/issues/156
-      const index = config.plugins?.findIndex(plugin => Array.isArray(plugin) &&
-        typeof plugin[0] === 'object' &&
-        !Array.isArray(plugin[0]) &&
+      const index = config.plugins?.findIndex(plugin => Array.isArray(plugin)
+        && typeof plugin[0] === 'object'
+        && !Array.isArray(plugin[0])
         // @ts-expect-error could have no property 'name'
-        plugin[0].name?.startsWith('vite:legacy'))
+        && plugin[0].name?.startsWith('vite:legacy'))
       if (index !== -1) {
         config.plugins?.splice(index, 1)
       }
@@ -154,16 +154,17 @@ export const configFileNames = [
   '.histoire.js',
 ]
 
-export function resolveConfigFile (cwd: string = process.cwd(), configFile?: string): string {
+export function resolveConfigFile(cwd: string = process.cwd(), configFile?: string): string {
   if (configFile) {
     // explicit config path is always resolved from cwd
     return path.resolve(configFile)
-  } else {
+  }
+  else {
     return findUp(cwd, configFileNames)
   }
 }
 
-export async function loadConfigFile (configFile: string): Promise<Partial<HistoireConfig>> {
+export async function loadConfigFile(configFile: string): Promise<Partial<HistoireConfig>> {
   try {
     const result = jiti(__filename, {
       esmResolve: true,
@@ -173,7 +174,8 @@ export async function loadConfigFile (configFile: string): Promise<Partial<Histo
       throw new Error(`Expected default export in ${configFile}`)
     }
     return result.default
-  } catch (e) {
+  }
+  catch (e) {
     console.error(pc.red(`Error while loading ${configFile}`))
     throw e
   }
@@ -230,7 +232,8 @@ export const mergeConfig = createDefu((obj: any, key, value) => {
       if (existing) {
         existing.patterns = [...existing.patterns, ...item.patterns]
         existing.pluginIds = [...existing.pluginIds, ...item.pluginIds]
-      } else {
+      }
+      else {
         obj[key].push(item)
       }
     }
@@ -249,7 +252,7 @@ export const mergeConfig = createDefu((obj: any, key, value) => {
   }
 })
 
-export async function resolveConfig (cwd: string = process.cwd(), mode: ConfigMode, configFile: string): Promise<HistoireConfig> {
+export async function resolveConfig(cwd: string = process.cwd(), mode: ConfigMode, configFile: string): Promise<HistoireConfig> {
   let result: Partial<HistoireConfig>
   const resolvedConfigFile = resolveConfigFile(cwd, configFile)
   if (resolvedConfigFile) {
@@ -264,7 +267,7 @@ export async function resolveConfig (cwd: string = process.cwd(), mode: ConfigMo
   return resolveConfigPlugins(mergeConfig(preUserConfig, processedDefaultConfig), mode)
 }
 
-async function resolveConfigPlugins (config: HistoireConfig, mode: ConfigMode): Promise<HistoireConfig> {
+async function resolveConfigPlugins(config: HistoireConfig, mode: ConfigMode): Promise<HistoireConfig> {
   for (const plugin of config.plugins) {
     if (plugin.config) {
       const result = await plugin.config(config, mode)
@@ -276,7 +279,7 @@ async function resolveConfigPlugins (config: HistoireConfig, mode: ConfigMode): 
   return config
 }
 
-async function processDefaultConfig (defaultConfig: HistoireConfig, preUserConfig: HistoireConfig, mode: ConfigMode, cwd: string): Promise<HistoireConfig> {
+async function processDefaultConfig(defaultConfig: HistoireConfig, preUserConfig: HistoireConfig, mode: ConfigMode, _cwd: string): Promise<HistoireConfig> {
   // Apply plugins
   for (const plugin of [...defaultConfig.plugins, ...preUserConfig.plugins ?? []]) {
     if (plugin.defaultConfig) {
@@ -289,7 +292,7 @@ async function processDefaultConfig (defaultConfig: HistoireConfig, preUserConfi
   return defaultConfig
 }
 
-export async function processConfig (ctx: Context) {
+export async function processConfig(ctx: Context) {
   const { config, root } = ctx
 
   // Resolve files paths
@@ -347,7 +350,8 @@ export async function processConfig (ctx: Context) {
           throw new Error(pc.red(`Histoire config: theme.favicon seems to target a file that does not exist: ${file} (resolved as ${resolvedFile})`))
         }
         config.theme.favicon = relativeFile
-      } else {
+      }
+      else {
         // Check if URL path is valid
         const resolvedFile = path.resolve(publicDir, file)
         if (!fs.existsSync(resolvedFile)) {
@@ -358,7 +362,7 @@ export async function processConfig (ctx: Context) {
   }
 }
 
-export function defineConfig (config: Partial<HistoireConfig>) {
+export function defineConfig(config: Partial<HistoireConfig>) {
   return config
 }
 

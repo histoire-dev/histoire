@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { defineAsyncComponent } from 'vue'
 import { useCommandStore } from '../../stores/command.js'
+
 const CommandPrompts = defineAsyncComponent(() => import('./CommandPrompts.vue'))
 
 defineProps({
@@ -14,7 +15,7 @@ const emit = defineEmits({
   close: () => true,
 })
 
-function close () {
+function close() {
   emit('close')
 }
 

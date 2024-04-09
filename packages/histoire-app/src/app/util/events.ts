@@ -1,6 +1,6 @@
 import { EVENT_SEND } from './const'
 
-export async function logEvent (name: string, argument) {
+export async function logEvent(name: string, argument) {
   console.log('[histoire] Event fired', { name, argument })
   const event = {
     name,
@@ -11,13 +11,14 @@ export async function logEvent (name: string, argument) {
       type: EVENT_SEND,
       event,
     })
-  } else {
+  }
+  else {
     const { useEventsStore } = await import('../stores/events.js')
     useEventsStore().addEvent(event)
   }
 }
 
-function stringifyEvent (e) {
+function stringifyEvent(e) {
   const obj = {}
   for (const k in e) {
     obj[k] = e[k]

@@ -292,7 +292,7 @@ const HSL = new RegExp(
   `^hsla?\\(\\s*((?:${VALUE})(?:deg|rad|grad|turn)?)${SEP}(${VALUE})${SEP}(${VALUE})(?:${ALPHA_SEP}(${VALUE}))?\\s*\\)$`,
 )
 
-export function parseColor (value) {
+export function parseColor(value) {
   if (typeof value !== 'string') {
     return null
   }
@@ -309,10 +309,10 @@ export function parseColor (value) {
   if (hex !== null) {
     return {
       mode: 'rgb',
-      color: [parseInt(hex[1], 16), parseInt(hex[2], 16), parseInt(hex[3], 16)].map((v) =>
+      color: [Number.parseInt(hex[1], 16), Number.parseInt(hex[2], 16), Number.parseInt(hex[3], 16)].map(v =>
         v.toString(),
       ),
-      alpha: hex[4] ? (parseInt(hex[4], 16) / 255).toString() : undefined,
+      alpha: hex[4] ? (Number.parseInt(hex[4], 16) / 255).toString() : undefined,
     }
   }
 
@@ -321,7 +321,7 @@ export function parseColor (value) {
   if (rgbMatch !== null) {
     return {
       mode: 'rgb',
-      color: [rgbMatch[1], rgbMatch[2], rgbMatch[3]].map((v) => v.toString()),
+      color: [rgbMatch[1], rgbMatch[2], rgbMatch[3]].map(v => v.toString()),
       alpha: rgbMatch[4]?.toString?.(),
     }
   }
@@ -331,7 +331,7 @@ export function parseColor (value) {
   if (hslMatch !== null) {
     return {
       mode: 'hsl',
-      color: [hslMatch[1], hslMatch[2], hslMatch[3]].map((v) => v.toString()),
+      color: [hslMatch[1], hslMatch[2], hslMatch[3]].map(v => v.toString()),
       alpha: hslMatch[4]?.toString?.(),
     }
   }

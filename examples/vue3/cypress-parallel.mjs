@@ -1,12 +1,12 @@
 // @TODO move to playwright
 
-import fs from 'fs/promises'
+import fs from 'node:fs/promises'
+import { exec } from 'node:child_process'
 import { globby } from 'globby'
 import minimatch from 'minimatch'
-import { exec } from 'child_process'
 
-const totalRunners = parseInt(process.env.TOTAL_RUNNERS)
-const thisRunner = parseInt(process.env.THIS_RUNNER)
+const totalRunners = Number.parseInt(process.env.TOTAL_RUNNERS)
+const thisRunner = Number.parseInt(process.env.THIS_RUNNER)
 
 // These are the same properties that are set in cypress.config.
 // In practice, it's better to export these from another file, and
@@ -20,14 +20,14 @@ const specPatterns = {
 // used to roughly determine how many tests are in a file
 const testPattern = /(^|\s)(it|test)\(/g
 
-async function getTestCount (filePath) {
+async function getTestCount(filePath) {
   const content = await fs.readFile(filePath, 'utf8')
   return content.match(testPattern)?.length || 0
 }
 
 // adapated from:
 // https://github.com/bahmutov/find-cypress-specs/blob/main/src/index.js
-async function getSpecFilePaths () {
+async function getSpecFilePaths() {
   const options = specPatterns
 
   const files = await globby(options.specPattern, {
@@ -56,7 +56,7 @@ async function getSpecFilePaths () {
   return filtered
 }
 
-async function sortSpecFilesByTestCount (specPathsOriginal) {
+async function sortSpecFilesByTestCount(specPathsOriginal) {
   const specPaths = [...specPathsOriginal]
 
   const testPerSpec = {}
@@ -72,11 +72,11 @@ async function sortSpecFilesByTestCount (specPathsOriginal) {
       // but better than just splitting them randomly. And this will create a
       // consistent file list/ordering so that file division is deterministic.
       .sort((a, b) => b[1] - a[1])
-      .map((x) => x[0])
+      .map(x => x[0])
   )
 }
 
-export function splitSpecs (specs, totalRunners, thisRunner) {
+export function splitSpecs(specs, totalRunners, thisRunner) {
   return specs.filter((_, index) => index % totalRunners === thisRunner)
 }
 
@@ -85,7 +85,7 @@ export function splitSpecs (specs, totalRunners, thisRunner) {
     const specFilePaths = await sortSpecFilesByTestCount(await getSpecFilePaths())
 
     if (!specFilePaths.length) {
-      throw Error('No spec files found.')
+      throw new Error('No spec files found.')
     }
 
     const specsToRun = splitSpecs(specFilePaths, totalRunners, thisRunner)
@@ -109,7 +109,8 @@ export function splitSpecs (specs, totalRunners, thisRunner) {
     commandProcess.on('exit', (code) => {
       process.exit(code || 0)
     })
-  } catch (err) {
+  }
+  catch (err) {
     console.error(err)
     process.exit(1)
   }

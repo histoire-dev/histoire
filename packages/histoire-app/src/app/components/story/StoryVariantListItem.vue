@@ -1,9 +1,10 @@
 <script lang="ts" setup>
-import { PropType, ref, toRefs } from 'vue'
+import type { PropType } from 'vue'
+import { ref, toRefs } from 'vue'
+import { Icon } from '@iconify/vue'
 import { useCurrentVariantRoute } from '../../util/variant'
 import type { Variant } from '../../types'
 import BaseListItemLink from '../base/BaseListItemLink.vue'
-import { Icon } from '@iconify/vue'
 import { useScrollOnActive } from '../../util/scroll'
 
 const props = defineProps({

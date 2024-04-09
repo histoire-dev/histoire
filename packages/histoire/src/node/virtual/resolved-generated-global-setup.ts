@@ -1,8 +1,8 @@
 import type { Context } from '../context.js'
-import { GENERATED_SETUP_CODE } from './index.js'
 import { ID_SEPARATOR } from './util.js'
+import { GENERATED_SETUP_CODE } from './index.js'
 
-export const resolvedGeneratedGlobalSetup = (ctx: Context) => {
+export function resolvedGeneratedGlobalSetup(ctx: Context) {
   if (ctx.config.setupCode) {
     return [
       // Import
@@ -18,7 +18,8 @@ export const resolvedGeneratedGlobalSetup = (ctx: Context) => {
         }
       }`),
     ].join('\n')
-  } else {
+  }
+  else {
     return ''
   }
 }

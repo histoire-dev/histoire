@@ -1,5 +1,6 @@
 <script lang="ts" setup>
-import { computed, PropType, ref, watch } from 'vue'
+import type { PropType } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { Icon } from '@iconify/vue'
 import GenericRenderStory from '../story/GenericRenderStory.vue'
 import type { Story, Variant } from '../../types'
@@ -33,7 +34,6 @@ const hasInitState = computed(() => Object
   .entries(props.variant.state || {})
   .filter(([key]) => !key.startsWith('_h'))
   .length > 0)
-
 </script>
 
 <template>

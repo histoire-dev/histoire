@@ -6,7 +6,7 @@ interface Line {
   line: string
 }
 
-export function serializeJs (value: any): string {
+export function serializeJs(value: any): string {
   const seen = new Set()
 
   if (value === undefined) {
@@ -36,20 +36,21 @@ export function serializeJs (value: any): string {
   return value.toString()
 }
 
-function printLines (lines: Line[]) {
+function printLines(lines: Line[]) {
   return lines.map(line => '  '.repeat(line.spaces) + line.line).join('\n')
 }
 
-function objectToSourceLines (object, seen: Set<unknown>, indentCount = 0) {
+function objectToSourceLines(object, seen: Set<unknown>, indentCount = 0) {
   if (seen.has(object)) {
     object = {}
-  } else {
+  }
+  else {
     seen.add(object)
   }
 
-  return createLines(indentCount, lines => {
+  return createLines(indentCount, (lines) => {
     lines.push('{')
-    lines.push(...createLines(1, lines => {
+    lines.push(...createLines(1, (lines) => {
       for (const key in object) {
         const value = object[key]
 
@@ -65,37 +66,40 @@ function objectToSourceLines (object, seen: Set<unknown>, indentCount = 0) {
   })
 }
 
-function arrayToSourceLines (array: any[], seen: Set<unknown>, indentCount = 0): Array<Line> {
+function arrayToSourceLines(array: any[], seen: Set<unknown>, indentCount = 0): Array<Line> {
   if (seen.has(array)) {
     array = []
-  } else {
+  }
+  else {
     seen.add(array)
   }
 
-  return createLines(indentCount, lines => {
-    const contentLines = createLines(1, lines => {
+  return createLines(indentCount, (lines) => {
+    const contentLines = createLines(1, (lines) => {
       for (const value of array) {
         addLinesFromValue(lines, value, '', ',', seen)
       }
     })
     if (contentLines.length === 0) {
       lines.push('[]')
-    } else if (contentLines.length <= MAX_SINGLE_LINE_ARRAY_LENGTH && !contentLines.some(line => line.spaces > 1)) {
+    }
+    else if (contentLines.length <= MAX_SINGLE_LINE_ARRAY_LENGTH && !contentLines.some(line => line.spaces > 1)) {
       const [first] = contentLines
       first.line = contentLines.map(({ line }) => line.substring(0, line.length - 1)).join(', ')
       first.line = `[${first.line}]`
       first.spaces--
       lines.push(first)
-    } else {
+    }
+    else {
       lines.push('[', ...contentLines, ']')
     }
   })
 }
 
-function createLines (indentCount: number, handler: (lines: any[]) => unknown): Array<Line> {
+function createLines(indentCount: number, handler: (lines: any[]) => unknown): Array<Line> {
   const lines: any[] = []
   handler(lines)
-  return lines.map(line => {
+  return lines.map((line) => {
     if (line.spaces != null) {
       line.spaces += indentCount
       return line
@@ -104,29 +108,35 @@ function createLines (indentCount: number, handler: (lines: any[]) => unknown): 
   })
 }
 
-function addLinesFromValue (lines: Line[], value, before, after, seen) {
+function addLinesFromValue(lines: Line[], value, before, after, seen) {
   let result
   if (Array.isArray(value)) {
     lines.push(...wrap(arrayToSourceLines(value, seen), before, after))
     return
-  } else if (value && typeof value === 'object') {
+  }
+  else if (value && typeof value === 'object') {
     lines.push(...wrap(objectToSourceLines(value, seen), before, after))
     return
-  } else if (typeof value === 'string') {
+  }
+  else if (typeof value === 'string') {
     result = value.includes('\'') ? `\`${value}\`` : `'${value}'`
-  } else if (typeof value === 'undefined') {
+  }
+  else if (typeof value === 'undefined') {
     result = 'undefined'
-  } else if (value === null) {
+  }
+  else if (value === null) {
     result = 'null'
-  } else if (typeof value === 'boolean') {
+  }
+  else if (typeof value === 'boolean') {
     result = value ? 'true' : 'false'
-  } else {
+  }
+  else {
     result = value
   }
   lines.push(before + result + after)
 }
 
-function wrap (lines: Line[], before: string, after: string) {
+function wrap(lines: Line[], before: string, after: string) {
   lines[0].line = before + lines[0].line
   lines[lines.length - 1].line += after
   return lines

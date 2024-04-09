@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 import { computed, ref, watch } from 'vue'
 import { useStoryStore } from '../../stores/story'
-import StoryVariantListItem from './StoryVariantListItem.vue'
 import MobileOverlay from '../app/MobileOverlay.vue'
+import StoryVariantListItem from './StoryVariantListItem.vue'
 import StoryVariantGrid from './StoryVariantGrid.vue'
 import StoryVariantSingle from './StoryVariantSingle.vue'
 
@@ -12,14 +12,13 @@ const variant = computed(() => storyStore.currentVariant)
 
 const isMenuOpened = ref(false)
 
-function closeMenu () {
+function closeMenu() {
   isMenuOpened.value = false
 }
 
 watch(variant, () => {
   isMenuOpened.value = false
 })
-
 </script>
 
 <template>

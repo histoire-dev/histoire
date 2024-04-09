@@ -5,9 +5,9 @@ export default {
 </script>
 
 <script lang="ts" setup>
+import { computed } from 'vue'
 import HstWrapper from '../HstWrapper.vue'
 import HstSimpleCheckbox from './HstSimpleCheckbox.vue'
-import { computed } from 'vue'
 
 type Booleanish = boolean | 'true' | 'false'
 
@@ -20,7 +20,7 @@ const emit = defineEmits({
   'update:modelValue': (newValue: Booleanish) => true,
 })
 
-function toggle () {
+function toggle() {
   if (typeof props.modelValue === 'string') {
     emit('update:modelValue', props.modelValue === 'false' ? 'true' : 'false')
     return

@@ -1,14 +1,14 @@
-import { dirname } from 'pathe'
 import { fileURLToPath } from 'node:url'
+import { dirname } from 'pathe'
 import type { Plugin } from '@histoire/shared'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
-export function vanillaSupport (): Plugin {
+export function vanillaSupport(): Plugin {
   return {
     name: 'builtin:vanilla-support',
 
-    defaultConfig () {
+    defaultConfig() {
       return {
         supportMatch: [
           {

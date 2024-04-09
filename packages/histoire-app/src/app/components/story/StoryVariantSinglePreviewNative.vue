@@ -17,7 +17,7 @@ Object.assign(props.variant, {
   previewReady: false,
 })
 
-function onReady () {
+function onReady() {
   Object.assign(props.variant, {
     previewReady: true,
   })
@@ -43,7 +43,7 @@ const autoApplyContrastColor = computed(() => !!histoireConfig.autoApplyContrast
         } : { width: '100%', height: '100%' },
         {
           '--histoire-contrast-color': contrastColor,
-          color: autoApplyContrastColor ? contrastColor : undefined,
+          'color': autoApplyContrastColor ? contrastColor : undefined,
         },
       ]"
       class="htw-relative"

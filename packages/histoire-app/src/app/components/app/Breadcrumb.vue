@@ -2,9 +2,9 @@
 import { computed, ref, watch } from 'vue'
 import { Icon } from '@iconify/vue'
 import { useStoryStore } from '../../stores/story'
-import { Story, Tree } from '../../types'
-import MobileOverlay from './MobileOverlay.vue'
+import type { Story, Tree } from '../../types'
 import StoryList from '../tree/StoryList.vue'
+import MobileOverlay from './MobileOverlay.vue'
 
 defineProps<{
   tree: Tree
@@ -21,11 +21,11 @@ const folders = computed(() => {
 
 const isMenuOpened = ref(false)
 
-function openMenu () {
+function openMenu() {
   isMenuOpened.value = true
 }
 
-function closeMenu () {
+function closeMenu() {
   isMenuOpened.value = false
 }
 

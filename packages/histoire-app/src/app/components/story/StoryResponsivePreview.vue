@@ -1,12 +1,13 @@
 <script lang="ts" setup>
-import { computed, onUnmounted, Ref, ref } from 'vue'
+import type { Ref } from 'vue'
+import { computed, onUnmounted, ref } from 'vue'
 import { useEventListener } from '@vueuse/core'
 import { Icon } from '@iconify/vue'
+import { VTooltip as vTooltip } from 'floating-vue'
 import HatchedPattern from '../misc/HatchedPattern.vue'
 import CheckerboardPattern from '../misc/CheckerboardPattern.vue'
 import { usePreviewSettingsStore } from '../../stores/preview-settings'
-import { Variant } from '../../types'
-import { VTooltip as vTooltip } from 'floating-vue'
+import type { Variant } from '../../types'
 
 const props = defineProps<{
   variant: Variant
@@ -23,7 +24,7 @@ onUnmounted(() => {
   onUnmountedCleanupFns.forEach(fn => fn())
 })
 
-function addWindowListener (event: string, listener: (event: any) => unknown) {
+function addWindowListener(event: string, listener: (event: any) => unknown) {
   window.addEventListener(event, listener)
   const removeListener = () => window.removeEventListener(event, listener)
   onUnmountedCleanupFns.push(removeListener)
@@ -33,8 +34,8 @@ function addWindowListener (event: string, listener: (event: any) => unknown) {
   }
 }
 
-function useDragger (el: Ref<HTMLDivElement>, value: Ref<number>, min: number, max: number, axis: 'x' | 'y') {
-  function onMouseDown (event: MouseEvent) {
+function useDragger(el: Ref<HTMLDivElement>, value: Ref<number>, min: number, max: number, axis: 'x' | 'y') {
+  function onMouseDown(event: MouseEvent) {
     event.preventDefault()
     event.stopPropagation()
     const start = axis === 'x' ? event.clientX : event.clientY
@@ -46,7 +47,7 @@ function useDragger (el: Ref<HTMLDivElement>, value: Ref<number>, min: number, m
       addWindowListener('mouseup', onMouseUp),
     ]
 
-    function onMouseMove (event: MouseEvent) {
+    function onMouseMove(event: MouseEvent) {
       const snapTarget = (axis === 'x' ? previewWrapper.value.clientWidth : previewWrapper.value.clientHeight)
       const delta = (axis === 'x' ? event.clientX : event.clientY) - start
       value.value = Math.max(min, Math.min(max, startValue + delta))
@@ -56,14 +57,14 @@ function useDragger (el: Ref<HTMLDivElement>, value: Ref<number>, min: number, m
       }
     }
 
-    function onMouseUp () {
+    function onMouseUp() {
       removeListeners.forEach(fn => fn())
       resizing.value = false
     }
   }
   useEventListener(el, 'mousedown', onMouseDown)
 
-  function onTouchStart (event: TouchEvent) {
+  function onTouchStart(event: TouchEvent) {
     event.preventDefault()
     event.stopPropagation()
     const start = axis === 'x' ? event.touches[0].clientX : event.touches[0].clientY
@@ -76,12 +77,12 @@ function useDragger (el: Ref<HTMLDivElement>, value: Ref<number>, min: number, m
       addWindowListener('touchcancel', onTouchEnd),
     ]
 
-    function onTouchMove (event: TouchEvent) {
+    function onTouchMove(event: TouchEvent) {
       const delta = (axis === 'x' ? event.touches[0].clientX : event.touches[0].clientY) - start
       value.value = Math.max(min, Math.min(max, startValue + delta))
     }
 
-    function onTouchEnd () {
+    function onTouchEnd() {
       removeListeners.forEach(fn => fn())
       resizing.value = false
     }
@@ -117,7 +118,7 @@ const finalHeight = computed(() => settings.rotate ? settings.responsiveWidth : 
 
 const isResponsiveEnabled = computed(() => !props.variant.responsiveDisabled)
 
-const sizeTooltip = computed(() => (responsiveWidth.value ?? 'Auto') + ' × ' + (responsiveHeight.value ?? 'Auto'))
+const sizeTooltip = computed(() => `${responsiveWidth.value ?? 'Auto'} × ${responsiveHeight.value ?? 'Auto'}`)
 </script>
 
 <template>
@@ -140,7 +141,7 @@ const sizeTooltip = computed(() => (responsiveWidth.value ?? 'Auto') + ' × ' + 
         :class="isResponsiveEnabled ? {
           'htw-w-fit': !!finalWidth,
           'htw-h-fit': !!finalHeight,
-          'htw-h-full': !finalHeight
+          'htw-h-full': !finalHeight,
         } : 'htw-h-full'"
       >
         <div

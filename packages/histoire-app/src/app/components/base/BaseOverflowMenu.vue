@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, h, onBeforeUnmount, reactive, computed } from 'vue'
+import { computed, h, onBeforeUnmount, reactive, ref } from 'vue'
 import { useResizeObserver } from '@vueuse/core'
 import { Icon } from '@iconify/vue'
 
@@ -43,7 +43,7 @@ const visibleChildrenCount = computed(() => {
 const ChildWrapper = {
   name: 'ChildWrapper',
   props: ['index'],
-  setup (props, { slots }) {
+  setup(props, { slots }) {
     const el = ref<HTMLDivElement>()
 
     const state = reactive({ width: 0, index: props.index })
@@ -69,7 +69,7 @@ const ChildWrapper = {
 /**
  * Wraps each child with a <ChildWrapper>
  */
-const ChildrenRender = (props, { slots }) => {
+function ChildrenRender(props, { slots }) {
   const [fragment] = slots.default()
   return fragment.children.map((vnode, index) => h(ChildWrapper, { index }, () => [vnode]))
 }
@@ -77,7 +77,7 @@ const ChildrenRender = (props, { slots }) => {
 /**
  * Only renders a part of a children list
  */
-const ChildrenSlice = (props, { slots }) => {
+function ChildrenSlice(props, { slots }) {
   const [fragment] = slots.default()
   return fragment.children.slice(props.start, props.end)
 }

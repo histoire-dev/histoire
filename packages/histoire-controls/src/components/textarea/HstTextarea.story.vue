@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import HstTextarea from './HstTextarea.vue'
 
-function initState () {
+function initState() {
   return {
     text: '',
   }

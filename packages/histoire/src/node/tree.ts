@@ -1,13 +1,13 @@
 import pc from 'picocolors'
 import type {
+  HistoireConfig,
   ServerStoryFile,
   ServerTree,
   ServerTreeFile,
-  HistoireConfig,
   TreeGroupConfig,
 } from '@histoire/shared'
 
-export function createPath (config: HistoireConfig, file: ServerTreeFile) {
+export function createPath(config: HistoireConfig, file: ServerTreeFile) {
   if (config.tree.file === 'title') {
     return file.title.split('/')
   }
@@ -28,7 +28,7 @@ export function createPath (config: HistoireConfig, file: ServerTreeFile) {
   return config.tree.file(file)
 }
 
-export function makeTree (config: HistoireConfig, files: ServerStoryFile[]) {
+export function makeTree(config: HistoireConfig, files: ServerStoryFile[]) {
   interface ITreeObject {
     [index: string]: number | ITreeObject
   }
@@ -63,7 +63,8 @@ export function makeTree (config: HistoireConfig, files: ServerStoryFile[]) {
   for (const group of groups) {
     if (group === defaultGroup) {
       result.push(...buildTree(group.treeObject))
-    } else {
+    }
+    else {
       result.push({
         group: true,
         id: group.groupConfig.id,
@@ -75,12 +76,13 @@ export function makeTree (config: HistoireConfig, files: ServerStoryFile[]) {
 
   return result
 
-  function getGroup (file: ServerStoryFile): ITreeGroup {
+  function getGroup(file: ServerStoryFile): ITreeGroup {
     if (file.story?.group) {
       const group = groups.find(g => g.groupConfig?.id === file.story.group)
       if (group) {
         return group
-      } else {
+      }
+      else {
         console.error(pc.red(`Group ${file.story.group} not found for story ${file.path}`))
       }
     }
@@ -92,25 +94,27 @@ export function makeTree (config: HistoireConfig, files: ServerStoryFile[]) {
     return defaultGroup
   }
 
-  function setPath (path: string[], value: unknown, tree: unknown) {
+  function setPath(path: string[], value: unknown, tree: unknown) {
     path.reduce((subtree, key, i) => {
       if (i === path.length - 1) {
         setKey(subtree, key, value)
-      } else if (isLeaf(subtree[key])) {
+      }
+      else if (isLeaf(subtree[key])) {
         setKey(subtree, key, subtree[key])
         subtree[key] = {}
-      } else if (!subtree[key]) {
+      }
+      else if (!subtree[key]) {
         subtree[key] = {}
       }
       return subtree[key]
     }, tree)
 
-    function isLeaf (element) {
-      return !isNaN(element)
+    function isLeaf(element) {
+      return !Number.isNaN(Number(element))
     }
   }
 
-  function setKey (tree, key, value) {
+  function setKey(tree, key, value) {
     if (isUndefined(tree[key])) {
       tree[key] = value
       return
@@ -124,12 +128,12 @@ export function makeTree (config: HistoireConfig, files: ServerStoryFile[]) {
 
     tree[`${key}-${copyNumber}`] = value
 
-    function isUndefined (element) {
+    function isUndefined(element) {
       return element === undefined
     }
   }
 
-  function buildTree (treeObject: ITreeObject): ServerTree {
+  function buildTree(treeObject: ITreeObject): ServerTree {
     const tree: ServerTree = []
 
     for (const [key, element] of Object.entries(treeObject)) {
@@ -138,7 +142,8 @@ export function makeTree (config: HistoireConfig, files: ServerStoryFile[]) {
           title: key,
           index: element as number,
         })
-      } else {
+      }
+      else {
         tree.push({
           title: key,
           children: buildTree(element as ITreeObject),

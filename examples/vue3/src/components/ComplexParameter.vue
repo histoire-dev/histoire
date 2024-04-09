@@ -1,7 +1,7 @@
 <script setup lang="ts">
-const props = defineProps<{
-  complexParameter: Array<{action: () => void}>
-  recursiveParameter: {name: string} & Record<string, unknown>
+defineProps<{
+  complexParameter: Array<{ action: () => void }>
+  recursiveParameter: { name: string } & Record<string, unknown>
 }>()
 </script>
 

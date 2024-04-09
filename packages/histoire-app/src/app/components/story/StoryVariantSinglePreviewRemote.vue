@@ -2,13 +2,14 @@
 import { computed, ref, toRaw, watch } from 'vue'
 import { useEventListener } from '@vueuse/core'
 import { applyState } from '@histoire/shared'
-import { STATE_SYNC, PREVIEW_SETTINGS_SYNC, SANDBOX_READY, EVENT_SEND } from '../../util/const'
+import { EVENT_SEND, PREVIEW_SETTINGS_SYNC, SANDBOX_READY, STATE_SYNC } from '../../util/const'
 import type { Story, Variant } from '../../types'
 import { getSandboxUrl } from '../../util/sandbox'
 import { usePreviewSettingsStore } from '../../stores/preview-settings'
-import { HstEvent, useEventsStore } from '../../stores/events'
-import StoryResponsivePreview from './StoryResponsivePreview.vue'
+import type { HstEvent } from '../../stores/events'
+import { useEventsStore } from '../../stores/events'
 import { toRawDeep } from '../../util/state'
+import StoryResponsivePreview from './StoryResponsivePreview.vue'
 
 const props = defineProps<{
   story: Story
@@ -21,7 +22,7 @@ const settings = usePreviewSettingsStore().currentSettings
 
 const iframe = ref<HTMLIFrameElement>()
 
-function syncState () {
+function syncState() {
   if (iframe.value && props.variant.previewReady) {
     iframe.value.contentWindow.postMessage({
       type: STATE_SYNC,
@@ -61,17 +62,17 @@ useEventListener(window, 'message', (event) => {
   }
 })
 
-function updateVariantState (state: any) {
+function updateVariantState(state: any) {
   synced = true
   applyState(props.variant.state, state)
 }
 
-function logEvent (event: HstEvent) {
+function logEvent(event: HstEvent) {
   const eventsStore = useEventsStore()
   eventsStore.addEvent(event)
 }
 
-function setPreviewReady () {
+function setPreviewReady() {
   Object.assign(props.variant, {
     previewReady: true,
   })
@@ -92,7 +93,7 @@ watch(sandboxUrl, () => {
 
 // Settings
 
-function syncSettings () {
+function syncSettings() {
   if (iframe.value) {
     iframe.value.contentWindow.postMessage({
       type: PREVIEW_SETTINGS_SYNC,
@@ -110,12 +111,11 @@ watch(() => settings, () => {
 
 // Iframe load
 
-function onIframeLoad () {
+function onIframeLoad() {
   isIframeLoaded.value = true
   syncState()
   syncSettings()
 }
-
 </script>
 
 <template>

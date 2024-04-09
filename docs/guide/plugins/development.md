@@ -39,12 +39,12 @@ Create a new npm package. Example `package.json`:
     "defu": "^6.0.0"
   },
   "devDependencies": {
-    "histoire": "^0.3.3",
+    "histoire": "latest",
     "rimraf": "^3.0.0",
-    "typescript": "^4.9.5"
+    "typescript": "^5.4.4"
   },
   "peerDependencies": {
-    "histoire": "^0.3.3"
+    "histoire": "latest"
   }
 }
 ```
@@ -80,7 +80,7 @@ Example `tsconfig.json`:
     "noImplicitThis": true,
     "alwaysStrict": true,
     "strictBindCallApply": true,
-    "strictFunctionTypes": true,
+    "strictFunctionTypes": true
   },
   "include": [
     "src"
@@ -107,7 +107,7 @@ const defaultOptions: MyPluginOptions = {
   // Default values here
 }
 
-export function MyHistoirePlugin (options: MyPluginOptions = {}): Plugin {
+export function MyHistoirePlugin(options: MyPluginOptions = {}): Plugin {
   const finalOptions: MyPluginOptions = defu(options, defaultOptions)
   return {
     name: 'my-histoire-plugin',

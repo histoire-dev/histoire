@@ -9,7 +9,7 @@ const props = defineProps<{
 }>()
 
 const stateKeys = computed(() => Object.keys(props.variant.state || {})
-  .filter((key) => !key.startsWith('_h')))
+  .filter(key => !key.startsWith('_h')))
 </script>
 
 <template>

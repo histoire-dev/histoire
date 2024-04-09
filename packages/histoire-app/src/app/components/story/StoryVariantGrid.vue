@@ -3,10 +3,10 @@ import { useResizeObserver } from '@vueuse/core'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useStoryStore } from '../../stores/story'
 import { isMobile } from '../../util/responsive'
-import StoryVariantGridItem from './StoryVariantGridItem.vue'
 import ToolbarBackground from '../toolbar/ToolbarBackground.vue'
 import ToolbarTextDirection from '../toolbar/ToolbarTextDirection.vue'
 import DevOnlyToolbarOpenInEditor from '../toolbar/DevOnlyToolbarOpenInEditor.vue'
+import StoryVariantGridItem from './StoryVariantGridItem.vue'
 
 const storyStore = useStoryStore()
 
@@ -22,7 +22,7 @@ const gridTemplateWidth = computed(() => {
   }
 
   if (typeof layoutWidth === 'number') {
-    return layoutWidth + 'px'
+    return `${layoutWidth}px`
   }
 
   return layoutWidth
@@ -44,7 +44,7 @@ useResizeObserver(el, () => {
   updateSize()
 })
 
-function updateMaxCount () {
+function updateMaxCount() {
   if (!maxItemHeight.value) return
 
   const width = el.value!.clientWidth - margin * 2
@@ -74,7 +74,7 @@ function updateMaxCount () {
   }
 }
 
-function onItemResize (w: number, h: number) {
+function onItemResize(w: number, h: number) {
   itemWidth.value = w
   if (maxItemHeight.value < h) {
     maxItemHeight.value = h
@@ -93,16 +93,17 @@ const gridEl = ref<HTMLDivElement>(null)
 const gridColumnWidth = ref(1)
 const viewWidth = ref(1)
 
-function updateSize () {
+function updateSize() {
   if (!el.value) return
   viewWidth.value = el.value.clientWidth
 
   if (!gridEl.value) return
 
   if (gridTemplateWidth.value.endsWith('%')) {
-    gridColumnWidth.value = viewWidth.value * parseInt(gridTemplateWidth.value) / 100 - gap
-  } else {
-    gridColumnWidth.value = parseInt(gridTemplateWidth.value)
+    gridColumnWidth.value = viewWidth.value * Number.parseInt(gridTemplateWidth.value) / 100 - gap
+  }
+  else {
+    gridColumnWidth.value = Number.parseInt(gridTemplateWidth.value)
   }
 }
 

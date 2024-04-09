@@ -2,6 +2,35 @@
   "tailwindCSS.experimental.configFile": {
     "tailwind.config.cjs": "docs/**",
     "packages/histoire-app/tailwind.config.cjs": "packages/histoire-app/**",
-    "packages/histoire-controls/tailwind.config.cjs": "packages/histoire-controls/**",
-  }
+    "packages/histoire-controls/tailwind.config.cjs": "packages/histoire-controls/**"
+  },
+
+  // Enable the ESlint flat config support
+  "eslint.experimental.useFlatConfig": true,
+
+  // Disable the default formatter, use eslint instead
+  "editor.formatOnSave": false,
+
+  // Auto fix
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit",
+    "source.organizeImports": "never"
+  },
+
+  // Enable eslint for all supported languages
+  "eslint.validate": [
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact",
+    "vue",
+    "html",
+    "markdown",
+    "json",
+    "jsonc",
+    "yaml",
+    "toml",
+    "gql",
+    "graphql"
+  ]
 }

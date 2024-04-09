@@ -1,7 +1,8 @@
 <script lang="ts" setup>
-import { PropType, ref, toRefs } from 'vue'
+import type { PropType } from 'vue'
+import { ref, toRefs } from 'vue'
 import { useRouter } from 'vue-router'
-import { SearchResult } from '../../types'
+import type { SearchResult } from '../../types'
 import { onKeyboardShortcut } from '../../util/keyboard'
 import { useScrollOnActive } from '../../util/scroll'
 import BaseListItemLink from '../base/BaseListItemLink.vue'
@@ -36,7 +37,7 @@ onKeyboardShortcut(['enter'], () => {
   action()
 })
 
-function action (fromClick = false) {
+function action(fromClick = false) {
   if ('route' in props.result && !fromClick) {
     router.push(props.result.route)
   }

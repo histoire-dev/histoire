@@ -1,14 +1,14 @@
-/* eslint-disable vue/one-component-per-file */
-
-import { SvelteComponent } from 'svelte'
+import type { SvelteComponent } from 'svelte'
+import type {
+  PropType as _PropType,
+} from '@histoire/vendors/vue'
 import {
   defineComponent as _defineComponent,
-  PropType as _PropType,
+  h as _h,
   onMounted as _onMounted,
   onUnmounted as _onUnmounted,
   ref as _ref,
   watch as _watch,
-  h as _h,
 } from '@histoire/vendors/vue'
 import type { Story } from '@histoire/shared'
 import { components } from '@histoire/controls'
@@ -16,10 +16,10 @@ import { components } from '@histoire/controls'
 import * as setup from 'virtual:$histoire-setup'
 // @ts-expect-error virtual module id
 import * as generatedSetup from 'virtual:$histoire-generated-global-setup'
+import type { SvelteStorySetupApi } from '../helpers.js'
 import MountStorySvelte from './MountStory.svelte'
 import MountVariantSvelte from './MountVariant.svelte'
 import StubComponent from './Stub.svelte'
-import type { SvelteStorySetupApi } from '../helpers.js'
 
 export default _defineComponent({
   name: 'MountStory',
@@ -31,12 +31,12 @@ export default _defineComponent({
     },
   },
 
-  setup (props) {
+  setup(props) {
     const el = _ref<HTMLDivElement>()
     let app: SvelteComponent
     let target: HTMLDivElement
 
-    async function mountStory () {
+    async function mountStory() {
       target = document.createElement('div')
       el.value.appendChild(target)
 
@@ -45,9 +45,7 @@ export default _defineComponent({
         target,
         props: {
           Hst: {
-            // @ts-ignore
             Story: MountStorySvelte,
-            // @ts-ignore
             Variant: MountVariantSvelte,
             ...getControls(),
           },
@@ -82,7 +80,7 @@ export default _defineComponent({
       }
     }
 
-    function unmountStory () {
+    function unmountStory() {
       app?.$destroy()
       if (target) {
         target.parentNode?.removeChild(target)
@@ -108,14 +106,14 @@ export default _defineComponent({
     }
   },
 
-  render () {
+  render() {
     return _h('div', {
       ref: 'el',
     })
   },
 })
 
-function getControls () {
+function getControls() {
   const result: Record<string, any> = {}
   for (const key in components) {
     result[key.substring(3)] = StubComponent

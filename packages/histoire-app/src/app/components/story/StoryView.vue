@@ -7,9 +7,9 @@ import { useStoryStore } from '../../stores/story'
 import BaseSplitPane from '../base/BaseSplitPane.vue'
 import BaseEmpty from '../base/BaseEmpty.vue'
 import { isMobile } from '../../util/responsive'
-import StoryViewer from './StoryViewer.vue'
 import StorySidePanel from '../panel/StorySidePanel.vue'
 import StoryDocs from '../panel/StoryDocs.vue'
+import StoryViewer from './StoryViewer.vue'
 
 const storyStore = useStoryStore()
 
@@ -18,7 +18,7 @@ const route = useRoute()
 
 // Restore variant selection
 
-watch(() => storyStore.currentVariant, value => {
+watch(() => storyStore.currentVariant, (value) => {
   if (value) {
     storyStore.currentStory.lastSelectedVariant = value
   }
@@ -41,7 +41,7 @@ watch(() => [storyStore.currentStory, storyStore.currentVariant], () => {
   immediate: true,
 })
 
-function setVariant (variantId: string) {
+function setVariant(variantId: string) {
   router.replace({
     ...route,
     query: {
@@ -55,7 +55,7 @@ function setVariant (variantId: string) {
 
 const docsOnlyScroller = ref<HTMLElement>(null)
 
-function scrollDocsToTop () {
+function scrollDocsToTop() {
   docsOnlyScroller.value?.scrollTo(0, 0)
 }
 </script>

@@ -1,11 +1,12 @@
 {
   "name": "@histoire/plugin-nuxt",
+  "type": "module",
   "version": "0.17.16",
   "description": "Histoire plugin to integrate with Nuxt 3",
-  "license": "MIT",
   "author": {
     "name": "Guillaume Chau"
   },
+  "license": "MIT",
   "repository": {
     "url": "https://github.com/Akryum/histoire.git",
     "type": "git",
@@ -14,7 +15,6 @@
   "publishConfig": {
     "access": "public"
   },
-  "type": "module",
   "exports": {
     ".": "./dist/index.js",
     "./*": "./*"
@@ -25,6 +25,11 @@
   "scripts": {
     "build": "rimraf dist && tsc -d",
     "watch": "tsc -d -w --sourceMap"
+  },
+  "peerDependencies": {
+    "@histoire/plugin-vue": "workspace:^",
+    "histoire": "workspace:^",
+    "nuxt": "^3.0.0-rc.11"
   },
   "dependencies": {
     "@nuxt/kit": "^3.8.2",
@@ -37,12 +42,7 @@
     "@nuxt/schema": "^3.8.2",
     "@types/node": "^18.11.9",
     "histoire": "workspace:*",
-    "typescript": "^4.9.5",
+    "typescript": "^5.4.4",
     "vite": "^5.0.11"
-  },
-  "peerDependencies": {
-    "@histoire/plugin-vue": "workspace:^",
-    "histoire": "workspace:^",
-    "nuxt": "^3.0.0-rc.11"
   }
 }

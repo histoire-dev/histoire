@@ -11,7 +11,7 @@ import DemoLinks from './DemoLinks.vue'
 
 export default {
   ...DefaultTheme,
-  enhanceApp ({ app }) {
+  enhanceApp({ app }) {
     app.use(FloatingVue, {
       themes: {
         dropdown: {

@@ -31,7 +31,7 @@ export interface ClientCommandContext {
 }
 
 export interface PluginCommand<
-  TParams = Record<string, any>
+  TParams = Record<string, any>,
 > extends Command {
   serverAction?: (params: TParams) => unknown // @TODO ctx
   clientSetupFile?: string | { file: string, importName: string }

@@ -1,9 +1,9 @@
-import { PublicRuntimeConfig } from '@nuxt/schema'
+import type { PublicRuntimeConfig } from '@nuxt/schema'
 import type { App } from 'h3'
 import { createApp } from 'h3'
 import { createFetch } from 'ofetch'
 
-export async function setupNuxtApp (publicConfig: PublicRuntimeConfig) {
+export async function setupNuxtApp(publicConfig: PublicRuntimeConfig) {
   const win = window as unknown as Window & {
     __app: App
     __registry: Set<string>
@@ -29,10 +29,10 @@ export async function setupNuxtApp (publicConfig: PublicRuntimeConfig) {
   app.id = 'nuxt-test'
   win.document.body.appendChild(app)
 
-  win.IntersectionObserver =
-      win.IntersectionObserver ||
-      class IntersectionObserver {
-        observe () {
+  win.IntersectionObserver
+      = win.IntersectionObserver
+      || class IntersectionObserver {
+        observe() {
           // noop
         }
       }
@@ -55,7 +55,7 @@ export async function setupNuxtApp (publicConfig: PublicRuntimeConfig) {
 
     win.fetch = (init: string, options?: any) => {
       if (typeof init === 'string' && registry.has(init)) {
-        init = '/_' + init
+        init = `/_${init}`
       }
       return localFetch(init, options)
     }
@@ -66,7 +66,7 @@ export async function setupNuxtApp (publicConfig: PublicRuntimeConfig) {
   win.__registry = registry
   win.__app = h3App
 
-  // @ts-ignore
+  // @ts-expect-error no types
   const result = await import('#app/entry')
   await result.default()
 }

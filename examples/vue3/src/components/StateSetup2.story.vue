@@ -2,7 +2,7 @@
 import { reactive, ref } from 'vue'
 
 export default {
-  setup () {
+  setup() {
     const state = reactive({
       count: 0,
       text: 'Meow',

@@ -6,7 +6,7 @@ export interface PreviewOptions {
   port?: number
 }
 
-export async function previewCommand (options: PreviewOptions) {
+export async function previewCommand(options: PreviewOptions) {
   const ctx = await createContext({
     mode: 'build',
   })

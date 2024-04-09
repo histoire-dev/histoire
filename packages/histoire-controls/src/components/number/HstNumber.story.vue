@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import HstNumber from './HstNumber.vue'
 
-function initState () {
+function initState() {
   return {
     count: 20,
     step: 1,

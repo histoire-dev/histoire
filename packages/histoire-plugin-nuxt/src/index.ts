@@ -14,12 +14,12 @@ const ignorePlugins = [
   'nuxt:import-protection',
 ]
 
-export function HstNuxt (): Plugin {
+export function HstNuxt(): Plugin {
   let nuxt: Nuxt
   return {
     name: '@histoire/plugin-nuxt',
 
-    async defaultConfig () {
+    async defaultConfig() {
       const nuxtViteConfig = await useNuxtViteConfig()
       const { viteConfig } = nuxtViteConfig
 
@@ -93,23 +93,23 @@ export async function setupVue3 () {
       }
     },
 
-    onDev (api, onCleanup) {
+    onDev(api, onCleanup) {
       onCleanup(async () => {
         nuxt?.close()
       })
     },
 
-    onBuild () {
+    onBuild() {
       nuxt?.close()
     },
 
-    onPreview () {
+    onPreview() {
       nuxt?.close()
     },
   }
 }
 
-async function useNuxtViteConfig () {
+async function useNuxtViteConfig() {
   const { loadNuxt, buildNuxt } = await import('@nuxt/kit')
   const nuxt = await loadNuxt({
     // cwd: process.cwd(),
@@ -139,12 +139,12 @@ async function useNuxtViteConfig () {
     { src: join(runtimeDir, 'components.mjs'), filename: 'histoire/components.mjs' },
   )
 
-  nuxt.hook('app:templates', app => {
+  nuxt.hook('app:templates', (app) => {
     app.templates = app.templates.filter(template => template.filename !== 'app-component.mjs')
     app.templates.push({ src: join(runtimeDir, 'app-component.mjs'), filename: 'app-component.mjs' })
   })
 
-  nuxt.hook('imports:sources', presets => {
+  nuxt.hook('imports:sources', (presets) => {
     const stubbedComposables = ['useNuxtApp']
     for (const appPreset of presets.filter(p => p.from?.startsWith('#app'))) {
       appPreset.imports = appPreset.imports.filter(i => typeof i !== 'string' || !stubbedComposables.includes(i))
@@ -175,7 +175,7 @@ async function useNuxtViteConfig () {
       })
       nuxt.ready()
         .then(() => buildNuxt(nuxt))
-        .catch(err => {
+        .catch((err) => {
           if (!err.toString().includes('_stop_')) {
             reject(err)
           }

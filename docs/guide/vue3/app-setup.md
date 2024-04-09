@@ -18,7 +18,7 @@ export const setupVue3 = defineSetupVue3(({ app, story, variant }) => {
   app.component('GlobalComponent', MyGlobalComponent)
 
   // Global property
-  app.config.globalProperties.$t = (key) => translate(key)
+  app.config.globalProperties.$t = key => translate(key)
 
   // Provide
   app.provide('key', 'meow')

@@ -8,7 +8,7 @@ interface ReturnPayload {
   close: () => Promise<void>
 }
 
-export async function startPreview (port: number | null, ctx: Context): Promise<ReturnPayload> {
+export async function startPreview(port: number | null, ctx: Context): Promise<ReturnPayload> {
   const app = connect()
 
   app.use(
@@ -25,10 +25,11 @@ export async function startPreview (port: number | null, ctx: Context): Promise<
   const httpServer = http.createServer(app)
 
   return new Promise((resolve, reject) => {
-    function onError (e: Error & { code?: string }) {
+    function onError(e: Error & { code?: string }) {
       if (e.code === 'EADDRINUSE') {
         httpServer.listen(++finalPort)
-      } else {
+      }
+      else {
         reject(e)
       }
     }
@@ -44,7 +45,8 @@ export async function startPreview (port: number | null, ctx: Context): Promise<
           httpServer.close((err) => {
             if (err) {
               reject(err)
-            } else {
+            }
+            else {
               resolve()
             }
           })

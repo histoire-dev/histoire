@@ -1,8 +1,8 @@
 {
   "name": "histoire-example-vue3-percy",
+  "type": "module",
   "version": "0.0.1",
   "private": true,
-  "type": "module",
   "scripts": {
     "story:dev": "histoire dev",
     "story:build": "histoire build",

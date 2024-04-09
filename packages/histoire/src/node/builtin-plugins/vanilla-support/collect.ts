@@ -1,7 +1,7 @@
 import type { ServerRunPayload, ServerStory, ServerVariant } from '@histoire/shared'
 import type { StoryOptions, VariantOptions } from './types'
 
-export async function run ({ file, storyData }: ServerRunPayload) {
+export async function run({ file, storyData }: ServerRunPayload) {
   const { default: Comp } = await import(/* @vite-ignore */ file.moduleId)
 
   const options = Comp as StoryOptions
@@ -14,7 +14,8 @@ export async function run ({ file, storyData }: ServerRunPayload) {
       id: '_default',
       title: 'default',
     }]
-  } else {
+  }
+  else {
     rawVariants = options.variants
   }
 

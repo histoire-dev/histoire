@@ -6,7 +6,7 @@
       title="array"
     >
       <div
-        :list="['a', 2, { foo: 'bar' } ]"
+        :list="['a', 2, { foo: 'bar' }]"
       >
         Array
       </div>

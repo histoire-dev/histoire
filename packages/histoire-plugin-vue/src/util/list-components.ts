@@ -1,6 +1,6 @@
 import { globby } from 'globby'
 
-export async function listComponentFiles (search = '', ignore: string[] = [], limit = 10) {
+export async function listComponentFiles(search = '', ignore: string[] = [], limit = 10) {
   let files = await globby('**/*.vue', {
     gitignore: true,
     ignore: [

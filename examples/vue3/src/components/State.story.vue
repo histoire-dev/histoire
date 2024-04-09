@@ -1,12 +1,12 @@
 <script lang="ts" setup>
-function initState () {
+function initState() {
   return {
     count: 0,
     text: '',
   }
 }
 
-function initState2 () {
+function initState2() {
   return {
     meow: {
       foo: 'bar',

@@ -1,23 +1,24 @@
-/* eslint-disable vue/one-component-per-file */
-
-import { App, createApp, h, Suspense, Component, VNode } from 'vue'
+import type { App, Component, VNode } from 'vue'
+import { Suspense, createApp, h } from 'vue'
+import type {
+  PropType as _PropType,
+} from '@histoire/vendors/vue'
 import {
   defineComponent as _defineComponent,
-  PropType as _PropType,
+  h as _h,
   onMounted as _onMounted,
   onUnmounted as _onUnmounted,
   ref as _ref,
   watch as _watch,
-  h as _h,
 } from '@histoire/vendors/vue'
 import type { Story } from '@histoire/shared'
 // @ts-expect-error virtual module id
 import * as setup from 'virtual:$histoire-setup'
 // @ts-expect-error virtual module id
 import * as generatedSetup from 'virtual:$histoire-generated-global-setup'
+import type { Vue3StorySetupApi, Vue3StorySetupHandler } from '../../helpers.js'
 import { registerGlobalComponents } from './global-components.js'
 import { RouterLinkStub } from './RouterLinkStub'
-import type { Vue3StorySetupHandler, Vue3StorySetupApi } from '../../helpers.js'
 
 export default _defineComponent({
   name: 'MountStory',
@@ -29,11 +30,11 @@ export default _defineComponent({
     },
   },
 
-  setup (props) {
+  setup(props) {
     const el = _ref<HTMLDivElement>()
     let app: App
 
-    async function mountStory () {
+    async function mountStory() {
       const wrappers: Component[] = []
 
       app = createApp({
@@ -52,14 +53,11 @@ export default _defineComponent({
               h(wrapper, {
                 story: props.story,
                 variant: null,
-              },
-              () => children[index]),
+              }, () => children[index]),
             )
           }
 
-          return h(Suspense, undefined,
-            children.at(-1),
-          )
+          return h(Suspense, undefined, children.at(-1))
         },
       })
 
@@ -101,7 +99,7 @@ export default _defineComponent({
       app.mount(target)
     }
 
-    function unmountStory () {
+    function unmountStory() {
       app?.unmount()
     }
 
@@ -123,7 +121,7 @@ export default _defineComponent({
     }
   },
 
-  render () {
+  render() {
     return _h('div', {
       ref: 'el',
     })

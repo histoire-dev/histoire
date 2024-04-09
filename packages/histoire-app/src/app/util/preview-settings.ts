@@ -1,10 +1,10 @@
 import { reactive } from 'vue'
-import { histoireConfig } from './config'
 import type { PreviewSettings } from '../types'
+import { histoireConfig } from './config'
 
 export const receivedSettings = reactive<PreviewSettings>({} as PreviewSettings)
 
-export function applyPreviewSettings (settings: PreviewSettings) {
+export function applyPreviewSettings(settings: PreviewSettings) {
   Object.assign(receivedSettings, settings)
 
   // Text direction
@@ -18,6 +18,6 @@ export function applyPreviewSettings (settings: PreviewSettings) {
   }
 }
 
-export function getContrastColor (setting: PreviewSettings) {
+export function getContrastColor(setting: PreviewSettings) {
   return histoireConfig.backgroundPresets.find(preset => preset.color === setting.backgroundColor)?.contrastColor ?? 'unset'
 }

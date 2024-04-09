@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { defineAsyncComponent } from 'vue'
 import SearchLoading from './SearchLoading.vue'
+
 const SearchPane = defineAsyncComponent({
   loader: () => import('./SearchPane.vue'),
   loadingComponent: SearchLoading,
@@ -18,7 +19,7 @@ const emit = defineEmits({
   close: () => true,
 })
 
-function close () {
+function close() {
   emit('close')
 }
 </script>

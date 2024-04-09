@@ -1,5 +1,6 @@
 import { useEventListener } from '@vueuse/core'
-import { isRef, Ref } from 'vue'
+import type { Ref } from 'vue'
+import { isRef } from 'vue'
 import { isMac } from './env.js'
 
 export type KeyboardShortcut = string[]
@@ -10,8 +11,8 @@ export interface KeyboardShortcutOptions {
   event?: 'keyup' | 'keydown' | 'keypress'
 }
 
-export function onKeyboardShortcut (shortcut: KeyboardShortcut | Ref<KeyboardShortcut>, handler: KeyboardHandler, options: KeyboardShortcutOptions = {}) {
-  useEventListener(options.event ?? 'keydown', event => {
+export function onKeyboardShortcut(shortcut: KeyboardShortcut | Ref<KeyboardShortcut>, handler: KeyboardHandler, options: KeyboardShortcutOptions = {}) {
+  useEventListener(options.event ?? 'keydown', (event) => {
     if (isMatchingShortcut(isRef(shortcut) ? shortcut.value : shortcut)) {
       handler(event)
     }
@@ -27,7 +28,7 @@ const modifiers: { [i: string]: { key: string, pressed: boolean } } = {
 
 const pressedKeys = new Set<string>()
 
-window.addEventListener('keydown', event => {
+window.addEventListener('keydown', (event) => {
   for (const i in modifiers) {
     const mod = modifiers[i]
     if (mod.key === event.key) {
@@ -38,7 +39,7 @@ window.addEventListener('keydown', event => {
   pressedKeys.add(event.key.toLocaleLowerCase())
 })
 
-window.addEventListener('keyup', event => {
+window.addEventListener('keyup', (event) => {
   requestAnimationFrame(() => {
     pressedKeys.clear()
     for (const i in modifiers) {
@@ -59,7 +60,7 @@ window.addEventListener('blur', () => {
   }
 })
 
-function isMatchingShortcut (shortcut: KeyboardShortcut): boolean {
+function isMatchingShortcut(shortcut: KeyboardShortcut): boolean {
   for (const combination of shortcut) {
     if (isMatchingCombination(combination.toLowerCase())) {
       return true
@@ -68,7 +69,7 @@ function isMatchingShortcut (shortcut: KeyboardShortcut): boolean {
   return false
 }
 
-function isMatchingCombination (combination: string): boolean {
+function isMatchingCombination(combination: string): boolean {
   const splitted = combination.split('+').map(key => key.trim())
   const targetKey = splitted.pop()
   for (const mod in modifiers) {
@@ -81,7 +82,7 @@ function isMatchingCombination (combination: string): boolean {
   return pressedKeys.has(targetKey)
 }
 
-export function formatKey (key: string) {
+export function formatKey(key: string) {
   key = key.toLowerCase()
   if (key === 'ctrl') {
     return isMac ? '^' : 'Ctrl'

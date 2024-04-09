@@ -1,10 +1,8 @@
-/* eslint-disable @typescript-eslint/ban-types */
-
-export function indent (lines: string[], count = 1) {
+export function indent(lines: string[], count = 1) {
   return lines.map(line => `${'  '.repeat(count)}${line}`)
 }
 
-export function unindent (code: string) {
+export function unindent(code: string) {
   const lines = code.split('\n')
   let indentLevel = -1
   let indentText: string
@@ -30,15 +28,15 @@ interface AutoBuildingOject {
   proxy: any
 }
 
-export function createAutoBuildingObject (format?: (key: string) => string, specialKeysHandler?: (target: any, p: string | symbol) => (() => unknown) | null, key = '', depth = 0): AutoBuildingOject {
+export function createAutoBuildingObject(format?: (key: string) => string, specialKeysHandler?: (target: any, p: string | symbol) => (() => unknown) | null, key = '', depth = 0): AutoBuildingOject {
   const cache: Record<string | symbol, AutoBuildingOject> = {}
   if (depth > 32) return { key, cache, target: {}, proxy: () => key }
   const target: any = () => {
-    const k = key + '()'
+    const k = `${key}()`
     return format ? format(k) : k
   }
   const proxy = new Proxy(target, {
-    get (_, p) {
+    get(_, p) {
       if (p === '__autoBuildingObject') {
         return true
       }
@@ -52,7 +50,7 @@ export function createAutoBuildingObject (format?: (key: string) => string, spec
         }
       }
       if (p === 'toString') {
-        const k = key + '.toString()'
+        const k = `${key}.toString()`
         return () => format ? format(k) : k
       }
       if (p === Symbol.toPrimitive) {
@@ -65,7 +63,7 @@ export function createAutoBuildingObject (format?: (key: string) => string, spec
       }
       return cache[p].proxy
     },
-    apply (_, thisArg, args) {
+    apply(_, thisArg, args) {
       const k = `${key}(${args.join(', ')})`
       return format ? format(k) : k
     },

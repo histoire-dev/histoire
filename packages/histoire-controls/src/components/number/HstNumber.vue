@@ -6,7 +6,7 @@ export default {
 </script>
 
 <script lang="ts" setup>
-import { computed, ref, onUnmounted } from 'vue'
+import { computed, onUnmounted, ref } from 'vue'
 import HstWrapper from '../HstWrapper.vue'
 
 const props = defineProps<{
@@ -20,14 +20,14 @@ const emit = defineEmits({
 
 const numberModel = computed({
   get: () => props.modelValue,
-  set: value => {
+  set: (value) => {
     emit('update:modelValue', value)
   },
 })
 
 const input = ref<HTMLInputElement>()
 
-function focusAndSelect () {
+function focusAndSelect() {
   input.value.focus()
   input.value.select()
 }
@@ -38,7 +38,7 @@ const isDragging = ref(false)
 let startX: number
 let startValue: number
 
-function onMouseDown (event: MouseEvent) {
+function onMouseDown(event: MouseEvent) {
   isDragging.value = true
   startX = event.clientX
   startValue = numberModel.value
@@ -46,15 +46,15 @@ function onMouseDown (event: MouseEvent) {
   window.addEventListener('mouseup', stopDragging)
 }
 
-function onMouseMove (event: MouseEvent) {
-  let step = parseFloat(input.value.step)
-  if (isNaN(step)) {
+function onMouseMove(event: MouseEvent) {
+  let step = Number.parseFloat(input.value.step)
+  if (Number.isNaN(step)) {
     step = 1
   }
   numberModel.value = startValue + Math.round((event.clientX - startX) / 10 / step) * step
 }
 
-function stopDragging () {
+function stopDragging() {
   isDragging.value = false
   window.removeEventListener('mousemove', onMouseMove)
   window.removeEventListener('mouseup', stopDragging)

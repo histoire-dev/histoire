@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { computed } from 'vue'
-import { HstEvent } from '../../stores/events'
+import type { HstEvent } from '../../stores/events'
 
 const props = defineProps<{
   event: HstEvent
@@ -11,7 +11,7 @@ const formattedArgument = computed(() => {
     case 'string':
       return `"${props.event.argument}"`
     case 'object':
-      return `{ ${Object.keys(props.event.argument).map((key) => `${key}: ${props.event.argument[key]}`).join(', ')} }`
+      return `{ ${Object.keys(props.event.argument).map(key => `${key}: ${props.event.argument[key]}`).join(', ')} }`
     default:
       return props.event.argument
   }

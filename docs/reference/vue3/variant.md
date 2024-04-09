@@ -48,10 +48,10 @@ Function that returns the intial state.
 
 ```vue
 <script setup>
-function initState () {
+function initState() {
   return {
     disabled: false,
-    content: "Hello world"
+    content: 'Hello world'
   }
 }
 </script>
@@ -83,7 +83,7 @@ It receives a payload object as parameter with the following properties:
 
 ```vue
 <script setup>
-function mySetupApp ({ app, story, variant }) {
+function mySetupApp({ app, story, variant }) {
   app.provide('demo', 'meow')
 }
 </script>
@@ -212,6 +212,7 @@ Props:
     <Variant>
       <template #controls="{ state }">
         <!-- Interact with state here -->
+        {{ state }}
       </template>
     </Variant>
   </Story>

@@ -1,23 +1,25 @@
+import { performance } from 'node:perf_hooks'
 import { join } from 'pathe'
-import {
-  build as viteBuild,
-  createServer as createViteServer,
+import type {
   InlineConfig as ViteInlineConfig,
-  mergeConfig as mergeViteConfig,
   Plugin as VitePlugin,
+} from 'vite'
+import {
+  createServer as createViteServer,
+  mergeConfig as mergeViteConfig,
+  build as viteBuild,
 } from 'vite'
 import fs from 'fs-extra'
 import { lookup as lookupMime } from 'mrmime'
 import pc from 'picocolors'
-import { performance } from 'node:perf_hooks'
 import type {
-  ChangeViteConfigCallback,
   BuildEndCallback,
+  ChangeViteConfigCallback,
   PreviewStoryCallback,
 } from '@histoire/shared'
 import type { RollupOutput } from 'rollup'
 import { APP_PATH } from './alias.js'
-import { Context } from './context.js'
+import type { Context } from './context.js'
 import { getViteConfigWithPlugins } from './vite.js'
 import { findAllStories } from './stories.js'
 import { useCollectStories } from './collect/index.js'
@@ -37,7 +39,7 @@ const PREFETCHED_MODULES = [
   'global-components',
 ]
 
-export async function build (ctx: Context) {
+export async function build(ctx: Context) {
   const startTime = performance.now()
   await findAllStories(ctx)
 
@@ -94,7 +96,7 @@ export async function build (ctx: Context) {
           {
             name: 'histoire-build-rollup-options-override',
             enforce: 'post',
-            options (options) {
+            options(options) {
               // Don't externalize
               options.external = []
             },
@@ -110,7 +112,7 @@ export async function build (ctx: Context) {
   // Nuxt: replaces the Nuxt vite dev server
   buildViteConfig.plugins.push({
     name: 'histoire-vue-plugin-override',
-    config (config) {
+    config(config) {
       const vuePlugin = config.plugins.find((p: any) => p.name === 'vite:vue') as VitePlugin
       if (vuePlugin) {
         // @ts-expect-error vue plugin use function form
@@ -135,13 +137,13 @@ export async function build (ctx: Context) {
   buildViteConfig.plugins.push({
     name: 'histoire-build-config-override',
     enforce: 'post',
-    config (config) {
+    config(config) {
       // Don't externalize
       config.build.rollupOptions.external = []
 
       // Force chunk strategy
       config.build.rollupOptions.output = {
-        manualChunks (id) {
+        manualChunks(id) {
           if (!id.includes('@histoire/app') && id.includes('node_modules')) {
             for (const test of ctx.config.build?.excludeFromVendorsChunk ?? []) {
               if ((
@@ -240,7 +242,7 @@ export async function build (ctx: Context) {
   }
 }
 
-function generateBaseHtml (head: string, body: string, ctx: Context) {
+function generateBaseHtml(head: string, body: string, ctx: Context) {
   return `<!DOCTYPE html>
 <html>
 <head>
@@ -256,7 +258,7 @@ function generateBaseHtml (head: string, body: string, ctx: Context) {
 </html>`
 }
 
-function generateEntryHtml (jsEntryFile: string, cssEntryFile: string, variables: { HEAD?: string }, ctx: Context) {
+function generateEntryHtml(jsEntryFile: string, cssEntryFile: string, variables: { HEAD?: string }, ctx: Context) {
   return generateBaseHtml(
     `<link rel="stylesheet" href="${ctx.resolvedViteConfig.base}${cssEntryFile}">
     ${ctx.config.theme?.favicon ? `<link rel="icon" type="${lookupMime(ctx.config.theme.favicon)}" href="${ctx.resolvedViteConfig.base}${ctx.config.theme.favicon}"/>` : ''}
@@ -267,10 +269,10 @@ function generateEntryHtml (jsEntryFile: string, cssEntryFile: string, variables
   )
 }
 
-async function writeFile (fileName: string, content: string, ctx: Context) {
+async function writeFile(fileName: string, content: string, ctx: Context) {
   await fs.writeFile(join(ctx.config.outDir, fileName), content, 'utf8')
 }
 
-function generateScriptLinks (prefetchScripts: string[], rel: string, ctx: Context) {
+function generateScriptLinks(prefetchScripts: string[], rel: string, ctx: Context) {
   return prefetchScripts.map(s => `<link rel="${rel}" href="${ctx.resolvedViteConfig.base}${s}" as="script" crossOrigin="anonymous">`).join('')
 }

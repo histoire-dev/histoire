@@ -12,7 +12,7 @@ import { reactive } from 'vue'
 import MyComponent from './MyComponent.vue'
 
 const state = reactive({
-  text: "Hello world"
+  text: 'Hello world'
 })
 </script>
 
@@ -36,7 +36,7 @@ import { reactive } from 'vue'
 import MyComponent from './MyComponent.vue'
 
 const state = reactive({
-  text: "Hello world"
+  text: 'Hello world'
 })
 </script>
 
@@ -65,7 +65,7 @@ import { reactive } from 'vue'
 import MyComponent from './MyComponent.vue'
 
 const state = reactive({
-  text: "Hello world"
+  text: 'Hello world'
 })
 </script>
 
@@ -92,16 +92,16 @@ This will isolate each variant so that you control only one variant at a time.
 <script lang="ts" setup>
 import MyComponent from './MyComponent.vue'
 
-function initState () {
+function initState() {
   return {
-    text: "Hello world"
+    text: 'Hello world'
   }
 }
 </script>
 
 <template>
   <Story title="MyStory">
-    <Variant 
+    <Variant
       title="MyVariant Red"
       :init-state="initState"
     >

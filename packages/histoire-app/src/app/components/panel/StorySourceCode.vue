@@ -1,11 +1,12 @@
 <script lang="ts" setup>
 import { computed, markRaw, nextTick, onMounted, ref, shallowRef, watch, watchEffect } from 'vue'
 import { Icon } from '@iconify/vue'
-import { getHighlighter, Highlighter } from 'shiki-es'
+import type { Highlighter } from 'shiki-es'
+import { getHighlighter } from 'shiki-es'
 import { HstCopyIcon } from '@histoire/controls'
 import { unindent } from '@histoire/shared'
 import { clientSupportPlugins } from 'virtual:$histoire-support-plugins-client'
-import type { Variant, Story } from '../../types'
+import type { Story, Variant } from '../../types'
 import { isDark } from '../../util/dark'
 import BaseEmpty from '../base/BaseEmpty.vue'
 
@@ -36,15 +37,18 @@ watch(() => [props.variant, generateSourceCodeFn.value], async () => {
   try {
     if (props.variant.source) {
       dynamicSourceCode.value = props.variant.source
-    } else if (props.variant.slots?.().source) {
+    }
+    else if (props.variant.slots?.().source) {
       const source = props.variant.slots?.().source()[0].children
       if (source) {
         dynamicSourceCode.value = await unindent(source)
       }
-    } else {
+    }
+    else {
       dynamicSourceCode.value = await generateSourceCodeFn.value(props.variant)
     }
-  } catch (e) {
+  }
+  catch (e) {
     console.error(e)
     error.value = e.message
   }
@@ -113,7 +117,7 @@ watch(() => props.variant, () => {
 
 const scroller = ref<HTMLElement>()
 
-function onScroll (event) {
+function onScroll(event) {
   if (sourceHtml.value) {
     lastScroll = event.target.scrollTop
   }

@@ -1,7 +1,6 @@
 /// <reference types="histoire" />
 
 import { defineConfig } from 'vite'
-// @ts-ignore
 import { sveltekit } from '@sveltejs/kit/vite'
 import { HstSvelte } from '@histoire/plugin-svelte'
 

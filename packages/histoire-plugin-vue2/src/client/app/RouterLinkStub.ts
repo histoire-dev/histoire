@@ -28,8 +28,8 @@ export const RouterLinkStub = defineComponent({
       default: 'click',
     },
   },
-  render (h) {
-    // @ts-ignore
+  render(h) {
+    // @ts-expect-error TODO
     return h(this.tag, undefined, this.$slots.default)
   },
 })

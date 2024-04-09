@@ -6,7 +6,7 @@ Lost Pixel is a [modern open-source visual regression testing tool](https://gith
 
 Lost Pixel has first-class Histoire support meaning that you don't need to do much to add visual tests to your app if you have your Histoire book ready!
 
-Start with installing lost-pixel by `npm install lost-pixel` and creating a `lostpixel.config.js|ts` file with following contents. 
+Start with installing lost-pixel by `npm install lost-pixel` and creating a `lostpixel.config.js|ts` file with following contents.
 
 ```javascript
 import { CustomProjectConfig } from 'lost-pixel';
@@ -44,7 +44,7 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 18.x
-          cache: 'npm'
+          cache: npm
 
       - name: Install dependencies
         run: npm install

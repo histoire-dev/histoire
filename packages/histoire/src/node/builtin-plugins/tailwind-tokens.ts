@@ -6,7 +6,7 @@ export interface TailwindTokensOptions {
   configFile?: string
 }
 
-export function tailwindTokens (options: TailwindTokensOptions = {}): Plugin {
+export function tailwindTokens(options: TailwindTokensOptions = {}): Plugin {
   const tailwindConfigFile = options.configFile ?? findUp(process.cwd(), [
     'tailwind.config.js',
     'tailwind.config.cjs',
@@ -18,7 +18,7 @@ export function tailwindTokens (options: TailwindTokensOptions = {}): Plugin {
     'tailwind-config.ts',
   ])
 
-  async function generate (api: PluginApiBase) {
+  async function generate(api: PluginApiBase) {
     try {
       await api.fs.ensureDir(api.pluginTempDir)
       await api.fs.emptyDir(api.pluginTempDir)
@@ -30,7 +30,8 @@ export function tailwindTokens (options: TailwindTokensOptions = {}): Plugin {
       const storyFile = api.path.resolve(api.pluginTempDir, 'Tailwind.story.js')
       await api.fs.writeFile(storyFile, storyTemplate(resolvedTailwindConfig))
       api.addStoryFile(storyFile)
-    } catch (e) {
+    }
+    catch (e) {
       api.error(e.stack ?? e.message)
     }
   }
@@ -38,7 +39,7 @@ export function tailwindTokens (options: TailwindTokensOptions = {}): Plugin {
   return {
     name: 'builtin:tailwind-tokens',
 
-    config (config) {
+    config(config) {
       if (tailwindConfigFile) {
         // Add 'design-system' group
         if (!config.tree) {
@@ -63,7 +64,7 @@ export function tailwindTokens (options: TailwindTokensOptions = {}): Plugin {
       }
     },
 
-    onDev (api, onCleanup) {
+    onDev(api, onCleanup) {
       if (tailwindConfigFile) {
         const watcher = api.watcher.watch(tailwindConfigFile)
           .on('change', () => generate(api))
@@ -74,7 +75,7 @@ export function tailwindTokens (options: TailwindTokensOptions = {}): Plugin {
       }
     },
 
-    async onBuild (api) {
+    async onBuild(api) {
       if (tailwindConfigFile) {
         await generate(api)
       }
@@ -82,7 +83,8 @@ export function tailwindTokens (options: TailwindTokensOptions = {}): Plugin {
   }
 }
 
-const storyTemplate = (tailwindConfig: any) => `import 'histoire-style'
+function storyTemplate(tailwindConfig: any) {
+  return `import 'histoire-style'
 import './style.css'
 import { createApp, h, markRaw, ref } from ${getInjectedImport('@histoire/vendors/vue')}
 import {
@@ -446,6 +448,7 @@ export default {
     },
   ],
 }`
+}
 
 const css = `.__hst-shade {
   height: 80px;

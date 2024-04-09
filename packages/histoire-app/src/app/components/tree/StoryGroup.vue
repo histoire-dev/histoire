@@ -1,10 +1,10 @@
 <script lang="ts" setup>
-import type { Story, TreeGroup } from '../../types'
-import StoryListItem from './StoryListItem.vue'
-import StoryListFolder from './StoryListFolder.vue'
 import { Icon } from '@iconify/vue'
 import { computed, withDefaults } from 'vue'
+import type { Story, TreeGroup } from '../../types'
 import { useFolderStore } from '../../stores/folder'
+import StoryListItem from './StoryListItem.vue'
+import StoryListFolder from './StoryListFolder.vue'
 
 const props = withDefaults(defineProps<{
   path?: Array<string>
@@ -19,7 +19,7 @@ const folderStore = useFolderStore()
 const folderPath = computed(() => [...props.path, props.group.title])
 const isFolderOpen = computed(() => folderStore.isFolderOpened(folderPath.value, true))
 
-function toggleOpen () {
+function toggleOpen() {
   folderStore.toggleFolder(folderPath.value, false)
 }
 </script>

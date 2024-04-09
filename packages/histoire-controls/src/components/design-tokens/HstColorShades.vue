@@ -7,8 +7,8 @@ export default {
 <script lang="ts" setup>
 import { computed, ref } from 'vue'
 import { VTooltip as vTooltip } from 'floating-vue'
-import HstCopyIcon from '../HstCopyIcon.vue'
 import type { CSSProperties } from 'vue'
+import HstCopyIcon from '../HstCopyIcon.vue'
 
 const props = defineProps<{
   shades: Record<string, any>
@@ -16,7 +16,7 @@ const props = defineProps<{
   search?: string
 }>()
 
-const flattenShades = (shades: Record<string, any>, path = ''): Record<string, string> => {
+function flattenShades(shades: Record<string, any>, path = ''): Record<string, string> {
   return Object.entries(shades).reduce((acc, [key, color]) => {
     const nextPath = path ? key === 'DEFAULT' ? path : `${path}-${key}` : key
     const obj = typeof color === 'object' ? flattenShades(color, nextPath) : { [nextPath]: color }

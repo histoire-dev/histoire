@@ -17,17 +17,17 @@ import { addStory, notifyStoryChange, removeStory } from './stories.js'
 
 const onMarkdownListChangeHandlers: (() => unknown)[] = []
 
-export function onMarkdownListChange (handler: () => unknown) {
+export function onMarkdownListChange(handler: () => unknown) {
   onMarkdownListChangeHandlers.push(handler)
 }
 
-function notifyMarkdownListChange () {
+function notifyMarkdownListChange() {
   for (const handler of onMarkdownListChangeHandlers) {
     handler()
   }
 }
 
-export async function createMarkdownRenderer (ctx: Context) {
+export async function createMarkdownRenderer(ctx: Context) {
   const highlighter = await getHighlighter({
     theme: 'github-dark',
   })
@@ -78,13 +78,15 @@ export async function createMarkdownRenderer (ctx: Context) {
           const newHref = `${ctx.resolvedViteConfig.base}story/${encodeURIComponent(storyFile?.id ?? mdFile.storyFile.id)}${query}`
           token.attrSet('href', newHref)
           token.attrSet('data-route', 'true')
-        } else if (!href.startsWith('/') && !href.startsWith('#') && (classIndex < 0 || !token.attrs[classIndex][1].includes('header-anchor'))) {
+        }
+        else if (!href.startsWith('/') && !href.startsWith('#') && (classIndex < 0 || !token.attrs[classIndex][1].includes('header-anchor'))) {
           // Add target="_blank" to external links
           const aIndex = token.attrIndex('target')
 
           if (aIndex < 0) {
             token.attrPush(['target', '_blank']) // add new attribute
-          } else {
+          }
+          else {
             token.attrs[aIndex][1] = '_blank' // replace value of existing attr
           }
         }
@@ -98,7 +100,7 @@ export async function createMarkdownRenderer (ctx: Context) {
   return md
 }
 
-async function createMarkdownRendererWithPlugins (ctx: Context) {
+async function createMarkdownRendererWithPlugins(ctx: Context) {
   let md = await createMarkdownRenderer(ctx)
   if (ctx.config.markdown) {
     const result = await ctx.config.markdown(md)
@@ -109,14 +111,14 @@ async function createMarkdownRendererWithPlugins (ctx: Context) {
   return md
 }
 
-export async function createMarkdownPlugins (ctx: Context) {
+export async function createMarkdownPlugins(ctx: Context) {
   const plugins: VitePlugin[] = []
   const md = await createMarkdownRendererWithPlugins(ctx)
 
   // @TODO extract
   plugins.push({
     name: 'histoire-vue-docs-block',
-    transform (code, id) {
+    transform(code, id) {
       if (!id.includes('?vue&type=docs')) return
       if (!id.includes('lang.md')) return
       const file = id.substring(0, id.indexOf('?vue'))
@@ -132,7 +134,7 @@ export async function createMarkdownPlugins (ctx: Context) {
   return plugins
 }
 
-export async function createMarkdownFilesWatcher (ctx: Context) {
+export async function createMarkdownFilesWatcher(ctx: Context) {
   const md = await createMarkdownRendererWithPlugins(ctx)
 
   const watcher = chokidar.watch(['**/*.story.md'], {
@@ -145,11 +147,11 @@ export async function createMarkdownFilesWatcher (ctx: Context) {
    */
   let watcherIsReady = false
 
-  function addFile (relativePath: string) {
+  function addFile(relativePath: string) {
     const absolutePath = path.resolve(ctx.root, relativePath)
     const dirFiles = fs.readdirSync(path.dirname(absolutePath))
     const truncatedName = path.basename(absolutePath, '.md')
-    const isRelatedToStory = dirFiles.some((file) => !file.endsWith('.md') && file.startsWith(truncatedName))
+    const isRelatedToStory = dirFiles.some(file => !file.endsWith('.md') && file.startsWith(truncatedName))
 
     const { data: frontmatter, content } = matter(fs.readFileSync(absolutePath, 'utf8'))
 
@@ -189,7 +191,8 @@ export async function createMarkdownFilesWatcher (ctx: Context) {
       file.storyFile = storyFile
       storyFile.markdownFile = file
       notifyStoryChange(storyFile)
-    } else {
+    }
+    else {
       const searchPath = path.join(path.dirname(relativePath), truncatedName)
       const storyFile = ctx.storyFiles.find(f => f.relativePath.startsWith(searchPath))
       if (storyFile) {
@@ -204,8 +207,8 @@ export async function createMarkdownFilesWatcher (ctx: Context) {
     return file
   }
 
-  function removeFile (relativePath: string) {
-    const index = ctx.markdownFiles.findIndex((file) => file.relativePath === relativePath)
+  function removeFile(relativePath: string) {
+    const index = ctx.markdownFiles.findIndex(file => file.relativePath === relativePath)
     if (index !== -1) {
       const file = ctx.markdownFiles[index]
       if (!file.isRelatedToStory) {
@@ -217,7 +220,7 @@ export async function createMarkdownFilesWatcher (ctx: Context) {
     }
   }
 
-  async function stop () {
+  async function stop() {
     await watcher.close()
   }
 
@@ -229,7 +232,7 @@ export async function createMarkdownFilesWatcher (ctx: Context) {
       removeFile(relativePath)
     })
 
-  await new Promise(resolve => {
+  await new Promise((resolve) => {
     watcher.once('ready', resolve)
   })
 
@@ -245,7 +248,8 @@ export async function createMarkdownFilesWatcher (ctx: Context) {
     return {
       stop,
     }
-  } catch (e) {
+  }
+  catch (e) {
     stop()
     throw e
   }

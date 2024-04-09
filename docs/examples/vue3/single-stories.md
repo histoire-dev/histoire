@@ -36,4 +36,3 @@ import MyComponent from './MyComponent.vue'
   </Story>
 </template>
 ```
-

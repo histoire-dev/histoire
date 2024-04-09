@@ -1,5 +1,6 @@
-import { defineComponent, inject, onMounted, PropType, provide, useAttrs } from 'vue'
-import type { ServerStoryFile, ServerStory, ServerVariant } from '@histoire/shared'
+import type { PropType } from 'vue'
+import { defineComponent, inject, onMounted, provide, useAttrs } from 'vue'
+import type { ServerStory, ServerStoryFile, ServerVariant } from '@histoire/shared'
 import { autoStubComponents } from './stub'
 
 export default defineComponent({
@@ -49,7 +50,7 @@ export default defineComponent({
     },
   },
 
-  setup (props) {
+  setup(props) {
     const attrs = useAttrs() as {
       data: ServerStoryFile
     }
@@ -92,11 +93,11 @@ export default defineComponent({
     }
   },
 
-  render () {
+  render() {
     let suppressError = false
     try {
       const vnodes = this.$slots.default?.({
-        get state () {
+        get state() {
           // No variant tags
           suppressError = true
           return {}
@@ -109,7 +110,8 @@ export default defineComponent({
       }
 
       return vnodes
-    } catch (e) {
+    }
+    catch (e) {
       if (!suppressError) {
         console.error(e)
       }

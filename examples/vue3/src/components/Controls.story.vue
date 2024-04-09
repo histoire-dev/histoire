@@ -11,7 +11,7 @@ const radioOptions = {
   'elden-ring': 'Elden Ring',
 }
 
-function initState () {
+function initState() {
   return {
     text: 'Hello',
     checkbox: false,

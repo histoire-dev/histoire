@@ -16,7 +16,7 @@ const objectOptions = Object.keys(options).map(key => ({
 
 const numberOptions = [0, 1, 2, 3, 4, 5]
 
-function initState () {
+function initState() {
   return {
     label: 'My really long label',
     select: 'crash-bandicoot',

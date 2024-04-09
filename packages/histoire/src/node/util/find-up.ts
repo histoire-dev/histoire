@@ -1,7 +1,7 @@
-import path from 'pathe'
 import fs from 'node:fs'
+import path from 'pathe'
 
-export function findUp (cwd: string = process.cwd(), fileNames: string[]): string {
+export function findUp(cwd: string = process.cwd(), fileNames: string[]): string {
   let { root } = path.parse(cwd)
   let dir = cwd
 

@@ -26,7 +26,7 @@ const model = computed({
 
 const input = ref<HTMLInputElement>()
 
-function focus () {
+function focus() {
   input.value?.focus()
   input.value?.select()
 }
@@ -47,7 +47,8 @@ watchEffect(async () => {
     if (rId === requestId) {
       options.value = result
     }
-  } else {
+  }
+  else {
     options.value = props.prompt.options
   }
 })
@@ -59,7 +60,8 @@ const formattedOptions = computed(() => {
         value: option,
         label: option,
       }
-    } else {
+    }
+    else {
       return option
     }
   })
@@ -73,7 +75,7 @@ const {
   selectPrevious,
 } = useSelection(formattedOptions)
 
-function selectIndex (index: number) {
+function selectIndex(index: number) {
   const result = formattedOptions.value[index].value
   if (result) {
     model.value = result

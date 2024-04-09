@@ -1,6 +1,6 @@
 <script>
 export default {
-  data () {
+  data() {
     return {
       optionApiData: 'OPTION API',
     }

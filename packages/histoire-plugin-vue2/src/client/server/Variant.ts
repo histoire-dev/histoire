@@ -1,4 +1,4 @@
-import { defineComponent, inject, type PropType } from 'vue'
+import { type PropType, defineComponent, inject } from 'vue'
 import type { ServerStory, ServerVariant } from '@histoire/shared'
 
 export default defineComponent({
@@ -31,10 +31,10 @@ export default defineComponent({
     },
   },
 
-  setup (props) {
+  setup(props) {
     const story = inject<ServerStory>('story')
 
-    function generateId () {
+    function generateId() {
       return `${story.id}-${story.variants.length}`
     }
 
@@ -50,7 +50,7 @@ export default defineComponent({
     addVariant(variant)
   },
 
-  render () {
+  render() {
     return null
   },
 })

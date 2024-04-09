@@ -1,10 +1,10 @@
 import chokidar from 'chokidar'
 import { globby } from 'globby'
 import { paramCase } from 'change-case'
-import { resolve, basename } from 'pathe'
+import { basename, resolve } from 'pathe'
 import micromatch from 'micromatch'
 import type { ServerStoryFile } from '@histoire/shared'
-import { Context } from './context.js'
+import type { Context } from './context.js'
 
 type StoryChangeHandler = (file?: ServerStoryFile) => unknown
 const storyChangeHandlers: StoryChangeHandler[] = []
@@ -13,11 +13,11 @@ const storyChangeHandlers: StoryChangeHandler[] = []
  * Called when a new story is added or modified. Collecting should be done.
  * @param handler
  */
-export function onStoryChange (handler: StoryChangeHandler) {
+export function onStoryChange(handler: StoryChangeHandler) {
   storyChangeHandlers.push(handler)
 }
 
-export function notifyStoryChange (file?: ServerStoryFile) {
+export function notifyStoryChange(file?: ServerStoryFile) {
   for (const handler of storyChangeHandlers) {
     handler(file)
   }
@@ -30,11 +30,11 @@ const storyListChangeHandlers: StoryListChangeHandler[] = []
  * Called when the story list has changed (ex: removed a story). No collecting should be needed.
  * @param handler
  */
-export function onStoryListChange (handler: StoryListChangeHandler) {
+export function onStoryListChange(handler: StoryListChangeHandler) {
   storyListChangeHandlers.push(handler)
 }
 
-export function notifyStoryListChange () {
+export function notifyStoryListChange() {
   for (const handler of storyListChangeHandlers) {
     handler()
   }
@@ -42,7 +42,7 @@ export function notifyStoryListChange () {
 
 let context: Context
 
-export async function watchStories (newContext: Context) {
+export async function watchStories(newContext: Context) {
   context = newContext
   const watcher = chokidar.watch(context.config.storyMatch, {
     cwd: context.root,
@@ -62,11 +62,11 @@ export async function watchStories (newContext: Context) {
   return watcher
 }
 
-function getAbsoluteFilePath (relativeFilePath: string) {
+function getAbsoluteFilePath(relativeFilePath: string) {
   return resolve(context.root, relativeFilePath)
 }
 
-export function addStory (relativeFilePath: string, virtualModuleCode?: string) {
+export function addStory(relativeFilePath: string, virtualModuleCode?: string) {
   const absoluteFilePath = getAbsoluteFilePath(relativeFilePath)
 
   for (const file of context.storyFiles) {
@@ -110,13 +110,13 @@ export function addStory (relativeFilePath: string, virtualModuleCode?: string) 
   return file
 }
 
-export function removeStory (relativeFilePath: string) {
+export function removeStory(relativeFilePath: string) {
   const absoluteFilePath = getAbsoluteFilePath(relativeFilePath)
-  const index = context.storyFiles.findIndex((file) => file.path === absoluteFilePath)
+  const index = context.storyFiles.findIndex(file => file.path === absoluteFilePath)
   if (index !== -1) context.storyFiles.splice(index, 1)
 }
 
-export async function findAllStories (newContext: Context) {
+export async function findAllStories(newContext: Context) {
   context = newContext
 
   const files = await globby(context.config.storyMatch, {

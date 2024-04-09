@@ -1,9 +1,11 @@
-import { computed, defineComponent, provide, useAttrs, VNode, h, PropType, getCurrentInstance, reactive, cloneVNode } from 'vue'
-import { Story, omitInheritStoryProps } from '@histoire/shared'
+import type { PropType, VNode } from 'vue'
+import { cloneVNode, computed, defineComponent, getCurrentInstance, h, provide, reactive, useAttrs } from 'vue'
+import type { Story } from '@histoire/shared'
+import { omitInheritStoryProps } from '@histoire/shared'
 import Variant from './Variant'
 
 export default defineComponent({
-  // eslint-disable-next-line vue/multi-word-component-names
+
   name: 'Story',
   __histoireType: 'story',
 
@@ -21,7 +23,7 @@ export default defineComponent({
     },
   },
 
-  setup (props) {
+  setup(props) {
     const vm = getCurrentInstance()
 
     const attrs = useAttrs() as {
@@ -36,7 +38,7 @@ export default defineComponent({
     const implicitState = {
       $data: storyComponent.data,
     }
-    function addImplicitState (key, value) {
+    function addImplicitState(key, value) {
       if (typeof value === 'function' || (value?.__file) || typeof value?.render === 'function' || typeof value?.setup === 'function') {
         return
       }
@@ -54,7 +56,7 @@ export default defineComponent({
     // Wrap with reactive to unwrap refs
     provide('implicitState', () => reactive({ ...implicitState }))
 
-    function updateStory () {
+    function updateStory() {
       Object.assign(attrs.story, {
         meta: props.meta,
         slots: () => vm.proxy.$slots,
@@ -67,7 +69,7 @@ export default defineComponent({
     }
   },
 
-  render () {
+  render() {
     this.updateStory()
 
     const [firstVariant] = this.story.variants
@@ -105,7 +107,8 @@ export default defineComponent({
           }
           index++
           result.push(cloneVNode(vnode, props))
-        } else {
+        }
+        else {
           if (vnode.children?.length) {
             vnode.children = applyAttrs(vnode.children as VNode[])
           }

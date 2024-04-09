@@ -5,7 +5,7 @@ export const NuxtLink = defineComponent({
   props: {
     to: [String, Object],
   },
-  setup (props, ctx) {
+  setup(props, ctx) {
     return () => h('a', {
       href: typeof props.to === 'string' ? props.to : '#',
       ...ctx.attrs,

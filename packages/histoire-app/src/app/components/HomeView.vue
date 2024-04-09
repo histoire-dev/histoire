@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { computed } from 'vue'
-import { histoireConfig, customLogos } from '../util/config'
+import { customLogos, histoireConfig } from '../util/config'
 import HistoireLogo from '../assets/histoire.svg'
 import { useStoryStore } from '../stores/story'
 import HomeCounter from './app/HomeCounter.vue'
@@ -13,10 +13,11 @@ const stats = computed(() => {
   let variantCount = 0
   let docsCount = 0;
 
-  (storyStore.stories || []).forEach(story => {
+  (storyStore.stories || []).forEach((story) => {
     if (story.docsOnly) {
       docsCount++
-    } else {
+    }
+    else {
       storyCount++
       if (story.variants) {
         variantCount += story.variants.length

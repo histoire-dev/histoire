@@ -39,7 +39,7 @@ const defaultOptions: ScreenshotPluginOptions = {
   presets: [],
 }
 
-export function HstScreenshot (options: ScreenshotPluginOptions = {}): Plugin {
+export function HstScreenshot(options: ScreenshotPluginOptions = {}): Plugin {
   const finalOptions: ScreenshotPluginOptions = defu(options, defaultOptions)
   if (!finalOptions.presets.length) {
     finalOptions.presets.push({
@@ -50,7 +50,7 @@ export function HstScreenshot (options: ScreenshotPluginOptions = {}): Plugin {
   return {
     name: '@histoire/plugin-screenshot',
 
-    onBuild: async api => {
+    onBuild: async (api) => {
       const { default: captureWebsite } = await import('capture-website')
       await fs.ensureDir(finalOptions.saveFolder)
 
@@ -71,8 +71,8 @@ export function HstScreenshot (options: ScreenshotPluginOptions = {}): Plugin {
         for (const preset of finalOptions.presets) {
           const launchOptions = finalOptions.launchOptionsArgs
             ? {
-              args: finalOptions.launchOptionsArgs,
-            }
+                args: finalOptions.launchOptionsArgs,
+              }
             : {}
           const captureWebsiteFileOptions: FileOptions = {
             overwrite: true,

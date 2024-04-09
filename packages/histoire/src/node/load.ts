@@ -12,7 +12,7 @@ export interface UseModuleLoaderOptions {
 
 let _load: ModuleLoader['loadModule']
 
-export function useModuleLoader (options: UseModuleLoaderOptions): ModuleLoader {
+export function useModuleLoader(options: UseModuleLoaderOptions): ModuleLoader {
   const { server } = options
 
   const node = new ViteNodeServer(server)
@@ -24,17 +24,18 @@ export function useModuleLoader (options: UseModuleLoaderOptions): ModuleLoader 
     resolveId: (id, importer) => node.resolveId(id, importer),
   })
 
-  function clearCache () {
+  function clearCache() {
     server.moduleGraph.invalidateAll()
     node.fetchCache.clear()
     runner.moduleCache.clear()
   }
 
-  async function loadModule (file: string) {
+  async function loadModule(file: string) {
     try {
       const result = await runner.executeFile(resolve(file))
       return result
-    } catch (e) {
+    }
+    catch (e) {
       console.error(pc.red(`Error while loading module ${file}:\n${e.frame ? `${pc.bold(e.message)}\n${e.frame}` : e.stack}`))
       if (options.throws) {
         throw e
@@ -44,7 +45,7 @@ export function useModuleLoader (options: UseModuleLoaderOptions): ModuleLoader 
 
   _load = loadModule
 
-  async function destroy () {
+  async function destroy() {
     // Noop
   }
 

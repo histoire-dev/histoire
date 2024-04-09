@@ -3,17 +3,17 @@ import path from 'pathe'
 import fs from 'fs-extra'
 import pc from 'picocolors'
 import type {
+  BuildEndCallback,
+  ChangeViteConfigCallback,
+  HistoireConfig,
+  ModuleLoader,
   Plugin,
   PluginApiBase,
-  PluginApiDev,
   PluginApiBuild,
-  ChangeViteConfigCallback,
-  BuildEndCallback,
-  PreviewStoryCallback,
-  ModuleLoader,
-  ServerStory,
+  PluginApiDev,
   PluginApiDevEvent,
-  HistoireConfig,
+  PreviewStoryCallback,
+  ServerStory,
 } from '@histoire/shared'
 import { TEMP_PATH } from './alias.js'
 import type { Context } from './context.js'
@@ -24,39 +24,38 @@ export class BasePluginApi implements PluginApiBase {
   path = path
   fs = fs
 
-  // eslint-disable-next-line no-useless-constructor
-  constructor (
+  constructor(
     protected ctx: Context,
     protected plugin: Plugin,
     public moduleLoader: ModuleLoader,
   ) { }
 
-  get pluginTempDir () {
+  get pluginTempDir() {
     return path.resolve(TEMP_PATH, 'plugins', this.plugin.name.replace(/:/g, '_'))
   }
 
-  log (...msg) {
+  log(...msg) {
     console.log(this.colors.gray(`[Plugin:${this.plugin.name}]`), ...msg)
   }
 
-  warn (...msg) {
+  warn(...msg) {
     console.warn(this.colors.yellow(`[Plugin:${this.plugin.name}]`), ...msg)
   }
 
-  error (...msg) {
+  error(...msg) {
     console.error(this.colors.red(`[Plugin:${this.plugin.name}]`), ...msg)
   }
 
-  addStoryFile (file: string) {
+  addStoryFile(file: string) {
     removeStory(file)
     addStory(file)
   }
 
-  getStories (): ServerStory[] {
+  getStories(): ServerStory[] {
     return this.ctx.storyFiles.map(f => f.story).filter(Boolean)
   }
 
-  getConfig (): HistoireConfig {
+  getConfig(): HistoireConfig {
     return this.ctx.config
   }
 }
@@ -70,21 +69,21 @@ export class BuildPluginApi extends BasePluginApi implements PluginApiBuild {
   buildEndCallbacks: BuildEndCallback[] = []
   previewStoryCallbacks: PreviewStoryCallback[] = []
 
-  changeViteConfig (cb: ChangeViteConfigCallback) {
+  changeViteConfig(cb: ChangeViteConfigCallback) {
     this.changeViteConfigCallbacks.push(cb)
   }
 
-  onBuildEnd (cb: BuildEndCallback) {
+  onBuildEnd(cb: BuildEndCallback) {
     this.buildEndCallbacks.push(cb)
   }
 
-  onPreviewStory (cb: PreviewStoryCallback) {
+  onPreviewStory(cb: PreviewStoryCallback) {
     this.previewStoryCallbacks.push(cb)
   }
 }
 
 export class DevEventPluginApi extends BasePluginApi implements PluginApiDevEvent {
-  constructor (
+  constructor(
     ctx: Context,
     plugin: Plugin,
     moduleLoader: ModuleLoader,

@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import BaseButton from './BaseButton.vue'
 
-function initState () {
+function initState() {
   return {
     disabled: false,
     color: undefined,

@@ -5,8 +5,8 @@ import { useEventsStore } from '../../stores/events'
 import type { Story, Variant } from '../../types'
 import BaseOverflowMenu from '../base/BaseOverflowMenu.vue'
 import BaseOverflowTab from '../base/BaseOverflowTab.vue'
-import { useStoryDoc } from './StoryDocs.vue'
 import BaseTag from '../base/BaseTag.vue'
+import { useStoryDoc } from './StoryDocs.vue'
 
 const props = defineProps<{
   story: Story

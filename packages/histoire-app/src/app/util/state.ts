@@ -1,8 +1,8 @@
-import { unref, isRef } from 'vue'
+import { isRef, unref } from 'vue'
 
-const isObject = (val) => val !== null && typeof val === 'object'
+const isObject = val => val !== null && typeof val === 'object'
 
-export function toRawDeep (val, clean = false, seen = new WeakMap()) {
+export function toRawDeep(val, clean = false, seen = new WeakMap()) {
   const unwrappedValue = isRef(val) ? unref(val) : val
 
   if (typeof unwrappedValue === 'symbol') {
@@ -26,7 +26,8 @@ export function toRawDeep (val, clean = false, seen = new WeakMap()) {
     }
     result.push(...list)
     return result
-  } else {
+  }
+  else {
     const result = {}
     seen.set(unwrappedValue, result)
     toRawObject(unwrappedValue, result, clean, seen)
@@ -34,7 +35,7 @@ export function toRawDeep (val, clean = false, seen = new WeakMap()) {
   }
 }
 
-const toRawObject = (obj: Record<any, any>, target: Record<any, any>, clean = false, seen = new WeakMap()) => {
+function toRawObject(obj: Record<any, any>, target: Record<any, any>, clean = false, seen = new WeakMap()) {
   Object.keys(obj).forEach((key) => {
     if (clean && typeof obj[key] === 'function') {
       return

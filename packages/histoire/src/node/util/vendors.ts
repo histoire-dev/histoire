@@ -11,7 +11,7 @@ const alias = {
   '@histoire/controls': path.resolve(__dirname, '../vendors/controls.js'),
 }
 
-export function getInjectedImport (request: string) {
+export function getInjectedImport(request: string) {
   let id: string = request
 
   if (alias[id]) {

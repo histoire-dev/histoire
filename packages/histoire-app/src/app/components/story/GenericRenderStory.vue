@@ -6,7 +6,7 @@ export default {
 
 <script lang="ts" setup>
 import { clientSupportPlugins } from 'virtual:$histoire-support-plugins-client'
-import { ref, watchEffect, markRaw } from 'vue'
+import { markRaw, ref, watchEffect } from 'vue'
 import type { Story } from '../../types'
 
 const props = defineProps<{
@@ -21,7 +21,8 @@ watchEffect(async () => {
     try {
       const pluginModule = await clientPlugin()
       mountComponent.value = markRaw(pluginModule.RenderStory)
-    } catch (e) {
+    }
+    catch (e) {
       console.error(e)
       throw e
     }

@@ -1,4 +1,5 @@
-import { defineComponent, getCurrentInstance, inject, PropType, useAttrs } from 'vue'
+import type { PropType } from 'vue'
+import { defineComponent, getCurrentInstance, inject, useAttrs } from 'vue'
 import type { Variant } from '@histoire/shared'
 import { applyState } from '@histoire/shared'
 import { syncStateBundledAndExternal, toRawDeep } from './util.js'
@@ -6,7 +7,7 @@ import { syncStateBundledAndExternal, toRawDeep } from './util.js'
 // const logLocation = location.href.includes('__sandbox') ? '[Sandbox]' : '[Host]'
 
 export default defineComponent({
-  // eslint-disable-next-line vue/multi-word-component-names
+
   name: 'Variant',
   __histoireType: 'variant',
 
@@ -42,7 +43,7 @@ export default defineComponent({
     },
   },
 
-  async setup (props) {
+  async setup(props) {
     const attrs = useAttrs() as {
       variant: Variant
     }
@@ -58,7 +59,7 @@ export default defineComponent({
 
     syncStateBundledAndExternal(attrs.variant.state, implicitState())
 
-    function updateVariant () {
+    function updateVariant() {
       Object.assign(attrs.variant, {
         slots: () => vm.proxy.$slots,
         source: props.source,
@@ -76,7 +77,7 @@ export default defineComponent({
     }
   },
 
-  render () {
+  render() {
     // Trigger variant updates to (re-)render slots
     this.updateVariant()
     return null

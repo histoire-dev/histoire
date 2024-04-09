@@ -1,4 +1,4 @@
-import type { StoryProps, VariantProps, Story, Variant, Awaitable } from '@histoire/shared'
+import type { Awaitable, Story, StoryProps, Variant, VariantProps } from '@histoire/shared'
 
 export interface App {
   el: HTMLElement
@@ -35,6 +35,6 @@ export interface VariantOptions extends Omit<VariantProps, 'setupApp'>, CommonPr
 
 }
 
-export function defineStory (story: StoryOptions) {
+export function defineStory(story: StoryOptions) {
   return story
 }

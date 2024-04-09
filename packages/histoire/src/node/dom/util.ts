@@ -11,7 +11,7 @@ const skipKeys = [
   'parent',
 ]
 
-export function getWindowKeys (global: any, win: any) {
+export function getWindowKeys(global: any, win: any) {
   const keys = new Set(KEYS.concat(Object.getOwnPropertyNames(win))
     .filter((k) => {
       if (skipKeys.includes(k)) {
@@ -26,7 +26,7 @@ export function getWindowKeys (global: any, win: any) {
   return keys
 }
 
-function isClassLikeName (name: string) {
+function isClassLikeName(name: string) {
   return name[0] === name[0].toUpperCase()
 }
 
@@ -38,7 +38,7 @@ interface PopulateOptions {
   bindFunctions?: boolean
 }
 
-export function populateGlobal (global: any, win: any, options: PopulateOptions = {}) {
+export function populateGlobal(global: any, win: any, options: PopulateOptions = {}) {
   const { bindFunctions = false } = options
   const keys = getWindowKeys(global, win)
 
@@ -46,20 +46,20 @@ export function populateGlobal (global: any, win: any, options: PopulateOptions 
 
   const overrideObject = new Map<string | symbol, any>()
   for (const key of keys) {
-    const boundFunction = bindFunctions &&
-      typeof win[key] === 'function' &&
-      !isClassLikeName(key) &&
-      win[key].bind(win)
+    const boundFunction = bindFunctions
+      && typeof win[key] === 'function'
+      && !isClassLikeName(key)
+      && win[key].bind(win)
 
-    if (KEYS.includes(key) && key in global) { originals.set(key, global[key]) }
+    if (KEYS.includes(key) && key in global) originals.set(key, global[key])
 
     Object.defineProperty(global, key, {
-      get () {
-        if (overrideObject.has(key)) { return overrideObject.get(key) }
-        if (boundFunction) { return boundFunction }
+      get() {
+        if (overrideObject.has(key)) return overrideObject.get(key)
+        if (boundFunction) return boundFunction
         return win[key]
       },
-      set (v) {
+      set(v) {
         overrideObject.set(key, v)
       },
       configurable: true,
@@ -71,7 +71,7 @@ export function populateGlobal (global: any, win: any, options: PopulateOptions 
   global.top = global
   global.parent = global
 
-  if (global.global) { global.global = global }
+  if (global.global) global.global = global
 
   skipKeys.forEach(k => keys.add(k))
 

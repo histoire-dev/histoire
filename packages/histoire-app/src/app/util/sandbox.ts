@@ -1,8 +1,7 @@
-
 import { base } from '../router'
-import { Story, Variant } from '../types'
+import type { Story, Variant } from '../types'
 
-export function getSandboxUrl (story: Story, variant: Variant) {
+export function getSandboxUrl(story: Story, variant: Variant) {
   const url = new URLSearchParams()
   url.append('storyId', story.id)
   url.append('variantId', variant.id)

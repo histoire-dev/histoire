@@ -1,14 +1,14 @@
 <script lang="ts" setup>
-import { Story, Variant } from 'histoire'
+import type { Story, Variant } from 'histoire'
 
 const props = defineProps<{
   story: Story
   variant?: Variant
 }>()
 
-function hasWrapper () {
-  return props.story.meta?.wrapper !== false &&
-    props.variant?.meta?.wrapper !== false
+function hasWrapper() {
+  return props.story.meta?.wrapper !== false
+    && props.variant?.meta?.wrapper !== false
 }
 </script>
 

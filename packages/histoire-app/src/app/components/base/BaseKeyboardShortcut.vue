@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import { formatKey } from '../../util/keyboard.js'
 import { computed } from 'vue'
+import { formatKey } from '../../util/keyboard.js'
 
 const props = defineProps<{
   shortcut: string

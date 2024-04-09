@@ -57,7 +57,6 @@ export default defineConfig({
 
 Use `src/**/*.story.vue` to prevent search errors in binary files (e.g., in iOS or Android folders) when using Ionic Capacitor.
 
-
 ## `storyIgnored`
 
 `string[]` - Default: `[ '**/node_modules/**', '**/dist/**' ]`

@@ -1,9 +1,11 @@
-import { defineComponent, provide, VNode, h, PropType, getCurrentInstance, reactive, inject } from 'vue'
-import { Story, omitInheritStoryProps } from '@histoire/shared'
+import type { PropType, VNode } from 'vue'
+import { defineComponent, getCurrentInstance, h, inject, provide, reactive } from 'vue'
+import type { Story } from '@histoire/shared'
+import { omitInheritStoryProps } from '@histoire/shared'
 import Variant from './Variant'
 
 export default Object.assign(defineComponent({
-  // eslint-disable-next-line vue/multi-word-component-names
+
   name: 'Story',
 
   inheritAttrs: false,
@@ -20,7 +22,7 @@ export default Object.assign(defineComponent({
     },
   },
 
-  setup (props) {
+  setup(props) {
     const vm = getCurrentInstance()
 
     const story = inject('hstStory') as Story
@@ -31,7 +33,7 @@ export default Object.assign(defineComponent({
     const implicitState = {
       $data: storyComponent.data,
     }
-    function addImplicitState (key, value) {
+    function addImplicitState(key, value) {
       if (typeof value === 'function' || (value?.__file) || typeof value?.render === 'function' || typeof value?.setup === 'function') {
         return
       }
@@ -49,7 +51,7 @@ export default Object.assign(defineComponent({
     // Wrap with reactive to unwrap refs
     provide('implicitState', () => reactive({ ...implicitState }))
 
-    function updateStory () {
+    function updateStory() {
       Object.assign(story, {
         meta: props.meta,
         slots: () => vm.proxy.$slots,
@@ -62,7 +64,7 @@ export default Object.assign(defineComponent({
     }
   },
 
-  render () {
+  render() {
     this.updateStory()
 
     const [firstVariant] = this.story.variants
@@ -70,7 +72,6 @@ export default Object.assign(defineComponent({
       return h(Variant, {
         props: {
           variant: firstVariant,
-          // @ts-ignore
           initState: this.initState,
           ...this.$attrs,
         },
@@ -111,7 +112,8 @@ export default Object.assign(defineComponent({
           }
           vnode.key = variant ? `variant-${variant.id}` : `null-variant-${index}`
           index++
-        } else if (vnode.children?.length) {
+        }
+        else if (vnode.children?.length) {
           applyAttrs(vnode.children as VNode[])
         }
       }

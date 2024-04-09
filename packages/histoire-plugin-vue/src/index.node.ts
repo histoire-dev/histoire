@@ -2,11 +2,11 @@ import type { Plugin } from 'histoire'
 import generateStoryCommand from './commands/generate-story.server.js'
 import { listComponentFiles } from './util/list-components.js'
 
-export function HstVue (): Plugin {
+export function HstVue(): Plugin {
   return {
     name: '@histoire/plugin-vue',
 
-    defaultConfig () {
+    defaultConfig() {
       return {
         supportMatch: [
           {
@@ -18,14 +18,14 @@ export function HstVue (): Plugin {
       }
     },
 
-    config () {
+    config() {
       return {
         vite: {
           plugins: [
             {
               name: 'histoire-plugin-vue',
               enforce: 'post',
-              transform (code, id) {
+              transform(code, id) {
                 // Remove vue warnings about unknown components
                 if ((this.meta as any).histoire?.isCollecting && id.endsWith('.vue')) {
                   return `const _stubComponent = (name) => ['Story','Variant'].includes(name) ? _resolveComponent(name) : ({ render: () => null });${code?.replaceAll('_resolveComponent(', '_stubComponent(') ?? ''}`
@@ -49,7 +49,7 @@ export function HstVue (): Plugin {
       generateStoryCommand,
     ],
 
-    async onDevEvent (api) {
+    async onDevEvent(api) {
       switch (api.event) {
         case 'listVueComponents': {
           return listComponentFiles(api.payload.search, api.getConfig().storyMatch)

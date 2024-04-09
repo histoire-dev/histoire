@@ -15,7 +15,6 @@ withDefaults(defineProps<{
   title: undefined,
   tag: 'label',
 })
-
 </script>
 
 <template>

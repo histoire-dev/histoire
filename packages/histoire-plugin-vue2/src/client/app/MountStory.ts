@@ -1,23 +1,23 @@
-/* eslint-disable vue/one-component-per-file */
-
-import Vue, { ref, h, provide } from 'vue'
+import Vue, { h, provide, ref } from 'vue'
+import type {
+  PropType as _PropType,
+} from '@histoire/vendors/vue'
 import {
   defineComponent as _defineComponent,
-  PropType as _PropType,
+  h as _h,
   onMounted as _onMounted,
   onUnmounted as _onUnmounted,
   ref as _ref,
   watch as _watch,
-  h as _h,
 } from '@histoire/vendors/vue'
 import type { Story } from '@histoire/shared'
 // @ts-expect-error virtual module id
 import * as setup from 'virtual:$histoire-setup'
 // @ts-expect-error virtual module id
 import * as generatedSetup from 'virtual:$histoire-generated-global-setup'
+import type { Vue2StorySetupApi, Vue2StorySetupHandler } from '../../index.js'
 import { registerGlobalComponents } from './global-components.js'
 import { RouterLinkStub } from './RouterLinkStub'
-import type { Vue2StorySetupApi, Vue2StorySetupHandler } from '../../index.js'
 
 export default _defineComponent({
   name: 'MountStory',
@@ -29,13 +29,13 @@ export default _defineComponent({
     },
   },
 
-  setup (props) {
+  setup(props) {
     const el = _ref<HTMLDivElement>()
     let app: Vue
 
     const forceUpdateKey = ref(0)
 
-    async function mountStory () {
+    async function mountStory() {
       const wrappers: any[] = []
 
       // Call app setups to resolve global assets such as components
@@ -70,7 +70,7 @@ export default _defineComponent({
       app = new Vue({
         name: 'MountStorySubApp',
 
-        setup () {
+        setup() {
           provide('hstStory', props.story)
         },
 
@@ -106,7 +106,7 @@ export default _defineComponent({
       app.$mount(target)
     }
 
-    function unmountStory () {
+    function unmountStory() {
       app?.$destroy()
     }
 
@@ -135,7 +135,7 @@ export default _defineComponent({
     }
   },
 
-  render () {
+  render() {
     return _h('div', {
       ref: 'el',
     })

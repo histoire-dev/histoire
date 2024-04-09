@@ -1,7 +1,7 @@
 import type { Context } from '../context.js'
 import { makeTree } from '../tree.js'
 
-export const resolvedStories = (ctx: Context) => {
+export function resolvedStories(ctx: Context) {
   const resolvedStories = ctx.storyFiles.filter(s => !!s.story)
   const files = resolvedStories.map((file, index) => {
     return {
@@ -25,7 +25,7 @@ ${resolvedStories.map((file, index) => {
     }
     return supportPlugin.importStoryComponent(file, index)
   }).filter(Boolean).join('\n')}
-export let files = [${files.map((file) => `{${JSON.stringify(file).slice(1, -1)}, component: Comp${file.index}, source: () => import('virtual:story-source:${file.story.id}')}`).join(',\n')}]
+export let files = [${files.map(file => `{${JSON.stringify(file).slice(1, -1)}, component: Comp${file.index}, source: () => import('virtual:story-source:${file.story.id}')}`).join(',\n')}]
 export let tree = ${JSON.stringify(makeTree(ctx.config, resolvedStories))}
 const handlers = []
 export function onUpdate (cb) {

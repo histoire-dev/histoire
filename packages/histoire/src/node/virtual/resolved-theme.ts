@@ -1,7 +1,7 @@
 import { parseColor } from '../colors.js'
 import type { Context } from '../context.js'
 
-export const resolvedTheme = (ctx: Context) => {
+export function resolvedTheme(ctx: Context) {
   let css = '*, ::before, ::after {'
   // Colors
   for (const color in ctx.config.theme?.colors ?? {}) {

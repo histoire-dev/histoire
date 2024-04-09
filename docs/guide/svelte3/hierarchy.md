@@ -19,7 +19,7 @@ If you want to use the real path of your story files, you can change that in you
 ```ts{5}
 // histoire.config.ts
 
-export default defineConfig({ 
+export default defineConfig({
   tree: {
     file: 'path',
   },
@@ -33,7 +33,7 @@ If you want a custom hierarchy, you can define your own function that takes an o
 ```ts{5}
 // histoire.config.ts
 
-export default defineConfig({ 
+export default defineConfig({
   tree: {
     file: ({ title, path }) => title.split('/'), // equivalent to default behavior
   },
@@ -47,7 +47,7 @@ By default, files and stories are sorted by ascending order. But you might want 
 ```ts{5}
 // histoire.config.ts
 
-export default defineConfig({ 
+export default defineConfig({
   tree: {
     order: (a, b) => a.localeCompare(b), // equivalent to default behavior
   },
@@ -84,7 +84,7 @@ Example:
 ```ts
 // histoire.config.ts
 
-export default defineConfig({ 
+export default defineConfig({
   tree: {
     groups: [
       {

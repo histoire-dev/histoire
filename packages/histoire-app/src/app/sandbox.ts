@@ -2,12 +2,12 @@ import { parseQuery } from 'vue-router'
 import { computed, createApp, h, onMounted, ref, watch } from 'vue'
 import { createPinia } from 'pinia'
 import { applyState } from '@histoire/shared'
+import { files } from 'virtual:$histoire-stories'
 import GenericMountStory from './components/story/GenericMountStory.vue'
 import GenericRenderStory from './components/story/GenericRenderStory.vue'
 import type { StoryFile } from './types'
 import { mapFile } from './util/mapping'
-import { files } from 'virtual:$histoire-stories'
-import { PREVIEW_SETTINGS_SYNC, STATE_SYNC, SANDBOX_READY } from './util/const.js'
+import { PREVIEW_SETTINGS_SYNC, SANDBOX_READY, STATE_SYNC } from './util/const.js'
 import { applyPreviewSettings } from './util/preview-settings.js'
 import { isDark } from './util/dark.js'
 import { histoireConfig } from './util/config.js'
@@ -20,25 +20,26 @@ const file = ref<StoryFile>(mapFile(files.find(f => f.id === query.storyId)))
 const app = createApp({
   name: 'SandboxApp',
 
-  setup () {
+  setup() {
     const story = computed(() => file.value.story)
     const variant = computed(() => story.value?.variants.find(v => v.id === query.variantId))
 
     let synced = false
     let mounted = false
 
-    window.addEventListener('message', event => {
+    window.addEventListener('message', (event) => {
       // console.log('[sandbox] received message', event.data)
       if (event.data?.type === STATE_SYNC) {
         if (!mounted) return
         synced = true
         applyState(variant.value.state, event.data.state)
-      } else if (event.data?.type === PREVIEW_SETTINGS_SYNC) {
+      }
+      else if (event.data?.type === PREVIEW_SETTINGS_SYNC) {
         applyPreviewSettings(event.data.settings)
       }
     })
 
-    watch(() => variant.value.state, value => {
+    watch(() => variant.value.state, (value) => {
       if (synced && mounted) {
         synced = false
         return
@@ -61,7 +62,7 @@ const app = createApp({
     }
   },
 
-  render () {
+  render() {
     return [
       h('div', { class: 'htw-sandbox-hidden' }, [
         h(GenericMountStory, {
@@ -86,11 +87,12 @@ const app = createApp({
 app.use(createPinia())
 app.mount('#app')
 
-watch(isDark, value => {
+watch(isDark, (value) => {
   if (value) {
     document.documentElement.classList.add(histoireConfig.sandboxDarkClass) // @TODO remove
     document.documentElement.classList.add(histoireConfig.theme.darkClass)
-  } else {
+  }
+  else {
     document.documentElement.classList.remove(histoireConfig.sandboxDarkClass) // @TODO remove
     document.documentElement.classList.remove(histoireConfig.theme.darkClass)
   }
@@ -99,6 +101,5 @@ watch(isDark, value => {
 })
 
 if (import.meta.hot) {
-  // eslint-disable-next-line spaced-comment
-  /*#__PURE__*/ setupPluginApi()
+  /* #__PURE__ */ setupPluginApi()
 }

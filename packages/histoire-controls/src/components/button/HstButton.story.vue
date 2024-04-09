@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import HstButton from './HstButton.vue'
 
-const variants: Array<{name: string, bind?: unknown}> = [
+const variants: Array<{ name: string, bind?: unknown }> = [
   { name: 'Default' },
   { name: 'Primary', bind: { color: 'primary' } },
   { name: 'Flat', bind: { color: 'flat' } },

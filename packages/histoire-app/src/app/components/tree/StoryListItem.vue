@@ -1,9 +1,9 @@
 <script lang="ts" setup>
-import type { Story } from '../../types'
-import BaseListItemLink from '../base/BaseListItemLink.vue'
 import { Icon } from '@iconify/vue'
 import { computed, ref, withDefaults } from 'vue'
 import { useRoute } from 'vue-router'
+import BaseListItemLink from '../base/BaseListItemLink.vue'
+import type { Story } from '../../types'
 import { useScrollOnActive } from '../../util/scroll'
 
 const props = withDefaults(defineProps<{
@@ -14,7 +14,7 @@ const props = withDefaults(defineProps<{
 })
 
 const filePadding = computed(() => {
-  return (props.depth * 12) + 'px'
+  return `${props.depth * 12}px`
 })
 
 const route = useRoute()

@@ -6,7 +6,7 @@ defineProps<{
   opened: boolean
 }>()
 
-const emit = defineEmits<{(e: 'close'): void}>()
+const emit = defineEmits<{ (e: 'close'): void }>()
 </script>
 
 <template>

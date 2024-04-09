@@ -1,11 +1,15 @@
 <script lang="ts">
-import { nextTick, PropType, Ref, ref, toRefs, watch, watchEffect, computed } from 'vue'
-import type { Story } from '../../types'
+import type { PropType, Ref } from 'vue'
+import { computed, nextTick, ref, toRefs, watch, watchEffect } from 'vue'
 import { markdownFiles } from 'virtual:$histoire-markdown-files'
+import { Icon } from '@iconify/vue'
+import { useRoute, useRouter } from 'vue-router'
+import type { Story } from '../../types'
 import { histoireConfig } from '../../util/config.js'
 import DevOnlyToolbarOpenInEditor from '../toolbar/DevOnlyToolbarOpenInEditor.vue'
+import BaseEmpty from '../base/BaseEmpty.vue'
 
-export function useStoryDoc (story: Ref<Story>) {
+export function useStoryDoc(story: Ref<Story>) {
   const renderedDoc = ref('')
 
   watchEffect(async () => {
@@ -23,12 +27,15 @@ export function useStoryDoc (story: Ref<Story>) {
     if (comp) {
       if (comp.__asyncResolved) {
         comp = comp.__asyncResolved
-      } else if (comp.__asyncLoader) {
+      }
+      else if (comp.__asyncLoader) {
         comp = await comp.__asyncLoader()
-      } else if (typeof comp === 'function') {
+      }
+      else if (typeof comp === 'function') {
         try {
           comp = await comp()
-        } catch (e) {
+        }
+        catch (e) {
           // Noop
           // Could be a class that requires `new com()`
         }
@@ -47,10 +54,6 @@ export function useStoryDoc (story: Ref<Story>) {
 </script>
 
 <script lang="ts" setup>
-import { Icon } from '@iconify/vue'
-import { useRoute, useRouter } from 'vue-router'
-import BaseEmpty from '../base/BaseEmpty.vue'
-
 const props = defineProps({
   story: {
     type: Object as PropType<Story>,
@@ -64,7 +67,7 @@ const props = defineProps({
 })
 
 const emit = defineEmits<{
-  (e: 'scroll-top'): void
+  (e: 'scrollTop'): void
 }>()
 
 const { story } = toRefs(props)
@@ -78,16 +81,16 @@ const router = useRouter()
 // matter and is only passed to support same-host hrefs.
 const fakeHost = `http://a.com`
 
-function onClick (e: MouseEvent) {
+function onClick(e: MouseEvent) {
   const link = (e.target as Element).closest('a')
   if (
-    link &&
-    link.getAttribute('data-route') &&
-    !e.ctrlKey &&
-    !e.shiftKey &&
-    !e.altKey &&
-    !e.metaKey &&
-    link.target !== `_blank`
+    link
+    && link.getAttribute('data-route')
+    && !e.ctrlKey
+    && !e.shiftKey
+    && !e.altKey
+    && !e.metaKey
+    && link.target !== `_blank`
   ) {
     e.preventDefault()
     const url = new URL(link.href, fakeHost)
@@ -98,20 +101,21 @@ function onClick (e: MouseEvent) {
 
 // Handle URL anchor
 
-function getHash () {
+function getHash() {
   const hash = location.hash
   if (histoireConfig.routerMode === 'hash') {
     const index = hash.indexOf('#', 1)
     if (index !== -1) {
       return hash.slice(index)
-    } else {
+    }
+    else {
       return undefined
     }
   }
   return hash
 }
 
-async function scrollToAnchor () {
+async function scrollToAnchor() {
   await nextTick()
   const hash = getHash()
   if (hash) {
@@ -121,7 +125,7 @@ async function scrollToAnchor () {
       return
     }
   }
-  emit('scroll-top')
+  emit('scrollTop')
 }
 
 watch(renderedDoc, () => {
@@ -135,7 +139,7 @@ watch(renderedDoc, () => {
 const renderedEl = ref<HTMLElement>()
 const route = useRoute()
 
-async function patchAnchorLinks () {
+async function patchAnchorLinks() {
   await nextTick()
   if (histoireConfig.routerMode === 'hash' && renderedEl.value) {
     const links = renderedEl.value.querySelectorAll('a.header-anchor')

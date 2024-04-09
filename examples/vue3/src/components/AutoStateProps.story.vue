@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import AutoStateProps from './AutoStateProps.vue'
 
-function initState () {
+function initState() {
   return {
     name: 'Fry',
   }

@@ -10,8 +10,8 @@ export const isDark = useDark({
 })
 export const toggleDark = useToggle(isDark)
 
-function applyDarkToControls () {
-  window.__hst_controls_dark?.forEach(ref => {
+function applyDarkToControls() {
+  window.__hst_controls_dark?.forEach((ref) => {
     ref.value = isDark.value
   })
 }

@@ -3,26 +3,25 @@ import type { ServerRunPayload } from '@histoire/shared'
 import * as setup from 'virtual:$histoire-setup'
 // @ts-expect-error virtual module id
 import * as generatedSetup from 'virtual:$histoire-generated-global-setup'
-import { tick, SvelteComponent } from 'svelte'
+import type { SvelteComponent } from 'svelte'
+import { tick } from 'svelte'
+import type { SvelteStorySetupApi } from '../helpers.js'
 import Story from './Story.svelte'
 import Variant from './Variant.svelte'
-import type { SvelteStorySetupApi } from '../helpers.js'
 
-export async function run ({ file, el, storyData }: ServerRunPayload) {
+export async function run({ file, el, storyData }: ServerRunPayload) {
   const { default: Comp } = await import(/* @vite-ignore */ file.moduleId)
 
   const app: SvelteComponent = new Comp({
     target: el,
     props: {
       Hst: {
-        // @ts-ignore
         Story,
-        // @ts-ignore
         Variant,
       },
     },
     context: new Map(Object.entries({
-      __hstAddStory (data) {
+      __hstAddStory(data) {
         storyData.push(data)
       },
       __hstStoryFile: file,

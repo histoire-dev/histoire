@@ -7,7 +7,7 @@ import { createBirpc } from 'birpc'
 import type { FetchFunction, ResolveIdFunction } from 'vite-node'
 import { dirname, resolve } from 'pathe'
 import pc from 'picocolors'
-import type { ServerStoryFile, ServerStory, ServerRunPayload } from '@histoire/shared'
+import type { ServerRunPayload, ServerStory, ServerStoryFile } from '@histoire/shared'
 import { createDomEnv } from '../dom/env.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
@@ -31,7 +31,7 @@ let _rpc: ReturnType<typeof createBirpc<{
 }>>
 
 // Cleanup module cache
-parentPort.on('message', message => {
+parentPort.on('message', (message) => {
   if (message?.kind === 'hst:invalidate') {
     _moduleCache.delete(message.file)
   }
@@ -53,10 +53,10 @@ export default async (payload: Payload): Promise<ReturnData> => {
     root: payload.root,
     base: payload.base,
     moduleCache: _moduleCache,
-    fetchModule (id) {
+    fetchModule(id) {
       return _rpc.fetchModule(id)
     },
-    resolveId (id, importer) {
+    resolveId(id, importer) {
       return _rpc.resolveId(id, importer)
     },
   }))
@@ -81,7 +81,7 @@ export default async (payload: Payload): Promise<ReturnData> => {
     const el = document.createElement('div')
     el.innerHTML = payload.storyFile.markdownFile.html
     const text = el.textContent
-    storyData.forEach(s => {
+    storyData.forEach((s) => {
       s.docsText = text
     })
   }

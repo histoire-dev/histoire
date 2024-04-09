@@ -1,11 +1,12 @@
 // @TODO remove @ts-ignore
 
-import { VNode, vModelText, vModelCheckbox, vModelSelect, vModelRadio, vModelDynamic, Text } from 'vue'
-import { pascalCase, camelCase } from 'change-case'
+import type { VNode } from 'vue'
+import { Text, vModelCheckbox, vModelDynamic, vModelRadio, vModelSelect, vModelText } from 'vue'
+import { camelCase, pascalCase } from 'change-case'
 import { createAutoBuildingObject, indent, serializeJs, voidElements } from '@histoire/shared'
 import type { Variant } from '@histoire/shared'
 
-export async function generateSourceCode (variant: Variant) {
+export async function generateSourceCode(variant: Variant) {
   const vnode = variant.slots().default?.({ state: variant.state ?? {} }) ?? []
   const list = Array.isArray(vnode) ? vnode : [vnode]
   const lines: string[] = []
@@ -16,10 +17,10 @@ export async function generateSourceCode (variant: Variant) {
   return lines.join('\n')
 }
 
-async function printVNode (vnode: VNode, propsOverrides: Record<string, any> = null): Promise<{ lines: string[], isText?: boolean }> {
+async function printVNode(vnode: VNode, propsOverrides: Record<string, any> = null): Promise<{ lines: string[], isText?: boolean }> {
   if (vnode.type === Text) {
     return {
-      // @ts-ignore
+      // @ts-expect-error TODO
       lines: [vnode.children],
       isText: true,
     }
@@ -29,9 +30,9 @@ async function printVNode (vnode: VNode, propsOverrides: Record<string, any> = n
 
   if (typeof vnode.type === 'object' || typeof vnode.type === 'string') {
     // Wait for async component
-    // @ts-ignore
+    // @ts-expect-error TODO
     if (vnode.type?.__asyncLoader && !vnode.type.__asyncResolved) {
-      // @ts-ignore
+      // @ts-expect-error TODO
       await vnode.type.__asyncLoader()
     }
 
@@ -42,7 +43,7 @@ async function printVNode (vnode: VNode, propsOverrides: Record<string, any> = n
     ]
 
     // Directives
-    function genDirective (dirName: string, dir, valueCode: string = null) {
+    function genDirective(dirName: string, dir, valueCode: string = null) {
       let modifiers = ''
       for (const key in dir.modifiers) {
         if (dir.modifiers[key]) {
@@ -65,7 +66,8 @@ async function printVNode (vnode: VNode, propsOverrides: Record<string, any> = n
         attr.push(...valueLines.slice(1, valueLines.length - 1))
         attr.push(`${valueLines[valueLines.length - 1]}"`)
         multilineAttrs = true
-      } else {
+      }
+      else {
         attr.push(`${dirAttr}${valueLines[0] ?? ''}"`)
       }
       attrs.push(attr)
@@ -87,9 +89,10 @@ async function printVNode (vnode: VNode, propsOverrides: Record<string, any> = n
             }
           }
           genDirective('model', dir, valueCode)
-          // @ts-ignore
-        } else if (dir.instance._ || dir.instance.$) {
-          // @ts-ignore
+        }
+        // @ts-expect-error TODO
+        else if (dir.instance._ || dir.instance.$) {
+          // @ts-expect-error TODO
           const target = dir.instance.$ ?? dir.instance._
           let dirName: string
           for (const directives of [target.directives, target.appContext.directives]) {
@@ -118,8 +121,8 @@ async function printVNode (vnode: VNode, propsOverrides: Record<string, any> = n
     }
 
     // Attributes
-    function addAttr (prop: string, value: any) {
-      // @ts-ignore
+    function addAttr(prop: string, value: any) {
+      // @ts-expect-error TODO
       if (typeof value !== 'string' || vnode.dynamicProps?.includes(prop)) {
         let directive = ':'
         if (prop.startsWith('on')) {
@@ -129,7 +132,7 @@ async function printVNode (vnode: VNode, propsOverrides: Record<string, any> = n
 
         // v-model on component
         const vmodelListeners = [`onUpdate:${prop}`, `onUpdate:${camelCase(prop)}`]
-        // @ts-ignore
+        // @ts-expect-error TODO
         const vmodelListener = vmodelListeners.find(key => vnode.dynamicProps?.includes(key) || (vnode.props && key in vnode.props))
         if (directive === ':' && vmodelListener) {
           // Listener
@@ -164,20 +167,23 @@ async function printVNode (vnode: VNode, propsOverrides: Record<string, any> = n
         if (typeof value === 'string' && value.startsWith('{{') && value.endsWith('}}')) {
           // It was formatted from auto building object (slot props)
           serialized = cleanupExpression(value.substring(2, value.length - 2).trim()).split('\n')
-        } else if (typeof value === 'function') {
+        }
+        else if (typeof value === 'function') {
           let code = cleanupExpression(value.toString().replace(/'/g, '\\\'').replace(/"/g, '\''))
           const testResult = /function ([^\s]+)\(/.exec(code)
           if (testResult) {
             // Function name only
             serialized = [testResult[1]]
-          } else {
+          }
+          else {
             if (code.startsWith('($event) => ')) {
               // Remove unnecessary `($event) => `
               code = code.substring('($event) => '.length)
             }
             serialized = code.split('\n')
           }
-        } else {
+        }
+        else {
           serialized = serializeAndCleanJs(value)
         }
         if (serialized.length > 1) {
@@ -186,13 +192,16 @@ async function printVNode (vnode: VNode, propsOverrides: Record<string, any> = n
           indented.push(...serialized.slice(1, serialized.length - 1))
           indented.push(`${serialized[serialized.length - 1]}"`)
           attrs.push(indented)
-        } else {
+        }
+        else {
           attrs.push([`${directive}${arg}="${serialized[0]}"`])
         }
-        // @ts-ignore
-      } else if (vnode.type?.props?.[prop]?.type === Boolean) {
+      }
+      // @ts-expect-error TODO
+      else if (vnode.type?.props?.[prop]?.type === Boolean) {
         attrs.push([prop])
-      } else {
+      }
+      else {
         attrs.push([`${prop}="${value}"`])
       }
     }
@@ -224,14 +233,16 @@ async function printVNode (vnode: VNode, propsOverrides: Record<string, any> = n
     if (typeof vnode.children === 'string') {
       if (tagName === 'pre') {
         childLines.push(vnode.children)
-      } else {
+      }
+      else {
         childLines.push(...vnode.children.split('\n'))
       }
       isChildText = true
-    } else if (Array.isArray(vnode.children)) {
+    }
+    else if (Array.isArray(vnode.children)) {
       let isAllChildText
       for (const child of vnode.children) {
-        // @ts-ignore
+        // @ts-expect-error TODO
         const result = await printVNode(child)
         if (result.isText) {
           if (isAllChildText === undefined) {
@@ -240,10 +251,12 @@ async function printVNode (vnode: VNode, propsOverrides: Record<string, any> = n
           const text = result.lines[0]
           if (!childLines.length || /^\s/.test(text)) {
             childLines.push(text.trim())
-          } else {
+          }
+          else {
             childLines[childLines.length - 1] += text
           }
-        } else {
+        }
+        else {
           if (isAllChildText === undefined) {
             isAllChildText = false
           }
@@ -265,7 +278,7 @@ async function printVNode (vnode: VNode, propsOverrides: Record<string, any> = n
               return () => false
             }
           })
-          // @ts-ignore
+          // @ts-expect-error TODO
           const children = vnode.children[key](autoObject.proxy)
           const slotLines: string[] = []
           for (const child of children) {
@@ -276,9 +289,11 @@ async function printVNode (vnode: VNode, propsOverrides: Record<string, any> = n
             childLines.push(`<template #${key}="{ ${slotProps.join(', ')} }">`)
             childLines.push(...indent(slotLines))
             childLines.push('</template>')
-          } else if (key === 'default') {
+          }
+          else if (key === 'default') {
             childLines.push(...slotLines)
-          } else {
+          }
+          else {
             childLines.push(`<template #${key}>`)
             childLines.push(...indent(slotLines))
             childLines.push(`</template>`)
@@ -296,7 +311,8 @@ async function printVNode (vnode: VNode, propsOverrides: Record<string, any> = n
       if (childLines.length > 0) {
         tag.push('>')
       }
-    } else {
+    }
+    else {
       if (attrs.length === 1) {
         tag[0] += ` ${attrs[0]}`
       }
@@ -310,19 +326,23 @@ async function printVNode (vnode: VNode, propsOverrides: Record<string, any> = n
     if (childLines.length > 0) {
       if (childLines.length === 1 && tag.length === 1 && !attrs.length && isChildText) {
         lines.push(`${tag[0]}${childLines[0]}</${tagName}>`)
-      } else {
+      }
+      else {
         lines.push(...tag)
         lines.push(...indent(childLines))
         lines.push(`</${tagName}>`)
       }
-    } else if (tag.length > 1) {
+    }
+    else if (tag.length > 1) {
       lines.push(...tag)
       lines.push(isVoid ? '>' : '/>')
-    } else {
+    }
+    else {
       lines.push(`${tag[0]}${isVoid ? '' : ' /'}>`)
     }
-  } else if (vnode?.shapeFlag & 1 << 4) {
-    // @ts-ignore
+  }
+  else if (vnode?.shapeFlag & 1 << 4) {
+    // @ts-expect-error TODO
     for (const child of vnode.children) {
       lines.push(...(await printVNode(child)).lines)
     }
@@ -333,27 +353,30 @@ async function printVNode (vnode: VNode, propsOverrides: Record<string, any> = n
   }
 }
 
-export function getTagName (vnode: VNode) {
+export function getTagName(vnode: VNode) {
   if (typeof vnode.type === 'string') {
     return vnode.type
-    // @ts-ignore
-  } else if (vnode.type?.__asyncResolved) {
-    // @ts-ignore
+  }
+  // @ts-expect-error TODO
+  else if (vnode.type?.__asyncResolved) {
+    // @ts-expect-error TODO
     const asyncComp = vnode.type?.__asyncResolved
     return asyncComp.name ?? getNameFromFile(asyncComp.__file)
-    // @ts-ignore
-  } else if (vnode.type?.name) {
-    // @ts-ignore
+  }
+  // @ts-expect-error TODO
+  else if (vnode.type?.name) {
+    // @ts-expect-error TODO
     return vnode.type.name
-    // @ts-ignore
-  } else if (vnode.type?.__file) {
-    // @ts-ignore
+  }
+  // @ts-expect-error TODO
+  else if (vnode.type?.__file) {
+    // @ts-expect-error TODO
     return getNameFromFile(vnode.type.__file)
   }
   return 'Anonymous'
 }
 
-function getNameFromFile (file: string) {
+function getNameFromFile(file: string) {
   const parts = /([^/]+)\.vue$/.exec(file)
   if (parts) {
     return pascalCase(parts[1])
@@ -361,17 +384,18 @@ function getNameFromFile (file: string) {
   return 'Anonymous'
 }
 
-function serializeAndCleanJs (value: any) {
+function serializeAndCleanJs(value: any) {
   const isAutoBuildingObject = !!value?.__autoBuildingObject
   const result = serializeJs(value)
   if (isAutoBuildingObject) {
-    // @ts-ignore
+    // @ts-expect-error TODO
     return [cleanupExpression(result.__autoBuildingObjectGetKey)]
-  } else {
+  }
+  else {
     return cleanupExpression(result).split('\n')
   }
 }
 
-function cleanupExpression (expr: string) {
+function cleanupExpression(expr: string) {
   return expr.replace(/\$setup\./g, '')
 }

@@ -8,8 +8,8 @@ export default {
 <script lang="ts" setup>
 import { computed, ref } from 'vue'
 import type { CSSProperties } from 'vue'
-import HstWrapper from '../HstWrapper.vue'
 import { VTooltip as vTooltip } from 'floating-vue'
+import HstWrapper from '../HstWrapper.vue'
 
 const props = defineProps<{
   title?: string
@@ -27,7 +27,7 @@ const input = ref<HTMLInputElement>(null)
 
 const numberModel = computed({
   get: () => props.modelValue,
-  set: value => {
+  set: (value) => {
     emit('update:modelValue', value)
   },
 })
@@ -41,7 +41,7 @@ const tooltipStyle = computed<CSSProperties>(() => {
   if (input.value) {
     const position = gap + ((input.value.clientWidth - 2 * gap) * percentage.value)
     return {
-      left: position + 'px',
+      left: `${position}px`,
     }
   }
   return {}

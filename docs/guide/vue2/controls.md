@@ -89,7 +89,7 @@ Example with Composition API (Script Setup):
 
 ```vue
 <script lang="ts" setup>
-import { reactive, count } from 'vue'
+import { count, reactive } from 'vue'
 import MyButton from './MyButton.vue'
 
 const state = reactive({

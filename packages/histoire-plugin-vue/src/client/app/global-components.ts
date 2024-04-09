@@ -1,29 +1,30 @@
-/* eslint-disable vue/one-component-per-file */
-
-import {
+import type {
   App,
-  defineComponent,
-  ref,
-  h,
-  onMounted,
-  onBeforeUpdate,
-  onBeforeUnmount,
-  onUpdated,
 } from 'vue'
+import {
+  defineComponent,
+  h,
+  onBeforeUnmount,
+  onBeforeUpdate,
+  onMounted,
+  onUpdated,
+  ref,
+} from 'vue'
+import type {
+  App as _App,
+} from '@histoire/vendors/vue'
 import {
   createApp as _createApp,
   h as _h,
-  App as _App,
   reactive as _reactive,
 } from '@histoire/vendors/vue'
 import { components } from '@histoire/controls'
 import Story from './Story'
 import Variant from './Variant'
 
-export function registerGlobalComponents (app: App) {
-  // eslint-disable-next-line vue/multi-word-component-names
+export function registerGlobalComponents(app: App) {
   app.component('Story', Story)
-  // eslint-disable-next-line vue/multi-word-component-names
+
   app.component('Variant', Variant)
 
   for (const key in components) {
@@ -31,11 +32,11 @@ export function registerGlobalComponents (app: App) {
   }
 }
 
-function wrapControlComponent (controlComponent) {
+function wrapControlComponent(controlComponent) {
   return defineComponent({
     name: controlComponent.name,
     inheritAttrs: false,
-    setup (props, { attrs }) {
+    setup(props, { attrs }) {
       const el = ref<HTMLDivElement>()
       const slotEl = ref<HTMLDivElement>()
 
@@ -43,7 +44,7 @@ function wrapControlComponent (controlComponent) {
 
       const state = _reactive({})
 
-      function applyState (data) {
+      function applyState(data) {
         Object.assign(state, data)
       }
 
@@ -57,7 +58,7 @@ function wrapControlComponent (controlComponent) {
       let newSlotCalls = []
       const slotCalls = ref([])
 
-      function moveSlotContent () {
+      function moveSlotContent() {
         slotCalls.value.forEach((props, index) => {
           const renderedEl = slotEl.value.querySelector(`[renderslotid="${index}"]`)
           if (!renderedEl) return
@@ -75,20 +76,20 @@ function wrapControlComponent (controlComponent) {
 
       onMounted(() => {
         app = _createApp({
-          mounted () {
+          mounted() {
             slotCalls.value = newSlotCalls
             newSlotCalls = []
           },
-          updated () {
+          updated() {
             slotCalls.value = newSlotCalls
             newSlotCalls = []
           },
-          render () {
+          render() {
             return _h(controlComponent, {
               ...state,
               key: 'component',
             }, {
-              default: props => {
+              default: (props) => {
                 newSlotCalls.push(props)
                 return _h('div', {
                   slotId: newSlotCalls.length - 1,
@@ -114,7 +115,7 @@ function wrapControlComponent (controlComponent) {
         slotCalls,
       }
     },
-    render () {
+    render() {
       return [
         h('div', {
           ref: 'el',

@@ -13,7 +13,7 @@ import Vuei18n from 'vue-i18n'
 import { store } from './store'
 import { router } from './router'
 
-export const setupVue2 = defineSetupVue2(({story, variant }) => {
+export const setupVue2 = defineSetupVue2(({ story, variant }) => {
   // Vue plugin
   Vue.use(Vuei18n)
 

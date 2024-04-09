@@ -1,9 +1,9 @@
 <script lang="ts" setup>
-import type { Story, TreeFolder, TreeLeaf } from '../../types'
-import StoryListItem from './StoryListItem.vue'
 import { Icon } from '@iconify/vue'
 import { computed, withDefaults } from 'vue'
+import type { Story, TreeFolder, TreeLeaf } from '../../types'
 import { useFolderStore } from '../../stores/folder'
+import StoryListItem from './StoryListItem.vue'
 
 const props = withDefaults(defineProps<{
   path?: Array<string>
@@ -20,12 +20,12 @@ const folderStore = useFolderStore()
 const folderPath = computed(() => [...props.path, props.folder.title])
 const isFolderOpen = computed(() => folderStore.isFolderOpened(folderPath.value))
 
-function toggleOpen () {
+function toggleOpen() {
   folderStore.toggleFolder(folderPath.value)
 }
 
 const folderPadding = computed(() => {
-  return (props.depth * 12) + 'px'
+  return `${props.depth * 12}px`
 })
 </script>
 

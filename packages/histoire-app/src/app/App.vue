@@ -5,15 +5,15 @@ export default {
 </script>
 
 <script lang="ts" setup>
-import { files as rawFiles, tree as rawTree, onUpdate } from 'virtual:$histoire-stories'
+import { onUpdate, files as rawFiles, tree as rawTree } from 'virtual:$histoire-stories'
+import { computed, onMounted, ref, watch } from 'vue'
+import { useTitle } from '@vueuse/core'
 import StoryList from './components/tree/StoryList.vue'
 import BaseSplitPane from './components/base/BaseSplitPane.vue'
-import { computed, onMounted, ref, watch } from 'vue'
 import AppHeader from './components/app/AppHeader.vue'
 import type { StoryFile, Tree } from './types'
 import { useStoryStore } from './stores/story'
 import { mapFile } from './util/mapping'
-import { useTitle } from '@vueuse/core'
 import { histoireConfig } from './util/config'
 import { onKeyboardShortcut } from './util/keyboard'
 import { isMobile } from './util/responsive'
@@ -29,7 +29,7 @@ const tree = ref<Tree>(rawTree)
 
 onUpdate((newFiles: StoryFile[], newTree: Tree) => {
   loading.value = false
-  files.value = newFiles.map(file => {
+  files.value = newFiles.map((file) => {
     const existingFile = files.value.find(f => f.id === file.id)
     return mapFile(file, existingFile)
   })
@@ -44,7 +44,7 @@ const stories = computed(() => files.value.reduce((acc, file) => {
 // Store
 
 const storyStore = useStoryStore()
-watch(stories, value => {
+watch(stories, (value) => {
   storyStore.setStories(value)
 }, {
   immediate: true,
@@ -66,7 +66,7 @@ useTitle(computed(() => {
 const loadSearch = ref(false)
 const isSearchOpen = ref(false)
 
-watch(isSearchOpen, value => {
+watch(isSearchOpen, (value) => {
   if (value) {
     loadSearch.value = true
   }

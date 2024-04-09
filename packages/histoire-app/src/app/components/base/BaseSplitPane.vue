@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, computed, watch, onUnmounted } from 'vue'
+import { computed, onUnmounted, ref, watch } from 'vue'
 
 const SAVE_PREFIX = '__histoire'
 
@@ -48,8 +48,7 @@ const props = defineProps({
 })
 
 const emit = defineEmits({
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  'update:split': (value: number) => true,
+  'update:split': (_value: number) => true,
 })
 
 const currentSplit = ref(props.defaultSplit)
@@ -70,7 +69,8 @@ if (props.saveId) {
     let parsedValue
     try {
       parsedValue = JSON.parse(savedValue)
-    } catch (e) {
+    }
+    catch (e) {
       console.error(e)
     }
 
@@ -79,11 +79,11 @@ if (props.saveId) {
     }
   }
 
-  watch(currentSplit, value => {
+  watch(currentSplit, (value) => {
     localStorage.setItem(storageKey, JSON.stringify(value))
   })
 
-  watch(currentSplit, value => {
+  watch(currentSplit, (value) => {
     if (value !== props.split) {
       emit('update:split', value)
     }
@@ -95,9 +95,11 @@ if (props.saveId) {
 const boundSplit = computed(() => {
   if (currentSplit.value < props.min) {
     return props.min
-  } else if (currentSplit.value > props.max) {
+  }
+  else if (currentSplit.value > props.max) {
     return props.max
-  } else {
+  }
+  else {
     return currentSplit.value
   }
 })
@@ -115,7 +117,7 @@ let startPosition = 0
 let startSplit = 0
 const el = ref(null)
 
-function dragStart (e) {
+function dragStart(e) {
   dragging.value = true
   startPosition = props.orientation === 'landscape' ? e.pageX : e.pageY
   startSplit = boundSplit.value
@@ -123,32 +125,34 @@ function dragStart (e) {
   window.addEventListener('mouseup', dragEnd)
 }
 
-function dragMove (e) {
+function dragMove(e) {
   if (dragging.value) {
     let position
     let totalSize
     if (props.orientation === 'landscape') {
       position = e.pageX
       totalSize = el.value.offsetWidth
-    } else {
+    }
+    else {
       position = e.pageY
       totalSize = el.value.offsetHeight
     }
     const dPosition = position - startPosition
     if (props.fixed) {
       currentSplit.value = startSplit + dPosition
-    } else {
+    }
+    else {
       currentSplit.value = startSplit + ~~(dPosition / totalSize * 200) / 2
     }
   }
 }
 
-function dragEnd () {
+function dragEnd() {
   dragging.value = false
   removeDragListeners()
 }
 
-function removeDragListeners () {
+function removeDragListeners() {
   window.removeEventListener('mousemove', dragMove)
   window.removeEventListener('mouseup', dragEnd)
 }
@@ -166,7 +170,7 @@ onUnmounted(() => {
       'htw-flex-col': orientation === 'portrait',
       'htw-cursor-ew-resize': dragging && orientation === 'landscape',
       'htw-cursor-ns-resize': dragging && orientation === 'portrait',
-      [orientation]: true
+      [orientation]: true,
     }"
   >
     <div

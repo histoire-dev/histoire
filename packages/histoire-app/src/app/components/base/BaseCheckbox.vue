@@ -9,11 +9,10 @@ const props = defineProps({
 })
 
 const emit = defineEmits({
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  'update:modelValue': (newValue: boolean) => true,
+  'update:modelValue': (_newValue: boolean) => true,
 })
 
-function toggle () {
+function toggle() {
   emit('update:modelValue', !props.modelValue)
   animationEnabled.value = true
 }
