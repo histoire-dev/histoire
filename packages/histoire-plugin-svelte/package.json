@@ -1,7 +1,7 @@
 {
   "name": "@histoire/plugin-svelte",
   "type": "module",
-  "version": "0.17.16",
+  "version": "0.17.17",
   "description": "Histoire plugin for Svelte support",
   "author": {
     "name": "Guillaume Chau"

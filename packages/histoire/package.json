@@ -1,7 +1,7 @@
 {
   "name": "histoire",
   "type": "module",
-  "version": "0.17.16",
+  "version": "0.17.17",
   "description": "A fast story book powered by Vite",
   "author": {
     "name": "Guillaume Chau"

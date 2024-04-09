@@ -1,7 +1,7 @@
 {
   "name": "@histoire/plugin-percy",
   "type": "module",
-  "version": "0.17.16",
+  "version": "0.17.17",
   "description": "Histoire plugin to take screenshots with Percy for visual regression testing",
   "author": {
     "name": "Guillaume Chau"

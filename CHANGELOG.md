@@ -1,3 +1,24 @@
+## v0.17.17
+
+[compare changes](https://github.com/Akryum/histoire/compare/v0.17.16...v0.17.17)
+
+
+### 🚀 Enhancements
+
+  - Remove counter animation ([a6a9b81d](https://github.com/Akryum/histoire/commit/a6a9b81d))
+
+### 🩹 Fixes
+
+  - **vue:** Codegen setup directives ([92f91cc7](https://github.com/Akryum/histoire/commit/92f91cc7))
+
+### 💅 Refactors
+
+  - Typescript 5 + eslint 9 + antfu eslint ([1e679fda](https://github.com/Akryum/histoire/commit/1e679fda))
+
+### ❤️  Contributors
+
+- Guillaume Chau ([@Akryum](http://github.com/Akryum))
+
 ## v0.17.16
 
 [compare changes](https://github.com/Akryum/histoire/compare/v0.17.15...v0.17.16)

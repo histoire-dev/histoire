@@ -1,6 +1,6 @@
 {
   "name": "histoire-monorepo",
-  "version": "0.17.16",
+  "version": "0.17.17",
   "private": true,
   "packageManager": "pnpm@8.6.2",
   "repository": {
