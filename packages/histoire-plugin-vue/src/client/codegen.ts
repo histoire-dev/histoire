@@ -101,6 +101,15 @@ async function printVNode (vnode: VNode, propsOverrides: Record<string, any> = n
             }
             if (dirName) break
           }
+          // Check in setup state
+          if (!dirName) {
+            for (const key in target.setupState) {
+              if (target.setupState[key] === dir.dir) {
+                dirName = key.replace(/^v(\w)/, (_, p1) => p1.toLowerCase())
+                break
+              }
+            }
+          }
           if (dirName) {
             genDirective(dirName, dir)
           }
