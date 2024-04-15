@@ -23,7 +23,7 @@ export async function run({ file, storyData }: ServerRunPayload) {
     id: options.id ?? file.id,
     title: options.title ?? file.fileName,
     group: options.group,
-    layout: options.layout ?? { type: 'single', iframe: true },
+    layout: options.layout ?? { type: 'single' },
     icon: options.icon,
     iconColor: options.iconColor,
     docsOnly: options.docsOnly ?? false,

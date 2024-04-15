@@ -3,7 +3,6 @@
     title="BaseButton with NuxtLink"
     :layout="{
       type: 'single',
-      iframe: false,
     }"
   >
     <Variant>

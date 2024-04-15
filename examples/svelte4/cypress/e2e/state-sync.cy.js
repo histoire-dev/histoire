@@ -14,13 +14,4 @@ describe('State sync', () => {
     getIframeBody().find('input[type="checkbox"]').click()
     cy.get('[data-test-id="story-controls"] pre').contains('"disabled": false')
   })
-
-  it('should display the story content (no iframe)', () => {
-    cy.visit('/story/src-noiframe-story-svelte?variantId=_default')
-    cy.get('[data-test-id="sandbox-render"]').find('div').contains('Some content')
-    cy.get('[data-test-id="story-controls"]').get('input').clear().type('42')
-    cy.get('[data-test-id="sandbox-render"]').find('div').contains('42')
-    cy.get('[data-test-id="sandbox-render"]').find('input').clear().type('Meow')
-    cy.get('[data-test-id="story-controls"]').get('input').should('have.value', 'Meow')
-  })
 })

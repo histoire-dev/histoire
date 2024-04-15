@@ -23,17 +23,6 @@ describe('background color', () => {
     'rgb(0, 81, 66)',
   ]
 
-  it('should provide background and contrast color (no iframe)', () => {
-    cy.visit('/story/src-components-complexparameter-story-vue?variantId=_default')
-    cy.get('[data-test-id="toolbar-background"]').click()
-    cy.get('[data-test-id="background-popper"]').should('be.visible').find('button').should('have.length', 6).each(($el, index) => {
-      cy.wrap($el).click()
-      cy.get('[data-test-id="responsive-preview-bg"]').should('have.css', 'background-color', backgroundColorShouldBe[index])
-      cy.get('[data-test-id="story-variant-single-view"] .native-story').should('have.css', 'color', contrastColorShouldBe[index])
-      cy.get('[data-test-id="toolbar-background"]').click()
-    })
-  })
-
   it('should provide background and contrast color (with iframe)', () => {
     cy.visit('story/src-components-contrastcolor-story-vue?variantId=_default')
     cy.get('[data-test-id="toolbar-background"]').click()
@@ -49,8 +38,8 @@ describe('background color', () => {
     cy.get('[data-test-id="toolbar-background"]').click()
     cy.get('[data-test-id="background-popper"]').should('be.visible').find('button').should('have.length', 6).each(($el, index) => {
       cy.wrap($el).click()
-      cy.get('[data-test-id="responsive-preview-bg"]').should('have.css', 'background-color', backgroundColorShouldBe[index])
-      cy.get('.histoire-generic-render-story .text').should('have.css', 'color', contrastColorShouldBe[index])
+      getIframeBody().find('[data-test-id="responsive-preview-bg"]').should('have.css', 'background-color', backgroundColorShouldBe[index])
+      getIframeBody().find('.histoire-generic-render-story .text').should('have.css', 'color', contrastColorShouldBe[index])
       cy.get('[data-test-id="toolbar-background"]').click()
     })
   })
