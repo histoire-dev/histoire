@@ -28,6 +28,9 @@
     // Strict
     "noImplicitAny": false,
     "noImplicitThis": true,
+    // Output
+    "declaration": true,
+    "declarationMap": true,
     "outDir": "dist",
     "removeComments": false,
     "sourceMap": false,

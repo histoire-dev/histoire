@@ -37,8 +37,8 @@
     "histoire": "./bin.mjs"
   },
   "scripts": {
-    "build": "rimraf dist && tsc -d",
-    "watch": "tsc -d -w --sourceMap",
+    "build": "rimraf dist && tsc",
+    "watch": "tsc -w --sourceMap",
     "test": "vitest run",
     "test:dev": "vitest"
   },
