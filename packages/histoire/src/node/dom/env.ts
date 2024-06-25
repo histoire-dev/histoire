@@ -32,6 +32,16 @@ export function createDomEnv() {
     unobserve(_target: Element): void { /* noop */ }
   }
 
+  window.IntersectionObserver = window.IntersectionObserver || class IntersectionObserver {
+    root: Element
+    rootMargin: string
+    thresholds: number[]
+    disconnect(): void { /* noop */ }
+    observe(_target: Element): void { /* noop */  }
+    unobserve(_target: Element): void { /* noop */ }
+    takeRecords(): IntersectionObserverEntry[] { return [] }
+    }
+
   return {
     window,
     destroy,
