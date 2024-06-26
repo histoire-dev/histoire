@@ -6,7 +6,6 @@ import Responsive from './Responsive.vue'
   <Story title="Responsive">
     <Variant
       title="default"
-      iframe
     >
       <Responsive />
     </Variant>

@@ -3,7 +3,7 @@ import { computed, ref, watch } from 'vue'
 import { useStoryStore } from '../../stores/story'
 import MobileOverlay from '../app/MobileOverlay.vue'
 import StoryVariantListItem from './StoryVariantListItem.vue'
-import StoryVariantGrid from './StoryVariantGrid.vue'
+import StoryVariantGridIframe from './StoryVariantGridIframe.vue'
 import StoryVariantSingle from './StoryVariantSingle.vue'
 
 const storyStore = useStoryStore()
@@ -23,7 +23,7 @@ watch(variant, () => {
 
 <template>
   <div class="histoire-story-viewer htw-bg-gray-50 htw-h-full dark:htw-bg-gray-750">
-    <StoryVariantGrid
+    <StoryVariantGridIframe
       v-if="storyStore.currentStory.layout.type === 'grid'"
     />
     <StoryVariantSingle

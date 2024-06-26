@@ -154,7 +154,7 @@ export default {
   group: 'design-system',
   icon: 'noto:paintbrush',
   responsiveDisabled: true,
-  layout: { type: 'single', iframe: false },
+  layout: { type: 'single' },
   variants: [
     {
       id: 'media-queries',

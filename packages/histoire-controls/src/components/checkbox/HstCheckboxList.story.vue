@@ -23,7 +23,6 @@ function initState() {
   <Story
     title="HstCheckboxList"
     group="controls"
-    :layout="{ type: 'single', iframe: false }"
   >
     <Variant
       title="playground"

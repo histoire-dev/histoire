@@ -88,7 +88,9 @@ function scrollDocsToTop() {
       />
     </div>
     <template v-else-if="isMobile">
-      <StoryViewer />
+      <StoryViewer
+        :key="storyStore.currentStory.id"
+      />
     </template>
     <BaseSplitPane
       v-else
@@ -99,7 +101,9 @@ function scrollDocsToTop() {
       class="htw-h-full"
     >
       <template #first>
-        <StoryViewer />
+        <StoryViewer
+          :key="storyStore.currentStory.id"
+        />
       </template>
 
       <template #last>

@@ -22,7 +22,7 @@ describe('Story render', () => {
 
   it('should render NuxtLink', () => {
     cy.visit('/story/components-basebuttonlink-story-vue?variantId=_default')
-    cy.get('.histoire-generic-render-story a').contains('Hello world')
+    getIframeBody().find('.histoire-generic-render-story a').contains('Hello world')
   })
 
   it('should render the public config populated from Nuxt', () => {

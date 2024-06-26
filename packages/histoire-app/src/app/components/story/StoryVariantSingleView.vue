@@ -7,8 +7,7 @@ import ToolbarBackground from '../toolbar/ToolbarBackground.vue'
 import ToolbarTextDirection from '../toolbar/ToolbarTextDirection.vue'
 import ToolbarNewTab from '../toolbar/ToolbarNewTab.vue'
 import DevOnlyToolbarOpenInEditor from '../toolbar/DevOnlyToolbarOpenInEditor.vue'
-import StoryVariantSinglePreviewNative from './StoryVariantSinglePreviewNative.vue'
-import StoryVariantSinglePreviewRemote from './StoryVariantSinglePreviewRemote.vue'
+import StoryVariantSingleIframe from './StoryVariantSingleIframe.vue'
 
 defineProps<{
   variant: Variant
@@ -47,13 +46,7 @@ defineProps<{
     </div>
 
     <!-- Preview -->
-    <StoryVariantSinglePreviewNative
-      v-if="story.layout?.iframe === false"
-      :story="story"
-      :variant="variant"
-    />
-    <StoryVariantSinglePreviewRemote
-      v-else
+    <StoryVariantSingleIframe
       :story="story"
       :variant="variant"
     />

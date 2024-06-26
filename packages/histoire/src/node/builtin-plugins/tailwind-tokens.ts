@@ -124,7 +124,7 @@ export default {
   group: 'design-system',
   icon: 'mdi:tailwind',
   responsiveDisabled: true,
-  layout: { type: 'single', iframe: false },
+  layout: { type: 'single' },
   variants: [
     {
       id: 'background-color',

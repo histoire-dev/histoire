@@ -16,7 +16,6 @@ function initState() {
   <Story
     title="HstJson"
     group="controls"
-    :layout="{ type: 'single', iframe: false }"
   >
     <Variant
       title="default"

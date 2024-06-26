@@ -28,7 +28,6 @@ const count = ref('0')
   <Story
     title="HstButtonGroup"
     group="controls"
-    :layout="{ type: 'single', iframe: false }"
   >
     <Variant
       title="playground"

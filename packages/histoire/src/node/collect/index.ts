@@ -126,7 +126,7 @@ export function useCollectStories(options: UseCollectStoriesOptions, ctx: Contex
       }
 
       if (!finalData.layout) {
-        finalData.layout = { type: 'single', iframe: true }
+        finalData.layout = { type: 'single' }
       }
 
       storyFile.id = finalData.id

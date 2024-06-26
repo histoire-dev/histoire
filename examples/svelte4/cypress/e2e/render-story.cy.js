@@ -10,16 +10,11 @@ describe('Story render', () => {
     getIframeBody().contains('😺')
   })
 
-  it('should display the story content (no iframe)', () => {
-    cy.visit('/story/src-noiframe-story-svelte?variantId=_default')
-    cy.get('[data-test-id="story-variant-single-view"]').contains('No iframe story content')
-  })
-
   it('should display the story content (grid)', () => {
     cy.visit('/story/src-cars-story-svelte')
-    cy.get('[data-test-id="sandbox-render"]').contains('🚗')
-    cy.get('[data-test-id="sandbox-render"]').contains('🏎️')
-    cy.get('[data-test-id="sandbox-render"]').contains('🚜')
+    getIframeBody().find('[data-test-id="sandbox-render"]').contains('🚗')
+    getIframeBody().find('[data-test-id="sandbox-render"]').contains('🏎️')
+    getIframeBody().find('[data-test-id="sandbox-render"]').contains('🚜')
   })
 })
 

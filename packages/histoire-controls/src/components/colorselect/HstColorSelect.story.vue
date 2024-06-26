@@ -11,7 +11,6 @@ const state = reactive({
   <Story
     title="HstColorSelect"
     group="controls"
-    :layout="{ type: 'single', iframe: false }"
   >
     <HstColorSelect
       v-model="state.value"

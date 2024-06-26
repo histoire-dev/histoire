@@ -1,11 +1,8 @@
 <script lang="ts" setup>
-import type { PropType } from 'vue'
 import { computed, ref, toRefs } from 'vue'
 import { Icon } from '@iconify/vue'
-import { useRouter } from 'vue-router'
 import { useResizeObserver } from '@vueuse/core'
 import { HstCopyIcon } from '@histoire/controls'
-import { useCurrentVariantRoute } from '../../util/variant'
 import type { Story, Variant } from '../../types'
 import { useScrollOnActive } from '../../util/scroll'
 import { usePreviewSettingsStore } from '../../stores/preview-settings'
@@ -17,24 +14,21 @@ import ToolbarNewTab from '../toolbar/ToolbarNewTab.vue'
 import CheckerboardPattern from '../misc/CheckerboardPattern.vue'
 import GenericRenderStory from './GenericRenderStory.vue'
 
-const props = defineProps({
-  variant: {
-    type: Object as PropType<Variant>,
-    required: true,
-  },
+const props = defineProps<{
+  story: Story
+  variant: Variant
+  selected: boolean
+}>()
 
-  story: {
-    type: Object as PropType<Story>,
-    required: true,
-  },
-})
+const emit = defineEmits<{
+  select: []
+  resize: [width: number, height: number]
+  ready: []
+}>()
 
-const emit = defineEmits({
-  resize: (_width: number, _height: number) => true,
-})
+const { selected } = toRefs(props)
 
 const { variant } = toRefs(props)
-const { isActive, targetRoute } = useCurrentVariantRoute(variant)
 
 Object.assign(props.variant, {
   previewReady: false,
@@ -43,30 +37,29 @@ function onReady() {
   Object.assign(props.variant, {
     previewReady: true,
   })
+  emit('ready')
 }
 
-const router = useRouter()
-
 function selectVariant() {
-  router.push(targetRoute.value)
+  emit('select')
 }
 
 const el = ref<HTMLDivElement>()
 
-const { autoScroll } = useScrollOnActive(isActive, el)
+const { autoScroll } = useScrollOnActive(selected, el)
 
 useResizeObserver(el, () => {
   if (props.variant.previewReady) {
     emit('resize', el.value!.clientWidth, el.value!.clientHeight)
-    if (isActive.value) {
+    if (selected.value) {
       autoScroll()
     }
   }
 })
 
-const settings = usePreviewSettingsStore().currentSettings
+const settingsStore = usePreviewSettingsStore()
 
-const contrastColor = computed(() => getContrastColor(settings))
+const contrastColor = computed(() => getContrastColor(settingsStore.currentSettings))
 const autoApplyContrastColor = computed(() => !!histoireConfig.autoApplyContrastColor)
 </script>
 
@@ -77,25 +70,24 @@ const autoApplyContrastColor = computed(() => !!histoireConfig.autoApplyContrast
   >
     <!-- Header -->
     <div class="htw-flex-none htw-flex htw-items-center">
-      <RouterLink
+      <button
         v-tooltip="variant.title"
-        :to="targetRoute"
-        class="htw-rounded htw-w-max htw-px-2 htw-py-0.5 htw-min-w-16 htw-cursor-pointer htw-flex htw-items-center htw-gap-1 htw-flex-shrink"
+        class="htw-rounded htw-w-max htw-px-2 htw-py-0.5 htw-min-w-16 htw-cursor-pointer htw-flex htw-items-center htw-gap-1 htw-flex-shrink htw-bg-transparent"
         :class="{
-          'hover:htw-bg-gray-200 htw-text-gray-500 dark:hover:htw-bg-gray-800': !isActive,
-          'htw-bg-primary-200 hover:htw-bg-primary-300 htw-text-primary-800 dark:htw-bg-primary-700 dark:hover:htw-bg-primary-800 dark:htw-text-primary-200': isActive,
+          'hover:htw-bg-gray-200 htw-text-gray-500 dark:hover:htw-bg-gray-800': !selected,
+          'htw-bg-primary-200 hover:htw-bg-primary-300 htw-text-primary-800 dark:htw-bg-primary-700 dark:hover:htw-bg-primary-800 dark:htw-text-primary-200': selected,
         }"
       >
         <Icon
           :icon="variant.icon ?? 'carbon:cube'"
           class="htw-w-4 htw-h-4 htw-opacity-50"
           :class="{
-            'htw-text-gray-500': !isActive && !variant.iconColor,
-            'bind-icon-color': !isActive && variant.iconColor,
+            'htw-text-gray-500': !selected && !variant.iconColor,
+            'bind-icon-color': !selected && variant.iconColor,
           }"
         />
         <span class="htw-truncate htw-flex-1">{{ variant.title }}</span>
-      </RouterLink>
+      </button>
 
       <!-- Toolbar -->
       <div class="htw-flex-none htw-ml-auto htw-hidden group-hover:htw-flex htw-items-center">
@@ -113,8 +105,8 @@ const autoApplyContrastColor = computed(() => !!histoireConfig.autoApplyContrast
     <div
       class="htw-border htw-bg-white dark:htw-bg-gray-700 htw-rounded htw-flex-1 htw-p-4 htw-relative"
       :class="{
-        'htw-border-gray-100 dark:htw-border-gray-800': !isActive,
-        'htw-border-primary-200 dark:htw-border-primary-900': isActive,
+        'htw-border-gray-100 dark:htw-border-gray-800': !selected,
+        'htw-border-primary-200 dark:htw-border-primary-900': selected,
       }"
       data-test-id="sandbox-render"
       @click.stop="selectVariant()"
@@ -126,7 +118,7 @@ const autoApplyContrastColor = computed(() => !!histoireConfig.autoApplyContrast
       />
 
       <CheckerboardPattern
-        v-if="settings.checkerboard"
+        v-if="settingsStore.currentSettings.checkerboard"
         class="htw-absolute htw-inset-0 htw-w-full htw-h-full htw-text-gray-500/20"
       />
 
@@ -141,7 +133,7 @@ const autoApplyContrastColor = computed(() => !!histoireConfig.autoApplyContrast
           :key="`${story.id}-${variant.id}`"
           :variant="variant"
           :story="story"
-          :dir="settings.textDirection"
+          :dir="settingsStore.currentSettings.textDirection"
           :class="{
             [histoireConfig.theme.darkClass]: isDark,
           }"
@@ -158,6 +150,6 @@ const autoApplyContrastColor = computed(() => !!histoireConfig.autoApplyContrast
 }
 
 .bind-preview-bg {
-  background-color: v-bind('settings.backgroundColor');
+  background-color: v-bind('settingsStore.currentSettings.backgroundColor');
 }
 </style>

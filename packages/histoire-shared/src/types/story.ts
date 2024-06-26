@@ -11,7 +11,6 @@ export interface StoryFile {
 
 export type StoryLayout = {
   type: 'single'
-  iframe?: boolean
 } | {
   type: 'grid'
   width?: number | string
