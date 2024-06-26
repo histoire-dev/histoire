@@ -135,24 +135,12 @@ async function useNuxtViteConfig() {
   }
   const runtimeDir = fileURLToPath(new URL('../runtime', import.meta.url))
   nuxt.options.build.templates.push(
-    { src: join(runtimeDir, 'composables.mjs'), filename: 'histoire/composables.mjs' },
     { src: join(runtimeDir, 'components.mjs'), filename: 'histoire/components.mjs' },
   )
 
   nuxt.hook('app:templates', (app) => {
     app.templates = app.templates.filter(template => template.filename !== 'app-component.mjs')
     app.templates.push({ src: join(runtimeDir, 'app-component.mjs'), filename: 'app-component.mjs' })
-  })
-
-  nuxt.hook('imports:sources', (presets) => {
-    const stubbedComposables = ['useNuxtApp']
-    for (const appPreset of presets.filter(p => p.from?.startsWith('#app'))) {
-      appPreset.imports = appPreset.imports.filter(i => typeof i !== 'string' || !stubbedComposables.includes(i))
-    }
-    presets.push({
-      from: '#build/histoire/composables.mjs',
-      imports: stubbedComposables,
-    })
   })
 
   return {
