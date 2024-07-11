@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "dev:hst": "nodemon --watch ../../packages/histoire/dist --watch ../../packages/histoire-plugin-vue/dist --exec \"rm -rf ./node_modules/.hst* && HISTOIRE_DEV=true histoire dev\"",
-    "story:dev": "histoire dev",
+    "story:dev": "histoire dev --host",
     "story:build": "histoire build",
     "story:preview": "histoire preview --port 4567",
     "ci": "start-server-and-test story:preview http://localhost:4567/ test",

@@ -18,6 +18,7 @@ program.command('dev')
   .option('-p, --port <port>', 'Listening port of the server')
   .option('-c, --config <file>', `[string] use specified config file`)
   .option('--open', 'Open in your default browser')
+  .option('--host <host>', '[string] specify hostname')
   .action(async (options) => {
     const { devCommand } = await import('./commands/dev.js')
     return devCommand(options)
