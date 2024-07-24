@@ -1,6 +1,6 @@
 # Lost Pixel visual regression testing
 
-Lost Pixel is a [modern open-source visual regression testing tool](https://github.com/lost-pixel/lost-pixel) that allows you to run self-hosted visual regression tests. [Lost Pixel Platofrm](https://lost-pixel.com) is for teams and is a cloud version of visual testing.
+Lost Pixel is a [modern open-source visual regression testing tool](https://github.com/lost-pixel/lost-pixel) that allows you to run self-hosted visual regression tests. [Lost Pixel Platform](https://lost-pixel.com) is for teams and is a cloud version of visual testing.
 
 ## Setting up self-hosted visual testing
 

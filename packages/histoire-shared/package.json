@@ -25,8 +25,8 @@
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "scripts": {
-    "build": "rimraf dist && tsc -d",
-    "watch": "tsc -d -w --sourceMap"
+    "build": "rimraf dist && tsc",
+    "watch": "tsc -w --sourceMap"
   },
   "peerDependencies": {
     "vite": "^2.9.0 || ^3.0.0 || ^4.0.0 || ^5.0.0"
