@@ -5,39 +5,39 @@
 @import 'floating.pcss' layer(histoire);
 @import 'transitions.pcss' layer(histoire);
 
-*,
-::before,
-::after {
-  box-sizing: border-box;
-  border-width: 0;
-  border-style: solid;
-  border-color: #e5e7eb;
-}
-
-a,
-input,
-button {
-  color: inherit;
-}
-
-a {
-  text-decoration: inherit;
-}
-
-input, button {
-  font-family: inherit;
-}
-
-a,
-button {
-  user-select: none;
-}
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
+@layer histoire {
+  *,
+  ::before,
+  ::after {
+    box-sizing: border-box;
+    border-width: 0;
+    border-style: solid;
+    border-color: #e5e7eb;
+  }
+
+  a,
+  input,
+  button {
+    color: inherit;
+  }
+
+  a {
+    text-decoration: inherit;
+  }
+
+  input, button {
+    font-family: inherit;
+  }
+
+  a,
+  button {
+    user-select: none;
+  }
+
   body,
   pre {
     margin: 0;
