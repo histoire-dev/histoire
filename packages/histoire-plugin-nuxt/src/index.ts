@@ -14,13 +14,33 @@ const ignorePlugins = [
   'nuxt:import-protection',
 ]
 
-export function HstNuxt(): Plugin {
+interface IncludeOption {
+  include?: (string | RegExp)[] | '*'
+  exclude?: undefined
+  mock?: Record<string, any>
+}
+
+interface ExcludeOption {
+  include?: undefined
+  exclude?: (string | RegExp)[]
+  mock?: Record<string, any>
+}
+
+interface NuxtPluginOptions {
+  nuxtAppMockSettings: IncludeOption | ExcludeOption
+}
+
+const defaultOptions: NuxtPluginOptions = {
+  nuxtAppMockSettings: { mock: {} },
+}
+
+export function HstNuxt(options: NuxtPluginOptions = defaultOptions): Plugin {
   let nuxt: Nuxt
   return {
     name: '@histoire/plugin-nuxt',
 
     async defaultConfig() {
-      const nuxtViteConfig = await useNuxtViteConfig()
+      const nuxtViteConfig = await useNuxtViteConfig(options)
       const { viteConfig } = nuxtViteConfig
 
       nuxt = nuxtViteConfig.nuxt // We save it to close it later
@@ -109,7 +129,7 @@ export async function setupVue3 () {
   }
 }
 
-async function useNuxtViteConfig() {
+async function useNuxtViteConfig(options: NuxtPluginOptions) {
   const { loadNuxt, buildNuxt } = await import('@nuxt/kit')
   const nuxt = await loadNuxt({
     // cwd: process.cwd(),
@@ -127,6 +147,11 @@ async function useNuxtViteConfig() {
       pages: false,
       typescript: {
         typeCheck: false,
+      },
+      runtimeConfig: {
+        public: {
+          histoireNuxtPluginOptions: JSON.stringify(options, stringifyOptionalRegExp),
+        },
       },
     },
   })
@@ -183,4 +208,11 @@ async function useNuxtViteConfig() {
     }),
     nuxt,
   }
+}
+
+function stringifyOptionalRegExp(_key: unknown, value: unknown) {
+  if (value && value instanceof RegExp) {
+    return `__REGEXP:${value.toString()}`
+  }
+  return value
 }
