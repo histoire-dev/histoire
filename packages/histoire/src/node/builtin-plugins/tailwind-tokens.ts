@@ -66,6 +66,8 @@ export function tailwindTokens(options: TailwindTokensOptions = {}): Plugin {
 
     onDev(api, onCleanup) {
       if (tailwindConfigFile) {
+        generate(api)
+        
         const watcher = api.watcher.watch(tailwindConfigFile)
           .on('change', () => generate(api))
           .on('add', () => generate(api))
