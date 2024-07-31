@@ -1,6 +1,7 @@
 import { fileURLToPath } from 'node:url'
 import { join } from 'node:path'
 import replace from '@rollup/plugin-replace'
+import { defu } from 'defu'
 import type { Plugin } from 'histoire'
 import type { Nuxt } from '@nuxt/schema'
 import type { UserConfig as ViteConfig } from 'vite'
@@ -27,23 +28,25 @@ interface ExcludeOption {
 }
 
 interface NuxtPluginOptions {
-  nuxtAppMockSettings: IncludeOption | ExcludeOption
+  nuxtAppSettings: IncludeOption | ExcludeOption
 }
 
-const defaultOptions: NuxtPluginOptions = {
-  nuxtAppMockSettings: { mock: {} },
+export const defaultOptions: NuxtPluginOptions = {
+  nuxtAppSettings: { mock: {} },
 }
 
 export function HstNuxt(options: NuxtPluginOptions = defaultOptions): Plugin {
   let nuxt: Nuxt
+  const _options: NuxtPluginOptions = defu(options, defaultOptions)
   return {
     name: '@histoire/plugin-nuxt',
 
     async defaultConfig() {
-      const nuxtViteConfig = await useNuxtViteConfig(options)
+      const nuxtViteConfig = await useNuxtViteConfig()
       const { viteConfig } = nuxtViteConfig
 
       nuxt = nuxtViteConfig.nuxt // We save it to close it later
+      const nuxtConfigPublic = { ...nuxt.options.runtimeConfig.public, histoireNuxtPluginOptions: _options }
       const plugins = viteConfig.plugins.filter((p: any) => !ignorePlugins.includes(p?.name))
       return {
         vite: {
@@ -94,7 +97,7 @@ export function HstNuxt(options: NuxtPluginOptions = defaultOptions): Plugin {
           `${nuxt.options.css.map(file => `import '${file}'`).join('\n')}`,
           `import { setupNuxtApp } from '@histoire/plugin-nuxt/dist/runtime/app-setup.js'
 export async function setupVue3 () {
-  await setupNuxtApp(${JSON.stringify(nuxt.options.runtimeConfig.public)})
+  await setupNuxtApp(${JSON.stringify(nuxtConfigPublic, stringifyOptionalRegExp)})
 }`,
         ],
         viteNodeInlineDeps: [
@@ -129,7 +132,7 @@ export async function setupVue3 () {
   }
 }
 
-async function useNuxtViteConfig(options: NuxtPluginOptions) {
+async function useNuxtViteConfig() {
   const { loadNuxt, buildNuxt } = await import('@nuxt/kit')
   const nuxt = await loadNuxt({
     // cwd: process.cwd(),
@@ -147,11 +150,6 @@ async function useNuxtViteConfig(options: NuxtPluginOptions) {
       pages: false,
       typescript: {
         typeCheck: false,
-      },
-      runtimeConfig: {
-        public: {
-          histoireNuxtPluginOptions: JSON.stringify(options, stringifyOptionalRegExp),
-        },
       },
     },
   })
