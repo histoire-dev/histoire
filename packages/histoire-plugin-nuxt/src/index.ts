@@ -4,7 +4,7 @@ import replace from '@rollup/plugin-replace'
 import { defu } from 'defu'
 import type { Plugin } from 'histoire'
 import type { Nuxt } from '@nuxt/schema'
-import type { UserConfig as ViteConfig } from 'vite'
+import type { PluginOption, UserConfig as ViteConfig } from 'vite'
 
 const ignorePlugins = [
   'nuxt:vite-node-server',
@@ -77,7 +77,7 @@ export function HstNuxt(options: NuxtPluginOptions = defaultOptions): Plugin {
                 'import.meta.client': 'true',
               },
               preventAssignment: true,
-            }),
+            }) as unknown as PluginOption,
           ],
           css: viteConfig.css,
           publicDir: viteConfig.publicDir,
