@@ -1,5 +1,13 @@
 <script lang="ts" setup>
 import NoButton from './NoButton.vue'
+
+const { locale, availableLocales } = useI18n()
+
+function initState() {
+  return {
+    locale: locale.value,
+  }
+}
 </script>
 
 <template>
@@ -12,8 +20,16 @@ import NoButton from './NoButton.vue'
   >
     <Variant
       title="no button"
+      :init-state="initState"
     >
-      <NoButton />
+      <template #default="{ state }">
+        <LocaleWrapper :locale="state.locale">
+          <NoButton />
+        </LocaleWrapper>
+      </template>
+      <template #controls="{ state }">
+        <HstSelect v-model="state.locale" :options="availableLocales" title="Choose locale" />
+      </template>
     </Variant>
   </Story>
 </template>

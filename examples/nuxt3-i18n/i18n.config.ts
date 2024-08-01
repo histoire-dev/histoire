@@ -2,7 +2,7 @@ import type { I18nOptions } from 'vue-i18n'
 
 export const i18nConfig: I18nOptions = {
   legacy: false,
-  locale: 'en',
+  locale: 'fr',
   messages: {
     en: {},
     es: {},

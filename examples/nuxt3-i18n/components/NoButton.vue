@@ -1,4 +1,4 @@
-<script setup type="ts">
+<script setup lang="ts">
 const { t } = useI18n()
 </script>
 

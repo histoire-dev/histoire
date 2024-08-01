@@ -1,5 +1,13 @@
 <script lang="ts" setup>
 import YesButton from './YesButton.vue'
+
+const { locale, availableLocales } = useI18n()
+
+function initState() {
+  return {
+    locale: locale.value,
+  }
+}
 </script>
 
 <template>
@@ -12,9 +20,16 @@ import YesButton from './YesButton.vue'
   >
     <Variant
       title="yes button"
-      icon="el:resize-full"
+      :init-state="initState"
     >
-      <YesButton />
+      <template #default="{ state }">
+        <LocaleWrapper :locale="state.locale">
+          <YesButton />
+        </LocaleWrapper>
+      </template>
+      <template #controls="{ state }">
+        <HstSelect v-model="state.locale" :options="availableLocales" title="Choose locale" />
+      </template>
     </Variant>
   </Story>
 </template>
