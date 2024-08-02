@@ -25,6 +25,7 @@ defineProps({
       [`btn-color-${color}`]: color,
       [`btn-size-${size}`]: size,
     }"
+    data-testid="base-button"
   >
     <slot />
   </button>
