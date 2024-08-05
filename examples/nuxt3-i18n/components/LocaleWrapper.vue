@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { type Ref, watch, computed } from 'vue'
+import { type Ref, computed, watch } from 'vue'
 
 const { locale } = useI18n()
 

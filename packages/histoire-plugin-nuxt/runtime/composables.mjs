@@ -13,12 +13,12 @@ function parseOptionalRegexp(_key, value) {
 function shallowClone(obj) {
   return Object.create(
     Object.getPrototypeOf(obj),
-    Object.getOwnPropertyDescriptors(obj)
-  );
+    Object.getOwnPropertyDescriptors(obj),
+  )
 }
 
 function findValueFunc(value) {
-  return function(item) {
+  return function (item) {
     if (typeof item === 'string') {
       return (item === value)
     }
@@ -38,13 +38,13 @@ function nuxtAppInclusion(originalApp, include, mock) {
     throw new TypeError('Include has to be the string \'*\' or an array of strings or RegExps')
   }
 
-  const nuxtAppClone = Object.create(Object.getPrototypeOf(originalApp));
+  const nuxtAppClone = Object.create(Object.getPrototypeOf(originalApp))
   Object.getOwnPropertyNames(originalApp).forEach((key) => {
     if (include.find(findValueFunc(key))) {
-      const descriptor = Object.getOwnPropertyDescriptor(originalApp, key);
-      const conflictingMockDescriptor = Object.getOwnPropertyDescriptor(mock, key);
+      const descriptor = Object.getOwnPropertyDescriptor(originalApp, key)
+      const conflictingMockDescriptor = Object.getOwnPropertyDescriptor(mock, key)
       if (!conflictingMockDescriptor) {
-        Object.defineProperty(nuxtAppClone, key, descriptor);
+        Object.defineProperty(nuxtAppClone, key, descriptor)
       }
     }
   })
@@ -56,13 +56,13 @@ function nuxtAppExclusion(originalApp, exclude, mock) {
     throw new TypeError('Exclude has to be an array of strings or RegExps')
   }
 
-  const nuxtAppClone = Object.create(Object.getPrototypeOf(originalApp));
+  const nuxtAppClone = Object.create(Object.getPrototypeOf(originalApp))
   Object.getOwnPropertyNames(originalApp).forEach((key) => {
     if (!exclude.find(findValueFunc(key))) {
-      const descriptor = Object.getOwnPropertyDescriptor(originalApp, key);
-      const conflictingMockDescriptor = Object.getOwnPropertyDescriptor(mock, key);
+      const descriptor = Object.getOwnPropertyDescriptor(originalApp, key)
+      const conflictingMockDescriptor = Object.getOwnPropertyDescriptor(mock, key)
       if (!conflictingMockDescriptor) {
-        Object.defineProperty(nuxtAppClone, key, descriptor);
+        Object.defineProperty(nuxtAppClone, key, descriptor)
       }
     }
   })
@@ -80,8 +80,8 @@ function deriveNuxtApp(originalApp, settings) {
 
   // @TODO: Do we want a recursive merge strategy for the mock?
   Object.getOwnPropertyNames(settings.mock).forEach((key) => {
-    const descriptor = Object.getOwnPropertyDescriptor(settings.mock, key);
-    Object.defineProperty(nuxtAppClone, key, descriptor);
+    const descriptor = Object.getOwnPropertyDescriptor(settings.mock, key)
+    Object.defineProperty(nuxtAppClone, key, descriptor)
   })
   return nuxtAppClone
 }
@@ -94,10 +94,10 @@ export function useNuxtApp() {
   const nuxtAppOriginal = useNuxtAppOriginal()
   const options = nuxtAppOriginal.$config?.public?.histoireNuxtPluginOptions
     ? JSON.parse(nuxtAppOriginal.$config.public.histoireNuxtPluginOptions, parseOptionalRegexp)
-    : defaultOptions;
-  const _options = defu(options, defaultOptions);
+    : defaultOptions
+  const _options = defu(options, defaultOptions)
 
-  const settings = _options.nuxtAppSettings;
+  const settings = _options.nuxtAppSettings
 
   const nuxtApp = deriveNuxtApp(nuxtAppOriginal, settings)
   nuxtApp.runWithContext = nuxtAppOriginal.runWithContext
