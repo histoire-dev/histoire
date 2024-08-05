@@ -1,4 +1,4 @@
-name: Nuxt 3 tests
+name: Nuxt 3 I18n tests
 
 on:
   push:
