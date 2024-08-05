@@ -2,7 +2,7 @@
   "name": "histoire-monorepo",
   "version": "0.17.17",
   "private": true,
-  "packageManager": "pnpm@8.6.2",
+  "packageManager": "pnpm@8.15.9",
   "repository": {
     "url": "https://github.com/Akryum/histoire.git",
     "type": "git"

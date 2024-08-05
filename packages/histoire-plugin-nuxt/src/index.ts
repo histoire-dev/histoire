@@ -1,9 +1,10 @@
 import { fileURLToPath } from 'node:url'
 import { join } from 'node:path'
 import replace from '@rollup/plugin-replace'
+import { defu } from 'defu'
 import type { Plugin } from 'histoire'
 import type { Nuxt } from '@nuxt/schema'
-import type { UserConfig as ViteConfig } from 'vite'
+import type { PluginOption, UserConfig as ViteConfig } from 'vite'
 
 const ignorePlugins = [
   'nuxt:vite-node-server',
@@ -14,13 +15,34 @@ const ignorePlugins = [
   'nuxt:import-protection',
 ]
 
-export function HstNuxt(): Plugin {
+interface IncludeOption {
+  include?: (string | RegExp)[] | '*'
+  exclude?: undefined
+  mock?: Record<string, any>
+}
+
+interface ExcludeOption {
+  include?: undefined
+  exclude?: (string | RegExp)[]
+  mock?: Record<string, any>
+}
+
+interface NuxtPluginOptions {
+  nuxtAppSettings: IncludeOption | ExcludeOption
+}
+
+const defaultOptions: NuxtPluginOptions = {
+  nuxtAppSettings: { mock: {} },
+}
+
+export function HstNuxt(options: NuxtPluginOptions = defaultOptions): Plugin {
   let nuxt: Nuxt
+  const _options: NuxtPluginOptions = defu(options, defaultOptions)
   return {
     name: '@histoire/plugin-nuxt',
 
     async defaultConfig() {
-      const nuxtViteConfig = await useNuxtViteConfig()
+      const nuxtViteConfig = await useNuxtViteConfig(_options)
       const { viteConfig } = nuxtViteConfig
 
       nuxt = nuxtViteConfig.nuxt // We save it to close it later
@@ -55,7 +77,7 @@ export function HstNuxt(): Plugin {
                 'import.meta.client': 'true',
               },
               preventAssignment: true,
-            }),
+            }) as unknown as PluginOption,
           ],
           css: viteConfig.css,
           publicDir: viteConfig.publicDir,
@@ -109,7 +131,7 @@ export async function setupVue3 () {
   }
 }
 
-async function useNuxtViteConfig() {
+async function useNuxtViteConfig(options: NuxtPluginOptions) {
   const { loadNuxt, buildNuxt } = await import('@nuxt/kit')
   const nuxt = await loadNuxt({
     // cwd: process.cwd(),
@@ -127,6 +149,11 @@ async function useNuxtViteConfig() {
       pages: false,
       typescript: {
         typeCheck: false,
+      },
+      runtimeConfig: {
+        public: {
+          histoireNuxtPluginOptions: JSON.stringify(options, stringifyOptionalRegExp),
+        },
       },
     },
   })
@@ -183,4 +210,11 @@ async function useNuxtViteConfig() {
     }),
     nuxt,
   }
+}
+
+function stringifyOptionalRegExp(_key: unknown, value: unknown) {
+  if (value && value instanceof RegExp) {
+    return `__REGEXP:${value.toString()}`
+  }
+  return value
 }

@@ -1,4 +1,4 @@
-name: Svelte 4 tests
+name: Nuxt 3 I18n tests
 
 on:
   push:
@@ -19,7 +19,7 @@ jobs:
     name: Build and test
 
     env:
-      dir: ./examples/svelte4
+      dir: ./examples/nuxt3-i18n
 
     steps:
       - uses: actions/checkout@v2

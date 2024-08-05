@@ -7,3 +7,4 @@ histoire-dist/
 **/cypress/videos/
 .DS_Store
 .eslintcache
+**/.nuxt/
