@@ -22,17 +22,17 @@ jobs:
       dir: ./examples/nuxt3
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@master
 
       - name: Install node
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
 
       - name: Install pnpm
-        uses: pnpm/action-setup@v2.2.4
+        uses: pnpm/action-setup@v4.0.0
         with:
-          version: 8.10.5
+          version: 9.7.0
 
       - name: Get pnpm store directory
         id: pnpm-cache
