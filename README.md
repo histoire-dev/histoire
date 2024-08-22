@@ -24,6 +24,12 @@
 
 ![screenshot](./screenshot.png)
 
+## Continuous Releases
+
+You can install builds from any commit or pull request by going to the `Continuous Releases` status check or the comment in the PR.
+
+![screenshot of the status check](./.github/continuous-releases.png)
+
 ## Contributing
 
 See [Contributing Guide](https://github.com/Akryum/histoire/blob/main/CONTRIBUTING.md) to learn more about the repository and how you can contribute.
