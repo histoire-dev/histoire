@@ -76,7 +76,7 @@
     "sade": "^1.8.1",
     "shiki-es": "^0.2.0",
     "sirv": "^2.0.3",
-    "vite-node": "^0.34.6"
+    "vite-node": "^2.0.5"
   },
   "devDependencies": {
     "@types/fs-extra": "^9.0.13",
@@ -86,7 +86,7 @@
     "esbuild": "^0.18.20",
     "rollup": "^4.8.0",
     "typescript": "^5.4.4",
-    "vite": "^5.0.11",
-    "vitest": "^0.34.6"
+    "vite": "^5.4.3",
+    "vitest": "^2.0.5"
   }
 }
