@@ -25,7 +25,6 @@ function initState() {
   <Story
     title="HstRadio"
     group="controls"
-    :layout="{ type: 'single', iframe: false }"
   >
     <Variant
       title="playground"

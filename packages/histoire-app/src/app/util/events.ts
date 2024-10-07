@@ -1,3 +1,4 @@
+import { parseQuery } from 'vue-router'
 import { EVENT_SEND } from './const'
 
 export async function logEvent(name: string, argument) {
@@ -7,9 +8,12 @@ export async function logEvent(name: string, argument) {
     argument: JSON.parse(stringifyEvent(argument)), // Needed for HTMLEvent that can't be cloned
   }
   if (location.href.includes('__sandbox')) {
+    const query = parseQuery(window.location.search)
     window.parent?.postMessage({
+      __histoire: true,
       type: EVENT_SEND,
       event,
+      variantId: query.variantId,
     })
   }
   else {
