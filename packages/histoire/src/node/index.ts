@@ -5,7 +5,7 @@ export { defaultColors } from './colors.js'
 
 declare module 'rollup' {
   interface PluginContextMeta {
-    histoire: {
+    histoire?: {
       isCollecting: boolean
     }
   }
