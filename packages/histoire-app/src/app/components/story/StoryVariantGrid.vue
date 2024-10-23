@@ -100,7 +100,7 @@ function updateSize() {
   if (!gridEl.value) return
 
   if (gridTemplateWidth.value.endsWith('%')) {
-    gridColumnWidth.value = viewWidth.value * Number.parseInt(gridTemplateWidth.value) / 100 - gap
+    gridColumnWidth.value = viewWidth.value * Number.parseInt(gridTemplateWidth.value) / 100 - gap * 2
   }
   else {
     gridColumnWidth.value = Number.parseInt(gridTemplateWidth.value)
