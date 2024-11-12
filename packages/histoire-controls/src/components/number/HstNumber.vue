@@ -11,7 +11,7 @@ import HstWrapper from '../HstWrapper.vue'
 
 const props = defineProps<{
   title?: string
-  modelValue?: number
+  modelValue?: number | null
 }>()
 
 const emit = defineEmits({

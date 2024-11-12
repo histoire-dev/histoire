@@ -12,7 +12,7 @@ import HstSimpleCheckbox from './HstSimpleCheckbox.vue'
 type Booleanish = boolean | 'true' | 'false'
 
 const props = defineProps<{
-  modelValue?: Booleanish
+  modelValue?: Booleanish | null
   title?: string
 }>()
 
