@@ -30,6 +30,9 @@ export default defineConfig({
         'es',
       ],
       fileName: 'index.es',
+      // eslint-disable-next-line ts/prefer-ts-expect-error
+      // @ts-ignore only exists in Vite 6
+      cssFileName: 'style',
     },
 
     rollupOptions: {
