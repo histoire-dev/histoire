@@ -169,11 +169,11 @@ export async function loadConfigFile(configFile: string): Promise<Partial<Histoi
     const jiti = createJiti(__filename, {
       moduleCache: false,
     })
-    const result = await jiti.import(configFile)
-    if (!result.default) {
+    const result = await jiti.import(configFile, { default: true }) as Partial<HistoireConfig>
+    if (!result) {
       throw new Error(`Expected default export in ${configFile}`)
     }
-    return result.default
+    return result
   }
   catch (e) {
     console.error(pc.red(`Error while loading ${configFile}`))

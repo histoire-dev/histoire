@@ -4,6 +4,7 @@ import { kebabCase } from 'change-case'
 import chokidar from 'chokidar'
 import { globby } from 'globby'
 import micromatch from 'micromatch'
+import { minimatch } from 'minimatch'
 import { basename, resolve } from 'pathe'
 
 type StoryChangeHandler = (file?: ServerStoryFile) => unknown
@@ -44,9 +45,19 @@ let context: Context
 
 export async function watchStories(newContext: Context) {
   context = newContext
-  const watcher = chokidar.watch(context.config.storyMatch, {
+
+  const watcher = chokidar.watch('.', {
+    ignored: (path, stats) => {
+      if (context.config.storyIgnored.some(pattern => minimatch(path, pattern))) {
+        return true
+      }
+      if (context.config.storyMatch.some(pattern => minimatch(path, pattern))) {
+        return false
+      }
+
+      return stats?.isFile()
+    },
     cwd: context.root,
-    ignored: context.config.storyIgnored,
   })
 
   watcher
