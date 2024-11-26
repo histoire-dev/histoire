@@ -42,10 +42,6 @@ module.exports = {
                 link: '/guide/vue3/getting-started',
               },
               {
-                text: 'Vue 2.7',
-                link: '/guide/vue2/getting-started',
-              },
-              {
                 text: 'Svelte 3',
                 link: '/guide/svelte3/getting-started',
               },
@@ -190,64 +186,6 @@ module.exports = {
             {
               text: 'Hierarchy',
               link: '/guide/vue3/hierarchy',
-            },
-          ],
-        },
-        {
-          text: 'Learn more',
-          collapsible: true,
-          items: [
-            {
-              text: 'About Histoire ⮌',
-              link: '/guide/',
-            },
-            {
-              text: 'Configuration ⮌',
-              link: '/guide/config',
-            },
-            {
-              text: 'Plugins ⮌',
-              link: '/guide/plugins/official',
-            },
-          ],
-        },
-      ],
-      '/guide/vue2/': [
-        {
-          text: 'Guide - Vue 2',
-          collapsible: true,
-          items: [
-            {
-              text: 'Getting Started',
-              link: '/guide/vue2/getting-started',
-            },
-            {
-              text: 'Stories',
-              link: '/guide/vue2/stories',
-            },
-            {
-              text: 'State & Controls',
-              link: '/guide/vue2/controls',
-            },
-            {
-              text: 'Events',
-              link: '/guide/vue2/events',
-            },
-            {
-              text: 'App setup',
-              link: '/guide/vue2/app-setup',
-            },
-            {
-              text: 'Wrapper',
-              link: '/guide/vue2/wrapper',
-            },
-            {
-              text: 'Documentation',
-              link: '/guide/vue2/docs',
-            },
-            {
-              text: 'Hierarchy',
-              link: '/guide/vue2/hierarchy',
             },
           ],
         },

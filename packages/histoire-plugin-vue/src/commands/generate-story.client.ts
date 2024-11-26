@@ -1,6 +1,6 @@
 import type { ClientCommandOptions } from 'histoire'
+import { kebabCase } from 'change-case'
 import { openStory, sendEvent } from 'histoire/plugin'
-import { paramCase } from 'change-case'
 
 export default {
   prompts: [
@@ -23,7 +23,7 @@ export default {
     const index = params.component.lastIndexOf('/')
     const dirname = params.component.substring(0, index + 1)
     const file = `${dirname}${params.fileName}`
-    const storyId = paramCase(file.toLowerCase())
+    const storyId = kebabCase(file.toLowerCase())
     openStory(storyId)
   },
 } as ClientCommandOptions

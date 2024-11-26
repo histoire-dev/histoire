@@ -20,23 +20,24 @@
     "release": "pnpm run lint && pnpm run test && pnpm run build && sheep release -b main --force",
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
-    "docs:serve": "vitepress serve docs"
+    "docs:serve": "vitepress serve docs",
+    "update": "pnpm --recursive update --latest"
   },
   "devDependencies": {
-    "@akryum/sheep": "^0.5.0",
-    "@antfu/eslint-config": "^2.13.0",
+    "@akryum/sheep": "^0.5.2",
+    "@antfu/eslint-config": "^3.10.0",
     "@histoire/vendors": "workspace:*",
-    "@iconify/vue": "^3.2.1",
-    "@vueuse/core": "^9.13.0",
-    "autoprefixer": "^10.4.16",
-    "eslint": "^9.0.0",
-    "floating-vue": "2.0.0-beta.19",
-    "postcss": "^8.4.31",
-    "rimraf": "^3.0.2",
-    "tailwindcss": "^3.3.5",
-    "typescript": "^5.4.4",
-    "vitepress": "1.0.0-alpha.10",
-    "vue-eslint-parser": "^9.3.2"
+    "@iconify/vue": "^4.1.2",
+    "@vueuse/core": "^11.3.0",
+    "autoprefixer": "^10.4.20",
+    "eslint": "^9.15.0",
+    "floating-vue": "5.2.2",
+    "postcss": "^8.4.49",
+    "rimraf": "^6.0.1",
+    "tailwindcss": "^3.4.15",
+    "typescript": "5.6.3",
+    "vitepress": "1.5.0",
+    "vue-eslint-parser": "^9.4.3"
   },
   "pnpm": {
     "peerDependencyRules": {
@@ -54,7 +55,7 @@
         "eslint": "*",
         "eslint-plugin-promise": "*",
         "eslint-plugin-vue": "*",
-        "vite": "^2.9.0 || ^3.0.0 || ^4.0.0",
+        "vite": "^6.0.0",
         "vue": "*"
       }
     }

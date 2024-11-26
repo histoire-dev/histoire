@@ -1,10 +1,10 @@
 // @TODO remove @ts-ignore
 
-import type { VNode } from 'vue'
-import { Text, vModelCheckbox, vModelDynamic, vModelRadio, vModelSelect, vModelText } from 'vue'
-import { camelCase, pascalCase } from 'change-case'
-import { createAutoBuildingObject, indent, serializeJs, voidElements } from '@histoire/shared'
 import type { Variant } from '@histoire/shared'
+import type { VNode } from 'vue'
+import { createAutoBuildingObject, indent, serializeJs, voidElements } from '@histoire/shared'
+import { camelCase, pascalCase } from 'change-case'
+import { Text, vModelCheckbox, vModelDynamic, vModelRadio, vModelSelect, vModelText } from 'vue'
 
 export async function generateSourceCode(variant: Variant) {
   const vnode = variant.slots().default?.({ state: variant.state ?? {} }) ?? []
@@ -170,7 +170,7 @@ async function printVNode(vnode: VNode, propsOverrides: Record<string, any> = nu
         }
         else if (typeof value === 'function') {
           let code = cleanupExpression(value.toString().replace(/'/g, '\\\'').replace(/"/g, '\''))
-          const testResult = /function ([^\s]+)\(/.exec(code)
+          const testResult = /function (\S+)\(/.exec(code)
           if (testResult) {
             // Function name only
             serialized = [testResult[1]]
@@ -278,7 +278,6 @@ async function printVNode(vnode: VNode, propsOverrides: Record<string, any> = nu
               return () => false
             }
           })
-          // @ts-expect-error TODO
           const children = vnode.children[key](autoObject.proxy)
           const slotLines: string[] = []
           for (const child of children) {

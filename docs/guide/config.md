@@ -142,11 +142,10 @@ You can also tell Histoire to configure the sandbox application using the corres
 | Framework | Setup function |
 | --------- | -------------- |
 | Vue 3 | `setupVue3` |
-| Vue 2 | `setupVue2` |
 
 ### Vue setup
 
-Inside your setup file, you can export a `setupVue3` (or `setupVue2` for Vue 2) function that will be called by Histoire allowing you to configure the Vue 3 sandbox application. Histoire provides an optional `defineSetupVue3` helper to have better types in your IDE :
+Inside your setup file, you can export a `setupVue3` function that will be called by Histoire allowing you to configure the Vue 3 sandbox application. Histoire provides an optional `defineSetupVue3` helper to have better types in your IDE :
 
 ```ts
 // src/histoire.setup.ts

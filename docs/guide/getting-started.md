@@ -53,7 +53,6 @@ Histoire is an Open-Source project supported by our sponsors - thank you!
 | Framework | Version | Support* | Auto-CodeGen* | Auto-Docs* |
 | --------- | -------- | ------- | ------------ | ---- |
 | [Vue →](./vue3/getting-started.md) | `3.2+` | ✅ | ✅ | 🏗️ |
-| [Vue →](./vue2/getting-started.md) | `2.7+` | ✅ | ✅ | 🏗️ |
 | [Svelte →](./svelte3/getting-started.md) | `3+` | ✅ | - | 🏗️ |
 | Solid | - | - | - | - |
 | Angular | - | - | - | - |

@@ -30,21 +30,21 @@
     "build": "rimraf dist && rollup -c rollup.config.mjs"
   },
   "devDependencies": {
-    "@iconify/vue": "^3.2.1",
-    "@rollup/plugin-commonjs": "^23.0.7",
-    "@rollup/plugin-node-resolve": "^15.2.3",
-    "@types/node": "^18.11.9",
-    "@vueuse/core": "^9.13.0",
-    "execa": "^6.1.0",
-    "floating-vue": "2.0.0-beta.19",
-    "fs-extra": "^10.1.0",
-    "globby": "^13.2.2",
-    "pinia": "^2.1.7",
-    "rollup": "^4.8.0",
-    "rollup-plugin-typescript2": "^0.34.1",
-    "scroll-into-view-if-needed": "^2.2.31",
-    "typescript": "^5.4.4",
-    "vue": "^3.3.8",
-    "vue-router": "^4.2.5"
+    "@iconify/vue": "^4.1.2",
+    "@rollup/plugin-commonjs": "^28.0.1",
+    "@rollup/plugin-node-resolve": "^15.3.0",
+    "@types/node": "^22.10.0",
+    "@vueuse/core": "^11.3.0",
+    "execa": "^9.5.1",
+    "floating-vue": "5.2.2",
+    "fs-extra": "^11.2.0",
+    "globby": "^14.0.2",
+    "pinia": "^2.2.6",
+    "rollup": "^4.27.4",
+    "rollup-plugin-typescript2": "^0.36.0",
+    "scroll-into-view-if-needed": "^3.1.0",
+    "typescript": "5.6.3",
+    "vue": "^3.5.13",
+    "vue-router": "^4.5.0"
   }
 }

@@ -1,24 +1,24 @@
-import { fileURLToPath } from 'node:url'
-import fs from 'node:fs'
-import path from 'pathe'
-import { createDefu } from 'defu'
-import {
-  mergeConfig as mergeViteConfig,
-  resolveConfig as resolveViteConfig,
-} from 'vite'
-import jiti from 'jiti'
-import pc from 'picocolors'
 import type {
   ConfigMode,
   HistoireConfig,
   Plugin,
   SupportMatchPattern,
 } from '@histoire/shared'
-import { defaultColors } from './colors.js'
-import { findUp } from './util/find-up.js'
+import type { Context } from './context.js'
+import fs from 'node:fs'
+import { fileURLToPath } from 'node:url'
+import { createDefu } from 'defu'
+import jiti from 'jiti'
+import path from 'pathe'
+import pc from 'picocolors'
+import {
+  mergeConfig as mergeViteConfig,
+  resolveConfig as resolveViteConfig,
+} from 'vite'
 import { tailwindTokens } from './builtin-plugins/tailwind-tokens.js'
 import { vanillaSupport } from './builtin-plugins/vanilla-support/plugin.js'
-import type { Context } from './context.js'
+import { defaultColors } from './colors.js'
+import { findUp } from './util/find-up.js'
 
 const __filename = fileURLToPath(import.meta.url)
 
@@ -167,7 +167,6 @@ export function resolveConfigFile(cwd: string = process.cwd(), configFile?: stri
 export async function loadConfigFile(configFile: string): Promise<Partial<HistoireConfig>> {
   try {
     const result = jiti(__filename, {
-      esmResolve: true,
       requireCache: false,
     })(configFile)
     if (!result.default) {

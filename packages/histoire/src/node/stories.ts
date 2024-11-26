@@ -1,10 +1,10 @@
-import chokidar from 'chokidar'
-import { globby } from 'globby'
-import { paramCase } from 'change-case'
-import { basename, resolve } from 'pathe'
-import micromatch from 'micromatch'
 import type { ServerStoryFile } from '@histoire/shared'
 import type { Context } from './context.js'
+import { kebabCase } from 'change-case'
+import chokidar from 'chokidar'
+import { globby } from 'globby'
+import micromatch from 'micromatch'
+import { basename, resolve } from 'pathe'
 
 type StoryChangeHandler = (file?: ServerStoryFile) => unknown
 const storyChangeHandlers: StoryChangeHandler[] = []
@@ -75,7 +75,7 @@ export function addStory(relativeFilePath: string, virtualModuleCode?: string) {
     }
   }
 
-  const fileId = paramCase(relativeFilePath.toLowerCase())
+  const fileId = kebabCase(relativeFilePath.toLowerCase())
   let fileName = basename(relativeFilePath)
   if (fileName.includes('.')) {
     fileName = fileName.substring(0, fileName.indexOf('.'))

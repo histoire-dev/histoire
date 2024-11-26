@@ -33,25 +33,25 @@
     "@histoire/shared": "workspace:^",
     "@histoire/vendors": "workspace:^",
     "@types/flexsearch": "^0.7.6",
-    "flexsearch": "0.7.21",
-    "shiki-es": "^0.2.0"
+    "flexsearch": "0.7.43",
+    "shiki-es": "^0.14.0"
   },
   "devDependencies": {
-    "@tailwindcss/typography": "^0.5.10",
-    "@types/fs-extra": "^9.0.13",
-    "@types/node": "^18.11.9",
-    "@vitejs/plugin-vue": "^4.5.0",
-    "autoprefixer": "^10.4.16",
-    "chokidar": "^3.5.3",
-    "concurrently": "^7.6.0",
-    "fs-extra": "^10.1.0",
-    "globby": "^13.2.2",
-    "pathe": "^1.1.1",
-    "postcss": "^8.4.31",
-    "postcss-import": "^14.1.0",
-    "tailwindcss": "^3.3.5",
-    "typescript": "^5.4.4",
-    "vite": "^5.0.11",
-    "vue": "^3.3.8"
+    "@tailwindcss/typography": "^0.5.15",
+    "@types/fs-extra": "^11.0.4",
+    "@types/node": "^22.10.0",
+    "@vitejs/plugin-vue": "^5.2.1",
+    "autoprefixer": "^10.4.20",
+    "chokidar": "^4.0.1",
+    "concurrently": "^9.1.0",
+    "fs-extra": "^11.2.0",
+    "globby": "^14.0.2",
+    "pathe": "^1.1.2",
+    "postcss": "^8.4.49",
+    "postcss-import": "^16.1.0",
+    "tailwindcss": "^3.4.15",
+    "typescript": "5.6.3",
+    "vite": "^6.0.0",
+    "vue": "^3.5.13"
   }
 }

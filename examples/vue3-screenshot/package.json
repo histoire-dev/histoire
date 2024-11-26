@@ -9,13 +9,13 @@
     "story:preview": "histoire preview"
   },
   "dependencies": {
-    "vue": "^3.3.8"
+    "vue": "^3.5.13"
   },
   "devDependencies": {
     "@histoire/plugin-screenshot": "workspace:*",
     "@histoire/plugin-vue": "workspace:*",
-    "@vitejs/plugin-vue": "^4.5.0",
+    "@vitejs/plugin-vue": "^5.2.1",
     "histoire": "workspace:*",
-    "vite": "^5.0.11"
+    "vite": "^6.0.0"
   }
 }
