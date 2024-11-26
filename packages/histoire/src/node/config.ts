@@ -8,7 +8,7 @@ import type { Context } from './context.js'
 import fs from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { createDefu } from 'defu'
-import jiti from 'jiti'
+import { createJiti } from 'jiti'
 import path from 'pathe'
 import pc from 'picocolors'
 import {
@@ -166,9 +166,10 @@ export function resolveConfigFile(cwd: string = process.cwd(), configFile?: stri
 
 export async function loadConfigFile(configFile: string): Promise<Partial<HistoireConfig>> {
   try {
-    const result = jiti(__filename, {
-      requireCache: false,
-    })(configFile)
+    const jiti = createJiti(__filename, {
+      moduleCache: false,
+    })
+    const result = await jiti.import(configFile)
     if (!result.default) {
       throw new Error(`Expected default export in ${configFile}`)
     }
