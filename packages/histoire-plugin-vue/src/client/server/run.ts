@@ -1,10 +1,10 @@
-import { createApp, h } from 'vue'
 import type { ServerRunPayload } from '@histoire/shared'
-// @ts-expect-error virtual module id
-import * as setup from 'virtual:$histoire-setup'
+import type { Vue3StorySetupApi, Vue3StorySetupHandler } from '../../helpers.js'
 // @ts-expect-error virtual module id
 import * as generatedSetup from 'virtual:$histoire-generated-global-setup'
-import type { Vue3StorySetupApi, Vue3StorySetupHandler } from '../../helpers.js'
+// @ts-expect-error virtual module id
+import * as setup from 'virtual:$histoire-setup'
+import { createApp, h } from 'vue'
 import Story from './Story'
 import Variant from './Variant'
 

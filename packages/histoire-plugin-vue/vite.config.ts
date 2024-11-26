@@ -1,6 +1,6 @@
 import fs from 'node:fs'
-import { defineConfig } from 'vite'
 import { globbySync } from 'globby'
+import { defineConfig } from 'vite'
 
 export default defineConfig({
   plugins: [
