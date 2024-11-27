@@ -1,9 +1,9 @@
-import type { ViteDevServer } from 'vite'
-import { ViteNodeServer } from 'vite-node/server'
-import { ViteNodeRunner } from 'vite-node/client'
-import pc from 'picocolors'
-import { resolve } from 'pathe'
 import type { ModuleLoader } from '@histoire/shared'
+import type { ViteDevServer } from 'vite'
+import { resolve } from 'pathe'
+import pc from 'picocolors'
+import { ViteNodeRunner } from 'vite-node/client'
+import { ViteNodeServer } from 'vite-node/server'
 
 export interface UseModuleLoaderOptions {
   server: ViteDevServer

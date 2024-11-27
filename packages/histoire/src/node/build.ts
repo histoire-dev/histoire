@@ -21,7 +21,7 @@ import {
 } from 'vite'
 import { APP_PATH } from './alias.js'
 import { getSerializedStoryData } from './build-serialize.js'
-import { useCollectStories } from './collect'
+import { useCollectStories } from './collect/index.js'
 import { useModuleLoader } from './load.js'
 import { createMarkdownFilesWatcher } from './markdown.js'
 import { BuildPluginApi } from './plugin.js'
