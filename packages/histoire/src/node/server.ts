@@ -2,7 +2,7 @@ import type { ServerStoryFile } from '@histoire/shared'
 import type { Context } from './context.js'
 import { performance } from 'node:perf_hooks'
 import pc from 'picocolors'
-import { createServer as createViteServer } from 'vite'
+import { createServer as createViteServer, mergeConfig as mergeViteConfig } from 'vite'
 import { useCollectStories } from './collect/index.js'
 import { useModuleLoader } from './load.js'
 import { createMarkdownFilesWatcher, onMarkdownListChange } from './markdown.js'
@@ -25,7 +25,11 @@ export async function createServer(ctx: Context, options: CreateServerOptions = 
       viteConfig.server.open = true
     }
 
-    const server = await createViteServer(viteConfig)
+    const server = await createViteServer(
+      mergeViteConfig(viteConfig, {
+        optimizeDeps: { include: [], noDiscovery: true },
+      }),
+    )
     await server.pluginContainer.buildStart({})
     return {
       server,

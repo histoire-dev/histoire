@@ -55,7 +55,7 @@
         "eslint": "*",
         "eslint-plugin-promise": "*",
         "eslint-plugin-vue": "*",
-        "vite": "^6.0.0",
+        "vite": "^6.0.1",
         "vue": "*"
       }
     }

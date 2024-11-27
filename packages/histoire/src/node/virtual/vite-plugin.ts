@@ -1,9 +1,9 @@
 import type { Plugin as VitePlugin } from 'vite'
-import { resolve } from 'pathe'
 import type { Context } from '../context.js'
+import { resolve } from 'pathe'
 import { generateDocSearchData, generateTitleSearchData, getSearchDataJS } from '../search.js'
-import { ID_SEPARATOR } from './util.js'
 import * as VirtualFiles from './index.js'
+import { ID_SEPARATOR } from './util.js'
 
 export function createVirtualFilesPlugin(ctx: Context, isServer: boolean) {
   return {
