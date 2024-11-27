@@ -9,6 +9,7 @@ import MarkdownIt from 'markdown-it'
 import anchor from 'markdown-it-anchor'
 import attrs from 'markdown-it-attrs'
 import { full as emoji } from 'markdown-it-emoji'
+import micromatch from 'micromatch'
 import path from 'pathe'
 import pc from 'picocolors'
 import { getHighlighter } from 'shiki-es'
@@ -137,9 +138,18 @@ export async function createMarkdownPlugins(ctx: Context) {
 export async function createMarkdownFilesWatcher(ctx: Context) {
   const md = await createMarkdownRendererWithPlugins(ctx)
 
-  const watcher = chokidar.watch(['**/*.story.md'], {
+  const watcher = chokidar.watch('.', {
     cwd: ctx.root,
-    ignored: ctx.config.storyIgnored,
+    ignored: (path, stats) => {
+      if (ctx.config.storyIgnored.some(pattern => micromatch.isMatch(path, pattern))) {
+        return true
+      }
+      if (micromatch.isMatch(path, '**/*.story.md')) {
+        return false
+      }
+
+      return stats?.isFile()
+    },
   })
 
   /**

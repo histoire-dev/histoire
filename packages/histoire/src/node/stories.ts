@@ -46,6 +46,7 @@ export async function watchStories(newContext: Context) {
   context = newContext
 
   const watcher = chokidar.watch('.', {
+    cwd: context.root,
     ignored: (path, stats) => {
       if (context.config.storyIgnored.some(pattern => micromatch.isMatch(path, pattern))) {
         return true
@@ -56,7 +57,6 @@ export async function watchStories(newContext: Context) {
 
       return stats?.isFile()
     },
-    cwd: context.root,
   })
 
   watcher
