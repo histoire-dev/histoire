@@ -27,7 +27,7 @@ export function tailwindTokens(options: TailwindTokensOptions = {}): Plugin {
       const tailwindConfig = await api.moduleLoader.loadModule(tailwindConfigFile)
       const { default: resolveConfig } = await import('tailwindcss/resolveConfig.js')
       const resolvedTailwindConfig = resolveConfig(tailwindConfig.default ?? tailwindConfig)
-      const storyFile = api.path.resolve(api.pluginTempDir, 'Tailwind.story.js')
+      const storyFile = api.path.resolve(api.pluginTempDir, 'Tailwind.story.mjs')
       await api.fs.writeFile(storyFile, storyTemplate(resolvedTailwindConfig))
       api.addStoryFile(storyFile)
     }

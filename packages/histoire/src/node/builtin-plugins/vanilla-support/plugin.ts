@@ -1,6 +1,6 @@
+import type { Plugin } from '@histoire/shared'
 import { fileURLToPath } from 'node:url'
 import { dirname } from 'pathe'
-import type { Plugin } from '@histoire/shared'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
@@ -13,7 +13,7 @@ export function vanillaSupport(): Plugin {
         supportMatch: [
           {
             id: 'vanilla',
-            patterns: ['**/*.js'],
+            patterns: ['**/*.js', '**/*.mjs'],
             pluginIds: ['vanilla'],
           },
         ],

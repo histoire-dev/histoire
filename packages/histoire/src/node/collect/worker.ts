@@ -65,10 +65,10 @@ export default async (payload: Payload): Promise<ReturnData> => {
 
   const el = window.document.createElement('div')
 
-  const beforeExectureTime = performance.now()
+  const beforeExecuteTime = performance.now()
   // Mount app to collect stories/variants
   const { run } = (await runner.executeFile(resolve(__dirname, './run.js'))) as { run: (payload: ServerRunPayload) => Promise<any> }
-  const afterExectureTime = performance.now()
+  const afterExecuteTime = performance.now()
   const storyData: ServerStory[] = []
   await run({
     file: payload.storyFile,
@@ -89,7 +89,7 @@ export default async (payload: Payload): Promise<ReturnData> => {
   destroyDomEnv()
 
   const endTime = performance.now()
-  console.log(pc.dim(`${payload.storyFile.relativePath} ${Math.round(endTime - startTime)}ms (setup:${Math.round(beforeExectureTime - startTime)}ms, execute:${Math.round(afterExectureTime - beforeExectureTime)}ms, run:${Math.round(afterRunTime - afterExectureTime)}ms)`))
+  console.log(pc.dim(`${payload.storyFile.relativePath} ${Math.round(endTime - startTime)}ms (setup:${Math.round(beforeExecuteTime - startTime)}ms, execute:${Math.round(afterExecuteTime - beforeExecuteTime)}ms, run:${Math.round(afterRunTime - afterExecuteTime)}ms)`))
 
   return {
     storyData,

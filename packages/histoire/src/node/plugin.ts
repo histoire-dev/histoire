@@ -1,7 +1,3 @@
-import chokidar from 'chokidar'
-import path from 'pathe'
-import fs from 'fs-extra'
-import pc from 'picocolors'
 import type {
   BuildEndCallback,
   ChangeViteConfigCallback,
@@ -15,8 +11,12 @@ import type {
   PreviewStoryCallback,
   ServerStory,
 } from '@histoire/shared'
-import { TEMP_PATH } from './alias.js'
 import type { Context } from './context.js'
+import chokidar from 'chokidar'
+import fs from 'fs-extra'
+import path from 'pathe'
+import pc from 'picocolors'
+import { TEMP_PATH } from './alias.js'
 import { addStory, removeStory } from './stories.js'
 
 export class BasePluginApi implements PluginApiBase {

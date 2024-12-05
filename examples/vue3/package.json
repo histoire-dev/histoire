@@ -17,7 +17,7 @@
   },
   "dependencies": {
     "lottie-web": "^5.12.2",
-    "pinia": "^2.2.6",
+    "pinia": "^2.3.0",
     "vue": "^3.5.13"
   },
   "devDependencies": {
@@ -25,13 +25,13 @@
     "@histoire/plugin-vue": "workspace:*",
     "@histoire/vendors": "workspace:*",
     "@vitejs/plugin-vue": "^5.2.1",
-    "cypress": "^13.16.0",
+    "cypress": "^13.16.1",
     "globby": "^14.0.2",
     "histoire": "workspace:*",
     "minimatch": "^10.0.1",
     "nodemon": "^3.1.7",
-    "sass": "^1.81.0",
+    "sass": "^1.82.0",
     "start-server-and-test": "^2.0.8",
-    "vite": "^6.0.1"
+    "vite": "^6.0.3"
   }
 }

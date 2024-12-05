@@ -9,7 +9,7 @@ import Story from './Story'
 import Variant from './Variant'
 
 export async function run({ file, storyData, el }: ServerRunPayload) {
-  const { default: Comp } = await import(file.moduleId)
+  const { default: Comp } = await import(/* @vite-ignore */ file.moduleId)
 
   const app = createApp({
     provide: {

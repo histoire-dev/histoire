@@ -39,7 +39,7 @@
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.15",
     "@types/fs-extra": "^11.0.4",
-    "@types/node": "^22.10.0",
+    "@types/node": "^22.10.1",
     "@vitejs/plugin-vue": "^5.2.1",
     "autoprefixer": "^10.4.20",
     "chokidar": "^4.0.1",
@@ -49,9 +49,9 @@
     "pathe": "^1.1.2",
     "postcss": "^8.4.49",
     "postcss-import": "^16.1.0",
-    "tailwindcss": "^3.4.15",
+    "tailwindcss": "^3.4.16",
     "typescript": "5.6.3",
-    "vite": "^6.0.1",
+    "vite": "^6.0.3",
     "vue": "^3.5.13"
   }
 }

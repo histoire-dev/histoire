@@ -30,14 +30,14 @@
     "histoire": "workspace:^"
   },
   "dependencies": {
-    "@percy/sdk-utils": "^1.30.2",
+    "@percy/sdk-utils": "^1.30.4",
     "defu": "^6.1.4",
     "fs-extra": "^11.2.0",
     "pathe": "^1.1.2",
-    "puppeteer": "^23.9.0"
+    "puppeteer": "^23.10.1"
   },
   "devDependencies": {
-    "@types/node": "^22.10.0",
+    "@types/node": "^22.10.1",
     "histoire": "workspace:*",
     "typescript": "5.6.3"
   }

@@ -63,11 +63,11 @@
     "fs-extra": "^11.2.0",
     "globby": "^14.0.2",
     "gray-matter": "^4.0.3",
-    "jiti": "^2.4.0",
+    "jiti": "^2.4.1",
     "jsdom": "^25.0.1",
     "markdown-it": "^14.1.0",
     "markdown-it-anchor": "^9.2.0",
-    "markdown-it-attrs": "^4.2.0",
+    "markdown-it-attrs": "^4.3.0",
     "markdown-it-emoji": "^3.0.0",
     "micromatch": "^4.0.8",
     "mrmime": "^2.0.0",
@@ -76,17 +76,17 @@
     "sade": "^1.8.1",
     "shiki-es": "^0.14.0",
     "sirv": "^3.0.0",
-    "vite-node": "^2.1.6"
+    "vite-node": "3.0.0-beta.1"
   },
   "devDependencies": {
     "@types/fs-extra": "^11.0.4",
     "@types/markdown-it": "^12.2.3",
     "@types/micromatch": "^4.0.9",
-    "@types/node": "^22.10.0",
+    "@types/node": "^22.10.1",
     "esbuild": "^0.24.0",
-    "rollup": "^4.27.4",
+    "rollup": "^4.28.0",
     "typescript": "5.6.3",
-    "vite": "^6.0.1",
-    "vitest": "^2.2.0-beta.2"
+    "vite": "^6.0.3",
+    "vitest": "3.0.0-beta.1"
   }
 }
