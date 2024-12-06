@@ -50,10 +50,15 @@ export async function build(ctx: Context) {
   }
 
   const { viteConfig } = await getViteConfigWithPlugins(true, ctx)
-  const server = await createViteServer(
-    mergeViteConfig(viteConfig, {
+  const server = await createViteServer({
+    ...mergeViteConfig(viteConfig, {
       optimizeDeps: { include: [], noDiscovery: true },
     }),
+    environments: {
+      worker: {
+      },
+    },
+  },
   )
   await server.pluginContainer.buildStart({})
 

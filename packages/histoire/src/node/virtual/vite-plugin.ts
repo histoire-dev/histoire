@@ -10,6 +10,10 @@ export function createVirtualFilesPlugin(ctx: Context, isServer: boolean) {
     name: 'histoire-virtual-files',
 
     async resolveId(id, importer) {
+      if (id.startsWith('/@id/__x00__')) {
+        id = id.slice(12)
+      }
+
       if (id.startsWith(VirtualFiles.STORIES_ID)) {
         return VirtualFiles.RESOLVED_STORIES_ID
       }
