@@ -1,13 +1,13 @@
 import type { ServerRunPayload, ServerStory, ServerStoryFile } from '@histoire/shared'
 import type { MessagePort } from 'node:worker_threads'
+import type { FetchFunction, ResolveIdFunction } from 'vite-node'
 import { performance } from 'node:perf_hooks'
 import { fileURLToPath } from 'node:url'
 import { parentPort } from 'node:worker_threads'
 import { createBirpc } from 'birpc'
 import { dirname, resolve } from 'pathe'
 import pc from 'picocolors'
-import { ModuleCacheMap } from 'vite-node/client'
-import { ESModulesEvaluator, ModuleRunner } from 'vite/module-runner'
+import { ModuleCacheMap, ViteNodeRunner } from 'vite-node/client'
 import { createDomEnv } from '../dom/env.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
@@ -24,15 +24,16 @@ export interface ReturnData {
 }
 
 const _moduleCache = new ModuleCacheMap()
-let _runner: ModuleRunner
+let _runner: ViteNodeRunner
 let _rpc: ReturnType<typeof createBirpc<{
-  invoke: (payload: any) => Promise<any>
+  fetchModule: FetchFunction
+  resolveId: ResolveIdFunction
 }>>
 
 // Cleanup module cache
 parentPort.on('message', (message) => {
   if (message?.kind === 'hst:invalidate') {
-    _moduleCache.delete(message.file) // TODO: Do we need that with the new module runner?
+    _moduleCache.delete(message.file)
   }
 })
 
@@ -41,22 +42,24 @@ export default async (payload: Payload): Promise<ReturnData> => {
   process.env.HST_COLLECT = 'true'
 
   _rpc = createBirpc<{
-    invoke: (payload: any) => Promise<any>
+    fetchModule: FetchFunction
+    resolveId: ResolveIdFunction
   }>({}, {
-        post: data => payload.port.postMessage(data),
-        on: data => payload.port.on('message', data),
-      })
+    post: data => payload.port.postMessage(data),
+    on: data => payload.port.on('message', data),
+  })
 
-  const runner = _runner ?? (_runner = new ModuleRunner({
+  const runner = _runner ?? (_runner = new ViteNodeRunner({
     root: payload.root,
-    sourcemapInterceptor: false,
-    transport: {
-      invoke: async (payload) => {
-        return { result: await _rpc.invoke(payload) }
-      },
+    base: payload.base,
+    moduleCache: _moduleCache,
+    fetchModule(id) {
+      return _rpc.fetchModule(id)
     },
-    hmr: false,
-  }, new ESModulesEvaluator()))
+    resolveId(id, importer) {
+      return _rpc.resolveId(id, importer)
+    },
+  }))
 
   const { destroy: destroyDomEnv } = createDomEnv()
 
@@ -64,7 +67,7 @@ export default async (payload: Payload): Promise<ReturnData> => {
 
   const beforeExecuteTime = performance.now()
   // Mount app to collect stories/variants
-  const { run } = (await runner.import(resolve(__dirname, './run.js'))) as { run: (payload: ServerRunPayload) => Promise<any> }
+  const { run } = (await runner.executeFile(resolve(__dirname, './run.js'))) as { run: (payload: ServerRunPayload) => Promise<any> }
   const afterExecuteTime = performance.now()
   const storyData: ServerStory[] = []
   await run({

@@ -1,5 +1,6 @@
 import type { ServerStoryFile } from '@histoire/shared'
 import type { ViteDevServer } from 'vite'
+import type { FetchFunction, ResolveIdFunction } from 'vite-node'
 import type { Context } from '../context.js'
 import type { Payload, ReturnData } from './worker.js'
 import { cpus } from 'node:os'
@@ -8,6 +9,7 @@ import Tinypool from '@akryum/tinypool'
 import { createBirpc } from 'birpc'
 import { relative } from 'pathe'
 import pc from 'picocolors'
+import { ViteNodeServer } from 'vite-node/server'
 import { createPath } from '../tree.js'
 import { slash } from '../util/fs.js'
 
@@ -19,6 +21,24 @@ export interface UseCollectStoriesOptions {
 
 export function useCollectStories(options: UseCollectStoriesOptions, ctx: Context) {
   const { server, mainServer } = options
+
+  const node = new ViteNodeServer(server, {
+    deps: {
+      inline: [
+        /histoire\/dist/,
+        /histoire\/client/,
+        /@histoire\/[\w-]+\/dist/,
+        /histoire-[\w-]+\/dist/,
+        /@vue\/devtools-api/,
+        /vuetify/,
+        // @TODO temporary fix for https://github.com/histoire-dev/histoire/issues/409
+        /vite\w*\/dist\/client\/(client|env).mjs/,
+        ...ctx.config.viteNodeInlineDeps ?? [],
+      ],
+      fallbackCJS: true,
+    },
+    transformMode: ctx.config.viteNodeTransformMode,
+  })
 
   const maxThreads = ctx.config.collectMaxThreads ?? cpus().length
 
@@ -37,6 +57,7 @@ export function useCollectStories(options: UseCollectStoriesOptions, ctx: Contex
 
   function clearCache() {
     server.moduleGraph.invalidateAll()
+    node.fetchCache.clear()
   }
 
   function createChannel() {
@@ -45,17 +66,15 @@ export function useCollectStories(options: UseCollectStoriesOptions, ctx: Contex
     const workerPort = channel.port1
 
     createBirpc<Record<string, never>, {
-      invoke: (payload: any) => Promise<any>
+      fetchModule: FetchFunction
+      resolveId: ResolveIdFunction
     }>({
-          invoke: async (payload) => {
-            if (payload.type === 'custom' && payload.data.name === 'fetchModule') {
-              return await server.environments.worker.fetchModule(payload.data.data[0])
-            }
-          },
-        }, {
-          post: data => port.postMessage(data),
-          on: data => port.on('message', data),
-        })
+      fetchModule: id => node.fetchModule(id),
+      resolveId: (id, importer) => node.resolveId(id, importer),
+    }, {
+      post: data => port.postMessage(data),
+      on: data => port.on('message', data),
+    })
 
     return {
       port,

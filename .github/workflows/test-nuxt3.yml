@@ -38,7 +38,7 @@ jobs:
           echo "::set-output name=pnpm_cache_dir::$(pnpm store path)"
 
       - name: Cache pnpm modules
-        uses: actions/cache@v4
+        uses: actions/cache@v2
         with:
           path: |
             ${{ steps.pnpm-cache.outputs.pnpm_cache_dir }}
