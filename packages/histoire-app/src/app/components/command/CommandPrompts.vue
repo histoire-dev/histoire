@@ -36,12 +36,7 @@ for (const prompt of props.command.prompts) {
 
 function submit() {
   const params = props.command.getParams
-    ? props.command.getParams(
-      {
-        ...getCommandContext(),
-        answers,
-      },
-    )
+    ? props.command.getParams({ ...getCommandContext(), answers })
     : answers
   executeCommand(props.command, params)
   emit('close')
