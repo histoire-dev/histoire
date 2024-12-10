@@ -169,7 +169,7 @@ async function useNuxtViteConfig() {
 
         nuxt.hook('vite:configResolved', (config, { isClient }) => {
           if (isClient) {
-            resolve(config)
+            resolve(config as any)
           }
         })
       })
