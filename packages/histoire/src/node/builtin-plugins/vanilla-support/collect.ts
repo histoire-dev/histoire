@@ -2,6 +2,10 @@ import type { ServerRunPayload, ServerStory, ServerVariant } from '@histoire/sha
 import type { StoryOptions, VariantOptions } from './types'
 
 export async function run({ file, storyData }: ServerRunPayload) {
+  if (file.moduleId.toLowerCase().includes('tailwind')) {
+    return
+  }
+
   const { default: Comp } = await import(/* @vite-ignore */ file.moduleId)
 
   const options = Comp as StoryOptions
