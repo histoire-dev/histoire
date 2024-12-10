@@ -17,7 +17,7 @@ export function pinceauTokens(_options: PinceauTokensOptions = {}): Plugin {
       api.moduleLoader.clearCache()
       await api.fs.writeFile(api.path.resolve(api.pluginTempDir, 'style.css'), css)
       const theme = await api.moduleLoader.loadModule(themePath)
-      const storyFile = api.path.resolve(api.pluginTempDir, 'Pinceau.story.mjs')
+      const storyFile = api.path.resolve(api.pluginTempDir, 'Pinceau.story.js')
       await api.fs.writeFile(storyFile, storyTemplate(theme))
       api.addStoryFile(storyFile)
     }

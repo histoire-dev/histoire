@@ -13,7 +13,7 @@ export function vanillaSupport(): Plugin {
         supportMatch: [
           {
             id: 'vanilla',
-            patterns: ['**/*.js', '**/*.mjs'],
+            patterns: ['**/*.js'],
             pluginIds: ['vanilla'],
           },
         ],

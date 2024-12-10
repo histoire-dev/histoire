@@ -22,7 +22,7 @@ export interface UseCollectStoriesOptions {
 export function useCollectStories(options: UseCollectStoriesOptions, ctx: Context) {
   const { server, mainServer } = options
 
-  const node = new ViteNodeServer(server, {
+  const node = new ViteNodeServer(server as any, {
     deps: {
       inline: [
         /histoire\/dist/,

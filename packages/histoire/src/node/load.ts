@@ -15,7 +15,7 @@ let _load: ModuleLoader['loadModule']
 export function useModuleLoader(options: UseModuleLoaderOptions): ModuleLoader {
   const { server } = options
 
-  const node = new ViteNodeServer(server)
+  const node = new ViteNodeServer(server as any)
 
   const runner = new ViteNodeRunner({
     root: server.config.root,
