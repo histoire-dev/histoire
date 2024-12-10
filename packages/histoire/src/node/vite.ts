@@ -91,7 +91,7 @@ export async function getViteConfigWithPlugins(isServer: boolean, ctx: Context):
             'vue',
           ],
           alias: {
-            'histoire-style': `file://${join(APP_PATH, process.env.HISTOIRE_DEV ? 'app/style/main.pcss' : 'style.css')}`,
+            'histoire-style': join(APP_PATH, process.env.HISTOIRE_DEV ? 'app/style/main.pcss' : 'style.css'),
           },
           ...(isServer
             ? {

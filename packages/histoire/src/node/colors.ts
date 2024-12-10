@@ -281,7 +281,7 @@ export const defaultColors = {
 }
 
 const HEX = /^#([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})?$/i
-const SHORT_HEX = /^#([a-f\d])([a-f\d])([a-f\d])([a-f\d])?$/i
+const SHORT_HEX = /^#([a-f\d]){3,4}$/i
 const VALUE = `(?:\\d+|\\d*\\.\\d+)%?`
 const SEP = `(?:\\s*,\\s*|\\s+)`
 const ALPHA_SEP = `\\s*[,/]\\s*`
@@ -289,7 +289,7 @@ const RGB = new RegExp(
   `^rgba?\\(\\s*(${VALUE})${SEP}(${VALUE})${SEP}(${VALUE})(?:${ALPHA_SEP}(${VALUE}))?\\s*\\)$`,
 )
 const HSL = new RegExp(
-  `^hsla?\\(\\s*((?:${VALUE})(?:deg|rad|grad|turn)?)${SEP}(${VALUE})${SEP}(${VALUE})(?:${ALPHA_SEP}(${VALUE}))?\\s*\\)$`,
+  `^hsla?\\(\\s*(${VALUE}(?:deg|rad|grad|turn)?)${SEP}(${VALUE})${SEP}(${VALUE})(?:${ALPHA_SEP}(${VALUE}))?\\s*\\)$`,
 )
 
 export function parseColor(value) {

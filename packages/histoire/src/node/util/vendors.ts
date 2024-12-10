@@ -1,5 +1,5 @@
 import path from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { fileURLToPath, pathToFileURL } from 'node:url'
 
 // Resolve an absolute path to e.g. node_modules/.pnpm/histoire@0.11.7_vite@3.2.4/node_modules/histoire/dist/node/vendors/controls.js
 // https://github.com/histoire-dev/histoire/issues/282
@@ -18,5 +18,10 @@ export function getInjectedImport(request: string) {
     id = alias[id]
   }
 
-  return JSON.stringify(id)
+  if (path.isAbsolute(id)) {
+    return JSON.stringify(pathToFileURL(id).href)
+  }
+  else {
+    return JSON.stringify(id)
+  }
 }

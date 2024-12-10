@@ -1,4 +1,4 @@
-const KEY_ESCAPE_REG = /[\s-.:|#@$£*%]/
+const KEY_ESCAPE_REG = /[\s\-.:|#@$£*%]/
 const MAX_SINGLE_LINE_ARRAY_LENGTH = 3
 
 interface Line {
