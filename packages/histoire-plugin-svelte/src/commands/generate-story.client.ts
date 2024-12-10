@@ -16,7 +16,7 @@ export default {
       label: 'File name',
       type: 'text',
       required: true,
-      defaultValue: answers => answers.component?.replace(/.+\/(.+?)\.svelte$/, '$1.story.svelte'),
+      defaultValue: answers => answers.component?.replace(/[^/]+\/([^/]+)\.svelte$/, '$1.story.svelte'),
     },
   ],
   clientAction: (params) => {

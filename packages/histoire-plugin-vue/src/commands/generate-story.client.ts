@@ -16,7 +16,7 @@ export default {
       label: 'File name',
       type: 'text',
       required: true,
-      defaultValue: answers => answers.component?.replace(/.+\/(.+?)\.vue$/, '$1.story.vue'),
+      defaultValue: answers => answers.component?.replace(/[^/]+\/([^/]+)\.vue$/, '$1.story.vue'),
     },
   ],
   clientAction: (params) => {
