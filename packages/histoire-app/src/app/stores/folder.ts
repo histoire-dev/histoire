@@ -1,6 +1,6 @@
+import { useStorage } from '@vueuse/core'
 import { defineStore } from 'pinia'
 import { watch } from 'vue'
-import { useStorage } from '@vueuse/core'
 import { useStoryStore } from './story'
 
 export const useFolderStore = defineStore('folder', () => {

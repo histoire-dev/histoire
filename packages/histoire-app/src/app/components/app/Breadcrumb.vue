@@ -1,8 +1,8 @@
 <script lang="ts" setup>
-import { computed, ref, watch } from 'vue'
-import { Icon } from '@iconify/vue'
-import { useStoryStore } from '../../stores/story'
 import type { Story, Tree } from '../../types'
+import { Icon } from '@iconify/vue'
+import { computed, ref, watch } from 'vue'
+import { useStoryStore } from '../../stores/story'
 import StoryList from '../tree/StoryList.vue'
 import MobileOverlay from './MobileOverlay.vue'
 

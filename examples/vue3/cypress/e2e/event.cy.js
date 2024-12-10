@@ -2,7 +2,8 @@
 
 describe('Event (iframe)', () => {
   const getIframeBody = () => cy.get('iframe[data-test-id="preview-iframe"]')
-    .its('0.contentDocument.body').should('not.be.empty')
+    .its('0.contentDocument.body')
+    .should('not.be.empty')
     .then(cy.wrap)
 
   it('should send events', () => {

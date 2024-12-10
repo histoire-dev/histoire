@@ -9,8 +9,8 @@ pnpm add -D @histoire/plugin-percy
 Add the plugin in histoire config:
 
 ```js
-import { defineConfig } from 'histoire'
 import { HstPercy } from '@histoire/plugin-percy'
+import { defineConfig } from 'histoire'
 
 export default defineConfig({
   plugins: [

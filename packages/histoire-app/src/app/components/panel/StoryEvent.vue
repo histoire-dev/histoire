@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import { computed } from 'vue'
 import type { HstEvent } from '../../stores/events'
+import { computed } from 'vue'
 
 const props = defineProps<{
   event: HstEvent

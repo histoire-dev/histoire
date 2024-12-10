@@ -1,5 +1,5 @@
-const defaultColors = require('tailwindcss/colors')
 const path = require('pathe')
+const defaultColors = require('tailwindcss/colors')
 const inheritedConfig = require('../../tailwind.config.cjs')
 
 // Colors

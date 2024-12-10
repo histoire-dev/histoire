@@ -1,11 +1,11 @@
 <script lang="ts" setup>
-import { computed, nextTick, onMounted, ref } from 'vue'
+import type { Story, Variant } from '../../types'
+import { applyState, clone, omit } from '@histoire/shared'
 import { Icon } from '@iconify/vue'
 import { onClickOutside, useStorage, useTimeoutFn } from '@vueuse/core'
-import { applyState, clone, omit } from '@histoire/shared'
-import BaseSelect from '../base/BaseSelect.vue'
+import { computed, nextTick, onMounted, ref } from 'vue'
 import { toRawDeep } from '../../util/state'
-import type { Story, Variant } from '../../types'
+import BaseSelect from '../base/BaseSelect.vue'
 
 const DEFAULT_ID = 'default'
 

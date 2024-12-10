@@ -1,7 +1,7 @@
+import type { Story, Variant } from '../types'
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import { router } from '../router'
-import type { Story, Variant } from '../types'
 
 export const useStoryStore = defineStore('story', () => {
   const stories = ref<Story[]>([])

@@ -1,7 +1,7 @@
-import type { PropType as _PropType } from '@histoire/vendors/vue'
-import { defineComponent as _defineComponent } from '@histoire/vendors/vue'
 import type { Story } from '@histoire/shared'
+import type { PropType as _PropType } from '@histoire/vendors/vue'
 import type { StoryOptions, VariantOptions } from './types'
+import { defineComponent as _defineComponent } from '@histoire/vendors/vue'
 
 export default _defineComponent({
   name: 'MountStory',

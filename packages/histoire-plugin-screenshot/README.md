@@ -7,8 +7,8 @@ pnpm add -D @histoire/plugin-screenshot
 Add the plugin in histoire config:
 
 ```js
-import { defineConfig } from 'histoire'
 import { HstScreenshot } from '@histoire/plugin-screenshot'
+import { defineConfig } from 'histoire'
 
 export default defineConfig({
   plugins: [

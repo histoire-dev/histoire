@@ -1,10 +1,10 @@
+import type MarkdownIt from 'markdown-it'
 import type {
   UserConfig as ViteConfig,
   ConfigEnv as ViteConfigEnv,
 } from 'vite'
-import type MarkdownIt from 'markdown-it'
-import type { ServerTreeFile, StoryProps } from './story.js'
 import type { Plugin } from './plugin.js'
+import type { ServerTreeFile, StoryProps } from './story.js'
 
 export interface SupportMatchPattern {
   id: string

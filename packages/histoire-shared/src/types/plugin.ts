@@ -1,21 +1,21 @@
-import type path from 'pathe'
-import type fs from 'fs-extra'
-import type pc from 'picocolors'
 import type chokidar from 'chokidar'
+import type fs from 'fs-extra'
+import type path from 'pathe'
+import type pc from 'picocolors'
 import type { InlineConfig as ViteInlineConfig } from 'vite'
 import type { Awaitable } from '../type-utils.js'
 import type {
-  ServerStory,
-  ServerStoryFile,
-  ServerVariant,
-} from './story.js'
+  PluginCommand,
+} from './command.js'
 import type {
   ConfigMode,
   HistoireConfig,
 } from './config.js'
 import type {
-  PluginCommand,
-} from './command.js'
+  ServerStory,
+  ServerStoryFile,
+  ServerVariant,
+} from './story.js'
 
 export interface SupportPlugin {
   id: string

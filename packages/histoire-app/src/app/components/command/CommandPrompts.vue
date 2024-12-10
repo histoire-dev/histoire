@@ -1,11 +1,11 @@
 <script lang="ts" setup>
-import { nextTick, onMounted, reactive, ref } from 'vue'
 import type { ClientCommand } from '@histoire/shared'
+import { nextTick, onMounted, reactive, ref } from 'vue'
 import { executeCommand, getCommandContext } from '../../util/commands.js'
 import BaseButton from '../base/BaseButton.vue'
 import BaseKeyboardShortcut from '../base/BaseKeyboardShortcut.vue'
-import PromptText from './PromptText.vue'
 import PromptSelect from './PromptSelect.vue'
+import PromptText from './PromptText.vue'
 
 const props = defineProps<{
   command: ClientCommand

@@ -1,9 +1,9 @@
 <script lang="ts" setup>
-import { computed } from 'vue'
 import type { Story, Variant } from '../../types'
-import { isDark } from '../../util/dark'
-import { histoireConfig } from '../../util/config'
+import { computed } from 'vue'
 import { usePreviewSettingsStore } from '../../stores/preview-settings'
+import { histoireConfig } from '../../util/config'
+import { isDark } from '../../util/dark'
 import { getContrastColor } from '../../util/preview-settings'
 import GenericRenderStory from './GenericRenderStory.vue'
 import StoryResponsivePreview from './StoryResponsivePreview.vue'

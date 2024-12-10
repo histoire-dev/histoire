@@ -1,5 +1,5 @@
-import { type PropType, defineComponent, inject } from 'vue'
 import type { ServerStory, ServerVariant } from '@histoire/shared'
+import { defineComponent, inject, type PropType } from 'vue'
 
 export default defineComponent({
   name: 'HistoireVariant',

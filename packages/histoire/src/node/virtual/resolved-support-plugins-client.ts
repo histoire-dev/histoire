@@ -1,5 +1,5 @@
-import { createRequire } from 'node:module'
 import type { Context } from '../context.js'
+import { createRequire } from 'node:module'
 import { PLUGINS_HAVE_DEV } from './util.js'
 
 const require = createRequire(import.meta.url)

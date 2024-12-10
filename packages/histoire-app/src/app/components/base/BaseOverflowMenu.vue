@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import { computed, h, onBeforeUnmount, reactive, ref } from 'vue'
-import { useResizeObserver } from '@vueuse/core'
 import { Icon } from '@iconify/vue'
+import { useResizeObserver } from '@vueuse/core'
+import { computed, h, onBeforeUnmount, reactive, ref } from 'vue'
 
 // Container
 

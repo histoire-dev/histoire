@@ -5,11 +5,11 @@ export default {
 </script>
 
 <script lang="ts" setup>
-import { Dropdown as VDropdown } from 'floating-vue'
 import type { ComputedRef } from 'vue'
-import { computed } from 'vue'
-import { Icon } from '@iconify/vue'
 import type { HstControlOption } from '../../types'
+import { Icon } from '@iconify/vue'
+import { Dropdown as VDropdown } from 'floating-vue'
+import { computed } from 'vue'
 
 const props = defineProps<{
   modelValue: string

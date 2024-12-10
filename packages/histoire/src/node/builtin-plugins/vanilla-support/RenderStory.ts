@@ -1,4 +1,6 @@
+import type { Story, Variant } from '@histoire/shared'
 import type { PropType as _PropType } from '@histoire/vendors/vue'
+import type { App, MountApi, VanillaApi } from './types'
 import {
   defineComponent as _defineComponent,
   h as _h,
@@ -7,12 +9,10 @@ import {
   ref as _ref,
   watch as _watch,
 } from '@histoire/vendors/vue'
-import type { Story, Variant } from '@histoire/shared'
-// @ts-expect-error virtual module id
-import * as setup from 'virtual:$histoire-setup'
 // @ts-expect-error virtual module id
 import * as generatedSetup from 'virtual:$histoire-generated-global-setup'
-import type { App, MountApi, VanillaApi } from './types'
+// @ts-expect-error virtual module id
+import * as setup from 'virtual:$histoire-setup'
 
 export default _defineComponent({
   name: 'RenderStory',

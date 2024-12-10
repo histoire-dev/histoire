@@ -150,8 +150,8 @@ Inside your setup file, you can export a `setupVue3` function that will be calle
 ```ts
 // src/histoire.setup.ts
 
-import { createPinia } from 'pinia'
 import { defineSetupVue3 } from '@histoire/plugin-vue'
+import { createPinia } from 'pinia'
 
 export const setupVue3 = defineSetupVue3(({ app, story, variant }) => {
   const pinia = createPinia()

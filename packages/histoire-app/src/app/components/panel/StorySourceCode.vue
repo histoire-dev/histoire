@@ -1,12 +1,12 @@
 <script lang="ts" setup>
-import { computed, markRaw, nextTick, onMounted, ref, shallowRef, watch, watchEffect } from 'vue'
-import { Icon } from '@iconify/vue'
 import type { Highlighter } from 'shiki-es'
-import { getHighlighter } from 'shiki-es'
+import type { Story, Variant } from '../../types'
 import { HstCopyIcon } from '@histoire/controls'
 import { unindent } from '@histoire/shared'
+import { Icon } from '@iconify/vue'
+import { getHighlighter } from 'shiki-es'
 import { clientSupportPlugins } from 'virtual:$histoire-support-plugins-client'
-import type { Story, Variant } from '../../types'
+import { computed, markRaw, nextTick, onMounted, ref, shallowRef, watch, watchEffect } from 'vue'
 import { isDark } from '../../util/dark'
 import BaseEmpty from '../base/BaseEmpty.vue'
 

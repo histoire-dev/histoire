@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-import { Icon } from '@iconify/vue'
 import type { Variant } from '@histoire/shared'
+import { Icon } from '@iconify/vue'
+import { computed } from 'vue'
 import ControlsComponentStateItem from './ControlsComponentStateItem.vue'
 
 const props = defineProps<{

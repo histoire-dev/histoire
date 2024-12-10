@@ -5,10 +5,10 @@ export default {
 </script>
 
 <script lang="ts" setup>
+import type { Awaitable } from '@histoire/shared'
 import { Icon } from '@iconify/vue'
 import { useClipboard } from '@vueuse/core'
 import { VTooltip as vTooltip } from 'floating-vue'
-import type { Awaitable } from '@histoire/shared'
 
 const props = defineProps<{
   content: string | (() => Awaitable<string>)

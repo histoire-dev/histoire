@@ -49,8 +49,8 @@ yarn add -D histoire @histoire/plugin-svelte
 Create an `histoire.config.js` or `histoire.config.ts` file in your project root to enable the Svelte plugin:
 
 ```ts
-import { defineConfig } from 'histoire'
 import { HstSvelte } from '@histoire/plugin-svelte'
+import { defineConfig } from 'histoire'
 
 export default defineConfig({
   plugins: [

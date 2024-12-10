@@ -19,12 +19,12 @@ export function resolvedStories(ctx: Context) {
   })
   return `${ctx.supportPlugins.map(p => p.importStoriesPrepend).filter(Boolean).join('\n')}
 ${resolvedStories.map((file, index) => {
-    const supportPlugin = ctx.supportPlugins.find(p => p.id === file.supportPluginId)
-    if (!supportPlugin) {
-      throw new Error(`Could not find support plugin for story ${file.path}: ${file.supportPluginId}`)
-    }
-    return supportPlugin.importStoryComponent(file, index)
-  }).filter(Boolean).join('\n')}
+  const supportPlugin = ctx.supportPlugins.find(p => p.id === file.supportPluginId)
+  if (!supportPlugin) {
+    throw new Error(`Could not find support plugin for story ${file.path}: ${file.supportPluginId}`)
+  }
+  return supportPlugin.importStoryComponent(file, index)
+}).filter(Boolean).join('\n')}
 export let files = [${files.map(file => `{${JSON.stringify(file).slice(1, -1)}, component: Comp${file.index}, source: () => import('virtual:story-source:${file.story.id}')}`).join(',\n')}]
 export let tree = ${JSON.stringify(makeTree(ctx.config, resolvedStories))}
 const handlers = []

@@ -1,13 +1,13 @@
-import DefaultTheme from 'vitepress/theme'
-import FloatingVue from 'floating-vue'
 import { Icon } from '@iconify/vue'
+import FloatingVue from 'floating-vue'
+import DefaultTheme from 'vitepress/theme'
+import DemoLinks from './DemoLinks.vue'
+import DemoPreview from './DemoPreview.vue'
+import MeetTeam from './MeetTeam.vue'
+import SponsorButton from './SponsorButton.vue'
 import 'floating-vue/dist/style.css'
 import './style/vars.pcss'
 import './style/index.pcss'
-import SponsorButton from './SponsorButton.vue'
-import MeetTeam from './MeetTeam.vue'
-import DemoPreview from './DemoPreview.vue'
-import DemoLinks from './DemoLinks.vue'
 
 export default {
   ...DefaultTheme,

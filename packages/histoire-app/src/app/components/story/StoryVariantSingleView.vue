@@ -1,12 +1,12 @@
 <script lang="ts" setup>
 import type { Story, Variant } from '../../types'
 import { isMobile } from '../../util/responsive'
-import ToolbarTitle from '../toolbar/ToolbarTitle.vue'
-import ToolbarResponsiveSize from '../toolbar/ToolbarResponsiveSize.vue'
-import ToolbarBackground from '../toolbar/ToolbarBackground.vue'
-import ToolbarTextDirection from '../toolbar/ToolbarTextDirection.vue'
-import ToolbarNewTab from '../toolbar/ToolbarNewTab.vue'
 import DevOnlyToolbarOpenInEditor from '../toolbar/DevOnlyToolbarOpenInEditor.vue'
+import ToolbarBackground from '../toolbar/ToolbarBackground.vue'
+import ToolbarNewTab from '../toolbar/ToolbarNewTab.vue'
+import ToolbarResponsiveSize from '../toolbar/ToolbarResponsiveSize.vue'
+import ToolbarTextDirection from '../toolbar/ToolbarTextDirection.vue'
+import ToolbarTitle from '../toolbar/ToolbarTitle.vue'
 import StoryVariantSinglePreviewNative from './StoryVariantSinglePreviewNative.vue'
 import StoryVariantSinglePreviewRemote from './StoryVariantSinglePreviewRemote.vue'
 

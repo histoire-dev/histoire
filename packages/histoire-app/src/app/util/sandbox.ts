@@ -1,5 +1,5 @@
-import { base } from '../router'
 import type { Story, Variant } from '../types'
+import { base } from '../router'
 
 export function getSandboxUrl(story: Story, variant: Variant) {
   const url = new URLSearchParams()

@@ -3,9 +3,9 @@ import { useResizeObserver } from '@vueuse/core'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useStoryStore } from '../../stores/story'
 import { isMobile } from '../../util/responsive'
+import DevOnlyToolbarOpenInEditor from '../toolbar/DevOnlyToolbarOpenInEditor.vue'
 import ToolbarBackground from '../toolbar/ToolbarBackground.vue'
 import ToolbarTextDirection from '../toolbar/ToolbarTextDirection.vue'
-import DevOnlyToolbarOpenInEditor from '../toolbar/DevOnlyToolbarOpenInEditor.vue'
 import StoryVariantGridItem from './StoryVariantGridItem.vue'
 
 const storyStore = useStoryStore()

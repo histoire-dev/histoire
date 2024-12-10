@@ -1,6 +1,15 @@
 import type {
+  App as _App,
+} from '@histoire/vendors/vue'
+import type {
   App,
 } from 'vue'
+import { components } from '@histoire/controls'
+import {
+  createApp as _createApp,
+  h as _h,
+  reactive as _reactive,
+} from '@histoire/vendors/vue'
 import {
   defineComponent,
   h,
@@ -10,15 +19,6 @@ import {
   onUpdated,
   ref,
 } from 'vue'
-import type {
-  App as _App,
-} from '@histoire/vendors/vue'
-import {
-  createApp as _createApp,
-  h as _h,
-  reactive as _reactive,
-} from '@histoire/vendors/vue'
-import { components } from '@histoire/controls'
 import Story from './Story'
 import Variant from './Variant'
 

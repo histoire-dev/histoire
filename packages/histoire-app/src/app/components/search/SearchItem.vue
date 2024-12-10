@@ -1,12 +1,12 @@
 <script lang="ts" setup>
 import type { PropType } from 'vue'
+import type { SearchResult } from '../../types'
 import { ref, toRefs } from 'vue'
 import { useRouter } from 'vue-router'
-import type { SearchResult } from '../../types'
 import { onKeyboardShortcut } from '../../util/keyboard'
 import { useScrollOnActive } from '../../util/scroll'
-import BaseListItemLink from '../base/BaseListItemLink.vue'
 import BaseListItem from '../base/BaseListItem.vue'
+import BaseListItemLink from '../base/BaseListItemLink.vue'
 import SearchItemContent from './SearchItemContent.vue'
 
 const props = defineProps({

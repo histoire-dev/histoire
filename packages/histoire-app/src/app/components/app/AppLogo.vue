@@ -1,10 +1,10 @@
 <script lang="ts" setup>
 import { computed } from 'vue'
-import { isDark } from '../../util/dark'
-import { customLogos, histoireConfig } from '../../util/config'
-
 import HistoireLogoDark from '../../assets/histoire-text-dark.svg'
 import HistoireLogoLight from '../../assets/histoire-text.svg'
+
+import { customLogos, histoireConfig } from '../../util/config'
+import { isDark } from '../../util/dark'
 
 const logoUrl = computed(() => {
   if (isDark.value) {

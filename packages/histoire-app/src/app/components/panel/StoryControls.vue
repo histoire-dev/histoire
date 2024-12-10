@@ -1,13 +1,13 @@
 <script lang="ts" setup>
 import type { PropType } from 'vue'
-import { computed, ref, watch } from 'vue'
-import { Icon } from '@iconify/vue'
-import GenericRenderStory from '../story/GenericRenderStory.vue'
 import type { Story, Variant } from '../../types'
+import { Icon } from '@iconify/vue'
+import { computed, ref, watch } from 'vue'
 import BaseEmpty from '../base/BaseEmpty.vue'
-import StatePresets from './StatePresets.vue'
+import GenericRenderStory from '../story/GenericRenderStory.vue'
 import ControlsComponentProps from './ControlsComponentProps.vue'
 import ControlsComponentState from './ControlsComponentState.vue'
+import StatePresets from './StatePresets.vue'
 
 const props = defineProps({
   variant: {

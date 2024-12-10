@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 import type { Story, Tree, TreeFolder, TreeGroup, TreeLeaf } from '../../types'
-import StoryListItem from './StoryListItem.vue'
-import StoryListFolder from './StoryListFolder.vue'
 import StoryGroup from './StoryGroup.vue'
+import StoryListFolder from './StoryListFolder.vue'
+import StoryListItem from './StoryListItem.vue'
 
 defineProps<{
   tree: Tree

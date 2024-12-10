@@ -1,5 +1,5 @@
-import type { Story, StoryProps, Variant, VariantProps } from '@histoire/shared'
 import type { HstControlOption } from '@histoire/controls'
+import type { Story, StoryProps, Variant, VariantProps } from '@histoire/shared'
 import type { SvelteComponentTyped } from 'svelte'
 
 export interface SvelteStorySetupApi {

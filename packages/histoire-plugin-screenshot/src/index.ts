@@ -1,8 +1,8 @@
-import path from 'pathe'
-import fs from 'fs-extra'
+import type { FileOptions } from 'capture-website'
 import type { Plugin } from 'histoire'
 import { defu } from 'defu'
-import type { FileOptions } from 'capture-website'
+import fs from 'fs-extra'
+import path from 'pathe'
 
 interface ScreenshotPresets {
   /**

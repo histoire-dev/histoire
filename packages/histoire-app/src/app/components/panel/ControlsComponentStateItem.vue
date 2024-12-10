@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import { computed } from 'vue'
-import { HstCheckbox, HstJson, HstNumber, HstText } from '@histoire/controls'
 import type { Variant } from '../../types'
+import { HstCheckbox, HstJson, HstNumber, HstText } from '@histoire/controls'
+import { computed } from 'vue'
 
 const props = defineProps<{
   variant: Variant

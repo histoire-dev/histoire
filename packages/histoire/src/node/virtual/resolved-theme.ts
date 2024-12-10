@@ -1,5 +1,5 @@
-import { parseColor } from '../colors.js'
 import type { Context } from '../context.js'
+import { parseColor } from '../colors.js'
 
 export function resolvedTheme(ctx: Context) {
   let css = '*, ::before, ::after {'

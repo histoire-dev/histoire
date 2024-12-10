@@ -1,9 +1,9 @@
 import type { RouteLocationRaw } from 'vue-router'
 
 export type {
+  Story,
   StoryFile,
   StoryLayout,
-  Story,
   Variant,
 } from '@histoire/shared'
 

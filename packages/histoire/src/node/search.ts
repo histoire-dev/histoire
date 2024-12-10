@@ -1,8 +1,8 @@
+import type { Context } from './context.js'
 import { createRequire } from 'node:module'
+import { noCase } from 'change-case'
 import flexsearch from 'flexsearch'
 import path from 'pathe'
-import { noCase } from 'change-case'
-import type { Context } from './context.js'
 import { loadModule } from './load.js'
 
 const require = createRequire(import.meta.url)

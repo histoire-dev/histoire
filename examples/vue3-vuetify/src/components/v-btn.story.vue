@@ -1,6 +1,6 @@
 <script setup>
-import { ref } from 'vue'
 import { logEvent } from 'histoire/client'
+import { ref } from 'vue'
 
 const text = ref('Click me!')
 </script>

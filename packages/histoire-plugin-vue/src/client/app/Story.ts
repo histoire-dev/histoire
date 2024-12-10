@@ -1,7 +1,7 @@
-import type { PropType, VNode } from 'vue'
-import { cloneVNode, computed, defineComponent, getCurrentInstance, h, provide, reactive, useAttrs } from 'vue'
 import type { Story } from '@histoire/shared'
+import type { PropType, VNode } from 'vue'
 import { omitInheritStoryProps } from '@histoire/shared'
+import { cloneVNode, computed, defineComponent, getCurrentInstance, h, provide, reactive, useAttrs } from 'vue'
 import Variant from './Variant'
 
 export default defineComponent({

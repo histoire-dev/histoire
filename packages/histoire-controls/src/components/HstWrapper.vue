@@ -5,8 +5,8 @@ export default {
 </script>
 
 <script lang="ts" setup>
-import { withDefaults } from 'vue'
 import { VTooltip as vTooltip } from 'floating-vue'
+import { withDefaults } from 'vue'
 
 withDefaults(defineProps<{
   title?: string

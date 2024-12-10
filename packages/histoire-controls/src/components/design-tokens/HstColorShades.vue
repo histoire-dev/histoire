@@ -5,9 +5,9 @@ export default {
 </script>
 
 <script lang="ts" setup>
-import { computed, ref } from 'vue'
-import { VTooltip as vTooltip } from 'floating-vue'
 import type { CSSProperties } from 'vue'
+import { VTooltip as vTooltip } from 'floating-vue'
+import { computed, ref } from 'vue'
 import HstCopyIcon from '../HstCopyIcon.vue'
 
 const props = defineProps<{

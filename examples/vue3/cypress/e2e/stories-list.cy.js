@@ -6,8 +6,7 @@ describe('Stories list', () => {
     cy.visit('/')
     cy.get('[data-test-id="story-list-item"]').should('have.length', 33)
     cy.get('[data-test-id="story-list-item"]').contains('🐱 Meow')
-    cy.get('[data-test-id="story-list-item"]').contains('BaseButton')
-      .contains('3') // Variants count
+    cy.get('[data-test-id="story-list-item"]').contains('BaseButton').contains('3') // Variants count
     cy.get('[data-test-id="story-list-item"]').contains('Demo')
     cy.get('[data-test-id="story-list-folder"]').should('have.length', 2)
   })

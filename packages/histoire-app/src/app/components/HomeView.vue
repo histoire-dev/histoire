@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 import { computed } from 'vue'
-import { customLogos, histoireConfig } from '../util/config'
 import HistoireLogo from '../assets/histoire.svg'
 import { useStoryStore } from '../stores/story'
+import { customLogos, histoireConfig } from '../util/config'
 import HomeCounter from './app/HomeCounter.vue'
 
 const logoUrl = computed(() => histoireConfig.theme?.logo?.square ? customLogos.square : HistoireLogo)

@@ -1,6 +1,6 @@
 import type { Ref } from 'vue'
-import { onMounted, watch } from 'vue'
 import scrollIntoView from 'scroll-into-view-if-needed'
+import { onMounted, watch } from 'vue'
 
 export function useScrollOnActive(active: Ref<boolean>, el: Ref<HTMLElement>) {
   watch(active, (value) => {

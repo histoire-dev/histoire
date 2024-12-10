@@ -2,8 +2,8 @@
 import { computed, ref, watch } from 'vue'
 import { useStoryStore } from '../../stores/story'
 import MobileOverlay from '../app/MobileOverlay.vue'
-import StoryVariantListItem from './StoryVariantListItem.vue'
 import StoryVariantGrid from './StoryVariantGrid.vue'
+import StoryVariantListItem from './StoryVariantListItem.vue'
 import StoryVariantSingle from './StoryVariantSingle.vue'
 
 const storyStore = useStoryStore()

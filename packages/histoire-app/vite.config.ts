@@ -1,7 +1,7 @@
-import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import fs from 'fs-extra'
 import { globbySync } from 'globby'
+import { defineConfig } from 'vite'
 
 export default defineConfig({
   plugins: [
@@ -56,7 +56,7 @@ export default defineConfig({
       external: [
         /\$histoire/,
         /@histoire/,
-        // eslint-disable-next-line ts/no-var-requires, ts/no-require-imports
+        // eslint-disable-next-line ts/no-require-imports
         ...Object.keys(require('./package.json').dependencies),
       ],
 

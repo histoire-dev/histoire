@@ -49,8 +49,8 @@ yarn add -D histoire @histoire/plugin-vue
 Create an `histoire.config.js` or `histoire.config.ts` file in your project root to enable the Vue plugin:
 
 ```ts
-import { defineConfig } from 'histoire'
 import { HstVue } from '@histoire/plugin-vue'
+import { defineConfig } from 'histoire'
 
 export default defineConfig({
   plugins: [
@@ -128,9 +128,9 @@ pnpm add -D @histoire/plugin-nuxt
 Add the plugin in histoire config:
 
 ```js
-import { defineConfig } from 'histoire'
-import { HstVue } from '@histoire/plugin-vue'
 import { HstNuxt } from '@histoire/plugin-nuxt'
+import { HstVue } from '@histoire/plugin-vue'
+import { defineConfig } from 'histoire'
 
 export default defineConfig({
   plugins: [

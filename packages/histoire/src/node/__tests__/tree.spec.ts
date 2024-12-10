@@ -1,7 +1,7 @@
-import { describe, expect, it } from 'vitest'
 import type { ServerStoryFile } from '@histoire/shared'
-import { makeTree } from '../tree.js'
+import { describe, expect, it } from 'vitest'
 import { getDefaultConfig } from '../config.js'
+import { makeTree } from '../tree.js'
 
 let id = 0
 

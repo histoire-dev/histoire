@@ -6,9 +6,9 @@ export default {
 
 <script lang="ts" setup>
 import type { ComputedRef } from 'vue'
+import type { HstControlOption } from '../../types'
 import { computed } from 'vue'
 import HstWrapper from '../HstWrapper.vue'
-import type { HstControlOption } from '../../types'
 import HstSimpleCheckbox from './HstSimpleCheckbox.vue'
 
 const props = defineProps<{
