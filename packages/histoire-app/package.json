@@ -32,7 +32,6 @@
     "@histoire/controls": "workspace:^",
     "@histoire/shared": "workspace:^",
     "@histoire/vendors": "workspace:^",
-    "@types/flexsearch": "^0.7.6",
     "flexsearch": "0.7.43",
     "shiki-es": "^0.14.0"
   },

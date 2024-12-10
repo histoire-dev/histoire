@@ -4,7 +4,7 @@ import type { SearchResult, SearchResultType, Story, Variant } from '../../types
 import type { SearchData } from './types'
 import { Icon } from '@iconify/vue'
 import { useDebounce, useFocus } from '@vueuse/core'
-import * as flexsearch from 'flexsearch'
+import FlexSearch from 'flexsearch'
 import language from 'flexsearch/dist/module/lang/en.js'
 import charset from 'flexsearch/dist/module/lang/latin/advanced.js'
 import { registeredCommands } from 'virtual:$histoire-commands'
@@ -57,11 +57,11 @@ const rateLimitedSearch = useDebounce(searchInputText, 50)
 
 const storyStore = useStoryStore()
 
-let titleSearchIndex: flexsearch.Document<any, any>
+let titleSearchIndex: FlexSearch.Document<any, any>
 let titleIdMap: SearchData['idMap']
 
 function createIndex() {
-  return new flexsearch.Document({
+  return new FlexSearch.Document({
     preset: 'match',
     document: {
       id: 'id',
@@ -92,7 +92,7 @@ onUpdate((searchData) => {
   loadSearchIndex(searchData)
 })
 
-let docSearchIndex: flexsearch.Document<any, any>
+let docSearchIndex: FlexSearch.Document<any, any>
 let docIdMap: SearchData['idMap']
 
 async function loadDocSearchIndex() {

@@ -22,4 +22,9 @@ export default antfu({
   rules: {
     'import/first': 'off',
   },
+}, {
+  files: ['**/*.cy.js'],
+  env: {
+    'cypress/globals': true,
+  },
 })

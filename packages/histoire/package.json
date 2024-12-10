@@ -51,7 +51,6 @@
     "@histoire/controls": "workspace:^",
     "@histoire/shared": "workspace:^",
     "@histoire/vendors": "workspace:^",
-    "@types/flexsearch": "^0.7.6",
     "@types/markdown-it": "^14.1.2",
     "birpc": "^0.2.19",
     "change-case": "^5.4.4",

@@ -1,7 +1,7 @@
 import type { Context } from './context.js'
 import { createRequire } from 'node:module'
 import { noCase } from 'change-case'
-import flexsearch from 'flexsearch'
+import FlexSearch from 'flexsearch'
 import path from 'pathe'
 import { loadModule } from './load.js'
 
@@ -53,7 +53,7 @@ export async function generateDocSearchData(ctx: Context) {
 
 async function createIndex() {
   const flexsearchRoot = path.dirname(require.resolve('flexsearch/package.json'))
-  return new flexsearch.Document({
+  return new FlexSearch.Document({
     preset: 'match',
     document: {
       id: 'id',
