@@ -32,7 +32,7 @@
     "@histoire/controls": "workspace:^",
     "@histoire/shared": "workspace:^",
     "@histoire/vendors": "workspace:^",
-    "flexsearch": "0.7.43",
+    "fuse.js": "^7.0.0",
     "shiki-es": "^0.14.0"
   },
   "devDependencies": {

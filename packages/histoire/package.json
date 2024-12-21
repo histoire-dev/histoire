@@ -58,7 +58,6 @@
     "connect": "^3.7.0",
     "defu": "^6.1.4",
     "diacritics": "^1.3.0",
-    "flexsearch": "0.7.43",
     "fs-extra": "^11.2.0",
     "globby": "^14.0.2",
     "gray-matter": "^4.0.3",
