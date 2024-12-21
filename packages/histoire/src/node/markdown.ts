@@ -235,15 +235,15 @@ export async function createMarkdownFilesWatcher(ctx: Context) {
   }
 
   watcher
-    .on('add', async (relativePath) => {
-      await addFile(relativePath)
+    .on('add', (relativePath) => {
+      addFile(relativePath)
     })
     .on('unlink', (relativePath) => {
       removeFile(relativePath)
     })
 
   await new Promise((resolve) => {
-    watcher.once('ready', resolve)
+    watcher.once('ready', resolve as () => void)
   })
 
   try {
@@ -260,7 +260,7 @@ export async function createMarkdownFilesWatcher(ctx: Context) {
     }
   }
   catch (e) {
-    stop()
+    await stop()
     throw e
   }
 }
