@@ -1,10 +1,10 @@
+import type { Context } from '../context.js'
 import { createWriteStream, unlinkSync } from 'node:fs'
 import path from 'node:path'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { createContext } from '../context.js'
 import { createMarkdownFilesWatcher } from '../markdown.js'
 import { watchStories } from '../stories.js'
-import type { Context } from '../context.js'
-import { createContext } from '../context.js'
 
 describe('markdown', async () => {
   vi.spyOn(process, 'cwd').mockReturnValue(path.resolve(__dirname, './markdown'))

@@ -1,7 +1,7 @@
 <script lang="ts" setup>
+import type { SearchResult } from '../../types.js'
 import { Icon } from '@iconify/vue'
 import BaseIcon from '../base/BaseIcon.vue'
-import type { SearchResult } from '../../types.js'
 
 defineProps<{
   result: SearchResult

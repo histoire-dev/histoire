@@ -1,5 +1,5 @@
-import { reactive } from 'vue'
 import type { PreviewSettings } from '../types'
+import { reactive } from 'vue'
 import { histoireConfig } from './config'
 
 export const receivedSettings = reactive<PreviewSettings>({} as PreviewSettings)

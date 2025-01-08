@@ -1,9 +1,9 @@
 // @TODO move to playwright
 
-import fs from 'node:fs/promises'
 import { exec } from 'node:child_process'
+import fs from 'node:fs/promises'
 import { globby } from 'globby'
-import minimatch from 'minimatch'
+import { minimatch } from 'minimatch'
 
 const totalRunners = Number.parseInt(process.env.TOTAL_RUNNERS)
 const thisRunner = Number.parseInt(process.env.THIS_RUNNER)
@@ -25,7 +25,7 @@ async function getTestCount(filePath) {
   return content.match(testPattern)?.length || 0
 }
 
-// adapated from:
+// adapted from:
 // https://github.com/bahmutov/find-cypress-specs/blob/main/src/index.js
 async function getSpecFilePaths() {
   const options = specPatterns

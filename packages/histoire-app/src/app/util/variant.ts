@@ -1,7 +1,7 @@
 import type { Ref } from 'vue'
+import type { Variant } from '../types'
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
-import type { Variant } from '../types'
 
 export function useCurrentVariantRoute(variant: Ref<Variant>) {
   const route = useRoute()

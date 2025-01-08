@@ -1,10 +1,10 @@
 <script lang="ts" setup>
+import type { Story, TreeGroup } from '../../types'
 import { Icon } from '@iconify/vue'
 import { computed, withDefaults } from 'vue'
-import type { Story, TreeGroup } from '../../types'
 import { useFolderStore } from '../../stores/folder'
-import StoryListItem from './StoryListItem.vue'
 import StoryListFolder from './StoryListFolder.vue'
+import StoryListItem from './StoryListItem.vue'
 
 const props = withDefaults(defineProps<{
   path?: Array<string>

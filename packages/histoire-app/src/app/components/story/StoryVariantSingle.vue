@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import { computed } from 'vue'
 import { Icon } from '@iconify/vue'
+import { computed } from 'vue'
 import { useStoryStore } from '../../stores/story'
 import { isMobile } from '../../util/responsive'
 import BaseSplitPane from '../base/BaseSplitPane.vue'

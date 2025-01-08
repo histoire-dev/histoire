@@ -1,10 +1,10 @@
-import chokidar from 'chokidar'
-import { globby } from 'globby'
-import { paramCase } from 'change-case'
-import { basename, resolve } from 'pathe'
-import micromatch from 'micromatch'
 import type { ServerStoryFile } from '@histoire/shared'
 import type { Context } from './context.js'
+import { kebabCase } from 'change-case'
+import chokidar from 'chokidar'
+import { globby } from 'globby'
+import micromatch from 'micromatch'
+import { basename, resolve } from 'pathe'
 
 type StoryChangeHandler = (file?: ServerStoryFile) => unknown
 const storyChangeHandlers: StoryChangeHandler[] = []
@@ -44,9 +44,19 @@ let context: Context
 
 export async function watchStories(newContext: Context) {
   context = newContext
-  const watcher = chokidar.watch(context.config.storyMatch, {
+
+  const watcher = chokidar.watch('.', {
     cwd: context.root,
-    ignored: context.config.storyIgnored,
+    ignored: (path, stats) => {
+      if (context.config.storyIgnored.some(pattern => micromatch.isMatch(path, pattern))) {
+        return true
+      }
+      if (context.config.storyMatch.some(pattern => micromatch.isMatch(path, pattern))) {
+        return false
+      }
+
+      return stats?.isFile()
+    },
   })
 
   watcher
@@ -75,7 +85,7 @@ export function addStory(relativeFilePath: string, virtualModuleCode?: string) {
     }
   }
 
-  const fileId = paramCase(relativeFilePath.toLowerCase())
+  const fileId = kebabCase(relativeFilePath.toLowerCase())
   let fileName = basename(relativeFilePath)
   if (fileName.includes('.')) {
     fileName = fileName.substring(0, fileName.indexOf('.'))

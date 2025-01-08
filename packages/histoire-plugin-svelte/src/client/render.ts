@@ -1,7 +1,10 @@
-import type { SvelteComponent } from 'svelte'
+import type { Story, Variant } from '@histoire/shared'
 import type {
   PropType as _PropType,
 } from '@histoire/vendors/vue'
+import type { SvelteComponent } from 'svelte'
+import type { SvelteStorySetupApi } from '../helpers.js'
+import { components } from '@histoire/controls'
 import {
   defineComponent as _defineComponent,
   h as _h,
@@ -10,17 +13,14 @@ import {
   ref as _ref,
   watch as _watch,
 } from '@histoire/vendors/vue'
-import type { Story, Variant } from '@histoire/shared'
-import { components } from '@histoire/controls'
-// @ts-expect-error virtual module id
-import * as setup from 'virtual:$histoire-setup'
 // @ts-expect-error virtual module id
 import * as generatedSetup from 'virtual:$histoire-generated-global-setup'
-import type { SvelteStorySetupApi } from '../helpers.js'
+// @ts-expect-error virtual module id
+import * as setup from 'virtual:$histoire-setup'
 import RenderStorySvelte from './RenderStory.svelte'
 import RenderVariantSvelte from './RenderVariant.svelte'
-import Wrap from './Wrap.svelte'
 import { syncState } from './util'
+import Wrap from './Wrap.svelte'
 
 export default _defineComponent({
   name: 'RenderStory',

@@ -7,8 +7,8 @@ You can define a setup function globally in your setup file defined by the `setu
 For Vue 3, it must be called `setupVue3`. Histoire provides an optional `defineSetupVue3` helper to have better types in your IDE:
 
 ```ts
-import { createPinia } from 'pinia'
 import { defineSetupVue3 } from '@histoire/plugin-vue'
+import { createPinia } from 'pinia'
 
 export const setupVue3 = defineSetupVue3(({ app, story, variant }) => {
   // Vue plugin

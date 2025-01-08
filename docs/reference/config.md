@@ -18,8 +18,8 @@ Learn more about configuring Histoire [here](../guide/config.md).
 Array of plugins. Learn more about [official plugins](../guide/plugins/official.md) and [how to develop them](../guide/plugins/development.md).
 
 ```ts
-import { HstVue } from '@histoire/plugin-vue'
 import { HstNuxt } from '@histoire/plugin-nuxt'
+import { HstVue } from '@histoire/plugin-vue'
 
 export default defineConfig({
   plugins: [

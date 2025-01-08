@@ -6,19 +6,8 @@ export default {
 </script>
 
 <script lang="ts" setup>
-import { onMounted, ref, watch, watchEffect } from 'vue'
-import { Icon } from '@iconify/vue'
-import { VTooltip as vTooltip } from 'floating-vue'
-import { Compartment } from '@codemirror/state'
 import type {
   ViewUpdate,
-} from '@codemirror/view'
-import {
-  EditorView,
-  highlightActiveLine,
-  highlightActiveLineGutter,
-  highlightSpecialChars,
-  keymap,
 } from '@codemirror/view'
 import { defaultKeymap } from '@codemirror/commands'
 import { json } from '@codemirror/lang-json'
@@ -31,9 +20,20 @@ import {
   syntaxHighlighting,
 } from '@codemirror/language'
 import { lintKeymap } from '@codemirror/lint'
+import { Compartment } from '@codemirror/state'
 import { oneDarkHighlightStyle, oneDarkTheme } from '@codemirror/theme-one-dark'
-import HstWrapper from '../HstWrapper.vue'
+import {
+  EditorView,
+  highlightActiveLine,
+  highlightActiveLineGutter,
+  highlightSpecialChars,
+  keymap,
+} from '@codemirror/view'
+import { Icon } from '@iconify/vue'
+import { VTooltip as vTooltip } from 'floating-vue'
+import { onMounted, ref, watch, watchEffect } from 'vue'
 import { isDark } from '../../utils'
+import HstWrapper from '../HstWrapper.vue'
 
 const props = defineProps<{
   title?: string

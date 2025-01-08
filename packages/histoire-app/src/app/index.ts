@@ -1,10 +1,10 @@
-import 'virtual:$histoire-theme'
-import { createApp } from 'vue'
-import { createPinia } from 'pinia'
 import FloatingVue from 'floating-vue'
+import { createPinia } from 'pinia'
+import { createApp } from 'vue'
 import App from './App.vue'
-import { router } from './router'
 import { setupPluginApi } from './plugin.js'
+import { router } from './router'
+import 'virtual:$histoire-theme'
 
 export async function mountMainApp() {
   const app = createApp(App)

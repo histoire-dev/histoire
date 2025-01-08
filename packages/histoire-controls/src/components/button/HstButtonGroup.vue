@@ -6,9 +6,9 @@ export default {
 
 <script setup lang="ts">
 import type { ComputedRef } from 'vue'
+import type { HstControlOption } from '../../types'
 import { computed } from 'vue'
 import HstWrapper from '../HstWrapper.vue'
-import type { HstControlOption } from '../../types'
 import HstButton from './HstButton.vue'
 
 const props = defineProps<{

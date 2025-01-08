@@ -1,21 +1,19 @@
 <script lang="ts" setup>
-import { useDebounce, useFocus } from '@vueuse/core'
-import { computed, ref, watch } from 'vue'
-import { Icon } from '@iconify/vue'
-import * as flexsearch from 'flexsearch'
-import charset from 'flexsearch/dist/module/lang/latin/advanced.js'
-import language from 'flexsearch/dist/module/lang/en.js'
 import type { ClientCommand } from '@histoire/shared'
-import { registeredCommands } from 'virtual:$histoire-commands'
-import { useStoryStore } from '../../stores/story'
-import BaseEmpty from '../base/BaseEmpty.vue'
 import type { SearchResult, SearchResultType, Story, Variant } from '../../types'
-import { builtinCommands, getCommandContext } from '../../util/commands.js'
-import { useCommandStore } from '../../stores/command.js'
-import { useSelection } from '../../util/select.js'
-import SearchItem from './SearchItem.vue'
-import { onUpdate, searchData } from './search-title-data'
 import type { SearchData } from './types'
+import { Icon } from '@iconify/vue'
+import { useDebounce, useFocus } from '@vueuse/core'
+import Fuse from 'fuse.js'
+import { registeredCommands } from 'virtual:$histoire-commands'
+import { computed, ref, watch } from 'vue'
+import { useCommandStore } from '../../stores/command.js'
+import { useStoryStore } from '../../stores/story'
+import { builtinCommands, getCommandContext } from '../../util/commands.js'
+import { useSelection } from '../../util/select.js'
+import BaseEmpty from '../base/BaseEmpty.vue'
+import { onUpdate, searchData } from './search-title-data'
+import SearchItem from './SearchItem.vue'
 
 const DocSearchData = () => import('./search-docs-data')
 
@@ -57,30 +55,20 @@ const rateLimitedSearch = useDebounce(searchInputText, 50)
 
 const storyStore = useStoryStore()
 
-let titleSearchIndex: flexsearch.Document<any, any>
+let titleSearchIndex: Fuse<{ id: number, text: string }>
 let titleIdMap: SearchData['idMap']
 
 function createIndex() {
-  return new flexsearch.Document({
-    preset: 'match',
-    document: {
-      id: 'id',
-      index: [
-        'text',
-      ],
-    },
-    worker: true,
-    charset,
-    language,
-    tokenize: 'forward',
+  return new Fuse<{ id: number, text: string }>([], {
+    keys: ['text'],
   })
 }
 
 async function loadSearchIndex(data: SearchData) {
   titleSearchIndex = createIndex()
 
-  for (const key of Object.keys(data.index)) {
-    await titleSearchIndex.import(key, data.index[key])
+  for (const document of data.index) {
+    titleSearchIndex.add(document)
   }
 
   titleIdMap = data.idMap
@@ -92,27 +80,27 @@ onUpdate((searchData) => {
   loadSearchIndex(searchData)
 })
 
-let docSearchIndex: flexsearch.Document<any, any>
+let docSearchIndex: Fuse<{ id: number, text: string }>
 let docIdMap: SearchData['idMap']
 
 async function loadDocSearchIndex() {
   async function load(data: SearchData) {
     docSearchIndex = createIndex()
 
-    for (const key of Object.keys(data.index)) {
-      await docSearchIndex.import(key, data.index[key])
+    for (const document of data.index) {
+      docSearchIndex.add(document)
     }
 
     docIdMap = data.idMap
 
     if (rateLimitedSearch.value) {
-      searchOnDocField(rateLimitedSearch.value)
+      await searchOnDocField(rateLimitedSearch.value)
     }
   }
 
   const searchDataModule = await DocSearchData()
 
-  load(searchDataModule.searchData)
+  await load(searchDataModule.searchData)
   // Handle HMR
   searchDataModule.onUpdate((searchData) => {
     load(searchData)
@@ -127,29 +115,29 @@ const titleResults = ref<SearchResult[]>([])
 
 watch(rateLimitedSearch, async (value) => {
   const list: SearchResult[] = []
-  const raw = await titleSearchIndex.search(value)
+  const result = titleSearchIndex.search(value)
   let rank = 0
-  for (const field of raw) {
-    for (const id of field.result) {
-      const idMapData = titleIdMap[id]
-      if (!idMapData) continue
-      switch (idMapData.kind) {
-        case 'story': {
-          list.push(storyResultFactory(storyStore.getStoryById(idMapData.id), rank))
-          rank++
-          break
-        }
-        case 'variant': {
-          const [storyId] = idMapData.id.split(':')
-          const story = storyStore.getStoryById(storyId)
-          const variant = storyStore.getVariantById(idMapData.id)
-          list.push(variantResultFactory(story, variant, rank))
-          rank++
-          break
-        }
+
+  for (const document of result) {
+    const idMapData = titleIdMap[document.item.id]
+    if (!idMapData) continue
+    switch (idMapData.kind) {
+      case 'story': {
+        list.push(storyResultFactory(storyStore.getStoryById(idMapData.id), rank))
+        rank++
+        break
+      }
+      case 'variant': {
+        const [storyId] = idMapData.id.split(':')
+        const story = storyStore.getStoryById(storyId)
+        const variant = storyStore.getVariantById(idMapData.id)
+        list.push(variantResultFactory(story, variant, rank))
+        rank++
+        break
       }
     }
   }
+
   titleResults.value = list
 })
 
@@ -158,21 +146,21 @@ const docsResults = ref<SearchResult[]>([])
 async function searchOnDocField(query: string) {
   if (docSearchIndex) {
     const list: SearchResult[] = []
-    const raw = await docSearchIndex.search(query)
+    const result = docSearchIndex.search(query)
     let rank = 0
-    for (const field of raw) {
-      for (const id of field.result) {
-        const idMapData = docIdMap[id]
-        if (!idMapData) continue
-        switch (idMapData.kind) {
-          case 'story': {
-            list.push(storyResultFactory(storyStore.getStoryById(idMapData.id), rank, 'docs'))
-            rank++
-            break
-          }
+
+    for (const document of result) {
+      const idMapData = docIdMap[document.item.id]
+      if (!idMapData) continue
+      switch (idMapData.kind) {
+        case 'story': {
+          list.push(storyResultFactory(storyStore.getStoryById(idMapData.id), rank, 'docs'))
+          rank++
+          break
         }
       }
     }
+
     docsResults.value = list
   }
 }

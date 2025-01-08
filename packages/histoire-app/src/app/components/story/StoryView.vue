@@ -1,14 +1,14 @@
 <script lang="ts" setup>
+import { Icon } from '@iconify/vue'
 import { ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { Icon } from '@iconify/vue'
 import { useStoryStore } from '../../stores/story'
 
-import BaseSplitPane from '../base/BaseSplitPane.vue'
-import BaseEmpty from '../base/BaseEmpty.vue'
 import { isMobile } from '../../util/responsive'
-import StorySidePanel from '../panel/StorySidePanel.vue'
+import BaseEmpty from '../base/BaseEmpty.vue'
+import BaseSplitPane from '../base/BaseSplitPane.vue'
 import StoryDocs from '../panel/StoryDocs.vue'
+import StorySidePanel from '../panel/StorySidePanel.vue'
 import StoryViewer from './StoryViewer.vue'
 
 const storyStore = useStoryStore()

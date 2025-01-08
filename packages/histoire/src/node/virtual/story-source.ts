@@ -1,6 +1,6 @@
+import type { Context } from '../context.js'
 import fs from 'fs-extra'
 import { resolve } from 'pathe'
-import type { Context } from '../context.js'
 
 export async function storySource(ctx: Context, id: string) {
   const storyId = id.slice('/__resolved__virtual:story-source:'.length)

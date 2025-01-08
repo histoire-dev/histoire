@@ -1,24 +1,18 @@
-import { createRequire } from 'node:module'
-import flexsearch from 'flexsearch'
-import path from 'pathe'
-import { noCase } from 'change-case'
 import type { Context } from './context.js'
-import { loadModule } from './load.js'
-
-const require = createRequire(import.meta.url)
+import { noCase } from 'change-case'
 
 export async function generateTitleSearchData(ctx: Context) {
-  const searchIndex = await createIndex()
+  const searchIndex = []
   const { idMap, addToIdMap } = createIdMap()
 
   for (const storyFile of ctx.storyFiles) {
     if (storyFile.story) {
-      searchIndex.add({
+      searchIndex.push({
         id: addToIdMap(storyFile.story.id, 'story'),
         text: convertTitleToSentence(storyFile.story.title),
       })
       for (const variant of storyFile.story.variants) {
-        searchIndex.add({
+        searchIndex.push({
           id: addToIdMap(`${storyFile.story.id}:${variant.id}`, 'variant'),
           text: convertTitleToSentence(`${storyFile.story.title} ${variant.title}`),
         })
@@ -27,18 +21,18 @@ export async function generateTitleSearchData(ctx: Context) {
   }
 
   return {
-    index: await exportSearchIndex(searchIndex),
+    index: searchIndex,
     idMap,
   }
 }
 
 export async function generateDocSearchData(ctx: Context) {
-  const searchIndex = await createIndex()
+  const searchIndex = []
   const { idMap, addToIdMap } = createIdMap()
 
   for (const storyFile of ctx.storyFiles) {
     if (storyFile.story && storyFile.story.docsText) {
-      searchIndex.add({
+      searchIndex.push({
         id: addToIdMap(storyFile.story.id, 'story'),
         text: storyFile.story.docsText,
       })
@@ -46,25 +40,9 @@ export async function generateDocSearchData(ctx: Context) {
   }
 
   return {
-    index: await exportSearchIndex(searchIndex),
+    index: searchIndex,
     idMap,
   }
-}
-
-async function createIndex() {
-  const flexsearchRoot = path.dirname(require.resolve('flexsearch/package.json'))
-  return new flexsearch.Document({
-    preset: 'match',
-    document: {
-      id: 'id',
-      index: [
-        'text',
-      ],
-    },
-    charset: await loadModule(`${flexsearchRoot}/dist/module/lang/latin/advanced.js`),
-    language: await loadModule(`${flexsearchRoot}/dist/module/lang/en.js`),
-    tokenize: 'forward',
-  })
 }
 
 function createIdMap() {
@@ -81,30 +59,6 @@ function createIdMap() {
     idMap,
     addToIdMap,
   }
-}
-
-const exportKeys = new Set([
-  'reg',
-  'text.cfg',
-  'text.map',
-  'text.ctx',
-  'tag',
-  'store',
-])
-
-async function exportSearchIndex(index) {
-  // eslint-disable-next-line no-async-promise-executor
-  return new Promise(async (resolve) => {
-    const exportedData: Record<string, any> = {}
-    const exportedKeys = new Set<string>()
-    await index.export((key, data) => {
-      exportedData[key] = data
-      exportedKeys.add(key)
-      if (exportedKeys.size === exportKeys.size) {
-        resolve(exportedData)
-      }
-    })
-  })
 }
 
 function convertTitleToSentence(text: string) {

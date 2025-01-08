@@ -5,24 +5,24 @@ export default {
 </script>
 
 <script lang="ts" setup>
+import type { StoryFile, Tree } from './types'
+import { useTitle } from '@vueuse/core'
 import { onUpdate, files as rawFiles, tree as rawTree } from 'virtual:$histoire-stories'
 import { computed, onMounted, ref, watch } from 'vue'
-import { useTitle } from '@vueuse/core'
-import StoryList from './components/tree/StoryList.vue'
-import BaseSplitPane from './components/base/BaseSplitPane.vue'
 import AppHeader from './components/app/AppHeader.vue'
-import type { StoryFile, Tree } from './types'
+import Breadcrumb from './components/app/Breadcrumb.vue'
+import InitialLoading from './components/app/InitialLoading.vue'
+import BaseSplitPane from './components/base/BaseSplitPane.vue'
+import CommandPromptsModal from './components/command/CommandPromptsModal.vue'
+import SearchModal from './components/search/SearchModal.vue'
+import GenericMountStory from './components/story/GenericMountStory.vue'
+import StoryList from './components/tree/StoryList.vue'
+import { useCommandStore } from './stores/command'
 import { useStoryStore } from './stores/story'
-import { mapFile } from './util/mapping'
 import { histoireConfig } from './util/config'
 import { onKeyboardShortcut } from './util/keyboard'
+import { mapFile } from './util/mapping'
 import { isMobile } from './util/responsive'
-import { useCommandStore } from './stores/command'
-import Breadcrumb from './components/app/Breadcrumb.vue'
-import SearchModal from './components/search/SearchModal.vue'
-import CommandPromptsModal from './components/command/CommandPromptsModal.vue'
-import InitialLoading from './components/app/InitialLoading.vue'
-import GenericMountStory from './components/story/GenericMountStory.vue'
 
 const files = ref<StoryFile[]>(rawFiles.map(file => mapFile(file)))
 const tree = ref<Tree>(rawTree)

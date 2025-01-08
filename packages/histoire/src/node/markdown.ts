@@ -1,19 +1,20 @@
-import MarkdownIt from 'markdown-it'
-import matter from 'gray-matter'
-import { getHighlighter } from 'shiki-es'
-import anchor from 'markdown-it-anchor'
-import attrs from 'markdown-it-attrs'
-import emoji from 'markdown-it-emoji'
+import type { ServerMarkdownFile } from '@histoire/shared'
 import type { Plugin as VitePlugin } from 'vite'
+import type { Context } from './context.js'
+import { kebabCase } from 'change-case'
 import chokidar from 'chokidar'
 import fs from 'fs-extra'
+import matter from 'gray-matter'
+import MarkdownIt from 'markdown-it'
+import anchor from 'markdown-it-anchor'
+import attrs from 'markdown-it-attrs'
+import { full as emoji } from 'markdown-it-emoji'
+import micromatch from 'micromatch'
 import path from 'pathe'
-import { paramCase } from 'change-case'
 import pc from 'picocolors'
-import type { ServerMarkdownFile } from '@histoire/shared'
-import { slugify } from './util/slugify.js'
-import type { Context } from './context.js'
+import { getHighlighter } from 'shiki-es'
 import { addStory, notifyStoryChange, removeStory } from './stories.js'
+import { slugify } from './util/slugify.js'
 
 const onMarkdownListChangeHandlers: (() => unknown)[] = []
 
@@ -137,9 +138,18 @@ export async function createMarkdownPlugins(ctx: Context) {
 export async function createMarkdownFilesWatcher(ctx: Context) {
   const md = await createMarkdownRendererWithPlugins(ctx)
 
-  const watcher = chokidar.watch(['**/*.story.md'], {
+  const watcher = chokidar.watch('.', {
     cwd: ctx.root,
-    ignored: ctx.config.storyIgnored,
+    ignored: (path, stats) => {
+      if (ctx.config.storyIgnored.some(pattern => micromatch.isMatch(path, pattern))) {
+        return true
+      }
+      if (micromatch.isMatch(path, '**/*.story.md')) {
+        return false
+      }
+
+      return stats?.isFile()
+    },
   })
 
   /**
@@ -167,7 +177,7 @@ export async function createMarkdownFilesWatcher(ctx: Context) {
     }
 
     const file: ServerMarkdownFile = {
-      id: paramCase(relativePath.toLowerCase()),
+      id: kebabCase(relativePath.toLowerCase()),
       relativePath,
       absolutePath,
       isRelatedToStory,
@@ -225,15 +235,15 @@ export async function createMarkdownFilesWatcher(ctx: Context) {
   }
 
   watcher
-    .on('add', async (relativePath) => {
-      await addFile(relativePath)
+    .on('add', (relativePath) => {
+      addFile(relativePath)
     })
     .on('unlink', (relativePath) => {
       removeFile(relativePath)
     })
 
   await new Promise((resolve) => {
-    watcher.once('ready', resolve)
+    watcher.once('ready', resolve as () => void)
   })
 
   try {
@@ -250,7 +260,7 @@ export async function createMarkdownFilesWatcher(ctx: Context) {
     }
   }
   catch (e) {
-    stop()
+    await stop()
     throw e
   }
 }

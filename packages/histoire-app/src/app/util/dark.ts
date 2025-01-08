@@ -1,5 +1,5 @@
-import { watch } from 'vue'
 import { useDark, useToggle } from '@vueuse/core'
+import { watch } from 'vue'
 import { histoireConfig } from './config.js'
 
 export const isDark = useDark({

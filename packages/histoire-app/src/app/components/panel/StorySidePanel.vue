@@ -3,13 +3,13 @@ import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useStoryStore } from '../../stores/story'
 
-import BaseSplitPane from '../base/BaseSplitPane.vue'
 import BaseEmpty from '../base/BaseEmpty.vue'
+import BaseSplitPane from '../base/BaseSplitPane.vue'
+import PaneTabs from './PaneTabs.vue'
 import StoryControls from './StoryControls.vue'
 import StoryDocs from './StoryDocs.vue'
 import StoryEvents from './StoryEvents.vue'
 import StorySourceCode from './StorySourceCode.vue'
-import PaneTabs from './PaneTabs.vue'
 
 const storyStore = useStoryStore()
 

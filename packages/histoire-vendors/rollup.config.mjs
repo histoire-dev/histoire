@@ -1,13 +1,13 @@
 import { createRequire } from 'node:module'
-import { fileURLToPath } from 'node:url'
 import path from 'node:path'
-import { defineConfig } from 'rollup'
-import ts from 'rollup-plugin-typescript2'
-import resolve from '@rollup/plugin-node-resolve'
+import { fileURLToPath } from 'node:url'
 import commonjs from '@rollup/plugin-commonjs'
+import resolve from '@rollup/plugin-node-resolve'
+import { execaSync } from 'execa'
 import fs from 'fs-extra'
 import { globbySync } from 'globby'
-import { execaSync } from 'execa'
+import { defineConfig } from 'rollup'
+import ts from 'rollup-plugin-typescript2'
 import { entries } from './entries.js'
 
 const require = createRequire(import.meta.url)
@@ -56,7 +56,7 @@ export default defineConfig({
             {
               let content = fs.readFileSync(file, 'utf-8')
               content = content.replace(/from '(.*)'/g, (match, p1) => {
-                const data = fs.readJsonSync(require.resolve(`${p1}/package.json`))
+                const data = fs.readJsonSync(require.resolve(`./node_modules/${p1}/package.json`))
                 const versionSelector = data.version
                 tempPkg.dependencies[p1] = versionSelector
                 return `from './node_modules/${p1}'`

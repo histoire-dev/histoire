@@ -1,19 +1,19 @@
-import { createRequire } from 'node:module'
-import { dirname, join, relative } from 'pathe'
 import type {
   InlineConfig,
   UserConfig as ViteConfig,
   Plugin as VitePlugin,
 } from 'vite'
+import type { Context } from './context.js'
+import { createRequire } from 'node:module'
+import { lookup as lookupMime } from 'mrmime'
+import { dirname, join, relative } from 'pathe'
 import {
   loadConfigFromFile as loadViteConfigFromFile,
   mergeConfig as mergeViteConfig,
 } from 'vite'
-import { lookup as lookupMime } from 'mrmime'
 import { APP_PATH, TEMP_PATH } from './alias.js'
-import type { Context } from './context.js'
-import { notifyStoryChange } from './stories.js'
 import { createMarkdownPlugins } from './markdown.js'
+import { notifyStoryChange } from './stories.js'
 import { createVirtualFilesPlugin } from './virtual/vite-plugin.js'
 
 const require = createRequire(import.meta.url)
@@ -93,7 +93,6 @@ export async function getViteConfigWithPlugins(isServer: boolean, ctx: Context):
           alias: {
             'histoire-style': join(APP_PATH, process.env.HISTOIRE_DEV ? 'app/style/main.pcss' : 'style.css'),
           },
-
           ...(isServer
             ? {
               // Force resolving deps like Node.JS resolution algorithm (in case some modules are not loaded with ssr: true e.g. .vue files)

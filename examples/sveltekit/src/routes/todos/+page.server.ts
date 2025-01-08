@@ -1,6 +1,6 @@
+import type { Action, PageServerLoad } from './$types'
 import { error } from '@sveltejs/kit'
 import { api } from './api'
-import type { Action, PageServerLoad } from './$types'
 
 interface Todo {
   uid: string

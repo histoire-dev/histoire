@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 import { ref } from 'vue'
+import BaseButton from './BaseButton.vue'
 import ModalWithSlots from './ModalWithSlots.vue'
 import SlotWithProps from './SlotWithProps.vue'
-import BaseButton from './BaseButton.vue'
 
 const vTooltip = {
   mounted: (el, { value }) => {

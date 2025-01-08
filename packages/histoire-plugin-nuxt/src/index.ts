@@ -1,9 +1,9 @@
-import { fileURLToPath } from 'node:url'
-import { join } from 'node:path'
-import replace from '@rollup/plugin-replace'
-import type { Plugin } from 'histoire'
 import type { Nuxt } from '@nuxt/schema'
+import type { Plugin } from 'histoire'
 import type { UserConfig as ViteConfig } from 'vite'
+import { join } from 'node:path'
+import { fileURLToPath } from 'node:url'
+import replace from '@rollup/plugin-replace'
 
 const ignorePlugins = [
   'nuxt:vite-node-server',
@@ -169,7 +169,7 @@ async function useNuxtViteConfig() {
 
         nuxt.hook('vite:configResolved', (config, { isClient }) => {
           if (isClient) {
-            resolve(config)
+            resolve(config as any)
           }
         })
       })

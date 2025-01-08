@@ -1,10 +1,10 @@
 <script lang="ts" setup>
-import { computed, toRefs } from 'vue'
-import BaseTab from '../base/BaseTab.vue'
-import { useEventsStore } from '../../stores/events'
 import type { Story, Variant } from '../../types'
+import { computed, toRefs } from 'vue'
+import { useEventsStore } from '../../stores/events'
 import BaseOverflowMenu from '../base/BaseOverflowMenu.vue'
 import BaseOverflowTab from '../base/BaseOverflowTab.vue'
+import BaseTab from '../base/BaseTab.vue'
 import BaseTag from '../base/BaseTag.vue'
 import { useStoryDoc } from './StoryDocs.vue'
 

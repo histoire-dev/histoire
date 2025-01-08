@@ -1,18 +1,18 @@
-import { parseQuery } from 'vue-router'
-import { computed, createApp, h, onMounted, ref, watch } from 'vue'
-import { createPinia } from 'pinia'
+import type { StoryFile } from './types'
 import { applyState } from '@histoire/shared'
+import { createPinia } from 'pinia'
 import { files } from 'virtual:$histoire-stories'
+import { computed, createApp, h, onMounted, ref, watch } from 'vue'
+import { parseQuery } from 'vue-router'
 import GenericMountStory from './components/story/GenericMountStory.vue'
 import GenericRenderStory from './components/story/GenericRenderStory.vue'
-import type { StoryFile } from './types'
-import { mapFile } from './util/mapping'
-import { PREVIEW_SETTINGS_SYNC, SANDBOX_READY, STATE_SYNC } from './util/const.js'
-import { applyPreviewSettings } from './util/preview-settings.js'
-import { isDark } from './util/dark.js'
-import { histoireConfig } from './util/config.js'
-import { toRawDeep } from './util/state.js'
 import { setupPluginApi } from './plugin.js'
+import { histoireConfig } from './util/config.js'
+import { PREVIEW_SETTINGS_SYNC, SANDBOX_READY, STATE_SYNC } from './util/const.js'
+import { isDark } from './util/dark.js'
+import { mapFile } from './util/mapping'
+import { applyPreviewSettings } from './util/preview-settings.js'
+import { toRawDeep } from './util/state.js'
 
 const query = parseQuery(window.location.search)
 const file = ref<StoryFile>(mapFile(files.find(f => f.id === query.storyId)))
@@ -71,15 +71,11 @@ const app = createApp({
         }),
       ]),
       this.story && this.variant
-        ? h(GenericRenderStory, {
-          story: this.story,
-          variant: this.variant,
-          onReady: () => {
-            window.parent?.postMessage({
-              type: SANDBOX_READY,
-            })
-          },
-        })
+        ? h(GenericRenderStory, { story: this.story, variant: this.variant, onReady: () => {
+          window.parent?.postMessage({
+            type: SANDBOX_READY,
+          })
+        } })
         : null,
     ]
   },

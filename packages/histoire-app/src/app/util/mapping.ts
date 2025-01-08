@@ -1,5 +1,5 @@
-import { markRaw, reactive } from 'vue'
 import type { StoryFile, Variant } from '../types'
+import { markRaw, reactive } from 'vue'
 
 const copiedFromExistingVariant = [
   'state',

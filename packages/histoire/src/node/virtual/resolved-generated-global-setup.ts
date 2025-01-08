@@ -1,6 +1,6 @@
 import type { Context } from '../context.js'
-import { ID_SEPARATOR } from './util.js'
 import { GENERATED_SETUP_CODE } from './index.js'
+import { ID_SEPARATOR } from './util.js'
 
 export function resolvedGeneratedGlobalSetup(ctx: Context) {
   if (ctx.config.setupCode) {

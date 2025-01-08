@@ -1,6 +1,6 @@
 import type { Plugin, PluginApiBase } from '@histoire/shared'
-import { getInjectedImport } from '../util/vendors.js'
 import { findUp } from '../util/find-up.js'
+import { getInjectedImport } from '../util/vendors.js'
 
 export interface TailwindTokensOptions {
   configFile?: string

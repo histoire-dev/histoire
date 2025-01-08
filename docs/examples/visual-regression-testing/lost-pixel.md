@@ -8,8 +8,8 @@ Lost Pixel has first-class Histoire support meaning that you don't need to do mu
 
 Start with installing lost-pixel by `npm install lost-pixel` and creating a `lostpixel.config.js|ts` file with following contents.
 
-```javascript
-import { CustomProjectConfig } from 'lost-pixel';
+```ts
+import { CustomProjectConfig } from 'lost-pixel'
 
 export const config: CustomProjectConfig = {
   histoireShots: {
@@ -17,7 +17,7 @@ export const config: CustomProjectConfig = {
   },
   generateOnly: true,
   failOnDifference: true
-};
+}
 ```
 **Before running visual tests you need to have your Histoire book built first**.
 

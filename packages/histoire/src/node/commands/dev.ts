@@ -1,3 +1,4 @@
+import type { FSWatcher } from 'chokidar'
 import chokidar from 'chokidar'
 import pc from 'picocolors'
 import { resolveConfigFile } from '../config.js'
@@ -25,7 +26,7 @@ export async function devCommand(options: DevOptions) {
     server.printUrls()
 
     // Histoire config watcher
-    let watcher: chokidar.FSWatcher
+    let watcher: FSWatcher
     if (viteConfigFile) {
       watcher = chokidar.watch(viteConfigFile, {
         ignoreInitial: true,

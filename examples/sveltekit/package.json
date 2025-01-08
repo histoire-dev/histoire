@@ -15,20 +15,20 @@
     "story:preview": "histoire preview --port 4567"
   },
   "dependencies": {
-    "@fontsource/fira-mono": "^4.5.10",
-    "cookie": "^0.4.2"
+    "@fontsource/fira-mono": "^5.1.0",
+    "cookie": "^1.0.2"
   },
   "devDependencies": {
     "@histoire/plugin-svelte": "workspace:*",
-    "@sveltejs/adapter-auto": "^1.0.3",
-    "@sveltejs/kit": "^1.27.6",
-    "@types/cookie": "^0.5.4",
+    "@sveltejs/adapter-auto": "^3.3.1",
+    "@sveltejs/kit": "^2.9.0",
+    "@types/cookie": "^1.0.0",
     "histoire": "workspace:*",
-    "svelte": "^3.59.2",
-    "svelte-check": "^2.10.3",
-    "svelte-preprocess": "^4.10.7",
-    "tslib": "^2.6.2",
-    "typescript": "^5.4.4",
-    "vite": "^5.0.11"
+    "svelte": "^5.7.0",
+    "svelte-check": "^4.1.1",
+    "svelte-preprocess": "^6.0.3",
+    "tslib": "^2.8.1",
+    "typescript": "5.6.3",
+    "vite": "^6.0.5"
   }
 }

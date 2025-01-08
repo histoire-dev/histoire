@@ -1,17 +1,17 @@
-import { MessageChannel } from 'node:worker_threads'
-import { cpus } from 'node:os'
+import type { ServerStoryFile } from '@histoire/shared'
 import type { ViteDevServer } from 'vite'
-import { ViteNodeServer } from 'vite-node/server'
 import type { FetchFunction, ResolveIdFunction } from 'vite-node'
-import { relative } from 'pathe'
-import pc from 'picocolors'
+import type { Context } from '../context.js'
+import type { Payload, ReturnData } from './worker.js'
+import { cpus } from 'node:os'
+import { MessageChannel } from 'node:worker_threads'
 import Tinypool from '@akryum/tinypool'
 import { createBirpc } from 'birpc'
-import type { ServerStoryFile } from '@histoire/shared'
+import { relative } from 'pathe'
+import pc from 'picocolors'
+import { ViteNodeServer } from 'vite-node/server'
 import { createPath } from '../tree.js'
-import type { Context } from '../context.js'
 import { slash } from '../util/fs.js'
-import type { Payload, ReturnData } from './worker.js'
 
 export interface UseCollectStoriesOptions {
   server: ViteDevServer
@@ -22,13 +22,13 @@ export interface UseCollectStoriesOptions {
 export function useCollectStories(options: UseCollectStoriesOptions, ctx: Context) {
   const { server, mainServer } = options
 
-  const node = new ViteNodeServer(server, {
+  const node = new ViteNodeServer(server as any, {
     deps: {
       inline: [
         /histoire\/dist/,
         /histoire\/client/,
-        /@histoire\/[\w\d-]+\/dist/,
-        /histoire-[\w\d-]+\/dist/,
+        /@histoire\/[\w-]+\/dist/,
+        /histoire-[\w-]+\/dist/,
         /@vue\/devtools-api/,
         /vuetify/,
         // @TODO temporary fix for https://github.com/histoire-dev/histoire/issues/409

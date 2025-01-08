@@ -2,7 +2,8 @@
 
 describe('State Options API', () => {
   const getIframeBody = () => cy.get('iframe[data-test-id="preview-iframe"]')
-    .its('0.contentDocument.body').should('not.be.empty')
+    .its('0.contentDocument.body')
+    .should('not.be.empty')
     .then(cy.wrap)
 
   beforeEach(() => {
@@ -18,7 +19,8 @@ describe('State Options API', () => {
 
 describe('State Setup API', () => {
   const getIframeBody = () => cy.get('iframe[data-test-id="preview-iframe"]')
-    .its('0.contentDocument.body').should('not.be.empty')
+    .its('0.contentDocument.body')
+    .should('not.be.empty')
     .then(cy.wrap)
 
   beforeEach(() => {
@@ -37,7 +39,8 @@ describe('State Setup API', () => {
 
 describe('State Setup API (2)', () => {
   const getIframeBody = () => cy.get('iframe[data-test-id="preview-iframe"]')
-    .its('0.contentDocument.body').should('not.be.empty')
+    .its('0.contentDocument.body')
+    .should('not.be.empty')
     .then(cy.wrap)
 
   beforeEach(() => {

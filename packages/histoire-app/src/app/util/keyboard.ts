@@ -1,5 +1,5 @@
-import { useEventListener } from '@vueuse/core'
 import type { Ref } from 'vue'
+import { useEventListener } from '@vueuse/core'
 import { isRef } from 'vue'
 import { isMac } from './env.js'
 

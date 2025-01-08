@@ -1,5 +1,5 @@
-import { watch as _watch } from '@histoire/vendors/vue'
 import { applyState, clone } from '@histoire/shared'
+import { watch as _watch } from '@histoire/vendors/vue'
 
 function cleanupState(state: Record<string, any>): Record<string, any> {
   const result = {}

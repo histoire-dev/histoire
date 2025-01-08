@@ -1,13 +1,13 @@
 <script lang="ts" setup>
 import type { Ref } from 'vue'
-import { computed, onUnmounted, ref } from 'vue'
-import { useEventListener } from '@vueuse/core'
-import { Icon } from '@iconify/vue'
-import { VTooltip as vTooltip } from 'floating-vue'
-import HatchedPattern from '../misc/HatchedPattern.vue'
-import CheckerboardPattern from '../misc/CheckerboardPattern.vue'
-import { usePreviewSettingsStore } from '../../stores/preview-settings'
 import type { Variant } from '../../types'
+import { Icon } from '@iconify/vue'
+import { useEventListener } from '@vueuse/core'
+import { VTooltip as vTooltip } from 'floating-vue'
+import { computed, onUnmounted, ref } from 'vue'
+import { usePreviewSettingsStore } from '../../stores/preview-settings'
+import CheckerboardPattern from '../misc/CheckerboardPattern.vue'
+import HatchedPattern from '../misc/HatchedPattern.vue'
 
 const props = defineProps<{
   variant: Variant

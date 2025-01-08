@@ -1,7 +1,7 @@
-import fs from 'node:fs'
 import type { PluginCommand } from 'histoire'
-import path from 'pathe'
+import fs from 'node:fs'
 import launchEditor from 'launch-editor'
+import path from 'pathe'
 
 export default {
   id: 'histoire:plugin-vue:generate-story',

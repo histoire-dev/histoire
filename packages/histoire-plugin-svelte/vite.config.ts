@@ -1,7 +1,7 @@
-import { defineConfig } from 'vite'
 import { svelte } from '@sveltejs/vite-plugin-svelte'
 import fs from 'fs-extra'
 import { globbySync } from 'globby'
+import { defineConfig } from 'vite'
 import pkg from './package.json'
 
 export default defineConfig({

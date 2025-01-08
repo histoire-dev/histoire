@@ -5,9 +5,9 @@ export default {
 </script>
 
 <script lang="ts" setup>
+import type { Story } from '../../types'
 import { clientSupportPlugins } from 'virtual:$histoire-support-plugins-client'
 import { markRaw, ref, watchEffect } from 'vue'
-import type { Story } from '../../types'
 
 const props = defineProps<{
   story: Story

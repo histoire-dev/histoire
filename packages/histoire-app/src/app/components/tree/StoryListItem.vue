@@ -1,10 +1,10 @@
 <script lang="ts" setup>
+import type { Story } from '../../types'
 import { Icon } from '@iconify/vue'
 import { computed, ref, withDefaults } from 'vue'
 import { useRoute } from 'vue-router'
-import BaseListItemLink from '../base/BaseListItemLink.vue'
-import type { Story } from '../../types'
 import { useScrollOnActive } from '../../util/scroll'
+import BaseListItemLink from '../base/BaseListItemLink.vue'
 
 const props = withDefaults(defineProps<{
   story: Story

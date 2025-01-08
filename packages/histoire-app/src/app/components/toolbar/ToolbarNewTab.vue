@@ -1,7 +1,7 @@
 <script lang="ts" setup>
+import type { Story, Variant } from '../../types'
 import { Icon } from '@iconify/vue'
 import { computed } from 'vue'
-import type { Story, Variant } from '../../types'
 import { getSandboxUrl } from '../../util/sandbox'
 
 const props = defineProps<{

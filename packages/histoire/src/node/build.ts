@@ -1,33 +1,33 @@
-import { performance } from 'node:perf_hooks'
-import { join } from 'pathe'
-import type {
-  InlineConfig as ViteInlineConfig,
-  Plugin as VitePlugin,
-} from 'vite'
-import {
-  createServer as createViteServer,
-  mergeConfig as mergeViteConfig,
-  build as viteBuild,
-} from 'vite'
-import fs from 'fs-extra'
-import { lookup as lookupMime } from 'mrmime'
-import pc from 'picocolors'
 import type {
   BuildEndCallback,
   ChangeViteConfigCallback,
   PreviewStoryCallback,
 } from '@histoire/shared'
 import type { RollupOutput } from 'rollup'
-import { APP_PATH } from './alias.js'
+import type {
+  InlineConfig as ViteInlineConfig,
+  Plugin as VitePlugin,
+} from 'vite'
 import type { Context } from './context.js'
-import { getViteConfigWithPlugins } from './vite.js'
-import { findAllStories } from './stories.js'
-import { useCollectStories } from './collect/index.js'
-import { BuildPluginApi } from './plugin.js'
-import { useModuleLoader } from './load.js'
-import { startPreview } from './preview.js'
-import { createMarkdownFilesWatcher } from './markdown.js'
+import { performance } from 'node:perf_hooks'
+import fs from 'fs-extra'
+import { lookup as lookupMime } from 'mrmime'
+import { join } from 'pathe'
+import pc from 'picocolors'
+import {
+  createServer as createViteServer,
+  mergeConfig as mergeViteConfig,
+  build as viteBuild,
+} from 'vite'
+import { APP_PATH } from './alias.js'
 import { getSerializedStoryData } from './build-serialize.js'
+import { useCollectStories } from './collect/index.js'
+import { useModuleLoader } from './load.js'
+import { createMarkdownFilesWatcher } from './markdown.js'
+import { BuildPluginApi } from './plugin.js'
+import { startPreview } from './preview.js'
+import { findAllStories } from './stories.js'
+import { getViteConfigWithPlugins } from './vite.js'
 
 const PRELOAD_MODULES = [
   'vendor',

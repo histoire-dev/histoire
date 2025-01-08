@@ -1,5 +1,3 @@
-import type { ResolvedConfig } from 'vite'
-import { resolveConfig as resolveViteConfig } from 'vite'
 import type {
   ConfigMode,
   FinalSupportPlugin,
@@ -8,6 +6,8 @@ import type {
   ServerMarkdownFile,
   ServerStoryFile,
 } from '@histoire/shared'
+import type { ResolvedConfig } from 'vite'
+import { resolveConfig as resolveViteConfig } from 'vite'
 import { processConfig, resolveConfig } from './config.js'
 import { mergeHistoireViteConfig } from './vite.js'
 

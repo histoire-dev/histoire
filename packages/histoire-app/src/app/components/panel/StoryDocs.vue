@@ -1,20 +1,20 @@
 <script lang="ts">
 import type { PropType, Ref } from 'vue'
-import { computed, nextTick, ref, toRefs, watch, watchEffect } from 'vue'
-import { markdownFiles } from 'virtual:$histoire-markdown-files'
-import { Icon } from '@iconify/vue'
-import { useRoute, useRouter } from 'vue-router'
 import type { Story } from '../../types'
+import { Icon } from '@iconify/vue'
+import { markdownFiles } from 'virtual:$histoire-markdown-files'
+import { computed, nextTick, ref, toRefs, watch, watchEffect } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { histoireConfig } from '../../util/config.js'
-import DevOnlyToolbarOpenInEditor from '../toolbar/DevOnlyToolbarOpenInEditor.vue'
 import BaseEmpty from '../base/BaseEmpty.vue'
+import DevOnlyToolbarOpenInEditor from '../toolbar/DevOnlyToolbarOpenInEditor.vue'
 
 export function useStoryDoc(story: Ref<Story>) {
   const renderedDoc = ref('')
 
   watchEffect(async () => {
     // Markdown file
-    const mdKey = story.value.file.filePath.replace(/\.(\w*?)$/, '.md')
+    const mdKey = story.value.file.filePath.replace(/\.(\w*)$/, '.md')
     if (markdownFiles[mdKey]) {
       const md = await markdownFiles[mdKey]()
       renderedDoc.value = md.html

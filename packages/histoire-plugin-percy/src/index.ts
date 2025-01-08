@@ -1,10 +1,10 @@
-import { fileURLToPath } from 'node:url'
-import { createRequire } from 'node:module'
 import type { Plugin } from 'histoire'
+import type { Page, WaitForOptions } from 'puppeteer'
+import { createRequire } from 'node:module'
+import { fileURLToPath } from 'node:url'
+import { fetchPercyDOM, isPercyEnabled, postSnapshot } from '@percy/sdk-utils'
 import { defu } from 'defu'
 import path from 'pathe'
-import { fetchPercyDOM, isPercyEnabled, postSnapshot } from '@percy/sdk-utils'
-import type { JSONObject, Page, WaitForOptions } from 'puppeteer'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const require = createRequire(import.meta.url)
@@ -148,7 +148,7 @@ export function HstPercy(options: PercyPluginOptions = {}): Plugin {
         const domSnapshot = await page.evaluate((opts) => {
           // @ts-expect-error window global var
           return window.PercyDOM.serialize(opts)
-        }, percyOptions as JSONObject)
+        }, percyOptions)
         await postSnapshot({
           ...percyOptions,
           environmentInfo: ENV_INFO,

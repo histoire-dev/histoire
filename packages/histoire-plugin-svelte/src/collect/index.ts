@@ -1,11 +1,11 @@
 import type { ServerRunPayload } from '@histoire/shared'
-// @ts-expect-error virtual module id
-import * as setup from 'virtual:$histoire-setup'
+import type { SvelteComponent } from 'svelte'
+import type { SvelteStorySetupApi } from '../helpers.js'
+import { tick } from 'svelte'
 // @ts-expect-error virtual module id
 import * as generatedSetup from 'virtual:$histoire-generated-global-setup'
-import type { SvelteComponent } from 'svelte'
-import { tick } from 'svelte'
-import type { SvelteStorySetupApi } from '../helpers.js'
+// @ts-expect-error virtual module id
+import * as setup from 'virtual:$histoire-setup'
 import Story from './Story.svelte'
 import Variant from './Variant.svelte'
 
