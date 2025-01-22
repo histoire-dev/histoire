@@ -1,3 +1,41 @@
+## v1.0.0-alpha.1
+
+[compare changes](https://github.com/Akryum/histoire/compare/v0.17.17...v1.0.0-alpha.1)
+
+### 🚀 Enhancements
+
+- Support Vite 6 and update deps ([#770](https://github.com/Akryum/histoire/pull/770))
+
+### 🩹 Fixes
+
+- Make ResponsivePreset.height Type Nullable ([#722](https://github.com/Akryum/histoire/pull/722))
+- Handle ESM Tailwindconfigs ([#667](https://github.com/Akryum/histoire/pull/667), [#723](https://github.com/Akryum/histoire/pull/723))
+- Disable optimizer in vite-node for vite 6 compat ([#756](https://github.com/Akryum/histoire/pull/756))
+
+### 📖 Documentation
+
+- **lost-pixel:** Typo in the label ([#726](https://github.com/Akryum/histoire/pull/726))
+- Note about continuous releases ([4fd41ab](https://github.com/Akryum/histoire/commit/4fd41ab))
+- Switch to nightly.akryum.dev ([76bd44e](https://github.com/Akryum/histoire/commit/76bd44e))
+
+### 🏡 Chore
+
+- Generate declaration maps ([d139b28](https://github.com/Akryum/histoire/commit/d139b28))
+- Update node and pnpm ([1485149](https://github.com/Akryum/histoire/commit/1485149))
+
+### 🤖 CI
+
+- Continuous builds ([0c4a6ea](https://github.com/Akryum/histoire/commit/0c4a6ea))
+- Fix pnpm version ([5ca2939](https://github.com/Akryum/histoire/commit/5ca2939))
+
+### ❤️ Contributors
+
+- Hugo ATTAL ([@hugoattal](http://github.com/hugoattal))
+- 翠 / Green <green@sapphi.red>
+- Guillaume Chau ([@Akryum](http://github.com/Akryum))
+- Joachim Schwarm <joachim@schwarm.co>
+- Maarten Knijnenberg <m.knijnenberg@gmail.com>
+
 ## v0.17.17
 
 [compare changes](https://github.com/Akryum/histoire/compare/v0.17.16...v0.17.17)
