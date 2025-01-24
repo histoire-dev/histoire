@@ -2,13 +2,13 @@
   "name": "histoire-monorepo",
   "version": "1.0.0-alpha.1",
   "private": true,
-  "packageManager": "pnpm@9.7.1",
+  "packageManager": "pnpm@9.15.4",
   "repository": {
     "url": "https://github.com/Akryum/histoire.git",
     "type": "git"
   },
   "engines": {
-    "node": ">14.5.0"
+    "node": ">22"
   },
   "scripts": {
     "lint": "eslint . --cache",
