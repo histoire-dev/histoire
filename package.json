@@ -8,7 +8,7 @@
     "type": "git"
   },
   "engines": {
-    "node": ">22"
+    "node": ">=22"
   },
   "scripts": {
     "lint": "eslint . --cache",
