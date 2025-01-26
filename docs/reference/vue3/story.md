@@ -175,7 +175,7 @@ const source = `<h1>Toto</h1>
 
 ## `responsiveDisabled`
 
-Disables the responsive menu, preview resize handles and makes the preview laways fit the available space.
+Disables the responsive menu, preview resize handles and makes the preview always fit the available space.
 
 ```vue
 <template>
