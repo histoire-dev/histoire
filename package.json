@@ -63,7 +63,12 @@
       }
     },
     "onlyBuiltDependencies": [
-      "svelte-preprocess"
+      "@parcel/watcher",
+      "cypress",
+      "esbuild",
+      "puppeteer",
+      "svelte-preprocess",
+      "vue-demi"
     ]
   }
 }
