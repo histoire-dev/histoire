@@ -1,3 +1,30 @@
+## v1.0.0-alpha.2
+
+[compare changes](https://github.com/Akryum/histoire/compare/v1.0.0-alpha.1...v1.0.0-alpha.2)
+
+### 🩹 Fixes
+
+- **nuxt:** Do not auto-import idle callback polyfills ([#777](https://github.com/Akryum/histoire/pull/777))
+- Add more packages to onlyBuiltsDependencies ([f96b0ef](https://github.com/Akryum/histoire/commit/f96b0ef))
+
+### 🏡 Chore
+
+- Update node and pnpm ([cf54a24](https://github.com/Akryum/histoire/commit/cf54a24))
+- Refresh lockfile ([184b555](https://github.com/Akryum/histoire/commit/184b555))
+- Update to pnpm 10 ([ffcdea5](https://github.com/Akryum/histoire/commit/ffcdea5))
+- Refresh deps ([c8e6108](https://github.com/Akryum/histoire/commit/c8e6108))
+- Hoist postcss packages ([cfb06fd](https://github.com/Akryum/histoire/commit/cfb06fd))
+
+### ✅ Tests
+
+- **ci:** Remove nuxt and svelte from the CI test ([#781](https://github.com/Akryum/histoire/pull/781))
+
+### ❤️ Contributors
+
+- Guillaume Chau ([@Akryum](http://github.com/Akryum))
+- Hugo ATTAL ([@hugoattal](http://github.com/hugoattal))
+- Daniel Roe ([@danielroe](http://github.com/danielroe))
+
 ## v1.0.0-alpha.1
 
 [compare changes](https://github.com/Akryum/histoire/compare/v0.17.17...v1.0.0-alpha.1)
