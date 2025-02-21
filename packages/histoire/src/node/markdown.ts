@@ -12,7 +12,7 @@ import { full as emoji } from 'markdown-it-emoji'
 import micromatch from 'micromatch'
 import path from 'pathe'
 import pc from 'picocolors'
-import { getHighlighter } from 'shiki-es'
+import { bundledLanguages, createHighlighter } from 'shiki'
 import { addStory, notifyStoryChange, removeStory } from './stories.js'
 import { slugify } from './util/slugify.js'
 
@@ -29,14 +29,13 @@ function notifyMarkdownListChange() {
 }
 
 export async function createMarkdownRenderer(ctx: Context) {
-  const highlighter = await getHighlighter({
-    theme: 'github-dark',
+  const highlighter = await createHighlighter({
+    themes: ['github-dark'],
+    langs: Object.keys(bundledLanguages), // not ideal but markdown-it does not provide async highlight
   })
 
   const md = new MarkdownIt({
-    highlight: (code, lang) => `<div class="htw-relative htw-not-prose __histoire-code"><div class="htw-absolute htw-top-0 htw-right-0 htw-text-xs htw-text-white/40">${lang}</div>${highlighter.codeToHtml(code, {
-      lang,
-    })}</div>`,
+    highlight: (code, lang) => `<div class="htw-relative htw-not-prose __histoire-code"><div class="htw-absolute htw-top-0 htw-right-0 htw-text-xs htw-text-white/40">${lang}</div>${highlighter.codeToHtml(code, { theme: 'github-dark', lang })}</div>`,
     linkify: true,
     html: true,
     breaks: false,

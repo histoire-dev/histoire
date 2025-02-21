@@ -1,10 +1,10 @@
 <script lang="ts" setup>
-import type { Highlighter } from 'shiki-es'
+import type { Highlighter } from 'shiki'
 import type { Story, Variant } from '../../types'
 import { HstCopyIcon } from '@histoire/controls'
 import { unindent } from '@histoire/shared'
 import { Icon } from '@iconify/vue'
-import { getHighlighter } from 'shiki-es'
+import { createHighlighter } from 'shiki'
 import { clientSupportPlugins } from 'virtual:$histoire-support-plugins-client'
 import { computed, markRaw, nextTick, onMounted, ref, shallowRef, watch, watchEffect } from 'vue'
 import { isDark } from '../../util/dark'
@@ -87,7 +87,7 @@ const displayedSourceCode = computed(() => {
 // HTML render
 
 onMounted(async () => {
-  highlighter.value = await getHighlighter({
+  highlighter.value = await createHighlighter({
     langs: [
       'html',
       'jsx',
