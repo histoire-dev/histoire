@@ -38,6 +38,7 @@ This mono-repo contains the following packages:
 1. Install dependencies with [pnpm](https://pnpm.io/):
 
 ```sh
+node corepack enable
 pnpm i
 ```
 
