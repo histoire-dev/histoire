@@ -5,6 +5,7 @@
 ### 🩹 Fixes
 
 - **nuxt:** Do not auto-import idle callback polyfills ([#777](https://github.com/Akryum/histoire/pull/777))
+- update to shiki v1 [#683](https://github.com/histoire-dev/histoire/pull/683)
 - Add more packages to onlyBuiltsDependencies ([f96b0ef](https://github.com/Akryum/histoire/commit/f96b0ef))
 
 ### 🏡 Chore
@@ -17,13 +18,14 @@
 
 ### ✅ Tests
 
-- **ci:** Remove nuxt and svelte from the CI test ([#781](https://github.com/Akryum/histoire/pull/781))
+  - **ci:** Remove nuxt and svelte from the CI test ([#781](https://github.com/Akryum/histoire/pull/781))
 
-### ❤️ Contributors
+### ❤️  Contributors
 
 - Guillaume Chau ([@Akryum](http://github.com/Akryum))
 - Hugo ATTAL ([@hugoattal](http://github.com/hugoattal))
 - Daniel Roe ([@danielroe](http://github.com/danielroe))
+- Harlan Wilton ([@harlan-zw](https://github.com/harlan-zw))
 
 ## v1.0.0-alpha.1
 
