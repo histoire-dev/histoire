@@ -31,11 +31,11 @@ export async function setupNuxtApp(publicConfig: PublicRuntimeConfig) {
 
   win.IntersectionObserver
       = win.IntersectionObserver
-      || class IntersectionObserver {
-        observe() {
+        || class IntersectionObserver {
+          observe() {
           // noop
+          }
         }
-      }
 
   const h3App = createApp()
 

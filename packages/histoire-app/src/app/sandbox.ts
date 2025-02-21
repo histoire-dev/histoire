@@ -72,10 +72,10 @@ const app = createApp({
       ]),
       this.story && this.variant
         ? h(GenericRenderStory, { story: this.story, variant: this.variant, onReady: () => {
-          window.parent?.postMessage({
-            type: SANDBOX_READY,
-          })
-        } })
+            window.parent?.postMessage({
+              type: SANDBOX_READY,
+            })
+          } })
         : null,
     ]
   },
