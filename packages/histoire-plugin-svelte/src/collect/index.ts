@@ -1,7 +1,8 @@
 import type { ServerRunPayload } from '@histoire/shared'
 import type { SvelteComponent } from 'svelte'
 import type { SvelteStorySetupApi } from '../helpers.js'
-import { tick } from 'svelte'
+import { tick, unmount } from 'svelte'
+
 // @ts-expect-error virtual module id
 import * as generatedSetup from 'virtual:$histoire-generated-global-setup'
 // @ts-expect-error virtual module id
@@ -61,5 +62,5 @@ export async function run({ file, el, storyData }: ServerRunPayload) {
     })
   }
 
-  app.$destroy()
+  unmount(app)
 }

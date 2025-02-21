@@ -18,6 +18,7 @@ import {
   onMounted,
   onUpdated,
   ref,
+  useTemplateRef,
 } from 'vue'
 import Story from './Story'
 import Variant from './Variant'
@@ -37,8 +38,8 @@ function wrapControlComponent(controlComponent) {
     name: controlComponent.name,
     inheritAttrs: false,
     setup(props, { attrs }) {
-      const el = ref<HTMLDivElement>()
-      const slotEl = ref<HTMLDivElement>()
+      const el = useTemplateRef<HTMLDivElement>('el')
+      const slotEl = useTemplateRef<HTMLDivElement>('slotEl')
 
       // Attrs
 

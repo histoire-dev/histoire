@@ -1,6 +1,6 @@
 import type { HstControlOption } from '@histoire/controls'
 import type { Story, StoryProps, Variant, VariantProps } from '@histoire/shared'
-import type { SvelteComponentTyped } from 'svelte'
+import type { SvelteComponent } from 'svelte'
 
 export interface SvelteStorySetupApi {
   app: any
@@ -16,76 +16,76 @@ export function defineSetupSvelte(handler: SvelteStorySetupHandler): SvelteStory
 
 export interface Hst {
   // Main built-ins
-  Story: typeof SvelteComponentTyped<StoryProps>
-  Variant: typeof SvelteComponentTyped<VariantProps>
+  Story: typeof SvelteComponent<StoryProps>
+  Variant: typeof SvelteComponent<VariantProps>
   // Controls
-  Button: typeof SvelteComponentTyped
-  ButtonGroup: typeof SvelteComponentTyped<{
+  Button: typeof SvelteComponent
+  ButtonGroup: typeof SvelteComponent<{
     value?: string
     options: (string | HstControlOption)[]
     title?: string
   }>
-  Checkbox: typeof SvelteComponentTyped<{
+  Checkbox: typeof SvelteComponent<{
     value?: boolean
     title: string
   }>
-  CheckboxList: typeof SvelteComponentTyped<{
+  CheckboxList: typeof SvelteComponent<{
     value: string[]
     options: (string | HstControlOption)[]
     title?: string
   }>
-  Text: typeof SvelteComponentTyped<{
+  Text: typeof SvelteComponent<{
     value?: string
     title: string
   }>
-  Number: typeof SvelteComponentTyped<{
+  Number: typeof SvelteComponent<{
     value?: number
     title: string
     step?: number
   }>
-  Slider: typeof SvelteComponentTyped<{
+  Slider: typeof SvelteComponent<{
     value?: number
     title: string
     min: number
     max: number
     step?: number
   }>
-  Textarea: typeof SvelteComponentTyped<{
+  Textarea: typeof SvelteComponent<{
     value?: string
     title: string
   }>
-  Select: typeof SvelteComponentTyped<{
+  Select: typeof SvelteComponent<{
     value?: string
     title: string
     options: Record<string, any> | string[] | HstControlOption[]
   }>
-  Radio: typeof SvelteComponentTyped<{
+  Radio: typeof SvelteComponent<{
     value?: string
     options: HstControlOption[]
     title?: string
   }>
-  Json: typeof SvelteComponentTyped<{
+  Json: typeof SvelteComponent<{
     value: unknown
     title: string
   }>
-  Shades: typeof SvelteComponentTyped<{
+  Shades: typeof SvelteComponent<{
     shades: Record<string, any>
     getName?: (key: string, color: string) => string
     search?: string
   }>
-  TokenList: typeof SvelteComponentTyped<{
+  TokenList: typeof SvelteComponent<{
     tokens: Record<string, string | number | any[] | Record<string, any>>
     getName?: (key: string, value: string | number | any[] | Record<string, any>) => string
   }>
-  TokenGrid: typeof SvelteComponentTyped<{
+  TokenGrid: typeof SvelteComponent<{
     tokens: Record<string, string | number | any[] | Record<string, any>>
     getName?: (key: string, value: string | number | any[] | Record<string, any>) => string
     colSize?: number
   }>
-  CopyIcon: typeof SvelteComponentTyped<{
+  CopyIcon: typeof SvelteComponent<{
     content: string
   }>
-  ColorSelect: typeof SvelteComponentTyped<{
+  ColorSelect: typeof SvelteComponent<{
     value?: string
     title: string
   }>

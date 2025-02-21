@@ -9,7 +9,7 @@ import {
   h as _h,
   onMounted as _onMounted,
   onUnmounted as _onUnmounted,
-  ref as _ref,
+  useTemplateRef as _useTemplateRef,
   watch as _watch,
 } from '@histoire/vendors/vue'
 // @ts-expect-error virtual module id
@@ -31,7 +31,7 @@ export default _defineComponent({
   },
 
   setup(props) {
-    const el = _ref<HTMLDivElement>()
+    const el = _useTemplateRef<HTMLDivElement>('el')
     let app: App
 
     async function mountStory() {

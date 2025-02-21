@@ -10,7 +10,7 @@ import {
   h as _h,
   onBeforeUnmount as _onBeforeUnmount,
   onMounted as _onMounted,
-  ref as _ref,
+  useTemplateRef as _useTemplateRef,
   watch as _watch,
 } from '@histoire/vendors/vue'
 // @ts-expect-error virtual module id
@@ -48,7 +48,7 @@ export default _defineComponent({
   },
 
   setup(props, { emit }) {
-    const sandbox = _ref<HTMLDivElement>()
+    const sandbox = _useTemplateRef<HTMLDivElement>('sandbox')
     let app: App
     let mounting = false
 

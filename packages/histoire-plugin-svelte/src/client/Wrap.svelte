@@ -1,5 +1,5 @@
 <script lang="ts">
-import { onMount, createEventDispatcher } from 'svelte'
+import { onMount } from 'svelte'
 import {
   createApp as _createApp,
   h as _h,
@@ -7,10 +7,7 @@ import {
   reactive as _reactive,
 } from '@histoire/vendors/vue'
 
-export let controlComponent
-export let value
-
-const dispatch = createEventDispatcher()
+let { controlComponent, value, inflate, ...rest } = $props();
 
 let el: HTMLDivElement
 
@@ -29,7 +26,7 @@ function updateState (value, attrs) {
 }
 
 onMount(() => {
-  updateState(value, $$restProps)
+  updateState(value, rest)
 
   app = _createApp({
     render () {
@@ -42,7 +39,7 @@ onMount(() => {
             if (key === 'update:modelValue') {
               value = args[0]
             } else {
-              dispatch(key, ...args)
+              inflate(...args)
             }
           }
         }
@@ -59,7 +56,7 @@ onMount(() => {
   app.mount(el)
 })
 
-$: updateState(value, $$restProps)
+$effect(()=>updateState(value, rest))
 </script>
 
 <div bind:this={el}>

@@ -2,10 +2,7 @@
 import { ServerStory, ServerVariant } from '@histoire/shared'
 import { getContext } from 'svelte'
 
-export let title: string = 'untitled'
-export let id: string = null
-export let icon: string = null
-export let iconColor: string = null
+let {title="untitled", id=null, icon=null, iconColor=null} = $props();
 
 const story: ServerStory = getContext('__hstStory')
 const addVariant: (variant: ServerVariant) => void = getContext('__hstAddVariant')

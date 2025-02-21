@@ -10,24 +10,24 @@ const index: { value: number } = getContext('__hstIndex')
 const variant = story.variants[index.value]
 index.value++
 
-$: shouldRender = currentVariant.id === variant.id
+const shouldRender = $derived(currentVariant.id === variant.id)
 
-export let source: string = null
+const {source = null, children, controls = null} = $props<{source: string}>()
 
-$: {
+$effect(() => {
   if (source != null) {
     Object.assign(currentVariant, {
       source,
     })
   }
-}
+})
 </script>
 
 {#if shouldRender}
   {#if slotName === 'default'}
-    <slot />
+    {@render children?.()}
   {/if}
   {#if slotName === 'controls'}
-    <slot name="controls" />
+    {@render controls?.()}
   {/if}
 {/if}

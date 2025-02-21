@@ -9,20 +9,20 @@ const slotName: string = getContext('__hstSlot')
 let index = { value: 0 }
 setContext('__hstIndex', index)
 
-export let source: string = null
+let {source = null, children, controls} = $props<{source: string}>()
 
-$: {
+$effect(() => {
   if (source != null) {
     Object.assign(currentVariant, {
       source,
     })
   }
-}
+})
 </script>
 
 {#if slotName === 'controls'}
-  <slot name="controls" />
+  {@render controls?.()}
 {/if}
 {#if slotName === 'default' || story.meta?.hasVariantChildComponents}
-  <slot />
+  {@render children?.()}
 {/if}

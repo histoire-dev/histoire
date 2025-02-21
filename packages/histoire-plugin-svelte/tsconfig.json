@@ -26,7 +26,8 @@
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "preserveWatchOutput": true
+    "preserveWatchOutput": true,
+    "verbatimModuleSyntax": true
   },
   "include": [
     "src"

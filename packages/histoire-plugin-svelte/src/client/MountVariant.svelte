@@ -1,12 +1,8 @@
 <script lang="ts">
 import { Story } from '@histoire/shared'
-import { afterUpdate, getContext } from 'svelte'
+import { getContext } from 'svelte'
 
-export let source: string = null
-export let responsiveDisabled: boolean = false
-export let autoPropsDisabled: boolean = false
-export let setupApp: Function = null
-export let implicit: boolean = false
+let { source = null, responsiveDisabled = false, autoPropsDisabled = false, setupApp = null, implicit = false, children, controls = null } = $props()
 
 const story: Story = getContext('__hstStory')
 const index: { value: number } = getContext('__hstIndex')
@@ -19,7 +15,7 @@ function updateVariant () {
   Object.assign(variant, {
     slots: () => ({
       default: true,
-      controls: $$slots.controls ?? storySlots.controls,
+      controls: controls ?? storySlots.controls,
     }),
     source,
     responsiveDisabled,
@@ -37,12 +33,12 @@ function updateVariant () {
 }
 updateVariant()
 
-afterUpdate(() => {
+$effect(() => {
   updateVariant()
 })
 </script>
 
 {#if false}
-<slot />
-<slot name="controls" />
+{@render children?.()}
+{@render controls?.()}
 {/if}

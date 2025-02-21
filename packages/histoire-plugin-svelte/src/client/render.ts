@@ -13,6 +13,8 @@ import {
   ref as _ref,
   watch as _watch,
 } from '@histoire/vendors/vue'
+import { mount, unmount } from 'svelte'
+
 // @ts-expect-error virtual module id
 import * as generatedSetup from 'virtual:$histoire-generated-global-setup'
 // @ts-expect-error virtual module id
@@ -148,7 +150,7 @@ export default _defineComponent({
     }
 
     function unmountStory() {
-      app?.$destroy()
+      app && unmount(app)
       if (target) {
         target.parentNode?.removeChild(target)
         target = null
@@ -192,7 +194,7 @@ function getControls() {
 
 function wrapComponent(controlComponent) {
   function ProxyWrap(options) {
-    return new Wrap({
+    return mount(Wrap, {
       ...options,
       props: {
         ...options.props,

@@ -6,19 +6,21 @@ import MountVariant from './MountVariant.svelte'
 const story: Story = getContext('__hstStory')
 let index = { value: 0 }
 setContext('__hstIndex', index)
-setContext('__hstSlots', $$slots)
+// setContext('__hstSlots', $$slots) // TODO: update this?
 
-$: inheritedFromStory = Object.keys(story).filter(key => !omitInheritStoryProps.includes(key)).reduce((acc, key) => {
+let { children, controls, ...rest } = $props();
+
+const inheritedFromStory = $derived(Object.keys(story).filter(key => !omitInheritStoryProps.includes(key)).reduce((acc, key) => {
   acc[key] = story[key]
   return acc
-}, {})
+}, {}))
 </script>
 
 {#if story.variants.length === 1 && story.variants[0].id === '_default'}
-  <MountVariant {...inheritedFromStory} {...$$restProps} implicit>
-    <slot />
-    <slot name="controls" slot="controls" />
+  <MountVariant {...inheritedFromStory} {...rest} implicit>
+    {@render children?.()}
+    {@render controls?.()}
   </MountVariant>
 {:else}
-  <slot />
+  {@render children?.()}
 {/if}

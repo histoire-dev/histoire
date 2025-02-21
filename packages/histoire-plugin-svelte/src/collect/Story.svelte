@@ -2,13 +2,7 @@
 import { ServerStory, ServerStoryFile, ServerVariant } from '@histoire/shared'
 import { getContext, setContext } from 'svelte'
 
-export let title: string = null
-export let id: string = null
-export let group: string = null
-export let layout: ServerStory['layout'] = null
-export let icon: string = null
-export let iconColor: string = null
-export let docsOnly: boolean = false
+let { title = null, id = null, group = null, layout = null, icon = null, iconColor = null, docsOnly = false, children } = $props()
 
 const addStory: (story: ServerStory) => void = getContext('__hstAddStory')
 const file: ServerStoryFile = getContext('__hstStoryFile')
@@ -32,4 +26,4 @@ setContext('__hstAddVariant', (variant: ServerVariant) => {
 })
 </script>
 
-<slot />
+{@render children?.()}
