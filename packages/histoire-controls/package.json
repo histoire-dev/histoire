@@ -32,7 +32,7 @@
   "types": "./dist/index.d.ts",
   "scripts": {
     "build": "rimraf dist && pnpm run build:css && vite build && pnpm run build:types",
-    "build:css": "tailwindcss -i src/style/main.css -o ./dist/style-standalone.css -c tailwind.config.cjs --postcss postcss.config.cjs",
+    "build:css": "tailwindcss -i src/style/main.css -o ./dist/style-standalone.css",
     "build:types": "vue-tsc --declaration --emitDeclarationOnly",
     "watch": "concurrently \"vite build --watch\" \"pnpm run build:types --watch\"",
     "watch:full": "concurrently \"vite build --watch\" \"pnpm run build:css --watch\" \"pnpm run build:types --watch\"",
@@ -51,6 +51,8 @@
     "@histoire/vendors": "workspace:^"
   },
   "devDependencies": {
+    "@tailwindcss/cli": "^4.0.8",
+    "@tailwindcss/vite": "^4.0.8",
     "@types/node": "^22.10.1",
     "@vitejs/plugin-vue": "^5.2.1",
     "@vue/runtime-dom": "^3.5.13",
@@ -62,7 +64,7 @@
     "jsdom": "^25.0.1",
     "postcss": "^8.4.49",
     "postcss-import": "^16.1.0",
-    "tailwindcss": "^3.4.16",
+    "tailwindcss": "^4.0.8",
     "typescript": "5.6.3",
     "vite": "^6.0.5",
     "vitest": "0.34.6",
