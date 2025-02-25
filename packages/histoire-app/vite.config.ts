@@ -6,8 +6,8 @@ import { defineConfig } from 'vite'
 
 export default defineConfig({
   plugins: [
-    // tailwindcss(),
     vue(),
+    tailwindcss(),
     {
       name: 'histoire:preserve:import.meta',
       enforce: 'pre',

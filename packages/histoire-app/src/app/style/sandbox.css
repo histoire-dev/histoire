@@ -14,7 +14,7 @@ html {
   font-family: 'Noto Sans Display', system-ui, sans-serif;
 }
 
-.htw-sandbox-hidden {
+.htw:sandbox-hidden {
   display: none;
 }
 

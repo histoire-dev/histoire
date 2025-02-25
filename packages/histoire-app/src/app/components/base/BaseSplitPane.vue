@@ -165,42 +165,42 @@ onUnmounted(() => {
 <template>
   <div
     ref="el"
-    class="histoire-base-split-pane htw-flex htw-h-full htw-isolate htw-overflow-auto"
+    class="histoire-base-split-pane htw:flex htw:h-full htw:isolate htw:overflow-auto"
     :class="{
-      'htw-flex-col': orientation === 'portrait',
-      'htw-cursor-ew-resize': dragging && orientation === 'landscape',
-      'htw-cursor-ns-resize': dragging && orientation === 'portrait',
+      'htw:flex-col': orientation === 'portrait',
+      'htw:cursor-ew-resize': dragging && orientation === 'landscape',
+      'htw:cursor-ns-resize': dragging && orientation === 'portrait',
       [orientation]: true,
     }"
   >
     <div
-      class="htw-relative htw-top-0 htw-left-0 htw-z-20"
+      class="htw:relative htw:top-0 htw:left-0 htw:z-20"
       :class="{
-        'htw-pointer-events-none': dragging,
-        'htw-border-r htw-border-gray-300/30 dark:htw-border-gray-800': orientation === 'landscape',
-        'htw-flex-none': fixed,
+        'htw:pointer-events-none': dragging,
+        'htw:border-r htw:border-gray-300/30 dark:htw:border-gray-800': orientation === 'landscape',
+        'htw:flex-none': fixed,
       }"
       :style="leftStyle"
     >
       <slot name="first" />
 
       <div
-        class="dragger htw-absolute htw-z-100 hover:htw-bg-primary-500/50 htw-transition-colors htw-duration-150 htw-delay-150"
+        class="dragger htw:absolute htw:z-100 hover:htw:bg-primary-500/50 htw:transition-colors htw:duration-150 htw:delay-150"
         :class="{
-          'htw-top-0 htw-bottom-0 htw-cursor-ew-resize': orientation === 'landscape',
-          'htw-left-0 htw-right-0 htw-cursor-ns-resize': orientation === 'portrait',
+          'htw:top-0 htw:bottom-0 htw:cursor-ew-resize': orientation === 'landscape',
+          'htw:left-0 htw:right-0 htw:cursor-ns-resize': orientation === 'portrait',
           [`dragger-offset-${draggerOffset}`]: true,
-          'htw-bg-primary-500/25': dragging,
+          'htw:bg-primary-500/25': dragging,
         }"
         @mousedown.prevent="dragStart"
       />
     </div>
     <div
-      class="htw-relative htw-bottom-0 htw-right-0"
+      class="htw:relative htw:bottom-0 htw:right-0"
       :class="{
-        'htw-pointer-events-none': dragging,
-        'htw-border-t htw-border-gray-300/30 dark:htw-border-gray-800': orientation === 'portrait',
-        'htw-flex-1': fixed,
+        'htw:pointer-events-none': dragging,
+        'htw:border-t htw:border-gray-300/30 dark:htw:border-gray-800': orientation === 'portrait',
+        'htw:flex-1': fixed,
       }"
       :style="rightStyle"
     >

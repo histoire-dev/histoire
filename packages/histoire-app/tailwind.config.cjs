@@ -55,7 +55,7 @@ const colors = {
 
 module.exports = {
   ...inheritedConfig,
-  prefix: 'htw-',
+  prefix: 'htw:',
   content: [
     path.resolve(__dirname, './src/**/*.{vue,js,ts,jsx,tsx,md}'),
     // Include controls CSS directly
@@ -71,7 +71,7 @@ delete module.exports.theme.extend.colors.gray
 module.exports.theme.colors = colors
 
 module.exports.plugins.push(require('@tailwindcss/typography'))
-// prose-a:htw-text-primary-500 prose-headings:htw-mb-2 prose-headings:htw-mt-4 first:prose-headings:htw-mt-0 prose-blockquote:htw-ml-0
+// prose-a:htw:text-primary-500 prose-headings:htw:mb-2 prose-headings:htw:mt-4 first:prose-headings:htw:mt-0 prose-blockquote:htw:ml-0
 module.exports.theme.extend.typography = theme => ({
   DEFAULT: {
     css: {

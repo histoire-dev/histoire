@@ -1,9 +1,10 @@
+@import "tailwindcss" prefix(htw);
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Display&display=swap');
 @import 'floating-vue/dist/style.css';
 @import '@histoire/controls/dist/index.es.css';
 
-@import 'floating.pcss';
-@import 'transitions.pcss';
+@import './floating.pcss';
+@import './transitions.pcss';
 
 *,
 ::before,
@@ -32,10 +33,6 @@ a,
 button {
   user-select: none;
 }
-
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
 
 @layer base {
   body,
@@ -73,7 +70,7 @@ button {
     background: transparent !important;
   }
 
-  .htw-prose {
+  .htw:prose {
     h1, h2, h3, h4 {
       &:not(:hover) {
         .header-anchor[aria-hidden="true"] {
@@ -93,7 +90,7 @@ button {
     background-repeat: no-repeat;
     background-position: right;
 
-    .htw-dark & {
+    .htw:dark & {
       background-image: linear-gradient(to left, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0));
     }
   }

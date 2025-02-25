@@ -37,22 +37,22 @@ const folderPadding = computed(() => {
     <div
       role="button"
       tabindex="0"
-      class="histoire-story-list-folder-button htw-px-0.5 htw-py-2 md:htw-py-1.5 htw-mx-1 htw-rounded-sm hover:htw-bg-primary-100 dark:hover:htw-bg-primary-900 htw-cursor-pointer htw-select-none htw-flex"
+      class="histoire-story-list-folder-button htw:px-0.5 htw:py-2 md:htw:py-1.5 htw:mx-1 htw:rounded-sm hover:htw:bg-primary-100 dark:hover:htw:bg-primary-900 htw:cursor-pointer htw:select-none htw:flex"
       @click="toggleOpen"
       @keyup.enter="toggleOpen"
       @keyup.space="toggleOpen"
     >
-      <span class="bind-tree-padding htw-flex htw-items-center htw-gap-2 htw-min-w-0">
-        <span class="htw-flex htw-flex-none htw-items-center htw-opacity-30 [.histoire-story-list-folder-button:hover_&]:htw-opacity-100 htw-ml-4 htw-w-4 htw-h-4 htw-rounded-sm htw-border htw-border-gray-500/40">
+      <span class="bind-tree-padding htw:flex htw:items-center htw:gap-2 htw:min-w-0">
+        <span class="htw:flex htw:flex-none htw:items-center htw:opacity-30 [.histoire-story-list-folder-button:hover_&]:htw:opacity-100 htw:ml-4 htw:w-4 htw:h-4 htw:rounded-sm htw:border htw:border-gray-500/40">
           <Icon
             icon="carbon:caret-right"
-            class="htw-w-full htw-h-full htw-transition-transform htw-duration-150"
+            class="htw:w-full htw:h-full htw:transition-transform htw:duration-150"
             :class="{
-              'htw-rotate-90': isFolderOpen,
+              'htw:rotate-90': isFolderOpen,
             }"
           />
         </span>
-        <span class="htw-truncate">{{ folder.title }}</span>
+        <span class="htw:truncate">{{ folder.title }}</span>
       </span>
     </div>
 

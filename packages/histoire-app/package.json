@@ -36,7 +36,9 @@
     "shiki": "^3.0.0"
   },
   "devDependencies": {
+    "@tailwindcss/cli": "^4.0.8",
     "@tailwindcss/typography": "^0.5.15",
+    "@tailwindcss/vite": "^4.0.8",
     "@types/fs-extra": "^11.0.4",
     "@types/node": "^22.10.1",
     "@vitejs/plugin-vue": "^5.2.1",

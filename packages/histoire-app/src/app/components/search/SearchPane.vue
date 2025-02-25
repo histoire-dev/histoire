@@ -278,19 +278,19 @@ const {
 
 <template>
   <div
-    class="histoire-search-pane htw-flex htw-items-center htw-gap-4 htw-pl-6 htw-border htw-border-transparent focus-visible:htw-border-primary-500"
+    class="histoire-search-pane htw:flex htw:items-center htw:gap-4 htw:pl-6 htw:border htw:border-transparent focus-visible:htw:border-primary-500"
     @click="focused = true"
   >
     <Icon
       icon="carbon:search"
-      class="flex-none htw-w-4 htw-h-4"
+      class="flex-none htw:w-4 htw:h-4"
     />
 
     <input
       ref="input"
       v-model="searchInputText"
       placeholder="Search for stories, variants..."
-      class="htw-bg-transparent htw-w-full htw-flex-1 htw-pl-0 htw-pr-6 htw-py-4 htw-outline-none"
+      class="htw:bg-transparent htw:w-full htw:flex-1 htw:pl-0 htw:pr-6 htw:py-4 htw:outline-none"
       @keydown.down.prevent="selectNext()"
       @keydown.up.prevent="selectPrevious()"
       @keydown.escape="close()"
@@ -306,7 +306,7 @@ const {
 
   <div
     v-else-if="results.length"
-    class="htw-max-h-[400px] htw-overflow-y-auto htw-rounded-b-lg"
+    class="htw:max-h-[400px] htw:overflow-y-auto htw:rounded-b-lg"
   >
     <SearchItem
       v-for="(result, index) of results"
