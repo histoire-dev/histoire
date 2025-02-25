@@ -79,7 +79,7 @@ function initState() {
       :init-state="initState"
     >
       <template #default="{ state }">
-        <pre class="htw-text-xs htw-bg-gray-50 dark:htw-bg-gray-600 htw-rounded htw-p-4">{{ options }}</pre>
+        <pre class="htw:text-xs htw:bg-gray-50 htw:dark:bg-gray-600 htw:rounded htw:p-4">{{ options }}</pre>
         <HstSelect
           v-model="state.select"
           title="Games"
@@ -100,7 +100,7 @@ function initState() {
       :init-state="initState"
     >
       <template #default="{ state }">
-        <pre class="htw-text-xs htw-bg-gray-50 dark:htw-bg-gray-600 htw-rounded htw-p-4">{{ objectOptions }}</pre>
+        <pre class="htw:text-xs htw:bg-gray-50 htw:dark:bg-gray-600 htw:rounded htw:p-4">{{ objectOptions }}</pre>
         <HstSelect
           v-model="state.select"
           title="Games"
@@ -121,7 +121,7 @@ function initState() {
       :init-state="initState"
     >
       <template #default="{ state }">
-        <pre class="htw-text-xs htw-bg-gray-50 dark:htw-bg-gray-600 htw-rounded htw-p-4">{{ flatOptions }}</pre>
+        <pre class="htw:text-xs htw:bg-gray-50 htw:dark:bg-gray-600 htw:rounded htw:p-4">{{ flatOptions }}</pre>
         <HstSelect
           v-model="state.select"
           title="Select"
@@ -142,7 +142,7 @@ function initState() {
       :init-state="initState"
     >
       <template #default="{ state }">
-        <pre class="htw-text-xs htw-bg-gray-50 dark:htw-bg-gray-600 htw-rounded htw-p-4">{{ numberOptions }}</pre>
+        <pre class="htw:text-xs htw:bg-gray-50 htw:dark:bg-gray-600 htw:rounded htw:p-4">{{ numberOptions }}</pre>
         <HstSelect
           v-model="state.count"
           title="Select"

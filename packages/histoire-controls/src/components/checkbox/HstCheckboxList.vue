@@ -49,11 +49,11 @@ function toggleOption(value: string) {
   <HstWrapper
     role="group"
     :title="title"
-    class="histoire-checkbox-list htw-cursor-text"
+    class="histoire-checkbox-list htw:cursor-text"
     :class="$attrs.class"
     :style="$attrs.style"
   >
-    <div class="-htw-my-1">
+    <div class="-htw:my-1">
       <template
         v-for="(label, value) in formattedOptions"
         :key="value"
@@ -61,14 +61,14 @@ function toggleOption(value: string) {
         <label
           tabindex="0"
           :for="`${value}-radio`"
-          class="htw-cursor-pointer htw-flex htw-items-center htw-relative htw-py-1 htw-group"
+          class="htw:cursor-pointer htw:flex htw:items-center htw:relative htw:py-1 htw:group"
           @keydown.enter.prevent="toggleOption(value)"
           @keydown.space.prevent="toggleOption(value)"
           @click="toggleOption(value)"
         >
           <HstSimpleCheckbox
             :model-value="modelValue.includes(value)"
-            class="htw-mr-2"
+            class="htw:mr-2"
           />
           {{ label }}
         </label>

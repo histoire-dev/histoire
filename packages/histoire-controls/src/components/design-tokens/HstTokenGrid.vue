@@ -38,7 +38,7 @@ const hover = ref<string>(null)
 
 <template>
   <div
-    class="histoire-token-grid htw-bind-col-size htw-grid htw-gap-4 htw-m-4"
+    class="histoire-token-grid htw:bind-col-size htw:grid htw:gap-4 htw:m-4"
     :style="{
       '--histoire-col-size': colSizePx,
     }"
@@ -46,7 +46,7 @@ const hover = ref<string>(null)
     <div
       v-for="token of processedTokens"
       :key="token.key"
-      class="htw-flex htw-flex-col htw-gap-2"
+      class="htw:flex htw:flex-col htw:gap-2"
       @mouseenter="hover = token.key"
       @mouseleave="hover = null"
     >
@@ -54,26 +54,26 @@ const hover = ref<string>(null)
         :token="token"
       />
       <div>
-        <div class="htw-flex htw-gap-1">
+        <div class="htw:flex htw:gap-1">
           <pre
             v-tooltip="token.name.length > colSize / 8 ? token.name : ''"
-            class="htw-my-0 htw-truncate htw-shrink"
+            class="htw:my-0 htw:truncate htw:shrink"
           >{{ token.name }}</pre>
           <HstCopyIcon
             v-if="hover === token.key"
             :content="token.name"
-            class="htw-flex-none"
+            class="htw:flex-none"
           />
         </div>
-        <div class="htw-flex htw-gap-1">
+        <div class="htw:flex htw:gap-1">
           <pre
             v-tooltip="token.value.length > colSize / 8 ? token.value : ''"
-            class="htw-my-0 htw-opacity-50 htw-truncate htw-shrink"
+            class="htw:my-0 htw:opacity-50 htw:truncate htw:shrink"
           >{{ token.value }}</pre>
           <HstCopyIcon
             v-if="hover === token.key"
             :content="typeof token.value === 'string' ? token.value : JSON.stringify(token.value)"
-            class="htw-flex-none"
+            class="htw:flex-none"
           />
         </div>
       </div>
@@ -82,7 +82,7 @@ const hover = ref<string>(null)
 </template>
 
 <style>
-.htw-bind-col-size {
+.htw:bind-col-size {
   grid-template-columns: repeat(auto-fill, minmax(var(--histoire-col-size), 1fr));
 }
 </style>

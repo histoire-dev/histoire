@@ -53,12 +53,12 @@ const hover = ref<string>(null)
 <template>
   <div
     v-if="displayedShades.length"
-    class="histoire-color-shades htw-grid htw-gap-4 htw-grid-cols-[repeat(auto-fill,minmax(200px,1fr))] htw-m-4"
+    class="histoire-color-shades htw:grid htw:gap-4 htw:grid-cols-[repeat(auto-fill,minmax(200px,1fr))] htw:m-4"
   >
     <div
       v-for="shade of displayedShades"
       :key="shade.key"
-      class="htw-flex htw-flex-col htw-gap-2"
+      class="htw:flex htw:flex-col htw:gap-2"
       @mouseenter="hover = shade.key"
       @mouseleave="hover = null"
     >
@@ -66,33 +66,33 @@ const hover = ref<string>(null)
         :color="shade.color"
       >
         <div
-          class="htw-rounded-full htw-w-16 htw-h-16"
+          class="htw:rounded-full htw:w-16 htw:h-16"
           :style="{
             backgroundColor: shade.color,
           } as CSSProperties"
         />
       </slot>
       <div>
-        <div class="htw-flex htw-gap-1">
+        <div class="htw:flex htw:gap-1">
           <pre
             v-tooltip="shade.name.length > 23 ? shade.name : ''"
-            class="htw-my-0 htw-truncate htw-shrink"
+            class="htw:my-0 htw:truncate htw:shrink"
           >{{ shade.name }}</pre>
           <HstCopyIcon
             v-if="hover === shade.key"
             :content="shade.name"
-            class="htw-flex-none"
+            class="htw:flex-none"
           />
         </div>
-        <div class="htw-flex htw-gap-1">
+        <div class="htw:flex htw:gap-1">
           <pre
             v-tooltip="shade.color.length > 23 ? shade.color : ''"
-            class="htw-my-0 htw-opacity-50 htw-truncate htw-shrink"
+            class="htw:my-0 htw:opacity-50 htw:truncate htw:shrink"
           >{{ shade.color }}</pre>
           <HstCopyIcon
             v-if="hover === shade.key"
             :content="shade.color"
-            class="htw-flex-none"
+            class="htw:flex-none"
           />
         </div>
       </div>
