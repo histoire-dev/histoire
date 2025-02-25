@@ -30,17 +30,17 @@ useScrollOnActive(isActive, el)
       v-slot="{ active }"
       :to="targetRoute"
       :is-active="isActive"
-      class="htw-px-2 htw-py-2 md:htw-py-1.5 htw-m-1 htw-rounded-sm htw-flex htw-items-center htw-gap-2"
+      class="htw:px-2 htw:py-2 md:htw:py-1.5 htw:m-1 htw:rounded-sm htw:flex htw:items-center htw:gap-2"
     >
       <Icon
         :icon="variant.icon ?? 'carbon:cube'"
-        class="htw-w-5 htw-h-5 sm:htw-w-4 sm:htw-h-4 htw-flex-none"
+        class="htw:w-5 htw:h-5 sm:htw:w-4 sm:htw:h-4 htw:flex-none"
         :class="{
-          'htw-text-gray-500': !active && !variant.iconColor,
+          'htw:text-gray-500': !active && !variant.iconColor,
           'bind-icon-color': !active && variant.iconColor,
         }"
       />
-      <span class="htw-truncate">{{ variant.title }}</span>
+      <span class="htw:truncate">{{ variant.title }}</span>
     </BaseListItemLink>
   </div>
 </template>

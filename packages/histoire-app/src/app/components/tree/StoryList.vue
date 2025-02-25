@@ -11,7 +11,7 @@ defineProps<{
 </script>
 
 <template>
-  <div class="histoire-story-list htw-overflow-y-auto">
+  <div class="histoire-story-list htw:overflow-y-auto">
     <template
       v-for="element of tree"
       :key="element.title"

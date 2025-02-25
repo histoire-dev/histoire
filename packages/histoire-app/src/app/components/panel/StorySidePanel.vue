@@ -46,11 +46,11 @@ const panelContentComponent = computed(() => {
     v-else
     save-id="story-sidepane"
     orientation="portrait"
-    class="histoire-story-side-panel histoire-loaded htw-h-full"
+    class="histoire-story-side-panel histoire-loaded htw:h-full"
     data-test-id="story-side-panel"
   >
     <template #first>
-      <div class="htw-flex htw-flex-col htw-h-full">
+      <div class="htw:flex htw:flex-col htw:h-full">
         <PaneTabs
           :story="storyStore.currentStory"
           :variant="storyStore.currentVariant"
@@ -60,7 +60,7 @@ const panelContentComponent = computed(() => {
           :is="panelContentComponent"
           :story="storyStore.currentStory"
           :variant="storyStore.currentVariant"
-          class="htw-h-full htw-overflow-auto"
+          class="htw:h-full htw:overflow-auto"
         />
       </div>
     </template>
@@ -69,7 +69,7 @@ const panelContentComponent = computed(() => {
       <StorySourceCode
         :story="storyStore.currentStory"
         :variant="storyStore.currentVariant"
-        class="htw-h-full"
+        class="htw:h-full"
       />
     </template>
   </BaseSplitPane>

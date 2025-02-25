@@ -120,13 +120,13 @@ watch(() => internalValue.value, () => {
 <template>
   <HstWrapper
     :title="title"
-    class="histoire-json htw-cursor-text"
+    class="histoire-json htw:cursor-text"
     :class="$attrs.class"
     :style="$attrs.style"
   >
     <div
       ref="editorElement"
-      class="__histoire-json-code htw-w-full htw-border htw-border-solid htw-border-black/25 dark:htw-border-white/25 focus-within:htw-border-primary-500 dark:focus-within:htw-border-primary-500 htw-rounded-sm htw-box-border htw-overflow-auto htw-resize-y htw-min-h-32 htw-h-48 htw-relative"
+      class="__histoire-json-code htw:w-full htw:border htw:border-solid htw:border-black/25 htw:dark:border-white/25 focus-within:htw:border-primary-500 dark:focus-within:htw:border-primary-500 htw:rounded-sm htw:box-border htw:overflow-auto htw:resize-y htw:min-h-32 htw:h-48 htw:relative"
       v-bind="{ ...$attrs, class: null, style: null }"
     />
 
@@ -135,7 +135,7 @@ watch(() => internalValue.value, () => {
         v-if="invalidValue"
         v-tooltip="'JSON error'"
         icon="carbon:warning-alt"
-        class="htw-text-orange-500"
+        class="htw:text-orange-500"
       />
 
       <slot name="actions" />

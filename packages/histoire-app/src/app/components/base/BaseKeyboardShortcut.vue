@@ -10,7 +10,7 @@ const formatted = computed(() => props.shortcut.split('+').map(k => formatKey(k.
 </script>
 
 <template>
-  <span class="histoire-base-keyboard-shortcut htw-border htw-border-current htw-opacity-50 htw-px-1 htw-rounded-sm">
+  <span class="histoire-base-keyboard-shortcut htw:border htw:border-current htw:opacity-50 htw:px-1 htw:rounded-sm">
     {{ formatted }}
   </span>
 </template>

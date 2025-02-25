@@ -22,7 +22,7 @@ const hasEvents = computed(() => eventsStore.events.length)
 </script>
 
 <template>
-  <BaseOverflowMenu class="histoire-pane-tabs htw-h-10 htw-flex-none htw-border-b htw-border-gray-100 dark:htw-border-gray-750">
+  <BaseOverflowMenu class="histoire-pane-tabs htw:h-10 htw:flex-none htw:border-b htw:border-gray-100 dark:htw:border-gray-750">
     <BaseTab
       :to="{ ...$route, query: { ...$route.query, tab: '' } }"
       :matched="!$route.query.tab"
@@ -33,7 +33,7 @@ const hasEvents = computed(() => eventsStore.events.length)
       :to="{ ...$route, query: { ...$route.query, tab: 'docs' } }"
       :matched="$route.query.tab === 'docs'"
       :class="{
-        'htw-opacity-50': !renderedDoc,
+        'htw:opacity-50': !renderedDoc,
       }"
     >
       Docs
@@ -42,7 +42,7 @@ const hasEvents = computed(() => eventsStore.events.length)
       :to="{ ...$route, query: { ...$route.query, tab: 'events' } }"
       :matched="$route.query.tab === 'events'"
       :class="{
-        'htw-opacity-50': !hasEvents,
+        'htw:opacity-50': !hasEvents,
       }"
     >
       Events
@@ -71,7 +71,7 @@ const hasEvents = computed(() => eventsStore.events.length)
         :to="{ ...$route, query: { ...$route.query, tab: 'events' } }"
         :matched="$route.query.tab === 'events'"
         :class="{
-          'htw-opacity-50': !hasEvents,
+          'htw:opacity-50': !hasEvents,
         }"
       >
         Events

@@ -59,7 +59,7 @@ function action(fromClick = false) {
       v-if="'route' in result"
       :to="result.route"
       :is-active="selected"
-      class="htw-px-6 htw-py-4 htw-gap-4"
+      class="htw:px-6 htw:py-4 htw:gap-4"
       @navigate="action(true)"
     >
       <SearchItemContent
@@ -71,7 +71,7 @@ function action(fromClick = false) {
     <BaseListItem
       v-if="'onActivate' in result"
       :is-active="selected"
-      class="htw-px-6 htw-py-4 htw-gap-4"
+      class="htw:px-6 htw:py-4 htw:gap-4"
       @navigate="action(true)"
     >
       <SearchItemContent

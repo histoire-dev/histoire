@@ -18,19 +18,19 @@ const props = defineProps({
 </script>
 
 <template>
-  <div class="htw-p-2 htw-flex htw-items-center htw-gap-x-2">
+  <div class="htw:p-2 htw:flex htw:items-center htw:gap-x-2">
     <Icon
       :icon="props.icon"
-      class="htw-text-2xl htw-text-gray-700 dark:htw-text-gray-300 htw-flex-none"
+      class="htw:text-2xl htw:text-gray-700 dark:htw:text-gray-300 htw:flex-none"
     />
-    <div class="htw-flex htw-flex-col htw-leading-none">
+    <div class="htw:flex htw:flex-col htw:leading-none">
       <span
-        class="htw-text-primary-500 htw-min-w-[80px] htw-font-bold"
+        class="htw:text-primary-500 htw:min-w-[80px] htw:font-bold"
       >
         {{ count }}
       </span>
       <span
-        class="htw-text-sm htw-text-gray-900 dark:htw-text-gray-100"
+        class="htw:text-sm htw:text-gray-900 dark:htw:text-gray-100"
       >
         {{ title }}
       </span>

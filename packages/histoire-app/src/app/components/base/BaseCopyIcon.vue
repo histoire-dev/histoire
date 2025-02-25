@@ -28,7 +28,7 @@ const action = () => copy(props.content)
       delay: 0,
     }"
     icon="carbon:copy-file"
-    class="histoire-base-copy-icon htw-w-4 htw-h-4 htw-opacity-50 hover:htw-opacity-100 hover:htw-text-primary-500 htw-cursor-pointer"
+    class="histoire-base-copy-icon htw:w-4 htw:h-4 htw:opacity-50 hover:htw:opacity-100 hover:htw:text-primary-500 htw:cursor-pointer"
     @click="action()"
   />
 </template>

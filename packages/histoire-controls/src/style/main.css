@@ -1,13 +1,9 @@
+@import "tailwindcss" prefix(htw);
 @import 'floating-vue/dist/style.css';
-
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
 
 body {
   font-size: 1.125rem;
-  @apply dark:htw-text-gray-100;
+  @apply htw:dark:text-gray-100;
 }
 
 @media (min-width: 640px) {

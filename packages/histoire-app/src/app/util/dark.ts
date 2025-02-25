@@ -3,7 +3,7 @@ import { watch } from 'vue'
 import { histoireConfig } from './config.js'
 
 export const isDark = useDark({
-  valueDark: 'htw-dark',
+  valueDark: 'htw:dark',
   initialValue: histoireConfig.theme.defaultColorScheme,
   storageKey: 'histoire-color-scheme',
   storage: histoireConfig.theme.storeColorScheme ? localStorage : sessionStorage,

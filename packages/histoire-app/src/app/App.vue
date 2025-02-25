@@ -97,7 +97,7 @@ const commandStore = useCommandStore()
 <template>
   <div
     v-if="storyStore.currentStory"
-    class="histoire-app htw-hidden"
+    class="histoire-app htw:hidden"
   >
     <GenericMountStory
       :key="storyStore.currentStory.id"
@@ -106,7 +106,7 @@ const commandStore = useCommandStore()
   </div>
 
   <div
-    class="htw-h-screen htw-bg-white dark:htw-bg-gray-700 dark:htw-text-gray-100"
+    class="htw:h-screen htw:bg-white dark:htw:bg-gray-700 dark:htw:text-gray-100"
     :style="{
       // Prevent flash of content
       opacity: mounted ? 1 : 0,
@@ -114,14 +114,14 @@ const commandStore = useCommandStore()
   >
     <div
       v-if="isMobile"
-      class="htw-h-full htw-flex htw-flex-col htw-divide-y htw-divide-gray-100 dark:htw-divide-gray-800"
+      class="htw:h-full htw:flex htw:flex-col htw:divide-y htw:divide-gray-100 dark:htw:divide-gray-800"
     >
       <AppHeader @search="isSearchOpen = true" />
       <Breadcrumb
         :tree="tree"
         :stories="stories"
       />
-      <RouterView class="htw-grow" />
+      <RouterView class="htw:grow" />
     </div>
 
     <BaseSplitPane
@@ -130,18 +130,18 @@ const commandStore = useCommandStore()
       :min="5"
       :max="50"
       :default-split="15"
-      class="htw-h-full"
+      class="htw:h-full"
     >
       <template #first>
-        <div class="htw-flex htw-flex-col htw-h-full htw-bg-gray-100 dark:htw-bg-gray-750 __histoire-pane-shadow-from-right">
+        <div class="htw:flex htw:flex-col htw:h-full htw:bg-gray-100 dark:htw:bg-gray-750 __histoire-pane-shadow-from-right">
           <AppHeader
-            class="htw-flex-none"
+            class="htw:flex-none"
             @search="isSearchOpen = true"
           />
           <StoryList
             :tree="tree"
             :stories="stories"
-            class="htw-flex-1"
+            class="htw:flex-1"
           />
         </div>
       </template>

@@ -46,14 +46,14 @@ const autoApplyContrastColor = computed(() => !!histoireConfig.autoApplyContrast
           'color': autoApplyContrastColor ? contrastColor : undefined,
         },
       ]"
-      class="htw-relative"
+      class="htw:relative"
       data-test-id="sandbox-render"
     >
       <GenericRenderStory
         :key="`${story.id}-${variant.id}`"
         :variant="variant"
         :story="story"
-        class="htw-h-full"
+        class="htw:h-full"
         :class="{
           [histoireConfig.sandboxDarkClass]: isDark, // @TODO remove
           [histoireConfig.theme.darkClass]: isDark,
