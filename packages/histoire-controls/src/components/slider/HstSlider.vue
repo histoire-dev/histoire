@@ -85,7 +85,7 @@ const tooltipStyle = computed<CSSProperties>(() => {
   }
 
   &:hover::-webkit-slider-thumb {
-    @apply !htw:bg-primary-500  !htw:border-primary-500;
+    @apply htw:!bg-primary-500  htw:!border-primary-500;
   }
 }
 
@@ -97,7 +97,7 @@ const tooltipStyle = computed<CSSProperties>(() => {
   }
 
   &:hover::-moz-range-thumb {
-    @apply !htw:bg-primary-500  !htw:border-primary-500;
+    @apply htw:!bg-primary-500  htw:!border-primary-500;
   }
 }
 </style>

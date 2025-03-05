@@ -1,10 +1,19 @@
-@import "tailwindcss" prefix(htw);
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Display&display=swap');
+
+@import "tailwindcss" prefix(htw);
 @import 'floating-vue/dist/style.css';
-@import '@histoire/controls/dist/index.es.css';
+
+/* TODO: including this file produces Error: `Cannot apply unknown utility class: !htw:bg-primary-500` */
+/* @import '@histoire/controls/dist/index.es.css'; */
 
 @import './floating.pcss';
 @import './transitions.pcss';
+
+@theme {
+  --color-primary-500: #2563EB;
+
+  --color-gray-850: #1a1a1a;
+}
 
 *,
 ::before,

@@ -24,11 +24,13 @@ export function tailwindTokens(options: TailwindTokensOptions = {}): Plugin {
       await api.fs.emptyDir(api.pluginTempDir)
       api.moduleLoader.clearCache()
       await api.fs.writeFile(api.path.resolve(api.pluginTempDir, 'style.css'), css)
-      const tailwindConfig = await api.moduleLoader.loadModule(tailwindConfigFile)
-      const { default: resolveConfig } = await import('tailwindcss/resolveConfig.js')
-      const resolvedTailwindConfig = resolveConfig(tailwindConfig.default ?? tailwindConfig)
+
+      // TODO: `resolveConfig` was removed in Tailwind 4 - https://tailwindcss.com/docs/upgrade-guide#theme-values-in-javascript
+      // const tailwindConfig = await api.moduleLoader.loadModule(tailwindConfigFile)
+      // const { default: resolveConfig } = await import('tailwindcss/resolveConfig.js')
+      // const resolvedTailwindConfig = resolveConfig(tailwindConfig.default ?? tailwindConfig)
       const storyFile = api.path.resolve(api.pluginTempDir, 'Tailwind.story.js')
-      await api.fs.writeFile(storyFile, storyTemplate(resolvedTailwindConfig))
+      // await api.fs.writeFile(storyFile, storyTemplate(resolvedTailwindConfig))
       api.addStoryFile(storyFile)
     }
     catch (e) {
