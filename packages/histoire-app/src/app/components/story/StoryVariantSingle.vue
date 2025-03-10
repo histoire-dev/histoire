@@ -34,7 +34,7 @@ const variant = computed(() => storyStore.currentVariant)
       class="htw:divide-y htw:divide-gray-100 htw:dark:divide-gray-800 htw:h-full htw:flex htw:flex-col"
     >
       <a
-        class="htw:px-6 htw:h-12 hover:htw:text-primary-500 dark:hover:htw:text-primary-400 htw:cursor-pointer htw:flex htw:gap-2 htw:flex-wrap htw:w-full htw:items-center htw:flex-none"
+        class="htw:px-6 htw:h-12 htw:hover:text-primary-500 htw:dark:hover:text-primary-400 htw:cursor-pointer htw:flex htw:gap-2 htw:flex-wrap htw:w-full htw:items-center htw:flex-none"
         @click="$emit('openVariantMenu')"
       >
         <template v-if="variant">

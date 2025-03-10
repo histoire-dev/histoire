@@ -24,8 +24,8 @@ const comp = computed(() => {
     :is="comp"
     class="histoire-base-button htw:rounded htw:cursor-pointer"
     :class="{
-      'htw:bg-primary-200 htw:dark:bg-primary-800 hover:htw:bg-primary-300 dark:hover:htw:bg-primary-700': color === 'primary' || !color,
-      'htw:bg-grey-100 htw:dark:bg-grey-900 hover:htw:bg-grey-200 dark:hover:htw:bg-grey-800': color === 'grey',
+      'htw:bg-primary-200 htw:dark:bg-primary-800 htw:hover:bg-primary-300 htw:dark:hover:bg-primary-700': color === 'primary' || !color,
+      'htw:bg-grey-100 htw:dark:bg-grey-900 htw:hover:bg-grey-200 htw:dark:hover:bg-grey-800': color === 'grey',
     }"
   >
     <slot />

@@ -37,7 +37,7 @@ watch(story, () => {
 <template>
   <div class="histoire-breadcrumb">
     <a
-      class="htw:px-6 htw:h-12 hover:htw:text-primary-500 dark:hover:htw:text-primary-400 htw:cursor-pointer htw:flex htw:gap-2 htw:flex-wrap htw:w-full htw:items-center"
+      class="htw:px-6 htw:h-12 htw:hover:text-primary-500 htw:dark:hover:text-primary-400 htw:cursor-pointer htw:flex htw:gap-2 htw:flex-wrap htw:w-full htw:items-center"
       @click="openMenu"
     >
       <template v-if="story">

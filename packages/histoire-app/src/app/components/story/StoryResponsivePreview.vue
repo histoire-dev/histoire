@@ -180,27 +180,27 @@ const sizeTooltip = computed(() => `${responsiveWidth.value ?? 'Auto'} × ${resp
             <div
               ref="horizontalDragger"
               v-tooltip.right="sizeTooltip"
-              class="htw:absolute htw:w-4 htw:top-0 htw:bottom-4 htw:right-0 hover:htw:bg-primary-500/30 htw:flex htw:items-center htw:justify-center htw:cursor-ew-resize htw:group hover:htw:text-primary-500"
+              class="htw:absolute htw:w-4 htw:top-0 htw:bottom-4 htw:right-0 htw:hover:bg-primary-500/30 htw:flex htw:items-center htw:justify-center htw:cursor-ew-resize htw:group htw:hover:text-primary-500"
             >
               <Icon
                 icon="mdi:drag-vertical-variant"
-                class="htw:w-4 htw:h-4 htw:opacity-20 group-hover:htw:opacity-90"
+                class="htw:w-4 htw:h-4 htw:opacity-20 group-htw:hover:opacity-90"
               />
             </div>
             <div
               ref="verticalDragger"
               v-tooltip.bottom="sizeTooltip"
-              class="htw:absolute htw:h-4 htw:left-0 htw:right-4 htw:bottom-0 hover:htw:bg-primary-500/30 htw:flex htw:items-center htw:justify-center htw:cursor-ns-resize htw:group hover:htw:text-primary-500"
+              class="htw:absolute htw:h-4 htw:left-0 htw:right-4 htw:bottom-0 htw:hover:bg-primary-500/30 htw:flex htw:items-center htw:justify-center htw:cursor-ns-resize htw:group htw:hover:text-primary-500"
             >
               <Icon
                 icon="mdi:drag-horizontal-variant"
-                class="htw:w-4 htw:h-4 htw:opacity-20 group-hover:htw:opacity-90"
+                class="htw:w-4 htw:h-4 htw:opacity-20 group-htw:hover:opacity-90"
               />
             </div>
             <div
               ref="cornerDragger"
               v-tooltip.bottom="sizeTooltip"
-              class="htw:absolute htw:w-4 htw:h-4 htw:right-0 htw:bottom-0 hover:htw:bg-primary-500/30 htw:flex htw:items-center htw:justify-center htw:cursor-nwse-resize htw:group hover:htw:text-primary-500"
+              class="htw:absolute htw:w-4 htw:h-4 htw:right-0 htw:bottom-0 htw:hover:bg-primary-500/30 htw:flex htw:items-center htw:justify-center htw:cursor-nwse-resize htw:group htw:hover:text-primary-500"
             />
           </template>
         </div>

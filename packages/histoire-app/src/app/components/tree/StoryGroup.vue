@@ -27,14 +27,14 @@ function toggleOpen() {
 <template>
   <div
     data-test-id="story-group"
-    class="histoire-story-group htw:my-2 first:htw:mt-0 last:htw:mb-0 htw:group"
+    class="histoire-story-group htw:my-2 htw:first:mt-0 htw:last:mb-0 htw:group"
   >
     <template v-if="group.title">
-      <div class="htw:h-[1px] htw:bg-gray-500/10 htw:mx-6 htw:mb-2 group-first:htw:hidden" />
+      <div class="htw:h-[1px] htw:bg-gray-500/10 htw:mx-6 htw:mb-2 htw:group-first:hidden" />
       <div
         role="button"
         tabindex="0"
-        class="htw:px-0.5 htw:py-2 md:htw:py-1.5 htw:mx-1 htw:rounded-sm hover:htw:bg-primary-100 dark:hover:htw:bg-primary-900 htw:cursor-pointer htw:select-none htw:flex htw:items-center htw:gap-2 htw:min-w-0 htw:opacity-50 hover:htw:opacity-100"
+        class="htw:px-0.5 htw:py-2 htw:md:py-1.5 htw:mx-1 htw:rounded-sm htw:hover:bg-primary-100 htw:dark:hover:bg-primary-900 htw:cursor-pointer htw:select-none htw:flex htw:items-center htw:gap-2 htw:min-w-0 htw:opacity-50 htw:hover:opacity-100"
         @click="toggleOpen"
         @keyup.enter="toggleOpen"
         @keyup.space="toggleOpen"

@@ -21,7 +21,7 @@ const contrastColor = computed(() => getContrastColor(settings))
   >
     <div
       v-tooltip="'Background color'"
-      class="htw:cursor-pointer hover:htw:text-primary-500 htw:flex htw:items-center htw:gap-1 htw:h-full htw:px-2 htw:group"
+      class="htw:cursor-pointer htw:hover:text-primary-500 htw:flex htw:items-center htw:gap-1 htw:h-full htw:px-2 htw:group"
     >
       <div
         class="bind-preview-bg htw:w-4 htw:h-4 htw:rounded-full htw:border htw:border-black/50 htw:dark:border-white/50 htw:flex htw:items-center htw:justify-center htw:text-xs"
@@ -30,7 +30,7 @@ const contrastColor = computed(() => getContrastColor(settings))
       </div>
       <Icon
         icon="carbon:caret-down"
-        class="htw:w-4 htw:h-4 htw:opacity-50 group-hover:htw:opacity-100"
+        class="htw:w-4 htw:h-4 htw:opacity-50 group-htw:hover:opacity-100"
       />
     </div>
 
@@ -49,8 +49,8 @@ const contrastColor = computed(() => getContrastColor(settings))
           class="htw:px-4 htw:py-3 htw:cursor-pointer htw:text-left htw:flex htw:items-baseline htw:gap-4"
           :class="[
             settings.backgroundColor === option.color
-              ? 'htw:bg-primary-500 hover:htw:bg-primary-600 htw:text-white htw:dark:text-black'
-              : 'htw:bg-transparent hover:htw:bg-primary-100 dark:hover:htw:bg-primary-700',
+              ? 'htw:bg-primary-500 htw:hover:bg-primary-600 htw:text-white htw:dark:text-black'
+              : 'htw:bg-transparent htw:hover:bg-primary-100 htw:dark:hover:bg-primary-700',
           ]"
           @click="settings.backgroundColor = option.color;hide()"
         >

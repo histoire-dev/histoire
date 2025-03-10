@@ -28,7 +28,7 @@ export default defineComponent({
     <a
       v-bind="$attrs"
       :href="href"
-      class="htw:px-4 htw:h-10 htw:min-w-[150px] htw:inline-flex htw:items-center hover:htw:bg-primary-50 dark:hover:htw:bg-primary-900 htw:relative htw:text-gray-900 htw:dark:text-gray-100"
+      class="htw:px-4 htw:h-10 htw:min-w-[150px] htw:inline-flex htw:items-center htw:hover:bg-primary-50 htw:dark:hover:bg-primary-900 htw:relative htw:text-gray-900 htw:dark:text-gray-100"
       :class="{
         'htw:text-primary-500 htw:dark:text-primary-400': matched != null ? matched : (exact && isExactActive) || (!exact && isActive),
       }"

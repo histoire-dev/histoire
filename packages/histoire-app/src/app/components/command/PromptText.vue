@@ -57,7 +57,7 @@ watch(defaultValue, (value) => {
       <input
         ref="input"
         v-model="model"
-        class="htw:bg-transparent htw:w-full htw:p-2 htw:border htw:border-gray-500/50 focus:htw:border-primary-500/50 htw:rounded htw:outline-none"
+        class="htw:bg-transparent htw:w-full htw:p-2 htw:border htw:border-gray-500/50 htw:focus:border-primary-500/50 htw:rounded htw:outline-none"
         :required="prompt.required"
       >
     </label>

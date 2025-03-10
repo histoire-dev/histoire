@@ -1,6 +1,6 @@
 @import "tailwindcss" prefix(htw);
 @config "../../tailwind.config.cjs";
-@custom-variant dark (&:where(.htw\:.dark, .htw\:.dark *));
+@custom-variant dark (&:where(.htw\:dark, .htw\:dark *));
 
 @import 'floating-vue/dist/style.css';
 

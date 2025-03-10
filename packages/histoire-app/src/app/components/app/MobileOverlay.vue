@@ -18,7 +18,7 @@ const emit = defineEmits<{ (e: 'close'): void }>()
       <div class="htw:p-4 htw:h-16 htw:flex htw:border-b htw:border-gray-100 htw:dark:border-gray-800 htw:items-center htw:place-content-between">
         <span class="htw:text-gray-500">{{ title }}</span>
         <a
-          class="htw:p-1 hover:htw:text-primary-500 dark:hover:htw:text-primary-400 htw:cursor-pointer"
+          class="htw:p-1 htw:hover:text-primary-500 htw:dark:hover:text-primary-400 htw:cursor-pointer"
           @click="emit('close')"
         >
           <Icon

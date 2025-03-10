@@ -97,11 +97,11 @@ function ChildrenSlice(props, { slots }) {
     >
       <div
         role="button"
-        class="htw:cursor-pointer hover:htw:bg-primary-50 dark:hover:htw:bg-primary-900 htw:w-8 htw:h-full htw:flex htw:items-center htw:justify-center htw:absolute htw:top-0 htw:right-0"
+        class="htw:cursor-pointer htw:hover:bg-primary-50 htw:dark:hover:bg-primary-900 htw:w-8 htw:h-full htw:flex htw:items-center htw:justify-center htw:absolute htw:top-0 htw:right-0"
       >
         <Icon
           icon="carbon:caret-down"
-          class="htw:w-4 htw:h-4 htw:opacity-50 group-hover:htw:opacity-100"
+          class="htw:w-4 htw:h-4 htw:opacity-50 group-htw:hover:opacity-100"
         />
       </div>
 

@@ -82,8 +82,8 @@ const autoApplyContrastColor = computed(() => !!histoireConfig.autoApplyContrast
         :to="targetRoute"
         class="htw:rounded htw:w-max htw:px-2 htw:py-0.5 htw:min-w-16 htw:cursor-pointer htw:flex htw:items-center htw:gap-1 htw:flex-shrink"
         :class="{
-          'hover:htw:bg-gray-200 htw:text-gray-500 dark:hover:htw:bg-gray-800': !isActive,
-          'htw:bg-primary-200 hover:htw:bg-primary-300 htw:text-primary-800 htw:dark:bg-primary-700 dark:hover:htw:bg-primary-800 htw:dark:text-primary-200': isActive,
+          'htw:hover:bg-gray-200 htw:text-gray-500 htw:dark:hover:bg-gray-800': !isActive,
+          'htw:bg-primary-200 htw:hover:bg-primary-300 htw:text-primary-800 htw:dark:bg-primary-700 htw:dark:hover:bg-primary-800 htw:dark:text-primary-200': isActive,
         }"
       >
         <Icon
@@ -98,7 +98,7 @@ const autoApplyContrastColor = computed(() => !!histoireConfig.autoApplyContrast
       </RouterLink>
 
       <!-- Toolbar -->
-      <div class="htw:flex-none htw:ml-auto htw:hidden group-hover:htw:flex htw:items-center">
+      <div class="htw:flex-none htw:ml-auto htw:hidden group-htw:hover:flex htw:items-center">
         <HstCopyIcon
           :content="() => getSourceCode(story, variant)"
         />

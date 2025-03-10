@@ -185,7 +185,7 @@ onUnmounted(() => {
       <slot name="first" />
 
       <div
-        class="dragger htw:absolute htw:z-100 hover:htw:bg-primary-500/50 htw:transition-colors htw:duration-150 htw:delay-150"
+        class="dragger htw:absolute htw:z-100 htw:hover:bg-primary-500/50 htw:transition-colors htw:duration-150 htw:delay-150"
         :class="{
           'htw:top-0 htw:bottom-0 htw:cursor-ew-resize': orientation === 'landscape',
           'htw:left-0 htw:right-0 htw:cursor-ns-resize': orientation === 'portrait',

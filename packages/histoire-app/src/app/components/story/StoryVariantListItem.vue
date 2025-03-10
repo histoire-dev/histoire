@@ -30,7 +30,7 @@ useScrollOnActive(isActive, el)
       v-slot="{ active }"
       :to="targetRoute"
       :is-active="isActive"
-      class="htw:px-2 htw:py-2 md:htw:py-1.5 htw:m-1 htw:rounded-sm htw:flex htw:items-center htw:gap-2"
+      class="htw:px-2 htw:py-2 htw:md:py-1.5 htw:m-1 htw:rounded-sm htw:flex htw:items-center htw:gap-2"
     >
       <Icon
         :icon="variant.icon ?? 'carbon:cube'"

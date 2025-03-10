@@ -99,14 +99,14 @@ function selectIndex(index: number) {
           class="htw:opacity-70"
         >*</span>
 
-        <span class="htw:opacity-40 htw:text-sm htw:ml-auto htw:invisible group-focus-within:htw:visible">
+        <span class="htw:opacity-40 htw:text-sm htw:ml-auto htw:invisible htw:group-focus-within:visible">
           Press <BaseKeyboardShortcut shortcut="Space" /> to select
         </span>
       </span>
       <input
         ref="input"
         v-model="search"
-        class="htw:bg-transparent htw:w-full htw:p-2 htw:border htw:border-gray-500/50 focus:htw:border-primary-500/50 htw:rounded htw:outline-none"
+        class="htw:bg-transparent htw:w-full htw:p-2 htw:border htw:border-gray-500/50 htw:focus:border-primary-500/50 htw:rounded htw:outline-none"
         @keydown.down.prevent="selectNext()"
         @keydown.up.prevent="selectPrevious()"
         @keydown.space.prevent="selectIndex(selectedIndex)"
@@ -126,7 +126,7 @@ function selectIndex(index: number) {
               ? 'htw:bg-primary-500/10'
               : 'htw:bg-transparent',
         ]"
-        class="htw:w-full htw:text-left htw:px-4 htw:py-2 hover:htw:bg-primary-500/10 htw:flex htw:items-center"
+        class="htw:w-full htw:text-left htw:px-4 htw:py-2 htw:hover:bg-primary-500/10 htw:flex htw:items-center"
         @click="model = option.value"
       >
         <span class="htw:flex-1">{{ option.label }}</span>

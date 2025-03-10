@@ -152,7 +152,7 @@ watch(sourceHtml, async () => {
           class="htw:flex htw:items-center htw:gap-1 htw:h-full htw:px-1 htw:bg-gray-500/10 htw:rounded-l htw:transition-all htw:ease-[cubic-bezier(0,1,.6,1)] htw:duration-300 htw:overflow-hidden"
           :class="[
             displayedSource !== 'dynamic' ? 'htw:max-w-6 htw:opacity-70' : 'htw:max-w-[82px] htw:text-primary-600 htw:dark:text-primary-400',
-            dynamicSourceCode ? 'htw:cursor-pointer hover:htw:bg-gray-500/30 active:htw:bg-gray-600/50' : 'htw:opacity-50',
+            dynamicSourceCode ? 'htw:cursor-pointer htw:hover:bg-gray-500/30 htw:active:bg-gray-600/50' : 'htw:opacity-50',
           ]"
           @click="dynamicSourceCode && (displayedSource = 'dynamic')"
         >
@@ -174,7 +174,7 @@ watch(sourceHtml, async () => {
           class="htw:flex htw:items-center htw:gap-1 htw:h-full htw:px-1 htw:bg-gray-500/10 htw:rounded-r htw:transition-all htw:ease-[cubic-bezier(0,1,.6,1)] htw:duration-300 htw:overflow-hidden"
           :class="[
             displayedSource !== 'static' ? 'htw:max-w-6 htw:opacity-70' : 'htw:max-w-[63px] htw:text-primary-600 htw:dark:text-primary-400',
-            staticSourceCode ? 'htw:cursor-pointer hover:htw:bg-gray-500/30 active:htw:bg-gray-600/50' : 'htw:opacity-50',
+            staticSourceCode ? 'htw:cursor-pointer htw:hover:bg-gray-500/30 htw:active:bg-gray-600/50' : 'htw:opacity-50',
           ]"
           @click="staticSourceCode && (displayedSource = 'static')"
         >

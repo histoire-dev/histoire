@@ -19,7 +19,7 @@ const sandboxUrl = computed(() => {
     v-tooltip="'Open variant in new tab'"
     :href="sandboxUrl"
     target="_blank"
-    class="histoire-toolbar-new-tab htw:flex htw:items-center htw:gap-1 htw:h-full htw:px-2 hover:htw:text-primary-500 htw:opacity-50 hover:htw:opacity-100 dark:hover:htw:text-primary-400 htw:text-gray-900 htw:dark:text-gray-100"
+    class="histoire-toolbar-new-tab htw:flex htw:items-center htw:gap-1 htw:h-full htw:px-2 htw:hover:text-primary-500 htw:opacity-50 htw:hover:opacity-100 htw:dark:hover:text-primary-400 htw:text-gray-900 htw:dark:text-gray-100"
   >
     <Icon
       icon="carbon:launch"

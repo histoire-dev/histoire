@@ -71,6 +71,7 @@ module.exports = {
 // module.exports.theme.colors = colors
 
 module.exports.plugins.push(require('@tailwindcss/typography'))
+
 module.exports.theme.extend.typography = theme => ({
   DEFAULT: {
     css: {

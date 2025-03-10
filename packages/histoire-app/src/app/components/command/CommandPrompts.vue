@@ -76,7 +76,7 @@ onMounted(() => {
       :prompt="prompt"
       :answers="answers"
       :index="index"
-      class="hover:htw:bg-gray-500/10 focus-within:htw:bg-gray-500/5"
+      class="htw:hover:bg-gray-500/10 htw:focus-within:bg-gray-500/5"
       @next="focusPrompt(index + 1)"
     />
 
