@@ -1,20 +1,8 @@
-// const colors = require('tailwindcss/colors')
 const defaultTheme = require('tailwindcss/defaultTheme')
 
 module.exports = {
   theme: {
     extend: {
-      colors: {
-        // primary: colors.emerald,
-
-        // gray: {
-        //   ...colors.zinc,
-        //   750: '#323238',
-        //   850: '#1f1f21',
-        //   950: '#101012',
-        // },
-      },
-
       maxWidth: theme => ({
         ...theme('width'),
       }),

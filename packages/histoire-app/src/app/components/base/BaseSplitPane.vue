@@ -177,7 +177,7 @@ onUnmounted(() => {
       class="htw:relative htw:top-0 htw:left-0 htw:z-20"
       :class="{
         'htw:pointer-events-none': dragging,
-        'htw:border-r htw:border-gray-300/30 htw:dark:border-gray-800': orientation === 'landscape',
+        'htw:border-r htw:border-r-1 htw:border-gray-300/30 htw:dark:border-gray-800': orientation === 'landscape',
         'htw:flex-none': fixed,
       }"
       :style="leftStyle"
