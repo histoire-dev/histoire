@@ -106,7 +106,7 @@ const commandStore = useCommandStore()
   </div>
 
   <div
-    class="htw:h-screen htw:bg-white dark:htw:bg-gray-700 dark:htw:text-gray-100"
+    class="htw:h-screen htw:bg-white htw:dark:bg-gray-700 htw:dark:text-gray-100"
     :style="{
       // Prevent flash of content
       opacity: mounted ? 1 : 0,
@@ -114,7 +114,7 @@ const commandStore = useCommandStore()
   >
     <div
       v-if="isMobile"
-      class="htw:h-full htw:flex htw:flex-col htw:divide-y htw:divide-gray-100 dark:htw:divide-gray-800"
+      class="htw:h-full htw:flex htw:flex-col htw:divide-y htw:divide-gray-100 htw:dark:divide-gray-800"
     >
       <AppHeader @search="isSearchOpen = true" />
       <Breadcrumb
@@ -133,7 +133,7 @@ const commandStore = useCommandStore()
       class="htw:h-full"
     >
       <template #first>
-        <div class="htw:flex htw:flex-col htw:h-full htw:bg-gray-100 dark:htw:bg-gray-750 __histoire-pane-shadow-from-right">
+        <div class="htw:flex htw:flex-col htw:h-full htw:bg-gray-100 htw:dark:bg-gray-750 __histoire-pane-shadow-from-right">
           <AppHeader
             class="htw:flex-none"
             @search="isSearchOpen = true"

@@ -12,7 +12,7 @@ defineProps<{
   <a
     v-tooltip="tooltip"
     target="_blank"
-    class="histoire-toolbar-open-in-editor htw:flex htw:items-center htw:gap-1 htw:h-full htw:px-2 hover:htw:text-primary-500 htw:opacity-50 hover:htw:opacity-100 dark:hover:htw:text-primary-400 htw:text-gray-900 dark:htw:text-gray-100"
+    class="histoire-toolbar-open-in-editor htw:flex htw:items-center htw:gap-1 htw:h-full htw:px-2 hover:htw:text-primary-500 htw:opacity-50 hover:htw:opacity-100 dark:hover:htw:text-primary-400 htw:text-gray-900 htw:dark:text-gray-100"
     @click="openInEditor(file)"
   >
     <Icon

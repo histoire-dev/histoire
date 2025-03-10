@@ -43,7 +43,7 @@ const settings = usePreviewSettingsStore().currentSettings
             v-model.number="settings.responsiveWidth"
             v-tooltip="'Responsive width (px)'"
             type="number"
-            class="htw:bg-transparent htw:border htw:border-gray-200 dark:htw:border-gray-850 htw:rounded htw:w-20 htw:opacity-50 focus:htw:opacity-100 htw:flex-1 htw:min-w-0"
+            class="htw:bg-transparent htw:border htw:border-gray-200 htw:dark:border-gray-850 htw:rounded htw:w-20 htw:opacity-50 focus:htw:opacity-100 htw:flex-1 htw:min-w-0"
             step="16"
             placeholder="Auto"
           >
@@ -52,7 +52,7 @@ const settings = usePreviewSettingsStore().currentSettings
             v-model.number="settings.responsiveHeight"
             v-tooltip="'Responsive height (px)'"
             type="number"
-            class="htw:bg-transparent htw:border htw:border-gray-200 dark:htw:border-gray-850 htw:rounded htw:w-20 htw:opacity-50 focus:htw:opacity-100 htw:flex-1 htw:min-w-0"
+            class="htw:bg-transparent htw:border htw:border-gray-200 htw:dark:border-gray-850 htw:rounded htw:w-20 htw:opacity-50 focus:htw:opacity-100 htw:flex-1 htw:min-w-0"
             step="16"
             placeholder="Auto"
           >
@@ -64,7 +64,7 @@ const settings = usePreviewSettingsStore().currentSettings
           class="htw:px-4 htw:py-3 htw:cursor-pointer htw:text-left htw:flex htw:gap-4"
           :class="[
             settings.responsiveWidth === preset.width && settings.responsiveHeight === preset.height
-              ? 'htw:bg-primary-500 hover:htw:bg-primary-600 htw:text-white dark:htw:text-black'
+              ? 'htw:bg-primary-500 hover:htw:bg-primary-600 htw:text-white htw:dark:text-black'
               : 'htw:bg-transparent hover:htw:bg-primary-100 dark:hover:htw:bg-primary-700',
           ]"
           @click="settings.responsiveWidth = preset.width;settings.responsiveHeight = preset.height;hide()"

@@ -133,14 +133,14 @@ watch(sourceHtml, async () => {
 
 <template>
   <div
-    class="histoire-story-source-code htw:bg-gray-50 dark:htw:bg-gray-750 htw:h-full htw:overflow-hidden htw:flex htw:flex-col"
+    class="histoire-story-source-code htw:bg-gray-50 htw:dark:bg-gray-750 htw:h-full htw:overflow-hidden htw:flex htw:flex-col"
   >
     <!-- Toolbar -->
     <div
       v-if="!error"
       class="htw:h-10 htw:flex-none htw:border-b htw:border-solid htw:border-gray-500/5 htw:px-4 htw:flex htw:items-center htw:gap-2"
     >
-      <div class="htw:text-gray-900 dark:htw:text-gray-100">
+      <div class="htw:text-gray-900 htw:dark:text-gray-100">
         Source
       </div>
       <div class="htw:flex-1" />
@@ -151,7 +151,7 @@ watch(sourceHtml, async () => {
           v-tooltip="!dynamicSourceCode ? 'Dynamic source code is not available' : displayedSource !== 'dynamic' ? 'Switch to dynamic source' : null"
           class="htw:flex htw:items-center htw:gap-1 htw:h-full htw:px-1 htw:bg-gray-500/10 htw:rounded-l htw:transition-all htw:ease-[cubic-bezier(0,1,.6,1)] htw:duration-300 htw:overflow-hidden"
           :class="[
-            displayedSource !== 'dynamic' ? 'htw:max-w-6 htw:opacity-70' : 'htw:max-w-[82px] htw:text-primary-600 dark:htw:text-primary-400',
+            displayedSource !== 'dynamic' ? 'htw:max-w-6 htw:opacity-70' : 'htw:max-w-[82px] htw:text-primary-600 htw:dark:text-primary-400',
             dynamicSourceCode ? 'htw:cursor-pointer hover:htw:bg-gray-500/30 active:htw:bg-gray-600/50' : 'htw:opacity-50',
           ]"
           @click="dynamicSourceCode && (displayedSource = 'dynamic')"
@@ -173,7 +173,7 @@ watch(sourceHtml, async () => {
           v-tooltip="!staticSourceCode ? 'Static source code is not available' : displayedSource !== 'static' ? 'Switch to static source' : null"
           class="htw:flex htw:items-center htw:gap-1 htw:h-full htw:px-1 htw:bg-gray-500/10 htw:rounded-r htw:transition-all htw:ease-[cubic-bezier(0,1,.6,1)] htw:duration-300 htw:overflow-hidden"
           :class="[
-            displayedSource !== 'static' ? 'htw:max-w-6 htw:opacity-70' : 'htw:max-w-[63px] htw:text-primary-600 dark:htw:text-primary-400',
+            displayedSource !== 'static' ? 'htw:max-w-6 htw:opacity-70' : 'htw:max-w-[63px] htw:text-primary-600 htw:dark:text-primary-400',
             staticSourceCode ? 'htw:cursor-pointer hover:htw:bg-gray-500/30 active:htw:bg-gray-600/50' : 'htw:opacity-50',
           ]"
           @click="staticSourceCode && (displayedSource = 'static')"

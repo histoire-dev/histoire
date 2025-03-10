@@ -125,10 +125,10 @@ const sizeTooltip = computed(() => `${responsiveWidth.value ?? 'Auto'} × ${resp
   <div class="histoire-story-responsive-preview htw:w-full htw:h-full htw:flex-1 htw:rounded-lg htw:relative htw:overflow-hidden">
     <div
       v-if="isResponsiveEnabled"
-      class="htw:absolute htw:inset-0 htw:w-full htw:h-full htw:bg-gray-100 dark:htw:bg-gray-750 htw:rounded-r-lg htw:border-l-2 htw:border-gray-500/10 dark:htw:border-gray-700/30 htw:overflow-hidden"
+      class="htw:absolute htw:inset-0 htw:w-full htw:h-full htw:bg-gray-100 htw:dark:bg-gray-750 htw:rounded-r-lg htw:border-l-2 htw:border-gray-500/10 htw:dark:border-gray-700/30 htw:overflow-hidden"
     >
       <HatchedPattern
-        class="htw:w-full htw:h-full htw:text-black/[1%] dark:htw:text-white/[1%]"
+        class="htw:w-full htw:h-full htw:text-black/[1%] htw:dark:text-white/[1%]"
       />
     </div>
 
@@ -137,7 +137,7 @@ const sizeTooltip = computed(() => `${responsiveWidth.value ?? 'Auto'} × ${resp
       class="htw:h-full htw:overflow-auto htw:relative"
     >
       <div
-        class="htw:overflow-hidden htw:bg-white dark:htw:bg-gray-700 htw:rounded-lg htw:relative"
+        class="htw:overflow-hidden htw:bg-white htw:dark:bg-gray-700 htw:rounded-lg htw:relative"
         :class="isResponsiveEnabled ? {
           'htw:w-fit': !!finalWidth,
           'htw:h-fit': !!finalHeight,

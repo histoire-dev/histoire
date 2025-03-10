@@ -24,7 +24,7 @@ const contrastColor = computed(() => getContrastColor(settings))
       class="htw:cursor-pointer hover:htw:text-primary-500 htw:flex htw:items-center htw:gap-1 htw:h-full htw:px-2 htw:group"
     >
       <div
-        class="bind-preview-bg htw:w-4 htw:h-4 htw:rounded-full htw:border htw:border-black/50 dark:htw:border-white/50 htw:flex htw:items-center htw:justify-center htw:text-xs"
+        class="bind-preview-bg htw:w-4 htw:h-4 htw:rounded-full htw:border htw:border-black/50 htw:dark:border-white/50 htw:flex htw:items-center htw:justify-center htw:text-xs"
       >
         <span v-if="contrastColor">a</span>
       </div>
@@ -49,7 +49,7 @@ const contrastColor = computed(() => getContrastColor(settings))
           class="htw:px-4 htw:py-3 htw:cursor-pointer htw:text-left htw:flex htw:items-baseline htw:gap-4"
           :class="[
             settings.backgroundColor === option.color
-              ? 'htw:bg-primary-500 hover:htw:bg-primary-600 htw:text-white dark:htw:text-black'
+              ? 'htw:bg-primary-500 hover:htw:bg-primary-600 htw:text-white htw:dark:text-black'
               : 'htw:bg-transparent hover:htw:bg-primary-100 dark:hover:htw:bg-primary-700',
           ]"
           @click="settings.backgroundColor = option.color;hide()"
@@ -58,7 +58,7 @@ const contrastColor = computed(() => getContrastColor(settings))
           <template v-if="option.color !== '$checkerboard'">
             <span class="htw:ml-auto htw:opacity-70">{{ option.color }}</span>
             <div
-              class="htw:w-4 htw:h-4 htw:rounded-full htw:border htw:border-black/20 dark:htw:border-white/20 htw:flex htw:items-center htw:justify-center htw:text-xs"
+              class="htw:w-4 htw:h-4 htw:rounded-full htw:border htw:border-black/20 htw:dark:border-white/20 htw:flex htw:items-center htw:justify-center htw:text-xs"
               :style="{
                 backgroundColor: option.color,
                 color: option.contrastColor,

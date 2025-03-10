@@ -83,7 +83,7 @@ const autoApplyContrastColor = computed(() => !!histoireConfig.autoApplyContrast
         class="htw:rounded htw:w-max htw:px-2 htw:py-0.5 htw:min-w-16 htw:cursor-pointer htw:flex htw:items-center htw:gap-1 htw:flex-shrink"
         :class="{
           'hover:htw:bg-gray-200 htw:text-gray-500 dark:hover:htw:bg-gray-800': !isActive,
-          'htw:bg-primary-200 hover:htw:bg-primary-300 htw:text-primary-800 dark:htw:bg-primary-700 dark:hover:htw:bg-primary-800 dark:htw:text-primary-200': isActive,
+          'htw:bg-primary-200 hover:htw:bg-primary-300 htw:text-primary-800 htw:dark:bg-primary-700 dark:hover:htw:bg-primary-800 htw:dark:text-primary-200': isActive,
         }"
       >
         <Icon
@@ -111,10 +111,10 @@ const autoApplyContrastColor = computed(() => !!histoireConfig.autoApplyContrast
 
     <!-- Body -->
     <div
-      class="htw:border htw:bg-white dark:htw:bg-gray-700 htw:rounded htw:flex-1 htw:p-4 htw:relative"
+      class="htw:border htw:bg-white htw:dark:bg-gray-700 htw:rounded htw:flex-1 htw:p-4 htw:relative"
       :class="{
-        'htw:border-gray-100 dark:htw:border-gray-800': !isActive,
-        'htw:border-primary-200 dark:htw:border-primary-900': isActive,
+        'htw:border-gray-100 htw:dark:border-gray-800': !isActive,
+        'htw:border-primary-200 htw:dark:border-primary-900': isActive,
       }"
       data-test-id="sandbox-render"
       @click.stop="selectVariant()"

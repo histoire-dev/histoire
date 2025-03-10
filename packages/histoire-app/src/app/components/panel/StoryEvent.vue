@@ -28,7 +28,7 @@ const formattedArgument = computed(() => {
       <div
         class="group-hover:htw:bg-primary-100 dark:group-hover:htw:bg-primary-700 htw:cursor-pointer htw:py-2 htw:px-4 htw:flex htw:items-baseline htw:gap-1 htw:leading-normal"
         :class="[
-          shown ? 'htw:bg-primary-50 dark:htw:bg-primary-600' : 'group-odd:htw:bg-gray-100/50 dark:group-odd:htw:bg-gray-750/40',
+          shown ? 'htw:bg-primary-50 htw:dark:bg-primary-600' : 'group-odd:htw:bg-gray-100/50 dark:group-odd:htw:bg-gray-750/40',
         ]"
       >
         <span

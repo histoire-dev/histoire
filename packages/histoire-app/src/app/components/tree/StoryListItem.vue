@@ -42,7 +42,7 @@ useScrollOnActive(isActive, el)
       <span class="bind-tree-margin htw:flex htw:items-center htw:gap-2 htw:pl-4 htw:min-w-0">
         <Icon
           :icon="story.icon ?? 'carbon:cube'"
-          class="htw:w-5 htw:h-5 sm:htw:w-4 sm:htw:h-4 htw:flex-none"
+          class="htw:w-5 htw:h-5 htw:sm:w-4 htw:sm:h-4 htw:flex-none"
           :class="{
             'htw:text-primary-500': !active && !story.iconColor,
             'bind-icon-color': !active && story.iconColor,

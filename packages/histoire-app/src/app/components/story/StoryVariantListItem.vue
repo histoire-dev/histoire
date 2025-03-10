@@ -34,7 +34,7 @@ useScrollOnActive(isActive, el)
     >
       <Icon
         :icon="variant.icon ?? 'carbon:cube'"
-        class="htw:w-5 htw:h-5 sm:htw:w-4 sm:htw:h-4 htw:flex-none"
+        class="htw:w-5 htw:h-5 htw:sm:w-4 htw:sm:h-4 htw:flex-none"
         :class="{
           'htw:text-gray-500': !active && !variant.iconColor,
           'bind-icon-color': !active && variant.iconColor,

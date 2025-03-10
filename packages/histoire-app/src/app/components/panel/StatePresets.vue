@@ -152,7 +152,7 @@ onClickOutside(select, stopEditing)
               v-if="canEdit"
               v-tooltip="'Rename this preset'"
               icon="carbon:edit"
-              class="htw:flex-none htw:cursor-pointer htw:w-4 htw:h-4 hover:htw:text-primary-500 htw:opacity-50 hover:htw:opacity-100 dark:hover:htw:text-primary-400 htw:text-gray-900 dark:htw:text-gray-100"
+              class="htw:flex-none htw:cursor-pointer htw:w-4 htw:h-4 hover:htw:text-primary-500 htw:opacity-50 hover:htw:opacity-100 dark:hover:htw:text-primary-400 htw:text-gray-900 htw:dark:text-gray-100"
               @click.stop="startEditing()"
             />
           </div>
@@ -167,7 +167,7 @@ onClickOutside(select, stopEditing)
               v-if="value !== DEFAULT_ID"
               v-tooltip="'Delete this preset'"
               icon="carbon:trash-can"
-              class="htw:flex-none htw:cursor-pointer htw:w-4 htw:h-4 hover:htw:text-primary-500 htw:opacity-50 hover:htw:opacity-100 dark:hover:htw:text-primary-400 htw:text-gray-900 dark:htw:text-gray-100"
+              class="htw:flex-none htw:cursor-pointer htw:w-4 htw:h-4 hover:htw:text-primary-500 htw:opacity-50 hover:htw:opacity-100 dark:hover:htw:text-primary-400 htw:text-gray-900 htw:dark:text-gray-100"
               @click.stop="deletePreset(value)"
             />
           </div>
@@ -177,7 +177,7 @@ onClickOutside(select, stopEditing)
     <Icon
       v-tooltip="savedNotif ? 'Saved!' : canEdit ? 'Save to preset' : null"
       :icon="savedNotif ? 'carbon:checkmark' : 'carbon:save'"
-      class="htw:cursor-pointer htw:w-4 htw:h-4 hover:htw:text-primary-500 dark:hover:htw:text-primary-400 htw:text-gray-900 dark:htw:text-gray-100"
+      class="htw:cursor-pointer htw:w-4 htw:h-4 hover:htw:text-primary-500 dark:hover:htw:text-primary-400 htw:text-gray-900 htw:dark:text-gray-100"
       :class="[
         canEdit ? 'htw:opacity-50 hover:htw:opacity-100' : 'htw:opacity-25 htw:pointer-events-none',
       ]"
@@ -186,13 +186,13 @@ onClickOutside(select, stopEditing)
     <Icon
       v-tooltip="'Create new preset'"
       icon="carbon:add-alt"
-      class="htw:cursor-pointer htw:w-4 htw:h-4 hover:htw:text-primary-500 htw:opacity-50 hover:htw:opacity-100 dark:hover:htw:text-primary-400 htw:text-gray-900 dark:htw:text-gray-100"
+      class="htw:cursor-pointer htw:w-4 htw:h-4 hover:htw:text-primary-500 htw:opacity-50 hover:htw:opacity-100 dark:hover:htw:text-primary-400 htw:text-gray-900 htw:dark:text-gray-100"
       @click="createPreset()"
     />
     <Icon
       v-tooltip="'Reset to initial state'"
       icon="carbon:reset"
-      class="htw:cursor-pointer htw:w-4 htw:h-4 hover:htw:text-primary-500 htw:opacity-50 hover:htw:opacity-100 dark:hover:htw:text-primary-400 htw:text-gray-900 dark:htw:text-gray-100"
+      class="htw:cursor-pointer htw:w-4 htw:h-4 hover:htw:text-primary-500 htw:opacity-50 hover:htw:opacity-100 dark:hover:htw:text-primary-400 htw:text-gray-900 htw:dark:text-gray-100"
       @click="resetState()"
     />
   </div>
