@@ -25,7 +25,7 @@
   "types": "./src/index.ts",
   "scripts": {
     "build": "rimraf dist && vite build && pnpm run build:css && node ./scripts/copy.mjs",
-    "build:css": "tailwindcss -i src/app/style/main.pcss -o ./dist/style.css -c tailwind.config.cjs --postcss postcss.config.cjs",
+    "build:css": "tailwindcss -i src/app/style/main.pcss -o ./dist/style.css",
     "watch": "concurrently \"vite build --watch\" \"pnpm run build:css --watch\" \"node ./scripts/watchAndCopy.mjs\""
   },
   "dependencies": {

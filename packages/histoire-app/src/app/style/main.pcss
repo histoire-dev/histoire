@@ -1,18 +1,41 @@
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Display&display=swap');
 
 @import "tailwindcss" prefix(htw);
+@config "../../../tailwind.config.cjs";
+@custom-variant dark (&:where(.htw\:dark, .htw\:dark *));
+
+
 @import 'floating-vue/dist/style.css';
 
-/* TODO: including this file produces Error: `Cannot apply unknown utility class: !htw:bg-primary-500` */
-/* @import '@histoire/controls/dist/index.es.css'; */
+@import '@histoire/controls/dist/index.es.css';
 
 @import './floating.pcss';
 @import './transitions.pcss';
 
 @theme {
-  --color-primary-500: #2563EB;
+  --color-primary-100: var(--htw-color-emerald-100);
+  --color-primary-200: var(--htw-color-emerald-200);
+  --color-primary-300: var(--htw-color-emerald-300);
+  --color-primary-400: var(--htw-color-emerald-400);
+  --color-primary-500: var(--htw-color-emerald-500);
+  --color-primary-600: var(--htw-color-emerald-600);
+  --color-primary-700: var(--htw-color-emerald-700);
+  --color-primary-800: var(--htw-color-emerald-800);
+  --color-primary-900: var(--htw-color-emerald-900);
 
-  --color-gray-850: #1a1a1a;
+  --color-gray-50: var(--htw-color-zinc-50);
+  --color-gray-100: var(--htw-color-zinc-100);
+  --color-gray-200: var(--htw-color-zinc-200);
+  --color-gray-300: var(--htw-color-zinc-300);
+  --color-gray-400: var(--htw-color-zinc-400);
+  --color-gray-500: var(--htw-color-zinc-500);
+  --color-gray-600: var(--htw-color-zinc-600);
+  --color-gray-700: var(--htw-color-zinc-700);
+  --color-gray-800: var(--htw-color-zinc-800);
+  --color-gray-900: var(--htw-color-zinc-900);
+  --color-gray-750: '#323238';
+  --color-gray-850: '#1f1f21';
+  --color-gray-950: '#101012',
 }
 
 *,
