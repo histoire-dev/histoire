@@ -7,7 +7,4 @@ module.exports = {
   content: [
     path.resolve(__dirname, './src/**/*.{vue,js,ts,jsx,tsx,md}'),
   ],
-  corePlugins: {
-    preflight: false,
-  },
 }
