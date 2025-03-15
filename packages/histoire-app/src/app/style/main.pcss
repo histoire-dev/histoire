@@ -2,6 +2,7 @@
 
 @layer theme, base, components, utilities;
 @import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/preflight.css" layer(base);
 @import "tailwindcss/utilities.css" layer(utilities);
 
 @config "../../../tailwind.config.cjs";
@@ -17,6 +18,8 @@
 
 
 @theme {
+  --font-sans: 'Noto Sans Display', system-ui, sans-serif;
+
   --color-primary-100: var(--htw-color-emerald-100);
   --color-primary-200: var(--htw-color-emerald-200);
   --color-primary-300: var(--htw-color-emerald-300);
@@ -74,7 +77,7 @@ button {
   }
 
   html {
-    font-family: 'Noto Sans Display', system-ui, sans-serif;
+    @apply htw:!font-sans;
     font-size: 1rem;
   }
 
