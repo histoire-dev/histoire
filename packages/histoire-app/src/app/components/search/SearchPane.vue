@@ -290,7 +290,7 @@ const {
       ref="input"
       v-model="searchInputText"
       placeholder="Search for stories, variants..."
-      class="htw:bg-transparent htw:w-full htw:flex-1 htw:pl-0 htw:pr-6 htw:py-4 htw:outline-none"
+      class="htw:bg-transparent htw:w-full htw:flex-1 htw:pl-0 htw:pr-6 htw:py-4 htw:outline-none htw:border-0 htw:text-inherit"
       @keydown.down.prevent="selectNext()"
       @keydown.up.prevent="selectPrevious()"
       @keydown.escape="close()"
