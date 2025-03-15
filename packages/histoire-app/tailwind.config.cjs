@@ -9,9 +9,6 @@ module.exports = {
     // Include controls CSS directly
     path.resolve(__dirname, '../histoire-controls/src/**/*.{vue,js,ts,jsx,tsx,md}'),
   ],
-  corePlugins: { // TODO: NOT supported
-    preflight: false,
-  },
 }
 
 module.exports.plugins.push(require('@tailwindcss/typography'))
@@ -24,7 +21,7 @@ module.exports.theme.extend.typography = theme => ({
         'textDecoration': 'none',
 
         '&:hover': {
-          textDecoration: 'underline',
+          textDecoration: 'underline !important',
         },
       },
 
