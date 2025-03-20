@@ -59,11 +59,11 @@ onMounted(() => {
 
 <template>
   <form
-    class="histoire-command-prompts htw-flex htw-flex-col"
+    class="histoire-command-prompts htw:flex htw:flex-col"
     @submit.prevent="submit()"
     @keyup.escape="$emit('close')"
   >
-    <div class="htw-p-4 htw-opacity-70">
+    <div class="htw:p-4 htw:opacity-70">
       {{ command.label }}
     </div>
 
@@ -76,14 +76,14 @@ onMounted(() => {
       :prompt="prompt"
       :answers="answers"
       :index="index"
-      class="hover:htw-bg-gray-500/10 focus-within:htw-bg-gray-500/5"
+      class="htw:hover:bg-gray-500/10 htw:focus-within:bg-gray-500/5"
       @next="focusPrompt(index + 1)"
     />
 
-    <div class="htw-flex htw-justify-end htw-gap-2 htw-p-2">
+    <div class="htw:flex htw:justify-end htw:gap-2 htw:p-2">
       <BaseButton
         type="submit"
-        class="htw-px-4 htw-py-2 htw-flex htw-items-start htw-gap-2"
+        class="htw:px-4 htw:py-2 htw:flex htw:items-start htw:gap-2"
       >
         <BaseKeyboardShortcut
           shortcut="Enter"

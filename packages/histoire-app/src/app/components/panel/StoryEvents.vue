@@ -33,7 +33,7 @@ const eventsElement = ref<HTMLDivElement>()
     >
       <Icon
         icon="carbon:event-schedule"
-        class="htw-w-8 htw-h-8 htw-opacity-50 htw-mb-6"
+        class="htw:w-8 htw:h-8 htw:opacity-50 htw:mb-6"
       />
       No event fired
     </BaseEmpty>

@@ -21,7 +21,7 @@ const variants: Array<{ name: string, bind?: unknown }> = [
     >
       <HstButton
         v-bind="variant.bind as {}"
-        class="htw-p-2"
+        class="htw:p-2"
       >
         Click me!
       </HstButton>

@@ -30,6 +30,7 @@
     "@antfu/eslint-config": "^3.11.2",
     "@histoire/vendors": "workspace:*",
     "@iconify/vue": "^4.1.2",
+    "@tailwindcss/vite": "^4.0.8",
     "@vueuse/core": "^12.0.0",
     "autoprefixer": "^10.4.20",
     "eslint": "^9.16.0",
@@ -37,7 +38,7 @@
     "floating-vue": "5.2.2",
     "postcss": "^8.4.49",
     "rimraf": "^6.0.1",
-    "tailwindcss": "^3.4.16",
+    "tailwindcss": "^4.0.8",
     "typescript": "5.6.3",
     "vitepress": "1.5.0",
     "vue-eslint-parser": "^9.4.3"

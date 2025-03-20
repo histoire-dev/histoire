@@ -23,41 +23,41 @@ onKeyboardShortcut(['ctrl+shift+d', 'meta+shift+d'], (event) => {
 
 <template>
   <div
-    class="histoire-app-header htw-px-4 htw-h-16 htw-flex htw-items-center htw-gap-2"
+    class="histoire-app-header htw:px-4 htw:h-16 htw:flex htw:items-center htw:gap-2"
   >
-    <div class="htw-py-3 sm:htw-py-4 htw-flex-1 htw-h-full htw-flex htw-items-center htw-pr-2">
+    <div class="htw:py-3 htw:sm:py-4 htw:flex-1 htw:h-full htw:flex htw:items-center htw:pr-2">
       <a
         :href="histoireConfig.theme?.logoHref"
         target="_blank"
-        class="htw-w-full htw-h-full htw-flex htw-items-center"
+        class="htw:w-full htw:h-full htw:flex htw:items-center"
       >
         <AppLogo
-          class="htw-max-w-full htw-max-h-full"
+          class="htw:max-w-full htw:max-h-full"
         />
       </a>
     </div>
-    <div class="htw-ml-auto htw-flex-none htw-flex">
+    <div class="htw:ml-auto htw:flex-none htw:flex">
       <a
         v-tooltip="makeTooltip('Search', ({ isMac }) => isMac ? 'meta+k' : 'ctrl+k')"
-        class="htw-p-2 sm:htw-p-1 hover:htw-text-primary-500 dark:hover:htw-text-primary-400 htw-cursor-pointer htw-text-gray-900 dark:htw-text-gray-100"
+        class="htw:p-2 htw:sm:p-1 htw:hover:text-primary-500 htw:dark:hover:text-primary-400 htw:cursor-pointer htw:text-gray-900 htw:dark:text-gray-100"
         data-test-id="search-btn"
         @click="$emit('search')"
       >
         <Icon
           icon="carbon:search"
-          class="htw-w-6 htw-h-6 sm:htw-w-4 sm:htw-h-4"
+          class="htw:w-6 htw:h-6 htw:sm:w-4 htw:sm:h-4"
         />
       </a>
 
       <a
         v-if="!histoireConfig.theme.hideColorSchemeSwitch"
         v-tooltip="makeTooltip('Toggle dark mode', ({ isMac }) => isMac ? 'meta+shift+d' : 'ctrl+shift+d')"
-        class="htw-p-2 sm:htw-p-1 hover:htw-text-primary-500 dark:hover:htw-text-primary-400 htw-cursor-pointer htw-text-gray-900 dark:htw-text-gray-100"
+        class="htw:p-2 htw:sm:p-1 htw:hover:text-primary-500 htw:dark:hover:text-primary-400 htw:cursor-pointer htw:text-gray-900 htw:dark:text-gray-100"
         @click="toggleDark()"
       >
         <Icon
           :icon="themeIcon"
-          class="htw-w-6 htw-h-6 sm:htw-w-4 sm:htw-h-4"
+          class="htw:w-6 htw:h-6 htw:sm:w-4 htw:sm:h-4"
         />
       </a>
     </div>

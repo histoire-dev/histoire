@@ -133,32 +133,32 @@ watch(sourceHtml, async () => {
 
 <template>
   <div
-    class="histoire-story-source-code htw-bg-gray-50 dark:htw-bg-gray-750 htw-h-full htw-overflow-hidden htw-flex htw-flex-col"
+    class="histoire-story-source-code htw:bg-gray-50 htw:dark:bg-gray-750 htw:h-full htw:overflow-hidden htw:flex htw:flex-col"
   >
     <!-- Toolbar -->
     <div
       v-if="!error"
-      class="htw-h-10 htw-flex-none htw-border-b htw-border-solid htw-border-gray-500/5 htw-px-4 htw-flex htw-items-center htw-gap-2"
+      class="htw:h-10 htw:flex-none htw:border-b htw:border-solid htw:border-gray-500/5 htw:px-4 htw:flex htw:items-center htw:gap-2"
     >
-      <div class="htw-text-gray-900 dark:htw-text-gray-100">
+      <div class="htw:text-gray-900 htw:dark:text-gray-100">
         Source
       </div>
-      <div class="htw-flex-1" />
+      <div class="htw:flex-1" />
 
       <!-- Display source modes -->
-      <div class="htw-flex htw-flex-none htw-gap-px htw-h-full htw-py-2">
+      <div class="htw:flex htw:flex-none htw:gap-px htw:h-full htw:py-2">
         <button
           v-tooltip="!dynamicSourceCode ? 'Dynamic source code is not available' : displayedSource !== 'dynamic' ? 'Switch to dynamic source' : null"
-          class="htw-flex htw-items-center htw-gap-1 htw-h-full htw-px-1 htw-bg-gray-500/10 htw-rounded-l htw-transition-all htw-ease-[cubic-bezier(0,1,.6,1)] htw-duration-300 htw-overflow-hidden"
+          class="htw:flex htw:items-center htw:gap-1 htw:h-full htw:px-1 htw:bg-gray-500/10 htw:rounded-l htw:transition-all htw:ease-[cubic-bezier(0,1,.6,1)] htw:duration-300 htw:overflow-hidden"
           :class="[
-            displayedSource !== 'dynamic' ? 'htw-max-w-6 htw-opacity-70' : 'htw-max-w-[82px] htw-text-primary-600 dark:htw-text-primary-400',
-            dynamicSourceCode ? 'htw-cursor-pointer hover:htw-bg-gray-500/30 active:htw-bg-gray-600/50' : 'htw-opacity-50',
+            displayedSource !== 'dynamic' ? 'htw:max-w-6 htw:opacity-70' : 'htw:max-w-[82px] htw:text-primary-600 htw:dark:text-primary-400',
+            dynamicSourceCode ? 'htw:cursor-pointer htw:hover:bg-gray-500/30 htw:active:bg-gray-600/50' : 'htw:opacity-50',
           ]"
           @click="dynamicSourceCode && (displayedSource = 'dynamic')"
         >
           <Icon
             icon="carbon:flash"
-            class="htw-w-4 htw-h-4 htw-flex-none"
+            class="htw:w-4 htw:h-4 htw:flex-none"
           />
           <span
             class="transition-opacity duration-300"
@@ -171,16 +171,16 @@ watch(sourceHtml, async () => {
         </button>
         <button
           v-tooltip="!staticSourceCode ? 'Static source code is not available' : displayedSource !== 'static' ? 'Switch to static source' : null"
-          class="htw-flex htw-items-center htw-gap-1 htw-h-full htw-px-1 htw-bg-gray-500/10 htw-rounded-r htw-transition-all htw-ease-[cubic-bezier(0,1,.6,1)] htw-duration-300 htw-overflow-hidden"
+          class="htw:flex htw:items-center htw:gap-1 htw:h-full htw:px-1 htw:bg-gray-500/10 htw:rounded-r htw:transition-all htw:ease-[cubic-bezier(0,1,.6,1)] htw:duration-300 htw:overflow-hidden"
           :class="[
-            displayedSource !== 'static' ? 'htw-max-w-6 htw-opacity-70' : 'htw-max-w-[63px] htw-text-primary-600 dark:htw-text-primary-400',
-            staticSourceCode ? 'htw-cursor-pointer hover:htw-bg-gray-500/30 active:htw-bg-gray-600/50' : 'htw-opacity-50',
+            displayedSource !== 'static' ? 'htw:max-w-6 htw:opacity-70' : 'htw:max-w-[63px] htw:text-primary-600 htw:dark:text-primary-400',
+            staticSourceCode ? 'htw:cursor-pointer htw:hover:bg-gray-500/30 htw:active:bg-gray-600/50' : 'htw:opacity-50',
           ]"
           @click="staticSourceCode && (displayedSource = 'static')"
         >
           <Icon
             icon="carbon:document"
-            class="htw-w-4 htw-h-4 htw-flex-none"
+            class="htw:w-4 htw:h-4 htw:flex-none"
           />
           <span
             class="transition-opacity duration-300"
@@ -195,13 +195,13 @@ watch(sourceHtml, async () => {
 
       <HstCopyIcon
         :content="displayedSourceCode"
-        class="htw-flex-none"
+        class="htw:flex-none"
       />
     </div>
 
     <div
       v-if="error"
-      class="htw-text-red-500 htw-h-full htw-p-2 htw-overflow-auto htw-font-mono htw-text-sm"
+      class="htw:text-red-500 htw:h-full htw:p-2 htw:overflow-auto htw:font-mono htw:text-sm"
     >
       Error: {{ error }}
     </div>
@@ -209,7 +209,7 @@ watch(sourceHtml, async () => {
     <BaseEmpty v-else-if="!displayedSourceCode">
       <Icon
         icon="carbon:code-hide"
-        class="htw-w-8 htw-h-8 htw-opacity-50 htw-mb-6"
+        class="htw:w-8 htw:h-8 htw:opacity-50 htw:mb-6"
       />
       <span>Not available</span>
     </BaseEmpty>
@@ -217,7 +217,7 @@ watch(sourceHtml, async () => {
     <textarea
       v-else-if="!sourceHtml"
       ref="scroller"
-      class="__histoire-code-placeholder htw-w-full htw-h-full htw-p-4 htw-outline-none htw-bg-transparent htw-resize-none htw-m-0"
+      class="__histoire-code-placeholder htw:w-full htw:h-full htw:p-4 htw:outline-none htw:bg-transparent htw:resize-none htw:m-0"
       :value="displayedSourceCode"
       readonly
       data-test-id="story-source-code"
@@ -227,12 +227,12 @@ watch(sourceHtml, async () => {
     <div
       v-else
       ref="scroller"
-      class="htw-w-full htw-h-full htw-overflow-auto"
+      class="htw:w-full htw:h-full htw:overflow-auto"
       data-test-id="story-source-code"
       @scroll="onScroll"
     >
       <div
-        class="__histoire-code htw-p-4 htw-w-fit"
+        class="__histoire-code htw:p-4 htw:w-fit"
         v-html="sourceHtml"
       />
     </div>

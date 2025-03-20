@@ -37,12 +37,12 @@ export default defineComponent({
   >
     <a
       :href="href"
-      class="htw-flex htw-items-center htw-gap-2 htw-text-gray-900 dark:htw-text-gray-100"
+      class="htw:flex htw:items-center htw:gap-2 htw:text-gray-900 htw:dark:text-gray-100"
       :class="[
         $attrs.class,
         (isActive != null ? isActive : linkIsActive)
-          ? 'active htw-bg-primary-500 hover:htw-bg-primary-600 htw-text-white dark:htw-text-black'
-          : 'hover:htw-bg-primary-100 dark:hover:htw-bg-primary-900',
+          ? 'active htw:bg-primary-500 htw:hover:bg-primary-600 htw:text-white htw:dark:text-black'
+          : 'htw:hover:bg-primary-100 htw:dark:hover:bg-primary-900',
       ]"
       @click="handleNavigate($event, navigate)"
       @keyup.enter="handleNavigate($event, navigate)"

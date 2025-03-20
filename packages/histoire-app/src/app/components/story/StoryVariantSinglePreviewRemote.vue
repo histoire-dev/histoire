@@ -127,10 +127,10 @@ function onIframeLoad() {
     <iframe
       ref="iframe"
       :src="sandboxUrl"
-      class="htw-w-full htw-h-full htw-relative"
+      class="htw:w-full htw:h-full htw:relative"
       :class="{
-        'htw-invisible': !isIframeLoaded,
-        'htw-pointer-events-none': resizing,
+        'htw:invisible': !isIframeLoaded,
+        'htw:pointer-events-none': resizing,
       }"
       :style="isResponsiveEnabled ? {
         width: finalWidth ? `${finalWidth}px` : null,

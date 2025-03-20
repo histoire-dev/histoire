@@ -170,9 +170,9 @@ const filePath = computed(() => story.value.file?.docsFilePath ?? (props.standal
   >
     <div
       v-if="__HISTOIRE_DEV__ && renderedDoc && filePath"
-      class="htw-flex htw-items-center htw-gap-2 htw-p-2"
+      class="htw:flex htw:items-center htw:gap-2 htw:p-2"
       :class="{
-        'htw-pt-4': !standalone,
+        'htw:pt-4': !standalone,
       }"
     >
       <DevOnlyToolbarOpenInEditor
@@ -187,14 +187,14 @@ const filePath = computed(() => story.value.file?.docsFilePath ?? (props.standal
     >
       <Icon
         icon="carbon:document-unknown"
-        class="htw-w-8 htw-h-8 htw-opacity-50 htw-mb-6"
+        class="htw:w-8 htw:h-8 htw:opacity-50 htw:mb-6"
       />
       No documentation available
     </BaseEmpty>
     <div
       v-else
       ref="renderedEl"
-      class="htw-prose dark:htw-prose-invert htw-p-4 htw-max-w-none"
+      class="htw:prose htw:dark:prose-invert htw:p-4 htw:max-w-none"
       data-test-id="story-docs"
       v-html="renderedDoc"
     />

@@ -25,7 +25,7 @@
   "types": "./src/index.ts",
   "scripts": {
     "build": "rimraf dist && vite build && pnpm run build:css && node ./scripts/copy.mjs",
-    "build:css": "tailwindcss -i src/app/style/main.pcss -o ./dist/style.css -c tailwind.config.cjs --postcss postcss.config.cjs",
+    "build:css": "tailwindcss -i src/app/style/main.pcss -o ./dist/style.css",
     "watch": "concurrently \"vite build --watch\" \"pnpm run build:css --watch\" \"node ./scripts/watchAndCopy.mjs\""
   },
   "dependencies": {
@@ -36,7 +36,9 @@
     "shiki": "^3.0.0"
   },
   "devDependencies": {
+    "@tailwindcss/cli": "^4.0.8",
     "@tailwindcss/typography": "^0.5.15",
+    "@tailwindcss/vite": "^4.0.8",
     "@types/fs-extra": "^11.0.4",
     "@types/node": "^22.10.1",
     "@vitejs/plugin-vue": "^5.2.1",
@@ -48,7 +50,7 @@
     "pathe": "^1.1.2",
     "postcss": "^8.4.49",
     "postcss-import": "^16.1.0",
-    "tailwindcss": "^3.4.16",
+    "tailwindcss": "^4.0.8",
     "typescript": "5.6.3",
     "vite": "^6.0.5",
     "vue": "^3.5.13"

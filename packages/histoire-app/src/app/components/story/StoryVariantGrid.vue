@@ -119,11 +119,11 @@ const columnCount = computed(() => Math.min(storyStore.currentStory.variants.len
 </script>
 
 <template>
-  <div class="histoire-story-variant-grid htw-flex htw-flex-col htw-items-stretch htw-h-full __histoire-pane-shadow-from-right">
+  <div class="histoire-story-variant-grid htw:flex htw:flex-col htw:items-stretch htw:h-full __histoire-pane-shadow-from-right">
     <!-- Toolbar -->
     <div
       v-if="!isMobile"
-      class="htw-flex-none htw-flex htw-items-center htw-justify-end htw-h-8 htw-mx-2 htw-mt-1"
+      class="htw:flex-none htw:flex htw:items-center htw:justify-end htw:h-8 htw:mx-2 htw:mt-1"
     >
       <ToolbarBackground />
       <ToolbarTextDirection />
@@ -137,19 +137,19 @@ const columnCount = computed(() => Math.min(storyStore.currentStory.variants.len
 
     <div
       ref="el"
-      class="htw-overflow-y-auto htw-flex htw-flex-1"
+      class="htw:overflow-y-auto htw:flex htw:flex-1"
       @scroll="updateMaxCount()"
     >
-      <div class="htw-flex htw-w-0 htw-flex-1 htw-mx-4">
+      <div class="htw:flex htw:w-0 htw:flex-1 htw:mx-4">
         <div
-          class="htw-m-auto"
+          class="htw:m-auto"
           :style="{
             minHeight: `${(storyStore.currentStory.variants.length / countPerRow) * (maxItemHeight + gap) - gap}px`,
           }"
         >
           <div
             ref="gridEl"
-            class="htw-grid htw-gap-4 htw-my-4"
+            class="htw:grid htw:gap-4 htw:my-4"
             :style="{
               gridTemplateColumns: `repeat(${columnCount}, ${gridColumnWidth}px)`,
             }"

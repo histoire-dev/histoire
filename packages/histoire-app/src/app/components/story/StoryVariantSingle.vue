@@ -21,7 +21,7 @@ const variant = computed(() => storyStore.currentVariant)
 <template>
   <div
     v-if="hasSingleVariant && variant"
-    class="histoire-story-variant-single htw-p-2 htw-h-full __histoire-pane-shadow-from-right"
+    class="histoire-story-variant-single htw:p-2 htw:h-full __histoire-pane-shadow-from-right"
   >
     <StoryVariantSingleView
       :variant="variant"
@@ -31,18 +31,18 @@ const variant = computed(() => storyStore.currentVariant)
   <template v-else>
     <div
       v-if="isMobile"
-      class="htw-divide-y htw-divide-gray-100 dark:htw-divide-gray-800 htw-h-full htw-flex htw-flex-col"
+      class="htw:divide-y htw:divide-gray-100 htw:dark:divide-gray-800 htw:h-full htw:flex htw:flex-col"
     >
       <a
-        class="htw-px-6 htw-h-12 hover:htw-text-primary-500 dark:hover:htw-text-primary-400 htw-cursor-pointer htw-flex htw-gap-2 htw-flex-wrap htw-w-full htw-items-center htw-flex-none"
+        class="htw:px-6 htw:h-12 htw:hover:text-primary-500 htw:dark:hover:text-primary-400 htw:cursor-pointer htw:flex htw:gap-2 htw:flex-wrap htw:w-full htw:items-center htw:flex-none"
         @click="$emit('openVariantMenu')"
       >
         <template v-if="variant">
           <Icon
             :icon="variant.icon ?? 'carbon:cube'"
-            class="htw-w-5 htw-h-5 htw-flex-none"
+            class="htw:w-5 htw:h-5 htw:flex-none"
             :class="{
-              'htw-text-gray-500': !variant.iconColor,
+              'htw:text-gray-500': !variant.iconColor,
               'bind-icon-color': variant.iconColor,
             }"
           />
@@ -54,12 +54,12 @@ const variant = computed(() => storyStore.currentVariant)
 
         <Icon
           icon="carbon:chevron-sort"
-          class="htw-w-5 htw-h-5 htw-shrink-0 htw-ml-auto"
+          class="htw:w-5 htw:h-5 htw:shrink-0 htw:ml-auto"
         />
       </a>
       <div
         v-if="storyStore.currentVariant"
-        class="htw-p-2 htw-h-full"
+        class="htw:p-2 htw:h-full"
       >
         <StoryVariantSingleView
           :variant="storyStore.currentVariant"
@@ -75,7 +75,7 @@ const variant = computed(() => storyStore.currentVariant)
       :default-split="17"
     >
       <template #first>
-        <div class="htw-h-full htw-overflow-y-auto">
+        <div class="htw:h-full htw:overflow-y-auto">
           <StoryVariantListItem
             v-for="(v, index) of storyStore.currentStory.variants"
             :key="index"
@@ -86,7 +86,7 @@ const variant = computed(() => storyStore.currentVariant)
       <template #last>
         <div
           v-if="storyStore.currentVariant"
-          class="htw-p-2 htw-h-full __histoire-pane-shadow-from-right"
+          class="htw:p-2 htw:h-full __histoire-pane-shadow-from-right"
         >
           <StoryVariantSingleView
             :variant="storyStore.currentVariant"

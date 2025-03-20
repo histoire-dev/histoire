@@ -14,11 +14,11 @@ const stateKeys = computed(() => Object.keys(props.variant.state || {})
 
 <template>
   <div class="histoire-controls-component-init-state">
-    <div class="htw-p-2 htw-flex htw-items-center htw-gap-1">
+    <div class="htw:p-2 htw:flex htw:items-center htw:gap-1">
       <Icon
         v-tooltip="'Auto-detected state'"
         icon="carbon:data-vis-1"
-        class="htw-w-4 htw-h-4 htw-text-primary-500 htw-flex-none"
+        class="htw:w-4 htw:h-4 htw:text-primary-500 htw:flex-none"
       />
       <div>
         State

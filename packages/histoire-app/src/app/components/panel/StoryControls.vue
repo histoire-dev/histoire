@@ -39,11 +39,11 @@ const hasInitState = computed(() => Object
 <template>
   <div
     data-test-id="story-controls"
-    class="histoire-story-controls htw-flex htw-flex-col htw-divide-y htw-divide-gray-100 dark:htw-divide-gray-750"
+    class="histoire-story-controls htw:flex htw:flex-col htw:divide-y htw:divide-gray-100 htw:dark:divide-gray-750"
   >
     <!-- Toolbar -->
     <div
-      class="htw-h-9 htw-flex-none htw-px-2 htw-flex htw-items-center"
+      class="htw:h-9 htw:flex-none htw:px-2 htw:flex htw:items-center"
     >
       <StatePresets
         v-if="ready || !hasCustomControls"
@@ -59,7 +59,7 @@ const hasInitState = computed(() => Object
       slot-name="controls"
       :variant="variant"
       :story="story"
-      class="__histoire-render-custom-controls htw-flex-none"
+      class="__histoire-render-custom-controls htw:flex-none"
       @ready="ready = true"
     />
 
@@ -68,7 +68,7 @@ const hasInitState = computed(() => Object
       v-else-if="hasInitState"
     >
       <ControlsComponentState
-        class="htw-flex-none htw-my-2"
+        class="htw:flex-none htw:my-2"
         :variant="variant"
       />
     </div>
@@ -76,7 +76,7 @@ const hasInitState = computed(() => Object
     <BaseEmpty v-else-if="!variant.state?._hPropDefs?.length">
       <Icon
         icon="carbon:audio-console"
-        class="htw-w-8 htw-h-8 htw-opacity-50 htw-mb-6"
+        class="htw:w-8 htw:h-8 htw:opacity-50 htw:mb-6"
       />
       <span>No controls available for this story</span>
     </BaseEmpty>
@@ -90,7 +90,7 @@ const hasInitState = computed(() => Object
         :key="index"
         :variant="variant"
         :definition="def"
-        class="htw-flex-none htw-my-2"
+        class="htw:flex-none htw:my-2"
       />
     </div>
   </div>
