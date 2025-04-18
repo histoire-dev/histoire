@@ -37,7 +37,7 @@ export function createDomEnv() {
     rootMargin: string
     thresholds: number[]
     disconnect(): void { /* noop */ }
-    observe(_target: Element): void { /* noop */  }
+    observe = (_target: Element) => void { /* noop */  }
     unobserve(_target: Element): void { /* noop */ }
     takeRecords(): IntersectionObserverEntry[] { return [] }
     }
