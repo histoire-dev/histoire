@@ -133,6 +133,7 @@ export async function build(ctx: Context) {
             },
           })
         }
+        // @ts-expect-error vue plugin use function form
         vuePlugin.configureServer(server)
       }
     },
