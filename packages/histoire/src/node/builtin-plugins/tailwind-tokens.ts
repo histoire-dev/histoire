@@ -84,9 +84,9 @@ export function tailwindTokens(options: TailwindTokensOptions = {}): Plugin {
 }
 
 function storyTemplate(tailwindConfig: any) {
-  return `import 'histoire-style'
-import './style.css'
-import { createApp, h, markRaw, ref } from ${getInjectedImport('@histoire/vendors/vue')}
+  // import 'histoire-style'
+  // import './style.css'
+  return `import { createApp, h, markRaw, ref } from ${getInjectedImport('@histoire/vendors/vue')}
 import {
   HstColorShades,
   HstTokenList,
