@@ -154,7 +154,7 @@ export async function getViteConfigWithPlugins(isServer: boolean, ctx: Context):
     },
 
     options() {
-      this.meta.histoire = {
+      (this.meta as any).histoire = {
         isCollecting: isServer,
       }
     },

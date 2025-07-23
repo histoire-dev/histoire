@@ -43,7 +43,7 @@
     "test:dev": "vitest"
   },
   "peerDependencies": {
-    "vite": "^6.0.1"
+    "vite": "^7.0.0"
   },
   "dependencies": {
     "@akryum/tinypool": "^0.3.1",
@@ -74,7 +74,7 @@
     "sade": "^1.8.1",
     "shiki": "^3.0.0",
     "sirv": "^3.0.0",
-    "vite-node": "0.34.7"
+    "vite-node": "3.2.4"
   },
   "devDependencies": {
     "@types/fs-extra": "^11.0.4",
@@ -82,7 +82,7 @@
     "esbuild": "^0.24.0",
     "rollup": "^4.28.0",
     "typescript": "5.6.3",
-    "vite": "^6.0.5",
+    "vite": "^7.0.0",
     "vitest": "0.34.6"
   }
 }
