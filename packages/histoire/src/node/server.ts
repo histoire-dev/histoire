@@ -15,14 +15,21 @@ import { getViteConfigWithPlugins } from './vite.js'
 export interface CreateServerOptions {
   port?: number
   open?: boolean
+  host?: string | boolean
 }
 
 export async function createServer(ctx: Context, options: CreateServerOptions = {}) {
   const getViteServer = async (collecting: boolean) => {
     const { viteConfig, viteConfigFile } = await getViteConfigWithPlugins(collecting, ctx)
 
-    if (!collecting && options.open) {
-      viteConfig.server.open = true
+    if (!collecting) {
+      if (options.open) {
+        viteConfig.server.open = true
+      }
+
+      if (options.host) {
+        viteConfig.server.host = options.host
+      }
     }
 
     const server = await createViteServer(
