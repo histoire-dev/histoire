@@ -26,6 +26,6 @@
     "@histoire/plugin-vue": "workspace:*",
     "@vitejs/plugin-vue": "^5.2.1",
     "histoire": "workspace:*",
-    "vite": "^7.0.0"
+    "vite": "catalog:"
   }
 }
