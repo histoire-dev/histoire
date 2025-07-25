@@ -29,7 +29,7 @@
     "watch": "tsc -w --sourceMap"
   },
   "peerDependencies": {
-    "vite": "^7.0.0"
+    "vite": "catalog:"
   },
   "dependencies": {
     "@histoire/vendors": "workspace:^",
@@ -40,7 +40,7 @@
     "picocolors": "^1.1.1"
   },
   "devDependencies": {
-    "typescript": "5.6.3",
-    "vite": "^7.0.0"
+    "typescript": "catalog:",
+    "vite": "catalog:"
   }
 }
