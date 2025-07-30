@@ -12,7 +12,7 @@ import HstWrapper from '../HstWrapper.vue'
 
 const props = defineProps<{
   title?: string
-  modelValue?: string
+  modelValue?: string | null
   options: HstControlOption[]
 }>()
 
