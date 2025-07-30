@@ -6,7 +6,7 @@ export default {
 
 <script lang="ts" setup>
 import { VTooltip as vTooltip } from 'floating-vue'
-import { computed, ref, withDefaults } from 'vue'
+import { computed, ref } from 'vue'
 import HstCopyIcon from '../HstCopyIcon.vue'
 
 const props = withDefaults(defineProps<{

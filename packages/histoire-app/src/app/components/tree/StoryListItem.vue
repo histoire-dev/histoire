@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import type { Story } from '../../types'
 import { Icon } from '@iconify/vue'
-import { computed, ref, withDefaults } from 'vue'
+import { computed, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { useScrollOnActive } from '../../util/scroll'
 import BaseListItemLink from '../base/BaseListItemLink.vue'

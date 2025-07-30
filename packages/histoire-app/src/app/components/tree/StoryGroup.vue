@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import type { Story, TreeGroup } from '../../types'
 import { Icon } from '@iconify/vue'
-import { computed, withDefaults } from 'vue'
+import { computed } from 'vue'
 import { useFolderStore } from '../../stores/folder'
 import StoryListFolder from './StoryListFolder.vue'
 import StoryListItem from './StoryListItem.vue'
