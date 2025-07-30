@@ -40,17 +40,17 @@
     "@types/fs-extra": "^11.0.4",
     "@types/node": "^22.10.1",
     "@vitejs/plugin-vue": "^5.2.1",
-    "autoprefixer": "^10.4.20",
+    "autoprefixer": "catalog:",
     "chokidar": "^4.0.1",
     "concurrently": "^9.1.0",
     "fs-extra": "^11.2.0",
     "globby": "^14.0.2",
     "pathe": "^1.1.2",
-    "postcss": "^8.4.49",
+    "postcss": "catalog:",
     "postcss-import": "^16.1.0",
-    "tailwindcss": "^3.4.16",
-    "typescript": "5.6.3",
-    "vite": "^7.0.0",
+    "tailwindcss": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:",
     "vue": "^3.5.13"
   }
 }

@@ -34,7 +34,7 @@
     "@rollup/plugin-commonjs": "^28.0.1",
     "@rollup/plugin-node-resolve": "^15.3.0",
     "@types/node": "^22.10.1",
-    "@vueuse/core": "^12.0.0",
+    "@vueuse/core": "catalog:",
     "execa": "^9.5.1",
     "floating-vue": "5.2.2",
     "fs-extra": "^11.2.0",
@@ -43,7 +43,7 @@
     "rollup": "^4.28.0",
     "rollup-plugin-typescript2": "^0.36.0",
     "scroll-into-view-if-needed": "^3.1.0",
-    "typescript": "5.6.3",
+    "typescript": "catalog:",
     "vue": "^3.5.13",
     "vue-router": "^4.5.0"
   }

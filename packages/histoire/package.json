@@ -43,7 +43,7 @@
     "test:dev": "vitest"
   },
   "peerDependencies": {
-    "vite": "^7.0.0"
+    "vite": "catalog:"
   },
   "dependencies": {
     "@akryum/tinypool": "^0.3.1",
@@ -81,8 +81,8 @@
     "@types/node": "^22.10.1",
     "esbuild": "^0.24.0",
     "rollup": "^4.28.0",
-    "typescript": "5.6.3",
-    "vite": "^7.0.0",
+    "typescript": "catalog:",
+    "vite": "catalog:",
     "vitest": "0.34.6"
   }
 }
