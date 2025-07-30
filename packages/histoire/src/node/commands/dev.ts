@@ -8,6 +8,7 @@ import { createServer } from '../server.js'
 export interface DevOptions {
   port: number
   open?: boolean
+  host?: string | boolean
   config?: string
 }
 
@@ -22,6 +23,7 @@ export async function devCommand(options: DevOptions) {
     const { server, viteConfigFile, close } = await createServer(ctx, {
       port: options.port,
       open: options.open,
+      host: options.host,
     })
     server.printUrls()
 
