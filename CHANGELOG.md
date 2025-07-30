@@ -1,3 +1,44 @@
+## v1.0.0-alpha.3
+
+[compare changes](https://github.com/Akryum/histoire/compare/v1.0.0-alpha.2...v1.0.0-alpha.3)
+
+### 🚀 Enhancements
+
+- Add Vite 7 support ([#800](https://github.com/Akryum/histoire/pull/800))
+- Add host config to histoire dev ([#743](https://github.com/Akryum/histoire/pull/743))
+
+### 🩹 Fixes
+
+- Issue 407, add IntersectionObserver mock to Dom ([#730](https://github.com/Akryum/histoire/pull/730))
+- Don't import withDefaults anymore ([e83af06](https://github.com/Akryum/histoire/commit/e83af06))
+
+### 📖 Documentation
+
+- **story.md:** Fix typo ([#705](https://github.com/Akryum/histoire/pull/705))
+
+### 🌊 Types
+
+- **controls:** Allow null for modelValue ([#766](https://github.com/Akryum/histoire/pull/766))
+
+### 🏡 Chore
+
+- Update changelog ([158e013](https://github.com/Akryum/histoire/commit/158e013))
+- Use pnpm catalog ([#804](https://github.com/Akryum/histoire/pull/804))
+
+### ✅ Tests
+
+- **lint:** Fix ([cfd8da0](https://github.com/Akryum/histoire/commit/cfd8da0))
+
+### ❤️ Contributors
+
+- Guillaume Chau ([@Akryum](http://github.com/Akryum))
+- Andre ([@andre-brdoch](http://github.com/andre-brdoch))
+- Croatialu ([@croatialu](http://github.com/croatialu))
+- Kevin Detter ([@oikalyptus](http://github.com/oikalyptus))
+- Moussa Clarke <moussa@moussaclarke.dev>
+- Rim (Y Nguyen) ([@imrim12](http://github.com/imrim12))
+- Hugo ATTAL ([@hugoattal](http://github.com/hugoattal))
+
 ## v1.0.0-alpha.2
 
 [compare changes](https://github.com/Akryum/histoire/compare/v1.0.0-alpha.1...v1.0.0-alpha.2)
