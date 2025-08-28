@@ -83,6 +83,23 @@ export default defineConfig({
   },
 })
 ```
+::: warning
+
+CommonJS modules must be specified in `vite.optimizeDeps.include` to work in Dev mode.
+
+```ts
+// histoire.config.js
+import { defineConfig } from 'histoire'
+
+export default defineConfig({
+  vite: {
+    optimizeDeps: {
+      include: ['lodash'],
+    },
+  },
+})
+```
+:::
 
 ### Conditions in Vite config
 
