@@ -92,13 +92,13 @@ CommonJS modules must be specified in `vite.optimizeDeps.include` to work in Dev
 import { defineConfig } from 'histoire'
 
 export default defineConfig({
-    vite: {
-        optimizeDeps: {
-            include: ['lodash'],
-        },
+  vite: {
+    optimizeDeps: {
+      include: ['lodash'],
     },
+  },
 })
- ```
+```
 :::
 
 ### Conditions in Vite config
