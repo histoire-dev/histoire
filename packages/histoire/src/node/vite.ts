@@ -342,11 +342,11 @@ export async function getViteConfigWithPlugins(isServer: boolean, ctx: Context):
     })
   }
 
-  ctx.config.plugins.forEach((plugin) => {
+  for (const plugin of ctx.config.plugins) {
     if (plugin.vitePlugins) {
-      plugin.vitePlugins(plugins)
+      await plugin.vitePlugins(plugins)
     }
-  })
+  }
 
   const viteConfig = mergeViteConfig(inlineConfig, {
     configFile: false,

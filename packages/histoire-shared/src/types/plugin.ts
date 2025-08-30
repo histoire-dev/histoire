@@ -131,5 +131,5 @@ export interface Plugin {
   /**
    * Use this hook to manipulate Vite plugins before they are passed to Vite.
    */
-  vitePlugins?: (plugins: VitePlugin[]) => void
+  vitePlugins?: (plugins: VitePlugin[]) => Awaitable<void>
 }
