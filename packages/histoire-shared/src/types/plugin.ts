@@ -2,7 +2,7 @@ import type chokidar from 'chokidar'
 import type fs from 'fs-extra'
 import type path from 'pathe'
 import type pc from 'picocolors'
-import type { InlineConfig as ViteInlineConfig } from 'vite'
+import type { InlineConfig as ViteInlineConfig, Plugin as VitePlugin } from 'vite'
 import type { Awaitable } from '../type-utils.js'
 import type {
   PluginCommand,
@@ -128,4 +128,8 @@ export interface Plugin {
    * Handle a custom event from the client in development mode.
    */
   onDevEvent?: (api: PluginApiDevEvent) => Awaitable<any>
+  /**
+   * Use this hook to manipulate Vite plugins before they are passed to Vite.
+   */
+  vitePlugins?: (plugins: VitePlugin[]) => Awaitable<void>
 }

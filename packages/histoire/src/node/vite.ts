@@ -342,6 +342,12 @@ export async function getViteConfigWithPlugins(isServer: boolean, ctx: Context):
     })
   }
 
+  for (const plugin of ctx.config.plugins) {
+    if (plugin.vitePlugins) {
+      await plugin.vitePlugins(plugins)
+    }
+  }
+
   const viteConfig = mergeViteConfig(inlineConfig, {
     configFile: false,
     plugins,
