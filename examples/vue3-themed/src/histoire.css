@@ -1,10 +1,12 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,400;0,500;1,400;1,500&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Fira+Code&display=swap');
 
-html, body, #app {
-  font-family: 'Roboto', sans-serif;
-}
+@layer histoire-i-am-third-party {
+  html, body, #app {
+    font-family: 'Roboto', sans-serif;
+  }
 
-.__histoire-code code {
-  font-family: 'Fira Code', monospace;
+  .__histoire-code code {
+    font-family: 'Fira Code', monospace;
+  }
 }

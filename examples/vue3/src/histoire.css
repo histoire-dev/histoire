@@ -1,8 +1,10 @@
-.demo {
-  color: #10B981;
-}
+@layer histoire-i-am-third-party {
+  .demo {
+    color: #10B981;
+  }
 
-html.htw-dark {
-    background: #27272a;
-    color: #e9e9ed;
+  html.htw-dark {
+      background: #27272a;
+      color: #e9e9ed;
+  }
 }

@@ -1,98 +1,100 @@
 @tailwind base;
 @tailwind components;
 
-body {
-  font-family: 'Fira Sans', Inter, -apple-system,
-    BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell,
-    'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
-}
-
-button {
-  font-size: inherit;
-}
-
-@tailwind utilities;
-
-.btn {
-  @apply border border-solid border-gray-200 rounded hover:bg-primary-100 hover:border-primary-200 !text-primary-500 cursor-pointer hover:no-underline;
-  .dark & {
-    @apply bg-gray-850 border-gray-700 hover:bg-primary-900 hover:border-primary-600;
+@layer histoire-i-am-third-party {
+  body {
+    font-family: 'Fira Sans', Inter, -apple-system,
+      BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell,
+      'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
   }
-}
 
-.btn-blue {
-  @apply border border-solid border-gray-200 rounded hover:bg-blue-100 hover:border-blue-200 !text-blue-500 cursor-pointer hover:no-underline;
-  .dark & {
-    @apply bg-gray-850 border-gray-700 hover:bg-blue-900 hover:border-blue-600;
+  button {
+    font-size: inherit;
   }
-}
 
-.btn-flat {
-  @apply hover:no-underline rounded hover:bg-primary-100 border border-solid border-transparent hover:border-primary-200;
-  .dark & {
-    @apply hover:bg-primary-900 hover:border-primary-600;
-  }
-}
+  @tailwind utilities;
 
-.home-hero {
-  figure {
-    .image {
-      max-height: 140px;
-    }
-  }
-}
-
-.home-features {
-  .wrapper {
-    @apply pt-0 border-t-0 !important;
-  }
-}
-
-.v-popper--theme-dropdown {
-  .dark & {
-    .v-popper__inner {
-      @apply bg-gray-850 border-gray-750 text-gray-100;
-    }
-
-    .v-popper__arrow-inner {
-      @apply border-gray-850;
-    }
-
-    .v-popper__arrow-outer {
-      @apply border-gray-750;
+  .btn {
+    @apply border border-solid border-gray-200 rounded hover:bg-primary-100 hover:border-primary-200 !text-primary-500 cursor-pointer hover:no-underline;
+    .dark & {
+      @apply bg-gray-850 border-gray-700 hover:bg-primary-900 hover:border-primary-600;
     }
   }
 
-  &.v-popper__popper--show-from .v-popper__wrapper {
-    transform: scale(.75);
-  }
-
-  &.v-popper__popper--show-to .v-popper__wrapper {
-    transform: none;
-    transition: transform .15s cubic-bezier(0, 1, .5, 1);
-  }
-}
-
-table {
-  .dark & {
-    tr, td, th {
-      border-color: var(--c-border);
-    }
-
-    tr:nth-child(2n) {
-      background-color: #1a1e23;
+  .btn-blue {
+    @apply border border-solid border-gray-200 rounded hover:bg-blue-100 hover:border-blue-200 !text-blue-500 cursor-pointer hover:no-underline;
+    .dark & {
+      @apply bg-gray-850 border-gray-700 hover:bg-blue-900 hover:border-blue-600;
     }
   }
-}
 
-em {
-  @apply italic;
-}
-
-.demo-links-box {
-  @apply flex !md:flex-col !md:items-center gap-4 md:gap-6 p-4 md:p-6 rounded border border-solid my-6;
-
-  .demo-links {
-    @apply md:flex-1 !md:w-full;
+  .btn-flat {
+    @apply hover:no-underline rounded hover:bg-primary-100 border border-solid border-transparent hover:border-primary-200;
+    .dark & {
+      @apply hover:bg-primary-900 hover:border-primary-600;
+    }
   }
-}
+
+  .home-hero {
+    figure {
+      .image {
+        max-height: 140px;
+      }
+    }
+  }
+
+  .home-features {
+    .wrapper {
+      @apply pt-0 border-t-0 !important;
+    }
+  }
+
+  .v-popper--theme-dropdown {
+    .dark & {
+      .v-popper__inner {
+        @apply bg-gray-850 border-gray-750 text-gray-100;
+      }
+
+      .v-popper__arrow-inner {
+        @apply border-gray-850;
+      }
+
+      .v-popper__arrow-outer {
+        @apply border-gray-750;
+      }
+    }
+
+    &.v-popper__popper--show-from .v-popper__wrapper {
+      transform: scale(.75);
+    }
+
+    &.v-popper__popper--show-to .v-popper__wrapper {
+      transform: none;
+      transition: transform .15s cubic-bezier(0, 1, .5, 1);
+    }
+  }
+
+  table {
+    .dark & {
+      tr, td, th {
+        border-color: var(--c-border);
+      }
+
+      tr:nth-child(2n) {
+        background-color: #1a1e23;
+      }
+    }
+  }
+
+  em {
+    @apply italic;
+  }
+
+  .demo-links-box {
+    @apply flex !md:flex-col !md:items-center gap-4 md:gap-6 p-4 md:p-6 rounded border border-solid my-6;
+
+    .demo-links {
+      @apply md:flex-1 !md:w-full;
+    }
+  }
+} 
