@@ -17,26 +17,14 @@ module.exports = (opts = {}) => {
         params,
       })
 
-      const nodes = []
+      const nodesToMove = root.nodes.filter(node => !isImportRule(node))
 
-      root.each((node) => {
-        if (isImportRule(node)) {
-          nodes.push(node)
-          return
-        }
-
+      nodesToMove.forEach((node) => {
         if (node.type === 'rule') {
           node.selectors = node.selectors
-            .map(selector => ['html', ':root'].includes(selector) ? ':scope' : selector)
+            .map(selector => (['html', ':root'].includes(selector) ? ':scope' : selector))
         }
-
         scopeRule.append(node)
-      })
-
-      root.removeAll()
-
-      nodes.forEach((node) => {
-        root.append(node)
       })
 
       root.append(scopeRule)
