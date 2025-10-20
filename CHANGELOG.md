@@ -1,3 +1,17 @@
+## v1.0.0-alpha.4
+
+[compare changes](https://github.com/Akryum/histoire/compare/v1.0.0-alpha.3...v1.0.0-alpha.4)
+
+### 🚀 Enhancements
+
+- Add CommonJS support ([#806](https://github.com/Akryum/histoire/pull/806))
+- Add plugin API hook vitePlugins ([#807](https://github.com/Akryum/histoire/pull/807))
+- Add style isolation ([#813](https://github.com/Akryum/histoire/pull/813))
+
+### ❤️ Contributors
+
+- Hugo ATTAL ([@hugoattal](http://github.com/hugoattal))
+
 ## v1.0.0-alpha.3
 
 [compare changes](https://github.com/Akryum/histoire/compare/v1.0.0-alpha.2...v1.0.0-alpha.3)
