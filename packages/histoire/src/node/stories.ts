@@ -55,7 +55,8 @@ export async function watchStories(newContext: Context) {
         return false
       }
 
-      return stats?.isFile()
+      // Allow directories to be traversed, only ignore files that don't match
+      return stats?.isFile() ?? false
     },
   })
 
