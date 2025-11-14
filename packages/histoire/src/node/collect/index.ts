@@ -7,9 +7,10 @@ import { cpus } from 'node:os'
 import { MessageChannel } from 'node:worker_threads'
 import Tinypool from '@akryum/tinypool'
 import { createBirpc } from 'birpc'
-import { relative } from 'pathe'
+import path, { relative } from 'pathe'
 import pc from 'picocolors'
 import { ViteNodeServer } from 'vite-node/server'
+import { TEMP_PATH } from '../alias.js'
 import { createPath } from '../tree.js'
 import { slash } from '../util/fs.js'
 
@@ -34,6 +35,7 @@ export function useCollectStories(options: UseCollectStoriesOptions, ctx: Contex
         // @TODO temporary fix for https://github.com/histoire-dev/histoire/issues/409
         /vite\w*\/dist\/client\/(client|env).mjs/,
         ...ctx.config.viteNodeInlineDeps ?? [],
+        new RegExp(path.resolve(TEMP_PATH, 'plugins')),
       ],
       fallbackCJS: true,
     },
