@@ -45,18 +45,26 @@ let context: Context
 export async function watchStories(newContext: Context) {
   context = newContext
 
-  const watcher = chokidar.watch('.', {
+  const baseWatchPaths = Array.from(new Set(context.config.storyMatch.map((pattern) => {
+    const segments = pattern.split('/')
+    return segments.slice(0, segments.findIndex(segment => segment.includes('*'))).join('/') || '.'
+  })))
+
+  const resolvedStoryIgnored = context.config.storyIgnored.map((pattern) => {
+    return resolve(context.root, pattern)
+  })
+
+  const resolveStoryMatch = context.config.storyMatch.map((pattern) => {
+    return resolve(context.root, pattern)
+  })
+
+  const watcher = chokidar.watch(baseWatchPaths, {
     cwd: context.root,
     ignored: (path, stats) => {
-      // Normalize to relative path for pattern matching
-      const relativePath = resolve(path).startsWith(context.root)
-        ? relative(context.root, resolve(path))
-        : path
-
-      if (context.config.storyIgnored.some(pattern => micromatch.isMatch(relativePath, pattern))) {
+      if (resolvedStoryIgnored.some(pattern => micromatch.isMatch(path, pattern))) {
         return true
       }
-      if (context.config.storyMatch.some(pattern => micromatch.isMatch(relativePath, pattern))) {
+      if (resolveStoryMatch.some(pattern => micromatch.isMatch(path, pattern))) {
         return false
       }
 
