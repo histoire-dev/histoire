@@ -34,7 +34,7 @@ export async function createServer(ctx: Context, options: CreateServerOptions = 
 
     const server = await createViteServer(
       mergeViteConfig(viteConfig, {
-        optimizeDeps: { include: viteConfig.optimizeDeps?.include ?? [], noDiscovery: true },
+        optimizeDeps: { include: viteConfig.optimizeDeps?.include ?? [], noDiscovery: collecting },
       }),
     )
     await server.pluginContainer.buildStart({})
