@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { HstCopyIcon } from './HstCopyIcon.vue'
+import HstCopyIcon from './HstCopyIcon.vue'
 
 function initState() {
   return {
