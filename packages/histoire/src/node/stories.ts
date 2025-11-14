@@ -4,7 +4,7 @@ import { kebabCase } from 'change-case'
 import chokidar from 'chokidar'
 import { globby } from 'globby'
 import micromatch from 'micromatch'
-import { basename, relative, resolve } from 'pathe'
+import { basename, resolve } from 'pathe'
 
 type StoryChangeHandler = (file?: ServerStoryFile) => unknown
 const storyChangeHandlers: StoryChangeHandler[] = []
