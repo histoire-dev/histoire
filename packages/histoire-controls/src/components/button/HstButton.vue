@@ -18,7 +18,7 @@ defineProps<{
 
 <template>
   <button
-    class="histoire-button htw-cursor-pointer htw-rounded-sm"
+    class="histoire-button htw-cursor-pointer htw-rounded-sm htw-border-none"
     :class="colors[color ?? 'default']"
   >
     <slot />
