@@ -1,3 +1,38 @@
+## v1.0.0-alpha.5
+
+[compare changes](https://github.com/Akryum/histoire/compare/v1.0.0-alpha.4...v1.0.0-alpha.5)
+
+### 🩹 Fixes
+
+- #816 storyMatch traversing directories correctly ([#818](https://github.com/Akryum/histoire/pull/818), [#816](https://github.com/Akryum/histoire/issues/816))
+- Vite deps optimizer not working ([bb826e1](https://github.com/Akryum/histoire/commit/bb826e1))
+- Component case variance ([#789](https://github.com/Akryum/histoire/pull/789))
+- Improve watcher logic, watch for relative paths based on storyMatch ([a39796e](https://github.com/Akryum/histoire/commit/a39796e))
+- Tailwind design system story styling ([29164b6](https://github.com/Akryum/histoire/commit/29164b6))
+
+### 📖 Documentation
+
+- Add story of HstCopyIcon ([#717](https://github.com/Akryum/histoire/pull/717))
+- Fix HstCopyIcon story ([137a67c](https://github.com/Akryum/histoire/commit/137a67c))
+- Update node version ([ad49959](https://github.com/Akryum/histoire/commit/ad49959))
+- Button border in stories ([fe025ce](https://github.com/Akryum/histoire/commit/fe025ce))
+
+### ✅ Tests
+
+- **lint:** Fix ([fc7d23e](https://github.com/Akryum/histoire/commit/fc7d23e))
+- **lint:** Fix ([04198ed](https://github.com/Akryum/histoire/commit/04198ed))
+
+### 🤖 CI
+
+- Run tests on all branches ([f257c74](https://github.com/Akryum/histoire/commit/f257c74))
+
+### ❤️ Contributors
+
+- Guillaume Chau ([@Akryum](http://github.com/Akryum))
+- Reslear ([@reslear](http://github.com/reslear))
+- Eugen Istoc <eugenistoc@gmail.com>
+- Waldemar Enns ([@waldemarennsaed](http://github.com/waldemarennsaed))
+
 ## v1.0.0-alpha.4
 
 [compare changes](https://github.com/Akryum/histoire/compare/v1.0.0-alpha.3...v1.0.0-alpha.4)

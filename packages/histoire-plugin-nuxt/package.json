@@ -1,7 +1,7 @@
 {
   "name": "@histoire/plugin-nuxt",
   "type": "module",
-  "version": "1.0.0-alpha.4",
+  "version": "1.0.0-alpha.5",
   "description": "Histoire plugin to integrate with Nuxt 3",
   "author": {
     "name": "Guillaume Chau"
