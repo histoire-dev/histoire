@@ -83,6 +83,6 @@
     "rollup": "^4.28.0",
     "typescript": "catalog:",
     "vite": "catalog:",
-    "vitest": "0.34.6"
+    "vitest": "4.0.16"
   }
 }

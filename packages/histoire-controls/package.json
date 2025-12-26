@@ -65,7 +65,7 @@
     "tailwindcss": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",
-    "vitest": "0.34.6",
+    "vitest": "4.0.16",
     "vue": "^3.5.13",
     "vue-tsc": "^2.1.10"
   }
