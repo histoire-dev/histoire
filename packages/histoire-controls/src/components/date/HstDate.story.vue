@@ -30,7 +30,7 @@ function initState() {
             v-model="state.date"
             :title="state.label"
             :datetime="state.datetime"
-            @update:date-string="state.dateText = $event"
+            @input="state.dateText = $event.target.value"
           />
           <div class="text-sm text-gray-600 space-y-1">
             <p>Date object: {{ state.date instanceof Date ? state.date.toISOString() : 'null' }}</p>
@@ -65,7 +65,7 @@ function initState() {
           <HstDate
             v-model="state.date"
             :datetime="state.datetime"
-            @update:date-string="state.dateText = $event"
+            @input="state.dateText = $event.target.value"
           />
           <div class="text-sm text-gray-600 space-y-1">
             <p>Date object: {{ state.date instanceof Date ? state.date.toISOString() : 'null' }}</p>

@@ -11,19 +11,15 @@ import HstWrapper from '../HstWrapper.vue'
 const props = defineProps<{
   title?: string
   datetime?: boolean
-  modelValue?: Date | null
 }>()
 
-const emit = defineEmits({
-  'update:modelValue': (newValue: Date | null) => true,
-  'update:dateString': (newValue: string) => true,
-})
+const dateModel = defineModel<Date | null>({ default: null })
 
 let initialValue = ''
-if (props.modelValue instanceof Date) {
+if (dateModel.value instanceof Date) {
   initialValue = props.datetime
-    ? props.modelValue.toISOString().slice(0, 16)
-    : props.modelValue.toISOString().slice(0, 10)
+    ? dateModel.value.toISOString().slice(0, 16)
+    : dateModel.value.toISOString().slice(0, 10)
 }
 const inputValue = ref(initialValue)
 const input = ref<HTMLInputElement>()
@@ -40,9 +36,8 @@ function stringToDate(str: string): Date | null {
 function onInputUpdate(event: Event) {
   const value = (event.target as HTMLInputElement).value
   inputValue.value = value
-  emit('update:dateString', value)
   const date = stringToDate(value)
-  emit('update:modelValue', date)
+  dateModel.value = date
 }
 </script>
 
