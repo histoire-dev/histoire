@@ -1,3 +1,25 @@
+## v1.0.0-beta.1
+
+[compare changes](https://github.com/Akryum/histoire/compare/v1.0.0-alpha.5...v1.0.0-beta.1)
+
+### 🚀 Enhancements
+
+- Improved nuxt 4 support ([1cea9ed](https://github.com/Akryum/histoire/commit/1cea9ed))
+
+### 🩹 Fixes
+
+- Fix story collection on Vue>=3.5.26 ([#824](https://github.com/Akryum/histoire/pull/824))
+
+### 🏡 Chore
+
+- Upgrade vitest from 0.34 to 4.0 ([#823](https://github.com/Akryum/histoire/pull/823))
+
+### ❤️ Contributors
+
+- Hugo Attal ([@hugoattal](https://github.com/hugoattal))
+- Guillaume Chau ([@Akryum](http://github.com/Akryum))
+- Florent Catiau-Tristant <florent.ct@orange.fr>
+
 ## v1.0.0-alpha.5
 
 [compare changes](https://github.com/Akryum/histoire/compare/v1.0.0-alpha.4...v1.0.0-alpha.5)
