@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@mdi/font": "^7.4.47",
-    "vue": "^3.5.13",
+    "vue": "^3.5.26",
     "vuetify": "^3.7.5"
   },
   "devDependencies": {
