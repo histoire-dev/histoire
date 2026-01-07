@@ -177,9 +177,7 @@ const LIVING_KEYS = [
 const OTHER_KEYS = [
   'addEventListener',
   'alert',
-  'atob',
   'blur',
-  'btoa',
   'cancelAnimationFrame',
   /* 'clearInterval', */
   /* 'clearTimeout', */

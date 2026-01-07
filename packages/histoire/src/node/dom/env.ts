@@ -11,7 +11,7 @@ export function createDomEnv() {
       pretendToBeVisual: true,
       runScripts: 'dangerously',
       url: 'http://localhost:3000',
-      virtualConsole: console && globalThis.console ? new VirtualConsole().sendTo(globalThis.console) : undefined,
+      virtualConsole: console && globalThis.console ? new VirtualConsole().forwardTo(globalThis.console) : undefined,
       includeNodeLocations: false,
       contentType: 'text/html',
     },

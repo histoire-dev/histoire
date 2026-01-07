@@ -59,7 +59,7 @@
     "autoprefixer": "catalog:",
     "concurrently": "^9.1.0",
     "floating-vue": "5.2.2",
-    "jsdom": "^25.0.1",
+    "jsdom": "^27.4.0",
     "postcss": "catalog:",
     "postcss-import": "^16.1.0",
     "tailwindcss": "catalog:",
