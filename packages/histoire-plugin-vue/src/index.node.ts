@@ -1,12 +1,7 @@
 import type { Plugin } from 'histoire'
 
-import { atob as NodeAtob } from 'node:buffer'
 import generateStoryCommand from './commands/generate-story.server.js'
 import { listComponentFiles } from './util/list-components.js'
-
-// Polyfill atob for Vue >= 3.5.26, which can hang in Node.js environments where it's not available.
-// See: https://github.com/histoire-dev/histoire/issues/821
-globalThis.atob = NodeAtob
 
 export function HstVue(): Plugin {
   return {
