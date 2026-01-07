@@ -1,6 +1,10 @@
 import type { Plugin } from 'histoire'
+
+import { atob as NodeAtob } from 'node:buffer'
 import generateStoryCommand from './commands/generate-story.server.js'
 import { listComponentFiles } from './util/list-components.js'
+
+globalThis.atob = NodeAtob // Needed for Vue not to hang
 
 export function HstVue(): Plugin {
   return {
