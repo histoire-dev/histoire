@@ -62,7 +62,7 @@
     "globby": "^14.0.2",
     "gray-matter": "^4.0.3",
     "jiti": "^2.4.1",
-    "jsdom": "^25.0.1",
+    "jsdom": "^27.4.0",
     "markdown-it": "^14.1.0",
     "markdown-it-anchor": "^9.2.0",
     "markdown-it-attrs": "^4.3.0",
@@ -79,7 +79,7 @@
   "devDependencies": {
     "@types/fs-extra": "^11.0.4",
     "@types/node": "^22.10.1",
-    "esbuild": "^0.24.0",
+    "esbuild": "^0.27.2",
     "rollup": "^4.28.0",
     "typescript": "catalog:",
     "vite": "catalog:",

@@ -18,7 +18,7 @@
   "dependencies": {
     "lottie-web": "^5.12.2",
     "pinia": "^2.3.0",
-    "vue": "^3.5.13"
+    "vue": "^3.5.26"
   },
   "devDependencies": {
     "@histoire/app": "workspace:*",

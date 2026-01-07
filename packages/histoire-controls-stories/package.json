@@ -20,7 +20,7 @@
   },
   "dependencies": {
     "@histoire/controls": "workspace:*",
-    "vue": "^3.5.13"
+    "vue": "^3.5.26"
   },
   "devDependencies": {
     "@histoire/plugin-vue": "workspace:*",

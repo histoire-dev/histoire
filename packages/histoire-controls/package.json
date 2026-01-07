@@ -53,20 +53,20 @@
   "devDependencies": {
     "@types/node": "^22.10.1",
     "@vitejs/plugin-vue": "^5.2.1",
-    "@vue/runtime-dom": "^3.5.13",
+    "@vue/runtime-dom": "^3.5.26",
     "@vue/test-utils": "^2.4.6",
     "@vueuse/core": "catalog:",
     "autoprefixer": "catalog:",
     "concurrently": "^9.1.0",
     "floating-vue": "5.2.2",
-    "jsdom": "^25.0.1",
+    "jsdom": "^27.4.0",
     "postcss": "catalog:",
     "postcss-import": "^16.1.0",
     "tailwindcss": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",
     "vitest": "4.0.16",
-    "vue": "^3.5.13",
+    "vue": "^3.5.26",
     "vue-tsc": "^2.1.10"
   }
 }
