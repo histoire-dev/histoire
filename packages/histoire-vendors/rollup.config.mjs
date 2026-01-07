@@ -81,7 +81,7 @@ export * from '${filepath}'\n`.replace(/\n/g, process.platform === 'win32' ? '\r
             const tempPkgFile = path.resolve(tempDir, 'package.json')
             fs.writeJsonSync(tempPkgFile, tempPkg)
             execaSync('npm', ['install', '--prefer-offline --legacy-peer-deps'], { cwd: tempDir })
-            const dtsFiles = globbySync(['**/*.d.ts', '**/package.json'], {
+            const dtsFiles = globbySync(['**/*.d.{ts,mts}', '**/package.json'], {
               cwd: path.join(tempDir, 'node_modules'),
               dot: true,
             })

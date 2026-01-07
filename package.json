@@ -68,6 +68,7 @@
       "esbuild",
       "puppeteer",
       "svelte-preprocess",
+      "unrs-resolver",
       "vue-demi"
     ]
   }

@@ -1,4 +1,4 @@
-name: Nuxt 3 tests
+name: Nuxt 4 tests
 
 on:
   push:
@@ -15,7 +15,7 @@ jobs:
     name: Build and test
 
     env:
-      dir: ./examples/nuxt3
+      dir: ./examples/nuxt4
 
     steps:
       - uses: actions/checkout@master

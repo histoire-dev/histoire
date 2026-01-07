@@ -1,5 +1,5 @@
 {
-  "name": "histoire-example-nuxt3",
+  "name": "histoire-example-nuxt4",
   "type": "module",
   "version": "0.0.1",
   "private": true,
@@ -18,7 +18,7 @@
     "@nuxtjs/tailwindcss": "^6.12.2",
     "cypress": "^13.16.1",
     "histoire": "workspace:*",
-    "nuxt": "^3.14.1592",
+    "nuxt": "^4.2.2",
     "start-server-and-test": "^2.0.8",
     "vue": "^3.5.26"
   }

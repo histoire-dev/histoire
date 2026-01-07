@@ -99,8 +99,10 @@ export async function setupVue3 () {
       })
     },
 
-    onBuild() {
-      nuxt?.close()
+    onBuild(api) {
+      api.onBuildEnd(() => {
+        nuxt?.close()
+      })
     },
 
     onPreview() {
