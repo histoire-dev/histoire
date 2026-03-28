@@ -14,6 +14,10 @@ export function defineSetupSvelte(handler: SvelteStorySetupHandler): SvelteStory
   return handler
 }
 
+export const defineSetupSvelte3 = defineSetupSvelte
+export const defineSetupSvelte4 = defineSetupSvelte
+export const defineSetupSvelte5 = defineSetupSvelte
+
 export interface Hst {
   // Main built-ins
   Story: typeof SvelteComponentTyped<StoryProps>

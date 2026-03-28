@@ -1,16 +1,15 @@
-<script lang="ts">
-import { Story } from '@histoire/shared'
+<script>
 import { afterUpdate, getContext } from 'svelte'
 
-export let source: string = null
-export let responsiveDisabled: boolean = false
-export let autoPropsDisabled: boolean = false
-export let setupApp: Function = null
-export let implicit: boolean = false
+export let source = null
+export let responsiveDisabled = false
+export let autoPropsDisabled = false
+export let setupApp = null
+export let implicit = false
 
-const story: Story = getContext('__hstStory')
-const index: { value: number } = getContext('__hstIndex')
-const storySlots: any = getContext('__hstSlots')
+const story = getContext('__hstStory')
+const index = getContext('__hstIndex')
+const storySlots = getContext('__hstSlots')
 
 const variant = story.variants[index.value]
 index.value++

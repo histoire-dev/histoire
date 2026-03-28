@@ -1,15 +1,14 @@
-<script lang="ts">
-import type { Story, Variant } from '@histoire/shared'
+<script>
 import { getContext, setContext } from 'svelte'
 
-const story: Story = getContext('__hstStory')
-const currentVariant: Variant = getContext('__hstVariant')
-const slotName: string = getContext('__hstSlot')
+const story = getContext('__hstStory')
+const currentVariant = getContext('__hstVariant')
+const slotName = getContext('__hstSlot')
 
 let index = { value: 0 }
 setContext('__hstIndex', index)
 
-export let source: string = null
+export let source = null
 
 $: {
   if (source != null) {

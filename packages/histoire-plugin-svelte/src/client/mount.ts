@@ -2,7 +2,6 @@ import type { Story } from '@histoire/shared'
 import type {
   PropType as _PropType,
 } from '@histoire/vendors/vue'
-import type { SvelteComponent } from 'svelte'
 import type { SvelteStorySetupApi } from '../helpers.js'
 import { components } from '@histoire/controls'
 import {
@@ -17,6 +16,10 @@ import {
 import * as generatedSetup from 'virtual:$histoire-generated-global-setup'
 // @ts-expect-error virtual module id
 import * as setup from 'virtual:$histoire-setup'
+import {
+  callSetupFunctions,
+  mountSvelteComponent,
+} from '../util/svelte.js'
 import MountStorySvelte from './MountStory.svelte'
 import MountVariantSvelte from './MountVariant.svelte'
 import StubComponent from './Stub.svelte'
@@ -33,15 +36,15 @@ export default _defineComponent({
 
   setup(props) {
     const el = _ref<HTMLDivElement>()
-    let app: SvelteComponent
+    let app: any
     let target: HTMLDivElement
+    let destroyApp: (() => void) | null = null
 
     async function mountStory() {
       target = document.createElement('div')
       el.value.appendChild(target)
 
-      // eslint-disable-next-line new-cap
-      app = new props.story.file.component({
+      const mountedApp = await mountSvelteComponent(props.story.file.component, {
         target,
         props: {
           Hst: {
@@ -53,9 +56,9 @@ export default _defineComponent({
         context: new Map(Object.entries({
           __hstStory: props.story,
         })),
-      })
-
-      // Call app setups to resolve global assets such as components
+      }, 'client')
+      app = mountedApp.app
+      destroyApp = mountedApp.destroy
 
       const setupApi: SvelteStorySetupApi = {
         app,
@@ -63,29 +66,17 @@ export default _defineComponent({
         variant: null,
       }
 
-      if (typeof generatedSetup?.setupSvelte3 === 'function') {
-        await generatedSetup.setupSvelte3(setupApi)
-      }
-
-      if (typeof setup?.setupSvelte3 === 'function') {
-        await setup.setupSvelte3(setupApi)
-      }
-
-      if (typeof generatedSetup?.setupSvelte4 === 'function') {
-        await generatedSetup.setupSvelte3(setupApi)
-      }
-
-      if (typeof setup?.setupSvelte4 === 'function') {
-        await setup.setupSvelte3(setupApi)
-      }
+      await callSetupFunctions(generatedSetup, setup, setupApi)
     }
 
     function unmountStory() {
-      app?.$destroy()
+      destroyApp?.()
+      destroyApp = null
       if (target) {
         target.parentNode?.removeChild(target)
         target = null
       }
+      app = null
     }
 
     _watch(() => props.story.id, async () => {

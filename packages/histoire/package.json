@@ -43,7 +43,7 @@
     "test:dev": "vitest"
   },
   "peerDependencies": {
-    "vite": "catalog:"
+    "vite": "^7.0.0 || ^8.0.0"
   },
   "dependencies": {
     "@akryum/tinypool": "^0.3.1",

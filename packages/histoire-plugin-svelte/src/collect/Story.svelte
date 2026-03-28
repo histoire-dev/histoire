@@ -1,19 +1,18 @@
-<script lang="ts">
-import { ServerStory, ServerStoryFile, ServerVariant } from '@histoire/shared'
+<script>
 import { getContext, setContext } from 'svelte'
 
-export let title: string = null
-export let id: string = null
-export let group: string = null
-export let layout: ServerStory['layout'] = null
-export let icon: string = null
-export let iconColor: string = null
-export let docsOnly: boolean = false
+export let title = null
+export let id = null
+export let group = null
+export let layout = null
+export let icon = null
+export let iconColor = null
+export let docsOnly = false
 
-const addStory: (story: ServerStory) => void = getContext('__hstAddStory')
-const file: ServerStoryFile = getContext('__hstStoryFile')
+const addStory = getContext('__hstAddStory')
+const file = getContext('__hstStoryFile')
 
-const story: ServerStory = {
+const story = {
   id: id ?? file.id,
   title: title ?? file.fileName,
   group,
@@ -27,7 +26,7 @@ const story: ServerStory = {
 addStory(story)
 
 setContext('__hstStory', story)
-setContext('__hstAddVariant', (variant: ServerVariant) => {
+setContext('__hstAddVariant', (variant) => {
   story.variants.push(variant)
 })
 </script>

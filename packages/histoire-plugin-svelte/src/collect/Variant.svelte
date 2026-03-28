@@ -1,20 +1,19 @@
-<script lang="ts">
-import { ServerStory, ServerVariant } from '@histoire/shared'
+<script>
 import { getContext } from 'svelte'
 
-export let title: string = 'untitled'
-export let id: string = null
-export let icon: string = null
-export let iconColor: string = null
+export let title = 'untitled'
+export let id = null
+export let icon = null
+export let iconColor = null
 
-const story: ServerStory = getContext('__hstStory')
-const addVariant: (variant: ServerVariant) => void = getContext('__hstAddVariant')
+const story = getContext('__hstStory')
+const addVariant = getContext('__hstAddVariant')
 
 function generateId () {
   return `${story.id}-${story.variants.length}`
 }
 
-const variant: ServerVariant = {
+const variant = {
   id: id ?? generateId(),
   title,
   icon,

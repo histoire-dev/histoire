@@ -46,13 +46,13 @@
 			>
 				<input type="hidden" name="uid" value={todo.uid} />
 				<input type="hidden" name="done" value={todo.done ? '' : 'true'} />
-				<button class="toggle" aria-label="Mark todo as {todo.done ? 'not done' : 'done'}" />
+				<button class="toggle" aria-label="Mark todo as {todo.done ? 'not done' : 'done'}"></button>
 			</form>
 
 			<form class="text" action="/todos?_method=PATCH" method="post" use:enhance>
 				<input type="hidden" name="uid" value={todo.uid} />
 				<input aria-label="Edit todo" type="text" name="text" value={todo.text} />
-				<button class="save" aria-label="Save todo" />
+				<button class="save" aria-label="Save todo"></button>
 			</form>
 
 			<form
@@ -63,7 +63,7 @@
 				}}
 			>
 				<input type="hidden" name="uid" value={todo.uid} />
-				<button class="delete" aria-label="Delete todo" disabled={todo.pending_delete} />
+				<button class="delete" aria-label="Delete todo" disabled={todo.pending_delete}></button>
 			</form>
 		</div>
 	{/each}

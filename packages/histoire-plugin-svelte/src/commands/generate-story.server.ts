@@ -5,7 +5,7 @@ import path from 'pathe'
 
 export default {
   id: 'histoire:plugin-svelte:generate-story',
-  label: 'Generate Svelte 3 story from component',
+  label: 'Generate Svelte story from component',
   icon: 'https://svelte.dev/favicon.png',
   searchText: 'generate create',
   async serverAction(params) {

@@ -112,6 +112,6 @@ You can use the `group` prop to reference a group in your stories using its `id`
 
 ```svelte{1}
 <Hst.Story group="top">
-  This is a demo book using Svelte 3.
+  This is a demo book using Svelte.
 </Hst.Story>
 ```

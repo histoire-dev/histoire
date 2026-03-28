@@ -66,6 +66,24 @@ export async function getViteConfigWithPlugins(isServer: boolean, ctx: Context):
 
   const inlineConfig = await mergeHistoireViteConfig(userViteConfig, ctx)
   const plugins: VitePlugin[] = []
+  const supportPluginAllowPaths = ctx.supportPlugins.flatMap((plugin) => {
+    const paths = [ctx.root, import.meta.url]
+    const result = new Set<string>()
+
+    for (const suffix of ['', '/client', '/collect']) {
+      try {
+        const resolved = require.resolve(`${plugin.moduleName}${suffix}`, {
+          paths,
+        })
+        result.add(dirname(resolved))
+      }
+      catch {
+        // Noop
+      }
+    }
+
+    return Array.from(result)
+  })
 
   function optimizeDeps(deps: string[]): string[] {
     const result = []
@@ -124,6 +142,7 @@ export async function getViteConfigWithPlugins(isServer: boolean, ctx: Context):
               TEMP_PATH,
               ctx.resolvedViteConfig.root,
               process.cwd(),
+              ...supportPluginAllowPaths,
               ...process.env.HISTOIRE_DEV
                 ? [
                     '../../packages/histoire-vendors',

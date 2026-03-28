@@ -2,8 +2,7 @@ import type { Story, Variant } from '@histoire/shared'
 import type {
   PropType as _PropType,
 } from '@histoire/vendors/vue'
-import type { SvelteComponent } from 'svelte'
-import type { SvelteStorySetupApi } from '../helpers.js'
+import type { SvelteStorySetupApi, SvelteStorySetupHandler } from '../helpers.js'
 import { components } from '@histoire/controls'
 import {
   defineComponent as _defineComponent,
@@ -17,6 +16,12 @@ import {
 import * as generatedSetup from 'virtual:$histoire-generated-global-setup'
 // @ts-expect-error virtual module id
 import * as setup from 'virtual:$histoire-setup'
+import {
+  callSetupFunctions,
+  createWrappedComponent,
+  getLegacyStateApi,
+  mountSvelteComponent,
+} from '../util/svelte.js'
 import RenderStorySvelte from './RenderStory.svelte'
 import RenderVariantSvelte from './RenderVariant.svelte'
 import { syncState } from './util'
@@ -44,7 +49,7 @@ export default _defineComponent({
 
   setup(props, { emit }) {
     const el = _ref<HTMLDivElement>()
-    let app: SvelteComponent
+    let app: any
     let target: HTMLDivElement
 
     let tearDownHandlers: (() => void)[] = []
@@ -68,8 +73,7 @@ export default _defineComponent({
         components.push(component)
       })
 
-      // eslint-disable-next-line new-cap
-      app = new props.story.file.component({
+      const mountedApp = await mountSvelteComponent(props.story.file.component, {
         target,
         props: {
           Hst: {
@@ -83,40 +87,50 @@ export default _defineComponent({
           __hstVariant: props.variant,
           __hstSlot: props.slotName,
         })),
+      }, 'client')
+      app = mountedApp.app
+      tearDownHandlers.push(() => {
+        mountedApp.destroy()
       })
 
-      let appComponent = components.find(c => c.$$ === app.$$)
+      let appComponent = components.find(c => c.$$ && app?.$$ && c.$$ === app.$$) ?? app
       registerComponentOff()
       components = []
 
-      // Svelte on_hrm callbacks are buggy so we patch the hmr replace instead
-      function patchReplace() {
-        const origReplace = appComponent.$replace
-        if (!origReplace) return
+      function patchReplaceIfAvailable() {
+        const origReplace = appComponent?.$replace
+        if (!origReplace) {
+          return
+        }
+
         appComponent.$replace = (...args) => {
           const result = origReplace.apply(appComponent, args)
-          appComponent = result
-          watchState()
-          patchReplace()
+          appComponent = result ?? appComponent
           return result
         }
       }
-      patchReplace()
+      patchReplaceIfAvailable()
 
-      const { apply, stop } = syncState(props.variant.state, (value) => {
-        appComponent.$inject_state(value)
-      })
-      tearDownHandlers.push(stop)
-
-      function watchState() {
-        appComponent.$$.after_update.push(() => {
-          apply(appComponent.$capture_state())
+      const stateApi = getLegacyStateApi(appComponent)
+      if (stateApi) {
+        const { apply, stop } = syncState(props.variant.state, (value) => {
+          stateApi.injectState(value)
         })
-      }
-      watchState()
-      apply(appComponent.$capture_state())
+        tearDownHandlers.push(stop)
 
-      // Call app setups to resolve global assets such as components
+        let frameId: number
+        const syncFromComponent = () => {
+          apply(stateApi.captureState())
+          frameId = requestAnimationFrame(syncFromComponent)
+        }
+
+        frameId = requestAnimationFrame(syncFromComponent)
+        tearDownHandlers.push(() => {
+          cancelAnimationFrame(frameId)
+        })
+
+        apply(stateApi.captureState())
+      }
 
       const setupApi: SvelteStorySetupApi = {
         app,
@@ -124,37 +138,19 @@ export default _defineComponent({
         variant: props.variant,
       }
 
-      if (typeof generatedSetup?.setupSvelte3 === 'function') {
-        await generatedSetup.setupSvelte3(setupApi)
-      }
-
-      if (typeof setup?.setupSvelte3 === 'function') {
-        await setup.setupSvelte3(setupApi)
-      }
-
-      if (typeof generatedSetup?.setupSvelte4 === 'function') {
-        await generatedSetup.setupSvelte4(setupApi)
-      }
-
-      if (typeof setup?.setupSvelte4 === 'function') {
-        await setup.setupSvelte4(setupApi)
-      }
-
-      if (typeof props.variant.setupApp === 'function') {
-        await props.variant.setupApp(setupApi)
-      }
+      await callSetupFunctions(generatedSetup, setup, setupApi, props.variant.setupApp as SvelteStorySetupHandler | null)
 
       emit('ready')
     }
 
     function unmountStory() {
-      app?.$destroy()
+      tearDownHandlers.forEach(fn => fn())
+      tearDownHandlers = []
       if (target) {
         target.parentNode?.removeChild(target)
         target = null
       }
-      tearDownHandlers.forEach(fn => fn())
-      tearDownHandlers = []
+      app = null
     }
 
     _watch(() => props.story.id, async () => {
@@ -191,14 +187,5 @@ function getControls() {
 }
 
 function wrapComponent(controlComponent) {
-  function ProxyWrap(options) {
-    return new Wrap({
-      ...options,
-      props: {
-        ...options.props,
-        controlComponent,
-      },
-    })
-  }
-  return ProxyWrap
+  return createWrappedComponent(Wrap, controlComponent)
 }

@@ -1,9 +1,8 @@
-<script lang="ts">
+<script>
 import { onMount, createEventDispatcher } from 'svelte'
 import {
   createApp as _createApp,
   h as _h,
-  App as _App,
   reactive as _reactive,
 } from '@histoire/vendors/vue'
 
@@ -12,14 +11,11 @@ export let value
 
 const dispatch = createEventDispatcher()
 
-let el: HTMLDivElement
+let el
 
-let app: _App
+let app
 
-const state = _reactive<{
-  value?: any
-  attrs?: any
-}>({})
+const state = _reactive({})
 
 function updateState (value, attrs) {
   Object.assign(state, {

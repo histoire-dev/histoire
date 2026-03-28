@@ -1,9 +1,9 @@
-<script lang="ts">
-import { Story, omitInheritStoryProps } from '@histoire/shared'
+<script>
+import { omitInheritStoryProps } from '@histoire/shared'
 import { getContext, setContext } from 'svelte'
 import MountVariant from './MountVariant.svelte'
 
-const story: Story = getContext('__hstStory')
+const story = getContext('__hstStory')
 let index = { value: 0 }
 setContext('__hstIndex', index)
 setContext('__hstSlots', $$slots)

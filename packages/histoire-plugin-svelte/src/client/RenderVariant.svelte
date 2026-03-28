@@ -1,18 +1,17 @@
-<script lang="ts">
-import type { Story, Variant } from '@histoire/shared'
+<script>
 import { getContext } from 'svelte'
 
-const story: Story = getContext('__hstStory')
-const currentVariant: Variant = getContext('__hstVariant')
-const slotName: string = getContext('__hstSlot')
-const index: { value: number } = getContext('__hstIndex')
+const story = getContext('__hstStory')
+const currentVariant = getContext('__hstVariant')
+const slotName = getContext('__hstSlot')
+const index = getContext('__hstIndex')
 
 const variant = story.variants[index.value]
 index.value++
 
 $: shouldRender = currentVariant.id === variant.id
 
-export let source: string = null
+export let source = null
 
 $: {
   if (source != null) {

@@ -19,11 +19,43 @@ export default defineConfig({
       },
       closeBundle() {
         try {
+          const rawSvelteFiles = globbySync([
+            'src/client/**/*.svelte',
+            'src/collect/**/*.svelte',
+          ])
+          const rawSvelteBasenames = rawSvelteFiles.map(file => file.split('/').pop()?.replace(/\.svelte$/, '')).filter(Boolean)
+
+          for (const file of rawSvelteFiles) {
+            const target = file.replace(/^src\//, 'dist/')
+            fs.ensureDirSync(target.replace(/\/[^/]+$/, ''))
+            fs.copyFileSync(file, target)
+          }
+
           const files = globbySync('./dist/**/*.js')
           for (const file of files) {
-            const content = fs.readFileSync(file, 'utf-8')
+            let content = fs.readFileSync(file, 'utf-8')
+            let updated = false
+
             if (content.includes('import__dyn')) {
-              fs.writeFileSync(file, content.replace(/import__dyn\(/g, 'import(/* @vite-ignore */'), 'utf-8')
+              content = content.replace(/import__dyn\(/g, 'import(/* @vite-ignore */')
+              updated = true
+            }
+
+            if (content.includes('.svelte.js')) {
+              content = content.replace(/\.svelte\.js(["'])/g, '.svelte$1')
+              updated = true
+            }
+
+            for (const basename of rawSvelteBasenames) {
+              const compiledImport = `./${basename}.js`
+              if (content.includes(compiledImport)) {
+                content = content.replaceAll(compiledImport, `./${basename}.svelte`)
+                updated = true
+              }
+            }
+
+            if (updated) {
+              fs.writeFileSync(file, content, 'utf-8')
             }
           }
         }

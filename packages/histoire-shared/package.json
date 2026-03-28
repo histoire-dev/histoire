@@ -29,7 +29,7 @@
     "watch": "tsc -w --sourceMap"
   },
   "peerDependencies": {
-    "vite": "catalog:"
+    "vite": "^7.0.0 || ^8.0.0"
   },
   "dependencies": {
     "@histoire/vendors": "workspace:^",

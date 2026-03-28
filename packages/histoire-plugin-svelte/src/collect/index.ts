@@ -1,18 +1,21 @@
 import type { ServerRunPayload } from '@histoire/shared'
-import type { SvelteComponent } from 'svelte'
 import type { SvelteStorySetupApi } from '../helpers.js'
 import { tick } from 'svelte'
 // @ts-expect-error virtual module id
 import * as generatedSetup from 'virtual:$histoire-generated-global-setup'
 // @ts-expect-error virtual module id
 import * as setup from 'virtual:$histoire-setup'
+import {
+  callSetupFunctions,
+  mountSvelteComponent,
+} from '../util/svelte.js'
 import Story from './Story.svelte'
 import Variant from './Variant.svelte'
 
 export async function run({ file, el, storyData }: ServerRunPayload) {
   const { default: Comp } = await import(/* @vite-ignore */ file.moduleId)
 
-  const app: SvelteComponent = new Comp({
+  const mountedApp = await mountSvelteComponent(Comp, {
     target: el,
     props: {
       Hst: {
@@ -26,9 +29,8 @@ export async function run({ file, el, storyData }: ServerRunPayload) {
       },
       __hstStoryFile: file,
     })),
-  })
-
-  // Call app setups to resolve global assets such as components
+  }, 'client')
+  const app = mountedApp.app
 
   const setupApi: SvelteStorySetupApi = {
     app,
@@ -36,21 +38,7 @@ export async function run({ file, el, storyData }: ServerRunPayload) {
     variant: null,
   }
 
-  if (typeof generatedSetup?.setupSvelte3 === 'function') {
-    await generatedSetup.setupSvelte3(setupApi)
-  }
-
-  if (typeof setup?.setupSvelte3 === 'function') {
-    await setup.setupSvelte3(setupApi)
-  }
-
-  if (typeof generatedSetup?.setupSvelte4 === 'function') {
-    await generatedSetup.setupSvelte4(setupApi)
-  }
-
-  if (typeof setup?.setupSvelte4 === 'function') {
-    await setup.setupSvelte4(setupApi)
-  }
+  await callSetupFunctions(generatedSetup, setup, setupApi)
 
   await tick()
 
@@ -61,5 +49,5 @@ export async function run({ file, el, storyData }: ServerRunPayload) {
     })
   }
 
-  app.$destroy()
+  mountedApp.destroy()
 }
