@@ -1,10 +1,7 @@
-import type { AutoPropComponentDefinition, PropDefinition, Story, Variant } from '@histoire/shared'
+import type { Story, Variant } from '@histoire/shared'
 import type {
   PropType as _PropType,
 } from '@histoire/vendors/vue'
-import type { App, Component, VNode } from 'vue'
-import type { Vue3StorySetupApi, Vue3StorySetupHandler } from '../../helpers.js'
-import { applyState } from '@histoire/shared'
 import {
   defineComponent as _defineComponent,
   h as _h,
@@ -13,14 +10,8 @@ import {
   ref as _ref,
   watch as _watch,
 } from '@histoire/vendors/vue'
-// @ts-expect-error virtual module id
-import * as generatedSetup from 'virtual:$histoire-generated-global-setup'
-// @ts-expect-error virtual module id
-import * as setup from 'virtual:$histoire-setup'
-import { createApp, h, onMounted, reactive, Suspense } from 'vue'
-import { getTagName } from '../codegen'
-import { registerGlobalComponents } from './global-components.js'
-import { RouterLinkStub } from './RouterLinkStub'
+import { reactive } from 'vue'
+import { createPreviewHost } from './host.js'
 import { syncStateBundledAndExternal } from './util.js'
 
 export default _defineComponent({
@@ -49,18 +40,29 @@ export default _defineComponent({
 
   setup(props, { emit }) {
     const sandbox = _ref<HTMLDivElement>()
-    let app: App
+    let host: ReturnType<typeof createPreviewHost>
     let mounting = false
 
     const externalState = reactive<Variant['state']>({})
-
-    syncStateBundledAndExternal(props.variant.state, externalState)
+    let stateSync = syncStateBundledAndExternal(props.variant.state, externalState)
+    const renderContext = reactive({
+      mode: 'render' as const,
+      slotName: props.slotName,
+      currentVariant: props.variant,
+      externalState,
+      nextVariantIndex: {
+        value: 0,
+      },
+    })
 
     function unmountVariant() {
-      if (app) {
-        app.unmount()
-        app = null
-      }
+      host?.unmount()
+      host = null
+    }
+
+    function syncExternalState() {
+      stateSync?.stop()
+      stateSync = syncStateBundledAndExternal(props.variant.state, externalState)
     }
 
     async function mountVariant() {
@@ -68,169 +70,22 @@ export default _defineComponent({
       mounting = true
 
       unmountVariant()
+      renderContext.currentVariant = props.variant
+      renderContext.slotName = props.slotName
 
-      let lastPropsTypesSnapshot: string
-
-      const wrappers: Component[] = []
-
-      app = createApp({
+      host = createPreviewHost({
         name: 'RenderStorySubApp',
-
-        setup() {
-          onMounted(() => {
-            mounting = false
-          })
-        },
-
-        render: () => {
-          const vnodes = props.variant.slots()?.[props.slotName]?.({
-            state: externalState,
-          }) ?? props.story.slots()?.[props.slotName]?.({
-            state: externalState,
-          })
-
-          // Auto detect props
-          if (props.slotName === 'default' && !props.variant.autoPropsDisabled) {
-            const propsTypes: AutoPropComponentDefinition[] = scanForAutoProps(vnodes)
-
-            const snapshot = JSON.stringify(propsTypes)
-            if (!lastPropsTypesSnapshot || lastPropsTypesSnapshot !== snapshot) {
-              applyState(props.variant.state, {
-                _hPropDefs: propsTypes,
-              })
-              if (!props.variant.state._hPropState) {
-                applyState(props.variant.state, {
-                  _hPropState: {},
-                })
-              }
-              lastPropsTypesSnapshot = snapshot
-            }
-          }
-
-          const children: VNode[] = []
-          children.push(vnodes)
-
-          for (const [index, wrapper] of wrappers.entries()) {
-            children.push(
-              h(wrapper, {
-                story: props.story,
-                variant: props.variant,
-              }, () => children[index]),
-            )
-          }
-
-          // Wrap in div to ensure only one root element
-          children.push(h('div', children.at(-1)))
-          // Wrap in Suspense to render async components
-          children.push(h(Suspense, {}, children.at(-1)))
-
-          return children.at(-1)
-        },
+        el: sandbox.value,
+        getStory: () => props.story,
+        getVariant: () => props.variant,
+        renderContext,
+        wrapInDiv: true,
       })
 
-      registerGlobalComponents(app)
-
-      // Stubs
-      app.component('RouterLink', RouterLinkStub)
-
-      const setupApi: Vue3StorySetupApi = {
-        app,
-        story: props.story,
-        variant: props.variant,
-        addWrapper: (wrapper) => {
-          wrappers.push(wrapper)
-        },
-      }
-
-      if (typeof generatedSetup?.setupVue3 === 'function') {
-        const setupFn = generatedSetup.setupVue3 as Vue3StorySetupHandler
-        await setupFn(setupApi)
-      }
-
-      if (typeof setup?.setupVue3 === 'function') {
-        const setupFn = setup.setupVue3 as Vue3StorySetupHandler
-        await setupFn(setupApi)
-      }
-
-      if (typeof props.variant.setupApp === 'function') {
-        const setupFn = props.variant.setupApp as Vue3StorySetupHandler
-        await setupFn(setupApi)
-      }
-
-      wrappers.reverse()
-
-      const target = document.createElement('div')
-      sandbox.value.appendChild(target)
-      app.mount(target)
+      await host.mount()
+      mounting = false
 
       emit('ready')
-    }
-
-    function scanForAutoProps(vnodes: any[]) {
-      const result: AutoPropComponentDefinition[] = []
-      let index = 0
-      for (const vnode of vnodes) {
-        if (typeof vnode.type === 'object') {
-          const propDefs: PropDefinition[] = []
-          for (const key in vnode.type.props) {
-            const prop = vnode.type.props[key]
-            let types
-            let defaultValue
-            if (prop) {
-              const rawTypes = Array.isArray(prop.type) ? prop.type : typeof prop === 'function' ? [prop] : [prop.type]
-              types = rawTypes.map((t) => {
-                switch (t) {
-                  case String:
-                    return 'string'
-                  case Number:
-                    return 'number'
-                  case Boolean:
-                    return 'boolean'
-                  case Object:
-                    return 'object'
-                  case Array:
-                    return 'array'
-                  default:
-                    return 'unknown'
-                }
-              })
-              defaultValue = typeof prop.default === 'function' ? prop.default.toString() : prop.default
-            }
-            propDefs.push({
-              name: key,
-              types,
-              required: prop?.required,
-              default: defaultValue,
-            })
-
-            // Props overrides
-            if (externalState?._hPropState?.[index]?.[key] != null) {
-              if (!vnode.props) {
-                vnode.props = {}
-              }
-              vnode.props[key] = externalState._hPropState[index][key]
-              if (!vnode.dynamicProps) {
-                vnode.dynamicProps = []
-              }
-              if (!vnode.dynamicProps.includes(key)) {
-                vnode.dynamicProps.push(key)
-              }
-            }
-          }
-
-          result.push({
-            name: getTagName(vnode),
-            index,
-            props: propDefs,
-          } as AutoPropComponentDefinition)
-          index++
-        }
-
-        if (Array.isArray(vnode.children)) {
-          result.push(...scanForAutoProps(vnode.children))
-        }
-      }
-      return result.filter(def => def.props.length)
     }
 
     _onMounted(async () => {
@@ -239,20 +94,27 @@ export default _defineComponent({
       }
     })
 
-    _watch(() => props.variant, async (value) => {
-      if (value.configReady && !mounting) {
-        if (!app) {
+    _watch(() => props.variant, () => {
+      renderContext.currentVariant = props.variant
+      syncExternalState()
+    })
+
+    _watch(() => [props.story.id, props.slotName, props.variant.id, props.variant.configReady] as const, async ([, slotName]) => {
+      renderContext.currentVariant = props.variant
+      renderContext.slotName = slotName
+
+      if (props.variant.configReady && !mounting) {
+        if (!host) {
           await mountVariant()
         }
         else {
-          app._instance.proxy.$forceUpdate()
+          host.forceUpdate()
         }
       }
-    }, {
-      deep: true,
     })
 
     _onBeforeUnmount(() => {
+      stateSync?.stop()
       unmountVariant()
     })
 
