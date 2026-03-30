@@ -1,0 +1,25 @@
+{
+  "name": "histoire-example-nuxt3",
+  "type": "module",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "story:dev": "histoire dev",
+    "story:build": "histoire build",
+    "story:preview": "histoire preview --port 4567",
+    "ci": "start-server-and-test story:preview http://localhost:4567/ test",
+    "test": "cypress run",
+    "test:dev": "cypress open --config baseUrl=http://localhost:6006",
+    "test:examples": "pnpm run story:build && pnpm run ci"
+  },
+  "devDependencies": {
+    "@histoire/plugin-nuxt": "workspace:*",
+    "@histoire/plugin-vue": "workspace:*",
+    "@nuxtjs/tailwindcss": "^6.12.2",
+    "cypress": "^13.16.1",
+    "histoire": "workspace:*",
+    "nuxt": "^3.16.0",
+    "start-server-and-test": "^2.0.8",
+    "vue": "^3.5.26"
+  }
+}
