@@ -34,9 +34,19 @@ export const MARKDOWN_FILES = 'virtual:$histoire-markdown-files'
 export const RESOLVED_MARKDOWN_FILES = `\0${MARKDOWN_FILES}`
 export const COMMANDS = 'virtual:$histoire-commands'
 export const RESOLVED_COMMANDS = `/__resolved__${COMMANDS}`
+export const BROWSER_COLLECTOR_ID = 'virtual:$histoire-browser-collector'
+export const RESOLVED_BROWSER_COLLECTOR_ID = `/__resolved__${BROWSER_COLLECTOR_ID}`
+export const TEST_HARNESS_ID = 'virtual:$histoire-test-harness'
+export const RESOLVED_TEST_HARNESS_ID = `/__resolved__${TEST_HARNESS_ID}`
+export const PREVIEW_RUNTIME_ID = 'virtual:$histoire-preview-runtime'
+export const RESOLVED_PREVIEW_RUNTIME_ID = `/__resolved__${PREVIEW_RUNTIME_ID}`
+export const VITEST_BROWSER_RUNTIME_ID = 'virtual:$histoire-vitest-browser-runtime'
+export const RESOLVED_VITEST_BROWSER_RUNTIME_ID = `/__resolved__${VITEST_BROWSER_RUNTIME_ID}`
 
+export * from './browser-collector.js'
 export * from './markdown.js'
 export * from './noop.js'
+export * from './preview-runtime.js'
 export * from './resolved-commands.js'
 export * from './resolved-config.js'
 export * from './resolved-generated-global-setup.js'
@@ -48,3 +58,5 @@ export * from './resolved-support-plugins-collect.js'
 export * from './resolved-theme.js'
 export * from './story-source.js'
 export * from './story.js'
+export * from './test-harness.js'
+export * from './vitest-browser-runtime.js'

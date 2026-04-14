@@ -40,4 +40,14 @@ program.command('preview')
     return previewCommand(options)
   })
 
+program.command('test')
+  .describe('run histoire story tests in Vitest browser mode')
+  .option('-c, --config <file>', `[string] use specified config file`)
+  .action(async (options) => {
+    const separatorIndex = process.argv.indexOf('--')
+    const rawVitestArgs = separatorIndex === -1 ? [] : process.argv.slice(separatorIndex + 1)
+    const { testCommand } = await import('./commands/test.js')
+    return testCommand(options, rawVitestArgs)
+  })
+
 program.parse(process.argv)

@@ -65,6 +65,18 @@ export function createVirtualFilesPlugin(ctx: Context, isServer: boolean) {
       if (id.startsWith(VirtualFiles.COMMANDS)) {
         return VirtualFiles.RESOLVED_COMMANDS
       }
+      if (id.startsWith(VirtualFiles.BROWSER_COLLECTOR_ID)) {
+        return VirtualFiles.RESOLVED_BROWSER_COLLECTOR_ID
+      }
+      if (id.startsWith(VirtualFiles.TEST_HARNESS_ID)) {
+        return VirtualFiles.RESOLVED_TEST_HARNESS_ID
+      }
+      if (id.startsWith(VirtualFiles.PREVIEW_RUNTIME_ID)) {
+        return VirtualFiles.RESOLVED_PREVIEW_RUNTIME_ID
+      }
+      if (id.startsWith(VirtualFiles.VITEST_BROWSER_RUNTIME_ID)) {
+        return VirtualFiles.RESOLVED_VITEST_BROWSER_RUNTIME_ID
+      }
       if (id.startsWith('virtual:story:')) {
         return `\0${id}`
       }
@@ -128,6 +140,18 @@ export function createVirtualFilesPlugin(ctx: Context, isServer: boolean) {
 
       if (id === VirtualFiles.RESOLVED_COMMANDS) {
         return VirtualFiles.resolvedCommands(ctx)
+      }
+      if (id === VirtualFiles.RESOLVED_BROWSER_COLLECTOR_ID) {
+        return VirtualFiles.browserCollector(ctx)
+      }
+      if (id === VirtualFiles.RESOLVED_TEST_HARNESS_ID) {
+        return VirtualFiles.testHarness(ctx)
+      }
+      if (id === VirtualFiles.RESOLVED_PREVIEW_RUNTIME_ID) {
+        return VirtualFiles.previewRuntime(ctx)
+      }
+      if (id === VirtualFiles.RESOLVED_VITEST_BROWSER_RUNTIME_ID) {
+        return VirtualFiles.vitestBrowserRuntime(ctx)
       }
 
       if (id.startsWith('\0virtual:story:')) {

@@ -47,3 +47,20 @@ import { toggleDark } from 'histoire/client'
 
 toggleDark(true)
 ```
+
+## `onTest`
+
+Registers story-scoped Vitest cases for the current variant.
+
+```ts
+import { onTest } from 'histoire/client'
+import { describe, expect, it } from 'vitest'
+
+onTest(({ canvas }) => {
+  describe('my component', () => {
+    it('renders', () => {
+      expect(canvas.textContent).toContain('Hello')
+    })
+  })
+})
+```

@@ -5,6 +5,7 @@ export interface StoryFile {
   story: Story
   path: string[]
   filePath: string
+  hasVitestMocks?: boolean
   docsFilePath?: string
   source: () => Promise<{ default: string }>
 }
@@ -123,6 +124,7 @@ export interface ServerStoryFile {
    * Resolved story data from story file execution
    */
   story?: ServerStory
+  hasVitestMocks?: boolean
   /**
    * Data sent to user tree config functions
    */

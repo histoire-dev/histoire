@@ -13,6 +13,11 @@ export function useStoryDoc(story: Ref<Story>) {
   const renderedDoc = ref('')
 
   watchEffect(async () => {
+    if (story.value.docsText) {
+      renderedDoc.value = story.value.docsText
+      return
+    }
+
     // Markdown file
     const mdKey = story.value.file.filePath.replace(/\.(\w*)$/, '.md')
     if (markdownFiles[mdKey]) {
@@ -21,30 +26,7 @@ export function useStoryDoc(story: Ref<Story>) {
       return
     }
 
-    // Custom blocks (Vue)
-    // @TODO extract
-    let comp = story.value.file?.component
-    if (comp) {
-      if (comp.__asyncResolved) {
-        comp = comp.__asyncResolved
-      }
-      else if (comp.__asyncLoader) {
-        comp = await comp.__asyncLoader()
-      }
-      else if (typeof comp === 'function') {
-        try {
-          comp = await comp()
-        }
-        catch (e) {
-          // Noop
-          // Could be a class that requires `new com()`
-        }
-      }
-      if (comp?.default) {
-        comp = comp.default
-      }
-      renderedDoc.value = comp.doc
-    }
+    renderedDoc.value = ''
   })
 
   return {

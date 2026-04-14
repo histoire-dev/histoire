@@ -1,3 +1,5 @@
+import type { HistoireTestRegistration } from '@histoire/shared'
+
 /**
  * @deprecated
  */
@@ -14,6 +16,13 @@ export function logEvent(name: string, argument): void
  * Returns `true` when in the NodeJS server while collecting stories.
  */
 export function isCollecting(): boolean
+export function isTesting(): boolean
+
+/**
+ * Registers story-scoped Vitest cases. The callback is executed with the mounted
+ * story context and should define tests with `describe`, `it`, or `test`.
+ */
+export function onTest(register: HistoireTestRegistration): void
 
 export function toggleDark(value?: boolean): boolean
 export function isDark(): boolean

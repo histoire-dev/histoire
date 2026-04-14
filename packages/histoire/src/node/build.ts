@@ -27,6 +27,7 @@ import { createMarkdownFilesWatcher } from './markdown.js'
 import { BuildPluginApi } from './plugin.js'
 import { startPreview } from './preview.js'
 import { findAllStories } from './stories.js'
+import { hasProjectVitest } from './util/has-vitest.js'
 import { getViteConfigWithPlugins } from './vite.js'
 
 const PRELOAD_MODULES = [
@@ -74,13 +75,27 @@ export async function build(ctx: Context) {
     }
   }
 
-  // Collect story data
-  const { executeStoryFile, destroy: destroyCollectStories } = useCollectStories({
-    server,
-    throws: true,
-  }, ctx)
-  await Promise.all(ctx.storyFiles.map(storyFile => executeStoryFile(storyFile)))
-  await destroyCollectStories()
+  const shouldUseBrowserCollection = ctx.config.test?.buildCollection === 'browser'
+    && hasProjectVitest(ctx.root)
+
+  if (ctx.config.test?.buildCollection === 'browser' && !shouldUseBrowserCollection) {
+    console.warn(pc.yellow('Vitest is not installed in this project, falling back to hybrid build-time story collection.'))
+  }
+
+  if (shouldUseBrowserCollection) {
+    await server.close()
+    const { collectStoriesBrowser } = await import('./story-collection.js')
+    await collectStoriesBrowser(ctx)
+  }
+  else {
+    const { executeStoryFile, destroy: destroyCollectStories } = useCollectStories({
+      server,
+      throws: true,
+    }, ctx)
+    await Promise.all(ctx.storyFiles.map(storyFile => executeStoryFile(storyFile)))
+    await destroyCollectStories()
+    await server.close()
+  }
 
   const storyCount = ctx.storyFiles.reduce((sum, file) => sum + (file.story?.variants.length ? 1 : 0), 0)
   const variantCount = ctx.storyFiles.reduce((sum, file) => sum + (file.story?.variants.length ?? 0), 0)
@@ -240,8 +255,6 @@ export async function build(ctx: Context) {
     await close()
   }
 
-  await server.close()
-
   for (const fn of buildEndCallbacks) {
     await fn()
   }
@@ -269,6 +282,7 @@ function generateEntryHtml(jsEntryFile: string, cssEntryFile: string, variables:
     ${ctx.config.theme?.favicon ? `<link rel="icon" type="${lookupMime(ctx.config.theme.favicon)}" href="${ctx.resolvedViteConfig.base}${ctx.config.theme.favicon}"/>` : ''}
     ${variables.HEAD ?? ''}`,
     `<div id="app"></div>
+    ${generateVitestRunnerBootstrapScript()}
     <script type="module" src="${ctx.resolvedViteConfig.base}${jsEntryFile}"></script>`,
     ctx,
   )
@@ -280,4 +294,16 @@ async function writeFile(fileName: string, content: string, ctx: Context) {
 
 function generateScriptLinks(prefetchScripts: string[], rel: string, ctx: Context) {
   return prefetchScripts.map(s => `<link rel="${rel}" href="${ctx.resolvedViteConfig.base}${s}" as="script" crossOrigin="anonymous">`).join('')
+}
+
+function generateVitestRunnerBootstrapScript() {
+  return `<script>
+  (() => {
+    const runner = globalThis.__vitest_browser_runner__ ?? {}
+    if (typeof runner.wrapDynamicImport !== 'function') {
+      runner.wrapDynamicImport = loader => loader()
+    }
+    globalThis.__vitest_browser_runner__ = runner
+  })()
+  </script>`
 }

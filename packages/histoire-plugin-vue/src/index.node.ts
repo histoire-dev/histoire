@@ -27,9 +27,13 @@ export function HstVue(): Plugin {
               name: 'histoire-plugin-vue',
               enforce: 'post',
               transform(code, id) {
-                // Remove vue warnings about unknown components
+                // Keep bare `vitest` imports intact so Histoire core can remap
+                // them during collect-time resolution after Vite normalizes ids.
                 if ((this.meta as any).histoire?.isCollecting && id.endsWith('.vue')) {
-                  return `const _stubComponent = (name) => ['Story','Variant'].some(validName => name.toLowerCase() === validName.toLowerCase()) ? _resolveComponent(name) : ({ render: () => null });${code?.replaceAll('_resolveComponent(', '_stubComponent(') ?? ''}`
+                  const transformedCode = code
+                    ?.replaceAll('_resolveComponent(', '_stubComponent(')
+
+                  return `const _stubComponent = (name) => ['Story','Variant'].some(validName => name.toLowerCase() === validName.toLowerCase()) ? _resolveComponent(name) : ({ render: () => null });${transformedCode ?? ''}`
                 }
               },
             },
@@ -37,7 +41,6 @@ export function HstVue(): Plugin {
         },
       }
     },
-
     supportPlugin: {
       id: 'vue3',
       moduleName: '@histoire/plugin-vue',

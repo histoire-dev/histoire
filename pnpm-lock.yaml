@@ -230,6 +230,9 @@ importers:
       vite:
         specifier: 'catalog:'
         version: 7.3.1(@types/node@22.19.3)(jiti@2.6.1)(lightningcss@1.32.0)(sass@1.97.2)(terser@5.44.1)(yaml@2.8.2)
+      vitest:
+        specifier: 4.0.16
+        version: 4.0.16(@types/node@22.19.3)(jiti@2.6.1)(jsdom@27.4.0)(lightningcss@1.32.0)(sass@1.97.2)(terser@5.44.1)(yaml@2.8.2)
 
   examples/vue3-percy:
     dependencies:
@@ -16582,7 +16585,7 @@ snapshots:
       magic-string: 0.30.21
       obug: 2.1.1
       pathe: 2.0.3
-      picomatch: 4.0.3
+      picomatch: 4.0.4
       std-env: 3.10.0
       tinybench: 2.9.0
       tinyexec: 1.0.2

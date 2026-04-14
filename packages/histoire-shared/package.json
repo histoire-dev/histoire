@@ -17,9 +17,15 @@
   },
   "sideEffects": false,
   "exports": {
-    ".": "./dist/index.js",
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
     "./*": "./*",
-    "./client-node": "./dist/client/server/run.js"
+    "./client-node": {
+      "types": "./dist/client/server/run.d.ts",
+      "default": "./dist/client/server/run.js"
+    }
   },
   "main": "./dist/index.js",
   "module": "./dist/index.js",

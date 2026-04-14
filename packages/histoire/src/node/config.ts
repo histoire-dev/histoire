@@ -126,6 +126,9 @@ export function getDefaultConfig(): HistoireConfig {
     build: {
       excludeFromVendorsChunk: [],
     },
+    test: {
+      buildCollection: 'hybrid',
+    },
     vite: (config) => {
       // Remove vite:legacy plugins https://github.com/histoire-dev/histoire/issues/156
       const index = config.plugins?.findIndex(plugin => Array.isArray(plugin)
