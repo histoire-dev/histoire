@@ -23,7 +23,11 @@ export default _defineComponent({
     },
   },
 
-  setup(props) {
+  emits: {
+    ready: () => true,
+  },
+
+  setup(props, { emit }) {
     const el = _ref<HTMLDivElement>()
     const renderContext = reactive({
       mode: 'mount' as const,
@@ -46,6 +50,7 @@ export default _defineComponent({
       })
 
       await host.mount()
+      emit('ready')
     }
 
     function unmountStory() {

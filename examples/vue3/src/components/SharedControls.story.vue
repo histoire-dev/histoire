@@ -23,7 +23,10 @@ defineExpose({
 </script>
 
 <template>
-  <Story title="Shared Controls">
+  <Story
+    title="Variant-scoped Controls"
+    :layout="{ type: 'grid', width: 280 }"
+  >
     <template #controls>
       <HstText
         v-model="state.text"
@@ -56,14 +59,21 @@ defineExpose({
       title="variant 1"
     >
       <h1>Variant 1</h1>
-      <pre>{{ state }}</pre>
+      <pre data-test-id="shared-controls-state">{{ state }}</pre>
     </Variant>
 
     <Variant
       title="variant 2"
     >
       <h1>Variant 2</h1>
-      <pre>{{ state }}</pre>
+      <pre data-test-id="shared-controls-state">{{ state }}</pre>
+    </Variant>
+
+    <Variant
+      title="variant 3"
+    >
+      <h1>Variant 3</h1>
+      <pre data-test-id="shared-controls-state">{{ state }}</pre>
     </Variant>
   </Story>
 </template>

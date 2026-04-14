@@ -80,7 +80,7 @@ export function _toRawDeep(val, seen = new WeakMap()) {
 
 function _toRawObject(obj: Record<any, any>, target: Record<any, any>, seen = new WeakMap()) {
   Object.keys(obj).forEach((key) => {
-    target[key] = toRawDeep(obj[key], seen)
+    target[key] = _toRawDeep(obj[key], seen)
   })
 }
 

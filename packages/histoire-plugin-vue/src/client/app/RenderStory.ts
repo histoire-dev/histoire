@@ -5,6 +5,7 @@ import type {
 import {
   defineComponent as _defineComponent,
   h as _h,
+  nextTick as _nextTick,
   onBeforeUnmount as _onBeforeUnmount,
   onMounted as _onMounted,
   ref as _ref,
@@ -65,6 +66,12 @@ export default _defineComponent({
       stateSync = syncStateBundledAndExternal(props.variant.state, externalState)
     }
 
+    async function waitForVariantStateSettled() {
+      await _nextTick()
+      await _nextTick()
+      await new Promise<void>(resolve => requestAnimationFrame(() => resolve()))
+    }
+
     async function mountVariant() {
       if (mounting) return
       mounting = true
@@ -83,6 +90,9 @@ export default _defineComponent({
       })
 
       await host.mount()
+      // Let cross-Vue reactive mutations such as `_hPropDefs` and seeded state
+      // flush back into bundled variant state before runtime snapshots readiness.
+      await waitForVariantStateSettled()
       mounting = false
 
       emit('ready')

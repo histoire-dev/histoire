@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import type { HstEvent } from '../../stores/events'
-import { applyState } from '@histoire/shared'
 import { useEventListener } from '@vueuse/core'
 import { computed, onBeforeUnmount, onMounted, ref, toRaw, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
@@ -10,9 +9,9 @@ import { usePreviewSettingsStore } from '../../stores/preview-settings'
 import { useStoryStore } from '../../stores/story'
 import { EVENT_SEND, PREVIEW_SETTINGS_SYNC, PREVIEW_SYNC, SANDBOX_READY, SELECT_VARIANT, STATE_SYNC, VARIANT_READY } from '../../util/const'
 import { STORY_CHANGED_EVENT } from '../../util/hot'
+import { createPreviewStateSync } from '../../util/preview-state-sync'
 import { isMobile } from '../../util/responsive'
 import { getSandboxUrl } from '../../util/sandbox'
-import { toRawDeep } from '../../util/state'
 import DevOnlyToolbarOpenInEditor from '../toolbar/DevOnlyToolbarOpenInEditor.vue'
 import ToolbarBackground from '../toolbar/ToolbarBackground.vue'
 import ToolbarTextDirection from '../toolbar/ToolbarTextDirection.vue'
@@ -26,14 +25,17 @@ const iframe = ref<HTMLIFrameElement>()
 const iframeReloadKey = ref(0)
 const isIframeLoaded = ref(false)
 
+const stateSync = createPreviewStateSync({
+  getStoryId: () => storyStore.currentStory?.id,
+  getCurrentVariant: () => storyStore.currentVariant,
+  getVariantById: variantId => storyStore.getCurrentStoryVariantById(variantId),
+  postMessage: (payload) => {
+    iframe.value?.contentWindow?.postMessage(payload, window.location.origin)
+  },
+})
+
 function syncState() {
-  if (iframe.value && storyStore.currentVariant?.previewReady) {
-    iframe.value.contentWindow?.postMessage({
-      type: STATE_SYNC,
-      variantId: storyStore.currentVariant.id,
-      state: toRawDeep(storyStore.currentVariant.state, true),
-    }, window.location.origin)
-  }
+  stateSync.syncCurrentVariantState()
 }
 
 function syncPreview() {
@@ -46,8 +48,6 @@ function syncPreview() {
     }, window.location.origin)
   }
 }
-
-let synced = false
 
 /**
  * Marks every variant in the current story as waiting for a refreshed preview.
@@ -74,8 +74,7 @@ function reloadPreviewFrame() {
 }
 
 watch(() => storyStore.currentVariant?.state, () => {
-  if (synced) {
-    synced = false
+  if (stateSync.shouldSkipCurrentVariantSync()) {
     return
   }
 
@@ -92,25 +91,31 @@ useEventListener(window, 'message', (event) => {
 
   switch (event.data.type) {
     case STATE_SYNC: {
-      if (storyStore.currentVariant?.id === event.data.variantId) {
-        synced = true
-      }
-      const variant = storyStore.getCurrentStoryVariantById(event.data.variantId)
-      if (variant) {
-        applyState(variant.state, event.data.state)
-      }
+      stateSync.applyIncomingState(event.data.variantId, event.data.state)
       break
     }
     case EVENT_SEND:
       useEventsStore().addEvent(event.data.event as HstEvent)
       break
     case SANDBOX_READY:
-      if (storyStore.currentVariant) {
-        Object.assign(storyStore.currentVariant, {
+      if (!event.data.variantId) {
+        break
+      }
+
+      {
+        const variant = storyStore.getCurrentStoryVariantById(event.data.variantId)
+        if (!variant) {
+          break
+        }
+
+        Object.assign(variant, {
           previewReady: true,
         })
-        syncState()
-        syncSettings()
+
+        if (storyStore.currentVariant?.id === variant.id) {
+          syncState()
+          syncSettings()
+        }
       }
       break
     case VARIANT_READY: {
@@ -141,13 +146,25 @@ const sandboxUrl = computed(() => getSandboxUrl(storyStore.currentStory))
 
 watch(sandboxUrl, () => {
   isIframeLoaded.value = false
+  stateSync.reset()
   markStoryPreviewPending()
 })
 
-watch(() => [storyStore.currentStory?.id, storyStore.currentVariant?.id], () => {
+watch(() => storyStore.currentStory?.id, () => {
   syncPreview()
 }, {
   immediate: true,
+})
+
+watch(() => storyStore.currentVariant?.id, (variantId) => {
+  if (!iframe.value?.contentWindow || !variantId) {
+    return
+  }
+
+  iframe.value.contentWindow.postMessage({
+    type: SELECT_VARIANT,
+    variantId,
+  }, window.location.origin)
 })
 
 if (import.meta.hot) {

@@ -1,7 +1,6 @@
 <script lang="ts" setup>
 import type { HstEvent } from '../../stores/events'
 import type { Story, Variant } from '../../types'
-import { applyState } from '@histoire/shared'
 import { useEventListener } from '@vueuse/core'
 import { computed, onBeforeUnmount, onMounted, ref, toRaw, watch } from 'vue'
 import { useEventsStore } from '../../stores/events'
@@ -9,8 +8,8 @@ import { usePreviewRuntimeStore } from '../../stores/preview-runtime'
 import { usePreviewSettingsStore } from '../../stores/preview-settings'
 import { EVENT_SEND, PREVIEW_SETTINGS_SYNC, PREVIEW_SYNC, SANDBOX_READY, STATE_SYNC, VARIANT_READY } from '../../util/const'
 import { STORY_CHANGED_EVENT } from '../../util/hot'
+import { createPreviewStateSync } from '../../util/preview-state-sync'
 import { getSandboxUrl } from '../../util/sandbox'
-import { toRawDeep } from '../../util/state'
 import StoryResponsivePreview from './StoryResponsivePreview.vue'
 
 const props = defineProps<{
@@ -23,15 +22,17 @@ const previewRuntimeStore = usePreviewRuntimeStore()
 
 const iframe = ref<HTMLIFrameElement>()
 const iframeReloadKey = ref(0)
+const stateSync = createPreviewStateSync({
+  getStoryId: () => props.story.id,
+  getCurrentVariant: () => props.variant,
+  getVariantById: variantId => (variantId === props.variant.id ? props.variant : null),
+  postMessage: (payload) => {
+    iframe.value?.contentWindow?.postMessage(payload, window.location.origin)
+  },
+})
 
 function syncState() {
-  if (iframe.value && props.variant.previewReady) {
-    iframe.value.contentWindow?.postMessage({
-      type: STATE_SYNC,
-      variantId: props.variant.id,
-      state: toRawDeep(props.variant.state, true),
-    }, window.location.origin)
-  }
+  stateSync.syncCurrentVariantState()
 }
 
 function syncPreview() {
@@ -44,8 +45,6 @@ function syncPreview() {
     }, window.location.origin)
   }
 }
-
-let synced = false
 
 /**
  * Marks the current variant as waiting for a refreshed preview runtime.
@@ -66,8 +65,7 @@ function reloadPreviewFrame() {
 }
 
 watch(() => props.variant.state, () => {
-  if (synced) {
-    synced = false
+  if (stateSync.shouldSkipCurrentVariantSync()) {
     return
   }
   syncState()
@@ -87,8 +85,7 @@ useEventListener(window, 'message', (event) => {
 
   switch (event.data.type) {
     case STATE_SYNC:
-      synced = true
-      applyState(props.variant.state, event.data.state)
+      stateSync.applyIncomingState(event.data.variantId, event.data.state)
       break
     case EVENT_SEND:
       useEventsStore().addEvent(event.data.event as HstEvent)
@@ -119,6 +116,7 @@ const isIframeLoaded = ref(false)
 
 watch(sandboxUrl, () => {
   isIframeLoaded.value = false
+  stateSync.reset()
   markPreviewPending()
 })
 

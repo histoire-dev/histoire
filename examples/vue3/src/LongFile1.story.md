@@ -94,6 +94,7 @@ Display all the variants in a grid.
 
 Additional `layout` properties:
 - `width`: Column size. Can be number (pixels) or string (like `'100%'`).
+- variant state stays isolated per variant, even when controls live at story level.
 
 ```vue{4}
 <template>

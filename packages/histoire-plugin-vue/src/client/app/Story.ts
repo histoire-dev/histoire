@@ -1,7 +1,7 @@
 import type { Story } from '@histoire/shared'
 import type { PropType, VNode } from 'vue'
 import { omitInheritStoryProps } from '@histoire/shared'
-import { cloneVNode, computed, defineComponent, getCurrentInstance, h, isRef, provide, reactive, useAttrs } from 'vue'
+import { cloneVNode, computed, defineComponent, getCurrentInstance, h, isRef, provide, reactive, renderSlot, useAttrs } from 'vue'
 import { useRenderContext } from './render-context.js'
 import Variant from './Variant'
 
@@ -175,11 +175,11 @@ export default defineComponent({
       const children = []
 
       if (renderContext.slotName === 'controls') {
-        children.push(...(vm.proxy.$slots.controls?.(slotProps) ?? []))
+        children.push(renderSlot(vm.proxy.$slots, 'controls', slotProps))
       }
 
       if (renderContext.slotName === 'default' || attrs.story.meta?.hasVariantChildComponents) {
-        children.push(...(vm.proxy.$slots.default?.(slotProps) ?? []))
+        children.push(renderSlot(vm.proxy.$slots, 'default', slotProps))
       }
 
       return children

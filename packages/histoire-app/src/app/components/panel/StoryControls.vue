@@ -32,8 +32,15 @@ const hasCustomControls = computed(() => props.variant.slots().controls || props
 
 const hasInitState = computed(() => Object
   .entries(props.variant.state || {})
-  .filter(([key]) => !key.startsWith('_h'))
+  .filter(([key, value]) => !key.startsWith('_h') && !(key === '$data' && isEmptyStateObject(value)))
   .length > 0)
+
+function isEmptyStateObject(value: unknown) {
+  return value != null
+    && typeof value === 'object'
+    && !Array.isArray(value)
+    && !Object.keys(value as Record<string, unknown>).length
+}
 </script>
 
 <template>

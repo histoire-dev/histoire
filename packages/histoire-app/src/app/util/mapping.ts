@@ -68,7 +68,7 @@ export function mapVariant(variant: Variant, existingVariant?: Variant): Variant
       ...variant,
       state: reactive({
         _hPropState: {},
-        _hPropDefs: {},
+        _hPropDefs: [],
       }),
       setupApp: null,
       slots: () => ({}),

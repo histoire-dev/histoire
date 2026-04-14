@@ -47,7 +47,7 @@ import { isDark } from '@histoire/app/dist/bundled/util/dark.js'
 import { mapFile } from '@histoire/app/dist/bundled/util/mapping.js'
 import { applyPreviewSettings } from '@histoire/app/dist/bundled/util/preview-settings.js'
 import { toRawDeep } from '@histoire/app/dist/bundled/util/state.js'
-import { applyState, createHistoireTestSummary, serializeTestError } from ${JSON.stringify(histoireSharedId)}
+import { applyVariantStateUpdate, createHistoireTestSummary, createVariantStateSyncGuards, getVariantStateKey, serializeTestError } from ${JSON.stringify(histoireSharedId)}
 import { createVariantTestSession } from ${JSON.stringify(variantTestSessionId)}
 
 const TEST_DEFINITIONS_KEY = '__HST_TEST_DEFINITIONS__'
@@ -345,7 +345,8 @@ function summarizeRunError(storyId, variantId, error) {
   }])
 }
 
-function postVariantStateSnapshot(variant) {
+function postVariantStateSnapshotById(story, variantId) {
+  const variant = story?.variants.find(item => item.id === variantId)
   if (!variant) {
     return
   }
@@ -355,6 +356,16 @@ function postVariantStateSnapshot(variant) {
     variantId: variant.id,
     state: toRawDeep(variant.state, true),
   })
+}
+
+function postVariantStateSnapshot(variant) {
+  if (!variant) {
+    return
+  }
+
+  postVariantStateSnapshotById({
+    variants: [variant],
+  }, variant.id)
 }
 
 async function runVariantTests(storyFile, variant) {
@@ -424,14 +435,66 @@ const app = createApp({
     const selection = reactive({ storyId: null, variantId: null, grid: false })
     const gridSelectedVariantId = ref(null)
     const previewSettingsStore = usePreviewSettingsStore()
-    let synced = false
     let mounted = false
     let selectionToken = 0
+    const variantStateGuards = createVariantStateSyncGuards()
+    const variantStateWatchStops = new Map()
     const story = computed(() => file.value?.story ?? null)
     const variant = computed(() => {
       const variantId = selection.grid ? (gridSelectedVariantId.value ?? selection.variantId) : selection.variantId
       return story.value?.variants.find(item => item.id === variantId) ?? null
     })
+
+    function getVariantById(variantId) {
+      return story.value?.variants.find(item => item.id === variantId) ?? null
+    }
+
+    function stopVariantStateWatchers() {
+      for (const stop of variantStateWatchStops.values()) {
+        stop()
+      }
+
+      variantStateWatchStops.clear()
+      variantStateGuards.reset()
+    }
+
+    function syncVariantStateWatchers(nextStory) {
+      stopVariantStateWatchers()
+
+      if (!nextStory) {
+        return
+      }
+
+      for (const targetVariant of nextStory.variants) {
+        const key = getVariantStateKey(nextStory.id, targetVariant.id)
+        if (!key) {
+          continue
+        }
+
+        const stop = watch(() => targetVariant.state, value => {
+          if (variantStateGuards.consume(key)) {
+            return
+          }
+
+          postToParent({
+            type: STATE_SYNC,
+            variantId: targetVariant.id,
+            state: toRawDeep(value, true),
+          })
+        }, {
+          deep: true,
+          flush: 'sync',
+        })
+
+        variantStateWatchStops.set(key, stop)
+      }
+    }
+
+    async function waitForVariantSnapshot() {
+      await nextTick()
+      await nextTick()
+      await new Promise(resolve => requestAnimationFrame(resolve))
+    }
 
     async function syncSelection(nextSelection) {
       const token = ++selectionToken
@@ -442,6 +505,7 @@ const app = createApp({
       gridSelectedVariantId.value = nextSelection.variantId ?? null
       clearRuntimeTestDefinitions()
       if (!selection.storyId) {
+        stopVariantStateWatchers()
         file.value = null
         return
       }
@@ -449,6 +513,7 @@ const app = createApp({
       const nextFile = await loadStoryFile(selection.storyId)
       if (selectionToken === token) {
         file.value = nextFile
+        syncVariantStateWatchers(nextFile.story)
         await nextTick()
       }
     }
@@ -460,11 +525,14 @@ const app = createApp({
         postToParent({ type: SANDBOX_READY, variantId: variant.value?.id })
       }
       else if (event.data?.type === STATE_SYNC) {
-        if (mounted && variant.value) {
-          synced = true
-          if (!selection.grid || variant.value.id === event.data.variantId) {
-            applyState(variant.value.state, event.data.state)
-          }
+        if (mounted) {
+          applyVariantStateUpdate({
+            storyId: story.value?.id ?? selection.storyId,
+            variantId: event.data.variantId,
+            state: event.data.state,
+            getVariantById,
+            guards: variantStateGuards,
+          })
         }
       }
       else if (event.data?.type === PREVIEW_SETTINGS_SYNC) {
@@ -541,23 +609,6 @@ const app = createApp({
       }
     })
 
-    watch(() => variant.value?.state, value => {
-      if (synced && mounted) {
-        synced = false
-        return
-      }
-      if (variant.value) {
-        postToParent({
-          type: STATE_SYNC,
-          variantId: variant.value.id,
-          state: toRawDeep(value, true),
-        })
-      }
-    }, {
-      deep: true,
-      flush: 'sync',
-    })
-
     onMounted(() => {
       mounted = true
       if (initialSelection.storyId) {
@@ -574,15 +625,20 @@ const app = createApp({
       variant,
       selection,
       selectGridVariant(variantId) {
-        synced = false
         gridSelectedVariantId.value = variantId
         postToParent({ type: SELECT_VARIANT, variantId })
       },
-      markVariantReady(variantId) {
-        if (variant.value?.id === variantId) {
-          postVariantStateSnapshot(variant.value)
-        }
+      async markVariantReady(variantId) {
+        await waitForVariantSnapshot()
+        postVariantStateSnapshotById(story.value, variantId)
         postToParent({ type: VARIANT_READY, variantId })
+      },
+      async syncMountedStoryVariants() {
+        await waitForVariantSnapshot()
+
+        for (const targetVariant of story.value?.variants ?? []) {
+          postVariantStateSnapshotById(story.value, targetVariant.id)
+        }
       },
     }
   },
@@ -593,7 +649,11 @@ const app = createApp({
 
     return [
       this.selection.grid
-        ? h('div', { class: 'htw-sandbox-hidden' }, [h(GenericMountStory, { key: this.story.id, story: this.story })])
+        ? h('div', { class: 'htw-sandbox-hidden' }, [h(GenericMountStory, {
+          key: this.story.id,
+          story: this.story,
+          onReady: this.syncMountedStoryVariants,
+        })])
         : null,
       this.selection.grid
         ? h(StoryVariantGridSandbox, {

@@ -9,6 +9,7 @@ import {
   createApp,
   defineComponent,
   h,
+  nextTick,
   Suspense,
 } from 'vue'
 import { registerGlobalComponents } from './global-components.js'
@@ -51,6 +52,16 @@ const PreviewHostRoot = defineComponent({
 export function createPreviewHost(options: PreviewHostOptions) {
   let app: App = null
   let target: HTMLDivElement = null
+
+  /**
+   * Waits for the user Vue app to flush render-time mutations like auto-prop
+   * detection before the bundled wrapper reports readiness.
+   */
+  async function waitForHostRenderSettled() {
+    await nextTick()
+    await nextTick()
+    await new Promise<void>(resolve => requestAnimationFrame(() => resolve()))
+  }
 
   async function mount() {
     const wrappers: Component[] = []
@@ -98,6 +109,7 @@ export function createPreviewHost(options: PreviewHostOptions) {
     await runSetupHooks(setupApi)
 
     app.mount(target)
+    await waitForHostRenderSettled()
   }
 
   function unmount() {

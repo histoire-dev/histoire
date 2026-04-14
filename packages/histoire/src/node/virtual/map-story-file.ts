@@ -90,7 +90,7 @@ export function mapStoryVariant(variant: MappableVariant, existingVariant?: Vari
       ...variant,
       state: reactive({
         _hPropState: {},
-        _hPropDefs: {},
+        _hPropDefs: [],
       }),
       setupApp: null,
       slots: createEmptySlots,
