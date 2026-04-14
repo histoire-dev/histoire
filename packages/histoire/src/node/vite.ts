@@ -191,6 +191,10 @@ export async function getViteConfigWithPlugins(
               replacement: join(APP_PATH, process.env.HISTOIRE_DEV ? 'app/style/main.pcss' : 'style.css'),
             },
             {
+              find: 'histoire-bundled-style',
+              replacement: join(APP_PATH, 'bundled/app.css'),
+            },
+            {
               find: /^@histoire\/shared$/,
               replacement: histoireSharedPath,
             },

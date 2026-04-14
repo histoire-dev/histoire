@@ -1,5 +1,6 @@
 import type { Context } from '../context.js'
 import fs from 'node:fs'
+import path from 'node:path'
 import { resolveConfig } from 'vite'
 import { describe, expect, it } from 'vitest'
 import { getDefaultConfig } from '../config.js'
@@ -97,5 +98,13 @@ describe('getViteConfigWithPlugins', () => {
     expect(typeof querySuffixedResolvedId).toBe('string')
     expect(rootRelativeResolvedId).toMatch(/vendors\/vitest-collect\.(ts|js)$/)
     expect(querySuffixedResolvedId).toMatch(/vendors\/vitest-collect\.(ts|js)$/)
+  })
+
+  it('uses compiled style aliases in the sandbox entry', () => {
+    const sandboxEntry = fs.readFileSync(path.resolve(process.cwd(), '../histoire-app/src/bundle-sandbox.js'), 'utf8')
+
+    expect(sandboxEntry).toContain(`import 'histoire-style'`)
+    expect(sandboxEntry).toContain(`import 'histoire-bundled-style'`)
+    expect(sandboxEntry).not.toContain(`import './app/style/sandbox.css'`)
   })
 })
