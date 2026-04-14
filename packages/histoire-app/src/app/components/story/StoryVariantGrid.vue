@@ -1,121 +1,203 @@
 <script lang="ts" setup>
-import { useResizeObserver } from '@vueuse/core'
-import { computed, onMounted, ref, watch } from 'vue'
+import type { HstEvent } from '../../stores/events'
+import { applyState } from '@histoire/shared'
+import { useEventListener } from '@vueuse/core'
+import { computed, onBeforeUnmount, onMounted, ref, toRaw, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { useEventsStore } from '../../stores/events'
+import { usePreviewRuntimeStore } from '../../stores/preview-runtime'
+import { usePreviewSettingsStore } from '../../stores/preview-settings'
 import { useStoryStore } from '../../stores/story'
+import { EVENT_SEND, PREVIEW_SETTINGS_SYNC, PREVIEW_SYNC, SANDBOX_READY, SELECT_VARIANT, STATE_SYNC, VARIANT_READY } from '../../util/const'
+import { STORY_CHANGED_EVENT } from '../../util/hot'
 import { isMobile } from '../../util/responsive'
+import { getSandboxUrl } from '../../util/sandbox'
+import { toRawDeep } from '../../util/state'
 import DevOnlyToolbarOpenInEditor from '../toolbar/DevOnlyToolbarOpenInEditor.vue'
 import ToolbarBackground from '../toolbar/ToolbarBackground.vue'
 import ToolbarTextDirection from '../toolbar/ToolbarTextDirection.vue'
-import StoryVariantGridItem from './StoryVariantGridItem.vue'
 
 const storyStore = useStoryStore()
+const router = useRouter()
+const route = useRoute()
+const settings = usePreviewSettingsStore().currentSettings
+const previewRuntimeStore = usePreviewRuntimeStore()
+const iframe = ref<HTMLIFrameElement>()
+const iframeReloadKey = ref(0)
+const isIframeLoaded = ref(false)
 
-const gridTemplateWidth = computed(() => {
-  if (storyStore.currentStory.layout.type !== 'grid') {
+function syncState() {
+  if (iframe.value && storyStore.currentVariant?.previewReady) {
+    iframe.value.contentWindow?.postMessage({
+      type: STATE_SYNC,
+      variantId: storyStore.currentVariant.id,
+      state: toRawDeep(storyStore.currentVariant.state, true),
+    }, window.location.origin)
+  }
+}
+
+function syncPreview() {
+  if (iframe.value?.contentWindow && storyStore.currentStory) {
+    iframe.value.contentWindow.postMessage({
+      type: PREVIEW_SYNC,
+      storyId: storyStore.currentStory.id,
+      variantId: storyStore.currentVariant?.id ?? null,
+      grid: true,
+    }, window.location.origin)
+  }
+}
+
+let synced = false
+
+/**
+ * Marks every variant in the current story as waiting for a refreshed preview.
+ */
+function markStoryPreviewPending() {
+  if (!storyStore.currentStory) {
     return
   }
 
-  const layoutWidth = storyStore.currentStory.layout.width
+  for (const variant of storyStore.currentStory.variants) {
+    Object.assign(variant, {
+      previewReady: false,
+    })
+  }
+}
 
-  if (!layoutWidth) {
-    return '200px'
+/**
+ * Forces a fresh iframe mount when the active story uses Vitest mocks because
+ * mock HMR is less reliable than a clean preview boot.
+ */
+function reloadPreviewFrame() {
+  isIframeLoaded.value = false
+  iframeReloadKey.value++
+}
+
+watch(() => storyStore.currentVariant?.state, () => {
+  if (synced) {
+    synced = false
+    return
   }
 
-  if (typeof layoutWidth === 'number') {
-    return `${layoutWidth}px`
-  }
-
-  return layoutWidth
+  syncState()
+}, {
+  deep: true,
+  immediate: true,
 })
 
-const margin = 16
-const gap = 16
-
-const itemWidth = ref(16)
-const maxItemHeight = ref(0)
-const maxCount = ref(10)
-const countPerRow = ref(0)
-const visibleRows = ref(0)
-
-const el = ref<HTMLDivElement>(null)
-
-useResizeObserver(el, () => {
-  updateMaxCount()
-  updateSize()
-})
-
-function updateMaxCount() {
-  if (!maxItemHeight.value) return
-
-  const width = el.value!.clientWidth - margin * 2
-  const height = el.value!.clientHeight
-  const scrollTop = el.value!.scrollTop
-
-  // width = (countPerRow - 1) * gap + countPerRow * itemWidth.value
-
-  // W = (C - 1) * G + C * I
-  // W = C * G - G + C * I
-  // W + G = C * G + C * I
-  // W + G = C * (G + I)
-  // (W + G) / (G + I) = C
-
-  countPerRow.value = Math.floor((width + gap) / (itemWidth.value + gap))
-  visibleRows.value = Math.ceil((height + scrollTop + gap) / (maxItemHeight.value + gap))
-  const newMaxCount = countPerRow.value * visibleRows.value
-  if (maxCount.value < newMaxCount) {
-    maxCount.value = newMaxCount
+useEventListener(window, 'message', (event) => {
+  if (!event.data?.__histoire || event.source !== iframe.value?.contentWindow) {
+    return
   }
 
-  if (storyStore.currentVariant) {
-    const index = storyStore.currentStory.variants.indexOf(storyStore.currentVariant)
-    if (index + 1 > maxCount.value) {
-      maxCount.value = index + 1
+  switch (event.data.type) {
+    case STATE_SYNC: {
+      if (storyStore.currentVariant?.id === event.data.variantId) {
+        synced = true
+      }
+      const variant = storyStore.getCurrentStoryVariantById(event.data.variantId)
+      if (variant) {
+        applyState(variant.state, event.data.state)
+      }
+      break
     }
+    case EVENT_SEND:
+      useEventsStore().addEvent(event.data.event as HstEvent)
+      break
+    case SANDBOX_READY:
+      if (storyStore.currentVariant) {
+        Object.assign(storyStore.currentVariant, {
+          previewReady: true,
+        })
+        syncState()
+        syncSettings()
+      }
+      break
+    case VARIANT_READY: {
+      const variant = storyStore.getCurrentStoryVariantById(event.data.variantId)
+      if (variant) {
+        Object.assign(variant, {
+          previewReady: true,
+        })
+        if (storyStore.currentVariant?.id === variant.id) {
+          syncState()
+          syncSettings()
+        }
+      }
+      break
+    }
+    case SELECT_VARIANT:
+      router.push({
+        query: {
+          ...route.query,
+          variantId: event.data.variantId,
+        },
+      })
+      break
   }
-}
-
-function onItemResize(w: number, h: number) {
-  itemWidth.value = w
-  if (maxItemHeight.value < h) {
-    maxItemHeight.value = h
-    updateMaxCount()
-  }
-}
-
-watch(() => storyStore.currentVariant, () => {
-  maxItemHeight.value = 0 // Reset max height
-  updateMaxCount()
 })
 
-// Grid size
+const sandboxUrl = computed(() => getSandboxUrl(storyStore.currentStory))
 
-const gridEl = ref<HTMLDivElement>(null)
-const gridColumnWidth = ref(1)
-const viewWidth = ref(1)
+watch(sandboxUrl, () => {
+  isIframeLoaded.value = false
+  markStoryPreviewPending()
+})
 
-function updateSize() {
-  if (!el.value) return
-  viewWidth.value = el.value.clientWidth
+watch(() => [storyStore.currentStory?.id, storyStore.currentVariant?.id], () => {
+  syncPreview()
+}, {
+  immediate: true,
+})
 
-  if (!gridEl.value) return
+if (import.meta.hot) {
+  import.meta.hot.on(STORY_CHANGED_EVENT, ({ storyId, hasVitestMocks }) => {
+    if (storyId !== storyStore.currentStory?.id) {
+      return
+    }
 
-  if (gridTemplateWidth.value.endsWith('%')) {
-    gridColumnWidth.value = viewWidth.value * Number.parseInt(gridTemplateWidth.value) / 100 - gap
-  }
-  else {
-    gridColumnWidth.value = Number.parseInt(gridTemplateWidth.value)
+    markStoryPreviewPending()
+
+    if (hasVitestMocks) {
+      reloadPreviewFrame()
+      return
+    }
+
+    syncPreview()
+  })
+}
+
+function syncSettings() {
+  if (iframe.value) {
+    iframe.value.contentWindow?.postMessage({
+      type: PREVIEW_SETTINGS_SYNC,
+      settings: toRaw(settings),
+    }, window.location.origin)
   }
 }
+
+watch(() => settings, () => {
+  syncSettings()
+}, {
+  deep: true,
+  immediate: true,
+})
 
 onMounted(() => {
-  updateSize()
+  previewRuntimeStore.setFrame('grid', iframe.value ?? null)
 })
 
-useResizeObserver(gridEl, () => {
-  updateSize()
+onBeforeUnmount(() => {
+  previewRuntimeStore.setFrame('grid', null)
 })
 
-const columnCount = computed(() => Math.min(storyStore.currentStory.variants.length, Math.floor((viewWidth.value + gap) / (gridColumnWidth.value + gap))))
+function onIframeLoad() {
+  previewRuntimeStore.setFrame('grid', iframe.value ?? null)
+  isIframeLoaded.value = true
+  syncPreview()
+  syncState()
+  syncSettings()
+}
 </script>
 
 <template>
@@ -135,35 +217,17 @@ const columnCount = computed(() => Math.min(storyStore.currentStory.variants.len
       />
     </div>
 
-    <div
-      ref="el"
-      class="htw-overflow-y-auto htw-flex htw-flex-1"
-      @scroll="updateMaxCount()"
-    >
-      <div class="htw-flex htw-w-0 htw-flex-1 htw-mx-4">
-        <div
-          class="htw-m-auto"
-          :style="{
-            minHeight: `${(storyStore.currentStory.variants.length / countPerRow) * (maxItemHeight + gap) - gap}px`,
-          }"
-        >
-          <div
-            ref="gridEl"
-            class="htw-grid htw-gap-4 htw-my-4"
-            :style="{
-              gridTemplateColumns: `repeat(${columnCount}, ${gridColumnWidth}px)`,
-            }"
-          >
-            <StoryVariantGridItem
-              v-for="(variant, index) of storyStore.currentStory.variants.slice(0, maxCount)"
-              :key="index"
-              :variant="variant"
-              :story="storyStore.currentStory"
-              @resize="onItemResize"
-            />
-          </div>
-        </div>
-      </div>
-    </div>
+    <iframe
+      :key="iframeReloadKey"
+      ref="iframe"
+      :src="sandboxUrl"
+      loading="lazy"
+      class="htw-w-full htw-h-full htw-relative"
+      :class="{
+        'htw-invisible': !isIframeLoaded,
+      }"
+      data-test-id="preview-iframe"
+      @load="onIframeLoad()"
+    />
   </div>
 </template>

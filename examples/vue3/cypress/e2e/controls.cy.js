@@ -6,40 +6,46 @@ describe('Controls', () => {
     .should('not.be.empty')
     .then(cy.wrap)
 
+  const getControls = () => cy.get('[data-test-id="story-controls"]')
+  const getControl = label => getControls().contains('label', new RegExp(`^${label}$`))
+
   beforeEach(() => {
     cy.visit('/')
     cy.get('[data-test-id="story-list-item"]').contains('Controls').click()
+    cy.get('[data-test-id="story-side-panel"]').should('be.visible')
+    cy.get('[data-test-id="story-side-panel"]').contains('Loading...').should('not.exist')
   })
 
-  it('HstText', () => {
+  it('updates text state', () => {
     getIframeBody().find('.state-output').contains('"text": "Hello"')
-    cy.get('[data-test-id="story-controls"]').contains('HstText').clear().type('Foo')
+    getControl('text').find('input').clear().type('Foo')
     getIframeBody().find('.state-output').contains('"text": "Foo"')
   })
 
-  it('HstCheckbox', () => {
+  it('updates checkbox state', () => {
     getIframeBody().find('.state-output').contains('"checkbox": false')
-    cy.get('[data-test-id="story-controls"]').contains('HstCheckbox').click()
+    getControl('checkbox').click()
     getIframeBody().find('.state-output').contains('"checkbox": true')
-    cy.get('[data-test-id="story-controls"]').contains('HstCheckbox').click()
+    getControl('checkbox').click()
     getIframeBody().find('.state-output').contains('"checkbox": false')
   })
 
-  it('HstNumber', () => {
+  it('updates numeric state', () => {
     getIframeBody().find('.state-output').contains('"number": 20')
-    cy.get('[data-test-id="story-controls"] input[type="number"]').clear().type('42')
-    getIframeBody().find('.state-output').contains('"number": 42')
+    getControl('number').find('input').clear()
+    getControl('number').find('input').type('42')
+    getIframeBody().find('.state-output').contains('"number": "42"')
   })
 
-  it('HstTextarea', () => {
+  it('updates long text state', () => {
     getIframeBody().find('.state-output').contains('"longText": "Longer text..."')
-    cy.get('[data-test-id="story-controls"] textarea').clear().type('Meow meow meow')
+    getControl('longText').find('input').clear().type('Meow meow meow')
     getIframeBody().find('.state-output').contains('"longText": "Meow meow meow"')
   })
 
-  it('HstColorSelect', () => {
+  it('updates color state', () => {
     getIframeBody().find('.state-output').contains('"colorselect": "#000000"')
-    cy.get('[data-test-id="story-controls"]').contains('HstColorSelect').clear().type('#ffffff')
+    getControl('colorselect').find('input').clear().type('#ffffff')
     getIframeBody().find('.state-output').contains('"colorselect": "#ffffff"')
   })
 })

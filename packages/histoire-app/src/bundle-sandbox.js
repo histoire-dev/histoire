@@ -1,2 +1,2 @@
 import './app/style/sandbox.css'
-import './bundled/sandbox.js'
+import 'virtual:$histoire-preview-runtime'

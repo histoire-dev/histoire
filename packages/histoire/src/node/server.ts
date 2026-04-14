@@ -9,8 +9,11 @@ import { createMarkdownFilesWatcher, onMarkdownListChange } from './markdown.js'
 import { DevEventPluginApi, DevPluginApi } from './plugin.js'
 import { onStoryChange, onStoryListChange, watchStories } from './stories.js'
 import { wrapLogError } from './util/log.js'
+import { fileHasVitestMocks } from './util/story-vitest.js'
 import * as VirtualFiles from './virtual/index.js'
 import { getViteConfigWithPlugins } from './vite.js'
+
+const STORY_CHANGED_EVENT = 'histoire:story-changed'
 
 export interface CreateServerOptions {
   port?: number
@@ -65,8 +68,28 @@ export async function createServer(ctx: Context, options: CreateServerOptions = 
     }
   }
 
+  let currentTestRun: Promise<unknown> | null = null
+
   // Custom dev events
   server.ws.on(`histoire:dev-event`, async ({ event, payload }) => {
+    if (event === 'runStoryTests') {
+      if (!currentTestRun) {
+        currentTestRun = import('./test.js')
+          .then(({ runHistoireTests }) => runHistoireTests(ctx, {
+            storyId: payload?.storyId,
+            variantId: payload?.variantId,
+            rawVitestArgs: payload?.rawVitestArgs ?? [],
+          }))
+          .finally(() => {
+            currentTestRun = null
+          })
+      }
+
+      const result = await currentTestRun
+      server.ws.send(`histoire:dev-event-result`, { event, result })
+      return
+    }
+
     for (const plugin of ctx.config.plugins) {
       if (plugin.onDevEvent) {
         const api = new DevEventPluginApi(ctx, plugin, moduleLoader, event, payload)
@@ -167,6 +190,10 @@ export async function createServer(ctx: Context, options: CreateServerOptions = 
         await executeStoryFile(storyFile)
         if (storyFile.story) {
           await invalidateModule(`/__resolved__virtual:story-source:${storyFile.story.id}`)
+          server.ws.send(STORY_CHANGED_EVENT, {
+            storyId: storyFile.story.id,
+            hasVitestMocks: fileHasVitestMocks(storyFile),
+          })
         }
       }))
     }

@@ -242,6 +242,17 @@ export interface HistoireConfig {
      */
     excludeFromVendorsChunk?: (string | RegExp)[]
   }
+  /**
+   * Test runtime integration.
+   */
+  test?: {
+    /**
+     * Strategy used to collect stories during build.
+     * - browser: headless browser collection
+     * - hybrid: keep the Node collector for build-time metadata
+     */
+    buildCollection?: 'browser' | 'hybrid'
+  }
 }
 
 export type ConfigMode = 'build' | 'dev'

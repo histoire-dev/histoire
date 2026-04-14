@@ -1,7 +1,7 @@
 import type { ServerStory } from '@histoire/shared'
 import type { Context } from './context.js'
 
-interface SerializedStory extends Omit<ServerStory, 'docsText'> {
+interface SerializedStory extends ServerStory {
   relativePath: string
   supportPluginId: string
   treePath?: string[]
@@ -30,9 +30,7 @@ export function getSerializedStoryData(ctx: Context): SerializedStoryData {
   for (const storyFile of ctx.storyFiles) {
     if (storyFile.story) {
       data.stories.push({
-        ...Object.assign({}, storyFile.story, {
-          docsText: undefined,
-        }),
+        ...storyFile.story,
         relativePath: storyFile.relativePath,
         supportPluginId: storyFile.supportPluginId,
         treePath: storyFile.treePath,

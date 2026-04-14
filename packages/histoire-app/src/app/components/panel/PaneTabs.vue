@@ -2,6 +2,7 @@
 import type { Story, Variant } from '../../types'
 import { computed, toRefs } from 'vue'
 import { useEventsStore } from '../../stores/events'
+import { useTestsStore } from '../../stores/tests'
 import BaseOverflowMenu from '../base/BaseOverflowMenu.vue'
 import BaseOverflowTab from '../base/BaseOverflowTab.vue'
 import BaseTab from '../base/BaseTab.vue'
@@ -19,6 +20,7 @@ const { renderedDoc } = useStoryDoc(story)
 
 const eventsStore = useEventsStore()
 const hasEvents = computed(() => eventsStore.events.length)
+const testsStore = useTestsStore()
 </script>
 
 <template>
@@ -50,6 +52,22 @@ const hasEvents = computed(() => eventsStore.events.length)
         {{ eventsStore.unseen <= 99 ? eventsStore.unseen : "99+" }}
       </BaseTag>
     </BaseTab>
+    <BaseTab
+      :to="{ ...$route, query: { ...$route.query, tab: 'tests' } }"
+      :matched="$route.query.tab === 'tests'"
+      data-test-id="story-tests-tab"
+      :class="{
+        'htw-opacity-50': !testsStore.currentHasTests,
+      }"
+    >
+      Tests
+      <BaseTag
+        v-if="testsStore.currentDefinitions.length"
+        data-test-id="story-tests-tab-count"
+      >
+        {{ testsStore.currentDefinitions.length <= 99 ? testsStore.currentDefinitions.length : "99+" }}
+      </BaseTag>
+    </BaseTab>
 
     <template #overflow>
       <BaseOverflowTab
@@ -77,6 +95,22 @@ const hasEvents = computed(() => eventsStore.events.length)
         Events
         <BaseTag v-if="eventsStore.unseen">
           {{ eventsStore.unseen <= 99 ? eventsStore.unseen : "99+" }}
+        </BaseTag>
+      </BaseOverflowTab>
+      <BaseOverflowTab
+        :to="{ ...$route, query: { ...$route.query, tab: 'tests' } }"
+        :matched="$route.query.tab === 'tests'"
+        data-test-id="story-tests-overflow-tab"
+        :class="{
+          'htw-opacity-50': !testsStore.currentHasTests,
+        }"
+      >
+        Tests
+        <BaseTag
+          v-if="testsStore.currentDefinitions.length"
+          data-test-id="story-tests-overflow-tab-count"
+        >
+          {{ testsStore.currentDefinitions.length <= 99 ? testsStore.currentDefinitions.length : "99+" }}
         </BaseTag>
       </BaseOverflowTab>
     </template>
