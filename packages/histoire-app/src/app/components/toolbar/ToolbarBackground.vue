@@ -16,21 +16,20 @@ const contrastColor = computed(() => getContrastColor(settings))
     v-if="histoireConfig.backgroundPresets.length"
     placement="bottom-end"
     :skidding="6"
-    class="histoire-toolbar-background htw-h-full htw-flex-none"
+    class="histoire-toolbar-background htw-flex-none"
     data-test-id="toolbar-background"
   >
     <div
       v-tooltip="'Background color'"
-      class="htw-cursor-pointer hover:htw-text-primary-500 htw-flex htw-items-center htw-gap-1 htw-h-full htw-px-2 htw-group"
+      class="htw-flex htw-items-center htw-gap-1 htw-px-2.5 htw-py-1.5 hover:htw-bg-white/50 dark:hover:htw-bg-white/10 hover:htw-text-primary-500 dark:hover:htw-text-primary-400 htw-cursor-pointer htw-text-gray-900 dark:htw-text-gray-100 htw-transition-colors htw-group"
     >
-      <div
-        class="bind-preview-bg htw-w-4 htw-h-4 htw-rounded-full htw-border htw-border-black/50 dark:htw-border-white/50 htw-flex htw-items-center htw-justify-center htw-text-xs"
-      >
-        <span v-if="contrastColor">a</span>
-      </div>
       <Icon
-        icon="carbon:caret-down"
-        class="htw-w-4 htw-h-4 htw-opacity-50 group-hover:htw-opacity-100"
+        icon="carbon:color-palette"
+        class="htw-w-4 htw-h-4"
+      />
+      <Icon
+        icon="carbon:chevron-down"
+        class="htw-w-3 htw-h-3 htw-opacity-40 group-hover:htw-opacity-70"
       />
     </div>
 

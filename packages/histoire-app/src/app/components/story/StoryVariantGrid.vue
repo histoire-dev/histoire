@@ -2,10 +2,6 @@
 import { useResizeObserver } from '@vueuse/core'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useStoryStore } from '../../stores/story'
-import { isMobile } from '../../util/responsive'
-import DevOnlyToolbarOpenInEditor from '../toolbar/DevOnlyToolbarOpenInEditor.vue'
-import ToolbarBackground from '../toolbar/ToolbarBackground.vue'
-import ToolbarTextDirection from '../toolbar/ToolbarTextDirection.vue'
 import StoryVariantGridItem from './StoryVariantGridItem.vue'
 
 const storyStore = useStoryStore()
@@ -120,21 +116,6 @@ const columnCount = computed(() => Math.min(storyStore.currentStory.variants.len
 
 <template>
   <div class="histoire-story-variant-grid htw-flex htw-flex-col htw-items-stretch htw-h-full __histoire-pane-shadow-from-right">
-    <!-- Toolbar -->
-    <div
-      v-if="!isMobile"
-      class="htw-flex-none htw-flex htw-items-center htw-justify-end htw-h-8 htw-mx-2 htw-mt-1"
-    >
-      <ToolbarBackground />
-      <ToolbarTextDirection />
-
-      <DevOnlyToolbarOpenInEditor
-        v-if="__HISTOIRE_DEV__"
-        :file="storyStore.currentStory.file?.filePath"
-        tooltip="Edit story in editor"
-      />
-    </div>
-
     <div
       ref="el"
       class="htw-overflow-y-auto htw-flex htw-flex-1"

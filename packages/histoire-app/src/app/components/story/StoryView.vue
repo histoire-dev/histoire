@@ -106,6 +106,7 @@ function scrollDocsToTop() {
       :min="30"
       :max="95"
       :default-split="layoutStore.settings.storyOptionsPlacement === 'bottom' ? 60 : 75"
+      :show-divider="false"
       class="htw-h-full"
     >
       <template #first>
@@ -113,7 +114,11 @@ function scrollDocsToTop() {
       </template>
 
       <template #last>
-        <StorySidePanel />
+        <div class="htw-h-full htw-w-full htw-p-2">
+          <div class="htw-h-full htw-w-full htw-rounded-lg htw-border htw-border-gray-200 dark:htw-border-gray-700 htw-overflow-hidden htw-bg-white dark:htw-bg-gray-700">
+            <StorySidePanel />
+          </div>
+        </div>
       </template>
     </BaseSplitPane>
   </div>

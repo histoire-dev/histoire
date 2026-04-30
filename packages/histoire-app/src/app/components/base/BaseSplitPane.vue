@@ -45,6 +45,11 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+
+  showDivider: {
+    type: Boolean,
+    default: true,
+  },
 })
 
 const emit = defineEmits({
@@ -177,7 +182,7 @@ onUnmounted(() => {
       class="htw-relative htw-top-0 htw-left-0 htw-z-20"
       :class="{
         'htw-pointer-events-none': dragging,
-        'htw-border-r htw-border-gray-300/30 dark:htw-border-gray-800': orientation === 'landscape',
+        'htw-border-r htw-border-gray-300/30 dark:htw-border-gray-800': orientation === 'landscape' && showDivider,
         'htw-flex-none': fixed,
       }"
       :style="leftStyle"
@@ -199,7 +204,7 @@ onUnmounted(() => {
       class="htw-relative htw-bottom-0 htw-right-0"
       :class="{
         'htw-pointer-events-none': dragging,
-        'htw-border-t htw-border-gray-300/30 dark:htw-border-gray-800': orientation === 'portrait',
+        'htw-border-t htw-border-gray-300/30 dark:htw-border-gray-800': orientation === 'portrait' && showDivider,
         'htw-flex-1': fixed,
       }"
       :style="rightStyle"

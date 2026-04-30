@@ -9,9 +9,11 @@ import type { StoryFile, Tree } from './types'
 import { useTitle } from '@vueuse/core'
 import { onUpdate, files as rawFiles, tree as rawTree } from 'virtual:$histoire-stories'
 import { computed, onMounted, ref, watch } from 'vue'
+import AppActions from './components/app/AppActions.vue'
 import AppHeader from './components/app/AppHeader.vue'
 import Breadcrumb from './components/app/Breadcrumb.vue'
 import InitialLoading from './components/app/InitialLoading.vue'
+import TopBar from './components/app/TopBar.vue'
 import BaseSplitPane from './components/base/BaseSplitPane.vue'
 import CommandPromptsModal from './components/command/CommandPromptsModal.vue'
 import LayoutModal from './components/layout/LayoutModal.vue'
@@ -118,7 +120,7 @@ const layoutStore = useLayoutStore()
   </div>
 
   <div
-    class="htw-h-screen htw-bg-white dark:htw-bg-gray-700 dark:htw-text-gray-100"
+    class="htw-h-screen htw-bg-gray-100 dark:htw-bg-gray-750 dark:htw-text-gray-100"
     :style="{
       // Prevent flash of content
       opacity: mounted ? 1 : 0,
@@ -128,7 +130,14 @@ const layoutStore = useLayoutStore()
       v-if="isMobile"
       class="htw-h-full htw-flex htw-flex-col htw-divide-y htw-divide-gray-100 dark:htw-divide-gray-800"
     >
-      <AppHeader @search="isSearchOpen = true" />
+      <div class="htw-flex htw-items-center htw-gap-2 htw-pr-4">
+        <AppHeader class="htw-flex-1" />
+        <AppActions
+          class="htw-flex-none"
+          @layout="isLayoutOpen = true"
+          @search="isSearchOpen = true"
+        />
+      </div>
       <Breadcrumb
         :tree="tree"
         :stories="stories"
@@ -136,42 +145,44 @@ const layoutStore = useLayoutStore()
       <RouterView class="htw-grow" />
     </div>
 
+    <BaseSplitPane
+      v-else-if="layoutStore.settings.storyListVisible"
+      save-id="main-horiz"
+      :min="5"
+      :max="50"
+      :default-split="15"
+      class="htw-h-full"
+    >
+      <template #first>
+        <div class="htw-flex htw-flex-col htw-h-full htw-bg-gray-100 dark:htw-bg-gray-750 __histoire-pane-shadow-from-right">
+          <AppHeader class="htw-flex-none" />
+          <StoryList
+            :tree="tree"
+            :stories="stories"
+            class="htw-flex-1"
+          />
+        </div>
+      </template>
+
+      <template #last>
+        <div class="htw-flex htw-flex-col htw-h-full">
+          <TopBar
+            @layout="isLayoutOpen = true"
+            @search="isSearchOpen = true"
+          />
+          <RouterView class="htw-flex-1 htw-min-h-0" />
+        </div>
+      </template>
+    </BaseSplitPane>
     <div
       v-else
       class="htw-h-full htw-flex htw-flex-col"
     >
-      <AppHeader
-        class="htw-flex-none"
+      <TopBar
         @layout="isLayoutOpen = true"
         @search="isSearchOpen = true"
       />
-
-      <BaseSplitPane
-        v-if="layoutStore.settings.storyListVisible"
-        save-id="main-horiz"
-        :min="5"
-        :max="50"
-        :default-split="15"
-        class="htw-flex-1 htw-min-h-0"
-      >
-        <template #first>
-          <div class="htw-flex htw-flex-col htw-h-full htw-bg-gray-100 dark:htw-bg-gray-750 __histoire-pane-shadow-from-right">
-            <StoryList
-              :tree="tree"
-              :stories="stories"
-              class="htw-flex-1"
-            />
-          </div>
-        </template>
-
-        <template #last>
-          <RouterView />
-        </template>
-      </BaseSplitPane>
-      <RouterView
-        v-else
-        class="htw-flex-1 htw-min-h-0"
-      />
+      <RouterView class="htw-flex-1 htw-min-h-0" />
     </div>
 
     <LayoutModal
