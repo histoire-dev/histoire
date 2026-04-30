@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { Icon } from '@iconify/vue'
-import { ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useLayoutStore } from '../../stores/layout'
 import { useStoryStore } from '../../stores/story'
@@ -14,6 +14,10 @@ import StoryViewer from './StoryViewer.vue'
 
 const storyStore = useStoryStore()
 const layoutStore = useLayoutStore()
+
+const effectiveStoryOptionsVisible = computed(() =>
+  storyStore.currentStory?.meta?.storyOptions ?? layoutStore.settings.storyOptionsVisible,
+)
 
 const router = useRouter()
 const route = useRoute()
@@ -92,7 +96,7 @@ function scrollDocsToTop() {
     <template v-else-if="isMobile">
       <StoryViewer />
     </template>
-    <template v-else-if="!layoutStore.settings.storyOptionsVisible">
+    <template v-else-if="!effectiveStoryOptionsVisible">
       <StoryViewer />
     </template>
     <BaseSplitPane
