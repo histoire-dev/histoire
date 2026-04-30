@@ -95,78 +95,80 @@ const commandStore = useCommandStore()
 </script>
 
 <template>
-  <div
-    v-if="storyStore.currentStory"
-    class="histoire-app htw-hidden"
-  >
-    <GenericMountStory
-      :key="storyStore.currentStory.id"
-      :story="storyStore.currentStory"
-    />
-  </div>
-
-  <div
-    class="htw-h-screen htw-bg-white dark:htw-bg-gray-700 dark:htw-text-gray-100"
-    :style="{
-      // Prevent flash of content
-      opacity: mounted ? 1 : 0,
-    }"
-  >
+  <div class="histoire-app-root htw-h-full">
     <div
-      v-if="isMobile"
-      class="htw-h-full htw-flex htw-flex-col htw-divide-y htw-divide-gray-100 dark:htw-divide-gray-800"
+      v-if="storyStore.currentStory"
+      class="histoire-app htw-hidden"
     >
-      <AppHeader @search="isSearchOpen = true" />
-      <Breadcrumb
-        :tree="tree"
-        :stories="stories"
+      <GenericMountStory
+        :key="storyStore.currentStory.id"
+        :story="storyStore.currentStory"
       />
-      <RouterView class="htw-grow" />
     </div>
 
-    <BaseSplitPane
-      v-else
-      save-id="main-horiz"
-      :min="5"
-      :max="50"
-      :default-split="15"
-      class="htw-h-full"
+    <div
+      class="htw-h-screen htw-bg-white dark:htw-bg-gray-700 dark:htw-text-gray-100"
+      :style="{
+        // Prevent flash of content
+        opacity: mounted ? 1 : 0,
+      }"
     >
-      <template #first>
-        <div class="htw-flex htw-flex-col htw-h-full htw-bg-gray-100 dark:htw-bg-gray-750 __histoire-pane-shadow-from-right">
-          <AppHeader
-            class="htw-flex-none"
-            @search="isSearchOpen = true"
-          />
-          <StoryList
-            :tree="tree"
-            :stories="stories"
-            class="htw-flex-1"
-          />
-        </div>
-      </template>
+      <div
+        v-if="isMobile"
+        class="htw-h-full htw-flex htw-flex-col htw-divide-y htw-divide-gray-100 dark:htw-divide-gray-800"
+      >
+        <AppHeader @search="isSearchOpen = true" />
+        <Breadcrumb
+          :tree="tree"
+          :stories="stories"
+        />
+        <RouterView class="htw-grow" />
+      </div>
 
-      <template #last>
-        <RouterView />
-      </template>
-    </BaseSplitPane>
+      <BaseSplitPane
+        v-else
+        save-id="main-horiz"
+        :min="5"
+        :max="50"
+        :default-split="15"
+        class="htw-h-full"
+      >
+        <template #first>
+          <div class="htw-flex htw-flex-col htw-h-full htw-bg-gray-100 dark:htw-bg-gray-750 __histoire-pane-shadow-from-right">
+            <AppHeader
+              class="htw-flex-none"
+              @search="isSearchOpen = true"
+            />
+            <StoryList
+              :tree="tree"
+              :stories="stories"
+              class="htw-flex-1"
+            />
+          </div>
+        </template>
 
-    <SearchModal
-      v-if="loadSearch"
-      :shown="isSearchOpen"
-      @close="isSearchOpen = false"
-    />
+        <template #last>
+          <RouterView />
+        </template>
+      </BaseSplitPane>
 
-    <CommandPromptsModal
-      v-if="__HISTOIRE_DEV__"
-      :shown="commandStore.showPromptsModal"
-      @close="commandStore.showPromptsModal = false"
-    />
+      <SearchModal
+        v-if="loadSearch"
+        :shown="isSearchOpen"
+        @close="isSearchOpen = false"
+      />
+
+      <CommandPromptsModal
+        v-if="__HISTOIRE_DEV__"
+        :shown="commandStore.showPromptsModal"
+        @close="commandStore.showPromptsModal = false"
+      />
+    </div>
+
+    <transition name="__histoire-fade">
+      <InitialLoading
+        v-if="loading"
+      />
+    </transition>
   </div>
-
-  <transition name="__histoire-fade">
-    <InitialLoading
-      v-if="loading"
-    />
-  </transition>
 </template>
