@@ -1,14 +1,10 @@
 <script lang="ts" setup>
 import { Icon } from '@iconify/vue'
-import { computed } from 'vue'
 import { usePreviewSettingsStore } from '../../stores/preview-settings'
 import { histoireConfig } from '../../util/config'
-import { getContrastColor } from '../../util/preview-settings'
 import BaseCheckbox from '../base/BaseCheckbox.vue'
 
 const settings = usePreviewSettingsStore().currentSettings
-
-const contrastColor = computed(() => getContrastColor(settings))
 </script>
 
 <template>

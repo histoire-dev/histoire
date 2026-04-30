@@ -24,6 +24,7 @@ import { useCommandStore } from './stores/command'
 import { useLayoutStore } from './stores/layout'
 import { useStoryStore } from './stores/story'
 import { histoireConfig } from './util/config'
+import { toggleDark } from './util/dark'
 import { onKeyboardShortcut } from './util/keyboard'
 import { mapFile } from './util/mapping'
 import { isMobile } from './util/responsive'
@@ -83,6 +84,11 @@ onKeyboardShortcut(['ctrl+k', 'meta+k'], (event) => {
 onKeyboardShortcut(['ctrl+shift+l', 'meta+shift+l'], (event) => {
   isLayoutOpen.value = !isLayoutOpen.value
   event.preventDefault()
+})
+
+onKeyboardShortcut(['ctrl+shift+d', 'meta+shift+d'], (event) => {
+  event.preventDefault()
+  toggleDark()
 })
 
 const loading = ref(false)

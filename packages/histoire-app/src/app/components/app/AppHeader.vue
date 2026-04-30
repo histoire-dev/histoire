@@ -1,13 +1,6 @@
 <script setup lang="ts">
 import { histoireConfig } from '../../util/config'
-import { toggleDark } from '../../util/dark'
-import { onKeyboardShortcut } from '../../util/keyboard'
 import AppLogo from './AppLogo.vue'
-
-onKeyboardShortcut(['ctrl+shift+d', 'meta+shift+d'], (event) => {
-  event.preventDefault()
-  toggleDark()
-})
 </script>
 
 <template>
