@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
+import { useLayoutStore } from '../../stores/layout'
 import { useStoryStore } from '../../stores/story'
 
 import BaseEmpty from '../base/BaseEmpty.vue'
@@ -12,6 +13,11 @@ import StoryEvents from './StoryEvents.vue'
 import StorySourceCode from './StorySourceCode.vue'
 
 const storyStore = useStoryStore()
+const layoutStore = useLayoutStore()
+
+const innerOrientation = computed(() =>
+  layoutStore.settings.storyOptionsPlacement === 'bottom' ? 'landscape' : 'portrait',
+)
 
 const route = useRoute()
 
@@ -44,8 +50,8 @@ const panelContentComponent = computed(() => {
 
   <BaseSplitPane
     v-else
-    save-id="story-sidepane"
-    orientation="portrait"
+    :save-id="`story-sidepane-${innerOrientation}`"
+    :orientation="innerOrientation"
     class="histoire-story-side-panel histoire-loaded htw-h-full"
     data-test-id="story-side-panel"
   >

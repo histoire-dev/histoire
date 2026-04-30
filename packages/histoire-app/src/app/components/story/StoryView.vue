@@ -2,6 +2,7 @@
 import { Icon } from '@iconify/vue'
 import { ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useLayoutStore } from '../../stores/layout'
 import { useStoryStore } from '../../stores/story'
 
 import { isMobile } from '../../util/responsive'
@@ -12,6 +13,7 @@ import StorySidePanel from '../panel/StorySidePanel.vue'
 import StoryViewer from './StoryViewer.vue'
 
 const storyStore = useStoryStore()
+const layoutStore = useLayoutStore()
 
 const router = useRouter()
 const route = useRoute()
@@ -90,12 +92,16 @@ function scrollDocsToTop() {
     <template v-else-if="isMobile">
       <StoryViewer />
     </template>
+    <template v-else-if="!layoutStore.settings.storyOptionsVisible">
+      <StoryViewer />
+    </template>
     <BaseSplitPane
       v-else
-      save-id="story-main"
+      :save-id="`story-main-${layoutStore.settings.storyOptionsPlacement}`"
+      :orientation="layoutStore.settings.storyOptionsPlacement === 'bottom' ? 'portrait' : 'landscape'"
       :min="30"
       :max="95"
-      :default-split="75"
+      :default-split="layoutStore.settings.storyOptionsPlacement === 'bottom' ? 60 : 75"
       class="htw-h-full"
     >
       <template #first>

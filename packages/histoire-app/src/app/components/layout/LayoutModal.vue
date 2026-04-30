@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Icon } from '@iconify/vue'
+import { useEventListener } from '@vueuse/core'
 import { defineAsyncComponent } from 'vue'
 import SearchLoading from '../search/SearchLoading.vue'
 
@@ -9,7 +10,7 @@ const LayoutPane = defineAsyncComponent({
   delay: 0,
 })
 
-defineProps({
+const props = defineProps({
   shown: {
     type: Boolean,
     default: false,
@@ -24,11 +25,11 @@ function close() {
   emit('close')
 }
 
-function onEsc(event: KeyboardEvent) {
-  if (event.key === 'Escape') {
+useEventListener(window, 'keydown', (event: KeyboardEvent) => {
+  if (props.shown && event.key === 'Escape') {
     close()
   }
-}
+})
 </script>
 
 <template>
@@ -36,7 +37,6 @@ function onEsc(event: KeyboardEvent) {
     v-show="shown"
     class="histoire-layout-modal htw-fixed htw-inset-0 htw-bg-white/80 dark:htw-bg-gray-900/80 htw-z-20"
     data-test-id="layout-modal"
-    @keydown="onEsc"
   >
     <div
       class="htw-absolute htw-inset-0"

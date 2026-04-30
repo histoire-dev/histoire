@@ -19,6 +19,7 @@ import SearchModal from './components/search/SearchModal.vue'
 import GenericMountStory from './components/story/GenericMountStory.vue'
 import StoryList from './components/tree/StoryList.vue'
 import { useCommandStore } from './stores/command'
+import { useLayoutStore } from './stores/layout'
 import { useStoryStore } from './stores/story'
 import { histoireConfig } from './util/config'
 import { onKeyboardShortcut } from './util/keyboard'
@@ -97,6 +98,7 @@ onMounted(() => {
 })
 
 const commandStore = useCommandStore()
+const layoutStore = useLayoutStore()
 </script>
 
 <template>
@@ -140,6 +142,7 @@ const commandStore = useCommandStore()
       />
 
       <BaseSplitPane
+        v-if="layoutStore.settings.storyListVisible"
         save-id="main-horiz"
         :min="5"
         :max="50"
@@ -160,6 +163,10 @@ const commandStore = useCommandStore()
           <RouterView />
         </template>
       </BaseSplitPane>
+      <RouterView
+        v-else
+        class="htw-flex-1 htw-min-h-0"
+      />
     </div>
 
     <LayoutModal
