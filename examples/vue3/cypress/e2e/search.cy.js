@@ -7,12 +7,12 @@ describe('Search', () => {
     cy.get('[data-test-id="search-modal"] input').type('Demo')
     cy.get('[data-test-id="search-item"]').should('have.length.greaterThan', 3)
     cy.get('[data-test-id="search-item"]').contains('untitled').click()
-    cy.get('[data-test-id="story-variant-single-view"]').contains('untitled')
+    cy.get('.histoire-toolbar-title').contains('untitled')
     cy.get('[data-test-id="search-btn"]').click()
     cy.get('[data-test-id="search-modal"] input').type('variant 2')
     cy.contains('[data-test-id="search-item"][data-selected]', 'Variant 2')
     cy.get('[data-test-id="search-modal"] input').type('{enter}')
-    cy.get('[data-test-id="story-variant-single-view"]').contains('Variant 2')
+    cy.get('.histoire-toolbar-title').contains('Variant 2')
   })
 
   it('should handle keyboard navigation', () => {
@@ -21,13 +21,13 @@ describe('Search', () => {
     cy.get('[data-test-id="search-modal"] input').type('Demo')
     cy.contains('[data-test-id="search-item"][data-selected]', 'Demo')
     cy.get('[data-test-id="search-modal"] input').type('{downArrow}{enter}')
-    cy.get('[data-test-id="story-variant-single-view"]').contains('untitled')
+    cy.get('.histoire-toolbar-title').contains('untitled')
     cy.get('[data-test-id="search-btn"]').click()
     cy.get('[data-test-id="search-modal"] input').clear()
     cy.get('[data-test-id="search-modal"] input').type('Demo')
     cy.contains('[data-test-id="search-item"][data-selected]', 'Demo')
     cy.get('[data-test-id="search-modal"] input').type('{downArrow}{downArrow}{enter}')
-    cy.get('[data-test-id="story-variant-single-view"]').contains('Variant 2')
+    cy.get('.histoire-toolbar-title').contains('Variant 2')
   })
 
   it('should close', () => {
