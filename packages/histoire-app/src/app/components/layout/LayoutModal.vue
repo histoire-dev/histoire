@@ -1,14 +1,7 @@
 <script setup lang="ts">
 import { Icon } from '@iconify/vue'
-import { useEventListener } from '@vueuse/core'
-import { defineAsyncComponent } from 'vue'
-import SearchLoading from '../search/SearchLoading.vue'
-
-const LayoutPane = defineAsyncComponent({
-  loader: () => import('./LayoutPane.vue'),
-  loadingComponent: SearchLoading,
-  delay: 0,
-})
+import { onKeyboardShortcut } from '../../util/keyboard'
+import LayoutPane from './LayoutPane.vue'
 
 const props = defineProps({
   shown: {
@@ -25,8 +18,8 @@ function close() {
   emit('close')
 }
 
-useEventListener(window, 'keydown', (event: KeyboardEvent) => {
-  if (props.shown && event.key === 'Escape') {
+onKeyboardShortcut(['escape'], () => {
+  if (props.shown) {
     close()
   }
 })

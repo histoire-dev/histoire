@@ -19,6 +19,10 @@ const effectiveStoryOptionsVisible = computed(() =>
   storyStore.currentStory?.meta?.storyOptions ?? layoutStore.settings.storyOptionsVisible,
 )
 
+const placement = computed(() => layoutStore.settings.storyOptionsPlacement)
+const splitOrientation = computed(() => placement.value === 'bottom' ? 'portrait' : 'landscape')
+const splitDefaultSplit = computed(() => placement.value === 'bottom' ? 60 : 75)
+
 const router = useRouter()
 const route = useRoute()
 
@@ -101,11 +105,11 @@ function scrollDocsToTop() {
     </template>
     <BaseSplitPane
       v-else
-      :save-id="`story-main-${layoutStore.settings.storyOptionsPlacement}`"
-      :orientation="layoutStore.settings.storyOptionsPlacement === 'bottom' ? 'portrait' : 'landscape'"
+      :save-id="`story-main-${placement}`"
+      :orientation="splitOrientation"
       :min="30"
       :max="95"
-      :default-split="layoutStore.settings.storyOptionsPlacement === 'bottom' ? 60 : 75"
+      :default-split="splitDefaultSplit"
       :show-divider="false"
       class="htw-h-full"
     >
@@ -114,11 +118,7 @@ function scrollDocsToTop() {
       </template>
 
       <template #last>
-        <div class="htw-h-full htw-w-full htw-p-2">
-          <div class="htw-h-full htw-w-full htw-rounded-lg htw-border htw-border-gray-200 dark:htw-border-gray-700 htw-overflow-hidden htw-bg-white dark:htw-bg-gray-700">
-            <StorySidePanel />
-          </div>
-        </div>
+        <StorySidePanel />
       </template>
     </BaseSplitPane>
   </div>

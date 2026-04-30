@@ -65,13 +65,8 @@ useTitle(computed(() => {
   return histoireConfig.theme.title
 }))
 
-// Search
-
 const loadSearch = ref(false)
 const isSearchOpen = ref(false)
-
-// Layout
-
 const isLayoutOpen = ref(false)
 
 watch(isSearchOpen, (value) => {

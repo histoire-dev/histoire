@@ -2,7 +2,7 @@
 
 describe('Layout customization', () => {
   beforeEach(() => {
-    cy.window().then(w => w.localStorage.removeItem('_histoire-layout-v1'))
+    cy.clearLocalStorage()
     cy.visit('/')
   })
 

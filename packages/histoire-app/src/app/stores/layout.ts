@@ -16,22 +16,7 @@ export const useLayoutStore = defineStore('layout', () => {
     storyOptionsPlacement: 'right',
   })
 
-  function toggleStoryList() {
-    settings.value.storyListVisible = !settings.value.storyListVisible
-  }
-
-  function toggleStoryOptions() {
-    settings.value.storyOptionsVisible = !settings.value.storyOptionsVisible
-  }
-
-  function setStoryOptionsPlacement(value: StoryOptionsPlacement) {
-    settings.value.storyOptionsPlacement = value
-  }
-
   return {
     settings,
-    toggleStoryList,
-    toggleStoryOptions,
-    setStoryOptionsPlacement,
   }
 })
