@@ -51,6 +51,13 @@ describe('Layout customization', () => {
     cy.get('[data-test-id="layout-btn"]').should('not.exist')
   })
 
+  it('opens and toggles via keyboard shortcut', () => {
+    cy.get('body').type('{meta}{shift}l')
+    cy.get('[data-test-id="layout-modal"]').should('be.visible')
+    cy.get('body').type('{meta}{shift}l')
+    cy.get('[data-test-id="layout-modal"]').should('not.be.visible')
+  })
+
   it('respects per-story meta.storyOptions override', () => {
     cy.get('[data-test-id="story-list-item"]').contains('StoryOptions Override').click()
     cy.get('[data-test-id="story-side-panel"]').should('not.exist')

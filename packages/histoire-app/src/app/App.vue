@@ -83,6 +83,11 @@ onKeyboardShortcut(['ctrl+k', 'meta+k'], (event) => {
   event.preventDefault()
 })
 
+onKeyboardShortcut(['ctrl+shift+l', 'meta+shift+l'], (event) => {
+  isLayoutOpen.value = !isLayoutOpen.value
+  event.preventDefault()
+})
+
 const loading = ref(false)
 
 if (import.meta.hot && !rawFiles.length) {
