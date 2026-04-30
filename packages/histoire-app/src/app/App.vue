@@ -14,6 +14,7 @@ import Breadcrumb from './components/app/Breadcrumb.vue'
 import InitialLoading from './components/app/InitialLoading.vue'
 import BaseSplitPane from './components/base/BaseSplitPane.vue'
 import CommandPromptsModal from './components/command/CommandPromptsModal.vue'
+import LayoutModal from './components/layout/LayoutModal.vue'
 import SearchModal from './components/search/SearchModal.vue'
 import GenericMountStory from './components/story/GenericMountStory.vue'
 import StoryList from './components/tree/StoryList.vue'
@@ -65,6 +66,10 @@ useTitle(computed(() => {
 
 const loadSearch = ref(false)
 const isSearchOpen = ref(false)
+
+// Layout
+
+const isLayoutOpen = ref(false)
 
 watch(isSearchOpen, (value) => {
   if (value) {
@@ -136,6 +141,7 @@ const commandStore = useCommandStore()
         <div class="htw-flex htw-flex-col htw-h-full htw-bg-gray-100 dark:htw-bg-gray-750 __histoire-pane-shadow-from-right">
           <AppHeader
             class="htw-flex-none"
+            @layout="isLayoutOpen = true"
             @search="isSearchOpen = true"
           />
           <StoryList
@@ -150,6 +156,12 @@ const commandStore = useCommandStore()
         <RouterView />
       </template>
     </BaseSplitPane>
+
+    <LayoutModal
+      v-if="!isMobile"
+      :shown="isLayoutOpen"
+      @close="isLayoutOpen = false"
+    />
 
     <SearchModal
       v-if="loadSearch"

@@ -4,11 +4,13 @@ import { computed } from 'vue'
 import { histoireConfig } from '../../util/config'
 import { isDark, toggleDark } from '../../util/dark'
 import { onKeyboardShortcut } from '../../util/keyboard'
+import { isMobile } from '../../util/responsive'
 import { makeTooltip } from '../../util/tooltip'
 import AppLogo from './AppLogo.vue'
 
 defineEmits({
   search: () => true,
+  layout: () => true,
 })
 
 const themeIcon = computed(() => {
@@ -37,6 +39,20 @@ onKeyboardShortcut(['ctrl+shift+d', 'meta+shift+d'], (event) => {
       </a>
     </div>
     <div class="htw-ml-auto htw-flex-none htw-flex">
+      <a
+        v-if="!isMobile"
+        v-tooltip="makeTooltip('Layout', ({ isMac }) => isMac ? 'meta+shift+l' : 'ctrl+shift+l')"
+        class="htw-p-2 sm:htw-p-1 hover:htw-text-primary-500 dark:hover:htw-text-primary-400 htw-cursor-pointer htw-text-gray-900 dark:htw-text-gray-100"
+        aria-label="Open layout customization"
+        data-test-id="layout-btn"
+        @click="$emit('layout')"
+      >
+        <Icon
+          icon="carbon:panel-expansion"
+          class="htw-w-6 htw-h-6 sm:htw-w-4 sm:htw-h-4"
+        />
+      </a>
+
       <a
         v-tooltip="makeTooltip('Search', ({ isMac }) => isMac ? 'meta+k' : 'ctrl+k')"
         class="htw-p-2 sm:htw-p-1 hover:htw-text-primary-500 dark:hover:htw-text-primary-400 htw-cursor-pointer htw-text-gray-900 dark:htw-text-gray-100"
