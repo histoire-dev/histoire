@@ -129,33 +129,38 @@ const commandStore = useCommandStore()
       <RouterView class="htw-grow" />
     </div>
 
-    <BaseSplitPane
+    <div
       v-else
-      save-id="main-horiz"
-      :min="5"
-      :max="50"
-      :default-split="15"
-      class="htw-h-full"
+      class="htw-h-full htw-flex htw-flex-col"
     >
-      <template #first>
-        <div class="htw-flex htw-flex-col htw-h-full htw-bg-gray-100 dark:htw-bg-gray-750 __histoire-pane-shadow-from-right">
-          <AppHeader
-            class="htw-flex-none"
-            @layout="isLayoutOpen = true"
-            @search="isSearchOpen = true"
-          />
-          <StoryList
-            :tree="tree"
-            :stories="stories"
-            class="htw-flex-1"
-          />
-        </div>
-      </template>
+      <AppHeader
+        class="htw-flex-none"
+        @layout="isLayoutOpen = true"
+        @search="isSearchOpen = true"
+      />
 
-      <template #last>
-        <RouterView />
-      </template>
-    </BaseSplitPane>
+      <BaseSplitPane
+        save-id="main-horiz"
+        :min="5"
+        :max="50"
+        :default-split="15"
+        class="htw-flex-1 htw-min-h-0"
+      >
+        <template #first>
+          <div class="htw-flex htw-flex-col htw-h-full htw-bg-gray-100 dark:htw-bg-gray-750 __histoire-pane-shadow-from-right">
+            <StoryList
+              :tree="tree"
+              :stories="stories"
+              class="htw-flex-1"
+            />
+          </div>
+        </template>
+
+        <template #last>
+          <RouterView />
+        </template>
+      </BaseSplitPane>
+    </div>
 
     <LayoutModal
       v-if="!isMobile"
