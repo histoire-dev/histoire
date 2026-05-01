@@ -8,7 +8,7 @@ describe('Controls', () => {
 
   const getControl = title => cy.get('[data-test-id="story-controls"]')
     .contains('label', title)
-    .find('input, textarea')
+    .find('input[type="text"], textarea')
 
   beforeEach(() => {
     cy.visit('/')
