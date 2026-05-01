@@ -93,12 +93,14 @@ export async function getViteConfigWithPlugins(isServer: boolean, ctx: Context):
   function optimizeDeps(deps: string[]): string[] {
     const result = []
     for (const dep of deps) {
-      result.push(dep)
       try {
-        result.push(dirname(require.resolve(`${dep}/package.json`)))
+        const resolved = dirname(require.resolve(`${dep}/package.json`))
+        result.push(dep, resolved)
       }
-      catch (e) {
-        // Noop
+      catch {
+        // Skip deps that aren't installed at the project root — they're
+        // typically shipped vendored via @histoire/vendors. Including them
+        // in optimizeDeps would emit a "Failed to resolve dependency" warn.
       }
     }
     return result

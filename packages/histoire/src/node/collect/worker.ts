@@ -29,6 +29,10 @@ let _rpc: ReturnType<typeof createBirpc<{
   fetchModule: FetchFunction
   resolveId: ResolveIdFunction
 }>>
+// Reuse one JSDOM instance per worker thread; resetting the body between
+// stories is much cheaper than re-creating a fresh JSDOM (~30-100ms saved
+// per story).
+let _domEnv: ReturnType<typeof createDomEnv> | null = null
 
 // Cleanup module cache
 parentPort.on('message', (message) => {
@@ -61,7 +65,14 @@ export default async (payload: Payload): Promise<ReturnData> => {
     },
   }))
 
-  const { destroy: destroyDomEnv } = createDomEnv()
+  if (!_domEnv) {
+    _domEnv = createDomEnv()
+  }
+  else {
+    // Reset DOM state between stories without paying the JSDOM rebuild cost.
+    document.body.innerHTML = ''
+    document.head.innerHTML = ''
+  }
 
   const el = window.document.createElement('div')
 
@@ -85,8 +96,6 @@ export default async (payload: Payload): Promise<ReturnData> => {
       s.docsText = text
     })
   }
-
-  destroyDomEnv()
 
   const endTime = performance.now()
   console.log(pc.dim(`${payload.storyFile.relativePath} ${Math.round(endTime - startTime)}ms (setup:${Math.round(beforeExecuteTime - startTime)}ms, execute:${Math.round(afterExecuteTime - beforeExecuteTime)}ms, run:${Math.round(afterRunTime - afterExecuteTime)}ms)`))
