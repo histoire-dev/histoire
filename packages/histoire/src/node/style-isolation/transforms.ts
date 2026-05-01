@@ -1,3 +1,4 @@
+import { Buffer } from 'node:buffer'
 import { transform as lightningcssTransform } from 'lightningcss'
 
 export interface WrapOptions {
@@ -69,7 +70,7 @@ function rewriteRootToScope(css: string): string {
 // with rules on the same line as other rules, or strings/comments containing
 // `;`/`}`, are not handled — these are extremely rare in practice and would
 // only mis-classify within a generated histoire-app or vendor stylesheet.
-const HOIST_SEMI_RE = /^[ \t]*@(?:import|charset|namespace)\s+[^;]+;[ \t]*\n?/gm
+const HOIST_SEMI_RE = /^[ \t]*@(?:import|charset|namespace)\s[^;]+;[ \t]*\n?/gm
 const HOIST_FONT_FACE_RE = /^[ \t]*@font-face\s*\{[^}]*\}[ \t]*\n?/gm
 
 function extractHoistableAtRules(css: string): { hoisted: string[], remainder: string } {

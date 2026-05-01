@@ -70,6 +70,14 @@ describe('wrapChromeCss', () => {
     })
     expect(out.indexOf('@font-face')).toBeLessThan(out.indexOf('@scope'))
   })
+
+  it('preserves an arbitrary scopeLower selector in the @scope prelude', () => {
+    const out = wrapChromeCss('body { color: red }', {
+      scopeRoot: '.histoire-app-root',
+      scopeLower: '.__histoire-render-story:not(.__histoire-render-custom-controls)',
+    })
+    expect(out).toContain('@scope (.histoire-app-root) to (.__histoire-render-story:not(.__histoire-render-custom-controls))')
+  })
 })
 
 describe('isGlobalImport', () => {

@@ -1,10 +1,7 @@
 /// <reference types="cypress" />
 
 describe('Story render', () => {
-  const getIframeBody = () => cy.get('iframe[data-test-id="preview-iframe"]')
-    .its('0.contentDocument.body')
-    .should('not.be.empty')
-    .then(cy.wrap)
+  const getIframeBody = (index = 0) => cy.get('iframe[data-test-id="preview-iframe"]').eq(index).its('0.contentDocument.body').should('not.be.empty').then(cy.wrap)
 
   it('should display the story content (with iframe)', () => {
     cy.visit('/story/src-meow-story-svelte?variantId=src-meow-story-svelte-0')
@@ -18,9 +15,9 @@ describe('Story render', () => {
 
   it('should display the story content (grid)', () => {
     cy.visit('/story/src-cars-story-svelte')
-    cy.get('[data-test-id="sandbox-render"]').contains('🚗')
-    cy.get('[data-test-id="sandbox-render"]').contains('🏎️')
-    cy.get('[data-test-id="sandbox-render"]').contains('🚜')
+    getIframeBody(0).contains('🚗')
+    getIframeBody(1).contains('🏎️')
+    getIframeBody(2).contains('🚜')
   })
 })
 

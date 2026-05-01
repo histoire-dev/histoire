@@ -1,5 +1,5 @@
 import type { Plugin as VitePlugin } from 'vite'
-import { APP_SCOPE_ROOT, DEFAULTS_LAYER, STORY_SCOPE_ROOT } from './selectors.js'
+import { APP_SCOPE_ROOT, DEFAULTS_LAYER, STORY_SCOPE_BOUNDARY } from './selectors.js'
 import { wrapChromeCss } from './transforms.js'
 import { isChromeCss } from './vite-plugin.js'
 
@@ -13,7 +13,7 @@ export function chromeCssScopePlugin(opts: ChromeCssScopePluginOptions): VitePlu
     transform(code, id) {
       if (!opts.enabled) return null
       if (isMainChromeCss(id)) {
-        return { code: wrapChromeCss(code, { scopeRoot: APP_SCOPE_ROOT, scopeLower: STORY_SCOPE_ROOT }), map: null }
+        return { code: wrapChromeCss(code, { scopeRoot: APP_SCOPE_ROOT, scopeLower: STORY_SCOPE_BOUNDARY }), map: null }
       }
       if (isSandboxChromeCss(id)) {
         // Sandbox chrome defaults coexist with user CSS inside the iframe.

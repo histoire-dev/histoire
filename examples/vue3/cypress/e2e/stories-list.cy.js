@@ -8,7 +8,7 @@ describe('Stories list', () => {
     cy.get('[data-test-id="story-list-item"]').contains('🐱 Meow')
     cy.get('[data-test-id="story-list-item"]').contains('BaseButton').contains('3') // Variants count
     cy.get('[data-test-id="story-list-item"]').contains('Demo')
-    cy.get('[data-test-id="story-list-folder"]').should('have.length', 2)
+    cy.get('[data-test-id="story-list-folder"]').should('have.length', 3)
   })
 
   it('should toggle folder', () => {
