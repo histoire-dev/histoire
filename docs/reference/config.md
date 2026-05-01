@@ -169,6 +169,32 @@ export default defineConfig({
 
 This can be useful if you need to exclude some imported libraries that only works in the browser.
 
+## `isolateStyles`
+
+`boolean` - Default: `true`
+
+Master switch for CSS isolation between Histoire's chrome and your stories. When enabled, your CSS imported via `setupFile` is scoped to story containers, chrome CSS is scoped away from them, and grid items render in iframes.
+
+See [the Styles & CSS guide](../guide/css.md) for details.
+
+```ts
+export default defineConfig({
+  isolateStyles: false, // restore pre-isolation behaviour
+})
+```
+
+## `globalStyles`
+
+`string[]` - Default: `[]`
+
+CSS files to load into the main app (not into stories). They are wrapped in `@layer histoire-user-globals`, which keeps them lower priority than chrome rules. Use for design tokens or anything you want to apply across both chrome and stories.
+
+```ts
+export default defineConfig({
+  globalStyles: ['./src/styles/tokens.css'],
+})
+```
+
 ## `defaultStoryProps`
 
 `Object`
