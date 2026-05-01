@@ -16,12 +16,10 @@ export async function run({ file, storyData, el }: ServerRunPayload) {
       addStory(data) {
         storyData.push(data)
       },
+      hstStoryFile: file,
     },
     render() {
-      return h(Comp, {
-        ref: 'comp',
-        data: file,
-      })
+      return h(Comp)
     },
   })
 
