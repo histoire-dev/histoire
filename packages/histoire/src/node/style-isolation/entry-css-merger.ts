@@ -1,19 +1,18 @@
 import type { OutputBundle } from 'rollup'
 import type { Plugin as VitePlugin } from 'vite'
+import { STORY_SCOPE_ROOT } from './selectors.js'
 import { wrapUserCss } from './transforms.js'
 import { USER_CSS_MARK_END, USER_CSS_MARK_START } from './vite-plugin.js'
 
 export interface EntryCssMergerOptions {
   isolateStyles: boolean
-  scopeRoot: string
-  mainEntryName: string
+  scopeRoot?: string
+  mainEntryName?: string
 }
 
-export function entryCssMergerPlugin(opts: EntryCssMergerOptions = {
-  isolateStyles: false,
-  scopeRoot: '.__histoire-render-story',
-  mainEntryName: 'bundle-main',
-}): VitePlugin {
+export function entryCssMergerPlugin(opts: EntryCssMergerOptions = { isolateStyles: false }): VitePlugin {
+  const scopeRoot = opts.scopeRoot ?? STORY_SCOPE_ROOT
+  const mainEntryName = opts.mainEntryName ?? 'bundle-main'
   return {
     name: 'histoire:style-isolation:entry-css-merger',
     apply: 'build',
@@ -22,8 +21,9 @@ export function entryCssMergerPlugin(opts: EntryCssMergerOptions = {
       function collectChunkCss(entryFileName: string, entryName: string, acc: Map<string, string[]>) {
         const seen = new Set<string>()
         const queue = [entryFileName]
-        while (queue.length) {
-          const cur = queue.shift()!
+        let head = 0
+        while (head < queue.length) {
+          const cur = queue[head++]
           if (seen.has(cur)) continue
           seen.add(cur)
           const c = bundle[cur]
@@ -65,8 +65,8 @@ export function entryCssMergerPlugin(opts: EntryCssMergerOptions = {
       for (const [entryName, sources] of mergedByEntry) {
         const fileName = `${entryName}.css`
         const merged = sources.join('\n')
-        const finalSource = entryName === opts.mainEntryName && opts.isolateStyles
-          ? wrapMarkedUserCss(merged, opts.scopeRoot)
+        const finalSource = entryName === mainEntryName && opts.isolateStyles
+          ? wrapMarkedUserCss(merged, scopeRoot)
           : stripMarkers(merged)
         bundle[fileName] = {
           type: 'asset',

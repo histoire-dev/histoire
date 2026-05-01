@@ -83,20 +83,22 @@ const app = createApp({
 app.use(createPinia())
 app.mount('#app')
 
-// Mark the sandbox body itself as a story render root so that components
-// teleported to body (e.g. floating-vue popper, dialogs) sit inside the
-// `@scope (.__histoire-render-story)` boundary that wraps user CSS in dev.
+// Tagging body itself as a story render root puts components teleported to
+// document.body (floating-vue popper, dialogs) inside the user-CSS @scope
+// boundary applied in dev. The custom-controls class opts out of histoire-app
+// source-level rules that add overflow/min-height to the render root.
 document.body.classList.add('__histoire-render-story', '__histoire-render-custom-controls')
 
-// Height sync for grid iframes (#339): observe content height and post it
-// to the parent so the iframe can size to its content.
 let pendingFrame: number | null = null
+let lastReportedHeight = -1
 function reportHeight() {
   pendingFrame = null
   const renderRoot = document.querySelector('.__histoire-render-story')
   const h = renderRoot
     ? Math.ceil(renderRoot.getBoundingClientRect().height)
     : Math.ceil(document.body.scrollHeight)
+  if (h === lastReportedHeight) return
+  lastReportedHeight = h
   window.parent?.postMessage({ type: SANDBOX_HEIGHT, h }, '*')
 }
 function scheduleReport() {

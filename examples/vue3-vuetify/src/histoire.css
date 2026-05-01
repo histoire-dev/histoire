@@ -1,7 +1,6 @@
 /*
- * Adversarial rules to verify CSS isolation (#339):
- * Vuetify itself ships heavy global styles. These should land inside the
- * story scope and never touch Histoire's chrome.
+ * Adversarial rules to verify CSS isolation. Vuetify itself ships heavy
+ * global styles; with isolation they land inside the story scope only.
  */
 :root {
   --user-accent: hotpink;

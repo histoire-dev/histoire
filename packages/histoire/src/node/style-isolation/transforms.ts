@@ -15,9 +15,40 @@ export function wrapUserCss(css: string, opts: WrapOptions): string {
     return css
   }
   const { hoisted, remainder } = extractHoistableAtRules(css)
+  const body = remainder.includes(':root')
+    ? rewriteRootToScope(remainder)
+    : remainder
+  const hoistedBlock = hoisted.length > 0 ? `${hoisted.join('\n')}\n` : ''
+  return `${hoistedBlock}@scope (${opts.scopeRoot}) {\n${body}\n}\n`
+}
+
+export function wrapChromeCss(css: string, opts: WrapWithLowerOptions): string {
+  const trimmed = css.trimStart()
+  if (trimmed.startsWith('@scope (')) {
+    return css
+  }
+  const { hoisted, remainder } = extractHoistableAtRules(css)
+  // Rewrite `:root` to `:scope` so source-level `@scope (:root) to (...)` rules
+  // nest correctly under the outer scope; without this, the inner `:root`
+  // resolves to the document root, which is outside the outer scope range.
+  const body = remainder.includes(':root')
+    ? rewriteRootToScopeRegex(remainder)
+    : remainder
+  const hoistedBlock = hoisted.length > 0 ? `${hoisted.join('\n')}\n` : ''
+  return `${hoistedBlock}@scope (${opts.scopeRoot}) to (${opts.scopeLower}) {\n${body}\n}\n`
+}
+
+export function isGlobalImport(id: string): boolean {
+  const q = id.indexOf('?')
+  if (q === -1) return false
+  const parts = id.slice(q + 1).split('&')
+  return parts.includes('global') || parts.some(p => p.startsWith('global='))
+}
+
+function rewriteRootToScope(css: string): string {
   const processed = lightningcssTransform({
     filename: 'user.css',
-    code: Buffer.from(remainder, 'utf8'),
+    code: Buffer.from(css, 'utf8'),
     minify: false,
     visitor: {
       Selector(selector) {
@@ -30,46 +61,18 @@ export function wrapUserCss(css: string, opts: WrapOptions): string {
       },
     },
   })
-  const body = Buffer.from(processed.code).toString('utf8')
-  const hoistedBlock = hoisted.length > 0 ? `${hoisted.join('\n')}\n` : ''
-  return `${hoistedBlock}@scope (${opts.scopeRoot}) {\n${body}\n}\n`
+  return Buffer.from(processed.code).toString('utf8')
 }
 
-export function wrapChromeCss(css: string, opts: WrapWithLowerOptions): string {
-  const trimmed = css.trimStart()
-  if (trimmed.startsWith('@scope (')) {
-    return css
-  }
-
-  const { hoisted, remainder } = extractHoistableAtRules(css)
-
-  // Rewrite any existing `:root` references to `:scope` so source-level
-  // `@scope (:root) to (...)` rules nest correctly under our outer scope.
-  // Without this, the inner `:root` resolves to the document root which is
-  // outside the outer `@scope (.histoire-app-root)` range, so nothing matches.
-  const rewritten = remainder
+function rewriteRootToScopeRegex(css: string): string {
+  return css
     .replace(/@scope\s*\(\s*:root\s*\)/g, '@scope (:scope)')
     .replace(/([^\w-]|^):root(?![\w-])/g, '$1:scope')
-
-  const processed = lightningcssTransform({
-    filename: 'chrome.css',
-    code: Buffer.from(rewritten, 'utf8'),
-    minify: false,
-  })
-  const body = Buffer.from(processed.code).toString('utf8')
-
-  const hoistedBlock = hoisted.length > 0 ? `${hoisted.join('\n')}\n` : ''
-  return `${hoistedBlock}@scope (${opts.scopeRoot}) to (${opts.scopeLower}) {\n${body}\n}\n`
-}
-
-export function isGlobalImport(id: string): boolean {
-  const queryStart = id.indexOf('?')
-  if (queryStart === -1) return false
-  const params = new URLSearchParams(id.slice(queryStart + 1))
-  return params.has('global')
 }
 
 const HOIST_SEMI_RE = /^[ \t]*@(?:import|charset|namespace)\s+[^;]+;[ \t]*\n?/gm
+// Top-level `@font-face { ... }` only — no nested braces (the `[^}]*` body
+// matcher does not handle them, but font-face properties are flat).
 const HOIST_FONT_FACE_RE = /^[ \t]*@font-face\s*\{[^}]*\}[ \t]*\n?/gm
 
 function extractHoistableAtRules(css: string): { hoisted: string[], remainder: string } {

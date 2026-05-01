@@ -174,7 +174,7 @@ export async function build(ctx: Context) {
       Object.assign(config.build, {
         outDir: ctx.config.outDir,
         emptyOutDir: true,
-        // re-merged per-entry by entry-css-merger plugin (#339)
+        // Re-merged per-entry by entry-css-merger.
         cssCodeSplit: true,
         minify: false,
         // Don't build in SSR mode
@@ -188,11 +188,7 @@ export async function build(ctx: Context) {
   const isolate = ctx.config.isolateStyles !== false
   buildViteConfig.plugins.push(userCssScopePlugin({ enabled: isolate }))
   buildViteConfig.plugins.push(chromeCssScopePlugin({ enabled: isolate }))
-  buildViteConfig.plugins.push(entryCssMergerPlugin({
-    isolateStyles: isolate,
-    scopeRoot: '.__histoire-render-story',
-    mainEntryName: 'bundle-main',
-  }))
+  buildViteConfig.plugins.push(entryCssMergerPlugin({ isolateStyles: isolate }))
 
   for (const cb of changeViteConfigCallbacks) {
     console.log('vite config hook', cb)

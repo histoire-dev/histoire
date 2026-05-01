@@ -9,7 +9,7 @@ html.htw-dark {
 
 /*
  * Adversarial rules that would normally bleed into Histoire's chrome
- * without isolation. With #339 they should be scoped to story containers only.
+ * without isolation; they should be scoped to story containers only.
  */
 :root {
   --user-primary: tomato;

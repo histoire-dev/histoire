@@ -71,9 +71,10 @@ const contrastColor = computed(() => getContrastColor(settings))
 const autoApplyContrastColor = computed(() => !!histoireConfig.autoApplyContrastColor)
 
 const useIframe = computed(() => {
-  const layout = props.story.layout as any
-  if (layout?.iframeGrid === false) return false
-  if (layout?.iframeGrid === true) return true
+  const layout = props.story.layout
+  if (layout?.type === 'grid' && layout.iframeGrid !== undefined) {
+    return layout.iframeGrid
+  }
   return histoireConfig.isolateStyles !== false
 })
 </script>

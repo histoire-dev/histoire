@@ -52,6 +52,9 @@ Object.assign(props.variant, {
 const reportedHeight = ref<number | null>(null)
 
 useEventListener(window, 'message', (event) => {
+  // With many grid iframes mounted, every sandbox postMessage hits every
+  // parent listener. Skip events that didn't originate from this iframe.
+  if (event.source !== iframe.value?.contentWindow) return
   switch (event.data?.type) {
     case STATE_SYNC:
       updateVariantState(event.data.state)
@@ -64,7 +67,8 @@ useEventListener(window, 'message', (event) => {
       break
     case SANDBOX_HEIGHT:
       if (typeof event.data.h === 'number') {
-        reportedHeight.value = Math.max(40, event.data.h)
+        const next = Math.max(40, event.data.h)
+        if (next !== reportedHeight.value) reportedHeight.value = next
       }
       break
   }
