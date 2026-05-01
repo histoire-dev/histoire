@@ -6,7 +6,7 @@ import { useEventListener } from '@vueuse/core'
 import { computed, ref, toRaw, watch } from 'vue'
 import { useEventsStore } from '../../stores/events'
 import { usePreviewSettingsStore } from '../../stores/preview-settings'
-import { EVENT_SEND, PREVIEW_SETTINGS_SYNC, SANDBOX_READY, STATE_SYNC } from '../../util/const'
+import { EVENT_SEND, PREVIEW_SETTINGS_SYNC, SANDBOX_HEIGHT, SANDBOX_READY, STATE_SYNC } from '../../util/const'
 import { getSandboxUrl } from '../../util/sandbox'
 import { toRawDeep } from '../../util/state'
 import StoryResponsivePreview from './StoryResponsivePreview.vue'
@@ -14,6 +14,7 @@ import StoryResponsivePreview from './StoryResponsivePreview.vue'
 const props = defineProps<{
   story: Story
   variant: Variant
+  autoHeight?: boolean
 }>()
 
 const settings = usePreviewSettingsStore().currentSettings
@@ -48,8 +49,10 @@ Object.assign(props.variant, {
   previewReady: false,
 })
 
+const reportedHeight = ref<number | null>(null)
+
 useEventListener(window, 'message', (event) => {
-  switch (event.data.type) {
+  switch (event.data?.type) {
     case STATE_SYNC:
       updateVariantState(event.data.state)
       break
@@ -58,6 +61,11 @@ useEventListener(window, 'message', (event) => {
       break
     case SANDBOX_READY:
       setPreviewReady()
+      break
+    case SANDBOX_HEIGHT:
+      if (typeof event.data.h === 'number') {
+        reportedHeight.value = Math.max(40, event.data.h)
+      }
       break
   }
 })
@@ -135,7 +143,7 @@ function onIframeLoad() {
       :style="isResponsiveEnabled ? {
         width: finalWidth ? `${finalWidth}px` : null,
         height: finalHeight ? `${finalHeight}px` : null,
-      } : undefined"
+      } : (props.autoHeight && reportedHeight ? { height: `${reportedHeight}px` } : undefined)"
       data-test-id="preview-iframe"
       @load="onIframeLoad()"
     />

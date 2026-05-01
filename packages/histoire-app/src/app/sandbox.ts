@@ -8,7 +8,7 @@ import GenericMountStory from './components/story/GenericMountStory.vue'
 import GenericRenderStory from './components/story/GenericRenderStory.vue'
 import { setupPluginApi } from './plugin.js'
 import { histoireConfig } from './util/config.js'
-import { PREVIEW_SETTINGS_SYNC, SANDBOX_READY, STATE_SYNC } from './util/const.js'
+import { PREVIEW_SETTINGS_SYNC, SANDBOX_HEIGHT, SANDBOX_READY, STATE_SYNC } from './util/const.js'
 import { isDark } from './util/dark.js'
 import { mapFile } from './util/mapping'
 import { applyPreviewSettings } from './util/preview-settings.js'
@@ -82,6 +82,25 @@ const app = createApp({
 })
 app.use(createPinia())
 app.mount('#app')
+
+// Height sync for grid iframes (#339): observe content height and post it
+// to the parent so the iframe can size to its content.
+let pendingFrame: number | null = null
+function reportHeight() {
+  pendingFrame = null
+  const renderRoot = document.querySelector('.__histoire-render-story')
+  const h = renderRoot
+    ? Math.ceil(renderRoot.getBoundingClientRect().height)
+    : Math.ceil(document.body.scrollHeight)
+  window.parent?.postMessage({ type: SANDBOX_HEIGHT, h }, '*')
+}
+function scheduleReport() {
+  if (pendingFrame !== null) return
+  pendingFrame = requestAnimationFrame(reportHeight)
+}
+const ro = new ResizeObserver(scheduleReport)
+ro.observe(document.body)
+requestAnimationFrame(scheduleReport)
 
 watch(isDark, (value) => {
   if (value) {
