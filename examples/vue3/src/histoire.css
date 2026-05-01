@@ -6,3 +6,32 @@ html.htw-dark {
     background: #27272a;
     color: #e9e9ed;
 }
+
+/*
+ * Adversarial rules that would normally bleed into Histoire's chrome
+ * without isolation. With #339 they should be scoped to story containers only.
+ */
+:root {
+  --user-primary: tomato;
+  --user-spacing: 24px;
+}
+
+body {
+  background: var(--user-primary);
+}
+
+* {
+  box-sizing: content-box;
+}
+
+a {
+  color: var(--user-primary);
+  text-decoration: underline wavy;
+}
+
+.user-card {
+  padding: var(--user-spacing);
+  background: lime;
+  color: navy;
+  border: 4px dashed var(--user-primary);
+}

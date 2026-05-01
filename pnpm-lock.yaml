@@ -184,6 +184,9 @@ importers:
 
   examples/vue3:
     dependencies:
+      floating-vue:
+        specifier: 5.2.2
+        version: 5.2.2(@nuxt/kit@3.20.2(magicast@0.5.1))(vue@3.5.26(typescript@5.6.3))
       lottie-web:
         specifier: ^5.12.2
         version: 5.13.0
