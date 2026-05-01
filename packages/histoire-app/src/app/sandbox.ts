@@ -99,7 +99,9 @@ function reportHeight() {
     : Math.ceil(document.body.scrollHeight)
   if (h === lastReportedHeight) return
   lastReportedHeight = h
-  window.parent?.postMessage({ type: SANDBOX_HEIGHT, h }, '*')
+  // Same-origin: parent and iframe are both served by the histoire dev /
+  // build server, so scope the target rather than broadcasting.
+  window.parent?.postMessage({ type: SANDBOX_HEIGHT, h }, window.location.origin)
 }
 function scheduleReport() {
   if (pendingFrame !== null) return

@@ -77,11 +77,28 @@ export function entryCssMergerPlugin(opts: EntryCssMergerOptions = { isolateStyl
         } as any
       }
 
+      // Re-point CSS metadata: entries claim their own merged file; non-entry
+      // chunks (vendor, route splits) drop their importedCss because the
+      // assets they referenced were merged into the entry's CSS and deleted.
+      // Without this, Vite's runtime preload helper 404s on the missing
+      // per-chunk CSS files.
+      const entryCssByEntryName = new Map<string, string>()
       for (const [, chunk] of Object.entries(bundle)) {
         if (chunk.type !== 'chunk' || !chunk.isEntry) continue
+        if (mergedByEntry.has(chunk.name)) {
+          entryCssByEntryName.set(chunk.name, `${chunk.name}.css`)
+        }
+      }
+      for (const [, chunk] of Object.entries(bundle)) {
+        if (chunk.type !== 'chunk') continue
         const meta = (chunk as any).viteMetadata
         if (!meta?.importedCss) continue
-        meta.importedCss = new Set([`${chunk.name}.css`])
+        if (chunk.isEntry && entryCssByEntryName.has(chunk.name)) {
+          meta.importedCss = new Set([entryCssByEntryName.get(chunk.name)!])
+        }
+        else {
+          meta.importedCss = new Set()
+        }
       }
     },
   }

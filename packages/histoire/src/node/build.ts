@@ -214,13 +214,11 @@ export async function build(ctx: Context) {
   // Prefetch
   const prefetchOutputs = result.output.filter(o => PREFETCHED_MODULES.includes(o.name) && o.type === 'chunk')
   const prefetchHtml = generateScriptLinks(prefetchOutputs.map(o => o.fileName), 'prefetch', ctx)
-  const prefetchCssNames = prefetchOutputs.flatMap(o => Array.from((o as any).viteMetadata?.importedCss ?? []) as string[])
-  const prefetchCssHtml = prefetchCssNames.length ? generateStyleLinks(prefetchCssNames, 'prefetch', ctx) : ''
 
   // Index
   const indexOutput = result.output.find(o => o.name === 'bundle-main' && o.type === 'chunk')
   const indexHtml = generateEntryHtml(indexOutput.fileName, mainStyleOutput.fileName, {
-    HEAD: `${preloadHtml}${prefetchHtml}${prefetchCssHtml}`,
+    HEAD: `${preloadHtml}${prefetchHtml}`,
   }, ctx)
   await writeFile('index.html', indexHtml, ctx)
 

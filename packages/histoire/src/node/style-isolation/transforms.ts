@@ -28,11 +28,11 @@ export function wrapChromeCss(css: string, opts: WrapWithLowerOptions): string {
     return css
   }
   const { hoisted, remainder } = extractHoistableAtRules(css)
-  // Rewrite `:root` to `:scope` so source-level `@scope (:root) to (...)` rules
-  // nest correctly under the outer scope; without this, the inner `:root`
-  // resolves to the document root, which is outside the outer scope range.
+  // Rewrite `:root` to `:scope` so source-level `@scope (:root) to (...)`
+  // rules nest correctly under the outer scope; without this, the inner
+  // `:root` resolves to the document root which is outside the outer scope.
   const body = remainder.includes(':root')
-    ? rewriteRootToScopeRegex(remainder)
+    ? rewriteRootToScope(remainder)
     : remainder
   const hoistedBlock = hoisted.length > 0 ? `${hoisted.join('\n')}\n` : ''
   return `${hoistedBlock}@scope (${opts.scopeRoot}) to (${opts.scopeLower}) {\n${body}\n}\n`
@@ -64,15 +64,12 @@ function rewriteRootToScope(css: string): string {
   return Buffer.from(processed.code).toString('utf8')
 }
 
-function rewriteRootToScopeRegex(css: string): string {
-  return css
-    .replace(/@scope\s*\(\s*:root\s*\)/g, '@scope (:scope)')
-    .replace(/([^\w-]|^):root(?![\w-])/g, '$1:scope')
-}
-
+// Top-level at-rule extraction. Anchored to line start with optional leading
+// whitespace; covers the formatted output produced by Vite/PostCSS. Inputs
+// with rules on the same line as other rules, or strings/comments containing
+// `;`/`}`, are not handled — these are extremely rare in practice and would
+// only mis-classify within a generated histoire-app or vendor stylesheet.
 const HOIST_SEMI_RE = /^[ \t]*@(?:import|charset|namespace)\s+[^;]+;[ \t]*\n?/gm
-// Top-level `@font-face { ... }` only — no nested braces (the `[^}]*` body
-// matcher does not handle them, but font-face properties are flat).
 const HOIST_FONT_FACE_RE = /^[ \t]*@font-face\s*\{[^}]*\}[ \t]*\n?/gm
 
 function extractHoistableAtRules(css: string): { hoisted: string[], remainder: string } {
