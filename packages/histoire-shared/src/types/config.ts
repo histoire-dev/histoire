@@ -53,6 +53,19 @@ export interface HistoireConfig {
    */
   supportMatch: SupportMatchPattern[]
   /**
+   * Master switch for CSS isolation between Histoire chrome and user stories.
+   * When true (default), user CSS imported via histoire.setup is scoped to story
+   * containers, chrome CSS is scoped away from them, and grid items render
+   * in iframes. Set to false to restore pre-1.0 behavior. See guide/css.md.
+   */
+  isolateStyles?: boolean
+  /**
+   * CSS files loaded into the main app (not into stories). Wrapped in
+   * @layer histoire-user-globals — lower priority than chrome.
+   * Use for design tokens or anything intentionally global.
+   */
+  globalStyles?: string[]
+  /**
    * How to generate the story tree.
    */
   tree: {
