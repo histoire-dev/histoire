@@ -10,6 +10,10 @@ export async function mountMainApp() {
   const app = createApp(App)
   app.use(createPinia())
   app.use(FloatingVue, {
+    // Anchor poppers inside the app-root so chrome's @scope-wrapped
+    // floating-vue styles reach them; otherwise they would teleport to
+    // <body> and lose their styling under #339 isolation.
+    container: '.histoire-app-root',
     overflowPadding: 4,
     arrowPadding: 8,
     themes: {

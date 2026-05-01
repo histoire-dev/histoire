@@ -58,9 +58,13 @@ import './tokens.css?global'
 
 The file loads exactly as if you had written it without isolation — at your own risk; it can override chrome.
 
-## Dev mode caveat
+## Dev vs. build behaviour
 
-Isolation runs at build time only. `histoire dev` serves your CSS as-is so HMR stays cheap, which means story-to-chrome leakage may be visible in the dev server even though the published bundle is correctly scoped. Use `histoire build` to verify final isolation behaviour.
+Both `histoire dev` and `histoire build` apply `@scope (.__histoire-render-story)` to user CSS, which keeps it from leaking into Histoire's chrome (popovers, tooltips, dropdowns).
+
+`@scope` only matches descendants of the story container, so user styling for components that teleport outside the story (e.g. `floating-vue` popper, modal overlays) does not visually apply in `histoire dev`. The build path emits per-bundle isolation that keeps that styling working inside the sandbox iframe — verify the final visuals with `histoire build`.
+
+Histoire's own sandbox-side defaults are wrapped in `@layer histoire-defaults` so unlayered user CSS overrides them without specificity tricks.
 
 ## Browser support
 

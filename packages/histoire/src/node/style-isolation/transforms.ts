@@ -37,15 +37,23 @@ export function wrapUserCss(css: string, opts: WrapOptions): string {
 
 export function wrapChromeCss(css: string, opts: WrapWithLowerOptions): string {
   const trimmed = css.trimStart()
-  if (trimmed.startsWith('@scope')) {
+  if (trimmed.startsWith('@scope (')) {
     return css
   }
 
   const { hoisted, remainder } = extractHoistableAtRules(css)
 
+  // Rewrite any existing `:root` references to `:scope` so source-level
+  // `@scope (:root) to (...)` rules nest correctly under our outer scope.
+  // Without this, the inner `:root` resolves to the document root which is
+  // outside the outer `@scope (.histoire-app-root)` range, so nothing matches.
+  const rewritten = remainder
+    .replace(/@scope\s*\(\s*:root\s*\)/g, '@scope (:scope)')
+    .replace(/([^\w-]|^):root(?![\w-])/g, '$1:scope')
+
   const processed = lightningcssTransform({
     filename: 'chrome.css',
-    code: Buffer.from(remainder, 'utf8'),
+    code: Buffer.from(rewritten, 'utf8'),
     minify: false,
   })
   const body = Buffer.from(processed.code).toString('utf8')
