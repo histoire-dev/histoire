@@ -1,57 +1,40 @@
 import type { Context } from './context.js'
-import http from 'node:http'
-import connect from 'connect'
-import sirv from 'sirv'
+import { preview } from 'vite'
+
+export interface StartPreviewOptions {
+  port?: number
+  host?: string | boolean
+  open?: boolean
+}
 
 interface ReturnPayload {
   baseUrl: string
+  printUrls: () => void
   close: () => Promise<void>
 }
 
-export async function startPreview(port: number | null, ctx: Context): Promise<ReturnPayload> {
-  const app = connect()
-
-  app.use(
-    ctx.resolvedViteConfig.base,
-    sirv(ctx.config.outDir, {
-      dev: true,
-      etag: true,
-      single: true,
-    }),
-  )
-
-  let finalPort = port ?? 6006
-
-  const httpServer = http.createServer(app)
-
-  return new Promise((resolve, reject) => {
-    function onError(e: Error & { code?: string }) {
-      if (e.code === 'EADDRINUSE') {
-        httpServer.listen(++finalPort)
-      }
-      else {
-        reject(e)
-      }
-    }
-
-    httpServer.on('error', onError)
-
-    httpServer.listen(finalPort, () => {
-      httpServer.off('error', onError)
-      const baseUrl = `http://localhost:${finalPort}${ctx.resolvedViteConfig.base}`
-      resolve({
-        baseUrl,
-        close: () => new Promise((resolve, reject) => {
-          httpServer.close((err) => {
-            if (err) {
-              reject(err)
-            }
-            else {
-              resolve()
-            }
-          })
-        }),
-      })
-    })
+export async function startPreview(options: StartPreviewOptions, ctx: Context): Promise<ReturnPayload> {
+  const port = options.port ?? 6006
+  const server = await preview({
+    root: ctx.root,
+    base: ctx.resolvedViteConfig.base,
+    configFile: false,
+    build: {
+      outDir: ctx.config.outDir,
+    },
+    preview: {
+      port,
+      host: options.host,
+      open: options.open,
+      strictPort: false,
+    },
   })
+
+  const baseUrl = server.resolvedUrls?.local[0] ?? `http://localhost:${port}${ctx.resolvedViteConfig.base}`
+
+  return {
+    baseUrl,
+    printUrls: () => server.printUrls(),
+    close: () => server.close(),
+  }
 }
