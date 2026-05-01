@@ -253,6 +253,7 @@ export async function getViteConfigWithPlugins(isServer: boolean, ctx: Context):
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="description" content="">
     ${ctx.config.theme?.favicon ? `<link rel="icon" type="${lookupMime(ctx.config.theme.favicon)}" href="${server.config.base}${ctx.config.theme.favicon}"/>` : ''}
+    <style>html,body{margin:0;padding:0}</style>
   </head>
   <body>
     <div id="app"></div>

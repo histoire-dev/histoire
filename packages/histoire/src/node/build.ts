@@ -279,6 +279,7 @@ function generateBaseHtml(head: string, body: string, ctx: Context) {
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="">
+  <style>html,body{margin:0;padding:0}</style>
   ${head}
 </head>
 <body>
