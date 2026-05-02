@@ -147,13 +147,46 @@ export function createVariantTestSession(options: VariantTestSessionOptions) {
           }
         }
 
+        // Reset shared expect state so assertion counters and `expect.assertions(n)`
+        // expectations from the previous test do not leak into this one.
+        resetSharedExpectState()
+
+        let testError: unknown
         try {
           if (!definition.handler) {
             throw new Error(`Could not resolve histoire test "${definition.fullName}" for ${storyId}:${variantId}`)
           }
 
           await definition.handler()
-          await Promise.all(workerState?.current?.onFinished ?? [])
+        }
+        catch (error) {
+          testError = error
+        }
+
+        // Always run onFinished callbacks even when the handler threw, so that
+        // cleanup hooks registered through the test context still execute.
+        const onFinished = workerState?.current?.onFinished ?? []
+        for (const callback of onFinished) {
+          try {
+            await callback()
+          }
+          catch (cleanupError) {
+            if (!testError) {
+              testError = cleanupError
+            }
+          }
+        }
+
+        if (testError) {
+          results.push({
+            id: definition.id,
+            name: definition.name,
+            fullName: definition.fullName,
+            state: 'failed',
+            errors: [serializeTestError(testError)],
+          })
+        }
+        else {
           results.push({
             id: definition.id,
             name: definition.name,
@@ -162,19 +195,9 @@ export function createVariantTestSession(options: VariantTestSessionOptions) {
             errors: [],
           })
         }
-        catch (error) {
-          results.push({
-            id: definition.id,
-            name: definition.name,
-            fullName: definition.fullName,
-            state: 'failed',
-            errors: [serializeTestError(error)],
-          })
-        }
-        finally {
-          if (workerState) {
-            workerState.current = previousCurrent
-          }
+
+        if (workerState) {
+          workerState.current = previousCurrent
         }
       }
 
@@ -229,6 +252,28 @@ function getSerializedFile(files: SerializedStoryFile[], storyId: string) {
     throw new Error(`Unknown histoire story "${storyId}"`)
   }
   return file
+}
+
+const SHARED_EXPECT_KEY = Symbol.for('expect-global')
+
+/**
+ * Resets the global expect bookkeeping (`assertionCalls`, `expect.assertions(n)`,
+ * `expect.hasAssertions()`) so they don't leak between consecutive test handlers
+ * inside the same iframe runtime.
+ */
+function resetSharedExpectState() {
+  const sharedExpect = (globalThis as Record<symbol, any>)[SHARED_EXPECT_KEY]
+  if (typeof sharedExpect?.setState !== 'function') {
+    return
+  }
+
+  sharedExpect.setState({
+    assertionCalls: 0,
+    isExpectingAssertions: false,
+    isExpectingAssertionsError: null,
+    expectedAssertionsNumber: null,
+    expectedAssertionsNumberErrorGen: null,
+  })
 }
 
 function withRegistry(registry: HistoireTestRegistration[], testing: boolean, fn: () => Promise<void> | void) {

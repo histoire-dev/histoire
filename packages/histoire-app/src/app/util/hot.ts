@@ -1,12 +1,5 @@
 /**
- * HMR event emitted by the dev server after a story file has been recollected.
+ * Re-exports the canonical HMR event constant + payload type so the host UI and
+ * preview iframe stay aligned with the dev server.
  */
-export const STORY_CHANGED_EVENT = 'histoire:story-changed'
-
-/**
- * Payload describing a story file that changed in dev mode.
- */
-export interface HistoireStoryChangedPayload {
-  storyId: string
-  hasVitestMocks: boolean
-}
+export { type HistoireStoryChangedPayload, STORY_CHANGED_EVENT } from '@histoire/shared'

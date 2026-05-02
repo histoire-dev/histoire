@@ -1,6 +1,7 @@
 import type { ServerStoryFile } from '@histoire/shared'
 import type { Context } from './context.js'
 import { performance } from 'node:perf_hooks'
+import { STORY_CHANGED_EVENT } from '@histoire/shared'
 import pc from 'picocolors'
 import { createServer as createViteServer, mergeConfig as mergeViteConfig } from 'vite'
 import { useCollectStories } from './collect/index.js'
@@ -12,8 +13,6 @@ import { wrapLogError } from './util/log.js'
 import { fileHasVitestMocks } from './util/story-vitest.js'
 import * as VirtualFiles from './virtual/index.js'
 import { getViteConfigWithPlugins } from './vite.js'
-
-const STORY_CHANGED_EVENT = 'histoire:story-changed'
 
 export interface CreateServerOptions {
   port?: number

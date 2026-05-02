@@ -220,4 +220,145 @@ describe('createVariantTestSession', () => {
       'duplicate suite > renders only once',
     ])
   })
+
+  it('resets shared expect state between consecutive test handlers', async () => {
+    const expectKey = Symbol.for('expect-global')
+    const sharedExpectState = {
+      assertionCalls: 0,
+      isExpectingAssertions: false,
+      isExpectingAssertionsError: null as Error | null,
+      expectedAssertionsNumber: null as number | null,
+      expectedAssertionsNumberErrorGen: null as (() => Error) | null,
+    }
+    const fakeExpect = {
+      setState: vi.fn((state: Partial<typeof sharedExpectState>) => {
+        Object.assign(sharedExpectState, state)
+      }),
+      getState: () => sharedExpectState,
+    }
+    const previousExpect = (globalThis as any)[expectKey]
+    ;(globalThis as any)[expectKey] = fakeExpect
+
+    try {
+      const observedAssertionCalls: number[] = []
+      renderRegistrations.push(({ canvas }) => {
+        collectIt('first test', () => {
+          observedAssertionCalls.push(sharedExpectState.assertionCalls)
+          // Simulate the user calling `expect(value)` which would bump the counter.
+          sharedExpectState.assertionCalls += 5
+          expect(canvas.textContent).toContain('cache invalidation')
+        })
+
+        collectIt('second test', () => {
+          observedAssertionCalls.push(sharedExpectState.assertionCalls)
+          expect(canvas.textContent).toContain('cache invalidation')
+        })
+      })
+
+      const session = createVariantTestSession({
+        files: [{
+          id: 'story-id',
+          path: ['Story'],
+          filePath: 'src/components/Example.story.vue',
+          supportPluginId: 'vue3',
+          moduleId: '/src/components/Example.story.vue',
+          story: {
+            id: 'story-id',
+            title: 'Example',
+            layout: { type: 'single' },
+            variants: [{
+              id: 'variant-id',
+              title: 'Default',
+            }],
+          } as any,
+        }],
+        moduleLoaders: {
+          'story-id': vi.fn(async () => ({
+            default: { name: 'ExpectStateComponent' },
+          })),
+        },
+        runWithDynamicImport(importLoader) {
+          return importLoader()
+        },
+      })
+
+      const summary = await session.runVariantTests('story-id', 'variant-id')
+
+      expect(summary.passed).toBe(2)
+      // The second test must observe a freshly reset assertion counter, even
+      // though the first test bumped it before completing.
+      expect(observedAssertionCalls).toEqual([0, 0])
+    }
+    finally {
+      ;(globalThis as any)[expectKey] = previousExpect
+    }
+  })
+
+  it('runs onFinished callbacks even when a test handler throws', async () => {
+    const cleanupOrder: string[] = []
+    let activeTask: any = null
+    const previousWorker = (globalThis as any).__vitest_worker__
+    ;(globalThis as any).__vitest_worker__ = {
+      get current() {
+        return activeTask
+      },
+      set current(value: any) {
+        activeTask = value
+      },
+    }
+
+    try {
+      renderRegistrations.push(() => {
+        collectIt('failing test that registers cleanup', async () => {
+          activeTask?.onFinished?.push(async () => {
+            cleanupOrder.push('failing-cleanup')
+          })
+          throw new Error('boom')
+        })
+
+        collectIt('passing test that registers cleanup', async () => {
+          activeTask?.onFinished?.push(async () => {
+            cleanupOrder.push('passing-cleanup')
+          })
+        })
+      })
+
+      const session = createVariantTestSession({
+        files: [{
+          id: 'story-id',
+          path: ['Story'],
+          filePath: 'src/components/Example.story.vue',
+          supportPluginId: 'vue3',
+          moduleId: '/src/components/Example.story.vue',
+          story: {
+            id: 'story-id',
+            title: 'Example',
+            layout: { type: 'single' },
+            variants: [{
+              id: 'variant-id',
+              title: 'Default',
+            }],
+          } as any,
+        }],
+        moduleLoaders: {
+          'story-id': vi.fn(async () => ({
+            default: { name: 'OnFinishedComponent' },
+          })),
+        },
+        runWithDynamicImport(importLoader) {
+          return importLoader()
+        },
+      })
+
+      const summary = await session.runVariantTests('story-id', 'variant-id')
+
+      expect(summary.passed).toBe(1)
+      expect(summary.failed).toBe(1)
+      // Both cleanups must run regardless of test outcome.
+      expect(cleanupOrder).toEqual(['failing-cleanup', 'passing-cleanup'])
+    }
+    finally {
+      ;(globalThis as any).__vitest_worker__ = previousWorker
+    }
+  })
 })

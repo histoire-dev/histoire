@@ -1,5 +1,5 @@
 import type { Variant } from '../types'
-import { applyVariantStateUpdate, createVariantStateSyncGuards, getVariantStateKey } from '@histoire/shared'
+import { applyState, applyVariantStateUpdate, createVariantStateSyncGuards, getVariantStateKey } from '@histoire/shared'
 import { STATE_SYNC } from './const'
 import { toRawDeep } from './state'
 
@@ -17,6 +17,7 @@ export function createPreviewStateSync(options: {
   }) => void
 }) {
   const guards = createVariantStateSyncGuards()
+  const pendingPreviewStates = new Map<string, any>()
 
   /**
    * Returns suppression key for one variant in current story.
@@ -35,6 +36,11 @@ export function createPreviewStateSync(options: {
         return
       }
 
+      const key = getKey(variant.id)
+      if (key) {
+        pendingPreviewStates.delete(key)
+      }
+
       options.postMessage({
         type: STATE_SYNC,
         variantId: variant.id,
@@ -46,20 +52,37 @@ export function createPreviewStateSync(options: {
      * Consumes one pending local echo for current variant.
      */
     shouldSkipCurrentVariantSync() {
-      return guards.consume(getKey(options.getCurrentVariant()?.id))
+      const variant = options.getCurrentVariant()
+      const key = getKey(variant?.id)
+      const shouldSkip = guards.consume(key)
+
+      if (!shouldSkip && variant && !variant.previewReady && key) {
+        pendingPreviewStates.set(key, toRawDeep(variant.state, true))
+      }
+
+      return shouldSkip
     },
 
     /**
      * Applies preview message to exact target variant.
      */
     applyIncomingState(variantId: string | null | undefined, state: any) {
-      return applyVariantStateUpdate({
+      const variant = applyVariantStateUpdate({
         storyId: options.getStoryId(),
         variantId,
         state,
         getVariantById: options.getVariantById,
         guards,
       })
+
+      const key = getKey(variantId)
+      const pendingState = key ? pendingPreviewStates.get(key) : null
+
+      if (variant && pendingState && !variant.previewReady) {
+        applyState(variant.state, pendingState)
+      }
+
+      return variant
     },
 
     /**
@@ -67,6 +90,7 @@ export function createPreviewStateSync(options: {
      */
     reset() {
       guards.reset()
+      pendingPreviewStates.clear()
     },
   }
 }

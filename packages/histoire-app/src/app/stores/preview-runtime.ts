@@ -72,6 +72,30 @@ export const usePreviewRuntimeStore = defineStore('preview-runtime', () => {
 
   function setFrame(mode: PreviewMode, frame: HTMLIFrameElement | null) {
     frames.value[mode] = frame
+
+    if (frame === null && !getCurrentFrame()) {
+      // No iframe is mounted anymore — abort any in-flight requests so the
+      // next collect/run starts fresh instead of waiting on the 15s timeout.
+      abortPendingRequests('Preview iframe was detached before completing the request.')
+    }
+  }
+
+  /**
+   * Rejects in-flight collection/run promises with an explicit reason so the
+   * UI does not stay locked on the previous request after an iframe unmount.
+   */
+  function abortPendingRequests(reason: string) {
+    if (pendingCollection) {
+      const aborted = pendingCollection
+      pendingCollection = null
+      aborted.reject(new Error(reason))
+    }
+
+    if (pendingRun) {
+      const aborted = pendingRun
+      pendingRun = null
+      aborted.reject(new Error(reason))
+    }
   }
 
   function getCurrentFrame() {

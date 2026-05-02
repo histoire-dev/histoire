@@ -1,5 +1,6 @@
 import type { Context } from '../context.js'
 import { createRequire } from 'node:module'
+import { STORY_CHANGED_EVENT } from '@histoire/shared'
 import { hasProjectVitest } from '../util/has-vitest.js'
 import { resolveHistoireSharedEntry } from '../util/resolve-histoire-shared.js'
 import { tryResolveVitestModule } from '../util/resolve-vitest-package.js'
@@ -51,7 +52,7 @@ import { applyVariantStateUpdate, createHistoireTestSummary, createVariantStateS
 import { createVariantTestSession } from ${JSON.stringify(variantTestSessionId)}
 
 const TEST_DEFINITIONS_KEY = '__HST_TEST_DEFINITIONS__'
-const STORY_CHANGED_EVENT = 'histoire:story-changed'
+const STORY_CHANGED_EVENT = ${JSON.stringify(STORY_CHANGED_EVENT)}
 const files = ${JSON.stringify(files)}
 const moduleLoaders = {
   ${loaders.join(',\n  ')}
@@ -242,21 +243,55 @@ function postToParent(payload) {
   }, targetOrigin)
 }
 
+const RUNTIME_ERROR_OVERLAY_ID = '__histoire-runtime-error'
+
 function renderRuntimeError(error) {
   const message = error instanceof Error
     ? (error.stack ?? error.message)
     : String(error)
 
-  document.body.innerHTML = ''
+  // If the Vue app has not booted yet, render the error in place of the empty
+  // body. Otherwise overlay the error so the previously mounted preview is not
+  // destroyed by a late unhandled rejection (e.g. a flaky user vi.mock).
+  const appMounted = !!document.getElementById('app')
+
+  if (!appMounted) {
+    document.body.innerHTML = ''
+    document.body.appendChild(createRuntimeErrorBlock(message))
+    return
+  }
+
+  let overlay = document.getElementById(RUNTIME_ERROR_OVERLAY_ID)
+  if (!overlay) {
+    overlay = document.createElement('div')
+    overlay.id = RUNTIME_ERROR_OVERLAY_ID
+    overlay.style.position = 'fixed'
+    overlay.style.bottom = '0'
+    overlay.style.left = '0'
+    overlay.style.right = '0'
+    overlay.style.maxHeight = '50vh'
+    overlay.style.overflow = 'auto'
+    overlay.style.zIndex = '2147483647'
+    overlay.style.borderTop = '2px solid #fca5a5'
+    document.body.appendChild(overlay)
+  }
+  else {
+    overlay.innerHTML = ''
+  }
+  overlay.appendChild(createRuntimeErrorBlock(message))
+}
+
+function createRuntimeErrorBlock(message) {
   const pre = document.createElement('pre')
   pre.style.whiteSpace = 'pre-wrap'
   pre.style.padding = '16px'
+  pre.style.margin = '0'
   pre.style.fontFamily = 'monospace'
   pre.style.fontSize = '12px'
   pre.style.color = '#fca5a5'
   pre.style.background = '#111827'
   pre.textContent = message
-  document.body.appendChild(pre)
+  return pre
 }
 
 window.addEventListener('error', event => {
@@ -437,6 +472,7 @@ const app = createApp({
     const previewSettingsStore = usePreviewSettingsStore()
     let mounted = false
     let selectionToken = 0
+    const readyVariantIds = new Set()
     const variantStateGuards = createVariantStateSyncGuards()
     const variantStateWatchStops = new Map()
     const story = computed(() => file.value?.story ?? null)
@@ -454,6 +490,7 @@ const app = createApp({
         stop()
       }
 
+      readyVariantIds.clear()
       variantStateWatchStops.clear()
       variantStateGuards.reset()
     }
@@ -472,6 +509,10 @@ const app = createApp({
         }
 
         const stop = watch(() => targetVariant.state, value => {
+          if (!readyVariantIds.has(targetVariant.id)) {
+            return
+          }
+
           if (variantStateGuards.consume(key)) {
             return
           }
@@ -612,11 +653,15 @@ const app = createApp({
     onMounted(() => {
       mounted = true
       if (initialSelection.storyId) {
+        // Wait for the initial selection to load before announcing readiness so
+        // the host receives the resolved variantId, not a stale null.
         void syncSelection(initialSelection).then(() => {
           postToParent({ type: SANDBOX_READY, variantId: variant.value?.id })
         })
       }
-      postToParent({ type: SANDBOX_READY, variantId: variant.value?.id })
+      else {
+        postToParent({ type: SANDBOX_READY, variantId: variant.value?.id })
+      }
     })
 
     return {
@@ -630,6 +675,7 @@ const app = createApp({
       },
       async markVariantReady(variantId) {
         await waitForVariantSnapshot()
+        readyVariantIds.add(variantId)
         postVariantStateSnapshotById(story.value, variantId)
         postToParent({ type: VARIANT_READY, variantId })
       },
@@ -637,6 +683,7 @@ const app = createApp({
         await waitForVariantSnapshot()
 
         for (const targetVariant of story.value?.variants ?? []) {
+          readyVariantIds.add(targetVariant.id)
           postVariantStateSnapshotById(story.value, targetVariant.id)
         }
       },

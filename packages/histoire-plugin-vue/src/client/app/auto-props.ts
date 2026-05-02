@@ -86,11 +86,12 @@ function visitVNodes(vnodes: any, externalState: Variant['state'], traversalStat
           default: defaultValue,
         })
 
-        if (externalState?._hPropState?.[index]?.[key] != null) {
+        const propState = externalState?._hPropState?.[index]
+        if (propState && Object.prototype.hasOwnProperty.call(propState, key)) {
           if (!vnode.props) {
             vnode.props = {}
           }
-          vnode.props[key] = externalState._hPropState[index][key]
+          vnode.props[key] = propState[key]
 
           if (!vnode.dynamicProps) {
             vnode.dynamicProps = []
