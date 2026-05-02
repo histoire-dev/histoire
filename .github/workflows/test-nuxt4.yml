@@ -38,13 +38,17 @@ jobs:
         with:
           path: |
             ${{ steps.pnpm-cache.outputs.pnpm_cache_dir }}
-            ~/.cache/Cypress
+            ~/.cache/ms-playwright
           key: pnpm-v1-${{ runner.os }}-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
             pnpm-v1-${{ runner.os }}-
 
       - name: Install dependencies
         run: pnpm install
+
+      - name: Install Playwright browsers
+        working-directory: ${{env.dir}}
+        run: pnpm exec playwright install --with-deps chromium
 
       - name: Build
         run: pnpm run build
@@ -55,10 +59,10 @@ jobs:
 
       - name: Run tests
         working-directory: ${{env.dir}}
-        run: pnpm run ci
+        run: pnpm run test
 
       - uses: actions/upload-artifact@v4
         if: failure()
         with:
-          name: cypress-screenshots
-          path: ${{env.dir}}/cypress/screenshots
+          name: playwright-report-nuxt4
+          path: ${{env.dir}}/playwright-report

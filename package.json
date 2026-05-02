@@ -33,7 +33,6 @@
     "@vueuse/core": "catalog:",
     "autoprefixer": "catalog:",
     "eslint": "^9.16.0",
-    "eslint-plugin-cypress": "^4.1.0",
     "floating-vue": "5.2.2",
     "postcss": "catalog:",
     "rimraf": "^6.0.1",
@@ -64,7 +63,6 @@
     },
     "onlyBuiltDependencies": [
       "@parcel/watcher",
-      "cypress",
       "esbuild",
       "puppeteer",
       "svelte-preprocess",

@@ -7,22 +7,17 @@
     "story:dev": "histoire dev",
     "story:build": "histoire build",
     "story:preview": "histoire preview --port 4567",
-    "ci": "start-server-and-test story:preview http://localhost:4567/ test",
-    "test": "cypress run",
-    "test:dev": "cypress open --config baseUrl=http://localhost:6006",
-    "test:examples": "pnpm run story:build && pnpm run ci",
-    "test:playwright": "playwright test",
-    "test:playwright:dev": "playwright test --ui"
+    "test": "playwright test",
+    "test:dev": "playwright test --ui",
+    "test:examples": "pnpm run story:build && pnpm run test"
   },
   "devDependencies": {
     "@histoire/plugin-nuxt": "workspace:*",
     "@histoire/plugin-vue": "workspace:*",
     "@nuxtjs/tailwindcss": "^6.12.2",
     "@playwright/test": "^1.59.1",
-    "cypress": "^13.16.1",
     "histoire": "workspace:*",
     "nuxt": "^4.2.2",
-    "start-server-and-test": "^2.0.8",
     "vue": "^3.5.26"
   }
 }

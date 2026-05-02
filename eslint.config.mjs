@@ -1,5 +1,4 @@
 import antfu from '@antfu/eslint-config'
-import pluginCypress from 'eslint-plugin-cypress/flat'
 
 export default antfu({
   ignores: [
@@ -24,9 +23,4 @@ export default antfu({
   rules: {
     'import/first': 'off',
   },
-}, {
-  files: ['**/*.cy.js'],
-  plugins: {
-    cypress: pluginCypress,
-  },
-}, pluginCypress.configs.globals)
+})
