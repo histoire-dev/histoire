@@ -124,7 +124,6 @@ export async function getViteConfigWithPlugins(isServer: boolean, ctx: Context):
             `${APP_PATH}/bundle-sandbox.js`,
           ],
           include: optimizeDeps([
-            'flexsearch',
             'shiki',
             // Shiki dependencies
             'vscode-oniguruma',
