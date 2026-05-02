@@ -21,10 +21,45 @@ test.describe('story render', () => {
   })
 })
 
-// TODO: controls-slot tests need finer iframe-ready synchronization than the
-// implicit Cypress retries provided. Skipping until a reliable wait is wired up.
-test.describe.skip('controls render', () => {
-  test('shows the controls for a variant with default props', async () => {})
-  test('shares the same controls slot across variants', async () => {})
-  test('renders per-variant controls slots independently', async () => {})
+test.describe('controls render', () => {
+  // Hst.Checkbox / Hst.Select stay as the literal placeholder string
+  // ("HstCheckbox" / "HstSelect") instead of mounting the Vue control.
+  // The bridge in `packages/histoire-plugin-svelte/src/client/Wrap.svelte`
+  // expects `app.mount(el)` to wipe the placeholder during Svelte's onMount,
+  // but the Vue mount is no-op'ing under the Svelte 5 compat path.
+  // Cypress fails identically — same translation, same coverage.
+  test.fixme('shows the controls for a variant with default props', async ({ page }) => {
+    await page.goto('/story/src-basebutton-story-svelte?variantId=_default')
+    const controls = page.getByTestId('story-controls')
+    await expect(controls.getByText('Disabled')).toBeVisible()
+    await expect(controls.locator('[role="checkbox"]')).toBeVisible()
+    await expect(controls.getByText('Size')).toBeVisible()
+    await expect(controls).not.toContainText('Click me!')
+  })
+
+  test.fixme('shares the same controls slot across variants', async ({ page }) => {
+    const controls = page.getByTestId('story-controls')
+
+    await page.goto('/story/src-sharecontrols-story-svelte?variantId=src-sharecontrols-story-svelte-0')
+    await expect(controls.getByText('Disabled')).toBeVisible()
+    await expect(controls.locator('[role="checkbox"]')).toBeVisible()
+
+    await page.goto('/story/src-sharecontrols-story-svelte?variantId=src-sharecontrols-story-svelte-1')
+    await expect(controls.getByText('Disabled')).toBeVisible()
+    await expect(controls.locator('[role="checkbox"]')).toBeVisible()
+  })
+
+  test.fixme('renders per-variant controls slots independently', async ({ page }) => {
+    const controls = page.getByTestId('story-controls')
+
+    await page.goto('/story/src-controlsvariant-story-svelte?variantId=src-controlsvariant-story-svelte-0')
+    await expect(controls.getByText('Content 1')).toBeVisible()
+    await expect(controls.getByText('Disabled 1')).toBeVisible()
+    await expect(controls.locator('[role="checkbox"]')).toBeVisible()
+
+    await page.goto('/story/src-controlsvariant-story-svelte?variantId=src-controlsvariant-story-svelte-1')
+    await expect(controls.getByText('Content 2')).toBeVisible()
+    await expect(controls.getByText('Disabled 2')).toBeVisible()
+    await expect(controls.locator('[role="checkbox"]')).toBeVisible()
+  })
 })
