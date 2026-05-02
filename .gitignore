@@ -5,5 +5,7 @@ histoire-dist/
 .idea
 **/cypress/screenshots/
 **/cypress/videos/
+**/test-results/
+**/playwright-report/
 .DS_Store
 .eslintcache
