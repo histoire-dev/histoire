@@ -3,10 +3,11 @@ import type { HstEvent } from '../../stores/events'
 import type { Story, Variant } from '../../types'
 import { applyState } from '@histoire/shared'
 import { useEventListener } from '@vueuse/core'
-import { computed, ref, toRaw, watch } from 'vue'
+import { computed, onBeforeUnmount, ref, toRaw, watch } from 'vue'
 import { useEventsStore } from '../../stores/events'
 import { usePreviewSettingsStore } from '../../stores/preview-settings'
 import { EVENT_SEND, PREVIEW_SETTINGS_SYNC, SANDBOX_READY, STATE_SYNC } from '../../util/const'
+import { trackWindow } from '../../util/keyboard'
 import { getSandboxUrl } from '../../util/sandbox'
 import { toRawDeep } from '../../util/state'
 import StoryResponsivePreview from './StoryResponsivePreview.vue'
@@ -84,11 +85,21 @@ const sandboxUrl = computed(() => {
 
 const isIframeLoaded = ref(false)
 
+let stopTrackKeyboard: (() => void) | undefined
+let unmounted = false
+
 watch(sandboxUrl, () => {
   isIframeLoaded.value = false
   Object.assign(props.variant, {
     previewReady: false,
   })
+  stopTrackKeyboard?.()
+  stopTrackKeyboard = undefined
+})
+
+onBeforeUnmount(() => {
+  unmounted = true
+  stopTrackKeyboard?.()
 })
 
 // Settings
@@ -112,9 +123,14 @@ watch(() => settings, () => {
 // Iframe load
 
 function onIframeLoad() {
+  if (unmounted) return
   isIframeLoaded.value = true
   syncState()
   syncSettings()
+  stopTrackKeyboard?.()
+  if (iframe.value?.contentWindow) {
+    stopTrackKeyboard = trackWindow(iframe.value.contentWindow)
+  }
 }
 </script>
 
