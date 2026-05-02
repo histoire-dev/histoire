@@ -75,7 +75,13 @@ export function trackWindow(target: Window): () => void {
 trackWindow(window)
 
 export function onKeyboardShortcut(shortcut: KeyboardShortcut | Ref<KeyboardShortcut>, handler: KeyboardHandler, options: KeyboardShortcutOptions = {}) {
-  useEventListener(trackedWindows, options.event ?? 'keydown', (event) => {
+  useEventListener(trackedWindows, options.event ?? 'keydown', (event: KeyboardEvent) => {
+    // Sync modifier state from the event so a blur-clear (e.g. focusing an
+    // iframe while holding a modifier) doesn't drop the shortcut.
+    modifiers.ctrl.pressed = event.ctrlKey
+    modifiers.alt.pressed = event.altKey
+    modifiers.shift.pressed = event.shiftKey
+    modifiers.meta.pressed = event.metaKey
     if (isMatchingShortcut(isRef(shortcut) ? shortcut.value : shortcut)) {
       handler(event)
     }
