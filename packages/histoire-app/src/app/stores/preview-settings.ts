@@ -10,6 +10,7 @@ export const usePreviewSettingsStore = defineStore('preview-settings', () => {
     backgroundColor: 'transparent',
     checkerboard: false,
     textDirection: 'ltr',
+    colorScheme: 'auto',
   })
 
   return {

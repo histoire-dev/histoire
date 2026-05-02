@@ -1,5 +1,6 @@
 import type { StoryFile } from './types'
 import { applyState } from '@histoire/shared'
+import { usePreferredDark } from '@vueuse/core'
 import { createPinia } from 'pinia'
 import { files } from 'virtual:$histoire-stories'
 import { computed, createApp, h, onMounted, ref, watch } from 'vue'
@@ -11,7 +12,7 @@ import { histoireConfig } from './util/config.js'
 import { PREVIEW_SETTINGS_SYNC, SANDBOX_READY, STATE_SYNC } from './util/const.js'
 import { isDark } from './util/dark.js'
 import { mapFile } from './util/mapping'
-import { applyPreviewSettings } from './util/preview-settings.js'
+import { applyPreviewSettings, receivedSettings } from './util/preview-settings.js'
 import { toRawDeep } from './util/state.js'
 
 const query = parseQuery(window.location.search)
@@ -83,7 +84,18 @@ const app = createApp({
 app.use(createPinia())
 app.mount('#app')
 
-watch(isDark, (value) => {
+// Default branch covers the boot window before the first PREVIEW_SETTINGS_SYNC arrives.
+const prefersDark = usePreferredDark()
+const effectiveDark = computed(() => {
+  switch (receivedSettings.colorScheme) {
+    case 'light': return false
+    case 'dark': return true
+    case 'auto': return prefersDark.value
+    default: return isDark.value
+  }
+})
+
+watch(effectiveDark, (value) => {
   if (value) {
     document.documentElement.classList.add(histoireConfig.sandboxDarkClass) // @TODO remove
     document.documentElement.classList.add(histoireConfig.theme.darkClass)

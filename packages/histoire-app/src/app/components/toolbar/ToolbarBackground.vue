@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import type { SandboxColorScheme } from '../../types'
 import { Icon } from '@iconify/vue'
 import { computed } from 'vue'
 import { usePreviewSettingsStore } from '../../stores/preview-settings'
@@ -9,6 +10,12 @@ import BaseCheckbox from '../base/BaseCheckbox.vue'
 const settings = usePreviewSettingsStore().currentSettings
 
 const contrastColor = computed(() => getContrastColor(settings))
+
+const colorSchemeOptions: { value: SandboxColorScheme, label: string, icon: string }[] = [
+  { value: 'auto', label: 'System', icon: 'carbon:screen' },
+  { value: 'light', label: 'Light', icon: 'carbon:sun' },
+  { value: 'dark', label: 'Dark', icon: 'carbon:moon' },
+]
 </script>
 
 <template>
@@ -39,6 +46,26 @@ const contrastColor = computed(() => getContrastColor(settings))
         class="htw-flex htw-flex-col htw-items-stretch"
         data-test-id="background-popper"
       >
+        <div
+          class="htw-flex htw-items-stretch htw-px-2 htw-pt-2 htw-gap-1"
+          data-test-id="sandbox-color-scheme"
+        >
+          <button
+            v-for="option in colorSchemeOptions"
+            :key="option.value"
+            class="htw-flex-1 htw-px-3 htw-py-1.5 htw-rounded htw-flex htw-items-center htw-justify-center htw-gap-1.5 htw-cursor-pointer htw-text-sm"
+            :class="[
+              settings.colorScheme === option.value
+                ? 'htw-bg-primary-500 hover:htw-bg-primary-600 htw-text-white dark:htw-text-black'
+                : 'htw-bg-transparent hover:htw-bg-primary-100 dark:hover:htw-bg-primary-700',
+            ]"
+            @click="settings.colorScheme = option.value"
+          >
+            <Icon :icon="option.icon" class="htw-w-4 htw-h-4" />
+            <span>{{ option.label }}</span>
+          </button>
+        </div>
+
         <BaseCheckbox v-model="settings.checkerboard">
           Checkerboard
         </BaseCheckbox>

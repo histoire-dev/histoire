@@ -45,6 +45,8 @@ export type SearchResult = SearchResultBase & ({
   onActivate: () => unknown
 })
 
+export type SandboxColorScheme = 'auto' | 'light' | 'dark'
+
 export interface PreviewSettings {
   responsiveWidth: number
   responsiveHeight: number
@@ -52,6 +54,7 @@ export interface PreviewSettings {
   backgroundColor: string
   checkerboard: boolean
   textDirection: 'ltr' | 'rtl'
+  colorScheme: SandboxColorScheme
 }
 
 declare module 'vue' {
