@@ -13,56 +13,8 @@ jobs:
   build-and-test:
     runs-on: ubuntu-latest
     name: Build and test
-
-    env:
-      dir: ./examples/nuxt4
-
     steps:
-      - uses: actions/checkout@master
-
-      - name: Install node
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/test-example
         with:
-          node-version: 22
-
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4.0.0
-
-      - name: Get pnpm store directory
-        id: pnpm-cache
-        run: |
-          echo "::set-output name=pnpm_cache_dir::$(pnpm store path)"
-
-      - name: Cache pnpm modules
-        uses: actions/cache@v4
-        with:
-          path: |
-            ${{ steps.pnpm-cache.outputs.pnpm_cache_dir }}
-            ~/.cache/ms-playwright
-          key: pnpm-v1-${{ runner.os }}-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            pnpm-v1-${{ runner.os }}-
-
-      - name: Install dependencies
-        run: pnpm install
-
-      - name: Install Playwright browsers
-        working-directory: ${{env.dir}}
-        run: pnpm exec playwright install --with-deps chromium
-
-      - name: Build
-        run: pnpm run build
-
-      - name: Build book
-        working-directory: ${{env.dir}}
-        run: pnpm run story:build
-
-      - name: Run tests
-        working-directory: ${{env.dir}}
-        run: pnpm run test
-
-      - uses: actions/upload-artifact@v4
-        if: failure()
-        with:
-          name: playwright-report-nuxt4
-          path: ${{env.dir}}/playwright-report
+          dir: ./examples/nuxt4

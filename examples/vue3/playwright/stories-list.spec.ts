@@ -13,25 +13,26 @@ test.describe('stories list', () => {
     await expect(page.getByTestId('story-list-folder')).toHaveCount(2)
   })
 
-  // TODO: the second click on "Meow" doesn't collapse the folder reliably
-  // under Playwright's strict mode — the inner story remains visible. Same
-  // race the Cypress retries hid. Needs a finer wait on the folder's expanded
-  // state attribute.
-  test.fixme('toggles folder visibility', async ({ page }) => {
+  test('toggles folder visibility', async ({ page }) => {
     await page.goto('/')
     await page.evaluate(() => localStorage.clear())
     await page.reload()
 
-    await page.getByTestId('story-list-folder').filter({ hasText: 'Sub Folder' }).click()
+    // Filter on the title button instead of the folder element so nested
+    // folder names don't leak into the parent's text content.
+    const folderButton = (label: string) =>
+      page.locator('[data-test-id="story-list-folder"] [role="button"]').filter({ hasText: label })
+
+    await folderButton('Sub Folder').click()
     await expect(page.getByTestId('story-list-item').filter({ hasText: 'Sub Story 2' })).toBeVisible()
 
-    await page.getByTestId('story-list-folder').filter({ hasText: 'Meow' }).first().click()
+    await folderButton('Meow').click()
     await expect(page.getByTestId('story-list-item').filter({ hasText: 'Sub Story 1' })).toBeVisible()
 
-    await page.getByTestId('story-list-folder').filter({ hasText: 'Meow' }).first().click()
+    await folderButton('Meow').click()
     await expect(page.getByTestId('story-list-item').filter({ hasText: 'Sub Story 1' })).toHaveCount(0)
 
-    await page.getByTestId('story-list-folder').filter({ hasText: 'Sub Folder' }).click()
+    await folderButton('Sub Folder').click()
     await expect(page.getByTestId('story-list-item').filter({ hasText: 'Sub Story 2' })).toHaveCount(0)
   })
 })
