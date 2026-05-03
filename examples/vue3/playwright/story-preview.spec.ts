@@ -10,7 +10,7 @@ test.describe('story preview', () => {
 
     const iframe = page.frameLocator('iframe[data-test-id="preview-iframe"]')
     await expect(iframe.getByText('Hello world!')).toBeVisible()
-    await expect(page.getByTestId('story-source-code')).toHaveText('<Demo message="Hello world!" />')
+    expect(await page.getByTestId('story-source-code').textContent()).toEqual('<Demo message="Hello world!" />')
   })
 
   test('renders the second variant', async ({ page }) => {
@@ -22,6 +22,6 @@ test.describe('story preview', () => {
 
     const iframe = page.frameLocator('iframe[data-test-id="preview-iframe"]')
     await expect(iframe.getByText('Meow!')).toBeVisible()
-    await expect(page.getByTestId('story-source-code')).toHaveText('<Demo message="Meow!" />')
+    expect(await page.getByTestId('story-source-code').textContent()).toEqual('<Demo message="Meow!" />')
   })
 })

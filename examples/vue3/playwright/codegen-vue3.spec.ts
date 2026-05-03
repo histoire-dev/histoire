@@ -19,7 +19,7 @@ const cases: { variant: string, expected: string }[] = [
 </div>
 <button>A button</button>
 <button class="btn btn-primary">
-   A button
+   A button 
 </button>
 <button
   class="btn btn-primary"
@@ -27,7 +27,7 @@ const cases: { variant: string, expected: string }[] = [
     color: 'red',
   }"
 >
-   A button
+   A button 
 </button>
 <input
   type="phone"
@@ -37,7 +37,7 @@ const cases: { variant: string, expected: string }[] = [
   <li>Single</li>
 </ul>
 <p>
-  <span>Next to it:</span>****
+  <span>Next to it:</span>**** 
 </p>
 <p>
   <span>Not next to it:</span>
@@ -63,22 +63,22 @@ const cases: { variant: string, expected: string }[] = [
   {
     variant: 'boolean+props',
     expected: `<BaseButton disabled>
-   Button
+   Button 
 </BaseButton>
 <BaseButton :disabled="false">
-   Button
+   Button 
 </BaseButton>`,
   },
   {
     variant: 'click-events',
     expected: `<button @click="onClick">
-   Click me
+   Click me 
 </button>
 <button @click="onClick($event)">
-   Click me
+   Click me 
 </button>
 <button @click="(event) => onClick(event)">
-   Click me
+   Click me 
 </button>`,
   },
   {
@@ -126,12 +126,12 @@ const cases: { variant: string, expected: string }[] = [
     variant: 'slots',
     expected: `<ModalWithSlots>
   <template #title>
-     Title
+     Title 
   </template>
   <template #footer>
-     Footer
+     Footer 
   </template>
-   Content
+   Content 
 </ModalWithSlots>`,
   },
   {
@@ -186,7 +186,10 @@ test.describe('codegen (vue 3)', () => {
   for (const { variant, expected } of cases) {
     test(`renders source code for the ${variant} variant`, async ({ page }) => {
       await page.goto(`/story/src-components-codegen-story-vue?variantId=${variant}`)
-      await expect(page.getByTestId('story-source-code')).toHaveText(expected)
+      // textContent comparison preserves whitespace; toHaveText would normalize it.
+      const code = page.getByTestId('story-source-code')
+      await expect(code).toBeVisible()
+      expect(await code.textContent()).toEqual(expected)
     })
   }
 })
