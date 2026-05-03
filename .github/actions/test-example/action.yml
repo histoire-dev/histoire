@@ -1,0 +1,72 @@
+name: Test example
+description: Build the histoire monorepo and run an example's Playwright suite
+
+inputs:
+  dir:
+    description: Path to the example (e.g. ./examples/vue3)
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Resolve example name
+      id: example
+      shell: bash
+      run: echo "name=$(basename '${{ inputs.dir }}')" >> "$GITHUB_OUTPUT"
+
+    - uses: pnpm/action-setup@v4.0.0
+
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 22
+        cache: pnpm
+
+    - name: Install dependencies
+      shell: bash
+      run: pnpm install
+
+    - name: Resolve Playwright version
+      id: playwright
+      shell: bash
+      working-directory: ${{ inputs.dir }}
+      run: |
+        version="$(pnpm exec playwright --version | sed 's/Version //')"
+        echo "version=$version" >> "$GITHUB_OUTPUT"
+
+    - name: Cache Playwright browsers
+      id: playwright-cache
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/ms-playwright
+        key: playwright-${{ runner.os }}-${{ steps.playwright.outputs.version }}
+
+    - name: Install Playwright browser
+      if: steps.playwright-cache.outputs.cache-hit != 'true'
+      shell: bash
+      working-directory: ${{ inputs.dir }}
+      run: pnpm exec playwright install chromium
+
+    - name: Install Playwright system deps
+      shell: bash
+      working-directory: ${{ inputs.dir }}
+      run: pnpm exec playwright install-deps chromium
+
+    - name: Build
+      shell: bash
+      run: pnpm run build
+
+    - name: Build book
+      shell: bash
+      working-directory: ${{ inputs.dir }}
+      run: pnpm run story:build
+
+    - name: Run tests
+      shell: bash
+      working-directory: ${{ inputs.dir }}
+      run: pnpm run test
+
+    - uses: actions/upload-artifact@v4
+      if: failure()
+      with:
+        name: playwright-report-${{ steps.example.outputs.name }}
+        path: ${{ inputs.dir }}/playwright-report

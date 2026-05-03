@@ -7,20 +7,18 @@
     "story:dev": "histoire dev",
     "story:build": "histoire build",
     "story:preview": "histoire preview --port 4567",
-    "ci": "start-server-and-test story:preview http://localhost:4567/ test",
-    "test": "cypress run",
-    "test:dev": "cypress open --config baseUrl=http://localhost:6006",
-    "test:examples": "pnpm run story:build && pnpm run ci"
+    "test": "playwright test",
+    "test:dev": "playwright test --ui",
+    "test:examples": "pnpm run story:build && pnpm run test"
   },
   "dependencies": {
     "svelte": "^4.2.7"
   },
   "devDependencies": {
     "@histoire/plugin-svelte": "workspace:*",
+    "@playwright/test": "^1.59.1",
     "@sveltejs/vite-plugin-svelte": "^3.0.2",
-    "cypress": "^13.16.1",
     "histoire": "workspace:*",
-    "start-server-and-test": "^2.0.8",
     "svelte-preprocess": "^5.1.0",
     "vite": "^5.0.11"
   }

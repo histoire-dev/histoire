@@ -8,12 +8,9 @@
     "story:dev": "histoire dev",
     "story:build": "histoire build",
     "story:preview": "histoire preview --port 4567",
-    "ci": "start-server-and-test story:preview http://localhost:4567/ test",
-    "test": "node ./cypress-parallel.mjs",
-    "test:dev": "cypress open --config baseUrl=http://localhost:6006",
-    "test:examples": "pnpm run story:build && pnpm run ci-s",
-    "ci-s": "start-server-and-test story:preview http://localhost:4567/ test-s",
-    "test-s": "cypress run --config baseUrl=http://localhost:4567"
+    "test": "playwright test",
+    "test:dev": "playwright test --ui",
+    "test:examples": "pnpm run story:build && pnpm run test"
   },
   "dependencies": {
     "lottie-web": "^5.12.2",
@@ -24,14 +21,11 @@
     "@histoire/app": "workspace:*",
     "@histoire/plugin-vue": "workspace:*",
     "@histoire/vendors": "workspace:*",
+    "@playwright/test": "^1.59.1",
     "@vitejs/plugin-vue": "^5.2.1",
-    "cypress": "^13.16.1",
-    "globby": "^14.0.2",
     "histoire": "workspace:*",
-    "minimatch": "^10.0.1",
     "nodemon": "^3.1.7",
     "sass": "^1.82.0",
-    "start-server-and-test": "^2.0.8",
     "vite": "catalog:"
   }
 }
