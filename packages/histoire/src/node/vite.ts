@@ -499,13 +499,39 @@ export function inject() {}
 export const mocker = globalThis.__vitest_mocker__
 export function onTestFailed() {}
 
-export function describe(name, fn) {
-  registerCollectedTestSuite(name, fn)
-}
+export const describe = Object.assign(
+  (name, fn) => {
+    registerCollectedTestSuite(name, fn)
+  },
+  {
+    only(name, fn) {
+      registerCollectedTestSuite(name, fn, 'only')
+    },
+    skip(name, fn) {
+      registerCollectedTestSuite(name, fn, 'skip')
+    },
+    todo(name, fn) {
+      registerCollectedTestSuite(name, fn, 'todo')
+    },
+  },
+)
 
-export function it(name, fn) {
-  registerCollectedTestCase(name, fn)
-}
+export const it = Object.assign(
+  (name, fn) => {
+    registerCollectedTestCase(name, fn)
+  },
+  {
+    only(name, fn) {
+      registerCollectedTestCase(name, fn, 'only')
+    },
+    skip(name, fn) {
+      registerCollectedTestCase(name, fn, 'skip')
+    },
+    todo(name, fn) {
+      registerCollectedTestCase(name, fn, 'todo')
+    },
+  },
+)
 
 export const test = it
 

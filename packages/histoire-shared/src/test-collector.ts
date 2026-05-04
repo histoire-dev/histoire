@@ -1,4 +1,4 @@
-import type { HistoireTestContext, HistoireTestDefinition, HistoireTestRegistration } from './types/test.js'
+import type { HistoireTestContext, HistoireTestDefinition, HistoireTestMode, HistoireTestRegistration } from './types/test.js'
 
 export const TEST_REGISTRY_KEY = '__HST_TEST_REGISTRY__'
 export const TEST_DEFINITIONS_KEY = '__HST_TEST_DEFINITIONS__'
@@ -8,6 +8,7 @@ const ACTIVE_TEST_COLLECTOR_KEY = '__HST_ACTIVE_TEST_COLLECTOR__'
 interface HistoireActiveTestCollector {
   cases: HistoireTestDefinition[]
   nextId: number
+  suiteModes: HistoireTestMode[]
   suiteStack: string[]
 }
 
@@ -32,33 +33,73 @@ export function pushHistoireTestRegistration(register: HistoireTestRegistration)
   }
 }
 
-export function registerCollectedTestSuite(_name: string, fn: () => void) {
+/**
+ * Registers a collected suite and applies suite mode to nested test cases.
+ */
+export function registerCollectedTestSuite(_name: string, fn?: () => void, mode: HistoireTestMode = 'run') {
   const collector = getActiveCollector()
   if (!collector) {
     return
   }
 
   collector.suiteStack.push(_name)
+  if (mode !== 'run') {
+    collector.suiteModes.push(mode)
+  }
+
   try {
-    fn()
+    fn?.()
   }
   finally {
+    if (mode !== 'run') {
+      collector.suiteModes.pop()
+    }
+
     collector.suiteStack.pop()
   }
 }
 
-export function registerCollectedTestCase(name: string, handler?: () => Promise<void> | void) {
+/**
+ * Registers a collected test case for the active collector.
+ */
+export function registerCollectedTestCase(name: string, handler?: () => Promise<void> | void, mode: HistoireTestMode = 'run') {
   const collector = getActiveCollector()
   if (!collector) {
     return
   }
+  const resolvedMode = resolveCollectedTestMode(collector, mode)
+  const shouldKeepHandler = resolvedMode !== 'skip' && resolvedMode !== 'todo'
 
   collector.cases.push({
     id: String(collector.nextId++),
     name,
     fullName: [...collector.suiteStack, name].join(' > '),
-    handler,
+    ...(resolvedMode !== 'run' ? { mode: resolvedMode } : {}),
+    ...(shouldKeepHandler ? { handler } : {}),
   })
+}
+
+/**
+ * Resolves explicit test mode against inherited suite modifiers.
+ */
+function resolveCollectedTestMode(collector: HistoireActiveTestCollector, mode: HistoireTestMode) {
+  if (mode === 'skip' || mode === 'todo') {
+    return mode
+  }
+
+  if (collector.suiteModes.includes('skip')) {
+    return 'skip'
+  }
+
+  if (collector.suiteModes.includes('todo')) {
+    return 'todo'
+  }
+
+  if (mode === 'only' || collector.suiteModes.includes('only')) {
+    return 'only'
+  }
+
+  return 'run'
 }
 
 export function collectHistoireTests(
@@ -68,6 +109,7 @@ export function collectHistoireTests(
   const collector: HistoireActiveTestCollector = {
     cases: [],
     nextId: 0,
+    suiteModes: [],
     suiteStack: [],
   }
   const globals = globalThis as typeof globalThis & {

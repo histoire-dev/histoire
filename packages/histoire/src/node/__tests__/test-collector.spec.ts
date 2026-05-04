@@ -47,6 +47,91 @@ describe('collectHistoireTests', () => {
     await definitions[0].handler?.()
   })
 
+  it('collects skipped tests and skipped suites', () => {
+    const definitions = collectHistoireTests([
+      () => {
+        collectDescribe('my component', () => {
+          collectIt.skip('does not run', () => {
+            throw new Error('Skipped test should not run')
+          })
+
+          collectDescribe.skip('disabled states', () => {
+            collectIt('also does not run', () => {
+              throw new Error('Skipped suite test should not run')
+            })
+          })
+        })
+      },
+    ], {
+      story: {} as any,
+      variant: {} as any,
+      canvas: {} as HTMLElement,
+    })
+
+    expect(definitions).toMatchObject([
+      {
+        name: 'does not run',
+        fullName: 'my component > does not run',
+        mode: 'skip',
+      },
+      {
+        name: 'also does not run',
+        fullName: 'my component > disabled states > also does not run',
+        mode: 'skip',
+      },
+    ])
+    expect(definitions[0].handler).toBeUndefined()
+    expect(definitions[1].handler).toBeUndefined()
+  })
+
+  it('collects only and todo test modifiers', () => {
+    const definitions = collectHistoireTests([
+      () => {
+        collectDescribe.only('focused suite', () => {
+          collectIt('inherits only mode', () => {})
+        })
+
+        collectIt.only('runs focused test', () => {})
+        collectIt.todo('documents missing behavior')
+
+        collectDescribe.todo('future suite', () => {
+          collectIt('also documents missing behavior', () => {})
+        })
+      },
+    ], {
+      story: {} as any,
+      variant: {} as any,
+      canvas: {} as HTMLElement,
+    })
+
+    expect(definitions).toMatchObject([
+      {
+        name: 'inherits only mode',
+        fullName: 'focused suite > inherits only mode',
+        mode: 'only',
+      },
+      {
+        name: 'runs focused test',
+        fullName: 'runs focused test',
+        mode: 'only',
+      },
+      {
+        name: 'documents missing behavior',
+        fullName: 'documents missing behavior',
+        mode: 'todo',
+      },
+      {
+        name: 'also documents missing behavior',
+        fullName: 'future suite > also documents missing behavior',
+        mode: 'todo',
+      },
+    ])
+    expect(definitions[0].handler).toBeTypeOf('function')
+    expect(definitions[1].handler).toBeTypeOf('function')
+    expect(definitions[2].handler).toBeUndefined()
+    expect(definitions[3].handler).toBeUndefined()
+  })
+
   it('keeps collected definitions visible before they have run', () => {
     expect(mergeTestDefinitionsAndSummary([
       {

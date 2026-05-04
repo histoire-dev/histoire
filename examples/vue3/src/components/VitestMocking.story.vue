@@ -21,7 +21,7 @@ onTest(({ canvas }) => {
       expect(mockedGetGreeting).toHaveBeenCalledWith('Vitest browser mode')
     })
     // HMR_TEST_INSERTION_POINT
-    it('fails', () => {
+    it.skip('fails', () => {
       expect(canvas.textContent).toContain('This test is expected to fail')
     })
   })

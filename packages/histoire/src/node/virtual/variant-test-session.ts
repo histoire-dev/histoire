@@ -110,6 +110,10 @@ export function createVariantTestSession(options: VariantTestSessionOptions) {
     try {
       const currentDefinition = getDefinitionById(session.definitions, definition.id)
 
+      if (currentDefinition?.mode === 'skip' || currentDefinition?.mode === 'todo') {
+        return
+      }
+
       if (!currentDefinition?.handler) {
         throw new Error(`Could not resolve histoire test "${definition.fullName}" for ${storyId}:${variantId}`)
       }
@@ -129,9 +133,21 @@ export function createVariantTestSession(options: VariantTestSessionOptions) {
       const workerState = (globalThis as typeof globalThis & {
         __vitest_worker__?: any
       }).__vitest_worker__
+      const hasFocusedTests = session.definitions.some(definition => definition.mode === 'only')
 
       for (const [index, definition] of session.definitions.entries()) {
         const previousCurrent = workerState?.current
+
+        if (definition.mode === 'skip' || definition.mode === 'todo' || (hasFocusedTests && definition.mode !== 'only')) {
+          results.push({
+            id: definition.id,
+            name: definition.name,
+            fullName: definition.fullName,
+            state: 'skipped',
+            errors: [],
+          })
+          continue
+        }
 
         if (workerState) {
           workerState.filepath = session.file.story.file?.filePath ?? session.file.filePath
@@ -312,7 +328,7 @@ function dedupeCollectedTestDefinitions(definitions: HistoireTestDefinition[]) {
   const seen = new Set<string>()
 
   for (const definition of definitions) {
-    const key = `${definition.fullName}\n${definition.handler?.toString() ?? ''}`
+    const key = `${definition.mode ?? 'run'}\n${definition.fullName}\n${definition.handler?.toString() ?? ''}`
     if (seen.has(key)) {
       continue
     }

@@ -1,6 +1,16 @@
 import { registerCollectedTestCase, registerCollectedTestSuite } from '@histoire/shared'
 
 type AnyFn = (...args: any[]) => any
+type CollectSuiteFn = ((name: string, fn: AnyFn) => void) & {
+  only: (name: string, fn: AnyFn) => void
+  skip: (name: string, fn?: AnyFn) => void
+  todo: (name: string, fn?: AnyFn) => void
+}
+type CollectTestFn = ((name: string, fn?: AnyFn) => void) & {
+  only: (name: string, fn?: AnyFn) => void
+  skip: (name: string, fn?: AnyFn) => void
+  todo: (name: string, fn?: AnyFn) => void
+}
 
 function createNoopMatcher() {
   return new Proxy(() => undefined, {
@@ -66,13 +76,49 @@ export const expect = Object.assign(
   },
 )
 
-export function describe(name: string, fn: AnyFn) {
-  registerCollectedTestSuite(name, fn)
+/** Creates a Vitest-like suite collector with chain modifiers. */
+function createSuiteCollector(): CollectSuiteFn {
+  return Object.assign(
+    (name: string, fn: AnyFn) => {
+      registerCollectedTestSuite(name, fn)
+    },
+    {
+      only(name: string, fn: AnyFn) {
+        registerCollectedTestSuite(name, fn, 'only')
+      },
+      skip(name: string, fn?: AnyFn) {
+        registerCollectedTestSuite(name, fn, 'skip')
+      },
+      todo(name: string, fn?: AnyFn) {
+        registerCollectedTestSuite(name, fn, 'todo')
+      },
+    },
+  )
 }
 
-export function it(name: string, fn?: AnyFn) {
-  registerCollectedTestCase(name, fn)
+/** Creates a Vitest-like test collector with chain modifiers. */
+function createTestCollector(): CollectTestFn {
+  return Object.assign(
+    (name: string, fn?: AnyFn) => {
+      registerCollectedTestCase(name, fn)
+    },
+    {
+      only(name: string, fn?: AnyFn) {
+        registerCollectedTestCase(name, fn, 'only')
+      },
+      skip(name: string, fn?: AnyFn) {
+        registerCollectedTestCase(name, fn, 'skip')
+      },
+      todo(name: string, fn?: AnyFn) {
+        registerCollectedTestCase(name, fn, 'todo')
+      },
+    },
+  )
 }
+
+export const describe = createSuiteCollector()
+
+export const it = createTestCollector()
 
 export const test = it
 

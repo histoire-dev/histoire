@@ -20,10 +20,15 @@ export type HistoireTestRegistration = (context: HistoireTestContext) => void
 
 export type HistoireTestHandler = () => Promise<void> | void
 
+/** Execution mode for a collected Histoire test definition. */
+export type HistoireTestMode = 'run' | 'skip' | 'only' | 'todo'
+
 export interface HistoireSerializedTestDefinition {
   id: string
   name: string
   fullName: string
+  /** Mirrors Vitest modifiers such as `.skip`, `.only`, and `.todo`. */
+  mode?: HistoireTestMode
 }
 
 export interface HistoireCollectTestsPayload {
@@ -56,6 +61,8 @@ export interface HistoireTestDefinition {
   id: string
   name: string
   fullName: string
+  /** Mirrors Vitest modifiers such as `.skip`, `.only`, and `.todo`. */
+  mode?: HistoireTestMode
   handler?: HistoireTestHandler
 }
 
@@ -145,10 +152,11 @@ export function formatTestError(error: HistoireTestError): string {
 }
 
 export function serializeTestDefinitions(definitions: HistoireTestDefinition[]): HistoireSerializedTestDefinition[] {
-  return definitions.map(({ id, name, fullName }) => ({
+  return definitions.map(({ id, name, fullName, mode }) => ({
     id,
     name,
     fullName,
+    ...(mode ? { mode } : {}),
   }))
 }
 

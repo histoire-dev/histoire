@@ -294,6 +294,96 @@ describe('createVariantTestSession', () => {
     }
   })
 
+  it('reports skipped collected tests without running their handlers', async () => {
+    renderRegistrations.push(() => {
+      collectIt.skip('skips this test', () => {
+        throw new Error('Skipped test should not run')
+      })
+    })
+
+    const session = createVariantTestSession({
+      files: [{
+        id: 'story-id',
+        path: ['Story'],
+        filePath: 'src/components/Example.story.vue',
+        supportPluginId: 'vue3',
+        moduleId: '/src/components/Example.story.vue',
+        story: {
+          id: 'story-id',
+          title: 'Example',
+          layout: { type: 'single' },
+          variants: [{
+            id: 'variant-id',
+            title: 'Default',
+          }],
+        } as any,
+      }],
+      moduleLoaders: {
+        'story-id': vi.fn(async () => ({
+          default: { name: 'SkippedComponent' },
+        })),
+      },
+      runWithDynamicImport(importLoader) {
+        return importLoader()
+      },
+    })
+
+    const summary = await session.runVariantTests('story-id', 'variant-id')
+
+    expect(summary.skipped).toBe(1)
+    expect(summary.failed).toBe(0)
+    expect(summary.tests[0].state).toBe('skipped')
+  })
+
+  it('runs only focused collected tests when an only modifier is present', async () => {
+    const executed: string[] = []
+    renderRegistrations.push(() => {
+      collectIt('unfocused test', () => {
+        throw new Error('Unfocused test should not run')
+      })
+
+      collectIt.only('focused test', () => {
+        executed.push('focused')
+      })
+
+      collectIt.todo('future test')
+    })
+
+    const session = createVariantTestSession({
+      files: [{
+        id: 'story-id',
+        path: ['Story'],
+        filePath: 'src/components/Example.story.vue',
+        supportPluginId: 'vue3',
+        moduleId: '/src/components/Example.story.vue',
+        story: {
+          id: 'story-id',
+          title: 'Example',
+          layout: { type: 'single' },
+          variants: [{
+            id: 'variant-id',
+            title: 'Default',
+          }],
+        } as any,
+      }],
+      moduleLoaders: {
+        'story-id': vi.fn(async () => ({
+          default: { name: 'OnlyComponent' },
+        })),
+      },
+      runWithDynamicImport(importLoader) {
+        return importLoader()
+      },
+    })
+
+    const summary = await session.runVariantTests('story-id', 'variant-id')
+
+    expect(executed).toEqual(['focused'])
+    expect(summary.passed).toBe(1)
+    expect(summary.skipped).toBe(2)
+    expect(summary.tests.map(test => test.state)).toEqual(['skipped', 'passed', 'skipped'])
+  })
+
   it('runs onFinished callbacks even when a test handler throws', async () => {
     const cleanupOrder: string[] = []
     let activeTask: any = null

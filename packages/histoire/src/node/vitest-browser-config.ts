@@ -44,12 +44,30 @@ function getResolvedIds(root?: string) {
     'vitest/internal/browser': resolve(vitestDir, 'dist/browser.js'),
     '@vitest/browser/dist/context.js': resolve(vitestBrowserDir, 'dist/context.js'),
     'vitest/runners': resolve(vitestDir, 'dist/runners.js'),
-    '@testing-library/dom': require.resolve('@testing-library/dom'),
-    '@testing-library/user-event': require.resolve('@testing-library/user-event'),
     [BROWSER_COLLECTOR_ID]: RESOLVED_BROWSER_COLLECTOR_ID,
     [TEST_HARNESS_ID]: RESOLVED_TEST_HARNESS_ID,
     [PREVIEW_RUNTIME_ID]: RESOLVED_PREVIEW_RUNTIME_ID,
+    ...getOptionalResolvedIds(root, [
+      '@testing-library/dom',
+      '@testing-library/user-event',
+    ]),
   }
+}
+
+/**
+ * Resolves optional browser helpers only when the host project provides them.
+ */
+function getOptionalResolvedIds(root: string | undefined, ids: string[]) {
+  const projectRequire = root ? createRequire(resolve(root, 'package.json')) : require
+
+  return Object.fromEntries(ids.flatMap((id) => {
+    try {
+      return [[id, projectRequire.resolve(id)]]
+    }
+    catch {
+      return []
+    }
+  }))
 }
 
 export function debugVitestBrowserLifecycle(...args: unknown[]) {

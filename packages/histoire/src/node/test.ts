@@ -205,7 +205,13 @@ const definitions = await collectVariantTests(${JSON.stringify(storyId)}, ${JSON
 
 describe(${JSON.stringify(`${storyTitle} > ${variantTitle}`)}, () => {
   for (const definition of definitions) {
-    test(definition.fullName, async () => {
+    if (definition.mode === 'todo') {
+      test.todo(definition.fullName)
+      continue
+    }
+
+    const testFn = definition.mode === 'only' ? test.only : definition.mode === 'skip' ? test.skip : test
+    testFn(definition.fullName, async () => {
       await runCollectedTest(${JSON.stringify(storyId)}, ${JSON.stringify(variantId)}, definition)
     })
   }

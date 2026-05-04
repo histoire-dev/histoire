@@ -161,6 +161,26 @@ describe('runHistoireTests', () => {
     expect(createVitestMock.mock.calls[0][1].include[0]).toContain('eligible-variant.histoire.spec.ts')
   })
 
+  it('generates specs that preserve Vitest definition modes', async () => {
+    const eligibleStory = createStoryFile({
+      id: 'skip-story',
+      variantId: 'skip-variant',
+      source: `
+        import { onTest } from 'histoire/client'
+        onTest(() => {})
+      `,
+    })
+
+    await runHistoireTests(createContext([eligibleStory]))
+
+    const specPath = createVitestMock.mock.calls[0][1].include[0]
+    const specCode = fs.readFileSync(specPath, 'utf8')
+
+    expect(specCode).toContain(`if (definition.mode === 'todo')`)
+    expect(specCode).toContain(`definition.mode === 'only' ? test.only`)
+    expect(specCode).toContain(`: definition.mode === 'skip' ? test.skip`)
+  })
+
   it('warns and runs nothing when explicit storyId matches no eligible tests', async () => {
     const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
 

@@ -59,6 +59,9 @@ describe('getViteConfigWithPlugins', () => {
 
     expect(shimCode).not.toContain('expect-type')
     expect(shimCode).toContain('export const expectTypeOf = () => ({})')
+    expect(shimCode).toContain(`registerCollectedTestCase(name, fn, 'skip')`)
+    expect(shimCode).toContain(`registerCollectedTestCase(name, fn, 'only')`)
+    expect(shimCode).toContain(`registerCollectedTestCase(name, fn, 'todo')`)
   })
 
   it('resolves the browser collection vitest stub to the source file', async () => {
