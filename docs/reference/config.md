@@ -220,8 +220,8 @@ Predefined responsive sizes for story playgrounds.
 Each object in the array is a preset with the following properties:
 
 - `label: string`: Label for the preset.
-- `width: number`: Width of the preset (pixels).
-- `height: number`: Height of the preset (pixels).
+- `width: number | null`: Width of the preset (pixels). Pass `null` to leave the width unconstrained ("Auto").
+- `height: number | null`: Height of the preset (pixels). Pass `null` to leave the height unconstrained ("Auto").
 
 Default values are shown in the example below:
 

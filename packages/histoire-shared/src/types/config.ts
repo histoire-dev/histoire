@@ -18,8 +18,10 @@ export type GrayColorKeys = ColorKeys | '750' | '850' | '950'
 
 export interface ResponsivePreset {
   label: string
-  width: number
-  height?: number
+  /** Width in pixels. `null` renders as "Auto" (no constraint). */
+  width: number | null
+  /** Height in pixels. `null` renders as "Auto" (no constraint). */
+  height?: number | null
 }
 
 export interface BackgroundPreset {
