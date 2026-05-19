@@ -1,6 +1,7 @@
 import type { RouteLocationRaw } from 'vue-router'
 
 export type {
+  PreviewSettings,
   Story,
   StoryFile,
   StoryLayout,
@@ -44,15 +45,6 @@ export type SearchResult = SearchResultBase & ({
 } | {
   onActivate: () => unknown
 })
-
-export interface PreviewSettings {
-  responsiveWidth: number
-  responsiveHeight: number
-  rotate: boolean
-  backgroundColor: string
-  checkerboard: boolean
-  textDirection: 'ltr' | 'rtl'
-}
 
 declare module 'vue' {
   interface ComponentCustomProperties {

@@ -190,6 +190,27 @@ export default defineConfig({
 })
 ```
 
+## `defaultPreviewSettings`
+
+`Object`
+
+Initial values for the persisted preview-settings store. Lets you seed the responsive size picker (which otherwise defaults to 720px) and other preview-pane UI state. Each field is optional; omitted fields fall back to the built-in default. Set `responsiveWidth: null` to default the picker to "Auto" so previews render at their natural width.
+
+Only seeds the store on first visit (or when local storage hasn't yet been written). Once the user changes a setting via the toolbar, their choice is persisted and takes precedence.
+
+```ts
+export default defineConfig({
+  defaultPreviewSettings: {
+    responsiveWidth: null, // null → "Auto"
+    responsiveHeight: null,
+    rotate: false,
+    backgroundColor: 'transparent',
+    checkerboard: false,
+    textDirection: 'ltr',
+  },
+})
+```
+
 ## `responsivePresets`
 
 `Array`
