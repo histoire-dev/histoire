@@ -6,6 +6,10 @@ describe('Controls', () => {
     .should('not.be.empty')
     .then(cy.wrap)
 
+  const getControl = title => cy.get('[data-test-id="story-controls"]')
+    .contains('label', title)
+    .find('input[type="text"], textarea')
+
   beforeEach(() => {
     cy.visit('/')
     cy.get('[data-test-id="story-list-item"]').contains('Controls').click()
@@ -13,7 +17,7 @@ describe('Controls', () => {
 
   it('HstText', () => {
     getIframeBody().find('.state-output').contains('"text": "Hello"')
-    cy.get('[data-test-id="story-controls"]').contains('HstText').clear().type('Foo')
+    getControl('HstText').clear().type('Foo')
     getIframeBody().find('.state-output').contains('"text": "Foo"')
   })
 
@@ -39,7 +43,7 @@ describe('Controls', () => {
 
   it('HstColorSelect', () => {
     getIframeBody().find('.state-output').contains('"colorselect": "#000000"')
-    cy.get('[data-test-id="story-controls"]').contains('HstColorSelect').clear().type('#ffffff')
+    getControl('HstColorSelect').clear().type('#ffffff')
     getIframeBody().find('.state-output').contains('"colorselect": "#ffffff"')
   })
 })

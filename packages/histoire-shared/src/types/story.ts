@@ -15,6 +15,7 @@ export type StoryLayout = {
 } | {
   type: 'grid'
   width?: number | string
+  iframeGrid?: boolean
 }
 
 export interface CommonProps {

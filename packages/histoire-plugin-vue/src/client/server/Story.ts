@@ -1,6 +1,6 @@
 import type { ServerStory, ServerStoryFile, ServerVariant } from '@histoire/shared'
 import type { PropType } from 'vue'
-import { defineComponent, inject, onMounted, provide, useAttrs } from 'vue'
+import { defineComponent, inject, onMounted, provide } from 'vue'
 import { autoStubComponents } from './stub'
 
 export default defineComponent({
@@ -51,15 +51,13 @@ export default defineComponent({
   },
 
   setup(props) {
-    const attrs = useAttrs() as {
-      data: ServerStoryFile
-    }
+    const file = inject<ServerStoryFile>('hstStoryFile')
 
     // Story
 
     const story: ServerStory = {
-      id: props.id ?? attrs.data.id,
-      title: props.title ?? attrs.data.fileName,
+      id: props.id ?? file?.id,
+      title: props.title ?? file?.fileName,
       group: props.group,
       layout: props.layout,
       icon: props.icon,

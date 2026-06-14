@@ -6,6 +6,7 @@ import { createVuetify } from 'vuetify'
 import '@mdi/font/css/materialdesignicons.css'
 
 import 'vuetify/styles'
+import './histoire.css'
 
 export const setupVue3 = defineSetupVue3(({ app }) => {
   app.use(createVuetify())

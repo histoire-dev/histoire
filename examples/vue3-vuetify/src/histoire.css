@@ -1,0 +1,27 @@
+/*
+ * Adversarial rules to verify CSS isolation. Vuetify itself ships heavy
+ * global styles; with isolation they land inside the story scope only.
+ */
+:root {
+  --user-accent: hotpink;
+}
+
+body {
+  background: var(--user-accent);
+  font-family: cursive;
+}
+
+* {
+  letter-spacing: 0.05em;
+}
+
+a {
+  color: var(--user-accent);
+}
+
+.user-card {
+  background: hotpink;
+  color: white;
+  padding: 16px;
+  border: 3px dashed black;
+}

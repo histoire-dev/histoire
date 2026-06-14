@@ -8,7 +8,7 @@ import GenericMountStory from './components/story/GenericMountStory.vue'
 import GenericRenderStory from './components/story/GenericRenderStory.vue'
 import { setupPluginApi } from './plugin.js'
 import { histoireConfig } from './util/config.js'
-import { PREVIEW_SETTINGS_SYNC, SANDBOX_READY, STATE_SYNC } from './util/const.js'
+import { PREVIEW_SETTINGS_SYNC, SANDBOX_HEIGHT, SANDBOX_READY, STATE_SYNC } from './util/const.js'
 import { isDark } from './util/dark.js'
 import { mapFile } from './util/mapping'
 import { applyPreviewSettings } from './util/preview-settings.js'
@@ -82,6 +82,34 @@ const app = createApp({
 })
 app.use(createPinia())
 app.mount('#app')
+
+// Tagging body itself as a story render root puts components teleported to
+// document.body (floating-vue popper, dialogs) inside the user-CSS @scope
+// boundary applied in dev. The custom-controls class opts out of histoire-app
+// source-level rules that add overflow/min-height to the render root.
+document.body.classList.add('__histoire-render-story', '__histoire-render-custom-controls')
+
+let pendingFrame: number | null = null
+let lastReportedHeight = -1
+function reportHeight() {
+  pendingFrame = null
+  const renderRoot = document.querySelector('.__histoire-render-story')
+  const h = renderRoot
+    ? Math.ceil(renderRoot.getBoundingClientRect().height)
+    : Math.ceil(document.body.scrollHeight)
+  if (h === lastReportedHeight) return
+  lastReportedHeight = h
+  // Same-origin: parent and iframe are both served by the histoire dev /
+  // build server, so scope the target rather than broadcasting.
+  window.parent?.postMessage({ type: SANDBOX_HEIGHT, h }, window.location.origin)
+}
+function scheduleReport() {
+  if (pendingFrame !== null) return
+  pendingFrame = requestAnimationFrame(reportHeight)
+}
+const ro = new ResizeObserver(scheduleReport)
+ro.observe(document.body)
+requestAnimationFrame(scheduleReport)
 
 watch(isDark, (value) => {
   if (value) {

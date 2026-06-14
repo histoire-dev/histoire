@@ -16,6 +16,7 @@
     "test-s": "cypress run --config baseUrl=http://localhost:4567"
   },
   "dependencies": {
+    "floating-vue": "5.2.2",
     "lottie-web": "^5.12.2",
     "pinia": "^2.3.0",
     "vue": "^3.5.26"

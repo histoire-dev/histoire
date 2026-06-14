@@ -16,6 +16,7 @@ import { useCurrentVariantRoute } from '../../util/variant'
 import CheckerboardPattern from '../misc/CheckerboardPattern.vue'
 import ToolbarNewTab from '../toolbar/ToolbarNewTab.vue'
 import GenericRenderStory from './GenericRenderStory.vue'
+import StoryVariantSinglePreviewRemote from './StoryVariantSinglePreviewRemote.vue'
 
 const props = defineProps({
   variant: {
@@ -68,6 +69,14 @@ const settings = usePreviewSettingsStore().currentSettings
 
 const contrastColor = computed(() => getContrastColor(settings))
 const autoApplyContrastColor = computed(() => !!histoireConfig.autoApplyContrastColor)
+
+const useIframe = computed(() => {
+  const layout = props.story.layout
+  if (layout?.type === 'grid' && layout.iframeGrid !== undefined) {
+    return layout.iframeGrid
+  }
+  return histoireConfig.isolateStyles !== false
+})
 </script>
 
 <template>
@@ -137,7 +146,15 @@ const autoApplyContrastColor = computed(() => !!histoireConfig.autoApplyContrast
           'color': autoApplyContrastColor ? contrastColor : undefined,
         }"
       >
+        <StoryVariantSinglePreviewRemote
+          v-if="useIframe"
+          :key="`iframe-${story.id}-${variant.id}`"
+          :story="story"
+          :variant="variant"
+          auto-height
+        />
         <GenericRenderStory
+          v-else
           :key="`${story.id}-${variant.id}`"
           :variant="variant"
           :story="story"

@@ -27,6 +27,11 @@ import { createMarkdownFilesWatcher } from './markdown.js'
 import { BuildPluginApi } from './plugin.js'
 import { startPreview } from './preview.js'
 import { findAllStories } from './stories.js'
+import {
+  chromeCssScopePlugin,
+  entryCssMergerPlugin,
+  userCssScopePlugin,
+} from './style-isolation/index.js'
 import { getViteConfigWithPlugins } from './vite.js'
 
 const PRELOAD_MODULES = [
@@ -169,7 +174,8 @@ export async function build(ctx: Context) {
       Object.assign(config.build, {
         outDir: ctx.config.outDir,
         emptyOutDir: true,
-        cssCodeSplit: false,
+        // Re-merged per-entry by entry-css-merger.
+        cssCodeSplit: true,
         minify: false,
         // Don't build in SSR mode
         ssr: false,
@@ -179,6 +185,11 @@ export async function build(ctx: Context) {
     },
   })
 
+  const isolate = ctx.config.isolateStyles !== false
+  buildViteConfig.plugins.push(userCssScopePlugin({ enabled: isolate }))
+  buildViteConfig.plugins.push(chromeCssScopePlugin({ enabled: isolate }))
+  buildViteConfig.plugins.push(entryCssMergerPlugin({ isolateStyles: isolate }))
+
   for (const cb of changeViteConfigCallbacks) {
     console.log('vite config hook', cb)
     await cb(buildViteConfig)
@@ -187,7 +198,14 @@ export async function build(ctx: Context) {
   const results = await viteBuild(buildViteConfig)
   const result = Array.isArray(results) ? results[0] : results as RollupOutput
 
-  const styleOutput = result.output.find(o => o.name === 'style.css' && o.type === 'asset')
+  function findEntryCss(entryName: string) {
+    return result.output.find(
+      o => o.type === 'asset' && o.fileName === `${entryName}.css`,
+    )
+  }
+  const mainStyleOutput = findEntryCss('bundle-main')
+    ?? result.output.find(o => o.name === 'style.css' && o.type === 'asset')
+  const sandboxStyleOutput = findEntryCss('bundle-sandbox') ?? mainStyleOutput
 
   // Preload
   const preloadOutputs = result.output.filter(o => PRELOAD_MODULES.includes(o.name) && o.type === 'chunk')
@@ -199,14 +217,14 @@ export async function build(ctx: Context) {
 
   // Index
   const indexOutput = result.output.find(o => o.name === 'bundle-main' && o.type === 'chunk')
-  const indexHtml = generateEntryHtml(indexOutput.fileName, styleOutput.fileName, {
+  const indexHtml = generateEntryHtml(indexOutput.fileName, mainStyleOutput.fileName, {
     HEAD: `${preloadHtml}${prefetchHtml}`,
   }, ctx)
   await writeFile('index.html', indexHtml, ctx)
 
   // Sandbox
   const sandboxOutput = result.output.find(o => o.name === 'bundle-sandbox' && o.type === 'chunk')
-  const sandboxHtml = generateEntryHtml(sandboxOutput.fileName, styleOutput.fileName, {}, ctx)
+  const sandboxHtml = generateEntryHtml(sandboxOutput.fileName, sandboxStyleOutput.fileName, {}, ctx)
   await writeFile('__sandbox.html', sandboxHtml, ctx)
 
   await writeFile('histoire.json', JSON.stringify(getSerializedStoryData(ctx), null, 2), ctx)
@@ -255,6 +273,7 @@ function generateBaseHtml(head: string, body: string, ctx: Context) {
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="">
+  <style>html,body{margin:0;padding:0}</style>
   ${head}
 </head>
 <body>
@@ -280,4 +299,8 @@ async function writeFile(fileName: string, content: string, ctx: Context) {
 
 function generateScriptLinks(prefetchScripts: string[], rel: string, ctx: Context) {
   return prefetchScripts.map(s => `<link rel="${rel}" href="${ctx.resolvedViteConfig.base}${s}" as="script" crossOrigin="anonymous">`).join('')
+}
+
+function generateStyleLinks(styleFiles: string[], rel: string, ctx: Context) {
+  return styleFiles.map(s => `<link rel="${rel}" href="${ctx.resolvedViteConfig.base}${s}" as="style">`).join('')
 }

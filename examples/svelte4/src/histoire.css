@@ -1,0 +1,27 @@
+/*
+ * Adversarial rules to verify CSS isolation: without isolation these
+ * would bleed into Histoire's chrome.
+ */
+:root {
+  --user-accent: deeppink;
+}
+
+body {
+  background: var(--user-accent);
+  font-family: cursive;
+}
+
+* {
+  outline: 1px dotted transparent;
+}
+
+a {
+  color: var(--user-accent);
+}
+
+.user-card {
+  background: deeppink;
+  color: white;
+  padding: 16px;
+  border: 3px dashed black;
+}
