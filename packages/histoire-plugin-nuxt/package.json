@@ -2,7 +2,7 @@
   "name": "@histoire/plugin-nuxt",
   "type": "module",
   "version": "1.0.0-beta.1",
-  "description": "Histoire plugin to integrate with Nuxt 3",
+  "description": "Histoire plugin to integrate with Nuxt",
   "author": {
     "name": "Guillaume Chau"
   },
@@ -29,17 +29,17 @@
   "peerDependencies": {
     "@histoire/plugin-vue": "workspace:^",
     "histoire": "workspace:^",
-    "nuxt": "^3.0.0-rc.11"
+    "nuxt": "^3.0.0-rc.11 || ^4.0.0"
   },
   "dependencies": {
-    "@nuxt/kit": "^3.14.1592",
+    "@nuxt/kit": "^3.14.1592 || ^4.0.0",
     "@rollup/plugin-replace": "^6.0.1",
     "h3": "^1.13.0",
     "ofetch": "^1.4.1",
     "unenv": "^1.10.0"
   },
   "devDependencies": {
-    "@nuxt/schema": "^3.14.1592",
+    "@nuxt/schema": "^3.14.1592 || ^4.0.0",
     "@types/node": "^22.10.1",
     "histoire": "workspace:*",
     "typescript": "catalog:",
