@@ -20,8 +20,9 @@ const comp = computed(() => {
     case 'boolean':
       return HstCheckbox
     case 'object':
-    default:
       return HstJson
+    default:
+      return null
   }
 })
 
