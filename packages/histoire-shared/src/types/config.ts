@@ -1,4 +1,5 @@
 import type MarkdownIt from 'markdown-it'
+import type { UseHeadInput } from 'unhead/types'
 import type {
   UserConfig as ViteConfig,
   ConfigEnv as ViteConfigEnv,
@@ -173,9 +174,26 @@ export interface HistoireConfig {
    */
   backgroundPresets?: BackgroundPreset[]
   /**
+   * Initial background color used for story previews before the user picks one.
+   *
+   * Should match a `color` from `backgroundPresets` to also highlight the corresponding
+   * entry in the dropdown; any other value is still applied as a CSS color.
+   *
+   * @default 'transparent'
+   */
+  defaultBackgroundColor?: string
+  /**
    * Automatically apply the current background preset's contrast color to the story preview text.
    */
   autoApplyContrastColor?: boolean
+  /**
+   * Extra `<head>` tags injected into the Histoire app and the story sandbox.
+   * Same input shape as Nuxt's `useHead`. Use for global stylesheets, web fonts,
+   * analytics snippets, or any meta tag that needs to apply in both contexts.
+   *
+   * Example: `head: { link: [{ rel: 'stylesheet', href: '...' }] }`
+   */
+  head?: UseHeadInput
   /**
    * Class added to the html root of the story preview when dark mode is enabled.
    * @deprecated use `theme.darkClass` instead

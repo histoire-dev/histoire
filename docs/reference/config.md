@@ -305,6 +305,20 @@ You can use current contrast color via the css variable `--histoire-contrast-col
 }
 ```
 
+## `defaultBackgroundColor`
+
+`string` - Default: `'transparent'`
+
+Initial background color used for story previews before the user picks one from the dropdown. Should match a `color` from `backgroundPresets` to also highlight the matching entry.
+
+```ts
+export default defineConfig({
+  defaultBackgroundColor: '#fff',
+})
+```
+
+When the value changes, it is pushed to existing users' stored settings once. Subsequent manual picks via the toolbar are preserved.
+
 ## `autoApplyContrastColor`
 
 `boolean` - Default: `false`
@@ -314,6 +328,26 @@ Automatically apply the contrast color to the story preview text.
 ```ts
 export default defineConfig({
   autoApplyContrastColor: true,
+})
+```
+
+## `head`
+
+`UseHeadInput` - Default: `undefined`
+
+Extra `<head>` tags injected into the Histoire app **and** the story sandbox iframe. Same input shape as Nuxt's [`useHead`](https://unhead.unjs.io/), rendered at build time. Use for global stylesheets, web fonts, analytics snippets, or any meta tag that needs to apply in both contexts.
+
+```ts
+export default defineConfig({
+  head: {
+    link: [
+      { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
+      { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Poppins&display=swap' },
+    ],
+    meta: [
+      { name: 'theme-color', content: '#10b981' },
+    ],
+  },
 })
 ```
 
