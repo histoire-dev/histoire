@@ -1,7 +1,8 @@
 <script lang="ts" setup>
 import { Icon } from '@iconify/vue'
-import { ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useLayoutStore } from '../../stores/layout'
 import { useStoryStore } from '../../stores/story'
 
 import { isMobile } from '../../util/responsive'
@@ -12,6 +13,15 @@ import StorySidePanel from '../panel/StorySidePanel.vue'
 import StoryViewer from './StoryViewer.vue'
 
 const storyStore = useStoryStore()
+const layoutStore = useLayoutStore()
+
+const effectiveStoryOptionsVisible = computed(() =>
+  storyStore.currentStory?.meta?.storyOptions ?? layoutStore.settings.storyOptionsVisible,
+)
+
+const placement = computed(() => layoutStore.settings.storyOptionsPlacement)
+const splitOrientation = computed(() => placement.value === 'bottom' ? 'portrait' : 'landscape')
+const splitDefaultSplit = computed(() => placement.value === 'bottom' ? 60 : 75)
 
 const router = useRouter()
 const route = useRoute()
@@ -90,12 +100,17 @@ function scrollDocsToTop() {
     <template v-else-if="isMobile">
       <StoryViewer />
     </template>
+    <template v-else-if="!effectiveStoryOptionsVisible">
+      <StoryViewer />
+    </template>
     <BaseSplitPane
       v-else
-      save-id="story-main"
+      :save-id="`story-main-${placement}`"
+      :orientation="splitOrientation"
       :min="30"
       :max="95"
-      :default-split="75"
+      :default-split="splitDefaultSplit"
+      :show-divider="false"
       class="htw-h-full"
     >
       <template #first>

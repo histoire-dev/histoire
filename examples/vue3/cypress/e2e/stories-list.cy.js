@@ -4,7 +4,7 @@ describe('Stories list', () => {
   it('should display the stories', () => {
     cy.clearLocalStorage()
     cy.visit('/')
-    cy.get('[data-test-id="story-list-item"]').should('have.length', 35)
+    cy.get('[data-test-id="story-list-item"]').should('have.length', 36)
     cy.get('[data-test-id="story-list-item"]').contains('🐱 Meow')
     cy.get('[data-test-id="story-list-item"]').contains('BaseButton').contains('3') // Variants count
     cy.get('[data-test-id="story-list-item"]').contains('Demo')

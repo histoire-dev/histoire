@@ -3,6 +3,7 @@ import type { Story, Variant } from '../../types'
 import { Icon } from '@iconify/vue'
 import { computed } from 'vue'
 import { getSandboxUrl } from '../../util/sandbox'
+import TopBarChipItem from '../app/TopBarChipItem.vue'
 
 const props = defineProps<{
   variant: Variant
@@ -15,15 +16,15 @@ const sandboxUrl = computed(() => {
 </script>
 
 <template>
-  <a
+  <TopBarChipItem
     v-tooltip="'Open variant in new tab'"
     :href="sandboxUrl"
     target="_blank"
-    class="histoire-toolbar-new-tab htw-flex htw-items-center htw-gap-1 htw-h-full htw-px-2 hover:htw-text-primary-500 htw-opacity-50 hover:htw-opacity-100 dark:hover:htw-text-primary-400 htw-text-gray-900 dark:htw-text-gray-100"
+    class="histoire-toolbar-new-tab"
   >
     <Icon
       icon="carbon:launch"
       class="htw-w-4 htw-h-4"
     />
-  </a>
+  </TopBarChipItem>
 </template>

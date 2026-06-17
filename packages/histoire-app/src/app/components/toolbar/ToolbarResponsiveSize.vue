@@ -13,22 +13,22 @@ const settings = usePreviewSettingsStore().currentSettings
     placement="bottom-end"
     :skidding="6"
     :disabled="!histoireConfig.responsivePresets?.length"
-    class="histoire-toolbar-responsive-size htw-h-full htw-flex-none"
+    class="histoire-toolbar-responsive-size htw-flex-none"
   >
     <div
       v-tooltip="'Responsive sizes'"
-      class="htw-flex htw-items-center htw-gap-1 htw-h-full htw-px-2 htw-group"
+      class="htw-flex htw-items-center htw-gap-1 htw-px-2.5 htw-py-1.5 htw-text-gray-900 dark:htw-text-gray-100 htw-transition-colors htw-group"
       :class="{
-        'htw-cursor-pointer hover:htw-text-primary-500': histoireConfig.responsivePresets?.length,
+        'hover:htw-bg-white/50 dark:hover:htw-bg-white/10 hover:htw-text-primary-500 dark:hover:htw-text-primary-400 htw-cursor-pointer': histoireConfig.responsivePresets?.length,
       }"
     >
       <Icon
         icon="carbon:devices"
-        class="htw-w-4 htw-h-4 htw-opacity-50 group-hover:htw-opacity-100"
+        class="htw-w-4 htw-h-4"
       />
       <Icon
-        icon="carbon:caret-down"
-        class="htw-w-4 htw-h-4 htw-opacity-50 group-hover:htw-opacity-100"
+        icon="carbon:chevron-down"
+        class="htw-w-3 htw-h-3 htw-opacity-40 group-hover:htw-opacity-70"
       />
     </div>
 

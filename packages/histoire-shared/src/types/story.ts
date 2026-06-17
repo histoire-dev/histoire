@@ -43,7 +43,14 @@ export interface StoryProps extends CommonProps, InheritedProps {
 
 export interface CommonMeta {}
 
-export interface StoryMeta extends CommonMeta {}
+export interface StoryMeta extends CommonMeta {
+  /**
+   * When set, overrides the global Story Options visibility for this story.
+   * `true` forces the right pane visible; `false` forces it hidden.
+   * `undefined` (default) defers to the global layout setting.
+   */
+  storyOptions?: boolean
+}
 
 export interface Story {
   id: string

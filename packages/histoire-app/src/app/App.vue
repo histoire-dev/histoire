@@ -9,17 +9,22 @@ import type { StoryFile, Tree } from './types'
 import { useTitle } from '@vueuse/core'
 import { onUpdate, files as rawFiles, tree as rawTree } from 'virtual:$histoire-stories'
 import { computed, onMounted, ref, watch } from 'vue'
+import AppActions from './components/app/AppActions.vue'
 import AppHeader from './components/app/AppHeader.vue'
 import Breadcrumb from './components/app/Breadcrumb.vue'
 import InitialLoading from './components/app/InitialLoading.vue'
+import TopBar from './components/app/TopBar.vue'
 import BaseSplitPane from './components/base/BaseSplitPane.vue'
 import CommandPromptsModal from './components/command/CommandPromptsModal.vue'
+import LayoutModal from './components/layout/LayoutModal.vue'
 import SearchModal from './components/search/SearchModal.vue'
 import GenericMountStory from './components/story/GenericMountStory.vue'
 import StoryList from './components/tree/StoryList.vue'
 import { useCommandStore } from './stores/command'
+import { useLayoutStore } from './stores/layout'
 import { useStoryStore } from './stores/story'
 import { histoireConfig } from './util/config'
+import { toggleDark } from './util/dark'
 import { onKeyboardShortcut } from './util/keyboard'
 import { mapFile } from './util/mapping'
 import { isMobile } from './util/responsive'
@@ -61,10 +66,9 @@ useTitle(computed(() => {
   return histoireConfig.theme.title
 }))
 
-// Search
-
 const loadSearch = ref(false)
 const isSearchOpen = ref(false)
+const isLayoutOpen = ref(false)
 
 watch(isSearchOpen, (value) => {
   if (value) {
@@ -75,6 +79,16 @@ watch(isSearchOpen, (value) => {
 onKeyboardShortcut(['ctrl+k', 'meta+k'], (event) => {
   isSearchOpen.value = true
   event.preventDefault()
+})
+
+onKeyboardShortcut(['ctrl+shift+l', 'meta+shift+l'], (event) => {
+  isLayoutOpen.value = !isLayoutOpen.value
+  event.preventDefault()
+})
+
+onKeyboardShortcut(['ctrl+shift+d', 'meta+shift+d'], (event) => {
+  event.preventDefault()
+  toggleDark()
 })
 
 const loading = ref(false)
@@ -92,6 +106,7 @@ onMounted(() => {
 })
 
 const commandStore = useCommandStore()
+const layoutStore = useLayoutStore()
 </script>
 
 <template>
@@ -106,7 +121,7 @@ const commandStore = useCommandStore()
   </div>
 
   <div
-    class="htw-h-screen htw-bg-white dark:htw-bg-gray-700 dark:htw-text-gray-100"
+    class="htw-h-screen htw-bg-gray-100 dark:htw-bg-gray-750 dark:htw-text-gray-100"
     :style="{
       // Prevent flash of content
       opacity: mounted ? 1 : 0,
@@ -116,7 +131,14 @@ const commandStore = useCommandStore()
       v-if="isMobile"
       class="htw-h-full htw-flex htw-flex-col htw-divide-y htw-divide-gray-100 dark:htw-divide-gray-800"
     >
-      <AppHeader @search="isSearchOpen = true" />
+      <div class="htw-flex htw-items-center htw-gap-2 htw-pr-4">
+        <AppHeader class="htw-flex-1" />
+        <AppActions
+          class="htw-flex-none"
+          @layout="isLayoutOpen = true"
+          @search="isSearchOpen = true"
+        />
+      </div>
       <Breadcrumb
         :tree="tree"
         :stories="stories"
@@ -125,7 +147,7 @@ const commandStore = useCommandStore()
     </div>
 
     <BaseSplitPane
-      v-else
+      v-else-if="layoutStore.settings.storyListVisible"
       save-id="main-horiz"
       :min="5"
       :max="50"
@@ -134,10 +156,7 @@ const commandStore = useCommandStore()
     >
       <template #first>
         <div class="htw-flex htw-flex-col htw-h-full htw-bg-gray-100 dark:htw-bg-gray-750 __histoire-pane-shadow-from-right">
-          <AppHeader
-            class="htw-flex-none"
-            @search="isSearchOpen = true"
-          />
+          <AppHeader class="htw-flex-none" />
           <StoryList
             :tree="tree"
             :stories="stories"
@@ -147,9 +166,31 @@ const commandStore = useCommandStore()
       </template>
 
       <template #last>
-        <RouterView />
+        <div class="htw-flex htw-flex-col htw-h-full">
+          <TopBar
+            @layout="isLayoutOpen = true"
+            @search="isSearchOpen = true"
+          />
+          <RouterView class="htw-flex-1 htw-min-h-0" />
+        </div>
       </template>
     </BaseSplitPane>
+    <div
+      v-else
+      class="htw-h-full htw-flex htw-flex-col"
+    >
+      <TopBar
+        @layout="isLayoutOpen = true"
+        @search="isSearchOpen = true"
+      />
+      <RouterView class="htw-flex-1 htw-min-h-0" />
+    </div>
+
+    <LayoutModal
+      v-if="!isMobile"
+      :shown="isLayoutOpen"
+      @close="isLayoutOpen = false"
+    />
 
     <SearchModal
       v-if="loadSearch"
