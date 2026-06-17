@@ -18,14 +18,27 @@ export type GrayColorKeys = ColorKeys | '750' | '850' | '950'
 
 export interface ResponsivePreset {
   label: string
-  width: number
-  height?: number
+  /** Width in pixels. `null` renders as "Auto" (no constraint). */
+  width: number | null
+  /** Height in pixels. `null` renders as "Auto" (no constraint). */
+  height?: number | null
 }
 
 export interface BackgroundPreset {
   label: string
   color: string
   contrastColor?: string
+}
+
+export interface PreviewSettings {
+  /** Width of the responsive preview. `null` renders as "Auto" (no constraint). */
+  responsiveWidth: number | null
+  /** Height of the responsive preview. `null` renders as "Auto" (no constraint). */
+  responsiveHeight: number | null
+  rotate: boolean
+  backgroundColor: string
+  checkerboard: boolean
+  textDirection: 'ltr' | 'rtl'
 }
 
 export interface TreeGroupConfig {
@@ -181,6 +194,19 @@ export interface HistoireConfig {
    * @deprecated use `theme.darkClass` instead
    */
   sandboxDarkClass?: string
+  /**
+   * Initial values for the persisted preview-settings store. Lets users
+   * change the seed for the responsive size picker (which is otherwise
+   * hardcoded to 720px) or any other preview-pane UI setting. Each field
+   * is optional; omitted fields fall back to the built-in default. Set
+   * `responsiveWidth: null` to default the picker to "Auto" so previews
+   * render at their natural width.
+   *
+   * Only seeds the store on first visit (or when localStorage hasn't yet
+   * been written). Once the user changes a setting via the toolbar,
+   * their choice is persisted and takes precedence.
+   */
+  defaultPreviewSettings?: Partial<PreviewSettings>
   /**
    * Default props for stories.
    */
