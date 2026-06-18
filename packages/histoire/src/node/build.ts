@@ -219,7 +219,7 @@ export async function build(ctx: Context) {
 
   // Render
   if (previewStoryCallbacks.length) {
-    const { baseUrl, close } = await startPreview(null, ctx)
+    const { baseUrl, close } = await startPreview({}, ctx)
     for (const storyFile of ctx.storyFiles) {
       const story = storyFile.story
       for (const variant of story.variants) {

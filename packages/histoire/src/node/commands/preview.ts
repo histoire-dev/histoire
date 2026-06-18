@@ -1,9 +1,10 @@
-import pc from 'picocolors'
 import { createContext } from '../context.js'
 import { startPreview } from '../preview.js'
 
 export interface PreviewOptions {
   port?: number
+  host?: string | boolean
+  open?: boolean
 }
 
 export async function previewCommand(options: PreviewOptions) {
@@ -17,6 +18,10 @@ export async function previewCommand(options: PreviewOptions) {
     }
   }
 
-  const { baseUrl } = await startPreview(options.port, ctx)
-  console.log(`Preview server listening on ${pc.cyan(baseUrl)}`)
+  const { printUrls } = await startPreview({
+    port: options.port,
+    host: options.host,
+    open: options.open,
+  }, ctx)
+  printUrls()
 }
