@@ -32,7 +32,7 @@ export default defineComponent({
   },
 
   setup(props) {
-    const story = inject<ServerStory>('story')
+    const story = inject<ServerStory>('story')!
 
     function generateId() {
       return `${story.id}-${story.variants.length}`

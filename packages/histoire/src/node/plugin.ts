@@ -52,7 +52,7 @@ export class BasePluginApi implements PluginApiBase {
   }
 
   getStories(): ServerStory[] {
-    return this.ctx.storyFiles.map(f => f.story).filter(Boolean)
+    return this.ctx.storyFiles.map(f => f.story).filter((story): story is ServerStory => Boolean(story))
   }
 
   getConfig(): HistoireConfig {

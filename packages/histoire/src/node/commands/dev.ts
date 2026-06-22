@@ -13,7 +13,7 @@ export interface DevOptions {
 }
 
 export async function devCommand(options: DevOptions) {
-  let stop: () => Promise<void>
+  let stop: (() => Promise<void>) | null = null
 
   async function start() {
     const ctx = await createContext({

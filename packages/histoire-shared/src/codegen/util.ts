@@ -5,7 +5,7 @@ export function indent(lines: string[], count = 1) {
 export function unindent(code: string) {
   const lines = code.split('\n')
   let indentLevel = -1
-  let indentText: string
+  let indentText = ''
   const linesToAnalyze = lines.filter(line => line.trim().length > 0)
   for (const line of linesToAnalyze) {
     const match = /^\s*/.exec(line)
@@ -21,15 +21,15 @@ export function unindent(code: string) {
   return result.join('\n').trim()
 }
 
-interface AutoBuildingOject {
+interface AutoBuildingObject {
   key: string
-  cache: Record<string | symbol, AutoBuildingOject>
+  cache: Record<string | symbol, AutoBuildingObject>
   target: any
   proxy: any
 }
 
-export function createAutoBuildingObject(format?: (key: string) => string, specialKeysHandler?: (target: any, p: string | symbol) => (() => unknown) | null, key = '', depth = 0): AutoBuildingOject {
-  const cache: Record<string | symbol, AutoBuildingOject> = {}
+export function createAutoBuildingObject(format?: (key: string) => string, specialKeysHandler?: (target: any, p: string | symbol) => (() => unknown) | null, key = '', depth = 0): AutoBuildingObject {
+  const cache: Record<string | symbol, AutoBuildingObject> = {}
   if (depth > 32) return { key, cache, target: {}, proxy: () => key }
   const target: any = () => {
     const k = `${key}()`
@@ -59,7 +59,7 @@ export function createAutoBuildingObject(format?: (key: string) => string, speci
       if (!cache[p]) {
         const childKey = key ? `${key}.${p.toString()}` : p.toString()
         const child = createAutoBuildingObject(format, specialKeysHandler, childKey, depth + 1)
-        cache[p] = { key: childKey, ...child }
+        cache[p] = { ...child }
       }
       return cache[p].proxy
     },

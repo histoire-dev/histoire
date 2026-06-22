@@ -58,7 +58,7 @@ Example `tsconfig.json`:
   "compilerOptions": {
     "target": "ESNext",
     "module": "ESNext",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "outDir": "dist",
     "rootDir": "src",
     "allowSyntheticDefaultImports": true,

@@ -2,7 +2,7 @@ import type { Context } from './context.js'
 import { noCase } from 'change-case'
 
 export async function generateTitleSearchData(ctx: Context) {
-  const searchIndex = []
+  const searchIndex: { id: number, text: string }[] = []
   const { idMap, addToIdMap } = createIdMap()
 
   for (const storyFile of ctx.storyFiles) {
@@ -27,7 +27,7 @@ export async function generateTitleSearchData(ctx: Context) {
 }
 
 export async function generateDocSearchData(ctx: Context) {
-  const searchIndex = []
+  const searchIndex: { id: number, text: string }[] = []
   const { idMap, addToIdMap } = createIdMap()
 
   for (const storyFile of ctx.storyFiles) {

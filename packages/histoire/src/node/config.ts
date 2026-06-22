@@ -76,22 +76,18 @@ export function getDefaultConfig(): HistoireConfig {
       {
         label: 'Laptop (Small)',
         width: 1024,
-        height: null,
       },
       {
         label: 'Laptop (Large)',
         width: 1366,
-        height: null,
       },
       {
         label: 'Desktop',
         width: 1920,
-        height: null,
       },
       {
         label: '4K',
         width: 3840,
-        height: null,
       },
     ],
     backgroundPresets: [
@@ -133,7 +129,7 @@ export function getDefaultConfig(): HistoireConfig {
         && !Array.isArray(plugin[0])
         // @ts-expect-error could have no property 'name'
         && plugin[0].name?.startsWith('vite:legacy'))
-      if (index !== -1) {
+      if (index != null && index !== -1) {
         config.plugins?.splice(index, 1)
       }
 
@@ -154,7 +150,7 @@ export const configFileNames = [
   '.histoire.js',
 ]
 
-export function resolveConfigFile(cwd: string = process.cwd(), configFile?: string): string {
+export function resolveConfigFile(cwd: string = process.cwd(), configFile?: string): string | null {
   if (configFile) {
     // explicit config path is always resolved from cwd
     return path.resolve(configFile)
@@ -252,8 +248,8 @@ export const mergeConfig = createDefu((obj: any, key, value) => {
   }
 })
 
-export async function resolveConfig(cwd: string = process.cwd(), mode: ConfigMode, configFile: string): Promise<HistoireConfig> {
-  let result: Partial<HistoireConfig>
+export async function resolveConfig(cwd: string = process.cwd(), mode: ConfigMode, configFile?: string): Promise<HistoireConfig> {
+  let result: Partial<HistoireConfig> = {}
   const resolvedConfigFile = resolveConfigFile(cwd, configFile)
   if (resolvedConfigFile) {
     result = await loadConfigFile(resolvedConfigFile)
@@ -261,10 +257,10 @@ export async function resolveConfig(cwd: string = process.cwd(), mode: ConfigMod
   const viteConfig = await resolveViteConfig({}, 'serve')
   const viteHistoireConfig = (viteConfig.histoire ?? {}) as HistoireConfig
 
-  const preUserConfig = mergeConfig(result, viteHistoireConfig)
+  const preUserConfig = mergeConfig(result, viteHistoireConfig) as HistoireConfig
   const processedDefaultConfig = await processDefaultConfig(getDefaultConfig(), preUserConfig, mode, cwd)
 
-  return resolveConfigPlugins(mergeConfig(preUserConfig, processedDefaultConfig), mode)
+  return resolveConfigPlugins(mergeConfig(preUserConfig, processedDefaultConfig) as HistoireConfig, mode)
 }
 
 async function resolveConfigPlugins(config: HistoireConfig, mode: ConfigMode): Promise<HistoireConfig> {
@@ -272,7 +268,7 @@ async function resolveConfigPlugins(config: HistoireConfig, mode: ConfigMode): P
     if (plugin.config) {
       const result = await plugin.config(config, mode)
       if (result) {
-        config = mergeConfig(result, config)
+        config = mergeConfig(result, config) as HistoireConfig
       }
     }
   }
@@ -285,7 +281,7 @@ async function processDefaultConfig(defaultConfig: HistoireConfig, preUserConfig
     if (plugin.defaultConfig) {
       const result = await plugin.defaultConfig(defaultConfig, mode)
       if (result) {
-        defaultConfig = mergeConfig(result, defaultConfig)
+        defaultConfig = mergeConfig(result, defaultConfig) as HistoireConfig
       }
     }
   }

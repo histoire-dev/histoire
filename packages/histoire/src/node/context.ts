@@ -6,7 +6,7 @@ import type {
   ServerMarkdownFile,
   ServerStoryFile,
 } from '@histoire/shared'
-import type { ResolvedConfig } from 'vite'
+import type { InlineConfig, ResolvedConfig } from 'vite'
 import { resolveConfig as resolveViteConfig } from 'vite'
 import { processConfig, resolveConfig } from './config.js'
 import { mergeHistoireViteConfig } from './vite.js'
@@ -19,7 +19,7 @@ export interface Context {
   storyFiles: ServerStoryFile[]
   supportPlugins: FinalSupportPlugin[]
   markdownFiles: ServerMarkdownFile[]
-  registeredCommands?: PluginCommand[]
+  registeredCommands: PluginCommand[]
 }
 
 export interface CreateContextOptions {
@@ -32,12 +32,14 @@ export async function createContext(options: CreateContextOptions): Promise<Cont
   const command = options.mode === 'dev' ? 'serve' : 'build'
   const viteConfig = await resolveViteConfig({}, command)
 
-  const supportPlugins = config.plugins.map(p => p.supportPlugin).filter(Boolean)
+  const supportPlugins = config.plugins
+    .map(p => p.supportPlugin)
+    .filter((plugin): plugin is FinalSupportPlugin => Boolean(plugin))
 
-  const ctx = {
+  const ctx: Context = {
     root: viteConfig.root,
     config,
-    resolvedViteConfig: null,
+    resolvedViteConfig: viteConfig,
     mode: options.mode,
     storyFiles: [],
     supportPlugins,
@@ -45,7 +47,7 @@ export async function createContext(options: CreateContextOptions): Promise<Cont
     registeredCommands: [],
   }
 
-  ctx.resolvedViteConfig = await mergeHistoireViteConfig(viteConfig as unknown, ctx)
+  ctx.resolvedViteConfig = await mergeHistoireViteConfig(viteConfig as unknown as InlineConfig, ctx) as unknown as ResolvedConfig
 
   await processConfig(ctx)
 

@@ -12,29 +12,26 @@ import HstSimpleCheckbox from './HstSimpleCheckbox.vue'
 type Booleanish = boolean | 'true' | 'false'
 
 const props = defineProps<{
-  modelValue?: Booleanish | null
   title?: string
 }>()
 
-const emit = defineEmits({
-  'update:modelValue': (newValue: Booleanish) => true,
-})
+const value = defineModel<Booleanish | null>({ default: null })
 
 function toggle() {
-  if (typeof props.modelValue === 'string') {
-    emit('update:modelValue', props.modelValue === 'false' ? 'true' : 'false')
+  if (typeof value.value === 'string') {
+    value.value = (value.value === 'false' ? 'true' : 'false')
     return
   }
 
-  emit('update:modelValue', !props.modelValue)
+  value.value = !value.value
 }
 
 const isTrue = computed(() => {
-  if (typeof props.modelValue === 'string') {
-    return props.modelValue !== 'false'
+  if (typeof value.value === 'string') {
+    return value.value !== 'false'
   }
 
-  return props.modelValue
+  return value.value
 })
 </script>
 
@@ -48,7 +45,7 @@ const isTrue = computed(() => {
     @keydown.enter.prevent="toggle()"
     @keydown.space.prevent="toggle()"
   >
-    <HstSimpleCheckbox :model-value="isTrue" />
+    <HstSimpleCheckbox :model-value="!!isTrue" />
     <template #actions>
       <slot name="actions" />
     </template>

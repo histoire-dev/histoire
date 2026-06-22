@@ -13,7 +13,7 @@ export default defineConfig({
       fileName: format => `histoire-kit.${format}.js`,
     },
 
-    rollupOptions: {
+    rolldownOptions: {
       // make sure to externalize deps that shouldn't be bundled
       // into your library
       external: ['vue'],

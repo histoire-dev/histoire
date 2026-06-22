@@ -26,7 +26,7 @@ const processedTokens = computed(() => {
   })
 })
 
-const hover = ref<string>(null)
+const hover = ref<string | null>(null)
 </script>
 
 <template>

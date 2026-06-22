@@ -105,7 +105,7 @@ export function addStory(relativeFilePath: string, virtualModuleCode?: string) {
     fileName = fileName.substring(0, fileName.indexOf('.'))
   }
 
-  let supportPluginId: string
+  let supportPluginId: string | undefined
 
   for (const p of context.config.supportMatch) {
     if (micromatch.isMatch(absoluteFilePath, p.patterns, {

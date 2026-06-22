@@ -91,7 +91,7 @@ export async function build(ctx: Context) {
     mode: 'development',
     build: {
       lib: false,
-      rollupOptions: {
+      rolldownOptions: {
         input: [
           join(APP_PATH, 'bundle-main.js'),
           join(APP_PATH, 'bundle-sandbox.js'),
@@ -109,6 +109,7 @@ export async function build(ctx: Context) {
       },
     },
   })
+  buildViteConfig.plugins ??= []
 
   // For @vite/plugin-vue: Always put our vite server
   // Disable template inlining
@@ -117,7 +118,7 @@ export async function build(ctx: Context) {
   buildViteConfig.plugins.push({
     name: 'histoire-vue-plugin-override',
     config(config) {
-      const vuePlugin = config.plugins.find((p: any) => p.name === 'vite:vue') as VitePlugin
+      const vuePlugin = config.plugins?.find((p: any) => p.name === 'vite:vue') as VitePlugin | undefined
       if (vuePlugin) {
         // @ts-expect-error vue plugin use function form
         const original = vuePlugin.configureServer.bind(vuePlugin)
@@ -143,11 +144,14 @@ export async function build(ctx: Context) {
     name: 'histoire-build-config-override',
     enforce: 'post',
     config(config) {
+      const build = config.build ??= {}
+      const rolldownOptions = build.rolldownOptions ??= {}
+
       // Don't externalize
-      config.build.rollupOptions.external = []
+      rolldownOptions.external = []
 
       // Force chunk strategy
-      config.build.rollupOptions.output = {
+      rolldownOptions.output = {
         manualChunks(id) {
           if (!id.includes('@histoire/app') && id.includes('node_modules')) {
             for (const test of ctx.config.build?.excludeFromVendorsChunk ?? []) {
@@ -166,7 +170,7 @@ export async function build(ctx: Context) {
       }
 
       // Force vite build options
-      Object.assign(config.build, {
+      Object.assign(build, {
         outDir: ctx.config.outDir,
         emptyOutDir: true,
         cssCodeSplit: false,
@@ -175,6 +179,7 @@ export async function build(ctx: Context) {
         ssr: false,
       })
 
+      config.define ??= {}
       config.define.__HST_COLLECT__ = false
     },
   })
@@ -185,20 +190,26 @@ export async function build(ctx: Context) {
   }
 
   const results = await viteBuild(buildViteConfig)
-  const result = Array.isArray(results) ? results[0] : results as RollupOutput
+  const result = (Array.isArray(results) ? results[0] : results) as unknown as RollupOutput
 
   const styleOutput = result.output.find(o => o.name === 'style.css' && o.type === 'asset')
+  if (!styleOutput) {
+    throw new Error('Could not find generated style.css asset')
+  }
 
   // Preload
-  const preloadOutputs = result.output.filter(o => PRELOAD_MODULES.includes(o.name) && o.type === 'chunk')
+  const preloadOutputs = result.output.filter(o => o.type === 'chunk' && PRELOAD_MODULES.includes(o.name))
   const preloadHtml = generateScriptLinks(preloadOutputs.map(o => o.fileName), 'preload', ctx)
 
   // Prefetch
-  const prefetchOutputs = result.output.filter(o => PREFETCHED_MODULES.includes(o.name) && o.type === 'chunk')
+  const prefetchOutputs = result.output.filter(o => o.type === 'chunk' && PREFETCHED_MODULES.includes(o.name))
   const prefetchHtml = generateScriptLinks(prefetchOutputs.map(o => o.fileName), 'prefetch', ctx)
 
   // Index
   const indexOutput = result.output.find(o => o.name === 'bundle-main' && o.type === 'chunk')
+  if (!indexOutput) {
+    throw new Error('Could not find generated bundle-main chunk')
+  }
   const indexHtml = generateEntryHtml(indexOutput.fileName, styleOutput.fileName, {
     HEAD: `${preloadHtml}${prefetchHtml}`,
   }, ctx)
@@ -206,6 +217,9 @@ export async function build(ctx: Context) {
 
   // Sandbox
   const sandboxOutput = result.output.find(o => o.name === 'bundle-sandbox' && o.type === 'chunk')
+  if (!sandboxOutput) {
+    throw new Error('Could not find generated bundle-sandbox chunk')
+  }
   const sandboxHtml = generateEntryHtml(sandboxOutput.fileName, styleOutput.fileName, {}, ctx)
   await writeFile('__sandbox.html', sandboxHtml, ctx)
 
@@ -222,6 +236,9 @@ export async function build(ctx: Context) {
     const { baseUrl, close } = await startPreview(null, ctx)
     for (const storyFile of ctx.storyFiles) {
       const story = storyFile.story
+      if (!story) {
+        continue
+      }
       for (const variant of story.variants) {
         const query = new URLSearchParams()
         query.append('storyId', story.id)

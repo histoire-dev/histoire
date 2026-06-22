@@ -44,7 +44,7 @@ export function getSerializedStoryData(ctx: Context): SerializedStoryData {
               isRelatedToStory: storyFile.markdownFile.isRelatedToStory,
               frontmatter: storyFile.markdownFile.frontmatter,
             }
-          : null,
+          : undefined,
       })
     }
   }

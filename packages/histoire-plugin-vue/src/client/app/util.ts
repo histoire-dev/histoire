@@ -27,7 +27,7 @@ export function toRawDeep(val, seen = new WeakMap()) {
   }
 
   if (Array.isArray(unwrappedValue)) {
-    const result = []
+    const result: any[] = []
     seen.set(unwrappedValue, result)
     result.push(...unwrappedValue.map(value => toRawDeep(value, seen)))
     return result
@@ -65,7 +65,7 @@ export function _toRawDeep(val, seen = new WeakMap()) {
   }
 
   if (Array.isArray(unwrappedValue)) {
-    const result = []
+    const result: any[] = []
     seen.set(unwrappedValue, result)
     result.push(...unwrappedValue.map(value => _toRawDeep(value, seen)))
     return result

@@ -17,6 +17,6 @@ export async function previewCommand(options: PreviewOptions) {
     }
   }
 
-  const { baseUrl } = await startPreview(options.port, ctx)
+  const { baseUrl } = await startPreview(options.port ?? null, ctx)
   console.log(`Preview server listening on ${pc.cyan(baseUrl)}`)
 }

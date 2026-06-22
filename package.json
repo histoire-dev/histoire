@@ -2,7 +2,7 @@
   "name": "histoire-monorepo",
   "version": "1.0.0-beta.1",
   "private": true,
-  "packageManager": "pnpm@10.33.0+sha512.10568bb4a6afb58c9eb3630da90cc9516417abebd3fabbe6739f0ae795728da1491e9db5a544c76ad8eb7570f5c4bb3d6c637b2cb41bfdcdb47fa823c8649319",
+  "packageManager": "pnpm@11.8.0",
   "repository": {
     "url": "https://github.com/Akryum/histoire.git",
     "type": "git"
@@ -41,35 +41,5 @@
     "typescript": "catalog:",
     "vitepress": "1.5.0",
     "vue-eslint-parser": "^9.4.3"
-  },
-  "pnpm": {
-    "peerDependencyRules": {
-      "ignoreMissing": [
-        "@algolia/client-search",
-        "@types/react",
-        "eslint",
-        "react",
-        "react-dom",
-        "vue",
-        "vue-template-compiler",
-        "webpack"
-      ],
-      "allowedVersions": {
-        "eslint": "*",
-        "eslint-plugin-promise": "*",
-        "eslint-plugin-vue": "*",
-        "vite": "^7.0.0 || ^8.0.0",
-        "vue": "*"
-      }
-    },
-    "onlyBuiltDependencies": [
-      "@parcel/watcher",
-      "cypress",
-      "esbuild",
-      "puppeteer",
-      "svelte-preprocess",
-      "unrs-resolver",
-      "vue-demi"
-    ]
   }
 }

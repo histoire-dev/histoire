@@ -1,8 +1,15 @@
 import fs from 'node:fs'
+import { fileURLToPath } from 'node:url'
 import { globbySync } from 'globby'
 import { defineConfig } from 'vite'
+import pkg from './package.json'
+
+const packageRoot = fileURLToPath(new URL('.', import.meta.url))
+const sourceRoot = fileURLToPath(new URL('src', import.meta.url))
 
 export default defineConfig({
+  root: packageRoot,
+
   plugins: [
     {
       name: 'histoire:preserve:import.dynamic',
@@ -16,7 +23,10 @@ export default defineConfig({
       },
       closeBundle() {
         try {
-          const files = globbySync('./dist/**/*.js')
+          const files = globbySync('dist/**/*.js', {
+            absolute: true,
+            cwd: packageRoot,
+          })
           for (const file of files) {
             const content = fs.readFileSync(file, 'utf-8')
             if (content.includes('import__dyn')) {
@@ -38,11 +48,12 @@ export default defineConfig({
       entry: '',
       formats: ['es'],
     },
-    rollupOptions: {
+    rolldownOptions: {
       external: [
+        ...Object.keys(pkg.dependencies).map(dep => new RegExp(`^${dep}(\\/?)`)),
+        ...Object.keys(pkg.peerDependencies).map(dep => new RegExp(`^${dep}(\\/?)`)),
         /\$histoire/,
         /@histoire/,
-        'vue',
       ],
 
       input: [
@@ -61,7 +72,7 @@ export default defineConfig({
         assetFileNames: '[name][extname]',
         // hoistTransitiveImports: false,
         preserveModules: true,
-        preserveModulesRoot: 'src',
+        preserveModulesRoot: sourceRoot,
       },
       treeshake: false,
       preserveEntrySignatures: 'strict',

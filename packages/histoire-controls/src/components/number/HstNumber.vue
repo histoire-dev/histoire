@@ -6,7 +6,7 @@ export default {
 </script>
 
 <script lang="ts" setup>
-import { computed, onUnmounted, ref } from 'vue'
+import { onUnmounted, ref } from 'vue'
 import HstWrapper from '../HstWrapper.vue'
 
 const props = defineProps<{
@@ -14,22 +14,13 @@ const props = defineProps<{
   modelValue?: number | null
 }>()
 
-const emit = defineEmits({
-  'update:modelValue': (newValue: number) => true,
-})
-
-const numberModel = computed({
-  get: () => props.modelValue,
-  set: (value) => {
-    emit('update:modelValue', value)
-  },
-})
+const value = defineModel<number>({ default: 0 })
 
 const input = ref<HTMLInputElement>()
 
 function focusAndSelect() {
-  input.value.focus()
-  input.value.select()
+  input.value?.focus()
+  input.value?.select()
 }
 
 // Drag to modify
@@ -41,17 +32,17 @@ let startValue: number
 function onMouseDown(event: MouseEvent) {
   isDragging.value = true
   startX = event.clientX
-  startValue = numberModel.value
+  startValue = value.value
   window.addEventListener('mousemove', onMouseMove)
   window.addEventListener('mouseup', stopDragging)
 }
 
 function onMouseMove(event: MouseEvent) {
-  let step = Number.parseFloat(input.value.step)
+  let step = Number.parseFloat(input.value?.step ?? '1')
   if (Number.isNaN(step)) {
     step = 1
   }
-  numberModel.value = startValue + Math.round((event.clientX - startX) / 10 / step) * step
+  value.value = startValue + Math.round((event.clientX - startX) / 10 / step) * step
 }
 
 function stopDragging() {
@@ -80,7 +71,7 @@ onUnmounted(() => {
     <input
       ref="input"
       v-bind="{ ...$attrs, class: null, style: null }"
-      v-model.number="numberModel"
+      v-model.number="value"
       type="number"
       :class="{
         'htw-select-none': isDragging,

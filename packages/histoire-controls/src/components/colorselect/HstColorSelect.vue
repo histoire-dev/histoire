@@ -6,24 +6,13 @@ export default {
 </script>
 
 <script lang="ts" setup>
-import { computed } from 'vue'
 import HstWrapper from '../HstWrapper.vue'
 
 const props = defineProps<{
   title?: string
-  modelValue?: string | null
 }>()
 
-const emit = defineEmits({
-  'update:modelValue': (newValue: string) => true,
-})
-
-const stringModel = computed({
-  get: () => props.modelValue,
-  set: value => {
-    emit('update:modelValue', value)
-  },
-})
+const value = defineModel<string>({ default: '' })
 
 function throttle(cb, delay = 15) {
   let shouldWait = false
@@ -31,7 +20,8 @@ function throttle(cb, delay = 15) {
   const timeoutFunc = () => {
     if (waitingArgs == null) {
       shouldWait = false
-    } else {
+    }
+    else {
       cb(...waitingArgs)
       waitingArgs = null
       setTimeout(timeoutFunc, delay)
@@ -49,16 +39,12 @@ function throttle(cb, delay = 15) {
     setTimeout(timeoutFunc, delay)
   }
 }
-const updateValue = throttle((value: string) => {
-  emit('update:modelValue', value)
+const updateValue = throttle((newValue: string) => {
+  value.value = newValue
 })
 function processChange(inp) {
   updateValue(inp)
 }
-</script>
-
-<script>
-
 </script>
 
 <template>
@@ -71,13 +57,13 @@ function processChange(inp) {
     <div class="htw-flex htw-flex-row htw-gap-1">
       <input
         v-bind="{ ...$attrs, class: null, style: null }"
-        v-model="stringModel"
+        v-model="value"
         type="text"
         class="htw-text-inherit htw-bg-transparent htw-w-full htw-outline-none htw-px-2 htw-py-1 -htw-my-1 htw-border htw-border-solid htw-border-black/25 dark:htw-border-white/25 focus:htw-border-primary-500 dark:focus:htw-border-primary-500 htw-rounded-sm"
       >
       <input
         type="color"
-        :value="modelValue"
+        :value="value"
         @input="((e) => processChange((e.target as HTMLInputElement).value as string))"
       >
     </div>

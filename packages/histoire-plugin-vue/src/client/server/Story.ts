@@ -68,7 +68,7 @@ export default defineComponent({
       meta: props.meta,
       variants: [],
     }
-    const addStory = inject('addStory', null)
+    const addStory = inject<(story: ServerStory) => void>('addStory')
     addStory?.(story)
 
     // Variants

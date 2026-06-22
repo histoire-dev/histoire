@@ -42,15 +42,15 @@ const PreviewHostRoot = defineComponent({
   setup(props) {
     provideRenderContext(props.renderContext)
 
-    return () => h(props.story.file.component, {
+    return () => h(props.story.file!.component, {
       story: props.story,
     })
   },
 })
 
 export function createPreviewHost(options: PreviewHostOptions) {
-  let app: App = null
-  let target: HTMLDivElement = null
+  let app: App | null = null
+  let target: HTMLDivElement | null = null
 
   async function mount() {
     const wrappers: Component[] = []
@@ -89,7 +89,7 @@ export function createPreviewHost(options: PreviewHostOptions) {
     const setupApi: Vue3StorySetupApi = {
       app,
       story: options.getStory(),
-      variant: options.getVariant(),
+      variant: options.getVariant() ?? undefined,
       addWrapper: (wrapper) => {
         wrappers.unshift(wrapper)
       },
