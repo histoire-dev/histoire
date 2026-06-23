@@ -17,34 +17,52 @@
   },
   "sideEffects": false,
   "exports": {
-    "./floating-vue": "./dist/client/b-floating-vue.js",
-    "./iconify": "./dist/client/b-iconify.js",
-    "./pinia": "./dist/client/b-pinia.js",
-    "./scroll": "./dist/client/b-scroll.js",
-    "./vue-router": "./dist/client/b-vue-router.js",
-    "./vue-use": "./dist/client/b-vue-use.js",
-    "./vue": "./dist/client/b-vue.js",
+    "./floating-vue": {
+      "types": "./dist/client/b-floating-vue.d.ts",
+      "default": "./dist/client/b-floating-vue.js"
+    },
+    "./iconify": {
+      "types": "./dist/client/b-iconify.d.ts",
+      "default": "./dist/client/b-iconify.js"
+    },
+    "./pinia": {
+      "types": "./dist/client/b-pinia.d.ts",
+      "default": "./dist/client/b-pinia.js"
+    },
+    "./scroll": {
+      "types": "./dist/client/b-scroll.d.ts",
+      "default": "./dist/client/b-scroll.js"
+    },
+    "./vue-router": {
+      "types": "./dist/client/b-vue-router.d.ts",
+      "default": "./dist/client/b-vue-router.js"
+    },
+    "./vue-use": {
+      "types": "./dist/client/b-vue-use.d.ts",
+      "default": "./dist/client/b-vue-use.js"
+    },
+    "./vue": {
+      "types": "./dist/client/b-vue.d.ts",
+      "default": "./dist/client/b-vue.js"
+    },
     "./*": "./*"
   },
   "scripts": {
-    "build": "rimraf dist && rollup -c rollup.config.mjs"
+    "build": "rimraf dist && rolldown -c rolldown.config.mjs"
+  },
+  "dependencies": {
+    "@iconify/vue": "^4.1.2",
+    "@vueuse/core": "catalog:",
+    "floating-vue": "5.2.2",
+    "pinia": "^2.3.0",
+    "scroll-into-view-if-needed": "^3.1.0",
+    "vue": "^3.5.38",
+    "vue-router": "^4.6.4"
   },
   "devDependencies": {
-    "@iconify/vue": "^4.1.2",
-    "@rollup/plugin-commonjs": "^28.0.1",
-    "@rollup/plugin-node-resolve": "^15.3.0",
     "@types/node": "^22.10.1",
-    "@vueuse/core": "catalog:",
-    "execa": "^9.5.1",
-    "floating-vue": "5.2.2",
-    "fs-extra": "^11.2.0",
-    "globby": "^14.0.2",
-    "pinia": "^2.3.0",
-    "rollup": "^4.28.0",
-    "rollup-plugin-typescript2": "^0.36.0",
-    "scroll-into-view-if-needed": "^3.1.0",
-    "typescript": "catalog:",
-    "vue": "^3.5.26",
-    "vue-router": "^4.5.0"
+    "rolldown": "^1.0.3",
+    "rolldown-plugin-dts": "^0.26.0",
+    "typescript": "catalog:"
   }
 }

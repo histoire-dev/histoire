@@ -40,7 +40,7 @@ export default _defineComponent({
 
   setup(props, { emit }) {
     const sandbox = _ref<HTMLDivElement>()
-    let host: ReturnType<typeof createPreviewHost>
+    let host: ReturnType<typeof createPreviewHost> | null = null
     let mounting = false
 
     const externalState = reactive<Variant['state']>({})
@@ -75,7 +75,7 @@ export default _defineComponent({
 
       host = createPreviewHost({
         name: 'RenderStorySubApp',
-        el: sandbox.value,
+        el: sandbox.value!,
         getStory: () => props.story,
         getVariant: () => props.variant,
         renderContext,

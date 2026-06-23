@@ -8,7 +8,7 @@ export async function storySource(ctx: Context, id: string) {
   if (storyFile) {
     let source: string
     if (storyFile.virtual) {
-      source = storyFile.moduleCode
+      source = storyFile.moduleCode!
     }
     else {
       source = await fs.readFile(resolve(ctx.root, storyFile.relativePath), 'utf-8')

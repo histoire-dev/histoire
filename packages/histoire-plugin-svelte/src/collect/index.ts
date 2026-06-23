@@ -12,8 +12,8 @@ import {
 import Story from './Story.svelte'
 import Variant from './Variant.svelte'
 
-export async function run({ file, el, storyData }: ServerRunPayload) {
-  const { default: Comp } = await import(/* @vite-ignore */ file.moduleId)
+export async function run({ file, storyModule, el, storyData }: ServerRunPayload) {
+  const { default: Comp } = (storyModule ?? await import(/* @vite-ignore */ file.moduleId)) as { default: any }
 
   const mountedApp = await mountSvelteComponent(Comp, {
     target: el,

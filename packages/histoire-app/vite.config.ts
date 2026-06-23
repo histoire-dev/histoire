@@ -52,7 +52,7 @@ export default defineConfig({
       entry: '',
       formats: ['es'],
     },
-    rollupOptions: {
+    rolldownOptions: {
       external: [
         /\$histoire/,
         /@histoire/,

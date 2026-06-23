@@ -15,7 +15,6 @@ const props = withDefaults(defineProps<{
   getName?: (key: string, value: string | number | any[] | Record<string, any>) => string
 }>(), {
   colSize: 180,
-  getName: null,
 })
 
 const processedTokens = computed(() => {
@@ -33,7 +32,7 @@ const processedTokens = computed(() => {
 
 const colSizePx = computed(() => `${props.colSize}px`)
 
-const hover = ref<string>(null)
+const hover = ref<string | null>(null)
 </script>
 
 <template>
@@ -56,7 +55,7 @@ const hover = ref<string>(null)
       <div>
         <div class="htw-flex htw-gap-1">
           <pre
-            v-tooltip="token.name.length > colSize / 8 ? token.name : ''"
+            v-tooltip="token.name.length > colSize! / 8 ? token.name : ''"
             class="htw-my-0 htw-truncate htw-shrink"
           >{{ token.name }}</pre>
           <HstCopyIcon
@@ -67,7 +66,7 @@ const hover = ref<string>(null)
         </div>
         <div class="htw-flex htw-gap-1">
           <pre
-            v-tooltip="token.value.length > colSize / 8 ? token.value : ''"
+            v-tooltip="token.value.length > colSize! / 8 ? token.value : ''"
             class="htw-my-0 htw-opacity-50 htw-truncate htw-shrink"
           >{{ token.value }}</pre>
           <HstCopyIcon

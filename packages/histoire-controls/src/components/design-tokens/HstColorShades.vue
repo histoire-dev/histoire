@@ -47,7 +47,7 @@ const displayedShades = computed(() => {
   return list
 })
 
-const hover = ref<string>(null)
+const hover = ref<string | null>(null)
 </script>
 
 <template>

@@ -8,8 +8,8 @@ import { createApp, h } from 'vue'
 import Story from './Story'
 import Variant from './Variant'
 
-export async function run({ file, storyData, el }: ServerRunPayload) {
-  const { default: Comp } = await import(/* @vite-ignore */ file.moduleId)
+export async function run({ file, storyModule, storyData, el }: ServerRunPayload) {
+  const { default: Comp } = (storyModule ?? await import(/* @vite-ignore */ file.moduleId)) as { default: any }
 
   const app = createApp({
     provide: {
@@ -33,8 +33,8 @@ export async function run({ file, storyData, el }: ServerRunPayload) {
 
   const setupApi: Vue3StorySetupApi = {
     app,
-    story: null,
-    variant: null,
+    story: undefined,
+    variant: undefined,
     addWrapper: () => { /* noop */ },
   }
 

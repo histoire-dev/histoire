@@ -7,19 +7,17 @@
       "ESNext",
       "DOM"
     ],
-    "baseUrl": ".",
     "rootDir": "src",
     "module": "ESNext",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     // Alias
     "paths": {
-      "floating-vue": ["node_modules/@histoire/vendors/floating-vue"],
-      "@iconify/vue": ["node_modules/@histoire/vendors/iconify"],
-      "pinia": ["node_modules/@histoire/vendors/pinia"],
-      "scroll-into-view-if-needed": ["node_modules/@histoire/vendors/scroll"],
-      "vue-router": ["node_modules/@histoire/vendors/vue-router"],
-      "@vueuse/core": ["node_modules/@histoire/vendors/vue-use"],
-      "vue": ["node_modules/@histoire/vendors/vue"]
+      "floating-vue": ["./node_modules/@histoire/vendors/node_modules/floating-vue"],
+      "@iconify/vue": ["./node_modules/@histoire/vendors/node_modules/@iconify/vue"],
+      "pinia": ["./node_modules/@histoire/vendors/node_modules/pinia"],
+      "scroll-into-view-if-needed": ["./node_modules/@histoire/vendors/node_modules/scroll-into-view-if-needed"],
+      "@vueuse/core": ["./node_modules/@histoire/vendors/node_modules/@vueuse/core"],
+      "vue": ["./node_modules/@histoire/vendors/node_modules/vue"]
     },
     "resolveJsonModule": true,
     "strictBindCallApply": true,

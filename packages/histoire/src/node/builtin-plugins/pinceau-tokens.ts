@@ -22,7 +22,7 @@ export function pinceauTokens(_options: PinceauTokensOptions = {}): Plugin {
       api.addStoryFile(storyFile)
     }
     catch (e) {
-      api.error(e.stack ?? e.message)
+      api.error(e instanceof Error ? e.stack ?? e.message : e)
     }
   }
 

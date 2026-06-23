@@ -16,7 +16,7 @@ export function createVirtualFilesPlugin(ctx: Context, isServer: boolean) {
       if (id.startsWith(VirtualFiles.SETUP_ID)) {
         const setupFileConfig = ctx.config.setupFile
         if (setupFileConfig) {
-          let file: string
+          let file: string | undefined
           if (typeof setupFileConfig === 'string') {
             file = setupFileConfig
           }

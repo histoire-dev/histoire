@@ -8,23 +8,20 @@ export default {
 import { computed, ref, watch } from 'vue'
 
 const props = defineProps<{
-  modelValue?: boolean
   withToggle?: boolean
 }>()
 
-const emit = defineEmits({
-  'update:modelValue': (newValue: boolean) => true,
-})
+const value = defineModel<boolean>({ default: false })
 
 function toggle() {
   if (!props.withToggle) {
     return
   }
 
-  emit('update:modelValue', !props.modelValue)
+  value.value = !value.value
 }
 
-watch(() => props.modelValue, () => {
+watch(() => value.value, () => {
   animationEnabled.value = true
 })
 
@@ -32,14 +29,14 @@ watch(() => props.modelValue, () => {
 
 const path = ref<SVGPathElement>()
 const dasharray = ref(0)
-const progress = computed(() => props.modelValue ? 1 : 0)
+const progress = computed(() => value.value ? 1 : 0)
 const dashoffset = computed(() => (1 - progress.value) * dasharray.value)
 
 // animationEnabled prevents the animation from triggering on mounted
 const animationEnabled = ref(false)
 
 watch(path, () => {
-  dasharray.value = path.value.getTotalLength?.() ?? 21.21
+  dasharray.value = path.value?.getTotalLength?.() ?? 21.21
 })
 </script>
 

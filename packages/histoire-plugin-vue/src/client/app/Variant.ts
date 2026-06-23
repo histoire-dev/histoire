@@ -54,13 +54,13 @@ export default defineComponent({
     const attrs = useAttrs() as {
       variant?: Variant
     }
-    const vm = getCurrentInstance()
-    const story = inject<ComputedRef<any>>('story')
+    const vm = getCurrentInstance()!
+    const story = inject<ComputedRef<any>>('story')!
     const implicitState = inject<() => any>('implicitState')
     const renderContext = useRenderContext()
     let lastPropsTypesSnapshot: string
-    let renderVariant: Variant
-    let renderStateSync: ReturnType<typeof syncStateBundledAndExternal>
+    let renderVariant: Variant | undefined
+    let renderStateSync: ReturnType<typeof syncStateBundledAndExternal> | null = null
 
     const mountVariant = computed(() => attrs.variant)
 
@@ -75,7 +75,7 @@ export default defineComponent({
 
     function updateVariant(variant: Variant) {
       Object.assign(variant, {
-        slots: () => vm.proxy.$slots,
+        slots: () => vm.proxy!.$slots,
         source: props.source,
         responsiveDisabled: props.responsiveDisabled,
         autoPropsDisabled: props.autoPropsDisabled,
@@ -84,7 +84,7 @@ export default defineComponent({
         configReady: true,
       })
 
-      if (!props.implicit && !story.value?.meta?.hasVariantChildComponents) {
+      if (!props.implicit && !story.value.meta?.hasVariantChildComponents) {
         if (!story.value.meta) {
           story.value.meta = {}
         }
@@ -105,33 +105,36 @@ export default defineComponent({
       }
 
       if (!renderVariant) {
-        renderVariant = story.value?.variants[renderContext.nextVariantIndex.value]
-        renderContext.nextVariantIndex.value++
+        renderVariant = story.value.variants[renderContext!.nextVariantIndex.value]
+        renderContext!.nextVariantIndex.value++
       }
 
       return renderVariant
     }
 
     function renderVariantSlot(variant: Variant) {
-      if (renderContext.slotName === 'controls') {
-        return vm.proxy.$slots.controls?.({
-          state: renderContext.externalState,
+      const context = renderContext!
+      const proxy = vm.proxy!
+
+      if (context.slotName === 'controls') {
+        return proxy.$slots.controls?.({
+          state: context.externalState,
         }) ?? null
       }
 
-      if (renderContext.slotName !== 'default') {
+      if (context.slotName !== 'default') {
         return null
       }
 
-      const vnodes = vm.proxy.$slots.default?.({
-        state: renderContext.externalState,
+      const vnodes = proxy.$slots.default?.({
+        state: context.externalState,
       }) ?? null
 
       if (vnodes && !variant.autoPropsDisabled) {
         lastPropsTypesSnapshot = syncVariantAutoProps(
           variant,
           vnodes,
-          renderContext.externalState,
+          context.externalState,
           lastPropsTypesSnapshot,
         )
       }

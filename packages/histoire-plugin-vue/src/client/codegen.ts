@@ -7,7 +7,7 @@ import { camelCase, pascalCase } from 'change-case'
 import { Text, vModelCheckbox, vModelDynamic, vModelRadio, vModelSelect, vModelText } from 'vue'
 
 export async function generateSourceCode(variant: Variant) {
-  const vnode = variant.slots().default?.({ state: variant.state ?? {} }) ?? []
+  const vnode = variant.slots?.().default?.({ state: variant.state ?? {} }) ?? []
   const list = Array.isArray(vnode) ? vnode : [vnode]
   const lines: string[] = []
   for (const n in list) {
@@ -17,7 +17,7 @@ export async function generateSourceCode(variant: Variant) {
   return lines.join('\n')
 }
 
-async function printVNode(vnode: VNode, propsOverrides: Record<string, any> = null): Promise<{ lines: string[], isText?: boolean }> {
+async function printVNode(vnode: VNode, propsOverrides: Record<string, any> | null = null): Promise<{ lines: string[], isText?: boolean }> {
   if (vnode.type === Text) {
     return {
       // @ts-expect-error TODO
@@ -43,7 +43,7 @@ async function printVNode(vnode: VNode, propsOverrides: Record<string, any> = nu
     ]
 
     // Directives
-    function genDirective(dirName: string, dir, valueCode: string = null) {
+    function genDirective(dirName: string, dir, valueCode: string | null = null) {
       let modifiers = ''
       for (const key in dir.modifiers) {
         if (dir.modifiers[key]) {
@@ -77,10 +77,11 @@ async function printVNode(vnode: VNode, propsOverrides: Record<string, any> = nu
         // Vmodel
         if (dir.dir === vModelText || dir.dir === vModelSelect || dir.dir === vModelRadio || dir.dir === vModelCheckbox || dir.dir === vModelDynamic) {
           const listenerKeys = [`onUpdate:${dir.arg ?? 'modelValue'}`, `onUpdate:${camelCase(dir.arg ?? 'modelValue')}`]
-          const listenerKey = listenerKeys.find(key => vnode.props[key])
-          const listener = vnode.props[listenerKey]
-          let valueCode: string = null
-          if (listener) {
+          const vnodeProps = vnode.props ?? {}
+          const listenerKey = listenerKeys.find(key => vnodeProps[key])
+          const listener = listenerKey ? vnodeProps[listenerKey] : undefined
+          let valueCode: string | null = null
+          if (listenerKey && listener) {
             skipProps.push(listenerKey)
             const listenerSource = listener.toString()
             const result = /\(\$event\) => (.*?) = \$event/.exec(listenerSource)
@@ -94,7 +95,7 @@ async function printVNode(vnode: VNode, propsOverrides: Record<string, any> = nu
         else if (dir.instance._ || dir.instance.$) {
           // @ts-expect-error TODO
           const target = dir.instance.$ ?? dir.instance._
-          let dirName: string
+          let dirName: string | undefined
           for (const directives of [target.directives, target.appContext.directives]) {
             for (const key in directives) {
               if (directives[key] === dir.dir) {
@@ -137,9 +138,10 @@ async function printVNode(vnode: VNode, propsOverrides: Record<string, any> = nu
         if (directive === ':' && vmodelListener) {
           // Listener
           skipProps.push(vmodelListener)
-          const listener = vnode.props[vmodelListener]
+          const vnodeProps = vnode.props ?? {}
+          const listener = vnodeProps[vmodelListener]
           const listenerSource = listener.toString()
-          let valueCode: string
+          let valueCode: string | null = null
           const result = /\(\$event\) => (.*?) = \$event/.exec(listenerSource)
           if (result) {
             valueCode = result[1]
@@ -147,7 +149,7 @@ async function printVNode(vnode: VNode, propsOverrides: Record<string, any> = nu
 
           // Modifiers
           const modifiersKey = `${prop === 'modelValue' ? 'model' : prop}Modifiers`
-          const modifiers = vnode.props[modifiersKey] ?? {}
+          const modifiers = vnodeProps[modifiersKey] ?? {}
           skipProps.push(modifiersKey)
 
           // Directive
@@ -206,11 +208,11 @@ async function printVNode(vnode: VNode, propsOverrides: Record<string, any> = nu
       }
     }
 
-    for (const prop in vnode.props) {
+    for (const prop in vnode.props ?? {}) {
       if (skipProps.includes(prop) || (propsOverrides && prop in propsOverrides)) {
         continue
       }
-      const value = vnode.props[prop]
+      const value = vnode.props![prop]
       addAttr(prop, value)
     }
 
@@ -277,6 +279,7 @@ async function printVNode(vnode: VNode, propsOverrides: Record<string, any> = nu
             if (p === '__v_isRef') {
               return () => false
             }
+            return null
           })
           const children = vnode.children[key](autoObject.proxy)
           const slotLines: string[] = []

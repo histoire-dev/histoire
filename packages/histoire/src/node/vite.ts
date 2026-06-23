@@ -6,7 +6,7 @@ import type {
 import type { Context } from './context.js'
 import { createRequire } from 'node:module'
 import { lookup as lookupMime } from 'mrmime'
-import { dirname, join, relative } from 'pathe'
+import path, { dirname, join, relative } from 'pathe'
 import {
   loadConfigFromFile as loadViteConfigFromFile,
   mergeConfig as mergeViteConfig,
@@ -17,6 +17,25 @@ import { notifyStoryChange } from './stories.js'
 import { createVirtualFilesPlugin } from './virtual/vite-plugin.js'
 
 const require = createRequire(import.meta.url)
+
+const collectInlineDeps = [
+  /histoire\/dist/,
+  /histoire\/client/,
+  /@histoire\/[\w-]+\/dist/,
+  /histoire-[\w-]+\/dist/,
+  /@vue\/devtools-api/,
+  /vuetify/,
+  // @TODO temporary fix for https://github.com/histoire-dev/histoire/issues/409
+  /vite\w*\/dist\/client\/(client|env).mjs/,
+]
+
+const collectVueAliases = {
+  'vue': 'vue/dist/vue.runtime.esm-bundler.js',
+  '@vue/runtime-dom': '@vue/runtime-dom/dist/runtime-dom.esm-bundler.js',
+  '@vue/runtime-core': '@vue/runtime-core/dist/runtime-core.esm-bundler.js',
+  '@vue/reactivity': '@vue/reactivity/dist/reactivity.esm-bundler.js',
+  '@vue/shared': '@vue/shared/dist/shared.esm-bundler.js',
+}
 
 export async function mergeHistoireViteConfig(viteConfig: InlineConfig, ctx: Context) {
   if (ctx.config.vite) {
@@ -32,25 +51,29 @@ export async function mergeHistoireViteConfig(viteConfig: InlineConfig, ctx: Con
     }
   }
 
-  let flatPlugins = []
+  const flatPlugins: VitePlugin[] = []
   if (viteConfig.plugins) {
     for (const pluginOption of viteConfig.plugins) {
       const resolvedPluginOption = await pluginOption
       if (Array.isArray(resolvedPluginOption)) {
-        flatPlugins.push(...await Promise.all(resolvedPluginOption))
+        for (const plugin of await Promise.all(resolvedPluginOption)) {
+          if (plugin) {
+            flatPlugins.push(plugin as VitePlugin)
+          }
+        }
       }
-      else {
-        flatPlugins.push(resolvedPluginOption)
+      else if (resolvedPluginOption) {
+        flatPlugins.push(resolvedPluginOption as VitePlugin)
       }
     }
-    flatPlugins = flatPlugins.filter(Boolean)
   }
 
-  if (ctx.config.viteIgnorePlugins) {
-    flatPlugins = flatPlugins.filter(plugin => !ctx.config.viteIgnorePlugins.includes(plugin.name))
+  if (ctx.config.viteIgnorePlugins?.length) {
+    viteConfig.plugins = flatPlugins.filter(plugin => !ctx.config.viteIgnorePlugins!.includes(plugin.name))
   }
-
-  viteConfig.plugins = flatPlugins
+  else {
+    viteConfig.plugins = flatPlugins
+  }
 
   return viteConfig
 }
@@ -86,7 +109,7 @@ export async function getViteConfigWithPlugins(isServer: boolean, ctx: Context):
   })
 
   function optimizeDeps(deps: string[]): string[] {
-    const result = []
+    const result: string[] = []
     for (const dep of deps) {
       result.push(dep)
       try {
@@ -107,9 +130,14 @@ export async function getViteConfigWithPlugins(isServer: boolean, ctx: Context):
         resolve: {
           dedupe: [
             'vue',
+            '@vue/runtime-dom',
+            '@vue/runtime-core',
+            '@vue/reactivity',
+            '@vue/shared',
           ],
           alias: {
             'histoire-style': join(APP_PATH, process.env.HISTOIRE_DEV ? 'app/style/main.pcss' : 'style.css'),
+            ...(isServer ? collectVueAliases : {}),
           },
           ...(isServer
             ? {
@@ -118,23 +146,29 @@ export async function getViteConfigWithPlugins(isServer: boolean, ctx: Context):
               }
             : {}),
         },
-        optimizeDeps: {
-          entries: [
-            `${APP_PATH}/bundle-main.js`,
-            `${APP_PATH}/bundle-sandbox.js`,
-          ],
-          include: optimizeDeps([
-            'flexsearch',
-            'shiki',
-            // Shiki dependencies
-            'vscode-oniguruma',
-            'vscode-textmate',
-          ]),
-          exclude: [
-            'histoire',
-            '@histoire/vendors',
-          ],
-        },
+        optimizeDeps: isServer
+          ? {
+              entries: [],
+              include: [],
+              noDiscovery: true,
+            }
+          : {
+              entries: [
+                `${APP_PATH}/bundle-main.js`,
+                `${APP_PATH}/bundle-sandbox.js`,
+              ],
+              include: optimizeDeps([
+                'flexsearch',
+                'shiki',
+                // Shiki dependencies
+                'vscode-oniguruma',
+                'vscode-textmate',
+              ]),
+              exclude: [
+                'histoire',
+                '@histoire/vendors',
+              ],
+            },
         server: {
           fs: {
             allow: [
@@ -155,6 +189,24 @@ export async function getViteConfigWithPlugins(isServer: boolean, ctx: Context):
           },
           hmr: command === 'build' ? false : !isServer,
         },
+        ...(isServer
+          ? {
+              environments: {
+                client: {
+                  dev: {
+                    moduleRunnerTransform: true,
+                  },
+                },
+              },
+              ssr: {
+                noExternal: [
+                  ...collectInlineDeps,
+                  ...ctx.config.viteNodeInlineDeps ?? [],
+                  new RegExp(path.resolve(TEMP_PATH, 'plugins')),
+                ],
+              },
+            }
+          : {}),
         define: {
           // We need to force this to be able to use `devtoolsRawSetupState`
           '__VUE_PROD_DEVTOOLS__': 'true',
@@ -222,7 +274,7 @@ export async function getViteConfigWithPlugins(isServer: boolean, ctx: Context):
 </html>`
           // Apply Vite HTML transforms. This injects the Vite HMR client, and
           // also applies HTML transforms from Vite plugins
-          html = await server.transformIndexHtml(req.url, html)
+          html = await server.transformIndexHtml(req.url ?? '/', html)
           res.setHeader('content-type', 'text/html; charset=UTF-8')
           res.end(html)
           return
@@ -254,7 +306,7 @@ export async function getViteConfigWithPlugins(isServer: boolean, ctx: Context):
 </html>`
             // Apply Vite HTML transforms. This injects the Vite HMR client, and
             // also applies HTML transforms from Vite plugins
-            html = await server.transformIndexHtml(req.url, html)
+            html = await server.transformIndexHtml(req.url ?? '/', html)
             res.setHeader('content-type', 'text/html; charset=UTF-8')
             res.end(html)
             return

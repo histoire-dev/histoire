@@ -4,9 +4,17 @@ import { parseColor } from '../colors.js'
 export function resolvedTheme(ctx: Context) {
   let css = '*, ::before, ::after {'
   // Colors
-  for (const color in ctx.config.theme?.colors ?? {}) {
-    for (const key in ctx.config.theme.colors[color]) {
-      css += `--_histoire-color-${color}-${key}: ${parseColor(ctx.config.theme.colors[color][key]).color.join(' ')};`
+  const colors = ctx.config.theme.colors as Record<string, Record<string, string> | undefined> | undefined
+  for (const color in colors ?? {}) {
+    const shades = colors?.[color]
+    if (!shades) {
+      continue
+    }
+    for (const key in shades) {
+      const parsed = parseColor(shades[key])
+      if (parsed) {
+        css += `--_histoire-color-${color}-${key}: ${parsed.color.join(' ')};`
+      }
     }
   }
   css += '}'

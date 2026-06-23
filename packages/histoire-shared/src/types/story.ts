@@ -199,6 +199,7 @@ export type ServerTree = (ServerTreeGroup | ServerTreeFolder | ServerTreeLeaf)[]
 
 export interface ServerRunPayload {
   file: ServerStoryFile
+  storyModule?: Record<string, any>
   storyData: ServerStory[]
   el: HTMLElement
 }

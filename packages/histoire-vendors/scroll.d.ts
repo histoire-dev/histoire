@@ -1,4 +1,2 @@
-import Default from './dist/client/b-scroll'
-
-export default Default
+export { default } from './dist/client/b-scroll'
 export * from './dist/client/b-scroll'

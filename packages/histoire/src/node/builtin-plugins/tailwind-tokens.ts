@@ -1,6 +1,10 @@
 import type { Plugin, PluginApiBase } from '@histoire/shared'
+import { fileURLToPath } from 'node:url'
+import { createJiti } from 'jiti'
 import { findUp } from '../util/find-up.js'
 import { getInjectedImport } from '../util/vendors.js'
+
+const __filename = fileURLToPath(import.meta.url)
 
 export interface TailwindTokensOptions {
   configFile?: string
@@ -19,20 +23,27 @@ export function tailwindTokens(options: TailwindTokensOptions = {}): Plugin {
   ])
 
   async function generate(api: PluginApiBase) {
+    if (!tailwindConfigFile) {
+      return
+    }
+
     try {
       await api.fs.ensureDir(api.pluginTempDir)
       await api.fs.emptyDir(api.pluginTempDir)
       api.moduleLoader.clearCache()
       await api.fs.writeFile(api.path.resolve(api.pluginTempDir, 'style.css'), css)
-      const tailwindConfig = await api.moduleLoader.loadModule(tailwindConfigFile)
+      const jiti = createJiti(__filename, {
+        moduleCache: false,
+      })
       const { default: resolveConfig } = await import('tailwindcss/resolveConfig.js')
-      const resolvedTailwindConfig = resolveConfig(tailwindConfig.default ?? tailwindConfig)
+      const tailwindConfig = await jiti.import(tailwindConfigFile, { default: true }) as Parameters<typeof resolveConfig>[0]
+      const resolvedTailwindConfig = resolveConfig(tailwindConfig)
       const storyFile = api.path.resolve(api.pluginTempDir, 'Tailwind.story.js')
       await api.fs.writeFile(storyFile, storyTemplate(resolvedTailwindConfig))
       api.addStoryFile(storyFile)
     }
     catch (e) {
-      api.error(e.stack ?? e.message)
+      api.error(e instanceof Error ? e.stack ?? e.message : e)
     }
   }
 

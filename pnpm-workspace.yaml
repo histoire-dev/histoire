@@ -3,9 +3,41 @@ packages:
   - 'examples/*'
   - docs
 catalog:
-  '@vueuse/core': ^12.0.0
+  '@vueuse/core': ^14.3.0
   autoprefixer: ^10.4.20
   postcss: ^8.4.49
   tailwindcss: ^3.4.16
-  typescript: 5.6.3
-  vite: ^7.3.0
+  typescript: 6.0.3
+  vite: 8.0.16
+peerDependencyRules:
+  ignoreMissing:
+    - '@algolia/client-search'
+    - '@types/react'
+    - 'eslint'
+    - 'react'
+    - 'react-dom'
+    - 'vue'
+    - 'vue-template-compiler'
+    - 'webpack'
+  allowedVersions:
+    'eslint': '*'
+    'eslint-plugin-promise': '*'
+    'eslint-plugin-vue': '*'
+    'vite': '^8.0.0'
+    'vue': '*'
+onlyBuiltDependencies:
+  - '@parcel/watcher'
+  - 'cypress'
+  - 'esbuild'
+  - 'puppeteer'
+  - 'svelte-preprocess'
+  - 'unrs-resolver'
+  - 'vue-demi'
+allowBuilds:
+  '@parcel/watcher': true
+  cypress: true
+  esbuild: true
+  puppeteer: true
+  svelte-preprocess: true
+  unrs-resolver: true
+  vue-demi: true

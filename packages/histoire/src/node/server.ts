@@ -23,6 +23,7 @@ export async function createServer(ctx: Context, options: CreateServerOptions = 
     const { viteConfig, viteConfigFile } = await getViteConfigWithPlugins(collecting, ctx)
 
     if (!collecting) {
+      viteConfig.server ??= {}
       if (options.open) {
         viteConfig.server.open = true
       }
@@ -34,7 +35,15 @@ export async function createServer(ctx: Context, options: CreateServerOptions = 
 
     const server = await createViteServer(
       mergeViteConfig(viteConfig, {
-        optimizeDeps: { include: viteConfig.optimizeDeps?.include ?? [], noDiscovery: collecting },
+        optimizeDeps: collecting
+          ? {
+              entries: [],
+              include: [],
+              noDiscovery: true,
+            }
+          : {
+              include: viteConfig.optimizeDeps?.include ?? [],
+            },
       }),
     )
     await server.pluginContainer.buildStart({})

@@ -59,8 +59,12 @@ export async function createMarkdownRenderer(ctx: Context) {
       const hrefIndex = token.attrIndex('href')
       const classIndex = token.attrIndex('class')
 
-      if (hrefIndex >= 0) {
-        const href = token.attrs[hrefIndex][1]
+      if (hrefIndex >= 0 && token.attrs) {
+        const hrefAttr = token.attrs[hrefIndex]
+        if (!hrefAttr) {
+          return defaultRender(tokens, idx, options, env, self)
+        }
+        const href = hrefAttr[1]
         if (href.startsWith('.')) {
           const queryIndex = href.indexOf('?')
           const pathname = queryIndex >= 0 ? href.slice(0, queryIndex) : href
@@ -70,16 +74,17 @@ export async function createMarkdownRenderer(ctx: Context) {
           const file = path.resolve(path.dirname(env.file), pathname)
           const storyFile = ctx.storyFiles.find(f => f.path === file)
           const mdFile = ctx.markdownFiles.find(f => f.absolutePath === file)
-          if (!storyFile && !mdFile?.storyFile) {
+          const linkedStoryFile = storyFile ?? mdFile?.storyFile
+          if (!linkedStoryFile) {
             throw new Error(pc.red(`[md] Cannot find story file: ${pathname} from ${env.file}`))
           }
 
           // Add attributes
-          const newHref = `${ctx.resolvedViteConfig.base}story/${encodeURIComponent(storyFile?.id ?? mdFile.storyFile.id)}${query}`
+          const newHref = `${ctx.resolvedViteConfig.base}story/${encodeURIComponent(linkedStoryFile.id)}${query}`
           token.attrSet('href', newHref)
           token.attrSet('data-route', 'true')
         }
-        else if (!href.startsWith('/') && !href.startsWith('#') && (classIndex < 0 || !token.attrs[classIndex][1].includes('header-anchor'))) {
+        else if (!href.startsWith('/') && !href.startsWith('#') && (classIndex < 0 || !token.attrs[classIndex]?.[1].includes('header-anchor'))) {
           // Add target="_blank" to external links
           const aIndex = token.attrIndex('target')
 
@@ -87,7 +92,10 @@ export async function createMarkdownRenderer(ctx: Context) {
             token.attrPush(['target', '_blank']) // add new attribute
           }
           else {
-            token.attrs[aIndex][1] = '_blank' // replace value of existing attr
+            const targetAttr = token.attrs[aIndex]
+            if (targetAttr) {
+              targetAttr[1] = '_blank' // replace value of existing attr
+            }
           }
         }
       }
@@ -147,7 +155,7 @@ export async function createMarkdownFilesWatcher(ctx: Context) {
         return false
       }
 
-      return stats?.isFile()
+      return stats?.isFile() ?? false
     },
   })
 
@@ -219,8 +227,8 @@ export async function createMarkdownFilesWatcher(ctx: Context) {
   function removeFile(relativePath: string) {
     const index = ctx.markdownFiles.findIndex(file => file.relativePath === relativePath)
     if (index !== -1) {
-      const file = ctx.markdownFiles[index]
-      if (!file.isRelatedToStory) {
+      const file = ctx.markdownFiles[index]!
+      if (!file.isRelatedToStory && file.storyFile) {
         removeStory(file.storyFile.relativePath)
         notifyStoryChange()
       }
@@ -248,7 +256,7 @@ export async function createMarkdownFilesWatcher(ctx: Context) {
   try {
     // Render markdown after initial scan is complete.
     for (const mdFile of ctx.markdownFiles) {
-      mdFile.html = md.render(mdFile.content, {
+      mdFile.html = md.render(mdFile.content!, {
         file: mdFile.absolutePath,
       })
     }

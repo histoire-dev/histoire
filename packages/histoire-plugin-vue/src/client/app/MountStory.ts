@@ -34,12 +34,12 @@ export default _defineComponent({
         value: 0,
       },
     })
-    let host: ReturnType<typeof createPreviewHost>
+    let host: ReturnType<typeof createPreviewHost> | null = null
 
     async function mountStory() {
       host = createPreviewHost({
         name: 'MountStorySubApp',
-        el: el.value,
+        el: el.value!,
         getStory: () => props.story,
         getVariant: () => null,
         renderContext,

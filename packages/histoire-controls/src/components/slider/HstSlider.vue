@@ -7,33 +7,24 @@ export default {
 
 <script lang="ts" setup>
 import type { CSSProperties } from 'vue'
-import { VTooltip as vTooltip } from 'floating-vue'
-import { computed, ref } from 'vue'
+import { vTooltip } from 'floating-vue'
+import { computed, ref, useTemplateRef } from 'vue'
+
 import HstWrapper from '../HstWrapper.vue'
 
 const props = defineProps<{
   title?: string
-  modelValue?: number | null
   min: number
   max: number
 }>()
 
-const emit = defineEmits({
-  'update:modelValue': (newValue: number) => true,
-})
+const value = defineModel<number>({ default: 0 })
 
 const showTooltip = ref(false)
-const input = ref<HTMLInputElement>(null)
-
-const numberModel = computed({
-  get: () => props.modelValue,
-  set: (value) => {
-    emit('update:modelValue', value)
-  },
-})
+const input = useTemplateRef<HTMLInputElement>('input')
 
 const percentage = computed(() => {
-  return (props.modelValue - props.min) / (props.max - props.min)
+  return (value.value - props.min) / (props.max - props.min)
 })
 
 const tooltipStyle = computed<CSSProperties>(() => {
@@ -61,7 +52,7 @@ const tooltipStyle = computed<CSSProperties>(() => {
       </div>
       <input
         ref="input"
-        v-model.number="numberModel"
+        v-model.number="value"
         class="htw-range-input htw-appearance-none htw-border-0 htw-bg-transparent htw-cursor-pointer htw-relative htw-w-full htw-m-0 htw-text-gray-700"
         type="range"
         v-bind="{ ...$attrs, class: null, style: null, min, max }"
@@ -70,7 +61,7 @@ const tooltipStyle = computed<CSSProperties>(() => {
       >
       <div
         v-if="showTooltip"
-        v-tooltip="{ content: modelValue.toString(), shown: true, distance: 16, delay: 0 }"
+        v-tooltip="{ content: value.toString(), shown: true, distance: 16, delay: 0 }"
         class="htw-absolute"
         :style="tooltipStyle"
       />

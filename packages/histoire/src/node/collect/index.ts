@@ -1,16 +1,19 @@
 import type { ServerStoryFile } from '@histoire/shared'
-import type { ViteDevServer } from 'vite'
-import type { FetchFunction, ResolveIdFunction } from 'vite-node'
+import type {
+  DevEnvironment,
+  FetchModuleOptions,
+  FetchResult,
+  ViteDevServer,
+} from 'vite'
 import type { Context } from '../context.js'
 import type { Payload, ReturnData } from './worker.js'
 import { cpus } from 'node:os'
 import { MessageChannel } from 'node:worker_threads'
 import Tinypool from '@akryum/tinypool'
 import { createBirpc } from 'birpc'
-import path, { relative } from 'pathe'
+import { relative } from 'pathe'
 import pc from 'picocolors'
-import { ViteNodeServer } from 'vite-node/server'
-import { TEMP_PATH } from '../alias.js'
+import { moduleRunnerTransform } from 'vite'
 import { createPath } from '../tree.js'
 import { slash } from '../util/fs.js'
 
@@ -20,27 +23,45 @@ export interface UseCollectStoriesOptions {
   throws?: boolean
 }
 
+type TBuiltinRpcValue = string | {
+  type: 'string'
+  value: string
+} | {
+  type: 'RegExp'
+  source: string
+  flags: string
+}
+
+export type TCollectRpc = {
+  fetchModule: (id: string, importer?: string, options?: FetchModuleOptions) => Promise<FetchResult>
+  getBuiltins: () => Promise<TBuiltinRpcValue[]>
+}
+
+const NOOP_VITE_CLIENT_ID = '\0histoire:collect-vite-client'
+const noopViteClientCode = `
+export class ErrorOverlay {}
+export function createHotContext() {
+  return {
+    data: {},
+    accept() {},
+    dispose() {},
+    prune() {},
+    decline() {},
+    invalidate() {},
+    on() {},
+    off() {},
+    send() {},
+  }
+}
+export function injectQuery(url) {
+  return url
+}
+export function removeStyle() {}
+export function updateStyle() {}
+`
+
 export function useCollectStories(options: UseCollectStoriesOptions, ctx: Context) {
   const { server, mainServer } = options
-
-  const node = new ViteNodeServer(server as any, {
-    deps: {
-      inline: [
-        /histoire\/dist/,
-        /histoire\/client/,
-        /@histoire\/[\w-]+\/dist/,
-        /histoire-[\w-]+\/dist/,
-        /@vue\/devtools-api/,
-        /vuetify/,
-        // @TODO temporary fix for https://github.com/histoire-dev/histoire/issues/409
-        /vite\w*\/dist\/client\/(client|env).mjs/,
-        ...ctx.config.viteNodeInlineDeps ?? [],
-        new RegExp(path.resolve(TEMP_PATH, 'plugins')),
-      ],
-      fallbackCJS: true,
-    },
-    transformMode: ctx.config.viteNodeTransformMode,
-  })
 
   const maxThreads = ctx.config.collectMaxThreads ?? cpus().length
 
@@ -59,7 +80,9 @@ export function useCollectStories(options: UseCollectStoriesOptions, ctx: Contex
 
   function clearCache() {
     server.moduleGraph.invalidateAll()
-    node.fetchCache.clear()
+    for (const environment of Object.values(server.environments)) {
+      environment.moduleGraph.invalidateAll()
+    }
   }
 
   function createChannel() {
@@ -67,12 +90,26 @@ export function useCollectStories(options: UseCollectStoriesOptions, ctx: Contex
     const port = channel.port2
     const workerPort = channel.port1
 
-    createBirpc<Record<string, never>, {
-      fetchModule: FetchFunction
-      resolveId: ResolveIdFunction
-    }>({
-      fetchModule: id => node.fetchModule(id),
-      resolveId: (id, importer) => node.resolveId(id, importer),
+    createBirpc<Record<string, never>, TCollectRpc>({
+      async fetchModule(id, importer, fetchOptions) {
+        if (isViteClientModule(id)) {
+          return fetchNoopViteClientModule(id)
+        }
+        return getFetchEnvironment(id).fetchModule(id, importer, fetchOptions)
+      },
+      getBuiltins: async () => server.environments.ssr.config.resolve.builtins.map((builtin) => {
+        if (typeof builtin === 'string') {
+          return {
+            type: 'string',
+            value: builtin,
+          }
+        }
+        return {
+          type: 'RegExp',
+          source: builtin.source,
+          flags: builtin.flags,
+        }
+      }),
     }, {
       post: data => port.postMessage(data),
       on: data => port.on('message', data),
@@ -98,8 +135,6 @@ export function useCollectStories(options: UseCollectStoriesOptions, ctx: Contex
     try {
       const { workerPort } = createChannel()
       const payload: Payload = {
-        root: server.config.root,
-        base: server.config.base,
         storyFile,
         port: workerPort,
       }
@@ -141,7 +176,7 @@ export function useCollectStories(options: UseCollectStoriesOptions, ctx: Contex
       storyFile.story.title = storyFile.treePath[storyFile.treePath.length - 1]
     }
     catch (e) {
-      console.error(pc.red(`Error while collecting story ${storyFile.path}:\n${e.frame ? `${pc.bold(e.message)}\n${e.frame}` : e.stack}`))
+      console.error(pc.red(`Error while collecting story ${storyFile.path}:\n${formatError(e)}`))
       if (options.throws) {
         throw e
       }
@@ -157,4 +192,45 @@ export function useCollectStories(options: UseCollectStoriesOptions, ctx: Contex
     executeStoryFile,
     destroy,
   }
+
+  function getFetchEnvironment(id: string): DevEnvironment {
+    if (isWebTransform(id)) {
+      return server.environments.client
+    }
+    return server.environments.ssr
+  }
+
+  function isWebTransform(id: string) {
+    const transformMode = ctx.config.viteNodeTransformMode
+    if (transformMode?.web?.some(pattern => pattern.test(id))) {
+      return true
+    }
+    if (transformMode?.ssr?.some(pattern => pattern.test(id))) {
+      return false
+    }
+    return !/\.([cm]?[jt]sx?|json)$/.test(id)
+  }
+}
+
+function isViteClientModule(id: string) {
+  const normalizedId = id.replace(/\\/g, '/').replace(/\?.*$/, '')
+  return normalizedId === '@vite/client'
+    || normalizedId === '/@vite/client'
+    || normalizedId.endsWith('/vite/dist/client/client.mjs')
+}
+
+async function fetchNoopViteClientModule(url: string): Promise<FetchResult> {
+  const result = await moduleRunnerTransform(noopViteClientCode, null, url, noopViteClientCode)
+  return {
+    code: result?.code ?? '',
+    file: null,
+    id: NOOP_VITE_CLIENT_ID,
+    url,
+    invalidate: false,
+  }
+}
+
+function formatError(error: unknown) {
+  const e = error as Error & { frame?: string }
+  return e.frame ? `${pc.bold(e.message)}\n${e.frame}` : e.stack ?? e.message ?? String(error)
 }

@@ -25,7 +25,7 @@ export default defineComponent({
   },
 
   setup(props) {
-    const vm = getCurrentInstance()
+    const vm = getCurrentInstance()!
 
     const attrs = useAttrs() as {
       story: Story
@@ -100,7 +100,7 @@ export default defineComponent({
       }
 
       Object.assign(attrs.story, {
-        slots: () => vm.proxy.$slots,
+        slots: () => vm.proxy!.$slots,
       })
     }
 
@@ -136,9 +136,9 @@ export default defineComponent({
               nextProps.initState = props.initState
             }
 
-            for (const attr in vm.proxy.$attrs) {
+            for (const attr in vm.proxy!.$attrs) {
               if (typeof vnode.props?.[attr] === 'undefined') {
-                nextProps[attr] = vm.proxy.$attrs[attr]
+                nextProps[attr] = vm.proxy!.$attrs[attr]
               }
             }
 
@@ -162,24 +162,27 @@ export default defineComponent({
         return result
       }
 
-      return applyAttrs(vm.proxy.$slots.default?.() ?? [])
+      return applyAttrs(vm.proxy!.$slots.default?.() ?? [])
     }
 
     function renderPreviewStory() {
-      renderContext.nextVariantIndex.value = 0
+      const context = renderContext!
+      const proxy = vm.proxy!
+
+      context.nextVariantIndex.value = 0
 
       const slotProps = {
-        state: renderContext.externalState,
+        state: context.externalState,
       }
 
-      const children = []
+      const children: VNode[] = []
 
-      if (renderContext.slotName === 'controls') {
-        children.push(...(vm.proxy.$slots.controls?.(slotProps) ?? []))
+      if (context.slotName === 'controls') {
+        children.push(...(proxy.$slots.controls?.(slotProps) ?? []))
       }
 
-      if (renderContext.slotName === 'default' || attrs.story.meta?.hasVariantChildComponents) {
-        children.push(...(vm.proxy.$slots.default?.(slotProps) ?? []))
+      if (context.slotName === 'default' || attrs.story.meta?.hasVariantChildComponents) {
+        children.push(...(proxy.$slots.default?.(slotProps) ?? []))
       }
 
       return children
