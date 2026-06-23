@@ -30,6 +30,14 @@ const collectInlineDeps = [
   /vite\w*\/dist\/client\/(client|env).mjs/,
 ]
 
+const collectVueAliases = {
+  vue: 'vue/dist/vue.runtime.esm-bundler.js',
+  '@vue/runtime-dom': '@vue/runtime-dom/dist/runtime-dom.esm-bundler.js',
+  '@vue/runtime-core': '@vue/runtime-core/dist/runtime-core.esm-bundler.js',
+  '@vue/reactivity': '@vue/reactivity/dist/reactivity.esm-bundler.js',
+  '@vue/shared': '@vue/shared/dist/shared.esm-bundler.js',
+}
+
 export async function mergeHistoireViteConfig(viteConfig: InlineConfig, ctx: Context) {
   if (ctx.config.vite) {
     const command = ctx.mode === 'dev' ? 'serve' : 'build'
@@ -123,14 +131,14 @@ export async function getViteConfigWithPlugins(isServer: boolean, ctx: Context):
         resolve: {
           dedupe: [
             'vue',
+            '@vue/runtime-dom',
+            '@vue/runtime-core',
+            '@vue/reactivity',
+            '@vue/shared',
           ],
           alias: {
             'histoire-style': join(APP_PATH, process.env.HISTOIRE_DEV ? 'app/style/main.pcss' : 'style.css'),
-            ...(isServer
-              ? {
-                  vue: 'vue/dist/vue.runtime.esm-bundler.js',
-                }
-              : {}),
+            ...(isServer ? collectVueAliases : {}),
           },
           ...(isServer
             ? {
