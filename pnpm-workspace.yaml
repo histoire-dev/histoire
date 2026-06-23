@@ -9,30 +9,30 @@ catalog:
   tailwindcss: ^3.4.16
   typescript: 6.0.3
   vite: 8.0.16
-"peerDependencyRules":
-  "ignoreMissing":
-    - "@algolia/client-search"
-    - "@types/react"
-    - "eslint"
-    - "react"
-    - "react-dom"
-    - "vue"
-    - "vue-template-compiler"
-    - "webpack"
-  "allowedVersions":
-    "eslint": "*"
-    "eslint-plugin-promise": "*"
-    "eslint-plugin-vue": "*"
-    "vite": "^8.0.0"
-    "vue": "*"
-"onlyBuiltDependencies":
-  - "@parcel/watcher"
-  - "cypress"
-  - "esbuild"
-  - "puppeteer"
-  - "svelte-preprocess"
-  - "unrs-resolver"
-  - "vue-demi"
+peerDependencyRules:
+  ignoreMissing:
+    - '@algolia/client-search'
+    - '@types/react'
+    - 'eslint'
+    - 'react'
+    - 'react-dom'
+    - 'vue'
+    - 'vue-template-compiler'
+    - 'webpack'
+  allowedVersions:
+    'eslint': '*'
+    'eslint-plugin-promise': '*'
+    'eslint-plugin-vue': '*'
+    'vite': '^8.0.0'
+    'vue': '*'
+onlyBuiltDependencies:
+  - '@parcel/watcher'
+  - 'cypress'
+  - 'esbuild'
+  - 'puppeteer'
+  - 'svelte-preprocess'
+  - 'unrs-resolver'
+  - 'vue-demi'
 allowBuilds:
   '@parcel/watcher': true
   cypress: true

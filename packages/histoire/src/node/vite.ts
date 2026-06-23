@@ -1,6 +1,5 @@
 import type {
   InlineConfig,
-  PluginOption,
   UserConfig as ViteConfig,
   Plugin as VitePlugin,
 } from 'vite'
@@ -31,7 +30,7 @@ const collectInlineDeps = [
 ]
 
 const collectVueAliases = {
-  vue: 'vue/dist/vue.runtime.esm-bundler.js',
+  'vue': 'vue/dist/vue.runtime.esm-bundler.js',
   '@vue/runtime-dom': '@vue/runtime-dom/dist/runtime-dom.esm-bundler.js',
   '@vue/runtime-core': '@vue/runtime-core/dist/runtime-core.esm-bundler.js',
   '@vue/reactivity': '@vue/reactivity/dist/reactivity.esm-bundler.js',
@@ -192,21 +191,21 @@ export async function getViteConfigWithPlugins(isServer: boolean, ctx: Context):
         },
         ...(isServer
           ? {
-            environments: {
-              client: {
-                dev: {
-                  moduleRunnerTransform: true,
+              environments: {
+                client: {
+                  dev: {
+                    moduleRunnerTransform: true,
+                  },
                 },
               },
-            },
-            ssr: {
-              noExternal: [
-                ...collectInlineDeps,
-                ...ctx.config.viteNodeInlineDeps ?? [],
-                new RegExp(path.resolve(TEMP_PATH, 'plugins')),
-              ],
-            },
-          }
+              ssr: {
+                noExternal: [
+                  ...collectInlineDeps,
+                  ...ctx.config.viteNodeInlineDeps ?? [],
+                  new RegExp(path.resolve(TEMP_PATH, 'plugins')),
+                ],
+              },
+            }
           : {}),
         define: {
           // We need to force this to be able to use `devtoolsRawSetupState`
