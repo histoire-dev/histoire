@@ -87,7 +87,7 @@ pnpm run lint
 
 We use [Vitest](https://vitest.dev/) to run unit tests on workspaces listed under the `packages` folder.
 
-For developping:
+For developing:
 
 ```sh
 # Root of the mono-repo
