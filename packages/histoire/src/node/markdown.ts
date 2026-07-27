@@ -134,21 +134,27 @@ export async function createMarkdownPlugins(ctx: Context) {
   return plugins
 }
 
+export function isMarkdownFileIgnored(ctx: Context, filePath: string, stats?: { isFile: () => boolean }) {
+  const relativePath = path.relative(ctx.root, filePath)
+  if (ctx.config.storyIgnored.some(pattern => (
+    micromatch.isMatch(relativePath, pattern, { dot: true })
+    || micromatch.isMatch(filePath, pattern, { dot: true })
+  ))) {
+    return true
+  }
+  if (micromatch.isMatch(relativePath, '**/*.story.md')) {
+    return false
+  }
+
+  return stats?.isFile() ?? false
+}
+
 export async function createMarkdownFilesWatcher(ctx: Context) {
   const md = await createMarkdownRendererWithPlugins(ctx)
 
   const watcher = chokidar.watch('.', {
     cwd: ctx.root,
-    ignored: (path, stats) => {
-      if (ctx.config.storyIgnored.some(pattern => micromatch.isMatch(path, pattern))) {
-        return true
-      }
-      if (micromatch.isMatch(path, '**/*.story.md')) {
-        return false
-      }
-
-      return stats?.isFile()
-    },
+    ignored: (filePath, stats) => isMarkdownFileIgnored(ctx, filePath, stats),
   })
 
   /**

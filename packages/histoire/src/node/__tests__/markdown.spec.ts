@@ -3,7 +3,7 @@ import { createWriteStream, unlinkSync } from 'node:fs'
 import path from 'node:path'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { createContext } from '../context.js'
-import { createMarkdownFilesWatcher } from '../markdown.js'
+import { createMarkdownFilesWatcher, isMarkdownFileIgnored } from '../markdown.js'
 import { watchStories } from '../stories.js'
 
 describe('markdown', async () => {
@@ -31,13 +31,21 @@ describe('markdown', async () => {
     // test 2 links to test1
     const { stop } = await createMarkdownFilesWatcher(ctx)
     expect(ctx.markdownFiles.length).toEqual(2)
-    stop()
+    await stop()
   })
 
   it('should render html from md', async () => {
     const { stop } = await createMarkdownFilesWatcher(ctx)
     expect(ctx.markdownFiles[0].html).toContain('<p>')
-    stop()
+    await stop()
+  })
+
+  it('ignores dependencies when the project root has a hidden parent', async () => {
+    const root = path.join(path.parse(ctx.root).root, '.worktrees', 'project')
+    ctx.root = root
+
+    expect(isMarkdownFileIgnored(ctx, path.join(root, 'node_modules', 'dependency'))).toBe(true)
+    expect(isMarkdownFileIgnored(ctx, path.join(root, 'example.story.md'), { isFile: () => true })).toBe(false)
   })
 
   it('should throw error on missing [md] story file.', async () => {
