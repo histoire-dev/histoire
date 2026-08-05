@@ -1,22 +1,32 @@
 /**
  * Minimal Vitest shape used for reporting unhandled browser-run errors without
- * coupling this helper to Vitest's concrete class types.
+ * coupling these helpers to Vitest's concrete class types.
  */
-interface VitestLike {
-  state: {
+export interface VitestLike {
+  state?: {
     getUnhandledErrors?: () => unknown[]
   }
 }
 
 /**
  * Extracts a readable error message from a Vitest error payload.
+ *
+ * Errors coming back from the browser are serialized plain objects, not `Error`
+ * instances: their stack is kept too, since it often carries the only mention of
+ * what actually broke (a nested cause, the failing module…).
  */
 export function formatVitestError(error: unknown): string {
   if (error instanceof Error) {
     return error.stack ?? error.message
   }
-  if (typeof error === 'object' && error && 'message' in error) {
-    return String((error as { message: unknown }).message)
+  if (typeof error === 'object' && error) {
+    const { stack, message } = error as { stack?: unknown, message?: unknown }
+    if (typeof stack === 'string' && stack) {
+      return stack
+    }
+    if (message !== undefined) {
+      return String(message)
+    }
   }
   return String(error)
 }
@@ -25,7 +35,7 @@ export function formatVitestError(error: unknown): string {
  * Returns all unhandled Vitest errors as printable strings.
  */
 export function getUnhandledVitestErrors(vitest: VitestLike): string[] {
-  return (vitest.state.getUnhandledErrors?.() ?? []).map(formatVitestError)
+  return (vitest.state?.getUnhandledErrors?.() ?? []).map(formatVitestError)
 }
 
 /**

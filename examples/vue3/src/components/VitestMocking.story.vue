@@ -33,5 +33,26 @@ onTest(({ canvas }) => {
     <Variant title="mocked module in story setup">
       <VitestMockedGreeting />
     </Variant>
+
+    <Variant
+      title="mocked with controls"
+      :init-state="() => ({ name: 'Histoire' })"
+    >
+      <template #default="{ state }">
+        <div data-test-id="controlled-name">
+          {{ state.name }}
+        </div>
+        <VitestMockedGreeting />
+      </template>
+
+      <!-- Rendered inside the controls sandbox iframe: this story's module
+           only executes where the Vitest mocker is active. -->
+      <template #controls="{ state }">
+        <HstText
+          v-model="state.name"
+          title="Name"
+        />
+      </template>
+    </Variant>
   </Story>
 </template>

@@ -1,37 +1,58 @@
-import fs from 'node:fs'
-import { resolve } from 'pathe'
 import { describe, expect, it } from 'vitest'
+import { readAppSource, readAppSourceEntries } from './utils/app-source.js'
+import { generatePreviewRuntimeSource } from './utils/preview-runtime-source.js'
 
-describe('story grid preview readiness', () => {
-  it('marks ready variant from sandbox event instead of current route variant', () => {
-    const componentPath = resolve(process.cwd(), '../histoire-app/src/app/components/story/StoryVariantGrid.vue')
-    const source = fs.readFileSync(componentPath, 'utf8')
+/**
+ * Source-level guards, deliberately NOT behavioral.
+ *
+ * The preview half lives in a generated source string whose imports only exist
+ * inside a live browser sandbox, and the host half in `.vue` single-file
+ * components this Node suite cannot compile. The composable they share IS
+ * driven behaviorally, in `preview-iframe-host.spec.ts`; what is pinned here is
+ * that the story views keep delegating to it, plus the readiness bookkeeping
+ * baked into the generated runtime.
+ */
 
-    expect(source).toContain('const variant = storyStore.getCurrentStoryVariantById(event.data.variantId)')
-    expect(source).toContain('if (!event.data.variantId)')
-    expect(source).not.toContain(`case SANDBOX_READY:
-      if (storyStore.currentVariant)`)
+describe('story views', () => {
+  it('keep the preview iframe protocol in one shared composable', () => {
+    // The readiness/state/selection protocol used to be copy-pasted in both
+    // story views and drifted between them.
+    const host = readAppSource('app/util/preview-iframe-host.ts')
+
+    // Vite hot listeners persist for the module's lifetime: without `off`,
+    // every story navigation leaks one handler holding the unmounted instance.
+    expect(host).toContain('import.meta.hot.on(STORY_CHANGED_EVENT, onStoryChanged)')
+    expect(host).toContain('import.meta.hot?.off(STORY_CHANGED_EVENT, onStoryChanged)')
+
+    // Scanned over the whole story component directory rather than the two
+    // known views, so a third view cannot grow its own copy unnoticed.
+    const views = readAppSourceEntries('app/components/story')
+    expect(views.length).toBeGreaterThanOrEqual(2)
+
+    for (const [path, source] of views) {
+      expect(source, path).not.toContain('import.meta.hot')
+      expect(source, path).not.toContain(`useEventListener(window, 'message'`)
+    }
+
+    // And the two iframe-hosting views really do use the composable.
+    for (const view of [
+      'app/components/story/StoryVariantGrid.vue',
+      'app/components/story/StoryVariantSingleIframe.vue',
+    ]) {
+      expect(readAppSource(view), view).toContain('usePreviewIframeHost({')
+    }
   })
+})
 
-  it('routes incoming state updates through exact variant ids', () => {
-    const componentPath = resolve(process.cwd(), '../histoire-app/src/app/components/story/StoryVariantGrid.vue')
-    const source = fs.readFileSync(componentPath, 'utf8')
+describe('preview runtime readiness bookkeeping', () => {
+  const source = generatePreviewRuntimeSource()
 
-    expect(source).toContain('stateSync.applyIncomingState(event.data.variantId, event.data.state)')
-  })
-
-  it('snapshots exact ready variant ids in preview runtime', () => {
-    const runtimePath = resolve(process.cwd(), '../histoire/src/node/virtual/preview-runtime.ts')
-    const source = fs.readFileSync(runtimePath, 'utf8')
-
+  it('snapshots exact ready variant ids', () => {
     expect(source).toContain('function postVariantStateSnapshotById(story, variantId)')
     expect(source).toContain('postVariantStateSnapshotById(story.value, variantId)')
   })
 
   it('waits for ready variants before pushing preview state back to host', () => {
-    const runtimePath = resolve(process.cwd(), '../histoire/src/node/virtual/preview-runtime.ts')
-    const source = fs.readFileSync(runtimePath, 'utf8')
-
     expect(source).toContain('const readyVariantIds = new Set()')
     expect(source).toContain('if (!readyVariantIds.has(targetVariant.id))')
     expect(source).toContain('readyVariantIds.add(variantId)')
@@ -39,9 +60,6 @@ describe('story grid preview readiness', () => {
   })
 
   it('only emits one SANDBOX_READY on initial mount', () => {
-    const runtimePath = resolve(process.cwd(), '../histoire/src/node/virtual/preview-runtime.ts')
-    const source = fs.readFileSync(runtimePath, 'utf8')
-
     // The pre-fix code unconditionally re-emitted SANDBOX_READY with a stale
     // variantId after the conditional emission. The else branch makes the two
     // mutually exclusive.
@@ -49,9 +67,6 @@ describe('story grid preview readiness', () => {
   })
 
   it('preserves the mounted preview when a runtime error overlays it', () => {
-    const runtimePath = resolve(process.cwd(), '../histoire/src/node/virtual/preview-runtime.ts')
-    const source = fs.readFileSync(runtimePath, 'utf8')
-
     // Wiping document.body.innerHTML on every error blew away the running
     // preview when a late unhandled rejection fired; the overlay path keeps
     // the mounted app intact.

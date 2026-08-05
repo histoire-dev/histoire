@@ -46,7 +46,7 @@ export const RESOLVED_VITEST_BROWSER_RUNTIME_ID = `/__resolved__${VITEST_BROWSER
 export * from './browser-collector.js'
 export * from './markdown.js'
 export * from './noop.js'
-export * from './preview-runtime.js'
+export * from './preview-runtime/index.js'
 export * from './resolved-commands.js'
 export * from './resolved-config.js'
 export * from './resolved-generated-global-setup.js'

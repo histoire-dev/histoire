@@ -438,3 +438,45 @@ export default defineConfig({
   collectMaxThreads: 4,
 })
 ```
+
+## `test.collectTimeout`
+
+`number` - Default: `120000`
+
+Maximum time in milliseconds the headless browser story collection is allowed to take before the run is aborted. Raise it for large projects where collecting every story takes more than two minutes.
+
+```ts
+export default defineConfig({
+  test: {
+    collectTimeout: 300_000,
+  },
+})
+```
+
+## `test.storyCollectTimeout`
+
+`number` - Default: `30000`
+
+Maximum time in milliseconds a single story is allowed to take to load and mount while collecting in the browser. It guards the whole collection against one story that never settles (top-level await on a promise that never resolves, hanging import): only that story fails, the others still collect. Raise it if some of your stories are legitimately slow to mount.
+
+```ts
+export default defineConfig({
+  test: {
+    storyCollectTimeout: 60_000,
+  },
+})
+```
+
+## `test.runTimeout`
+
+`number` - Default: `300000`
+
+Maximum time in milliseconds a `histoire test` run is allowed to take before it is aborted.
+
+```ts
+export default defineConfig({
+  test: {
+    runTimeout: 900_000,
+  },
+})
+```

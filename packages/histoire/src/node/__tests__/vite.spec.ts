@@ -3,8 +3,9 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { resolveConfig } from 'vite'
 import { describe, expect, it } from 'vitest'
-import { getDefaultConfig } from '../config.js'
-import { getViteConfigWithPlugins } from '../vite.js'
+import { getDefaultConfig } from '../config/index.js'
+import { getViteConfigWithPlugins } from '../vite/index.js'
+import { createVitestBrowserRuntimeConfig } from '../vitest-browser-config/index.js'
 
 describe('getViteConfigWithPlugins', () => {
   function createContext(): Context {
@@ -64,6 +65,32 @@ describe('getViteConfigWithPlugins', () => {
     expect(shimCode).toContain(`registerCollectedTestCase(name, fn, 'todo')`)
   })
 
+  it('shims story files discovered after the config was built', async () => {
+    const ctx = createContext()
+    const { viteConfig } = await getViteConfigWithPlugins(false, ctx, {
+      browserRuntime: true,
+    })
+    const storyShimPlugin = viteConfig.plugins?.find(plugin => plugin?.name === 'histoire:story-vitest-shim')
+
+    // Story files discovered by the watcher AFTER server start (custom
+    // storyMatch patterns not covered by the `.story.*` fallback) must still
+    // get the browser vitest shim — a set frozen at startup would hand them
+    // the node-oriented `vitest` entry, which breaks in the browser.
+    const lateStoryPath = `${ctx.root}/src/components/Late.tale.vue`
+    ctx.storyFiles.push({
+      ...ctx.storyFiles[0],
+      id: 'late-story-id',
+      path: lateStoryPath,
+      moduleId: lateStoryPath,
+      relativePath: 'src/components/Late.tale.vue',
+      fileName: 'Late',
+    })
+
+    expect(await storyShimPlugin!.resolveId?.('vitest', lateStoryPath)).toBeTruthy()
+    // Non-story importers keep resolving the real vitest entry.
+    expect(await storyShimPlugin!.resolveId?.('vitest', `${ctx.root}/src/components/Example.vue`)).toBeFalsy()
+  })
+
   it('resolves the browser collection vitest stub to the source file', async () => {
     const ctx = createContext()
     const { viteConfig } = await getViteConfigWithPlugins(false, ctx, {
@@ -80,6 +107,57 @@ describe('getViteConfigWithPlugins', () => {
     expect(fs.existsSync(resolvedId as string)).toBe(true)
     expect(resolvedId).toMatch(/vendors\/vitest-collect\.(ts|js)$/)
   })
+
+  it('uses the browser collection vitest stub for helper imports', async () => {
+    const ctx = createContext()
+    const { viteConfig } = await getViteConfigWithPlugins(false, ctx, {
+      browserRuntime: true,
+      collecting: true,
+    })
+    const collectStubPlugin = viteConfig.plugins?.find(plugin => plugin?.name === 'histoire:collect-story-vitest-stub')
+
+    expect(collectStubPlugin).toBeTruthy()
+
+    const resolvedId = await collectStubPlugin!.resolveId?.('vitest', `${ctx.root}/src/helpers/use-vitest.ts`)
+
+    expect(typeof resolvedId).toBe('string')
+    expect(resolvedId).toMatch(/vendors\/vitest-collect\.(ts|js)$/)
+  })
+
+  it('resolves @vitest/runner for generated browser collection specs', async () => {
+    const ctx = createContext()
+    const { viteConfig } = await getViteConfigWithPlugins(false, ctx, {
+      browserRuntime: true,
+      collecting: true,
+    })
+    const runtimeConfig = await createVitestBrowserRuntimeConfig(ctx, viteConfig)
+    const browserResolvePlugin = runtimeConfig.vitestOptions.plugins.find(plugin => plugin?.name === 'histoire-vitest-browser-resolve')
+
+    expect(browserResolvePlugin).toBeTruthy()
+
+    const resolvedId = await browserResolvePlugin!.resolveId?.('@vitest/runner')
+
+    expect(typeof resolvedId).toBe('string')
+    expect(resolvedId).toMatch(/@vitest[+/]runner/)
+  }, 15000)
+
+  it('excludes Vitest public entry dependencies from the browser optimizer', async () => {
+    const ctx = createContext()
+    const { viteConfig } = await getViteConfigWithPlugins(false, ctx, {
+      browserRuntime: true,
+      collecting: true,
+    })
+    const runtimeConfig = await createVitestBrowserRuntimeConfig(ctx, viteConfig)
+    const optimizer = runtimeConfig.viteConfig.test.deps.optimizer.client
+
+    expect(optimizer.exclude).toContain('vitest')
+    expect(optimizer.exclude).toContain('expect-type')
+    expect(optimizer.exclude).toContain('@vitest/expect')
+    expect(optimizer.exclude).toContain('@vitest/snapshot')
+    expect(optimizer.exclude).toContain('vitest > expect-type')
+    expect(optimizer.exclude).toContain('vitest > @vitest/expect > chai')
+    expect(optimizer.exclude).toContain('vitest > @vitest/snapshot > magic-string')
+  }, 15000)
 
   it('matches root-relative and query-suffixed story importers in browser collection mode', async () => {
     const ctx = createContext()

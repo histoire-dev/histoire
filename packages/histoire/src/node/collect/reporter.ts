@@ -10,7 +10,7 @@ export interface HistoireCollectionVitestCliOptions {
  * No-op reporter used to keep successful collection passes fully silent.
  *
  * Collection failures are surfaced by Histoire after the run via
- * `assertCollectionRunOk`, so Vitest does not need to print anything here.
+ * `analyzeCollectionRun`, so Vitest does not need to print anything here.
  */
 export class HistoireCollectionReporter {}
 

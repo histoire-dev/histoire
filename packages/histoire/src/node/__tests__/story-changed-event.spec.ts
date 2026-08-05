@@ -1,19 +1,13 @@
-import fs from 'node:fs'
-import { resolve } from 'pathe'
 import { describe, expect, it } from 'vitest'
 import { STORY_CHANGED_EVENT } from '../../../../histoire-shared/src/events.js'
+import { readAppSource } from './utils/app-source.js'
+import { readNodeSources } from './utils/node-source.js'
+import { generatePreviewRuntimeSource } from './utils/preview-runtime-source.js'
 
-describe('STORY_CHANGED_EVENT centralization', () => {
-  it('exposes the canonical event name from @histoire/shared', () => {
-    expect(STORY_CHANGED_EVENT).toBe('histoire:story-changed')
-  })
-
-  it('does not redeclare the constant in server.ts or hot.ts', () => {
-    const serverPath = resolve(process.cwd(), 'src/node/server.ts')
-    const hotPath = resolve(process.cwd(), '../histoire-app/src/app/util/hot.ts')
-
-    const serverSource = fs.readFileSync(serverPath, 'utf8')
-    const hotSource = fs.readFileSync(hotPath, 'utf8')
+describe('story changed event centralization', () => {
+  it('does not redeclare the constant in the dev server or hot.ts', () => {
+    const serverSource = readNodeSources('server')
+    const hotSource = readAppSource('app/util/hot.ts')
 
     expect(serverSource).not.toMatch(/^const STORY_CHANGED_EVENT =/m)
     expect(serverSource).toContain(`from '@histoire/shared'`)
@@ -21,14 +15,10 @@ describe('STORY_CHANGED_EVENT centralization', () => {
     expect(hotSource).toContain(`from '@histoire/shared'`)
   })
 
-  it('derives the preview runtime constant from the shared event name', () => {
-    const previewRuntimePath = resolve(process.cwd(), 'src/node/virtual/preview-runtime.ts')
-    const source = fs.readFileSync(previewRuntimePath, 'utf8')
-
-    expect(source).toContain(`import { STORY_CHANGED_EVENT } from '@histoire/shared'`)
-    expect(source).toContain(`const STORY_CHANGED_EVENT = \${JSON.stringify(STORY_CHANGED_EVENT)}`)
-    // The hardcoded literal must no longer live inside the generated runtime
-    // template — only inside the shared event module.
-    expect(source).not.toContain(`const STORY_CHANGED_EVENT = 'histoire:story-changed'`)
+  it('bakes the shared event name into the generated preview runtime', () => {
+    // The runtime listens for this event to invalidate a changed story: a
+    // second copy of the name drifting from the one the server emits would
+    // leave the preview serving pre-update stories with nothing to notice it.
+    expect(generatePreviewRuntimeSource()).toContain(`const STORY_CHANGED_EVENT = ${JSON.stringify(STORY_CHANGED_EVENT)}`)
   })
 })

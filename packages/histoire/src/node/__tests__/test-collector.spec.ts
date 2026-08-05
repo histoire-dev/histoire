@@ -1,5 +1,5 @@
 import { collectHistoireTests } from '@histoire/shared/src/test-collector.js'
-import { mergeTestDefinitionsAndSummary } from '@histoire/shared/src/types/test.js'
+import { mergeTestDefinitionsAndSummary } from '@histoire/shared/src/test-results.js'
 import { describe, expect, it } from 'vitest'
 import { describe as collectDescribe, it as collectIt } from '../vendors/vitest-collect.js'
 

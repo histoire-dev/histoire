@@ -1,222 +1,222 @@
-import type { HistoireSerializedTestDefinition, HistoireTestRunSummary } from '@histoire/shared'
+import type {
+  HistoireCollectTestsPayload,
+  HistoireRunTestsPayload,
+  HistoireTestCollectionResult,
+  HistoireTestDefinitionsPayload,
+  HistoireTestResultPayload,
+  HistoireTestRunSummary,
+} from '@histoire/shared'
+import type { PendingRequest } from '../util/preview-request'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
+import { histoireConfig } from '../util/config'
 import { COLLECT_TESTS, RUN_TESTS, TEST_DEFINITIONS, TEST_RESULT } from '../util/const'
+import { isTrustedPreviewFrameMessage } from '../util/preview-message'
+import { requestFromFrame, settleReply } from '../util/preview-request'
 
 type PreviewMode = 'single' | 'grid'
+
+/**
+ * Marker every host <-> preview message carries. The preview runtime drops
+ * inbound messages without it, exactly like {@link isTrustedPreviewFrameMessage}
+ * does for the replies below.
+ */
+interface HistoireMessageMarker { __histoire: true }
+
+/** Outbound request asking the preview iframe to collect a variant's tests. */
+type CollectTestsMessage = HistoireCollectTestsPayload & HistoireMessageMarker & { type: typeof COLLECT_TESTS }
+
+/** Outbound request asking the preview iframe to run a variant's tests. */
+type RunTestsMessage = HistoireRunTestsPayload & HistoireMessageMarker & { type: typeof RUN_TESTS }
+
+/** Default budget for a whole test run inside the iframe (user code). */
+const DEFAULT_RUN_TIMEOUT = 300_000
 
 let listenersReady = false
 let collectCounter = 0
 let runCounter = 0
 
-export const usePreviewRuntimeStore = defineStore('preview-runtime', () => {
-  const frames = ref<Record<PreviewMode, HTMLIFrameElement | null>>({
-    single: null,
-    grid: null,
-  })
+// Module scope, not store scope: the `message` listener below is installed once
+// for the whole module, so slots owned by one store instance would be invisible
+// to it as soon as a second pinia instance created another store — its requests
+// could then never settle.
+const frames = ref<Record<PreviewMode, HTMLIFrameElement | null>>({
+  single: null,
+  grid: null,
+})
+let pendingRun: PendingRequest<HistoireTestRunSummary> | null = null
+let pendingCollection: PendingRequest<HistoireTestCollectionResult> | null = null
 
-  let pendingRun:
-    | {
-      id: string
-      resolve: (summary: HistoireTestRunSummary) => void
-      reject: (error: Error) => void
-      variantKey?: string | null
-    }
-    | null = null
-  let pendingCollection:
-    | {
-      id: string
-      resolve: (definitions: HistoireSerializedTestDefinition[]) => void
-      reject: (error: Error) => void
-      variantKey?: string | null
-    }
-    | null = null
+function getCurrentFrame() {
+  return frames.value.single ?? frames.value.grid
+}
 
-  if (!listenersReady && typeof window !== 'undefined') {
-    listenersReady = true
-    window.addEventListener('message', (event) => {
-      if (!event.data?.__histoire) {
-        return
-      }
+function getCurrentFrameOrigin(frame: HTMLIFrameElement) {
+  try {
+    return new URL(frame.src || window.location.href, window.location.href).origin
+  }
+  catch {
+    // Never broadcast to '*': the same-origin live preview always lives on the
+    // host origin, so fall back to it instead of any origin.
+    return window.location.origin
+  }
+}
 
-      if (event.data.type === TEST_DEFINITIONS && pendingCollection) {
-        if (String(event.data.requestId) !== pendingCollection.id) {
-          return
-        }
-
-        if (pendingCollection.variantKey !== undefined && String(event.data.variantKey) !== String(pendingCollection.variantKey)) {
-          return
-        }
-
-        pendingCollection.resolve(event.data.definitions as HistoireSerializedTestDefinition[])
-        pendingCollection = null
-        return
-      }
-
-      if (event.data.type !== TEST_RESULT || !pendingRun) {
-        return
-      }
-
-      if (String(event.data.runId) !== pendingRun.id) {
-        return
-      }
-
-      if (pendingRun.variantKey !== undefined && String(event.data.variantKey) !== String(pendingRun.variantKey)) {
-        return
-      }
-
-      pendingRun.resolve(event.data.summary as HistoireTestRunSummary)
-      pendingRun = null
-    })
+/**
+ * Rejects in-flight collection/run promises with an explicit reason so the
+ * UI does not stay locked on the previous request after an iframe unmount.
+ */
+function abortPendingRequests(reason: string) {
+  if (pendingCollection) {
+    const aborted = pendingCollection
+    pendingCollection = null
+    aborted.reject(new Error(reason))
   }
 
+  if (pendingRun) {
+    const aborted = pendingRun
+    pendingRun = null
+    aborted.reject(new Error(reason))
+  }
+}
+
+/** Installs the single listener settling the replies of the preview iframe. */
+function installReplyListener() {
+  if (listenersReady || typeof window === 'undefined') {
+    return
+  }
+
+  listenersReady = true
+  window.addEventListener('message', (event) => {
+    // Defense-in-depth: only trust messages from the current preview frame and
+    // our own origin (subsumes the legacy `__histoire` marker check) before we
+    // resolve any pending collection/run promise by requestId/runId.
+    if (!isTrustedPreviewFrameMessage(event, getCurrentFrame())) {
+      return
+    }
+
+    if (event.data.type === TEST_DEFINITIONS) {
+      // Untrusted postMessage data: typed against the reply contract, but
+      // every field still defaulted in case the iframe answers a partial one.
+      const reply = event.data as Partial<HistoireTestDefinitionsPayload>
+      settleReply(
+        pendingCollection,
+        () => { pendingCollection = null },
+        reply.requestId,
+        reply.variantKey,
+        () => ({
+          definitions: reply.definitions ?? [],
+          error: reply.error ?? null,
+        }),
+      )
+      return
+    }
+
+    if (event.data.type === TEST_RESULT) {
+      const reply = event.data as Partial<HistoireTestResultPayload>
+      settleReply(
+        pendingRun,
+        () => { pendingRun = null },
+        reply.runId,
+        reply.variantKey,
+        () => reply.summary as HistoireTestRunSummary,
+      )
+    }
+  })
+}
+
+export const usePreviewRuntimeStore = defineStore('preview-runtime', () => {
+  installReplyListener()
+
   function setFrame(mode: PreviewMode, frame: HTMLIFrameElement | null) {
+    const previous = frames.value[mode]
     frames.value[mode] = frame
 
     if (frame === null && !getCurrentFrame()) {
       // No iframe is mounted anymore — abort any in-flight requests so the
-      // next collect/run starts fresh instead of waiting on the 15s timeout.
+      // next collect/run starts fresh instead of waiting on the reply timeout.
       abortPendingRequests('Preview iframe was detached before completing the request.')
+    }
+    else if (previous && frame && previous !== frame) {
+      // The frame was replaced (reloadPreviewFrame): in-flight requests can
+      // never be answered by the new frame.
+      abortPendingRequests('Preview iframe was reloaded before completing the request.')
     }
   }
 
   /**
-   * Rejects in-flight collection/run promises with an explicit reason so the
-   * UI does not stay locked on the previous request after an iframe unmount.
+   * Announces that the preview iframe is about to load another document.
+   *
+   * Story/variant navigation reuses the same iframe element and only swaps its
+   * `src`, so `setFrame` sees no change: without this notice the requests only
+   * the outgoing document could answer would stall until the reply timeout.
+   * Aborting with nothing in flight is a no-op (the grid calls this from an
+   * `immediate` watcher that also runs on mount).
    */
-  function abortPendingRequests(reason: string) {
-    if (pendingCollection) {
-      const aborted = pendingCollection
-      pendingCollection = null
-      aborted.reject(new Error(reason))
-    }
-
-    if (pendingRun) {
-      const aborted = pendingRun
-      pendingRun = null
-      aborted.reject(new Error(reason))
-    }
+  function notifyFrameNavigating() {
+    abortPendingRequests('Preview iframe navigated away before completing the request.')
   }
 
-  function getCurrentFrame() {
-    return frames.value.single ?? frames.value.grid
-  }
-
-  function getCurrentFrameOrigin(frame: HTMLIFrameElement) {
-    try {
-      return new URL(frame.src || window.location.href, window.location.href).origin
-    }
-    catch {
-      return '*'
-    }
-  }
-
+  /**
+   * Asks the preview iframe for the tests registered by a variant.
+   *
+   * @param variantKey - `storyId:variantId` to collect, or null/undefined for
+   * whatever the iframe currently has selected.
+   */
   async function collectCurrentFrameTests(variantKey?: string | null) {
-    const frame = getCurrentFrame()
-    if (!frame?.contentWindow) {
-      throw new Error('Preview iframe is not ready yet.')
-    }
-
-    if (pendingCollection) {
-      throw new Error('A preview test collection is already active.')
-    }
-
-    const requestId = `${++collectCounter}`
-
-    return await new Promise<HistoireSerializedTestDefinition[]>((resolve, reject) => {
-      pendingCollection = {
-        id: requestId,
-        resolve,
-        reject,
-        variantKey,
-      }
-
-      const timeout = window.setTimeout(() => {
-        if (!pendingCollection || pendingCollection.id !== requestId) {
-          return
+    return await requestFromFrame<HistoireTestCollectionResult>({
+      getPending: () => pendingCollection,
+      setPending: (request) => { pendingCollection = request },
+      getFrame: getCurrentFrame,
+      nextId: () => `${++collectCounter}`,
+      timeoutMessage: 'Preview iframe did not return collected tests in time.',
+      variantKey,
+      post: (frame, requestId) => {
+        const message: CollectTestsMessage = {
+          __histoire: true,
+          type: COLLECT_TESTS,
+          requestId,
+          variantKey,
         }
-
-        pendingCollection.reject(new Error('Preview iframe did not return collected tests in time.'))
-        pendingCollection = null
-      }, 15000)
-
-      const clear = () => {
-        window.clearTimeout(timeout)
-      }
-
-      const originalResolve = pendingCollection.resolve
-      const originalReject = pendingCollection.reject
-      pendingCollection.resolve = (definitions) => {
-        clear()
-        originalResolve(definitions)
-      }
-      pendingCollection.reject = (error) => {
-        clear()
-        originalReject(error)
-      }
-
-      frame.contentWindow?.postMessage({
-        type: COLLECT_TESTS,
-        requestId,
-        variantKey,
-      }, getCurrentFrameOrigin(frame))
+        frame.contentWindow?.postMessage(message, getCurrentFrameOrigin(frame))
+      },
     })
   }
 
+  /**
+   * Runs a variant's tests inside the preview iframe.
+   *
+   * @param variantKey - `storyId:variantId` to run, or null/undefined for
+   * whatever the iframe currently has selected.
+   */
   async function runCurrentFrameTests(variantKey?: string | null) {
-    const frame = getCurrentFrame()
-    if (!frame?.contentWindow) {
-      throw new Error('Preview iframe is not ready yet.')
-    }
-
-    if (pendingRun) {
-      throw new Error('A preview test run is already active.')
-    }
-
-    const runId = `${++runCounter}`
-
-    return await new Promise<HistoireTestRunSummary>((resolve, reject) => {
-      pendingRun = {
-        id: runId,
-        resolve,
-        reject,
-        variantKey,
-      }
-
-      const timeout = window.setTimeout(() => {
-        if (!pendingRun || pendingRun.id !== runId) {
-          return
+    return await requestFromFrame<HistoireTestRunSummary>({
+      getPending: () => pendingRun,
+      setPending: (request) => { pendingRun = request },
+      getFrame: getCurrentFrame,
+      nextId: () => `${++runCounter}`,
+      timeoutMessage: 'Preview iframe did not return test results in time.',
+      // A run executes the story's own tests: anything shorter than the
+      // configured run budget would fail a suite that is merely slow, and the
+      // failure escalates to a full headless run of the SAME tests while the
+      // iframe keeps running them (both hitting the story's side effects).
+      timeoutMs: histoireConfig.test?.runTimeout ?? DEFAULT_RUN_TIMEOUT,
+      variantKey,
+      post: (frame, runId) => {
+        const message: RunTestsMessage = {
+          __histoire: true,
+          type: RUN_TESTS,
+          runId,
+          variantKey,
         }
-
-        pendingRun.reject(new Error('Preview iframe did not return test results in time.'))
-        pendingRun = null
-      }, 15000)
-
-      const clear = () => {
-        window.clearTimeout(timeout)
-      }
-
-      const originalResolve = pendingRun.resolve
-      const originalReject = pendingRun.reject
-      pendingRun.resolve = (summary) => {
-        clear()
-        originalResolve(summary)
-      }
-      pendingRun.reject = (error) => {
-        clear()
-        originalReject(error)
-      }
-
-      frame.contentWindow?.postMessage({
-        type: RUN_TESTS,
-        runId,
-        variantKey,
-      }, getCurrentFrameOrigin(frame))
+        frame.contentWindow?.postMessage(message, getCurrentFrameOrigin(frame))
+      },
     })
   }
 
   return {
     collectCurrentFrameTests,
+    notifyFrameNavigating,
     setFrame,
     runCurrentFrameTests,
   }

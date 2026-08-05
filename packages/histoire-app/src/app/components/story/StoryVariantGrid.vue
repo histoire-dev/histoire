@@ -1,17 +1,9 @@
 <script lang="ts" setup>
-import type { HstEvent } from '../../stores/events'
-import { useEventListener } from '@vueuse/core'
-import { computed, onBeforeUnmount, onMounted, ref, toRaw, watch } from 'vue'
+import { watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { useEventsStore } from '../../stores/events'
-import { usePreviewRuntimeStore } from '../../stores/preview-runtime'
-import { usePreviewSettingsStore } from '../../stores/preview-settings'
 import { useStoryStore } from '../../stores/story'
-import { EVENT_SEND, PREVIEW_SETTINGS_SYNC, PREVIEW_SYNC, SANDBOX_READY, SELECT_VARIANT, STATE_SYNC, VARIANT_READY } from '../../util/const'
-import { STORY_CHANGED_EVENT } from '../../util/hot'
-import { createPreviewStateSync } from '../../util/preview-state-sync'
+import { usePreviewIframeHost } from '../../util/preview-iframe-host'
 import { isMobile } from '../../util/responsive'
-import { getSandboxUrl } from '../../util/sandbox'
 import DevOnlyToolbarOpenInEditor from '../toolbar/DevOnlyToolbarOpenInEditor.vue'
 import ToolbarBackground from '../toolbar/ToolbarBackground.vue'
 import ToolbarTextDirection from '../toolbar/ToolbarTextDirection.vue'
@@ -19,38 +11,10 @@ import ToolbarTextDirection from '../toolbar/ToolbarTextDirection.vue'
 const storyStore = useStoryStore()
 const router = useRouter()
 const route = useRoute()
-const settings = usePreviewSettingsStore().currentSettings
-const previewRuntimeStore = usePreviewRuntimeStore()
-const iframe = ref<HTMLIFrameElement>()
-const iframeReloadKey = ref(0)
-const isIframeLoaded = ref(false)
-
-const stateSync = createPreviewStateSync({
-  getStoryId: () => storyStore.currentStory?.id,
-  getCurrentVariant: () => storyStore.currentVariant,
-  getVariantById: variantId => storyStore.getCurrentStoryVariantById(variantId),
-  postMessage: (payload) => {
-    iframe.value?.contentWindow?.postMessage(payload, window.location.origin)
-  },
-})
-
-function syncState() {
-  stateSync.syncCurrentVariantState()
-}
-
-function syncPreview() {
-  if (iframe.value?.contentWindow && storyStore.currentStory) {
-    iframe.value.contentWindow.postMessage({
-      type: PREVIEW_SYNC,
-      storyId: storyStore.currentStory.id,
-      variantId: storyStore.currentVariant?.id ?? null,
-      grid: true,
-    }, window.location.origin)
-  }
-}
 
 /**
- * Marks every variant in the current story as waiting for a refreshed preview.
+ * Marks every variant in the current story as waiting for a refreshed preview:
+ * the grid document hosts them all, so a reload invalidates all of them.
  */
 function markStoryPreviewPending() {
   if (!storyStore.currentStory) {
@@ -64,157 +28,55 @@ function markStoryPreviewPending() {
   }
 }
 
-/**
- * Forces a fresh iframe mount when the active story uses Vitest mocks because
- * mock HMR is less reliable than a clean preview boot.
- */
-function reloadPreviewFrame() {
-  isIframeLoaded.value = false
-  iframeReloadKey.value++
-}
+const {
+  iframe,
+  iframeReloadKey,
+  isIframeLoaded,
+  sandboxUrl,
+  onIframeLoad,
+  reloadPreviewFrame,
+} = usePreviewIframeHost({
+  mode: 'grid',
+  getStory: () => storyStore.currentStory,
+  getCurrentVariant: () => storyStore.currentVariant,
+  getVariantById: variantId => storyStore.getCurrentStoryVariantById(variantId),
+  markPreviewPending: markStoryPreviewPending,
+  onSelectVariant: (variantId) => {
+    router.push({
+      query: {
+        ...route.query,
+        variantId,
+      },
+    })
+  },
+  // Variant objects survive navigation (`previewReady` is copied across story
+  // remaps), so revisiting a grid story would otherwise start with stale-true
+  // readiness while the new iframe is still loading.
+  resetOnMount: true,
+})
 
-watch(() => storyStore.currentVariant?.state, () => {
-  if (stateSync.shouldSkipCurrentVariantSync()) {
+// The sandbox iframe bakes the story's variant list when its module loads, so
+// it cannot pick up added/removed/renamed variants via HMR. The host sees the
+// fresh list first — force a clean mount (the dev server invalidated the
+// runtime module during collection, so the reload gets up-to-date data).
+watch(() => [
+  storyStore.currentStory?.id,
+  storyStore.currentStory?.variants.map(variant => variant.id).join('\n'),
+] as const, ([storyId, variantIds], previous) => {
+  const [previousStoryId, previousVariantIds] = previous ?? []
+  if (!storyId || storyId !== previousStoryId) {
+    // Story switches remount the iframe through sandboxUrl already.
     return
   }
 
-  syncState()
-}, {
-  deep: true,
-  immediate: true,
-})
-
-useEventListener(window, 'message', (event) => {
-  if (!event.data?.__histoire || event.source !== iframe.value?.contentWindow) {
-    return
-  }
-
-  switch (event.data.type) {
-    case STATE_SYNC: {
-      stateSync.applyIncomingState(event.data.variantId, event.data.state)
-      break
-    }
-    case EVENT_SEND:
-      useEventsStore().addEvent(event.data.event as HstEvent)
-      break
-    case SANDBOX_READY:
-      if (!event.data.variantId) {
-        break
-      }
-
-      {
-        const variant = storyStore.getCurrentStoryVariantById(event.data.variantId)
-        if (!variant) {
-          break
-        }
-
-        Object.assign(variant, {
-          previewReady: true,
-        })
-
-        if (storyStore.currentVariant?.id === variant.id) {
-          syncState()
-          syncSettings()
-        }
-      }
-      break
-    case VARIANT_READY: {
-      const variant = storyStore.getCurrentStoryVariantById(event.data.variantId)
-      if (variant) {
-        Object.assign(variant, {
-          previewReady: true,
-        })
-        if (storyStore.currentVariant?.id === variant.id) {
-          syncState()
-          syncSettings()
-        }
-      }
-      break
-    }
-    case SELECT_VARIANT:
-      router.push({
-        query: {
-          ...route.query,
-          variantId: event.data.variantId,
-        },
-      })
-      break
-  }
-})
-
-const sandboxUrl = computed(() => getSandboxUrl(storyStore.currentStory))
-
-watch(sandboxUrl, () => {
-  isIframeLoaded.value = false
-  stateSync.reset()
-  markStoryPreviewPending()
-})
-
-watch(() => storyStore.currentStory?.id, () => {
-  syncPreview()
-}, {
-  immediate: true,
-})
-
-watch(() => storyStore.currentVariant?.id, (variantId) => {
-  if (!iframe.value?.contentWindow || !variantId) {
-    return
-  }
-
-  iframe.value.contentWindow.postMessage({
-    type: SELECT_VARIANT,
-    variantId,
-  }, window.location.origin)
-})
-
-if (import.meta.hot) {
-  import.meta.hot.on(STORY_CHANGED_EVENT, ({ storyId, hasVitestMocks }) => {
-    if (storyId !== storyStore.currentStory?.id) {
-      return
-    }
-
+  if (variantIds !== previousVariantIds) {
+    // Mark pending before the remount so readiness does not stay stale-true from
+    // the previous variant list while the fresh iframe boots (which would let
+    // test collection post into a not-yet-ready frame).
     markStoryPreviewPending()
-
-    if (hasVitestMocks) {
-      reloadPreviewFrame()
-      return
-    }
-
-    syncPreview()
-  })
-}
-
-function syncSettings() {
-  if (iframe.value) {
-    iframe.value.contentWindow?.postMessage({
-      type: PREVIEW_SETTINGS_SYNC,
-      settings: toRaw(settings),
-    }, window.location.origin)
+    reloadPreviewFrame()
   }
-}
-
-watch(() => settings, () => {
-  syncSettings()
-}, {
-  deep: true,
-  immediate: true,
 })
-
-onMounted(() => {
-  previewRuntimeStore.setFrame('grid', iframe.value ?? null)
-})
-
-onBeforeUnmount(() => {
-  previewRuntimeStore.setFrame('grid', null)
-})
-
-function onIframeLoad() {
-  previewRuntimeStore.setFrame('grid', iframe.value ?? null)
-  isIframeLoaded.value = true
-  syncPreview()
-  syncState()
-  syncSettings()
-}
 </script>
 
 <template>

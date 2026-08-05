@@ -1,4 +1,5 @@
 import type { HistoireTestContext, HistoireTestDefinition, HistoireTestMode, HistoireTestRegistration } from './types/test.js'
+import { tagStoryExecution } from './test-execution.js'
 
 export const TEST_REGISTRY_KEY = '__HST_TEST_REGISTRY__'
 export const TEST_DEFINITIONS_KEY = '__HST_TEST_DEFINITIONS__'
@@ -23,6 +24,10 @@ export function pushHistoireTestRegistration(register: HistoireTestRegistration)
     [TEST_DEFINITIONS_KEY]?: HistoireTestRegistration[]
     [TEST_REGISTRY_KEY]?: HistoireTestRegistration[]
   }
+
+  // Remember which story mount emitted this registration so collection can tell
+  // "the same setup ran twice" from "one setup registered twice".
+  tagStoryExecution(register)
 
   if (Array.isArray(globals[TEST_DEFINITIONS_KEY])) {
     globals[TEST_DEFINITIONS_KEY].push(register)

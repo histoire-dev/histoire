@@ -1,6 +1,8 @@
 import type { Context } from '../context.js'
 import { makeTree } from '../tree.js'
 import { fileHasVitestMocks } from '../util/story-vitest.js'
+import { STORY_SOURCE_ID_PREFIX } from './story-source.js'
+import { VITEST_DYNAMIC_IMPORT_SNIPPET } from './vitest-runner-bootstrap.js'
 
 export function resolvedStories(ctx: Context) {
   const resolvedStories = ctx.storyFiles.filter(s => !!s.story)
@@ -17,20 +19,9 @@ export function resolvedStories(ctx: Context) {
       moduleId: file.moduleId,
     }
   })
-  return `function ensureVitestRunner() {
-  const runner = globalThis.__vitest_browser_runner__ ?? {}
-  if (typeof runner.wrapDynamicImport !== 'function') {
-    runner.wrapDynamicImport = loader => loader()
-  }
-  globalThis.__vitest_browser_runner__ = runner
-  return runner
-}
+  return `${VITEST_DYNAMIC_IMPORT_SNIPPET}
 
-function runWithVitestDynamicImport(loader) {
-  return ensureVitestRunner().wrapDynamicImport(loader)
-}
-
-export let files = [${files.map(file => `{${JSON.stringify(file).slice(1, -1)}, component: () => runWithVitestDynamicImport(() => import(${JSON.stringify(file.moduleId)})).then(m => m.default ?? m), source: () => runWithVitestDynamicImport(() => import('virtual:story-source:${file.story.id}'))}`).join(',\n')}]
+export let files = [${files.map(file => `{${JSON.stringify(file).slice(1, -1)}, component: () => runWithVitestDynamicImport(() => import(${JSON.stringify(file.moduleId)})).then(m => m.default ?? m), source: () => runWithVitestDynamicImport(() => import(${JSON.stringify(`${STORY_SOURCE_ID_PREFIX}${file.story.id}`)}))}`).join(',\n')}]
 export let tree = ${JSON.stringify(makeTree(ctx.config, resolvedStories))}
 const handlers = []
 export function onUpdate (cb) {

@@ -1,7 +1,41 @@
 import type { Context } from '../context.js'
 import { hasProjectVitest } from '../util/has-vitest.js'
 import { tryResolveVitestModule } from '../util/resolve-vitest-package.js'
+import { MOCK_RPC_SNIPPET } from './mock-rpc-snippet.js'
+import { DEV_MODULE_MOCKER_SNIPPET, MOCKER_HELPERS_SNIPPET } from './mocker-snippet.js'
 
+/**
+ * Emits `virtual:$histoire-vitest-browser-runtime`, imported by the Histoire app
+ * shell (`@histoire/app` `src/app/index.ts`) and by nothing else.
+ *
+ * Where this actually runs — the name is about the *Vitest* browser mocker, not
+ * about `histoire test`:
+ * - `histoire dev`: the app dev server serves this module with `import.meta.hot`
+ *   set and carries Histoire's mock RPC plugin, so the `ModuleMocker` below is
+ *   installed and functional in the app's own (top) window. It is the only
+ *   mocker that window ever gets: `util/vitest-mocker-shim.ts` runs first and
+ *   only guarantees a passthrough `wrapDynamicImport`, which has no `queueMock`.
+ * - `histoire build`: the module is emitted into the bundle, but its whole body
+ *   is behind `import.meta.hot`, which is `undefined` in a production build — so
+ *   the bundler drops it and nothing runs.
+ * - `histoire test` / story collection: never loaded at all. Those runs execute
+ *   generated specs whose graph is `virtual:$histoire-test-harness` (or the
+ *   generated collector), never the app shell — and real Vitest browser mode
+ *   installs its own `__vitest_mocker__` there anyway, which is what makes
+ *   `vi.mock` work in stories under `histoire test`.
+ *
+ * The app window mounts story modules (`GenericMountStory` in `App.vue`) for
+ * every story whose source has no detectable `vi.mock(...)`. That detection is
+ * a source regex (`fileHasVitestMocks`), so a story mocking indirectly — a
+ * shared helper calling `vi.doMock`, an aliased `vi` — still executes here, and
+ * this mocker is what keeps it from throwing "Vitest mocker was not initialized
+ * in this environment".
+ *
+ * Shares its mocker bootstrap (`mocker-snippet.ts`) with the preview runtime's
+ * own (`preview-runtime/vitest-environment.ts`), which does the same job inside
+ * the story sandbox iframes.
+ * @param ctx The histoire context, used to resolve the project's Vitest.
+ */
 export function vitestBrowserRuntime(ctx: Context) {
   const hasVitest = hasProjectVitest(ctx.root)
   const vitestSpyId = tryResolveVitestModule(ctx.root, '@vitest/spy')
@@ -14,93 +48,14 @@ export function vitestBrowserRuntime(ctx: Context) {
 
   return `
 import { createMockInstance } from ${JSON.stringify(vitestSpyId)}
-import { ModuleMocker, ModuleMockerServerInterceptor } from ${JSON.stringify(vitestMockerBrowserId)}
+import { ModuleMocker } from ${JSON.stringify(vitestMockerBrowserId)}
 
-function hotRpc(event, data) {
-  const hot = import.meta.hot
-  if (!hot) {
-    throw new Error('Vitest mock RPC is unavailable without Vite HMR.')
-  }
+${MOCK_RPC_SNIPPET}
 
-  hot.send(event, data)
-  return new Promise((resolve, reject) => {
-    const timeout = setTimeout(() => {
-      hot.off(\`\${event}:result\`, onResult)
-      reject(new Error(\`Failed to resolve \${event} in time\`))
-    }, 5_000)
-
-    function onResult(result) {
-      clearTimeout(timeout)
-      hot.off(\`\${event}:result\`, onResult)
-      resolve(result)
-    }
-
-    hot.on(\`\${event}:result\`, onResult)
-  })
-}
-
-function registerNativeFactoryResolver(mocker) {
-  const hot = import.meta.hot
-  if (!hot) {
-    return
-  }
-
-  hot.on('vitest:interceptor:resolve', async url => {
-    const exports = await mocker.resolveFactoryModule(url)
-    hot.send('vitest:interceptor:resolved', {
-      url,
-      keys: Object.keys(exports),
-    })
-  })
-}
-
-function enableManualMockPreload(mocker) {
-  const originalQueueMock = mocker.queueMock.bind(mocker)
-
-  mocker.queueMock = (rawId, importer, factoryOrOptions) => {
-    originalQueueMock(rawId, importer, factoryOrOptions)
-
-    if (typeof factoryOrOptions !== 'function') {
-      return
-    }
-
-    const pendingRegistration = Array.from(mocker.queue).at(-1)
-    if (!pendingRegistration) {
-      return
-    }
-
-    const preloadPromise = pendingRegistration.then(async () => {
-      for (const mockUrl of mocker.registry.keys()) {
-        const mock = mocker.registry.get(mockUrl)
-        if (mock?.type === 'manual' && !mock.cache) {
-          await mock.resolve()
-        }
-      }
-    }).finally(() => {
-      mocker.queue.delete(preloadPromise)
-    })
-
-    mocker.queue.add(preloadPromise)
-  }
-}
+${MOCKER_HELPERS_SNIPPET}
 
 if (import.meta.hot && typeof globalThis.__vitest_mocker__?.queueMock !== 'function') {
-  const mocker = new ModuleMocker(
-    new ModuleMockerServerInterceptor(),
-    {
-      resolveId(id, importer) {
-        return hotRpc('vitest:mocks:resolveId', { id, importer })
-      },
-      resolveMock(id, importer, options) {
-        return hotRpc('vitest:mocks:resolveMock', { id, importer, options })
-      },
-      async invalidate(ids) {
-        await hotRpc('vitest:mocks:invalidate', { ids })
-      },
-    },
-    createMockInstance,
-    { root: '/' },
-  )
+  const mocker = ${DEV_MODULE_MOCKER_SNIPPET}
 
   enableManualMockPreload(mocker)
   globalThis.__vitest_mocker__ = mocker

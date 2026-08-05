@@ -10,8 +10,14 @@ const props = defineProps<{
 
 /**
  * Returns the user-facing label for a test state.
+ *
+ * A test that never runs on purpose (`.skip` / `.todo`) reads as its modifier
+ * rather than "Not run", which would look like the whole variant was never run.
  */
 const label = computed(() => {
+  if (props.test.state === 'idle' && (props.test.mode === 'skip' || props.test.mode === 'todo')) {
+    return props.test.mode === 'skip' ? 'Skipped' : 'Todo'
+  }
   return props.test.state === 'idle' ? 'Not run' : props.test.state
 })
 
@@ -46,6 +52,10 @@ const icon = computed(() => {
       return 'carbon:close-large'
     case 'skipped':
       return 'carbon:skip-forward'
+  }
+  // Not run yet, but declared as never-to-run: same icon as an actual skip.
+  if (props.test.mode === 'skip' || props.test.mode === 'todo') {
+    return 'carbon:skip-forward'
   }
   return 'carbon:circle-dash'
 })

@@ -18,8 +18,22 @@ import { slugify } from './util/slugify.js'
 
 const onMarkdownListChangeHandlers: (() => unknown)[] = []
 
+/**
+ * Called when the markdown file list changed.
+ *
+ * The handler list is module-global and outlives a dev server, so the returned
+ * disposer must be called when the listening server closes.
+ * @param handler
+ * @returns Removes the handler.
+ */
 export function onMarkdownListChange(handler: () => unknown) {
   onMarkdownListChangeHandlers.push(handler)
+  return () => {
+    const index = onMarkdownListChangeHandlers.indexOf(handler)
+    if (index !== -1) {
+      onMarkdownListChangeHandlers.splice(index, 1)
+    }
+  }
 }
 
 function notifyMarkdownListChange() {
@@ -265,3 +279,16 @@ export async function createMarkdownFilesWatcher(ctx: Context) {
 }
 
 export type MarkdownFilesWatcher = ReturnType<typeof createMarkdownFilesWatcher>
+
+/**
+ * Scans the markdown files once, without leaving a watcher behind.
+ *
+ * The build and the test run need the markdown files in the context but have no
+ * use for the file watching that comes with {@link createMarkdownFilesWatcher}
+ * (which resolves only once its initial scan is done).
+ * @param ctx The histoire context.
+ */
+export async function scanMarkdownFiles(ctx: Context) {
+  const { stop } = await createMarkdownFilesWatcher(ctx)
+  await stop()
+}

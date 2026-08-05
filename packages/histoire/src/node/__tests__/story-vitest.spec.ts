@@ -2,7 +2,7 @@ import fs from 'node:fs'
 import os from 'node:os'
 import { join } from 'pathe'
 import { afterEach, describe, expect, it } from 'vitest'
-import { fileHasOnTestCall } from '../util/story-vitest.js'
+import { fileHasVitestMocks } from '../util/story-vitest.js'
 
 const tempDirs: string[] = []
 
@@ -24,17 +24,17 @@ function createStoryFile(source: string) {
   } as any
 }
 
-describe('fileHasOnTestCall', () => {
-  it('matches direct onTest calls in virtual story sources', () => {
-    expect(fileHasOnTestCall(createStoryFile(`
-      import { onTest } from 'histoire/client'
+describe('fileHasVitestMocks', () => {
+  it('matches vitest mock calls in virtual story sources', () => {
+    expect(fileHasVitestMocks(createStoryFile(`
+      import { vi } from 'vitest'
 
-      onTest(() => {})
+      vi.mock('./greeting')
     `))).toBe(true)
   })
 
-  it('does not match stories without onTest calls', () => {
-    expect(fileHasOnTestCall(createStoryFile(`
+  it('does not match stories without mock calls', () => {
+    expect(fileHasVitestMocks(createStoryFile(`
       export default {
         title: 'Plain story',
       }
@@ -42,14 +42,14 @@ describe('fileHasOnTestCall', () => {
   })
 
   it('does not match imports, comments, or strings without direct calls', () => {
-    expect(fileHasOnTestCall(createStoryFile(`
-      import { onTest } from 'histoire/client'
+    expect(fileHasVitestMocks(createStoryFile(`
+      import { vi } from 'vitest'
 
-      const message = "onTest(() => {})"
-      const template = \`onTest(() => {})\`
+      const message = "vi.mock('./greeting')"
+      const template = \`vi.mock('./greeting')\`
 
-      // onTest(() => {})
-      /* onTest(() => {}) */
+      // vi.mock('./greeting')
+      /* vi.mock('./greeting') */
     `))).toBe(false)
   })
 
@@ -58,12 +58,12 @@ describe('fileHasOnTestCall', () => {
     tempDirs.push(tempDir)
     const filePath = join(tempDir, 'DiskBacked.story.ts')
     fs.writeFileSync(filePath, `
-      import { onTest } from 'histoire/client'
+      import { vi } from 'vitest'
 
-      onTest(() => {})
+      vi.mock('./greeting')
     `, 'utf8')
 
-    expect(fileHasOnTestCall({
+    expect(fileHasVitestMocks({
       path: filePath,
       relativePath: 'DiskBacked.story.ts',
       virtual: false,

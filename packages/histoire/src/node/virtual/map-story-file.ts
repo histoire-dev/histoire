@@ -12,7 +12,9 @@ const copiedFromExistingVariant = [
   'previewReady',
 ]
 
-interface MappableStoryFile extends Omit<StoryFile, 'story'> {
+interface MappableStoryFile extends Omit<StoryFile, 'story' | 'path'> {
+  /** Tree path segments; absent for a story file that was never placed in the tree. */
+  path?: StoryFile['path']
   story: ServerStory | StoryFile['story']
 }
 
@@ -55,6 +57,9 @@ export function mapStoryFile(file: MappableStoryFile, existingFile?: StoryFile):
   else {
     result = {
       ...file,
+      // A story file that never made it into the tree still needs a path: the
+      // story runtime reads it unconditionally.
+      path: file.path ?? [],
       component: markRaw(file.component),
       story: {
         ...file.story,

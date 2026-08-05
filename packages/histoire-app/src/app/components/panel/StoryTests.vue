@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { formatTestError } from '@histoire/shared'
 import { Icon } from '@iconify/vue'
 import { computed } from 'vue'
 import { useTestsStore } from '../../stores/tests'
@@ -30,10 +31,10 @@ const tests = computed(() => testsStore.currentTests)
       <BaseButton
         color="primary"
         class="htw-px-3 htw-py-1.5 htw-text-sm"
-        :disabled="testsStore.running"
+        :disabled="testsStore.currentRunning"
         @click="testsStore.runCurrentVariantTests()"
       >
-        {{ testsStore.running ? 'Running…' : 'Run tests' }}
+        {{ testsStore.currentRunning ? 'Running…' : 'Run tests' }}
       </BaseButton>
     </div>
 
@@ -46,7 +47,19 @@ const tests = computed(() => testsStore.currentTests)
         Collecting tests...
       </BaseEmpty>
 
-      <BaseEmpty v-else-if="!definitions.length && !testsStore.running">
+      <BaseEmpty
+        v-else-if="testsStore.currentCollectError && !definitions.length"
+        data-test-id="story-tests-collect-error"
+      >
+        <Icon
+          icon="carbon:warning-alt"
+          class="htw-w-8 htw-h-8 htw-opacity-50 htw-mb-2 htw-text-red-500 dark:htw-text-red-400"
+        />
+        Failed to collect tests
+        <pre class="htw-text-xs htw-text-left htw-whitespace-pre-wrap htw-max-h-48 htw-w-full htw-overflow-auto htw-opacity-80 htw-select-text">{{ formatTestError(testsStore.currentCollectError) }}</pre>
+      </BaseEmpty>
+
+      <BaseEmpty v-else-if="!definitions.length && !testsStore.currentRunning">
         <Icon
           icon="carbon:test-tool"
           class="htw-w-8 htw-h-8 htw-opacity-50 htw-mb-2"
@@ -54,7 +67,7 @@ const tests = computed(() => testsStore.currentTests)
         No story tests registered for this variant
       </BaseEmpty>
 
-      <BaseEmpty v-else-if="testsStore.running && !definitions.length">
+      <BaseEmpty v-else-if="testsStore.currentRunning && !definitions.length">
         <Icon
           icon="carbon:progress-bar-round"
           class="htw-w-8 htw-h-8 htw-opacity-50 htw-mb-2"

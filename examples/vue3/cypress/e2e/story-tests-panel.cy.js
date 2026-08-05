@@ -5,24 +5,6 @@ describe('Preview tests panel', () => {
   const hmrInsertionMarker = '    // HMR_TEST_INSERTION_POINT'
   let originalStorySource = ''
 
-  const getIframeBody = () => cy.get('iframe[data-test-id="preview-iframe"]')
-    .its('0.contentDocument.body')
-    .should('not.be.empty')
-    .then(cy.wrap)
-
-  const assertMockedGreeting = () => {
-    getIframeBody().find('iframe').should('have.length', 0)
-    getIframeBody().contains('Mocked by Vitest for Vitest browser mode', {
-      timeout: 20000,
-    })
-    getIframeBody().should('not.contain', 'Failed to resolve vitest:mocks:resolveMock in time')
-  }
-
-  function openVitestStory() {
-    cy.get('[data-test-id="story-list-item"]').contains('Vitest Mocking').click()
-    cy.location('search').should('include', 'variantId=src-components-vitestmocking-story-vue-0')
-  }
-
   function openTestsPanel() {
     cy.get('[data-test-id="story-tests-tab"]:visible').click()
     cy.get('[data-test-id="story-side-panel"]').should('be.visible')
@@ -61,10 +43,10 @@ describe('Preview tests panel', () => {
     cy.viewport(1600, 1000)
     cy.visit('/')
 
-    openVitestStory()
+    cy.openVitestStory()
     assertCollectedDefinitions(3)
     assertTestsTabCount(3)
-    assertMockedGreeting()
+    cy.assertMockedGreeting()
 
     openTestsPanel()
     cy.contains('button', 'Run tests').should('be.visible')
@@ -77,21 +59,23 @@ describe('Preview tests panel', () => {
     cy.get('[data-test-id="story-test-row"]').should('have.length', 3)
     cy.contains('[data-test-id="story-test-row"]', 'renders the mocked dependency output').contains('passed')
     cy.contains('[data-test-id="story-test-row"]', 'tracks calls through the mocked module function').contains('passed')
-    cy.contains('[data-test-id="story-test-row"]', 'fails').as('failedRow')
-    cy.get('@failedRow').contains('failed')
-    cy.get('@failedRow').contains('This test is expected to fail')
+    // The story declares this one with `it.skip`, so it must be reported as
+    // skipped and must not produce the failure it would otherwise throw.
+    cy.contains('[data-test-id="story-test-row"]', 'fails').as('skippedRow')
+    cy.get('@skippedRow').contains('skipped')
+    cy.get('@skippedRow').should('not.contain', 'This test is expected to fail')
   })
 
   it('refreshes mocked story tests after hot updates', () => {
     cy.viewport(1600, 1000)
     cy.visit('/')
 
-    openVitestStory()
+    cy.openVitestStory()
     openTestsPanel()
     assertCollectedDefinitions(3)
     assertTestsTabCount(3)
     cy.get('[data-test-id="story-test-row"]').should('have.length', 3)
-    assertMockedGreeting()
+    cy.assertMockedGreeting()
 
     cy.then(() => {
       const updatedStorySource = originalStorySource.replace(hmrInsertionMarker, `    it('updates the tests panel after hot reload', () => {
@@ -108,7 +92,7 @@ ${hmrInsertionMarker}`)
     cy.get('[data-test-id="story-test-row"]', {
       timeout: 20000,
     }).should('have.length', 4)
-    assertMockedGreeting()
+    cy.assertMockedGreeting()
 
     cy.writeFile(storyPath, originalStorySource)
 
@@ -117,6 +101,6 @@ ${hmrInsertionMarker}`)
     cy.get('[data-test-id="story-test-row"]', {
       timeout: 20000,
     }).should('have.length', 3)
-    assertMockedGreeting()
+    cy.assertMockedGreeting()
   })
 })

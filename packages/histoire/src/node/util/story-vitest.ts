@@ -4,17 +4,10 @@ import fs from 'node:fs'
 /**
  * Reads raw source for virtual or disk-backed story files.
  */
-export function getStorySource(file: Context['storyFiles'][number]) {
+function getStorySource(file: Context['storyFiles'][number]) {
   return file.moduleCode ?? (!file.virtual && fs.existsSync(file.path)
     ? fs.readFileSync(file.path, 'utf8')
     : '')
-}
-
-/**
- * Detects whether story source directly calls `onTest(...)`.
- */
-export function fileHasOnTestCall(file: Context['storyFiles'][number]) {
-  return /\bonTest\s*\(/.test(stripNonCodeSegments(getStorySource(file)))
 }
 
 /**

@@ -1,6 +1,20 @@
 import type { StoryFile, Variant } from '../types'
 import { markRaw, reactive } from 'vue'
 
+/**
+ * Fresh slot holders for a story/variant.
+ *
+ * A new object per call: a shared one would let one variant's slots leak into
+ * every other variant mapped from the same file.
+ */
+function createEmptySlots() {
+  return {
+    default: null,
+    controls: null,
+    source: null,
+  }
+}
+
 const copiedFromExistingVariant = [
   'state',
   'slots',
@@ -40,11 +54,14 @@ export function mapFile(file: StoryFile, existingFile?: StoryFile): StoryFile {
       story: {
         ...file.story,
         title: file.story.title,
-        file: markRaw(file),
+        // Points at the mapped file, not the raw input: `story.file` is read
+        // back to reach the mapped variants (and their state).
+        file: null as unknown as StoryFile,
         variants: file.story.variants.map(v => mapVariant(v)),
-        slots: () => ({}),
+        slots: createEmptySlots,
       },
     }
+    result.story.file = markRaw(result)
   }
 
   return result
@@ -71,7 +88,7 @@ export function mapVariant(variant: Variant, existingVariant?: Variant): Variant
         _hPropDefs: [],
       }),
       setupApp: null,
-      slots: () => ({}),
+      slots: createEmptySlots,
       previewReady: false,
     }
   }

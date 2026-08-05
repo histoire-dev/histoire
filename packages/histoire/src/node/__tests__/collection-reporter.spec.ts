@@ -4,12 +4,6 @@ import {
   HistoireCollectionReporter,
 } from '../collect/reporter.js'
 
-describe('histoireCollectionReporter', () => {
-  it('is a no-op reporter instance', () => {
-    expect(new HistoireCollectionReporter()).toBeInstanceOf(HistoireCollectionReporter)
-  })
-})
-
 describe('getCollectionVitestCliOptions', () => {
   it('runs collection silently in normal mode', () => {
     const options = getCollectionVitestCliOptions(false)

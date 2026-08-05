@@ -1,11 +1,22 @@
-export const STATE_SYNC = '__histoire:state-sync'
-export const SANDBOX_READY = '__histoire:sandbox-ready'
-export const EVENT_SEND = '__histoire:event'
-export const PREVIEW_SETTINGS_SYNC = '__histoire:preview-settings-sync'
-export const SELECT_VARIANT = '__histoire:select-variant'
-export const VARIANT_READY = '__histoire:variant-ready'
-export const PREVIEW_SYNC = '__histoire:preview-sync'
-export const COLLECT_TESTS = '__histoire:collect-tests'
-export const RUN_TESTS = '__histoire:run-tests'
-export const TEST_DEFINITIONS = '__histoire:test-definitions'
-export const TEST_RESULT = '__histoire:test-result'
+/**
+ * Message types of the host <-> preview protocol.
+ *
+ * Re-exported from `@histoire/shared` (which also declares the payload of each
+ * message): the generated preview runtime imports them from this module's
+ * bundled build, so the path stays stable for it.
+ */
+export {
+  COLLECT_TESTS,
+  CONTROLS_READY,
+  CONTROLS_RESIZE,
+  EVENT_SEND,
+  PREVIEW_SETTINGS_SYNC,
+  PREVIEW_SYNC,
+  RUN_TESTS,
+  SANDBOX_READY,
+  SELECT_VARIANT,
+  STATE_SYNC,
+  TEST_DEFINITIONS,
+  TEST_RESULT,
+  VARIANT_READY,
+} from '@histoire/shared'

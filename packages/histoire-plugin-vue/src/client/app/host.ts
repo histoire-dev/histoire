@@ -1,6 +1,7 @@
 import type { Story, Variant } from '@histoire/shared'
 import type { App, Component, PropType, VNode } from 'vue'
 import type { Vue3StorySetupApi, Vue3StorySetupHandler } from '../../helpers.js'
+import { withStoryExecution } from '@histoire/shared'
 // @ts-expect-error virtual module id
 import * as generatedSetup from 'virtual:$histoire-generated-global-setup'
 // @ts-expect-error virtual module id
@@ -108,7 +109,12 @@ export function createPreviewHost(options: PreviewHostOptions) {
 
     await runSetupHooks(setupApi)
 
-    app.mount(target)
+    // The story component's `setup()` — where `onTest(...)` runs — executes
+    // synchronously inside this call, so wrapping it attributes the story's test
+    // registrations to THIS mount. Several mounts of the same story coexist in
+    // one page (live preview + the two test-session mounts) and all push into
+    // the same ambient registry, so the tag is what keeps their tests apart.
+    withStoryExecution(() => app.mount(target))
     await waitForHostRenderSettled()
   }
 

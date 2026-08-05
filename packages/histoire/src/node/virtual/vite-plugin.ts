@@ -80,7 +80,7 @@ export function createVirtualFilesPlugin(ctx: Context, isServer: boolean) {
       if (id.startsWith('virtual:story:')) {
         return `\0${id}`
       }
-      if (id.startsWith('virtual:story-source:')) {
+      if (id.startsWith(VirtualFiles.STORY_SOURCE_ID_PREFIX)) {
         return `/__resolved__${id}`
       // @TODO
       // return `\0${id}`
@@ -158,7 +158,7 @@ export function createVirtualFilesPlugin(ctx: Context, isServer: boolean) {
         return VirtualFiles.story(ctx, id)
       }
 
-      if (id.startsWith('/__resolved__virtual:story-source:')) {
+      if (id.startsWith(VirtualFiles.RESOLVED_STORY_SOURCE_ID_PREFIX)) {
         return VirtualFiles.storySource(ctx, id)
       }
 

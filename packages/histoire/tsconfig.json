@@ -39,6 +39,9 @@
     "node_modules",
     "generated/**/*",
     "dist/**/*",
-    "src/**/*.spec.ts"
+    // Test-only code. The specs were already excluded; their shared helpers
+    // import across package boundaries (app stores, `vue`), which `rootDir`
+    // cannot express, and they have no business being emitted into `dist`.
+    "src/node/__tests__/**/*"
   ]
 }

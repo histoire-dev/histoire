@@ -12,6 +12,10 @@ export interface StoryFile {
 
 export type StoryLayout = {
   type: 'single'
+  /**
+   * @deprecated The preview now always renders stories inside an iframe —
+   * this option is ignored.
+   */
   iframe?: boolean
 } | {
   type: 'grid'
@@ -124,7 +128,6 @@ export interface ServerStoryFile {
    * Resolved story data from story file execution
    */
   story?: ServerStory
-  hasVitestMocks?: boolean
   /**
    * Data sent to user tree config functions
    */

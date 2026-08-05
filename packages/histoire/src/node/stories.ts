@@ -11,10 +11,24 @@ const storyChangeHandlers: StoryChangeHandler[] = []
 
 /**
  * Called when a new story is added or modified. Collecting should be done.
+ *
+ * The handler list is module-global and outlives a dev server, so the returned
+ * disposer must be called when the listening server closes — otherwise every
+ * config-change restart stacks another live collector on the same events.
  * @param handler
+ * @returns Removes the handler.
  */
 export function onStoryChange(handler: StoryChangeHandler) {
   storyChangeHandlers.push(handler)
+  return () => removeHandler(storyChangeHandlers, handler)
+}
+
+/** Removes a registered handler from its list. */
+function removeHandler<T>(handlers: T[], handler: T) {
+  const index = handlers.indexOf(handler)
+  if (index !== -1) {
+    handlers.splice(index, 1)
+  }
 }
 
 export function notifyStoryChange(file?: ServerStoryFile) {
@@ -29,9 +43,11 @@ const storyListChangeHandlers: StoryListChangeHandler[] = []
 /**
  * Called when the story list has changed (ex: removed a story). No collecting should be needed.
  * @param handler
+ * @returns Removes the handler (see {@link onStoryChange}).
  */
 export function onStoryListChange(handler: StoryListChangeHandler) {
   storyListChangeHandlers.push(handler)
+  return () => removeHandler(storyListChangeHandlers, handler)
 }
 
 export function notifyStoryListChange() {

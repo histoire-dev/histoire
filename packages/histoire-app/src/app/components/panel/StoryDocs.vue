@@ -13,11 +13,6 @@ export function useStoryDoc(story: Ref<Story>) {
   const renderedDoc = ref('')
 
   watchEffect(async () => {
-    if (story.value.docsText) {
-      renderedDoc.value = story.value.docsText
-      return
-    }
-
     // Markdown file
     const mdKey = story.value.file.filePath.replace(/\.(\w*)$/, '.md')
     if (markdownFiles[mdKey]) {
@@ -26,7 +21,45 @@ export function useStoryDoc(story: Ref<Story>) {
       return
     }
 
-    renderedDoc.value = ''
+    // Custom blocks (Vue): the compiled component carries the rendered
+    // `<docs>` HTML on its `doc` field, but only when the host app could load
+    // the story module (vitest-mocked stories only run inside the preview
+    // iframe, so their component never loads here).
+    try {
+      let comp = story.value.file?.component
+      if (comp) {
+        if (comp.__asyncResolved) {
+          comp = comp.__asyncResolved
+        }
+        else if (comp.__asyncLoader) {
+          comp = await comp.__asyncLoader()
+        }
+        else if (typeof comp === 'function') {
+          try {
+            comp = await comp()
+          }
+          catch (e) {
+            // Noop
+            // Could be a class that requires `new com()`
+          }
+        }
+        if (comp?.default) {
+          comp = comp.default
+        }
+        if (comp?.doc) {
+          renderedDoc.value = comp.doc
+          return
+        }
+      }
+    }
+    catch (e) {
+      // Loading the story module can fail here (e.g. module-scope code that
+      // only works inside the preview iframe) — fall through to docsText.
+    }
+
+    // Last resort: plain text extracted at collection time (tags stripped).
+    // Used for stories whose component cannot load in the host app.
+    renderedDoc.value = story.value.docsText ?? ''
   })
 
   return {
