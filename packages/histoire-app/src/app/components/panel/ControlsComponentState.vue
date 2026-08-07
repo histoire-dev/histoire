@@ -28,7 +28,10 @@ const stateKeys = computed(() => Object.keys(props.variant.state || {})
 </script>
 
 <template>
-  <div class="histoire-controls-component-init-state">
+  <div
+    class="histoire-controls-component-init-state"
+    data-test-id="story-controls-detected-state"
+  >
     <div class="htw-p-2 htw-flex htw-items-center htw-gap-1">
       <Icon
         v-tooltip="'Auto-detected state'"

@@ -15,7 +15,6 @@ const myParameter = [
 <template>
   <Story
     title="ComplexParameter"
-    :layout="{ type: 'single', iframe: false }"
   >
     <ComplexParameter
       :complex-parameter="myParameter"

@@ -3,12 +3,7 @@
 describe('Grid state isolation', () => {
   const storyPath = '/story/src-components-sharedcontrols-story-vue?variantId=src-components-sharedcontrols-story-vue-0'
 
-  const getIframeBody = () => cy.get('iframe[data-test-id="preview-iframe"]')
-    .its('0.contentDocument.body')
-    .should('not.be.empty')
-    .then(cy.wrap)
-
-  const getVariantCard = variantId => getIframeBody()
+  const getVariantCard = variantId => cy.getPreviewIframeBody()
     .find(`[data-histoire-variant-id="${variantId}"]`)
 
   beforeEach(() => {

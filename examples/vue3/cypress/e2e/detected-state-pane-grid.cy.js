@@ -1,31 +1,13 @@
 /// <reference types="cypress" />
 
 describe('Detected state pane in grid stories', () => {
-  before(() => {
-    Cypress.on('uncaught:exception', (error) => {
-      if (error.message.includes('A preview test collection is already active.')) {
-        return false
-      }
-    })
-  })
-
   const storyPath = '/story/src-components-detectedstatepane-story-vue?variantId=src-components-detectedstatepane-story-vue-0'
-
-  /**
-   * Returns preview iframe body for grid story interactions.
-   */
-  function getIframeBody() {
-    return cy.get('iframe[data-test-id="preview-iframe"]')
-      .its('0.contentDocument.body')
-      .should('not.be.empty')
-      .then(cy.wrap)
-  }
 
   /**
    * Selects one variant card from grid iframe.
    */
   function selectGridVariant(title, variantId) {
-    getIframeBody().contains('button', title).click({ force: true })
+    cy.getPreviewIframeBody().contains('button', title).click({ force: true })
     cy.location('search').should('include', `variantId=${variantId}`)
   }
 

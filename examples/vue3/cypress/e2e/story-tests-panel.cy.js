@@ -51,9 +51,11 @@ describe('Preview tests panel', () => {
     openTestsPanel()
     cy.contains('button', 'Run tests').should('be.visible')
     cy.get('[data-test-id="story-test-row"]').should('have.length', 3)
-    cy.get('[data-test-id="story-test-row"]').each(($row) => {
-      cy.wrap($row).contains('Not run')
-    })
+    // The runnable tests start as "Not run"; the `it.skip` one is known to be
+    // skipped before anything runs, so it reports that from the start.
+    cy.contains('[data-test-id="story-test-row"]', 'renders the mocked dependency output').contains('Not run')
+    cy.contains('[data-test-id="story-test-row"]', 'tracks calls through the mocked module function').contains('Not run')
+    cy.contains('[data-test-id="story-test-row"]', 'fails').contains('Skipped')
 
     cy.contains('button', 'Run tests').click()
     cy.get('[data-test-id="story-test-row"]').should('have.length', 3)
@@ -66,9 +68,18 @@ describe('Preview tests panel', () => {
     cy.get('@skippedRow').should('not.contain', 'This test is expected to fail')
   })
 
-  it('refreshes mocked story tests after hot updates', () => {
+  // Hot updates only exist while the dev server is running. `histoire preview`
+  // (what CI serves) is a static build of the book, so this is skipped there
+  // rather than failing: run the suite against `histoire dev` to cover it.
+  it('refreshes mocked story tests after hot updates', function () {
     cy.viewport(1600, 1000)
     cy.visit('/')
+
+    cy.document().then((doc) => {
+      if (!doc.querySelector('script[src*="/@vite/client"]')) {
+        this.skip()
+      }
+    })
 
     cy.openVitestStory()
     openTestsPanel()

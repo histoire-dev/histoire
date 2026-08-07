@@ -1,11 +1,6 @@
 /// <reference types="cypress" />
 
 describe('background color', () => {
-  const getIframeBody = () => cy.get('iframe[data-test-id="preview-iframe"]')
-    .its('0.contentDocument.body')
-    .should('not.be.empty')
-    .then(cy.wrap)
-
   const backgroundColorShouldBe = [
     'rgba(0, 0, 0, 0)',
     'rgb(255, 255, 255)',
@@ -24,35 +19,48 @@ describe('background color', () => {
     'rgb(0, 81, 66)',
   ]
 
-  it('should provide background and contrast color (no iframe)', () => {
-    cy.visit('/story/src-components-complexparameter-story-vue?variantId=_default')
+  /**
+   * Applies the nth background preset. The popper is re-queried on every call
+   * instead of iterating over one captured button list: opening the story
+   * re-renders the toolbar, which detaches previously yielded elements.
+   */
+  function selectBackground(index) {
     cy.get('[data-test-id="toolbar-background"]').click()
-    cy.get('[data-test-id="background-popper"]').should('be.visible').find('button').should('have.length', 6).each(($el, index) => {
-      cy.wrap($el).click()
-      cy.get('[data-test-id="responsive-preview-bg"]').should('have.css', 'background-color', backgroundColorShouldBe[index])
-      cy.get('[data-test-id="story-variant-single-view"] .native-story').should('have.css', 'color', contrastColorShouldBe[index])
-      cy.get('[data-test-id="toolbar-background"]').click()
+    cy.get('[data-test-id="background-popper"]').should('be.visible').find('button').should('have.length', 6).eq(index).click()
+  }
+
+  /** Runs `assert(index)` once per background preset. */
+  function forEachBackground(assert) {
+    for (let index = 0; index < backgroundColorShouldBe.length; index++) {
+      selectBackground(index)
+      assert(index)
+    }
+  }
+
+  /**
+   * Opens a story and waits for the preview to report ready: the toolbar
+   * re-renders at that point, and interacting with it before detaches the
+   * element mid-command.
+   */
+  function openStory(url) {
+    cy.visit(url)
+    cy.get('[data-test-id="story-side-panel"]').should('be.visible')
+  }
+
+  it('should provide background and contrast color (single variant)', () => {
+    openStory('/story/src-components-contrastcolor-story-vue?variantId=_default')
+    forEachBackground((index) => {
+      cy.getPreviewIframeBody().find('.contrast-color').should('have.css', 'color', contrastColorShouldBe[index])
     })
   })
 
-  it('should provide background and contrast color (with iframe)', () => {
-    cy.visit('story/src-components-contrastcolor-story-vue?variantId=_default')
-    cy.get('[data-test-id="toolbar-background"]').click()
-    cy.get('[data-test-id="background-popper"]').should('be.visible').find('button').should('have.length', 6).each(($el, index) => {
-      cy.wrap($el).click()
-      getIframeBody().find('.contrast-color').should('have.css', 'color', contrastColorShouldBe[index])
-      cy.get('[data-test-id="toolbar-background"]').click()
-    })
-  })
-
+  // The whole grid renders inside a single sandbox iframe, so both the preview
+  // background and the story content live in that document.
   it('should provide background and contrast color (grid)', () => {
-    cy.visit('/story/src-components-substory-story-vue?variantId=src-components-substory-story-vue-0')
-    cy.get('[data-test-id="toolbar-background"]').click()
-    cy.get('[data-test-id="background-popper"]').should('be.visible').find('button').should('have.length', 6).each(($el, index) => {
-      cy.wrap($el).click()
-      cy.get('[data-test-id="responsive-preview-bg"]').should('have.css', 'background-color', backgroundColorShouldBe[index])
-      cy.get('.histoire-generic-render-story .text').should('have.css', 'color', contrastColorShouldBe[index])
-      cy.get('[data-test-id="toolbar-background"]').click()
+    openStory('/story/src-components-substory-story-vue?variantId=src-components-substory-story-vue-0')
+    forEachBackground((index) => {
+      cy.getPreviewIframeBody().find('[data-test-id="responsive-preview-bg"]').should('have.css', 'background-color', backgroundColorShouldBe[index])
+      cy.getPreviewIframeBody().find('.histoire-generic-render-story .text').should('have.css', 'color', contrastColorShouldBe[index])
     })
   })
 })

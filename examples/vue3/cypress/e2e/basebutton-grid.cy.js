@@ -1,43 +1,22 @@
 /// <reference types="cypress" />
 
 describe('BaseButton grid detection', () => {
-  before(() => {
-    Cypress.on('uncaught:exception', (error) => {
-      if (error.message.includes('A preview test collection is already active.')) {
-        return false
-      }
-    })
-  })
-
-  const getIframeBody = () => cy.get('iframe[data-test-id="preview-iframe"]')
-    .its('0.contentDocument.body')
-    .should('not.be.empty')
-    .then(cy.wrap)
-
   function openBaseButtonStory() {
     cy.visit('/story/src-components-basebutton-story-vue?variantId=src-components-basebutton-story-vue-0')
     cy.get('[data-test-id="story-side-panel"]').should('be.visible')
   }
 
   function selectGridVariant(title, variantId) {
-    getIframeBody().contains('button', title).click({ force: true })
+    cy.getPreviewIframeBody().contains('button', title).click({ force: true })
     cy.location('search').should('include', `variantId=${variantId}`)
   }
 
-  function expectDetectedState(count) {
-    cy.get('[data-test-id="story-controls"]').within(() => {
-      cy.contains('State').parents('.histoire-controls-component-init-state').find('.histoire-controls-component-prop-item').should('have.length', count)
-    })
-  }
-
   function expectDetectedProps(componentCount) {
-    cy.get('[data-test-id="story-controls"]').within(() => {
-      cy.get('.histoire-controls-component-props').should('have.length', componentCount)
-    })
+    cy.get('[data-test-id="story-controls-detected-props"]').should('have.length', componentCount)
   }
 
   function expectNoDetectedState() {
-    cy.get('[data-test-id="story-controls"]').contains('State').should('not.exist')
+    cy.get('[data-test-id="story-controls-detected-state"]').should('not.exist')
   }
 
   beforeEach(() => {
@@ -47,9 +26,19 @@ describe('BaseButton grid detection', () => {
 
   it('shows deterministic detected controls for all grid variants', () => {
     cy.location('search').should('include', 'variantId=src-components-basebutton-story-vue-0')
-    expectDetectedState(3)
+    // The "playground" variant defines a `#controls` slot: those custom
+    // controls replace the generic editors for its own state, and the detected
+    // props of the rendered component are listed next to them.
+    cy.get('[data-test-id="story-controls"]').within(() => {
+      cy.contains('label', /^Disabled$/).should('be.visible')
+      cy.contains('label', 'Color').should('be.visible')
+      cy.contains('label', 'Size').should('be.visible')
+    })
     expectDetectedProps(1)
+    expectNoDetectedState()
 
+    // The other variants declare neither init state nor controls: only the
+    // detected props of the component they render.
     selectGridVariant('big green button', 'src-components-basebutton-story-vue-1')
     expectDetectedProps(1)
     expectNoDetectedState()
