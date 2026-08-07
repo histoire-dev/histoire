@@ -8,6 +8,7 @@ export default {
 import type { Story } from '../../types'
 import { clientSupportPlugins } from 'virtual:$histoire-support-plugins-client'
 import { markRaw, ref, watchEffect } from 'vue'
+import { resolveStoryFileComponent } from '../../util/story-component'
 
 const props = defineProps<{
   story: Story
@@ -17,10 +18,15 @@ const mountComponent = ref(null)
 
 watchEffect(async () => {
   const clientPlugin = clientSupportPlugins[props.story.file?.supportPluginId]
-  if (clientPlugin) {
-    const pluginModule = await clientPlugin()
-    mountComponent.value = markRaw(pluginModule.MountStory)
+  if (!clientPlugin) {
+    return
   }
+
+  // The story component is exposed as a loader: resolve it before mounting, or
+  // the support plugin renders the loader itself.
+  await resolveStoryFileComponent(props.story.file)
+  const pluginModule = await clientPlugin()
+  mountComponent.value = markRaw(pluginModule.MountStory)
 })
 </script>
 

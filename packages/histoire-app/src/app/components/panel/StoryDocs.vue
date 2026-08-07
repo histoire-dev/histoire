@@ -6,6 +6,7 @@ import { markdownFiles } from 'virtual:$histoire-markdown-files'
 import { computed, nextTick, ref, toRefs, watch, watchEffect } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { histoireConfig } from '../../util/config.js'
+import { resolveStoryFileComponent } from '../../util/story-component'
 import BaseEmpty from '../base/BaseEmpty.vue'
 import DevOnlyToolbarOpenInEditor from '../toolbar/DevOnlyToolbarOpenInEditor.vue'
 
@@ -26,30 +27,10 @@ export function useStoryDoc(story: Ref<Story>) {
     // the story module (vitest-mocked stories only run inside the preview
     // iframe, so their component never loads here).
     try {
-      let comp = story.value.file?.component
-      if (comp) {
-        if (comp.__asyncResolved) {
-          comp = comp.__asyncResolved
-        }
-        else if (comp.__asyncLoader) {
-          comp = await comp.__asyncLoader()
-        }
-        else if (typeof comp === 'function') {
-          try {
-            comp = await comp()
-          }
-          catch (e) {
-            // Noop
-            // Could be a class that requires `new com()`
-          }
-        }
-        if (comp?.default) {
-          comp = comp.default
-        }
-        if (comp?.doc) {
-          renderedDoc.value = comp.doc
-          return
-        }
+      const comp = await resolveStoryFileComponent(story.value.file)
+      if (comp?.doc) {
+        renderedDoc.value = comp.doc
+        return
       }
     }
     catch (e) {
