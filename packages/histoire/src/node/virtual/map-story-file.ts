@@ -42,7 +42,7 @@ export function mapStoryFile(file: MappableStoryFile, existingFile?: StoryFile):
         result.story = {
           ...result.story,
           ...file.story,
-          file: markRaw(result),
+          file: result,
           variants: file.story.variants.map(variant => mapStoryVariant(
             variant,
             existingFile.story.variants.find(item => item.id === variant.id),
@@ -64,12 +64,15 @@ export function mapStoryFile(file: MappableStoryFile, existingFile?: StoryFile):
       story: {
         ...file.story,
         title: file.story.title,
+        // Deliberately NOT `markRaw`ed: the mapped file is stored in a `ref`,
+        // and `__v_skip` on it would leave the whole story/variant tree
+        // non-reactive. Only `component` stays raw.
         file: null as unknown as StoryFile,
         variants: file.story.variants.map(variant => mapStoryVariant(variant)),
         slots: createEmptySlots,
       },
     }
-    result.story.file = markRaw(result)
+    result.story.file = result
   }
 
   return result

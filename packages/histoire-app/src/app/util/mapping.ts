@@ -37,7 +37,7 @@ export function mapFile(file: StoryFile, existingFile?: StoryFile): StoryFile {
         result.story = {
           ...result.story,
           ...file.story,
-          file: markRaw(result),
+          file: result,
           variants: file.story.variants.map(v => mapVariant(v, existingFile.story.variants.find(item => item.id === v.id))),
         }
       }
@@ -55,13 +55,17 @@ export function mapFile(file: StoryFile, existingFile?: StoryFile): StoryFile {
         ...file.story,
         title: file.story.title,
         // Points at the mapped file, not the raw input: `story.file` is read
-        // back to reach the mapped variants (and their state).
+        // back to reach the mapped variants (and their state). Deliberately NOT
+        // `markRaw`ed: the mapped file is stored in a `ref` by both the app and
+        // the preview runtime, and `__v_skip` on it would leave the whole
+        // story/variant tree non-reactive — `configReady` and `previewReady`
+        // would stop notifying their watchers. Only `component` stays raw.
         file: null as unknown as StoryFile,
         variants: file.story.variants.map(v => mapVariant(v)),
         slots: createEmptySlots,
       },
     }
-    result.story.file = markRaw(result)
+    result.story.file = result
   }
 
   return result
