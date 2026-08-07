@@ -29,6 +29,12 @@ export interface PreviewRuntimePreambleOptions {
   variantTestSessionId: string
   /** Resolved id of the static (build mode) mock runtime module. */
   staticMockRuntimeId: string
+  /**
+   * Resolved directory of the bundled `@histoire/app` build. Baked as absolute
+   * paths because a bare specifier in this virtual module would be resolved
+   * from the user's project, which only depends on `histoire`.
+   */
+  histoireAppBundledDir: string
   /** Baked story metadata. */
   files: PreviewRuntimeStoryFile[]
   /** Emitted `"<story id>": () => import("<module id>")` loader entries. */
@@ -48,10 +54,14 @@ export function previewRuntimePreamble({
   histoireSharedId,
   variantTestSessionId,
   staticMockRuntimeId,
+  histoireAppBundledDir,
   files,
   loaders,
 }: PreviewRuntimePreambleOptions) {
-  return `import '@histoire/app/dist/bundled/util/vitest-mocker-shim.js'
+  /** Quotes an absolute specifier for a module of the bundled app build. */
+  const app = (subpath: string) => JSON.stringify(`${histoireAppBundledDir}/${subpath}`)
+
+  return `import ${app('util/vitest-mocker-shim.js')}
 import 'virtual:$histoire-theme'
 ${hasVitestPreview
   ? `import { createMockInstance } from ${JSON.stringify(vitestSpyId)}
@@ -60,17 +70,17 @@ import { ModuleMocker, ModuleMockerMSWInterceptor } from ${JSON.stringify(vitest
 import FloatingVue from '@histoire/vendors/floating-vue'
 import { createPinia } from '@histoire/vendors/pinia'
 import { computed, createApp, defineComponent, h, nextTick, onMounted, reactive, ref, watch } from '@histoire/vendors/vue'
-import StoryVariantGridSandbox from '@histoire/app/dist/bundled/components/story/StoryVariantGridSandbox.vue.js'
-import GenericMountStory from '@histoire/app/dist/bundled/components/story/GenericMountStory.vue.js'
-import GenericRenderStory from '@histoire/app/dist/bundled/components/story/GenericRenderStory.vue.js'
-import { setupPluginApi } from '@histoire/app/dist/bundled/plugin.js'
-import { usePreviewSettingsStore } from '@histoire/app/dist/bundled/stores/preview-settings.js'
-import { COLLECT_TESTS, CONTROLS_READY, CONTROLS_RESIZE, PREVIEW_SETTINGS_SYNC, PREVIEW_SYNC, RUN_TESTS, SANDBOX_READY, SELECT_VARIANT, STATE_SYNC, TEST_DEFINITIONS, TEST_RESULT, VARIANT_READY } from '@histoire/app/dist/bundled/util/const.js'
-import { histoireConfig } from '@histoire/app/dist/bundled/util/config.js'
-import { isDark } from '@histoire/app/dist/bundled/util/dark.js'
-import { mapFile } from '@histoire/app/dist/bundled/util/mapping.js'
-import { applyPreviewSettings } from '@histoire/app/dist/bundled/util/preview-settings.js'
-import { toRawDeep } from '@histoire/app/dist/bundled/util/state.js'
+import StoryVariantGridSandbox from ${app('components/story/StoryVariantGridSandbox.vue.js')}
+import GenericMountStory from ${app('components/story/GenericMountStory.vue.js')}
+import GenericRenderStory from ${app('components/story/GenericRenderStory.vue.js')}
+import { setupPluginApi } from ${app('plugin.js')}
+import { usePreviewSettingsStore } from ${app('stores/preview-settings.js')}
+import { COLLECT_TESTS, CONTROLS_READY, CONTROLS_RESIZE, PREVIEW_SETTINGS_SYNC, PREVIEW_SYNC, RUN_TESTS, SANDBOX_READY, SELECT_VARIANT, STATE_SYNC, TEST_DEFINITIONS, TEST_RESULT, VARIANT_READY } from ${app('util/const.js')}
+import { histoireConfig } from ${app('util/config.js')}
+import { isDark } from ${app('util/dark.js')}
+import { mapFile } from ${app('util/mapping.js')}
+import { applyPreviewSettings } from ${app('util/preview-settings.js')}
+import { toRawDeep } from ${app('util/state.js')}
 import { applyVariantStateUpdate, createFailedRunSummary, createVariantStateSyncGuards, getVariantStateKey, serializeTestError } from ${JSON.stringify(histoireSharedId)}
 import { createVariantTestSession } from ${JSON.stringify(variantTestSessionId)}
 ${hasVitestPreview

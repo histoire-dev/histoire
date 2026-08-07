@@ -2,6 +2,7 @@ import type { Context } from '../../context.js'
 import type { PreviewRuntimeStoryFile } from './preamble.js'
 import { createRequire } from 'node:module'
 import { hasProjectVitest } from '../../util/has-vitest.js'
+import { resolveHistoireAppBundledDir } from '../../util/resolve-histoire-app.js'
 import { resolveHistoireSharedEntry } from '../../util/resolve-histoire-shared.js'
 import { tryResolveVitestModule } from '../../util/resolve-vitest-package.js'
 import { previewAppRoot } from './app-root.js'
@@ -40,6 +41,8 @@ export interface PreviewRuntimeSourceOptions {
   variantTestSessionId: string
   /** Resolved id of the static (build mode) mock runtime module. */
   staticMockRuntimeId: string
+  /** Resolved directory of the bundled `@histoire/app` build. */
+  histoireAppBundledDir: string
   /** Story metadata baked into the runtime at transform time. */
   files: PreviewRuntimeStoryFile[]
   /** Emitted `"<story id>": () => import("<module id>")` loader entries. */
@@ -167,6 +170,7 @@ export function previewRuntime(ctx: Context) {
     histoireSharedId,
     variantTestSessionId,
     staticMockRuntimeId,
+    histoireAppBundledDir: resolveHistoireAppBundledDir(),
     files,
     loaders,
   })
