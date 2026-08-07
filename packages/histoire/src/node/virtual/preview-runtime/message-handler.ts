@@ -9,10 +9,13 @@
 export function previewMessageHandler() {
   return `    window.addEventListener('message', async (event) => {
       // Defense-in-depth, applied uniformly to every message type: the host
-      // posts same-origin messages from window.parent, all carrying the
-      // __histoire marker. Anything from a foreign frame or origin, or without
-      // the marker, is dropped before it reaches the dispatch below.
-      if (event.source !== window.parent) return
+      // posts same-origin messages from the window embedding this sandbox, all
+      // carrying the __histoire marker. Anything from a foreign frame or
+      // origin, or without the marker, is dropped before it reaches the
+      // dispatch below. Resolved through \`getHostWindow()\` rather than
+      // \`window.parent\` for the reasons documented there.
+      const hostWindow = getHostWindow()
+      if (!hostWindow || event.source !== hostWindow) return
       if (event.origin && event.origin !== window.location.origin) return
       if (!event.data?.__histoire) return
 

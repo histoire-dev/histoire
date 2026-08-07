@@ -59,12 +59,18 @@ function splitTopLevelArgs(args: string): string[] {
  * True for a receiver that really is another browsing context — the only calls
  * this contract governs.
  *
+ * `hostWindow` is what the preview runtime resolves the embedding window to
+ * (`getHostWindow()`), the host half reaches the sandbox through
+ * `contentWindow`.
+ *
  * `options.postMessage(...)`-style receivers are injected transports (the
  * caller hands in a function that ultimately delegates to one of these real
  * ones), so they are covered by their own unit tests instead.
  */
 function isFrameBoundaryReceiver(receiver: string) {
-  return receiver.includes('parent') || receiver.includes('contentWindow')
+  return receiver.includes('parent')
+    || receiver.includes('hostWindow')
+    || receiver.includes('contentWindow')
 }
 
 /**

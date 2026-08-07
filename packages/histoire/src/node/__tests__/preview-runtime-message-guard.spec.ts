@@ -34,12 +34,13 @@ function createPreviewRuntime(options: { onCollect?: () => void, onRun?: () => v
   const syncSelection = vi.fn(async () => {})
   let listener: (event: any) => Promise<void>
 
-  const parent = {}
+  // The window embedding the sandbox, as `getHostWindow()` resolves it.
+  const hostWindow = {}
   const story: { value: { id: string } | null } = { value: { id: 'story-a' } }
   const variant: { value: { id: string } | null } = { value: { id: 'variant-a' } }
   const stubs: Record<string, any> = {
+    getHostWindow: () => hostWindow,
     window: {
-      parent,
       location: { origin: 'http://localhost:3000' },
       addEventListener: (type: string, handler: any) => {
         if (type === 'message') {
@@ -85,7 +86,7 @@ function createPreviewRuntime(options: { onCollect?: () => void, onRun?: () => v
     /** Delivers a message to the runtime, awaiting the async dispatch. */
     async deliver(data: Record<string, any>, overrides: { source?: unknown, origin?: string } = {}) {
       await listener!({
-        source: 'source' in overrides ? overrides.source : parent,
+        source: 'source' in overrides ? overrides.source : hostWindow,
         origin: overrides.origin ?? 'http://localhost:3000',
         data,
       })
