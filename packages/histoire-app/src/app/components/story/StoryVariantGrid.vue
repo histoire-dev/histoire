@@ -1,121 +1,82 @@
 <script lang="ts" setup>
-import { useResizeObserver } from '@vueuse/core'
-import { computed, onMounted, ref, watch } from 'vue'
+import { watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { useStoryStore } from '../../stores/story'
+import { usePreviewIframeHost } from '../../util/preview-iframe-host'
 import { isMobile } from '../../util/responsive'
 import DevOnlyToolbarOpenInEditor from '../toolbar/DevOnlyToolbarOpenInEditor.vue'
 import ToolbarBackground from '../toolbar/ToolbarBackground.vue'
 import ToolbarTextDirection from '../toolbar/ToolbarTextDirection.vue'
-import StoryVariantGridItem from './StoryVariantGridItem.vue'
 
 const storyStore = useStoryStore()
+const router = useRouter()
+const route = useRoute()
 
-const gridTemplateWidth = computed(() => {
-  if (storyStore.currentStory.layout.type !== 'grid') {
+/**
+ * Marks every variant in the current story as waiting for a refreshed preview:
+ * the grid document hosts them all, so a reload invalidates all of them.
+ */
+function markStoryPreviewPending() {
+  if (!storyStore.currentStory) {
     return
   }
 
-  const layoutWidth = storyStore.currentStory.layout.width
-
-  if (!layoutWidth) {
-    return '200px'
-  }
-
-  if (typeof layoutWidth === 'number') {
-    return `${layoutWidth}px`
-  }
-
-  return layoutWidth
-})
-
-const margin = 16
-const gap = 16
-
-const itemWidth = ref(16)
-const maxItemHeight = ref(0)
-const maxCount = ref(10)
-const countPerRow = ref(0)
-const visibleRows = ref(0)
-
-const el = ref<HTMLDivElement>(null)
-
-useResizeObserver(el, () => {
-  updateMaxCount()
-  updateSize()
-})
-
-function updateMaxCount() {
-  if (!maxItemHeight.value) return
-
-  const width = el.value!.clientWidth - margin * 2
-  const height = el.value!.clientHeight
-  const scrollTop = el.value!.scrollTop
-
-  // width = (countPerRow - 1) * gap + countPerRow * itemWidth.value
-
-  // W = (C - 1) * G + C * I
-  // W = C * G - G + C * I
-  // W + G = C * G + C * I
-  // W + G = C * (G + I)
-  // (W + G) / (G + I) = C
-
-  countPerRow.value = Math.floor((width + gap) / (itemWidth.value + gap))
-  visibleRows.value = Math.ceil((height + scrollTop + gap) / (maxItemHeight.value + gap))
-  const newMaxCount = countPerRow.value * visibleRows.value
-  if (maxCount.value < newMaxCount) {
-    maxCount.value = newMaxCount
-  }
-
-  if (storyStore.currentVariant) {
-    const index = storyStore.currentStory.variants.indexOf(storyStore.currentVariant)
-    if (index + 1 > maxCount.value) {
-      maxCount.value = index + 1
-    }
+  for (const variant of storyStore.currentStory.variants) {
+    Object.assign(variant, {
+      previewReady: false,
+    })
   }
 }
 
-function onItemResize(w: number, h: number) {
-  itemWidth.value = w
-  if (maxItemHeight.value < h) {
-    maxItemHeight.value = h
-    updateMaxCount()
-  }
-}
-
-watch(() => storyStore.currentVariant, () => {
-  maxItemHeight.value = 0 // Reset max height
-  updateMaxCount()
+const {
+  iframe,
+  iframeReloadKey,
+  isIframeLoaded,
+  sandboxUrl,
+  onIframeLoad,
+  reloadPreviewFrame,
+} = usePreviewIframeHost({
+  mode: 'grid',
+  getStory: () => storyStore.currentStory,
+  getCurrentVariant: () => storyStore.currentVariant,
+  getVariantById: variantId => storyStore.getCurrentStoryVariantById(variantId),
+  markPreviewPending: markStoryPreviewPending,
+  onSelectVariant: (variantId) => {
+    router.push({
+      query: {
+        ...route.query,
+        variantId,
+      },
+    })
+  },
+  // Variant objects survive navigation (`previewReady` is copied across story
+  // remaps), so revisiting a grid story would otherwise start with stale-true
+  // readiness while the new iframe is still loading.
+  resetOnMount: true,
 })
 
-// Grid size
-
-const gridEl = ref<HTMLDivElement>(null)
-const gridColumnWidth = ref(1)
-const viewWidth = ref(1)
-
-function updateSize() {
-  if (!el.value) return
-  viewWidth.value = el.value.clientWidth
-
-  if (!gridEl.value) return
-
-  if (gridTemplateWidth.value.endsWith('%')) {
-    gridColumnWidth.value = viewWidth.value * Number.parseInt(gridTemplateWidth.value) / 100 - gap
+// The sandbox iframe bakes the story's variant list when its module loads, so
+// it cannot pick up added/removed/renamed variants via HMR. The host sees the
+// fresh list first — force a clean mount (the dev server invalidated the
+// runtime module during collection, so the reload gets up-to-date data).
+watch(() => [
+  storyStore.currentStory?.id,
+  storyStore.currentStory?.variants.map(variant => variant.id).join('\n'),
+] as const, ([storyId, variantIds], previous) => {
+  const [previousStoryId, previousVariantIds] = previous ?? []
+  if (!storyId || storyId !== previousStoryId) {
+    // Story switches remount the iframe through sandboxUrl already.
+    return
   }
-  else {
-    gridColumnWidth.value = Number.parseInt(gridTemplateWidth.value)
+
+  if (variantIds !== previousVariantIds) {
+    // Mark pending before the remount so readiness does not stay stale-true from
+    // the previous variant list while the fresh iframe boots (which would let
+    // test collection post into a not-yet-ready frame).
+    markStoryPreviewPending()
+    reloadPreviewFrame()
   }
-}
-
-onMounted(() => {
-  updateSize()
 })
-
-useResizeObserver(gridEl, () => {
-  updateSize()
-})
-
-const columnCount = computed(() => Math.min(storyStore.currentStory.variants.length, Math.floor((viewWidth.value + gap) / (gridColumnWidth.value + gap))))
 </script>
 
 <template>
@@ -135,35 +96,17 @@ const columnCount = computed(() => Math.min(storyStore.currentStory.variants.len
       />
     </div>
 
-    <div
-      ref="el"
-      class="htw-overflow-y-auto htw-flex htw-flex-1"
-      @scroll="updateMaxCount()"
-    >
-      <div class="htw-flex htw-w-0 htw-flex-1 htw-mx-4">
-        <div
-          class="htw-m-auto"
-          :style="{
-            minHeight: `${(storyStore.currentStory.variants.length / countPerRow) * (maxItemHeight + gap) - gap}px`,
-          }"
-        >
-          <div
-            ref="gridEl"
-            class="htw-grid htw-gap-4 htw-my-4"
-            :style="{
-              gridTemplateColumns: `repeat(${columnCount}, ${gridColumnWidth}px)`,
-            }"
-          >
-            <StoryVariantGridItem
-              v-for="(variant, index) of storyStore.currentStory.variants.slice(0, maxCount)"
-              :key="index"
-              :variant="variant"
-              :story="storyStore.currentStory"
-              @resize="onItemResize"
-            />
-          </div>
-        </div>
-      </div>
-    </div>
+    <iframe
+      :key="iframeReloadKey"
+      ref="iframe"
+      :src="sandboxUrl"
+      loading="lazy"
+      class="htw-w-full htw-h-full htw-relative"
+      :class="{
+        'htw-invisible': !isIframeLoaded,
+      }"
+      data-test-id="preview-iframe"
+      @load="onIframeLoad()"
+    />
   </div>
 </template>

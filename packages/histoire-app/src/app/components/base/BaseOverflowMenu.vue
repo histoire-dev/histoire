@@ -9,11 +9,10 @@ const overflowButtonWidth = 32
 
 const el = ref<HTMLDivElement>()
 
-const availableWidth = ref(0)
+const containerWidth = ref(0)
 
 useResizeObserver(el, (entries) => {
-  const containerWidth = entries[0].contentRect.width
-  availableWidth.value = containerWidth - overflowButtonWidth
+  containerWidth.value = entries[0].contentRect.width
 })
 
 // Children
@@ -26,11 +25,22 @@ interface ChildState {
 const children = ref(new Map<HTMLElement, ChildState>())
 
 const visibleChildrenCount = computed(() => {
-  let width = 0
   const c = [...children.value.values()].sort((a, b) => a.index - b.index)
+  const totalWidth = c.reduce((total, child) => total + child.width, 0)
+
+  // The overflow button is only rendered once something actually overflows, so
+  // its width must not be reserved while every child still fits: doing so hides
+  // the last child even though there is room for it (and then the button it made
+  // room for is what shows instead).
+  if (totalWidth <= containerWidth.value) {
+    return c.length
+  }
+
+  const availableWidth = containerWidth.value - overflowButtonWidth
+  let width = 0
   for (let i = 0; i < c.length; i++) {
     width += c[i].width
-    if (width > availableWidth.value) {
+    if (width > availableWidth) {
       return i
     }
   }

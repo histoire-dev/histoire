@@ -5,12 +5,17 @@ export interface StoryFile {
   story: Story
   path: string[]
   filePath: string
+  hasVitestMocks?: boolean
   docsFilePath?: string
   source: () => Promise<{ default: string }>
 }
 
 export type StoryLayout = {
   type: 'single'
+  /**
+   * @deprecated The preview now always renders stories inside an iframe —
+   * this option is ignored.
+   */
   iframe?: boolean
 } | {
   type: 'grid'

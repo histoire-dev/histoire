@@ -13,7 +13,11 @@ export default _defineComponent({
     },
   },
 
-  setup(props) {
+  emits: {
+    ready: () => true,
+  },
+
+  setup(props, { emit }) {
     const options = props.story.file.component as StoryOptions
 
     let rawVariants: VariantOptions[] = []
@@ -41,6 +45,8 @@ export default _defineComponent({
         configReady: true,
       })
     }
+
+    emit('ready')
   },
 
   render() {

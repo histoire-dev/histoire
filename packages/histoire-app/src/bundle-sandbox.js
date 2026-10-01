@@ -1,2 +1,3 @@
-import './app/style/sandbox.css'
-import './bundled/sandbox.js'
+import 'histoire-style'
+import 'histoire-bundled-style'
+import 'virtual:$histoire-preview-runtime'

@@ -7,12 +7,12 @@ import { cpus } from 'node:os'
 import { MessageChannel } from 'node:worker_threads'
 import Tinypool from '@akryum/tinypool'
 import { createBirpc } from 'birpc'
-import path, { relative } from 'pathe'
+import path from 'pathe'
 import pc from 'picocolors'
 import { ViteNodeServer } from 'vite-node/server'
 import { TEMP_PATH } from '../alias.js'
-import { createPath } from '../tree.js'
 import { slash } from '../util/fs.js'
+import { finalizeCollectedStoryFile } from './finalize.js'
 
 export interface UseCollectStoriesOptions {
   server: ViteDevServer
@@ -116,29 +116,9 @@ export function useCollectStories(options: UseCollectStoriesOptions, ctx: Contex
         console.warn(pc.yellow(`⚠️  Multiple stories not supported: ${storyFile.path}`))
       }
 
-      const finalData = storyData[0]
-
-      // Default props
-      if (ctx.config.defaultStoryProps) {
-        for (const key in ctx.config.defaultStoryProps) {
-          if (finalData[key] == null) {
-            finalData[key] = ctx.config.defaultStoryProps[key]
-          }
-        }
-      }
-
-      if (!finalData.layout) {
-        finalData.layout = { type: 'single', iframe: true }
-      }
-
-      storyFile.id = finalData.id
-      storyFile.story = finalData
-      storyFile.treeFile = {
-        title: finalData.title,
-        path: relative(server.config.root, storyFile.path),
-      }
-      storyFile.treePath = createPath(ctx.config, storyFile.treeFile)
-      storyFile.story.title = storyFile.treePath[storyFile.treePath.length - 1]
+      // Shared with the browser collection: the two collection modes must not
+      // produce different story metadata for the same story file.
+      finalizeCollectedStoryFile(storyFile, ctx, storyData[0])
     }
     catch (e) {
       console.error(pc.red(`Error while collecting story ${storyFile.path}:\n${e.frame ? `${pc.bold(e.message)}\n${e.frame}` : e.stack}`))

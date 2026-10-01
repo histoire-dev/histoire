@@ -4,7 +4,11 @@ import { createApp } from 'vue'
 import App from './App.vue'
 import { setupPluginApi } from './plugin.js'
 import { router } from './router'
+import './util/vitest-mocker-shim'
+import 'virtual:$histoire-vitest-browser-runtime'
 import 'virtual:$histoire-theme'
+
+export { default as StoryVariantGridSandbox } from './components/story/StoryVariantGridSandbox.vue'
 
 export async function mountMainApp() {
   const app = createApp(App)

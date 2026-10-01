@@ -64,13 +64,22 @@ export default defineComponent({
 
     const mountVariant = computed(() => attrs.variant)
 
+    // Lifecycle hooks must register before async initState suspends setup;
+    // Vue clears active component context after first await.
+    onBeforeUnmount(() => {
+      renderStateSync?.stop()
+    })
+
     if (renderContext?.mode !== 'render' && typeof props.initState === 'function' && mountVariant.value) {
       const state = await props.initState()
       applyState(mountVariant.value.state, toRawDeep(state))
     }
 
     if (renderContext?.mode !== 'render' && mountVariant.value && implicitState) {
-      syncStateBundledAndExternal(mountVariant.value.state, implicitState())
+      // Hidden mount pass still needs each variant to start with its own
+      // snapshot of story-level exposed/setup/data state so detected controls
+      // and props are collected deterministically for every grid cell.
+      applyState(mountVariant.value.state, toRawDeep(implicitState()))
     }
 
     function updateVariant(variant: Variant) {
@@ -139,6 +148,25 @@ export default defineComponent({
       return vnodes
     }
 
+    function syncMountVariantAutoProps(variant: Variant) {
+      if (props.implicit || variant.autoPropsDisabled) {
+        return
+      }
+
+      const vnodes = vm.proxy.$slots.default?.({
+        state: variant.state,
+      }) ?? null
+
+      if (vnodes) {
+        lastPropsTypesSnapshot = syncVariantAutoProps(
+          variant,
+          vnodes,
+          variant.state,
+          lastPropsTypesSnapshot,
+        )
+      }
+    }
+
     function syncRenderVariantState(variant: Variant) {
       if (!implicitState) {
         return
@@ -160,14 +188,11 @@ export default defineComponent({
       updateVariant(mountVariant.value)
     }
 
-    onBeforeUnmount(() => {
-      renderStateSync?.stop()
-    })
-
     return {
       renderContext,
       renderVariantSlot,
       resolveVariant,
+      syncMountVariantAutoProps,
       syncRenderVariantState,
       updateVariant,
     }
@@ -184,6 +209,7 @@ export default defineComponent({
     this.syncRenderVariantState(variant)
 
     if (this.renderContext?.mode !== 'render') {
+      this.syncMountVariantAutoProps(variant)
       return null
     }
 

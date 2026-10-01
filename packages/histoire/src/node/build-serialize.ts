@@ -1,7 +1,10 @@
 import type { ServerStory } from '@histoire/shared'
 import type { Context } from './context.js'
+import { fileHasVitestMocks } from './util/story-vitest.js'
 
 interface SerializedStory extends Omit<ServerStory, 'docsText'> {
+  /** Only kept for stories whose docs are unreachable in the built app. */
+  docsText?: string
   relativePath: string
   supportPluginId: string
   treePath?: string[]
@@ -29,10 +32,18 @@ export function getSerializedStoryData(ctx: Context): SerializedStoryData {
 
   for (const storyFile of ctx.storyFiles) {
     if (storyFile.story) {
+      // docsText otherwise only feeds the build-time search index — keeping it
+      // out of histoire.json spares built apps every story's docs text.
+      //
+      // Vitest-mocked stories are the exception: their module only executes
+      // inside the preview iframe, so the app can never load the component
+      // carrying the rendered `<docs>` block and this extracted text is the
+      // only documentation it can show for them.
+      const { docsText, ...story } = storyFile.story
+      const keepDocsText = docsText && fileHasVitestMocks(storyFile)
       data.stories.push({
-        ...Object.assign({}, storyFile.story, {
-          docsText: undefined,
-        }),
+        ...story,
+        ...(keepDocsText ? { docsText } : {}),
         relativePath: storyFile.relativePath,
         supportPluginId: storyFile.supportPluginId,
         treePath: storyFile.treePath,

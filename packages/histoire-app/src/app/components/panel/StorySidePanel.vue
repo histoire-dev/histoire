@@ -10,6 +10,7 @@ import StoryControls from './StoryControls.vue'
 import StoryDocs from './StoryDocs.vue'
 import StoryEvents from './StoryEvents.vue'
 import StorySourceCode from './StorySourceCode.vue'
+import StoryTests from './StoryTests.vue'
 
 const storyStore = useStoryStore()
 
@@ -21,6 +22,8 @@ const panelContentComponent = computed(() => {
       return StoryDocs
     case 'events':
       return StoryEvents
+    case 'tests':
+      return StoryTests
     default:
       return StoryControls
   }
@@ -36,7 +39,7 @@ const panelContentComponent = computed(() => {
   </BaseEmpty>
 
   <BaseEmpty
-    v-else-if="!storyStore.currentVariant.configReady || !storyStore.currentVariant.previewReady"
+    v-else-if="!storyStore.currentVariant.previewReady"
     class="histoire-story-side-panel histoire-loading"
   >
     <span>Loading...</span>

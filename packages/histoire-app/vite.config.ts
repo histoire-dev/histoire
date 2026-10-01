@@ -60,10 +60,13 @@ export default defineConfig({
         ...Object.keys(require('./package.json').dependencies),
       ],
 
+      // The sandbox document is no longer a bundled app entry: it loads the
+      // generated `virtual:$histoire-preview-runtime` (see bundle-sandbox.js).
       input: [
         'src/app/api.ts',
         'src/app/index.ts',
-        'src/app/sandbox.ts',
+        // Generated sandbox runtime imports this bootstrap directly.
+        'src/app/util/controls-document.ts',
       ],
 
       output: {

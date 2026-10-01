@@ -11,7 +11,7 @@ function initState() {
 <template>
   <Story
     title="internals/HstSimpleCheckbox"
-    :layout="{ type: 'single', iframe: false }"
+    :layout="{ type: 'single' }"
   >
     <Variant
       title="playground"

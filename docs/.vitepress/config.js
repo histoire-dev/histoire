@@ -63,6 +63,10 @@ module.exports = {
                 link: '/guide/config',
               },
               {
+                text: 'Browser tests and migration',
+                link: '/guide/testing',
+              },
+              {
                 text: 'Plugins',
                 link: '/guide/plugins/official',
               },
@@ -273,6 +277,10 @@ module.exports = {
             {
               text: 'Configuration',
               link: '/guide/config',
+            },
+            {
+              text: 'Browser tests and migration',
+              link: '/guide/testing',
             },
           ],
         },

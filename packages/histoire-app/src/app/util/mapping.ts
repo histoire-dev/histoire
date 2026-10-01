@@ -1,6 +1,20 @@
 import type { StoryFile, Variant } from '../types'
 import { markRaw, reactive } from 'vue'
 
+/**
+ * Fresh slot holders for a story/variant.
+ *
+ * A new object per call: a shared one would let one variant's slots leak into
+ * every other variant mapped from the same file.
+ */
+function createEmptySlots() {
+  return {
+    default: null,
+    controls: null,
+    source: null,
+  }
+}
+
 const copiedFromExistingVariant = [
   'state',
   'slots',
@@ -23,7 +37,7 @@ export function mapFile(file: StoryFile, existingFile?: StoryFile): StoryFile {
         result.story = {
           ...result.story,
           ...file.story,
-          file: markRaw(result),
+          file: result,
           variants: file.story.variants.map(v => mapVariant(v, existingFile.story.variants.find(item => item.id === v.id))),
         }
       }
@@ -40,11 +54,18 @@ export function mapFile(file: StoryFile, existingFile?: StoryFile): StoryFile {
       story: {
         ...file.story,
         title: file.story.title,
-        file: markRaw(file),
+        // Points at the mapped file, not the raw input: `story.file` is read
+        // back to reach the mapped variants (and their state). Deliberately NOT
+        // `markRaw`ed: the mapped file is stored in a `ref` by both the app and
+        // the preview runtime, and `__v_skip` on it would leave the whole
+        // story/variant tree non-reactive — `configReady` and `previewReady`
+        // would stop notifying their watchers. Only `component` stays raw.
+        file: null as unknown as StoryFile,
         variants: file.story.variants.map(v => mapVariant(v)),
-        slots: () => ({}),
+        slots: createEmptySlots,
       },
     }
+    result.story.file = result
   }
 
   return result
@@ -68,10 +89,10 @@ export function mapVariant(variant: Variant, existingVariant?: Variant): Variant
       ...variant,
       state: reactive({
         _hPropState: {},
-        _hPropDefs: {},
+        _hPropDefs: [],
       }),
       setupApp: null,
-      slots: () => ({}),
+      slots: createEmptySlots,
       previewReady: false,
     }
   }

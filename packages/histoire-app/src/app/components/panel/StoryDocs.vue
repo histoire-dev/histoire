@@ -6,6 +6,7 @@ import { markdownFiles } from 'virtual:$histoire-markdown-files'
 import { computed, nextTick, ref, toRefs, watch, watchEffect } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { histoireConfig } from '../../util/config.js'
+import { resolveStoryFileComponent } from '../../util/story-component'
 import BaseEmpty from '../base/BaseEmpty.vue'
 import DevOnlyToolbarOpenInEditor from '../toolbar/DevOnlyToolbarOpenInEditor.vue'
 
@@ -21,30 +22,25 @@ export function useStoryDoc(story: Ref<Story>) {
       return
     }
 
-    // Custom blocks (Vue)
-    // @TODO extract
-    let comp = story.value.file?.component
-    if (comp) {
-      if (comp.__asyncResolved) {
-        comp = comp.__asyncResolved
+    // Custom blocks (Vue): the compiled component carries the rendered
+    // `<docs>` HTML on its `doc` field, but only when the host app could load
+    // the story module (vitest-mocked stories only run inside the preview
+    // iframe, so their component never loads here).
+    try {
+      const comp = await resolveStoryFileComponent(story.value.file)
+      if (comp?.doc) {
+        renderedDoc.value = comp.doc
+        return
       }
-      else if (comp.__asyncLoader) {
-        comp = await comp.__asyncLoader()
-      }
-      else if (typeof comp === 'function') {
-        try {
-          comp = await comp()
-        }
-        catch (e) {
-          // Noop
-          // Could be a class that requires `new com()`
-        }
-      }
-      if (comp?.default) {
-        comp = comp.default
-      }
-      renderedDoc.value = comp.doc
     }
+    catch (e) {
+      // Loading the story module can fail here (e.g. module-scope code that
+      // only works inside the preview iframe) — fall through to docsText.
+    }
+
+    // Last resort: plain text extracted at collection time (tags stripped).
+    // Used for stories whose component cannot load in the host app.
+    renderedDoc.value = story.value.docsText ?? ''
   })
 
   return {

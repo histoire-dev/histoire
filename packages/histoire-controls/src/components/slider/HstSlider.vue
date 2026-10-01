@@ -7,8 +7,8 @@ export default {
 
 <script lang="ts" setup>
 import type { CSSProperties } from 'vue'
-import { VTooltip as vTooltip } from 'floating-vue'
 import { computed, ref } from 'vue'
+import { VTooltip as vTooltip } from '../../overlay/tooltip'
 import HstWrapper from '../HstWrapper.vue'
 
 const props = defineProps<{

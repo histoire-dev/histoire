@@ -96,7 +96,7 @@ const commandStore = useCommandStore()
 
 <template>
   <div
-    v-if="storyStore.currentStory"
+    v-if="storyStore.currentStory && !storyStore.currentStory.file?.hasVitestMocks"
     class="histoire-app htw-hidden"
   >
     <GenericMountStory

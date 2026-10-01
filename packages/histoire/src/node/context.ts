@@ -8,13 +8,18 @@ import type {
 } from '@histoire/shared'
 import type { ResolvedConfig } from 'vite'
 import { resolveConfig as resolveViteConfig } from 'vite'
-import { processConfig, resolveConfig } from './config.js'
-import { mergeHistoireViteConfig } from './vite.js'
+import { processConfig, resolveConfig } from './config/index.js'
+import { mergeHistoireViteConfig } from './vite/index.js'
 
 export interface Context {
   root: string
   config: HistoireConfig
-  resolvedViteConfig: ResolvedConfig
+  /**
+   * Vite's resolved config, with the Histoire overrides merged on top — the
+   * merge produces a plain config object, not another `ResolvedConfig`, so only
+   * the fields both shapes share (`root`, `base`, `publicDir`…) are readable.
+   */
+  resolvedViteConfig: Pick<ResolvedConfig, 'root' | 'base' | 'publicDir'>
   mode: ConfigMode
   storyFiles: ServerStoryFile[]
   supportPlugins: FinalSupportPlugin[]
@@ -34,10 +39,12 @@ export async function createContext(options: CreateContextOptions): Promise<Cont
 
   const supportPlugins = config.plugins.map(p => p.supportPlugin).filter(Boolean)
 
-  const ctx = {
+  const ctx: Context = {
     root: viteConfig.root,
     config,
-    resolvedViteConfig: null,
+    // Filled in right below: merging the Histoire Vite config needs the context
+    // itself (plugins receive it), so the field cannot be built before it.
+    resolvedViteConfig: viteConfig,
     mode: options.mode,
     storyFiles: [],
     supportPlugins,
@@ -45,7 +52,7 @@ export async function createContext(options: CreateContextOptions): Promise<Cont
     registeredCommands: [],
   }
 
-  ctx.resolvedViteConfig = await mergeHistoireViteConfig(viteConfig as unknown, ctx)
+  ctx.resolvedViteConfig = await mergeHistoireViteConfig(viteConfig, ctx)
 
   await processConfig(ctx)
 

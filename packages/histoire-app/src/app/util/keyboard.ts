@@ -13,73 +13,47 @@ export interface KeyboardShortcutOptions {
 
 export function onKeyboardShortcut(shortcut: KeyboardShortcut | Ref<KeyboardShortcut>, handler: KeyboardHandler, options: KeyboardShortcutOptions = {}) {
   useEventListener(options.event ?? 'keydown', (event) => {
-    if (isMatchingShortcut(isRef(shortcut) ? shortcut.value : shortcut)) {
+    if (isMatchingShortcut(isRef(shortcut) ? shortcut.value : shortcut, event)) {
       handler(event)
     }
   })
 }
 
-const modifiers: { [i: string]: { key: string, pressed: boolean } } = {
-  ctrl: { key: 'Control', pressed: false },
-  alt: { key: 'Alt', pressed: false },
-  shift: { key: 'Shift', pressed: false },
-  meta: { key: 'Meta', pressed: false },
+/** Modifier combination names mapped to the flag the event carries. */
+const modifiers = {
+  ctrl: (event: KeyboardEvent) => event.ctrlKey,
+  alt: (event: KeyboardEvent) => event.altKey,
+  shift: (event: KeyboardEvent) => event.shiftKey,
+  meta: (event: KeyboardEvent) => event.metaKey,
 }
 
-const pressedKeys = new Set<string>()
-
-window.addEventListener('keydown', (event) => {
-  for (const i in modifiers) {
-    const mod = modifiers[i]
-    if (mod.key === event.key) {
-      mod.pressed = true
-      return
-    }
-  }
-  pressedKeys.add(event.key.toLocaleLowerCase())
-})
-
-window.addEventListener('keyup', (event) => {
-  requestAnimationFrame(() => {
-    pressedKeys.clear()
-    for (const i in modifiers) {
-      const mod = modifiers[i]
-      if (mod.key === event.key) {
-        mod.pressed = false
-        break
-      }
-    }
-  })
-})
-
-window.addEventListener('blur', () => {
-  pressedKeys.clear()
-  for (const i in modifiers) {
-    const mod = modifiers[i]
-    mod.pressed = false
-  }
-})
-
-function isMatchingShortcut(shortcut: KeyboardShortcut): boolean {
+function isMatchingShortcut(shortcut: KeyboardShortcut, event: KeyboardEvent): boolean {
   for (const combination of shortcut) {
-    if (isMatchingCombination(combination.toLowerCase())) {
+    if (isMatchingCombination(combination.toLowerCase(), event)) {
       return true
     }
   }
   return false
 }
 
-function isMatchingCombination(combination: string): boolean {
+/**
+ * Matches a combination against the event that is being handled.
+ *
+ * Everything is read off the event itself rather than from a set of currently
+ * pressed keys kept up to date by global listeners: such a set is only as
+ * accurate as the key events the page actually receives, and a missed (or
+ * merely late) `keyup` leaves a key "pressed" forever — the next unrelated
+ * keypress then fires the stale shortcut.
+ */
+function isMatchingCombination(combination: string, event: KeyboardEvent): boolean {
   const splitted = combination.split('+').map(key => key.trim())
   const targetKey = splitted.pop()
   for (const mod in modifiers) {
-    const containsMod = splitted.includes(mod)
-    const isPressed = modifiers[mod].pressed
-    if (containsMod !== isPressed) {
+    if (splitted.includes(mod) !== modifiers[mod](event)) {
       return false
     }
   }
-  return pressedKeys.has(targetKey)
+  return event.key.toLocaleLowerCase() === targetKey
 }
 
 export function formatKey(key: string) {

@@ -1,9 +1,9 @@
 import type { FSWatcher } from 'chokidar'
 import chokidar from 'chokidar'
 import pc from 'picocolors'
-import { resolveConfigFile } from '../config.js'
+import { resolveConfigFile } from '../config/index.js'
 import { createContext } from '../context.js'
-import { createServer } from '../server.js'
+import { createServer } from '../server/index.js'
 
 export interface DevOptions {
   port: number

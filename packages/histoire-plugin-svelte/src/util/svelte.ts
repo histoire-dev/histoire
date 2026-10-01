@@ -1,4 +1,5 @@
 import type { SvelteStorySetupApi, SvelteStorySetupHandler } from '../helpers.js'
+import { withStoryExecution } from '@histoire/shared'
 import * as svelte from 'svelte'
 
 type SetupModule = Record<string, unknown>
@@ -28,9 +29,12 @@ export async function mountSvelteComponent(
   options: Record<string, any>,
   mode: 'auto' | 'client' | 'server-compat' = 'auto',
 ): Promise<MountedSvelteComponent> {
+  // Each branch below runs the story's setup code synchronously, so wrapping it
+  // attributes the `onTest(...)` calls it emits to THIS mount — several mounts of
+  // the same story coexist in one page and share the ambient test registry.
   if (mode !== 'server-compat') {
     if (typeof (svelte as any)?.mount === 'function') {
-      const app = (svelte as any).mount(component, options)
+      const app = withStoryExecution(() => (svelte as any).mount(component, options), options.target)
       return {
         app,
         destroy: () => {
@@ -47,7 +51,7 @@ export async function mountSvelteComponent(
 
   try {
     // eslint-disable-next-line new-cap
-    const app = new component(options)
+    const app = withStoryExecution(() => new component(options), options.target)
     return {
       app,
       destroy: () => {
@@ -59,10 +63,10 @@ export async function mountSvelteComponent(
     const legacyModuleId = ['svelte', 'legacy'].join('/')
     const legacy = await loadSvelteModule(legacyModuleId).catch(() => null)
     if (typeof legacy?.createClassComponent === 'function') {
-      const app = legacy.createClassComponent({
+      const app = withStoryExecution(() => legacy.createClassComponent({
         component,
         ...options,
-      })
+      }), options.target)
       return {
         app,
         destroy: () => {

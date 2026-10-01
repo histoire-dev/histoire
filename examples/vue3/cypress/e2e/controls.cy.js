@@ -1,45 +1,49 @@
 /// <reference types="cypress" />
 
+// The story defines a `#controls` slot, so the panel renders those custom
+// controls (labelled after the component they use) rather than the generic
+// state editors.
 describe('Controls', () => {
-  const getIframeBody = () => cy.get('iframe[data-test-id="preview-iframe"]')
-    .its('0.contentDocument.body')
-    .should('not.be.empty')
-    .then(cy.wrap)
+  const getControls = () => cy.getControlsIframeBody()
+  const getControl = label => getControls().contains('label', new RegExp(`^${label}$`))
 
   beforeEach(() => {
     cy.visit('/')
     cy.get('[data-test-id="story-list-item"]').contains('Controls').click()
+    cy.get('[data-test-id="story-side-panel"]').should('be.visible')
+    cy.get('[data-test-id="story-side-panel"]').contains('Loading...').should('not.exist')
   })
 
-  it('HstText', () => {
-    getIframeBody().find('.state-output').contains('"text": "Hello"')
-    cy.get('[data-test-id="story-controls"]').contains('HstText').clear().type('Foo')
-    getIframeBody().find('.state-output').contains('"text": "Foo"')
+  it('updates text state', () => {
+    cy.getPreviewIframeBody().find('.state-output').contains('"text": "Hello"')
+    getControl('HstText').find('input').clear().type('Foo')
+    cy.getPreviewIframeBody().find('.state-output').contains('"text": "Foo"')
   })
 
-  it('HstCheckbox', () => {
-    getIframeBody().find('.state-output').contains('"checkbox": false')
-    cy.get('[data-test-id="story-controls"]').contains('HstCheckbox').click()
-    getIframeBody().find('.state-output').contains('"checkbox": true')
-    cy.get('[data-test-id="story-controls"]').contains('HstCheckbox').click()
-    getIframeBody().find('.state-output').contains('"checkbox": false')
+  it('updates checkbox state', () => {
+    cy.getPreviewIframeBody().find('.state-output').contains('"checkbox": false')
+    getControl('HstCheckbox').click()
+    cy.getPreviewIframeBody().find('.state-output').contains('"checkbox": true')
+    getControl('HstCheckbox').click()
+    cy.getPreviewIframeBody().find('.state-output').contains('"checkbox": false')
   })
 
-  it('HstNumber', () => {
-    getIframeBody().find('.state-output').contains('"number": 20')
-    cy.get('[data-test-id="story-controls"] input[type="number"]').clear().type('42')
-    getIframeBody().find('.state-output').contains('"number": 42')
+  it('updates numeric state', () => {
+    cy.getPreviewIframeBody().find('.state-output').contains('"number": 20')
+    getControl('HstNumber').find('input').clear()
+    getControl('HstNumber').find('input').type('42')
+    cy.getPreviewIframeBody().find('.state-output').contains('"number": 42')
   })
 
-  it('HstTextarea', () => {
-    getIframeBody().find('.state-output').contains('"longText": "Longer text..."')
-    cy.get('[data-test-id="story-controls"] textarea').clear().type('Meow meow meow')
-    getIframeBody().find('.state-output').contains('"longText": "Meow meow meow"')
+  it('updates long text state', () => {
+    cy.getPreviewIframeBody().find('.state-output').contains('"longText": "Longer text..."')
+    getControl('HstTextarea').find('textarea').clear().type('Meow meow meow')
+    cy.getPreviewIframeBody().find('.state-output').contains('"longText": "Meow meow meow"')
   })
 
-  it('HstColorSelect', () => {
-    getIframeBody().find('.state-output').contains('"colorselect": "#000000"')
-    cy.get('[data-test-id="story-controls"]').contains('HstColorSelect').clear().type('#ffffff')
-    getIframeBody().find('.state-output').contains('"colorselect": "#ffffff"')
+  it('updates color state', () => {
+    cy.getPreviewIframeBody().find('.state-output').contains('"colorselect": "#000000"')
+    getControl('HstColorSelect').find('input[type="text"]').clear().type('#ffffff')
+    cy.getPreviewIframeBody().find('.state-output').contains('"colorselect": "#ffffff"')
   })
 })

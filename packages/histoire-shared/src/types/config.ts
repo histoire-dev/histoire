@@ -242,6 +242,41 @@ export interface HistoireConfig {
      */
     excludeFromVendorsChunk?: (string | RegExp)[]
   }
+  /**
+   * Test runtime integration.
+   */
+  test?: {
+    /**
+     * Strategy used to collect stories during build.
+     * - browser: headless browser collection
+     * - hybrid: keep the Node collector for build-time metadata
+     */
+    buildCollection?: 'browser' | 'hybrid'
+    /**
+     * Maximum time in milliseconds the headless browser story collection is
+     * allowed to take before the run is aborted.
+     *
+     * @default 120000
+     */
+    collectTimeout?: number
+    /**
+     * Maximum time in milliseconds a single story is allowed to take to load
+     * and mount while collecting in the browser.
+     *
+     * Guards the whole batch against one story that never settles: only that
+     * story fails, the others still collect.
+     *
+     * @default 30000
+     */
+    storyCollectTimeout?: number
+    /**
+     * Maximum time in milliseconds a `histoire test` run is allowed to take
+     * before it is aborted.
+     *
+     * @default 300000
+     */
+    runTimeout?: number
+  }
 }
 
 export type ConfigMode = 'build' | 'dev'

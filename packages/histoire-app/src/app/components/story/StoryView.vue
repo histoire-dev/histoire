@@ -5,6 +5,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useStoryStore } from '../../stores/story'
 
 import { isMobile } from '../../util/responsive'
+import { resolveAutoSelectedVariantId } from '../../util/variant-selection'
 import BaseEmpty from '../base/BaseEmpty.vue'
 import BaseSplitPane from '../base/BaseSplitPane.vue'
 import StoryDocs from '../panel/StoryDocs.vue'
@@ -27,15 +28,9 @@ watch(() => storyStore.currentVariant, (value) => {
 })
 
 watch(() => [storyStore.currentStory, storyStore.currentVariant], () => {
-  if (!storyStore.currentVariant) {
-    if (storyStore.currentStory?.lastSelectedVariant) {
-      setVariant(storyStore.currentStory.lastSelectedVariant.id)
-      return
-    }
-
-    if (storyStore.currentStory?.variants.length === 1) {
-      setVariant(storyStore.currentStory.variants[0].id)
-    }
+  const variantId = resolveAutoSelectedVariantId(storyStore.currentStory, storyStore.currentVariant)
+  if (variantId) {
+    setVariant(variantId)
   }
 }, {
   immediate: true,

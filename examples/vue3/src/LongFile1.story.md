@@ -64,10 +64,10 @@ You can change the layout of the variant by using the `layout` prop with an obje
 
 ### Single layout
 
-This is the default layout, displaying one variant at a time. The default behavior is to isolate the story with an iframe.
+This is default layout, displaying one variant at a time inside iframe runtime.
 
 Additional `layout` properties:
-- `iframe`: (default: `true`) enables the iframe, useful when your CSS has media queries for responsive design.
+- `iframe`: deprecated and ignored; stories always run inside iframe.
 
 ```vue{4}
 <template>
@@ -94,6 +94,7 @@ Display all the variants in a grid.
 
 Additional `layout` properties:
 - `width`: Column size. Can be number (pixels) or string (like `'100%'`).
+- variant state stays isolated per variant, even when controls live at story level.
 
 ```vue{4}
 <template>

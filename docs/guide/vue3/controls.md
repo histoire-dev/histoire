@@ -2,6 +2,48 @@
 
 Controls give you the ability to interact with your components arguments.
 
+Custom `#controls` slots run in a dedicated sandbox. Their background, typography and color scheme follow the Histoire panel. Built-in dropdowns and tooltips render in the host window, so they can extend beyond the controls form.
+
+## Custom overlays
+
+Use `getControlsHost()` inside a custom controls component to display a text tooltip or a dropdown in the host. The adapter is available only in the controls sandbox. Keep option values in your component and pass string IDs and labels to the host.
+
+```vue
+<script setup lang="ts">
+import type { HistoireControlsOverlayHandle } from 'histoire/client'
+import { getControlsHost } from 'histoire/client'
+import { onBeforeUnmount, ref } from 'vue'
+
+const anchor = ref<HTMLButtonElement>()
+let overlay: HistoireControlsOverlayHandle | undefined
+
+function showTooltip() {
+  if (!anchor.value) return
+  overlay?.close()
+  overlay = getControlsHost()?.open(anchor.value, {
+    kind: 'tooltip',
+    content: 'Custom control',
+    placement: 'top',
+  }, () => { overlay = undefined })
+}
+
+function hideTooltip() {
+  overlay?.close()
+  overlay = undefined
+}
+
+onBeforeUnmount(hideTooltip)
+</script>
+
+<template>
+  <button ref="anchor" @mouseenter="showTooltip" @mouseleave="hideTooltip">
+    Custom control
+  </button>
+</template>
+```
+
+Call `handle.update(overlay)` when content changes and `handle.close()` on unmount. Dropdown overlays use `{ kind: 'select', label, items: [{ id, label }], selectedId }`; the callback receives `itemId` on selection. Content is plain text. Third-party popovers rendering their own DOM remain inside the sandbox unless adapted to this API.
+
 ## Defining a state
 
 The first step is to define the state that will be shared to your story. Histoire will automatically synchronize the `data` or reactive data returned in your `setup`. Then you can proceed using your state as usual.

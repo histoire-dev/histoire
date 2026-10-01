@@ -1,17 +1,67 @@
+@import 'floating-vue/dist/style.css';
 @import '@histoire/controls/dist/index.es.css';
+
+@tailwind components;
+@tailwind utilities;
+
+*,
+::before,
+::after {
+  box-sizing: border-box;
+  border-width: 0;
+  border-style: solid;
+  border-color: #e5e7eb;
+}
+
+a,
+input,
+button {
+  color: inherit;
+}
+
+a {
+  text-decoration: inherit;
+}
+
+input,
+button {
+  font-family: inherit;
+}
+
+a,
+button {
+  user-select: none;
+}
 
 html,
 body {
   background: transparent !important;
 }
 
-body {
+body,
+pre {
   margin: 0;
+}
+
+html,
+body,
+#app {
+  height: 100%;
+}
+
+body {
+  font-size: 1.125rem;
 }
 
 html {
   font-size: 1rem;
   font-family: 'Noto Sans Display', system-ui, sans-serif;
+}
+
+@media (min-width: 640px) {
+  body {
+    font-size: .875rem;
+  }
 }
 
 .htw-sandbox-hidden {

@@ -1,6 +1,7 @@
 import type { Story, Variant } from '@histoire/shared'
 import type { App, Component, PropType, VNode } from 'vue'
 import type { Vue3StorySetupApi, Vue3StorySetupHandler } from '../../helpers.js'
+import { withStoryExecution } from '@histoire/shared'
 // @ts-expect-error virtual module id
 import * as generatedSetup from 'virtual:$histoire-generated-global-setup'
 // @ts-expect-error virtual module id
@@ -9,6 +10,7 @@ import {
   createApp,
   defineComponent,
   h,
+  nextTick,
   Suspense,
 } from 'vue'
 import { registerGlobalComponents } from './global-components.js'
@@ -51,6 +53,16 @@ const PreviewHostRoot = defineComponent({
 export function createPreviewHost(options: PreviewHostOptions) {
   let app: App = null
   let target: HTMLDivElement = null
+
+  /**
+   * Waits for the user Vue app to flush render-time mutations like auto-prop
+   * detection before the bundled wrapper reports readiness.
+   */
+  async function waitForHostRenderSettled() {
+    await nextTick()
+    await nextTick()
+    await new Promise<void>(resolve => requestAnimationFrame(() => resolve()))
+  }
 
   async function mount() {
     const wrappers: Component[] = []
@@ -97,7 +109,13 @@ export function createPreviewHost(options: PreviewHostOptions) {
 
     await runSetupHooks(setupApi)
 
-    app.mount(target)
+    // The story component's `setup()` — where `onTest(...)` runs — executes
+    // synchronously inside this call, so wrapping it attributes the story's test
+    // registrations to THIS mount. Several mounts of the same story coexist in
+    // one page (live preview + the two test-session mounts) and all push into
+    // the same ambient registry, so the tag is what keeps their tests apart.
+    withStoryExecution(() => app.mount(target), target)
+    await waitForHostRenderSettled()
   }
 
   function unmount() {

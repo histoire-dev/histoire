@@ -31,11 +31,13 @@ Id of the story used in the URL. By default, the id is automatically generated f
 Layout of the story. Object with the following properties:
   - `type`: `'single'` or `'grid'`
   - with `type: 'single'` you can specify:
-    - `iframe`: Whether to isolate the story in an iframe. You might want to disable it if you want to pass complexe parameters that can't be serialized.
+    - `iframe`: **Deprecated** and ignored. Stories always run inside iframe runtime.
   - with `type: 'grid'` you can specify:
     - `width`: Column size. Can be number (pixels) or string (like `'100%'`).
 
 [Learn more](../../guide/vue3/stories.md#layout)
+
+See [runtime migration guide](../../guide/testing.md#state-ownership) for non-serializable state and custom controls.
 
 ## `initState`
 

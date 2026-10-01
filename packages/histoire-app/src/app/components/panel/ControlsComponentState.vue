@@ -8,12 +8,30 @@ const props = defineProps<{
   variant: Variant
 }>()
 
+/**
+ * Empty Vue `$data` should not show as a user-editable detected state item.
+ */
+function isMeaningfulStateValue(key: string, value: unknown) {
+  if (key !== '$data') {
+    return true
+  }
+
+  return value == null
+    || typeof value !== 'object'
+    || Array.isArray(value)
+    || Object.keys(value as Record<string, unknown>).length > 0
+}
+
 const stateKeys = computed(() => Object.keys(props.variant.state || {})
-  .filter(key => !key.startsWith('_h')))
+  .filter(key => !key.startsWith('_h'))
+  .filter(key => isMeaningfulStateValue(key, props.variant.state?.[key])))
 </script>
 
 <template>
-  <div class="histoire-controls-component-init-state">
+  <div
+    class="histoire-controls-component-init-state"
+    data-test-id="story-controls-detected-state"
+  >
     <div class="htw-p-2 htw-flex htw-items-center htw-gap-1">
       <Icon
         v-tooltip="'Auto-detected state'"

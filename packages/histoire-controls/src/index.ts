@@ -52,3 +52,5 @@ export const components = {
 }
 
 export * from './types'
+export { getControlsHost } from '@histoire/shared'
+export type { HistoireControlsOverlay, HistoireControlsOverlayHandle, HistoireControlsOverlayResult } from '@histoire/shared'

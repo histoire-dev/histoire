@@ -20,19 +20,8 @@ import MyComponent from './MyComponent.vue'
 
 ## Integrated
 
-This will integrate your component directly in the app. The advantage being that you can pass complex arguments (such as functions or recursive object), but responsiveness won't work for CSS media queries.
+::: warning Deprecated
+The `iframe: false` layout option is deprecated and ignored — stories always render inside an iframe now.
+:::
 
-```vue
-<script lang="ts" setup>
-import MyComponent from './MyComponent.vue'
-</script>
-
-<template>
-  <Story
-    title="MyStory"
-    :layout="{ type: 'single', iframe: false }"
-  >
-    <MyComponent />
-  </Story>
-</template>
-```
+Remove option when migrating. Non-serializable state stays inside preview runtime; see [browser runtime migration](../../guide/testing.md#state-ownership).

@@ -64,16 +64,18 @@ You can change the layout of the variant by using the `layout` prop with an obje
 
 ### Single layout
 
-This is the default layout, displaying one variant at a time. The default behavior is to isolate the story with an iframe.
+This is the default layout, displaying one variant at a time. The story is isolated with an iframe so CSS media queries work correctly.
 
 Additional `layout` properties:
-- `iframe`: (default: `true`) enables the iframe, useful when your CSS has media queries for responsive design.
+- `iframe`: **Deprecated** — this option is ignored, stories always render inside an iframe.
+
+Remove `iframe: false` when migrating. Preview runtime owns live state; see [browser runtime migration](../testing.md#state-ownership).
 
 ```vue{4}
 <template>
   <Story
     title="Cars"
-    :layout="{ type: 'single', iframe: true }"
+    :layout="{ type: 'single' }"
   >
     <Variant title="default">
       🚗
