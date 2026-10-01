@@ -30,8 +30,8 @@ import {
   keymap,
 } from '@codemirror/view'
 import { Icon } from '@iconify/vue'
-import { VTooltip as vTooltip } from 'floating-vue'
 import { onMounted, ref, watch, watchEffect } from 'vue'
+import { VTooltip as vTooltip } from '../../overlay/tooltip'
 import { isDark } from '../../utils'
 import HstWrapper from '../HstWrapper.vue'
 

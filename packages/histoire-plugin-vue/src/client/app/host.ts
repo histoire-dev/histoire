@@ -114,7 +114,7 @@ export function createPreviewHost(options: PreviewHostOptions) {
     // registrations to THIS mount. Several mounts of the same story coexist in
     // one page (live preview + the two test-session mounts) and all push into
     // the same ambient registry, so the tag is what keeps their tests apart.
-    withStoryExecution(() => app.mount(target))
+    withStoryExecution(() => app.mount(target), target)
     await waitForHostRenderSettled()
   }
 

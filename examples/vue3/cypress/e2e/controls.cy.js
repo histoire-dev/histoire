@@ -4,7 +4,7 @@
 // controls (labelled after the component they use) rather than the generic
 // state editors.
 describe('Controls', () => {
-  const getControls = () => cy.get('[data-test-id="story-controls"]')
+  const getControls = () => cy.getControlsIframeBody()
   const getControl = label => getControls().contains('label', new RegExp(`^${label}$`))
 
   beforeEach(() => {

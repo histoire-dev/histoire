@@ -34,7 +34,7 @@ export async function mountSvelteComponent(
   // the same story coexist in one page and share the ambient test registry.
   if (mode !== 'server-compat') {
     if (typeof (svelte as any)?.mount === 'function') {
-      const app = withStoryExecution(() => (svelte as any).mount(component, options))
+      const app = withStoryExecution(() => (svelte as any).mount(component, options), options.target)
       return {
         app,
         destroy: () => {
@@ -51,7 +51,7 @@ export async function mountSvelteComponent(
 
   try {
     // eslint-disable-next-line new-cap
-    const app = withStoryExecution(() => new component(options))
+    const app = withStoryExecution(() => new component(options), options.target)
     return {
       app,
       destroy: () => {
@@ -66,7 +66,7 @@ export async function mountSvelteComponent(
       const app = withStoryExecution(() => legacy.createClassComponent({
         component,
         ...options,
-      }))
+      }), options.target)
       return {
         app,
         destroy: () => {

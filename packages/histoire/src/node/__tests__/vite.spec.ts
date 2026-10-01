@@ -2,7 +2,7 @@ import type { Context } from '../context.js'
 import fs from 'node:fs'
 import path from 'node:path'
 import { resolveConfig } from 'vite'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { getDefaultConfig } from '../config/index.js'
 import { getViteConfigWithPlugins } from '../vite/index.js'
 import { createVitestBrowserRuntimeConfig } from '../vitest-browser-config/index.js'
@@ -59,10 +59,23 @@ describe('getViteConfigWithPlugins', () => {
     const shimCode = await storyShimPlugin!.load?.(shimId as string)
 
     expect(shimCode).not.toContain('expect-type')
-    expect(shimCode).toContain('export const expectTypeOf = () => ({})')
-    expect(shimCode).toContain(`registerCollectedTestCase(name, fn, 'skip')`)
-    expect(shimCode).toContain(`registerCollectedTestCase(name, fn, 'only')`)
-    expect(shimCode).toContain(`registerCollectedTestCase(name, fn, 'todo')`)
+    expect(shimCode).toContain('export const expectTypeOf = createTypeExpect')
+    expect(shimCode).toContain('createHistoireSuiteCollector()')
+    expect(shimCode).toContain('createHistoireTestCollector()')
+    expect(shimCode).toContain('registerCollectedTestHook')
+    expect(shimCode).toContain('export function onTestFinished(callback, timeout)')
+    expect(shimCode).toContain('export function onTestFailed(callback, timeout)')
+    expect(shimCode).toContain('stubGlobal(name, value)')
+    expect(shimCode).toContain('useFakeTimers()')
+    expect(shimCode).toContain('waitFor: waitForValue')
+    expect(shimCode).toContain(`unsupportedRuntimeFeature('vi.useFakeTimers')`)
+    expect(shimCode).toContain(`unsupportedSnapshotResult`)
+    expect(shimCode).toContain(`unsupportedRuntimeFeature('recordArtifact')`)
+    expect(shimCode).toContain('providedContext?.[key]')
+    expect(shimCode).toContain('createTypeExpect')
+    for (const exportName of ['BenchmarkRunner', 'EvaluatedModules', 'TestRunner', 'bench', 'chai', 'createExpect']) {
+      expect(shimCode, exportName).toMatch(new RegExp(`export (?:class|const|function|\\{) ${exportName}`))
+    }
   })
 
   it('shims story files discovered after the config was built', async () => {
@@ -124,6 +137,22 @@ describe('getViteConfigWithPlugins', () => {
     expect(resolvedId).toMatch(/vendors\/vitest-collect\.(ts|js)$/)
   })
 
+  it('keeps Vitest browser internals on the real Vitest entry', async () => {
+    const ctx = createContext()
+    const { viteConfig } = await getViteConfigWithPlugins(false, ctx, {
+      browserRuntime: true,
+      collecting: true,
+    })
+    const collectStubPlugin = viteConfig.plugins?.find(plugin => plugin?.name === 'histoire:collect-story-vitest-stub')
+
+    const resolvedId = await collectStubPlugin!.resolveId?.(
+      'vitest',
+      `${ctx.root}/node_modules/@vitest/browser/dist/expect-element.js`,
+    )
+
+    expect(resolvedId).toBeFalsy()
+  })
+
   it('resolves @vitest/runner for generated browser collection specs', async () => {
     const ctx = createContext()
     const { viteConfig } = await getViteConfigWithPlugins(false, ctx, {
@@ -181,11 +210,29 @@ describe('getViteConfigWithPlugins', () => {
     expect(querySuffixedResolvedId).toMatch(/vendors\/vitest-collect\.(ts|js)$/)
   })
 
-  it('uses compiled style aliases in the sandbox entry', () => {
-    const sandboxEntry = fs.readFileSync(path.resolve(process.cwd(), '../histoire-app/src/bundle-sandbox.js'), 'utf8')
+  it.each([undefined, 'true'])('resolves sandbox styles with HISTOIRE_DEV=%s', async (dev) => {
+    vi.stubEnv('HISTOIRE_DEV', dev)
+    // APP_PATH is selected at module load, so each mode needs fresh imports.
+    vi.resetModules()
+    try {
+      const { getViteConfigWithPlugins } = await import('../vite/index.js')
+      const { viteConfig } = await getViteConfigWithPlugins(false, createContext())
+      const config = await resolveConfig(viteConfig, 'serve')
+      const resolve = config.createResolver()
+      const entry = path.resolve(process.cwd(), `../histoire-app/src/bundle-sandbox${dev ? '-dev' : ''}.js`)
+      const source = fs.readFileSync(entry, 'utf8')
+      const styles = [...source.matchAll(/import '(histoire-[^']*style)'/g)].map(match => match[1])
 
-    expect(sandboxEntry).toContain(`import 'histoire-style'`)
-    expect(sandboxEntry).toContain(`import 'histoire-bundled-style'`)
-    expect(sandboxEntry).not.toContain(`import './app/style/sandbox.css'`)
+      expect(styles).toHaveLength(2)
+      for (const style of styles) {
+        const resolved = await resolve(style, entry)
+        expect(resolved, style).toBeTruthy()
+        expect(fs.existsSync(resolved!), `${style}: ${resolved}`).toBe(true)
+      }
+    }
+    finally {
+      vi.unstubAllEnvs()
+      vi.resetModules()
+    }
   })
 })

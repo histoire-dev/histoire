@@ -64,3 +64,5 @@ onTest(({ canvas }) => {
   })
 })
 ```
+
+Tests execute in browser runtime and support Vitest suites, modifiers, standard lifecycle hooks, `onTestFinished`, and `onTestFailed`. See [browser tests and runtime migration](../guide/testing.md).

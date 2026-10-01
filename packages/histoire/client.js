@@ -2,6 +2,7 @@ import { logEvent } from '@histoire/app'
 import { pushHistoireTestRegistration } from '@histoire/shared'
 
 export * from '@histoire/app'
+export { getControlsHost } from '@histoire/shared'
 
 export function isCollecting() {
   return process.env.HST_COLLECT === 'true'

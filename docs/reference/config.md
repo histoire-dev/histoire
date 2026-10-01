@@ -457,7 +457,7 @@ export default defineConfig({
 
 `number` - Default: `30000`
 
-Maximum time in milliseconds a single story is allowed to take to load and mount while collecting in the browser. It guards the whole collection against one story that never settles (top-level await on a promise that never resolves, hanging import): only that story fails, the others still collect. Raise it if some of your stories are legitimately slow to mount.
+Maximum time in milliseconds a single story is allowed to take to load and mount while collecting in browser. Same budget guards bootstrap readiness, render readiness, and generated Vitest harness mounts. One stuck story fails without stalling whole collection. Raise it for legitimately slow stories.
 
 ```ts
 export default defineConfig({

@@ -97,7 +97,7 @@ export function createPreviewStateSync(options: {
       const key = getKey(variantId)
       const pendingState = key ? pendingPreviewStates.get(key) : null
 
-      if (variant && pendingState && !variant.previewReady) {
+      if (variant && pendingState) {
         // `_hPropDefs` is derived control metadata owned by the running story
         // — never a user edit. The stash captured the host's (possibly empty)
         // skeleton, and the iframe does not re-send defs it considers
@@ -105,6 +105,15 @@ export function createPreviewStateSync(options: {
         // drop the auto-detected controls.
         const { _hPropDefs: _ignored, ...reappliedState } = pendingState
         applyState(variant.state, reappliedState)
+        pendingPreviewStates.delete(key!)
+        // Runtime snapshot stays canonical. Replay only user-authored patch,
+        // never host boot metadata or a full serialized mirror that could erase
+        // functions, classes, Maps, or other runtime-only values in the frame.
+        options.postMessage({
+          type: STATE_SYNC,
+          variantId: variant.id,
+          state: reappliedState,
+        })
       }
 
       return variant

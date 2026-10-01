@@ -1,14 +1,17 @@
-<script setup lang="ts">
-import { onTest } from 'histoire/client'
+<script lang="ts">
 import { describe, expect, it, vi } from 'vitest'
 import { getGreeting } from './vitest-mocking-greeting'
-import VitestMockedGreeting from './VitestMockedGreeting.vue'
 
 vi.mock('./vitest-mocking-greeting', () => ({
   getGreeting: vi.fn((name: string) => `Mocked by Vitest for ${name}`),
 }))
 
 const mockedGetGreeting = vi.mocked(getGreeting)
+</script>
+
+<script setup lang="ts">
+import { onTest } from 'histoire/client'
+import VitestMockedGreeting from './VitestMockedGreeting.vue'
 
 onTest(({ canvas }) => {
   describe('mocked module in story setup', () => {

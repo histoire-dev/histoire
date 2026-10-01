@@ -66,6 +66,19 @@ describe('runHistoireTests lifecycle', () => {
     consoleWarn.mockRestore()
   })
 
+  it('keeps outer Vitest deadlines clear for embedded test lifecycle', async () => {
+    const story = createRunTestsStoryFile({
+      id: 'deadline-story',
+      variantId: 'deadline-variant',
+      source: 'onTest(() => {})',
+    })
+
+    await runHistoireTests(createRunTestsContext([story]))
+
+    const [generatedSpec] = mocks.generatedSpecCode.values()
+    expect(generatedSpec).toContain('}, 0)')
+  })
+
   it('warns when generated specs were not executed by vitest', async () => {
     const story = createRunTestsStoryFile({
       id: 'missing-story',
@@ -212,6 +225,14 @@ describe('runHistoireTests lifecycle', () => {
     const source = readNodeSource('test/preflight.ts')
     expect(source).toContain('Install with: pnpm add -D')
     expect(source).toContain('missing.push(dependency)')
+  })
+
+  it('checks the optional Vitest peer before loading the test runner', () => {
+    const source = readNodeSource('commands/test.ts')
+
+    expect(source).not.toMatch(/^import \{ runHistoireTests \}/m)
+    expect(source).toContain('ensureProjectVitest(ctx)')
+    expect(source).toMatch(/ensureProjectVitest\(ctx\)[\s\S]*await import\('\.\.\/test\/index\.js'\)/)
   })
 
   it('flushes its output before ending, and still terminates when handles linger', async () => {

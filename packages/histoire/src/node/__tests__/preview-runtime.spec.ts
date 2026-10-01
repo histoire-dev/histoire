@@ -55,9 +55,9 @@ describe('preview runtime generation', () => {
       expect(withVitest, identifier).toContain(identifier)
     }
 
-    // The no-vitest bootstrap stays callable (the runtime always awaits it).
+    // The no-vitest bootstrap stays callable; the shared import session awaits it.
     expect(withoutVitest).toContain('async function ensureVitestPreviewEnvironment() {')
-    expect(withoutVitest).toContain('await ensureVitestPreviewEnvironment()')
+    expect(withoutVitest).toContain('ensureEnvironment: ensureVitestPreviewEnvironment')
     expect(withVitest).toContain('globalThis.__vitest_mocker__ = mocker')
   })
 

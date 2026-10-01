@@ -5,6 +5,7 @@ import { hasProjectVitest } from '../../util/has-vitest.js'
 import { resolveHistoireAppBundledDir } from '../../util/resolve-histoire-app.js'
 import { resolveHistoireSharedEntry } from '../../util/resolve-histoire-shared.js'
 import { tryResolveVitestModule } from '../../util/resolve-vitest-package.js'
+import { getStoryCollectTimeout } from '../../util/test-timeouts.js'
 import { previewAppRoot } from './app-root.js'
 import { previewApp } from './app.js'
 import { previewComponents } from './components.js'
@@ -45,6 +46,8 @@ export interface PreviewRuntimeSourceOptions {
   histoireAppBundledDir: string
   /** Story metadata baked into the runtime at transform time. */
   files: PreviewRuntimeStoryFile[]
+  /** Maximum time allowed for one variant mount. */
+  mountTimeoutMs: number
   /** Emitted `"<story id>": () => import("<module id>")` loader entries. */
   loaders: string[]
 }
@@ -113,7 +116,7 @@ ${previewHostMessaging()}
 
 ${previewErrorOverlay()}
 
-${previewStoryLoading()}
+${previewStoryLoading(options.mountTimeoutMs)}
 
 ${previewVariantBridge()}
 
@@ -173,5 +176,6 @@ export function previewRuntime(ctx: Context) {
     histoireAppBundledDir: resolveHistoireAppBundledDir(),
     files,
     loaders,
+    mountTimeoutMs: getStoryCollectTimeout(ctx),
   })
 }

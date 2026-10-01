@@ -50,6 +50,8 @@ export interface StoryModuleExports {
 
 export interface VariantTestSessionOptions {
   files: SerializedStoryFile[]
+  /** Maximum time allowed for bootstrap and render mounting. */
+  mountTimeoutMs: number
   /**
    * Generated story module loaders, keyed by story id. The optional version is
    * appended to the module URL to bust the browser's native module cache after

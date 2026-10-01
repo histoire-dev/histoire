@@ -78,7 +78,7 @@ interface ServerMockResolverLike {
 /**
  * The only `@vitest/mocker` internal Histoire depends on here:
  * `ServerMockResolver` is a **named export of `@vitest/mocker/node`** (typed in
- * its `node.d.ts`), verified against 4.0.16 — the version shipped by the
+ * its `node.d.ts`), verified through 4.1.10 — a version supported by the
  * `vitest@^4` peer range declared in this package. `mockerPlugin` builds the
  * exact same object (`new ServerMockResolver(server)`); Histoire only replaces
  * the transport around it.
@@ -207,7 +207,7 @@ export function createVitestMockRpcPlugin(mockerNode: VitestMockerNodeModule): V
   if (typeof ServerMockResolver !== 'function') {
     throw new TypeError(
       '@vitest/mocker/node no longer exports ServerMockResolver. Histoire needs it to answer mock '
-      + 'resolution requests. Expected vitest ^4 (verified against 4.0.16).',
+      + 'resolution requests. Expected vitest ^4 (verified through 4.1.10).',
     )
   }
 

@@ -49,14 +49,26 @@ describe('hasProjectVitest', () => {
   let hasProjectVitest: typeof import('../util/has-vitest.js').hasProjectVitest
 
   beforeEach(async () => {
+    vi.doUnmock('node:module')
     vi.resetModules()
   })
 
-  it('returns true when vitest is listed in package.json dependencies', async () => {
+  it('returns false when vitest is declared but not installed', async () => {
+    vi.doMock('node:module', async (importOriginal) => {
+      const actual = await importOriginal<typeof import('node:module')>()
+      return {
+        ...actual,
+        createRequire: vi.fn(() => ({
+          resolve: vi.fn(() => {
+            throw new Error('Vitest is declared but missing from node_modules')
+          }),
+        })),
+      }
+    })
     ;({ hasProjectVitest } = await import('../util/has-vitest.js'))
     const root = createProjectRoot({ devDependencies: { vitest: '^4.0.0' } })
 
-    expect(hasProjectVitest(root)).toBe(true)
+    expect(hasProjectVitest(root)).toBe(false)
   })
 
   it('returns true in hoisted workspaces where vitest is resolvable but not declared in package.json', async () => {

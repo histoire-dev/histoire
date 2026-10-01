@@ -20,7 +20,19 @@ function resolveVitestCollectStubPath() {
 const vitestCollectStubPath = resolveVitestCollectStubPath()
 
 /**
- * Redirects every `vitest` import to the collect stub.
+ * Detects imports made by Vitest's own browser runtime. Those imports must
+ * resolve to real Vitest; replacing them with Histoire's story facade breaks
+ * whenever Vitest adds a new internal public-export dependency.
+ * @param importer Module requesting `vitest`.
+ */
+function isVitestRuntimeImporter(importer?: string) {
+  const normalized = importer?.replaceAll('\\', '/')
+  return normalized?.includes('/node_modules/@vitest/')
+    || normalized?.includes('/node_modules/vitest/')
+}
+
+/**
+ * Redirects user story/helper `vitest` imports to the collect stub.
  *
  * During collection the story modules only need `vi`/`expect`-shaped no-ops:
  * the real `vitest` entry either targets node (breaking in the browser) or
@@ -32,8 +44,8 @@ function createVitestCollectStubPlugin(name: string): VitePlugin {
   return {
     name,
     enforce: 'pre',
-    resolveId(id) {
-      if (id === 'vitest') {
+    resolveId(id, importer) {
+      if (id === 'vitest' && !isVitestRuntimeImporter(importer)) {
         return vitestCollectStubPath
       }
     },

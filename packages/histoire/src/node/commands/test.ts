@@ -1,17 +1,27 @@
 import { createContext } from '../context.js'
-import { runHistoireTests } from '../test/index.js'
+import { ensureProjectVitest } from '../test/preflight.js'
 import { exitAfterFlush } from '../util/exit.js'
 
 export interface TestOptions {
   config?: string
 }
 
+/**
+ * Runs Histoire's Vitest-based browser test command.
+ * @param options Histoire command options.
+ * @param rawVitestArgs Arguments forwarded to Vitest.
+ */
 export async function testCommand(options: TestOptions, rawVitestArgs: string[] = []) {
   const ctx = await createContext({
     configFile: options.config,
     mode: 'dev',
   })
 
+  // Keep Vitest optional for every other Histoire command. Importing the test
+  // runtime before this guard would fail with Node's module-resolution error
+  // instead of Histoire's actionable install message.
+  ensureProjectVitest(ctx)
+  const { runHistoireTests } = await import('../test/index.js')
   const summary = await runHistoireTests(ctx, {
     rawVitestArgs,
   })

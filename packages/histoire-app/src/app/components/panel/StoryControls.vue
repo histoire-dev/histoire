@@ -4,7 +4,6 @@ import type { Story, Variant } from '../../types'
 import { Icon } from '@iconify/vue'
 import { computed, ref, watch } from 'vue'
 import BaseEmpty from '../base/BaseEmpty.vue'
-import GenericRenderStory from '../story/GenericRenderStory.vue'
 import ControlsComponentProps from './ControlsComponentProps.vue'
 import ControlsComponentState from './ControlsComponentState.vue'
 import StatePresets from './StatePresets.vue'
@@ -25,33 +24,25 @@ const props = defineProps({
 // Wait for controls render before applying presets
 const ready = ref(false)
 
-// Custom controls of vitest-mocked stories render inside a sandbox iframe:
-// their module cannot execute in the host (mocks only work in the sandbox),
-// so `slots()` stays empty here and the iframe reports whether the story
-// actually defines a controls slot.
-const customControlsInIframe = computed(() => !!props.story.file?.hasVitestMocks)
-const mockedControlsAvailable = ref<boolean | null>(null)
+// Every custom controls slot executes beside story code in sandbox runtime.
+// Host only renders generic serializable-state editors.
+const sandboxControlsAvailable = ref<boolean | null>(null)
 
 watch(() => props.variant, () => {
   ready.value = false
-  mockedControlsAvailable.value = null
+  sandboxControlsAvailable.value = null
 })
 
 /**
  * What the panel renders as controls:
- * - `iframe`: the story's custom controls, in the sandbox iframe,
- * - `custom`: the story's custom controls, rendered here,
+ * - `iframe`: story custom controls in sandbox runtime,
  * - `state`: the generic editors for the variant's own state.
  */
-const controlsKind = computed<'iframe' | 'custom' | 'state'>(() => {
-  if (customControlsInIframe.value) {
-    return mockedControlsAvailable.value === true ? 'iframe' : 'state'
-  }
-  return props.variant.slots().controls || props.story.slots().controls ? 'custom' : 'state'
-})
+const controlsKind = computed<'iframe' | 'state'>(() => sandboxControlsAvailable.value === true ? 'iframe' : 'state')
 
-function onMockedControlsInfo(payload: { hasControls: boolean }) {
-  mockedControlsAvailable.value = payload.hasControls
+/** Applies custom-controls availability reported by sandbox runtime. */
+function onSandboxControlsInfo(payload: { hasControls: boolean }) {
+  sandboxControlsAvailable.value = payload.hasControls
   ready.value = true
 }
 
@@ -60,6 +51,7 @@ const hasInitState = computed(() => Object
   .filter(([key, value]) => !key.startsWith('_h') && !(key === '$data' && isEmptyStateObject(value)))
   .length > 0)
 
+/** Detects empty `$data` objects omitted from initial-state controls. */
 function isEmptyStateObject(value: unknown) {
   return value != null
     && typeof value === 'object'
@@ -78,37 +70,25 @@ function isEmptyStateObject(value: unknown) {
       class="htw-h-9 htw-flex-none htw-px-2 htw-flex htw-items-center"
     >
       <StatePresets
-        v-if="ready || controlsKind === 'state'"
+        v-if="ready"
         :story="story"
         :variant="variant"
       />
     </div>
 
-    <!-- Custom controls (vitest-mocked): rendered in a sandbox iframe -->
+    <!-- Custom controls execute inside story-compatible sandbox runtime. -->
     <StoryControlsSandboxIframe
-      v-if="customControlsInIframe"
-      v-show="mockedControlsAvailable === true"
+      v-show="sandboxControlsAvailable === true"
       :key="`${story.id}-${variant.id}`"
       :story="story"
       :variant="variant"
       class="htw-flex-none"
-      @info="onMockedControlsInfo"
-    />
-
-    <!-- Custom controls -->
-    <GenericRenderStory
-      v-if="controlsKind === 'custom'"
-      :key="`${story.id}-${variant.id}`"
-      slot-name="controls"
-      :variant="variant"
-      :story="story"
-      class="__histoire-render-custom-controls htw-flex-none"
-      @ready="ready = true"
+      @info="onSandboxControlsInfo"
     />
 
     <!-- Init state -->
     <div
-      v-if="controlsKind === 'state' && hasInitState"
+      v-if="ready && controlsKind === 'state' && hasInitState"
     >
       <ControlsComponentState
         class="htw-flex-none htw-my-2"
@@ -116,7 +96,7 @@ function isEmptyStateObject(value: unknown) {
       />
     </div>
 
-    <BaseEmpty v-else-if="controlsKind === 'state' && !variant.state?._hPropDefs?.length">
+    <BaseEmpty v-else-if="ready && controlsKind === 'state' && !variant.state?._hPropDefs?.length">
       <Icon
         icon="carbon:audio-console"
         class="htw-w-8 htw-h-8 htw-opacity-50 htw-mb-6"
@@ -126,7 +106,7 @@ function isEmptyStateObject(value: unknown) {
 
     <!-- Auto props -->
     <div
-      v-if="variant.state?._hPropDefs?.length"
+      v-if="ready && variant.state?._hPropDefs?.length"
     >
       <ControlsComponentProps
         v-for="(def, index) of variant.state._hPropDefs"

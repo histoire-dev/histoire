@@ -1,38 +1,24 @@
-import type { HistoireTestCaseResultInput, HistoireTestDefinition, HistoireTestRunSummary } from '@histoire/shared'
+import type { HistoireTestCaseResultInput, HistoireTestCleanup, HistoireTestDefinition, HistoireTestHookScope, HistoireTestRunSummary } from '@histoire/shared'
+import type { OpenAroundHooks } from './around-hooks.js'
 import type { VariantSession } from './session.js'
 import { createHistoireTestSummary, serializeTestError } from '@histoire/shared'
-import { createMissingHandlerError } from './definitions.js'
-import { assertSharedExpectState, resetSharedExpectState } from './expect-state.js'
+import { openAroundHooks } from './around-hooks.js'
+import { resetSharedExpectState } from './expect-state.js'
+import { runHooks } from './hooks.js'
+import { runDefinitionWithHooks } from './run-definition.js'
 
-/**
- * The slice of Vitest's worker global the preview runtime drives by hand.
- *
- * Histoire executes collected handlers itself instead of going through Vitest's
- * runner, so it has to publish the "current task" Vitest APIs (`onTestFinished`,
- * `expect` state, locators…) read from the global.
- */
-interface VitestWorkerState {
-  filepath?: string
-  current?: any
-}
+import { finishHistoireTestTask } from './task-callbacks.js'
+import { createPreviewTestTask } from './test-task.js'
+import { getVitestWorkerState } from './worker-state.js'
 
-/** Reads Vitest's worker global, absent when running outside a Vitest runtime. */
-function getVitestWorkerState(): VitestWorkerState | undefined {
-  return (globalThis as typeof globalThis & { __vitest_worker__?: VitestWorkerState }).__vitest_worker__
-}
-
-/**
- * Decides whether a definition must be reported as skipped instead of run.
- * @param definition The collected definition.
- * @param hasFocusedTests True when at least one definition of the variant uses `.only`.
- */
+/** Decides whether a definition must be reported as skipped. */
 function isSkipped(definition: HistoireTestDefinition, hasFocusedTests: boolean) {
   return definition.mode === 'skip'
     || definition.mode === 'todo'
     || (hasFocusedTests && definition.mode !== 'only')
 }
 
-/** Builds the result entry reported for one definition. */
+/** Builds one result entry reported to Histoire. */
 function toResult(
   definition: HistoireTestDefinition,
   state: HistoireTestCaseResultInput['state'],
@@ -47,57 +33,25 @@ function toResult(
   }
 }
 
-/**
- * Runs one test handler, returning the thrown value instead of propagating it.
- * @returns The error thrown by the handler, or `undefined` when it passed.
- */
-async function runDefinitionHandler(definition: HistoireTestDefinition, storyId: string, variantId: string) {
-  try {
-    if (!definition.handler) {
-      throw createMissingHandlerError(definition.fullName, storyId, variantId)
-    }
-
-    await definition.handler()
+/** Returns count of identical leading suite scopes. */
+function commonScopeCount(left: HistoireTestHookScope[], right: HistoireTestHookScope[]) {
+  let count = 0
+  while (left[count] && left[count] === right[count]) {
+    count++
   }
-  catch (error) {
-    return error
-  }
+  return count
 }
 
-/**
- * Runs the `onFinished` callbacks registered through the test context.
- *
- * They must run even when the handler threw, so that cleanup hooks still
- * execute; a cleanup failure is only reported when the test itself passed.
- * @param workerState Vitest's worker global, if any.
- * @param testError The error already produced by the handler, if any.
- * @returns The error to report for this test.
- */
-async function runOnFinishedCallbacks(workerState: VitestWorkerState | undefined, testError: unknown) {
-  let error = testError
-
-  for (const callback of workerState?.current?.onFinished ?? []) {
-    try {
-      await callback()
-    }
-    catch (cleanupError) {
-      if (!error) {
-        error = cleanupError
-      }
-    }
+/** Marks an already-created result failed because suite cleanup failed. */
+function appendResultError(result: HistoireTestCaseResultInput | undefined, error: unknown) {
+  if (!result || !error) {
+    return
   }
-
-  return error
+  result.state = 'failed'
+  result.errors.push(serializeTestError(error))
 }
 
-/**
- * Executes every collected test of a mounted variant session, honouring the
- * `.skip` / `.only` / `.todo` modifiers.
- * @param session The mounted variant session to run.
- * @param storyId Story the variant belongs to, used for ids and error messages.
- * @param variantId Variant being run.
- * @returns The summary reported back to the host UI.
- */
+/** Executes all collected tests of one mounted variant session. */
 export async function runSessionTests(
   session: VariantSession,
   storyId: string,
@@ -107,58 +61,128 @@ export async function runSessionTests(
   const hasFocusedTests = session.definitions.some(definition => definition.mode === 'only')
   const filepath = session.file.story.file?.filePath ?? session.file.filePath
   const results: HistoireTestCaseResultInput[] = []
+  const scopeErrors = new Map<HistoireTestHookScope, unknown>()
+  const unopenedScopeErrors = new Map<HistoireTestHookScope, unknown>()
+  const suiteCleanups = new Map<HistoireTestHookScope, HistoireTestCleanup[]>()
+  const aroundControllers = new Map<HistoireTestHookScope, OpenAroundHooks>()
+  let activeScopes: HistoireTestHookScope[] = []
+  let lastRunnableResult: HistoireTestCaseResultInput | undefined
+
+  /** Unwinds a completed suite, including setup disposers and its aroundAll wrapper. */
+  async function closeScope(scope: HistoireTestHookScope, error?: unknown) {
+    error = await runHooks([...scope.afterAll].reverse(), undefined, scope.suite, error, true)
+    error = await runHooks((suiteCleanups.get(scope) ?? []).reverse(), undefined, undefined, error, true)
+    const aroundError = await aroundControllers.get(scope)?.close()
+    suiteCleanups.delete(scope)
+    aroundControllers.delete(scope)
+    scopeErrors.delete(scope)
+    return error ?? aroundError
+  }
 
   for (const [index, definition] of session.definitions.entries()) {
-    const previousCurrent = workerState?.current
-    const previousFilepath = workerState?.filepath
-
     if (isSkipped(definition, hasFocusedTests)) {
       results.push(toResult(definition, 'skipped', []))
       continue
     }
 
+    const nextScopes = definition.hookScopes ?? []
+    const sharedCount = commonScopeCount(activeScopes, nextScopes)
+    let transitionError: unknown
+    for (const scope of activeScopes.slice(sharedCount).reverse()) {
+      transitionError = await closeScope(scope, transitionError)
+    }
+    appendResultError(lastRunnableResult, transitionError)
+    activeScopes = activeScopes.slice(0, sharedCount)
+
+    // A failed ancestor prevents Vitest from entering descendant suites. Keep
+    // `activeScopes` to scopes that actually opened so their teardown runs,
+    // while never calling child beforeAll/afterAll hooks that were skipped.
+    let blockedByAncestor = activeScopes.some(scope => scopeErrors.has(scope))
+    for (const scope of nextScopes.slice(sharedCount)) {
+      if (blockedByAncestor || unopenedScopeErrors.has(scope)) {
+        blockedByAncestor = true
+        break
+      }
+      let openingError: unknown
+      if (scope.aroundAll.length) {
+        const opened = await openAroundHooks(scope.aroundAll, scope.suite)
+        if ('controller' in opened) {
+          aroundControllers.set(scope, opened.controller)
+        }
+        else {
+          openingError = opened.error
+        }
+      }
+      if (openingError) {
+        // Vitest never enters a suite whose aroundAll setup failed, so neither
+        // afterAll nor beforeAll disposers may run for this scope.
+        unopenedScopeErrors.set(scope, openingError)
+        blockedByAncestor = true
+        break
+      }
+      const cleanups: HistoireTestCleanup[] = []
+      suiteCleanups.set(scope, cleanups)
+      const error = await runHooks(scope.beforeAll, undefined, scope.suite, undefined, false, cleanups)
+      activeScopes.push(scope)
+      if (error) {
+        scopeErrors.set(scope, error)
+        blockedByAncestor = true
+      }
+    }
+
+    const previousCurrent = workerState?.current
+    const previousFilepath = workerState?.filepath
+    const task = createPreviewTestTask(definition, `${storyId}:${variantId}:${index}`, filepath)
     if (workerState) {
       workerState.filepath = filepath
-      workerState.current = {
-        id: `${storyId}:${variantId}:${index}`,
-        type: 'test',
-        name: definition.fullName,
-        file: {
-          filepath,
-          name: session.file.story.title,
-        },
-        onFinished: [],
-      }
+      workerState.current = task
     }
 
-    // Reset shared expect state so assertion counters and `expect.assertions(n)`
-    // expectations from the previous test do not leak into this one.
-    resetSharedExpectState()
-
-    let testError = await runDefinitionHandler(definition, storyId, variantId)
-    testError = await runOnFinishedCallbacks(workerState, testError)
-
-    if (!testError) {
-      try {
-        assertSharedExpectState()
+    try {
+      resetSharedExpectState()
+      let taskFinalized = false
+      let testError = nextScopes.map(scope => scopeErrors.get(scope) ?? unopenedScopeErrors.get(scope)).find(Boolean)
+      if (!testError) {
+        try {
+          await runDefinitionWithHooks(definition, storyId, variantId, async (error) => {
+            taskFinalized = true
+            return await finishHistoireTestTask(task, error)
+          })
+        }
+        catch (error) {
+          testError = error
+        }
       }
-      catch (assertionError) {
-        testError = assertionError
+      // A failed aroundEach setup may never call the inner lifecycle, so its
+      // callbacks have not finalized the task yet. Finalize it here exactly
+      // once; otherwise callbacks have already run before wrapper teardown.
+      if (!taskFinalized) {
+        await finishHistoireTestTask(task, testError)
       }
+      else if (testError) {
+        const errors = testError instanceof AggregateError ? testError.errors : [testError]
+        for (const error of errors) {
+          if (!task.result.errors.includes(error)) task.result.errors.push(error)
+        }
+        task.result.state = 'fail'
+      }
+      const errors = task.result.errors
+      lastRunnableResult = toResult(definition, errors.length ? 'failed' : 'passed', errors.map(serializeTestError))
+      results.push(lastRunnableResult)
     }
-
-    results.push(testError
-      ? toResult(definition, 'failed', [serializeTestError(testError)])
-      : toResult(definition, 'passed', []))
-
-    if (workerState) {
-      // Both fields are borrowed from the Vitest worker for the duration of one
-      // test: leaving `filepath` pointing at the story would misattribute
-      // whatever the harness reports after this run.
-      workerState.current = previousCurrent
-      workerState.filepath = previousFilepath
+    finally {
+      if (workerState) {
+        workerState.current = previousCurrent
+        workerState.filepath = previousFilepath
+      }
     }
   }
+
+  let finalError: unknown
+  for (const scope of [...activeScopes].reverse()) {
+    finalError = await closeScope(scope, finalError)
+  }
+  appendResultError(lastRunnableResult, finalError)
 
   return createHistoireTestSummary(storyId, variantId, results)
 }

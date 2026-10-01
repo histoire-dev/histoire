@@ -190,6 +190,36 @@ describe('tests store dev-run robustness', () => {
     expect(store.currentDefinitions).toHaveLength(0)
   })
 
+  it.each(['resolve', 'reject'] as const)('ignores a run that %ss after HMR invalidates its story', async (outcome) => {
+    const store = await loadTestsStore()
+    const story = { id: 'story-a', variants: [{ id: 'variant-a' }] }
+    storyState.stories = [story]
+    await nextTick()
+    await store.collectCurrentVariantTests()
+    await store.runCurrentVariantTests()
+    const previousSummary = store.currentSummary
+    let finish!: () => void
+    previewRuntime.runCurrentFrameTests = vi.fn(() => new Promise((resolve, reject) => {
+      finish = () => outcome === 'resolve'
+        ? resolve({ ...EMPTY_SUMMARY, total: 99 })
+        : reject(new Error('old runtime failed'))
+    }))
+    const sendEvent = vi.fn()
+    fakeWindow.window.__HST_PLUGIN_API__ = { sendEvent }
+    const run = store.runCurrentVariantTests()
+    await flushMicrotasks()
+    store.invalidateStoryTests('story-a')
+    storyState.stories = [{ ...story }]
+    await nextTick()
+    expect(store.currentStale).toBe(true)
+    finish()
+    await run
+    expect(store.currentSummary).toBe(previousSummary)
+    expect(store.currentStale).toBe(true)
+    expect(store.currentRunning).toBe(false)
+    expect(sendEvent).not.toHaveBeenCalled()
+  })
+
   it('drops cached entries of stories that no longer exist', async () => {
     const store = await loadTestsStore()
 

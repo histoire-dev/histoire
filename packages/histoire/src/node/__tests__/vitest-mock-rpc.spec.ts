@@ -228,7 +228,7 @@ describe('vitest mock RPC plugin', () => {
 
   it('the installed @vitest/mocker still exports ServerMockResolver', async () => {
     // Version canary for the one @vitest/mocker internal Histoire depends on
-    // (named export of `@vitest/mocker/node`, verified against 4.0.16, which
+    // (named export of `@vitest/mocker/node`, verified through 4.1.10, which
     // is what the declared `vitest@^4` peer range ships).
     const mockerModuleId = tryResolveVitestModule(process.cwd(), '@vitest/mocker/node')
     expect(mockerModuleId).toBeTruthy()

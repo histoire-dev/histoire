@@ -1,6 +1,7 @@
 import type { Context } from '../context.js'
 import type { PreviewRuntimeStoryFile } from './preview-runtime/preamble.js'
 import { createRequire } from 'node:module'
+import { getStoryCollectTimeout } from '../util/test-timeouts.js'
 import { buildStoryModuleLoaders, getRuntimeStoryFiles } from './preview-runtime/index.js'
 import { VITEST_DYNAMIC_IMPORT_SNIPPET } from './vitest-runner-bootstrap.js'
 
@@ -12,6 +13,8 @@ export interface TestHarnessOptions {
   variantTestSessionId: string
   /** Story metadata baked into the harness at transform time. */
   files: PreviewRuntimeStoryFile[]
+  /** Maximum time allowed for one variant mount. */
+  mountTimeoutMs: number
 }
 
 /**
@@ -21,7 +24,7 @@ export interface TestHarnessOptions {
  * Kept free of module resolution (which needs a real install layout) so the
  * generated source can be exercised on its own.
  */
-export function buildTestHarnessSource({ variantTestSessionId, files }: TestHarnessOptions) {
+export function buildTestHarnessSource({ variantTestSessionId, files, mountTimeoutMs }: TestHarnessOptions) {
   // The harness runs one Vitest pass per story: no hot update can invalidate a
   // module mid-run, so the plain (bundler-analyzable) loaders are enough.
   const loaders = buildStoryModuleLoaders(files)
@@ -42,6 +45,7 @@ ${VITEST_DYNAMIC_IMPORT_SNIPPET}
 
 const variantTestSession = createVariantTestSession({
   files,
+  mountTimeoutMs: ${mountTimeoutMs},
   moduleLoaders,
   runWithDynamicImport: runWithVitestDynamicImport,
 })
@@ -64,5 +68,6 @@ export function testHarness(ctx: Context) {
   return buildTestHarnessSource({
     variantTestSessionId: require.resolve('./variant-test-session/index.js'),
     files: getRuntimeStoryFiles(ctx),
+    mountTimeoutMs: getStoryCollectTimeout(ctx),
   })
 }

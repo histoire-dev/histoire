@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import * as realVitest from 'vitest'
 import * as collectVitest from '../vendors/vitest-collect.js'
 
 describe('browser collection Vitest stub', () => {
@@ -40,12 +41,13 @@ describe('browser collection Vitest stub', () => {
     })
   })
 
-  it('exposes common Vitest public exports without importing Vitest itself', () => {
-    expect(collectVitest).toHaveProperty('chai')
-    expect(collectVitest).toHaveProperty('expectTypeOf')
-    expect(collectVitest).toHaveProperty('suite')
-    expect(collectVitest).toHaveProperty('onTestFinished')
-    expect(collectVitest).toHaveProperty('recordArtifact')
+  it('exposes every Vitest 4.1 public export without importing Vitest itself', () => {
+    for (const exportName of Object.keys(realVitest)) {
+      expect(collectVitest, exportName).toHaveProperty(exportName)
+    }
+    expect(collectVitest.Snapshots).toHaveProperty('toMatchSnapshot')
+    expect(collectVitest.Snapshots).toHaveProperty('toMatchInlineSnapshot')
+    expect(collectVitest.Snapshots).toHaveProperty('toMatchFileSnapshot')
   })
 
   describe('vi.fn() chainable mock surface', () => {

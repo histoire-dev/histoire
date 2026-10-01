@@ -23,3 +23,5 @@ import MyComponent from './MyComponent.vue'
 ::: warning Deprecated
 The `iframe: false` layout option is deprecated and ignored — stories always render inside an iframe now.
 :::
+
+Remove option when migrating. Non-serializable state stays inside preview runtime; see [browser runtime migration](../../guide/testing.md#state-ownership).

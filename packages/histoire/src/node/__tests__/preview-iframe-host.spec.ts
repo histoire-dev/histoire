@@ -197,7 +197,8 @@ describe('preview iframe host', () => {
 
     host.deliver({ type: VARIANT_READY, variantId: 'variant-a' })
     expect(story.variants[0].previewReady).toBe(true)
-    expect(host.sent(STATE_SYNC)).toHaveLength(1)
+    // Runtime owns boot state; host never seeds its stale mirror back.
+    expect(host.sent(STATE_SYNC)).toHaveLength(0)
     expect(host.sent(PREVIEW_SETTINGS_SYNC)).toHaveLength(1)
   })
 

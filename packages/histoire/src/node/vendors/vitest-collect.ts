@@ -7,22 +7,12 @@
  * has to expose a surface broad enough that none of those calls throws.
  *
  * COMPAT: mirrors the `vitest` public exports of Vitest ^4 (verified against
- * 4.0.16). A story using an API added later crashes at collection with a plain
+ * 4.1.10). A story using an API added later crashes at collection with a plain
  * `undefined is not a function` — add it here when that happens.
  */
-import { registerCollectedTestCase, registerCollectedTestSuite } from '@histoire/shared'
+import { createHistoireSuiteCollector, createHistoireTestCollector, registerCollectedAroundHook, registerCollectedTestHook } from '@histoire/shared'
 
 type AnyFn = (...args: any[]) => any
-type CollectSuiteFn = ((name: string, fn: AnyFn) => void) & {
-  only: (name: string, fn: AnyFn) => void
-  skip: (name: string, fn?: AnyFn) => void
-  todo: (name: string, fn?: AnyFn) => void
-}
-type CollectTestFn = ((name: string, fn?: AnyFn) => void) & {
-  only: (name: string, fn?: AnyFn) => void
-  skip: (name: string, fn?: AnyFn) => void
-  todo: (name: string, fn?: AnyFn) => void
-}
 
 function createNoopMatcher() {
   return new Proxy(() => undefined, {
@@ -186,6 +176,25 @@ export const expect = Object.assign(
   },
 )
 
+/** Returns collection-only expect facade. */
+export function createExpect() {
+  return expect
+}
+
+/** Base for runner classes unavailable during story collection. */
+class UnsupportedVitestRuntime {
+  constructor() {
+    throw new Error('Vitest runner classes are not available during Histoire story collection.')
+  }
+}
+
+/** Collection placeholder for Vitest benchmark runner. */
+export class BenchmarkRunner extends UnsupportedVitestRuntime {}
+/** Collection placeholder for Vitest evaluated-module registry. */
+export class EvaluatedModules extends UnsupportedVitestRuntime {}
+/** Collection placeholder for Vitest test runner. */
+export class TestRunner extends UnsupportedVitestRuntime {}
+
 /**
  * Chai-style assertions. Every method is a noop except `fail`, which a story
  * may legitimately use to abort its own setup.
@@ -218,49 +227,9 @@ export function assertType() {}
 /** No-op context injection helper for browser story collection. */
 export function inject() {}
 
-/** Creates a Vitest-like suite collector with chain modifiers. */
-function createSuiteCollector(): CollectSuiteFn {
-  return Object.assign(
-    (name: string, fn: AnyFn) => {
-      registerCollectedTestSuite(name, fn)
-    },
-    {
-      only(name: string, fn: AnyFn) {
-        registerCollectedTestSuite(name, fn, 'only')
-      },
-      skip(name: string, fn?: AnyFn) {
-        registerCollectedTestSuite(name, fn, 'skip')
-      },
-      todo(name: string, fn?: AnyFn) {
-        registerCollectedTestSuite(name, fn, 'todo')
-      },
-    },
-  )
-}
+export const describe = createHistoireSuiteCollector()
 
-/** Creates a Vitest-like test collector with chain modifiers. */
-function createTestCollector(): CollectTestFn {
-  return Object.assign(
-    (name: string, fn?: AnyFn) => {
-      registerCollectedTestCase(name, fn)
-    },
-    {
-      only(name: string, fn?: AnyFn) {
-        registerCollectedTestCase(name, fn, 'only')
-      },
-      skip(name: string, fn?: AnyFn) {
-        registerCollectedTestCase(name, fn, 'skip')
-      },
-      todo(name: string, fn?: AnyFn) {
-        registerCollectedTestCase(name, fn, 'todo')
-      },
-    },
-  )
-}
-
-export const describe = createSuiteCollector()
-
-export const it = createTestCollector()
+export const it = createHistoireTestCollector()
 
 export const test = it
 
@@ -280,13 +249,51 @@ export const bench = Object.assign(
   },
 )
 
-export function beforeAll() {}
-export function beforeEach() {}
-export function afterAll() {}
-export function afterEach() {}
+/** Registers a suite-level setup hook. */
+export function beforeAll(handler: AnyFn, timeout?: number) {
+  registerCollectedTestHook('beforeAll', handler, timeout)
+}
+
+/** Registers a per-test setup hook. */
+export function beforeEach(handler: AnyFn, timeout?: number) {
+  registerCollectedTestHook('beforeEach', handler, timeout)
+}
+
+/** Registers a suite-level cleanup hook. */
+export function afterAll(handler: AnyFn, timeout?: number) {
+  registerCollectedTestHook('afterAll', handler, timeout)
+}
+
+/** Registers a per-test cleanup hook. */
+export function afterEach(handler: AnyFn, timeout?: number) {
+  registerCollectedTestHook('afterEach', handler, timeout)
+}
+
+/** Registers a Vitest 4.1 suite lifecycle wrapper. */
+export function aroundAll(handler: AnyFn, timeout?: number) {
+  registerCollectedAroundHook('aroundAll', handler, timeout)
+}
+
+/** Registers a Vitest 4.1 per-test lifecycle wrapper. */
+export function aroundEach(handler: AnyFn, timeout?: number) {
+  registerCollectedAroundHook('aroundEach', handler, timeout)
+}
 /** No-op failure hook for browser story collection. */
 export function onTestFailed() {}
 /** No-op finished hook for browser story collection. */
 export function onTestFinished() {}
 /** No-op artifact recorder for browser story collection. */
 export function recordArtifact() {}
+
+/**
+ * Snapshot namespace placeholder. Vitest's browser runtime imports this public
+ * export internally; story collection never executes snapshot operations.
+ */
+export const Snapshots = Object.freeze({
+  /** Collection-only snapshot matcher placeholder. */
+  toMatchSnapshot: () => ({ pass: true, message: () => '' }),
+  /** Collection-only inline snapshot matcher placeholder. */
+  toMatchInlineSnapshot: () => ({ pass: true, message: () => '' }),
+  /** Collection-only file snapshot matcher placeholder. */
+  toMatchFileSnapshot: () => ({ pass: true, message: () => '' }),
+})

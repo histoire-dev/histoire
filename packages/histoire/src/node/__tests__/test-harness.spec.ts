@@ -18,13 +18,14 @@ const STUB_SESSION_ID = '/stub/histoire/virtual/variant-test-session.js'
 /** What the generated module handed to `createVariantTestSession`. */
 interface HarnessSessionOptions {
   files: { id: string, moduleId: string }[]
+  mountTimeoutMs: number
   moduleLoaders: Record<string, () => Promise<unknown>>
   runWithDynamicImport: (loader: () => any) => any
 }
 
 /** Generates the harness for the shared stub story files. */
 function generateHarness(files = previewRuntimeStubStoryFiles) {
-  return buildTestHarnessSource({ variantTestSessionId: STUB_SESSION_ID, files })
+  return buildTestHarnessSource({ variantTestSessionId: STUB_SESSION_ID, files, mountTimeoutMs: 30_000 })
 }
 
 /**

@@ -69,7 +69,9 @@ describe(${JSON.stringify(`${storyTitle} > ${variantTitle}`)}, () => {
     const testFn = definition.mode === 'only' ? test.only : definition.mode === 'skip' ? test.skip : test
     testFn(definition.fullName, async () => {
       await runCollectedTest(${JSON.stringify(storyId)}, ${JSON.stringify(variantId)}, definition)
-    })
+    // Embedded runtime owns body and hook deadlines. A second outer deadline
+    // races it, duplicates failures, and can preempt a valid longer test.
+    }, 0)
   }
 })
 `

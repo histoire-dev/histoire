@@ -1,7 +1,7 @@
 import type { HistoireTestRegistration, ServerStory } from '@histoire/shared'
 import type { VariantTestSessionOptions } from '../../virtual/variant-test-session/index.js'
 import { getStoryExecutionId, pushHistoireTestRegistration, TEST_REGISTRY_KEY, withStoryExecution } from '@histoire/shared'
-import { vi } from 'vitest'
+import { beforeEach, vi } from 'vitest'
 
 /** Text the mocked render mount exposes as the collected tests' canvas. */
 export const MOCK_CANVAS_TEXT = 'Mocked by Vitest for cache invalidation'
@@ -64,7 +64,7 @@ export function createVariantMountMocks() {
 
   /**
    * Executions a mocked mount claims as its own. The real mounts read them off
-   * the execution counter around `app.mount()`; the specs stage their setups
+   * their DOM subtree at the actual framework mount; the specs stage setups
    * before the mount instead, so the mock claims the executions of the
    * registrations it hands back.
    */
@@ -130,6 +130,7 @@ export function createSessionOptions(
   overrides: Partial<VariantTestSessionOptions> = {},
 ): VariantTestSessionOptions {
   return {
+    mountTimeoutMs: 30_000,
     files: [{
       id: STORY_ID,
       path: ['Story'],
@@ -155,5 +156,25 @@ export function createSessionOptions(
       return importLoader()
     },
     ...overrides,
+  }
+}
+
+/** Installs fresh mount mocks and session modules before each test in this suite. */
+export function useVariantTestSession() {
+  let mounts: ReturnType<typeof createVariantMountMocks>
+  let createVariantTestSession: typeof import('../../virtual/variant-test-session/index.js').createVariantTestSession
+
+  beforeEach(async () => {
+    vi.resetModules()
+    mounts = createVariantMountMocks()
+    vi.doMock('../../virtual/variant-test-mount.js', mounts.moduleFactory)
+    ;({ createVariantTestSession } = await import('../../virtual/variant-test-session/index.js'))
+  })
+
+  return {
+    /** Mount registrations and cleanup counts owned by the current test. */
+    get mounts() { return mounts },
+    /** Fresh session factory bound to the current test's mock modules. */
+    get createVariantTestSession() { return createVariantTestSession },
   }
 }

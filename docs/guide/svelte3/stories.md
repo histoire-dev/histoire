@@ -92,6 +92,8 @@ This is the default layout, displaying one variant at a time. The story is isola
 Additional `layout` properties:
 - `iframe`: **Deprecated** — this option is ignored, stories always render inside an iframe.
 
+Remove `iframe: false` when migrating. Preview runtime owns live state; see [browser runtime migration](../testing.md#state-ownership).
+
 ```svelte{7}
 <script>
   export let Hst

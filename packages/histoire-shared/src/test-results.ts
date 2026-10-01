@@ -8,11 +8,12 @@ import type {
 import { serializeTestError } from './test-errors.js'
 
 export function serializeTestDefinitions(definitions: HistoireTestDefinition[]): HistoireSerializedTestDefinition[] {
-  return definitions.map(({ id, name, fullName, mode }) => ({
+  return definitions.map(({ id, name, fullName, mode, timeout }) => ({
     id,
     name,
     fullName,
     ...(mode ? { mode } : {}),
+    ...(timeout === undefined ? {} : { timeout }),
   }))
 }
 

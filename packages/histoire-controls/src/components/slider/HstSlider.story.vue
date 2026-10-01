@@ -14,7 +14,7 @@ const state = reactive({
   <Story
     title="HstSlider"
     group="controls"
-    :layout="{ type: 'single', iframe: false }"
+    :layout="{ type: 'single' }"
   >
     <HstSlider
       v-model="state.value"

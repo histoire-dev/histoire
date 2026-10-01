@@ -65,6 +65,8 @@ export default defineConfig({
       input: [
         'src/app/api.ts',
         'src/app/index.ts',
+        // Generated sandbox runtime imports this bootstrap directly.
+        'src/app/util/controls-document.ts',
       ],
 
       output: {

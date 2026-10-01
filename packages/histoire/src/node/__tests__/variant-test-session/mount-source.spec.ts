@@ -22,4 +22,11 @@ describe('mountRenderVariant render-timeout cleanup', () => {
     // tear the timer down.
     expect(source).toMatch(/finally\s*\{[\s\S]*clearTimeout\(timeoutHandle\)/)
   })
+
+  it('takes the mount timeout from the variant session options', () => {
+    const source = readNodeSources('virtual')
+
+    expect(source).toContain('mountTimeoutMs')
+    expect(source).not.toContain('const RENDER_TIMEOUT = 15_000')
+  })
 })

@@ -64,6 +64,12 @@ export default defineComponent({
 
     const mountVariant = computed(() => attrs.variant)
 
+    // Lifecycle hooks must register before async initState suspends setup;
+    // Vue clears active component context after first await.
+    onBeforeUnmount(() => {
+      renderStateSync?.stop()
+    })
+
     if (renderContext?.mode !== 'render' && typeof props.initState === 'function' && mountVariant.value) {
       const state = await props.initState()
       applyState(mountVariant.value.state, toRawDeep(state))
@@ -181,10 +187,6 @@ export default defineComponent({
     if (mountVariant.value) {
       updateVariant(mountVariant.value)
     }
-
-    onBeforeUnmount(() => {
-      renderStateSync?.stop()
-    })
 
     return {
       renderContext,

@@ -78,10 +78,10 @@ import { usePreviewSettingsStore } from ${app('stores/preview-settings.js')}
 import { COLLECT_TESTS, CONTROLS_READY, CONTROLS_RESIZE, PREVIEW_SETTINGS_SYNC, PREVIEW_SYNC, RUN_TESTS, SANDBOX_READY, SELECT_VARIANT, STATE_SYNC, TEST_DEFINITIONS, TEST_RESULT, VARIANT_READY } from ${app('util/const.js')}
 import { histoireConfig } from ${app('util/config.js')}
 import { isDark } from ${app('util/dark.js')}
-import { mapFile } from ${app('util/mapping.js')}
+import { setupControlsDocument } from ${app('util/controls-document.js')}
 import { applyPreviewSettings } from ${app('util/preview-settings.js')}
 import { toRawDeep } from ${app('util/state.js')}
-import { applyVariantStateUpdate, createFailedRunSummary, createVariantStateSyncGuards, getVariantStateKey, serializeTestError } from ${JSON.stringify(histoireSharedId)}
+import { applyVariantStateUpdate, createControlsOverlayBridge, createFailedRunSummary, createVariantStateSyncGuards, getVariantStateKey, serializeTestError } from ${JSON.stringify(histoireSharedId)}
 import { createVariantTestSession } from ${JSON.stringify(variantTestSessionId)}
 ${hasVitestPreview
   ? `import { createStaticPreviewMockRpc, createStaticPreviewMswOptions, enableStaticPreviewMockInterception } from ${JSON.stringify(staticMockRuntimeId)}`

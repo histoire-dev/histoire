@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { readWorkspaceSources } from './utils/workspace-source.js'
+import { readWorkspaceSource, readWorkspaceSources } from './utils/workspace-source.js'
 
 /**
  * Source-level guard, deliberately NOT behavioral.
@@ -28,5 +28,11 @@ describe('vue variant implicit state sync', () => {
     // A live two-way sync (the previous behavior) made every hidden variant
     // share one state object, so whichever mounted last won.
     expect(source).not.toContain('syncStateBundledAndExternal(mountVariant.value.state, implicitState())')
+  })
+
+  it('registers teardown before async state initialization loses Vue context', () => {
+    const variantSource = readWorkspaceSource('histoire-plugin-vue', 'src/client/app/Variant.ts')
+
+    expect(variantSource.indexOf('onBeforeUnmount(() => {')).toBeLessThan(variantSource.indexOf('await props.initState()'))
   })
 })

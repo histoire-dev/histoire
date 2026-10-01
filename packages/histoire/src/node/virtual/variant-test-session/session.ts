@@ -16,6 +16,8 @@ export interface VariantSession {
 export interface CreateVariantSessionOptions {
   /** Positions the render mount off the viewport (see `VariantTestSessionOptions`). */
   offscreenRenderMount: boolean
+  /** Maximum time allowed for each mount phase. */
+  mountTimeoutMs: number
 }
 
 /**
@@ -32,7 +34,7 @@ export async function createVariantSession(
   options: CreateVariantSessionOptions,
 ): Promise<VariantSession> {
   const { file, importedDefinitions } = storyFile
-  const bootstrap = await bootstrapVariant(file, variantId, withRegistry)
+  const bootstrap = await bootstrapVariant(file, variantId, withRegistry, options.mountTimeoutMs)
 
   // Hoisted so the catch can unmount it: `collectHistoireTests` below runs
   // user registration callbacks that can throw AFTER a successful mount. A
@@ -42,6 +44,7 @@ export async function createVariantSession(
   try {
     rendered = await mountRenderVariant(file, variantId, withRegistry, {
       offscreen: options.offscreenRenderMount,
+      timeoutMs: options.mountTimeoutMs,
     })
     const context = {
       story: rendered.story,

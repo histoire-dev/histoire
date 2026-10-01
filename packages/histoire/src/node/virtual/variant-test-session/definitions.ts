@@ -75,6 +75,7 @@ export function dedupeCollectedTestDefinitionGroups(groups: CollectedTestDefinit
       // list but adopt the later mount's handler — never a foreign mount's.
       if (definition.handler && group.own) {
         previous[occurrence - 1].handler = definition.handler
+        previous[occurrence - 1].hookScopes = definition.hookScopes
       }
     }
   }
@@ -104,6 +105,8 @@ export function getMatchingDefinition(
   if (byId && byId.fullName === serialized.fullName && sameMode(byId.mode, serialized.mode)) {
     return byId
   }
-  // Fallback: tolerate reordered/changed collections by matching stable identity.
-  return definitions.find(d => d.fullName === serialized.fullName && sameMode(d.mode, serialized.mode)) ?? byId
+  // Fallback: tolerate reordered collections only when stable identity is
+  // unique. Duplicate names are valid Vitest, so guessing would run wrong test.
+  const matches = definitions.filter(d => d.fullName === serialized.fullName && sameMode(d.mode, serialized.mode))
+  return matches.length === 1 ? matches[0] : undefined
 }

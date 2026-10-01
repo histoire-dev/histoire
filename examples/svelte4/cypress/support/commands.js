@@ -15,3 +15,9 @@ Cypress.Commands.add('getPreviewIframeBody', (options = {}) => cy.get('iframe[da
   .its('0.contentDocument.body')
   .should('not.be.empty')
   .then(cy.wrap))
+
+/** Yields custom controls rendered in dedicated sandbox iframe. */
+Cypress.Commands.add('getControlsIframeBody', (options = {}) => cy.get('iframe[data-test-id="story-controls-sandbox"]', options)
+  .its('0.contentDocument.body')
+  .should('not.be.empty')
+  .then(cy.wrap))

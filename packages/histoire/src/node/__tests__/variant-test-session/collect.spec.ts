@@ -1,24 +1,16 @@
 import type { HistoireTestRegistration } from '@histoire/shared'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { describe as collectDescribe, it as collectIt } from '../../vendors/vitest-collect.js'
 import {
   createSessionOptions,
-  createVariantMountMocks,
   runStorySetup,
   STORY_ID,
+  useVariantTestSession,
   VARIANT_ID,
 } from '../utils/variant-test-session.js'
 
 describe('createVariantTestSession collection', () => {
-  let createVariantTestSession: typeof import('../../virtual/variant-test-session/index.js').createVariantTestSession
-  let mounts: ReturnType<typeof createVariantMountMocks>
-
-  beforeEach(async () => {
-    vi.resetModules()
-    mounts = createVariantMountMocks()
-    vi.doMock('../../virtual/variant-test-mount.js', mounts.moduleFactory)
-    ;({ createVariantTestSession } = await import('../../virtual/variant-test-session/index.js'))
-  })
+  const runtime = useVariantTestSession()
 
   it('re-imports invalidated stories before collecting tests again', async () => {
     let revision = 0
@@ -45,7 +37,7 @@ describe('createVariantTestSession collection', () => {
       }
     })
 
-    const session = createVariantTestSession(createSessionOptions({
+    const session = runtime.createVariantTestSession(createSessionOptions({
       moduleLoaders: { [STORY_ID]: loader },
     }))
 
@@ -76,7 +68,7 @@ describe('createVariantTestSession collection', () => {
     // `items.forEach(item => it('works', () => …))` produces tests with the
     // same fullName AND identical handler source but different closures —
     // vitest runs them all, so collection must not collapse them.
-    runStorySetup(mounts.renderRegistrations, () => {
+    runStorySetup(runtime.mounts.renderRegistrations, () => {
       for (const item of ['a', 'b']) {
         collectDescribe('loop suite', () => {
           collectIt('works', () => {
@@ -86,11 +78,22 @@ describe('createVariantTestSession collection', () => {
       }
     })
 
-    const session = createVariantTestSession(createSessionOptions())
+    const session = runtime.createVariantTestSession(createSessionOptions())
 
     const definitions = await session.collectVariantTests(STORY_ID, VARIANT_ID)
 
     expect(definitions.filter(definition => definition.fullName === 'loop suite > works')).toHaveLength(2)
+  })
+
+  it('preserves explicit test deadlines for the generated Vitest spec', async () => {
+    runStorySetup(runtime.mounts.renderRegistrations, () => {
+      collectIt('deadline', () => {}, 2_000)
+    })
+
+    const definitions = await runtime.createVariantTestSession(createSessionOptions())
+      .collectVariantTests(STORY_ID, VARIANT_ID)
+
+    expect(definitions).toMatchObject([{ name: 'deadline', timeout: 2_000 }])
   })
 
   it('keeps same-named tests registered by several onTest calls of one story setup', async () => {
@@ -101,9 +104,9 @@ describe('createVariantTestSession collection', () => {
         collectIt('works', () => {})
       })
     }
-    runStorySetup(mounts.renderRegistrations, makeRegistration(), makeRegistration())
+    runStorySetup(runtime.mounts.renderRegistrations, makeRegistration(), makeRegistration())
 
-    const session = createVariantTestSession(createSessionOptions())
+    const session = runtime.createVariantTestSession(createSessionOptions())
 
     const definitions = await session.collectVariantTests(STORY_ID, VARIANT_ID)
 
@@ -118,10 +121,10 @@ describe('createVariantTestSession collection', () => {
         collectIt('same test', () => {})
       })
     }
-    runStorySetup(mounts.bootstrapRegistrations, makeRegistration())
-    runStorySetup(mounts.renderRegistrations, makeRegistration())
+    runStorySetup(runtime.mounts.bootstrapRegistrations, makeRegistration())
+    runStorySetup(runtime.mounts.renderRegistrations, makeRegistration())
 
-    const session = createVariantTestSession(createSessionOptions())
+    const session = runtime.createVariantTestSession(createSessionOptions())
 
     const definitions = await session.collectVariantTests(STORY_ID, VARIANT_ID)
 
@@ -143,12 +146,12 @@ describe('createVariantTestSession collection', () => {
       })
     }
 
-    runStorySetup(mounts.bootstrapRegistrations, makeRegistration())
-    runStorySetup(mounts.bootstrapRegistrations, makeRegistration())
-    runStorySetup(mounts.bootstrapRegistrations, makeRegistration())
-    runStorySetup(mounts.renderRegistrations, makeRegistration())
+    runStorySetup(runtime.mounts.bootstrapRegistrations, makeRegistration())
+    runStorySetup(runtime.mounts.bootstrapRegistrations, makeRegistration())
+    runStorySetup(runtime.mounts.bootstrapRegistrations, makeRegistration())
+    runStorySetup(runtime.mounts.renderRegistrations, makeRegistration())
 
-    const session = createVariantTestSession(createSessionOptions())
+    const session = runtime.createVariantTestSession(createSessionOptions())
 
     const definitions = await session.collectVariantTests(STORY_ID, VARIANT_ID)
 
@@ -163,28 +166,28 @@ describe('createVariantTestSession collection', () => {
   it('forwards the offscreen render option to the render mount', async () => {
     const { mountRenderVariant } = await import('../../virtual/variant-test-mount.js')
 
-    await createVariantTestSession(createSessionOptions({ offscreenRenderMount: true }))
+    await runtime.createVariantTestSession(createSessionOptions({ offscreenRenderMount: true }))
       .collectVariantTests(STORY_ID, VARIANT_ID)
     expect(vi.mocked(mountRenderVariant)).toHaveBeenLastCalledWith(
       expect.anything(),
       VARIANT_ID,
       expect.any(Function),
-      { offscreen: true },
+      { offscreen: true, timeoutMs: 30_000 },
     )
 
     // Defaults to a visible mount (the vitest browser harness keeps real,
     // on-screen elements so real-pointer interactions stay possible).
-    await createVariantTestSession(createSessionOptions()).collectVariantTests(STORY_ID, VARIANT_ID)
+    await runtime.createVariantTestSession(createSessionOptions()).collectVariantTests(STORY_ID, VARIANT_ID)
     expect(vi.mocked(mountRenderVariant)).toHaveBeenLastCalledWith(
       expect.anything(),
       VARIANT_ID,
       expect.any(Function),
-      { offscreen: false },
+      { offscreen: false, timeoutMs: 30_000 },
     )
   })
 
   it('keeps registrations produced during bootstrap mounting', async () => {
-    runStorySetup(mounts.bootstrapRegistrations, ({ canvas }) => {
+    runStorySetup(runtime.mounts.bootstrapRegistrations, ({ canvas }) => {
       collectDescribe('bootstrap suite', () => {
         collectIt('captures bootstrap registrations', () => {
           expect(canvas.textContent).toContain('cache invalidation')
@@ -192,7 +195,7 @@ describe('createVariantTestSession collection', () => {
       })
     })
 
-    const session = createVariantTestSession(createSessionOptions({
+    const session = runtime.createVariantTestSession(createSessionOptions({
       moduleLoaders: {
         [STORY_ID]: vi.fn(async () => ({ default: { name: 'BootstrapComponent' } })),
       },
@@ -206,22 +209,22 @@ describe('createVariantTestSession collection', () => {
   })
 
   it('unmounts both mounts of every flow, including a failing one', async () => {
-    const session = createVariantTestSession(createSessionOptions())
+    const session = runtime.createVariantTestSession(createSessionOptions())
 
     await session.collectVariantTests(STORY_ID, VARIANT_ID)
     // One offscreen copy of the story per mount stays in the page otherwise,
     // accumulating over a dev session of collect/run flows.
-    expect(mounts.cleanups).toEqual({ bootstrap: 1, render: 1 })
+    expect(runtime.mounts.cleanups).toEqual({ bootstrap: 1, render: 1 })
 
     await session.runVariantTests(STORY_ID, VARIANT_ID)
-    expect(mounts.cleanups).toEqual({ bootstrap: 2, render: 2 })
+    expect(runtime.mounts.cleanups).toEqual({ bootstrap: 2, render: 2 })
 
     await expect(session.runCollectedTest(STORY_ID, VARIANT_ID, {
       id: '404',
       name: 'missing',
       fullName: 'missing',
     })).rejects.toThrow(/Could not resolve/)
-    expect(mounts.cleanups).toEqual({ bootstrap: 3, render: 3 })
+    expect(runtime.mounts.cleanups).toEqual({ bootstrap: 3, render: 3 })
   })
 
   it('never adopts the handler of a story copy mounted outside the session', async () => {
@@ -236,10 +239,10 @@ describe('createVariantTestSession collection', () => {
       })
     }
 
-    runStorySetup(mounts.renderRegistrations, makeRegistration('session'))
-    runStorySetup(mounts.foreignRegistrations, makeRegistration('foreign'))
+    runStorySetup(runtime.mounts.renderRegistrations, makeRegistration('session'))
+    runStorySetup(runtime.mounts.foreignRegistrations, makeRegistration('foreign'))
 
-    const session = createVariantTestSession(createSessionOptions())
+    const session = runtime.createVariantTestSession(createSessionOptions())
 
     const definitions = await session.collectVariantTests(STORY_ID, VARIANT_ID)
     expect(definitions).toHaveLength(1)

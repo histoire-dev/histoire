@@ -28,6 +28,7 @@ const emit = defineEmits<{
     :style="$attrs.style"
   >
     <CustomSelect
+      :title="title"
       :options="options"
       :model-value="modelValue"
       @update:model-value="emit('update:modelValue', $event)"

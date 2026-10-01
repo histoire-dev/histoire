@@ -2,7 +2,7 @@
  * Emits the two sandbox capture components:
  * - `PreviewTestCapture` renders the selected variant for the preview iframe,
  * - `PreviewControlsCapture` renders only the story `#controls` slot for the
- *   host Controls panel (used by vitest-mocked stories).
+ *   host Controls panel.
  *
  * Both mount the story off-screen first so its slots register.
  */
@@ -60,19 +60,27 @@ const PreviewControlsCapture = defineComponent({
     ready: () => true,
   },
   setup(props, { emit }) {
+    const controlsBootstrapReady = ref(false)
+
     return () => [
-      // The story must execute (with mocks active) for its slots to register;
-      // only the controls slot below is visible.
+      // Story must execute before its controls render. Svelte variant slots
+      // depend on metadata populated by this hidden mount, and plain-object
+      // metadata mutations do not retrigger an already-rendered Svelte tree.
       h('div', { class: 'htw-sandbox-hidden' }, [h(GenericMountStory, {
         story: props.story,
+        onReady: () => {
+          controlsBootstrapReady.value = true
+        },
       })]),
-      h(GenericRenderStory, {
-        class: '__histoire-render-custom-controls',
-        slotName: 'controls',
-        story: props.story,
-        variant: props.variant,
-        onReady: () => emit('ready'),
-      }),
+      controlsBootstrapReady.value
+        ? h(GenericRenderStory, {
+            class: '__histoire-render-custom-controls',
+            slotName: 'controls',
+            story: props.story,
+            variant: props.variant,
+            onReady: () => emit('ready'),
+          })
+        : null,
     ]
   },
 })`

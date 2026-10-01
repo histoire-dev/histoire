@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 import { previewHostMessaging } from '../virtual/preview-runtime/host-messaging.js'
+import { readAppSource } from './utils/app-source.js'
 
 /**
  * Executes the generated outbound channel of the preview runtime.
@@ -85,5 +86,21 @@ describe('preview runtime outbound channel', () => {
 
     expect(channel.getHostWindow()).toBe(null)
     expect(() => channel.postToParent({ type: 'test' })).not.toThrow()
+  })
+})
+
+describe('host state ownership', () => {
+  const source = readAppSource('app/util/preview-iframe-host.ts')
+
+  it('does not seed a newly loaded preview from the host mirror', () => {
+    const loadHandler = source.match(/function onIframeLoad\(\) \{([\s\S]*?)\n {2}\}/)?.[1]
+    expect(loadHandler).toBeTruthy()
+    expect(loadHandler).not.toContain('syncState()')
+  })
+
+  it('does not echo the boot snapshot back after variant readiness', () => {
+    const readyHandler = source.match(/function markVariantReady\([^)]*\) \{([\s\S]*?)\n {2}\}/)?.[1]
+    expect(readyHandler).toBeTruthy()
+    expect(readyHandler).not.toContain('syncState()')
   })
 })

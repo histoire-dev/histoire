@@ -46,4 +46,23 @@ describe('getMatchingDefinition', () => {
 
     expect(getMatchingDefinition(definitions, serialized)).toBeUndefined()
   })
+
+  it('returns undefined when a removed test id now belongs to another test', () => {
+    const definitions = [
+      { id: '0', name: 'replacement', fullName: 'suite > replacement' },
+    ]
+    const serialized = { id: '0', name: 'removed', fullName: 'suite > removed' }
+
+    expect(getMatchingDefinition(definitions, serialized)).toBeUndefined()
+  })
+
+  it('returns undefined when reordered collection has ambiguous duplicate names', () => {
+    const definitions = [
+      { id: '0', name: 'same', fullName: 'suite > same' },
+      { id: '1', name: 'same', fullName: 'suite > same' },
+    ]
+    const serialized = { id: '4', name: 'same', fullName: 'suite > same' }
+
+    expect(getMatchingDefinition(definitions, serialized)).toBeUndefined()
+  })
 })

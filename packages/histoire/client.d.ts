@@ -1,5 +1,8 @@
 import type { HistoireTestRegistration } from '@histoire/shared'
 
+export { getControlsHost } from '@histoire/shared'
+export type { HistoireControlsOverlay, HistoireControlsOverlayHandle, HistoireControlsOverlayResult } from '@histoire/shared'
+
 /**
  * @deprecated
  */

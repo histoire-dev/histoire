@@ -29,7 +29,7 @@ describe('BaseButton grid detection', () => {
     // The "playground" variant defines a `#controls` slot: those custom
     // controls replace the generic editors for its own state, and the detected
     // props of the rendered component are listed next to them.
-    cy.get('[data-test-id="story-controls"]').within(() => {
+    cy.getControlsIframeBody().within(() => {
       cy.contains('label', /^Disabled$/).should('be.visible')
       cy.contains('label', 'Color').should('be.visible')
       cy.contains('label', 'Size').should('be.visible')

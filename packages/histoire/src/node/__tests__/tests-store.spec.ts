@@ -122,6 +122,21 @@ describe('tests store collection', () => {
     expect(store.currentHasTests).toBe(false)
   })
 
+  it('surfaces permanent preview transport failures', async () => {
+    const store = await loadTestsStore()
+    previewRuntime.collectCurrentFrameTests = vi.fn(async () => {
+      throw new Error('Preview iframe did not return collected tests in time.')
+    })
+
+    await expect(store.collectCurrentVariantTests()).resolves.toBeUndefined()
+
+    expect(store.currentDefinitions).toEqual([])
+    expect(store.currentCollectError).toMatchObject({
+      message: 'Preview iframe did not return collected tests in time.',
+    })
+    expect(store.currentHasTests).toBe(true)
+  })
+
   it('scopes definitions and errors to the variant they were collected for', async () => {
     const store = await loadTestsStore()
     previewRuntime.collectCurrentFrameTests = vi.fn(async (key?: string | null) => (

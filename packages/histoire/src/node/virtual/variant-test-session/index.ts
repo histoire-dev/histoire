@@ -4,9 +4,12 @@ import type { VariantTestSessionOptions } from './types.js'
 import { serializeTestDefinitions } from '@histoire/shared'
 import { createMissingHandlerError, getMatchingDefinition } from './definitions.js'
 import { createExclusiveQueue } from './exclusive.js'
+import { runSingleDefinition } from './run-single-definition.js'
 import { runSessionTests } from './run.js'
 import { createVariantSession } from './session.js'
 import { createStoryModuleCache } from './story-modules.js'
+import { enterHistoireTestTask } from './test-task.js'
+import { getVitestWorkerState } from './worker-state.js'
 
 export { getMatchingDefinition } from './definitions.js'
 export type { VariantSession } from './session.js'
@@ -19,6 +22,11 @@ export type { SerializedStoryFile, VariantTestSessionOptions } from './types.js'
  * iframe (or of the Vitest test harness), so it owns the story module cache and
  * serializes its flows — collect and run both take over the global test
  * registry while they mount a variant.
+ *
+ * Execution is split by ownership: run.ts walks preview suites once, while
+ * run-single-definition.ts wraps each CLI test in its own mounted suites.
+ * Both use run-definition.ts for the per-test lifecycle, hooks.ts and
+ * around-hooks.ts for setup/teardown, and task-callbacks.ts for final results.
  * @param options Baked story metadata, module loaders and mount options.
  */
 export function createVariantTestSession(options: VariantTestSessionOptions) {
@@ -30,8 +38,17 @@ export function createVariantTestSession(options: VariantTestSessionOptions) {
     return createVariantSession(
       await storyModules.createSessionStoryFile(storyId),
       variantId,
-      { offscreenRenderMount: options.offscreenRenderMount ?? false },
+      {
+        offscreenRenderMount: options.offscreenRenderMount ?? false,
+        mountTimeoutMs: options.mountTimeoutMs,
+      },
     )
+  }
+
+  /** Loads the visible preview while retaining its module-scope registrations for tests. */
+  async function loadStoryFile(storyId: string) {
+    // Imports borrow the same global registry as test mounts, so both use one queue.
+    return runExclusive(async () => (await storyModules.createSessionStoryFile(storyId, false)).file)
   }
 
   /**
@@ -58,6 +75,7 @@ export function createVariantTestSession(options: VariantTestSessionOptions) {
   async function runCollectedTest(storyId: string, variantId: string, definition: HistoireSerializedTestDefinition) {
     return runExclusive(async () => {
       const session = await openVariantSession(storyId, variantId)
+      const leaveTask = enterHistoireTestTask(getVitestWorkerState()?.current)
 
       try {
         const currentDefinition = getMatchingDefinition(session.definitions, definition)
@@ -66,13 +84,14 @@ export function createVariantTestSession(options: VariantTestSessionOptions) {
           return
         }
 
-        if (!currentDefinition?.handler) {
+        if (!currentDefinition) {
           throw createMissingHandlerError(definition.fullName, storyId, variantId)
         }
 
-        await currentDefinition.handler()
+        await runSingleDefinition(currentDefinition, storyId, variantId)
       }
       finally {
+        leaveTask()
         session.cleanup()
       }
     })
@@ -94,6 +113,7 @@ export function createVariantTestSession(options: VariantTestSessionOptions) {
 
   return {
     collectVariantTests,
+    loadStoryFile,
     // Exposed so the preview runtime imports the story at the same version as
     // the session, instead of ending up with two module instances of it.
     getStoryModuleVersion: storyModules.getStoryModuleVersion,

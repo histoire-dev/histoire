@@ -1,4 +1,3 @@
-import fs from 'node:fs'
 import { createRequire } from 'node:module'
 import { resolve } from 'pathe'
 
@@ -28,32 +27,10 @@ function canResolveVitest(root: string) {
 }
 
 /**
- * Checks whether the project lists `vitest` in its own package.json.
- *
- * Kept as a secondary signal — module resolution above is authoritative.
- */
-function isVitestDeclared(root: string) {
-  try {
-    const packageJson = JSON.parse(fs.readFileSync(resolve(root, 'package.json'), 'utf8')) as {
-      dependencies?: Record<string, string>
-      devDependencies?: Record<string, string>
-    }
-
-    return Boolean(
-      packageJson.dependencies?.vitest
-      || packageJson.devDependencies?.vitest,
-    )
-  }
-  catch {
-    return false
-  }
-}
-
-/**
- * Returns true when Vitest is available for the given project root, either
- * because it is declared in package.json or because it is resolvable (e.g.
- * hoisted to the workspace root in a monorepo).
+ * Returns true when Vitest is resolvable from the project root.
+ * A package.json declaration alone is insufficient: users may not have run
+ * their package manager yet, or an install may be incomplete.
  */
 export function hasProjectVitest(root: string) {
-  return isVitestDeclared(root) || canResolveVitest(root)
+  return canResolveVitest(root)
 }

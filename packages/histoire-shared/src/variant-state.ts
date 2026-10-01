@@ -1,4 +1,4 @@
-import { applyState } from './state.js'
+import { applySerializedState } from './serialized-state.js'
 
 /**
  * Creates stable lookup key for one variant state inside one story.
@@ -80,7 +80,8 @@ export function applyVariantStateUpdate<T extends { state: any }>(options: {
     return null
   }
 
-  options.guards?.suppress(getVariantStateKey(options.storyId, options.variantId))
-  applyState(variant.state, options.state)
+  if (applySerializedState(variant.state, options.state)) {
+    options.guards?.suppress(getVariantStateKey(options.storyId, options.variantId))
+  }
   return variant
 }

@@ -1,4 +1,4 @@
-import type { HistoireTestContext, HistoireTestDefinition, HistoireTestMode, HistoireTestRegistration } from './types/test.js'
+import type { HistoireTestAroundHook, HistoireTestContext, HistoireTestDefinition, HistoireTestHook, HistoireTestHookKind, HistoireTestHookScope, HistoireTestMode, HistoireTestRegistration } from './types/test.js'
 import { tagStoryExecution } from './test-execution.js'
 
 export const TEST_REGISTRY_KEY = '__HST_TEST_REGISTRY__'
@@ -9,8 +9,26 @@ const ACTIVE_TEST_COLLECTOR_KEY = '__HST_ACTIVE_TEST_COLLECTOR__'
 interface HistoireActiveTestCollector {
   cases: HistoireTestDefinition[]
   nextId: number
+  hookScopes: HistoireTestHookScope[]
   suiteModes: HistoireTestMode[]
   suiteStack: string[]
+}
+
+/** Creates an empty mutable lifecycle scope for one registration or suite. */
+function createHookScope(name: string, fullName: string): HistoireTestHookScope {
+  return {
+    suite: {
+      type: 'suite',
+      name,
+      fullName,
+    },
+    aroundAll: [],
+    aroundEach: [],
+    beforeAll: [],
+    beforeEach: [],
+    afterEach: [],
+    afterAll: [],
+  }
 }
 
 function getActiveCollector() {
@@ -48,6 +66,7 @@ export function registerCollectedTestSuite(_name: string, fn?: () => void, mode:
   }
 
   collector.suiteStack.push(_name)
+  collector.hookScopes.push(createHookScope(_name, collector.suiteStack.join(' > ')))
   if (mode !== 'run') {
     collector.suiteModes.push(mode)
   }
@@ -60,19 +79,47 @@ export function registerCollectedTestSuite(_name: string, fn?: () => void, mode:
       collector.suiteModes.pop()
     }
 
+    collector.hookScopes.pop()
     collector.suiteStack.pop()
   }
 }
 
 /**
+ * Registers a Vitest lifecycle hook on the active suite scope.
+ * Calls outside active Histoire collection are ignored.
+ * @param kind Lifecycle phase.
+ * @param handler Callback registered by story code.
+ */
+export function registerCollectedTestHook(kind: HistoireTestHookKind, handler: HistoireTestHook, timeout?: number) {
+  const scope = getActiveCollector()?.hookScopes.at(-1)
+  scope?.[kind].push({ handler, timeout })
+}
+
+/** Registers a Vitest 4.1 lifecycle wrapper on current suite scope. */
+export function registerCollectedAroundHook(
+  kind: 'aroundAll' | 'aroundEach',
+  handler: HistoireTestAroundHook,
+  timeout?: number,
+) {
+  const scope = getActiveCollector()?.hookScopes.at(-1)
+  scope?.[kind].push({ handler, timeout })
+}
+
+/**
  * Registers a collected test case for the active collector.
  */
-export function registerCollectedTestCase(name: string, handler?: () => Promise<void> | void, mode: HistoireTestMode = 'run') {
+export function registerCollectedTestCase(
+  name: string,
+  handler?: HistoireTestDefinition['handler'],
+  timeoutOrMode?: number | HistoireTestMode,
+  mode: HistoireTestMode = 'run',
+) {
   const collector = getActiveCollector()
   if (!collector) {
     return
   }
-  const resolvedMode = resolveCollectedTestMode(collector, mode)
+  const timeout = typeof timeoutOrMode === 'number' ? timeoutOrMode : undefined
+  const resolvedMode = resolveCollectedTestMode(collector, typeof timeoutOrMode === 'string' ? timeoutOrMode : mode)
   const shouldKeepHandler = resolvedMode !== 'skip' && resolvedMode !== 'todo'
 
   collector.cases.push({
@@ -81,6 +128,8 @@ export function registerCollectedTestCase(name: string, handler?: () => Promise<
     fullName: [...collector.suiteStack, name].join(' > '),
     ...(resolvedMode !== 'run' ? { mode: resolvedMode } : {}),
     ...(shouldKeepHandler ? { handler } : {}),
+    ...(timeout === undefined ? {} : { timeout }),
+    hookScopes: [...collector.hookScopes],
   })
 }
 
@@ -114,6 +163,7 @@ export function collectHistoireTests(
   const collector: HistoireActiveTestCollector = {
     cases: [],
     nextId: 0,
+    hookScopes: [],
     suiteModes: [],
     suiteStack: [],
   }
@@ -125,7 +175,13 @@ export function collectHistoireTests(
 
   try {
     for (const register of registrations) {
-      register(context)
+      collector.hookScopes.push(createHookScope('', ''))
+      try {
+        register(context)
+      }
+      finally {
+        collector.hookScopes.pop()
+      }
     }
   }
   finally {

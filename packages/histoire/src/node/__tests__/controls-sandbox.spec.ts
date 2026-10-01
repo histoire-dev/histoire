@@ -2,12 +2,13 @@ import { CONTROLS_READY, CONTROLS_RESIZE } from '@histoire/shared'
 import { describe, expect, it } from 'vitest'
 import { readAppSource } from './utils/app-source.js'
 import { generatePreviewRuntimeSource } from './utils/preview-runtime-source.js'
+import { readWorkspaceSource } from './utils/workspace-source.js'
 
 /**
- * Custom `<template #controls>` slots need the story's render function, which
- * the host cannot obtain for vitest-mocked stories (their module only runs
- * inside the sandbox where the mocker is active). The controls are therefore
- * rendered in a dedicated sandbox iframe embedded in the Controls panel.
+ * Custom `<template #controls>` slots execute beside their owning runtime so
+ * mocked modules, component metadata and state remain local to one browsing
+ * context. The controls are rendered in a dedicated sandbox iframe embedded
+ * in the Controls panel.
  *
  * Source-level guards, deliberately NOT behavioral: one half is a generated
  * source string whose imports (`virtual:$histoire-theme`, `@vitest/mocker`,
@@ -34,10 +35,29 @@ describe('controls sandbox mode (preview runtime)', () => {
     expect(source).toMatch(/PreviewControlsCapture[\s\S]{0,600}htw-sandbox-hidden/)
   })
 
+  it('waits for hidden story metadata before rendering variant controls', () => {
+    expect(source).toContain('const controlsBootstrapReady = ref(false)')
+    expect(source).toContain('controlsBootstrapReady.value = true')
+    expect(source).toMatch(/controlsBootstrapReady\.value[\s\S]{0,300}GenericRenderStory/)
+  })
+
+  it('receives hidden-mount readiness from every support runtime', () => {
+    const sources = [
+      readWorkspaceSource('histoire-plugin-vue', 'src/client/app/MountStory.ts'),
+      readWorkspaceSource('histoire-plugin-svelte', 'src/client/mount.ts'),
+      readWorkspaceSource('histoire', 'src/node/builtin-plugins/vanilla-support/MountStory.ts'),
+    ]
+
+    for (const runtimeSource of sources) {
+      expect(runtimeSource).toContain(`emits: {`)
+      expect(runtimeSource).toContain(`ready: () => true`)
+      expect(runtimeSource).toContain(`emit('ready')`)
+    }
+  })
+
   it('announces readiness without posting the boot state snapshot', () => {
-    // With two iframes, the preview frame's state (already held by the host)
-    // is authoritative — pushing this frame's defaults would reset it. The
-    // host sends the full state after CONTROLS_READY instead.
+    // Primary preview state is authoritative. Pushing controls-frame defaults
+    // would reset it, so host sends primary snapshot after CONTROLS_READY.
     const body = source.match(/async markControlsReady\(variantId\) \{([\s\S]*?)\n {6}\}/)?.[1]
     expect(body).toBeTruthy()
     expect(body).toContain('readyVariantIds.add(variantId)')
@@ -53,9 +73,9 @@ describe('controls sandbox mode (preview runtime)', () => {
     expect(body).toBeTruthy()
     expect(body).toContain('type: CONTROLS_RESIZE')
     expect(body).toContain('new ResizeObserver(')
-    // scrollHeight, not the box height: the sandbox root is viewport-bound and
-    // this iframe starts at 0px, so a box measure would stay 0 forever.
-    expect(body).toContain('document.documentElement.scrollHeight')
+    // Controls mode measures intrinsic form height, excluding viewport height
+    // and floating overlays. Shrinking behavior is covered by controls-resize.
+    expect(body).toContain('root.getBoundingClientRect().height')
   })
 })
 
@@ -85,14 +105,14 @@ describe('controls sandbox iframe (host component)', () => {
 })
 
 describe('controls panel integration', () => {
-  it('routes mocked stories to the sandbox iframe and keeps fallbacks reachable', () => {
+  it('routes every custom-controls probe through the sandbox iframe and keeps fallbacks reachable', () => {
     const source = readAppSource('app/components/panel/StoryControls.vue')
 
     expect(source).toContain('StoryControlsSandboxIframe')
-    expect(source).toContain('hasVitestMocks')
-    // A mocked story without custom controls must still reach the init-state /
-    // empty-state fallbacks (driven by the iframe's hasControls report).
-    expect(source).toContain('mockedControlsAvailable')
+    expect(source).not.toContain('GenericRenderStory')
+    // A story without custom controls must still reach the init-state / empty-
+    // state fallbacks, driven by the iframe runtime's hasControls report.
+    expect(source).toContain('sandboxControlsAvailable')
   })
 
   it('shares the controls message names with the generated preview runtime', () => {

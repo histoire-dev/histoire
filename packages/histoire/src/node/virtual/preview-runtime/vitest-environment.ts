@@ -37,6 +37,8 @@ async function ensureVitestPreviewEnvironment() {
         trackUnhandledErrors: false,
       },
       expect: {},
+      hookTimeout: 10_000,
+      testTimeout: 5_000,
     },
     providedContext: {},
     filepath: '',

@@ -8,7 +8,7 @@ export default {
 import type { Awaitable } from '@histoire/shared'
 import { Icon } from '@iconify/vue'
 import { useClipboard } from '@vueuse/core'
-import { VTooltip as vTooltip } from 'floating-vue'
+import { VTooltip as vTooltip } from '../overlay/tooltip'
 
 const props = defineProps<{
   content: string | (() => Awaitable<string>)

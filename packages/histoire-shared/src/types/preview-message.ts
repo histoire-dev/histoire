@@ -1,3 +1,4 @@
+import type { HistoireControlsAppearanceMessage, HistoireControlsOverlayMessage, HistoireControlsOverlayRefreshMessage, HistoireControlsOverlayResultMessage } from './controls.js'
 import type {
   HistoireCollectTestsPayload,
   HistoireRunTestsPayload,
@@ -128,6 +129,9 @@ export type HistoireTestResultMessage = HistoireRunTestsPayload & {
 
 /** Every message the host posts into the preview iframe. */
 export type HistoireHostMessage =
+  | HistoireControlsAppearanceMessage
+  | HistoireControlsOverlayRefreshMessage
+  | HistoireControlsOverlayResultMessage
   | HistoirePreviewSyncMessage
   | HistoireStateSyncMessage
   | HistoirePreviewSettingsSyncMessage
@@ -137,6 +141,7 @@ export type HistoireHostMessage =
 
 /** Every message the preview iframe posts back to the host. */
 export type HistoirePreviewMessage =
+  | HistoireControlsOverlayMessage
   | HistoireStateSyncMessage
   | HistoireSandboxReadyMessage
   | HistoireVariantReadyMessage

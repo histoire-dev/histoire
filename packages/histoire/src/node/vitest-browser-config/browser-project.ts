@@ -32,7 +32,7 @@ export async function getVitestBrowserProjectConfig(root: string, plugins: ViteP
  * `@internal` API surfaces (`provider.serverFactory`, `project.options`,
  * `coreWorkspaceProject`) — the only channel through which `@vitest/browser`
  * accepts extra Vite plugins for its browser server (it reads
- * `project.options?.plugins`). Verified against vitest 4.0.16; the
+ * `project.options?.plugins`). Verified through vitest 4.1.10; the
  * `peerDependencies` range in package.json documents the supported versions
  * and must be re-verified before widening it.
  */

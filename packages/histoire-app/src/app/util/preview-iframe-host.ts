@@ -1,6 +1,6 @@
 import type { HistoireHostMessage, HistoireInboundPreviewMessage } from '@histoire/shared'
 import type { HstEvent } from '../stores/events'
-import type { Story, Variant } from '../types'
+import type { PreviewIframeHostOptions } from './preview-iframe-host-types'
 import { useEventListener } from '@vueuse/core'
 import { computed, onBeforeUnmount, onMounted, ref, toRaw, watch } from 'vue'
 import { useEventsStore } from '../stores/events'
@@ -20,43 +20,7 @@ import { isTrustedPreviewFrameMessage } from './preview-message'
 import { createPreviewStateSync } from './preview-state-sync'
 import { getSandboxUrl } from './sandbox'
 
-/** Preview slot this host owns in the preview runtime store. */
-export type PreviewIframeMode = 'single' | 'grid'
-
-export interface PreviewIframeHostOptions {
-  /**
-   * Which preview the host owns. Drives the store slot, the `grid` flag of
-   * PREVIEW_SYNC and whether the sandbox URL is pinned to one variant.
-   */
-  mode: PreviewIframeMode
-  /**
-   * Story currently shown. May be nullish while navigating away (the grid reads
-   * it from the story store, which is cleared before the component unmounts).
-   */
-  getStory: () => Story | null | undefined
-  /** Variant the host currently shows, or nullish when none is selected. */
-  getCurrentVariant: () => Variant | null | undefined
-  /** Resolves one variant of the current story by id, for messages from the frame. */
-  getVariantById: (variantId: string) => Variant | null | undefined
-  /**
-   * Marks the variants this host owns as awaiting a refreshed preview runtime.
-   * Single mode owns one variant, grid mode owns every variant of the story.
-   */
-  markPreviewPending: () => void
-  /**
-   * Handles a variant selection made inside the preview document (grid only).
-   * Providing it also enables the outbound half: a selection change is then
-   * pushed into the running iframe instead of remounting it. Omit it for hosts
-   * pinned to a single variant, which swap the sandbox URL instead.
-   */
-  onSelectVariant?: (variantId: string) => void
-  /**
-   * Also runs the sandbox-url watcher at setup, announcing the imminent
-   * navigation to the preview runtime store when a host remounts while a
-   * request is still in flight. Aborting with nothing in flight is a no-op.
-   */
-  resetOnMount?: boolean
-}
+export type { PreviewIframeHostOptions, PreviewIframeMode } from './preview-iframe-host-types'
 
 /**
  * Hosts a Histoire preview iframe: owns the sandbox URL, the postMessage
@@ -132,7 +96,7 @@ export function usePreviewIframeHost(options: PreviewIframeHostOptions) {
     iframeReloadKey.value++
   }
 
-  /** Flags a booted variant, seeding host state + settings when it is the shown one. */
+  /** Flags a booted variant and applies host-only preview settings. */
   function markVariantReady(variantId: string | null | undefined) {
     if (!variantId) {
       return
@@ -148,7 +112,6 @@ export function usePreviewIframeHost(options: PreviewIframeHostOptions) {
     })
 
     if (options.getCurrentVariant()?.id === variant.id) {
-      syncState()
       syncSettings()
     }
   }
@@ -295,7 +258,6 @@ export function usePreviewIframeHost(options: PreviewIframeHostOptions) {
     previewRuntimeStore.setFrame(options.mode, iframe.value ?? null)
     isIframeLoaded.value = true
     syncPreview()
-    syncState()
     syncSettings()
   }
 

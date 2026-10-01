@@ -175,9 +175,9 @@ ${previewMessageHandler()}
       async markControlsReady(variantId) {
         await waitForVariantSnapshot()
         // Enable outbound edit sync WITHOUT pushing the boot state snapshot:
-        // with a second iframe, the preview frame's state (already held by
-        // the host) is authoritative — posting this frame's defaults would
-        // reset it. The host replies to CONTROLS_READY with the full state.
+        // This controls replica never publishes boot defaults: primary preview
+        // runtime owns state. Host relays its latest serializable mirror after
+        // both runtimes report ready.
         readyVariantIds.add(variantId)
         const activeVariant = getVariantById(variantId)
         const hasControls = Boolean(

@@ -1,34 +1,12 @@
 import type { HistoireResolvedTestCase, HistoireSerializedTestDefinition, HistoireTestError, HistoireTestRunSummary } from '@histoire/shared'
-import { createFailedRunSummary, getVariantStateKey, mergeTestDefinitionsAndSummary } from '@histoire/shared'
+import { createFailedRunSummary, getVariantStateKey, mergeTestDefinitionsAndSummary, serializeTestError } from '@histoire/shared'
 import { defineStore } from 'pinia'
 import { computed, ref, watch } from 'vue'
 import { STORY_CHANGED_EVENT } from '../util/hot.js'
 import { usePreviewRuntimeStore } from './preview-runtime.js'
 import { useStoryStore } from './story.js'
 import { watchCurrentVariantTestCollection } from './test-collection.js'
-
-/**
- * Removes every key matching `shouldDrop` from a keyed record.
- *
- * Entries are deleted rather than blanked so the store cannot grow without
- * bound over a long dev session (and so a missing entry keeps meaning
- * "not collected yet").
- * @param record The per-variant record to filter.
- * @param shouldDrop Predicate receiving each run key.
- * @returns A new record without the dropped keys, or the same one when nothing matched.
- */
-function omitKeys<T>(record: Record<string, T>, shouldDrop: (key: string) => boolean): Record<string, T> {
-  const dropped = Object.keys(record).filter(shouldDrop)
-  if (!dropped.length) {
-    return record
-  }
-
-  const result = { ...record }
-  for (const key of dropped) {
-    delete result[key]
-  }
-  return result
-}
+import { isPreviewNavigationAbort, omitTestStoreKeys } from './tests-utils.js'
 
 export const useTestsStore = defineStore('tests', () => {
   const previewRuntimeStore = usePreviewRuntimeStore()
@@ -75,7 +53,6 @@ export const useTestsStore = defineStore('tests', () => {
     currentDefinitions.value,
     currentSummary.value,
   ))
-
   async function collectCurrentVariantTests() {
     if (!storyStore.currentStory || !storyStore.currentVariant || !storyStore.currentVariant.previewReady) {
       return
@@ -125,16 +102,22 @@ export const useTestsStore = defineStore('tests', () => {
         }
       }
     }
-    catch {
-      // Keep prior definitions intact; this is an expected race on rapid
-      // navigation (iframe swapped away mid-request), not a hard failure — so
-      // swallow it rather than let it escape this watcher callback as an
-      // unhandled rejection.
+    catch (error) {
+      // Navigation aborts and replies invalidated by HMR are expected. A real
+      // timeout or transport defect must remain visible instead of looking
+      // like a story that registered no tests.
+      if ((storyEpochs.get(storyId) ?? 0) !== epoch || isPreviewNavigationAbort(error)) {
+        return
+      }
+      collectErrors.value = {
+        ...collectErrors.value,
+        [runKey]: serializeTestError(error),
+      }
     }
     finally {
       // Delete instead of storing `false`: only in-flight collections are
       // tracked, so the record stays bounded.
-      collecting.value = omitKeys(collecting.value, key => key === runKey)
+      collecting.value = omitTestStoreKeys(collecting.value, key => key === runKey)
     }
   }
 
@@ -151,8 +134,8 @@ export const useTestsStore = defineStore('tests', () => {
   function invalidateStoryTests(storyId: string) {
     const isStoryKey = (key: string) => key.startsWith(`${storyId}:`)
     storyEpochs.set(storyId, (storyEpochs.get(storyId) ?? 0) + 1)
-    definitions.value = omitKeys(definitions.value, isStoryKey)
-    collectErrors.value = omitKeys(collectErrors.value, isStoryKey)
+    definitions.value = omitTestStoreKeys(definitions.value, isStoryKey)
+    collectErrors.value = omitTestStoreKeys(collectErrors.value, isStoryKey)
   }
 
   /**
@@ -167,10 +150,10 @@ export const useTestsStore = defineStore('tests', () => {
     const isRemoved = (key: string) => key !== currentKey.value
       && !prefixes.some(prefix => key.startsWith(prefix))
 
-    definitions.value = omitKeys(definitions.value, isRemoved)
-    summaries.value = omitKeys(summaries.value, isRemoved)
-    collectErrors.value = omitKeys(collectErrors.value, isRemoved)
-    stale.value = omitKeys(stale.value, isRemoved)
+    definitions.value = omitTestStoreKeys(definitions.value, isRemoved)
+    summaries.value = omitTestStoreKeys(summaries.value, isRemoved)
+    collectErrors.value = omitTestStoreKeys(collectErrors.value, isRemoved)
+    stale.value = omitTestStoreKeys(stale.value, isRemoved)
     // `collecting`/`running` are owned by in-flight operations, which delete
     // their own key when they settle.
   }
@@ -180,12 +163,11 @@ export const useTestsStore = defineStore('tests', () => {
       return
     }
 
-    // Capture the ids up front: the awaited run/fallback may resolve after the
-    // user navigated away, so reading `storyStore.current*` later would either
-    // throw (null deref) or target the wrong variant.
+    // Capture identity and revision: navigation/HMR may overtake the run.
     const storyId = storyStore.currentStory.id
     const variantId = storyStore.currentVariant.id
     const runKey = getVariantStateKey(storyId, variantId)!
+    const epoch = storyEpochs.get(storyId) ?? 0
 
     if (running.value[runKey]) {
       return
@@ -194,6 +176,7 @@ export const useTestsStore = defineStore('tests', () => {
     if (!definitions.value[runKey]) {
       await collectCurrentVariantTests()
     }
+    if ((storyEpochs.get(storyId) ?? 0) !== epoch) return
 
     running.value = {
       ...running.value,
@@ -202,10 +185,8 @@ export const useTestsStore = defineStore('tests', () => {
 
     try {
       const summary = await previewRuntimeStore.runCurrentFrameTests(runKey).catch(async (originalError) => {
-        // The dev-server fallback only exists under `import.meta.hot`. In a
-        // built/preview app it is undefined, so surface the real preview error
-        // instead of masking it with a TypeError on `__HST_PLUGIN_API__`.
-        if (!window.__HST_PLUGIN_API__) {
+        // Never start a fallback for an invalidated revision or a static app.
+        if ((storyEpochs.get(storyId) ?? 0) !== epoch || !window.__HST_PLUGIN_API__) {
           throw originalError
         }
 
@@ -215,6 +196,7 @@ export const useTestsStore = defineStore('tests', () => {
         }) as HistoireTestRunSummary
       })
 
+      if ((storyEpochs.get(storyId) ?? 0) !== epoch) return
       summaries.value = {
         ...summaries.value,
         [runKey]: summary,
@@ -225,6 +207,7 @@ export const useTestsStore = defineStore('tests', () => {
       }
     }
     catch (error) {
+      if ((storyEpochs.get(storyId) ?? 0) !== epoch) return
       // Both the iframe run and the node fallback failed. Surface the failure
       // as a synthetic failed run in the panel — rethrowing would escape into
       // the template click handler as an unhandled rejection with zero UI
@@ -237,7 +220,7 @@ export const useTestsStore = defineStore('tests', () => {
     finally {
       // Delete instead of storing `false`: only in-flight runs are tracked, so
       // the record stays bounded.
-      running.value = omitKeys(running.value, key => key === runKey)
+      running.value = omitTestStoreKeys(running.value, key => key === runKey)
     }
   }
 

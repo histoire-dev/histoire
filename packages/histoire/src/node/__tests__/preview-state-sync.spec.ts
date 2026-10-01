@@ -42,14 +42,10 @@ describe('createPreviewStateSync', () => {
       },
     })
 
-    variant.previewReady = true
-    stateSync.syncCurrentVariantState()
-
     expect(postMessage).toHaveBeenCalledWith({
       type: '__histoire:state-sync',
       variantId: 'variant',
       state: {
-        _hPropDefs: [{ name: 'disabled' }],
         _hPropState: {
           0: {
             disabled: true,
@@ -57,6 +53,29 @@ describe('createPreviewStateSync', () => {
         },
       },
     })
+  })
+
+  it('does not send the host boot mirror into the iframe', () => {
+    const variant = reactive({
+      id: 'variant',
+      previewReady: false,
+      state: { text: 'host collection snapshot' },
+    })
+    const postMessage = vi.fn()
+    const stateSync = createPreviewStateSync({
+      getStoryId: () => 'story',
+      getCurrentVariant: () => variant as any,
+      getVariantById: variantId => (variantId === variant.id ? variant as any : null),
+      postMessage,
+    })
+
+    expect(stateSync.shouldSkipCurrentVariantSync()).toBe(false)
+    expect(postMessage).not.toHaveBeenCalled()
+
+    stateSync.applyIncomingState('variant', { text: 'iframe-owned value' })
+
+    expect(variant.state.text).toBe('iframe-owned value')
+    expect(postMessage).not.toHaveBeenCalled()
   })
 
   it('does not let the initial empty snapshot wipe iframe-provided auto-props', () => {

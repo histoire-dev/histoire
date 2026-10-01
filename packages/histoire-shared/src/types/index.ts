@@ -1,5 +1,6 @@
 export * from './command.js'
 export * from './config.js'
+export * from './controls.js'
 export * from './plugin.js'
 export * from './preview-message.js'
 export * from './prompt.js'

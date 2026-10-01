@@ -3,30 +3,23 @@ import { VITEST_DYNAMIC_IMPORT_SNIPPET } from '../vitest-runner-bootstrap.js'
 /**
  * Emits the story-loading layer of the preview runtime:
  * - the Vitest-aware dynamic import wrapper and the variant test session,
- * - `getSerializedFile` / `loadStoryFile` with their module cache,
+ * - `loadStoryFile` and its mapped preview cache,
  * - the stale-runtime one-shot reload used when the baked metadata predates the
  *   latest collection,
  * - the collected test-definition globals, cleared together with the caches
  *   when a story is invalidated by HMR.
  */
-export function previewStoryLoading() {
+export function previewStoryLoading(mountTimeoutMs: number) {
   return `${VITEST_DYNAMIC_IMPORT_SNIPPET}
 
 const variantTestSession = createVariantTestSession({
   files,
+  mountTimeoutMs: ${mountTimeoutMs},
   moduleLoaders,
   runWithDynamicImport: runWithVitestDynamicImport,
   ensureEnvironment: ensureVitestPreviewEnvironment,
   offscreenRenderMount: true,
 })
-
-function getSerializedFile(storyId) {
-  const file = files.find(item => item.id === storyId)
-  if (!file) {
-    throw new Error(\`Unknown histoire story "\${storyId}"\`)
-  }
-  return file
-}
 
 const STALE_RELOAD_GUARD_KEY = '__histoire_preview_stale_reload__'
 
@@ -94,29 +87,16 @@ function invalidateStoryRuntime(storyId) {
 }
 
 async function loadStoryFile(storyId, { useCache = true } = {}) {
-  await ensureVitestPreviewEnvironment()
-
   if (useCache && storyFileCache.has(storyId)) {
     return storyFileCache.get(storyId)
   }
 
-  const file = getSerializedFile(storyId)
-  const loadModule = moduleLoaders[storyId]
-  if (!loadModule) {
-    throw new Error(\`Missing histoire story module loader for "\${storyId}"\`)
-  }
-
-  // Same version as the test session: importing the story at a different one
-  // would give the preview and the session two module instances of it.
+  // The session owns first import and captures module-scope onTest callbacks.
+  // A separate native import here would consume them before its registry exists.
   const version = variantTestSession.getStoryModuleVersion(storyId)
-  const module = await runWithVitestDynamicImport(() => loadModule(version))
-  const mappedFile = mapFile({
-    ...file,
-    component: module.default,
-    source: async () => ({ default: '' }),
-  })
+  const mappedFile = await variantTestSession.loadStoryFile(storyId)
 
-  if (useCache) {
+  if (useCache && variantTestSession.getStoryModuleVersion(storyId) === version) {
     storyFileCache.set(storyId, mappedFile)
   }
 

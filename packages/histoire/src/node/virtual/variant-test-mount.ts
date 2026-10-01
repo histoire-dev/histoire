@@ -3,18 +3,17 @@ import type { App } from '@histoire/vendors/vue'
 import type { WithRegistry } from './variant-test-session/registry.js'
 import GenericMountStory from '@histoire/app/dist/bundled/components/story/GenericMountStory.vue.js'
 import GenericRenderStory from '@histoire/app/dist/bundled/components/story/GenericRenderStory.vue.js'
-import { getStoryExecutionCounter, getStoryExecutionsSince } from '@histoire/shared'
+import { createStoryExecutionOwner } from '@histoire/shared'
 import FloatingVue from '@histoire/vendors/floating-vue'
 import { createPinia } from '@histoire/vendors/pinia'
 import { createApp, h, nextTick } from '@histoire/vendors/vue'
 import { applyOffscreenHostStyle } from './offscreen-host.js'
 
-/** Maximum time (ms) to wait for the variant to render before aborting. */
-const RENDER_TIMEOUT = 15_000
-
 interface RenderMountOptions {
   /** Positions the render host off the viewport so it stays invisible to the user. */
   offscreen?: boolean
+  /** Maximum time to wait for the render-ready event. */
+  timeoutMs: number
 }
 
 interface MountedRenderVariant {
@@ -37,18 +36,16 @@ interface BootstrappedVariant {
 /**
  * Mounts a test app and reports the story-setup executions it caused.
  *
- * The registry captures every registration emitted anywhere in the page while
- * it is installed, so registrations from a story copy mounted elsewhere (the
- * preview iframe rendering the same story live) end up in the same list. Vue
- * runs the setup of `app.mount()` synchronously, so the executions started
- * during that call — and only those — belong to this mount.
+ * Ownership follows the DOM subtree, so support plugins can report their real
+ * setup executions after asynchronous loading. A synchronous app.mount window
+ * only sees the generic wrapper and cannot identify those later story mounts.
  * @param app The test app to mount.
  * @param host Element the app is mounted into.
  */
 function mountStoryApp(app: App<Element>, host: HTMLElement) {
-  const counterBeforeMount = getStoryExecutionCounter()
+  const executions = createStoryExecutionOwner(host)
   app.mount(host)
-  return getStoryExecutionsSince(counterBeforeMount)
+  return executions
 }
 
 /**
@@ -59,6 +56,7 @@ export async function bootstrapVariant(
   file: StoryFile,
   variantId: string,
   withRegistry: WithRegistry,
+  timeoutMs: number,
 ): Promise<BootstrappedVariant> {
   const variant = getVariant(file, variantId)
   const host = createHost()
@@ -72,7 +70,7 @@ export async function bootstrapVariant(
   try {
     await withRegistry(registrations, false, async () => {
       ownExecutionIds = mountStoryApp(app, host)
-      await waitForVariantConfig(variant)
+      await waitForVariantConfig(variant, timeoutMs)
       await nextTick()
     })
 
@@ -94,7 +92,7 @@ export async function mountRenderVariant(
   file: StoryFile,
   variantId: string,
   withRegistry: WithRegistry,
-  options: RenderMountOptions = {},
+  options: RenderMountOptions,
 ): Promise<MountedRenderVariant> {
   const variant = getVariant(file, variantId)
   const host = createHost()
@@ -129,10 +127,10 @@ export async function mountRenderVariant(
           new Promise<void>((_, reject) => {
             timeoutHandle = setTimeout(
               () => reject(new Error(
-                `Timed out waiting ${RENDER_TIMEOUT}ms for histoire variant "${variantId}" `
+                `Timed out waiting ${options.timeoutMs}ms for histoire variant "${variantId}" `
                 + `to render in story "${file.story?.id}". The RenderStory component never emitted "ready".`,
               )),
-              RENDER_TIMEOUT,
+              options.timeoutMs,
             )
           }),
         ])
@@ -197,7 +195,7 @@ function cleanupMountedApp(app: App<Element>, host: HTMLElement) {
   host.remove()
 }
 
-async function waitForVariantConfig(variant: StoryFile['story']['variants'][number], timeout = 5000) {
+async function waitForVariantConfig(variant: StoryFile['story']['variants'][number], timeoutMs: number) {
   if (variant.configReady) {
     return
   }
@@ -205,7 +203,7 @@ async function waitForVariantConfig(variant: StoryFile['story']['variants'][numb
   const start = Date.now()
 
   while (!variant.configReady) {
-    if (Date.now() - start > timeout) {
+    if (Date.now() - start > timeoutMs) {
       throw new Error(`Timed out waiting for histoire variant "${variant.id}" to finish bootstrap.`)
     }
 

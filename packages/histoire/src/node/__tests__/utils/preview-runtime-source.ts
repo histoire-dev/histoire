@@ -75,7 +75,9 @@ export function generatePreviewRuntimeSource(hasVitestPreview = true) {
     histoireSharedId: '/stub/node_modules/@histoire/shared/dist/index.js',
     variantTestSessionId: '/stub/histoire/virtual/variant-test-session.js',
     staticMockRuntimeId: '/stub/histoire/virtual/vitest-static-mock-runtime.js',
+    histoireAppBundledDir: '/stub/histoire-app/dist/bundled',
     files: previewRuntimeStubStoryFiles,
     loaders: buildStoryModuleLoaders(previewRuntimeStubStoryFiles),
+    mountTimeoutMs: 30_000,
   })
 }

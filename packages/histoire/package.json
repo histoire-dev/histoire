@@ -94,10 +94,11 @@
   "devDependencies": {
     "@types/fs-extra": "^11.0.4",
     "@types/node": "^22.10.1",
+    "@vitest/browser-playwright": "4.1.10",
     "esbuild": "^0.27.2",
     "rollup": "^4.28.0",
     "typescript": "catalog:",
     "vite": "catalog:",
-    "vitest": "4.0.16"
+    "vitest": "4.1.10"
   }
 }

@@ -59,10 +59,10 @@ export function createStoryModuleCache(options: StoryModuleCacheOptions) {
    * Imports a story module (or returns the cached one), capturing the test
    * registrations emitted while its top-level code runs.
    */
-  async function loadImportedStory(storyId: string, { useCache = true } = {}): Promise<ImportedStoryModule> {
+  async function loadImportedStory(storyId: string, testing: boolean): Promise<ImportedStoryModule> {
     await options.ensureEnvironment?.()
 
-    if (useCache && importedStoryCache.has(storyId)) {
+    if (importedStoryCache.has(storyId)) {
       return importedStoryCache.get(storyId)!
     }
 
@@ -76,7 +76,7 @@ export function createStoryModuleCache(options: StoryModuleCacheOptions) {
     let component: any
 
     const version = getStoryModuleVersion(storyId)
-    await withRegistry(definitions, true, async () => {
+    await withRegistry(definitions, testing, async () => {
       const module = await options.runWithDynamicImport(() => loadModule(version))
       component = module.default
     })
@@ -87,7 +87,8 @@ export function createStoryModuleCache(options: StoryModuleCacheOptions) {
       file,
     }
 
-    if (useCache) {
+    // A hot update during the import must not repopulate the cache with its old version.
+    if (getStoryModuleVersion(storyId) === version) {
       importedStoryCache.set(storyId, result)
     }
 
@@ -98,8 +99,8 @@ export function createStoryModuleCache(options: StoryModuleCacheOptions) {
    * Builds the mapped story file a variant session mounts, plus a copy of the
    * import-time registrations (the session mutates neither).
    */
-  async function createSessionStoryFile(storyId: string): Promise<SessionStoryFile> {
-    const imported = await loadImportedStory(storyId)
+  async function createSessionStoryFile(storyId: string, testing = true): Promise<SessionStoryFile> {
+    const imported = await loadImportedStory(storyId, testing)
 
     return {
       file: mapStoryFile({

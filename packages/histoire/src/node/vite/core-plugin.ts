@@ -4,6 +4,7 @@ import type { BrowserRuntimePaths } from './resolve-paths.js'
 import { join } from 'pathe'
 import { APP_PATH, TEMP_PATH } from '../alias.js'
 import { notifyStoryChange } from '../stories.js'
+import { resolveHistoireAppBundledDir } from '../util/resolve-histoire-app.js'
 import { createAppHtmlMiddleware, createSandboxHtmlMiddleware } from './dev-html.js'
 import { histoireSharedPath, resolveSupportPluginAllowPaths, withPackageDirs } from './resolve-paths.js'
 
@@ -57,7 +58,8 @@ export function createHistoireVitePlugin(ctx: Context, options: HistoireVitePlug
             },
             {
               find: 'histoire-bundled-style',
-              replacement: join(APP_PATH, 'bundled/app.css'),
+              // The preview uses bundled components even when the host app runs from source.
+              replacement: join(resolveHistoireAppBundledDir(), 'app.css'),
             },
             {
               find: /^@histoire\/shared$/,

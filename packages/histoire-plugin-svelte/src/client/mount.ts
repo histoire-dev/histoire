@@ -34,7 +34,11 @@ export default _defineComponent({
     },
   },
 
-  setup(props) {
+  emits: {
+    ready: () => true,
+  },
+
+  setup(props, { emit }) {
     const el = _ref<HTMLDivElement>()
     let app: any
     let target: HTMLDivElement
@@ -67,6 +71,7 @@ export default _defineComponent({
       }
 
       await callSetupFunctions(generatedSetup, setup, setupApi)
+      emit('ready')
     }
 
     function unmountStory() {

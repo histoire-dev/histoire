@@ -17,7 +17,7 @@ describe('Grid state isolation', () => {
     getVariantCard(thirdVariantId).contains('variant 3').click()
     cy.location('search').should('include', `variantId=${thirdVariantId}`)
 
-    cy.get('[data-test-id="story-controls"] input[type="text"]').first().clear().type('Gamma')
+    cy.getControlsIframeBody().find('input[type="text"]').first().clear().type('Gamma')
 
     getVariantCard('src-components-sharedcontrols-story-vue-0')
       .find('[data-test-id="shared-controls-state"]')
@@ -35,11 +35,11 @@ describe('Grid state isolation', () => {
     const thirdVariantId = 'src-components-sharedcontrols-story-vue-2'
 
     getVariantCard(thirdVariantId).contains('variant 3').click()
-    cy.get('[data-test-id="story-controls"] input[type="text"]').first().clear().type('Gamma')
+    cy.getControlsIframeBody().find('input[type="text"]').first().clear().type('Gamma')
 
     getVariantCard(firstVariantId).contains('variant 1').click()
     cy.location('search').should('include', `variantId=${firstVariantId}`)
-    cy.get('[data-test-id="story-controls"] input[type="text"]').first().clear().type('Alpha')
+    cy.getControlsIframeBody().find('input[type="text"]').first().clear().type('Alpha')
 
     getVariantCard(firstVariantId)
       .find('[data-test-id="shared-controls-state"]')

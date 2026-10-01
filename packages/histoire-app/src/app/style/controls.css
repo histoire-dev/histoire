@@ -1,0 +1,28 @@
+/* Controls share panel appearance even when story setup imports global CSS. */
+:scope[data-histoire-controls],
+:scope[data-histoire-controls] body {
+  background: var(--histoire-controls-background, transparent) !important;
+  color: var(--histoire-controls-foreground) !important;
+  font-family: var(--histoire-controls-font-family) !important;
+  font-size: var(--histoire-controls-font-size) !important;
+  line-height: var(--histoire-controls-line-height) !important;
+  margin: 0 !important;
+  height: auto !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+}
+
+:scope[data-histoire-controls] #app {
+  height: auto;
+  min-height: 0;
+  display: flow-root;
+}
+
+:scope[data-histoire-controls] .__histoire-render-custom-controls {
+  display: flow-root;
+  min-height: 0;
+}
+
+:scope[data-histoire-controls] .htw-sandbox-hidden {
+  display: none !important;
+}

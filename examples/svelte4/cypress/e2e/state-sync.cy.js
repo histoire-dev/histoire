@@ -7,10 +7,10 @@ describe('State sync', () => {
     // this is what makes the control below reach a live preview.
     cy.get('[data-test-id="story-side-panel"]').should('be.visible')
     cy.getPreviewIframeBody().find('button').should('not.have.class', 'disabled')
-    cy.get('[data-test-id="story-controls"] [role="checkbox"]').click()
-    cy.get('[data-test-id="story-controls"] pre').contains('"disabled": true')
+    cy.getControlsIframeBody().find('[role="checkbox"]').click()
+    cy.getControlsIframeBody().find('pre').contains('"disabled": true')
     cy.getPreviewIframeBody().find('button').should('have.class', 'disabled')
     cy.getPreviewIframeBody().find('input[type="checkbox"]').click()
-    cy.get('[data-test-id="story-controls"] pre').contains('"disabled": false')
+    cy.getControlsIframeBody().find('pre').contains('"disabled": false')
   })
 })
