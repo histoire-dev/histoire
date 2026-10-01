@@ -71,67 +71,34 @@ delete module.exports.theme.extend.colors.gray
 module.exports.theme.colors = colors
 
 module.exports.plugins.push(require('@tailwindcss/typography'))
-// prose-a:htw-text-primary-500 prose-headings:htw-mb-2 prose-headings:htw-mt-4 first:prose-headings:htw-mt-0 prose-blockquote:htw-ml-0
+
 module.exports.theme.extend.typography = theme => ({
   DEFAULT: {
     css: {
-      'a': {
-        'color': theme('colors.primary-500'),
-        'textDecoration': 'none',
-
-        '&:hover': {
-          textDecoration: 'underline',
-        },
+      // Custom style
+      'table': {
+        borderCollapse: 'collapse',
       },
-
-      'h1, h2, h3, h4, th': {
-        'marginBottom': '0.75rem',
-
-        '&:not(:first-child)': {
-          marginTop: '1.25rem',
-        },
+      'thead, tr, blockquote': {
+        borderStyle: 'solid',
       },
-
-      '--tw-prose-invert-quote-borders': theme('colors.gray-800'),
-      '--tw-prose-invert-hr': theme('colors.gray-800'),
-
       'blockquote': {
-        'marginLeft': 0,
-        'marginRight': 0,
-        'backgroundColor': theme('colors.gray-100'),
-        'padding': '.25rem .375rem',
-
-        '& p:first-child': {
-          marginTop: 0,
-        },
-
-        '& p:last-child': {
-          marginBottom: 0,
-        },
-
-        '.dark &': {
-          backgroundColor: theme('colors.gray-750'),
-        },
+        marginInlineStart: '0.375rem',
+        marginInlineEnd: '0.375rem',
       },
 
+      // Theme variables
+      // Light
+      '--tw-prose-links': theme('colors.primary-500'),
+      '--tw-prose-pre-bg': theme('colors.gray-800'),
+      // Dark
+      '--tw-prose-invert-links': theme('colors.primary-500'),
+      '--tw-prose-invert-quote-borders': theme('colors.gray-500'),
+      '--tw-prose-invert-hr': theme('colors.gray-500'),
+      '--tw-prose-invert-th-borders': theme('colors.gray-500'),
+      '--tw-prose-invert-td-borders': theme('colors.gray-600'),
       '--tw-prose-invert-bullets': theme('colors.gray-500'),
-
-      'li': {
-        marginTop: '0.1rem',
-        marginBottom: '0.1rem',
-      },
-
-      'code': {
-        'backgroundColor': theme('colors.gray-500 / 20%'),
-        'fontWeight': 'normal',
-        'padding': '0.05rem 0.5rem',
-        'borderRadius': '0.25rem',
-        'fontSize': '0.8rem',
-
-        '&::before, &::after': {
-          display: 'none',
-        },
-      },
+      '--tw-prose-invert-pre-bg': theme('colors.gray-800'),
     },
   },
 })
