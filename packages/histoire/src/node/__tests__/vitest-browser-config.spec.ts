@@ -1,8 +1,10 @@
 import type { Context } from '../context.js'
+import fs from 'node:fs'
 import { readFile } from 'node:fs/promises'
-import { expect, it } from 'vitest'
+import { expect, it, vi } from 'vitest'
 import { getDefaultConfig } from '../config/index.js'
 import { resolveVitestModule } from '../util/resolve-vitest-package.js'
+import { getVitestBrowserDependencyNames } from '../vitest-browser-config/dependencies.js'
 import { createVitestBrowserResolvePlugin } from '../vitest-browser-config/index.js'
 import { getHistoireBrowserRunConfig } from '../vitest-browser-config/run-config.js'
 
@@ -20,6 +22,17 @@ function createContext(): Context {
     registeredCommands: [],
   }
 }
+
+it('keeps installed Node Playwright providers out of browser dependency optimization', () => {
+  const read = vi.spyOn(fs, 'readFileSync').mockReturnValue(JSON.stringify({
+    dependencies: { 'vue': '3', 'playwright': '1', 'playwright-core': '1' },
+    devDependencies: { '@playwright/test': '1', '@vitest/browser-playwright': '4', 'client-library': '1' },
+  }))
+  try {
+    expect(getVitestBrowserDependencyNames({ root: '/consumer', supportPlugins: [] } as Context)).toEqual(['vue', 'client-library'])
+  }
+  finally { read.mockRestore() }
+})
 
 it('reuses the dep-optimizer cache between runs instead of forcing prebundles', async () => {
   const ctx = createContext()

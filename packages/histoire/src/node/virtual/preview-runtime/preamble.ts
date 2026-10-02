@@ -35,6 +35,15 @@ export interface PreviewRuntimePreambleOptions {
    * from the user's project, which only depends on `histoire`.
    */
   histoireAppBundledDir: string
+  /** Vendor entries resolved from Histoire, never the consumer's virtual root. */
+  histoireVendorIds: {
+    /** Bundled floating-vue browser entry. */
+    floatingVue: string
+    /** Bundled Pinia browser entry. */
+    pinia: string
+    /** Bundled Vue browser entry. */
+    vue: string
+  }
   /** Baked story metadata. */
   files: PreviewRuntimeStoryFile[]
   /** Emitted `"<story id>": () => import("<module id>")` loader entries. */
@@ -55,6 +64,7 @@ export function previewRuntimePreamble({
   variantTestSessionId,
   staticMockRuntimeId,
   histoireAppBundledDir,
+  histoireVendorIds,
   files,
   loaders,
 }: PreviewRuntimePreambleOptions) {
@@ -67,9 +77,9 @@ ${hasVitestPreview
   ? `import { createMockInstance } from ${JSON.stringify(vitestSpyId)}
 import { ModuleMocker, ModuleMockerMSWInterceptor } from ${JSON.stringify(vitestMockerBrowserId)}`
   : ''}
-import FloatingVue from '@histoire/vendors/floating-vue'
-import { createPinia } from '@histoire/vendors/pinia'
-import { computed, createApp, defineComponent, h, nextTick, onMounted, reactive, ref, watch } from '@histoire/vendors/vue'
+import FloatingVue from ${JSON.stringify(histoireVendorIds.floatingVue)}
+import { createPinia } from ${JSON.stringify(histoireVendorIds.pinia)}
+import { computed, createApp, defineComponent, h, nextTick, onMounted, reactive, ref, watch } from ${JSON.stringify(histoireVendorIds.vue)}
 import StoryVariantGridSandbox from ${app('components/story/StoryVariantGridSandbox.vue.js')}
 import GenericMountStory from ${app('components/story/GenericMountStory.vue.js')}
 import GenericRenderStory from ${app('components/story/GenericRenderStory.vue.js')}

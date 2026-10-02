@@ -35,14 +35,25 @@ function createEmbeddedWindow(hostWindow: Record<string, any>, overrides: Record
 describe('preview runtime outbound channel', () => {
   it('posts to the window embedding the sandbox', () => {
     const hostWindow = { postMessage: vi.fn() }
-    const channel = createOutboundChannel(createEmbeddedWindow(hostWindow))
+    const window = createEmbeddedWindow(hostWindow)
+    const channel = createOutboundChannel(window)
 
     channel.postToParent({ type: 'test' })
 
     expect(hostWindow.postMessage).toHaveBeenCalledWith(
-      { __histoire: true, type: 'test' },
+      { __histoire: true, type: 'test', documentId: window.__HST_PREVIEW_DOCUMENT_ID__ },
       'http://localhost:3000',
     )
+  })
+
+  it('pins outbound messages to each fresh document despite stale payload identity', () => {
+    const hostWindow = { postMessage: vi.fn() }
+    const windows = [createEmbeddedWindow(hostWindow), createEmbeddedWindow(hostWindow)]
+    for (const window of windows) createOutboundChannel(window).postToParent({ type: 'test', documentId: 'stale' })
+    const identities = hostWindow.postMessage.mock.calls.map(([message]) => message.documentId)
+    expect(identities).toEqual(windows.map(window => window.__HST_PREVIEW_DOCUMENT_ID__))
+    expect(identities.every(identity => typeof identity === 'string' && identity !== 'stale')).toBe(true)
+    expect(identities[0]).not.toBe(identities[1])
   })
 
   it('resolves the host through the frame element, not `window.parent`', () => {

@@ -1,6 +1,6 @@
 import { fileURLToPath } from 'node:url'
 import { dirname, resolve } from 'pathe'
-import { defineConfig } from 'vitest/config'
+import { configDefaults, defineConfig } from 'vitest/config'
 
 const currentDir = dirname(fileURLToPath(import.meta.url))
 
@@ -18,6 +18,7 @@ export default defineConfig({
     },
   },
   test: {
+    exclude: [...configDefaults.exclude, '**/mcp/integration/**', '**/mcp/package-smoke.spec.ts'],
     testTimeout: 15_000,
   },
 })

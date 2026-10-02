@@ -1,95 +1,125 @@
 import type { Context } from '../context.js'
-import type { CreateServerOptions } from './vite-servers.js'
+import type { ExecutionService } from '../runtime/execution-service.js'
+import type { CreateServerOptions as ViteServerOptions } from './vite-servers.js'
 import { useCollectStories } from '../collect/index.js'
 import { useModuleLoader } from '../load.js'
 import { createMarkdownFilesWatcher, onMarkdownListChange } from '../markdown.js'
 import { DevPluginApi } from '../plugin.js'
+import { createCleanupStack } from '../runtime/cleanup.js'
+import { resolveDevServerPort } from '../runtime/port.js'
+import { waitForRuntimeWork } from '../runtime/wait.js'
 import { onStoryListChange, watchStories } from '../stories.js'
-import { wrapLogError } from '../util/log.js'
 import * as VirtualFiles from '../virtual/index.js'
 import { createStoryCollector } from './collect.js'
 import { registerDevEvents } from './dev-events.js'
 import { createModuleInvalidators } from './invalidate.js'
 import { createViteServers } from './vite-servers.js'
 
-export type { CreateServerOptions } from './vite-servers.js'
+/** Dev generation startup and publication ownership. */
+export interface CreateServerOptions extends ViteServerOptions {
+  /** Cancels startup when its owning controller closes or restarts. */
+  signal?: AbortSignal
+  /** Suppresses publication from a superseded runtime generation. */
+  isActive?: () => boolean
+  /** Controller-owned shared lane for UI fallback tests and MCP operations. */
+  execution?: ExecutionService
+}
 
-/**
- * Starts the Histoire dev server: the Vite servers, the story/markdown
- * watchers, the plugin dev hooks and the story collection loop.
- */
+/** Starts both Vite servers and owns their watchers, collection and plugin hooks. */
 export async function createServer(ctx: Context, options: CreateServerOptions = {}) {
-  const { nodeServer, server, viteConfigFile } = await createViteServers(ctx, options)
-  const storyWatcher = await watchStories(ctx)
-  const { stop: stopMdFileWatcher } = await createMarkdownFilesWatcher(ctx)
+  const cleanup = createCleanupStack()
+  let stopped = false
+  let stopCollection: (() => Promise<void>) | undefined
+  const isActive = () => !stopped && !options.signal?.aborted && (options.isActive?.() ?? true)
+  /** Rejects work acquired after a startup cancellation. */
+  function checkActive() {
+    options.signal?.throwIfAborted()
+    if (!isActive()) throw new Error('Project runtime closed')
+  }
+  /** Stops publication synchronously before closing acquired resources. */
+  function close() {
+    stopped = true
+    // Stop hooks/listeners synchronously; worker destruction below can then
+    // unblock pending collection before its bounded drain is awaited.
+    void stopCollection?.().catch(() => {})
+    return cleanup.close()
+  }
+  try {
+    checkActive()
+    const { nodeServer, server, viteConfigFile } = await createViteServers(ctx, options)
+    cleanup.add(() => nodeServer.close())
+    cleanup.add(() => server.close())
+    checkActive()
 
-  const moduleLoader = useModuleLoader({
-    server: nodeServer,
-  })
+    const storyWatcher = await watchStories(ctx)
+    cleanup.add(() => storyWatcher.close())
+    await waitForRuntimeWork(storyWatcher.ready, options.signal)
+    checkActive()
+    // Markdown associations require the complete story scan, including siblings.
+    const { stop: stopMdFileWatcher } = await createMarkdownFilesWatcher(ctx, options.signal)
+    cleanup.add(stopMdFileWatcher)
+    checkActive()
 
-  const pluginOnCleanups: (() => void | Promise<void>)[] = []
-  for (const plugin of ctx.config.plugins) {
-    if (plugin.onDev) {
-      const api = new DevPluginApi(ctx, plugin, moduleLoader)
-      const onCleanup = (cb: () => void | Promise<void>) => {
-        pluginOnCleanups.push(cb)
+    const moduleLoader = useModuleLoader({ server: nodeServer })
+    for (const plugin of ctx.config.plugins) {
+      if (plugin.onDev) {
+        const api = new DevPluginApi(ctx, plugin, moduleLoader)
+        await plugin.onDev(api, callback => cleanup.add(callback))
+        checkActive()
       }
-      await plugin.onDev(api, onCleanup)
+    }
+    registerDevEvents(ctx, server, moduleLoader, options.execution, isActive)
+    // Vite pre-bundling completes during listen; initial collection follows it.
+    const port = await resolveDevServerPort(options.port ?? server.config.server?.port)
+    checkActive()
+    await server.listen(port)
+    checkActive()
+
+    const collectStories = useCollectStories({ server: nodeServer, mainServer: server }, ctx)
+    const { invalidateModule, invalidateModuleSilently } = createModuleInvalidators(server)
+    let collector: ReturnType<typeof createStoryCollector> | undefined
+    cleanup.add(async () => {
+      const draining = collector?.stop()
+      try {
+        await collectStories.destroy()
+      }
+      finally { await draining }
+    })
+    collector = createStoryCollector({ ctx, server, collectStories, invalidateModule, invalidateModuleSilently, isActive })
+    stopCollection = collector.stop
+
+    cleanup.add(onStoryListChange(() => {
+      if (!isActive()) return
+      invalidateModule(VirtualFiles.RESOLVED_STORIES_ID)
+      invalidateModule(VirtualFiles.RESOLVED_SEARCH_TITLE_DATA_ID)
+      invalidateModuleSilently(VirtualFiles.RESOLVED_PREVIEW_RUNTIME_ID)
+    }))
+    cleanup.add(onMarkdownListChange(() => {
+      if (isActive()) invalidateModule(VirtualFiles.RESOLVED_MARKDOWN_FILES)
+    }))
+    const ready = collector.collect()
+    // Returned readiness still rejects for callers, but ordinary dev never leaks
+    // an unhandled rejection while the controller attaches its observer.
+    void ready.catch(() => {})
+    return {
+      server,
+      viteConfigFile,
+      ready,
+      collect: collector.collect,
+      onCollection: collector.onCollection,
+      get collectionOutcomes() {
+        return collector.outcomes
+      },
+      close,
     }
   }
-
-  registerDevEvents(ctx, server, moduleLoader)
-
-  // Wait for pre-bundling (in `listen()`)
-  await server.listen(options.port ?? server.config.server?.port)
-
-  const collectStories = useCollectStories({
-    server: nodeServer,
-    mainServer: server,
-  }, ctx)
-
-  const { invalidateModule, invalidateModuleSilently } = createModuleInvalidators(server)
-
-  const { collect, stop: stopStoryCollector } = createStoryCollector({
-    ctx,
-    server,
-    collectStories,
-    invalidateModule,
-    invalidateModuleSilently,
-  })
-
-  // Every listener registered here lives in a module-global list, so a server
-  // that closes without removing them (a config change restarts it) leaves one
-  // more copy of them running against a dead server on every restart.
-  const offStoryListChange = onStoryListChange(() => {
-    invalidateModule(VirtualFiles.RESOLVED_STORIES_ID)
-    invalidateModule(VirtualFiles.RESOLVED_SEARCH_TITLE_DATA_ID)
-    invalidateModuleSilently(VirtualFiles.RESOLVED_PREVIEW_RUNTIME_ID)
-  })
-
-  const offMarkdownListChange = onMarkdownListChange(() => {
-    invalidateModule(VirtualFiles.RESOLVED_MARKDOWN_FILES)
-  })
-
-  async function close() {
-    for (const cb of pluginOnCleanups) {
-      await wrapLogError('plugin.onDev.onCleanup', () => cb())
+  catch (error) {
+    try {
+      await close()
     }
-    stopStoryCollector()
-    offStoryListChange()
-    offMarkdownListChange()
-    await wrapLogError('server.close', () => server.close())
-    await wrapLogError('nodeServer', () => nodeServer.close())
-    await wrapLogError('destroyCollectStories', () => collectStories.destroy())
-    await wrapLogError('storyWatcher', () => storyWatcher.close())
-    await wrapLogError('stopMdFileWatcher', () => stopMdFileWatcher())
-  }
-
-  collect()
-
-  return {
-    server,
-    viteConfigFile,
-    close,
+    catch (cleanupError) {
+      throw new AggregateError([error, cleanupError], String(error))
+    }
+    throw error
   }
 }

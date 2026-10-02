@@ -25,6 +25,8 @@
 
 ![screenshot](./screenshot.png)
 
+`histoire dev` exposes [MCP tools](./docs/guide/mcp.md) by default. Use `histoire build --target node` for a [standalone Node book and MCP server](./docs/guide/deploy-node.md).
+
 ## Continuous Releases
 
 You can install builds from any commit on the main branch from [here](https://nightly.akryum.dev/histoire-dev/histoire) or from any Pull Request.

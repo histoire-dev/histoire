@@ -3,12 +3,16 @@ import fs from 'node:fs'
 import { resolve } from 'pathe'
 import { withPackageDirs } from '../util/resolve-package.js'
 
+/** Node browser providers are executed by Vitest, never by its browser page. */
+const NODE_BROWSER_PROVIDERS = new Set(['playwright', 'playwright-core', '@playwright/test'])
+
 /**
  * Packages that must NEVER be prebundled for the browser run: Vitest and its
  * expect/snapshot internals are resolved to the project's own copy by the
  * resolve plugin, and optimizing them would fork that copy.
  */
 export const VITEST_BROWSER_OPTIMIZER_EXCLUDES = [
+  ...NODE_BROWSER_PROVIDERS,
   'vitest',
   'expect-type',
   '@vitest/expect',
@@ -35,8 +39,8 @@ export function getVitestBrowserOptimizeDeps(ctx: Context) {
  * run disables Vite's dep discovery, so a story importing a package that was not
  * pre-bundled triggers a mid-run optimizer reload that kills the browser
  * connection — the failure `shouldRetryBrowserRun` in `test.ts` has to retry.
- * Over-including only costs prebundle time: Vite merely warns for entries it
- * cannot resolve or optimize (node-only packages, type-only `@types/*`).
+ * Node browser providers stay excluded: scanning their server graph can fail on
+ * optional platform modules such as Playwright's Chromium BiDi implementation.
  * @param ctx The histoire context, used for the project root and support plugins.
  */
 export function getVitestBrowserDependencyNames(ctx: Context) {
@@ -65,6 +69,7 @@ export function getVitestBrowserDependencyNames(ctx: Context) {
     ]) {
       if (
         dep !== 'histoire'
+        && !NODE_BROWSER_PROVIDERS.has(dep)
         && dep !== 'vite'
         && dep !== 'vitest'
         && !dep.startsWith('@histoire/')

@@ -66,6 +66,13 @@ export default async (payload: Payload): Promise<ReturnData> => {
   const el = window.document.createElement('div')
 
   const beforeExecuteTime = performance.now()
+  // Generated Markdown stories have no physical module change for Vite's
+  // watcher to broadcast. Evict their resolved worker import before reusing
+  // the collection plugin, otherwise new frontmatter keeps old IDs/titles.
+  if (payload.storyFile.virtual) {
+    _moduleCache.delete(payload.storyFile.moduleId)
+    _moduleCache.delete(`\0${payload.storyFile.moduleId}`)
+  }
   // Mount app to collect stories/variants
   const { run } = (await runner.executeFile(resolve(__dirname, './run.js'))) as { run: (payload: ServerRunPayload) => Promise<any> }
   const afterExecuteTime = performance.now()

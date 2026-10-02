@@ -32,6 +32,15 @@ export function previewMessageHandler() {
     })
 
     async function handlePreviewMessage(event) {
+      // Automation requests retain exact tuple and document identity. Existing
+      // UI callers omit these additive fields and keep their current protocol.
+      if (event.data.type === COLLECT_TESTS || event.data.type === RUN_TESTS) {
+        if (event.data.documentId !== undefined && event.data.documentId !== previewDocumentId) return
+        if (event.data.storyId !== undefined && event.data.storyId !== story.value?.id) return
+        if (event.data.variantId !== undefined && event.data.variantId !== variant.value?.id) return
+        if (event.data.mcpNonce !== undefined && event.data.mcpNonce !== new URLSearchParams(window.location.search).get('mcpNonce')) return
+        if (event.data.mcpEpoch !== undefined && event.data.mcpEpoch !== new URLSearchParams(window.location.search).get('mcpEpoch')) return
+      }
       if (event.data?.type === PREVIEW_SYNC) {
         try {
           await syncSelection(event.data)
@@ -70,7 +79,6 @@ export function previewMessageHandler() {
       }
       else if (event.data?.type === COLLECT_TESTS) {
         const requestId = event.data?.requestId
-        const variantKey = event.data?.variantKey
 
         if (!story.value || !variant.value) {
           setCollectedTestDefinitions([])
@@ -83,6 +91,10 @@ export function previewMessageHandler() {
             type: TEST_DEFINITIONS,
             requestId,
             variantKey: null,
+            storyId: null,
+            variantId: null,
+            mcpNonce: event.data.mcpNonce,
+            mcpEpoch: event.data.mcpEpoch,
             definitions: [],
           })
           return
@@ -112,6 +124,10 @@ export function previewMessageHandler() {
             type: TEST_DEFINITIONS,
             requestId,
             variantKey: \`\${collectedStoryId}:\${collectedVariantId}\`,
+            storyId: collectedStoryId,
+            variantId: collectedVariantId,
+            mcpNonce: event.data.mcpNonce,
+            mcpEpoch: event.data.mcpEpoch,
             definitions,
           })
         }
@@ -121,7 +137,11 @@ export function previewMessageHandler() {
           postToParent({
             type: TEST_DEFINITIONS,
             requestId,
-            variantKey,
+            variantKey: \`\${collectedStoryId}:\${collectedVariantId}\`,
+            storyId: collectedStoryId,
+            variantId: collectedVariantId,
+            mcpNonce: event.data.mcpNonce,
+            mcpEpoch: event.data.mcpEpoch,
             definitions: [],
             // Lets the host UI distinguish "no tests registered" from a
             // crashed collection (e.g. a story module that fails to load).
@@ -130,7 +150,6 @@ export function previewMessageHandler() {
         }
       }
       else if (event.data?.type === RUN_TESTS) {
-        const variantKey = event.data?.variantKey
         if (!story.value || !variant.value) {
           // Same as the collection branch: tagged with what is selected (
           // nothing), so a variant-scoped request retries instead of taking
@@ -139,6 +158,10 @@ export function previewMessageHandler() {
             type: TEST_RESULT,
             runId: event.data.runId,
             variantKey: null,
+            storyId: null,
+            variantId: null,
+            mcpNonce: event.data.mcpNonce,
+            mcpEpoch: event.data.mcpEpoch,
             summary: createFailedRunSummary('unknown', 'unknown', new Error('Could not run tests. No active story/variant is selected.')),
           })
           return
@@ -155,13 +178,17 @@ export function previewMessageHandler() {
           // Tag the reply with the key of the variant that was actually run
           // (captured before the await), so the host files it against the
           // matching request instead of ignoring a stale-keyed reply.
-          postToParent({ type: TEST_RESULT, runId: event.data.runId, variantKey: \`\${runStory.id}:\${runVariant.id}\`, summary })
+          postToParent({ type: TEST_RESULT, runId: event.data.runId, variantKey: \`\${runStory.id}:\${runVariant.id}\`, storyId: runStory.id, variantId: runVariant.id, mcpNonce: event.data.mcpNonce, mcpEpoch: event.data.mcpEpoch, summary })
         }
         catch (error) {
           postToParent({
             type: TEST_RESULT,
             runId: event.data.runId,
-            variantKey,
+            variantKey: \`\${runStory.id}:\${runVariant.id}\`,
+            storyId: runStory.id,
+            variantId: runVariant.id,
+            mcpNonce: event.data.mcpNonce,
+            mcpEpoch: event.data.mcpEpoch,
             summary: createFailedRunSummary(runStory.id, runVariant.id, error),
           })
         }

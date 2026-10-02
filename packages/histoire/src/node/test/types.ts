@@ -1,4 +1,8 @@
 export interface RunHistoireTestsOptions {
+  /** Controller-owned abort signal; cancellation retains lane until cleanup completes. */
+  signal?: AbortSignal
+  /** Reject unconfirmed runner teardown rather than recycling an unsafe execution lane. */
+  strictCleanup?: boolean
   rawVitestArgs?: string[]
   storyId?: string
   variantId?: string

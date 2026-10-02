@@ -1,14 +1,8 @@
 import type { Story, Variant } from '../types'
+import { getSandboxRelativeUrl } from '@histoire/shared'
 import { base } from '../router'
 
+/** Resolve sandbox with exact collected identities and existing grid default. */
 export function getSandboxUrl(story: Story, variant?: Variant) {
-  const url = new URLSearchParams()
-  url.append('storyId', story.id)
-  if (variant) {
-    url.append('variantId', variant.id)
-  }
-  else {
-    url.append('grid', 'true')
-  }
-  return `${base}__sandbox.html?${url.toString()}`
+  return getSandboxRelativeUrl({ base, storyId: story.id, variantId: variant?.id })
 }

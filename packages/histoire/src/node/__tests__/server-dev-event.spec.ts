@@ -1,4 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { createExecutionService } from '../runtime/execution-service.js'
+import { createHistoireTestTask } from '../test/execution-service.js'
 
 /**
  * Behaviour of the dev-server `histoire:dev-event` handler, driven through a
@@ -29,13 +31,13 @@ describe('dev-event handler', () => {
   }
 
   function createContext(plugins: any[] = []) {
-    return { config: { plugins } } as any
+    return { config: { plugins }, storyFiles: [], markdownFiles: [] } as any
   }
 
   /** Registers the handler on a fresh fake server and returns both. */
-  function register(ctx = createContext()) {
+  function register(ctx = createContext(), execution?: ReturnType<typeof createExecutionService>, isActive = () => true) {
     const server = createServer()
-    registerDevEvents(ctx, server as any, {} as any)
+    registerDevEvents(ctx, server as any, {} as any, execution, isActive)
     return server
   }
 
@@ -79,6 +81,8 @@ describe('dev-event handler', () => {
       storyId: 'story',
       variantId: 'variant',
       skipStoryScan: true,
+      signal: expect.any(AbortSignal),
+      strictCleanup: true,
     })
   })
 
@@ -111,6 +115,48 @@ describe('dev-event handler', () => {
     // request's outcome (filtered to another story).
     expect(first.send.mock.calls[0][1].error).toContain('first run exploded')
     expect(second.send.mock.calls[0][1].result).toEqual({ ok: true, storyId: 'second' })
+  })
+
+  it('serializes UI and MCP through one lane with each request own target and summary', async () => {
+    const execution = createExecutionService()
+    const ctx = createContext()
+    const server = register(ctx, execution)
+    const order: string[] = []
+    let release!: () => void
+    runHistoireTests.mockImplementation(async (_context, options) => {
+      order.push(options.storyId)
+      if (options.storyId === 'ui-a') {
+        await new Promise<void>((done) => {
+          release = done
+        })
+      }
+      return { ok: true, storyId: options.storyId }
+    })
+    const first = createClient()
+    const third = createClient()
+    const a = server.emit({ event: 'runStoryTests', payload: { storyId: 'ui-a' }, requestId: 1 }, first)
+    const b = execution.enqueue(createHistoireTestTask(ctx, { storyId: 'mcp-b' })).result
+    const c = server.emit({ event: 'runStoryTests', payload: { storyId: 'ui-c' }, requestId: 3 }, third)
+    await vi.waitFor(() => expect(order).toEqual(['ui-a']))
+    release()
+    await Promise.all([a, b, c])
+    expect(order).toEqual(['ui-a', 'mcp-b', 'ui-c'])
+    expect(await b).toEqual({ ok: true, storyId: 'mcp-b' })
+    expect(first.send.mock.calls[0][1].result.storyId).toBe('ui-a')
+    expect(third.send.mock.calls[0][1].result.storyId).toBe('ui-c')
+    await execution.close()
+  })
+
+  it('suppresses completion feedback after captured runtime becomes inactive', async () => {
+    let active = true
+    runHistoireTests.mockImplementationOnce(async () => {
+      active = false
+      return { ok: true }
+    })
+    const server = register(createContext(), undefined, () => active)
+    const client = createClient()
+    await server.emit({ event: 'runStoryTests', payload: { storyId: 'old' }, requestId: 1 }, client)
+    expect(client.send).not.toHaveBeenCalled()
   })
 
   it('answers a failing plugin dev event instead of escaping the callback', async () => {

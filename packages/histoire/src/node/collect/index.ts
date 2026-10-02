@@ -2,6 +2,7 @@ import type { ServerStoryFile } from '@histoire/shared'
 import type { ViteDevServer } from 'vite'
 import type { FetchFunction, ResolveIdFunction } from 'vite-node'
 import type { Context } from '../context.js'
+import type { StoryCollectionOutcome } from './outcome.js'
 import type { Payload, ReturnData } from './worker.js'
 import { cpus } from 'node:os'
 import { MessageChannel } from 'node:worker_threads'
@@ -11,6 +12,7 @@ import path from 'pathe'
 import pc from 'picocolors'
 import { ViteNodeServer } from 'vite-node/server'
 import { TEMP_PATH } from '../alias.js'
+import { hashContent, readRegisteredText } from '../mcp/project/content-index.js'
 import { slash } from '../util/fs.js'
 import { finalizeCollectedStoryFile } from './finalize.js'
 
@@ -94,8 +96,17 @@ export function useCollectStories(options: UseCollectStoriesOptions, ctx: Contex
     })
   }
 
-  async function executeStoryFile(storyFile: ServerStoryFile) {
+  /** Executes registered source and records success without trusting stale metadata. */
+  async function executeStoryFile(storyFile: ServerStoryFile): Promise<StoryCollectionOutcome> {
     try {
+      let sourceSha256: string
+      try {
+        sourceSha256 = storyFile.virtual ? hashContent(storyFile.moduleCode ?? '') : (await readRegisteredText(ctx.root, storyFile.path)).sha256
+      }
+      catch {
+        // Content availability does not change existing trusted collection
+        // policy. Unavailable source is diagnosed by the catalog projector.
+      }
       const { workerPort } = createChannel()
       const payload: Payload = {
         root: server.config.root,
@@ -110,7 +121,10 @@ export function useCollectStories(options: UseCollectStoriesOptions, ctx: Contex
       }) as ReturnData
       if (storyData.length === 0) {
         console.warn(pc.yellow(`⚠️  No story found for ${storyFile.path}`))
-        return
+        delete storyFile.story
+        delete storyFile.treePath
+        delete storyFile.treeFile
+        return { status: 'empty' }
       }
       else if (storyData.length > 1) {
         console.warn(pc.yellow(`⚠️  Multiple stories not supported: ${storyFile.path}`))
@@ -119,12 +133,17 @@ export function useCollectStories(options: UseCollectStoriesOptions, ctx: Contex
       // Shared with the browser collection: the two collection modes must not
       // produce different story metadata for the same story file.
       finalizeCollectedStoryFile(storyFile, ctx, storyData[0])
+      return { status: 'collected', sourceSha256 }
     }
     catch (e) {
+      delete storyFile.story
+      delete storyFile.treePath
+      delete storyFile.treeFile
       console.error(pc.red(`Error while collecting story ${storyFile.path}:\n${e.frame ? `${pc.bold(e.message)}\n${e.frame}` : e.stack}`))
       if (options.throws) {
         throw e
       }
+      return { status: 'failed', error: e }
     }
   }
 

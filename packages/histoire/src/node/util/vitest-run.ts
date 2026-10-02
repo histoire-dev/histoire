@@ -1,9 +1,11 @@
 import type { InlineConfig as ViteInlineConfig } from 'vite'
 import type { Vitest } from 'vitest/node'
 import pc from 'picocolors'
-import { createVitest } from 'vitest/node'
+import { ExecutionError } from '../runtime/execution-types.js'
 import { cleanupVitestBrowserRun } from '../vitest-browser-cleanup.js'
 import { assignVitestBrowserProjectOptions } from '../vitest-browser-config/index.js'
+import { loadProjectVitest } from './project-vitest.js'
+import { throwIfTestAborted, withTestAbort } from './test-abort.js'
 import { CLEANUP_TIMEOUT } from './test-timeouts.js'
 import { formatVitestError } from './vitest-errors.js'
 import { shouldRetryVitestBrowserRun } from './vitest-retry.js'
@@ -36,6 +38,12 @@ export interface VitestAttemptSetup<TContext> {
 }
 
 export interface RunVitestAttemptsOptions<TContext, TResult> {
+  /** Project install used for Node and browser Vitest APIs. */
+  root: string
+  /** Controller-owned cancellation. */
+  signal?: AbortSignal
+  /** Require confirmed runner/server teardown before lane reuse. */
+  strictCleanup?: boolean
   /** Human-readable name of the run, used in cleanup diagnostics. */
   label: string
   /** Warning printed when the run is retried. */
@@ -49,23 +57,26 @@ export interface RunVitestAttemptsOptions<TContext, TResult> {
 }
 
 /**
- * Tears down a Vitest browser run without ever letting the teardown failure
- * escape.
+ * Tear down a run. Controller-owned runs reject any unconfirmed cleanup; CLI
+ * callers retain best-effort warnings.
  *
- * `cleanupVitestBrowserRun` propagates a genuine cleanup rejection, which would
- * either discard the results of an already-successful run, or — on the failure
- * path — replace the real error (hiding the actual cause) and skip the
- * browser-crash retry that follows it. The teardown failure is therefore
- * reported as a warning, and attached to the original error when there is one.
+ * Strict cleanup failure blocks the shared execution lane even when assertions
+ * finished successfully. Best-effort CLI cleanup warns and retains the original
+ * run error so diagnostics and existing browser-crash retry remain useful.
  * @param vitest The Vitest instance to tear down.
  * @param label Human-readable name of the run.
  * @param originalError The error currently being handled, if any.
+ * @param strict Require confirmed teardown for a long-lived shared execution lane.
  */
-async function cleanupRun(vitest: Vitest, label: string, originalError?: unknown) {
+async function cleanupRun(vitest: Vitest, label: string, originalError?: unknown, strict = false) {
   try {
-    await cleanupVitestBrowserRun(vitest, { label, timeoutMs: CLEANUP_TIMEOUT })
+    const outcome = await cleanupVitestBrowserRun(vitest, { label, timeoutMs: CLEANUP_TIMEOUT })
+    if (strict && outcome?.status === 'unconfirmed') {
+      throw new ExecutionError('CLEANUP_UNCONFIRMED', `${label} cleanup could not be confirmed`, originalError)
+    }
   }
   catch (cleanupError) {
+    if (strict) throw new ExecutionError('CLEANUP_UNCONFIRMED', `${label} cleanup could not be confirmed`, cleanupError)
     console.warn(pc.yellow(`${label} cleanup failed: ${formatVitestError(cleanupError)}`))
     // Keep the teardown failure reachable for debugging, but never overwrite an
     // existing cause chain of the error that actually failed the run.
@@ -90,30 +101,41 @@ export async function runVitestAttempts<TContext, TResult>(
   let retryCount = 0
 
   while (true) {
+    throwIfTestAborted(options.signal)
     const setup = await options.setup()
+    throwIfTestAborted(options.signal)
+    const api = await loadProjectVitest(options.root)
+    throwIfTestAborted(options.signal)
     let vitest: Vitest | undefined
+    let cleanupStarted = false
 
     try {
-      vitest = await createVitest('test', setup.vitestOptions as any, setup.viteConfig as any)
+      // Observe late creation even after abort: only the acquired handle can confirm teardown.
+      vitest = await api.createVitest('test', setup.vitestOptions as any, setup.viteConfig as any)
+      throwIfTestAborted(options.signal)
       if (setup.browserProjectOptions) {
         assignVitestBrowserProjectOptions(vitest, setup.browserProjectOptions)
       }
 
-      await runWithVitestStartTimeout(() => vitest!.start(setup.filter ?? []), {
+      await runWithVitestStartTimeout(() => withTestAbort(() => vitest!.start(setup.filter ?? []), options.signal), {
         timeoutMs: setup.timeoutMs,
         message: setup.timeoutMessage,
         onTimeout: () => setup.onTimeout?.(vitest!),
       })
 
+      throwIfTestAborted(options.signal)
       const result = await options.read(vitest, setup.context)
-      await cleanupRun(vitest, options.label)
+      throwIfTestAborted(options.signal)
+      cleanupStarted = true
+      await cleanupRun(vitest, options.label, undefined, options.strictCleanup)
       return result
     }
     catch (error) {
-      if (vitest) {
-        await cleanupRun(vitest, options.label, error)
+      if (vitest && !cleanupStarted) {
+        await cleanupRun(vitest, options.label, error, options.strictCleanup)
       }
 
+      throwIfTestAborted(options.signal)
       if (retryCount < maxRetries && shouldRetryVitestBrowserRun(error, vitest)) {
         retryCount++
         console.warn(pc.yellow(options.retryMessage))

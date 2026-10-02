@@ -36,6 +36,13 @@ export interface TreeGroupConfig {
 
 export interface HistoireConfig {
   plugins: Plugin[]
+  /** Default-on separate loopback MCP endpoint during dev; deployed mode records enabled policy. */
+  mcp?: boolean | {
+    /** Disable MCP explicitly; absent means enabled. */
+    enabled?: boolean
+    /** Dev loopback port; zero requests an ephemeral port. Default 6007 may fall back on collision. */
+    port?: number
+  }
   /**
    * Output directory.
    */
@@ -236,6 +243,13 @@ export interface HistoireConfig {
    * Build options
    */
   build?: {
+    /** Deployment artifact layout. Static retains the usual browser-only output. */
+    target?: 'static' | 'node'
+    /** Options applying only to standalone Node deployment artifacts. */
+    node?: {
+      /** Include registered raw source in private MCP content. Defaults to true. */
+      includeSource?: boolean
+    }
     /**
      * By default all dependencies in `node_modules` are bundled into a single 'vendors' file.
      * You can use this option to exclude some dependencies from this file.

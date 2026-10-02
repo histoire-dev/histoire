@@ -41,7 +41,7 @@ function createPreviewRuntime(options: { onCollect?: () => void, onRun?: () => v
   const stubs: Record<string, any> = {
     getHostWindow: () => hostWindow,
     window: {
-      location: { origin: 'http://localhost:3000' },
+      location: { origin: 'http://localhost:3000', search: '?mcpNonce=nonce&mcpEpoch=epoch' },
       addEventListener: (type: string, handler: any) => {
         if (type === 'message') {
           listener = handler
@@ -49,6 +49,7 @@ function createPreviewRuntime(options: { onCollect?: () => void, onRun?: () => v
       },
     },
     COLLECT_TESTS,
+    previewDocumentId: 'document',
     PREVIEW_SETTINGS_SYNC,
     PREVIEW_SYNC,
     RUN_TESTS,
@@ -95,6 +96,26 @@ function createPreviewRuntime(options: { onCollect?: () => void, onRun?: () => v
 }
 
 describe('preview runtime inbound message guard', () => {
+  it.each([
+    { storyId: 'story' },
+    { variantId: 'variant' },
+    { documentId: 'old-document' },
+    { mcpNonce: 'other' },
+    { mcpEpoch: 'other' },
+  ])('rejects mismatched automated test authority %j before side effects', async (mismatch) => {
+    const runtime = createPreviewRuntime()
+    const authority = { __histoire: true, storyId: 'story-a', variantId: 'variant-a', documentId: 'document', mcpNonce: 'nonce', mcpEpoch: 'epoch', ...mismatch }
+    await runtime.deliver({ ...authority, type: COLLECT_TESTS, requestId: 'collect' })
+    await runtime.deliver({ ...authority, type: RUN_TESTS, runId: 'run' })
+    expect(runtime.collectVariantTests).not.toHaveBeenCalled()
+    expect(runtime.runVariantTests).not.toHaveBeenCalled()
+  })
+
+  it('echoes independent automation authority with actual tuple', async () => {
+    const runtime = createPreviewRuntime()
+    await runtime.deliver({ __histoire: true, type: COLLECT_TESTS, requestId: 'collect', storyId: 'story-a', variantId: 'variant-a', documentId: 'document', mcpNonce: 'nonce', mcpEpoch: 'epoch' })
+    expect(runtime.postToParent).toHaveBeenLastCalledWith(expect.objectContaining({ storyId: 'story-a', variantId: 'variant-a', mcpNonce: 'nonce', mcpEpoch: 'epoch' }))
+  })
   it('ignores test requests that do not carry the histoire marker', async () => {
     const runtime = createPreviewRuntime()
 

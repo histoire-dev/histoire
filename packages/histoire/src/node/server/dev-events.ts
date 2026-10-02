@@ -1,7 +1,10 @@
 import type { ViteDevServer } from 'vite'
 import type { Context } from '../context.js'
 import type { useModuleLoader } from '../load.js'
+import type { ExecutionService } from '../runtime/execution-service.js'
 import { DevEventPluginApi } from '../plugin.js'
+import { createExecutionService } from '../runtime/execution-service.js'
+import { enqueueHistoireTestRun } from '../test/execution-service.js'
 
 /** Websocket client a dev event is replied to. */
 type DevEventClient = Parameters<Parameters<ViteDevServer['ws']['on']>[1]>[1]
@@ -23,30 +26,21 @@ function formatDevEventError(error: unknown) {
  * @param moduleLoader Loader bound to the node-side collection server, handed
  * to the plugin API.
  */
-export function registerDevEvents(ctx: Context, server: ViteDevServer, moduleLoader: ReturnType<typeof useModuleLoader>) {
-  // Serializes dev-triggered test runs. Each request gets its own run with
-  // its own story/variant filter — a single-flight latch would answer request
-  // B with request A's summary (filtered to A's variant).
-  let testRunChain: Promise<unknown> = Promise.resolve()
-
-  /**
-   * Queues a UI-triggered test run behind the runs already in flight.
-   * @param payload The story/variant filter sent by the UI.
-   */
-  function queueStoryTestRun(payload: any) {
-    const runPromise = testRunChain.then(async () => {
-      const { runHistoireTests } = await import('../test/index.js')
-      return await runHistoireTests(ctx, {
-        storyId: payload?.storyId,
-        variantId: payload?.variantId,
-        // The live dev ctx already holds scanned+collected stories; a
-        // re-scan would reset them and duplicate markdown entries.
-        skipStoryScan: true,
-      })
+export function registerDevEvents(ctx: Context, server: ViteDevServer, moduleLoader: ReturnType<typeof useModuleLoader>, execution?: ExecutionService, isActive = () => true) {
+  const lane = execution ?? createExecutionService()
+  if (!execution) {
+    server.httpServer?.once('close', () => {
+      void lane.close().catch(() => {})
     })
-    // Keep the chain alive on failure so one failed run can't wedge the queue.
-    testRunChain = runPromise.then(() => undefined, () => undefined)
-    return runPromise
+  }
+
+  /** Submit own target to controller-owned lane with independent result. */
+  function queueStoryTestRun(payload: any) {
+    if (!isActive()) throw new Error('Project runtime closed')
+    return enqueueHistoireTestRun(lane, ctx, {
+      storyId: payload?.storyId,
+      variantId: payload?.variantId,
+    }, isActive).result
   }
 
   /**
@@ -62,7 +56,7 @@ export function registerDevEvents(ctx: Context, server: ViteDevServer, moduleLoa
         const api = new DevEventPluginApi(ctx, plugin, moduleLoader, event, payload)
         const result = await plugin.onDevEvent(api)
         if (!event.startsWith('on') && result !== undefined) {
-          client.send(`histoire:dev-event-result`, { event, requestId, result })
+          if (isActive()) client.send(`histoire:dev-event-result`, { event, requestId, result })
           break
         }
       }
@@ -88,13 +82,14 @@ export function registerDevEvents(ctx: Context, server: ViteDevServer, moduleLoa
     try {
       if (event === 'runStoryTests') {
         const result = await queueStoryTestRun(payload)
-        client.send(`histoire:dev-event-result`, { event, requestId, result })
+        if (isActive()) client.send(`histoire:dev-event-result`, { event, requestId, result })
         return
       }
 
       await runPluginDevEvent(event, payload, requestId, client)
     }
     catch (error) {
+      if (!isActive()) return
       client.send(`histoire:dev-event-result`, {
         event,
         requestId,

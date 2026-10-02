@@ -1,4 +1,5 @@
 import type { Story, Variant } from '../types'
+import { resolveStoryRouteId } from '@histoire/shared'
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import { router } from '../router'
@@ -9,7 +10,10 @@ export const useStoryStore = defineStore('story', () => {
     stories.value = value
   }
 
-  const currentStory = computed(() => stories.value.find(s => s.id === router.currentRoute.value.params.storyId))
+  const currentStory = computed(() => {
+    const route = router.currentRoute.value
+    return stories.value.find(s => s.id === resolveStoryRouteId(route.params, route.query))
+  })
   const currentVariant = computed(() => getCurrentStoryVariantById(String(router.currentRoute.value.query.variantId)))
 
   const maps = computed(() => {

@@ -1,4 +1,4 @@
-import { transformSync } from 'esbuild'
+import { build, transformSync } from 'esbuild'
 import { describe, expect, it } from 'vitest'
 import { generatePreviewRuntimeSource, HOSTILE_STORY_ID, previewRuntimeStubStoryFiles } from './utils/preview-runtime-source.js'
 
@@ -12,6 +12,19 @@ function parseAsModule(source: string) {
 }
 
 describe('preview runtime generation', () => {
+  it('binds preview vendor imports to Histoire dependencies instead of consumer root', async () => {
+    for (const hasVitest of [true, false]) {
+      const source = generatePreviewRuntimeSource(hasVitest)
+      const output = await build({ stdin: { contents: source, loader: 'js' }, format: 'esm', write: false, metafile: true })
+      const imports = Object.values(output.metafile!.outputs).flatMap(value => value.imports.map(entry => entry.path))
+      expect(imports.filter(path => path.includes('histoire-vendors') || path.startsWith('@histoire/vendors/'))).toEqual([
+        '/stub/histoire-vendors/dist/client/b-floating-vue.js',
+        '/stub/histoire-vendors/dist/client/b-pinia.js',
+        '/stub/histoire-vendors/dist/client/b-vue.js',
+      ])
+    }
+  })
+
   it('emits syntactically valid modules for both the vitest and plain branches', () => {
     // Hostile story ids (quotes, backslash, backtick, `${`, newline) are baked
     // into the metadata, the loader keys and the import specifiers.

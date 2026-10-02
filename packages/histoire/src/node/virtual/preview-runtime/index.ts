@@ -1,5 +1,5 @@
 import type { Context } from '../../context.js'
-import type { PreviewRuntimeStoryFile } from './preamble.js'
+import type { PreviewRuntimePreambleOptions, PreviewRuntimeStoryFile } from './preamble.js'
 import { createRequire } from 'node:module'
 import { hasProjectVitest } from '../../util/has-vitest.js'
 import { resolveHistoireAppBundledDir } from '../../util/resolve-histoire-app.js'
@@ -44,6 +44,8 @@ export interface PreviewRuntimeSourceOptions {
   staticMockRuntimeId: string
   /** Resolved directory of the bundled `@histoire/app` build. */
   histoireAppBundledDir: string
+  /** Already resolved browser vendors keep virtual imports out of consumer root. */
+  histoireVendorIds: PreviewRuntimePreambleOptions['histoireVendorIds']
   /** Story metadata baked into the runtime at transform time. */
   files: PreviewRuntimeStoryFile[]
   /** Maximum time allowed for one variant mount. */
@@ -174,6 +176,13 @@ export function previewRuntime(ctx: Context) {
     variantTestSessionId,
     staticMockRuntimeId,
     histoireAppBundledDir: resolveHistoireAppBundledDir(),
+    // A virtual module has no dependency owner. Resolve from Histoire's package,
+    // as with the app build above; consumers need only depend on Histoire.
+    histoireVendorIds: {
+      floatingVue: require.resolve('@histoire/vendors/floating-vue'),
+      pinia: require.resolve('@histoire/vendors/pinia'),
+      vue: require.resolve('@histoire/vendors/vue'),
+    },
     files,
     loaders,
     mountTimeoutMs: getStoryCollectTimeout(ctx),

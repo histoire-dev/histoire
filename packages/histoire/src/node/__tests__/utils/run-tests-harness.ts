@@ -145,6 +145,9 @@ export function installRunTestsMocks(): RunTestsMocks {
       options: {},
     })),
   }))
+  vi.doMock('../../util/project-vitest.js', () => ({
+    loadProjectVitest: async () => import('vitest/node'),
+  }))
   vi.doMock('../../markdown.js', () => ({
     scanMarkdownFiles: vi.fn(async () => {}),
   }))

@@ -76,6 +76,11 @@ export function generatePreviewRuntimeSource(hasVitestPreview = true) {
     variantTestSessionId: '/stub/histoire/virtual/variant-test-session.js',
     staticMockRuntimeId: '/stub/histoire/virtual/vitest-static-mock-runtime.js',
     histoireAppBundledDir: '/stub/histoire-app/dist/bundled',
+    histoireVendorIds: {
+      floatingVue: '/stub/histoire-vendors/dist/client/b-floating-vue.js',
+      pinia: '/stub/histoire-vendors/dist/client/b-pinia.js',
+      vue: '/stub/histoire-vendors/dist/client/b-vue.js',
+    },
     files: previewRuntimeStubStoryFiles,
     loaders: buildStoryModuleLoaders(previewRuntimeStubStoryFiles),
     mountTimeoutMs: 30_000,

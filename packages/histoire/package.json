@@ -36,10 +36,24 @@
   "bin": {
     "histoire": "./bin.mjs"
   },
+  "files": [
+    "bin.mjs",
+    "client.d.ts",
+    "client.js",
+    "dist",
+    "index.d.ts",
+    "plugin.d.ts",
+    "plugin.js"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "build": "rimraf dist && tsc",
     "watch": "tsc -w --sourceMap",
     "test": "vitest run",
+    "test:mcp:integration": "vitest run --config vitest.mcp.config.ts",
+    "test:mcp:package": "vitest run --config vitest.package.config.ts",
     "test:dev": "vitest"
   },
   "peerDependencies": {
@@ -65,6 +79,8 @@
     "@histoire/controls": "workspace:^",
     "@histoire/shared": "workspace:^",
     "@histoire/vendors": "workspace:^",
+    "@modelcontextprotocol/node": "2.1.0",
+    "@modelcontextprotocol/server": "2.2.0",
     "@types/markdown-it": "^14.1.2",
     "birpc": "^0.2.19",
     "change-case": "^5.4.4",
@@ -72,6 +88,7 @@
     "connect": "^3.7.0",
     "defu": "^6.1.4",
     "diacritics": "^1.3.0",
+    "esbuild": "^0.27.2",
     "fs-extra": "^11.2.0",
     "globby": "^14.0.2",
     "gray-matter": "^4.0.3",
@@ -89,13 +106,14 @@
     "sade": "^1.8.1",
     "shiki": "^3.0.0",
     "sirv": "^3.0.0",
-    "vite-node": "3.2.4"
+    "vite-node": "3.2.4",
+    "zod": "4.6.5"
   },
   "devDependencies": {
+    "@modelcontextprotocol/client": "2.2.0",
     "@types/fs-extra": "^11.0.4",
     "@types/node": "^22.10.1",
     "@vitest/browser-playwright": "4.1.10",
-    "esbuild": "^0.27.2",
     "rollup": "^4.28.0",
     "typescript": "catalog:",
     "vite": "catalog:",

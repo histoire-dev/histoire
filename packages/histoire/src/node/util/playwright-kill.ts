@@ -43,15 +43,18 @@ export function getPlaywrightBrowserProcess(browser: unknown): BrowserChildProce
  * long-lived dev server would strand one headless browser per timed-out run.
  * Never throws and is idempotent per browser handle.
  * @param browser The Playwright client `Browser` instance.
+ * @param capturedProcess Owned process captured before graceful close removed it.
  * @returns Whether a process was actually signalled.
  */
-export function forceKillPlaywrightBrowser(browser: unknown): boolean {
+export function forceKillPlaywrightBrowser(browser: unknown, capturedProcess?: BrowserChildProcessLike): boolean {
   if (!browser || typeof browser !== 'object' || killedBrowsers.has(browser)) {
     return false
   }
 
-  const child = getPlaywrightBrowserProcess(browser)
-  if (!child?.pid || child.killed) {
+  const child = capturedProcess ?? getPlaywrightBrowserProcess(browser)
+  // ChildProcess.killed confirms only that some signal was sent. A graceful
+  // signal can leave a hung process alive, which still needs this SIGKILL.
+  if (!child?.pid) {
     return false
   }
 

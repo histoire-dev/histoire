@@ -12,6 +12,10 @@ export interface BrowserCollectedStoryResult {
 }
 
 export interface CollectStoriesBrowserOptions {
+  /** Abort controller-owned collection without publishing obsolete results. */
+  signal?: AbortSignal
+  /** Require confirmed runner cleanup before returning. */
+  strictCleanup?: boolean
   storyFiles?: Context['storyFiles']
   /**
    * Assigns the collected data onto the live `ctx.storyFiles` objects.

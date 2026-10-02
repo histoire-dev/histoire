@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import type { Story } from '../../types'
+import { resolveStoryRouteId } from '@histoire/shared'
 import { Icon } from '@iconify/vue'
 import { computed, ref } from 'vue'
 import { useRoute } from 'vue-router'
@@ -18,7 +19,7 @@ const filePadding = computed(() => {
 })
 
 const route = useRoute()
-const isActive = computed(() => route.params.storyId === props.story.id)
+const isActive = computed(() => resolveStoryRouteId(route.params, route.query) === props.story.id)
 const el = ref<HTMLDivElement>()
 useScrollOnActive(isActive, el)
 </script>

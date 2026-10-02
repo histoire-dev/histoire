@@ -1,6 +1,7 @@
 import type { IncomingMessage, ServerResponse } from 'node:http'
 import type { ViteDevServer, Plugin as VitePlugin } from 'vite'
 import { readRequestBody, RequestBodyTooLargeError } from './util/http-body.js'
+import { resolveMockImporter } from './util/mock-importer.js'
 
 /**
  * Dev-server path the browser runtimes POST their mock-resolution requests to.
@@ -225,8 +226,8 @@ export function createVitestMockRpcPlugin(mockerNode: VitestMockerNodeModule): V
       })
 
       server.middlewares.use(VITEST_MOCK_RPC_ENDPOINT, createMockRpcMiddleware({
-        [VITEST_MOCK_RPC_METHODS.resolveId]: ({ id, importer }) => resolver.resolveId(id, importer),
-        [VITEST_MOCK_RPC_METHODS.resolveMock]: ({ id, importer, options }) => resolver.resolveMock(id, importer, options),
+        [VITEST_MOCK_RPC_METHODS.resolveId]: async ({ id, importer }) => resolver.resolveId(id, await resolveMockImporter(server, importer)),
+        [VITEST_MOCK_RPC_METHODS.resolveMock]: async ({ id, importer, options }) => resolver.resolveMock(id, (await resolveMockImporter(server, importer))!, options),
         [VITEST_MOCK_RPC_METHODS.invalidate]: ({ ids }) => resolver.invalidate(ids),
         [VITEST_MOCK_RPC_METHODS.awaitBarrier]: ({ barrierId }) => barriers.wait(barrierId),
       }))

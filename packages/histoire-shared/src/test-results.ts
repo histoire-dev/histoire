@@ -7,6 +7,22 @@ import type {
 } from './types/test.js'
 import { serializeTestError } from './test-errors.js'
 
+/** Merge existing summaries without changing per-variant test identities or semantics. */
+export function mergeHistoireTestSummaries(values: HistoireTestRunSummary[]): HistoireTestRunSummary {
+  const summary: HistoireTestRunSummary = { ok: true, total: 0, passed: 0, failed: 0, skipped: 0, errors: [], tests: [] }
+  for (const value of values) {
+    summary.ok &&= value.ok
+    summary.total += value.total
+    summary.passed += value.passed
+    summary.failed += value.failed
+    summary.skipped += value.skipped
+    for (const error of value.errors) summary.errors.push(error)
+    for (const test of value.tests) summary.tests.push(test)
+    for (const story of value.uncollectedStories ?? []) (summary.uncollectedStories ??= []).push(story)
+  }
+  return summary
+}
+
 export function serializeTestDefinitions(definitions: HistoireTestDefinition[]): HistoireSerializedTestDefinition[] {
   return definitions.map(({ id, name, fullName, mode, timeout }) => ({
     id,

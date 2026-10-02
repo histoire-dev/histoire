@@ -32,36 +32,41 @@ export async function collectStories(ctx: Context, server: ViteDevServer) {
     server,
     throws: true,
   }, ctx)
-  await Promise.all(ctx.storyFiles.map(storyFile => executeStoryFile(storyFile)))
-  await destroyCollectStories()
+  try {
+    await Promise.all(ctx.storyFiles.map(storyFile => executeStoryFile(storyFile)))
+  }
+  finally { await destroyCollectStories() }
 }
 
 /**
  * Serves the built output and invokes the plugin `previewStory` callbacks once
  * per variant (screenshot plugins and the like).
  */
-export async function renderPreviewStories(ctx: Context, previewStoryCallbacks: PreviewStoryCallback[]) {
+export async function renderPreviewStories(ctx: Context, previewStoryCallbacks: PreviewStoryCallback[], outputRoot = ctx.config.outDir) {
   if (!previewStoryCallbacks.length) {
     return
   }
 
-  const { baseUrl, close } = await startPreview(null, ctx)
-  for (const storyFile of ctx.storyFiles) {
-    const story = storyFile.story
-    for (const variant of story.variants) {
-      const query = new URLSearchParams()
-      query.append('storyId', story.id)
-      query.append('variantId', variant.id)
-      const url = `${baseUrl}__sandbox.html?${query.toString()}`
-      for (const fn of previewStoryCallbacks) {
-        await fn({
-          file: storyFile.path,
-          story,
-          variant,
-          url,
-        })
+  const { baseUrl, close } = await startPreview(null, ctx, outputRoot)
+  try {
+    for (const storyFile of ctx.storyFiles) {
+      const story = storyFile.story
+      if (!story) continue
+      for (const variant of story.variants) {
+        const query = new URLSearchParams()
+        query.append('storyId', story.id)
+        query.append('variantId', variant.id)
+        const url = `${baseUrl}__sandbox.html?${query.toString()}`
+        for (const fn of previewStoryCallbacks) {
+          await fn({
+            file: storyFile.path,
+            story,
+            variant,
+            url,
+          })
+        }
       }
     }
   }
-  await close()
+  finally { await close() }
 }

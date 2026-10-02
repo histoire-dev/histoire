@@ -6,6 +6,7 @@ import fs from 'fs-extra'
 import pc from 'picocolors'
 import { getCollectionVitestCliOptions } from '../collect/reporter.js'
 import { getRunTempDir } from '../util/temp-paths.js'
+import { throwIfTestAborted } from '../util/test-abort.js'
 import { getCollectTimeout } from '../util/test-timeouts.js'
 import { runVitestAttempts } from '../util/vitest-run.js'
 import { reportStuckVitestRun } from '../util/vitest-stuck-run.js'
@@ -65,6 +66,7 @@ export async function collectStoriesBrowser(ctx: Context, options: CollectStorie
  * @param specRoot Directory owned by this run, where the specs are generated.
  */
 async function collect(ctx: Context, options: CollectStoriesBrowserOptions, specRoot: string): Promise<BrowserCollectionResult> {
+  throwIfTestAborted(options.signal)
   const startTime = performance.now()
   const collectionVitestCliOptions = getCollectionVitestCliOptions()
   const storyFiles = options.storyFiles ?? ctx.storyFiles
@@ -72,12 +74,16 @@ async function collect(ctx: Context, options: CollectStoriesBrowserOptions, spec
 
   const result = await runVitestAttempts<CollectionAttemptContext, BrowserCollectionResult>({
     label: CLEANUP_LABEL,
+    root: ctx.root,
+    signal: options.signal,
+    strictCleanup: options.strictCleanup,
     retryMessage: 'Retrying browser story collection after Vitest browser optimizer reload',
     setup: async () => {
       const channel = createCollectionChannel()
       const runToken = `${Date.now().toString(36)}:${Math.random().toString(36).slice(2)}`
       const specFiles = await generateCollectionSpecFiles(ctx, runToken, specRoot, storyFiles)
       const specPaths = specFiles.map(spec => spec.path)
+      throwIfTestAborted(options.signal)
       const { vitestOptions, viteConfig } = await getCollectionVitestConfig(ctx, specPaths, channel.plugin)
 
       return {

@@ -1,3 +1,4 @@
+import { STORY_ROUTE_PATH } from '@histoire/shared'
 import { createRouter, createWebHashHistory, createWebHistory } from 'vue-router'
 import { histoireConfig } from './util/config'
 
@@ -21,7 +22,8 @@ export const router = createRouter({
       component: () => import('./components/HomeView.vue'),
     },
     {
-      path: '/story/:storyId',
+      // Query identity fallback preserves dot-only IDs in history URLs.
+      path: STORY_ROUTE_PATH,
       name: 'story',
       component: () => import('./components/story/StoryView.vue'),
     },

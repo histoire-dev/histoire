@@ -31,6 +31,7 @@ function removeHandler<T>(handlers: T[], handler: T) {
   }
 }
 
+/** Requests collection of a registered story, or a full batch when omitted. */
 export function notifyStoryChange(file?: ServerStoryFile) {
   for (const handler of storyChangeHandlers) {
     handler(file)
@@ -50,6 +51,7 @@ export function onStoryListChange(handler: StoryListChangeHandler) {
   return () => removeHandler(storyListChangeHandlers, handler)
 }
 
+/** Announces structural changes to the registered story list. */
 export function notifyStoryListChange() {
   for (const handler of storyListChangeHandlers) {
     handler()
@@ -57,8 +59,11 @@ export function notifyStoryListChange() {
 }
 
 let context: Context
+let watcherContext: Context | undefined
 
+/** Watches one project and exposes completion of its initial filesystem scan. */
 export async function watchStories(newContext: Context) {
+  if (watcherContext) throw new Error('A story watcher already owns this process')
   context = newContext
 
   const baseWatchPaths = Array.from(new Set(context.config.storyMatch.map((pattern) => {
@@ -88,24 +93,70 @@ export async function watchStories(newContext: Context) {
       return stats?.isFile() ?? false
     },
   })
+  watcherContext = newContext
 
+  const delayedChanges = new Set<ReturnType<typeof setTimeout>>()
+  let stopped = false
+  let readySettled = false
+  let rejectReady: (error: unknown) => void
+  const ready = new Promise<void>((resolveReady, reject) => {
+    rejectReady = reject
+    watcher.once('ready', () => {
+      readySettled = true
+      resolveReady()
+    })
+    watcher.on('error', (error) => {
+      if (!readySettled) reject(error)
+      else if (!stopped) console.error(error)
+    })
+  })
+  // A caller may close during startup before it begins awaiting readiness.
+  void ready.catch(() => {})
   watcher
     .on('add', (file) => {
-      const storyFile = addStory(file)
-      setTimeout(() => notifyStoryChange(storyFile), 100) // Delay in case file renaming fired Add event before Unlink event
+      if (stopped) return
+      try {
+        const storyFile = addStory(file)
+        const timer = setTimeout(() => {
+          delayedChanges.delete(timer)
+          if (!stopped) notifyStoryChange(storyFile)
+        }, 100) // Delay in case file renaming fired Add event before Unlink event
+        delayedChanges.add(timer)
+      }
+      catch (error) {
+        if (!readySettled) rejectReady(error)
+        else console.error(error)
+      }
     })
     .on('unlink', (file) => {
+      if (stopped) return
       removeStory(file)
       notifyStoryListChange()
     })
 
-  return watcher
+  const originalClose = watcher.close.bind(watcher)
+  let closing: Promise<void>
+  watcher.close = () => {
+    if (!closing) {
+      stopped = true
+      for (const timer of delayedChanges) clearTimeout(timer)
+      delayedChanges.clear()
+      if (!readySettled) rejectReady(new Error('Story watcher closed before initial scan'))
+      closing = originalClose().finally(() => {
+        if (watcherContext === newContext) watcherContext = undefined
+      })
+    }
+    return closing
+  }
+  return Object.assign(watcher, { ready })
 }
 
+/** Resolves a registered project-relative story path. */
 function getAbsoluteFilePath(relativeFilePath: string) {
   return resolve(context.root, relativeFilePath)
 }
 
+/** Registers one physical or generated story without duplicating its path. */
 export function addStory(relativeFilePath: string, virtualModuleCode?: string) {
   const absoluteFilePath = getAbsoluteFilePath(relativeFilePath)
 
@@ -150,13 +201,16 @@ export function addStory(relativeFilePath: string, virtualModuleCode?: string) {
   return file
 }
 
+/** Removes a registered story using its project-relative path. */
 export function removeStory(relativeFilePath: string) {
   const absoluteFilePath = getAbsoluteFilePath(relativeFilePath)
   const index = context.storyFiles.findIndex(file => file.path === absoluteFilePath)
   if (index !== -1) context.storyFiles.splice(index, 1)
 }
 
+/** Scans a project once; does not replace another live watcher's context. */
 export async function findAllStories(newContext: Context) {
+  if (watcherContext && watcherContext !== newContext) throw new Error('A story watcher already owns another project in this process')
   context = newContext
 
   const files = await globby(context.config.storyMatch, {

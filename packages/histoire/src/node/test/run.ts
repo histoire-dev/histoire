@@ -4,11 +4,12 @@ import type { RunHistoireTestsOptions } from './types.js'
 import { performance } from 'node:perf_hooks'
 import fs from 'fs-extra'
 import pc from 'picocolors'
-import { parseCLI } from 'vitest/node'
 import { scanMarkdownFiles } from '../markdown.js'
 import { findAllStories } from '../stories.js'
 import { collectStoriesBrowser } from '../story-collection/index.js'
+import { loadProjectVitest } from '../util/project-vitest.js'
 import { getRunTempDir } from '../util/temp-paths.js'
+import { throwIfTestAborted } from '../util/test-abort.js'
 import { getRunTimeout } from '../util/test-timeouts.js'
 import { assertVitestRunHasNoUnhandledErrors } from '../util/vitest-errors.js'
 import { runVitestAttempts } from '../util/vitest-run.js'
@@ -34,11 +35,15 @@ export async function runHistoireTests(ctx: Context, options: RunHistoireTestsOp
   // Each run owns its spec directory: a shared one emptied at the start of the
   // run would delete the specs of any concurrent run in the same project.
   const specRoot = getRunTempDir(ctx.root, 'tests')
+  const previousExitCode = process.exitCode
 
   try {
     return await runTests(ctx, options, specRoot)
   }
   finally {
+    // Vitest sets a global exit code for failed assertions. A dev MCP/UI job
+    // returns its own summary; it must not poison the long-lived server's exit.
+    process.exitCode = previousExitCode
     // Remove the generated specs on every path, including failures.
     await fs.remove(specRoot).catch(() => {})
   }
@@ -51,6 +56,7 @@ export async function runHistoireTests(ctx: Context, options: RunHistoireTestsOp
  * @param specRoot Directory owned by this run, where the specs are generated.
  */
 async function runTests(ctx: Context, options: RunHistoireTestsOptions, specRoot: string): Promise<HistoireTestRunSummary> {
+  throwIfTestAborted(options.signal)
   const startTime = performance.now()
   const hasExplicitSelection = Boolean(options.storyId || options.variantId)
   ensureProjectVitest(ctx)
@@ -58,11 +64,13 @@ async function runTests(ctx: Context, options: RunHistoireTestsOptions, specRoot
   // UI needs the same actionable message, and both resolve from the context
   // root instead of whatever directory the process happens to run in.
   await ensureBrowserTestDepsInstalled(ctx.root)
+  throwIfTestAborted(options.signal)
   if (!options.skipStoryScan) {
     await findAllStories(ctx)
     await scanMarkdownFiles(ctx)
   }
 
+  throwIfTestAborted(options.signal)
   const targetStoryFiles = getTargetStoryFiles(ctx, options)
   // `onTest` is registered at runtime at any call depth (shared helpers,
   // renamed imports…), so only executing the story reveals whether it defines
@@ -76,9 +84,12 @@ async function runTests(ctx: Context, options: RunHistoireTestsOptions, specRoot
       // Discovering eligibility means collecting stories the user never asked
       // about: one broken unrelated story must not abort their test run.
       tolerateStoryFailures: true,
+      signal: options.signal,
+      strictCleanup: options.strictCleanup,
     })
     : { files: [], failures: [] }
 
+  throwIfTestAborted(options.signal)
   assertTargetedStoriesCollected(collection.failures, targetStoryFiles, options)
   warnAboutUncollectedStories(collection.failures)
 
@@ -92,6 +103,8 @@ async function runTests(ctx: Context, options: RunHistoireTestsOptions, specRoot
     return withUncollectedStories(createEmptyTestSummary(), collection.failures)
   }
 
+  throwIfTestAborted(options.signal)
+  const { parseCLI } = await loadProjectVitest(ctx.root)
   const { filter, options: vitestOptions } = parseCLI(['vitest', ...(options.rawVitestArgs ?? [])], {
     allowUnknownOptions: true,
   })
@@ -105,6 +118,9 @@ async function runTests(ctx: Context, options: RunHistoireTestsOptions, specRoot
 
   const summary = await runVitestAttempts<undefined, HistoireTestRunSummary>({
     label: CLEANUP_LABEL,
+    root: ctx.root,
+    signal: options.signal,
+    strictCleanup: options.strictCleanup,
     retryMessage: 'Retrying Histoire tests after Vitest browser optimizer reload',
     // Rebuilt per attempt: the config carries live plugin instances bound to
     // the Vite server of the attempt that created them.

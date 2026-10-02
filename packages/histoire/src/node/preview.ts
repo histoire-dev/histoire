@@ -8,12 +8,13 @@ interface ReturnPayload {
   close: () => Promise<void>
 }
 
-export async function startPreview(port: number | null, ctx: Context): Promise<ReturnPayload> {
+/** Serves built browser assets from an explicit root; default keeps static preview behavior. */
+export async function startPreview(port: number | null, ctx: Context, outputRoot = ctx.config.outDir): Promise<ReturnPayload> {
   const app = connect()
 
   app.use(
     ctx.resolvedViteConfig.base,
-    sirv(ctx.config.outDir, {
+    sirv(outputRoot, {
       dev: true,
       etag: true,
       single: true,

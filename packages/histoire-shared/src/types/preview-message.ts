@@ -32,6 +32,8 @@ export const TEST_RESULT = '__histoire:test-result'
 /** Marker every host <-> preview message carries; both ends drop messages without it. */
 export interface HistoireMessageMarker {
   __histoire: true
+  /** Outbound document lifetime; iframe WindowProxy persists across navigation. */
+  documentId?: string
 }
 
 /**

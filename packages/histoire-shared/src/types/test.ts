@@ -109,12 +109,26 @@ export interface HistoireSerializedTestDefinition {
   timeout?: number
 }
 
-export interface HistoireCollectTestsPayload {
+/** Optional exact authority used by automated same-origin preview hosts. */
+export interface HistoireTestRequestAuthority {
+  /** Story selected when request was dispatched. */
+  storyId?: string | null
+  /** Variant selected when request was dispatched. */
+  variantId?: string | null
+  /** Preview document lifetime; WindowProxy survives navigation. */
+  documentId?: string
+  /** Owned host capability echoed only for automation correlation. */
+  mcpNonce?: string
+  /** Captured project generation echoed only for automation correlation. */
+  mcpEpoch?: string
+}
+
+export interface HistoireCollectTestsPayload extends HistoireTestRequestAuthority {
   requestId?: string
   variantKey?: string | null
 }
 
-export interface HistoireRunTestsPayload {
+export interface HistoireRunTestsPayload extends HistoireTestRequestAuthority {
   runId?: string
   variantKey?: string | null
 }

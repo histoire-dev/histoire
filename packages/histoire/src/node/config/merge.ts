@@ -73,7 +73,9 @@ export const mergeConfig = createDefu((obj: any, key, value) => {
   }
 
   if (obj[key] && key === 'build') {
-    obj[key] = mergeBuildConfig(obj[key], value)
+    // defu passes fallback state as obj and higher-priority user input as value.
+    // Preserve that order for nested target and Node source-privacy settings.
+    obj[key] = mergeBuildConfig(value, obj[key])
     return true
   }
 

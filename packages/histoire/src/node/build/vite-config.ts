@@ -18,7 +18,7 @@ import { getViteConfigWithPlugins } from '../vite/index.js'
  * @param collectServer The dev server used for story collection: `@vitejs/plugin-vue`
  * is re-pointed at it so template inlining stays disabled during the build.
  */
-export async function createBuildViteConfig(ctx: Context, collectServer: ViteDevServer) {
+export async function createBuildViteConfig(ctx: Context, collectServer: ViteDevServer, outputRoot = ctx.config.outDir) {
   const { viteConfig: buildViteConfigRaw } = await getViteConfigWithPlugins(false, ctx)
   const buildViteConfig: ViteInlineConfig = mergeViteConfig(buildViteConfigRaw, {
     mode: 'development',
@@ -100,7 +100,7 @@ export async function createBuildViteConfig(ctx: Context, collectServer: ViteDev
 
       // Force vite build options
       Object.assign(config.build, {
-        outDir: ctx.config.outDir,
+        outDir: outputRoot,
         emptyOutDir: true,
         cssCodeSplit: false,
         minify: false,

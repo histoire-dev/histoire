@@ -6,6 +6,7 @@ import { APP_PATH, TEMP_PATH } from '../alias.js'
 import { notifyStoryChange } from '../stories.js'
 import { resolveHistoireAppBundledDir } from '../util/resolve-histoire-app.js'
 import { createAppHtmlMiddleware, createSandboxHtmlMiddleware } from './dev-html.js'
+import { createMcpPreviewHtmlMiddleware } from './mcp-preview-html.js'
 import { histoireSharedPath, resolveSupportPluginAllowPaths, withPackageDirs } from './resolve-paths.js'
 
 export interface HistoireVitePluginOptions {
@@ -160,6 +161,7 @@ export function createHistoireVitePlugin(ctx: Context, options: HistoireVitePlug
         firstMount = false
       })
 
+      server.middlewares.use(createMcpPreviewHtmlMiddleware(server))
       server.middlewares.use(createSandboxHtmlMiddleware(server))
 
       // serve our index.html after vite history fallback

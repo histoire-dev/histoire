@@ -10,9 +10,19 @@ import { hasProjectVitest } from '../util/has-vitest.js'
  * @param root The project root to resolve from.
  */
 export async function ensureBrowserTestDepsInstalled(root: string) {
+  const missing = missingBrowserTestDependencies(root)
+  if (missing.length) {
+    throw new Error(
+      `\`histoire test\` runs stories in a browser and requires ${missing.join(' and ')} in the project. `
+      + `Install with: pnpm add -D ${missing.join(' ')}`,
+    )
+  }
+}
+
+/** Resolve optional browser peers from target project exactly as runner preflight does. */
+export function missingBrowserTestDependencies(root: string): string[] {
   const projectRequire = createRequire(join(root, 'package.json'))
   const missing: string[] = []
-
   for (const dependency of ['@vitest/browser-playwright', 'playwright']) {
     try {
       projectRequire.resolve(dependency)
@@ -21,13 +31,7 @@ export async function ensureBrowserTestDepsInstalled(root: string) {
       missing.push(dependency)
     }
   }
-
-  if (missing.length) {
-    throw new Error(
-      `\`histoire test\` runs stories in a browser and requires ${missing.join(' and ')} in the project. `
-      + `Install with: pnpm add -D ${missing.join(' ')}`,
-    )
-  }
+  return missing
 }
 
 /**

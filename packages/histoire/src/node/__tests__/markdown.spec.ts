@@ -1,5 +1,5 @@
 import type { Context } from '../context.js'
-import { createWriteStream, existsSync, unlinkSync } from 'node:fs'
+import { createWriteStream, existsSync, unlinkSync, writeFileSync } from 'node:fs'
 import path from 'node:path'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { createContext } from '../context.js'
@@ -62,5 +62,23 @@ describe('markdown', async () => {
 
     // create markdownWatcher and check for error
     await expect(createMarkdownFilesWatcher(ctx)).rejects.toThrowError()
+  })
+
+  it('updates standalone frontmatter, HTML and virtual module without duplicate records', async () => {
+    writeFileSync(missingStoryFile, '---\nid: original\ntitle: Original\n---\nFirst body\n')
+    markdownWatcher = await createMarkdownFilesWatcher(ctx)
+    const file = ctx.markdownFiles.find(file => file.absolutePath === missingStoryFile)
+    const story = file.storyFile
+    writeFileSync(missingStoryFile, '---\nid: changed\ntitle: Changed\n---\nSecond body\n')
+    await vi.waitFor(() => expect(file.content).toContain('Second body'))
+    expect(file.html).toContain('Second body')
+    expect(file.storyFile).toBe(story)
+    expect(story.moduleCode).toContain('"id":"changed"')
+    expect(story.moduleCode).toContain('"title":"Changed"')
+    expect(ctx.markdownFiles.filter(file => file.absolutePath === missingStoryFile)).toHaveLength(1)
+    expect(ctx.storyFiles.filter(file => file.relativePath === 'test3.story.js')).toHaveLength(1)
+    unlinkSync(missingStoryFile)
+    await vi.waitFor(() => expect(ctx.markdownFiles.includes(file)).toBe(false))
+    expect(ctx.storyFiles.includes(story)).toBe(false)
   })
 })

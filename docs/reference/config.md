@@ -35,9 +35,51 @@ export default defineConfig({
 
 Output directory.
 
+Static builds put browser files directly here. [Node builds](../guide/deploy-node.md) put `server.mjs`, `package.json`, `public/`, and private MCP content here.
+
 ```ts
 export default defineConfig({
   outDir: '.histoire/dist',
+})
+```
+
+## `mcp`
+
+`boolean | { enabled?: boolean, port?: number }` - Default: `true`
+
+Enable the [MCP server](../guide/mcp.md) automatically in development. Its separate listener always binds loopback. Default port `6007` falls back to an available port if occupied; an explicitly selected occupied port fails. Port `0` requests an ephemeral port. Object form defaults `enabled` to true. A config port does not enable `enabled: false`.
+
+```ts
+export default defineConfig({
+  mcp: { enabled: true, port: 6010 },
+})
+```
+
+`histoire dev --no-mcp` disables it. `--mcp` overrides config false; `--mcp-port <port>` selects a port and implies enabled. Combining either with `--no-mcp` fails. Optional `HISTOIRE_MCP_TOKEN` requires local bearer authentication. Stdio `histoire mcp` operates independently and disables dev HTTP MCP in its worker.
+
+Node builds record the enabled policy, with runtime `--mcp`/`--no-mcp` overrides. Node ignores this dev-only port and uses the book listener. Deployed MCP requires a strong `HISTOIRE_MCP_TOKEN`.
+
+## `build.target`
+
+`'static' | 'node'` - Default: `'static'`
+
+Select static browser output or a standalone [Node deployment](../guide/deploy-node.md). `histoire build --target static|node` overrides config.
+
+```ts
+export default defineConfig({
+  build: { target: 'node' },
+})
+```
+
+## `build.node.includeSource`
+
+`boolean` - Default: `true`
+
+Include registered raw source in private Node MCP content. Set false to omit it from that private store. Catalog/docs remain available. This does not remove the existing book Source panel or source contained in public browser assets.
+
+```ts
+export default defineConfig({
+  build: { target: 'node', node: { includeSource: false } },
 })
 ```
 

@@ -66,6 +66,8 @@ module.exports = {
                 text: 'Browser tests and migration',
                 link: '/guide/testing',
               },
+              { text: 'MCP server', link: '/guide/mcp' },
+              { text: 'Deploy to Node.js', link: '/guide/deploy-node' },
               {
                 text: 'Plugins',
                 link: '/guide/plugins/official',
@@ -119,6 +121,7 @@ module.exports = {
               text: 'Client API',
               link: '/reference/client',
             },
+            { text: 'MCP reference', link: '/reference/mcp' },
             {
               text: 'Plugin API',
               link: '/reference/plugin-api',
@@ -282,6 +285,8 @@ module.exports = {
               text: 'Browser tests and migration',
               link: '/guide/testing',
             },
+            { text: 'MCP server', link: '/guide/mcp' },
+            { text: 'Deploy to Node.js', link: '/guide/deploy-node' },
           ],
         },
         {

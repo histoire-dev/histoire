@@ -1,6 +1,7 @@
 import type { Vitest } from 'vitest/node'
 import { debugVitestBrowser } from './util/browser-debug.js'
-import { forceKillPlaywrightBrowser } from './util/playwright-kill.js'
+import { terminatePlaywrightBrowser } from './util/playwright-cleanup.js'
+import { getPlaywrightBrowserProcess } from './util/playwright-kill.js'
 
 /**
  * Cleanup options for a Vitest browser-mode run.
@@ -68,31 +69,30 @@ async function closeVitestBrowserProviders(providers: VitestBrowserProviderLike[
     }
     catch (error) {
       debugVitestBrowser('cleanup:provider:close:error', error)
+      throw error
     }
   }))
 }
 
-/**
- * Force-kills the browser processes of a run whose cleanup got stuck.
- * Never throws: a failed kill must not turn cleanup into a run failure.
- * @param browsers Browser handles captured before cleanup started.
- * @returns How many browser processes were actually signalled.
- */
-function hardKillVitestBrowsers(browsers: Iterable<unknown>): number {
-  let killed = 0
+/** Confirmed outcome consumed by controller-owned execution lanes. */
+export interface VitestCleanupOutcome {
+  /** Unconfirmed cleanup cannot safely release a long-lived execution lane. */
+  status: 'graceful' | 'forced' | 'unconfirmed'
+}
 
-  for (const browser of browsers) {
-    try {
-      if (forceKillPlaywrightBrowser(browser)) {
-        killed++
-      }
-    }
-    catch (error) {
-      debugVitestBrowser('cleanup:hard-kill:error', error)
-    }
+/** Observe a cleanup promise under a bound without discarding late rejection. */
+async function waitForCleanup(work: Promise<void>, timeoutMs: number): Promise<boolean> {
+  let timer: ReturnType<typeof setTimeout> | undefined
+  try {
+    return await Promise.race([
+      work.then(() => true),
+      new Promise<false>((resolve) => {
+        timer = setTimeout(() => resolve(false), timeoutMs)
+        timer.unref?.()
+      }),
+    ])
   }
-
-  return killed
+  finally { clearTimeout(timer) }
 }
 
 /**
@@ -110,46 +110,31 @@ function hardKillVitestBrowsers(browsers: Iterable<unknown>): number {
 export async function cleanupVitestBrowserRun(
   vitest: Vitest,
   options: CleanupVitestBrowserRunOptions,
-) {
+): Promise<VitestCleanupOutcome> {
   const providers = getVitestBrowserProviders(vitest as VitestLike)
-  // Capture the browser handles up front: the Playwright provider clears
-  // `provider.browser` at the very start of `close()`, so a stuck close would
-  // leave no reachable handle to kill.
-  const browsers = new Set(providers.map(provider => provider.browser).filter(Boolean))
-
+  // Providers clear this handle as close begins. Capture only owned browsers first.
+  const browsers = new Map(providers.filter(provider => provider.browser).map(provider => [provider.browser, getPlaywrightBrowserProcess(provider.browser)]))
   const cleanupPromise = (async () => {
     await closeVitestBrowserProviders(providers)
     await vitest.close()
   })()
+  cleanupPromise.catch(error => debugVitestBrowser('cleanup:error', options.label, error))
+  if (await waitForCleanup(cleanupPromise, options.timeoutMs)) return { status: 'graceful' }
 
-  cleanupPromise.catch((error) => {
-    debugVitestBrowser('cleanup:error', options.label, error)
-  })
-
-  let timer: ReturnType<typeof setTimeout> | undefined
-
-  try {
-    await new Promise<void>((resolve, reject) => {
-      timer = setTimeout(() => {
-        // Best-effort: a stuck teardown should not fail an already-successful
-        // run. Surface a warning and resolve instead of rejecting.
-        const killed = hardKillVitestBrowsers(browsers)
-        const message = `${options.label} cleanup timed out after ${options.timeoutMs}ms.${
-          killed
-            ? ` Force killed ${killed} browser process(es).`
-            : ' Its browser could not be force killed (no reachable process handle) and may still be running.'
-        }`
-        debugVitestBrowser('cleanup:timeout', message)
-        console.warn(message)
-        resolve()
-      }, options.timeoutMs)
-      timer.unref?.()
-
-      // A real cleanup failure still rejects and propagates to the caller.
-      cleanupPromise.then(resolve, reject)
-    })
+  let confirmed = browsers.size > 0
+  for (const [browser, child] of browsers) {
+    try {
+      await terminatePlaywrightBrowser(browser, Math.min(2500, options.timeoutMs), child)
+    }
+    catch (error) {
+      confirmed = false
+      debugVitestBrowser('cleanup:hard-kill:error', error)
+    }
   }
-  finally {
-    clearTimeout(timer)
-  }
+  // Browser exit alone does not confirm Vite sockets/workers were released.
+  const stopped = confirmed && await waitForCleanup(cleanupPromise, Math.min(2500, options.timeoutMs))
+  console.warn(`${options.label} cleanup timed out after ${options.timeoutMs}ms. ${
+    stopped ? `Force killed ${browsers.size} browser process(es).` : 'Its runner teardown could not be confirmed.'
+  }`)
+  return { status: stopped ? 'forced' : 'unconfirmed' }
 }

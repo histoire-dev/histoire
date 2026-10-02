@@ -1,7 +1,7 @@
 import type { HistoireTestCaseResultInput, HistoireTestRunSummary } from '@histoire/shared'
 import type { TestModule } from 'vitest/node'
 import type { GeneratedSpecFile } from './types.js'
-import { createHistoireTestSummary, serializeTestErrors } from '@histoire/shared'
+import { createHistoireTestSummary, mergeHistoireTestSummaries, serializeTestErrors } from '@histoire/shared'
 import { normalize } from 'pathe'
 import pc from 'picocolors'
 
@@ -9,15 +9,7 @@ import pc from 'picocolors'
  * Creates the summary of a run that executed no test at all.
  */
 export function createEmptyTestSummary(): HistoireTestRunSummary {
-  return {
-    ok: true,
-    total: 0,
-    passed: 0,
-    failed: 0,
-    skipped: 0,
-    errors: [],
-    tests: [],
-  }
+  return mergeHistoireTestSummaries([])
 }
 
 /**
@@ -75,18 +67,5 @@ export function summarizeResults(testModules: TestModule[], specFiles: Generated
     }
   }
 
-  const summary = createEmptyTestSummary()
-
-  for (const bucket of groupedTests.values()) {
-    const partial = createHistoireTestSummary(bucket.storyId, bucket.variantId, bucket.tests)
-    summary.ok = summary.ok && partial.ok
-    summary.total += partial.total
-    summary.passed += partial.passed
-    summary.failed += partial.failed
-    summary.skipped += partial.skipped
-    summary.errors.push(...partial.errors)
-    summary.tests.push(...partial.tests)
-  }
-
-  return summary
+  return mergeHistoireTestSummaries([...groupedTests.values()].map(bucket => createHistoireTestSummary(bucket.storyId, bucket.variantId, bucket.tests)))
 }

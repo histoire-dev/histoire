@@ -2,11 +2,29 @@ import fs from 'node:fs'
 import { createRequire } from 'node:module'
 import os from 'node:os'
 import { join } from 'pathe'
+import { createSourceFile, forEachChild, isAwaitExpression, isCallExpression, isStringLiteralLike, ScriptTarget, SyntaxKind } from 'typescript'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { importResolvedModule } from '../util/import-resolved.js'
 import { listNodeSourceFiles, readNodeSource, readNodeSources } from './utils/node-source.js'
 
 const require = createRequire(import.meta.url)
+
+/** Inspect executable imports, excluding source strings used by child-process proofs. */
+function hasRawAwaitedImport(file: string): boolean {
+  const source = createSourceFile(file, readNodeSource(file), ScriptTarget.Latest, true)
+  let found = false
+  /** Match the existing awaited-import guard without parsing quoted code as execution. */
+  function visit(node: import('typescript').Node) {
+    if (isCallExpression(node) && node.expression.kind === SyntaxKind.ImportKeyword
+      && isAwaitExpression(node.parent) && !isStringLiteralLike(node.arguments[0])
+      && !node.getFullText(source).includes('@vite-ignore')) {
+      found = true
+    }
+    forEachChild(node, visit)
+  }
+  visit(source)
+  return found
+}
 
 describe('importResolvedModule', () => {
   const tempDirs: string[] = []
@@ -44,11 +62,7 @@ describe('importResolvedModule', () => {
     // must always go through importResolvedModule (pathToFileURL). Only
     // explicitly bundler-handled imports (`@vite-ignore`, resolved by Vite in
     // the browser, never by Node's ESM loader) may take a raw value.
-    const offenders = listNodeSourceFiles().filter((file) => {
-      return readNodeSource(file)
-        .split('\n')
-        .some(line => /await import\(\s*(?!['"`])/.test(line) && !line.includes('@vite-ignore'))
-    })
+    const offenders = listNodeSourceFiles().filter(hasRawAwaitedImport)
 
     expect(offenders).toEqual([])
 

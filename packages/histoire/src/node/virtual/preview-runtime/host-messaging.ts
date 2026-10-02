@@ -4,7 +4,13 @@
  * results) goes through it, which is why the target origin is pinned here.
  */
 export function previewHostMessaging() {
-  return `function getHostWindow() {
+  return `// A WindowProxy survives iframe reloads. Give each document its own
+// identity so automation hosts can drop queued readiness from its predecessor.
+const previewDocumentId = globalThis.crypto?.randomUUID?.() ?? \
+  Date.now().toString(36) + '-' + Math.random().toString(36).slice(2)
+window.__HST_PREVIEW_DOCUMENT_ID__ = previewDocumentId
+
+function getHostWindow() {
   // \`window.parent\` is NOT a reliable way to tell whether we are embedded:
   // test runners (Cypress) patch it to point at the sandbox itself while the
   // document boots, to defeat framebusting. Trusting it there drops every
@@ -46,6 +52,7 @@ function postToParent(payload) {
   hostWindow.postMessage({
     __histoire: true,
     ...payload,
+    documentId: previewDocumentId,
   }, window.location.origin)
 }`
 }

@@ -3,7 +3,7 @@ import { STORY_CHANGED_EVENT } from '@histoire/shared'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { createStoryCollector } from '../server/collect.js'
 import { createModuleInvalidators } from '../server/invalidate.js'
-import { notifyStoryChange } from '../stories.js'
+import { notifyStoryChange, notifyStoryListChange } from '../stories.js'
 import * as VirtualFiles from '../virtual/index.js'
 import { flushMicrotasks } from './utils/flush.js'
 
@@ -132,5 +132,112 @@ describe('createStoryCollector', () => {
     await new Promise(resolve => setTimeout(resolve, 150))
 
     expect(server.sent).toHaveLength(sentBefore)
+  })
+
+  it('suppresses progress, invalidation and publication after in-flight stop', async () => {
+    let finish: () => void
+    const execution = new Promise<void>((resolve) => {
+      finish = resolve
+    })
+    const invalidated = vi.fn()
+    const published = vi.fn()
+    const executeStoryFile = vi.fn(() => execution)
+    const collector = createStoryCollector({
+      ctx: createContext([{ fileName: 'pending' }]),
+      server: server as any,
+      collectStories: { clearCache: vi.fn(), executeStoryFile } as any,
+      invalidateModule: invalidated,
+      invalidateModuleSilently: invalidated,
+    })
+    collector.onCollection(published)
+    const first = collector.collect()
+    expect(collector.collect()).toBe(first)
+    await flushMicrotasks()
+    const sentBefore = server.sent.length
+    const stopped = collector.stop()
+    finish()
+    await Promise.all([first, stopped])
+    expect(executeStoryFile).toHaveBeenCalledTimes(1)
+    expect(server.sent).toHaveLength(sentBefore)
+    expect(invalidated).not.toHaveBeenCalled()
+    expect(published).toHaveBeenCalledTimes(1)
+    expect(published.mock.calls[0][0].phase).toBe('started')
+  })
+
+  it('reports completed batches after invalidation and keeps failures observed', async () => {
+    const invalidated = vi.fn()
+    const executeStoryFile = vi.fn().mockRejectedValueOnce(new Error('batch failed')).mockResolvedValue(undefined)
+    const collector = createStoryCollector({
+      ctx: createContext([{ fileName: 'retry' }]),
+      server: server as any,
+      collectStories: { clearCache: vi.fn(), executeStoryFile } as any,
+      invalidateModule: invalidated,
+      invalidateModuleSilently: invalidated,
+    })
+    const phases: string[] = []
+    collector.onCollection((event) => {
+      phases.push(event.phase)
+      if (event.phase === 'completed') expect(invalidated).toHaveBeenCalled()
+    })
+    await expect(collector.collect()).rejects.toThrow('batch failed')
+    await collector.collect()
+    expect(phases).toEqual(['started', 'failed', 'started', 'completed'])
+    await collector.stop()
+  })
+
+  it('awaits completed publication before executing the next changed batch', async () => {
+    const file = { fileName: 'a', path: '/project/a.js', relativePath: 'a.js', virtual: true, moduleCode: '', story: { id: 'a' } }
+    const ctx = createContext([file])
+    let release: () => void
+    let entered: () => void
+    const gate = new Promise<void>((resolve) => {
+      release = resolve
+    })
+    const waiting = new Promise<void>((resolve) => {
+      entered = resolve
+    })
+    const execute = vi.fn(async () => ({ status: 'collected' as const }))
+    const collector = createStoryCollector({ ctx, server: server as any, collectStories: { clearCache: vi.fn(), executeStoryFile: execute }, invalidateModule: () => {}, invalidateModuleSilently: () => {} })
+    await collector.collect()
+    let completed = 0
+    collector.onCollection(async (event) => {
+      if (event.phase !== 'completed') return
+      completed++
+      expect(event.outcomes.get(file.path).status).toBe('collected')
+      if (completed === 1) {
+        entered()
+        await gate
+      }
+    })
+    notifyStoryChange(file as any)
+    await waiting
+    notifyStoryChange(file as any)
+    expect(execute).toHaveBeenCalledTimes(2)
+    release()
+    await collector.collect()
+    expect(execute).toHaveBeenCalledTimes(3)
+    expect(completed).toBe(2)
+    await collector.stop()
+  })
+
+  it('publishes unlinked membership after invalidation and never executes removed files', async () => {
+    const file = { fileName: 'a', path: '/project/a.js', relativePath: 'a.js', story: { id: 'a' } }
+    const ctx = createContext([file])
+    const execute = vi.fn(async () => ({ status: 'collected' as const }))
+    const invalidated: string[] = []
+    const collector = createStoryCollector({ ctx, server: server as any, collectStories: { clearCache: vi.fn(), executeStoryFile: execute }, invalidateModule: id => invalidated.push(id), invalidateModuleSilently: id => invalidated.push(id) })
+    await collector.collect()
+    const events: any[] = []
+    collector.onCollection((event) => {
+      if (event.phase === 'completed') events.push(event)
+    })
+    ctx.storyFiles.length = 0
+    notifyStoryListChange()
+    await vi.waitFor(() => expect(events).toHaveLength(1))
+    expect(events[0].files).toEqual([])
+    expect(events[0].outcomes.size).toBe(0)
+    expect(invalidated).toContain(VirtualFiles.RESOLVED_PREVIEW_RUNTIME_ID)
+    expect(execute).toHaveBeenCalledTimes(1)
+    await collector.stop()
   })
 })

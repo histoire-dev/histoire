@@ -17,6 +17,7 @@ export function getDefaultConfig(): HistoireConfig {
       tailwindTokens(),
     ],
     outDir: '.histoire/dist',
+    mcp: true,
     storyMatch: [
       '**/*.story.vue',
       '**/*.story.svelte',
@@ -112,6 +113,8 @@ export function getDefaultConfig(): HistoireConfig {
     sandboxDarkClass: 'dark',
     routerMode: 'history',
     build: {
+      target: 'static',
+      node: { includeSource: true },
       excludeFromVendorsChunk: [],
     },
     test: {
