@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import type { WorkbenchProps } from '../../standalone/workbench-types.js'
+import type { HistoireTarget } from '@histoire/protocol'
 import type { HistoireSession } from '@histoire/sdk'
-import { getSandboxRelativeUrl } from '@histoire/protocol'
+import type { WorkbenchProps } from '../../standalone/workbench-types.js'
+import { getHistoireTargetKey, getSandboxRelativeUrl } from '@histoire/protocol'
 import { HistoireProvider } from '@histoire/vue'
 import { computed, defineAsyncComponent, ref, shallowRef } from 'vue'
 import { useWorkbenchBuildInfo } from '../../standalone/build-info.js'
@@ -48,17 +49,25 @@ const cols = computed(() => typeof route.value.query.cols === 'string' ? route.v
 function activatePane(pane: 'stories' | 'search' | 'tests' | 'comments' | 'mcp'): void {
   void workbench.activatePane(pane).catch(error => emit('error', error))
 }
+
+/** Fit the exact mounted frame; Matrix has multiple cells for one variant. */
+function fitVariant(target: HistoireTarget): void {
+  if (arrange.value === 'matrix' || target.variantId === null) return
+  const current = canvas.value
+  const frame = current?.registry.getFrame(getHistoireTargetKey(target))
+  if (frame) current.canvas.zoomToFrame(frame.fitBounds ?? frame.rect)
+}
+
 /** Bind inspector to retained preview session only for canvas replica promotion. */
 function setReplicaSession(session: HistoireSession | undefined): void {
   replicaSession.value = session
 }
-
 </script>
 
 <template>
   <ShellLayout :home-href="navigation.router.resolve({ name: 'home' }).href" :home-active="route.name === 'home'" :logo-href="histoireConfig.theme.logoHref" :logos="customLogos" settings-available :settings-active="route.name === 'settings'" :hide-theme="histoireConfig.theme.hideColorSchemeSwitch" :show-inspector="inspector" :badges="badges" :data-density="settings.state.density" @home="workbench.navigate('home')" @pane="activatePane" @settings="workbench.navigate('settings')" @error="emit('error', $event)">
     <template #stories>
-      <StoriesPanel :folders="folders" @select="shell.closePanelAfterSelection" @error="emit('error', $event)" />
+      <StoriesPanel :folders="folders" @select="shell.closePanelAfterSelection" @fit="fitVariant" @error="emit('error', $event)" />
     </template>
     <template #search>
       <SearchPanel ref="search" :commands="commands" @select="workbench.searchSelected" @isolated="workbench.openIsolated" @highlight="highlighted = $event" @query="searchQuery = $event" @next-match="workbench.nextMatch" @close="workbench.closeSearch" @error="emit('error', $event)" />

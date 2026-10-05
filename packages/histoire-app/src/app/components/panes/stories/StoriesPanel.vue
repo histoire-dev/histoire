@@ -18,6 +18,8 @@ const props = defineProps<{
 const emit = defineEmits<{
   /** Canonical successful SDK selection handed to standalone router. */
   select: [target: HistoireTarget]
+  /** Exact variant whose visible canvas frame should fill available space. */
+  fit: [target: HistoireTarget]
   /** Observed activation error handed to provider. */
   error: [error: unknown]
 }>()
@@ -124,6 +126,12 @@ function toggle(row: StoryTreeRow): void {
   if (row.kind === 'story' && row.story?.id === snapshot.value.selection?.storyId) collapsedStory.value = row.expanded ? row.story.id : ''
 }
 
+/** Variant rows retain an exact frame target; stories and folders have no single frame. */
+function fit(row: StoryTreeRow): void {
+  if (row.kind !== 'variant' || !row.target || !('variantId' in row.target) || row.target.variantId === null) return
+  emit('fit', row.target)
+}
+
 /** Roving focus waits for folder and current-story children to enter DOM. */
 async function focus(key: string): Promise<void> {
   focused.value = key
@@ -215,6 +223,7 @@ function icon(row: StoryTreeRow): string {
             @focus="focused = row.key"
             @keydown="onKeydown($event, row)"
             @click="row.kind === 'folder' ? toggle(row) : select(row)"
+            @dblclick="fit(row)"
           >
             <WorkbenchIcon v-if="row.expanded !== undefined" :name="row.expanded ? 'chevron-down' : 'chevron-right'" class="stories-chevron" />
             <span v-else class="stories-chevron" />

@@ -1,3 +1,4 @@
+import type { HistoireTarget } from '@histoire/protocol'
 import { createHistoireSessionWithAdapters } from '@histoire/sdk/internal'
 import { mount } from '@vue/test-utils'
 import { afterEach, describe, expect, it, vi } from 'vitest'
@@ -14,7 +15,7 @@ vi.mock('virtual:$histoire-config', () => ({ config: { theme: { title: 'Stories'
 afterEach(() => vi.restoreAllMocks())
 
 /** Real catalog/session and production tree own navigation; only layout is supplied. */
-async function tree(density: 'comfortable' | 'compact', options: { count?: number, variants?: { id: string, title: string }[], primary?: boolean, prepare?: (fixture: ReturnType<typeof sourceFixture>) => void, onError?: (error: unknown) => void } = {}) {
+async function tree(density: 'comfortable' | 'compact', options: { count?: number, variants?: { id: string, title: string }[], primary?: boolean, prepare?: (fixture: ReturnType<typeof sourceFixture>) => void, onError?: (error: unknown) => void, onFit?: (target: HistoireTarget) => void } = {}) {
   const fixture = sourceFixture()
   options.prepare?.(fixture)
   const prototype = fixture.descriptor.catalog.stories[0]
@@ -30,7 +31,7 @@ async function tree(density: 'comfortable' | 'compact', options: { count?: numbe
   const Owner = defineComponent({
     setup() {
       provideUiSettingsStore(settings)
-      return () => h(HistoireProvider, { session }, { default: () => h(StoriesPanel, { folders, onError: options.onError }) })
+      return () => h(HistoireProvider, { session }, { default: () => h(StoriesPanel, { folders, onError: options.onError, onFit: options.onFit }) })
     },
   })
   const wrapper = mount(Owner, { attachTo: document.body })
@@ -48,6 +49,29 @@ async function tree(density: 'comfortable' | 'compact', options: { count?: numbe
 }
 
 describe('production story tree keyboard focus', () => {
+  it('emits exact variant target on double-click without changing ordinary selection', async () => {
+    const fit = vi.fn()
+    const owner = await tree('comfortable', {
+      count: 1,
+      variants: [{ id: 'default', title: 'Default' }, { id: 'other', title: 'Other' }],
+      onFit: fit,
+    })
+    try {
+      await vi.waitFor(() => expect(owner.wrapper.text()).toContain('Other'))
+      const story = owner.wrapper.findAll('[role=treeitem]').find(row => row.text().includes('Story 0'))!
+      const other = owner.wrapper.findAll('[role=treeitem]').find(row => row.text() === 'Other')!
+      await other.trigger('click')
+      await vi.waitFor(() => expect(owner.session.getSnapshot().selection).toEqual({ storyId: 'story-0', variantId: 'other' }))
+      expect(fit).not.toHaveBeenCalled()
+      await other.trigger('dblclick')
+      expect(fit).toHaveBeenCalledOnce()
+      expect(fit).toHaveBeenCalledWith({ storyId: 'story-0', variantId: 'other' })
+      await story.trigger('dblclick')
+      expect(fit).toHaveBeenCalledOnce()
+    }
+    finally { await owner.close() }
+  })
+
   it.each(['comfortable', 'compact'] as const)('keeps %s End/Home focus when native scroll events arrive later', async (density) => {
     const viewport = virtualViewport(true)
     const owner = await tree(density)

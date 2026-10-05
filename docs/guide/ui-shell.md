@@ -8,6 +8,8 @@ On containers at most 640px wide, the rail moves to the bottom and panels open o
 
 Select (V), Pan (H), and Measure (M) share the canvas toolbar's tool switch; one tool stays active at a time. Pan, Space+drag, or middle mouse pans the canvas. Space+drag and middle mouse temporarily pan while keeping the selected tool. Its shortcut hint stays inside the workspace beside the inspector. With Measure selected, hover a selected preview to inspect its size and spacing. Click to lock that measurement; click again to resume hovering. Changing tool, preview, or runtime clears the lock. Enter or Space also toggles a displayed measurement.
 
+Canvas zoom is saved locally for Grid, List, and Props matrix independently. **Fit** recalculates for current arrangement. With **Sync zoom across stories** disabled, selecting another story resets only active arrangement to Fit.
+
 Static builds include Home, Stories, Search, appearance controls, panel collapse, and Settings. Dev-only destinations are omitted. Opening a static book with an old dev pane preference restores Stories.
 
 Press **Ctrl/⌘ Shift D** to switch light/dark appearance. **Ctrl/⌘ K** retains the story and command palette. The existing `theme.hideColorSchemeSwitch` option controls the appearance switch.

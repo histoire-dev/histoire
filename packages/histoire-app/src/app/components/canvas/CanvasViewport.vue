@@ -14,13 +14,13 @@ import CanvasFrame from './CanvasFrame.vue'
 import CanvasHeader from './CanvasHeader.vue'
 import CanvasStatus from './CanvasStatus.vue'
 import { canvasRectsOverlap } from './canvas-overlay-occlusion.js'
-import { createCanvasReplicaPromotion } from './frame-promotion.js'
 import CollectErrorCard from './CollectErrorCard.vue'
 import { useCanvasFrameAdmission } from './frame-admission.js'
 import { createCanvasArrangement } from './frame-arrangement.js'
 import { watchCanvasFrameFocus } from './frame-focus.js'
 import { bindCanvasFrameInteractions } from './frame-interactions.js'
 import { canvasFrameBounds, layoutCanvasFrames } from './frame-layout.js'
+import { createCanvasReplicaPromotion } from './frame-promotion.js'
 import { createCanvasFrameState } from './frame-state.js'
 import FrameGrid from './FrameGrid.vue'
 import FrameList from './FrameList.vue'
@@ -53,11 +53,11 @@ const toolbar = ref<HTMLElement>()
 const header = ref<HTMLElement>()
 const panHint = ref<InstanceType<typeof CanvasStatus>>()
 const primaryContainer = ref<HTMLElement>()
-const primaryVisible = ref(true)
 const primary = ref<{ unmount: () => Promise<void> }>()
+const primaryVisible = ref(true)
 const primaryKey = ref(0)
-const promotedFrameId = ref<string>()
 const primaryError = shallowRef<unknown>()
+const promotedFrameId = ref<string>()
 const cachedStory = shallowRef<HistoireCatalogStory>()
 const cachedVariantId = ref<string | null>(null)
 const currentStory = computed(() => snapshot.value.catalog.stories.find(story => story.id === snapshot.value.selection?.storyId))
@@ -70,10 +70,7 @@ const settings = useUiSettingsStore()
 const renderedArrange = createCanvasArrangement(() => props.arrange, useMatrixStore())
 provideCanvas(canvas, registry, frameState)
 const space = useSpacePan({ getTool: () => canvas.tool, getRoot: () => viewport.value })
-const pointer = usePointerPan({ getTool: () => canvas.tool, getSpace: () => space.held.value, getOffset: () => canvas.panOffset, setOffset: (value) => {
-  canvas.panOffset = value
-  canvas.zoom = canvas.effectiveZoom
-}, onActive: value => canvas.panning = value })
+const pointer = usePointerPan({ getTool: () => canvas.tool, getSpace: () => space.held.value, getOffset: () => canvas.panOffset, setOffset: canvas.setPanOffset, onActive: value => canvas.panning = value })
 provideCanvasPointerPan(pointer)
 const panning = computed(() => canvas.tool === 'pan' || space.held.value || canvas.panning)
 const size = computed(() => {
@@ -87,10 +84,6 @@ function layoutFrames(zoom = canvas.effectiveZoom) {
 const frames = computed(() => layoutFrames())
 const selectedFrame = computed(() => frames.value.find(frame => frame.variantId === (snapshot.value.selection?.variantId ?? (diagnostics.value.length ? cachedVariantId.value : null))))
 const primarySearch = computed(() => getSearchFrameState(selectedFrame.value?.id, Boolean(props.searchActive && renderedArrange.value !== 'matrix'), props.highlightedTargets))
-/** List labels use screen-space width, so resolve selected bounds at each fit candidate zoom. */
-function fitSelectedFrame(frame: CanvasFrameLayout) {
-  canvas.zoomToFrame(zoom => layoutFrames(zoom).find(candidate => candidate.id === frame.id) ?? frame)
-}
 const live = useCanvasFrameAdmission({
   frames: () => frames.value,
   viewport: () => {
@@ -132,8 +125,21 @@ const { insets: contentInsets, headerBounds, measure } = useCanvasGeometry({
     // Selection can arrive before the host has measurable dimensions; reveal it once ready.
     if (initialFocusPending && selectedFrame.value && size.width > props.inspectorWidth && size.height > (insets.topInset ?? 0) + (insets.bottomInset ?? 0)) {
       canvas.focusFrame(selectedFrame.value)
-      if (renderedArrange.value === 'list') fitSelectedFrame(selectedFrame.value)
       initialFocusPending = false
+    }
+  },
+})
+const headerObscured = ref(false)
+
+/** Give mounted iframe content visual priority over fixed, non-interactive header metadata. */
+function updateHeaderOcclusion(): void {
+  const headerRect = header.value?.getBoundingClientRect()
+  headerObscured.value = Boolean(headerRect && [...registry.frames.values()].some((frame) => {
+    const iframe = frame.iframe
+    return iframe?.isConnected && canvasRectsOverlap(headerRect, iframe.getBoundingClientRect())
+  }))
+}
+
 /** Clear canonical document registration without removing a retained replica entry. */
 function clearPrimaryRegistration() {
   const previous = registry.getFrame(primaryRegistration)
@@ -146,16 +152,27 @@ function clearPrimaryRegistration() {
   primaryIframe = undefined
 }
 
-    }
-  },
+/** Register selected physical document; src identity changes on runtime navigation. */
+function registerPrimary() {
   if (!primaryVisible.value || promotedFrameId.value) {
     clearPrimaryRegistration()
     return
   }
-})
-const headerObscured = ref(false)
+  const frame = selectedFrame.value
+  const iframe = primaryContainer.value?.querySelector('iframe')
+  if (primaryRegistration && (primaryRegistration !== frame?.id || primaryIframe !== iframe)) clearPrimaryRegistration()
+  const entry = frame && registry.getFrame(frame.id)
+  if (!entry || !iframe) return
   primaryRegistration = frame.id
   primaryIframe = iframe
+  iframe.setAttribute('data-test-id', 'preview-iframe')
+  entry.iframe = iframe
+  entry.documentId = snapshot.value.runtime.status === 'ready' ? new URL(iframe.src).searchParams.get('documentId') : null
+  entry.session = diagnostics.value.length ? undefined : session
+  const override = canvas.frameBackgrounds[frame.id]
+  if (override && snapshot.value.runtime.status === 'ready') registry.postToFrame(frame.id, { type: PREVIEW_SETTINGS_SYNC, settings: { ...snapshot.value.settings, ...override } })
+}
+
 /** Keep a ready passive document selected while canonical session owns only route state. */
 const promotion = createCanvasReplicaPromotion({
   async detachPrimary() {
@@ -175,32 +192,6 @@ const promotion = createCanvasReplicaPromotion({
   current: () => session.getSnapshot().selection,
   error: error => emit('error', error),
 })
-
-
-/** Give mounted iframe content visual priority over fixed, non-interactive header metadata. */
-function updateHeaderOcclusion(): void {
-  const headerRect = header.value?.getBoundingClientRect()
-  headerObscured.value = Boolean(headerRect && [...registry.frames.values()].some((frame) => {
-    const iframe = frame.iframe
-    return iframe?.isConnected && canvasRectsOverlap(headerRect, iframe.getBoundingClientRect())
-  }))
-}
-
-
-/** Register selected physical document; src identity changes on runtime navigation. */
-function registerPrimary() {
-  const frame = selectedFrame.value
-  const iframe = primaryContainer.value?.querySelector('iframe')
-  if (primaryRegistration && (primaryRegistration !== frame?.id || primaryIframe !== iframe)) clearPrimaryRegistration()
-  const entry = frame && registry.getFrame(frame.id)
-  if (!entry || !iframe) return
-  iframe.setAttribute('data-test-id', 'preview-iframe')
-  entry.iframe = iframe
-  entry.documentId = snapshot.value.runtime.status === 'ready' ? new URL(iframe.src).searchParams.get('documentId') : null
-  entry.session = diagnostics.value.length ? undefined : session
-  const override = canvas.frameBackgrounds[frame.id]
-  if (override && snapshot.value.runtime.status === 'ready') registry.postToFrame(frame.id, { type: PREVIEW_SETTINGS_SYNC, settings: { ...snapshot.value.settings, ...override } })
-}
 
 /** Wheel pans normally; modifier zoom remains anchored at local cursor position. */
 function onWheel(event: WheelEvent) {
@@ -230,10 +221,6 @@ function promoteVariant(frameId: string) {
     selectVariant(entry.variantId)
     return
   }
-// Source collection errors and Matrix entry retire promotion; primary teardown does not.
-watch(() => [snapshot.value.selection?.storyId, snapshot.value.selection?.variantId, diagnostics.value.length > 0, renderedArrange.value] as const, ([storyId, variantId, hasDiagnostics, arrange]) => {
-  promotion.synchronize(storyId && variantId ? { storyId, variantId } : null, hasDiagnostics || arrange === 'matrix')
-}, { flush: 'sync' })
   void promotion.promote({ id: entry.id, storyId: entry.storyId, variantId: entry.variantId, session: replica })
 }
 
@@ -241,7 +228,6 @@ watch(() => [snapshot.value.selection?.storyId, snapshot.value.selection?.varian
 function pointerDown(event: PointerEvent) {
   const target = event.target as Element | null
   if (!target?.closest('button, a[href], input, textarea, select, summary, [contenteditable], [role="button"]')) viewport.value?.focus({ preventScroll: true })
-  promotion.close()
   pointer.onPointerDown(event)
 }
 
@@ -290,15 +276,21 @@ watch(() => currentStory.value?.id, (value, previous) => {
 watch(() => snapshot.value.selection?.variantId, (value) => {
   if (value) cachedVariantId.value = value
 }, { immediate: true })
+// Matrix may temporarily render as Grid while its axes are unavailable; zoom follows actual canvas content.
+watch(renderedArrange, arrangement => canvas.setArrangement(arrangement), { flush: 'sync', immediate: true })
 watch([frames, () => props.inspectorWidth, renderedArrange, story, panning], measure, { flush: 'post' })
 watch([
   () => [canvas.effectiveZoom, canvas.panOffset.x, canvas.panOffset.y],
   () => [headerBounds.value?.top, headerBounds.value?.bottom],
   () => [...registry.frames.values()].map(frame => frame.iframe),
 ], updateHeaderOcclusion, { flush: 'post', immediate: true })
-watchCanvasFrameFocus({ getFrame: () => selectedFrame.value, getArrange: () => renderedArrange.value, focusFrame: canvas.focusFrame, fitFrame: fitSelectedFrame, registerPrimary })
+watchCanvasFrameFocus({ getFrame: () => selectedFrame.value, getArrange: () => renderedArrange.value, focusFrame: canvas.focusFrame, registerPrimary })
 watch(() => [snapshot.value.runtime.status, snapshot.value.runtime.runtimeId, canvas.frameBackgrounds[selectedFrame.value?.id ?? ''], primaryVisible.value, promotedFrameId.value], registerPrimary, { deep: true, flush: 'post' })
 watch(() => registry.frames.get(selectedFrame.value?.id ?? ''), registerPrimary, { flush: 'post' })
+// Source collection errors and Matrix entry retire promotion; primary teardown does not.
+watch(() => [snapshot.value.selection?.storyId, snapshot.value.selection?.variantId, diagnostics.value.length > 0, renderedArrange.value] as const, ([storyId, variantId, hasDiagnostics, arrange]) => {
+  promotion.synchronize(storyId && variantId ? { storyId, variantId } : null, hasDiagnostics || arrange === 'matrix')
+}, { flush: 'sync' })
 onMounted(() => {
   if (viewport.value) stopInteractions = bindCanvasFrameInteractions(viewport.value, pointer, space, onWheel)
   mutation = new MutationObserver(registerPrimary)
@@ -306,6 +298,7 @@ onMounted(() => {
   measure()
 })
 onBeforeUnmount(() => {
+  promotion.close()
   mutation?.disconnect()
   stopInteractions()
   frameState.dispose()

@@ -85,6 +85,30 @@ describe('canvas overlay geometry', () => {
     assertFrames('.histoire-canvas-frame.is-selected')
   })
 
+  it('fits selected Story variant after double-clicking its tree row', () => {
+    const target = JSON.stringify(['src-components-codegen-story-vue', 'props'])
+    visitCanvas(codegen, 0.67)
+    cy.contains('[data-test-id="story-list-variant"]', /^props$/).dblclick()
+    cy.location('search').should('include', 'variantId=props')
+    cy.window().should((window) => {
+      expect(storedCanvasZoom(window), 'double-click stores fitted numeric zoom').to.be.a('number')
+    })
+    cy.get(canvas).should(($canvas) => {
+      const root = $canvas[0]
+      const header = root.querySelector('.histoire-canvas-header').getBoundingClientRect()
+      const footer = root.querySelector('.histoire-canvas-info')?.getBoundingClientRect()
+      const viewport = root.getBoundingClientRect()
+      const inspector = root.ownerDocument.querySelector('aside.histoire-inspector-frame')?.getBoundingClientRect()
+      const frame = [...root.querySelectorAll('[data-frame-id]')].find(element => element.getAttribute('data-frame-id') === target)
+      expect(frame, 'target frame').to.not.equal(undefined)
+      const rect = frame.getBoundingClientRect()
+      expect(rect.left, 'target frame starts inside canvas').to.be.at.least(viewport.left - 1)
+      expect(rect.top, 'target frame starts below header').to.be.at.least(header.bottom - 1)
+      expect(rect.right, 'target frame clears inspector').to.be.at.most((inspector ? inspector.left - 12 : viewport.right) + 1)
+      expect(rect.bottom, 'target frame clears footer').to.be.at.most((footer?.top ?? viewport.bottom) + 1)
+    })
+  })
+
   it('fits selected variant once when List opens and preserves zoom for later selection', () => {
     let initialZoom
     visitCanvas(`${matrix.replace('&arrange=matrix', '')}&arrange=list`)

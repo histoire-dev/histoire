@@ -22,7 +22,7 @@ All new keys use the `_histoire-ui-` prefix and JSON values. Each store owns its
 | Key | Shape | Owner |
 | --- | --- | --- |
 | `_histoire-ui-shell` | `{ pane: 'home'\|'stories'\|'search'\|'tests'\|'comments'\|'mcp', panelOpen: boolean, inspectorOpen: boolean }` | 02 |
-| `_histoire-ui-canvas` | `{ zoom: number\|'fit', tool: 'select'\|'pan', measure: boolean, frameBackground: string }` | 04, 05 |
+| `_histoire-ui-canvas` | `{ zoomByArrange: { grid: number\|'fit', list: number\|'fit', matrix: number\|'fit' }, tool: 'select'\|'pan'\|'measure', frameBackground: string }` | 04, 05 |
 | `_histoire-ui-matrix/<storyId>` | `{ rows: string, cols: string, rowValues?: unknown[], colValues?: unknown[], base: Record<string, unknown> }` | 07 |
 | `_histoire-ui-settings` | `{ density: 'comfortable'\|'compact', syncZoom: boolean, watchTests: boolean }` | 12 |
 | `_histoire-ui-viewports` | `{ label: string, value: ResponsivePreset\|null, localId?: number }[]` | 12 |

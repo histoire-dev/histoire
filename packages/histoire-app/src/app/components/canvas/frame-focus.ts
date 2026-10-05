@@ -9,8 +9,6 @@ export interface CanvasFrameFocusOptions {
   getArrange: () => 'grid' | 'list' | 'matrix'
   /** Bring selected frame into view without changing selected variant. */
   focusFrame: (frame: CanvasFrameLayout) => void
-  /** Fit selected frame once when List arrangement becomes active. */
-  fitFrame: (frame: CanvasFrameLayout) => void
   /** Refresh physical primary document registration after identity changes. */
   registerPrimary: () => void
 }
@@ -18,12 +16,9 @@ export interface CanvasFrameFocusOptions {
 /** Bind focus to canonical selection while matrix retains its own passive-cell selection. */
 export function watchCanvasFrameFocus(options: CanvasFrameFocusOptions) {
   // Scalar sources keep zoom-created frame objects from retriggering selection focus.
-  return watch([() => options.getFrame()?.id, options.getArrange], ([, arrange], [, previousArrange]) => {
+  return watch([() => options.getFrame()?.id, options.getArrange], ([, arrange]) => {
     const frame = options.getFrame()
-    if (frame && arrange !== 'matrix') {
-      options.focusFrame(frame)
-      if (arrange === 'list' && previousArrange !== 'list') options.fitFrame(frame)
-    }
+    if (frame && arrange !== 'matrix') options.focusFrame(frame)
     options.registerPrimary()
   }, { flush: 'post' })
 }
