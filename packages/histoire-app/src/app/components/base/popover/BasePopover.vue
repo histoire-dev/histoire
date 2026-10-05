@@ -131,7 +131,7 @@ defineExpose({ panel, close, place })
 <style scoped>
 .histoire-base-popover { position: fixed; box-sizing: border-box; max-width: calc(100vw - 16px);  }
 .histoire-base-popover :deep(.popover-title) { margin: 8px 8px 10px; color: var(--histoire-muted); font-size: 11px; font-weight: 700; }
-.histoire-base-popover :deep(.popover-row) { display: flex; width: 100%; min-height: 32px; gap: 9px; align-items: center; padding: 6px 8px; text-align: start; }
+.histoire-base-popover :deep(.popover-row) { display: flex; width: 100%; min-height: 32px; gap: 9px; align-items: center; justify-content: flex-start; padding: 6px 8px; text-align: start; }
 .histoire-base-popover :deep(.popover-meta) { margin-inline-start: auto; color: var(--histoire-muted); font-family: var(--histoire-font-mono); font-size: 11px; }
 .histoire-base-popover :deep(.popover-divider) { height: 1px; margin: 5px 0; background: var(--histoire-border); }
 .histoire-base-popover :deep(.popover-error) { margin: 5px 8px; color: var(--histoire-danger); font-size: 11px; }
