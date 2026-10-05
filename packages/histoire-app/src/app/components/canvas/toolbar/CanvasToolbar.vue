@@ -67,7 +67,7 @@ onBeforeUnmount(() => disposers.forEach(dispose => dispose()))
       <SearchMatchStepper :count="matchCount" :position="matchPosition ?? 0" @previous="emit('previousMatch')" @next="emit('nextMatch')" />
     </BaseOverflowToolbarItem>
     <BaseOverflowToolbarItem id="tools" :separator-before="Boolean(matchCount)">
-      <ToolSwitch />
+      <ToolSwitch :class="{ 'histoire-tool-switch--leading': !matchCount }" />
     </BaseOverflowToolbarItem>
     <BaseOverflowToolbarItem id="arrange" separator-before>
       <ArrangeSwitch :arrange="arrange" :matrix-available="matrixAvailable" @arrange="emit('arrange', $event)" /><slot name="matrix" v-bind="{ open, setOpen }" />
@@ -98,4 +98,6 @@ onBeforeUnmount(() => disposers.forEach(dispose => dispose()))
 
 <style scoped>
 .histoire-canvas-toolbar { height: 36px; padding: 3px; border: 1px solid var(--histoire-border); border-radius: 12px; background: var(--histoire-surface); box-shadow: 0 2px 5px rgb(0 0 0 / .07); pointer-events: auto; }
+/* ToolSwitch retains its group inset while consuming duplicate toolbar inset only when leading inline. */
+.histoire-canvas-toolbar :deep(.overflow-toolbar-item[data-toolbar-presentation="inline"] .histoire-tool-switch--leading) { margin-inline-start: -3px; }
 </style>
