@@ -15,6 +15,60 @@ describe('canvas frame admission', () => {
     expect([...moved]).not.toEqual([...live])
   })
 
+  it('admits variants by descending visible area instead of distance to viewport center', () => {
+    const frames = [
+      { id: 'near', storyId: 'story', variantId: 'near', x: 45, y: 45, width: 10, height: 10 },
+      { id: 'wide', storyId: 'story', variantId: 'wide', x: 0, y: 0, width: 100, height: 100 },
+    ]
+    const live = liveCanvasFrames(frames, { x: 0, y: 0, width: 100, height: 100 }, 1, null, 0)
+
+    expect([...live]).toEqual(['wide'])
+  })
+
+  it('keeps selected variants ahead of larger visible areas', () => {
+    const frames = [
+      { id: 'selected', storyId: 'story', variantId: 'selected', x: 45, y: 45, width: 10, height: 10 },
+      { id: 'wide', storyId: 'story', variantId: 'wide', x: 0, y: 0, width: 100, height: 100 },
+    ]
+    const live = liveCanvasFrames(frames, { x: 0, y: 0, width: 100, height: 100 }, 1, 'selected', 0)
+
+    expect([...live]).toEqual(['selected'])
+  })
+
+  it('uses margin-only variants only after visible variants, in layout order', () => {
+    const frames = [
+      { id: 'visible', storyId: 'story', variantId: 'visible', x: 0, y: 0, width: 40, height: 40 },
+      { id: 'prefetch-first', storyId: 'story', variantId: 'prefetch-first', x: 101, y: 45, width: 10, height: 10 },
+      { id: 'prefetch-second', storyId: 'story', variantId: 'prefetch-second', x: 110, y: 45, width: 10, height: 10 },
+    ]
+    const live = liveCanvasFrames(frames, { x: 0, y: 0, width: 100, height: 100 }, 3, null, 20)
+
+    expect([...live]).toEqual(['visible', 'prefetch-first', 'prefetch-second'])
+  })
+
+  it('updates admission after panning to keep variants with larger visible areas', () => {
+    const frames = [
+      { id: 'left', storyId: 'story', variantId: 'left', x: 0, y: 0, width: 100, height: 100 },
+      { id: 'middle', storyId: 'story', variantId: 'middle', x: 100, y: 0, width: 100, height: 100 },
+      { id: 'right', storyId: 'story', variantId: 'right', x: 200, y: 0, width: 100, height: 100 },
+    ]
+
+    expect([...liveCanvasFrames(frames, { x: 0, y: 0, width: 180, height: 100 }, 2, null, 0)]).toEqual(['left', 'middle'])
+    expect([...liveCanvasFrames(frames, { x: 120, y: 0, width: 180, height: 100 }, 2, null, 0)]).toEqual(['right', 'middle'])
+  })
+
+  it('normalizes fractional and non-finite budgets before admitting frames', () => {
+    const frames = [
+      { id: 'first', storyId: 'story', variantId: 'first', x: 0, y: 0, width: 100, height: 100 },
+      { id: 'second', storyId: 'story', variantId: 'second', x: 0, y: 0, width: 80, height: 80 },
+      { id: 'third', storyId: 'story', variantId: 'third', x: 0, y: 0, width: 60, height: 60 },
+    ]
+    const viewport = { x: 0, y: 0, width: 100, height: 100 }
+
+    expect([...liveCanvasFrames(frames, viewport, 2.9, null, 0)]).toEqual(['first', 'second'])
+    expect([...liveCanvasFrames(frames, viewport, Number.NaN, null, 0)]).toEqual(['first'])
+  })
+
   it('includes preview labels in fit bounds and preserves variant order', () => {
     const frames = layoutCanvasFrames('story', ['a', 'b', 'c', 'd'], { width: 200, height: 180 }, 'grid')
     expect(frames.map(frame => frame.variantId)).toEqual(['a', 'b', 'c', 'd'])

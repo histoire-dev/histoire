@@ -36,14 +36,23 @@ export function canvasFrameBounds(frames: readonly CanvasRect[]): CanvasRect {
   return { x, y, width: Math.max(...frames.map(frame => frame.x + frame.width)) - x, height: Math.max(...frames.map(frame => frame.y + frame.height)) - y }
 }
 
-/** Admit selected frame first, then nearby frames, never above live budget. */
+/** Calculate a frame's rendered area inside the actual viewport. */
+function visibleArea(frame: CanvasRect, viewport: CanvasRect): number {
+  const width = Math.max(0, Math.min(frame.x + frame.width, viewport.x + viewport.width) - Math.max(frame.x, viewport.x))
+  const height = Math.max(0, Math.min(frame.y + frame.height, viewport.y + viewport.height) - Math.max(frame.y, viewport.y))
+  return width * height
+}
+
+/** Admit selected frame first, then largest visible frames, never above live budget. */
 export function liveCanvasFrames(frames: readonly CanvasFrameLayout[], viewport: CanvasRect, budget: number, selected: string | null, margin = 160): Set<string> {
   const limit = Math.max(1, Math.floor(Number.isFinite(budget) ? budget : 1))
   const selectedFrame = frames.find(frame => frame.id === selected)
-  const intersects = (frame: CanvasRect) => frame.x + frame.width >= viewport.x - margin && frame.x <= viewport.x + viewport.width + margin
+  const intersectsMargin = (frame: CanvasRect) => frame.x + frame.width >= viewport.x - margin && frame.x <= viewport.x + viewport.width + margin
     && frame.y + frame.height >= viewport.y - margin && frame.y <= viewport.y + viewport.height + margin
-  const visible = frames.filter(frame => frame !== selectedFrame && intersects(frame))
-  const center = { x: viewport.x + viewport.width / 2, y: viewport.y + viewport.height / 2 }
-  visible.sort((a, b) => Math.hypot(a.x - center.x, a.y - center.y) - Math.hypot(b.x - center.x, b.y - center.y))
-  return new Set([...(selectedFrame ? [selectedFrame] : []), ...visible].slice(0, limit).map(frame => frame.id))
+  const candidates = frames
+    .map((frame, index) => ({ frame, index, area: visibleArea(frame, viewport) }))
+    .filter(candidate => candidate.frame !== selectedFrame && intersectsMargin(candidate.frame))
+    // Layout order makes ties deterministic and lets margin-only frames prefetch predictably.
+    .sort((first, second) => second.area - first.area || first.index - second.index)
+  return new Set([...(selectedFrame ? [selectedFrame] : []), ...candidates.map(candidate => candidate.frame)].slice(0, limit).map(frame => frame.id))
 }
