@@ -1,6 +1,7 @@
 import type { HistoireBridgePublication, HistoireControlsOverlayMessage, HistoireControlsOverlayResult } from '@histoire/protocol'
 import type { HistoireMount } from '@histoire/sdk'
 import type { HistoireStatePresetsHandle } from './StatePresets.js'
+import { Icon } from '@iconify/vue'
 import { HstButton, restoreControlsFocus } from '@histoire/controls/vue'
 import { configureHistoireMountControls, postHistoireMountEvent, subscribeHistoireMountEvents } from '@histoire/sdk/internal'
 import { defineComponent, h, onMounted, shallowRef, watch } from 'vue'
@@ -139,9 +140,12 @@ export const HistoireControls = defineComponent({
     return () => h('section', { 'class': 'histoire-controls', 'aria-label': 'Controls' }, [
       snapshot.value.runtime.status !== 'ready' || !snapshot.value.selection?.variantId
         ? (slots.unavailable?.() ?? h('div', { role: 'status' }, 'Preview unavailable'))
-        : [h(GenericControls, { showState: hasControls.value !== true }), h(StatePresets, { ref: presets, compact: props.compactPresets }), h(HstButton, { color: 'flat', type: 'button', class: 'histoire-controls-reset', disabled: !presets.value || presets.value.busy(), onClick: () => {
-            void presets.value?.reset()
-          } }, { default: () => 'Reset state' })],
+        : [h('div', { class: 'histoire-controls-presets' }, [
+            h(StatePresets, { ref: presets, compact: props.compactPresets }),
+            h(HstButton, { 'color': 'flat', 'type': 'button', 'class': 'histoire-controls-reset', 'aria-label': 'Reset state', 'title': 'Reset state', 'disabled': !presets.value || presets.value.busy(), 'onClick': () => {
+              void presets.value?.reset()
+            } }, { default: () => h(Icon, { icon: 'carbon:reset', width: 16, height: 16, 'aria-hidden': 'true' }) }),
+          ]), h(GenericControls, { showState: hasControls.value !== true })],
       failure.value
         ? h('div', { class: 'histoire-controls-failure' }, [
             h('p', { role: 'alert' }, `Custom controls unavailable: ${(failure.value as Error)?.message ?? String(failure.value)}`),
