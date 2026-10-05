@@ -2,6 +2,7 @@
 import type { UiComment, UiCommentAgent } from '@histoire/shared'
 import { HstButton } from '@histoire/controls/vue'
 import { computed } from 'vue'
+import PulsatingDisc from '../../base/PulsatingDisc.vue'
 import { commentAge } from '../../comments/presentation.js'
 import WorkbenchIcon from '../../shell/WorkbenchIcon.vue'
 
@@ -28,7 +29,14 @@ const status = computed(() => props.comment.status === 'draft' ? 'Not sent yet' 
 <template>
   <HstButton color="flat" type="button" class="comment-row" :class="{ active }" :aria-current="active ? 'true' : undefined" @click="emit('select')">
     <span class="row-pin" :class="{ draft: comment.status === 'draft' }">{{ number }}</span>
-    <span class="row-content"><span class="row-title"><strong>{{ title }}</strong><time :datetime="comment.updatedAt" :title="comment.updatedAt">{{ commentAge(comment.updatedAt) }}</time></span><span class="row-body">{{ comment.body }}</span><span class="row-status" :class="{ neutral: comment.status === 'draft' || comment.status === 'resolved' }"><WorkbenchIcon :name="comment.status === 'draft' ? 'edit' : comment.status === 'resolved' ? 'checkmark' : comment.status === 'working' ? 'in-progress' : 'bot'" />{{ status }}</span></span>
+    <span class="row-content">
+      <span class="row-title"><strong>{{ title }}</strong><time :datetime="comment.updatedAt" :title="comment.updatedAt">{{ commentAge(comment.updatedAt) }}</time></span>
+      <span class="row-body">{{ comment.body }}</span>
+      <span class="row-status" :class="{ neutral: comment.status === 'draft' || comment.status === 'resolved' }">
+        <PulsatingDisc v-if="comment.status === 'working'" :size="13" />
+        <WorkbenchIcon v-else :name="comment.status === 'draft' ? 'edit' : comment.status === 'resolved' ? 'checkmark' : 'bot'" />{{ status }}
+      </span>
+    </span>
   </HstButton>
 </template>
 

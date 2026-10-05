@@ -2,6 +2,7 @@
 import type { UiCommentAgent, UiCommentDraft } from '@histoire/shared'
 import { getControlElement, HstButton, HstSelect, HstTextarea } from '@histoire/controls/vue'
 import { onMounted, ref, watch } from 'vue'
+import PulsatingDisc from '../base/PulsatingDisc.vue'
 import WorkbenchIcon from '../shell/WorkbenchIcon.vue'
 import CommentContext from './CommentContext.vue'
 import { useCommentDestination } from './destination.js'
@@ -48,7 +49,8 @@ function send() {
     <HstTextarea :ref="value => { input = getControlElement(value) as HTMLTextAreaElement }" v-model="body" layout="inline" maxlength="8192" aria-label="Comment message" placeholder="Describe what to change…" @keydown.meta.enter.prevent="send" @keydown.ctrl.enter.prevent="send" />
     <footer>
       <HstButton color="flat" type="button" class="icon-button" :disabled="capturing" :aria-label="capturing ? 'Capturing screenshot' : 'Attach screenshot'" @click="emit('attach')">
-        <WorkbenchIcon :name="capturing ? 'in-progress' : 'camera'" />
+        <PulsatingDisc v-if="capturing" />
+        <WorkbenchIcon v-else name="camera" />
       </HstButton>
       <HstButton color="flat" type="button" class="save-draft" :disabled="!body.trim() || capturing" @click="emit('save', { ...draft, body })">
         Save draft

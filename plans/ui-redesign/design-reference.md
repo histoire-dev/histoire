@@ -55,7 +55,7 @@ Radii: 6–7px controls, 8–10px buttons and chips, 12–16px cards and floatin
 | Tree | `folder` (open and closed; chevron shows state), `cube` (story), `document` (docs), `dot-mark` (variant), `chevron-right`/`chevron-down` |
 | Toolbar | `cursor-1` (select), `move` (pan — Carbon has no hand icon), `grid`, `list-boxes`, `data-table` (matrix), `laptop`/`mobile`/`tablet`/`screen`, `rotate`, `zoom-out`/`zoom-in`, `color-palette`, `ruler`, `camera`, `chat` |
 | Inspector | `launch`, `close`, `copy`, `reset`, `bookmark`, `code`, `chevron-up`/`chevron-down` |
-| Status | `checkmark-filled`, `error-filled`, `warning-alt-filled`, `in-progress`, `subtract` (skipped) |
+| Status | `checkmark-filled`, `error-filled`, `warning-alt-filled`, shared pulsating disc (running), `subtract` (skipped) |
 | Menu and AI | `tree-view`, `link`, `compare`, `bookmark-add`, `add-comment`, `magic-wand`, `send-filled`, `attachment`, `user-avatar-filled`, `plug`, `terminal`, `edit`, `trash-can`, `filter`, `view`, `time`, `play-filled-alt`, `stop-filled-alt`, `renew`, `information`, `arrows-horizontal` |
 
 Inspector tabs are text-only (no icons). The grab cursor shown while panning is the OS `grabbing` cursor, not an icon.

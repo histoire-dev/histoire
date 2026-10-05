@@ -6,6 +6,7 @@ import { HstButton } from '@histoire/controls/vue'
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useCanvasFrames, useCanvasStore } from '../../composables/canvas-settings.js'
 import { useContextMenu } from '../../composables/context-menu.js'
+import PulsatingDisc from '../base/PulsatingDisc.vue'
 import { useWorkbenchTestsModel } from '../panes/tests/model.js'
 import WorkbenchIcon from '../shell/WorkbenchIcon.vue'
 import CanvasReplicaPreview from './CanvasReplicaPreview.vue'
@@ -42,7 +43,7 @@ const registry = useCanvasFrames()
 const menu = useContextMenu()
 const tests = useWorkbenchTestsModel()
 const test = computed(() => tests?.rows.value.find(row => row.target.storyId === props.frame.storyId && row.target.variantId === props.frame.variantId))
-const testIcon = computed(() => test.value?.running ? 'in-progress' : test.value?.failed || test.value?.error ? 'error-filled' : test.value?.stale ? 'warning-alt-filled' : test.value?.summary ? 'checkmark-filled' : props.variant.hasTests ? 'subtract' : null)
+const testIcon = computed(() => test.value?.failed || test.value?.error ? 'error-filled' : test.value?.stale ? 'warning-alt-filled' : test.value?.summary ? 'checkmark-filled' : props.variant.hasTests ? 'subtract' : null)
 const replica = ref<{ retry: () => Promise<void> }>()
 const status = ref<'loading' | 'ready' | 'error'>('loading')
 const error = ref<unknown>()
@@ -104,7 +105,7 @@ function openMenu(event: MouseEvent | KeyboardEvent) {
 <template>
   <section class="histoire-canvas-frame" :class="{ 'is-selected': selected, 'is-stale': stale, 'is-list': arrange === 'list', 'is-highlighted': highlighted, 'is-dimmed': dimmed }" :style="position" :data-frame-id="frame.id" @contextmenu.prevent="openMenu">
     <button type="button" class="histoire-frame-label" :aria-pressed="selected" :disabled="!canSelect" @click="select" @keydown="onKeyDown">
-      <span :title="variant.title">{{ variant.title }}</span><WorkbenchIcon v-if="status === 'error'" name="error-filled" :size="12" class="is-error" /><WorkbenchIcon v-else-if="testIcon" :name="testIcon" :size="12" :class="{ 'is-error': test?.failed || test?.error }" />
+      <span class="histoire-frame-title" :title="variant.title">{{ variant.title }}</span><WorkbenchIcon v-if="status === 'error'" name="error-filled" :size="12" class="is-error" /><PulsatingDisc v-else-if="test?.running" :size="12" /><WorkbenchIcon v-else-if="testIcon" :name="testIcon" :size="12" :class="{ 'is-error': test?.failed || test?.error }" />
     </button>
     <div class="histoire-frame-body" data-test-id="responsive-preview-bg" :style="{ height: `${height * canvas.effectiveZoom}px`, background }" @click="select">
       <div class="histoire-frame-content" :style="previewStyle">
@@ -150,12 +151,12 @@ function openMenu(event: MouseEvent | KeyboardEvent) {
   text-align: left;
   cursor: pointer;
 }
-.histoire-frame-label span { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.histoire-frame-title { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .histoire-canvas-frame:not(.is-selected):not(.is-highlighted) .histoire-frame-label:enabled:hover { color: var(--histoire-text); }
 .histoire-frame-label:focus-visible { outline: 2px solid var(--histoire-accent); outline-offset: 2px; }
 .histoire-frame-label:disabled { opacity: .45; cursor: default; }
 .is-selected .histoire-frame-label { color: var(--histoire-accent); font-weight: 700; }
-.histoire-frame-label svg { color: var(--histoire-accent); } .histoire-frame-label svg.is-error { color: var(--histoire-danger); }
+.histoire-frame-label :is(svg, .histoire-pulsating-disc) { color: var(--histoire-accent); } .histoire-frame-label svg.is-error { color: var(--histoire-danger); }
 .histoire-frame-body { position: relative; width: 100%; overflow: hidden; border: 1px solid var(--histoire-border); border-radius: 7px; background: white; }
 .is-list { display: flex; align-items: center; gap: 0; } .is-list .histoire-frame-label { width: 144px; flex: none; justify-content: flex-start; padding: 0 12px 0 0; } .is-list .histoire-frame-body { flex: 1; min-width: 0; }
 .is-highlighted .histoire-frame-label { color: var(--histoire-accent); } .is-highlighted .histoire-frame-body { border-color: var(--histoire-accent); }

@@ -2,18 +2,22 @@
 import type { WorkbenchTestRow } from './types.js'
 import { HstButton } from '@histoire/controls/vue'
 import { computed } from 'vue'
+import PulsatingDisc from '../../base/PulsatingDisc.vue'
 import WorkbenchIcon from '../../shell/WorkbenchIcon.vue'
 
 /** One actual collected variant or diagnostic; unknown diagnostics stay visible. */
 const props = defineProps<{ row: WorkbenchTestRow, selected: boolean }>()
 const emit = defineEmits<{ select: [row: WorkbenchTestRow] }>()
-const icon = computed(() => props.row.notCollected ? 'warning-alt-filled' : props.row.running ? 'in-progress' : props.row.stale ? 'renew' : props.row.failed ? 'error-filled' : props.row.summary?.passed ? 'checkmark-filled' : 'subtract')
+/** Collection warnings retain priority over an active test operation. */
+const running = computed(() => !props.row.notCollected && props.row.running)
+const icon = computed(() => props.row.notCollected ? 'warning-alt-filled' : props.row.stale ? 'renew' : props.row.failed ? 'error-filled' : props.row.summary?.passed ? 'checkmark-filled' : 'subtract')
 const status = computed(() => props.row.notCollected ? 'not collected' : props.row.stale ? 'outdated' : props.row.running ? 'running' : props.row.failed ? 'tests failing' : props.row.summary ? 'tests completed' : 'not run')
 </script>
 
 <template>
   <HstButton color="flat" type="button" class="test-row" :class="{ failed: row.failed, warning: row.notCollected, passed: !row.failed && row.summary?.passed }" :aria-current="selected ? 'true' : undefined" :aria-label="`${row.storyTitle} / ${row.variantTitle ?? status}, ${status}`" :disabled="!row.selectable" :title="row.error ? String(row.error) : undefined" @click="emit('select', row)">
-    <WorkbenchIcon :name="icon" />
+    <PulsatingDisc v-if="running" />
+    <WorkbenchIcon v-else :name="icon" />
     <span class="test-row-title">{{ row.variantTitle ?? row.storyTitle }}</span>
     <span v-if="row.notCollected" class="test-row-detail">not collected</span>
     <span v-else-if="row.stale" class="test-row-detail">outdated</span>
