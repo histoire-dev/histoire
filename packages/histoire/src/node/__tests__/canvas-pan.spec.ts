@@ -60,6 +60,22 @@ describe('canvas transforms', () => {
     expect(topLeft.x).toBeGreaterThanOrEqual(20)
     expect(bottomRight.x).toBeLessThanOrEqual(880)
   })
+
+  it('pins minimum Fit below fixed chrome while retaining horizontal centering', () => {
+    const options = { padding: 20, inspectorWidth: 100, topInset: 160, bottomInset: 40 }
+    const oversized = { x: 100, y: 500, width: 800, height: 7000 }
+    const result = fitCanvas(oversized, { width: 1000, height: 600 }, options)
+    const topLeft = canvasToClient(oversized, result.zoom, result.offset)
+    expect(result.zoom).toBe(0.1)
+    expect(topLeft).toEqual({ x: 410, y: 180 })
+  })
+
+  it('pins exact minimum Fit below fixed chrome', () => {
+    const result = fitCanvas({ x: 0, y: 500, width: 8600, height: 100 }, { width: 1000, height: 600 }, { padding: 20, inspectorWidth: 100, topInset: 160, bottomInset: 40 })
+    const topLeft = canvasToClient({ x: 0, y: 500 }, result.zoom, result.offset)
+    expect(result.zoom).toBe(0.1)
+    expect(topLeft.y).toBe(180)
+  })
 })
 
 describe('canvas pointer pan', () => {

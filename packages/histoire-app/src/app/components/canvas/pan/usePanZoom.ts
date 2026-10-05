@@ -41,9 +41,14 @@ export interface PanZoomState {
   setOffset: (offset: CanvasPoint) => void
 }
 
+/** Smallest usable canvas scale, which preserves readable frame chrome. */
+const MIN_ZOOM = 0.1
+/** Largest supported canvas scale. */
+const MAX_ZOOM = 4
+
 /** Keeps zoom within the supported 10%–400% range. */
 export function clampZoom(value: number): number {
-  return Number.isNaN(value) ? 1 : Math.min(4, Math.max(0.1, value))
+  return Number.isNaN(value) ? 1 : Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, value))
 }
 
 /** Converts canvas coordinates into pixels relative to the viewport. */
@@ -78,18 +83,20 @@ export function canvasContentRect(viewport: CanvasSize, options: CanvasFitOption
   }
 }
 
-/** Centers bounds within available viewport space, excluding fixed overlays. */
+/** Fits bounds within available viewport space, pinning minimum-scale content below fixed overlays. */
 export function fitCanvas(bounds: CanvasRect, viewport: CanvasSize, options: CanvasFitOptions = {}) {
   const padding = Math.max(0, options.padding ?? 48)
   const content = canvasContentRect(viewport, options)
   const width = Math.max(1, content.width - padding * 2)
   const height = Math.max(1, content.height - padding * 2)
-  const zoom = clampZoom(Math.min(width / Math.max(1, bounds.width), height / Math.max(1, bounds.height)))
+  const requestedZoom = Math.min(width / Math.max(1, bounds.width), height / Math.max(1, bounds.height))
+  const zoom = clampZoom(requestedZoom)
   return {
     zoom,
     offset: {
       x: content.x + padding + (width - bounds.width * zoom) / 2 - bounds.x * zoom,
-      y: content.y + padding + (height - bounds.height * zoom) / 2 - bounds.y * zoom,
+      // Centering oversized bounds hides their first rows beneath fixed chrome.
+      y: content.y + padding + (requestedZoom <= MIN_ZOOM ? 0 : (height - bounds.height * zoom) / 2) - bounds.y * zoom,
     },
   }
 }

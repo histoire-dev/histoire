@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { canvasFrameBounds, layoutCanvasFrames } from '../../../../histoire-app/src/app/components/canvas/frame-layout.js'
-import { layoutMatrixFrames, MATRIX_TOP_INSET, matrixLayoutBounds } from '../../../../histoire-app/src/app/components/canvas/matrix/matrix-layout.js'
+import { layoutMatrixFrames, MATRIX_COLUMN_HEADER, MATRIX_TOP_INSET, matrixLayoutBounds } from '../../../../histoire-app/src/app/components/canvas/matrix/matrix-layout.js'
 import { canvasToClient, clientToCanvas } from '../../../../histoire-app/src/app/components/canvas/pan/usePanZoom.js'
 import { createCanvasStore } from '../../../../histoire-app/src/app/stores/canvas.js'
 import { expandMatrixCells } from '../../../../histoire-app/src/app/util/matrix.js'
@@ -103,6 +103,16 @@ describe('canvas geometry ownership', () => {
     expect(canvas.zoom).toBe(canvas.effectiveZoom)
   })
 
+  it('pins minimum selection Fit below fixed overlays', () => {
+    const canvas = createCanvasStore()
+    const oversized = { ...frame, width: 10000, height: 100 }
+    canvas.setGeometry({ width: 1200, height: 600 }, bounds, 300, { topInset: 120, bottomInset: 60 })
+    canvas.zoomToFrame(oversized)
+    const start = canvasToClient(oversized, canvas.effectiveZoom, canvas.panOffset)
+    expect(canvas.zoom).toBe(0.1)
+    expect(start.y).toBe(152)
+  })
+
   it.each(['grid', 'list'] as const)('fits %s selection using label bounds at target zoom', (arrange) => {
     const canvas = createCanvasStore()
     canvas.setGeometry({ width: 1000, height: 760 }, bounds, 300, { topInset: 120, bottomInset: 40 })
@@ -132,8 +142,9 @@ describe('canvas geometry ownership', () => {
       }
       return layoutMatrixFrames(cells, { storyId: 'story', variantId: 'variant', rows: rows.values, cols: cols.values, size: bounds, zoom: canvas.effectiveZoom })
     }
-    settle(500)
+    const narrowFrames = settle(500)
     expect(canvas.effectiveZoom).toBe(0.1)
+    expect(canvasToClient(narrowFrames[0], canvas.effectiveZoom, canvas.panOffset).y).toBe(MATRIX_TOP_INSET + 32 + MATRIX_COLUMN_HEADER)
     const frames = settle(1104)
     expect(canvas.zoom).toBe('fit')
     expect(canvas.effectiveZoom).toBeCloseTo((1104 - 380 - 64 - 144) / 1440, 3)
