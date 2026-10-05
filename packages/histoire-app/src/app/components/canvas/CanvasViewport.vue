@@ -14,10 +14,11 @@ import CanvasFrame from './CanvasFrame.vue'
 import CanvasHeader from './CanvasHeader.vue'
 import CanvasStatus from './CanvasStatus.vue'
 import CollectErrorCard from './CollectErrorCard.vue'
+import { useCanvasFrameAdmission } from './frame-admission.js'
 import { createCanvasArrangement } from './frame-arrangement.js'
 import { watchCanvasFrameFocus } from './frame-focus.js'
 import { bindCanvasFrameInteractions } from './frame-interactions.js'
-import { canvasFrameBounds, layoutCanvasFrames, liveCanvasFrames } from './frame-layout.js'
+import { canvasFrameBounds, layoutCanvasFrames } from './frame-layout.js'
 import { createCanvasFrameState } from './frame-state.js'
 import FrameGrid from './FrameGrid.vue'
 import FrameList from './FrameList.vue'
@@ -86,9 +87,16 @@ const primarySearch = computed(() => getSearchFrameState(selectedFrame.value?.id
 function fitSelectedFrame(frame: CanvasFrameLayout) {
   canvas.zoomToFrame(zoom => layoutFrames(zoom).find(candidate => candidate.id === frame.id) ?? frame)
 }
-const live = computed(() => {
-  const origin = clientToCanvas({ x: 0, y: 0 }, canvas.effectiveZoom, canvas.panOffset)
-  return liveCanvasFrames(frames.value, { ...origin, width: Math.max(0, canvas.viewport.width - props.inspectorWidth) / canvas.effectiveZoom, height: canvas.viewport.height / canvas.effectiveZoom }, props.frameBudget, selectedFrame.value?.id ?? null)
+const live = useCanvasFrameAdmission({
+  frames: () => frames.value,
+  viewport: () => {
+    const origin = clientToCanvas({ x: 0, y: 0 }, canvas.effectiveZoom, canvas.panOffset)
+    return { ...origin, width: Math.max(0, canvas.viewport.width - props.inspectorWidth) / canvas.effectiveZoom, height: canvas.viewport.height / canvas.effectiveZoom }
+  },
+  budget: () => props.frameBudget,
+  selected: () => selectedFrame.value?.id ?? null,
+  moving: () => canvas.panning,
+  context: () => JSON.stringify([story.value?.id, renderedArrange.value, size.value.width, size.value.height, canvas.viewport.width, canvas.viewport.height, props.inspectorWidth]),
 })
 const primaryStyle = computed(() => {
   const frame = selectedFrame.value

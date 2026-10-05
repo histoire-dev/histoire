@@ -6,7 +6,7 @@ import { useCanvasStore } from '../../../composables/canvas-settings.js'
 import { useSelection } from '../../../composables/selection.js'
 import { useMatrixStore } from '../../../stores/matrix.js'
 import { filterMatrixValues } from '../../../util/matrix.js'
-import { liveCanvasFrames } from '../frame-layout.js'
+import { useCanvasFrameAdmission } from '../frame-admission.js'
 import { canvasContentRect, clientToCanvas } from '../pan/usePanZoom.js'
 import { layoutMatrixFrames, MATRIX_COLUMN_HEADER, MATRIX_ROW_GUTTER, MATRIX_TOP_INSET, matrixLayoutBounds } from './matrix-layout.js'
 import { watchMatrixFrameSelection } from './matrix-selection.js'
@@ -43,11 +43,17 @@ function layoutFrames(zoom = canvas.effectiveZoom) {
 const frames = computed(() => layoutFrames())
 const topInset = computed(() => Math.max(MATRIX_TOP_INSET, props.contentInsets?.topInset ?? 0))
 const insets = computed(() => ({ topInset: topInset.value, bottomInset: props.contentInsets?.bottomInset ?? 0 }))
-const live = computed(() => {
-  if (props.frameBudget <= 1) return new Set<string>()
-  const content = canvasContentRect(canvas.viewport, { inspectorWidth: canvas.inspectorWidth, ...insets.value })
-  const origin = clientToCanvas(content, canvas.effectiveZoom, canvas.panOffset)
-  return liveCanvasFrames(frames.value, { ...origin, width: content.width / canvas.effectiveZoom, height: content.height / canvas.effectiveZoom }, props.frameBudget - 1, matrix.selectedCell.value?.key ?? null)
+const live = useCanvasFrameAdmission({
+  frames: () => frames.value,
+  viewport: () => {
+    const content = canvasContentRect(canvas.viewport, { inspectorWidth: canvas.inspectorWidth, ...insets.value })
+    const origin = clientToCanvas(content, canvas.effectiveZoom, canvas.panOffset)
+    return { ...origin, width: content.width / canvas.effectiveZoom, height: content.height / canvas.effectiveZoom }
+  },
+  budget: () => Math.max(0, props.frameBudget - 1),
+  selected: () => matrix.selectedCell.value?.key ?? null,
+  moving: () => canvas.panning,
+  context: () => JSON.stringify([story.value?.id, baseVariant.value, matrix.cells.value.map(cell => cell.key), props.size.width, props.size.height, canvas.viewport.width, canvas.viewport.height, canvas.inspectorWidth]),
 })
 const rowPosition = computed(() => {
   if (!frames.value.length) return []

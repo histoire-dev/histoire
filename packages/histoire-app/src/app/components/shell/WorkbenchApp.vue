@@ -67,7 +67,7 @@ function activatePane(pane: 'stories' | 'search' | 'tests' | 'comments' | 'mcp')
     <template #main>
       <SettingsPage v-if="route.name === 'settings'" :section="typeof route.params.section === 'string' ? route.params.section : undefined" :build-info="buildInfo" @section="workbench.navigate('settings', $event)" />
       <MarkdownPage v-else-if="route.name === 'story' && markdown" :anchor="route.hash" @select="shell.closePanelAfterSelection" @error="emit('error', $event)" />
-      <CanvasViewport v-else-if="route.name === 'story'" ref="canvas" :preview-base="previewBase" :frame-budget="histoireConfig.ui?.frameBudget ?? 24" :arrange="arrange" :highlighted-targets="highlighted" :search-active="searchActive" :comment-mode="dev?.commentMode.value" :inspector-width="shell.inspectorOpen.value && !shell.narrow.value ? shell.inspectorWidth.value + 24 : 0" @frame-pointer="dev?.pickComment($event)" @error="emit('error', $event)">
+      <CanvasViewport v-else-if="route.name === 'story'" ref="canvas" :preview-base="previewBase" :frame-budget="histoireConfig.ui?.frameBudget ?? 12" :arrange="arrange" :highlighted-targets="highlighted" :search-active="searchActive" :comment-mode="dev?.commentMode.value" :inspector-width="shell.inspectorOpen.value && !shell.narrow.value ? shell.inspectorWidth.value + 24 : 0" @frame-pointer="dev?.pickComment($event)" @error="emit('error', $event)">
         <template #toolbar>
           <CanvasToolbar :arrange="arrange" :matrix-available="matrix.available.value" :match-count="searchMatches.count.value" :match-position="searchMatches.position.value" @previous-match="workbench.previousMatch" @next-match="workbench.nextMatch" @arrange="workbench.setArrange" @edit-presets="workbench.navigate('settings', 'viewports')">
             <template #screenshot="slot">
@@ -82,7 +82,7 @@ function activatePane(pane: 'stories' | 'search' | 'tests' | 'comments' | 'mcp')
           </CanvasToolbar>
         </template>
         <template #matrix="slot">
-          <MatrixView :rows="rows" :cols="cols" :preview-base="previewBase" :frame-budget="histoireConfig.ui?.frameBudget ?? 24" :size="slot.size" :content-insets="slot.contentInsets" @axes="workbench.setAxes" @error="emit('error', $event)" />
+          <MatrixView :rows="rows" :cols="cols" :preview-base="previewBase" :frame-budget="histoireConfig.ui?.frameBudget ?? 12" :size="slot.size" :content-insets="slot.contentInsets" @axes="workbench.setAxes" @error="emit('error', $event)" />
         </template>
         <template #overlays>
           <CommentsCanvasOverlay v-if="CommentsCanvasOverlay && dev" ref="commentOverlay" :model="dev.comments" :agents="dev.commentAgents.value" @composed="dev.commentMode.value = false" @setup-agent="dev.setupAgents" />

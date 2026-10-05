@@ -44,7 +44,7 @@ export function getDefaultConfig(): HistoireConfig {
       storeColorScheme: true,
       darkClass: 'dark',
     },
-    ui: { defaultArrange: 'grid', frameBudget: 24 },
+    ui: { defaultArrange: 'grid', frameBudget: 12 },
     agents: { enabled: false, presets: [], permissions: { fileEdits: 'ask', terminal: 'ask' } },
     comments: { enabled: true, file: '.histoire/comments.json' },
     responsivePresets: [
