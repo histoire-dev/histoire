@@ -125,7 +125,7 @@ function openMenu(event: MouseEvent | KeyboardEvent) {
 
 <template>
   <section class="histoire-canvas-frame" :class="{ 'is-selected': selected, 'is-stale': stale, 'is-highlighted': highlighted, 'is-dimmed': dimmed }" :style="position" :data-frame-id="frame.id" @contextmenu.prevent="openMenu">
-    <button type="button" class="histoire-frame-label" :aria-pressed="selected" :disabled="!canSelect" @click="select" @keydown="onKeyDown">
+    <button type="button" class="histoire-frame-label" data-canvas-overlay-occluder :aria-pressed="selected" :disabled="!canSelect" @click="select" @keydown="onKeyDown">
       <span class="histoire-frame-title" :title="variant.title">{{ variant.title }}</span><WorkbenchIcon v-if="status === 'error'" name="error-filled" :size="12" class="is-error" /><PulsatingDisc v-else-if="test?.running" :size="12" /><WorkbenchIcon v-else-if="testIcon" :name="testIcon" :size="12" :class="{ 'is-error': test?.failed || test?.error }" />
     </button>
     <div class="histoire-frame-body" data-test-id="responsive-preview-bg" :style="{ height: `${height * canvas.effectiveZoom}px`, background }" @click="select">

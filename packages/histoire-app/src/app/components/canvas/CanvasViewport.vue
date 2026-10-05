@@ -9,7 +9,7 @@ import { createCanvasStore, getCanvasStorage } from '../../stores/canvas.js'
 import { useMatrixStore } from '../../stores/matrix.js'
 import { useUiSettingsStore } from '../../stores/settings.js'
 import { getSearchFrameState } from '../panes/search/frame-navigation.js'
-import { canvasRectsOverlap } from './canvas-overlay-occlusion.js'
+import { canvasOverlayIsOccluded } from './canvas-overlay-occlusion.js'
 import CanvasFrame from './CanvasFrame.vue'
 import CanvasHeader from './CanvasHeader.vue'
 import CanvasStatus from './CanvasStatus.vue'
@@ -133,13 +133,17 @@ const { insets: contentInsets, headerBounds, measure } = useCanvasGeometry({
 })
 const headerObscured = ref(false)
 
-/** Give mounted iframe content visual priority over fixed, non-interactive header metadata. */
+/** Give mounted preview content and variant-label controls priority over fixed header metadata. */
 function updateHeaderOcclusion(): void {
   const headerRect = header.value?.getBoundingClientRect()
-  headerObscured.value = Boolean(headerRect && [...registry.frames.values()].some((frame) => {
+  const frameSurfaces = [...registry.frames.values()].flatMap((frame) => {
     const iframe = frame.iframe
-    return iframe?.isConnected && canvasRectsOverlap(headerRect, iframe.getBoundingClientRect())
-  }))
+    return iframe?.isConnected ? [iframe.getBoundingClientRect()] : []
+  })
+  const labelSurfaces = [...(viewport.value?.querySelectorAll<HTMLElement>('[data-canvas-overlay-occluder]') ?? [])]
+    .filter(label => label.isConnected)
+    .map(label => label.getBoundingClientRect())
+  headerObscured.value = Boolean(headerRect && canvasOverlayIsOccluded(headerRect, [...frameSurfaces, ...labelSurfaces]))
 }
 
 /** Clear canonical document registration without removing a retained replica entry. */

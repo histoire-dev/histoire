@@ -10,3 +10,11 @@ export interface CanvasOverlayRect {
 export function canvasRectsOverlap(first: CanvasOverlayRect, second: CanvasOverlayRect): boolean {
   return first.left < second.right && first.right > second.left && first.top < second.bottom && first.bottom > second.top
 }
+
+/** Return true when any canvas surface obscures fixed overlay information. */
+export function canvasOverlayIsOccluded(overlay: CanvasOverlayRect, surfaces: Iterable<CanvasOverlayRect>): boolean {
+  for (const surface of surfaces) {
+    if (canvasRectsOverlap(overlay, surface)) return true
+  }
+  return false
+}
