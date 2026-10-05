@@ -1,7 +1,7 @@
 import type { Plugin as VitePlugin } from 'vite'
 import type { Context } from '../context.js'
 import type { BrowserRuntimePaths } from './resolve-paths.js'
-import { join } from 'pathe'
+import { dirname, join } from 'pathe'
 import { APP_PATH } from '../alias.js'
 import { getContextRegistry } from '../runtime/registry.js'
 import { installUiHttpRouter } from '../server/ui-channel/http.js'
@@ -10,7 +10,7 @@ import { resolveHistoireAppBundledDir } from '../util/resolve-histoire-app.js'
 import { createEmbedMiddleware } from '../virtual/embed/middleware.js'
 import { createAppHtmlMiddleware, createSandboxHtmlMiddleware } from './dev-html.js'
 import { createMcpPreviewHtmlMiddleware } from './mcp-preview-html.js'
-import { histoireSharedPath, resolveSupportPluginAllowPaths, withPackageDirs } from './resolve-paths.js'
+import { histoireSharedPath, resolveSupportPluginAllowPaths, tryResolveDependency, withPackageDirs } from './resolve-paths.js'
 
 export interface HistoireVitePluginOptions {
   /** Whether the config is built for the node-side (collecting) server. */
@@ -30,6 +30,9 @@ export interface HistoireVitePluginOptions {
 export function createHistoireVitePlugin(ctx: Context, options: HistoireVitePluginOptions): VitePlugin {
   const { isServer, browserRuntime, browserRuntimePaths } = options
   const supportPluginAllowPaths = resolveSupportPluginAllowPaths(ctx)
+  const controlsEntry = tryResolveDependency(ctx.root, '@histoire/controls/package.json')
+  // Peer CSS retains font URLs after package publishing, so Vite must serve its assets.
+  const controlsAllowPaths = controlsEntry ? [dirname(controlsEntry)] : []
   const { tempDir } = getContextRegistry(ctx)
 
   return {
@@ -110,6 +113,7 @@ export function createHistoireVitePlugin(ctx: Context, options: HistoireVitePlug
               ctx.resolvedViteConfig.root,
               ctx.root,
               ...supportPluginAllowPaths,
+              ...controlsAllowPaths,
               ...browserRuntimePaths.allowPaths,
               ...browserRuntimePaths.mswAllowPaths,
               ...process.env.HISTOIRE_DEV

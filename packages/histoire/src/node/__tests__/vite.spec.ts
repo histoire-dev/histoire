@@ -69,6 +69,14 @@ describe('getViteConfigWithPlugins', () => {
     expect(resolvedConfig.optimizeDeps.exclude).toContain('vitest')
   }, 15000)
 
+  it('allows packaged controls peer assets for the browser', async () => {
+    const ctx = createContext()
+    const { viteConfig } = await getViteConfigWithPlugins(false, ctx)
+    const resolvedConfig = await resolveConfig(viteConfig, 'serve')
+
+    expect(resolvedConfig.server.fs.allow).toContain(path.resolve(process.cwd(), '../histoire-controls'))
+  }, 15000)
+
   it('does not import expect-type in the browser story vitest shim', async () => {
     const ctx = createContext()
     const { viteConfig } = await getViteConfigWithPlugins(false, ctx, {
