@@ -610,7 +610,7 @@ export default defineConfig({
 
 ## `ui.frameBudget`
 
-`number` - Default: `12`
+`number` - Default: `6`
 
 Maximum live preview frames per canvas. Selected frames take priority; other frames outside the visible area or budget show placeholders. Matrix reserves one slot for its canonical preview. Use a positive integer. See [props matrix](../guide/ui-matrix.md).
 

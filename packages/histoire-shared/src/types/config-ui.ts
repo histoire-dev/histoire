@@ -22,7 +22,7 @@ export interface HistoireUiConfig {
   ui?: {
     /** Initial arrangement when story layout and URL omit it. */
     defaultArrange?: 'grid' | 'list'
-    /** Maximum simultaneously live preview frames. Defaults to 12. */
+    /** Maximum simultaneously live preview frames. Defaults to 6. */
     frameBudget?: number
   }
   /** ACP remains disabled until explicitly enabled. */

@@ -16,6 +16,6 @@ describe('workbench public config', () => {
     const output = resolvedConfig(ctx)
     expect(output).not.toContain('private-command')
     expect(output).not.toContain('private-comments')
-    expect(output).toContain('frameBudget')
+    expect(output).toContain('"frameBudget":12')
   })
 })
