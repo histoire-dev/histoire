@@ -228,7 +228,6 @@ ACP credential collision/rotation uses actual controlled Linux child processes a
 
 Test-owned static preview and temporary browser proof tabs closed after acceptance. No viewport override was introduced in this campaign. User tabs preserved; normal final bundled dev preview remains on port6006. Nothing was staged, committed or pushed.
 
-
 ## 2026-10-04 C1 shared-controls implementation
 
 `@histoire/controls` now owns C1 controls used by workbench, native Vue panels and public story controls. Controls share fields, neutral segments, switches, buttons, menus, typography, focus and disabled states. Preview content retains its styling.
@@ -303,7 +302,6 @@ Full-catalog dev campaigns suffered repeated collection, preview readiness failu
 
 Builds/tests were sequenced around emitted packages. Concurrent unrelated dirty/staged/untracked work preserved. No staging, commit or push. No CI/deploy or live agent-provider integration claim.
 
-
 ### Final C1 closure
 
 All five C1 acceptance cases pass on final build with fresh server per state: Light/Comfortable, Light/Compact, Dark/Comfortable, Dark/Compact and narrow provider. State filters run unchanged acceptance bodies; four cases verify real rendered matrix cells as well as settings, native fields, sandbox fields/menus, toolbar and comments. Final **29 captures** replace initial images in [screenshots](controls-c1-validation/screenshots/). Logs: `cypress-light-comfortable.log`, `cypress-light-compact.log`, `cypress-dark-comfortable.log`, `cypress-dark-compact.log`, `cypress-narrow.log`; campaign summary `state-proof.log`.
@@ -317,7 +315,6 @@ Fresh development workbench retry passed actual PNG and WebP captures through sc
 Final source review retained 201-file manifest, no changed Vue/TS/JS source above 300 lines and 29 final C1 images. Test-owned static Vue/Svelte servers and browser proof tab closed; user preview and tabs preserved.
 
 Final dev retry used `defaultCommandTimeout=20000` without changing tests or source. Cypress reports **7/15 pass, 8 fail** (`cypress-dev-workbench20.log`): detached document during startup reload, three owning-readiness failures, blank passive matrix documents, disabled matrix action and two page-load timeouts. Reload recovery, theme, pan/zoom, viewport persistence, mode constraints, comments and actual PNG/WebP capture pass. Runner exceeded its 600-second supervisor budget and cleanup needed SIGTERM after SIGINT; timeout receipts remain in `dev-workbench20-proof.log`. This is a failed campaign, not full dev acceptance. Scoped `git diff --check` passes (`diff-check.log`). No further retries or cosmetic edits.
-
 
 ### 2026-10-04 acceptance repair
 

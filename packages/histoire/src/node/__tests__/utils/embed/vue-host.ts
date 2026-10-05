@@ -14,7 +14,8 @@ export async function createEmbedVueHostAssets() {
       write: false,
       define: { '__VUE_OPTIONS_API__': 'true', '__VUE_PROD_DEVTOOLS__': 'false', '__VUE_PROD_HYDRATION_MISMATCH_DETAILS__': 'false', 'process.env.NODE_ENV': '"production"' },
     }),
-    build({ entryPoints: [join(resolveDir, 'dist/style.css')], bundle: true, write: false }),
+    // Native host fixtures serve one generated stylesheet, so embed peer fonts instead of producing asset URLs without a server route.
+    build({ entryPoints: [join(resolveDir, 'dist/style.css')], bundle: true, write: false, loader: { '.woff2': 'dataurl' } }),
   ])
   return {
     '/native.js': { body: javascript.outputFiles[0].text },

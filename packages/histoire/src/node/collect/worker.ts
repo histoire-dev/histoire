@@ -1,6 +1,7 @@
 // Capture Node's Event classes before Vite/Vitest dependencies can install DOM globals in this persistent collection worker.
 import '../dom/native-events.js'
 
+// eslint-disable-next-line perfectionist/sort-imports -- This type import must remain after the required runtime import.
 import type { ServerRunPayload, ServerStory, ServerStoryFile } from '@histoire/shared'
 import type { MessagePort } from 'node:worker_threads'
 import type { FetchFunction, ResolveIdFunction } from 'vite-node'

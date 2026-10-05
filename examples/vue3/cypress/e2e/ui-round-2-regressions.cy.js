@@ -34,10 +34,10 @@ function assertCanvasInfo({ inspector = true, matrix = false, pan = false } = {}
     const info = window.document.querySelector('.histoire-canvas-info')
     const header = window.document.querySelector('.histoire-canvas-header')
     const inspectorElement = window.document.querySelector('aside.histoire-inspector-frame')
-    expect(canvasElement, 'canvas').to.exist
-    expect(info, 'canvas info region').to.exist
-    expect(header, 'canvas header').to.exist
-    if (inspector) expect(inspectorElement, 'inspector').to.exist
+    expect(canvasElement, 'canvas').to.not.equal(null)
+    expect(info, 'canvas info region').to.not.equal(null)
+    expect(header, 'canvas header').to.not.equal(null)
+    if (inspector) expect(inspectorElement, 'inspector').to.not.equal(null)
     const canvasBounds = canvasElement.getBoundingClientRect()
     const inspectorBounds = inspectorElement?.getBoundingClientRect()
     const usableEnd = inspectorBounds ? inspectorBounds.left - 12 : canvasBounds.right
@@ -51,13 +51,13 @@ function assertCanvasInfo({ inspector = true, matrix = false, pan = false } = {}
     expect(headerBounds.right, 'header end').to.be.closeTo(expectedEnd, 1)
     if (pan) {
       const hint = window.document.querySelector('.histoire-pan-hint')
-      expect(hint, 'pan hint').to.exist
+      expect(hint, 'pan hint').to.not.equal(null)
       const hintBounds = hint.getBoundingClientRect()
       expect(hintBounds.left + hintBounds.width / 2, 'pan hint center').to.be.closeTo((canvasBounds.left + usableEnd) / 2, 1)
     }
     if (matrix) {
       const axes = window.document.querySelector('.histoire-matrix-axis-position')
-      expect(axes, 'matrix axes').to.exist
+      expect(axes, 'matrix axes').to.not.equal(null)
       const axesBounds = axes.getBoundingClientRect()
       expect(axesBounds.left, 'matrix axes start').to.be.closeTo(expectedStart, 1)
       expect(axesBounds.right, 'matrix axes end').to.be.closeTo(expectedEnd, 1)

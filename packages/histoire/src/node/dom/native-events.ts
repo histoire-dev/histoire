@@ -7,8 +7,10 @@ const nativeMessageEvent = globalThis.MessageEvent
  * JSDOM's globals have been installed for a story-collection pass.
  */
 export function restoreNativeEventGlobals(): void {
-  if (nativeEvent)
+  if (nativeEvent) {
     globalThis.Event = nativeEvent
-  if (nativeMessageEvent)
+  }
+  if (nativeMessageEvent) {
     globalThis.MessageEvent = nativeMessageEvent
+  }
 }
