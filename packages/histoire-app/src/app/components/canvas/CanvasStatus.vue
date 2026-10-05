@@ -17,19 +17,19 @@ const size = computed(() => {
 </script>
 
 <template>
-  <div class="histoire-canvas-info">
-    <div v-if="pan" class="histoire-pan-hint" aria-live="polite">
+  <div v-if="pan" class="histoire-canvas-info">
+    <div class="histoire-pan-hint" aria-live="polite">
       <strong>Panning</strong><span><kbd>Space</kbd> + drag</span><span>Middle mouse</span><span><kbd>H</kbd> hand tool</span><span><kbd>Shift + 1</kbd> recenter</span>
     </div>
-    <div v-else class="histoire-canvas-status">
-      <WorkbenchIcon name="laptop" :size="14" /><span>{{ size }} · {{ Math.round(canvas.effectiveZoom * 100) }}% · {{ snapshot.settings.backgroundColor }}</span>
-    </div>
+  </div>
+  <div v-else class="histoire-canvas-status">
+    <WorkbenchIcon name="laptop" :size="14" /><span>{{ size }} · {{ Math.round(canvas.effectiveZoom * 100) }}% · {{ snapshot.settings.backgroundColor }}</span>
   </div>
 </template>
 
 <style scoped>
 .histoire-canvas-info { position: absolute; inset-inline: var(--histoire-canvas-info-inset) calc(var(--histoire-canvas-inspector-reserve) + var(--histoire-canvas-info-inset)); bottom: 20px; display: flex; align-items: center; min-width: 0; container-type: inline-size; pointer-events: none; }
-.histoire-canvas-status { display: flex; flex: 1; align-items: center; gap: 8px; min-width: 0; font: 11px var(--histoire-font-mono, "JetBrains Mono", monospace); color: var(--histoire-muted); }
+.histoire-canvas-status { display: flex; inline-size: 100%; align-items: center; justify-content: flex-end; gap: 8px; min-width: 0; font: 11px var(--histoire-font-mono, "JetBrains Mono", monospace); color: var(--histoire-muted); }
 .histoire-canvas-status svg { flex: none; }
 .histoire-canvas-status span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .histoire-pan-hint { display: flex; flex: 0 1 auto; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px 14px; width: max-content; max-inline-size: 100%; margin-inline: auto; padding: 10px 14px; border: 1px solid var(--histoire-border); border-radius: 10px; background: var(--histoire-surface); color: var(--histoire-muted); font-size: 12px; white-space: nowrap; }

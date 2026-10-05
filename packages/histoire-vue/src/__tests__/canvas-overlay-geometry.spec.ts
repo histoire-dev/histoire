@@ -22,10 +22,10 @@ afterEach(async () => {
 })
 
 /** Mount genuine canvas geometry; preview lifetimes do not participate in layout. */
-async function canvasFixture(zoom: number | 'fit' = 'fit', initialHeight = 900) {
+async function canvasFixture(zoom: number | 'fit' = 'fit', initialHeight = 900, customHeader = false) {
   window.localStorage.setItem('_histoire-ui-canvas', JSON.stringify({ zoom }))
   const observers = resizeObserverFixture()
-  const geometry = { height: initialHeight, headerHeight: 30, footerHeight: 14 }
+  const geometry = { height: initialHeight, headerHeight: 48, footerHeight: 14 }
   vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockImplementation(function (this: HTMLElement) {
     const height = this.classList.contains('histoire-canvas-viewport')
       ? geometry.height
@@ -49,7 +49,7 @@ async function canvasFixture(zoom: number | 'fit' = 'fit', initialHeight = 900) 
     setup() {
       provideMatrix(matrix)
       return () => h(CanvasViewport, { arrange: arrange.value, previewBase: 'https://book.example/', frameBudget: 1, inspectorWidth: 300 }, {
-        header: () => h('div', 'Custom header'),
+        header: customHeader ? () => h('div', 'Custom header') : undefined,
         matrix: slot => h(MatrixView, { size: slot.size, contentInsets: slot.contentInsets, frameBudget: 1, previewBase: 'https://book.example/' }),
       })
     },
@@ -78,16 +78,18 @@ async function canvasFixture(zoom: number | 'fit' = 'fit', initialHeight = 900) 
 }
 
 describe('canvas overlay geometry', () => {
-  it('measures custom header and footer in viewport pixels and observes subsequent sizes', async () => {
+  it('measures header metadata and Pan hint in viewport pixels and observes subsequent sizes', async () => {
     const test = await canvasFixture()
-    expect(test.canvas.contentInsets).toEqual({ topInset: 118, bottomInset: 34 })
+    expect(test.component.get('.histoire-canvas-header .histoire-canvas-status').exists()).toBe(true)
+    expect(test.component.find('.histoire-canvas-info').exists()).toBe(false)
+    expect(test.canvas.contentInsets).toEqual({ topInset: 136, bottomInset: 0 })
     expect(test.canvas.bounds.y).toBe(0)
     const start = canvasToClient(test.canvas.bounds, test.canvas.effectiveZoom, test.canvas.panOffset)
-    expect(start.y).toBeGreaterThanOrEqual(150)
+    expect(start.y).toBeGreaterThanOrEqual(168)
     test.geometry.headerHeight = 80
     test.geometry.footerHeight = 40
     await test.resize()
-    expect(test.canvas.contentInsets).toEqual({ topInset: 168, bottomInset: 60 })
+    expect(test.canvas.contentInsets).toEqual({ topInset: 168, bottomInset: 0 })
     expect(test.observers.targets().has(test.component.get('.histoire-canvas-header').element)).toBe(true)
     const stories = test.fixture.descriptor.catalog.stories
     const oldHeader = test.component.get('.histoire-canvas-header').element
@@ -103,6 +105,12 @@ describe('canvas overlay geometry', () => {
     await dispose?.()
     dispose = undefined
     expect(test.observers.count()).toBe(0)
+  })
+
+  it('keeps custom header ownership separate from default metadata', async () => {
+    const test = await canvasFixture('fit', 900, true)
+    expect(test.component.get('.histoire-canvas-header').text()).toBe('Custom header')
+    expect(test.component.find('.histoire-canvas-status').exists()).toBe(false)
   })
 
   it('reveals saved numeric selection after an initially zero-height viewport is measured', async () => {
@@ -125,13 +133,14 @@ describe('canvas overlay geometry', () => {
     await nextTick()
     test.geometry.footerHeight = 80
     await test.resize()
-    expect(test.canvas.contentInsets.bottomInset).toBe(34)
+    expect(test.canvas.contentInsets.bottomInset).toBe(0)
     expect(test.canvas.effectiveZoom).toBe(before.zoom)
     expect(test.canvas.panOffset).toEqual(before.offset)
     root.dispatchEvent(new KeyboardEvent('keyup', { key: ' ', code: 'Space', bubbles: true }))
     test.geometry.footerHeight = 14
     await test.resize()
     test.canvas.setTool('pan')
+    await nextTick()
     test.geometry.footerHeight = 40
     await test.resize()
     expect(test.canvas.contentInsets.bottomInset).toBe(60)
@@ -143,9 +152,9 @@ describe('canvas overlay geometry', () => {
     test.arrange.value = 'matrix'
     await nextTick()
     await test.resize()
-    expect(test.canvas.contentInsets).toEqual({ topInset: 184, bottomInset: 34 })
+    expect(test.canvas.contentInsets).toEqual({ topInset: 184, bottomInset: 0 })
     test.geometry.headerHeight = 180
     await test.resize()
-    expect(test.canvas.contentInsets).toEqual({ topInset: 268, bottomInset: 34 })
+    expect(test.canvas.contentInsets).toEqual({ topInset: 268, bottomInset: 0 })
   })
 })

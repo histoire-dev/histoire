@@ -31,24 +31,23 @@ function resizePanel(label) {
 function assertCanvasInfo({ inspector = true, matrix = false, pan = false } = {}) {
   cy.window().then((window) => {
     const canvasElement = window.document.querySelector(canvas)
-    const info = window.document.querySelector('.histoire-canvas-info')
     const header = window.document.querySelector('.histoire-canvas-header')
     const file = header?.querySelector('.histoire-canvas-file')
     const fileLabel = file?.querySelector('span')
+    const status = header?.querySelector('.histoire-canvas-status')
+    const statusLabel = status?.querySelector('span')
+    const panHint = window.document.querySelector('.histoire-canvas-info')
     const inspectorElement = window.document.querySelector('aside.histoire-inspector-frame')
     expect(canvasElement, 'canvas').to.not.equal(null)
-    expect(info, 'canvas info region').to.not.equal(null)
     expect(header, 'canvas header').to.not.equal(null)
+    expect(status, 'viewport status').to.not.equal(null)
     if (inspector) expect(inspectorElement, 'inspector').to.not.equal(null)
     const canvasBounds = canvasElement.getBoundingClientRect()
     const inspectorBounds = inspectorElement?.getBoundingClientRect()
     const usableEnd = inspectorBounds ? inspectorBounds.left - 12 : canvasBounds.right
     const expectedStart = canvasBounds.left + 36
     const expectedEnd = usableEnd - 36
-    const infoBounds = info.getBoundingClientRect()
     const headerBounds = header.getBoundingClientRect()
-    expect(infoBounds.left, 'info start').to.be.closeTo(expectedStart, 1)
-    expect(infoBounds.right, 'info end').to.be.closeTo(expectedEnd, 1)
     expect(headerBounds.left, 'header start').to.be.closeTo(expectedStart, 1)
     expect(headerBounds.right, 'header end').to.be.closeTo(expectedEnd, 1)
     if (file && fileLabel) {
@@ -59,11 +58,25 @@ function assertCanvasInfo({ inspector = true, matrix = false, pan = false } = {}
         expect(fileLabelBounds.right, 'file metadata inline end').to.be.closeTo(expectedEnd, 1)
       }
     }
+    if (status && statusLabel) {
+      const statusBounds = status.getBoundingClientRect()
+      const statusLabelBounds = statusLabel.getBoundingClientRect()
+      expect(statusBounds.right, 'status metadata inline end').to.be.closeTo(expectedEnd, 1)
+      expect(statusLabelBounds.right, 'status text inline end').to.be.closeTo(expectedEnd, 1)
+      if (file) {
+        const fileBounds = file.getBoundingClientRect()
+        expect(statusBounds.top, 'status metadata second row').to.be.at.least(fileBounds.bottom - 1)
+      }
+    }
     if (pan) {
+      expect(panHint, 'Pan hint overlay').to.not.equal(null)
       const hint = window.document.querySelector('.histoire-pan-hint')
       expect(hint, 'pan hint').to.not.equal(null)
       const hintBounds = hint.getBoundingClientRect()
       expect(hintBounds.left + hintBounds.width / 2, 'pan hint center').to.be.closeTo((canvasBounds.left + usableEnd) / 2, 1)
+    }
+    else {
+      expect(panHint, 'idle Pan hint overlay').to.equal(null)
     }
     if (matrix) {
       const axes = window.document.querySelector('.histoire-matrix-axis-position')

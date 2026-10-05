@@ -48,7 +48,7 @@ const snapshot = useHistoireSnapshot()
 const viewport = ref<HTMLElement>()
 const toolbar = ref<HTMLElement>()
 const header = ref<HTMLElement>()
-const status = ref<InstanceType<typeof CanvasStatus>>()
+const panHint = ref<InstanceType<typeof CanvasStatus>>()
 const primaryContainer = ref<HTMLElement>()
 const primary = ref<{ unmount: () => Promise<void> }>()
 const primaryKey = ref(0)
@@ -98,7 +98,7 @@ const { insets: contentInsets, measure } = useCanvasGeometry({
   viewport: () => viewport.value,
   toolbar: () => toolbar.value,
   header: () => header.value,
-  footer: () => status.value?.$el,
+  footer: () => panHint.value?.$el,
   temporaryPan: () => space.held.value || canvas.panning,
   onMeasure(size, insets) {
     if (renderedArrange.value === 'matrix') {
@@ -249,7 +249,7 @@ defineExpose({ canvas, registry })
     <div v-if="commentMode" class="histoire-comment-capture" @pointerdown="framePointer" />
     <slot name="overlays" :canvas="canvas" :frames="registry" :selected-frame="selectedFrame" />
     <CollectErrorCard v-if="diagnostics.length" :errors="diagnostics" />
-    <CanvasStatus ref="status" :pan="panning" />
+    <CanvasStatus v-if="panning" ref="panHint" :pan="true" />
     <div v-if="!story" class="histoire-canvas-empty">
       Select story
     </div>

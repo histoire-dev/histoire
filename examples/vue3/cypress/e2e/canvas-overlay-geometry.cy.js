@@ -15,6 +15,7 @@ function visitCanvas(path = codegen, zoom = 'fit') {
     },
   })
   cy.get(`${canvas} .histoire-canvas-header`).should('be.visible')
+  cy.get(`${canvas} .histoire-canvas-header .histoire-canvas-status`).should('be.visible')
   cy.get(`${canvas} iframe`).should('exist')
 }
 
@@ -24,12 +25,33 @@ function zoomAction(label) {
   cy.contains('[role="dialog"][aria-label="Zoom level"] button', label).click()
 }
 
+/** Header metadata stays inside inspector-safe canvas space across responsive reflows. */
+function assertHeaderStatus() {
+  cy.get(canvas).should(($canvas) => {
+    const root = $canvas[0]
+    const viewport = root.getBoundingClientRect()
+    const inspector = root.ownerDocument.querySelector('aside.histoire-inspector-frame')?.getBoundingClientRect()
+    const right = inspector ? inspector.left - 12 : viewport.right
+    const header = root.querySelector('.histoire-canvas-header')
+    const status = header?.querySelector('.histoire-canvas-status')
+    const file = header?.querySelector('.histoire-canvas-file')
+    expect(status, 'viewport status').to.not.equal(null)
+    const statusBounds = status.getBoundingClientRect()
+    expect(statusBounds.right, 'status inline end').to.be.closeTo(right - 36, 1)
+    if (file) {
+      const fileBounds = file.getBoundingClientRect()
+      expect(statusBounds.top, 'status below source path').to.be.at.least(fileBounds.bottom - 1)
+    }
+  })
+}
+
 /** Check visible labels and previews against real overlay boundaries, never CSS class values. */
 function assertFrames(selector = '.histoire-canvas-frame', allEdges = true) {
+  assertHeaderStatus()
   cy.get(canvas).should(($canvas) => {
     const root = $canvas[0]
     const header = root.querySelector('.histoire-canvas-header').getBoundingClientRect()
-    const footer = root.querySelector('.histoire-canvas-info').getBoundingClientRect()
+    const footer = root.querySelector('.histoire-canvas-info')?.getBoundingClientRect()
     const viewport = root.getBoundingClientRect()
     const inspector = root.ownerDocument.querySelector('aside.histoire-inspector-frame')?.getBoundingClientRect()
     const right = inspector ? inspector.left - 12 : viewport.right
@@ -42,7 +64,7 @@ function assertFrames(selector = '.histoire-canvas-frame', allEdges = true) {
       if (allEdges) {
         expect(rect.left, 'frame starts inside canvas').to.be.at.least(viewport.left - 1)
         expect(rect.right, 'frame clear of inspector').to.be.at.most(right + 1)
-        expect(rect.bottom, 'frame ends above footer').to.be.at.most(footer.top + 1)
+        expect(rect.bottom, footer ? 'frame ends above Pan hint' : 'frame ends inside canvas').to.be.at.most((footer?.top ?? viewport.bottom) + 1)
       }
     }
   })
