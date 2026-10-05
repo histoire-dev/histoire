@@ -13,6 +13,7 @@ import { getSearchFrameState } from '../panes/search/frame-navigation.js'
 import CanvasFrame from './CanvasFrame.vue'
 import CanvasHeader from './CanvasHeader.vue'
 import CanvasStatus from './CanvasStatus.vue'
+import { canvasRectsOverlap } from './canvas-overlay-occlusion.js'
 import CollectErrorCard from './CollectErrorCard.vue'
 import { useCanvasFrameAdmission } from './frame-admission.js'
 import { createCanvasArrangement } from './frame-arrangement.js'
@@ -111,7 +112,7 @@ let mutation: MutationObserver | undefined
 let primaryRegistration = ''
 let stopInteractions = () => {}
 let initialFocusPending = true
-const { insets: contentInsets, measure } = useCanvasGeometry({
+const { insets: contentInsets, headerBounds, measure } = useCanvasGeometry({
   viewport: () => viewport.value,
   toolbar: () => toolbar.value,
   header: () => header.value,
@@ -132,6 +133,17 @@ const { insets: contentInsets, measure } = useCanvasGeometry({
     }
   },
 })
+const headerObscured = ref(false)
+
+/** Give mounted iframe content visual priority over fixed, non-interactive header metadata. */
+function updateHeaderOcclusion(): void {
+  const headerRect = header.value?.getBoundingClientRect()
+  headerObscured.value = Boolean(headerRect && [...registry.frames.values()].some((frame) => {
+    const iframe = frame.iframe
+    return iframe?.isConnected && canvasRectsOverlap(headerRect, iframe.getBoundingClientRect())
+  }))
+}
+
 
 /** Register selected physical document; src identity changes on runtime navigation. */
 function registerPrimary() {
@@ -227,6 +239,11 @@ watch(() => snapshot.value.selection?.variantId, (value) => {
   if (value) cachedVariantId.value = value
 }, { immediate: true })
 watch([frames, () => props.inspectorWidth, renderedArrange, story, panning], measure, { flush: 'post' })
+watch([
+  () => [canvas.effectiveZoom, canvas.panOffset.x, canvas.panOffset.y],
+  () => [headerBounds.value?.top, headerBounds.value?.bottom],
+  () => [...registry.frames.values()].map(frame => frame.iframe),
+], updateHeaderOcclusion, { flush: 'post', immediate: true })
 watchCanvasFrameFocus({ getFrame: () => selectedFrame.value, getArrange: () => renderedArrange.value, focusFrame: canvas.focusFrame, fitFrame: fitSelectedFrame, registerPrimary })
 watch(() => [snapshot.value.runtime.status, snapshot.value.runtime.runtimeId, canvas.frameBackgrounds[selectedFrame.value?.id ?? '']], registerPrimary, { deep: true, flush: 'post' })
 watch(() => registry.frames.get(selectedFrame.value?.id ?? ''), registerPrimary, { flush: 'post' })
@@ -249,7 +266,7 @@ defineExpose({ canvas, registry })
     <div ref="toolbar" class="histoire-canvas-toolbar-host">
       <slot name="toolbar" :canvas="canvas" :frames="registry" />
     </div>
-    <div v-if="story" ref="header" class="histoire-canvas-header">
+    <div v-if="story" ref="header" class="histoire-canvas-header" :class="{ 'is-obscured': headerObscured }">
       <slot name="header" :story="story">
         <CanvasHeader :story="story" />
       </slot>
@@ -291,7 +308,8 @@ defineExpose({ canvas, registry })
 /* Toolbar breakpoints follow usable canvas space after the floating inspector reserve. */
 .histoire-canvas-toolbar-host { position: absolute; top: 16px; inset-inline-start: calc((100% - var(--histoire-canvas-inspector-reserve)) / 2); display: flex; justify-content: center; width: max(0px, calc(100% - var(--histoire-canvas-inspector-reserve) - 16px)); min-width: 0; container-type: inline-size; transform: translateX(-50%); z-index: 10; }
 .histoire-canvas-toolbar-host:dir(rtl) { transform: translateX(50%); }
-.histoire-canvas-header { position: absolute; inset-inline: var(--histoire-canvas-info-inset) calc(var(--histoire-canvas-inspector-reserve) + var(--histoire-canvas-info-inset)); top: 88px; z-index: 1; container-type: inline-size; pointer-events: none; }
+.histoire-canvas-header { position: absolute; inset-inline: var(--histoire-canvas-info-inset) calc(var(--histoire-canvas-inspector-reserve) + var(--histoire-canvas-info-inset)); top: 88px; z-index: 1; container-type: inline-size; pointer-events: none; transition: opacity 160ms ease-out; }
+.histoire-canvas-header.is-obscured { opacity: 0; }
 /* Primary preview layers above frame chrome, so it owns visible selected-frame outline. */
 .histoire-canvas-primary { position: absolute; transform-origin: top left; overflow: hidden; border-radius: 6px; outline: 2px solid var(--histoire-accent); outline-offset: 0; }
 .histoire-canvas-primary.is-dimmed { opacity: .35; }
@@ -306,4 +324,5 @@ defineExpose({ canvas, registry })
 .histoire-primary-error.is-dimmed { opacity: .35; }
 .histoire-primary-error button { padding: 8px 16px; color: inherit; }
 .histoire-canvas-empty { position: absolute; inset: 0; display: grid; place-items: center; color: var(--histoire-muted); pointer-events: none; }
+@media (prefers-reduced-motion: reduce) { .histoire-canvas-header { transition: none; } }
 </style>

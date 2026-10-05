@@ -18,9 +18,16 @@ interface CanvasGeometryOptions {
   onMeasure: (size: CanvasSize, insets: CanvasContentInsets) => void
 }
 
+/** Relative header bounds let consumers react when fixed information moves. */
+interface CanvasHeaderBounds {
+  top: number
+  bottom: number
+}
+
 /** Observe viewport and overlay boxes without including scaled preview documents. */
 export function useCanvasGeometry(options: CanvasGeometryOptions) {
   const insets = shallowRef({ topInset: 0, bottomInset: 0 })
+  const headerBounds = shallowRef<CanvasHeaderBounds>()
   const elements = [options.viewport, options.toolbar, options.header, options.footer]
   let observer: ResizeObserver | undefined
   const observed = new Set<HTMLElement>()
@@ -42,6 +49,8 @@ export function useCanvasGeometry(options: CanvasGeometryOptions) {
     // Space/middle mouse only change hint presentation; they must never recenter Fit.
     const bottomInset = options.temporaryPan() ? insets.value.bottomInset : Math.max(0, viewport.bottom - (footer?.top ?? viewport.bottom))
     if (insets.value.topInset !== topInset || insets.value.bottomInset !== bottomInset) insets.value = { topInset, bottomInset }
+    const nextHeaderBounds = header ? { top: header.top - viewport.top, bottom: header.bottom - viewport.top } : undefined
+    if (headerBounds.value?.top !== nextHeaderBounds?.top || headerBounds.value?.bottom !== nextHeaderBounds?.bottom) headerBounds.value = nextHeaderBounds
     options.onMeasure({ width: viewport.width, height: viewport.height }, insets.value)
   }
 
@@ -73,5 +82,5 @@ export function useCanvasGeometry(options: CanvasGeometryOptions) {
     observer?.disconnect()
     observed.clear()
   })
-  return { insets, measure }
+  return { insets, headerBounds, measure }
 }
