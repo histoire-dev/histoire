@@ -1,14 +1,24 @@
 /**
- * Yields ready story document using shared explorer's accessible frame title.
- * Cold dev transforms need the same admission budget as existing C1/source checks.
+ * Yields selected retained replica before canonical primary fallback.
  * @param {object} [options] Options forwarded to `cy.get`, including timeout.
  */
-Cypress.Commands.add('getPreviewIframeBody', (options = {}) => cy.get('[aria-busy] iframe[title="Histoire preview"]', { timeout: 20000, ...options })
-  .should('be.visible')
-  // Story DOM may paint before framework readiness admits runtime input.
-  .should(($frames) => {
-    expect($frames[0].closest('[aria-busy]'), 'owning preview readiness').to.have.attr('aria-busy', 'false')
-  })
+export function getSelectedPreviewIframe(options = {}) {
+  return cy.get('body', options).then(($body) => {
+    const retained = $body.find('.histoire-canvas-frame.is-selected iframe[title="Histoire preview"]')
+    if (retained.length) return cy.wrap(retained.eq(0))
+    return cy.get('[aria-busy] iframe[title="Histoire preview"]', { timeout: 20000, ...options })
+      .should(($frames) => {
+        // Story DOM may paint before framework readiness admits runtime input.
+        expect($frames[0].closest('[aria-busy]'), 'owning preview readiness').to.have.attr('aria-busy', 'false')
+      })
+  }).should('be.visible')
+}
+
+/**
+ * Yields ready selected story document, including retained canvas replicas.
+ * @param {object} [options] Options forwarded to `cy.get`, including timeout.
+ */
+Cypress.Commands.add('getPreviewIframeBody', (options = {}) => getSelectedPreviewIframe(options)
   .its('0.contentDocument.body')
   .should('not.be.empty')
   .then(cy.wrap))

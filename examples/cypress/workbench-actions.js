@@ -1,6 +1,7 @@
 /// <reference types="cypress" />
 
 import { primaryPreviewFrame } from './workbench-contract.js'
+import { getSelectedPreviewIframe } from './frame-commands.js'
 
 /** Opens Home and reveals Stories without toggling an already expanded pane closed. */
 export function visitStories() {
@@ -20,7 +21,7 @@ export function selectCanvasVariant(title, variantId) {
 }
 
 /**
- * Returns the selected canonical document or an admitted passive frame document.
+ * Returns selected retained document or admitted passive frame document.
  * @param {string} storyId Exact collected story identity.
  * @param {string} variantId Exact collected variant identity.
  */
@@ -28,7 +29,7 @@ export function getCanvasVariantBody(storyId, variantId) {
   const key = JSON.stringify([storyId, variantId])
   return cy.get(`[data-frame-id='${key}']`).then(($frame) => {
     const selected = $frame.children('button').attr('aria-pressed') === 'true'
-    return (selected ? cy.get(primaryPreviewFrame) : cy.wrap($frame).find('iframe[title="Histoire preview"]'))
+    return (selected ? getSelectedPreviewIframe() : cy.wrap($frame).find('iframe[title="Histoire preview"]'))
       .its('0.contentDocument.body')
       .should('not.be.empty')
       .then(cy.wrap)

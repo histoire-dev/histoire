@@ -59,4 +59,26 @@ describe('Grid state isolation', () => {
       .find('[data-test-id="shared-controls-state"]')
       .should('contain', 'Gamma')
   })
+
+  it('retains ready replica document when selected from canvas chrome', () => {
+    const thirdVariantId = 'src-components-sharedcontrols-story-vue-2'
+    const key = JSON.stringify(['src-components-sharedcontrols-story-vue', thirdVariantId])
+    const thirdFrame = () => cy.get('[data-frame-id]', { timeout: 20000 })
+      .filter((_, element) => element.getAttribute('data-frame-id') === key)
+
+    thirdFrame().find('iframe[data-test-id="preview-iframe-passive"]').should('be.visible').then(($iframe) => {
+      cy.wrap($iframe[0]).as('retainedPreview')
+    })
+    thirdFrame().children('button').contains(/^variant 3$/).click()
+    cy.location('search').should('include', `variantId=${thirdVariantId}`)
+    thirdFrame().children('button').should('have.attr', 'aria-pressed', 'true')
+    cy.get('@retainedPreview').then((iframe) => {
+      thirdFrame().find('iframe[title="Histoire preview"]').should(($current) => {
+        expect($current[0]).to.equal(iframe[0] ?? iframe)
+      })
+    })
+    cy.get('[data-test-id="story-side-panel"] h2').should('have.text', 'variant 3')
+    cy.getControlsIframeBody().find('input[type="text"]').first().clear().type('Retained document')
+    cy.getPreviewIframeBody().find('[data-test-id="shared-controls-state"]').should('contain', 'Retained document')
+  })
 })

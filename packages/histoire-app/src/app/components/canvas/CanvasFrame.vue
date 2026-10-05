@@ -21,8 +21,10 @@ const props = defineProps<{
   variant: HistoireCatalogVariant
   /** Live-budget admission; placeholders preserve target and layout. */
   live: boolean
-  /** Primary selection owns canonical SDK runtime. */
+  /** Canonical selected frame; it may retain a promoted replica runtime. */
   selected: boolean
+  /** Selected canvas frame keeps its ready isolated runtime after promotion. */
+  retainReplica?: boolean
   /** Absolute configured source base. */
   previewBase: string
   /** Preview logical dimensions before canvas scaling. */
@@ -37,7 +39,7 @@ const props = defineProps<{
   /** Active-query nonmatches dim without disabling native frame interaction. */
   dimmed?: boolean
 }>()
-const emit = defineEmits<{ select: [variantId: string], contextmenu: [event: MouseEvent | KeyboardEvent, frame: CanvasFrameLayout] }>()
+const emit = defineEmits<{ select: [variantId: string], promote: [frameId: string], contextmenu: [event: MouseEvent | KeyboardEvent, frame: CanvasFrameLayout] }>()
 const canvas = useCanvasStore()
 const registry = useCanvasFrames()
 const menu = useContextMenu()
@@ -53,7 +55,7 @@ const background = computed(() => {
   const color = canvas.frameBackgrounds[props.frame.id]?.backgroundColor ?? canvas.frameBackground
   return color === 'transparent' ? '#fff' : color
 })
-const canSelect = computed(() => props.selected || (props.live && !props.stale && status.value === 'ready'))
+const canSelect = computed(() => !props.stale)
 let unregister = () => {}
 
 /** Register placeholder geometry before passive document readiness. */
@@ -81,9 +83,15 @@ function updateStatus(value: typeof status.value, detail?: unknown) {
   error.value = detail
 }
 
-/** Prevent selection until this replica owns a ready, live document. */
+/** Ready replicas retain their document while all paused states use canonical selection. */
 function select() {
-  if (canSelect.value) emit('select', props.variant.id)
+  if (!canSelect.value) return
+  if (!props.selected && props.live && status.value === 'ready') {
+    emit('promote', props.frame.id)
+  }
+  else {
+    emit('select', props.variant.id)
+  }
 }
 
 /** Native menu key opens same chrome menu as pointer context menu. */
@@ -109,7 +117,7 @@ function openMenu(event: MouseEvent | KeyboardEvent) {
     </button>
     <div class="histoire-frame-body" data-test-id="responsive-preview-bg" :style="{ height: `${height * canvas.effectiveZoom}px`, background }" @click="select">
       <div class="histoire-frame-content" :style="previewStyle">
-        <CanvasReplicaPreview v-if="live && !selected" ref="replica" :frame-id="frame.id" :story-id="frame.storyId" :variant-id="frame.variantId" :preview-base="previewBase" @status="updateStatus" />
+        <CanvasReplicaPreview v-if="live && (!selected || retainReplica)" ref="replica" :frame-id="frame.id" :story-id="frame.storyId" :variant-id="frame.variantId" :preview-base="previewBase" @status="updateStatus" />
       </div>
       <div v-if="!live" class="histoire-frame-placeholder">
         {{ variant.title }}
@@ -122,7 +130,8 @@ function openMenu(event: MouseEvent | KeyboardEvent) {
           Retry
         </HstButton>
       </div>
-      <div v-if="!selected && canSelect" class="histoire-frame-select" aria-hidden="true" />
+      <!-- Ready replicas keep direct pointer input; paused cards still activate canonical selection. -->
+      <div v-if="!selected && (!live || status !== 'ready') && canSelect" class="histoire-frame-select" aria-hidden="true" />
     </div>
   </section>
 </template>

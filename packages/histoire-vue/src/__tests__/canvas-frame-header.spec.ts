@@ -29,7 +29,7 @@ async function frameFixture(selected = false) {
   const story = source.descriptor.catalog.stories[0]
   const variant = story.variants[0]
   const frame = layoutCanvasFrames(story.id, [variant.id], { width: 208, height: 180 }, 'grid')[0]
-  const props = reactive({ frame, variant, selected, live: true, stale: false, previewBase: 'https://book.example/', width: 208, height: 180 })
+  const props = reactive({ frame, variant, selected, live: true, retainReplica: false, stale: false, previewBase: 'https://book.example/', width: 208, height: 180 })
   const Host = defineComponent({
     setup() {
       provideCanvas(canvas, frames)
@@ -59,33 +59,65 @@ async function frameFixture(selected = false) {
 }
 
 describe('canvas frame header interaction', () => {
-  it('selects exact ready variant once', async () => {
+  it('promotes exact ready live replica', async () => {
     const test = await frameFixture()
     await test.ready()
     test.header.element.click()
-    expect(test.component.emitted('select')).toEqual([[test.props.variant.id]])
+    expect(test.component.emitted('promote')).toEqual([[test.props.frame.id]])
+    expect(test.component.emitted('select')).toBeUndefined()
     expect(test.header.attributes('aria-pressed')).toBe('false')
   })
 
-  it.each(['loading', 'stale', 'budget-excluded'] as const)('prevents selection of %s passive preview', async (state) => {
+  it('leaves ready passive preview unobstructed for direct iframe interaction', async () => {
     const test = await frameFixture()
-    if (state !== 'loading') await test.ready()
-    if (state === 'stale') test.props.stale = true
-    if (state === 'budget-excluded') test.props.live = false
-    await nextTick()
-    expect(test.header.element.disabled).toBe(true)
-    test.header.element.click()
-    expect(test.component.emitted('select')).toBeUndefined()
+    await test.ready()
+    expect(test.component.find('.histoire-frame-select').exists()).toBe(false)
   })
 
-  it('keeps canonical selected header pressed and enabled', async () => {
-    const test = await frameFixture(true)
-    expect(test.header.attributes('aria-pressed')).toBe('true')
+  it('retains promoted replica when frame becomes selected', async () => {
+    const test = await frameFixture()
+    await test.ready()
+    test.props.selected = true
+    test.props.retainReplica = true
+    await nextTick()
+    expect(test.component.findComponent(CanvasReplicaPreview).exists()).toBe(true)
+  })
+
+  it.each(['loading', 'budget-excluded'] as const)('selects %s passive preview through its title', async (state) => {
+    const test = await frameFixture()
+    if (state === 'budget-excluded') test.props.live = false
+    await nextTick()
     expect(test.header.element.disabled).toBe(false)
+    test.header.element.click()
+    expect(test.component.emitted('select')).toEqual([[test.props.variant.id]])
+  })
+
+  it('selects budget-excluded placeholder through its body', async () => {
+    const test = await frameFixture()
+    test.props.live = false
+    await nextTick()
+    await test.component.get('[data-test-id="responsive-preview-bg"]').trigger('click')
+    expect(test.component.emitted('select')).toEqual([[test.props.variant.id]])
+  })
+
+  it('selects failed passive preview through its title', async () => {
+    const test = await frameFixture()
+    test.component.getComponent(CanvasReplicaPreview).vm.$emit('status', 'error', new Error('preview failed'))
+    await nextTick()
+    expect(test.header.element.disabled).toBe(false)
+    test.header.element.click()
+    expect(test.component.emitted('select')).toEqual([[test.props.variant.id]])
+  })
+
+  it.each([false, true])('keeps stale selected=%s frame inactive', async (selected) => {
+    const test = await frameFixture(selected)
     test.props.stale = true
     test.props.live = false
     await nextTick()
-    expect(test.header.element.disabled).toBe(false)
+    expect(test.header.attributes('aria-pressed')).toBe(String(selected))
+    expect(test.header.element.disabled).toBe(true)
+    test.header.element.click()
+    expect(test.component.emitted('select')).toBeUndefined()
   })
 
   it.each([

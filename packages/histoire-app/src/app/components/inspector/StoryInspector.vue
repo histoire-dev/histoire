@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { InspectorTab } from './state.js'
 import { getHistoireTargetKey } from '@histoire/protocol'
+import type { HistoireSession } from '@histoire/sdk'
 import { HistoireDocs, HistoireEvents, HistoireTests } from '@histoire/vue'
 import { useHistoireContext, useProvidedHistoireTestsModel } from '@histoire/vue/internal'
 import { computed, ref, useId, watch } from 'vue'
@@ -21,13 +22,15 @@ const props = defineProps<{
   isolatedHref?: string
   /** Matrix layout may name local props selection without changing canonical variant. */
   variantTitle?: string
+  /** Root workbench session retaining project-wide test aggregation. */
+  projectTestSession?: HistoireSession
 }>()
 const emit = defineEmits<{ panel: [value: InspectorTab], close: [], error: [error: unknown] }>()
 const { session, snapshot, story, variant } = useSelection()
 const context = useHistoireContext()
 const id = useId()
 const tests = useProvidedHistoireTestsModel(session)
-const projectTests = useWorkbenchTestsModel(session)
+const projectTests = useWorkbenchTestsModel(props.projectTestSession ?? session)
 /** Project results are displayed only for exact selected target and current source. */
 const testEntry = computed(() => {
   const target = snapshot.value.selection
