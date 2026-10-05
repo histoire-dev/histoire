@@ -85,7 +85,7 @@ onBeforeUnmount(() => {
     <span v-if="!live" class="histoire-matrix-cell-placeholder">Preview paused</span>
     <div v-else-if="status === 'error'" class="histoire-matrix-cell-error" role="alert">
       <span>{{ error instanceof Error ? error.message : 'Preview unavailable' }}</span>
-      <HstButton color="flat" type="button" @click="preview?.retry()">
+      <HstButton color="default" type="button" @click="preview?.retry()">
         Retry
       </HstButton>
     </div>

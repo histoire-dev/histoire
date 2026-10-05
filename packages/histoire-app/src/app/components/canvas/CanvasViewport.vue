@@ -98,10 +98,15 @@ const live = useCanvasFrameAdmission({
   moving: () => canvas.panning,
   context: () => JSON.stringify([story.value?.id, renderedArrange.value, size.value.width, size.value.height, canvas.viewport.width, canvas.viewport.height, props.inspectorWidth]),
 })
-const primaryStyle = computed(() => {
+/** Position logical preview bounds before iframe-only scaling. */
+const primaryPosition = computed(() => {
   const frame = selectedFrame.value
-  return { left: `${(frame?.x ?? 0) * canvas.effectiveZoom + canvas.panOffset.x + (renderedArrange.value === 'list' ? 145 : 1)}px`, top: `${(frame?.y ?? 0) * canvas.effectiveZoom + canvas.panOffset.y + (renderedArrange.value === 'list' ? 1 : 29)}px`, width: `${size.value.width}px`, height: `${size.value.height}px`, transform: `scale(${canvas.effectiveZoom})`, visibility: frame && renderedArrange.value !== 'matrix' ? 'visible' as const : 'hidden' as const }
+  return { left: `${(frame?.x ?? 0) * canvas.effectiveZoom + canvas.panOffset.x + (renderedArrange.value === 'list' ? 145 : 1)}px`, top: `${(frame?.y ?? 0) * canvas.effectiveZoom + canvas.panOffset.y + (renderedArrange.value === 'list' ? 1 : 29)}px` }
 })
+const primaryShown = computed(() => Boolean(selectedFrame.value && renderedArrange.value !== 'matrix'))
+const primaryStyle = computed(() => ({ ...primaryPosition.value, width: `${size.value.width}px`, height: `${size.value.height}px`, transform: `scale(${canvas.effectiveZoom})`, visibility: primaryShown.value ? 'visible' as const : 'hidden' as const }))
+/** Error chrome shares preview screen bounds but never inherits iframe zoom. */
+const primaryErrorStyle = computed(() => ({ ...primaryPosition.value, width: `${size.value.width * canvas.effectiveZoom}px`, height: `${size.value.height * canvas.effectiveZoom}px` }))
 let mutation: MutationObserver | undefined
 let primaryRegistration = ''
 let stopInteractions = () => {}
@@ -186,6 +191,18 @@ async function retryPrimary() {
   catch (error) { emit('error', error) }
 }
 
+/** A ready mounted document owns resolution of every prior primary error. */
+function readyPrimary() {
+  primaryError.value = undefined
+  registerPrimary()
+}
+
+/** Render runtime errors in canvas chrome, never inside transformed preview content. */
+function failPrimary(error: unknown) {
+  primaryError.value = error
+  emit('error', error)
+}
+
 /** Comment placement captures exact registered document coordinates. */
 function framePointer(event: PointerEvent) {
   if (!props.commentMode || event.button !== 0 || panning.value || (event.target as Element)?.closest('.histoire-canvas-toolbar, button, input, textarea, select, [contenteditable]')) return
@@ -244,20 +261,20 @@ defineExpose({ canvas, registry })
       </template>
     </component>
     <div ref="primaryContainer" class="histoire-canvas-primary" :class="{ 'is-stale': diagnostics.length, 'is-dimmed': primarySearch.dimmed }" :style="primaryStyle">
-      <HistoirePreview :key="primaryKey" ref="primary" @ready="registerPrimary" @error="primaryError = $event; emit('error', $event)">
+      <HistoirePreview :key="primaryKey" ref="primary" @ready="readyPrimary" @error="failPrimary">
         <template #loading>
           <div class="histoire-primary-loading">
             Loading preview…
           </div>
         </template>
-        <template #error="{ error }">
-          <div class="histoire-primary-error" role="alert">
-            <span>{{ error instanceof Error ? error.message : 'Preview unavailable' }}</span><HstButton color="flat" @click="retryPrimary">
-              Retry
-            </HstButton>
-          </div>
-        </template>
+        <!-- HistoirePreview emits errors; canvas chrome renders them outside iframe transform. -->
+        <template #error />
       </HistoirePreview>
+    </div>
+    <div v-if="primaryError && primaryShown" class="histoire-primary-error" :class="{ 'is-stale': diagnostics.length, 'is-dimmed': primarySearch.dimmed }" :style="primaryErrorStyle" role="alert">
+      <span>{{ primaryError instanceof Error ? primaryError.message : 'Preview unavailable' }}</span><HstButton color="default" @click="retryPrimary">
+        Retry
+      </HstButton>
     </div>
     <div v-if="commentMode" class="histoire-comment-capture" @pointerdown="framePointer" />
     <slot name="overlays" :canvas="canvas" :frames="registry" :selected-frame="selectedFrame" />
@@ -284,8 +301,9 @@ defineExpose({ canvas, registry })
 .histoire-frame-list :deep(.histoire-canvas-frame) { pointer-events: auto; }
 .histoire-comment-capture { position: absolute; inset: 76px 0 40px; cursor: crosshair; }
 .is-stale { opacity: .4; pointer-events: none; }
-.histoire-primary-loading, .histoire-primary-error { position: absolute; inset: 0; display: grid; place-items: center; color: var(--histoire-muted); font-size: 16px; }
-.histoire-primary-error { gap: 16px; padding: 24px; color: var(--histoire-danger); background: var(--histoire-danger-soft); }
+.histoire-primary-loading { position: absolute; inset: 0; display: grid; place-items: center; color: var(--histoire-muted); font-size: 16px; }
+.histoire-primary-error { position: absolute; z-index: 2; display: grid; place-items: center; gap: 16px; box-sizing: border-box; padding: 24px; color: var(--histoire-danger); background: var(--histoire-danger-soft); font-size: 16px; }
+.histoire-primary-error.is-dimmed { opacity: .35; }
 .histoire-primary-error button { padding: 8px 16px; color: inherit; }
 .histoire-canvas-empty { position: absolute; inset: 0; display: grid; place-items: center; color: var(--histoire-muted); pointer-events: none; }
 </style>

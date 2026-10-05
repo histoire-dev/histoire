@@ -117,7 +117,7 @@ function openMenu(event: MouseEvent | KeyboardEvent) {
         Loading preview…
       </div>
       <div v-else-if="!selected && status === 'error'" class="histoire-frame-error" role="alert">
-        <span>{{ error instanceof Error ? error.message : 'Preview unavailable' }}</span><HstButton color="flat" @click.stop="replica?.retry()">
+        <span>{{ error instanceof Error ? error.message : 'Preview unavailable' }}</span><HstButton color="default" @click.stop="replica?.retry()">
           Retry
         </HstButton>
       </div>

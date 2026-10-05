@@ -3,7 +3,7 @@ import { createHistoireSessionWithAdapters } from '@histoire/sdk/internal'
 import { HistoireProvider } from '@histoire/vue'
 import { flushPromises, mount } from '@vue/test-utils'
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { defineComponent, h, nextTick, ref } from 'vue'
+import { defineComponent, h, nextTick, onMounted, ref } from 'vue'
 import CanvasViewport from '../../../histoire-app/src/app/components/canvas/CanvasViewport.vue'
 import MatrixView from '../../../histoire-app/src/app/components/canvas/matrix/MatrixView.vue'
 import { canvasToClient } from '../../../histoire-app/src/app/components/canvas/pan/usePanZoom.js'
@@ -22,7 +22,7 @@ afterEach(async () => {
 })
 
 /** Mount genuine canvas geometry; preview lifetimes do not participate in layout. */
-async function canvasFixture(zoom: number | 'fit' = 'fit', initialHeight = 900, customHeader = false) {
+async function canvasFixture(zoom: number | 'fit' = 'fit', initialHeight = 900, customHeader = false, previewError?: Error) {
   window.localStorage.setItem('_histoire-ui-canvas', JSON.stringify({ zoom }))
   const observers = resizeObserverFixture()
   const geometry = { height: initialHeight, headerHeight: 48, footerHeight: 14 }
@@ -45,6 +45,19 @@ async function canvasFixture(zoom: number | 'fit' = 'fit', initialHeight = 900, 
   await session.selection.select({ storyId: 'a:b', variantId: 'c' })
   const matrix = createMatrixStore()
   const arrange = ref<'grid' | 'list' | 'matrix'>('grid')
+  const Preview = defineComponent({
+    emits: ['error'],
+    setup(_props, { emit, expose, slots }) {
+      expose({ unmount: async () => {} })
+      onMounted(() => {
+        if (previewError) emit('error', previewError)
+      })
+      return () => h('div', { class: 'histoire-primary' }, [
+        h('iframe', { class: 'histoire-primary-frame' }),
+        previewError ? slots.error?.({ error: previewError }) : slots.loading?.(),
+      ])
+    },
+  })
   const Host = defineComponent({
     setup() {
       provideMatrix(matrix)
@@ -58,7 +71,7 @@ async function canvasFixture(zoom: number | 'fit' = 'fit', initialHeight = 900, 
     props: { session },
     attachTo: document.body,
     slots: { default: () => h(Host) },
-    global: { stubs: { HistoirePreview: true, CanvasFrame: true, MatrixCell: true, MatrixAxisBar: true } },
+    global: { stubs: { HistoirePreview: Preview, CanvasFrame: true, MatrixCell: true, MatrixAxisBar: true } },
   })
   const component = wrapper.getComponent(CanvasViewport)
   const canvas = (component.vm as unknown as { canvas: CanvasStore }).canvas
@@ -156,5 +169,17 @@ describe('canvas overlay geometry', () => {
     test.geometry.headerHeight = 180
     await test.resize()
     expect(test.canvas.contentInsets).toEqual({ topInset: 268, bottomInset: 0 })
+  })
+
+  it('keeps primary mount errors outside zoomed preview content', async () => {
+    const error = new Error('Story runtime did not mount in time')
+    const test = await canvasFixture(0.5, 900, false, error)
+    const primary = test.component.get('.histoire-canvas-primary')
+    const overlay = test.component.get('.histoire-primary-error')
+
+    expect(overlay.text()).toContain(error.message)
+    expect(overlay.element.closest('.histoire-canvas-primary')).toBeNull()
+    expect(Number.parseFloat(overlay.element.style.width)).toBeCloseTo(Number.parseFloat(primary.element.style.width) * test.canvas.effectiveZoom)
+    expect(Number.parseFloat(overlay.element.style.height)).toBeCloseTo(Number.parseFloat(primary.element.style.height) * test.canvas.effectiveZoom)
   })
 })
