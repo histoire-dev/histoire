@@ -1,7 +1,7 @@
 .histoire-provider .histoire-settings-page { display: flex; height: 100%; min-height: 0; background: var(--histoire-canvas, #f0f0f3); color: var(--histoire-text, #27272a); }
 .histoire-provider .histoire-settings-nav { width: 280px; flex: 0 0 280px; display: flex; flex-direction: column; gap: 3px; padding: 20px 8px 16px; background: var(--histoire-surface, #fff); border-inline-end: 1px solid var(--histoire-border, #e4e4e7); }
 .histoire-provider .histoire-settings-nav > strong { padding: 0 10px 16px; font-size: 15px; }
-.histoire-provider .histoire-settings-nav > button { display: flex; align-items: center; gap: 10px; width: 100%; padding: 11px 10px; border: 0; border-radius: 9px; background: transparent; color: inherit; text-align: start; font: inherit; cursor: pointer; }
+.histoire-provider .histoire-settings-nav > button { display: flex; align-items: center; justify-content: flex-start; gap: 10px; width: 100%; padding: 11px 10px; border: 0; border-radius: 9px; background: transparent; color: inherit; text-align: start; font: inherit; cursor: pointer; }
 .histoire-provider .histoire-settings-nav > button[aria-current="page"] { background: var(--histoire-accent-soft, #ecfdf5); color: var(--histoire-accent-text, #047857); font-weight: 600; }
 .histoire-provider .histoire-settings-nav-icon { width: 18px; color: var(--histoire-muted, #71717a); font-size: 18px; }
 .histoire-provider .histoire-settings-nav footer { margin-top: auto; padding: 16px 10px 0; font-size: 11px; color: var(--histoire-muted, #71717a); }

@@ -69,5 +69,12 @@ for (const colorScheme of ['light', 'dark']) {
         assertAlignedText($menu[0], ['Copy source', 'Copy link'])
       })
     })
+
+    it('keeps Settings navigation labels left-aligned', () => {
+      cy.get('[aria-label="Settings"]').click()
+      cy.get('[aria-label="Settings sections"]').should(($navigation) => {
+        assertAlignedText($navigation[0], ['General', 'Appearance', 'Viewports', 'Keyboard shortcuts', 'About'])
+      })
+    })
   })
 }
