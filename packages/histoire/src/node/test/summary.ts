@@ -1,6 +1,7 @@
 import type { HistoireTestCaseResultInput, HistoireTestRunSummary } from '@histoire/shared'
 import type { TestModule } from 'vitest/node'
 import type { GeneratedSpecFile } from './types.js'
+import { getHistoireTargetKey } from '@histoire/protocol'
 import { createHistoireTestSummary, mergeHistoireTestSummaries, serializeTestErrors } from '@histoire/shared'
 import { normalize } from 'pathe'
 import pc from 'picocolors'
@@ -35,7 +36,9 @@ export function summarizeResults(testModules: TestModule[], specFiles: Generated
       // never reach the variant that owns them in the app.
       console.warn(pc.yellow(`⚠️  Histoire could not map the test module ${module.moduleId} back to a story variant.`))
     }
-    const key = `${meta?.storyId ?? 'unknown'}:${meta?.variantId ?? 'unknown'}`
+    // Reuse the portable tuple identity so delimiters inside IDs cannot merge
+    // independent targets in a multi-story server run.
+    const key = getHistoireTargetKey({ storyId: meta?.storyId ?? 'unknown', variantId: meta?.variantId ?? 'unknown' })
     for (const task of module.children.allTests()) {
       const result = task.result()
       const state = result.state === 'passed' ? 'passed' : result.state === 'skipped' ? 'skipped' : 'failed'

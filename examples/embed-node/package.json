@@ -1,0 +1,21 @@
+{
+  "name": "histoire-example-embed-node",
+  "type": "module",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "dev": "node --experimental-strip-types src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js"
+  },
+  "dependencies": {
+    "histoire": "workspace:^",
+    "vite": "catalog:",
+    "ws": "^8.18.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.1",
+    "@types/ws": "^8.5.13",
+    "typescript": "catalog:"
+  }
+}

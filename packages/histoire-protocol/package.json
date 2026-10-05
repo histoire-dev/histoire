@@ -1,0 +1,33 @@
+{
+  "name": "@histoire/protocol",
+  "type": "module",
+  "version": "1.0.0-beta.1",
+  "description": "Portable Histoire catalog and embedding contracts",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "rimraf dist && tsc",
+    "test": "vitest run",
+    "watch": "tsc -w --sourceMap"
+  },
+  "devDependencies": {
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vitest": "4.1.10"
+  }
+}

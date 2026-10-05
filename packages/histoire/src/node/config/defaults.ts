@@ -1,4 +1,5 @@
 import type { HistoireConfig } from '@histoire/shared'
+import { DEFAULT_THEME_FONTS } from '@histoire/shared'
 import { tailwindTokens } from '../builtin-plugins/tailwind-tokens.js'
 import { vanillaSupport } from '../builtin-plugins/vanilla-support/plugin.js'
 import { defaultColors } from '../colors.js'
@@ -18,6 +19,7 @@ export function getDefaultConfig(): HistoireConfig {
     ],
     outDir: '.histoire/dist',
     mcp: true,
+    embed: { enabled: false, allowedOrigins: [], channels: [], allowOpenInEditor: false, allowServerTests: false },
     storyMatch: [
       '**/*.story.vue',
       '**/*.story.svelte',
@@ -33,6 +35,7 @@ export function getDefaultConfig(): HistoireConfig {
     },
     theme: {
       title: 'Histoire',
+      fonts: { ...DEFAULT_THEME_FONTS },
       colors: {
         primary: defaultColors.emerald,
         gray: defaultColors.zinc,
@@ -41,6 +44,9 @@ export function getDefaultConfig(): HistoireConfig {
       storeColorScheme: true,
       darkClass: 'dark',
     },
+    ui: { defaultArrange: 'grid', frameBudget: 24 },
+    agents: { enabled: false, presets: [], permissions: { fileEdits: 'ask', terminal: 'ask' } },
+    comments: { enabled: true, file: '.histoire/comments.json' },
     responsivePresets: [
       {
         label: 'Mobile (Small)',

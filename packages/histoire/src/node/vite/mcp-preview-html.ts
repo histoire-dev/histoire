@@ -1,6 +1,6 @@
 import type { Connect, ViteDevServer } from 'vite'
-import type { PreviewHostRegistry } from '../mcp/browser/preview-host.js'
-import { createPreviewHostRegistry } from '../mcp/browser/preview-host.js'
+import type { PreviewHostRegistry } from '../runtime/browser/preview-host.js'
+import { createPreviewHostRegistry } from '../runtime/browser/preview-host.js'
 
 /** Inactive registries add no route until an execution owns a nonce. */
 const registries = new WeakMap<ViteDevServer['middlewares'], PreviewHostRegistry>()
@@ -12,6 +12,12 @@ export function getDevPreviewHost(server: ViteDevServer): PreviewHostRegistry {
   const registry = registries.get(server.middlewares)
   if (!registry) throw new Error('Histoire preview host is not installed')
   return registry
+}
+
+/** Retires middleware-mode leases even when Vite owns no HTTP listener. */
+export function closeDevPreviewHost(server: ViteDevServer): void {
+  registries.get(server.middlewares)?.close()
+  registries.delete(server.middlewares)
 }
 
 /** Thin adapter: transport-neutral HTML stays usable by standalone Node mode. */

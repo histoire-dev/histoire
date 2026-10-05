@@ -23,13 +23,28 @@ function createContext(): Context {
   }
 }
 
-it('keeps installed Node Playwright providers out of browser dependency optimization', () => {
+it('keeps Node Playwright providers and declaration packages out of browser optimization', () => {
   const read = vi.spyOn(fs, 'readFileSync').mockReturnValue(JSON.stringify({
     dependencies: { 'vue': '3', 'playwright': '1', 'playwright-core': '1' },
-    devDependencies: { '@playwright/test': '1', '@vitest/browser-playwright': '4', 'client-library': '1' },
+    devDependencies: { '@playwright/test': '1', '@vitest/browser-playwright': '4', '@types/react': '19', '@types/node': '22', 'client-library': '1' },
   }))
   try {
     expect(getVitestBrowserDependencyNames({ root: '/consumer', supportPlugins: [] } as Context)).toEqual(['vue', 'client-library'])
+  }
+  finally { read.mockRestore() }
+})
+
+it('includes framework runtime entry points without depending on package declarations', () => {
+  const read = vi.spyOn(fs, 'readFileSync').mockReturnValue('{}')
+  try {
+    expect(getVitestBrowserDependencyNames({ root: '/consumer', supportPlugins: [{ id: 'svelte4' }, { id: 'react' }] } as Context)).toEqual([
+      'svelte',
+      'react',
+      'react-dom',
+      'react-dom/client',
+      'react/jsx-runtime',
+      'react/jsx-dev-runtime',
+    ])
   }
   finally { read.mockRestore() }
 })

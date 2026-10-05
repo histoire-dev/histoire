@@ -1,88 +1,36 @@
-<script lang="ts">
-export default {
-  name: 'HstColorSelect',
-  inheritAttrs: false,
-}
-</script>
-
-<script lang="ts" setup>
-import { computed } from 'vue'
+<script setup lang="ts">
+import type { HstControlLayout } from '../../types'
+import { useThrottleFn } from '@vueuse/core'
+import { ref } from 'vue'
+import { useControlField } from '../../field'
 import HstWrapper from '../HstWrapper.vue'
 
+defineOptions({ name: 'HstColorSelect', inheritAttrs: false })
 const props = defineProps<{
+  /** Shared label placement. */
+  layout?: HstControlLayout
+  /** Visible field label. */
   title?: string
+  /** Preserve exact text drafts as well as native picker hex values. */
   modelValue?: string | null
 }>()
-
-const emit = defineEmits({
-  'update:modelValue': (newValue: string) => true,
-})
-
-const stringModel = computed({
-  get: () => props.modelValue,
-  set: value => {
-    emit('update:modelValue', value)
-  },
-})
-
-function throttle(cb, delay = 15) {
-  let shouldWait = false
-  let waitingArgs
-  const timeoutFunc = () => {
-    if (waitingArgs == null) {
-      shouldWait = false
-    } else {
-      cb(...waitingArgs)
-      waitingArgs = null
-      setTimeout(timeoutFunc, delay)
-    }
-  }
-
-  return (...args) => {
-    if (shouldWait) {
-      waitingArgs = args
-      return
-    }
-
-    cb(...args)
-    shouldWait = true
-    setTimeout(timeoutFunc, delay)
-  }
-}
-const updateValue = throttle((value: string) => {
-  emit('update:modelValue', value)
-})
-function processChange(inp) {
-  updateValue(inp)
-}
-</script>
-
-<script>
-
+const emit = defineEmits<{ 'update:modelValue': [value: string] }>()
+const input = ref<HTMLInputElement>()
+const { attrs, id, fieldAttrs, focus, select } = useControlField(input, () => props.title)
+defineExpose({ focus, select, element: input })
+/** Native picker can publish rapidly; retain leading and trailing updates. */
+const updateColor = useThrottleFn((value: string) => {
+  if (!input.value?.disabled && !input.value?.readOnly) emit('update:modelValue', value)
+}, 15, true, true)
 </script>
 
 <template>
-  <HstWrapper
-    :title="title"
-    class="histoire-select htw-cursor-text htw-items-center"
-    :class="$attrs.class"
-    :style="$attrs.style"
-  >
-    <div class="htw-flex htw-flex-row htw-gap-1">
-      <input
-        v-bind="{ ...$attrs, class: null, style: null }"
-        v-model="stringModel"
-        type="text"
-        class="htw-text-inherit htw-bg-transparent htw-w-full htw-outline-none htw-px-2 htw-py-1 -htw-my-1 htw-border htw-border-solid htw-border-black/25 dark:htw-border-white/25 focus:htw-border-primary-500 dark:focus:htw-border-primary-500 htw-rounded-sm"
-      >
-      <input
-        type="color"
-        :value="modelValue"
-        @input="((e) => processChange((e.target as HTMLInputElement).value as string))"
-      >
+  <HstWrapper :title="title" :layout="layout" :control-id="id()" class="histoire-color-select" :class="attrs.class" :style="attrs.style" :data-histoire-control-type="attrs['data-histoire-control-type']">
+    <div class="histoire-color-fields">
+      <input ref="input" v-bind="fieldAttrs()" type="text" :value="modelValue" class="histoire-control-field" @input="emit('update:modelValue', ($event.target as HTMLInputElement).value)">
+      <input type="color" :value="modelValue ?? undefined" :disabled="Boolean(attrs.disabled || attrs.readonly)" :aria-label="`${title ?? 'Color'} picker`" @input="updateColor(($event.target as HTMLInputElement).value)">
     </div>
-
-    <template #actions>
+    <template v-if="$slots.actions" #actions>
       <slot name="actions" />
     </template>
   </HstWrapper>

@@ -32,6 +32,15 @@ export function previewMessageHandler() {
     })
 
     async function handlePreviewMessage(event) {
+      // New opt-in traffic never inherits legacy optional document identity.
+      if ((event.data.type === HOST_CHANNEL_MESSAGE || (event.data.type === RUNTIME_REQUEST && event.data.command === 'channel.post')) && event.data.documentId !== previewDocumentId) return
+      if (event.data.documentId !== undefined && event.data.documentId !== previewDocumentId) return
+      if ([MEASURE_REQUEST, ELEMENT_PICK_REQUEST, PROPS_OVERRIDE].includes(event.data.type)) {
+        if (initialSelection.controls) return
+        if (event.data.storyId !== undefined && event.data.storyId !== story.value?.id) return
+        if (event.data.variantId !== undefined && event.data.variantId !== variant.value?.id) return
+        if (event.data.requestId !== undefined && (typeof event.data.requestId !== 'string' || event.data.requestId.length > 200)) return
+      }
       // Automation requests retain exact tuple and document identity. Existing
       // UI callers omit these additive fields and keep their current protocol.
       if (event.data.type === COLLECT_TESTS || event.data.type === RUN_TESTS) {
@@ -42,6 +51,11 @@ export function previewMessageHandler() {
         if (event.data.mcpEpoch !== undefined && event.data.mcpEpoch !== new URLSearchParams(window.location.search).get('mcpEpoch')) return
       }
       if (event.data?.type === PREVIEW_SYNC) {
+        const currentVariant = variant.value
+        if (event.data.selectionVersion !== undefined) {
+          if (!Number.isSafeInteger(event.data.selectionVersion) || event.data.selectionVersion < previewSelectionVersion) return
+          previewSelectionVersion = event.data.selectionVersion
+        }
         try {
           await syncSelection(event.data)
         }
@@ -52,30 +66,54 @@ export function previewMessageHandler() {
           console.error(error)
           return
         }
+        // Reload can restore the URL's same actor after its initial ready event.
+        if (!initialSelection.controls && !selection.grid && currentVariant && variant.value === currentVariant && frameworkReadyVariants.has(currentVariant)) {
+          await markVariantReady(currentVariant.id)
+        }
         postVariantStateSnapshot(story.value?.id, variant.value)
         postToParent({ type: SANDBOX_READY, storyId: story.value?.id, variantId: variant.value?.id })
       }
       else if (event.data?.type === STATE_SYNC) {
+        if (initialSelection.controls && !controlsRevision.accept(event.data.controlsRevision)) return
         if (mounted) {
-          applyVariantStateUpdate({
+          const updatedVariant = applyVariantStateUpdate({
             storyId: story.value?.id ?? selection.storyId,
             variantId: event.data.variantId,
             state: event.data.state,
             getVariantById,
             guards: variantStateGuards,
           })
+          if (updatedVariant) reapplyPropsOverride(updatedVariant.id)
         }
       }
+      else if (event.data?.type === MEASURE_REQUEST || event.data?.type === ELEMENT_PICK_REQUEST) {
+        handleElementInspection(event.data, { storyId: story.value?.id, variantId: variant.value?.id })
+      }
+      else if (event.data?.type === PROPS_OVERRIDE) {
+        applyPropsOverride(event.data)
+      }
       else if (event.data?.type === PREVIEW_SETTINGS_SYNC) {
+        applyPreviewSettings(event.data.settings)
         if (selection.grid) {
           Object.assign(previewSettingsStore.currentSettings, event.data.settings)
         }
-        else {
-          applyPreviewSettings(event.data.settings)
-        }
+      }
+      else if (event.data?.type === RUNTIME_REQUEST) {
+        await handleRuntimeRequest(event.data)
       }
       else if (event.data?.type === SELECT_VARIANT) {
+        if (event.data.selectionVersion !== undefined) {
+          if (!Number.isSafeInteger(event.data.selectionVersion) || event.data.selectionVersion < 0 || (gridSelectionVersion !== undefined && event.data.selectionVersion < gridSelectionVersion)) return
+          gridSelectionVersion = event.data.selectionVersion
+          previewSelectionVersion = event.data.selectionVersion
+        }
         gridSelectedVariantId.value = event.data.variantId
+      }
+      else if (event.data?.type === HOST_CHANNEL_MESSAGE) {
+        if (event.data.storyId !== story.value?.id || event.data.variantId !== variant.value?.id) return
+        // Malformed application data must not replace or fail the story runtime.
+        try { runtimeHostChannels.receive(event.data.channel, { storyId: event.data.storyId, variantId: event.data.variantId }) }
+        catch { /* Application admission errors never fail the story runtime. */ }
       }
       else if (event.data?.type === COLLECT_TESTS) {
         const requestId = event.data?.requestId
@@ -181,6 +219,10 @@ export function previewMessageHandler() {
           postToParent({ type: TEST_RESULT, runId: event.data.runId, variantKey: \`\${runStory.id}:\${runVariant.id}\`, storyId: runStory.id, variantId: runVariant.id, mcpNonce: event.data.mcpNonce, mcpEpoch: event.data.mcpEpoch, summary })
         }
         catch (error) {
+          if (event.data.command === 'tests.run') {
+            postToParent({ type: TEST_RESULT, runId: event.data.runId, storyId: runStory.id, variantId: runVariant.id, error: { code: 'COLLECTION_FAILED', message: error instanceof Error ? error.message : String(error) } })
+            return
+          }
           postToParent({
             type: TEST_RESULT,
             runId: event.data.runId,

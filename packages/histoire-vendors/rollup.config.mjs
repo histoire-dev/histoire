@@ -8,6 +8,7 @@ import fs from 'fs-extra'
 import { globbySync } from 'globby'
 import { defineConfig } from 'rollup'
 import ts from 'rollup-plugin-typescript2'
+import { guardFloatingUiFrameReads } from './build/floating-ui-frames.mjs'
 import { entries } from './entries.js'
 
 const require = createRequire(import.meta.url)
@@ -32,6 +33,10 @@ export default defineConfig({
       transform(code) {
         return code.replace(/__VUE_OPTIONS_API__/g, 'true')
       },
+    },
+    {
+      name: 'histoire-floating-ui-frame-ownership',
+      transform: guardFloatingUiFrameReads,
     },
     {
       name: 'process-build',

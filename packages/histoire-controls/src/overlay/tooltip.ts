@@ -3,6 +3,7 @@ import type { DirectiveBinding, ObjectDirective } from 'vue'
 import { getControlsHost } from '@histoire/shared'
 import { useEventListener } from '@vueuse/core'
 import { VTooltip as FloatingTooltip } from 'floating-vue'
+import { getHistoireControlsOverlay } from '../context'
 
 /** Built-in controls use text tooltips; HTML remains outside this adapter. */
 interface TooltipOptions {
@@ -110,10 +111,17 @@ function createTooltipSession(element: HTMLElement, binding: DirectiveBinding): 
 /** Delegates ordinary previews to Floating Vue and sandbox controls to the host. */
 export const VTooltip: ObjectDirective<HTMLElement> = Object.fromEntries(
   ['beforeMount', 'mounted', 'updated', 'beforeUnmount'].map(hook => [hook, (...args: any[]) => {
-    const [element, binding] = args
+    const [element, binding] = args as [HTMLElement, DirectiveBinding]
     if (!getControlsHost() && !sessions.has(element)) {
       const original = (FloatingTooltip as ObjectDirective)[hook]
-      if (typeof original === 'function') original(...args)
+      if (typeof original === 'function') {
+        const container = getHistoireControlsOverlay(element)
+        const options = typeof binding.value === 'object' && binding.value !== null ? binding.value : { content: binding.value }
+        const appearance = element.closest<HTMLElement>('[data-histoire-control-appearance]')?.dataset.histoireControlAppearance
+        const popperClass = ['histoire-controls-floating-tooltip', ...(appearance === 'dark' ? ['histoire-controls-floating-tooltip-dark'] : []), ...(Array.isArray(options.popperClass) ? options.popperClass : options.popperClass ? [options.popperClass] : [])]
+        args[1] = { ...binding, value: { ...options, popperClass, ...(container ? { container } : {}) } }
+        original(...args)
+      }
       return
     }
     if (hook === 'mounted') {

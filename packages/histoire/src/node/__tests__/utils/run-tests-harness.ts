@@ -160,6 +160,11 @@ export function installRunTestsMocks(): RunTestsMocks {
   vi.doMock('../../vitest-browser-cleanup.js', () => ({
     cleanupVitestBrowserRun: cleanupVitestBrowserRunMock,
   }))
+  vi.doMock('../../test/preflight.js', async importOriginal => ({
+    ...await importOriginal<typeof import('../../test/preflight.js')>(),
+    // Temp unit projects exercise orchestration without installing browser peers.
+    ensureBrowserTestDepsInstalled: vi.fn(async () => {}),
+  }))
   vi.doMock('../../util/has-vitest.js', () => ({
     hasProjectVitest: vi.fn(() => true),
   }))

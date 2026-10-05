@@ -8,6 +8,10 @@ const EXECUTION_COUNTER_KEY = '__HST_STORY_EXECUTION_COUNTER__'
 const EXECUTION_BY_REGISTRATION_KEY = '__HST_STORY_EXECUTION_BY_REGISTRATION__'
 /** Owners are tied to mount hosts, including descendants mounted asynchronously. */
 const EXECUTION_OWNERS_KEY = '__HST_STORY_EXECUTION_OWNERS__'
+/** Actual synchronous mount actor; restored before any asynchronous continuation. */
+const EXECUTION_TARGET_KEY = '__HST_STORY_EXECUTION_TARGET__'
+/** Framework resolvers read their own actual component context across bundle copies. */
+const EXECUTION_RESOLVERS_KEY = '__HST_STORY_EXECUTION_RESOLVERS__'
 
 /**
  * The tracking state lives on `globalThis` rather than in module scope on
@@ -16,6 +20,8 @@ const EXECUTION_OWNERS_KEY = '__HST_STORY_EXECUTION_OWNERS__'
  * must agree on execution ids for the tagging to be usable.
  */
 interface HistoireExecutionGlobals {
+  [EXECUTION_TARGET_KEY]?: Node
+  [EXECUTION_RESOLVERS_KEY]?: Map<string, () => Node | undefined>
   [EXECUTION_OWNERS_KEY]?: WeakMap<Node, Set<number>>
   [CURRENT_EXECUTION_KEY]?: number
   [EXECUTION_COUNTER_KEY]?: number
@@ -59,6 +65,8 @@ export function createStoryExecutionOwner(host: Node) {
 export function withStoryExecution<T>(fn: () => T, target?: Node): T {
   const globals = getGlobals()
   const previous = globals[CURRENT_EXECUTION_KEY]
+  const previousTarget = globals[EXECUTION_TARGET_KEY]
+  globals[EXECUTION_TARGET_KEY] = target
   globals[EXECUTION_COUNTER_KEY] = (globals[EXECUTION_COUNTER_KEY] ?? 0) + 1
   globals[CURRENT_EXECUTION_KEY] = globals[EXECUTION_COUNTER_KEY]
   // The actual target is available after plugin/setup awaits. Its ancestors
@@ -76,6 +84,30 @@ export function withStoryExecution<T>(fn: () => T, target?: Node): T {
   }
   finally {
     globals[CURRENT_EXECUTION_KEY] = previous
+    globals[EXECUTION_TARGET_KEY] = previousTarget
+  }
+}
+
+/** Capture exact mount owner during setup, including children mounted after initial sync scope. */
+export function getStoryExecutionTarget(): Node | undefined {
+  // Explicit synchronous owner wins, including an ownerless metadata mount.
+  if (getGlobals()[CURRENT_EXECUTION_KEY] !== undefined) return getGlobals()[EXECUTION_TARGET_KEY]
+  for (const resolve of getGlobals()[EXECUTION_RESOLVERS_KEY]?.values() ?? []) {
+    try {
+      const target = resolve()
+      if (target) return target
+    }
+    catch { /* Framework getContext may be called outside component initialization. */ }
+  }
+  return getGlobals()[EXECUTION_TARGET_KEY]
+}
+
+/** Framework owns resolver; no dependency on Vue/Svelte enters shared client helpers. */
+export function registerStoryExecutionTargetResolver(name: string, resolve: () => Node | undefined): () => void {
+  const resolvers = getGlobals()[EXECUTION_RESOLVERS_KEY] ??= new Map()
+  resolvers.set(name, resolve)
+  return () => {
+    if (resolvers.get(name) === resolve) resolvers.delete(name)
   }
 }
 

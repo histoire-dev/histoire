@@ -35,7 +35,21 @@ export interface ModuleLoader {
   destroy: () => void
 }
 
+/** Trusted configuration ownership available before dev/build plugin APIs exist. */
+export interface PluginConfigContext {
+  /** Resolved project root; never inferred from process cwd by plugins. */
+  readonly root: string
+  /** Mutable output directory owned by this context/generation. */
+  readonly tempDir: string
+  /** Registers an acquired resource immediately, including partial configuration. */
+  onCleanup: (callback: () => Awaitable<void>) => void
+}
+
 export interface PluginApiBase {
+  /** Explicit project root for dependency and configuration resolution. */
+  readonly root: string
+  /** Captured root/output/cleanup ownership, without exposing internal Node context. */
+  getContext: () => PluginConfigContext
   colors: typeof pc
   path: typeof path
   fs: typeof fs
@@ -89,7 +103,7 @@ export interface Plugin {
    * Note: User plugins are resolved before running this hook so injecting other
    * plugins inside  the `config` hook will have no effect.
    */
-  defaultConfig?: (defaultConfig: HistoireConfig, mode: ConfigMode) => Partial<HistoireConfig> | null | void | Promise<Partial<HistoireConfig> | null | void>
+  defaultConfig?: (defaultConfig: HistoireConfig, mode: ConfigMode, context?: PluginConfigContext) => Partial<HistoireConfig> | null | void | Promise<Partial<HistoireConfig> | null | void>
   /**
    * Modify histoire config. The hook can either mutate the passed config or
    * return a partial config object that will be deeply merged into the existing
@@ -98,11 +112,11 @@ export interface Plugin {
    * Note: User plugins are resolved before running this hook so injecting other
    * plugins inside  the `config` hook will have no effect.
    */
-  config?: (config: HistoireConfig, mode: ConfigMode) => Partial<HistoireConfig> | null | void | Promise<Partial<HistoireConfig> | null | void>
+  config?: (config: HistoireConfig, mode: ConfigMode, context?: PluginConfigContext) => Partial<HistoireConfig> | null | void | Promise<Partial<HistoireConfig> | null | void>
   /**
    * Use this hook to read and store the final resolved histoire config.
    */
-  configResolved?: (config: HistoireConfig) => Awaitable<void>
+  configResolved?: (config: HistoireConfig, context?: PluginConfigContext) => Awaitable<void>
   /**
    * Use this hook to do processing during development. The `onCleanup` hook
    * should handle cleanup tasks when development server is closed.

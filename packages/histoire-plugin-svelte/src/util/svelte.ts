@@ -1,6 +1,10 @@
 import type { SvelteStorySetupApi, SvelteStorySetupHandler } from '../helpers.js'
-import { withStoryExecution } from '@histoire/shared'
+import { registerStoryExecutionTargetResolver, withStoryExecution } from '@histoire/shared'
 import * as svelte from 'svelte'
+
+/** Svelte descendants inherit their actual root target, including later conditional children. */
+const actorContext = '__HST_STORY_MOUNT_TARGET__'
+registerStoryExecutionTargetResolver('svelte', () => svelte.getContext<Node | undefined>(actorContext))
 
 type SetupModule = Record<string, unknown>
 
@@ -29,6 +33,8 @@ export async function mountSvelteComponent(
   options: Record<string, any>,
   mode: 'auto' | 'client' | 'server-compat' = 'auto',
 ): Promise<MountedSvelteComponent> {
+  options = { ...options, context: new Map(options.context ?? []) }
+  options.context.set(actorContext, options.target)
   // Each branch below runs the story's setup code synchronously, so wrapping it
   // attributes the `onTest(...)` calls it emits to THIS mount — several mounts of
   // the same story coexist in one page and share the ambient test registry.
@@ -97,21 +103,22 @@ export async function callSetupFunctions(
   setup: SetupModule,
   setupApi: SvelteStorySetupApi,
   variantSetupApp?: SvelteStorySetupHandler | null,
+  target?: Node,
 ) {
   for (const hookName of setupHookNames) {
     const generatedHook = generatedSetup[hookName] as SvelteStorySetupHandler | undefined
     if (typeof generatedHook === 'function') {
-      await generatedHook(setupApi)
+      await withStoryExecution(() => generatedHook(setupApi), target)
     }
 
     const setupHook = setup[hookName] as SvelteStorySetupHandler | undefined
     if (typeof setupHook === 'function') {
-      await setupHook(setupApi)
+      await withStoryExecution(() => setupHook(setupApi), target)
     }
   }
 
   if (typeof variantSetupApp === 'function') {
-    await variantSetupApp(setupApi)
+    await withStoryExecution(() => variantSetupApp(setupApi), target)
   }
 }
 

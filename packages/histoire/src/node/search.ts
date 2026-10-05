@@ -61,7 +61,8 @@ function createIdMap() {
   }
 }
 
-function convertTitleToSentence(text: string) {
+/** Preserves standalone title tokenization across portable source search adapters. */
+export function convertTitleToSentence(text: string) {
   return text.split(' ').map(str => noCase(str)).join(' ')
 }
 

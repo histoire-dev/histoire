@@ -1,4 +1,4 @@
-import type { ConfigMode, HistoireConfig } from '@histoire/shared'
+import type { ConfigMode, HistoireConfig, PluginConfigContext } from '@histoire/shared'
 import { fileURLToPath } from 'node:url'
 import { createJiti } from 'jiti'
 import path from 'pathe'
@@ -29,7 +29,7 @@ export const configFileNames = [
 export function resolveConfigFile(cwd: string = process.cwd(), configFile?: string): string | null {
   if (configFile) {
     // explicit config path is always resolved from cwd
-    return path.resolve(configFile)
+    return path.resolve(cwd, configFile)
   }
   else {
     return findUp(cwd, configFileNames)
@@ -61,26 +61,26 @@ export async function loadConfigFile(configFile: string): Promise<Partial<Histoi
  * Resolves the final Histoire config: the config file, the `histoire` key of
  * the Vite config and the (plugin-processed) defaults, merged in that order.
  */
-export async function resolveConfig(cwd: string = process.cwd(), mode: ConfigMode, configFile: string): Promise<HistoireConfig> {
+export async function resolveConfig(cwd: string = process.cwd(), mode: ConfigMode, configFile?: string, context?: PluginConfigContext): Promise<HistoireConfig> {
   let result: Partial<HistoireConfig>
   const resolvedConfigFile = resolveConfigFile(cwd, configFile)
   if (resolvedConfigFile) {
     result = await loadConfigFile(resolvedConfigFile)
   }
-  const viteConfig = await resolveViteConfig({}, 'serve')
+  const viteConfig = await resolveViteConfig({ root: cwd }, mode === 'dev' ? 'serve' : 'build')
   const viteHistoireConfig = (viteConfig.histoire ?? {}) as HistoireConfig
 
   const preUserConfig = mergeConfig(result, viteHistoireConfig)
-  const processedDefaultConfig = await processDefaultConfig(getDefaultConfig(), preUserConfig, mode, cwd)
+  const processedDefaultConfig = await processDefaultConfig(getDefaultConfig(), preUserConfig, mode, context)
 
-  return resolveConfigPlugins(mergeConfig(preUserConfig, processedDefaultConfig), mode)
+  return resolveConfigPlugins(mergeConfig(preUserConfig, processedDefaultConfig), mode, context)
 }
 
 /** Applies the `config` hook of every resolved plugin. */
-async function resolveConfigPlugins(config: HistoireConfig, mode: ConfigMode): Promise<HistoireConfig> {
+async function resolveConfigPlugins(config: HistoireConfig, mode: ConfigMode, context?: PluginConfigContext): Promise<HistoireConfig> {
   for (const plugin of config.plugins) {
     if (plugin.config) {
-      const result = await plugin.config(config, mode)
+      const result = await plugin.config(config, mode, context)
       if (result) {
         config = mergeConfig(result, config)
       }
@@ -90,11 +90,11 @@ async function resolveConfigPlugins(config: HistoireConfig, mode: ConfigMode): P
 }
 
 /** Applies the `defaultConfig` hook of the builtin and user plugins. */
-async function processDefaultConfig(defaultConfig: HistoireConfig, preUserConfig: HistoireConfig, mode: ConfigMode, _cwd: string): Promise<HistoireConfig> {
+async function processDefaultConfig(defaultConfig: HistoireConfig, preUserConfig: HistoireConfig, mode: ConfigMode, context?: PluginConfigContext): Promise<HistoireConfig> {
   // Apply plugins
   for (const plugin of [...defaultConfig.plugins, ...preUserConfig.plugins ?? []]) {
     if (plugin.defaultConfig) {
-      const result = await plugin.defaultConfig(defaultConfig, mode)
+      const result = await plugin.defaultConfig(defaultConfig, mode, context)
       if (result) {
         defaultConfig = mergeConfig(result, defaultConfig)
       }

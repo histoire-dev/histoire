@@ -7,11 +7,15 @@ export default {
 
 <script lang="ts" setup>
 import type { CSSProperties } from 'vue'
+import type { HstControlLayout } from '../../types'
 import { computed, ref } from 'vue'
+import { useControlField } from '../../field'
 import { VTooltip as vTooltip } from '../../overlay/tooltip'
 import HstWrapper from '../HstWrapper.vue'
 
 const props = defineProps<{
+  /** Shared label placement. */
+  layout?: HstControlLayout
   title?: string
   modelValue?: number | null
   min: number
@@ -23,7 +27,10 @@ const emit = defineEmits({
 })
 
 const showTooltip = ref(false)
-const input = ref<HTMLInputElement>(null)
+const input = ref<HTMLInputElement>()
+
+const { attrs, id, fieldAttrs, focus } = useControlField(input, () => props.title)
+defineExpose({ focus, element: input })
 
 const numberModel = computed({
   get: () => props.modelValue,
@@ -33,7 +40,7 @@ const numberModel = computed({
 })
 
 const percentage = computed(() => {
-  return (props.modelValue - props.min) / (props.max - props.min)
+  return props.max === props.min ? 0 : ((props.modelValue ?? props.min) - props.min) / (props.max - props.min)
 })
 
 const tooltipStyle = computed<CSSProperties>(() => {
@@ -50,27 +57,30 @@ const tooltipStyle = computed<CSSProperties>(() => {
 
 <template>
   <HstWrapper
-    class="histoire-slider htw-items-center"
+    class="histoire-slider"
     :title="title"
+    :control-id="id()"
+    :data-histoire-control-type="attrs['data-histoire-control-type']"
+    :layout="layout"
     :class="$attrs.class"
     :style="$attrs.style"
   >
     <div class="htw-relative htw-w-full htw-flex htw-items-center">
       <div class="htw-absolute htw-inset-0 htw-flex htw-items-center">
-        <div class="htw-border htw-border-black/25 dark:htw-border-white/25 htw-h-1 htw-w-full htw-rounded-full" />
+        <div class="histoire-slider-track" />
       </div>
       <input
         ref="input"
         v-model.number="numberModel"
         class="htw-range-input htw-appearance-none htw-border-0 htw-bg-transparent htw-cursor-pointer htw-relative htw-w-full htw-m-0 htw-text-gray-700"
         type="range"
-        v-bind="{ ...$attrs, class: null, style: null, min, max }"
+        v-bind="{ ...fieldAttrs(), min, max }"
         @mouseover="showTooltip = true"
         @mouseleave="showTooltip = false"
       >
       <div
         v-if="showTooltip"
-        v-tooltip="{ content: modelValue.toString(), shown: true, distance: 16, delay: 0 }"
+        v-tooltip="{ content: String(modelValue ?? ''), shown: true, distance: 16, delay: 0 }"
         class="htw-absolute"
         :style="tooltipStyle"
       />
@@ -79,13 +89,15 @@ const tooltipStyle = computed<CSSProperties>(() => {
 </template>
 
 <style lang="pcss">
+.histoire-slider-track { height: 4px; width: 100%; border-radius: 4px; background: var(--histoire-control-resolved-border); }
 .htw-range-input {
+  min-height: var(--histoire-control-height, 34px);
   &::-webkit-slider-thumb {
-    @apply htw-appearance-none htw-h-3 htw-w-3 htw-bg-white dark:htw-bg-gray-700 htw-border htw-border-solid htw-border-black/25 dark:htw-border-white/25 htw-rounded-full;
+    appearance: none; width: 14px; height: 14px; background: var(--histoire-control-resolved-surface); border: 1px solid var(--histoire-control-resolved-border); border-radius: 50%;
   }
 
   &:hover::-webkit-slider-thumb {
-    @apply !htw-bg-primary-500  !htw-border-primary-500;
+    background: var(--histoire-control-resolved-accent); border-color: var(--histoire-control-resolved-accent);
   }
 }
 
@@ -93,11 +105,11 @@ const tooltipStyle = computed<CSSProperties>(() => {
 
 .htw-range-input {
   &::-moz-range-thumb {
-    @apply htw-appearance-none htw-h-3 htw-w-3 htw-bg-white dark:htw-bg-gray-700 htw-border htw-border-solid htw-border-black/25 dark:htw-border-white/25 htw-rounded-full;
+    appearance: none; width: 14px; height: 14px; background: var(--histoire-control-resolved-surface); border: 1px solid var(--histoire-control-resolved-border); border-radius: 50%;
   }
 
   &:hover::-moz-range-thumb {
-    @apply !htw-bg-primary-500  !htw-border-primary-500;
+    background: var(--histoire-control-resolved-accent); border-color: var(--histoire-control-resolved-accent);
   }
 }
 </style>

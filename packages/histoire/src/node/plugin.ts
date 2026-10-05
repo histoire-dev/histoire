@@ -16,8 +16,9 @@ import chokidar from 'chokidar'
 import fs from 'fs-extra'
 import path from 'pathe'
 import pc from 'picocolors'
-import { TEMP_PATH } from './alias.js'
+import { getContextRegistry } from './runtime/registry.js'
 import { addStory, removeStory } from './stories.js'
+import { toTempPathSegment } from './util/temp-paths.js'
 
 export class BasePluginApi implements PluginApiBase {
   colors = pc
@@ -30,8 +31,19 @@ export class BasePluginApi implements PluginApiBase {
     public moduleLoader: ModuleLoader,
   ) { }
 
+  /** Resolved project root, independent from the caller's process cwd. */
+  get root() {
+    return this.ctx.root
+  }
+
+  /** Trusted configuration/resource ownership for the captured generation. */
+  getContext() {
+    return getContextRegistry(this.ctx).pluginContext
+  }
+
+  /** Isolated mutable plugin output, unique across operation captures. */
   get pluginTempDir() {
-    return path.resolve(TEMP_PATH, 'plugins', this.plugin.name.replace(/:/g, '_'))
+    return path.resolve(getContextRegistry(this.ctx).tempDir, 'plugins', toTempPathSegment(this.plugin.name))
   }
 
   log(...msg) {
@@ -47,8 +59,8 @@ export class BasePluginApi implements PluginApiBase {
   }
 
   addStoryFile(file: string) {
-    removeStory(file)
-    addStory(file)
+    removeStory(this.ctx, file)
+    addStory(this.ctx, file)
   }
 
   getStories(): ServerStory[] {

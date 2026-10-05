@@ -1,4 +1,5 @@
 import type { ExecutionHandle, ExecutionState, ExecutionTask } from './execution-types.js'
+import { hasUnconfirmedCleanup } from './cleanup.js'
 import { ExecutionError } from './execution-types.js'
 
 /** Injectable bounds without importing MCP, Vite or project modules into the lane. */
@@ -46,6 +47,7 @@ export function createExecutionService(options: ExecutionServiceOptions = {}) {
   const cleanupTimeoutMs = options.cleanupTimeoutMs ?? 10_000
   let active: Pending | undefined
   let unavailable = false
+  let unsafeCleanupError: unknown
   let closed = false
   let closing: Promise<void> | undefined
   let draining: Promise<void> | undefined
@@ -93,8 +95,9 @@ export function createExecutionService(options: ExecutionServiceOptions = {}) {
         failed = true
         // Runners can discover unsafe teardown while unwinding internally.
         // A later no-op cleanup cannot restore certainty about those resources.
-        if (error instanceof ExecutionError && error.code === 'CLEANUP_UNCONFIRMED') {
+        if (hasUnconfirmedCleanup(error)) {
           unavailable = true
+          unsafeCleanupError ??= error
           for (const pending of [...queue]) cancel(pending)
         }
       }
@@ -105,6 +108,7 @@ export function createExecutionService(options: ExecutionServiceOptions = {}) {
         unavailable = true
         failed = true
         failure = new ExecutionError('CLEANUP_UNCONFIRMED', 'Execution cleanup could not be confirmed', failure ?? error)
+        unsafeCleanupError ??= failure
         for (const pending of [...queue]) cancel(pending)
       }
       if (failed && !(record.abort.signal.aborted && !unavailable)) {
@@ -135,9 +139,10 @@ export function createExecutionService(options: ExecutionServiceOptions = {}) {
     if (active) cancel(active)
     draining = deadline(active?.settled.catch(() => {}) ?? Promise.resolve(), cleanupTimeoutMs).catch((error) => {
       unavailable = true
+      unsafeCleanupError ??= error
       throw error
     }).then(() => {
-      if (unavailable) throw new ExecutionError('CLEANUP_UNCONFIRMED', 'Execution cleanup could not be confirmed')
+      if (unavailable) throw unsafeCleanupError ?? new ExecutionError('CLEANUP_UNCONFIRMED', 'Execution cleanup could not be confirmed')
     }).finally(() => { draining = undefined })
     return draining
   }
@@ -174,6 +179,11 @@ export function createExecutionService(options: ExecutionServiceOptions = {}) {
     },
     /** Invalidate queued/active work before project generation teardown. */
     cancelAll,
+    /** Blocks lane reuse after any owner's unconfirmed teardown, observing active work. */
+    quarantine() {
+      unavailable = true
+      for (const pending of [...queue]) cancel(pending)
+    },
     /** Mark closed immediately, then wait for owned runner teardown. */
     close() {
       if (!closing) {

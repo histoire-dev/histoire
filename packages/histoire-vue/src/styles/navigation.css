@@ -1,0 +1,50 @@
+.histoire-provider :is(.histoire-tree, .histoire-search, .histoire-events) {
+  min-width: 0;
+  min-height: 0;
+  overflow: auto;
+  flex: 1;
+  padding: 8px;
+}
+.histoire-provider :is(.histoire-tree, .histoire-search) ul {
+  list-style: none;
+  margin: 0;
+  padding: 0 0 0 12px;
+}
+.histoire-provider :is(.histoire-tree, .histoire-search) > ul { padding: 0; }
+.histoire-provider :is(.histoire-tree, .histoire-search) button {
+  display: block;
+  width: 100%;
+  text-align: start;
+
+
+
+  padding: 6px 8px;
+
+}
+.histoire-provider :is(.histoire-tree, .histoire-search) button:is(:hover, [aria-current="true"]) {
+  background: var(--histoire-panel);
+  color: var(--histoire-accent);
+}
+.histoire-provider .histoire-tree summary { padding: 6px 8px; cursor: pointer; }
+.histoire-provider .histoire-search small { display: block; color: var(--histoire-muted); }
+.histoire-provider .histoire-search .histoire-text { width: 100%; margin-bottom: 6px; }
+.histoire-provider .histoire-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  padding: 8px;
+  border-bottom: 1px solid var(--histoire-border);
+}
+.histoire-provider .histoire-toolbar label { display: flex; align-items: center; gap: 4px; }
+.histoire-provider .histoire-toolbar .histoire-text { width: 72px; }
+
+.histoire-provider :is(.histoire-toolbar, .histoire-events) button {  }
+.histoire-provider :is(.histoire-tree, .histoire-search, .histoire-toolbar, .histoire-events) button:disabled {   }
+.histoire-provider .histoire-events ol { margin: 8px 0; padding: 0; }
+.histoire-provider .histoire-events time { font-size: 12px; color: var(--histoire-muted); }
+.histoire-provider .histoire-events pre { margin: 4px 0 12px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.histoire-provider :is(.histoire-tree, .histoire-search) [role="alert"] { color: #dc2626; }
+
+.histoire-provider .histoire-events { display: flex; flex-direction: column; height: 100%; overflow: hidden; }
+.histoire-provider .histoire-events > .histoire-virtual-list { flex: 1; min-height: 0; }

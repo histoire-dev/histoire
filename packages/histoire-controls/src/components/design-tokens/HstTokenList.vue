@@ -6,7 +6,10 @@ export default {
 
 <script lang="ts" setup>
 import { computed, ref } from 'vue'
+import { useControlsTheme } from '../../utils'
 import HstCopyIcon from '../HstCopyIcon.vue'
+
+const dark = useControlsTheme()
 
 const props = defineProps<{
   tokens: Record<string, string | number | any[] | Record<string, any>>
@@ -33,6 +36,7 @@ const hover = ref<string>(null)
   <div
     v-for="token of processedTokens"
     :key="token.key"
+    :data-histoire-control-appearance="dark ? 'dark' : 'light'"
     class="histoire-token-list htw-flex htw-flex-col htw-gap-2 htw-my-8"
     @mouseenter="hover = token.key"
     @mouseleave="hover = null"

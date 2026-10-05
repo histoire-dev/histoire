@@ -156,6 +156,17 @@ describe('runHistoireTests lifecycle', () => {
     expect(clearTimeoutSpy).toHaveBeenCalled()
   })
 
+  it('runs explicit no-retry request once after execution started', async () => {
+    let executions = 0
+    mocks.setCreateVitest(vi.fn(async (_mode: string, options: any) => createVitestInstanceStub({ options, start: vi.fn(async () => {
+      executions++
+      throw new Error('Browser connection was closed while running tests')
+    }) })))
+    const story = createRunTestsStoryFile({ id: 'once', variantId: 'main', source: `import { onTest } from 'histoire/client'; onTest(() => {})` })
+    await expect(runHistoireTests(createRunTestsContext([story]), { maxRetries: 0 })).rejects.toThrow('Browser connection was closed')
+    expect(executions).toBe(1)
+  })
+
   it('never lets a failing cleanup mask the run error or defeat the browser-crash retry', async () => {
     const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
     // A rejecting teardown on the failure path used to propagate instead of the
@@ -200,7 +211,7 @@ describe('runHistoireTests lifecycle', () => {
     // so the run timeout comes from the histoire config.
     const ctx = createRunTestsContext([story], { test: { runTimeout: 10 } } as Partial<Context['config']>)
 
-    await expect(runHistoireTests(ctx)).rejects.toThrow(/timed out/)
+    await expect(runHistoireTests(ctx)).rejects.toMatchObject({ code: 'TIMEOUT', message: expect.stringMatching(/timed out/) })
   })
 
   it('resolves browser test deps from the project root', async () => {

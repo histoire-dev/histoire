@@ -6,11 +6,17 @@ export default {
 </script>
 
 <script lang="ts" setup>
+import type { HstControlLayout } from '../../types'
 import { computed, onUnmounted, ref } from 'vue'
+import { useControlField } from '../../field'
 import HstWrapper from '../HstWrapper.vue'
 
 const props = defineProps<{
+  /** Visible numeric field label. */
   title?: string
+  /** Shared label placement. */
+  layout?: HstControlLayout
+  /** Numeric state; native drafts retain browser number-input parsing. */
   modelValue?: number | null
 }>()
 
@@ -27,9 +33,14 @@ const numberModel = computed({
 
 const input = ref<HTMLInputElement>()
 
-function focusAndSelect() {
-  input.value.focus()
-  input.value.select()
+const { attrs, id, fieldAttrs, focus, select } = useControlField(input, () => props.title)
+defineExpose({ focus, select, element: input })
+
+/** Focus and select native numeric text without changing its value. */
+function focusAndSelect(event: MouseEvent) {
+  if (event.target === input.value) return
+  focus()
+  select()
 }
 
 // Drag to modify
@@ -38,15 +49,19 @@ const isDragging = ref(false)
 let startX: number
 let startValue: number
 
+/** Drag only from row chrome; native input edits keep browser behavior. */
 function onMouseDown(event: MouseEvent) {
+  if (input.value?.disabled || input.value?.readOnly || event.target === input.value) return
   isDragging.value = true
   startX = event.clientX
-  startValue = numberModel.value
+  startValue = numberModel.value ?? 0
   window.addEventListener('mousemove', onMouseMove)
   window.addEventListener('mouseup', stopDragging)
 }
 
+/** Follow configured native step while drag ownership remains current. */
 function onMouseMove(event: MouseEvent) {
+  if (input.value?.disabled || input.value?.readOnly) return stopDragging()
   let step = Number.parseFloat(input.value.step)
   if (Number.isNaN(step)) {
     step = 1
@@ -54,6 +69,7 @@ function onMouseMove(event: MouseEvent) {
   numberModel.value = startValue + Math.round((event.clientX - startX) / 10 / step) * step
 }
 
+/** Remove document listeners on release, disable, or unmount. */
 function stopDragging() {
   isDragging.value = false
   window.removeEventListener('mousemove', onMouseMove)
@@ -67,8 +83,11 @@ onUnmounted(() => {
 
 <template>
   <HstWrapper
-    class="histoire-number htw-cursor-ew-resize htw-items-center"
+    class="histoire-number htw-cursor-ew-resize"
     :title="title"
+    :layout="layout"
+    :control-id="id()"
+    :data-histoire-control-type="attrs['data-histoire-control-type']"
     :class="[
       $attrs.class,
       { 'htw-select-none': isDragging },
@@ -79,16 +98,16 @@ onUnmounted(() => {
   >
     <input
       ref="input"
-      v-bind="{ ...$attrs, class: null, style: null }"
+      v-bind="fieldAttrs()"
       v-model.number="numberModel"
       type="number"
       :class="{
         'htw-select-none': isDragging,
       }"
-      class="htw-text-inherit htw-bg-transparent htw-w-full htw-outline-none htw-pl-2 htw-py-1 -htw-my-1 htw-border htw-border-solid htw-border-black/25 dark:htw-border-white/25 focus:htw-border-primary-500 dark:focus:htw-border-primary-500 htw-rounded-sm htw-cursor-ew-resize htw-box-border"
+      class="histoire-control-field"
     >
 
-    <template #actions>
+    <template v-if="$slots.actions" #actions>
       <slot name="actions" />
     </template>
   </HstWrapper>

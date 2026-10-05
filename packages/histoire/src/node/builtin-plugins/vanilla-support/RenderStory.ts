@@ -1,6 +1,7 @@
 import type { Story, Variant } from '@histoire/shared'
 import type { PropType as _PropType } from '@histoire/vendors/vue'
 import type { App, MountApi, VanillaApi } from './types'
+import { withStoryExecution } from '@histoire/shared'
 import {
   defineComponent as _defineComponent,
   h as _h,
@@ -69,30 +70,30 @@ export default _defineComponent({
       }
 
       if (typeof generatedSetup?.setupVanilla === 'function') {
-        await generatedSetup.setupVanilla({
+        await withStoryExecution(() => generatedSetup.setupVanilla({
           app,
           story: props.story,
           variant: props.variant,
-        })
+        }), sandbox.value)
       }
 
       if (typeof setup?.setupVanilla === 'function') {
-        await setup.setupVanilla({
+        await withStoryExecution(() => setup.setupVanilla({
           app,
           story: props.story,
           variant: props.variant,
-        })
+        }), sandbox.value)
       }
 
       if (typeof props.variant.setupApp === 'function') {
-        await props.variant.setupApp({
+        await withStoryExecution(() => props.variant.setupApp({
           app,
           story: props.story,
           variant: props.variant,
-        })
+        }), sandbox.value)
       }
 
-      await app.onMount?.()
+      await withStoryExecution(() => app.onMount?.(), sandbox.value)
 
       appHooks = {
         onUpdate: [],
@@ -111,7 +112,7 @@ export default _defineComponent({
       }
 
       const onMount = props.variant.slots()[props.slotName] as VanillaApi['onMount'] | VanillaApi['onMountControls']
-      await onMount(api)
+      await withStoryExecution(() => onMount(api), sandbox.value)
 
       sandbox.value.appendChild(app.el)
 

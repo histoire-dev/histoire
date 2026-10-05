@@ -1,0 +1,21 @@
+{
+  "name": "histoire-example-embed-vue",
+  "type": "module",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "dev": "vite --host 127.0.0.1 --port 5174",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview --host 127.0.0.1 --port 5174"
+  },
+  "dependencies": {
+    "@histoire/controls": "workspace:^",
+    "@histoire/sdk": "workspace:^",
+    "@histoire/vue": "workspace:^",
+    "vue": "^3.5.26"
+  },
+  "devDependencies": {
+    "typescript": "catalog:",
+    "vite": "catalog:"
+  }
+}

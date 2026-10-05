@@ -1,0 +1,6 @@
+@import 'vue-virtual-scroller/index.css';
+.histoire-virtual-list { min-height: 0; min-width: 0; height: 100%; }
+.histoire-virtual-list > .vue-recycle-scroller { height: 100%; }
+.histoire-virtual-list-page, .histoire-virtual-list-page > .vue-recycle-scroller { height: auto; }
+.histoire-virtual-list :is(ul, ol) { list-style: none; margin: 0; padding: 0; }
+.histoire-virtual-list .vue-recycle-scroller__item-view { min-width: 0; }

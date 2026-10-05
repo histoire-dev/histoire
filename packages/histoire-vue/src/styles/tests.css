@@ -1,0 +1,8 @@
+.histoire-provider .histoire-tests{display:flex;flex-direction:column;height:100%;min-height:0;padding:12px;overflow:hidden;font:inherit}
+.histoire-provider .histoire-tests-actions{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.histoire-provider .histoire-tests button{color:inherit;padding:6px 10px;}
+.histoire-provider .histoire-tests button:disabled{}
+.histoire-provider .histoire-tests ul{margin:0;padding:0}
+.histoire-provider .histoire-tests pre{white-space:pre-wrap;overflow-wrap:anywhere}
+
+.histoire-provider .histoire-tests > .histoire-virtual-list{flex:1;min-height:0}

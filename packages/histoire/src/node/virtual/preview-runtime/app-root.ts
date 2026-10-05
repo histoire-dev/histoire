@@ -10,12 +10,13 @@ document.body.innerHTML = ''
 document.body.appendChild(root)
 
 if (initialSelection.controls && getHostWindow()) {
-  const disposeAppearance = setupControlsDocument(getHostWindow(), value => { isDark.value = value })
+  const disposeAppearance = setupControlsDocument(getHostWindow(), value => { isDark.value = value }, previewDocumentId)
   const bridge = createControlsOverlayBridge({
     window,
     host: getHostWindow(),
     storyId: initialSelection.storyId,
     variantId: initialSelection.variantId,
+    documentId: new URLSearchParams(window.location.search).get('documentId') ?? undefined,
     post: postToParent,
   })
   window.__HST_CONTROLS_HOST__ = bridge
@@ -41,7 +42,7 @@ function observeControlsResize() {
   }
 
   const postHeight = () => {
-    postToParent({ type: CONTROLS_RESIZE, height: Math.ceil(root.getBoundingClientRect().height) })
+    postToParent({ type: CONTROLS_RESIZE, storyId: initialSelection.storyId, variantId: initialSelection.variantId, height: Math.ceil(root.getBoundingClientRect().height) })
   }
 
   controlsResizeObserver = new ResizeObserver(postHeight)

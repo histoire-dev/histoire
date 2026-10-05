@@ -51,3 +51,9 @@ export function generateEntryHtml(jsEntryFile: string, cssEntryFile: string, var
 export function generateScriptLinks(prefetchScripts: string[], rel: string, ctx: Context) {
   return prefetchScripts.map(s => `<link rel="${rel}" href="${ctx.resolvedViteConfig.base}${s}" as="script" crossOrigin="anonymous">`).join('')
 }
+
+/** Bridge entry loads surface styles without booting an explorer, collector, or story runtime. */
+export function generateEmbedHtml(jsEntryFile: string, ctx: Context, cssEntryFile?: string): string {
+  const head = cssEntryFile ? `<link rel="stylesheet" href="${ctx.resolvedViteConfig.base}${cssEntryFile}">` : ''
+  return generateBaseHtml(head, `<script type="module" src="${ctx.resolvedViteConfig.base}${jsEntryFile}"></script>`, ctx)
+}

@@ -1,21 +1,19 @@
+import type { HistoireTestMode } from '@histoire/protocol'
 import type { Story, Variant } from './story.js'
 
-export interface HistoireSerializedTestError {
-  name?: string
-  message: string
-  stack?: string
-  diff?: string
-  raw?: unknown
-}
+export type { HistoireCollectTestsPayload, HistoireResolvedTestCase, HistoireRunTestsPayload, HistoireSerializedTestDefinition, HistoireSerializedTestError, HistoireTestCaseResult, HistoireTestCaseResultInput, HistoireTestCollectionResult, HistoireTestDefinitionsPayload, HistoireTestError, HistoireTestMode, HistoireTestRequestAuthority, HistoireTestResultPayload, HistoireTestRunSummary, HistoireUncollectedStory } from '@histoire/protocol'
 
-export type HistoireTestError = string | HistoireSerializedTestError
-
+/** Story-owned test execution contract; never sent through wire. */
 export interface HistoireTestContext {
+  /** Story owned by runtime. */
   story: Story
+  /** Variant owned by runtime. */
   variant: Variant
+  /** Rendered story canvas. */
   canvas: HTMLElement
 }
 
+/** Story-owned test execution contract; never sent through wire. */
 export type HistoireTestRegistration = (context: HistoireTestContext) => void
 
 /** Runtime context passed to test bodies and per-test lifecycle hooks. */
@@ -45,7 +43,9 @@ export type HistoireTestHandler = (context: HistoireTestRuntimeContext) => Promi
 
 /** Lifecycle callback registered through Vitest's suite API. */
 export type HistoireTestHook = (
+  /** Test lifecycle data. */
   context?: HistoireTestRuntimeContext | Record<string, never>,
+  /** Test lifecycle data. */
   suite?: HistoireTestSuiteContext,
 ) => Promise<void | HistoireTestCleanup> | void | HistoireTestCleanup
 
@@ -54,8 +54,11 @@ export type HistoireTestCleanup = () => Promise<void> | void
 
 /** Lifecycle wrapper introduced by Vitest 4.1. */
 export type HistoireTestAroundHook = (
+  /** Test lifecycle data. */
   run: () => Promise<void>,
+  /** Test lifecycle data. */
   context?: HistoireTestRuntimeContext | Record<string, never>,
+  /** Test lifecycle data. */
   suite?: HistoireTestSuiteContext,
 ) => Promise<void> | void
 
@@ -96,124 +99,20 @@ export interface HistoireTestHookScope {
   afterAll: HistoireTestHookEntry[]
 }
 
-/** Execution mode for a collected Histoire test definition. */
-export type HistoireTestMode = 'run' | 'skip' | 'only' | 'todo'
-
-export interface HistoireSerializedTestDefinition {
-  id: string
-  name: string
-  fullName: string
-  /** Mirrors Vitest modifiers such as `.skip`, `.only`, and `.todo`. */
-  mode?: HistoireTestMode
-  /** Optional Vitest deadline in milliseconds for this test body. */
-  timeout?: number
-}
-
-/** Optional exact authority used by automated same-origin preview hosts. */
-export interface HistoireTestRequestAuthority {
-  /** Story selected when request was dispatched. */
-  storyId?: string | null
-  /** Variant selected when request was dispatched. */
-  variantId?: string | null
-  /** Preview document lifetime; WindowProxy survives navigation. */
-  documentId?: string
-  /** Owned host capability echoed only for automation correlation. */
-  mcpNonce?: string
-  /** Captured project generation echoed only for automation correlation. */
-  mcpEpoch?: string
-}
-
-export interface HistoireCollectTestsPayload extends HistoireTestRequestAuthority {
-  requestId?: string
-  variantKey?: string | null
-}
-
-export interface HistoireRunTestsPayload extends HistoireTestRequestAuthority {
-  runId?: string
-  variantKey?: string | null
-}
-
-export interface HistoireTestDefinitionsPayload extends HistoireCollectTestsPayload {
-  definitions: HistoireSerializedTestDefinition[]
-  /**
-   * Present when the preview-side collection crashed — lets the host UI
-   * distinguish "no tests registered" from a broken collection.
-   */
-  error?: HistoireTestError | null
-}
-
-/** Result of a preview test collection request, resolved by the host store. */
-export interface HistoireTestCollectionResult {
-  definitions: HistoireSerializedTestDefinition[]
-  /** Set when the preview-side collection crashed instead of returning definitions. */
-  error?: HistoireTestError | null
-}
-
-export interface HistoireTestResultPayload extends HistoireRunTestsPayload {
-  summary: HistoireTestRunSummary
-}
-
-export interface HistoireTestCaseResultInput {
-  id?: string
-  name: string
-  fullName?: string
-  state: 'passed' | 'failed' | 'skipped'
-  errors: HistoireTestError[]
-}
-
+/** Story-owned test execution contract; never sent through wire. */
 export interface HistoireTestDefinition {
+  /** Stable test identity. */
   id: string
+  /** Display name. */
   name: string
+  /** Suite-qualified test name. */
   fullName: string
   /** Mirrors Vitest modifiers such as `.skip`, `.only`, and `.todo`. */
   mode?: HistoireTestMode
+  /** Runtime-local test callback. */
   handler?: HistoireTestHandler
   /** Optional Vitest deadline in milliseconds for this test body. */
   timeout?: number
   /** Suite scopes captured during collection; omitted from serialization. */
   hookScopes?: HistoireTestHookScope[]
-}
-
-export interface HistoireTestCaseResult {
-  id: string
-  name: string
-  fullName: string
-  state: 'passed' | 'failed' | 'skipped'
-  errors: HistoireTestError[]
-  storyId?: string
-  variantId?: string
-}
-
-/**
- * A story that could not be collected during a test run, so whether it defines
- * tests at all is unknown.
- */
-export interface HistoireUncollectedStory {
-  /** Story path relative to the project root. */
-  relativePath: string
-  /** Why the story could not be collected. */
-  error: string
-}
-
-export interface HistoireTestRunSummary {
-  ok: boolean
-  total: number
-  passed: number
-  failed: number
-  skipped: number
-  errors: HistoireTestError[]
-  tests: HistoireTestCaseResult[]
-  /**
-   * Stories the run had to skip because they failed to collect. Present only
-   * when something went wrong: a skipped story may have defined tests, so the
-   * run is reported as failed rather than silently under-reporting.
-   */
-  uncollectedStories?: HistoireUncollectedStory[]
-}
-
-export interface HistoireResolvedTestCase extends HistoireSerializedTestDefinition {
-  state: HistoireTestCaseResult['state'] | 'idle'
-  errors: HistoireTestError[]
-  storyId?: string
-  variantId?: string
 }

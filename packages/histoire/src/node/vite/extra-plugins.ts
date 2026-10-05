@@ -31,7 +31,9 @@ export function createFlagsPlugin(ctx: Context): VitePlugin {
     name: 'histoire:flags',
     enforce: 'pre',
     transform(code, id) {
-      if (id.match(/\.(vue|js)($|\?)/)) {
+      // Source-development workbench helpers are TypeScript; bundled consumers
+      // still enter through JavaScript. Both must share the same static gate.
+      if (id.match(/\.(vue|[cm]?[jt]sx?)($|\?)/)) {
         const original = code
         for (const flag in flags) {
           code = code.replace(new RegExp(flag, 'g'), flags[flag])

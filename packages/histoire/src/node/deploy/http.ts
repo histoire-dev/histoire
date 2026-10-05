@@ -2,12 +2,13 @@ import type { IncomingMessage, ServerResponse } from 'node:http'
 import type { PreviewHostRegistry } from '../mcp/browser/preview-host.js'
 import type { createMcpHttpHandler } from '../mcp/transport/http.js'
 import type { NodeArtifact } from './artifact-reader.js'
+import { mergeEmbedFrameAncestors } from '@histoire/protocol'
 import { serveNodeHealth } from './health.js'
 import { isBookNavigation, publicRequestPath } from './routes.js'
 import { serveArtifactAsset } from './static-files.js'
 
 /** Exact route composition shared by production listener tests and generated server. */
-export function createNodeHttpHandler(options: { artifact: NodeArtifact, host: PreviewHostRegistry, ready: () => boolean, mcp: () => ReturnType<typeof createMcpHttpHandler> | undefined }) {
+export function createNodeHttpHandler(options: { artifact: NodeArtifact, host: PreviewHostRegistry, ready: () => boolean, mcp: () => ReturnType<typeof createMcpHttpHandler> | undefined, embedOrigins?: readonly string[] }) {
   const manifest = options.artifact.manifest
   const prefix = `${manifest.base}__histoire/`
   const mcpPath = `${prefix}mcp`
@@ -19,6 +20,10 @@ export function createNodeHttpHandler(options: { artifact: NodeArtifact, host: P
   }
   return async (request: IncomingMessage, response: ServerResponse) => {
     const raw = request.url ?? ''
+    if (options.embedOrigins && raw.startsWith(manifest.base)) {
+      const existing = response.getHeader('content-security-policy')
+      response.setHeader('content-security-policy', mergeEmbedFrameAncestors(typeof existing === 'number' ? String(existing) : existing, options.embedOrigins))
+    }
     if (raw === mcpPath && options.mcp()) return options.mcp()!.handle(request, response)
     if (!['GET', 'HEAD'].includes(request.method ?? '')) {
       failure(response, 404)
@@ -45,6 +50,11 @@ export function createNodeHttpHandler(options: { artifact: NodeArtifact, host: P
     }
     if (!options.ready() || activeAssets >= 16) {
       failure(response, 503)
+      return
+    }
+    if (options.embedOrigins && path === 'histoire-embed-origins.json') {
+      response.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store' })
+      response.end(request.method === 'HEAD' ? undefined : JSON.stringify({ version: 1, allowedOrigins: options.embedOrigins }))
       return
     }
     activeAssets++

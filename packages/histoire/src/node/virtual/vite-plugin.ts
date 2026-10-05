@@ -2,14 +2,24 @@ import type { Plugin as VitePlugin } from 'vite'
 import type { Context } from '../context.js'
 import { resolve } from 'pathe'
 import { generateDocSearchData, generateTitleSearchData, getSearchDataJS } from '../search.js'
+import { EMBED_SOURCE_ID, embedSourceModule, LOCAL_SOURCE_ID, RESOLVED_EMBED_SOURCE_ID, RESOLVED_LOCAL_SOURCE_ID } from './embed/virtual.js'
 import * as VirtualFiles from './index.js'
 import { ID_SEPARATOR } from './util.js'
 
 export function createVirtualFilesPlugin(ctx: Context, isServer: boolean) {
+  let command: 'serve' | 'build' = ctx.mode === 'dev' ? 'serve' : 'build'
   return {
     name: 'histoire-virtual-files',
 
+    // Resolved command is authoritative even when NODE_ENV remains development.
+    configResolved(config) {
+      command = config.command
+    },
+
     async resolveId(id, importer) {
+      if (id === EMBED_SOURCE_ID) return RESOLVED_EMBED_SOURCE_ID
+      if (id === LOCAL_SOURCE_ID) return RESOLVED_LOCAL_SOURCE_ID
+      if (id === VirtualFiles.BUILD_INFO_ID) return VirtualFiles.RESOLVED_BUILD_INFO_ID
       if (id.startsWith(VirtualFiles.STORIES_ID)) {
         return VirtualFiles.RESOLVED_STORIES_ID
       }
@@ -94,6 +104,9 @@ export function createVirtualFilesPlugin(ctx: Context, isServer: boolean) {
     },
 
     async load(id) {
+      if (id === RESOLVED_EMBED_SOURCE_ID) return embedSourceModule('embed', command)
+      if (id === RESOLVED_LOCAL_SOURCE_ID) return embedSourceModule('local', command)
+      if (id === VirtualFiles.RESOLVED_BUILD_INFO_ID) return VirtualFiles.resolvedBuildInfo(ctx)
       if (id === VirtualFiles.RESOLVED_STORIES_ID) {
         return VirtualFiles.resolvedStories(ctx)
       }

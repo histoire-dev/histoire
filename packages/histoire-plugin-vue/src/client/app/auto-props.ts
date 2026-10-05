@@ -1,7 +1,8 @@
 import type { AutoPropComponentDefinition, PropDefinition, Variant } from '@histoire/shared'
-import { applyState } from '@histoire/shared'
+import { applyState, getHistoireFiniteMatrixValues, getHistoireMatrixValues } from '@histoire/shared'
 import { getTagName } from '../codegen'
 
+/** Publish changed component metadata and apply current controls overrides to VNodes. */
 export function syncVariantAutoProps(
   variant: Variant,
   vnodes: any,
@@ -26,6 +27,7 @@ export function syncVariantAutoProps(
   return snapshot
 }
 
+/** Traverse current rendered nodes without evaluating validators or prop factories. */
 function scanForAutoProps(vnodes: any, externalState: Variant['state']) {
   const result: AutoPropComponentDefinition[] = []
   const traversalState = {
@@ -37,6 +39,7 @@ function scanForAutoProps(vnodes: any, externalState: Variant['state']) {
   return result.filter(def => def.props.length)
 }
 
+/** Preserve component traversal ownership used by additive prop overrides. */
 function visitVNodes(vnodes: any, externalState: Variant['state'], traversalState: { index: number }, result: AutoPropComponentDefinition[]) {
   for (const vnode of normalizeVNodes(vnodes)) {
     if (!vnode) continue
@@ -79,11 +82,16 @@ function visitVNodes(vnodes: any, externalState: Variant['state'], traversalStat
             : prop.default
         }
 
+        const currentValue = getHistoireMatrixValues([vnode.props?.[key]])
         propDefs.push({
           name: key,
           types,
           required: prop?.required,
           default: defaultValue,
+          ...(currentValue?.length ? { value: currentValue[0] } : {}),
+          // Vue runtime metadata may advertise enum values; String alone never
+          // reveals a TypeScript union, so no guessed domain is synthesized.
+          values: getHistoireFiniteMatrixValues(prop?.values ?? prop?.enum),
         })
 
         const propState = externalState?._hPropState?.[index]
@@ -116,6 +124,7 @@ function visitVNodes(vnodes: any, externalState: Variant['state'], traversalStat
   }
 }
 
+/** Flatten fragment arrays while retaining declared node order. */
 function normalizeVNodes(vnodes: any) {
   if (!Array.isArray(vnodes)) {
     return vnodes == null ? [] : [vnodes]

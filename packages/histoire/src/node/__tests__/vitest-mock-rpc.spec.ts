@@ -11,11 +11,11 @@ import {
 } from '../vitest-mock-rpc.js'
 
 /** Records the middlewares and ws listeners a plugin registers. */
-function createFakeServer() {
+function createFakeServer(base = '/') {
   const middlewares: Array<{ path: string, handler: any }> = []
   const wsListeners = new Map<string, (payload: any) => void>()
   return {
-    config: { root: '/root' },
+    config: { root: '/root', base },
     middlewares: {
       use(path: string, handler: any) {
         middlewares.push({ path, handler })
@@ -96,6 +96,14 @@ function setup(overrides?: Record<string, any>) {
 }
 
 describe('vitest mock RPC plugin', () => {
+  it('owns mock RPC beneath project base before Vite rewrites request paths', () => {
+    const { mockerNode } = createResolverStub()
+    const server = createFakeServer('/book/')
+    const plugin = createVitestMockRpcPlugin(mockerNode)
+    ;(plugin.configureServer as any)(server)
+    expect(server.registered[0].path).toBe(`/book${VITEST_MOCK_RPC_ENDPOINT}`)
+  })
+
   it('answers the requesting round trip on its own dev-server endpoint', async () => {
     // The RPC deliberately does not ride Vite's HMR channel: replies there are
     // handled through one serial queue that a hot update in flight blocks, and

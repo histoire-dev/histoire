@@ -1,0 +1,15 @@
+.histoire-provider :is(.histoire-docs, .histoire-source) { min-width: 0; min-height: 0; flex: 1; overflow: auto; }
+.histoire-provider .histoire-docs { padding: 16px; }
+.histoire-provider .histoire-docs :is(h1, h2, h3, h4) { margin: 1.2em 0 .5em; line-height: 1.25; }
+.histoire-provider .histoire-docs a { color: var(--histoire-accent); }
+.histoire-provider .histoire-docs :is(img, video) { max-width: 100%; height: auto; }
+.histoire-provider .histoire-docs :is(pre, code) { font-family: ui-monospace, monospace; }
+.histoire-provider .histoire-docs pre { padding: 12px; overflow: auto; background: var(--histoire-panel); }
+.histoire-provider .histoire-source { display: flex; flex-direction: column; }
+.histoire-provider .histoire-content-actions { display: flex; gap: 4px; padding: 8px; border-bottom: 1px solid var(--histoire-border); }
+.histoire-provider .histoire-content-actions button {    padding: 4px 10px;  }
+.histoire-provider .histoire-content-actions button[aria-pressed="true"] { color: var(--histoire-accent); border-color: currentColor; }
+.histoire-provider .histoire-content-actions button:disabled {   }
+.histoire-provider .histoire-source-content { flex: 1; min-height: 0; overflow: auto; }
+.histoire-provider .histoire-source pre { margin: 0; padding: 16px; min-width: max-content; font-family: ui-monospace, monospace; }
+.histoire-provider :is(.histoire-docs, .histoire-source) [role="alert"] { margin: 12px; color: #dc2626; }

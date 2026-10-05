@@ -8,7 +8,10 @@ export default {
 import type { CSSProperties } from 'vue'
 import { computed, ref } from 'vue'
 import { VTooltip as vTooltip } from '../../overlay/tooltip'
+import { useControlsTheme } from '../../utils'
 import HstCopyIcon from '../HstCopyIcon.vue'
+
+const dark = useControlsTheme()
 
 const props = defineProps<{
   shades: Record<string, any>
@@ -16,6 +19,7 @@ const props = defineProps<{
   search?: string
 }>()
 
+/** Flatten nested shade groups without changing token values. */
 function flattenShades(shades: Record<string, any>, path = ''): Record<string, string> {
   return Object.entries(shades).reduce((acc, [key, color]) => {
     const nextPath = path ? key === 'DEFAULT' ? path : `${path}-${key}` : key
@@ -53,6 +57,7 @@ const hover = ref<string>(null)
 <template>
   <div
     v-if="displayedShades.length"
+    :data-histoire-control-appearance="dark ? 'dark' : 'light'"
     class="histoire-color-shades htw-grid htw-gap-4 htw-grid-cols-[repeat(auto-fill,minmax(200px,1fr))] htw-m-4"
   >
     <div

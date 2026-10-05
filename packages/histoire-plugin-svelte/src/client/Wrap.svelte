@@ -1,5 +1,6 @@
 <script>
-import { onMount, createEventDispatcher } from 'svelte'
+import { onMount, onDestroy, createEventDispatcher } from 'svelte'
+import { configureControlsApp } from '@histoire/controls'
 import {
   createApp as _createApp,
   h as _h,
@@ -17,6 +18,7 @@ let app
 
 const state = _reactive({})
 
+/** Mirror current framework-owned value and native attributes. */
 function updateState (value, attrs) {
   Object.assign(state, {
     value,
@@ -52,8 +54,11 @@ onMount(() => {
       })
     },
   })
+  configureControlsApp(app)
   app.mount(el)
 })
+
+onDestroy(() => app?.unmount())
 
 $: updateState(value, $$restProps)
 </script>

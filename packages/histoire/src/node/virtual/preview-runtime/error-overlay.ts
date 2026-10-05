@@ -8,6 +8,7 @@ export function previewErrorOverlay() {
   return `const RUNTIME_ERROR_OVERLAY_ID = '__histoire-runtime-error'
 
 function renderRuntimeError(error) {
+  postToParent({ type: RUNTIME_FAILED, error: serializeTestError(error) })
   const message = error instanceof Error
     ? (error.stack ?? error.message)
     : String(error)

@@ -41,7 +41,7 @@ describe('preview runtime outbound channel', () => {
     channel.postToParent({ type: 'test' })
 
     expect(hostWindow.postMessage).toHaveBeenCalledWith(
-      { __histoire: true, type: 'test', documentId: window.__HST_PREVIEW_DOCUMENT_ID__ },
+      { __histoire: true, type: 'test', documentId: window.__HST_PREVIEW_DOCUMENT_ID__, selectionVersion: 0 },
       'http://localhost:3000',
     )
   })

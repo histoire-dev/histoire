@@ -9,6 +9,7 @@ export default {
 import type {
   ViewUpdate,
 } from '@codemirror/view'
+import type { HstControlLayout } from '../../types'
 import { defaultKeymap } from '@codemirror/commands'
 import { json } from '@codemirror/lang-json'
 import {
@@ -20,8 +21,8 @@ import {
   syntaxHighlighting,
 } from '@codemirror/language'
 import { lintKeymap } from '@codemirror/lint'
-import { Compartment } from '@codemirror/state'
-import { oneDarkHighlightStyle, oneDarkTheme } from '@codemirror/theme-one-dark'
+import { Compartment, EditorState } from '@codemirror/state'
+import { oneDarkHighlightStyle } from '@codemirror/theme-one-dark'
 import {
   EditorView,
   highlightActiveLine,
@@ -29,14 +30,22 @@ import {
   highlightSpecialChars,
   keymap,
 } from '@codemirror/view'
-import { Icon } from '@iconify/vue'
-import { onMounted, ref, watch, watchEffect } from 'vue'
+import { onBeforeUnmount, onMounted, ref, watch, watchEffect } from 'vue'
 import { VTooltip as vTooltip } from '../../overlay/tooltip'
-import { isDark } from '../../utils'
+import { useControlsTheme } from '../../utils'
+import BuiltinIcon from '../BuiltinIcon.vue'
 import HstWrapper from '../HstWrapper.vue'
 
 const props = defineProps<{
+  /** Shared label placement. */
+  layout?: HstControlLayout
+  /** Lock editing while retaining external resets and invalid draft ownership. */
+  disabled?: boolean
+  /** Allow native editor focus without accepting edits. */
+  readonly?: boolean
+  /** Visible editor label. */
   title?: string
+  /** Parsed JSON value; invalid local drafts never replace this state. */
   modelValue: unknown
 }>()
 
@@ -44,17 +53,34 @@ const emit = defineEmits({
   'update:modelValue': (newValue: unknown) => true,
 })
 
+const isDark = useControlsTheme()
 let editorView: EditorView
 const internalValue = ref('')
 const invalidValue = ref(false)
 const editorElement = ref<HTMLInputElement>()
 
+/** CodeMirror keeps edit semantics while its chrome uses shared control palette. */
+const editorTheme = EditorView.theme({
+  '&': { color: 'var(--histoire-control-resolved-text)', backgroundColor: 'transparent', fontSize: '13px' },
+  '&.cm-focused': { outline: 'none' },
+  '.cm-scroller': { fontFamily: 'var(--histoire-font-mono, "JetBrains Mono", monospace)' },
+  '.cm-gutters': { color: 'var(--histoire-control-resolved-muted)', backgroundColor: 'var(--histoire-control-resolved-input)', border: '0' },
+  '.cm-activeLine, .cm-activeLineGutter': { backgroundColor: 'var(--histoire-control-resolved-chip)' },
+  '.cm-content': { caretColor: 'var(--histoire-control-resolved-accent)' },
+})
 const themes = {
-  light: [EditorView.baseTheme({}), syntaxHighlighting(defaultHighlightStyle)],
-  dark: [oneDarkTheme, syntaxHighlighting(oneDarkHighlightStyle)],
+  light: [editorTheme, syntaxHighlighting(defaultHighlightStyle)],
+  dark: [editorTheme, syntaxHighlighting(oneDarkHighlightStyle)],
 }
 
 const themeConfig = new Compartment()
+const availability = new Compartment()
+
+/** Public focus remains bound to existing CodeMirror editor. */
+function focus(): void {
+  if (!props.disabled) editorView?.focus()
+}
+defineExpose({ focus })
 
 const extensions = [
   highlightActiveLineGutter(),
@@ -73,6 +99,7 @@ const extensions = [
     internalValue.value = viewUpdate.view.state.doc.toString()
   }),
   themeConfig.of(themes.light),
+  availability.of([]),
 ]
 
 onMounted(() => {
@@ -86,12 +113,20 @@ onMounted(() => {
     editorView.dispatch({
       effects: [
         themeConfig.reconfigure(themes[isDark.value ? 'dark' : 'light']),
+        availability.reconfigure([
+          EditorState.readOnly.of(!!props.disabled || !!props.readonly),
+          EditorView.editable.of(!props.disabled && !props.readonly),
+          EditorView.contentAttributes.of({ 'aria-label': props.title ?? 'JSON', 'aria-disabled': String(!!props.disabled), 'aria-readonly': String(!!props.readonly), 'tabindex': props.disabled ? '-1' : '0' }),
+        ]),
       ],
     })
   })
 })
 
+onBeforeUnmount(() => editorView?.destroy())
+
 watch(() => props.modelValue, () => {
+  if (!editorView) return
   let sameDocument
 
   try {
@@ -120,18 +155,21 @@ watch(() => internalValue.value, () => {
 <template>
   <HstWrapper
     :title="title"
+    :layout="layout"
+    :aria-disabled="disabled || undefined"
+    :data-histoire-control-type="$attrs['data-histoire-control-type']"
     class="histoire-json htw-cursor-text"
     :class="$attrs.class"
     :style="$attrs.style"
   >
     <div
       ref="editorElement"
-      class="__histoire-json-code htw-w-full htw-border htw-border-solid htw-border-black/25 dark:htw-border-white/25 focus-within:htw-border-primary-500 dark:focus-within:htw-border-primary-500 htw-rounded-sm htw-box-border htw-overflow-auto htw-resize-y htw-min-h-32 htw-h-48 htw-relative"
+      class="__histoire-json-code"
       v-bind="{ ...$attrs, class: null, style: null }"
     />
 
-    <template #actions>
-      <Icon
+    <template v-if="invalidValue || $slots.actions" #actions>
+      <BuiltinIcon
         v-if="invalidValue"
         v-tooltip="'JSON error'"
         icon="carbon:warning-alt"
@@ -146,6 +184,6 @@ watch(() => internalValue.value, () => {
 <style scoped>
 .__histoire-json-code :deep(.cm-editor) {
   height: 100%;
-  min-width: 280px;
+  min-width: 0;
 }
 </style>

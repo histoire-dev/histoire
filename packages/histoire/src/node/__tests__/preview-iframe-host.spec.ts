@@ -145,7 +145,8 @@ async function mountHost(options: {
     state,
     /** Delivers a trusted message from the preview frame. */
     deliver(data: Record<string, any>) {
-      fakeWindow.dispatchMessage({ source: frame.contentWindow, origin: ORIGIN, data: { __histoire: true, ...data } })
+      const documentId = new URL(host!.sandboxUrl.value!).searchParams.get('documentId')
+      fakeWindow.dispatchMessage({ source: frame.contentWindow, origin: ORIGIN, data: { __histoire: true, documentId, ...data } })
     },
     /** Payloads posted into the frame, optionally filtered by message type. */
     sent(type?: string) {
@@ -191,6 +192,8 @@ describe('preview iframe host', () => {
     expect(story.variants.map(variant => variant.previewReady)).toEqual([false, false])
 
     host.deliver({ type: SANDBOX_READY, variantId: 'variant-b' })
+    expect(story.variants[1].previewReady).toBe(false)
+    host.deliver({ type: VARIANT_READY, variantId: 'variant-b' })
     expect(story.variants[1].previewReady).toBe(true)
     // Not the selected variant: nothing is pushed into the frame for it.
     expect(host.sent(STATE_SYNC)).toHaveLength(0)
@@ -199,7 +202,7 @@ describe('preview iframe host', () => {
     expect(story.variants[0].previewReady).toBe(true)
     // Runtime owns boot state; host never seeds its stale mirror back.
     expect(host.sent(STATE_SYNC)).toHaveLength(0)
-    expect(host.sent(PREVIEW_SETTINGS_SYNC)).toHaveLength(1)
+    expect(host.sent(PREVIEW_SETTINGS_SYNC).at(-1)).toMatchObject({ settings: { backgroundColor: 'transparent' } })
   })
 
   it('routes incoming state updates to the exact variant id', async () => {
@@ -225,10 +228,11 @@ describe('preview iframe host', () => {
     const story = createStory('story-a', ['variant-a', 'variant-b'])
 
     const grid = await mountHost({ mode: 'grid', story: { value: story }, currentVariantId: { value: 'variant-b' } })
-    expect(grid.sandboxUrl.value).toBe('sandbox?story=story-a&variant=grid')
+    expect(new URL(grid.sandboxUrl.value!).searchParams.get('variant')).toBe('grid')
+    expect(new URL(grid.sandboxUrl.value!).searchParams.get('documentId')).toBeTruthy()
 
     const single = await mountHost({ mode: 'single', story: { value: story }, currentVariantId: { value: 'variant-b' } })
-    expect(single.sandboxUrl.value).toBe('sandbox?story=story-a&variant=variant-b')
+    expect(new URL(single.sandboxUrl.value!).searchParams.get('variant')).toBe('variant-b')
 
     // Navigating away clears the story before the host unmounts, and the eager
     // watcher re-evaluates the computed: it must not dereference nothing.
@@ -243,6 +247,8 @@ describe('preview iframe host', () => {
 
     host.onIframeLoad()
     host.deliver({ type: SANDBOX_READY, variantId: 'variant-a' })
+    expect(story.variants[0].previewReady).toBe(false)
+    host.deliver({ type: VARIANT_READY, variantId: 'variant-a' })
     expect(host.isIframeLoaded.value).toBe(true)
     expect(story.variants[0].previewReady).toBe(true)
     previewRuntimeStore.notifyFrameNavigating.mockClear()
@@ -302,7 +308,7 @@ describe('preview iframe host', () => {
     await host.nextTick()
     // Pushed into the running document rather than remounting it, so the other
     // variants keep their live state.
-    expect(host.sent(SELECT_VARIANT)).toEqual([{ __histoire: true, type: SELECT_VARIANT, variantId: 'variant-b' }])
+    expect(host.sent(SELECT_VARIANT)).toEqual([{ __histoire: true, documentId: expect.any(String), type: SELECT_VARIANT, variantId: 'variant-b' }])
   })
 
   it('ignores selection messages in single mode, which remounts instead', async () => {
@@ -315,7 +321,7 @@ describe('preview iframe host', () => {
 
     expect(host.sent(SELECT_VARIANT)).toHaveLength(0)
     // The sandbox url is what changes instead, loading a fresh document.
-    expect(host.sandboxUrl.value).toBe('sandbox?story=story-a&variant=variant-b')
+    expect(new URL(host.sandboxUrl.value!).searchParams.get('variant')).toBe('variant-b')
   })
 
   it('publishes and retracts its frame in the runtime store slot it owns', async () => {
@@ -323,9 +329,9 @@ describe('preview iframe host', () => {
     const host = await mountHost({ mode: 'grid', story: { value: story }, currentVariantId: { value: 'variant-a' } })
 
     // Mounted before the ref was assigned, so the frame lands on load.
-    expect(previewRuntimeStore.setFrame).toHaveBeenNthCalledWith(1, 'grid', null)
+    expect(previewRuntimeStore.setFrame).toHaveBeenNthCalledWith(1, 'grid', null, expect.any(String))
     host.onIframeLoad()
-    expect(previewRuntimeStore.setFrame).toHaveBeenLastCalledWith('grid', host.frame)
+    expect(previewRuntimeStore.setFrame).toHaveBeenLastCalledWith('grid', host.frame, expect.any(String))
 
     host.app.unmount()
     expect(previewRuntimeStore.setFrame).toHaveBeenLastCalledWith('grid', null)

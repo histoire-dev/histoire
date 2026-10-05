@@ -95,22 +95,24 @@ describe('createStoryCollector', () => {
       invalidateModuleSilently: (id: string) => invalidated.push(`silent:${id}`),
     })
 
-    return { collector, invalidated }
+    return { collector, invalidated, ctx }
   }
 
   it('announces a changed story only after the virtual modules are invalidated', async () => {
     const storyFile = { fileName: 'a', relativePath: 'src/a.story.vue', virtual: true, moduleCode: '', story: { id: 'story-a' } }
-    const { collector, invalidated } = createCollector(storyFile)
+    const { collector, invalidated, ctx } = createCollector(storyFile)
 
     // Full pass first: per-file changes are queued only once every story loaded.
     await collector.collect()
-    notifyStoryChange(storyFile as any)
+    invalidated.length = 0
+    notifyStoryChange(ctx, storyFile as any)
     await vi.waitFor(() => expect(server.sent.some(message => message.event === STORY_CHANGED_EVENT)).toBe(true))
 
     // The app reloads the preview iframe on this event, and the fresh iframe
     // re-imports the preview runtime — which bakes the story metadata at
     // transform time, so it must have been invalidated first.
     expect(invalidated).toContain(`silent:${VirtualFiles.RESOLVED_PREVIEW_RUNTIME_ID}`)
+    expect(invalidated).toContain(VirtualFiles.RESOLVED_BUILD_INFO_ID)
     expect(invalidated).toContain(VirtualFiles.getResolvedStorySourceId('story-a'))
     const changed = server.sent.find(message => message.event === STORY_CHANGED_EVENT)
     expect(changed.payload).toEqual({ storyId: 'story-a', hasVitestMocks: false })
@@ -120,14 +122,14 @@ describe('createStoryCollector', () => {
 
   it('stops collecting once the server closed', async () => {
     const storyFile = { fileName: 'a', relativePath: 'src/a.story.vue', virtual: true, moduleCode: '', story: { id: 'story-a' } }
-    const { collector } = createCollector(storyFile)
+    const { collector, ctx } = createCollector(storyFile)
 
     await collector.collect()
     const sentBefore = server.sent.length
     // A pending debounce (or a listener left behind) would collect into the
-    // closed server, and the module-global listener list would keep it alive.
+    // closed server, and the context-owned listener list would keep it alive.
     collector.stop()
-    notifyStoryChange(storyFile as any)
+    notifyStoryChange(ctx, storyFile as any)
     await flushMicrotasks()
     await new Promise(resolve => setTimeout(resolve, 150))
 
@@ -209,9 +211,9 @@ describe('createStoryCollector', () => {
         await gate
       }
     })
-    notifyStoryChange(file as any)
+    notifyStoryChange(ctx, file as any)
     await waiting
-    notifyStoryChange(file as any)
+    notifyStoryChange(ctx, file as any)
     expect(execute).toHaveBeenCalledTimes(2)
     release()
     await collector.collect()
@@ -227,17 +229,35 @@ describe('createStoryCollector', () => {
     const invalidated: string[] = []
     const collector = createStoryCollector({ ctx, server: server as any, collectStories: { clearCache: vi.fn(), executeStoryFile: execute }, invalidateModule: id => invalidated.push(id), invalidateModuleSilently: id => invalidated.push(id) })
     await collector.collect()
+    invalidated.length = 0
     const events: any[] = []
     collector.onCollection((event) => {
       if (event.phase === 'completed') events.push(event)
     })
     ctx.storyFiles.length = 0
-    notifyStoryListChange()
+    notifyStoryListChange(ctx)
     await vi.waitFor(() => expect(events).toHaveLength(1))
     expect(events[0].files).toEqual([])
     expect(events[0].outcomes.size).toBe(0)
     expect(invalidated).toContain(VirtualFiles.RESOLVED_PREVIEW_RUNTIME_ID)
+    expect(invalidated).toContain(VirtualFiles.RESOLVED_BUILD_INFO_ID)
     expect(execute).toHaveBeenCalledTimes(1)
+    await collector.stop()
+  })
+
+  it('refreshes build metadata after added stories complete collection', async () => {
+    const file = { fileName: 'a', relativePath: 'src/a.story.vue', virtual: true, moduleCode: '', story: { id: 'a' } }
+    const { collector, invalidated, ctx } = createCollector(file)
+    await collector.collect()
+    invalidated.length = 0
+    const completed = vi.fn()
+    collector.onCollection((event) => {
+      if (event.phase === 'completed') completed()
+    })
+    ctx.storyFiles.push({ ...file, fileName: 'b', relativePath: 'src/b.story.vue', story: { ...file.story, id: 'b' } } as any)
+    notifyStoryListChange(ctx)
+    await vi.waitFor(() => expect(completed).toHaveBeenCalledOnce())
+    expect(invalidated).toContain(VirtualFiles.RESOLVED_BUILD_INFO_ID)
     await collector.stop()
   })
 })

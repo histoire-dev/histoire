@@ -1,0 +1,13 @@
+export type * from './adapters/types.js'
+export { bindHistoireMountChannel, configureHistoireMountControls, postHistoireMountEvent, subscribeHistoireMountEvents } from './mounts/channel.js'
+export type { HistoireMountChannel } from './mounts/channel.js'
+export { createHistoireSessionWithAdapters } from './session/controller.js'
+export { getHistoireDocsPolicy, getHistoireSessionDescriptor, isHistoirePrimaryMountActive, registerHistoireSessionInternals, requestHistoireOpenInEditor, requestHistoireStatePreset, selectHistoireStoryLink, waitForHistoireSelection } from './session/internal.js'
+export type { HistoirePresetAction, HistoirePresetList, HistoireStoryLink } from './session/internal.js'
+export { OperationOwner } from './session/ownership.js'
+export { createBridgePort } from './transport/port.js'
+export type { BridgePortOptions, HistoireBridgePort } from './transport/port.js'
+export { dispatchHistoireSessionCommand } from './transport/session-commands.js'
+export { getBridgeSurfaceRole } from './transport/validation.js'
+/** First-party-only adapter contracts; external story loaders are unsupported. */
+export type * from './types.js'

@@ -1,0 +1,24 @@
+.histoire-provider .histoire-controls { min-width: 0; padding: 8px; }
+.histoire-provider .histoire-controls fieldset { margin: 8px 0; border: 1px solid var(--histoire-border); }
+.histoire-provider .histoire-generic-controls { min-width: 0; max-width: 100%; }
+.histoire-provider .histoire-generic-controls fieldset { min-width: 0; min-inline-size: 0; max-width: 100%; }
+/* Finite scalar labels keep full accessible text without imposing their
+   min-content width on every fieldset row in a narrow inspector. */
+.histoire-provider .histoire-prop-control-finite { min-width: 0; max-width: 100%; }
+.histoire-provider .histoire-prop-control-finite :is(span,div) { min-width: 0; max-width: 100%; }
+.histoire-provider .histoire-prop-control-finite .histoire-button-group-options { flex-wrap: wrap; }
+.histoire-provider .histoire-prop-control-finite .histoire-button { flex: 1 1 6rem; min-width: 0; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.histoire-provider .histoire-custom-controls { min-width: 0; }
+.histoire-provider .histoire-custom-controls > iframe { display: block; width: 100%; min-height: 0; border: 0; }
+.histoire-provider .histoire-controls-reset { margin-top: 8px; }
+.histoire-provider .histoire-controls-anchor { position: absolute; pointer-events: none; }
+.histoire-provider .histoire-controls-anchor > span { display: block; width: 100%; height: 100%; }
+.histoire-provider .histoire-state-presets { display: flex; align-items: center; gap: 6px; min-width: 0; margin: 8px 0; }
+.histoire-provider .histoire-state-presets > .histoire-select { flex: 1; }
+.histoire-provider .histoire-preset-dropdown { flex: none; }
+.histoire-provider .histoire-preset-trigger { display: grid; place-items: center; width: 32px; height: 32px; cursor: pointer; }
+.histoire-provider :is(.histoire-preset-menu, .histoire-preset-form) { width: 200px; max-width: 100%; padding: 4px;  }
+.histoire-provider .histoire-preset-menu { display: flex; flex-direction: column; }
+.histoire-provider .histoire-preset-menu button { width: 100%; justify-content: flex-start; text-align: left; }
+.histoire-provider .histoire-preset-form { padding: 10px; }
+.histoire-provider .histoire-preset-form-actions { display: flex; justify-content: flex-end; gap: 4px; margin-top: 6px; }

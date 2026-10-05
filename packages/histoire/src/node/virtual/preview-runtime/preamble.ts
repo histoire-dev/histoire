@@ -85,13 +85,20 @@ import GenericMountStory from ${app('components/story/GenericMountStory.vue.js')
 import GenericRenderStory from ${app('components/story/GenericRenderStory.vue.js')}
 import { setupPluginApi } from ${app('plugin.js')}
 import { usePreviewSettingsStore } from ${app('stores/preview-settings.js')}
-import { COLLECT_TESTS, CONTROLS_READY, CONTROLS_RESIZE, PREVIEW_SETTINGS_SYNC, PREVIEW_SYNC, RUN_TESTS, SANDBOX_READY, SELECT_VARIANT, STATE_SYNC, TEST_DEFINITIONS, TEST_RESULT, VARIANT_READY } from ${app('util/const.js')}
+import { COLLECT_TESTS, CONTROLS_READY, CONTROLS_RESIZE, HOST_CHANNEL_MESSAGE, PREVIEW_SETTINGS_SYNC, PREVIEW_SYNC, RUN_TESTS, RUNTIME_REQUEST, RUNTIME_RESULT, RUNTIME_FAILED, RUNTIME_LAYOUT, RUNTIME_FOCUS, SANDBOX_READY, SELECT_VARIANT, STATE_SYNC, TEST_DEFINITIONS, TEST_RESULT, VARIANT_READY } from ${app('util/const.js')}
 import { histoireConfig } from ${app('util/config.js')}
 import { isDark } from ${app('util/dark.js')}
 import { setupControlsDocument } from ${app('util/controls-document.js')}
 import { applyPreviewSettings } from ${app('util/preview-settings.js')}
+import { installRuntimeEventScope } from ${app('util/runtime-events.js')}
+import { installRuntimeHostChannels } from ${app('util/host-channel.js')}
 import { toRawDeep } from ${app('util/state.js')}
-import { applyVariantStateUpdate, createControlsOverlayBridge, createFailedRunSummary, createVariantStateSyncGuards, getVariantStateKey, serializeTestError } from ${JSON.stringify(histoireSharedId)}
+import { getDynamicSourceCode } from ${app('util/docs.js')}
+import { createRuntimeState } from ${app('../embed/adapters/state.js')}
+import { createRuntimeStatePresets } from ${app('../embed/adapters/state-presets.js')}
+import { createStandalonePresetStorage } from ${app('../embed/app/standalone/presets.js')}
+import { observeRuntimeLayout } from ${app('../embed/adapters/layout.js')}
+import { ELEMENT_PICK_REQUEST, ELEMENT_PICK_RESULT, MEASURE_REQUEST, MEASURE_RESULT, PROPS_OVERRIDE, applyVariantStateUpdate, createControlsOverlayBridge, createControlsStateRevision, createFailedRunSummary, createVariantStateSyncGuards, getVariantStateKey, measureWireValue, serializeTestError } from ${JSON.stringify(histoireSharedId)}
 import { createVariantTestSession } from ${JSON.stringify(variantTestSessionId)}
 ${hasVitestPreview
   ? `import { createStaticPreviewMockRpc, createStaticPreviewMswOptions, enableStaticPreviewMockInterception } from ${JSON.stringify(staticMockRuntimeId)}`
@@ -112,6 +119,8 @@ const initialSelection = {
   // #controls slot for the host Controls panel (used for vitest-mocked
   // stories, whose module can only execute where the mocker is active).
   controls: new URLSearchParams(window.location.search).get('controls') === 'true',
+  // Isolated matrix cells consume canonical state without publishing back to it.
+  matrix: new URLSearchParams(window.location.search).get('matrix') === 'true',
 }
 // Story currently displayed, declared here rather than next to the app that
 // writes it: the story-loading section reads it several sections earlier, where

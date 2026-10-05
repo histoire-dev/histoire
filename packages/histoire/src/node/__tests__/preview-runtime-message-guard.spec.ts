@@ -1,101 +1,73 @@
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import {
   COLLECT_TESTS,
-  PREVIEW_SETTINGS_SYNC,
+  HOST_CHANNEL_MESSAGE,
   PREVIEW_SYNC,
   RUN_TESTS,
-  SANDBOX_READY,
+  RUNTIME_REQUEST,
   SELECT_VARIANT,
   STATE_SYNC,
   TEST_DEFINITIONS,
   TEST_RESULT,
 } from '../../../../histoire-app/src/app/util/const.js'
-import { previewMessageHandler } from '../virtual/preview-runtime/message-handler.js'
-
-/**
- * Executes the generated inbound message listener of the preview runtime.
- *
- * The listener is emitted as source text inside the app `setup()` body, so it
- * is run here in a `with` scope that supplies its free identifiers. Anything the
- * exercised branch does not stub resolves to `undefined` (or the real global),
- * which is enough to observe the guard and the two test-related branches.
- */
-function createPreviewRuntime(options: { onCollect?: () => void, onRun?: () => void } = {}) {
-  const postToParent = vi.fn()
-  const collectVariantTests = vi.fn(async () => {
-    options.onCollect?.()
-    return [{ id: '0', mode: 'run', name: 'a' }]
-  })
-  const runVariantTests = vi.fn(async () => {
-    options.onRun?.()
-    return { total: 1, passed: 1, failed: 0, skipped: 0, tests: [] }
-  })
-  const setCollectedTestDefinitions = vi.fn()
-  const syncSelection = vi.fn(async () => {})
-  let listener: (event: any) => Promise<void>
-
-  // The window embedding the sandbox, as `getHostWindow()` resolves it.
-  const hostWindow = {}
-  const story: { value: { id: string } | null } = { value: { id: 'story-a' } }
-  const variant: { value: { id: string } | null } = { value: { id: 'variant-a' } }
-  const stubs: Record<string, any> = {
-    getHostWindow: () => hostWindow,
-    window: {
-      location: { origin: 'http://localhost:3000', search: '?mcpNonce=nonce&mcpEpoch=epoch' },
-      addEventListener: (type: string, handler: any) => {
-        if (type === 'message') {
-          listener = handler
-        }
-      },
-    },
-    COLLECT_TESTS,
-    previewDocumentId: 'document',
-    PREVIEW_SETTINGS_SYNC,
-    PREVIEW_SYNC,
-    RUN_TESTS,
-    SANDBOX_READY,
-    SELECT_VARIANT,
-    STATE_SYNC,
-    TEST_DEFINITIONS,
-    TEST_RESULT,
-    postToParent,
-    postVariantStateSnapshot: vi.fn(),
-    syncSelection,
-    story,
-    variant,
-    variantTestSession: { collectVariantTests },
-    runVariantTests,
-    setCollectedTestDefinitions,
-    serializeTestError: (error: Error) => ({ message: error.message }),
-    createFailedRunSummary: () => ({ total: 0, passed: 0, failed: 1, skipped: 0, tests: [] }),
-  }
-
-  const scope = new Proxy(stubs, {
-    has: () => true,
-    get: (target, key) => (key in target ? target[key] : (globalThis as any)[key as any]),
-  })
-  // eslint-disable-next-line no-new-func -- the runtime only exists as source text
-  new Function('scope', `with (scope) { ${previewMessageHandler()} }`)(scope)
-
-  return {
-    postToParent,
-    collectVariantTests,
-    runVariantTests,
-    syncSelection,
-    story,
-    variant,
-    /** Delivers a message to the runtime, awaiting the async dispatch. */
-    async deliver(data: Record<string, any>, overrides: { source?: unknown, origin?: string } = {}) {
-      await listener!({
-        source: 'source' in overrides ? overrides.source : hostWindow,
-        origin: overrides.origin ?? 'http://localhost:3000',
-        data,
-      })
-    },
-  }
-}
+import { createPreviewRuntime } from './utils/preview-runtime-message.js'
 
 describe('preview runtime inbound message guard', () => {
+  it('rejects stale same-document variant intents before changing source selection', async () => {
+    const runtime = createPreviewRuntime()
+    await runtime.deliver({ __histoire: true, type: PREVIEW_SYNC, storyId: 'story-a', variantId: 'variant-a', documentId: 'document', selectionVersion: 2 })
+    for (const selectionVersion of [1, -1, 0.5, '3', Number.MAX_SAFE_INTEGER + 1]) {
+      await runtime.deliver({ __histoire: true, type: PREVIEW_SYNC, storyId: 'story-a', variantId: 'stale', documentId: 'document', selectionVersion })
+    }
+    expect(runtime.syncSelection).toHaveBeenCalledOnce()
+    await runtime.deliver({ __histoire: true, type: PREVIEW_SYNC, storyId: 'story-a', variantId: 'variant-b', documentId: 'document', selectionVersion: 3 })
+    expect(runtime.syncSelection).toHaveBeenCalledTimes(2)
+  })
+  it('does not apply older controls acknowledgment while newer local edit is in transit', async () => {
+    const runtime = createPreviewRuntime({ controls: true })
+    const previous = runtime.controlsRevision.capture()
+    const current = runtime.controlsRevision.capture()
+    const message = { __histoire: true, type: STATE_SYNC, documentId: 'document', variantId: 'variant-a', state: { text: 'new' } }
+    await runtime.deliver({ ...message, controlsRevision: previous })
+    await runtime.deliver({ ...message, controlsRevision: '2' })
+    await runtime.deliver({ ...message, documentId: 'old', controlsRevision: current })
+    expect(runtime.applyVariantStateUpdate).not.toHaveBeenCalled()
+    await runtime.deliver({ ...message, controlsRevision: current })
+    expect(runtime.applyVariantStateUpdate).toHaveBeenCalledOnce()
+    await runtime.deliver(message)
+    expect(runtime.applyVariantStateUpdate).toHaveBeenCalledTimes(2)
+  })
+  it('requires exact document and selected actor for new channels while isolating application failures', async () => {
+    const runtime = createPreviewRuntime()
+    const message = { __histoire: true, type: HOST_CHANNEL_MESSAGE, channel: { name: 'factory', type: 'application', data: null }, storyId: 'story-a', variantId: 'variant-a' }
+    await runtime.deliver(message)
+    await runtime.deliver({ ...message, documentId: 'old' })
+    await runtime.deliver({ ...message, documentId: 'document', variantId: 'other' })
+    await runtime.deliver({ ...message, documentId: 'document' }, { source: {} })
+    expect(runtime.channelReceive).not.toHaveBeenCalled()
+    await runtime.deliver({ ...message, documentId: 'document' })
+    expect(runtime.channelReceive).toHaveBeenCalledWith(message.channel, { storyId: 'story-a', variantId: 'variant-a' })
+    await runtime.deliver({ ...message, type: RUNTIME_REQUEST, command: 'channel.post' })
+    expect(runtime.handleRuntimeRequest).not.toHaveBeenCalled()
+    await runtime.deliver({ ...message, type: RUNTIME_REQUEST, command: 'channel.post', documentId: 'document' })
+    expect(runtime.handleRuntimeRequest).toHaveBeenCalledOnce()
+    runtime.channelReceive.mockImplementation(() => {
+      throw new Error('Application admission failure')
+    })
+    await expect(runtime.deliver({ ...message, documentId: 'document' })).resolves.toBeUndefined()
+  })
+  it('drops old or malformed grid versions while retaining legacy host selection', async () => {
+    const runtime = createPreviewRuntime()
+    await runtime.deliver({ __histoire: true, type: SELECT_VARIANT, variantId: 'current', selectionVersion: 2 })
+    for (const selectionVersion of [1, -1, 2.5, Number.NaN]) {
+      await runtime.deliver({ __histoire: true, type: SELECT_VARIANT, variantId: 'stale', selectionVersion })
+      expect(runtime.gridSelectedVariantId.value).toBe('current')
+    }
+    await runtime.deliver({ __histoire: true, type: SELECT_VARIANT, variantId: 'legacy' })
+    expect(runtime.gridSelectedVariantId.value).toBe('legacy')
+    await runtime.deliver({ __histoire: true, type: SELECT_VARIANT, variantId: 'new', selectionVersion: 3 })
+    expect(runtime.gridSelectedVariantId.value).toBe('new')
+  })
   it.each([
     { storyId: 'story' },
     { variantId: 'variant' },

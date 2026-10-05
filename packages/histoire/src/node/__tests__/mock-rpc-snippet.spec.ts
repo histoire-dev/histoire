@@ -120,6 +120,16 @@ function createSerialHmrChannel() {
 }
 
 describe('mock RPC snippet', () => {
+  it('binds generated browser RPC to nested Vite base instead of origin root', async () => {
+    const fetch = vi.fn(async () => ({ ok: true, json: async () => ({ result: 'resolved' }) }))
+    vi.stubGlobal('fetch', fetch)
+    vi.stubGlobal('window', { location: { href: 'https://book.example/book/__sandbox.html' } })
+    const source = MOCK_RPC_SNIPPET.replaceAll('import.meta.env.BASE_URL', JSON.stringify('/book/'))
+    // eslint-disable-next-line no-new-func -- execute actual generated snippet with resolved Vite constant
+    const rpc = new Function(`${source}\nreturn mockRpc`)()
+    expect(await rpc('resolveId', { id: './dep' })).toBe('resolved')
+    expect(fetch.mock.calls[0][0]).toBe('/book/__histoire_vitest_mock_rpc')
+  })
   afterEach(() => {
     vi.unstubAllGlobals()
   })
@@ -349,7 +359,7 @@ describe('mock RPC snippet', () => {
     // a module (that is what makes these tests work).
     expect(MOCK_RPC_CORE).not.toContain('import.meta')
     expect(MOCK_RPC_SNIPPET).toContain(MOCK_RPC_CORE)
-    expect(MOCK_RPC_SNIPPET).toContain('createMockRpc()')
+    expect(MOCK_RPC_SNIPPET).toContain('createMockRpc(')
   })
 
   it('is embedded by both generated runtimes, which use the correlated endpoint', () => {

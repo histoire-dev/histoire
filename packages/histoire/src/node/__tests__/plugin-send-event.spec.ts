@@ -33,6 +33,23 @@ function createChannel() {
 }
 
 describe('createDevEventApi', () => {
+  it('closes result subscription and rejects pending calls without leaving timers or sending again', async () => {
+    const channel = createChannel()
+    const off = vi.fn()
+    const api = createDevEventApi({ ...channel.transport, onResult(listener) {
+      channel.transport.onResult(listener)
+      return off
+    } })
+    const pending = api.sendEvent('pending')
+    const rejected = expect(pending).rejects.toThrow('Histoire dev event API closed.')
+    api.close()
+    api.close()
+    await rejected
+    expect(off).toHaveBeenCalledOnce()
+    expect(vi.getTimerCount()).toBe(0)
+    await expect(api.sendEvent('late')).rejects.toThrow('Histoire dev event API closed.')
+    expect(channel.requests).toHaveLength(1)
+  })
   beforeEach(() => {
     vi.useFakeTimers()
   })
@@ -76,6 +93,16 @@ describe('createDevEventApi', () => {
     await expect(promise).rejects.toThrow('vitest exited with code 1')
   })
 
+  it('preserves a typed source retirement error from the server', async () => {
+    const channel = createChannel()
+    const { sendEvent } = createDevEventApi(channel.transport)
+    const promise = sendEvent('runStoryTests')
+
+    channel.reply({ event: 'runStoryTests', requestId: channel.requests[0].requestId, error: 'Test source owner changed', code: 'RUNTIME_CHANGED' })
+
+    await expect(promise).rejects.toMatchObject({ code: 'RUNTIME_CHANGED' })
+  })
+
   it('keeps two overlapping calls of the same event from crossing results', async () => {
     const channel = createChannel()
     const { sendEvent } = createDevEventApi(channel.transport)
@@ -92,6 +119,26 @@ describe('createDevEventApi', () => {
 
     channel.reply({ event: 'runStoryTests', requestId: firstRequest.requestId, result: 'first' })
     await expect(first).resolves.toBe('first')
+  })
+
+  it.each(['runStoryTests', 'collectStoryTests'])('cancels only its correlated %s request when its caller aborts', async (event) => {
+    const channel = createChannel()
+    const { sendEvent } = createDevEventApi(channel.transport)
+    const controller = new AbortController()
+    const first = sendEvent(event, { storyId: 'first' }, controller.signal)
+    const second = sendEvent(event, { storyId: 'second' })
+    const [firstRequest, secondRequest] = channel.requests
+
+    controller.abort()
+
+    expect(channel.requests[2]).toEqual({
+      event: 'cancelStoryTests',
+      payload: { requestId: firstRequest.requestId },
+      requestId: firstRequest.requestId,
+    })
+    await expect(first).rejects.toThrow('cancelled')
+    channel.reply({ event, requestId: secondRequest.requestId, result: 'second' })
+    await expect(second).resolves.toBe('second')
   })
 
   it('still settles on a reply carrying no request id', async () => {

@@ -75,7 +75,7 @@ export function createStoryCollector(options: StoryCollectorOptions) {
     }
   }
 
-  const offStoryChange = onStoryChange(async (changedFile) => {
+  const offStoryChange = onStoryChange(ctx, async (changedFile) => {
     if (!isActive()) return
     if (changedFile && !didAllStoriesYet && !collecting) {
       return
@@ -105,7 +105,7 @@ export function createStoryCollector(options: StoryCollectorOptions) {
     }
   })
 
-  const offStoryListChange = onStoryListChange(() => {
+  const offStoryListChange = onStoryListChange(ctx, () => {
     if (isActive()) {
       queuedFiles = []
       queued = true
@@ -194,6 +194,7 @@ export function createStoryCollector(options: StoryCollectorOptions) {
 
     invalidateModule(VirtualFiles.RESOLVED_STORIES_ID)
     invalidateModule(VirtualFiles.RESOLVED_SEARCH_TITLE_DATA_ID)
+    invalidateModule(VirtualFiles.RESOLVED_BUILD_INFO_ID)
     invalidateModuleSilently(VirtualFiles.RESOLVED_PREVIEW_RUNTIME_ID)
 
     // Ordering guarantee: story-changed events are only announced once the

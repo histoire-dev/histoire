@@ -38,6 +38,7 @@
     "vite": "^7.0.0 || ^8.0.0"
   },
   "dependencies": {
+    "@histoire/protocol": "workspace:^",
     "@histoire/vendors": "workspace:^",
     "@types/fs-extra": "^11.0.4",
     "@types/markdown-it": "^14.1.2",

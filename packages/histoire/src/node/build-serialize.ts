@@ -1,5 +1,6 @@
-import type { ServerStory } from '@histoire/shared'
+import type { HistoireBuildInfo, ServerStory } from '@histoire/shared'
 import type { Context } from './context.js'
+import type { BuiltCaptureMetadata } from './runtime/catalog/build-metadata.js'
 import { fileHasVitestMocks } from './util/story-vitest.js'
 
 interface SerializedStory extends Omit<ServerStory, 'docsText'> {
@@ -19,11 +20,16 @@ interface SerializedMarkdownFile {
   frontmatter?: any
 }
 
-interface SerializedStoryData {
+export interface SerializedStoryData {
   stories: SerializedStory[]
   markdownFiles: SerializedMarkdownFile[]
+  /** Optional additive capture settings for immutable built preview. */
+  capture?: BuiltCaptureMetadata
+  /** Optional workbench project metadata. */
+  buildInfo?: HistoireBuildInfo
 }
 
+/** Serializes existing story fields compatibly; capture metadata is added after assets complete. */
 export function getSerializedStoryData(ctx: Context): SerializedStoryData {
   const data: SerializedStoryData = {
     stories: [],

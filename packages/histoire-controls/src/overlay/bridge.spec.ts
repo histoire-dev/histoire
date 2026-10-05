@@ -45,6 +45,16 @@ describe('controls overlay bridge', () => {
     expect(callback).toHaveBeenCalledExactlyOnceWith({ itemId: 'option', restoreFocus: false })
   })
 
+  it('rejects disabled results even when a trusted host sends them', () => {
+    const callback = vi.fn()
+    const handle = bridge.open(anchor, { kind: 'select', items: [{ id: 'option', label: 'Option', disabled: true }] }, callback)
+    reply(handle.id)
+    expect(callback).not.toHaveBeenCalled()
+    handle.update({ kind: 'select', items: [{ id: 'option', label: 'Option' }] })
+    reply(handle.id)
+    expect(callback).toHaveBeenCalledExactlyOnceWith({ itemId: 'option', restoreFocus: false })
+  })
+
   it('refreshes geometry and stops sending updates after close', () => {
     const rect = vi.spyOn(anchor, 'getBoundingClientRect').mockReturnValue({ x: 10, y: 20, width: 100, height: 27 } as DOMRect)
     const handle = bridge.open(anchor, { kind: 'tooltip', content: 'Label' }, vi.fn())

@@ -56,7 +56,7 @@ export function HstVue(): Plugin {
     async onDevEvent(api) {
       switch (api.event) {
         case 'listVueComponents': {
-          return listComponentFiles(api.payload.search, api.getConfig().storyMatch)
+          return listComponentFiles(api.payload.search, api.getConfig().storyMatch, undefined, api.root)
         }
       }
     },

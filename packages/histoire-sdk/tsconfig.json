@@ -1,0 +1,6 @@
+{
+  "extends": "../histoire-protocol/tsconfig.json",
+  "compilerOptions": { "rootDir": "src", "outDir": "dist" },
+  "include": ["src"],
+  "exclude": ["src/**/*.spec.ts", "src/__tests__/**"]
+}

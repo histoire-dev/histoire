@@ -25,7 +25,7 @@ export interface NodeBuildSnapshot {
   /** Digest-named private content deduplicated across all stories. */
   blobs: Map<string, string>
   /** Allowlisted settings, diagnostics, and timeouts. */
-  settings: Pick<ArtifactManifest, 'title' | 'base' | 'routerMode' | 'defaultColorScheme' | 'backgroundColor' | 'mcpEnabled' | 'timeouts' | 'diagnostics' | 'diagnosticsTruncated'>
+  settings: Pick<ArtifactManifest, 'title' | 'base' | 'routerMode' | 'defaultColorScheme' | 'backgroundColor' | 'textDirection' | 'globals' | 'mcpEnabled' | 'timeouts' | 'diagnostics' | 'diagnosticsTruncated'>
 }
 
 /** Captures source/docs before executing stories or any build-time test collection. */
@@ -88,6 +88,8 @@ export async function createNodeBuildSnapshot(ctx: Context, inputs: ReadonlyMap<
       routerMode: ctx.config.routerMode ?? 'history',
       defaultColorScheme: ctx.config.theme?.defaultColorScheme ?? 'auto',
       backgroundColor: ctx.config.backgroundPresets?.[0]?.color ?? 'transparent',
+      textDirection: ctx.config.preview?.textDirection ?? 'ltr',
+      globals: { ...ctx.config.preview?.globals },
       mcpEnabled: mcp !== false && (typeof mcp !== 'object' || mcp.enabled !== false),
       timeouts: { collect: getCollectTimeout(ctx), storyCollect: getStoryCollectTimeout(ctx), run: getRunTimeout(ctx) },
       diagnostics: captured.diagnostics.slice(),

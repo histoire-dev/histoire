@@ -18,7 +18,7 @@ export default defineConfig({
     },
   },
   test: {
-    exclude: [...configDefaults.exclude, '**/mcp/integration/**', '**/mcp/package-smoke.spec.ts'],
+    exclude: [...configDefaults.exclude, '**/mcp/integration/**', '**/embed/integration/**', '**/embed/consumers/**', '**/mcp/package-smoke.spec.ts'],
     testTimeout: 15_000,
   },
 })

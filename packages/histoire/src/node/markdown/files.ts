@@ -32,7 +32,7 @@ export function createMarkdownFileManager(ctx: Context, md: MarkdownIt) {
     const truncatedName = path.basename(file.absolutePath, '.md')
     const siblingExists = !!physical || fs.readdirSync(path.dirname(file.absolutePath)).some(name => !name.endsWith('.md') && name.startsWith(truncatedName))
     file.isRelatedToStory = siblingExists
-    if (previous && previous !== physical && previous.virtual && siblingExists) removeStory(previous.relativePath)
+    if (previous && previous !== physical && previous.virtual && siblingExists) removeStory(ctx, previous.relativePath)
     if (previous && previous !== physical && previous.markdownFile === file) delete previous.markdownFile
     if (siblingExists) {
       file.storyFile = physical
@@ -41,7 +41,7 @@ export function createMarkdownFileManager(ctx: Context, md: MarkdownIt) {
     else {
       const relativePath = file.relativePath.replace(/\.md$/, '.js')
       const code = virtualModule(file)
-      const story = addStory(relativePath, code)
+      const story = addStory(ctx, relativePath, code)
       // addStory intentionally returns an existing registered record. Changes
       // must update that record's generated module, otherwise recollection
       // would keep the previous frontmatter title/id forever.
@@ -64,8 +64,8 @@ export function createMarkdownFileManager(ctx: Context, md: MarkdownIt) {
     file.content = content
     associate(file)
     if (ready) file.html = md.render(content, { file: absolutePath })
-    notifyStoryChange(file.storyFile)
-    notifyMarkdownListChange()
+    notifyStoryChange(ctx, file.storyFile)
+    notifyMarkdownListChange(ctx)
     return file
   }
   /** Removes Markdown and clears sibling docs before recollecting affected stories. */
@@ -75,9 +75,9 @@ export function createMarkdownFileManager(ctx: Context, md: MarkdownIt) {
     const [file] = ctx.markdownFiles.splice(index, 1)
     const story = file.storyFile
     if (story?.markdownFile === file) delete story.markdownFile
-    if (story?.virtual && !file.isRelatedToStory) removeStory(story.relativePath)
-    notifyStoryChange(story?.virtual ? undefined : story)
-    notifyMarkdownListChange()
+    if (story?.virtual && !file.isRelatedToStory) removeStory(ctx, story.relativePath)
+    notifyStoryChange(ctx, story?.virtual ? undefined : story)
+    notifyMarkdownListChange(ctx)
   }
   /** Reassociates already parsed docs after registered physical stories add/unlink. */
   function reconcile() {
@@ -86,10 +86,10 @@ export function createMarkdownFileManager(ctx: Context, md: MarkdownIt) {
       if (associate(file)) {
         changed = true
         if (ready) file.html = md.render(file.content ?? '', { file: file.absolutePath })
-        notifyStoryChange(file.storyFile)
+        notifyStoryChange(ctx, file.storyFile)
       }
     }
-    if (changed) notifyMarkdownListChange()
+    if (changed) notifyMarkdownListChange(ctx)
   }
   return {
     update,

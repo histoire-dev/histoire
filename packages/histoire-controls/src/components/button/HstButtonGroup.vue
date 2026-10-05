@@ -1,70 +1,44 @@
-<script lang="ts">
-export default {
-  name: 'HstButtonGroup',
-}
-</script>
-
 <script setup lang="ts">
-import type { ComputedRef } from 'vue'
-import type { HstControlOption } from '../../types'
-import { computed } from 'vue'
+import type { HstControlOptions } from '../../options'
+import type { HstControlLayout } from '../../types'
+import { computed, ref } from 'vue'
+import { normalizeControlOptions } from '../../options'
 import HstWrapper from '../HstWrapper.vue'
 import HstButton from './HstButton.vue'
 
+defineOptions({ name: 'HstButtonGroup', inheritAttrs: false })
 const props = defineProps<{
+  /** Visible group name. */
   title?: string
-  modelValue?: string
-  options: string[] | number[] | HstControlOption[] | Record<string, string | number>
+  /** Exact selected value. */
+  modelValue?: any
+  /** Supported option forms. */
+  options: HstControlOptions
+  /** Disable every option while owner is busy. */
+  disabled?: boolean
+  /** Label placement. */
+  layout?: HstControlLayout
 }>()
-
-const formattedOptions: ComputedRef<HstControlOption[]> = computed(() => {
-  if (Array.isArray(props.options)) {
-    return props.options.map((value: string | number | HstControlOption) => {
-      if (typeof value === 'string' || typeof value === 'number') {
-        return { value, label: String(value) }
-      }
-      else {
-        return value
-      }
-    })
-  }
-  else {
-    return Object.keys(props.options).map((value: string) => ({
-      value,
-      label: props.options[value],
-    }))
-  }
-})
-
-const emit = defineEmits<{
-  (e: 'update:modelValue', value: string): void
-}>()
-
-function selectOption(value: string) {
-  emit('update:modelValue', value)
+const options = computed(() => normalizeControlOptions(props.options))
+const choices = ref<HTMLElement>()
+/** Group focus lands on current enabled choice; disabled groups stay inert. */
+function focus(): void {
+  if (props.disabled) return
+  const current = choices.value?.querySelector<HTMLElement>('button[aria-pressed="true"]:not(:disabled)')
+  ;(current ?? choices.value?.querySelector<HTMLElement>('button:not(:disabled)'))?.focus()
 }
+defineExpose({ focus })
+const emit = defineEmits<{ 'update:modelValue': [value: any] }>()
 </script>
 
 <template>
-  <HstWrapper
-    tag="div"
-    role="group"
-    :title="title"
-    class="histoire-button-group htw-flex-nowrap htw-items-center"
-  >
-    <div class="htw-flex htw-gap-px htw-border htw-border-solid htw-border-black/25 dark:htw-border-white/25 htw-rounded-sm htw-p-px">
-      <HstButton
-        v-for="{ label, value } of formattedOptions"
-        :key="value"
-        class="htw-px-1 htw-h-[22px] htw-flex-1 !htw-rounded-[3px]"
-        :color="value === modelValue ? 'primary' : 'flat'"
-        :rounded="false"
-        @click="selectOption(value)"
-      >
-        {{ label }}
+  <HstWrapper tag="div" role="group" v-bind="$attrs" :aria-label="$attrs['aria-label'] ?? title" :title="title" :layout="layout" class="histoire-button-group">
+    <div ref="choices" class="histoire-button-group-options">
+      <HstButton v-for="(option, index) in options" :key="index" color="flat" :disabled="disabled || option.disabled" :aria-label="option.label" :title="option.label" :aria-pressed="Object.is(option.value, modelValue)" @click="!disabled && !option.disabled && emit('update:modelValue', option.value)">
+        {{ option.label }}
       </HstButton>
     </div>
-    <template #actions>
+    <template v-if="$slots.actions" #actions>
       <slot name="actions" />
     </template>
   </HstWrapper>

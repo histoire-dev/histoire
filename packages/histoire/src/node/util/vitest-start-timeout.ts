@@ -1,3 +1,5 @@
+import { HistoireSdkError } from '@histoire/protocol'
+
 export interface VitestStartTimeoutOptions {
   /** Maximum time (ms) the run may take before it is considered stuck. */
   timeoutMs: number
@@ -35,7 +37,7 @@ export async function runWithVitestStartTimeout(run: () => Promise<unknown>, opt
             // Vitest may already be torn down when a late timer fires — its
             // diagnostics must never replace the timeout error.
           }
-          reject(new Error(options.message))
+          reject(new HistoireSdkError('TIMEOUT', options.message))
         }, options.timeoutMs)
         timer?.unref?.()
       }),

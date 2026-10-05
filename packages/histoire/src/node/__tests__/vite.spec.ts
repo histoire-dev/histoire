@@ -4,7 +4,10 @@ import path from 'node:path'
 import { resolveConfig } from 'vite'
 import { describe, expect, it, vi } from 'vitest'
 import { getDefaultConfig } from '../config/index.js'
+import { closeContext } from '../context.js'
+import { onStoryChange } from '../stories.js'
 import { getViteConfigWithPlugins } from '../vite/index.js'
+import { closeDevPreviewHost } from '../vite/mcp-preview-html.js'
 import { createVitestBrowserRuntimeConfig } from '../vitest-browser-config/index.js'
 
 describe('getViteConfigWithPlugins', () => {
@@ -32,6 +35,28 @@ describe('getViteConfigWithPlugins', () => {
       registeredCommands: [],
     }
   }
+
+  it('keeps browser mounts read-only while file updates still request collection', async () => {
+    const ctx = createContext()
+    const changed = vi.fn()
+    const off = onStoryChange(ctx, changed)
+    const handlers = new Map<string, () => void>()
+    const server = { config: { base: '/', server: {} }, middlewares: { use: vi.fn() }, ws: { on: (event: string, listener: () => void) => handlers.set(event, listener) } } as any
+    try {
+      const { viteConfig } = await getViteConfigWithPlugins(false, ctx)
+      const plugin = viteConfig.plugins.find(plugin => plugin?.name === 'histoire-vite-plugin') as any
+      plugin.configureServer(server)
+      for (let mount = 0; mount < 3; mount++) handlers.get('histoire:mount')?.()
+      expect(changed).not.toHaveBeenCalled()
+      plugin.handleHotUpdate({ file: ctx.storyFiles[0].path })
+      expect(changed).toHaveBeenCalledExactlyOnceWith(ctx.storyFiles[0])
+    }
+    finally {
+      off()
+      closeDevPreviewHost(server)
+      await closeContext(ctx)
+    }
+  })
 
   it('excludes vitest from optimized deps in browser runtime', async () => {
     const ctx = createContext()

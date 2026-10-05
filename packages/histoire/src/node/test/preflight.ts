@@ -1,5 +1,6 @@
 import type { Context } from '../context.js'
 import { createRequire } from 'node:module'
+import { HistoireSdkError } from '@histoire/protocol'
 import { join } from 'pathe'
 import { hasProjectVitest } from '../util/has-vitest.js'
 
@@ -12,10 +13,8 @@ import { hasProjectVitest } from '../util/has-vitest.js'
 export async function ensureBrowserTestDepsInstalled(root: string) {
   const missing = missingBrowserTestDependencies(root)
   if (missing.length) {
-    throw new Error(
-      `\`histoire test\` runs stories in a browser and requires ${missing.join(' and ')} in the project. `
-      + `Install with: pnpm add -D ${missing.join(' ')}`,
-    )
+    throw new HistoireSdkError('DEPENDENCY_MISSING', `\`histoire test\` runs stories in a browser and requires ${missing.join(' and ')} in the project. `
+      + `Install with: pnpm add -D ${missing.join(' ')}`)
   }
 }
 
@@ -41,6 +40,6 @@ export function missingBrowserTestDependencies(root: string): string[] {
  */
 export function ensureProjectVitest(ctx: Context) {
   if (!hasProjectVitest(ctx.root)) {
-    throw new Error('Vitest must be installed in the target project to run Histoire browser-mode tests.')
+    throw new HistoireSdkError('DEPENDENCY_MISSING', 'Vitest must be installed in the target project to run Histoire browser-mode tests.')
   }
 }

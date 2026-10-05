@@ -15,7 +15,7 @@ export class RuntimeCleanupError extends AggregateError {
 /** Finds unconfirmed teardown even when startup preserved it in an aggregate. */
 export function hasUnconfirmedCleanup(error: unknown): boolean {
   return error instanceof RuntimeCleanupError
-    || (typeof error === 'object' && error !== null && 'code' in error && error.code === 'HISTOIRE_RUNTIME_CLEANUP_FAILED')
+    || (typeof error === 'object' && error !== null && 'code' in error && (error.code === 'HISTOIRE_RUNTIME_CLEANUP_FAILED' || error.code === 'CLEANUP_UNCONFIRMED'))
     || (error instanceof AggregateError && error.errors.some(hasUnconfirmedCleanup))
 }
 

@@ -2,9 +2,12 @@ import type { Plugin as VitePlugin } from 'vite'
 import type { Context } from '../context.js'
 import type { BrowserRuntimePaths } from './resolve-paths.js'
 import { join } from 'pathe'
-import { APP_PATH, TEMP_PATH } from '../alias.js'
+import { APP_PATH } from '../alias.js'
+import { getContextRegistry } from '../runtime/registry.js'
+import { installUiHttpRouter } from '../server/ui-channel/http.js'
 import { notifyStoryChange } from '../stories.js'
 import { resolveHistoireAppBundledDir } from '../util/resolve-histoire-app.js'
+import { createEmbedMiddleware } from '../virtual/embed/middleware.js'
 import { createAppHtmlMiddleware, createSandboxHtmlMiddleware } from './dev-html.js'
 import { createMcpPreviewHtmlMiddleware } from './mcp-preview-html.js'
 import { histoireSharedPath, resolveSupportPluginAllowPaths, withPackageDirs } from './resolve-paths.js'
@@ -27,6 +30,7 @@ export interface HistoireVitePluginOptions {
 export function createHistoireVitePlugin(ctx: Context, options: HistoireVitePluginOptions): VitePlugin {
   const { isServer, browserRuntime, browserRuntimePaths } = options
   const supportPluginAllowPaths = resolveSupportPluginAllowPaths(ctx)
+  const { tempDir } = getContextRegistry(ctx)
 
   return {
     name: 'histoire-vite-plugin',
@@ -102,9 +106,9 @@ export function createHistoireVitePlugin(ctx: Context, options: HistoireVitePlug
           fs: {
             allow: [
               APP_PATH,
-              TEMP_PATH,
+              tempDir,
               ctx.resolvedViteConfig.root,
-              process.cwd(),
+              ctx.root,
               ...supportPluginAllowPaths,
               ...browserRuntimePaths.allowPaths,
               ...browserRuntimePaths.mswAllowPaths,
@@ -133,9 +137,9 @@ export function createHistoireVitePlugin(ctx: Context, options: HistoireVitePlug
             : {},
           '__HST_COLLECT__': isServer,
         },
-        cacheDir: browserRuntime
-          ? (isServer ? 'node_modules/.hst-vite-browser-server' : 'node_modules/.hst-vite-browser')
-          : (isServer ? 'node_modules/.hst-vite-server' : 'node_modules/.hst-vite'),
+        cacheDir: join(tempDir, 'vite', browserRuntime
+          ? (isServer ? 'browser-server' : 'browser-client')
+          : (isServer ? 'server' : 'client')),
       }
     },
 
@@ -148,20 +152,17 @@ export function createHistoireVitePlugin(ctx: Context, options: HistoireVitePlug
     handleHotUpdate(updateContext) {
       const story = ctx.storyFiles.find(file => file.path === updateContext.file)
       if (story) {
-        notifyStoryChange(story)
+        notifyStoryChange(ctx, story)
       }
     },
 
     configureServer(server) {
-      let firstMount = true
-      server.ws.on('histoire:mount', () => {
-        if (!firstMount) {
-          notifyStoryChange()
-        }
-        firstMount = false
-      })
-
+      // Catalog belongs to filesystem/explicit collection owners. Browser
+      // mounts and reconnects only read it; recollecting here retires ready
+      // runtimes on every visit and amplifies optimizer reloads into full scans.
+      server.middlewares.use(createEmbedMiddleware(server, ctx))
       server.middlewares.use(createMcpPreviewHtmlMiddleware(server))
+      if (!isServer && !browserRuntime) installUiHttpRouter(server)
       server.middlewares.use(createSandboxHtmlMiddleware(server))
 
       // serve our index.html after vite history fallback

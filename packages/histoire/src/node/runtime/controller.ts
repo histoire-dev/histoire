@@ -5,12 +5,8 @@ import { watchProjectConfiguration } from './config-watchers.js'
 import { startProjectRuntime } from './start.js'
 import { waitForRuntimeWork } from './wait.js'
 
-/** Module-global stories state supports one live project owner per process. */
-let processOwner: object | undefined
-
 /** Serializes startup/restart and suppresses feedback from superseded generations. */
 export function createProjectRuntimeController(options: ProjectRuntimeOptions = {}, dependencies: Partial<ProjectRuntimeDependencies> = {}) {
-  const owner = {}
   const acquire = dependencies.start ?? startProjectRuntime
   const watch = dependencies.watch ?? watchProjectConfiguration
   const listeners = new Set<(status: ProjectRuntimeStatus, handle?: ProjectRuntimeHandle) => void>()
@@ -46,7 +42,7 @@ export function createProjectRuntimeController(options: ProjectRuntimeOptions = 
     }
     catch (error) {
       unsafeCleanupError = error
-      // Preserve process ownership after unknown runner teardown; closing
+      // Quarantine this controller after unknown runner teardown; closing
       // remaining project resources still avoids watcher/server leaks.
       await Promise.allSettled([oldWatch?.(), oldGeneration?.close()])
       throw error
@@ -61,8 +57,6 @@ export function createProjectRuntimeController(options: ProjectRuntimeOptions = 
 
   /** Creates a fresh generation; late acquisition is closed before returning. */
   async function initialize(): Promise<ProjectRuntimeHandle> {
-    if (processOwner && processOwner !== owner) throw new Error('A project runtime already owns this process')
-    processOwner = owner
     const capturedVersion = ++version
     const active = () => status !== 'closed' && capturedVersion === version
     const localAbort = new AbortController()
@@ -92,7 +86,7 @@ export function createProjectRuntimeController(options: ProjectRuntimeOptions = 
       if (!active()) throw new Error('Project runtime closed')
       const stopWatch = await watch(runtime, options, (source) => {
         void restart(source).catch(error => options.onError?.(error))
-      })
+      }, runtime.configurationRevision)
       if (!active()) {
         try {
           await stopWatch()
@@ -107,7 +101,9 @@ export function createProjectRuntimeController(options: ProjectRuntimeOptions = 
       // Abort wins even if project execution never settles its readiness work.
       await waitForRuntimeWork(runtime.ready, localAbort.signal)
       if (!active()) throw new Error('Project runtime closed')
-      publish('ready')
+      // Reconciliation may have queued a successor while this watcher became
+      // ready. Let finishTransitions retire this stale generation unexposed.
+      if (!pendingRestart) publish('ready')
       return handle
     }
     catch (error) {
@@ -123,7 +119,6 @@ export function createProjectRuntimeController(options: ProjectRuntimeOptions = 
         finally {
           publish('failed')
         }
-        if (!cleanupError && !unsafeCleanupError && processOwner === owner) processOwner = undefined
         if (cleanupError) throw new AggregateError([error, cleanupError], String(error))
       }
       throw error
@@ -204,11 +199,10 @@ export function createProjectRuntimeController(options: ProjectRuntimeOptions = 
       if (!closing) {
         publish('closed')
         const released = release()
-        // Acquisition may ignore its signal. Keep process ownership until it
-        // returns and its late-created resources are confirmed closed.
+        // Acquisition may ignore its signal. Join late acquisition until its
+        // resources close, while unrelated project controllers remain usable.
         closing = withCleanupDeadline(Promise.all([released, transition?.catch(() => {})])).then(() => {
           if (unsafeCleanupError) throw unsafeCleanupError
-          if (processOwner === owner) processOwner = undefined
         }).finally(() => {
           listeners.clear()
         })

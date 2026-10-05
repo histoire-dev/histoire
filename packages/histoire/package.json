@@ -24,6 +24,10 @@
       "types": "./client.d.ts",
       "default": "./client.js"
     },
+    "./node": {
+      "types": "./dist/node/api/index.d.ts",
+      "default": "./dist/node/api/index.js"
+    },
     "./plugin": {
       "types": "./plugin.d.ts",
       "default": "./plugin.js"
@@ -52,6 +56,8 @@
     "build": "rimraf dist && tsc",
     "watch": "tsc -w --sourceMap",
     "test": "vitest run",
+    "test:embed:integration": "vitest run --config vitest.embed.config.ts",
+    "test:embed:consumers": "vitest run --config vitest.consumers.config.ts",
     "test:mcp:integration": "vitest run --config vitest.mcp.config.ts",
     "test:mcp:package": "vitest run --config vitest.package.config.ts",
     "test:dev": "vitest"
@@ -74,9 +80,11 @@
     }
   },
   "dependencies": {
+    "@agentclientprotocol/sdk": "^1.7.0",
     "@akryum/tinypool": "^0.3.1",
     "@histoire/app": "workspace:^",
     "@histoire/controls": "workspace:^",
+    "@histoire/protocol": "workspace:^",
     "@histoire/shared": "workspace:^",
     "@histoire/vendors": "workspace:^",
     "@modelcontextprotocol/node": "2.1.0",
@@ -92,8 +100,9 @@
     "fs-extra": "^11.2.0",
     "globby": "^14.0.2",
     "gray-matter": "^4.0.3",
-    "jiti": "^2.4.1",
+    "jiti": "^2.7.0",
     "jsdom": "^27.4.0",
+    "magicast": "^0.5.1",
     "markdown-it": "^14.1.0",
     "markdown-it-anchor": "^9.2.0",
     "markdown-it-attrs": "^4.3.0",

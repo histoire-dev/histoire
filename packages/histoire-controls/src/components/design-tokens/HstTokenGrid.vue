@@ -7,7 +7,10 @@ export default {
 <script lang="ts" setup>
 import { computed, ref } from 'vue'
 import { VTooltip as vTooltip } from '../../overlay/tooltip'
+import { useControlsTheme } from '../../utils'
 import HstCopyIcon from '../HstCopyIcon.vue'
+
+const dark = useControlsTheme()
 
 const props = withDefaults(defineProps<{
   tokens: Record<string, string | number | any[] | Record<string, any>>
@@ -38,6 +41,7 @@ const hover = ref<string>(null)
 
 <template>
   <div
+    :data-histoire-control-appearance="dark ? 'dark' : 'light'"
     class="histoire-token-grid htw-bind-col-size htw-grid htw-gap-4 htw-m-4"
     :style="{
       '--histoire-col-size': colSizePx,

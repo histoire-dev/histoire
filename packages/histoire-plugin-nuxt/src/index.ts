@@ -1,9 +1,12 @@
-import type { Nuxt } from '@nuxt/schema'
 import type { Plugin } from 'histoire'
-import type { UserConfig as ViteConfig } from 'vite'
+import type { UserConfig as ViteConfig, Plugin as VitePlugin } from 'vite'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import replace from '@rollup/plugin-replace'
+import { isolateNuxtResolver } from './resolve.js'
+
+/** Kit owns the loaded Nuxt shape; don't mix separately hoisted schema majors. */
+type Nuxt = Awaited<ReturnType<typeof import('@nuxt/kit').loadNuxt>>
 
 const ignorePlugins = [
   'nuxt:vite-node-server',
@@ -12,27 +15,59 @@ const ignorePlugins = [
   'nuxt:cache-dir',
   'nuxt:dynamic-base-path',
   'nuxt:import-protection',
+  // Histoire owns HTTP/HMR; Nuxt's Nitro adapter opens a second HMR listener.
+  'nuxt:dev-server',
 ]
 
+/** Nuxt uses process-wide internals; Vue/Svelte multi-root support does not extend it. */
+let activeNuxtOwner: object | undefined
+
+/** Integrates one Nuxt project with explicit root and startup cleanup ownership. */
 export function HstNuxt(): Plugin {
   let nuxt: Nuxt
+  const owner = {}
+  let closing: Promise<void> | undefined
+  /** Closes acquired Nuxt once, keeping ownership blocked after unconfirmed teardown. */
+  function close() {
+    return closing ??= (async () => {
+      await nuxt?.close()
+      if (activeNuxtOwner === owner) activeNuxtOwner = undefined
+    })()
+  }
   return {
     name: '@histoire/plugin-nuxt',
 
-    async defaultConfig() {
-      const nuxtViteConfig = await useNuxtViteConfig()
+    async defaultConfig(_config, _mode, context) {
+      if (activeNuxtOwner && activeNuxtOwner !== owner) throw new Error('Nuxt integration supports one active project per process')
+      activeNuxtOwner = owner
+      context?.onCleanup(close)
+      let nuxtViteConfig: Awaited<ReturnType<typeof useNuxtViteConfig>>
+      try {
+        nuxtViteConfig = await useNuxtViteConfig(context?.root ?? process.cwd(), (acquired) => {
+          nuxt = acquired
+        })
+      }
+      catch (error) {
+        try {
+          await close()
+        }
+        catch (cleanupError) {
+          throw new AggregateError([error, cleanupError], String(error))
+        }
+        throw error
+      }
       const { viteConfig } = nuxtViteConfig
 
       nuxt = nuxtViteConfig.nuxt // We save it to close it later
-      const plugins = viteConfig.plugins.filter((p: any) => !ignorePlugins.includes(p?.name))
+      const plugins = viteConfig.plugins.filter((p: any) => p && !ignorePlugins.includes(p.name)).map(plugin => isolateNuxtResolver(plugin as VitePlugin))
       return {
         vite: {
+          base: nuxt.options.app.baseURL,
           server: {
             watch: viteConfig.server.watch,
             fs: {
               allow: viteConfig.server.fs.allow,
             },
-            middlewareMode: false,
           },
           define: {
             ...viteConfig.define,
@@ -73,8 +108,8 @@ export function HstNuxt(): Plugin {
         setupCode: [
           `${nuxt.options.css.map(file => `import '${file}'`).join('\n')}`,
           `import { setupNuxtApp } from '@histoire/plugin-nuxt/dist/runtime/app-setup.js'
-export async function setupVue3 () {
-  await setupNuxtApp(${JSON.stringify(nuxt.options.runtimeConfig.public)})
+export async function setupVue3 (setupApi) {
+  await setupNuxtApp(${JSON.stringify(nuxt.options.runtimeConfig.public)}, setupApi, { ...${JSON.stringify(nuxt.options.app)}, baseURL: import.meta.env.BASE_URL })
 }`,
         ],
         viteNodeInlineDeps: [
@@ -94,27 +129,22 @@ export async function setupVue3 () {
     },
 
     onDev(api, onCleanup) {
-      onCleanup(async () => {
-        nuxt?.close()
-      })
+      onCleanup(close)
     },
 
     onBuild(api) {
-      api.onBuildEnd(() => {
-        nuxt?.close()
-      })
+      api.onBuildEnd(close)
     },
 
-    onPreview() {
-      nuxt?.close()
-    },
+    onPreview: close,
   }
 }
 
-async function useNuxtViteConfig() {
+/** Registers Nuxt before later template/config steps can fail. */
+async function useNuxtViteConfig(root: string, onAcquire: (nuxt: Nuxt) => void) {
   const { loadNuxt, buildNuxt } = await import('@nuxt/kit')
   const nuxt = await loadNuxt({
-    // cwd: process.cwd(),
+    cwd: root,
     ready: false,
     dev: true,
     overrides: {
@@ -132,6 +162,7 @@ async function useNuxtViteConfig() {
       },
     },
   })
+  onAcquire(nuxt)
   if (nuxt.options.builder as string !== '@nuxt/vite-builder') {
     throw new Error(`Histoire only supports Vite bundler, but Nuxt builder is currently set to '${nuxt.options.builder}'.`)
   }
@@ -162,6 +193,7 @@ async function useNuxtViteConfig() {
 
   return {
     viteConfig: await new Promise<ViteConfig>((resolve, reject) => {
+      let captured = false
       nuxt.hook('modules:done', () => {
         nuxt.hook('components:extend', (components) => {
           for (const name of ['NuxtLink']) {
@@ -173,8 +205,12 @@ async function useNuxtViteConfig() {
         })
 
         nuxt.hook('vite:configResolved', (config, { isClient }) => {
-          if (isClient) {
+          if (isClient && !captured) {
+            captured = true
             resolve(config as any)
+            // Nuxt generated templates/config already exist. Stop before its
+            // own dev server acquires HTTP/HMR resources Histoire would duplicate.
+            throw new Error('_stop_')
           }
         })
       })

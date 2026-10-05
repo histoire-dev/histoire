@@ -1,0 +1,57 @@
+{
+  "name": "@histoire/vue",
+  "type": "module",
+  "version": "1.0.0-beta.1",
+  "description": "Native Vue components for Histoire sessions",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./style.css": "./dist/style.css",
+    "./internal": {
+      "types": "./dist/internal.d.ts",
+      "default": "./dist/internal.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "rimraf dist && tsc && node scripts/copy-styles.mjs",
+    "watch": "concurrently \"tsc -w --sourceMap\" \"node scripts/copy-styles.mjs --watch\"",
+    "test": "vitest run"
+  },
+  "peerDependencies": {
+    "vue": "^3.5.0"
+  },
+  "dependencies": {
+    "@histoire/controls": "workspace:^",
+    "@histoire/protocol": "workspace:^",
+    "@histoire/sdk": "workspace:^",
+    "dompurify": "^3.4.16",
+    "floating-vue": "5.2.2",
+    "shiki": "^3.0.0",
+    "vue-virtual-scroller": "^3.0.5"
+  },
+  "devDependencies": {
+    "@vue/test-utils": "^2.4.6",
+    "concurrently": "^9.1.0",
+    "jsdom": "^27.4.0",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vitest": "4.1.10",
+    "vue": "^3.5.26",
+    "vue-router": "^4.5.0"
+  }
+}

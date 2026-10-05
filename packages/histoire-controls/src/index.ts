@@ -12,13 +12,16 @@ import HstNumberVue from './components/number/HstNumber.vue'
 import HstRadioVue from './components/radio/HstRadio.vue'
 import HstSelectVue from './components/select/HstSelect.vue'
 import HstSliderVue from './components/slider/HstSlider.vue'
+import HstSwitchVue from './components/switch/HstSwitch.vue'
 import HstTextVue from './components/text/HstText.vue'
 import HstTextareaVue from './components/textarea/HstTextarea.vue'
+import './style/controls.pcss'
 
 export const HstButton = HstButtonVue
 export const HstButtonGroup = HstButtonGroupVue
 export const HstCheckbox = HstCheckboxVue
 export const HstCheckboxList = HstCheckboxListVue
+export const HstSwitch = HstSwitchVue
 export const HstText = HstTextVue
 export const HstNumber = HstNumberVue
 export const HstSlider = HstSliderVue
@@ -37,6 +40,7 @@ export const components = {
   HstButtonGroup,
   HstCheckbox,
   HstCheckboxList,
+  HstSwitch,
   HstText,
   HstNumber,
   HstSlider,
@@ -51,6 +55,17 @@ export const components = {
   HstColorSelect,
 }
 
-export * from './types'
+// Declaration emit preserves these paths. Explicit extensions keep ESM hosts
+// from losing the exports (or silently treating their types as any).
+export { provideHistoireControls, useHistoireControls } from './context.js'
+export type { HistoireControlsContext } from './context.js'
+export { configureControlsApp, getControlElement } from './field.js'
+export { createPropOverridePatch, getControlComponent, getControlStateKeys } from './model.js'
+export type { HstControlOptions } from './options.js'
+export { getControlsAppearance } from './overlay/appearance.js'
+
+export { focusControlsSelectedOption, moveControlsOptionFocus, reconcileControlsOptionFocus, restoreControlsFocus } from './overlay/focus.js'
+export * from './types.js'
+
 export { getControlsHost } from '@histoire/shared'
 export type { HistoireControlsOverlay, HistoireControlsOverlayHandle, HistoireControlsOverlayResult } from '@histoire/shared'

@@ -11,12 +11,6 @@ export async function previewCommand(options: PreviewOptions) {
     mode: 'build',
   })
 
-  for (const plugin of ctx.config.plugins) {
-    if (plugin.onPreview) {
-      await plugin.onPreview()
-    }
-  }
-
   const { baseUrl } = await startPreview(options.port, ctx)
   console.log(`Preview server listening on ${pc.cyan(baseUrl)}`)
 }

@@ -3,6 +3,9 @@ import type {
   UserConfig as ViteConfig,
   ConfigEnv as ViteConfigEnv,
 } from 'vite'
+import type { HistoireThemeConfig } from './config-theme.js'
+import type { HistoireUiConfig } from './config-ui.js'
+import type { HistoireEmbedConfig, HistoirePreviewConfig } from './embed-config.js'
 import type { Plugin } from './plugin.js'
 import type { ServerTreeFile, StoryProps } from './story.js'
 
@@ -12,14 +15,14 @@ export interface SupportMatchPattern {
   pluginIds: string[]
 }
 
-export type CustomizableColors = 'primary' | 'gray'
-export type ColorKeys = '50' | '100' | '200' | '300' | '400' | '500' | '600' | '700' | '800' | '900'
-export type GrayColorKeys = ColorKeys | '750' | '850' | '950'
-
+/** Named viewport; null or omitted height keeps automatic story height. */
 export interface ResponsivePreset {
+  /** Picker label. */
   label: string
+  /** Viewport width in CSS pixels. */
   width: number
-  height?: number
+  /** Height in CSS pixels; null and omission both mean Auto. */
+  height?: number | null
 }
 
 export interface BackgroundPreset {
@@ -34,8 +37,15 @@ export interface TreeGroupConfig {
   include?: (file: ServerTreeFile) => boolean
 }
 
-export interface HistoireConfig {
+export * from './config-theme.js'
+export * from './config-ui.js'
+
+export interface HistoireConfig extends HistoireUiConfig {
+  /** Initial host-owned globals; embedded sessions keep separate runtime values. */
+  preview?: HistoirePreviewConfig
   plugins: Plugin[]
+  /** Opt-in data bridge and reusable browser surface documents. */
+  embed?: HistoireEmbedConfig
   /** Default-on separate loopback MCP endpoint during dev; deployed mode records enabled policy. */
   mcp?: boolean | {
     /** Disable MCP explicitly; absent means enabled. */
@@ -43,9 +53,7 @@ export interface HistoireConfig {
     /** Dev loopback port; zero requests an ephemeral port. Default 6007 may fall back on collision. */
     port?: number
   }
-  /**
-   * Output directory.
-   */
+  /** Output directory. */
   outDir: string
   /**
    * Glob patterns for story files to include.
@@ -75,71 +83,7 @@ export interface HistoireConfig {
   /**
    * Customize the look of the histoire book.
    */
-  theme: {
-    /**
-     * Main page title. For example: 'Acme Inc.'
-     */
-    title?: string
-    /**
-     * Custom logo files. Should be import paths (processed by Vite).
-     *
-     * Example: `'/src/assets/my-logo.svg'`
-     */
-    logo?: {
-      /**
-       * Square logo without text.
-       */
-      square?: string
-      /**
-       * Full logo for light theme.
-       */
-      light?: string
-      /**
-       * Full logo for dark theme.
-       */
-      dark?: string
-    }
-    /**
-     * Href to the favicon file (**not** processed by Vite). Put the file in the `public` directory.
-     *
-     * Example: `'/favicon.ico'`
-     */
-    favicon?: string
-    /**
-     * Customize the colors. Each color should be an object with shades as keys.
-     *
-     * Example: ```{ primary: { 50: '#eef2ff', 100: '#e0e7ff', ..., 900: '#312e81' } }```
-     *
-     * You can import `defaultColors` from `'histoire'` to use predefined colors or you can create your own colors from scratch.
-     */
-    colors?: {
-      [key in CustomizableColors]?: key extends 'gray' ? {
-        [key in GrayColorKeys]?: string
-      } : {
-        [key in ColorKeys]?: string
-      }
-    }
-    /**
-     * Add a link to the main logo
-     */
-    logoHref?: string
-    /**
-     * Default color scheme for the app.
-     */
-    defaultColorScheme?: 'light' | 'dark' | 'auto'
-    /**
-     * Hides the dark mode button in the toolbar.
-     */
-    hideColorSchemeSwitch?: boolean
-    /**
-     * Enable persistence of the color scheme in the browser.
-     */
-    storeColorScheme?: boolean
-    /**
-     * Class added to the story preview when dark mode is enabled.
-     */
-    darkClass?: string
-  }
+  theme: HistoireThemeConfig
   /**
    * Setup file exporting a default function executed when setting up each story preview.
    *
@@ -243,6 +187,8 @@ export interface HistoireConfig {
    * Build options
    */
   build?: {
+    /** Git reference used to list stories updated in a static release. */
+    changedSince?: string
     /** Deployment artifact layout. Static retains the usual browser-only output. */
     target?: 'static' | 'node'
     /** Options applying only to standalone Node deployment artifacts. */

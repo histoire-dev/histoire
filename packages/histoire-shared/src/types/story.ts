@@ -1,3 +1,5 @@
+import type { HistoireMatrixHint, HistoireMatrixValue } from '@histoire/protocol'
+
 export interface StoryFile {
   id: string
   supportPluginId: string
@@ -44,6 +46,8 @@ export interface StoryProps extends CommonProps, InheritedProps {
   group?: string
   layout?: StoryLayout
   docsOnly?: boolean
+  /** Explicit finite values for props matrix axes. */
+  matrix?: HistoireMatrixHint
 }
 
 export interface CommonMeta {}
@@ -56,10 +60,14 @@ export interface Story {
   group?: string
   variants: Variant[]
   layout?: StoryLayout
+  /** Explicit finite values for props matrix axes. */
+  matrix?: HistoireMatrixHint
   icon?: string
   iconColor?: string
   docsOnly?: boolean
   file?: StoryFile
+  /** Collected documentation fallback when the host cannot import this story. */
+  docsText?: string
   lastSelectedVariant?: Variant
   slots?: () => any
   meta?: StoryMeta
@@ -88,6 +96,10 @@ export interface PropDefinition {
   types?: string[]
   required?: boolean
   default?: any
+  /** Actual finite scalar source prop, before any controls override. */
+  value?: HistoireMatrixValue
+  /** Finite enum values advertised by runtime prop metadata. */
+  values?: readonly HistoireMatrixValue[]
 }
 
 export interface AutoPropComponentDefinition {
@@ -163,6 +175,8 @@ export interface ServerStory {
   group?: string
   variants: ServerVariant[]
   layout?: StoryLayout
+  /** Explicit finite values for props matrix axes. */
+  matrix?: HistoireMatrixHint
   icon?: string
   iconColor?: string
   docsOnly?: boolean

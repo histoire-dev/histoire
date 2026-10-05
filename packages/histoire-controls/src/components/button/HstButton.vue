@@ -1,26 +1,25 @@
-<script lang="ts">
-export default {
-  name: 'HstButton',
-}
-</script>
-
 <script setup lang="ts">
-const colors = {
-  default: 'htw-bg-gray-200 dark:htw-bg-gray-750 htw-text-gray-900 dark:htw-text-gray-100 hover:htw-bg-primary-200 dark:hover:htw-bg-primary-900',
-  primary: 'htw-bg-primary-500 hover:htw-bg-primary-600 htw-text-white dark:htw-text-black',
-  flat: 'htw-bg-transparent hover:htw-bg-gray-500/20 htw-text-gray-900 dark:htw-text-gray-100',
-}
+import { ref } from 'vue'
+import { useControlsTheme } from '../../utils'
 
+defineOptions({ name: 'HstButton' })
 defineProps<{
-  color?: keyof typeof colors
+  /** Existing semantic button appearance. */
+  color?: 'default' | 'primary' | 'flat'
+  /** Link adapters retain native anchor semantics with same shared appearance. */
+  as?: 'button' | 'a'
 }>()
+const dark = useControlsTheme()
+const button = ref<HTMLButtonElement | HTMLAnchorElement>()
+/** Native focus handle preserves keyboard ownership in chrome adapters. */
+function focus(): void {
+  button.value?.focus()
+}
+defineExpose({ focus, element: button })
 </script>
 
 <template>
-  <button
-    class="histoire-button htw-cursor-pointer htw-rounded-sm htw-border-none"
-    :class="colors[color ?? 'default']"
-  >
+  <component :is="as ?? 'button'" ref="button" :type="as === 'a' ? undefined : 'button'" class="histoire-button" :data-color="color ?? 'default'" :data-histoire-control-appearance="dark ? 'dark' : 'light'">
     <slot />
-  </button>
+  </component>
 </template>

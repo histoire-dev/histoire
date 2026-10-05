@@ -1,0 +1,6 @@
+@import 'fonts.pcss';
+@import 'floating-vue/dist/style.css';
+@import 'floating.pcss';
+
+@tailwind components;
+@tailwind utilities;

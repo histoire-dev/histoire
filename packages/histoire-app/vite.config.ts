@@ -1,3 +1,4 @@
+import { fileURLToPath } from 'node:url'
 import vue from '@vitejs/plugin-vue'
 import fs from 'fs-extra'
 import { globbySync } from 'globby'
@@ -35,6 +36,9 @@ export default defineConfig({
 
   resolve: {
     alias: {
+      '@histoire/vue/internal': fileURLToPath(new URL('../histoire-vue/src/internal.ts', import.meta.url)),
+      '@histoire/vue': fileURLToPath(new URL('../histoire-vue/src/index.ts', import.meta.url)),
+      '@histoire/controls/vue': fileURLToPath(new URL('../histoire-controls/src/index.ts', import.meta.url)),
       'floating-vue': '@histoire/vendors/floating-vue',
       '@iconify/vue': '@histoire/vendors/iconify',
       'pinia': '@histoire/vendors/pinia',
@@ -53,20 +57,27 @@ export default defineConfig({
       formats: ['es'],
     },
     rollupOptions: {
-      external: [
-        /\$histoire/,
-        /@histoire/,
+      // Native UI source must pass through existing vendor aliases so this
+      // document never mixes a host Vue copy with Histoire's vendor Vue.
+      external(id) {
+        if (id === '@histoire/vue' || id === '@histoire/vue/internal' || id === '@histoire/controls/vue') return false
         // eslint-disable-next-line ts/no-require-imports
-        ...Object.keys(require('./package.json').dependencies),
-      ],
+        const dependencies = Object.keys(require('./package.json').dependencies)
+        return /\$histoire|@histoire/.test(id) || dependencies.some(name => id === name || id.startsWith(`${name}/`))
+      },
 
       // The sandbox document is no longer a bundled app entry: it loads the
       // generated `virtual:$histoire-preview-runtime` (see bundle-sandbox.js).
       input: [
         'src/app/api.ts',
+        'src/app/reusable.ts',
         'src/app/index.ts',
         // Generated sandbox runtime imports this bootstrap directly.
         'src/app/util/controls-document.ts',
+        // Story modules execute only inside generated runtime; preserve its
+        // direct imports even when reusable standalone UI never imports them.
+        'src/app/components/story/GenericMountStory.vue',
+        'src/app/components/story/GenericRenderStory.vue',
       ],
 
       output: {

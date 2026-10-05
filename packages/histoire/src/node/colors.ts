@@ -1,3 +1,5 @@
+import { histoireDefaultAccentColors, histoireDefaultNeutralColors } from '@histoire/protocol'
+
 export const defaultColors = {
   slate: {
     50: '#f8fafc',
@@ -29,21 +31,7 @@ export const defaultColors = {
     900: '#111827',
     950: '#0c101d',
   },
-  zinc: {
-    50: '#fafafa',
-    100: '#f4f4f5',
-    200: '#e4e4e7',
-    300: '#d4d4d8',
-    400: '#a1a1aa',
-    500: '#71717a',
-    600: '#52525b',
-    700: '#3f3f46',
-    750: '#323238',
-    800: '#27272a',
-    850: '#1f1f21',
-    900: '#18181b',
-    950: '#101012',
-  },
+  zinc: histoireDefaultNeutralColors,
   neutral: {
     50: '#fafafa',
     100: '#f5f5f5',
@@ -146,18 +134,7 @@ export const defaultColors = {
     800: '#166534',
     900: '#14532d',
   },
-  emerald: {
-    50: '#ecfdf5',
-    100: '#d1fae5',
-    200: '#a7f3d0',
-    300: '#6ee7b7',
-    400: '#34d399',
-    500: '#10b981',
-    600: '#059669',
-    700: '#047857',
-    800: '#065f46',
-    900: '#064e3b',
-  },
+  emerald: histoireDefaultAccentColors,
   teal: {
     50: '#f0fdfa',
     100: '#ccfbf1',
@@ -280,61 +257,5 @@ export const defaultColors = {
   },
 }
 
-const HEX = /^#([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})?$/i
-const SHORT_HEX = /^#([a-f\d]){3,4}$/i
-const VALUE = `(?:\\d+|\\d*\\.\\d+)%?`
-const SEP = `(?:\\s*,\\s*|\\s+)`
-const ALPHA_SEP = `\\s*[,/]\\s*`
-const RGB = new RegExp(
-  `^rgba?\\(\\s*(${VALUE})${SEP}(${VALUE})${SEP}(${VALUE})(?:${ALPHA_SEP}(${VALUE}))?\\s*\\)$`,
-)
-const HSL = new RegExp(
-  `^hsla?\\(\\s*(${VALUE}(?:deg|rad|grad|turn)?)${SEP}(${VALUE})${SEP}(${VALUE})(?:${ALPHA_SEP}(${VALUE}))?\\s*\\)$`,
-)
-
-export function parseColor(value) {
-  if (typeof value !== 'string') {
-    return null
-  }
-
-  value = value.trim()
-  if (value === 'transparent') {
-    return { mode: 'rgb', color: ['0', '0', '0'], alpha: '0' }
-  }
-
-  const hex = value
-    .replace(SHORT_HEX, (_, r, g, b, a) => ['#', r, r, g, g, b, b, a ? a + a : ''].join(''))
-    .match(HEX)
-
-  if (hex !== null) {
-    return {
-      mode: 'rgb',
-      color: [Number.parseInt(hex[1], 16), Number.parseInt(hex[2], 16), Number.parseInt(hex[3], 16)].map(v =>
-        v.toString(),
-      ),
-      alpha: hex[4] ? (Number.parseInt(hex[4], 16) / 255).toString() : undefined,
-    }
-  }
-
-  const rgbMatch = value.match(RGB)
-
-  if (rgbMatch !== null) {
-    return {
-      mode: 'rgb',
-      color: [rgbMatch[1], rgbMatch[2], rgbMatch[3]].map(v => v.toString()),
-      alpha: rgbMatch[4]?.toString?.(),
-    }
-  }
-
-  const hslMatch = value.match(HSL)
-
-  if (hslMatch !== null) {
-    return {
-      mode: 'hsl',
-      color: [hslMatch[1], hslMatch[2], hslMatch[3]].map(v => v.toString()),
-      alpha: hslMatch[4]?.toString?.(),
-    }
-  }
-
-  return null
-}
+// Compatibility export; Node and native roots share one portable color parser.
+export { parseColor } from '@histoire/protocol'

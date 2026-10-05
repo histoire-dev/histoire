@@ -5,14 +5,17 @@ import type {
 } from 'vite'
 import type { Context } from '../context.js'
 import { join } from 'pathe'
-import { mergeConfig as mergeViteConfig } from 'vite'
+import { mergeConfig as mergeViteConfig, version as viteVersion } from 'vite'
 import { APP_PATH } from '../alias.js'
+import { resolveEmbedConfig } from '../config/embed.js'
 import { getViteConfigWithPlugins } from '../vite/index.js'
+import { isLazyBrowserDependency } from './lazy-dependencies.js'
+import { hasVendorDependencyClosure } from './vendor-graph.js'
 
 /**
  * Builds the Vite config of the final bundle: the histoire app entries plus the
  * overrides that must win over anything a user plugin sets (no externals, a
- * single vendor chunk, no code splitting of the CSS…).
+ * dependency-closed vendor chunk, no code splitting of the CSS…).
  *
  * @param ctx Histoire context holding the resolved user config.
  * @param collectServer The dev server used for story collection: `@vitejs/plugin-vue`
@@ -20,14 +23,17 @@ import { getViteConfigWithPlugins } from '../vite/index.js'
  */
 export async function createBuildViteConfig(ctx: Context, collectServer: ViteDevServer, outputRoot = ctx.config.outDir) {
   const { viteConfig: buildViteConfigRaw } = await getViteConfigWithPlugins(false, ctx)
+  const embedEnabled = resolveEmbedConfig(ctx.config.embed).enabled
   const buildViteConfig: ViteInlineConfig = mergeViteConfig(buildViteConfigRaw, {
     mode: 'development',
     build: {
       lib: false,
       rollupOptions: {
+        preserveEntrySignatures: 'strict',
         input: [
           join(APP_PATH, 'bundle-main.js'),
           join(APP_PATH, 'bundle-sandbox.js'),
+          ...embedEnabled ? [join(APP_PATH, 'bundle-embed.js')] : [],
         ],
         plugins: [
           {
@@ -79,22 +85,27 @@ export async function createBuildViteConfig(ctx: Context, collectServer: ViteDev
       // Don't externalize
       config.build.rollupOptions.external = []
 
-      // Force chunk strategy
+      /** Portable data stays outside UI/vendor even for installed SDK packages. */
+      const isEmbedData = (id: string) => embedEnabled && (id.includes('@histoire/protocol') || id.includes('/histoire-protocol/') || id.includes('/fuse.js/'))
+      /** Optional engines and project-dependent packages retain natural boundaries. */
+      const isVendorCandidate = (id: string) => !isLazyBrowserDependency(id) && !isEmbedData(id)
+        && !id.includes('@histoire/app') && id.includes('node_modules')
+        && !(ctx.config.build?.excludeFromVendorsChunk ?? []).some(test => typeof test === 'string' ? id.includes(test) : test.test(id))
+      // Force only dependency-closed packages into vendor. Generated Nuxt UI
+      // themes can import story code, so grouping them with Vue creates a cycle.
       config.build.rollupOptions.output = {
-        manualChunks(id) {
-          if (!id.includes('@histoire/app') && id.includes('node_modules')) {
-            for (const test of ctx.config.build?.excludeFromVendorsChunk ?? []) {
-              if ((
-                typeof test === 'string' && id.includes(test)
-              ) || (
-                test instanceof RegExp && test.test(id)
-              )) {
-                // Excluded from vendor chunk
-                return
-              }
-            }
-            return 'vendor'
-          }
+        // Shared vendor imports must not absorb Vite's preload helper used by
+        // data entry's lazy surface imports and thereby force Vue to execute.
+        ...(Number.parseInt(viteVersion, 10) < 8 ? { onlyExplicitManualChunks: true } : {}),
+        manualChunks(id, graph) {
+          // MSW storage effects and heavy content engines belong to explicit
+          // runtime/panel imports, never the shared Vue/vendor entry. Let
+          // Rollup preserve their actual dynamic dependency boundaries.
+          if (isLazyBrowserDependency(id)) return
+          // Data entry must not inherit Vue/router/runtime side effects from
+          // standalone's shared vendor chunk, even when both entries are built.
+          if (isEmbedData(id)) return 'embed-data'
+          if (hasVendorDependencyClosure(id, moduleId => graph.getModuleInfo(moduleId), isVendorCandidate)) return 'vendor'
         },
       }
 

@@ -7,10 +7,10 @@ export interface PinceauTokensOptions {
   configFileName?: string
 }
 
+/** Resolves generated theme modules only from the captured plugin API root. */
 export function pinceauTokens(_options: PinceauTokensOptions = {}): Plugin {
-  const themePath = join(process.cwd(), 'node_modules/.vite/pinceau/index.js')
-
   async function generate(api: PluginApiBase) {
+    const themePath = join(api.root, 'node_modules/.vite/pinceau/index.js')
     try {
       await api.fs.ensureDir(api.pluginTempDir)
       await api.fs.emptyDir(api.pluginTempDir)
@@ -53,13 +53,12 @@ export function pinceauTokens(_options: PinceauTokensOptions = {}): Plugin {
     },
 
     onDev(api, onCleanup) {
+      const themePath = join(api.root, 'node_modules/.vite/pinceau/index.js')
       const watcher = api.watcher.watch(themePath)
         .on('change', () => generate(api))
         .on('add', () => generate(api))
 
-      onCleanup(() => {
-        watcher.close()
-      })
+      onCleanup(() => watcher.close())
     },
 
     async onBuild(api) {

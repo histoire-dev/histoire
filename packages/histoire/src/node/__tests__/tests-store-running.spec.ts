@@ -102,7 +102,7 @@ describe('tests store dev-run robustness', () => {
     expect(JSON.stringify(failing.errors)).toContain('preview run blew up')
   })
 
-  it('uses captured story/variant ids for the fallback after navigation', async () => {
+  it('uses captured story/variant ids for explicit server execution after navigation', async () => {
     const store = await loadTestsStore()
 
     previewRuntime.runCurrentFrameTests = vi.fn(async () => {
@@ -111,10 +111,10 @@ describe('tests store dev-run robustness', () => {
     const sendEvent = vi.fn(async () => ({ total: 1, passed: 1, failed: 0, skipped: 0, tests: [] }))
     fakeWindow.window.__HST_PLUGIN_API__ = { sendEvent }
 
-    const runPromise = store.runCurrentVariantTests()
+    const runPromise = store.runCurrentVariantTests('server')
 
     // Simulate navigation away mid-run: nulling current* must not break the
-    // fallback, because the ids were captured before the await.
+    // server execution, because the ids were captured before the await.
     await Promise.resolve()
     storyState.currentStory = null
     storyState.currentVariant = null
@@ -125,6 +125,18 @@ describe('tests store dev-run robustness', () => {
       storyId: 'story-a',
       variantId: 'variant-a',
     })
+  })
+
+  it('never executes server fallback after preview run begins', async () => {
+    const store = await loadTestsStore()
+    previewRuntime.runCurrentFrameTests = vi.fn(async () => {
+      throw new Error('preview unavailable')
+    })
+    const sendEvent = vi.fn()
+    fakeWindow.window.__HST_PLUGIN_API__ = { sendEvent }
+    await store.runCurrentVariantTests('preview')
+    expect(sendEvent).not.toHaveBeenCalled()
+    expect(store.currentSummary?.ok).toBe(false)
   })
 
   it('swallows a collection rejection without clobbering the definitions it already has', async () => {

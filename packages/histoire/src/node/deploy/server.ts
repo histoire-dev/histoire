@@ -2,6 +2,8 @@ import type { LaunchPreviewBrowser } from '../mcp/browser/dependencies.js'
 import type { McpOperations } from '../mcp/operations/store.js'
 import type { NodeExecutionValue } from './execution.js'
 import { createServer } from 'node:http'
+import { readBuiltEmbedPolicy } from '../config/embed-built.js'
+import { registerNodeInspectionExecutors } from '../mcp/browser/inspection/node.js'
 import { createPreviewHostRegistry } from '../mcp/browser/preview-host.js'
 import { registerNodeTestExecutor } from '../mcp/browser/preview-tests.js'
 import { createMcpOperations } from '../mcp/operations/store.js'
@@ -36,6 +38,7 @@ export interface CreateNodeServerOptions {
 /** Start portable book/MCP listener after complete artifact and policy validation. */
 export async function createNodeServer(input: CreateNodeServerOptions) {
   const artifact = await readNodeArtifact(input.artifactDirectory)
+  const embed = await readBuiltEmbedPolicy(artifact.publicDir, { target: 'node', originOverride: (input.environment ?? process.env).HISTOIRE_EMBED_ORIGINS })
   const settings = resolveNodeOptions(artifact.manifest.mcpEnabled, input.environment, input.arguments)
   const host = createPreviewHostRegistry({ base: artifact.manifest.base })
   let active = true
@@ -48,8 +51,9 @@ export async function createNodeServer(input: CreateNodeServerOptions) {
   const browserAvailable = !!input.launch || !!tryResolveDependency(artifact.root, 'playwright')
   const authority = createNodeMcpProject({ artifact, origin: () => publicOrigin, isActive: () => active, capabilities: () => {
     const screenshots = browserAvailable && operations.hasExecutor('screenshot') && operations.available
+    const inspection = browserAvailable && operations.hasExecutor('inspect-variant') && operations.available
     const tests = browserAvailable && artifact.manifest.testRuntimeIncluded && operations.hasExecutor('tests') && operations.available
-    return withExecutionAvailability({ catalog: true, content: true, previews: true, screenshots: { available: screenshots, ...(!screenshots ? { reason: 'Install playwright and Chromium to capture screenshots' } : {}) }, tests: { available: tests, engine: tests ? 'built-preview' : 'unavailable', ...(!tests ? { reason: artifact.manifest.testRuntimeIncluded ? 'Compiled test runner or Playwright is unavailable' : 'Artifact does not include embedded tests' } : {}) } }, operations.available)
+    return withExecutionAvailability({ catalog: true, content: true, previews: true, screenshots: { available: screenshots, ...(!screenshots ? { reason: 'Install playwright and Chromium to capture screenshots' } : {}) }, inspection: { available: inspection, ...(!inspection ? { reason: 'Install playwright and Chromium to inspect rendered variants' } : {}) }, tests: { available: tests, engine: tests ? 'built-preview' : 'unavailable', ...(!tests ? { reason: artifact.manifest.testRuntimeIncluded ? 'Compiled test runner or Playwright is unavailable' : 'Artifact does not include embedded tests' } : {}) } }, operations.available)
   } })
   const value: NodeExecutionValue = {
     artifact,
@@ -71,10 +75,11 @@ export async function createNodeServer(input: CreateNodeServerOptions) {
     } }
   } })
   registerNodeScreenshotExecutor(operations, input.launch)
+  registerNodeInspectionExecutors(operations, input.launch, settings.token)
   registerNodeTestExecutor(operations, input.launch, settings.token)
   input.registerExecutors?.(operations, value)
   const extension = createOperationServerExtension(operations)
-  const handler = createNodeHttpHandler({ artifact, host, ready: () => ready, mcp: () => transport })
+  const handler = createNodeHttpHandler({ artifact, host, ready: () => ready, mcp: () => transport, embedOrigins: embed?.allowedOrigins })
   const server = createServer((request, response) => {
     void handler(request, response).catch(() => response.destroy())
   })

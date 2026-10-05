@@ -53,8 +53,12 @@ export function getVitestBrowserDependencyNames(ctx: Context) {
     deps.add('@vueuse/core')
   }
 
-  if (ctx.supportPlugins.some(plugin => plugin.id === 'svelte')) {
+  if (ctx.supportPlugins.some(plugin => plugin.id === 'svelte4')) {
     deps.add('svelte')
+  }
+
+  if (ctx.supportPlugins.some(plugin => plugin.id === 'react')) {
+    for (const name of ['react', 'react-dom', 'react-dom/client', 'react/jsx-runtime', 'react/jsx-dev-runtime']) deps.add(name)
   }
 
   try {
@@ -74,6 +78,7 @@ export function getVitestBrowserDependencyNames(ctx: Context) {
         && dep !== 'vitest'
         && !dep.startsWith('@histoire/')
         && !dep.startsWith('@vitest/')
+        && !dep.startsWith('@types/')
         && !dep.startsWith('@vue/')
       ) {
         deps.add(dep)

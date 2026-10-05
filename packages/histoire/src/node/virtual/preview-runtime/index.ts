@@ -9,6 +9,7 @@ import { getStoryCollectTimeout } from '../../util/test-timeouts.js'
 import { previewAppRoot } from './app-root.js'
 import { previewApp } from './app.js'
 import { previewComponents } from './components.js'
+import { previewElementInspection } from './element-inspection.js'
 import { previewErrorOverlay } from './error-overlay.js'
 import { previewHostMessaging } from './host-messaging.js'
 import { previewMount } from './mount.js'
@@ -121,6 +122,8 @@ ${previewErrorOverlay()}
 ${previewStoryLoading(options.mountTimeoutMs)}
 
 ${previewVariantBridge()}
+
+${previewElementInspection()}
 
 ${previewComponents()}
 

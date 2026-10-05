@@ -1,0 +1,67 @@
+.histoire-provider .histoire-explorer {
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+}
+.histoire-provider .histoire-explorer-navigation {
+  flex: 0 0 240px;
+  min-width: 0;
+  overflow: auto;
+  border-inline-end: 1px solid var(--histoire-border);
+}
+.histoire-provider .histoire-explorer-main {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.histoire-provider .histoire-explorer-workspace {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+}
+.histoire-provider .histoire-explorer-preview {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+}
+.histoire-provider .histoire-explorer-preview > .histoire-primary {
+  flex: 1;
+  min-height: 0;
+}
+.histoire-provider .histoire-explorer-layout,
+.histoire-provider .histoire-explorer-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 8px;
+}
+.histoire-provider .histoire-explorer-panels {
+  display: flex;
+  flex-direction: column;
+  flex: 0 0 320px;
+  min-width: 0;
+  min-height: 0;
+  overflow: auto;
+  border-inline-start: 1px solid var(--histoire-border);
+}
+.histoire-provider .histoire-explorer-panel {
+  flex: 1;
+  min-height: 180px;
+  overflow: auto;
+}
+.histoire-provider .histoire-explorer-panels > .histoire-source {
+  flex: 1;
+  min-height: 180px;
+  border-block-start: 1px solid var(--histoire-border);
+}
+@container (max-width: 760px) {
+  .histoire-provider .histoire-explorer { flex-direction: column; }
+  .histoire-provider .histoire-explorer-navigation { flex-basis: auto; max-height: 180px; }
+  .histoire-provider .histoire-explorer-workspace { flex-direction: column; }
+  .histoire-provider .histoire-explorer-panels { flex-basis: 260px; }
+}

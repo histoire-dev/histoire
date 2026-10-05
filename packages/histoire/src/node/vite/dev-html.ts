@@ -1,8 +1,16 @@
+import type { ServerResponse } from 'node:http'
 import type { Connect, ViteDevServer } from 'vite'
 import type { Context } from '../context.js'
 import { lookup as lookupMime } from 'mrmime'
 import { APP_PATH } from '../alias.js'
 import { renderVitestRunnerBootstrap } from '../virtual/vitest-runner-bootstrap.js'
+
+/** Early Histoire routes inherit Vite headers without replacing caller-owned response policy. */
+export function applyDevResponseHeaders(server: ViteDevServer, res: ServerResponse): void {
+  for (const [name, value] of Object.entries(server.config.server?.headers ?? {})) {
+    if (value !== undefined && res.getHeader?.(name) === undefined) res.setHeader(name, value)
+  }
+}
 
 /**
  * Suffix of the app bundles served in local Histoire development.
@@ -71,6 +79,7 @@ ${renderVitestRunnerBootstrap('    ')}
  * client and let other plugins post-process the markup.
  */
 async function sendHtml(server: ViteDevServer, req: Connect.IncomingMessage, res: any, html: string) {
+  applyDevResponseHeaders(server, res)
   res.statusCode = 200
   const transformed = await server.transformIndexHtml(req.url!, html)
   res.setHeader('content-type', 'text/html; charset=UTF-8')

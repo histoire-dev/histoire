@@ -1,3 +1,6 @@
+// Capture Node's Event classes before Vite/Vitest dependencies can install DOM globals in this persistent collection worker.
+import '../dom/native-events.js'
+
 import type { ServerRunPayload, ServerStory, ServerStoryFile } from '@histoire/shared'
 import type { MessagePort } from 'node:worker_threads'
 import type { FetchFunction, ResolveIdFunction } from 'vite-node'
@@ -17,6 +20,15 @@ export interface Payload {
   base: string
   port: MessagePort
   storyFile: ServerStoryFile
+  /** Captured cache revision; task-port delivery happens before story execution. */
+  invalidation?: {
+    /** Monotonic revision within this context-owned worker pool. */
+    revision: number
+    /** Bounded set of changed project modules. */
+    files: string[]
+    /** Full eviction once the bounded inventory overflows. */
+    all: boolean
+  }
 }
 
 export interface ReturnData {
@@ -29,6 +41,7 @@ let _rpc: ReturnType<typeof createBirpc<{
   fetchModule: FetchFunction
   resolveId: ResolveIdFunction
 }>>
+let _invalidationRevision = -1
 
 // Cleanup module cache
 parentPort.on('message', (message) => {
@@ -63,42 +76,52 @@ export default async (payload: Payload): Promise<ReturnData> => {
 
   const { destroy: destroyDomEnv } = createDomEnv()
 
-  const el = window.document.createElement('div')
+  try {
+    const el = window.document.createElement('div')
 
-  const beforeExecuteTime = performance.now()
-  // Generated Markdown stories have no physical module change for Vite's
-  // watcher to broadcast. Evict their resolved worker import before reusing
-  // the collection plugin, otherwise new frontmatter keeps old IDs/titles.
-  if (payload.storyFile.virtual) {
+    const beforeExecuteTime = performance.now()
+    // Tinypool may defer parentPort invalidations while its idle worker blocks.
+    // Apply the task's captured changes first, including importing story modules.
+    if (payload.invalidation && payload.invalidation.revision !== _invalidationRevision) {
+      if (payload.invalidation.all) _moduleCache.clear()
+      else _moduleCache.invalidateDepTree(payload.invalidation.files)
+      _invalidationRevision = payload.invalidation.revision
+    }
+    // Explicit recollection and virtual Markdown updates also require fresh target
+    // imports when there was no physical watcher event.
     _moduleCache.delete(payload.storyFile.moduleId)
     _moduleCache.delete(`\0${payload.storyFile.moduleId}`)
-  }
-  // Mount app to collect stories/variants
-  const { run } = (await runner.executeFile(resolve(__dirname, './run.js'))) as { run: (payload: ServerRunPayload) => Promise<any> }
-  const afterExecuteTime = performance.now()
-  const storyData: ServerStory[] = []
-  await run({
-    file: payload.storyFile,
-    storyData,
-    el,
-  })
-  const afterRunTime = performance.now()
-
-  if (payload.storyFile.markdownFile) {
-    const el = document.createElement('div')
-    el.innerHTML = payload.storyFile.markdownFile.html
-    const text = el.textContent
-    storyData.forEach((s) => {
-      s.docsText = text
+    // Mount app to collect stories/variants
+    const { run } = (await runner.executeFile(resolve(__dirname, './run.js'))) as { run: (payload: ServerRunPayload) => Promise<any> }
+    const afterExecuteTime = performance.now()
+    const storyData: ServerStory[] = []
+    await run({
+      file: payload.storyFile,
+      storyData,
+      el,
     })
+    const afterRunTime = performance.now()
+
+    if (payload.storyFile.markdownFile) {
+      const el = document.createElement('div')
+      el.innerHTML = payload.storyFile.markdownFile.html
+      const text = el.textContent
+      storyData.forEach((s) => {
+        s.docsText = text
+      })
+    }
+
+    const endTime = performance.now()
+    console.log(pc.dim(`${payload.storyFile.relativePath} ${Math.round(endTime - startTime)}ms (setup:${Math.round(beforeExecuteTime - startTime)}ms, execute:${Math.round(afterExecuteTime - beforeExecuteTime)}ms, run:${Math.round(afterRunTime - afterExecuteTime)}ms)`))
+
+    return {
+      storyData,
+    }
   }
-
-  destroyDomEnv()
-
-  const endTime = performance.now()
-  console.log(pc.dim(`${payload.storyFile.relativePath} ${Math.round(endTime - startTime)}ms (setup:${Math.round(beforeExecuteTime - startTime)}ms, execute:${Math.round(afterExecuteTime - beforeExecuteTime)}ms, run:${Math.round(afterRunTime - afterExecuteTime)}ms)`))
-
-  return {
-    storyData,
+  finally {
+    // Failed story imports cannot leave DOM globals or a transferred RPC port
+    // behind for the next collection in this same project-owned worker.
+    destroyDomEnv()
+    payload.port.close()
   }
 }

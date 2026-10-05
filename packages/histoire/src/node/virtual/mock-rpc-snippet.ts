@@ -23,7 +23,7 @@ const mockRpcEndpoint = ${JSON.stringify(VITEST_MOCK_RPC_ENDPOINT)}
 const mockRpcTimeout = 5_000
 
 // Calls one dev-server RPC method and resolves with its result.
-function createMockRpc() {
+function createMockRpc(endpoint = mockRpcEndpoint) {
   // Per-method promise chain. Correctness does not depend on it (each request
   // owns its own response), but it keeps server-side ordering deterministic —
   // e.g. an invalidate cannot overtake the resolve it was meant to follow.
@@ -49,7 +49,7 @@ function createMockRpc() {
     // which queues behind it.
     try {
       try {
-        response = await fetch(mockRpcEndpoint, {
+        response = await fetch(endpoint, {
           method: 'POST',
           headers: { 'content-type': 'application/json' },
           body: JSON.stringify({ method, data }),
@@ -135,5 +135,6 @@ function createMockInterceptor(hot, mockRpc) {
  * bound to a single instance per browsing context.
  */
 export const MOCK_RPC_SNIPPET = `${MOCK_RPC_CORE}
-const mockRpc = createMockRpc()
+// Vite rewrites requests under configured base before owned middleware runs.
+const mockRpc = createMockRpc(new URL(${JSON.stringify(VITEST_MOCK_RPC_ENDPOINT.slice(1))}, new URL(import.meta.env.BASE_URL, window.location.href)).pathname)
 `

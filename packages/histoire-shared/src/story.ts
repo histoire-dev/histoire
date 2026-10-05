@@ -3,6 +3,7 @@ export const omitInheritStoryProps = [
   'title',
   'group',
   'layout',
+  'matrix',
   'variants',
   'file',
   'slots',

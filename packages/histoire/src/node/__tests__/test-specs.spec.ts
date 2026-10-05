@@ -118,6 +118,31 @@ describe('runHistoireTests generated specs', () => {
     expect(summary.tests.map(test => test.id)).toEqual(['0', '1'])
   })
 
+  it('keeps delimiter-colliding targets distinct in all-story summaries', async () => {
+    const stories = [{ id: 'a:b', variantId: 'c' }, { id: 'a', variantId: 'b:c' }]
+      .map(target => createRunTestsStoryFile({ ...target, source: 'onTest(() => {})' }))
+    mocks.setTestModules(options => options.include.map((moduleId: string, index: number) => ({
+      moduleId,
+      errors: () => [],
+      children: { allTests: () => index === 0
+        ? [{ name: 'first', result: () => ({ state: 'passed', errors: [] }) }, { name: 'skipped', result: () => ({ state: 'skipped', errors: [] }) }]
+        : [{ name: 'second', result: () => ({ state: 'failed', errors: [new Error('second target assertion')] }) }] },
+    })))
+
+    const summary = await runHistoireTests(createRunTestsContext(stories))
+
+    expect(mocks.collectStoriesBrowserMock).toHaveBeenCalledTimes(1)
+    expect(mocks.createVitestMock).toHaveBeenCalledTimes(1)
+    expect(mocks.createVitestMock.mock.calls[0][1].include).toHaveLength(2)
+    expect(summary).toMatchObject({ ok: false, total: 3, passed: 1, failed: 1, skipped: 1 })
+    expect(summary.errors).toEqual([expect.objectContaining({ message: 'second target assertion' })])
+    expect(summary.tests.map(({ id, name, storyId, variantId }) => ({ id, name, storyId, variantId }))).toEqual([
+      { id: '0', name: 'first', storyId: 'a:b', variantId: 'c' },
+      { id: '1', name: 'skipped', storyId: 'a:b', variantId: 'c' },
+      { id: '0', name: 'second', storyId: 'a', variantId: 'b:c' },
+    ])
+  })
+
   it('isolates generated specs per run and removes them afterwards', async () => {
     const story = createRunTestsStoryFile({
       id: 'isolated-story',

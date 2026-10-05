@@ -1,152 +1,157 @@
-<script lang="ts">
-export default {
-  name: 'CustomSelect',
-}
-</script>
-
-<script lang="ts" setup>
+<script setup lang="ts">
 import type { HistoireControlsOverlayHandle } from '@histoire/shared'
-import type { ComputedRef } from 'vue'
-import type { HstControlOption } from '../../types'
+import type { HstControlOptions } from '../../options'
 import { getControlsHost } from '@histoire/shared'
-import { Icon } from '@iconify/vue'
 import { Dropdown as VDropdown } from 'floating-vue'
-import { computed, onBeforeUnmount, ref, toRaw, watch } from 'vue'
-import { restoreControlsFocus } from '../../overlay/focus'
+import { computed, nextTick, onBeforeUnmount, ref, toRaw, watch } from 'vue'
+import { useHistoireControls } from '../../context'
+import { normalizeControlOptions } from '../../options'
+import { focusControlsSelectedOption, moveControlsOptionFocus, reconcileControlsOptionFocus, restoreControlsFocus } from '../../overlay/focus'
+import { useControlsTheme } from '../../utils'
+import BuiltinIcon from '../BuiltinIcon.vue'
+import HstButton from '../button/HstButton.vue'
 
+defineOptions({ name: 'CustomSelect', inheritAttrs: false })
 const props = defineProps<{
-  /** Actual selected value, retained inside the story runtime. */
+  /** Actual value never leaves its owning runtime. */
   modelValue?: any
-  /** Accessible label forwarded to the host listbox. */
+  /** Accessible name. */
   title?: string
-  /** Local values and their visible labels. */
-  options: Record<string, any> | string[] | number[] | HstControlOption[]
+  /** Visible choices with original values and availability. */
+  options: HstControlOptions
+  /** Disable opening and selection while owner is busy. */
+  disabled?: boolean
+  /** Displayed when current value has no matching option. */
+  placeholder?: string
 }>()
-
-const emit = defineEmits<{
-  (e: 'update:modelValue', value: any): void
-}>()
-
-const formattedOptions: ComputedRef<[any, string][]> = computed(() => {
-  if (Array.isArray(props.options)) {
-    return props.options.map((option) => {
-      if (typeof option === 'string' || typeof option === 'number') {
-        return [option, String(option)] as [any, string]
-      }
-      else {
-        return [option.value, option.label] as [any, string]
-      }
-    })
-  }
-  else {
-    return Object.entries(props.options)
-  }
-})
-
-const selectedLabel = computed(() => formattedOptions.value.find(([value]) => value === props.modelValue)?.[1])
-
-/** Host adapter exists only in the dedicated controls sandbox. */
+const emit = defineEmits<{ 'update:modelValue': [value: any] }>()
+const options = computed(() => normalizeControlOptions(props.options))
+const selectedLabel = computed(() => options.value.find(option => Object.is(toRaw(option.value), toRaw(props.modelValue)))?.label)
 const host = getControlsHost()
-const anchor = ref<HTMLButtonElement | null>(null)
+const controls = useHistoireControls()
+const dark = useControlsTheme()
+const anchor = ref<HTMLButtonElement>()
+const list = ref<HTMLElement>()
 const opened = ref(false)
 let overlay: HistoireControlsOverlayHandle | undefined
-/** Stable IDs retain their meaning when options reorder while a menu is open. */
 const optionIds = new Map<unknown, string>()
-const localOptions = new Map<string, any>()
+const localOptions = new Map<string, { value: any, disabled?: boolean }>()
 
-/** Creates labels and opaque IDs without cloning the actual option values. */
+/** Stable opaque IDs preserve values and availability across reorders. */
 function getOverlay() {
   localOptions.clear()
-  const items = formattedOptions.value.map(([value, label]) => {
-    const raw = toRaw(value)
+  const items = options.value.map((option) => {
+    const raw = toRaw(option.value)
     if (!optionIds.has(raw)) optionIds.set(raw, String(optionIds.size))
     const id = optionIds.get(raw)!
-    localOptions.set(id, value)
-    return { id, label: String(label) }
+    localOptions.set(id, option)
+    return { id, label: option.label, ...(option.disabled ? { disabled: true } : {}) }
   })
-  return {
-    kind: 'select' as const,
-    label: props.title,
-    items,
-    selectedId: optionIds.get(toRaw(props.modelValue)),
-  }
+  const selectedId = optionIds.get(toRaw(props.modelValue))
+  return { kind: 'select' as const, items, ...(props.title === undefined ? {} : { label: props.title }), ...(selectedId === undefined ? {} : { selectedId }) }
 }
-
-/** Opens or toggles a host dropdown; its callback resolves values in this runtime. */
-function open() {
-  if (!host || !anchor.value) return
+/** Public focus handle points at actual trigger. */
+function focus(): void {
+  if (!props.disabled) anchor.value?.focus()
+}
+defineExpose({ focus })
+/** Dismiss without taking keyboard focus unless caller requested it. */
+function close(restore = false): void {
+  opened.value = false
+  const current = overlay
+  overlay = undefined
+  current?.close()
+  if (restore) focus()
+}
+/** Both render modes use same explicit open state. */
+function open(): void {
+  if (props.disabled || !options.value.length || !anchor.value) return
   if (opened.value) {
-    overlay?.close()
-    overlay = undefined
-    opened.value = false
+    close(true)
     return
   }
   opened.value = true
-  overlay = host.open(anchor.value, getOverlay(), (result) => {
-    overlay = undefined
-    opened.value = false
-    if (result.itemId !== undefined && localOptions.has(result.itemId)) emit('update:modelValue', localOptions.get(result.itemId))
-    restoreControlsFocus(anchor.value, result)
-  })
+  if (host) {
+    overlay = host.open(anchor.value, getOverlay(), (result) => {
+      overlay = undefined
+      opened.value = false
+      const option = result.itemId === undefined ? undefined : localOptions.get(result.itemId)
+      if (option && !option.disabled && !props.disabled) emit('update:modelValue', option.value)
+      restoreControlsFocus(anchor.value, result)
+    })
+  }
+  else {
+    // Rapid reopening can retain FloatingVue shell before its hide timer runs.
+    void focusSelected()
+  }
 }
-
-/** Allows keyboard users to open the host listbox with either arrow key. */
-function onKeydown(event: KeyboardEvent) {
-  if (host && (event.key === 'ArrowDown' || event.key === 'ArrowUp')) {
+/** Local dropdown focuses selected enabled option after real popper mount. */
+async function focusSelected(): Promise<void> {
+  await nextTick()
+  if (!opened.value) return
+  focusControlsSelectedOption(list.value ?? null)
+}
+/** Native button handles Enter/Space; arrow keys open menu explicitly. */
+function onKeydown(event: KeyboardEvent): void {
+  if (opened.value && event.key === 'Escape') {
+    event.preventDefault()
+    close(true)
+  }
+  else if (opened.value && event.key === 'Tab') {
+    close()
+  }
+  else if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
     event.preventDefault()
     if (!opened.value) open()
   }
 }
-
-watch(getOverlay, value => overlay?.update(value), { deep: true })
-onBeforeUnmount(() => overlay?.close())
-
-/** Selects an option when rendered outside the controls sandbox. */
-function selectValue(value: any, hide: () => void) {
-  emit('update:modelValue', value)
-  hide()
+/** Tab resumes native traversal from trigger; Escape returns trigger focus. */
+function onMenuKeydown(event: KeyboardEvent): void {
+  if (event.key === 'Escape' || event.key === 'Tab') {
+    event.preventDefault()
+    event.stopPropagation()
+    close()
+    restoreControlsFocus(anchor.value, { restoreFocus: true, ...(event.key === 'Tab' ? { focusDirection: event.shiftKey ? 'previous' : 'next' } : {}) })
+  }
+  else {
+    moveControlsOptionFocus(list.value ?? null, event)
+  }
 }
+/** Local slots change presentation only; values remain exact. */
+function select(index: number): void {
+  const option = options.value[index]
+  if (!option || props.disabled || option.disabled) return
+  emit('update:modelValue', option.value)
+  close(true)
+}
+watch(getOverlay, value => overlay?.update(value), { deep: true })
+watch(() => props.disabled, (value) => {
+  if (value) close()
+})
+watch(options, () => {
+  if (!opened.value) return
+  if (!options.value.length) return close(true)
+  if (host) return
+  void nextTick().then(() => {
+    if (opened.value) reconcileControlsOptionFocus(list.value ?? null)
+  })
+}, { deep: true })
+onBeforeUnmount(() => close())
 </script>
 
 <template>
-  <component
-    :is="host ? 'div' : VDropdown"
-    v-bind="host ? {} : { autoSize: true, autoBoundaryMaxSize: true }"
-  >
-    <button
-      ref="anchor"
-      type="button"
-      aria-haspopup="listbox"
-      :aria-expanded="host ? opened : undefined"
-      :aria-label="title"
-      class="htw-text-inherit htw-text-left htw-bg-transparent htw-cursor-pointer htw-w-full htw-outline-none htw-px-2 htw-h-[27px] -htw-my-1 htw-border htw-border-solid htw-border-black/25 dark:htw-border-white/25 hover:htw-border-primary-500 dark:hover:htw-border-primary-500 focus-visible:htw-border-primary-500 htw-rounded-sm htw-flex htw-gap-2 htw-items-center htw-leading-normal"
-      @click="open"
-      @keydown="onKeydown"
-    >
-      <div class="htw-flex-1 htw-truncate">
-        <slot :label="selectedLabel">
-          {{ selectedLabel }}
-        </slot>
-      </div>
-      <Icon
-        icon="carbon:chevron-sort"
-        class="htw-w-4 htw-h-4 htw-flex-none htw-ml-auto"
-      />
+  <component :is="host ? 'span' : VDropdown" v-bind="host ? {} : { shown: opened, triggers: [], autoSize: true, autoBoundaryMaxSize: true, noAutoFocus: true, ...(controls ? { container: controls.overlay.value ?? false } : {}) }" @apply-show="focusSelected" @hide="close()">
+    <button ref="anchor" v-bind="$attrs" type="button" aria-haspopup="listbox" :aria-expanded="opened" :aria-label="($attrs['aria-label'] as string | undefined) ?? title" :disabled="disabled" class="histoire-select-trigger" @click="open" @keydown="onKeydown">
+      <span class="histoire-select-value"><slot :label="selectedLabel">{{ selectedLabel ?? placeholder }}</slot></span>
+      <BuiltinIcon icon="carbon:chevron-down" width="16" height="16" />
     </button>
-    <template #popper="{ hide }">
-      <div class="htw-flex htw-flex-col htw-bg-gray-50 dark:htw-bg-gray-700">
-        <div
-          v-for="[value, label] of formattedOptions"
-          v-bind="{ ...$attrs, class: null, style: null }"
-          :key="label"
-          class="htw-px-2 htw-py-1 htw-cursor-pointer hover:htw-bg-primary-100 dark:hover:htw-bg-primary-700"
-          :class="{
-            'htw-bg-primary-200 dark:htw-bg-primary-800': props.modelValue === value,
-          }"
-          @click="selectValue(value, hide)"
-        >
-          {{ label }}
-        </div>
+    <template #popper>
+      <div ref="list" role="listbox" :aria-label="($attrs['aria-label'] as string | undefined) ?? title ?? 'Options'" class="histoire-control-menu" :data-histoire-control-appearance="dark ? 'dark' : 'light'" @keydown="onMenuKeydown">
+        <HstButton v-for="(option, index) in options" :key="index" color="flat" role="option" :disabled="option.disabled" :aria-selected="Object.is(toRaw(option.value), toRaw(modelValue))" @click="select(index)">
+          <slot name="option" :label="option.label" :value="option.value">
+            {{ option.label }}
+          </slot>
+        </HstButton>
       </div>
     </template>
   </component>

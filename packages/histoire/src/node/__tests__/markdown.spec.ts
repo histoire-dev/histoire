@@ -2,7 +2,7 @@ import type { Context } from '../context.js'
 import { createWriteStream, existsSync, unlinkSync, writeFileSync } from 'node:fs'
 import path from 'node:path'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { createContext } from '../context.js'
+import { closeContext, createContext } from '../context.js'
 import { createMarkdownFilesWatcher } from '../markdown.js'
 import { watchStories } from '../stories.js'
 
@@ -29,6 +29,7 @@ describe('markdown', async () => {
       markdownWatcher = undefined
     }
     await storyWatcher.close()
+    await closeContext(ctx)
 
     if (existsSync(missingStoryFile)) {
       unlinkSync(missingStoryFile)

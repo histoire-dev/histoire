@@ -1,108 +1,47 @@
-<script lang="ts">
-export default {
-  name: 'HstRadio',
-}
-</script>
-
-<script lang="ts" setup>
-import type { ComputedRef } from 'vue'
-import type { HstControlOption } from '../../types'
-import { computed, ref } from 'vue'
+<script setup lang="ts">
+import type { HstControlOptions } from '../../options'
+import type { HstControlLayout } from '../../types'
+import { computed, ref, useId } from 'vue'
+import { normalizeControlOptions } from '../../options'
 import HstWrapper from '../HstWrapper.vue'
 
+defineOptions({ name: 'HstRadio', inheritAttrs: false })
 const props = defineProps<{
+  /** Visible group name. */
   title?: string
+  /** Current selection. */
   modelValue?: string | null
-  options: HstControlOption[]
+  /** Option labels and exact values. */
+  options: HstControlOptions
+  /** Disable group interaction. */
+  disabled?: boolean
+  /** Label placement. */
+  layout?: HstControlLayout
 }>()
-
-const formattedOptions: ComputedRef<Record<string, string>> = computed(() => {
-  if (Array.isArray(props.options)) {
-    return Object.fromEntries(props.options.map((value: string | HstControlOption) => {
-      if (typeof value === 'string') {
-        return [value, value]
-      }
-      else {
-        return [value.value, value.label]
-      }
-    }))
-  }
-  return props.options
-})
-
-const emit = defineEmits<{
-  (e: 'update:modelValue', value: string): void
-}>()
-
-function selectOption(value: string) {
-  emit('update:modelValue', value)
-  animationEnabled.value = true
+const choices = ref<HTMLElement>()
+/** Group focus lands on current enabled choice; disabled groups stay inert. */
+function focus(): void {
+  if (props.disabled) return
+  const current = choices.value?.querySelector<HTMLElement>('input:checked:not(:disabled)')
+  ;(current ?? choices.value?.querySelector<HTMLElement>('input:not(:disabled)'))?.focus()
 }
-
-// animationEnabled prevents the animation from triggering on mounted
-const animationEnabled = ref(false)
+defineExpose({ focus })
+const emit = defineEmits<{ 'update:modelValue': [value: string] }>()
+const options = computed(() => normalizeControlOptions(props.options))
+const groupId = useId()
+/** Selection changes retain original public values. */
+function choose(value: string): void {
+  if (props.disabled) return
+  emit('update:modelValue', value)
+}
 </script>
 
 <template>
-  <HstWrapper
-    role="group"
-    :title="title"
-    class="histoire-radio htw-cursor-text"
-    :class="$attrs.class"
-    :style="$attrs.style"
-  >
-    <div class="-htw-my-1">
-      <template
-        v-for="(label, value) in formattedOptions"
-        :key="value"
-      >
-        <input
-          :id="`${value}-radio_${title}`"
-          type="radio"
-          :name="`${value}-radio_${title}`"
-          :value="value"
-          :checked="value === modelValue"
-          class="!htw-hidden"
-          @change="selectOption(value)"
-        >
-        <label
-          tabindex="0"
-          :for="`${value}-radio_${title}`"
-          class="htw-cursor-pointer htw-flex htw-items-center htw-relative htw-py-1 htw-group"
-          @keydown.enter.prevent="selectOption(value)"
-          @keydown.space.prevent="selectOption(value)"
-        >
-          <svg
-            width="16"
-            height="16"
-            viewBox="-12 -12 24 24"
-            class="htw-relative htw-z-10 htw-border htw-border-solid  htw-text-inherit htw-rounded-full htw-box-border htw-inset-0 htw-transition-border htw-duration-150 htw-ease-out htw-mr-2 group-hover:htw-border-primary-500"
-            :class="[
-              modelValue === value
-                ? 'htw-border-primary-500'
-                : 'htw-border-black/25 dark:htw-border-white/25',
-            ]"
-          >
-            <circle
-              r="7"
-              class="htw-will-change-transform"
-              :class="[
-                animationEnabled ? 'htw-transition-all' : 'htw-transition-none',
-                {
-                  'htw-delay-150': modelValue === value,
-                },
-                modelValue === value
-                  ? 'htw-fill-primary-500'
-                  : 'htw-fill-transparent htw-scale-0',
-              ]"
-            />
-          </svg>
-          {{ label }}
-        </label>
-      </template>
+  <HstWrapper tag="div" v-bind="$attrs" role="radiogroup" :aria-label="$attrs['aria-label'] ?? title" :title="title" :layout="layout" class="histoire-radio">
+    <div ref="choices" class="histoire-choice-list">
+      <label v-for="(option, index) in options" :key="index"><input :name="groupId" type="radio" :value="option.value" :checked="modelValue === option.value" :disabled="disabled || option.disabled" @change="!option.disabled && choose(option.value)">{{ option.label }}</label>
     </div>
-
-    <template #actions>
+    <template v-if="$slots.actions" #actions>
       <slot name="actions" />
     </template>
   </HstWrapper>

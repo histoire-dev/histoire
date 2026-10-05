@@ -24,9 +24,9 @@ import { resolveMockImporter } from './util/mock-importer.js'
  * iframe, "open in new tab" sandbox, extra app tabs) — which is exactly what
  * `@vitest/mocker`'s uncorrelated `server.ws.send` broadcasts did.
  *
- * The path is absolute and base-less on purpose: the middleware is registered
- * from `configureServer`, which runs before Vite's base and transform
- * middlewares, so it matches whatever `base` the project configures.
+ * This suffix is mounted beneath the configured project base. configureServer
+ * runs before Vite's base rewriting, so both browser URL and owned route must
+ * include that base, including when a host owns several middleware projects.
  */
 export const VITEST_MOCK_RPC_ENDPOINT = '/__histoire_vitest_mock_rpc'
 
@@ -225,7 +225,8 @@ export function createVitestMockRpcPlugin(mockerNode: VitestMockerNodeModule): V
         barriers.reach(barrierId)
       })
 
-      server.middlewares.use(VITEST_MOCK_RPC_ENDPOINT, createMockRpcMiddleware({
+      const endpoint = new URL(VITEST_MOCK_RPC_ENDPOINT.slice(1), new URL(server.config.base ?? '/', 'http://histoire.invalid')).pathname
+      server.middlewares.use(endpoint, createMockRpcMiddleware({
         [VITEST_MOCK_RPC_METHODS.resolveId]: async ({ id, importer }) => resolver.resolveId(id, await resolveMockImporter(server, importer)),
         [VITEST_MOCK_RPC_METHODS.resolveMock]: async ({ id, importer, options }) => resolver.resolveMock(id, (await resolveMockImporter(server, importer))!, options),
         [VITEST_MOCK_RPC_METHODS.invalidate]: ({ ids }) => resolver.invalidate(ids),

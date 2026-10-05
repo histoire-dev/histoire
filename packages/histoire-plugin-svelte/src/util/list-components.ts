@@ -1,7 +1,9 @@
 import { globby } from 'globby'
 
-export async function listComponentFiles(search = '', ignore: string[] = [], limit = 10) {
+/** Lists components from a captured project; legacy direct callers keep cwd default. */
+export async function listComponentFiles(search = '', ignore: string[] = [], limit = 10, root = process.cwd()) {
   let files = await globby('**/*.svelte', {
+    cwd: root,
     gitignore: true,
     ignore: [
       'node_modules',

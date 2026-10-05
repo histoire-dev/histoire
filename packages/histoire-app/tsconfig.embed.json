@@ -1,0 +1,11 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "rootDir": "src/embed",
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "outDir": "dist/embed"
+  },
+  "include": ["src/embed"],
+  "exclude": ["src/embed/**/*.spec.ts"]
+}

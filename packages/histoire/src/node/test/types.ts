@@ -1,4 +1,10 @@
 export interface RunHistoireTestsOptions {
+  /** Isolates Vitest process handlers and exit state from library caller. */
+  isolate?: boolean
+  /** Execution retries; SDK/library adapters explicitly use zero. */
+  maxRetries?: number
+  /** Library requests reject explicit missing/ambiguous targets instead of empty success. */
+  strictTarget?: boolean
   /** Controller-owned abort signal; cancellation retains lane until cleanup completes. */
   signal?: AbortSignal
   /** Reject unconfirmed runner teardown rather than recycling an unsafe execution lane. */

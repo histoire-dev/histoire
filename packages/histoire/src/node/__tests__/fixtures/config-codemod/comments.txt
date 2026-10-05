@@ -1,0 +1,14 @@
+import { defineConfig } from 'histoire'
+
+// Config comment stays exactly as written.
+export default defineConfig({
+  theme: {
+    // Keep chosen theme title.
+    title: "My title",
+    defaultColorScheme: 'light', // Scheme comment survives.
+  },
+  responsivePresets: [
+    { label: 'Phone', width: 320, height: 640 }, // Phone comment
+    { label: 'Desktop', width: 1280, height: 800 },
+  ],
+})

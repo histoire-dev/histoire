@@ -32,11 +32,11 @@ export async function createMarkdownFilesWatcher(ctx: Context, signal?: AbortSig
       else console.error(error)
     }
   }
-  const offStoryChange = onStoryChange((file) => {
+  const offStoryChange = onStoryChange(ctx, (file) => {
     if (file) handle(manager.reconcile)
   })
-  const offStoryList = onStoryListChange(() => handle(manager.reconcile))
-  /** Drops module-global callbacks before closing the underlying watcher. */
+  const offStoryList = onStoryListChange(ctx, () => handle(manager.reconcile))
+  /** Drops context-owned callbacks before closing the underlying watcher. */
   async function stop() {
     if (stopped) return
     stopped = true
@@ -47,8 +47,15 @@ export async function createMarkdownFilesWatcher(ctx: Context, signal?: AbortSig
   watcher.on('add', file => handle(() => manager.update(file)))
     .on('change', file => handle(() => manager.update(file)))
     .on('unlink', file => handle(() => manager.remove(file)))
+    .on('error', (error) => {
+      if (!ready) initialError = error
+      else if (!stopped) console.error(error)
+    })
   try {
-    await waitForRuntimeWork(new Promise<void>(resolve => watcher.once('ready', resolve)), signal)
+    await waitForRuntimeWork(new Promise<void>((resolve, reject) => {
+      watcher.once('ready', resolve)
+      watcher.once('error', reject)
+    }), signal)
     if (initialError) throw initialError
     manager.finishInitialScan()
     ready = true

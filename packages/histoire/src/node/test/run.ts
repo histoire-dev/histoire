@@ -1,7 +1,9 @@
 import type { HistoireTestRunSummary } from '@histoire/shared'
 import type { Context } from '../context.js'
 import type { RunHistoireTestsOptions } from './types.js'
+import { basename } from 'node:path'
 import { performance } from 'node:perf_hooks'
+import { HistoireSdkError } from '@histoire/protocol'
 import fs from 'fs-extra'
 import pc from 'picocolors'
 import { scanMarkdownFiles } from '../markdown.js'
@@ -32,18 +34,20 @@ const CLEANUP_LABEL = 'Histoire tests'
  * @param options Run options (see {@link RunHistoireTestsOptions}).
  */
 export async function runHistoireTests(ctx: Context, options: RunHistoireTestsOptions = {}): Promise<HistoireTestRunSummary> {
+  if (options.isolate) {
+    const { runIsolatedHistoireTests } = await import('./isolated.js')
+    return runIsolatedHistoireTests(ctx, options)
+  }
   // Each run owns its spec directory: a shared one emptied at the start of the
   // run would delete the specs of any concurrent run in the same project.
   const specRoot = getRunTempDir(ctx.root, 'tests')
-  const previousExitCode = process.exitCode
 
   try {
-    return await runTests(ctx, options, specRoot)
+    const summary = await runTests(ctx, options, specRoot)
+    if (!options.strictTarget) return summary
+    return { ...summary, execution: { runId: basename(specRoot), mode: 'server', ...(options.storyId ? { target: { storyId: options.storyId, variantId: options.variantId ?? null } } : {}) } }
   }
   finally {
-    // Vitest sets a global exit code for failed assertions. A dev MCP/UI job
-    // returns its own summary; it must not poison the long-lived server's exit.
-    process.exitCode = previousExitCode
     // Remove the generated specs on every path, including failures.
     await fs.remove(specRoot).catch(() => {})
   }
@@ -71,7 +75,7 @@ async function runTests(ctx: Context, options: RunHistoireTestsOptions, specRoot
   }
 
   throwIfTestAborted(options.signal)
-  const targetStoryFiles = getTargetStoryFiles(ctx, options)
+  const targetStoryFiles = options.strictTarget && !options.skipStoryScan ? ctx.storyFiles : getTargetStoryFiles(ctx, options)
   // `onTest` is registered at runtime at any call depth (shared helpers,
   // renamed imports…), so only executing the story reveals whether it defines
   // tests: the browser collection is the sole source of eligibility.
@@ -91,6 +95,12 @@ async function runTests(ctx: Context, options: RunHistoireTestsOptions, specRoot
 
   throwIfTestAborted(options.signal)
   assertTargetedStoriesCollected(collection.failures, targetStoryFiles, options)
+  if (options.strictTarget && options.storyId) {
+    const matches = collection.files.filter(file => file.storyFile.story?.id === options.storyId)
+    if (!matches.length) throw new HistoireSdkError(collection.failures.length ? 'COLLECTION_FAILED' : 'STORY_NOT_FOUND', 'Requested story could not be resolved')
+    if (matches.length > 1) throw new HistoireSdkError('STORY_AMBIGUOUS', 'Requested story ID is ambiguous')
+    if (options.variantId && !matches[0].storyFile.story.variants.some(variant => variant.id === options.variantId)) throw new HistoireSdkError('VARIANT_NOT_FOUND', 'Requested variant does not exist')
+  }
   warnAboutUncollectedStories(collection.failures)
 
   const specFiles = await generateSpecFiles(
@@ -121,6 +131,7 @@ async function runTests(ctx: Context, options: RunHistoireTestsOptions, specRoot
     root: ctx.root,
     signal: options.signal,
     strictCleanup: options.strictCleanup,
+    maxRetries: options.maxRetries,
     retryMessage: 'Retrying Histoire tests after Vitest browser optimizer reload',
     // Rebuilt per attempt: the config carries live plugin instances bound to
     // the Vite server of the attempt that created them.

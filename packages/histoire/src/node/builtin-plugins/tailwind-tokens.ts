@@ -1,4 +1,5 @@
 import type { Plugin, PluginApiBase } from '@histoire/shared'
+import path from 'pathe'
 import { findUp } from '../util/find-up.js'
 import { getInjectedImport } from '../util/vendors.js'
 
@@ -6,19 +7,27 @@ export interface TailwindTokensOptions {
   configFile?: string
 }
 
+/** Generates tokens against each captured project instead of plugin import cwd. */
 export function tailwindTokens(options: TailwindTokensOptions = {}): Plugin {
-  const tailwindConfigFile = options.configFile ?? findUp(process.cwd(), [
-    'tailwind.config.js',
-    'tailwind.config.cjs',
-    'tailwind.config.mjs',
-    'tailwind.config.ts',
-    'tailwind-config.js',
-    'tailwind-config.cjs',
-    'tailwind-config.mjs',
-    'tailwind-config.ts',
-  ])
+  /** Resolves explicit relative files and discovered configuration from project root. */
+  function getConfigFile(root: string) {
+    return options.configFile
+      ? path.resolve(root, options.configFile)
+      : findUp(root, [
+          'tailwind.config.js',
+          'tailwind.config.cjs',
+          'tailwind.config.mjs',
+          'tailwind.config.ts',
+          'tailwind-config.js',
+          'tailwind-config.cjs',
+          'tailwind-config.mjs',
+          'tailwind-config.ts',
+        ])
+  }
 
   async function generate(api: PluginApiBase) {
+    const tailwindConfigFile = getConfigFile(api.root)
+    if (!tailwindConfigFile) return
     try {
       await api.fs.ensureDir(api.pluginTempDir)
       await api.fs.emptyDir(api.pluginTempDir)
@@ -39,8 +48,8 @@ export function tailwindTokens(options: TailwindTokensOptions = {}): Plugin {
   return {
     name: 'builtin:tailwind-tokens',
 
-    config(config) {
-      if (tailwindConfigFile) {
+    config(config, _mode, context) {
+      if (getConfigFile(context?.root ?? process.cwd())) {
         // Add 'design-system' group
         if (!config.tree) {
           config.tree = {}
@@ -65,20 +74,17 @@ export function tailwindTokens(options: TailwindTokensOptions = {}): Plugin {
     },
 
     onDev(api, onCleanup) {
+      const tailwindConfigFile = getConfigFile(api.root)
       if (tailwindConfigFile) {
         const watcher = api.watcher.watch(tailwindConfigFile)
           .on('change', () => generate(api))
           .on('add', () => generate(api))
-        onCleanup(() => {
-          watcher.close()
-        })
+        onCleanup(() => watcher.close())
       }
     },
 
     async onBuild(api) {
-      if (tailwindConfigFile) {
-        await generate(api)
-      }
+      await generate(api)
     },
   }
 }

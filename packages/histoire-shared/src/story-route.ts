@@ -1,7 +1,3 @@
-/** Resolve exact route identity, preferring normal path over dot-ID query fallback. */
-export function resolveStoryRouteId(params: { storyId?: unknown }, query: { storyId?: unknown }): string | undefined {
-  if (typeof params.storyId === 'string' && params.storyId) return params.storyId
-  return typeof query.storyId === 'string' && /^\.+$/.test(query.storyId) ? query.storyId : undefined
-}
-/** Named story route supports safe query selection for dot-only identities. */
-export const STORY_ROUTE_PATH = '/story/:storyId?'
+/** Compatibility entry keeps legacy callers on one portable route implementation. */
+export { isStoryRouteHash, parseStoryRouteQuery, resolveStoryRouteId, resolveStoryRouteSelection, STORY_ROUTE_PATH } from '@histoire/protocol'
+export type { StoryRouteQuery } from '@histoire/protocol'

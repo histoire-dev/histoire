@@ -5,14 +5,20 @@ import { useCollectStories } from '../collect/index.js'
 import { useModuleLoader } from '../load.js'
 import { createMarkdownFilesWatcher, onMarkdownListChange } from '../markdown.js'
 import { DevPluginApi } from '../plugin.js'
-import { createCleanupStack } from '../runtime/cleanup.js'
+import { createExecutionService } from '../runtime/execution-service.js'
 import { resolveDevServerPort } from '../runtime/port.js'
+import { getContextRegistry } from '../runtime/registry.js'
 import { waitForRuntimeWork } from '../runtime/wait.js'
 import { onStoryListChange, watchStories } from '../stories.js'
 import * as VirtualFiles from '../virtual/index.js'
+import { closeDevPreviewHost } from '../vite/mcp-preview-html.js'
 import { createStoryCollector } from './collect.js'
 import { registerDevEvents } from './dev-events.js'
 import { createModuleInvalidators } from './invalidate.js'
+import { registerAgentsChannel } from './ui-channel/agents.js'
+import { registerCommentsChannel } from './ui-channel/comments.js'
+import { registerConfigChannel } from './ui-channel/config.js'
+import { registerUiChannel } from './ui-channel/index.js'
 import { createViteServers } from './vite-servers.js'
 
 /** Dev generation startup and publication ownership. */
@@ -27,10 +33,13 @@ export interface CreateServerOptions extends ViteServerOptions {
 
 /** Starts both Vite servers and owns their watchers, collection and plugin hooks. */
 export async function createServer(ctx: Context, options: CreateServerOptions = {}) {
-  const cleanup = createCleanupStack()
+  const cleanup = getContextRegistry(ctx).cleanup
   let stopped = false
   let stopCollection: (() => Promise<void>) | undefined
   const isActive = () => !stopped && !options.signal?.aborted && (options.isActive?.() ?? true)
+  const execution = options.execution ?? createExecutionService()
+  getContextRegistry(ctx).execution = { service: execution, isActive }
+  if (!options.execution) cleanup.add(() => execution.close())
   /** Rejects work acquired after a startup cancellation. */
   function checkActive() {
     options.signal?.throwIfAborted()
@@ -46,9 +55,11 @@ export async function createServer(ctx: Context, options: CreateServerOptions = 
   }
   try {
     checkActive()
+    if (options.middleware?.base) ctx.resolvedViteConfig = { ...ctx.resolvedViteConfig, base: options.middleware.base }
     const { nodeServer, server, viteConfigFile } = await createViteServers(ctx, options)
     cleanup.add(() => nodeServer.close())
     cleanup.add(() => server.close())
+    cleanup.add(() => closeDevPreviewHost(server))
     checkActive()
 
     const storyWatcher = await watchStories(ctx)
@@ -68,11 +79,18 @@ export async function createServer(ctx: Context, options: CreateServerOptions = 
         checkActive()
       }
     }
-    registerDevEvents(ctx, server, moduleLoader, options.execution, isActive)
+    registerDevEvents(ctx, server, moduleLoader, execution, isActive)
+    const uiChannel = registerUiChannel(ctx, server, execution, isActive)
+    registerConfigChannel(ctx, uiChannel, isActive)
+    const agents = registerAgentsChannel(ctx, uiChannel, server)
+    registerCommentsChannel(ctx, uiChannel, agents, isActive)
+    cleanup.add(() => uiChannel.close())
     // Vite pre-bundling completes during listen; initial collection follows it.
-    const port = await resolveDevServerPort(options.port ?? server.config.server?.port)
-    checkActive()
-    await server.listen(port)
+    if (!options.middleware) {
+      const port = await resolveDevServerPort(options.port ?? server.config.server?.port)
+      checkActive()
+      await server.listen(port)
+    }
     checkActive()
 
     const collectStories = useCollectStories({ server: nodeServer, mainServer: server }, ctx)
@@ -88,13 +106,14 @@ export async function createServer(ctx: Context, options: CreateServerOptions = 
     collector = createStoryCollector({ ctx, server, collectStories, invalidateModule, invalidateModuleSilently, isActive })
     stopCollection = collector.stop
 
-    cleanup.add(onStoryListChange(() => {
+    cleanup.add(onStoryListChange(ctx, () => {
       if (!isActive()) return
       invalidateModule(VirtualFiles.RESOLVED_STORIES_ID)
       invalidateModule(VirtualFiles.RESOLVED_SEARCH_TITLE_DATA_ID)
+      invalidateModule(VirtualFiles.RESOLVED_BUILD_INFO_ID)
       invalidateModuleSilently(VirtualFiles.RESOLVED_PREVIEW_RUNTIME_ID)
     }))
-    cleanup.add(onMarkdownListChange(() => {
+    cleanup.add(onMarkdownListChange(ctx, () => {
       if (isActive()) invalidateModule(VirtualFiles.RESOLVED_MARKDOWN_FILES)
     }))
     const ready = collector.collect()

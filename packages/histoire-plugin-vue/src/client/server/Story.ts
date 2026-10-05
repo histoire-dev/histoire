@@ -29,6 +29,12 @@ export default defineComponent({
       default: undefined,
     },
 
+    /** Explicit finite values used by props matrix in every build mode. */
+    matrix: {
+      type: Object as PropType<ServerStory['matrix']>,
+      default: undefined,
+    },
+
     icon: {
       type: String,
       default: undefined,
@@ -62,6 +68,7 @@ export default defineComponent({
       title: props.title ?? attrs.data.fileName,
       group: props.group,
       layout: props.layout,
+      matrix: props.matrix,
       icon: props.icon,
       iconColor: props.iconColor,
       docsOnly: props.docsOnly,

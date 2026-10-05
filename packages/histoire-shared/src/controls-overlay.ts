@@ -1,5 +1,5 @@
 import type { HistoireControlsHost, HistoireControlsOverlay, HistoireControlsOverlayResult } from './types/controls.js'
-import { CONTROLS_OVERLAY, CONTROLS_OVERLAY_REFRESH, CONTROLS_OVERLAY_RESULT } from './types/controls.js'
+import { CONTROLS_FOCUS, CONTROLS_OVERLAY, CONTROLS_OVERLAY_REFRESH, CONTROLS_OVERLAY_RESULT } from './types/controls.js'
 
 /** Monotonic overlay identity within this document's module instance. */
 let nextOverlayId = 0
@@ -11,6 +11,8 @@ export function getControlsHost(): HistoireControlsHost | undefined {
 
 /** Dependencies of the framework-independent controls overlay transport. */
 interface ControlsOverlayBridgeOptions {
+  /** Optional strict document identity for SDK wrappers; legacy hosts omit it. */
+  documentId?: string
   /** Window running story code. */
   window: Window
   /** Embedding Histoire window, resolved through frameElement. */
@@ -57,6 +59,7 @@ export function createControlsOverlayBridge(options: ControlsOverlayBridgeOption
       || !message?.__histoire || message.storyId !== scope.storyId || message.variantId !== scope.variantId) {
       return
     }
+    if (options.documentId && message.documentId !== options.documentId) return
     const entry = pending.get(message.id)
     if (!entry) return
     if (message.type === CONTROLS_OVERLAY_REFRESH) {
@@ -64,7 +67,7 @@ export function createControlsOverlayBridge(options: ControlsOverlayBridgeOption
     }
     else if (message.type === CONTROLS_OVERLAY_RESULT) {
       if (message.itemId !== undefined && (entry.overlay.kind !== 'select'
-        || !entry.overlay.items.some(item => item.id === message.itemId))) {
+        || !entry.overlay.items.some(item => item.id === message.itemId && !item.disabled))) {
         return
       }
       pending.delete(message.id)
@@ -104,6 +107,7 @@ export function createControlsOverlayBridge(options: ControlsOverlayBridgeOption
   options.window.addEventListener('scroll', onScroll, true)
   options.window.addEventListener('keydown', onKeydown)
   return {
+    requestFocus: direction => options.post({ type: CONTROLS_FOCUS, ...scope, direction }),
     /** Opens a local session and sends only its serializable presentation. */
     open(anchor, overlay, onResult) {
       // A document timestamp distinguishes reloads without requiring HTTPS-only

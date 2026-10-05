@@ -4,6 +4,7 @@ import { createRequire } from 'node:module'
 import { defaultColors } from 'histoire'
 import { dirname, join } from 'pathe'
 import generateStoryCommand from './commands/generate-story.server.js'
+import { isolateSvelteKit } from './util/kit.js'
 import { listComponentFiles } from './util/list-components.js'
 import { disableStoryComponentHmr } from './util/story-hmr.js'
 
@@ -24,8 +25,8 @@ export function HstSvelte(): Plugin {
   return {
     name: '@histoire/plugin-svelte',
 
-    defaultConfig() {
-      const svelteClientAliases = getSvelteClientAliases()
+    defaultConfig(_config, _mode, context) {
+      const svelteClientAliases = getSvelteClientAliases(context?.root ?? process.cwd())
 
       return {
         supportMatch: [
@@ -48,22 +49,33 @@ export function HstSvelte(): Plugin {
         viteIgnorePlugins: [
           'vite-plugin-sveltekit-compile',
         ],
-        vite: {
-          plugins: [
-            disableStoryComponentHmr(),
-          ],
-          resolve: {
-            // This plugin's own client modules import `svelte` by bare
-            // specifier, and it is installed next to them as well (to compile
-            // their `.svelte` sources). Without deduping, those imports resolve
-            // to that copy instead of the project's: the two runtimes then have
-            // separate schedulers, so components the story creates are
-            // initialised but their render callbacks are never flushed — their
-            // `onMount` never runs and controls stay unmounted. Unlike the
-            // aliases below, this works whatever the Svelte major.
-            dedupe: SVELTE_RUNTIME_MODULES,
-            ...(svelteClientAliases.length ? { alias: svelteClientAliases } : {}),
-          },
+        vite: async (config) => {
+          const plugins = (await Promise.all(config.plugins ?? [])).flat().filter(Boolean)
+          const kit = plugins.find(plugin => typeof plugin === 'object' && 'name' in plugin && plugin.name === 'vite-plugin-sveltekit-setup') as { api?: { options?: { paths?: { base?: string } } } } | undefined
+          // Kit's app compiler uses './' for relative assets. Histoire's catalog
+          // and portable preview require the canonical deployment path instead.
+          const base = kit && (!config.base || config.base === './' || config.base === '')
+            ? `${kit.api?.options?.paths?.base ?? ''}/`
+            : undefined
+          return {
+            ...(base ? { base } : {}),
+            plugins: [
+              disableStoryComponentHmr(),
+              isolateSvelteKit(),
+            ],
+            resolve: {
+              // This plugin's own client modules import `svelte` by bare
+              // specifier, and it is installed next to them as well (to compile
+              // their `.svelte` sources). Without deduping, those imports resolve
+              // to that copy instead of the project's: the two runtimes then have
+              // separate schedulers, so components the story creates are
+              // initialised but their render callbacks are never flushed — their
+              // `onMount` never runs and controls stay unmounted. Unlike the
+              // aliases below, this works whatever the Svelte major.
+              dedupe: SVELTE_RUNTIME_MODULES,
+              ...(svelteClientAliases.length ? { alias: svelteClientAliases } : {}),
+            },
+          }
         },
       }
     },
@@ -82,7 +94,7 @@ export function HstSvelte(): Plugin {
     async onDevEvent(api) {
       switch (api.event) {
         case 'listSvelteComponents': {
-          return listComponentFiles(api.payload.search, api.getConfig().storyMatch)
+          return listComponentFiles(api.payload.search, api.getConfig().storyMatch, undefined, api.root)
         }
       }
     },
@@ -115,9 +127,9 @@ const SVELTE_CLIENT_ENTRIES: [RegExp, string[]][] = [
  * default — which the dep optimizer picks. That build has no scheduler, so
  * components mount without their `onMount` ever running (controls stay empty).
  */
-function getSvelteClientAliases() {
+function getSvelteClientAliases(root: string) {
   try {
-    const require = createRequire(join(process.cwd(), 'package.json'))
+    const require = createRequire(join(root, 'package.json'))
     const sveltePackagePath = require.resolve('svelte/package.json')
     const svelteDir = dirname(sveltePackagePath)
 

@@ -1,6 +1,7 @@
 import type { HistoireTestRunSummary, ServerStoryFile } from '@histoire/shared'
 import type { StoryCollectionFailure } from '../story-collection/index.js'
 import type { RunHistoireTestsOptions } from './types.js'
+import { HistoireSdkError } from '@histoire/protocol'
 import pc from 'picocolors'
 // Imported from the concrete module rather than the package barrel: the run
 // specs mock that barrel to stub the browser collection, which would otherwise
@@ -33,10 +34,8 @@ export function assertTargetedStoriesCollected(
     return
   }
 
-  throw new Error(
-    `Histoire could not collect the story targeted by this test run (storyId="${options.storyId}"):\n\n${
-      blocking.map(formatStoryCollectionFailure).join('\n\n')}`,
-  )
+  throw new HistoireSdkError('COLLECTION_FAILED', `Histoire could not collect the story targeted by this test run (storyId="${options.storyId}"):\n\n${
+    blocking.map(formatStoryCollectionFailure).join('\n\n')}`)
 }
 
 /**

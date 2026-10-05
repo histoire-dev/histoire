@@ -34,8 +34,11 @@ export function previewComponents() {
       h('div', {
         class: '__histoire-preview-canvas',
         'data-histoire-variant-id': props.variant.id,
+        'data-histoire-runtime-content': '',
         'data-test-id': 'sandbox-render',
       }, [h(GenericRenderStory, {
+        // Retain hidden story mount and variant state; fresh renderer must acknowledge selection.
+        key: props.variant.id,
         story: props.story,
         variant: props.variant,
         onReady,

@@ -15,13 +15,17 @@ export interface NodeBundleResult {
 
 /** Rejects project/dev tool packages from the immutable production runtime graph. */
 function forbiddenImport(id: string): boolean {
-  return /^(?:vite(?:\/|$)|vite-node(?:\/|$)|vitest(?:\/|$)|@vitest\/(?:runner|browser|browser-playwright)(?:\/|$)|@vue\/compiler|svelte\/compiler|histoire(?:\/|$))/.test(id)
+  return /^(?:vite(?:\/|$)|vite-node(?:\/|$)|vitest(?:\/|$)|@vitest\/(?:runner|browser|browser-playwright)(?:\/|$)|@vue\/compiler|svelte\/compiler|vue(?:\/|$)|@histoire\/(?:sdk|vue|app|controls|vendors)(?:\/|$)|histoire(?:\/|$))/.test(id)
 }
 
 /** Checks relative or resolved paths that could bypass a package-name import guard. */
 function forbiddenInput(id: string): boolean {
   const normalized = resolve(id).replace(/\\/g, '/')
+  // These exact audited modules contain only policy validation and SDK-free
+  // cleanup ownership. Their transitive inputs remain subject to every guard.
+  if (/\/histoire\/(?:src|dist)\/node\/(?:config\/embed-built|runtime\/cleanup)\.[cm]?[jt]s$/.test(normalized)) return false
   return /\/node_modules\/(?:vite|vite-node|vitest|@vue\/compiler[^/]*|@vitest\/(?:runner|browser|browser-playwright))\//.test(normalized)
+    || /\/histoire-(?:sdk|vue|app|controls|vendors)\/(?:src|dist)\//.test(normalized)
     || /\/histoire\/(?:src|dist)\/node\/(?:context|dev|index|load|stories|preview)\.[cm]?[jt]s$/.test(normalized)
     || /\/histoire\/(?:src|dist)\/node\/(?:config|collect|vite|story-collection|test)\//.test(normalized)
     || /\/histoire\/(?:src|dist)\/node\/runtime\/(?:start|controller|config-watchers|cleanup)\.[cm]?[jt]s$/.test(normalized)

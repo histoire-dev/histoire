@@ -1,11 +1,22 @@
+import type { Buffer } from 'node:buffer'
 import type { ViteDevServer } from 'vite'
 import type { StoryCollectionOutcome } from '../collect/outcome.js'
 import type { Context } from '../context.js'
 import type { CollectionEvent } from '../server/collect.js'
 import type { CreateServerOptions } from '../server/index.js'
 
-/** Observable lifecycle of a single process-owned project. */
+/** Observable lifecycle of one independently owned project. */
 export type ProjectRuntimeStatus = 'starting' | 'ready' | 'restarting' | 'failed' | 'closed'
+
+/** Exact configuration bytes captured before one generation loads its config. */
+export interface ProjectConfigurationRevision {
+  /** Selected Histoire config at acquisition, retained through priority changes. */
+  histoireFile: string | null
+  /** Selected default Vite config at acquisition, absent before first creation. */
+  viteConfigFile: string | null
+  /** Existing bytes, or undefined for a file absent during acquisition. */
+  snapshots: ReadonlyMap<string, Buffer | undefined>
+}
 
 /** Resources returned by one dev-server startup. */
 export interface RuntimeGeneration {
@@ -17,6 +28,8 @@ export interface RuntimeGeneration {
   ready: Promise<void>
   /** Optional resolved Vite config filename for restart watching. */
   viteConfigFile?: string
+  /** Config revision captured before this generation read its effective config. */
+  configurationRevision?: ProjectConfigurationRevision
   /** Releases all owned resources once. */
   close: () => Promise<void>
   /** Runs or joins the owned collection loop. */
@@ -37,6 +50,8 @@ export interface ProjectRuntimeHandle extends RuntimeGeneration {
 
 /** Inputs common to CLI dev and the stdio project worker. */
 export interface ProjectRuntimeOptions extends CreateServerOptions {
+  /** Explicit project root; CLI defaults to its launch cwd. */
+  root?: string
   /** Explicit Histoire configuration module. */
   config?: string
   /** Reserved transport policy; false disables dev HTTP in a stdio worker. */
@@ -54,5 +69,5 @@ export interface ProjectRuntimeDependencies {
   /** Acquires one generation without changing process cwd. */
   start: (options: ProjectRuntimeOptions, signal: AbortSignal, isActive: () => boolean) => Promise<RuntimeGeneration>
   /** Owns both Vite and Histoire configuration watchers. */
-  watch: (runtime: RuntimeGeneration, options: ProjectRuntimeOptions, restart: (source: string) => void) => Promise<() => Promise<void>>
+  watch: (runtime: RuntimeGeneration, options: ProjectRuntimeOptions, restart: (source: string) => void, revision?: ProjectConfigurationRevision) => Promise<() => Promise<void>>
 }

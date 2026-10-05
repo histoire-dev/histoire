@@ -12,12 +12,11 @@ function cloneMetadata<T>(value: T, seen = new WeakMap<object, unknown>()): T {
   return copy as T
 }
 
-/** Detach selected story/Markdown graph while preserving config and plugin function references. */
-export function createTestContextSnapshot(ctx: Context, storyId?: string): Context {
+/** Detach project link metadata; runner filters targets after docs resolve neighbors. */
+export function createTestContextSnapshot(ctx: Context): Context {
   const storyFiles = ctx.storyFiles
-    .filter(file => storyId === undefined || file.story?.id === storyId)
     .map(file => ({ ...file, treePath: file.treePath ? [...file.treePath] : undefined, story: cloneMetadata(file.story), treeFile: cloneMetadata(file.treeFile) }))
-  const markdownFiles = ctx.markdownFiles.filter(file => !file.storyFile || storyFiles.some(story => story.path === file.storyFile!.path))
+  const markdownFiles = ctx.markdownFiles
     .map(file => ({ ...file, frontmatter: cloneMetadata(file.frontmatter) }))
   for (const file of storyFiles) {
     file.markdownFile = markdownFiles.find(markdown => markdown.absolutePath === file.markdownFile?.absolutePath)

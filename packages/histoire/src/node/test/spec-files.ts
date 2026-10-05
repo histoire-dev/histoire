@@ -9,8 +9,9 @@ import { TEST_HARNESS_ID } from '../virtual/index.js'
  * Writes one Vitest spec file per collected variant.
  * @param storyFiles Collected story files that registered tests.
  * @param root Directory owned by the current run.
+ * @param mode Collection stores definitions in inert task metadata; run executes assertions.
  */
-export async function generateSpecFiles(storyFiles: ServerStoryFile[], root: string): Promise<GeneratedSpecFile[]> {
+export async function generateSpecFiles(storyFiles: ServerStoryFile[], root: string, mode: 'run' | 'collect' = 'run'): Promise<GeneratedSpecFile[]> {
   await fs.emptyDir(root)
   const results: GeneratedSpecFile[] = []
 
@@ -27,7 +28,7 @@ export async function generateSpecFiles(storyFiles: ServerStoryFile[], root: str
         `${toTempPathSegment(variant.id)}.histoire.spec.ts`,
       )
       await fs.ensureDir(join(specPath, '..'))
-      await fs.writeFile(specPath, generateSpecCode(storyFile.story.id, variant.id, storyFile.story.title, variant.title), 'utf8')
+      await fs.writeFile(specPath, mode === 'collect' ? generateCollectionSpecCode(storyFile.story.id, variant.id) : generateSpecCode(storyFile.story.id, variant.id, storyFile.story.title, variant.title), 'utf8')
       results.push({
         path: specPath,
         storyId: storyFile.story.id,
@@ -44,6 +45,24 @@ export async function generateSpecFiles(storyFiles: ServerStoryFile[], root: str
   )
 
   return results
+}
+
+/** Inert task metadata carries exact definitions through Vitest's collection reporting. */
+function generateCollectionSpecCode(storyId: string, variantId: string): string {
+  return `import { test } from '@vitest/runner'
+import { serializeTestErrors } from '@histoire/shared'
+import { collectVariantTests } from ${JSON.stringify(TEST_HARNESS_ID)}
+
+let collection
+try {
+  collection = { definitions: await collectVariantTests(${JSON.stringify(storyId)}, ${JSON.stringify(variantId)}) }
+}
+catch (error) {
+  collection = { definitions: [], error: serializeTestErrors([error])[0] }
+}
+// Runtime collection reads metadata; this callback never executes.
+test('Histoire test collection', { meta: { histoireCollection: collection } }, () => {})
+`
 }
 
 /**

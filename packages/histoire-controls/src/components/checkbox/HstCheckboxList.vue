@@ -1,81 +1,48 @@
-<script lang="ts">
-export default {
-  name: 'HstCheckboxList',
-}
-</script>
-
-<script lang="ts" setup>
-import type { ComputedRef } from 'vue'
-import type { HstControlOption } from '../../types'
-import { computed } from 'vue'
+<script setup lang="ts">
+import type { HstControlOptions } from '../../options'
+import type { HstControlLayout } from '../../types'
+import { computed, ref, useId } from 'vue'
+import { normalizeControlOptions } from '../../options'
 import HstWrapper from '../HstWrapper.vue'
 import HstSimpleCheckbox from './HstSimpleCheckbox.vue'
 
+defineOptions({ name: 'HstCheckboxList', inheritAttrs: false })
 const props = defineProps<{
+  /** Visible group name. */
   title?: string
-  modelValue: Array<string>
-  options: string[] | HstControlOption[]
+  /** Current selected values. */
+  modelValue: string[]
+  /** Option labels and exact values. */
+  options: HstControlOptions
+  /** Disable group interaction. */
+  disabled?: boolean
+  /** Label placement. */
+  layout?: HstControlLayout
 }>()
-
-const formattedOptions: ComputedRef<Record<string, string>> = computed(() => {
-  if (Array.isArray(props.options)) {
-    return Object.fromEntries(props.options.map((value: string | HstControlOption) => {
-      if (typeof value === 'string') {
-        return [value, value]
-      }
-      else {
-        return [value.value, value.label]
-      }
-    }))
-  }
-  return props.options
-})
-
-const emit = defineEmits<{
-  (e: 'update:modelValue', value: Array<string>): void
-}>()
-
-function toggleOption(value: string) {
-  if (props.modelValue.includes(value)) {
-    emit('update:modelValue', props.modelValue.filter(element => element !== value))
-  }
-  else {
-    emit('update:modelValue', [...props.modelValue, value])
-  }
+const choices = ref<HTMLElement>()
+/** Group focus lands on current enabled choice; disabled groups stay inert. */
+function focus(): void {
+  if (props.disabled) return
+  const current = choices.value?.querySelector<HTMLElement>('input:checked:not(:disabled)')
+  ;(current ?? choices.value?.querySelector<HTMLElement>('input:not(:disabled)'))?.focus()
+}
+defineExpose({ focus })
+const emit = defineEmits<{ 'update:modelValue': [value: string[]] }>()
+const options = computed(() => normalizeControlOptions(props.options))
+const groupId = useId()
+/** Selection changes retain original public values. */
+function choose(value: string): void {
+  if (props.disabled) return
+  emit('update:modelValue', props.modelValue.includes(value) ? props.modelValue.filter(item => item !== value) : [...props.modelValue, value])
 }
 </script>
 
 <template>
-  <HstWrapper
-    role="group"
-    :title="title"
-    class="histoire-checkbox-list htw-cursor-text"
-    :class="$attrs.class"
-    :style="$attrs.style"
-  >
-    <div class="-htw-my-1">
-      <template
-        v-for="(label, value) in formattedOptions"
-        :key="value"
-      >
-        <label
-          tabindex="0"
-          :for="`${value}-radio`"
-          class="htw-cursor-pointer htw-flex htw-items-center htw-relative htw-py-1 htw-group"
-          @keydown.enter.prevent="toggleOption(value)"
-          @keydown.space.prevent="toggleOption(value)"
-          @click="toggleOption(value)"
-        >
-          <HstSimpleCheckbox
-            :model-value="modelValue.includes(value)"
-            class="htw-mr-2"
-          />
-          {{ label }}
-        </label>
-      </template>
+  <HstWrapper tag="div" v-bind="$attrs" role="group" :aria-label="$attrs['aria-label'] ?? title" :title="title" :layout="layout" class="histoire-checkbox-list">
+    <div ref="choices" class="histoire-choice-list">
+      <label v-for="(option, index) in options" :key="index"><input :name="groupId" type="checkbox" :value="option.value" :checked="modelValue.includes(option.value)" :disabled="disabled || option.disabled" @change="!option.disabled && choose(option.value)"><HstSimpleCheckbox :model-value="modelValue.includes(option.value)" />{{ option.label }}</label>
     </div>
-
-    <template #actions>
+    <template v-if="$slots.actions" #actions>
       <slot name="actions" />
     </template>
   </HstWrapper>

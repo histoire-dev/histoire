@@ -1,7 +1,12 @@
+import type { HistoireStoryHostChannel } from '@histoire/protocol'
 import type { HistoireTestRegistration } from '@histoire/shared'
 
+/** Capture current story actor for explicitly enabled application channel. */
+export function useHostChannel(name: string): HistoireStoryHostChannel
+export type { HistoireStoryHostChannel } from '@histoire/protocol'
 export { getControlsHost } from '@histoire/shared'
-export type { HistoireControlsOverlay, HistoireControlsOverlayHandle, HistoireControlsOverlayResult } from '@histoire/shared'
+export { useHistoireGlobals, useHistoireGlobalsStore } from '@histoire/shared'
+export type { HistoireControlsOverlay, HistoireControlsOverlayHandle, HistoireControlsOverlayResult, HistoireGlobalsStore } from '@histoire/shared'
 
 /**
  * @deprecated

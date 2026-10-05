@@ -4,6 +4,7 @@ import type {
 } from '@histoire/vendors/vue'
 import type { SvelteStorySetupApi, SvelteStorySetupHandler } from '../helpers.js'
 import { components } from '@histoire/controls'
+import { useHistoireGlobals } from '@histoire/shared'
 import {
   defineComponent as _defineComponent,
   h as _h,
@@ -134,11 +135,12 @@ export default _defineComponent({
 
       const setupApi: SvelteStorySetupApi = {
         app,
+        globals: useHistoireGlobals(),
         story: props.story,
         variant: props.variant,
       }
 
-      await callSetupFunctions(generatedSetup, setup, setupApi, props.variant.setupApp as SvelteStorySetupHandler | null)
+      await callSetupFunctions(generatedSetup, setup, setupApi, props.variant.setupApp as SvelteStorySetupHandler | null, target)
 
       emit('ready')
     }

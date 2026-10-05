@@ -3,7 +3,7 @@ import { basename, dirname, join, resolve } from 'node:path'
 import { isPathWithinRoot } from '../../mcp/project/containment.js'
 
 /** Resolves existing parent aliases before checking an output path that may not exist yet. */
-async function canonicalOutput(path: string): Promise<string> {
+export async function canonicalOutput(path: string): Promise<string> {
   try {
     return await realpath(path)
   }

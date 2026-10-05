@@ -20,22 +20,37 @@
       "types": "./dist/index.d.ts",
       "default": "./dist/bundle-index.js"
     },
+    "./embed": {
+      "types": "./dist/embed/source.d.ts",
+      "default": "./dist/embed/source.js"
+    },
+    "./embed/capabilities": {
+      "types": "./dist/embed/capabilities.d.ts",
+      "default": "./dist/embed/capabilities.js"
+    },
     "./*": "./*"
   },
   "types": "./src/index.ts",
   "scripts": {
-    "build": "rimraf dist && vite build && pnpm run build:css && node ./scripts/copy.mjs",
+    "build": "rimraf dist && vite build && pnpm run build:embed && pnpm run build:css && node ./scripts/copy.mjs",
+    "build:embed": "vite build --config vite.embed.config.ts && tsc -p tsconfig.embed.json",
     "build:css": "tailwindcss -i src/app/style/main.pcss -o ./dist/style.css -c tailwind.config.cjs --postcss postcss.config.cjs",
-    "watch": "concurrently \"vite build --watch\" \"pnpm run build:css --watch\" \"node ./scripts/watchAndCopy.mjs\""
+    "watch": "concurrently \"vite build --watch\" \"vite build --config vite.embed.config.ts --watch\" \"tsc -p tsconfig.embed.json --watch\" \"pnpm run build:css --watch\" \"node ./scripts/watchAndCopy.mjs\""
   },
   "dependencies": {
     "@histoire/controls": "workspace:^",
+    "@histoire/protocol": "workspace:^",
+    "@histoire/sdk": "workspace:^",
     "@histoire/shared": "workspace:^",
     "@histoire/vendors": "workspace:^",
+    "@histoire/vue": "workspace:^",
     "fuse.js": "^7.0.0",
     "shiki": "^3.0.0"
   },
   "devDependencies": {
+    "@fontsource-variable/jetbrains-mono": "^5.3.0",
+    "@fontsource-variable/manrope": "^5.3.0",
+    "@iconify-json/carbon": "^1.2.28",
     "@tailwindcss/typography": "^0.5.15",
     "@types/fs-extra": "^11.0.4",
     "@types/node": "^22.10.1",

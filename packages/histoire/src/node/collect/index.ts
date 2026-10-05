@@ -1,4 +1,5 @@
 import type { ServerStoryFile } from '@histoire/shared'
+import type { MessagePort } from 'node:worker_threads'
 import type { ViteDevServer } from 'vite'
 import type { FetchFunction, ResolveIdFunction } from 'vite-node'
 import type { Context } from '../context.js'
@@ -11,8 +12,8 @@ import { createBirpc } from 'birpc'
 import path from 'pathe'
 import pc from 'picocolors'
 import { ViteNodeServer } from 'vite-node/server'
-import { TEMP_PATH } from '../alias.js'
 import { hashContent, readRegisteredText } from '../mcp/project/content-index.js'
+import { getContextRegistry } from '../runtime/registry.js'
 import { slash } from '../util/fs.js'
 import { finalizeCollectedStoryFile } from './finalize.js'
 
@@ -22,6 +23,7 @@ export interface UseCollectStoriesOptions {
   throws?: boolean
 }
 
+/** Owns one project's collection workers, transforms, ports and invalidations. */
 export function useCollectStories(options: UseCollectStoriesOptions, ctx: Context) {
   const { server, mainServer } = options
 
@@ -37,7 +39,7 @@ export function useCollectStories(options: UseCollectStoriesOptions, ctx: Contex
         // @TODO temporary fix for https://github.com/histoire-dev/histoire/issues/409
         /vite\w*\/dist\/client\/(client|env).mjs/,
         ...ctx.config.viteNodeInlineDeps ?? [],
-        new RegExp(path.resolve(TEMP_PATH, 'plugins')),
+        new RegExp(path.resolve(getContextRegistry(ctx).tempDir, 'plugins').replace(/[.*+?^${}()|[\]\\]/g, '\\$&')),
       ],
       fallbackCJS: true,
     },
@@ -58,16 +60,25 @@ export function useCollectStories(options: UseCollectStoriesOptions, ctx: Contex
     minThreads: threadsCount,
     maxThreads: threadsCount,
   })
+  const ports = new Set<MessagePort>()
+  let stopped = false
+  let destroying: Promise<void> | undefined
+  let invalidationRevision = 0
+  let invalidateAll = false
+  const invalidatedFiles = new Set<string>()
 
+  /** Clears Vite transforms for this collection server only. */
   function clearCache() {
     server.moduleGraph.invalidateAll()
     node.fetchCache.clear()
   }
 
+  /** Registers an RPC channel immediately so failure/close can release it. */
   function createChannel() {
     const channel = new MessageChannel()
     const port = channel.port2
     const workerPort = channel.port1
+    ports.add(port)
 
     createBirpc<Record<string, never>, {
       fetchModule: FetchFunction
@@ -86,18 +97,31 @@ export function useCollectStories(options: UseCollectStoriesOptions, ctx: Contex
     }
   }
 
-  if (mainServer) {
-    mainServer.watcher.on('change', (file) => {
+  /** Invalidates only this pool; removed when its owning collector stops. */
+  function invalidate(file: string) {
+    if (!stopped) {
       file = slash(file)
+      invalidationRevision++
+      // Every pool worker receives its own captured revision at task admission.
+      // Parent-port messages alone can be delayed by Tinypool's idle Atomics.wait.
+      if (!invalidateAll) {
+        invalidatedFiles.add(file)
+        if (invalidatedFiles.size > 4096) {
+          invalidateAll = true
+          invalidatedFiles.clear()
+        }
+      }
       threadPool.broadcastMessage({
         kind: 'hst:invalidate',
         file,
       })
-    })
+    }
   }
+  mainServer?.watcher.on('change', invalidate)
 
   /** Executes registered source and records success without trusting stale metadata. */
   async function executeStoryFile(storyFile: ServerStoryFile): Promise<StoryCollectionOutcome> {
+    let port: MessagePort | undefined
     try {
       let sourceSha256: string
       try {
@@ -107,12 +131,15 @@ export function useCollectStories(options: UseCollectStoriesOptions, ctx: Contex
         // Content availability does not change existing trusted collection
         // policy. Unavailable source is diagnosed by the catalog projector.
       }
-      const { workerPort } = createChannel()
+      const channel = createChannel()
+      port = channel.port
+      const { workerPort } = channel
       const payload: Payload = {
         root: server.config.root,
         base: server.config.base,
         storyFile,
         port: workerPort,
+        invalidation: { revision: invalidationRevision, files: [...invalidatedFiles], all: invalidateAll },
       }
       const { storyData } = await threadPool.run(payload, {
         transferList: [
@@ -145,10 +172,30 @@ export function useCollectStories(options: UseCollectStoriesOptions, ctx: Contex
       }
       return { status: 'failed', error: e }
     }
+    finally {
+      if (port) {
+        ports.delete(port)
+        port.close()
+      }
+    }
   }
 
-  async function destroy() {
-    await threadPool.destroy()
+  /** Stops invalidations and releases RPC ports even when worker teardown fails. */
+  function destroy() {
+    if (!destroying) {
+      stopped = true
+      mainServer?.watcher.off('change', invalidate)
+      destroying = (async () => {
+        try {
+          await threadPool.destroy()
+        }
+        finally {
+          for (const port of ports) port.close()
+          ports.clear()
+        }
+      })()
+    }
+    return destroying
   }
 
   return {

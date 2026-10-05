@@ -1,4 +1,6 @@
 import { previewMessageHandler } from './message-handler.js'
+import { previewPropsOverride } from './props-override.js'
+import { previewRuntimeService } from './runtime-service.js'
 
 /**
  * Emits the preview Vue app: the `setup()` that owns the current selection,
@@ -16,11 +18,20 @@ export function previewApp() {
     const file = ref(null)
     const selection = reactive({ storyId: null, variantId: null, grid: false })
     const gridSelectedVariantId = ref(null)
+    // Legacy standalone hosts omit the additive document-owned intent version.
+    const initialGridVersion = new URLSearchParams(window.location.search).get('selectionVersion')
+    let gridSelectionVersion = initialGridVersion !== null && Number.isSafeInteger(Number(initialGridVersion)) && Number(initialGridVersion) >= 0 ? Number(initialGridVersion) : undefined
     const previewSettingsStore = usePreviewSettingsStore()
     let mounted = false
     let selectionToken = 0
     const readyVariantIds = new Set()
+    // Framework readiness precedes delayed state serialization; reload resync can span that wait.
+    const frameworkReadyVariants = new WeakSet()
+    // Hidden story mounting may initialize state for all variants. Pointer
+    // admission belongs only to individually rendered actors that posted ready.
+    const gridReadyVariantIds = reactive(new Set())
     const variantStateGuards = createVariantStateSyncGuards()
+    const controlsRevision = createControlsStateRevision()
     const variantStateWatchStops = new Map()
     const story = computed(() => file.value?.story ?? null)
     const variant = computed(() => {
@@ -38,6 +49,7 @@ export function previewApp() {
       }
 
       readyVariantIds.clear()
+      gridReadyVariantIds.clear()
       variantStateWatchStops.clear()
       variantStateGuards.reset()
     }
@@ -67,12 +79,14 @@ export function previewApp() {
           if (!readyVariantIds.has(targetVariant.id)) {
             return
           }
+          if (initialSelection.matrix) return
 
           postToParent({
             type: STATE_SYNC,
             storyId: nextStory.id,
             variantId: targetVariant.id,
             state: toRawDeep(value, true),
+            ...(initialSelection.controls ? { controlsRevision: controlsRevision.capture() } : {}),
           })
         }, {
           // Default (batched) flush so all key mutations of one applyState coalesce
@@ -91,8 +105,29 @@ export function previewApp() {
       await new Promise(resolve => requestAnimationFrame(resolve))
     }
 
+    /** A mounted actor can acknowledge restored intent without remounting its story state. */
+    async function markVariantReady(variantId) {
+      const currentFile = file.value
+      const currentSelection = previewSelectionVersion
+      const targetVariant = getVariantById(variantId)
+      if (!targetVariant) return
+      frameworkReadyVariants.add(targetVariant)
+      await waitForVariantSnapshot()
+      if (file.value !== currentFile) return
+      if (!selection.grid && (currentSelection !== previewSelectionVersion || variantId !== selection.variantId)) return
+      getRuntimeState(targetVariant).capture()
+      getRuntimePresets(targetVariant).restoreSelected()
+      reapplyPropsOverride(variantId)
+      readyVariantIds.add(variantId)
+      postVariantStateSnapshotById(story.value, variantId)
+      postToParent({ type: VARIANT_READY, storyId: story.value?.id, variantId })
+      gridReadyVariantIds.add(variantId)
+      runtimeLayout.refresh()
+    }
+
     async function syncSelection(nextSelection) {
       const token = ++selectionToken
+      if (selection.storyId !== nextSelection.storyId || selection.variantId !== nextSelection.variantId) clearPropsOverrides()
       selection.storyId = nextSelection.storyId ?? null
       selectionState.storyId = selection.storyId
       selection.variantId = nextSelection.variantId ?? null
@@ -141,6 +176,10 @@ export function previewApp() {
       }
     }
 
+${previewRuntimeService()}
+
+${previewPropsOverride()}
+
 ${previewMessageHandler()}
 
     onMounted(() => {
@@ -150,7 +189,7 @@ ${previewMessageHandler()}
         // the host receives the resolved variantId, not a stale null.
         void syncSelection(initialSelection).then(() => {
           postToParent({ type: SANDBOX_READY, storyId: story.value?.id, variantId: variant.value?.id })
-        })
+        }).catch(error => { renderRuntimeError(error) })
       }
       else {
         postToParent({ type: SANDBOX_READY, storyId: story.value?.id, variantId: variant.value?.id })
@@ -162,16 +201,14 @@ ${previewMessageHandler()}
       story,
       variant,
       selection,
+      gridReadyVariantIds,
       selectGridVariant(variantId) {
+        if (!gridReadyVariantIds.has(variantId)) return
+        if (gridSelectedVariantId.value === variantId) return
         gridSelectedVariantId.value = variantId
-        postToParent({ type: SELECT_VARIANT, variantId })
+        postToParent({ type: SELECT_VARIANT, storyId: story.value?.id, variantId, ...(gridSelectionVersion === undefined ? {} : { selectionVersion: gridSelectionVersion }) })
       },
-      async markVariantReady(variantId) {
-        await waitForVariantSnapshot()
-        readyVariantIds.add(variantId)
-        postVariantStateSnapshotById(story.value, variantId)
-        postToParent({ type: VARIANT_READY, storyId: story.value?.id, variantId })
-      },
+      markVariantReady,
       async markControlsReady(variantId) {
         await waitForVariantSnapshot()
         // Enable outbound edit sync WITHOUT pushing the boot state snapshot:
@@ -197,6 +234,7 @@ ${previewMessageHandler()}
     }
   },
   render() {
+    const renderedVariantId = this.variant?.id
     if (!this.story) {
       return null
     }
@@ -224,6 +262,7 @@ ${previewMessageHandler()}
         ? h(StoryVariantGridSandbox, {
           story: this.story,
           variant: this.variant,
+          readyVariantIds: this.gridReadyVariantIds,
           onSelect: this.selectGridVariant,
           onReady: this.markVariantReady,
         })
@@ -231,7 +270,7 @@ ${previewMessageHandler()}
           ? h(PreviewTestCapture, {
             story: this.story,
             variant: this.variant,
-            onReady: () => this.markVariantReady(this.variant.id),
+            onReady: () => this.markVariantReady(renderedVariantId),
           })
           : null,
     ]

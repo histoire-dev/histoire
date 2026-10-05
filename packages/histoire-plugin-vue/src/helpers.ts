@@ -2,6 +2,8 @@ import type { Story, Variant } from '@histoire/shared'
 import type { App, Component } from 'vue'
 
 export interface Vue3StorySetupApi {
+  /** Reactive globals for this isolated story document. */
+  globals?: import('@histoire/shared').HistoireGlobals
   app: App
   story?: Story
   variant?: Variant

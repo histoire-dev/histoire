@@ -1,0 +1,11 @@
+@import '@histoire/vue/style.css';
+
+/* Document layout belongs to the source iframe, never the native host. */
+html, body {
+  width: 100%;
+  height: 100%;
+}
+body {
+  margin: 0;
+  overflow: hidden;
+}

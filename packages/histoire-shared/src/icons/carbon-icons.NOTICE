@@ -1,0 +1,11 @@
+Carbon icons
+Copyright IBM Corp.
+
+Source: https://github.com/carbon-design-system/carbon/tree/main/packages/icons
+Icon set version: 11.89.0
+Generated subset from @iconify-json/carbon 1.2.28.
+Shared by Histoire workbench and built-in controls. Regenerate with
+node packages/histoire-app/scripts/generate-icons.mjs from repository root.
+
+Licensed under the Apache License, Version 2.0.
+See carbon-icons.LICENSE for the full license text.

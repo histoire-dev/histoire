@@ -1,0 +1,89 @@
+name: Embed SDK tests
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  browser:
+    name: Embed ${{ matrix.browser }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chromium, firefox, webkit]
+    env:
+      BROWSER: none
+      HISTOIRE_EMBED_BROWSER: ${{ matrix.browser }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: pnpm/action-setup@v4.0.0
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        run: echo "pnpm_cache_dir=$(pnpm store path)" >> "$GITHUB_OUTPUT"
+      - uses: actions/cache@v4
+        with:
+          path: ${{ steps.pnpm-cache.outputs.pnpm_cache_dir }}
+          key: pnpm-v1-${{ runner.os }}-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: pnpm-v1-${{ runner.os }}-
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Build dependency graph
+        run: pnpm run build
+      - name: Test portable and native packages
+        if: matrix.browser == 'chromium'
+        run: |
+          pnpm --filter @histoire/protocol test
+          pnpm --filter @histoire/sdk test
+          pnpm --filter @histoire/vue test
+      - name: Install browser
+        run: pnpm --filter histoire exec playwright install --with-deps ${{ matrix.browser }}
+      - name: Complete Chromium embed suite
+        if: matrix.browser == 'chromium'
+        run: pnpm --filter histoire test:embed:integration
+      - name: Firefox and WebKit embed smoke
+        if: matrix.browser != 'chromium'
+        run: pnpm --filter histoire test:embed:integration bridge-origins bridge-lifecycle preview-grid controls-overlays vue-host-isolation src/node/__tests__/embed/integration/host-channels.spec.ts
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: embed-${{ matrix.browser }}-screenshots
+          path: /tmp/histoire-sdk-*.png
+          if-no-files-found: ignore
+  consumers:
+    name: Packed SDK consumers
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      BROWSER: none
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: pnpm/action-setup@v4.0.0
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        run: echo "pnpm_cache_dir=$(pnpm store path)" >> "$GITHUB_OUTPUT"
+      - uses: actions/cache@v4
+        with:
+          path: ${{ steps.pnpm-cache.outputs.pnpm_cache_dir }}
+          key: pnpm-v1-${{ runner.os }}-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: pnpm-v1-${{ runner.os }}-
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Build published package shape
+        run: pnpm run build
+      - name: Install consumer Chromium
+        run: pnpm --filter histoire exec playwright install --with-deps chromium
+      - name: Run packed consumer smoke
+        run: pnpm --filter histoire test:embed:consumers

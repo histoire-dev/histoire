@@ -7,6 +7,10 @@ import { full as emoji } from 'markdown-it-emoji'
 import path from 'pathe'
 import pc from 'picocolors'
 import { bundledLanguages, createHighlighter } from 'shiki'
+import { hashContent } from '../runtime/content/hash.js'
+import { captureInlineDocs } from '../runtime/content/inline.js'
+import { getContextRegistry } from '../runtime/registry.js'
+import { readStorySource } from '../story-source.js'
 import { slugify } from '../util/slugify.js'
 
 /** Creates existing Markdown renderer and story-aware relative link handling. */
@@ -15,6 +19,7 @@ export async function createMarkdownRenderer(ctx: Context) {
     themes: ['github-dark'],
     langs: Object.keys(bundledLanguages), // not ideal but markdown-it does not provide async highlight
   })
+  getContextRegistry(ctx).cleanup.add(() => highlighter.dispose())
 
   const md = new MarkdownIt({
     highlight: (code, lang) => `<div class="htw-relative htw-not-prose __histoire-code"><div class="htw-absolute htw-top-0 htw-right-0 htw-text-xs htw-text-white/40">${lang}</div>${highlighter.codeToHtml(code, { theme: 'github-dark', lang })}</div>`,
@@ -44,12 +49,12 @@ export async function createMarkdownRenderer(ctx: Context) {
       if (hrefIndex >= 0) {
         const href = token.attrs[hrefIndex][1]
         if (href.startsWith('.')) {
-          const queryIndex = href.indexOf('?')
-          const pathname = queryIndex >= 0 ? href.slice(0, queryIndex) : href
-          const query = queryIndex >= 0 ? href.slice(queryIndex) : ''
+          const suffixIndex = href.search(/[?#]/)
+          const pathname = suffixIndex >= 0 ? href.slice(0, suffixIndex) : href
+          const suffix = suffixIndex >= 0 ? href.slice(suffixIndex) : ''
 
           // File lookup
-          const file = path.resolve(path.dirname(env.file), pathname)
+          const file = path.resolve(path.dirname(env.file), decodeURIComponent(pathname))
           const storyFile = ctx.storyFiles.find(f => f.path === file)
           const mdFile = ctx.markdownFiles.find(f => f.absolutePath === file)
           if (!storyFile && !mdFile?.storyFile) {
@@ -57,9 +62,13 @@ export async function createMarkdownRenderer(ctx: Context) {
           }
 
           // Add attributes
-          const newHref = `${ctx.resolvedViteConfig.base}story/${encodeURIComponent(storyFile?.id ?? mdFile.storyFile.id)}${query}`
+          const newHref = `${ctx.resolvedViteConfig.base}story/${encodeURIComponent(storyFile?.id ?? mdFile.storyFile.id)}${suffix}`
           token.attrSet('href', newHref)
           token.attrSet('data-route', 'true')
+          // Markdown can render before custom story IDs finish collection.
+          // Native consumers resolve this exact portable catalog label; legacy
+          // standalone href remains compatible with its file-route adapter.
+          token.attrSet('data-histoire-story-path', (storyFile ?? mdFile.storyFile).relativePath)
         }
         else if (!href.startsWith('/') && !href.startsWith('#') && (classIndex < 0 || !token.attrs[classIndex][1].includes('header-anchor'))) {
           // Add target="_blank" to external links
@@ -102,13 +111,22 @@ export async function createMarkdownPlugins(ctx: Context) {
   // @TODO extract
   plugins.push({
     name: 'histoire-vue-docs-block',
-    transform(code, id) {
+    async transform(code, id) {
       if (!id.includes('?vue&type=docs')) return
       if (!id.includes('lang.md')) return
       const file = id.substring(0, id.indexOf('?vue'))
       const html = md.render(code, {
         file,
       })
+      const registered = ctx.storyFiles.find(story => story.path === file || story.moduleId === file)
+      try {
+        const source = await readStorySource(registered ?? { path: file })
+        if (source != null) captureInlineDocs(ctx, file, { html, text: code, sourceSha256: hashContent(source) })
+      }
+      catch {
+        // Some custom Vue transforms use synthetic IDs without registered raw
+        // source. Preserve their existing rendered docs and omit fresh capture.
+      }
       return `export default Comp => {
         Comp.doc = ${JSON.stringify(html)}
       }`

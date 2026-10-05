@@ -38,6 +38,8 @@ export interface VitestAttemptSetup<TContext> {
 }
 
 export interface RunVitestAttemptsOptions<TContext, TResult> {
+  /** Collection executes modules without executing assertion bodies or lifecycle hooks. */
+  mode?: 'run' | 'collect'
   /** Project install used for Node and browser Vitest APIs. */
   root: string
   /** Controller-owned cancellation. */
@@ -117,7 +119,7 @@ export async function runVitestAttempts<TContext, TResult>(
         assignVitestBrowserProjectOptions(vitest, setup.browserProjectOptions)
       }
 
-      await runWithVitestStartTimeout(() => withTestAbort(() => vitest!.start(setup.filter ?? []), options.signal), {
+      await runWithVitestStartTimeout(() => withTestAbort(() => options.mode === 'collect' ? vitest!.collect(setup.filter ?? [], { staticParse: false }) : vitest!.start(setup.filter ?? []), options.signal), {
         timeoutMs: setup.timeoutMs,
         message: setup.timeoutMessage,
         onTimeout: () => setup.onTimeout?.(vitest!),
@@ -132,6 +134,13 @@ export async function runVitestAttempts<TContext, TResult>(
     }
     catch (error) {
       if (vitest && !cleanupStarted) {
+        if (options.signal?.aborted) {
+          // Vitest must stop queued testers before browser teardown. Otherwise
+          // closing its RPC page is classified as a fatal run, and late pool
+          // work can exit the isolated worker without a cleanup acknowledgement.
+          // Resource release still waits for cleanupRun, even if cancellation fails.
+          void vitest.cancelCurrentRun?.('keyboard-input').catch(() => {})
+        }
         await cleanupRun(vitest, options.label, error, options.strictCleanup)
       }
 

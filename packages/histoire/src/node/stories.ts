@@ -4,67 +4,33 @@ import { kebabCase } from 'change-case'
 import chokidar from 'chokidar'
 import { globby } from 'globby'
 import micromatch from 'micromatch'
-import { basename, resolve } from 'pathe'
+import { basename, relative, resolve } from 'pathe'
+import { getContextRegistry } from './runtime/registry.js'
 
-type StoryChangeHandler = (file?: ServerStoryFile) => unknown
-const storyChangeHandlers: StoryChangeHandler[] = []
-
-/**
- * Called when a new story is added or modified. Collecting should be done.
- *
- * The handler list is module-global and outlives a dev server, so the returned
- * disposer must be called when the listening server closes — otherwise every
- * config-change restart stacks another live collector on the same events.
- * @param handler
- * @returns Removes the handler.
- */
-export function onStoryChange(handler: StoryChangeHandler) {
-  storyChangeHandlers.push(handler)
-  return () => removeHandler(storyChangeHandlers, handler)
+/** Registers collection feedback for one captured project context. */
+export function onStoryChange(ctx: Context, handler: (file?: ServerStoryFile) => unknown) {
+  return getContextRegistry(ctx).events.on('storyChanged', handler)
 }
 
-/** Removes a registered handler from its list. */
-function removeHandler<T>(handlers: T[], handler: T) {
-  const index = handlers.indexOf(handler)
-  if (index !== -1) {
-    handlers.splice(index, 1)
-  }
+/** Requests collection without notifying another project's listeners. */
+export function notifyStoryChange(ctx: Context, file?: ServerStoryFile) {
+  getContextRegistry(ctx).events.emit('storyChanged', file)
 }
 
-/** Requests collection of a registered story, or a full batch when omitted. */
-export function notifyStoryChange(file?: ServerStoryFile) {
-  for (const handler of storyChangeHandlers) {
-    handler(file)
-  }
+/** Registers inventory changes owned by one project. */
+export function onStoryListChange(ctx: Context, handler: () => unknown) {
+  return getContextRegistry(ctx).events.on('storyListChanged', handler)
 }
 
-type StoryListChangeHandler = () => unknown
-const storyListChangeHandlers: StoryListChangeHandler[] = []
-
-/**
- * Called when the story list has changed (ex: removed a story). No collecting should be needed.
- * @param handler
- * @returns Removes the handler (see {@link onStoryChange}).
- */
-export function onStoryListChange(handler: StoryListChangeHandler) {
-  storyListChangeHandlers.push(handler)
-  return () => removeHandler(storyListChangeHandlers, handler)
+/** Announces structural changes to the captured project inventory. */
+export function notifyStoryListChange(ctx: Context) {
+  getContextRegistry(ctx).events.emit('storyListChanged', undefined)
 }
-
-/** Announces structural changes to the registered story list. */
-export function notifyStoryListChange() {
-  for (const handler of storyListChangeHandlers) {
-    handler()
-  }
-}
-
-let context: Context
-let watcherContext: Context | undefined
 
 /** Watches one project and exposes completion of its initial filesystem scan. */
-export async function watchStories(newContext: Context) {
-  if (watcherContext) throw new Error('A story watcher already owns this process')
-  context = newContext
+export async function watchStories(context: Context) {
+  const registry = getContextRegistry(context)
+  if (registry.storyWatcher) throw new Error('A story watcher already owns this context')
 
   const baseWatchPaths = Array.from(new Set(context.config.storyMatch.map((pattern) => {
     const segments = pattern.split('/')
@@ -78,6 +44,13 @@ export async function watchStories(newContext: Context) {
   const resolveStoryMatch = context.config.storyMatch.map((pattern) => {
     return resolve(context.root, pattern)
   })
+
+  /** Recheck event paths because rename/unlink notifications can lack scan stats. */
+  function matchesStory(file: string): boolean {
+    const absolute = getAbsoluteFilePath(context, file)
+    return !resolvedStoryIgnored.some(pattern => micromatch.isMatch(absolute, pattern))
+      && resolveStoryMatch.some(pattern => micromatch.isMatch(absolute, pattern))
+  }
 
   const watcher = chokidar.watch(baseWatchPaths, {
     cwd: context.root,
@@ -93,7 +66,7 @@ export async function watchStories(newContext: Context) {
       return stats?.isFile() ?? false
     },
   })
-  watcherContext = newContext
+  registry.storyWatcher = watcher
 
   const delayedChanges = new Set<ReturnType<typeof setTimeout>>()
   let stopped = false
@@ -114,12 +87,12 @@ export async function watchStories(newContext: Context) {
   void ready.catch(() => {})
   watcher
     .on('add', (file) => {
-      if (stopped) return
+      if (stopped || !matchesStory(file)) return
       try {
-        const storyFile = addStory(file)
+        const storyFile = addStory(context, file)
         const timer = setTimeout(() => {
           delayedChanges.delete(timer)
-          if (!stopped) notifyStoryChange(storyFile)
+          if (!stopped) notifyStoryChange(context, storyFile)
         }, 100) // Delay in case file renaming fired Add event before Unlink event
         delayedChanges.add(timer)
       }
@@ -130,8 +103,12 @@ export async function watchStories(newContext: Context) {
     })
     .on('unlink', (file) => {
       if (stopped) return
-      removeStory(file)
-      notifyStoryListChange()
+      // Optimizer temp files share watched directories. Only removal of an
+      // actual physical story changes catalog membership or requires a scan.
+      const absolute = getAbsoluteFilePath(context, file)
+      if (!context.storyFiles.some(story => story.path === absolute && !story.virtual)) return
+      removeStory(context, file)
+      notifyStoryListChange(context)
     })
 
   const originalClose = watcher.close.bind(watcher)
@@ -143,7 +120,7 @@ export async function watchStories(newContext: Context) {
       delayedChanges.clear()
       if (!readySettled) rejectReady(new Error('Story watcher closed before initial scan'))
       closing = originalClose().finally(() => {
-        if (watcherContext === newContext) watcherContext = undefined
+        if (registry.storyWatcher === watcher) registry.storyWatcher = undefined
       })
     }
     return closing
@@ -152,13 +129,16 @@ export async function watchStories(newContext: Context) {
 }
 
 /** Resolves a registered project-relative story path. */
-function getAbsoluteFilePath(relativeFilePath: string) {
+function getAbsoluteFilePath(context: Context, relativeFilePath: string) {
   return resolve(context.root, relativeFilePath)
 }
 
 /** Registers one physical or generated story without duplicating its path. */
-export function addStory(relativeFilePath: string, virtualModuleCode?: string) {
-  const absoluteFilePath = getAbsoluteFilePath(relativeFilePath)
+export function addStory(context: Context, relativeFilePath: string, virtualModuleCode?: string) {
+  const absoluteFilePath = getAbsoluteFilePath(context, relativeFilePath)
+  // Plugin output paths are absolute after project isolation. Keep the actual
+  // loader path while publishing a root-relative inventory/build label.
+  const relativePath = relative(context.root, absoluteFilePath)
 
   for (const file of context.storyFiles) {
     if (file.path === absoluteFilePath) {
@@ -166,8 +146,8 @@ export function addStory(relativeFilePath: string, virtualModuleCode?: string) {
     }
   }
 
-  const fileId = kebabCase(relativeFilePath.toLowerCase())
-  let fileName = basename(relativeFilePath)
+  const fileId = kebabCase(relativePath.toLowerCase())
+  let fileName = basename(relativePath)
   if (fileName.includes('.')) {
     fileName = fileName.substring(0, fileName.indexOf('.'))
   }
@@ -190,7 +170,7 @@ export function addStory(relativeFilePath: string, virtualModuleCode?: string) {
   const file: ServerStoryFile = {
     id: fileId, // The file id will be changed by the story id after it is collected
     path: absoluteFilePath,
-    relativePath: relativeFilePath,
+    relativePath,
     fileName,
     moduleId: virtualModuleCode ? `virtual:story:${absoluteFilePath}` : absoluteFilePath,
     supportPluginId,
@@ -202,23 +182,20 @@ export function addStory(relativeFilePath: string, virtualModuleCode?: string) {
 }
 
 /** Removes a registered story using its project-relative path. */
-export function removeStory(relativeFilePath: string) {
-  const absoluteFilePath = getAbsoluteFilePath(relativeFilePath)
+export function removeStory(context: Context, relativeFilePath: string) {
+  const absoluteFilePath = getAbsoluteFilePath(context, relativeFilePath)
   const index = context.storyFiles.findIndex(file => file.path === absoluteFilePath)
   if (index !== -1) context.storyFiles.splice(index, 1)
 }
 
 /** Scans a project once; does not replace another live watcher's context. */
-export async function findAllStories(newContext: Context) {
-  if (watcherContext && watcherContext !== newContext) throw new Error('A story watcher already owns another project in this process')
-  context = newContext
-
+export async function findAllStories(context: Context) {
   const files = await globby(context.config.storyMatch, {
     cwd: context.root,
     ignore: context.config.storyIgnored,
   })
   context.storyFiles.length = 0
   for (const file of files) {
-    addStory(file)
+    addStory(context, file)
   }
 }

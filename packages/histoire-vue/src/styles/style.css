@@ -1,0 +1,85 @@
+@import '@histoire/controls/vue/style.css';
+@import './tests.css';
+@import './virtual-list.css';
+@import './controls.css';
+@import './content.css';
+@import './navigation.css';
+@import './explorer.css';
+
+.histoire-provider {
+  --histoire-background: #ffffff;
+  --histoire-foreground: #18181b;
+  --histoire-muted: #5f6370;
+  --histoire-border: #e4e4e7;
+  --histoire-accent: #059669;
+  --histoire-panel: #fafafa;
+  --histoire-surface: var(--histoire-background);
+  --histoire-input: var(--histoire-panel);
+  --histoire-text: var(--histoire-foreground);
+  --histoire-chip: #f4f4f5;
+  --histoire-accent-soft: #ecfdf5;
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+  color: var(--histoire-foreground);
+  background: var(--histoire-background);
+  font-family: var(--histoire-font-sans, "Manrope", system-ui, sans-serif);
+  font-size: 13px;
+  line-height: 1.5;
+  container-type: inline-size;
+}
+.histoire-provider[data-histoire-appearance="dark"] {
+  --histoire-background: #16171b;
+  --histoire-foreground: #e6e7ea;
+  --histoire-muted: #8a8e97;
+  --histoire-border: #26282d;
+  --histoire-panel: #0f1013;
+  --histoire-chip: #202227;
+  --histoire-accent: #34d399;
+  --histoire-accent-soft: rgb(52 211 153 / .12);
+  color-scheme: dark;
+}
+.histoire-provider *, .histoire-provider *::before, .histoire-provider *::after {
+  box-sizing: border-box;
+}
+.histoire-provider > .histoire-provider-content, .histoire-provider .histoire-primary, .histoire-provider .histoire-primary-frame {
+  flex: 1;
+  display: flex;
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+}
+.histoire-provider .histoire-primary-frame > iframe {
+  flex: 1;
+  min-width: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+.histoire-provider .histoire-primary-status {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  color: var(--histoire-muted);
+}
+.histoire-provider > .histoire-provider-overlays {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 100;
+}
+.histoire-provider > .histoire-provider-overlays > * {
+  pointer-events: auto;
+}
+/* Shared controls use zero line-height for icon wrappers. Native overlay
+   triggers inherit provider typography so ordinary host buttons keep height. */
+.histoire-provider .v-popper {
+  line-height: inherit;
+}

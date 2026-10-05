@@ -7,6 +7,7 @@ import {
 import { createMarkdownPlugins } from '../markdown.js'
 import { hasProjectVitest } from '../util/has-vitest.js'
 import { createVirtualFilesPlugin } from '../virtual/vite-plugin.js'
+import { createCollectionOptimizerPolicy } from './collection-optimizer.js'
 import { createHistoireVitePlugin } from './core-plugin.js'
 import {
   createDevCommandsPlugin,
@@ -44,8 +45,8 @@ export async function getViteConfigWithPlugins(
   ctx: Context,
   options: GetViteConfigWithPluginsOptions = {},
 ): Promise<ViteConfigWithPlugins> {
-  const userViteConfigFile = await loadViteConfigFromFile({ command: ctx.mode === 'dev' ? 'serve' : 'build', mode: ctx.mode })
-  const userViteConfig = mergeViteConfig(userViteConfigFile?.config ?? {}, { server: { port: 6006 } })
+  const userViteConfigFile = await loadViteConfigFromFile({ command: ctx.mode === 'dev' ? 'serve' : 'build', mode: ctx.mode }, undefined, ctx.root)
+  const userViteConfig = mergeViteConfig(userViteConfigFile?.config ?? {}, { root: ctx.root, server: { port: 6006 } })
 
   const inlineConfig = await mergeHistoireViteConfig(userViteConfig, ctx)
   const plugins: VitePlugin[] = []
@@ -111,6 +112,11 @@ export async function getViteConfigWithPlugins(
       await plugin.vitePlugins(plugins)
     }
   }
+
+  // Append after framework hooks: middleware-mode collection must not start a
+  // second optimized framework runtime beside vite-node's native imports.
+  const collectionOptimizer = createCollectionOptimizerPolicy(isServer && !options.browserRuntime)
+  if (collectionOptimizer) plugins.push(collectionOptimizer)
 
   const viteConfig = mergeViteConfig(inlineConfig, {
     configFile: false,

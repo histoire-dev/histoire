@@ -1,3 +1,4 @@
+import { HistoireSdkError } from '@histoire/protocol'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { createExecutionService } from '../runtime/execution-service.js'
 import { createHistoireTestTask } from '../test/execution-service.js'
@@ -27,7 +28,12 @@ describe('dev-event handler', () => {
 
   /** Fake websocket client recording what was replied to it. */
   function createClient() {
-    return { send: vi.fn() }
+    let close = () => {}
+    return {
+      send: vi.fn(),
+      socket: { once: vi.fn((_event: string, listener: () => void) => { close = listener }) },
+      close: () => close(),
+    }
   }
 
   function createContext(plugins: any[] = []) {
@@ -45,6 +51,7 @@ describe('dev-event handler', () => {
     vi.resetModules()
     runHistoireTests = vi.fn(async () => ({ ok: true }))
     vi.doMock('../test/index.js', () => ({ runHistoireTests }))
+    vi.doMock('../test/collect.js', () => ({ collectHistoireProjectTests: runHistoireTests }))
     ;({ registerDevEvents } = await import('../server/dev-events.js'))
   })
 
@@ -83,7 +90,29 @@ describe('dev-event handler', () => {
       skipStoryScan: true,
       signal: expect.any(AbortSignal),
       strictCleanup: true,
+      isolate: true,
+      maxRetries: 0,
     })
+  })
+
+  it('executes project tests in one owned runner with all captured story targets', async () => {
+    const ctx = createContext()
+    ctx.storyFiles = ['first', 'second'].map(id => ({
+      id,
+      path: `${id}.story.vue`,
+      story: { id, variants: [{ id: `${id}-one` }, { id: `${id}-two` }] },
+    }))
+    const server = register(ctx)
+    const client = createClient()
+
+    await server.emit({ event: 'runStoryTests', payload: {}, requestId: 8 }, client)
+
+    expect(runHistoireTests).toHaveBeenCalledTimes(1)
+    const [captured, options] = runHistoireTests.mock.calls[0]
+    expect(captured.storyFiles.map((file: { id: string }) => file.id)).toEqual(['first', 'second'])
+    expect(captured.storyFiles[0].story).not.toBe(ctx.storyFiles[0].story)
+    expect(options).toMatchObject({ storyId: undefined, variantId: undefined, isolate: true, strictCleanup: true })
+    expect(client.send).toHaveBeenCalledWith('histoire:dev-event-result', { event: 'runStoryTests', requestId: 8, result: { ok: true } })
   })
 
   it('answers a failed run with a serialized error instead of leaving it pending', async () => {
@@ -96,6 +125,20 @@ describe('dev-event handler', () => {
     const [, reply] = client.send.mock.calls[0]
     expect(reply.requestId).toBe(3)
     expect(reply.error).toContain('run exploded')
+  })
+
+  it('keeps typed source retirement errors across the dev channel', async () => {
+    runHistoireTests.mockRejectedValueOnce(new HistoireSdkError('RUNTIME_CHANGED', 'Test source owner changed'))
+    const server = register()
+    const client = createClient()
+
+    await server.emit({ event: 'runStoryTests', requestId: 4 }, client)
+
+    expect(client.send).toHaveBeenCalledWith('histoire:dev-event-result', expect.objectContaining({
+      event: 'runStoryTests',
+      requestId: 4,
+      code: 'RUNTIME_CHANGED',
+    }))
   })
 
   it('gives every request its own run and never wedges the queue on a failure', async () => {
@@ -144,6 +187,45 @@ describe('dev-event handler', () => {
     expect(await b).toEqual({ ok: true, storyId: 'mcp-b' })
     expect(first.send.mock.calls[0][1].result.storyId).toBe('ui-a')
     expect(third.send.mock.calls[0][1].result.storyId).toBe('ui-c')
+    await execution.close()
+  })
+
+  it.each(['runStoryTests', 'collectStoryTests'])('cancels only socket-owned %s and keeps lane until cleanup', async (event) => {
+    const execution = createExecutionService()
+    const server = register(createContext(), execution)
+    const first = createClient()
+    const other = createClient()
+    const started: string[] = []
+    let release!: () => void
+    let activeSignal!: AbortSignal
+    runHistoireTests.mockImplementation(async (_context, options) => {
+      started.push(options.storyId)
+      if (options.storyId === 'active') {
+        activeSignal = options.signal
+        await new Promise<void>((done) => {
+          release = done
+        })
+      }
+      return { ok: true, storyId: options.storyId }
+    })
+
+    const active = server.emit({ event, payload: { storyId: 'active' }, requestId: 'active' }, first)
+    const cancelled = server.emit({ event, payload: { storyId: 'cancelled' }, requestId: 'cancelled' }, first)
+    const retained = server.emit({ event, payload: { storyId: 'other' }, requestId: 'other' }, other)
+    await vi.waitFor(() => expect(started).toEqual(['active']))
+    await server.emit({ event: 'cancelStoryTests', payload: { requestId: 'active' }, requestId: 'foreign' }, other)
+    expect(activeSignal.aborted).toBe(false)
+    await server.emit({ event: 'cancelStoryTests', payload: { requestId: 'active' }, requestId: 'active' }, first)
+    first.close()
+
+    expect(activeSignal.aborted).toBe(true)
+    expect(execution.pendingCount).toBe(1)
+    expect(started).toEqual(['active'])
+    release()
+    await Promise.all([active, cancelled, retained])
+    expect(started).toEqual(['active', 'other'])
+    await server.emit({ event, payload: { storyId: 'reused' }, requestId: 'other' }, other)
+    expect(started).toEqual(['active', 'other', 'reused'])
     await execution.close()
   })
 

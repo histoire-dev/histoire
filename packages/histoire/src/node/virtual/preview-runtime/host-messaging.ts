@@ -6,9 +6,12 @@
 export function previewHostMessaging() {
   return `// A WindowProxy survives iframe reloads. Give each document its own
 // identity so automation hosts can drop queued readiness from its predecessor.
-const previewDocumentId = globalThis.crypto?.randomUUID?.() ?? \
+const previewDocumentId = new URLSearchParams(window.location.search).get('documentId') ?? globalThis.crypto?.randomUUID?.() ?? \
   Date.now().toString(36) + '-' + Math.random().toString(36).slice(2)
 window.__HST_PREVIEW_DOCUMENT_ID__ = previewDocumentId
+// Reused standalone documents distinguish queued messages from earlier variant actors.
+const requestedSelectionVersion = Number(new URLSearchParams(window.location.search).get('selectionVersion') ?? 0)
+let previewSelectionVersion = Number.isSafeInteger(requestedSelectionVersion) && requestedSelectionVersion >= 0 ? requestedSelectionVersion : 0
 
 function getHostWindow() {
   // \`window.parent\` is NOT a reliable way to tell whether we are embedded:
@@ -53,6 +56,7 @@ function postToParent(payload) {
     __histoire: true,
     ...payload,
     documentId: previewDocumentId,
+    selectionVersion: previewSelectionVersion,
   }, window.location.origin)
 }`
 }

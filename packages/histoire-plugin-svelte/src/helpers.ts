@@ -3,6 +3,8 @@ import type { Story, StoryProps, Variant, VariantProps } from '@histoire/shared'
 import type { SvelteComponentTyped } from 'svelte'
 
 export interface SvelteStorySetupApi {
+  /** Current host-owned globals for isolated story document. */
+  globals?: import('@histoire/shared').HistoireGlobals
   app: any
   story?: Story
   variant?: Variant

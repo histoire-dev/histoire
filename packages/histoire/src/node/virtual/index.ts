@@ -8,6 +8,10 @@ export const NOOP_ID = 'virtual:$histoire-noop'
 export const CONFIG_ID = 'virtual:$histoire-config'
 // export const RESOLVED_CONFIG_ID = `/__resolved__${CONFIG_ID}`
 export const RESOLVED_CONFIG_ID = `\0${CONFIG_ID}`
+/** Public workbench metadata virtual module. */
+export const BUILD_INFO_ID = 'virtual:$histoire-build-info'
+/** Match browser hot-context path; raw NUL module URLs miss fabricated self-accept updates. */
+export const RESOLVED_BUILD_INFO_ID = `/__resolved__${BUILD_INFO_ID}`
 export const THEME_ID = 'virtual:$histoire-theme'
 // export const RESOLVED_THEME_ID = `/__resolved__${THEME_ID}.css`
 export const RESOLVED_THEME_ID = `\0${THEME_ID}.css`
@@ -44,6 +48,7 @@ export const VITEST_BROWSER_RUNTIME_ID = 'virtual:$histoire-vitest-browser-runti
 export const RESOLVED_VITEST_BROWSER_RUNTIME_ID = `/__resolved__${VITEST_BROWSER_RUNTIME_ID}`
 
 export * from './browser-collector.js'
+export * from './build-info.js'
 export * from './markdown.js'
 export * from './noop.js'
 export * from './preview-runtime/index.js'

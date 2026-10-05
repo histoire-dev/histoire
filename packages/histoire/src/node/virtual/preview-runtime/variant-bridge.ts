@@ -5,7 +5,7 @@
  */
 export function previewVariantBridge() {
   return `function postVariantStateSnapshot(storyId, variant) {
-  if (!variant) {
+  if (!variant || initialSelection.matrix) {
     return
   }
 
