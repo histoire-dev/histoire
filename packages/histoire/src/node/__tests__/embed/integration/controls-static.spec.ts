@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { createEmbedBridgeFixture } from '../../utils/embed/bridge-fixture.js'
+import { chooseHistoireSelectOption } from '../../utils/embed/controls.js'
 
 const story = `<script setup>import Target from './Target.vue';function initial(){return{count:2,label:'Initial'}}</script><template><Story id="controls"><Variant id="main" :init-state="initial"><template #default="{state}"><button @click="state.count++">Count:{{state.count}}</button><Target/></template></Variant></Story></template>`
 describe('static independent controls surface', () => {
@@ -24,13 +25,15 @@ describe('static independent controls surface', () => {
       await expect.poll(() => sandbox.getByText('Amount:15', { exact: true }).isVisible()).toBe(true)
       await panel.getByRole('button', { name: 'Remove amount override', exact: true }).click()
       await expect.poll(() => sandbox.getByText('Amount:3', { exact: true }).isVisible()).toBe(true)
+      await panel.getByRole('button', { name: 'Manage presets', exact: true }).click()
+      await panel.getByRole('menuitem', { name: 'Save preset', exact: true }).click()
       await panel.getByRole('textbox', { name: 'Preset name', exact: true }).fill('Saved')
       await panel.getByRole('button', { name: 'Save', exact: true }).click()
-      await expect.poll(() => panel.getByRole('combobox', { name: 'State preset', exact: true }).inputValue()).toBe('preset-1')
+      await expect.poll(() => panel.getByRole('button', { name: 'State preset', exact: true }).textContent()).toBe('Saved')
       await page.evaluate('session.state.patch({count:22})')
-      await panel.getByRole('combobox', { name: 'State preset', exact: true }).selectOption('')
+      await chooseHistoireSelectOption(panel, panel, 'State preset', 'Initial state')
       await expect.poll(() => page.evaluate('session.state.get().then(state=>state.value.count)')).toBe(2)
-      await panel.getByRole('combobox', { name: 'State preset', exact: true }).selectOption('preset-1')
+      await chooseHistoireSelectOption(panel, panel, 'State preset', 'Saved')
       await expect.poll(() => page.evaluate('session.state.get().then(state=>state.value.count)')).toBe(9)
       await page.evaluate('panel.unmount()')
       expect(await page.evaluate('session.getSnapshot().runtime.status')).toBe('ready')

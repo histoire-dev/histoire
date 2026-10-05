@@ -1,9 +1,10 @@
 import { describe, expect, it } from 'vitest'
 import { createEmbedBridgeFixture } from '../../utils/embed/bridge-fixture.js'
+import { chooseHistoireSelectOption } from '../../utils/embed/controls.js'
 import { createEmbedVueHostAssets } from '../../utils/embed/vue-host.js'
 
 const hostHtml = '<!doctype html><html><head><title>Host title</title><style>body{margin:20px;color:navy;background:lavender}#first,#second{height:600px;width:1100px}#host-field{border:3px solid orange}</style></head><body><input id="host-field" value="host"><div id="first"></div><div id="second"></div></body></html>'
-const story = '<script>if(typeof window!==\'undefined\')window.__HOST_STORY_IMPORTS__=true</script><script setup>const initial=()=>({count:2,enabled:true})</script><template><Story id="normal" title="Normal story"><Variant id="one" :init-state="initial"><template #default="{state}"><button @click="state.count++">Count:{{state.count}}</button></template></Variant><Variant id="two"><button>Second</button></Variant></Story></template>'
+const story = '<script>if(typeof window!==\'undefined\')window.__HOST_STORY_IMPORTS__=true</script><script setup>const initial=()=>({count:2,enabled:true})</script><template><Story id="normal" title="Normal story"><Variant id="one" title="First" :init-state="initial"><template #default="{state}"><button @click="state.count++">Count:{{state.count}}</button></template></Variant><Variant id="two" title="Second"><button>Second</button></Variant></Story></template>'
 
 describe('shared native and iframe Explorer', () => {
   it('starts empty, selects docs/stories, joins grid switches, preserves host and isolates HSL palettes', async () => {
@@ -81,9 +82,9 @@ describe('shared native and iframe Explorer', () => {
       await nativeGrid.getByRole('button', { name: 'Count:2', exact: true }).click()
       expect(await page.evaluate('sessions[1].state.get().then(state=>state.value.count)')).toBe(3)
       const nativeDocument = await page.evaluate('sessions[1].getSnapshot().runtime.runtimeId')
-      await page.locator('#second').getByRole('combobox', { name: 'Variant', exact: true }).selectOption('two')
+      await chooseHistoireSelectOption(page.locator('#second'), page, 'Variant', 'Second')
       await expect.poll(() => page.evaluate('({variant:sessions[1].getSnapshot().selection.variantId,status:sessions[1].getSnapshot().runtime.status})')).toEqual({ variant: 'two', status: 'ready' })
-      await page.locator('#second').getByRole('combobox', { name: 'Variant', exact: true }).selectOption('one')
+      await chooseHistoireSelectOption(page.locator('#second'), page, 'Variant', 'First')
       await expect.poll(() => page.evaluate('({variant:sessions[1].getSnapshot().selection.variantId,status:sessions[1].getSnapshot().runtime.status})')).toEqual({ variant: 'one', status: 'ready' })
       expect(await page.evaluate('sessions[1].state.get().then(state=>state.value.count)')).toBe(3)
       expect(await page.evaluate('sessions[1].getSnapshot().runtime.runtimeId')).toBe(nativeDocument)

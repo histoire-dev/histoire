@@ -2,6 +2,7 @@ import { writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { createEmbedBridgeFixture } from '../../utils/embed/bridge-fixture.js'
+import { chooseHistoireSelectOption } from '../../utils/embed/controls.js'
 import { createEmbedVueHostAssets } from '../../utils/embed/vue-host.js'
 
 const story = `<script setup>import {logEvent} from 'histoire/client';function send(event,label){void logEvent('dom',event);void logEvent('nested',{label,nested:{count:2}})}</script><script>if(typeof window!=='undefined')window.__SOURCE_IMPORTS__=(window.__SOURCE_IMPORTS__||0)+1</script><template><Story id="a:b" title="Widget"><Variant id="one:alpha" title="First"><button @click="send($event,'first')">Emit first</button></Variant><Variant id="two" title="Second"><button @click="send($event,'second')">Emit second</button></Variant></Story></template>`
@@ -83,8 +84,8 @@ describe('independent native and iframe parts', () => {
       await page.keyboard.press('Control+k')
       expect(await page.locator('#first').getByRole('searchbox').evaluate(element => element === document.activeElement)).toBe(true)
       expect(await page.evaluate('hostShortcuts')).toBe(1)
-      await page.locator('#first').getByRole('combobox', { name: 'Appearance' }).selectOption('dark')
-      await page.locator('#first').getByRole('combobox', { name: 'Direction' }).selectOption('rtl')
+      await chooseHistoireSelectOption(page.locator('#first'), page, 'Appearance', 'dark')
+      await chooseHistoireSelectOption(page.locator('#first'), page, 'Direction', 'RTL')
       await page.locator('#first').getByRole('spinbutton', { name: 'Viewport width' }).fill('410')
       await page.locator('#first').getByRole('spinbutton', { name: 'Viewport width' }).blur()
       expect(await page.evaluate('sessions[0].getSnapshot().settings')).toMatchObject({ colorScheme: 'dark', textDirection: 'rtl', responsiveWidth: 410 })
