@@ -49,6 +49,7 @@ const background = computed(() => {
   const color = canvas.frameBackgrounds[props.frame.id]?.backgroundColor ?? canvas.frameBackground
   return color === 'transparent' ? '#fff' : color
 })
+const canSelect = computed(() => props.selected || (props.live && !props.stale && status.value === 'ready'))
 let unregister = () => {}
 
 /** Register placeholder geometry before passive document readiness. */
@@ -76,6 +77,11 @@ function updateStatus(value: typeof status.value, detail?: unknown) {
   error.value = detail
 }
 
+/** Prevent selection until this replica owns a ready, live document. */
+function select() {
+  if (canSelect.value) emit('select', props.variant.id)
+}
+
 /** Native menu key opens same chrome menu as pointer context menu. */
 function onKeyDown(event: KeyboardEvent) {
   if (isFrameMenuShortcut(event)) {
@@ -94,10 +100,10 @@ function openMenu(event: MouseEvent | KeyboardEvent) {
 
 <template>
   <section class="histoire-canvas-frame" :class="{ 'is-selected': selected, 'is-stale': stale, 'is-list': arrange === 'list', 'is-highlighted': highlighted, 'is-dimmed': dimmed }" :style="position" :data-frame-id="frame.id" @contextmenu.prevent="openMenu">
-    <HstButton color="flat" class="histoire-frame-label" :aria-pressed="selected" @click="emit('select', variant.id)" @keydown="onKeyDown">
+    <HstButton color="flat" class="histoire-frame-label" :aria-pressed="selected" :disabled="!canSelect" @click="select" @keydown="onKeyDown">
       <span>{{ variant.title }}</span><WorkbenchIcon v-if="status === 'error'" name="error-filled" :size="12" class="is-error" /><WorkbenchIcon v-else-if="testIcon" :name="testIcon" :size="12" :class="{ 'is-error': test?.failed || test?.error }" />
     </HstButton>
-    <div class="histoire-frame-body" data-test-id="responsive-preview-bg" :style="{ height: `${height * canvas.effectiveZoom}px`, background }" @click="!selected && emit('select', variant.id)">
+    <div class="histoire-frame-body" data-test-id="responsive-preview-bg" :style="{ height: `${height * canvas.effectiveZoom}px`, background }" @click="select">
       <div class="histoire-frame-content" :style="previewStyle">
         <CanvasReplicaPreview v-if="live && !selected" ref="replica" :frame-id="frame.id" :story-id="frame.storyId" :variant-id="frame.variantId" :preview-base="previewBase" @status="updateStatus" />
       </div>
@@ -112,7 +118,7 @@ function openMenu(event: MouseEvent | KeyboardEvent) {
           Retry
         </HstButton>
       </div>
-      <div v-if="!selected && live" class="histoire-frame-select" aria-hidden="true" />
+      <div v-if="!selected && canSelect" class="histoire-frame-select" aria-hidden="true" />
     </div>
   </section>
 </template>

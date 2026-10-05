@@ -7,6 +7,7 @@ export function createStandaloneSelection(session: HistoireSession) {
   const remembered = new Map<string, string>()
   let navigate: (target: HistoireTarget, link?: HistoireStoryLink) => Promise<unknown> = async () => {}
   let navigationIntents = 0
+  let selectionGeneration = 0
   const stop = session.subscribe((snapshot) => {
     if (snapshot.selection?.variantId) remembered.set(snapshot.selection.storyId, snapshot.selection.variantId)
   })
@@ -26,19 +27,35 @@ export function createStandaloneSelection(session: HistoireSession) {
   async function select(input: { storyId: string, variantId?: string | null }, link?: HistoireStoryLink): Promise<void> {
     const target = resolve(input)
     const source = session.getSnapshot().source
+    const generation = ++selectionGeneration
     navigationIntents++
     let operation: Promise<void>
+    let navigated = false
+    /** Only latest source-confirmed target may own the current route. */
+    function ownsNavigation(): boolean {
+      const current = session.getSnapshot()
+      return generation === selectionGeneration
+        && current.status === 'ready'
+        && current.selection?.storyId === target.storyId
+        && current.selection.variantId === target.variantId
+        && current.source?.sourceId === source?.sourceId
+        && current.source?.epoch === source?.epoch
+        && current.source?.revision === source?.revision
+    }
     // Accepted URL must survive cold Vite optimization reload before runtime ACK.
     // Source replacement during synchronous publication cannot acquire old URL intent.
     try {
       operation = session.selection.select(target)
-      const accepted = session.getSnapshot()
-      if (accepted.status === 'ready' && accepted.selection?.storyId === target.storyId && accepted.selection.variantId === target.variantId && accepted.source?.sourceId === source?.sourceId && accepted.source?.epoch === source?.epoch && accepted.source?.revision === source?.revision) {
+      if (ownsNavigation()) {
         await (link ? navigate(target, link) : navigate(target))
+        navigated = true
       }
+      await operation
+      // Some adapters publish selection only after their async operation settles.
+      // That accepted target still owns navigation unless a newer intent replaced it.
+      if (!navigated && ownsNavigation()) await (link ? navigate(target, link) : navigate(target))
     }
     finally { navigationIntents-- }
-    await operation
   }
   const facade: HistoireSession = { ...session, selection: { select } }
   registerHistoireSessionInternals(facade, { descriptor: () => getHistoireSessionDescriptor(session), presets: action => requestHistoireStatePreset(session, action), openInEditor: target => requestHistoireOpenInEditor(session, target), docsPolicy: 'trusted-local', selectionSettled: () => waitForHistoireSelection(session), primaryMountActive: mount => isHistoirePrimaryMountActive(session, mount), storyLink: link => select(link.selection, link) })
