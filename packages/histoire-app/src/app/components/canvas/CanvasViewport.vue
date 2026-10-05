@@ -262,7 +262,8 @@ defineExpose({ canvas, registry })
 .histoire-canvas-toolbar-host { position: absolute; top: 16px; inset-inline-start: calc((100% - var(--histoire-canvas-inspector-reserve)) / 2); display: flex; justify-content: center; width: max(0px, calc(100% - var(--histoire-canvas-inspector-reserve) - 16px)); min-width: 0; container-type: inline-size; transform: translateX(-50%); z-index: 10; }
 .histoire-canvas-toolbar-host:dir(rtl) { transform: translateX(50%); }
 .histoire-canvas-header { position: absolute; inset-inline: var(--histoire-canvas-info-inset) calc(var(--histoire-canvas-inspector-reserve) + var(--histoire-canvas-info-inset)); top: 88px; z-index: 1; container-type: inline-size; pointer-events: none; }
-.histoire-canvas-primary { position: absolute; transform-origin: top left; overflow: hidden; border-radius: 6px; }
+/* Primary preview layers above frame chrome, so it owns visible selected-frame outline. */
+.histoire-canvas-primary { position: absolute; transform-origin: top left; overflow: hidden; border-radius: 6px; outline: 2px solid var(--histoire-accent); outline-offset: 0; }
 .histoire-canvas-primary.is-dimmed { opacity: .35; }
 .histoire-canvas-primary :deep(.histoire-primary), .histoire-canvas-primary :deep(.histoire-primary-frame) { width: 100%; height: 100%; min-height: 0; }
 .is-panning { cursor: grab; } .is-dragging { cursor: grabbing; }

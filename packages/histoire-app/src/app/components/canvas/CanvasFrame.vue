@@ -159,7 +159,6 @@ function openMenu(event: MouseEvent | KeyboardEvent) {
 .histoire-frame-body { position: relative; width: 100%; overflow: hidden; border: 1px solid var(--histoire-border); border-radius: 7px; background: white; }
 .is-list { display: flex; align-items: center; gap: 0; } .is-list .histoire-frame-label { width: 144px; flex: none; justify-content: flex-start; padding: 0 12px 0 0; } .is-list .histoire-frame-body { flex: 1; min-width: 0; }
 .is-highlighted .histoire-frame-label { color: var(--histoire-accent); } .is-highlighted .histoire-frame-body { border-color: var(--histoire-accent); }
-.is-selected .histoire-frame-body { outline: 2px solid var(--histoire-accent); outline-offset: -1px; }
 .histoire-frame-content { transform-origin: top left; }
 .histoire-frame-select { position: absolute; inset: 0; cursor: pointer; }
 .histoire-frame-placeholder, .histoire-frame-error { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 16px; color: var(--histoire-muted); background: var(--histoire-field); font-size: 12px; text-align: center; }
