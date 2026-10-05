@@ -22,7 +22,7 @@ defineProps<{
 h1 { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin: 0; font-size: 24px; font-weight: 800; line-height: 1.2; letter-spacing: -.02em; color: var(--histoire-text); }
 span { color: var(--histoire-muted); font-size: 12px; }
 .histoire-canvas-heading > div > span { flex-shrink: 0; white-space: nowrap; }
-.histoire-canvas-file { display: flex; flex: 0 1 45%; min-width: 0; align-items: center; gap: 8px; overflow: hidden; white-space: nowrap; font-family: var(--histoire-font-mono, "JetBrains Mono", monospace); }
+.histoire-canvas-file { display: flex; flex: 0 1 45%; min-width: 0; align-self: flex-start; align-items: center; justify-content: flex-end; gap: 8px; overflow: hidden; white-space: nowrap; font-family: var(--histoire-font-mono, "JetBrains Mono", monospace); }
 .histoire-canvas-file > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
 @container (max-width: 640px) { .histoire-canvas-file { display: none; } }
 </style>

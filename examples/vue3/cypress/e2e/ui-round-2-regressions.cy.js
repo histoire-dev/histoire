@@ -33,6 +33,8 @@ function assertCanvasInfo({ inspector = true, matrix = false, pan = false } = {}
     const canvasElement = window.document.querySelector(canvas)
     const info = window.document.querySelector('.histoire-canvas-info')
     const header = window.document.querySelector('.histoire-canvas-header')
+    const file = header?.querySelector('.histoire-canvas-file')
+    const fileLabel = file?.querySelector('span')
     const inspectorElement = window.document.querySelector('aside.histoire-inspector-frame')
     expect(canvasElement, 'canvas').to.not.equal(null)
     expect(info, 'canvas info region').to.not.equal(null)
@@ -49,6 +51,14 @@ function assertCanvasInfo({ inspector = true, matrix = false, pan = false } = {}
     expect(infoBounds.right, 'info end').to.be.closeTo(expectedEnd, 1)
     expect(headerBounds.left, 'header start').to.be.closeTo(expectedStart, 1)
     expect(headerBounds.right, 'header end').to.be.closeTo(expectedEnd, 1)
+    if (file && fileLabel) {
+      const fileBounds = file.getBoundingClientRect()
+      const fileLabelBounds = fileLabel.getBoundingClientRect()
+      if (fileBounds.width) {
+        expect(fileBounds.top, 'file metadata top').to.be.closeTo(headerBounds.top, 1)
+        expect(fileLabelBounds.right, 'file metadata inline end').to.be.closeTo(expectedEnd, 1)
+      }
+    }
     if (pan) {
       const hint = window.document.querySelector('.histoire-pan-hint')
       expect(hint, 'pan hint').to.not.equal(null)
@@ -101,6 +111,7 @@ describe('UI review round 2 regressions', () => {
   it('reflows canvas information with pane resize and inspector visibility', () => {
     visitDesktop(story)
     cy.getPreviewIframeBody().contains('Hello world!')
+    assertCanvasInfo()
     resizePanel('Resize side panel')
     resizePanel('Resize inspector')
     assertCanvasInfo()
@@ -116,6 +127,7 @@ describe('UI review round 2 regressions', () => {
   it('reflows Matrix axes with pane resize and inspector visibility', () => {
     visitDesktop(matrix)
     cy.get('[aria-label^="Select matrix cell "]').should('have.length', 4)
+    assertCanvasInfo({ matrix: true })
     resizePanel('Resize side panel')
     resizePanel('Resize inspector')
     assertCanvasInfo({ matrix: true })
