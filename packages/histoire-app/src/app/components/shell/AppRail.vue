@@ -30,7 +30,7 @@ const props = defineProps<{
   /** Dev status counts from caller-owned services. */
   badges?: Partial<Record<ShellPane, number>>
 }>()
-const emit = defineEmits<{ home: [], settings: [], error: [error: unknown] }>()
+const emit = defineEmits<{ home: [], pane: [pane: Exclude<ShellPane, 'home'>], settings: [], error: [error: unknown] }>()
 const shell = useShell()
 const context = useHistoireContext()
 const dark = useHistoireControls()!.dark
@@ -46,7 +46,7 @@ function toggleTheme(): void {
 /** Home is URL navigation; pane preferences never encode route identity. */
 function activate(pane: ShellPane): void {
   if (pane === 'home') emit('home')
-  else shell.selectPane(pane)
+  else emit('pane', pane)
 }
 /** Project logo links retain external behavior; default logo uses owned router. */
 function activateLogo(event: MouseEvent): void {

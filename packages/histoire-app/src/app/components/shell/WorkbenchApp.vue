@@ -41,10 +41,14 @@ const isolated = computed(() => {
 })
 const rows = computed(() => typeof route.value.query.rows === 'string' ? route.value.query.rows : undefined)
 const cols = computed(() => typeof route.value.query.cols === 'string' ? route.value.query.cols : undefined)
+/** Report rejected route restoration through the existing workbench error boundary. */
+function activatePane(pane: 'stories' | 'search' | 'tests' | 'comments' | 'mcp'): void {
+  void workbench.activatePane(pane).catch(error => emit('error', error))
+}
 </script>
 
 <template>
-  <ShellLayout :home-href="navigation.router.resolve({ name: 'home' }).href" :home-active="route.name === 'home'" :logo-href="histoireConfig.theme.logoHref" :logos="customLogos" settings-available :settings-active="route.name === 'settings'" :hide-theme="histoireConfig.theme.hideColorSchemeSwitch" :show-inspector="inspector" :badges="badges" :data-density="settings.state.density" @home="workbench.navigate('home')" @settings="workbench.navigate('settings')" @error="emit('error', $event)">
+  <ShellLayout :home-href="navigation.router.resolve({ name: 'home' }).href" :home-active="route.name === 'home'" :logo-href="histoireConfig.theme.logoHref" :logos="customLogos" settings-available :settings-active="route.name === 'settings'" :hide-theme="histoireConfig.theme.hideColorSchemeSwitch" :show-inspector="inspector" :badges="badges" :data-density="settings.state.density" @home="workbench.navigate('home')" @pane="activatePane" @settings="workbench.navigate('settings')" @error="emit('error', $event)">
     <template #stories>
       <StoriesPanel :folders="folders" @select="shell.closePanelAfterSelection" @error="emit('error', $event)" />
     </template>

@@ -70,3 +70,19 @@ export function beginCommentDraft() {
   })
   cy.get('[aria-label="Comment message"]').should('be.focused')
 }
+
+/**
+ * Leaves Settings through one rail pane while retaining canonical selection.
+ * @param {{ path: string, previewText: string, label: string, panel: string }} options Story and pane acceptance fixture.
+ */
+export function restoreWorkspacePaneFromSettings(options) {
+  cy.visit(options.path)
+  cy.getPreviewIframeBody().contains(options.previewText)
+  cy.get('[aria-label="Workbench"] [aria-label="Settings"]').click()
+  cy.location('pathname').should('match', /^\/settings\//)
+  cy.get('[aria-label="stories panel"]').should('not.exist')
+  cy.get(`[aria-label="Workbench"] [aria-label^="${options.label}"]`).click()
+  cy.location('pathname').should('equal', options.path.split('?')[0])
+  cy.location('search').should('equal', `?${options.path.split('?')[1]}`)
+  cy.get(`[aria-label="${options.panel} panel"]`).should('be.visible')
+}

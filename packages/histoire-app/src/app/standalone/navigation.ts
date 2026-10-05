@@ -76,6 +76,10 @@ export function createStandaloneNavigation(selection: ReturnType<typeof createSt
     void synchronize()
   })
   return { router, synchronize,
+    /** Restore an already-selected target without invoking the SDK selection adapter. */
+    restore(target: HistoireTarget) { return router.push(location(target)) },
+    /** Leave a special page when no canonical story target is available. */
+    home() { return router.push({ name: 'home' }) },
     /** Resolve exact target links through current hash/history route contract. */
     href(target: HistoireTarget) { return router.resolve(location(target)).href },
     /** Workbench query additions retain story identity and existing tabs. */

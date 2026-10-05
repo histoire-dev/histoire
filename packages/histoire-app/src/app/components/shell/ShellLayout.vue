@@ -30,7 +30,7 @@ const props = defineProps<{
   /** Caller-provided dev status counts. */
   badges?: Partial<Record<ShellPane, number>>
 }>()
-const emit = defineEmits<{ home: [], settings: [], error: [error: unknown] }>()
+const emit = defineEmits<{ home: [], pane: [pane: Exclude<ShellPane, 'home'>], settings: [], error: [error: unknown] }>()
 const shell = useShell()
 const context = useHistoireContext()
 const panelId = `histoire-side-panel-${useId()}`
@@ -69,7 +69,7 @@ useHistoireResource(() => {
 
 <template>
   <div class="histoire-shell-layout" :data-panel-open="shell.panelOpen.value && shell.pane.value !== 'home'" :style="{ '--histoire-panel-width': `${shell.panelWidth.value}px` }">
-    <AppRail :panel-id="panelId" :home-href="homeHref" :home-active="homeActive" :logo-href="logoHref" :logos="logos" :settings-available="settingsAvailable" :settings-active="settingsActive" :hide-theme="hideTheme" :badges="badges" @home="emit('home')" @settings="emit('settings')" @error="emit('error', $event)" />
+    <AppRail :panel-id="panelId" :home-href="homeHref" :home-active="homeActive" :logo-href="logoHref" :logos="logos" :settings-available="settingsAvailable" :settings-active="settingsActive" :hide-theme="hideTheme" :badges="badges" @home="emit('home')" @pane="emit('pane', $event)" @settings="emit('settings')" @error="emit('error', $event)" />
     <HstButton v-if="shell.narrow.value && shell.panelOpen.value && shell.pane.value !== 'home'" color="flat" class="histoire-shell-backdrop" type="button" aria-label="Close side panel" @click="shell.togglePanel" />
     <SidePanelHost v-if="shell.panelOpen.value && shell.pane.value !== 'home'" :id="panelId" :pane="shell.pane.value">
       <slot :name="shell.pane.value" />

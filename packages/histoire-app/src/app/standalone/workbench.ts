@@ -25,6 +25,7 @@ import { onUiEvent, sendUiEvent } from '../util/ui-channel.js'
 import { resolveWorkbenchArrangement } from './arrangement.js'
 import { createWorkbenchMarkdownTransition } from './markdown-transition.js'
 import { useWorkbenchDev } from './workbench-dev.js'
+import { activateWorkspacePane, type WorkspacePane } from './workbench-navigation.js'
 
 /** Bind standalone adapters once, keeping every store owned by this provider. */
 export function useWorkbench(props: WorkbenchProps, error: (error: unknown) => void) {
@@ -179,6 +180,16 @@ export function useWorkbench(props: WorkbenchProps, error: (error: unknown) => v
   function showPane(pane: 'stories' | 'search' | 'tests' | 'comments' | 'mcp') {
     if (shell.pane.value !== pane || !shell.panelOpen.value) shell.selectPane(pane)
   }
+  /** Rail destinations leave Settings before exposing workspace content. */
+  async function activatePane(pane: WorkspacePane) {
+    await activateWorkspacePane({
+      pane,
+      currentRoute: () => route.value.name,
+      selection: () => snapshot.value.selection,
+      navigation: props.navigation,
+      showPane,
+    })
+  }
   /** Search rail and keyboard entry share one input and one source index. */
   async function openSearch() {
     showPane('search')
@@ -227,5 +238,5 @@ export function useWorkbench(props: WorkbenchProps, error: (error: unknown) => v
     const action = actions.entries.get('open-isolated')
     if (action && target.variantId) void actions.run(action, { ...target, variantId: target.variantId, frameKey: getHistoireTargetKey(target) })
   }
-  return { snapshot, route, shell, settings, presets, matrix, projectTests, project, mcp, dev, menu, actions, canvas, search, searchQuery, searchActive, searchMatches, highlighted, story, markdown: markdownTransition.visible, arrange, badges, showPane, openSearch, closeSearch, panel, setArrange, setAxes, navigate, searchSelected, testsSelected, nextMatch: searchMatches.next, previousMatch: searchMatches.previous, runAll, openIsolated }
+  return { snapshot, route, shell, settings, presets, matrix, projectTests, project, mcp, dev, menu, actions, canvas, search, searchQuery, searchActive, searchMatches, highlighted, story, markdown: markdownTransition.visible, arrange, badges, showPane, activatePane, openSearch, closeSearch, panel, setArrange, setAxes, navigate, searchSelected, testsSelected, nextMatch: searchMatches.next, previousMatch: searchMatches.previous, runAll, openIsolated }
 }
