@@ -82,6 +82,10 @@ function layoutFrames(zoom = canvas.effectiveZoom) {
 const frames = computed(() => layoutFrames())
 const selectedFrame = computed(() => frames.value.find(frame => frame.variantId === (snapshot.value.selection?.variantId ?? (diagnostics.value.length ? cachedVariantId.value : null))))
 const primarySearch = computed(() => getSearchFrameState(selectedFrame.value?.id, Boolean(props.searchActive && renderedArrange.value !== 'matrix'), props.highlightedTargets))
+/** List labels use screen-space width, so resolve selected bounds at each fit candidate zoom. */
+function fitSelectedFrame(frame: CanvasFrameLayout) {
+  canvas.zoomToFrame(zoom => layoutFrames(zoom).find(candidate => candidate.id === frame.id) ?? frame)
+}
 const live = computed(() => {
   const origin = clientToCanvas({ x: 0, y: 0 }, canvas.effectiveZoom, canvas.panOffset)
   return liveCanvasFrames(frames.value, { ...origin, width: Math.max(0, canvas.viewport.width - props.inspectorWidth) / canvas.effectiveZoom, height: canvas.viewport.height / canvas.effectiveZoom }, props.frameBudget, selectedFrame.value?.id ?? null)
@@ -110,6 +114,7 @@ const { insets: contentInsets, measure } = useCanvasGeometry({
     // Selection can arrive before the host has measurable dimensions; reveal it once ready.
     if (initialFocusPending && selectedFrame.value && size.width > props.inspectorWidth && size.height > (insets.topInset ?? 0) + (insets.bottomInset ?? 0)) {
       canvas.focusFrame(selectedFrame.value)
+      if (renderedArrange.value === 'list') fitSelectedFrame(selectedFrame.value)
       initialFocusPending = false
     }
   },
@@ -197,7 +202,7 @@ watch(() => snapshot.value.selection?.variantId, (value) => {
   if (value) cachedVariantId.value = value
 }, { immediate: true })
 watch([frames, () => props.inspectorWidth, renderedArrange, story, panning], measure, { flush: 'post' })
-watchCanvasFrameFocus({ getFrame: () => selectedFrame.value, getArrange: () => renderedArrange.value, focusFrame: canvas.focusFrame, registerPrimary })
+watchCanvasFrameFocus({ getFrame: () => selectedFrame.value, getArrange: () => renderedArrange.value, focusFrame: canvas.focusFrame, fitFrame: fitSelectedFrame, registerPrimary })
 watch(() => [snapshot.value.runtime.status, snapshot.value.runtime.runtimeId, canvas.frameBackgrounds[selectedFrame.value?.id ?? '']], registerPrimary, { deep: true, flush: 'post' })
 watch(() => registry.frames.get(selectedFrame.value?.id ?? ''), registerPrimary, { flush: 'post' })
 onMounted(() => {

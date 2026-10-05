@@ -25,6 +25,11 @@ function zoomAction(label) {
   cy.contains('[role="dialog"][aria-label="Zoom level"] button', label).click()
 }
 
+/** Read persisted numeric or automatic canvas zoom without coupling assertions to menu labels. */
+function storedCanvasZoom(window) {
+  return JSON.parse(window.localStorage.getItem('_histoire-ui-canvas')).zoom
+}
+
 /** Header metadata stays inside inspector-safe canvas space across responsive reflows. */
 function assertHeaderStatus() {
   cy.get(canvas).should(($canvas) => {
@@ -80,16 +85,33 @@ describe('canvas overlay geometry', () => {
     assertFrames('.histoire-canvas-frame.is-selected')
   })
 
+  it('fits selected variant once when List opens and preserves zoom for later selection', () => {
+    let initialZoom
+    visitCanvas(`${matrix.replace('&arrange=matrix', '')}&arrange=list`)
+    assertFrames('.histoire-canvas-frame.is-selected')
+    cy.window().then((window) => {
+      initialZoom = storedCanvasZoom(window)
+      expect(initialZoom, 'List entry stores selected-frame fit').to.be.a('number')
+    })
+    cy.contains('.histoire-frame-label', /^Alternate$/).click({ force: true })
+    cy.location('search').should('include', 'variantId=alternate')
+    cy.window().should((window) => {
+      expect(storedCanvasZoom(window), 'later List selection preserves fitted zoom').to.equal(initialZoom)
+    })
+    assertFrames('.histoire-canvas-frame.is-selected')
+  })
+
   for (const arrange of ['grid', 'list']) {
-    it(`fits ${arrange} labels and previews between overlays on initial load and resize`, () => {
+    it(`keeps ${arrange} labels clear of overlays and supports explicit canvas fit`, () => {
       // Eleven Code gen rows exceed minimum 10% zoom in List; two-row fixture can fit.
       const path = arrange === 'grid' ? codegen : matrix.replace('&arrange=matrix', '')
+      const initialFrames = arrange === 'list' ? '.histoire-canvas-frame.is-selected' : undefined
       visitCanvas(`${path}&arrange=${arrange}`)
-      assertFrames()
+      assertFrames(initialFrames)
       cy.get('[aria-label="Close inspector"]').click()
-      assertFrames()
+      assertFrames(initialFrames)
       cy.viewport(1000, 760)
-      assertFrames()
+      assertFrames(initialFrames, arrange === 'grid')
       zoomAction('Fit to canvas')
       assertFrames()
       zoomAction('Zoom to selection')
