@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { MatrixCellData } from '../../../util/matrix.js'
 import type { CanvasFrameLayout } from '../frame-layout.js'
+import type { CanvasRect } from '../pan/usePanZoom.js'
 import { HstButton } from '@histoire/controls/vue'
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { useCanvasFrames, useCanvasStore } from '../../../composables/canvas-settings.js'
@@ -15,6 +16,8 @@ const props = defineProps<{
   cell: MatrixCellData
   /** Logical preview bounds, excluding labels. */
   frame: CanvasFrameLayout
+  /** Cell coordinates at selection's candidate zoom, preserving fixed matrix gaps. */
+  fitBounds?: (zoom: number) => CanvasRect
   /** Whether budget admits a passive preview document. */
   live: boolean
   /** Exact base variant used by every cell. */
@@ -32,7 +35,7 @@ const error = ref<unknown>()
 const position = computed(() => ({ left: `${props.frame.x * canvas.effectiveZoom + canvas.panOffset.x}px`, top: `${props.frame.y * canvas.effectiveZoom + canvas.panOffset.y}px`, width: `${props.frame.width * canvas.effectiveZoom}px`, height: `${props.frame.height * canvas.effectiveZoom}px` }))
 const style = computed(() => ({ width: `${props.frame.width}px`, height: `${props.frame.height}px`, transform: `scale(${canvas.effectiveZoom})` }))
 let releaseSource = () => {}
-const unregister = watchMatrixFrameRegistration({ registry, getFrame: () => props.frame, getVariantId: () => props.variantId, getPropsOverride: () => props.cell.props, onTargetChange: () => {
+const unregister = watchMatrixFrameRegistration({ registry, getFrame: () => props.frame, getFitBounds: zoom => props.fitBounds?.(zoom) ?? props.frame, getVariantId: () => props.variantId, getPropsOverride: () => props.cell.props, onTargetChange: () => {
   releaseSource()
   releaseSource = () => {}
   status.value = 'loading'

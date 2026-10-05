@@ -67,19 +67,29 @@ export function zoomAroundPoint(zoom: number, nextZoom: number, offset: CanvasPo
   }
 }
 
-/** Centers bounds within available viewport space, excluding the inspector. */
+/** Unobstructed viewport rectangle, expressed in unscaled local client pixels. */
+export function canvasContentRect(viewport: CanvasSize, options: CanvasFitOptions = {}): CanvasRect {
+  const topInset = Math.max(0, options.topInset ?? 0)
+  return {
+    x: 0,
+    y: topInset,
+    width: Math.max(0, viewport.width - Math.max(0, options.inspectorWidth ?? 0)),
+    height: Math.max(0, viewport.height - topInset - Math.max(0, options.bottomInset ?? 0)),
+  }
+}
+
+/** Centers bounds within available viewport space, excluding fixed overlays. */
 export function fitCanvas(bounds: CanvasRect, viewport: CanvasSize, options: CanvasFitOptions = {}) {
   const padding = Math.max(0, options.padding ?? 48)
-  const topInset = Math.max(0, options.topInset ?? 0)
-  const bottomInset = Math.max(0, options.bottomInset ?? 0)
-  const width = Math.max(1, viewport.width - Math.max(0, options.inspectorWidth ?? 0) - padding * 2)
-  const height = Math.max(1, viewport.height - topInset - bottomInset - padding * 2)
+  const content = canvasContentRect(viewport, options)
+  const width = Math.max(1, content.width - padding * 2)
+  const height = Math.max(1, content.height - padding * 2)
   const zoom = clampZoom(Math.min(width / Math.max(1, bounds.width), height / Math.max(1, bounds.height)))
   return {
     zoom,
     offset: {
-      x: padding + (width - bounds.width * zoom) / 2 - bounds.x * zoom,
-      y: topInset + padding + (height - bounds.height * zoom) / 2 - bounds.y * zoom,
+      x: content.x + padding + (width - bounds.width * zoom) / 2 - bounds.x * zoom,
+      y: content.y + padding + (height - bounds.height * zoom) / 2 - bounds.y * zoom,
     },
   }
 }

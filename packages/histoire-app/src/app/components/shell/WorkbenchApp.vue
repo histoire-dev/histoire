@@ -78,7 +78,7 @@ const cols = computed(() => typeof route.value.query.cols === 'string' ? route.v
           </CanvasToolbar>
         </template>
         <template #matrix="slot">
-          <MatrixView :rows="rows" :cols="cols" :preview-base="previewBase" :frame-budget="histoireConfig.ui?.frameBudget ?? 24" :size="slot.size" @axes="workbench.setAxes" @error="emit('error', $event)" />
+          <MatrixView :rows="rows" :cols="cols" :preview-base="previewBase" :frame-budget="histoireConfig.ui?.frameBudget ?? 24" :size="slot.size" :content-insets="slot.contentInsets" @axes="workbench.setAxes" @error="emit('error', $event)" />
         </template>
         <template #overlays>
           <CommentsCanvasOverlay v-if="CommentsCanvasOverlay && dev" ref="commentOverlay" :model="dev.comments" :agents="dev.commentAgents.value" @composed="dev.commentMode.value = false" @setup-agent="dev.setupAgents" />

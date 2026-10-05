@@ -1,7 +1,7 @@
 import type { CanvasFrameLayout } from '../components/canvas/frame-layout.js'
 import type { CanvasFitOptions, CanvasPoint, CanvasRect, CanvasSize } from '../components/canvas/pan/usePanZoom.js'
 import { reactive } from 'vue'
-import { clampZoom, fitCanvas, zoomAroundPoint } from '../components/canvas/pan/usePanZoom.js'
+import { canvasContentRect, clampZoom, fitCanvas, zoomAroundPoint } from '../components/canvas/pan/usePanZoom.js'
 
 /** Persistent canvas pointer mode. */
 export type CanvasTool = 'select' | 'pan' | 'measure'
@@ -51,7 +51,11 @@ function readPreferences(storage?: CanvasStorage): CanvasPreferences {
 /** Create independent canvas state; nearest shell provides instance to its tools. */
 export function createCanvasStore(options: { storage?: CanvasStorage } = {}) {
   const preferences = readPreferences(options.storage)
-  const state = reactive({ ...preferences, effectiveZoom: preferences.zoom === 'fit' ? 1 : preferences.zoom, panOffset: { x: 32, y: 72 }, selectedFrame: null as string | null, viewport: { width: 0, height: 0 }, bounds: { x: 0, y: 0, width: 0, height: 0 }, inspectorWidth: 0, contentInsets: { topInset: 0, bottomInset: 0 }, frameBackgrounds: {} as Record<string, { backgroundColor: string, checkerboard: boolean }>, panning: false })
+  const state = reactive({ ...preferences, effectiveZoom: preferences.zoom === 'fit' ? 1 : preferences.zoom, panOffset: { x: 32, y: 32 }, selectedFrame: null as string | null, viewport: { width: 0, height: 0 }, bounds: { x: 0, y: 0, width: 0, height: 0 }, inspectorWidth: 0, contentInsets: { topInset: 0, bottomInset: 0 }, frameBackgrounds: {} as Record<string, { backgroundColor: string, checkerboard: boolean }>, panning: false })
+  /** Share unobstructed geometry between fitting, zoom anchors and selection reveal. */
+  function contentRect() {
+    return canvasContentRect(state.viewport, { inspectorWidth: state.inspectorWidth, ...state.contentInsets })
+  }
   /** Persist only contract preferences; failures leave usable current-session state. */
   function save() {
     try {
@@ -63,7 +67,8 @@ export function createCanvasStore(options: { storage?: CanvasStorage } = {}) {
   function fit() {
     state.zoom = 'fit'
     // Setup runs before ResizeObserver measures; fitting an empty viewport would lock at 10%.
-    if (state.viewport.width <= state.inspectorWidth || state.viewport.height <= state.contentInsets.topInset + state.contentInsets.bottomInset) return save()
+    const content = contentRect()
+    if (!content.width || !content.height) return save()
     const transform = fitCanvas(state.bounds, state.viewport, { padding: 32, inspectorWidth: state.inspectorWidth, ...state.contentInsets })
     if (Math.abs(state.effectiveZoom - transform.zoom) > 0.0001) state.effectiveZoom = transform.zoom
     state.panOffset = transform.offset
@@ -72,7 +77,8 @@ export function createCanvasStore(options: { storage?: CanvasStorage } = {}) {
   /** Switch zoom around current visible point rather than jumping canvas origin. */
   function setZoom(value: number | 'fit', point?: CanvasPoint) {
     if (value === 'fit') return fit()
-    const transform = zoomAroundPoint(state.effectiveZoom, value, state.panOffset, point ?? { x: state.viewport.width / 2, y: state.viewport.height / 2 })
+    const content = contentRect()
+    const transform = zoomAroundPoint(state.effectiveZoom, value, state.panOffset, point ?? { x: content.x + content.width / 2, y: content.y + content.height / 2 })
     state.zoom = transform.zoom
     state.effectiveZoom = transform.zoom
     state.panOffset = transform.offset
@@ -97,15 +103,18 @@ export function createCanvasStore(options: { storage?: CanvasStorage } = {}) {
   }
   /** Reveal logical frame bounds without changing canonical frame selection. */
   function revealFrame(frame: CanvasFrameLayout) {
-    if (state.viewport.width <= state.inspectorWidth || state.viewport.height <= state.contentInsets.topInset + state.contentInsets.bottomInset) return
+    const content = contentRect()
+    if (!content.width || !content.height) return
     const zoom = state.effectiveZoom
-    const right = Math.max(0, state.viewport.width - state.inspectorWidth - 24)
     const left = frame.x * zoom + state.panOffset.x
     const top = frame.y * zoom + state.panOffset.y
-    const dx = left < 24 ? 24 - left : left + frame.width * zoom > right ? right - left - frame.width * zoom : 0
-    const topLimit = Math.max(64, state.contentInsets.topInset + 24)
-    const bottomLimit = state.viewport.height - state.contentInsets.bottomInset - 24
-    const dy = top < topLimit ? topLimit - top : top + frame.height * zoom > bottomLimit ? bottomLimit - top - frame.height * zoom : 0
+    const leftLimit = content.x + 24
+    const rightLimit = content.x + content.width - 24
+    const topLimit = content.y + 24
+    const bottomLimit = content.y + content.height - 24
+    // Oversized previews cannot show both edges; keep labels and leading content visible.
+    const dx = frame.width * zoom > rightLimit - leftLimit || left < leftLimit ? leftLimit - left : left + frame.width * zoom > rightLimit ? rightLimit - left - frame.width * zoom : 0
+    const dy = frame.height * zoom > bottomLimit - topLimit || top < topLimit ? topLimit - top : top + frame.height * zoom > bottomLimit ? bottomLimit - top - frame.height * zoom : 0
     // Automatic selection visibility must not turn the user's Fit preference into numeric zoom.
     if (dx || dy) state.panOffset = { x: state.panOffset.x + dx, y: state.panOffset.y + dy }
   }
@@ -114,9 +123,20 @@ export function createCanvasStore(options: { storage?: CanvasStorage } = {}) {
     state.selectedFrame = frame.id
     revealFrame(frame)
   }
-  /** Fit one selected preview using same available geometry as whole-canvas fit. */
-  function zoomToFrame(frame: CanvasRect) {
-    const transform = fitCanvas(frame, state.viewport, { padding: 32, inspectorWidth: state.inspectorWidth, ...state.contentInsets })
+  /** Fit selection and fixed chrome using the same available viewport as canvas Fit. */
+  function zoomToFrame(frame: CanvasRect | ((zoom: number) => CanvasRect)) {
+    const content = contentRect()
+    if (!content.width || !content.height) return
+    const options = { padding: 32, inspectorWidth: state.inspectorWidth, ...state.contentInsets }
+    let zoom = state.effectiveZoom
+    let transform = fitCanvas(typeof frame === 'function' ? frame(zoom) : frame, state.viewport, options)
+    // Labels/gaps stay in screen pixels: resolve their world bounds at each candidate scale.
+    if (typeof frame === 'function') {
+      for (let pass = 0; Math.abs(transform.zoom - zoom) > 0.000001 && pass < 32; pass++) {
+        zoom = transform.zoom
+        transform = fitCanvas(frame(zoom), state.viewport, options)
+      }
+    }
     state.zoom = transform.zoom
     state.effectiveZoom = transform.zoom
     state.panOffset = transform.offset

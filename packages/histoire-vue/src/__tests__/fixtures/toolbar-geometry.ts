@@ -1,33 +1,18 @@
 import { vi } from 'vitest'
 import { nextTick } from 'vue'
+import { resizeObserverFixture } from './resize-observer.js'
 
 /** Model available host width and explicit control sizes without testing CSS. */
 export function toolbarGeometry(initialWidth = 300) {
   let available = initialWidth
   let frameId = 0
   const frames = new Map<number, FrameRequestCallback>()
-  const observers = new Set<{ callback: ResizeObserverCallback, targets: Set<Element> }>()
+  const observers = resizeObserverFixture()
   vi.stubGlobal('requestAnimationFrame', (callback: FrameRequestCallback) => {
     frames.set(++frameId, callback)
     return frameId
   })
   vi.stubGlobal('cancelAnimationFrame', (id: number) => frames.delete(id))
-  vi.stubGlobal('ResizeObserver', class {
-    /** Callback and targets remain local to each owning component. */
-    state: { callback: ResizeObserverCallback, targets: Set<Element> }
-    /** Register native-style geometry observation. */
-    constructor(callback: ResizeObserverCallback) {
-      this.state = { callback, targets: new Set() }
-      observers.add(this.state)
-    }
-
-    /** Track one observed element. */
-    observe = (target: Element) => this.state.targets.add(target)
-    /** Release one removed control. */
-    unobserve = (target: Element) => this.state.targets.delete(target)
-    /** Retire callbacks after unmount. */
-    disconnect = () => observers.delete(this.state)
-  })
   /** Widths describe controls, not their menu presentation. */
   function width(element: HTMLElement): number {
     if (element.classList.contains('toolbar-test-host')) return Number(element.dataset.available ?? available)
@@ -48,7 +33,7 @@ export function toolbarGeometry(initialWidth = 300) {
     /** Deliver native resize callbacks after changing host width. */
     resize(value: number) {
       available = value
-      for (const observer of observers) observer.callback([...observer.targets].map(target => ({ target, contentRect: target.getBoundingClientRect() }) as ResizeObserverEntry), {} as ResizeObserver)
+      observers.deliver()
     },
     /** Flush Vue and scheduled measurement work, including observer follow-ups. */
     async flush(passes = 8) {
@@ -61,6 +46,6 @@ export function toolbarGeometry(initialWidth = 300) {
       }
     },
     /** Unmount must release scheduled frames and geometry observers. */
-    pending: () => ({ frames: frames.size, observers: observers.size }),
+    pending: () => ({ frames: frames.size, observers: observers.count() }),
   }
 }

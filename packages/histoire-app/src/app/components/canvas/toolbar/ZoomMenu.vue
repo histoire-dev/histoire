@@ -23,7 +23,7 @@ function zoom(value: number | 'fit') {
 /** Selection zoom uses canvas geometry rather than preview document scaling. */
 function selection() {
   const frame = canvas.selectedFrame ? frames.getFrame(canvas.selectedFrame) : null
-  if (frame) canvas.zoomToFrame(frame.rect)
+  if (frame) canvas.zoomToFrame(frame.fitBounds ?? frame.rect)
   emit('update:open', null)
 }
 </script>

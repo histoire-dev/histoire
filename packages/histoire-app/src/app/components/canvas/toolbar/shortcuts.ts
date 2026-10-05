@@ -13,7 +13,7 @@ export function registerCanvasShortcuts(shortcuts: ReturnType<typeof createShort
     shortcuts.bind('canvas.actual', () => canvas.setZoom(1)),
     shortcuts.bind('canvas.selection', () => {
       const frame = canvas.selectedFrame ? frames.getFrame(canvas.selectedFrame) : null
-      if (frame) canvas.zoomToFrame(frame.rect)
+      if (frame) canvas.zoomToFrame(frame.fitBounds ?? frame.rect)
     }),
   ]
   return () => dispose.forEach(remove => remove())

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { HistoireCatalogVariant } from '@histoire/sdk'
 import type { CanvasFrameLayout } from './frame-layout.js'
+import type { CanvasRect } from './pan/usePanZoom.js'
 import { HstButton } from '@histoire/controls/vue'
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useCanvasFrames, useCanvasStore } from '../../composables/canvas-settings.js'
@@ -13,6 +14,8 @@ import { isFrameMenuShortcut, openFrameMenu } from './frame-menu.js'
 const props = defineProps<{
   /** Complete canvas target and logical bounds. */
   frame: CanvasFrameLayout
+  /** Complete chrome and preview geometry at selection's candidate zoom. */
+  fitBounds?: (zoom: number) => CanvasRect
   /** Collected variant display metadata. */
   variant: HistoireCatalogVariant
   /** Live-budget admission; placeholders preserve target and layout. */
@@ -55,7 +58,7 @@ let unregister = () => {}
 /** Register placeholder geometry before passive document readiness. */
 function register() {
   unregister()
-  unregister = registry.registerFrame({ id: props.frame.id, storyId: props.frame.storyId, variantId: props.frame.variantId, rect: { x: props.frame.x + (props.arrange === 'list' ? 144 / canvas.effectiveZoom : 0), y: props.frame.y + (props.arrange === 'list' ? 0 : 28 / canvas.effectiveZoom), width: props.width, height: props.height } })
+  unregister = registry.registerFrame({ id: props.frame.id, storyId: props.frame.storyId, variantId: props.frame.variantId, fitBounds: props.fitBounds ? zoom => props.fitBounds?.(zoom) ?? props.frame : undefined, rect: { x: props.frame.x + (props.arrange === 'list' ? 144 / canvas.effectiveZoom : 0), y: props.frame.y + (props.arrange === 'list' ? 0 : 28 / canvas.effectiveZoom), width: props.width, height: props.height } })
 }
 onMounted(register)
 watch(() => [props.frame, props.width, props.height, canvas.effectiveZoom], () => {

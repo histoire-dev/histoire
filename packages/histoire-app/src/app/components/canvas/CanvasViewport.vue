@@ -24,6 +24,7 @@ import FrameList from './FrameList.vue'
 import { clientToCanvas } from './pan/usePanZoom.js'
 import { usePointerPan } from './pan/usePointerPan.js'
 import { useSpacePan } from './pan/useSpacePan.js'
+import { useCanvasGeometry } from './useCanvasGeometry.js'
 
 const props = withDefaults(defineProps<{
   /** Absolute source base supplied by standalone adapter. */
@@ -45,6 +46,9 @@ const emit = defineEmits<{ error: [error: unknown], contextmenu: [event: MouseEv
 const session = useHistoireSession()
 const snapshot = useHistoireSnapshot()
 const viewport = ref<HTMLElement>()
+const toolbar = ref<HTMLElement>()
+const header = ref<HTMLElement>()
+const status = ref<InstanceType<typeof CanvasStatus>>()
 const primaryContainer = ref<HTMLElement>()
 const primary = ref<{ unmount: () => Promise<void> }>()
 const primaryKey = ref(0)
@@ -71,7 +75,11 @@ const size = computed(() => {
   const settings = snapshot.value.settings
   return { width: settings.rotate && settings.responsiveHeight ? settings.responsiveHeight : settings.responsiveWidth, height: settings.rotate ? settings.responsiveWidth : settings.responsiveHeight ?? 640 }
 })
-const frames = computed(() => story.value ? layoutCanvasFrames(story.value.id, story.value.variants.map(variant => variant.id), size.value, renderedArrange.value === 'list' ? 'list' : 'grid', 3, canvas.effectiveZoom) : [])
+/** Reuse arrangement geometry for rendering and target-zoom selection fitting. */
+function layoutFrames(zoom = canvas.effectiveZoom) {
+  return story.value ? layoutCanvasFrames(story.value.id, story.value.variants.map(variant => variant.id), size.value, renderedArrange.value === 'list' ? 'list' : 'grid', 3, zoom) : []
+}
+const frames = computed(() => layoutFrames())
 const selectedFrame = computed(() => frames.value.find(frame => frame.variantId === (snapshot.value.selection?.variantId ?? (diagnostics.value.length ? cachedVariantId.value : null))))
 const primarySearch = computed(() => getSearchFrameState(selectedFrame.value?.id, Boolean(props.searchActive && renderedArrange.value !== 'matrix'), props.highlightedTargets))
 const live = computed(() => {
@@ -82,23 +90,30 @@ const primaryStyle = computed(() => {
   const frame = selectedFrame.value
   return { left: `${(frame?.x ?? 0) * canvas.effectiveZoom + canvas.panOffset.x + (renderedArrange.value === 'list' ? 145 : 1)}px`, top: `${(frame?.y ?? 0) * canvas.effectiveZoom + canvas.panOffset.y + (renderedArrange.value === 'list' ? 1 : 29)}px`, width: `${size.value.width}px`, height: `${size.value.height}px`, transform: `scale(${canvas.effectiveZoom})`, visibility: frame && renderedArrange.value !== 'matrix' ? 'visible' as const : 'hidden' as const }
 })
-let resize: ResizeObserver | undefined
 let mutation: MutationObserver | undefined
 let primaryRegistration = ''
 let stopInteractions = () => {}
-
-/** Host measurements stay local and exclude floating inspector from automatic fit. */
-function measure() {
-  if (!viewport.value) return
-  const rect = viewport.value.getBoundingClientRect()
-  const bounds = canvasFrameBounds(frames.value)
-  if (renderedArrange.value === 'matrix') {
-    canvas.viewport = { width: rect.width, height: rect.height }
-    canvas.inspectorWidth = props.inspectorWidth
-    return
-  }
-  canvas.setGeometry({ width: rect.width, height: rect.height }, { ...bounds, y: bounds.y - 72, height: bounds.height + 72 }, props.inspectorWidth)
-}
+let initialFocusPending = true
+const { insets: contentInsets, measure } = useCanvasGeometry({
+  viewport: () => viewport.value,
+  toolbar: () => toolbar.value,
+  header: () => header.value,
+  footer: () => status.value?.$el,
+  temporaryPan: () => space.held.value || canvas.panning,
+  onMeasure(size, insets) {
+    if (renderedArrange.value === 'matrix') {
+      canvas.viewport = size
+      canvas.inspectorWidth = props.inspectorWidth
+      return
+    }
+    canvas.setGeometry(size, canvasFrameBounds(frames.value), props.inspectorWidth, insets)
+    // Selection can arrive before the host has measurable dimensions; reveal it once ready.
+    if (initialFocusPending && selectedFrame.value && size.width > props.inspectorWidth && size.height > (insets.topInset ?? 0) + (insets.bottomInset ?? 0)) {
+      canvas.focusFrame(selectedFrame.value)
+      initialFocusPending = false
+    }
+  },
+})
 
 /** Register selected physical document; src identity changes on runtime navigation. */
 function registerPrimary() {
@@ -181,21 +196,17 @@ watch(() => currentStory.value?.id, (value, previous) => {
 watch(() => snapshot.value.selection?.variantId, (value) => {
   if (value) cachedVariantId.value = value
 }, { immediate: true })
-watch([frames, () => props.inspectorWidth, renderedArrange], measure, { flush: 'post' })
+watch([frames, () => props.inspectorWidth, renderedArrange, story, panning], measure, { flush: 'post' })
 watchCanvasFrameFocus({ getFrame: () => selectedFrame.value, getArrange: () => renderedArrange.value, focusFrame: canvas.focusFrame, registerPrimary })
 watch(() => [snapshot.value.runtime.status, snapshot.value.runtime.runtimeId, canvas.frameBackgrounds[selectedFrame.value?.id ?? '']], registerPrimary, { deep: true, flush: 'post' })
 watch(() => registry.frames.get(selectedFrame.value?.id ?? ''), registerPrimary, { flush: 'post' })
 onMounted(() => {
-  resize = new ResizeObserver(measure)
-  if (viewport.value) resize.observe(viewport.value)
   if (viewport.value) stopInteractions = bindCanvasFrameInteractions(viewport.value, pointer, space, onWheel)
   mutation = new MutationObserver(registerPrimary)
   if (primaryContainer.value) mutation.observe(primaryContainer.value, { childList: true, subtree: true, attributes: true, attributeFilter: ['src'] })
   measure()
-  if (selectedFrame.value && renderedArrange.value !== 'matrix') canvas.focusFrame(selectedFrame.value)
 })
 onBeforeUnmount(() => {
-  resize?.disconnect()
   mutation?.disconnect()
   stopInteractions()
   frameState.dispose()
@@ -205,18 +216,18 @@ defineExpose({ canvas, registry })
 
 <template>
   <div ref="viewport" class="histoire-canvas-viewport" :class="{ 'is-panning': panning, 'is-dragging': canvas.panning, 'is-commenting': commentMode }" :style="{ '--histoire-canvas-inspector-reserve': `${inspectorWidth}px` }" role="region" aria-label="Story canvas" tabindex="-1" @wheel="onWheel" @pointerdown.capture="framePointer" @pointerdown="pointerDown" @pointermove="pointer.onPointerMove" @pointerup="pointer.onPointerUp" @pointercancel="pointer.onPointerCancel">
-    <div class="histoire-canvas-toolbar-host">
+    <div ref="toolbar" class="histoire-canvas-toolbar-host">
       <slot name="toolbar" :canvas="canvas" :frames="registry" />
     </div>
-    <div v-if="story" class="histoire-canvas-header">
+    <div v-if="story" ref="header" class="histoire-canvas-header">
       <slot name="header" :story="story">
         <CanvasHeader :story="story" />
       </slot>
     </div>
-    <slot v-if="renderedArrange === 'matrix'" name="matrix" :canvas="canvas" :frames="registry" :size="size" :frame-budget="frameBudget" :preview-base="previewBase" />
+    <slot v-if="renderedArrange === 'matrix'" name="matrix" :canvas="canvas" :frames="registry" :size="size" :content-insets="contentInsets" :frame-budget="frameBudget" :preview-base="previewBase" />
     <component :is="renderedArrange === 'list' ? FrameList : FrameGrid" v-else :frames="frames">
       <template #default="{ frame, index }">
-        <CanvasFrame :frame="frame" :variant="story!.variants[index]" :selected="frame.id === selectedFrame?.id" :live="live.has(frame.id)" :preview-base="previewBase" :width="size.width" :height="size.height" :stale="diagnostics.length > 0" :arrange="renderedArrange === 'list' ? 'list' : 'grid'" v-bind="getSearchFrameState(frame.id, !!searchActive, highlightedTargets)" @select="selectVariant" @contextmenu="(event, target) => emit('contextmenu', event, target)" />
+        <CanvasFrame :frame="frame" :fit-bounds="zoom => layoutFrames(zoom)[index]" :variant="story!.variants[index]" :selected="frame.id === selectedFrame?.id" :live="live.has(frame.id)" :preview-base="previewBase" :width="size.width" :height="size.height" :stale="diagnostics.length > 0" :arrange="renderedArrange === 'list' ? 'list' : 'grid'" v-bind="getSearchFrameState(frame.id, !!searchActive, highlightedTargets)" @select="selectVariant" @contextmenu="(event, target) => emit('contextmenu', event, target)" />
       </template>
     </component>
     <div ref="primaryContainer" class="histoire-canvas-primary" :class="{ 'is-stale': diagnostics.length, 'is-dimmed': primarySearch.dimmed }" :style="primaryStyle">
@@ -238,7 +249,7 @@ defineExpose({ canvas, registry })
     <div v-if="commentMode" class="histoire-comment-capture" @pointerdown="framePointer" />
     <slot name="overlays" :canvas="canvas" :frames="registry" :selected-frame="selectedFrame" />
     <CollectErrorCard v-if="diagnostics.length" :errors="diagnostics" />
-    <CanvasStatus :pan="panning" />
+    <CanvasStatus ref="status" :pan="panning" />
     <div v-if="!story" class="histoire-canvas-empty">
       Select story
     </div>

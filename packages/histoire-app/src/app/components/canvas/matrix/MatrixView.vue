@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { CanvasContentInsets } from '../../../stores/canvas.js'
 import { useHistoireContext } from '@histoire/vue/internal'
 import { computed, onBeforeUnmount, onMounted, watch } from 'vue'
 import { useCanvasStore } from '../../../composables/canvas-settings.js'
@@ -6,7 +7,7 @@ import { useSelection } from '../../../composables/selection.js'
 import { useMatrixStore } from '../../../stores/matrix.js'
 import { filterMatrixValues } from '../../../util/matrix.js'
 import { liveCanvasFrames } from '../frame-layout.js'
-import { clientToCanvas } from '../pan/usePanZoom.js'
+import { canvasContentRect, clientToCanvas } from '../pan/usePanZoom.js'
 import { layoutMatrixFrames, MATRIX_COLUMN_HEADER, MATRIX_ROW_GUTTER, MATRIX_TOP_INSET, matrixLayoutBounds } from './matrix-layout.js'
 import { watchMatrixFrameSelection } from './matrix-selection.js'
 import MatrixAxisBar from './MatrixAxisBar.vue'
@@ -23,6 +24,8 @@ const props = defineProps<{
   frameBudget: number
   /** Absolute first-party preview source URL. */
   previewBase: string
+  /** Measured fixed chrome; matrix adds its own axis-control reservation once. */
+  contentInsets?: CanvasContentInsets
 }>()
 const emit = defineEmits<{ axes: [value: { rows: string, cols: string }], error: [error: unknown] }>()
 const canvas = useCanvasStore()
@@ -33,11 +36,18 @@ const { story, variant } = useSelection()
 const baseVariant = computed(() => variant.value?.id ?? story.value?.variants[0]?.id)
 const rowValues = computed(() => matrix.rowAxis.value ? filterMatrixValues(matrix.rowAxis.value, matrix.rowValues.value) : [])
 const colValues = computed(() => matrix.colAxis.value ? filterMatrixValues(matrix.colAxis.value, matrix.colValues.value) : [])
-const frames = computed(() => layoutMatrixFrames(matrix.cells.value, { storyId: story.value?.id ?? '', variantId: baseVariant.value ?? '', rows: rowValues.value, cols: colValues.value, size: props.size, zoom: canvas.effectiveZoom }))
+/** Rendering and selection share fixed-pixel matrix gutter/gap calculations. */
+function layoutFrames(zoom = canvas.effectiveZoom) {
+  return layoutMatrixFrames(matrix.cells.value, { storyId: story.value?.id ?? '', variantId: baseVariant.value ?? '', rows: rowValues.value, cols: colValues.value, size: props.size, zoom })
+}
+const frames = computed(() => layoutFrames())
+const topInset = computed(() => Math.max(MATRIX_TOP_INSET, props.contentInsets?.topInset ?? 0))
+const insets = computed(() => ({ topInset: topInset.value, bottomInset: props.contentInsets?.bottomInset ?? 0 }))
 const live = computed(() => {
   if (props.frameBudget <= 1) return new Set<string>()
-  const origin = clientToCanvas({ x: 0, y: MATRIX_TOP_INSET }, canvas.effectiveZoom, canvas.panOffset)
-  return liveCanvasFrames(frames.value, { ...origin, width: Math.max(0, canvas.viewport.width - canvas.inspectorWidth) / canvas.effectiveZoom, height: Math.max(0, canvas.viewport.height - MATRIX_TOP_INSET) / canvas.effectiveZoom }, props.frameBudget - 1, matrix.selectedCell.value?.key ?? null)
+  const content = canvasContentRect(canvas.viewport, { inspectorWidth: canvas.inspectorWidth, ...insets.value })
+  const origin = clientToCanvas(content, canvas.effectiveZoom, canvas.panOffset)
+  return liveCanvasFrames(frames.value, { ...origin, width: content.width / canvas.effectiveZoom, height: content.height / canvas.effectiveZoom }, props.frameBudget - 1, matrix.selectedCell.value?.key ?? null)
 })
 const rowPosition = computed(() => {
   if (!frames.value.length) return []
@@ -56,9 +66,9 @@ const colPosition = computed(() => {
 
 /** Fit calculation uses same logical coordinate system and inspector reserve. */
 function geometry(): void {
-  canvas.setGeometry(canvas.viewport, matrixLayoutBounds(frames.value), canvas.inspectorWidth, { topInset: MATRIX_TOP_INSET })
+  canvas.setGeometry(canvas.viewport, matrixLayoutBounds(frames.value), canvas.inspectorWidth, insets.value)
 }
-watch([frames, () => canvas.viewport.width, () => canvas.viewport.height, () => canvas.inspectorWidth], geometry, { immediate: true })
+watch([frames, () => canvas.viewport.width, () => canvas.viewport.height, () => canvas.inspectorWidth, insets], geometry, { immediate: true })
 onMounted(() => {
   try {
     const window = context.root.value?.ownerDocument.defaultView
@@ -79,12 +89,12 @@ onMounted(() => {
     <p v-else-if="!matrix.cells.value.length" class="histoire-matrix-empty">
       No values selected. Enable row and column values in Props.
     </p>
-    <div v-else class="histoire-matrix-board" :style="{ top: `${MATRIX_TOP_INSET}px` }">
+    <div v-else class="histoire-matrix-board" :style="{ top: `${topInset}px` }">
       <!-- Keep world coordinates unchanged while clipping beneath fixed chrome. -->
-      <div class="histoire-matrix-board-world" :style="{ top: `${-MATRIX_TOP_INSET}px` }">
+      <div class="histoire-matrix-board-world" :style="{ top: `${-topInset}px` }">
         <span v-for="(position, index) in rowPosition" :key="index" class="histoire-matrix-row-label" :style="position.style">{{ matrix.rows.value }}={{ JSON.stringify(position.value) }}</span>
         <span v-for="(position, index) in colPosition" :key="index" class="histoire-matrix-col-label" :style="position.style">{{ matrix.cols.value }}={{ JSON.stringify(position.value) }}</span>
-        <MatrixCell v-for="(cell, index) in matrix.cells.value" :key="cell.key" :cell="cell" :frame="frames[index]" :live="live.has(cell.key)" :variant-id="baseVariant ?? ''" :preview-base="previewBase" />
+        <MatrixCell v-for="(cell, index) in matrix.cells.value" :key="cell.key" :cell="cell" :frame="frames[index]" :fit-bounds="zoom => layoutFrames(zoom)[index]" :live="live.has(cell.key)" :variant-id="baseVariant ?? ''" :preview-base="previewBase" />
       </div>
     </div>
   </div>

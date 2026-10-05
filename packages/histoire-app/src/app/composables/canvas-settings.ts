@@ -16,6 +16,8 @@ export interface CanvasFrameRegistration {
   variantId: string
   /** Preview body bounds in unscaled canvas CSS pixels. */
   rect: CanvasRect
+  /** Complete label/preview bounds recomputed for selection's target zoom. */
+  fitBounds?: (zoom: number) => CanvasRect
   /** Actual preview document, absent for budget placeholders. */
   iframe?: HTMLIFrameElement | null
   /** Parent-minted document identity read from active sandbox URL. */
