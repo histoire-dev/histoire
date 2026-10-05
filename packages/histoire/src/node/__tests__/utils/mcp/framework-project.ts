@@ -6,7 +6,7 @@ import { linkMcpFixtureDependencies, linkMcpFixturePlaywright, MCP_REPOSITORY_RO
 import { startMcpProcess } from './process.js'
 
 /** Copy unchanged example sources, reusing explicitly installed example dependencies. */
-export async function createMcpFrameworkProject(name: 'svelte4' | 'svelte5' | 'sveltekit' | 'nuxt4') {
+export async function createMcpFrameworkProject(name: 'react' | 'svelte4' | 'svelte5' | 'sveltekit' | 'nuxt4' | 'nuxt-ui') {
   const example = resolve(MCP_REPOSITORY_ROOT, 'examples', name === 'svelte5' ? 'sveltekit' : name)
   const root = await mkdtemp(resolve(tmpdir(), `histoire MCP ${name} `))
   await cp(example, root, {
@@ -26,7 +26,11 @@ export async function createMcpFrameworkProject(name: 'svelte4' | 'svelte5' | 's
     const sync = startMcpProcess(['sync'], root, {}, entry)
     if ((await sync.waitForExit()).code !== 0) throw new Error(`SvelteKit sync failed: ${sync.output()}`)
   }
-  else if (name !== 'nuxt4') {
+  else if (name === 'nuxt4') {
+    const path = resolve(root, 'nuxt.config.ts')
+    await writeFile(path, (await readFile(path, 'utf8')).replace('defineNuxtConfig({', 'defineNuxtConfig({ app: { baseURL: \'/book/\' },'))
+  }
+  else if (name !== 'nuxt4' && name !== 'nuxt-ui') {
     const path = resolve(root, 'vite.config.ts')
     await writeFile(path, (await readFile(path, 'utf8')).replace('defineConfig({', 'defineConfig({ base: \'/book/\','))
   }

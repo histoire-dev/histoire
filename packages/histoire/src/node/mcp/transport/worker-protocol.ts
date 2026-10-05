@@ -6,6 +6,7 @@ import { McpDomainError, mcpErrorSchema } from '../protocol/errors.js'
 import { mcpOperationSchema } from '../protocol/operation-schema.js'
 import { mcpProjectSchema } from '../protocol/project-schema.js'
 import { mcpToolInputSchemas, mcpToolOutputSchemas } from '../protocol/tool-schema.js'
+import { MCP_READ_TOOLS } from '../server/read-tools.js'
 
 /** Maximum serialized DTO frame; binary resource frames have a separate bound. */
 export const WORKER_METADATA_BYTES = 128 * 1024
@@ -21,9 +22,22 @@ export const workerMethods = {
   getPreview: 'histoire_get_preview',
   admitScreenshot: 'histoire_capture_screenshot',
   admitTests: 'histoire_run_tests',
+  inspectVariant: 'histoire_inspect_variant',
+  inspectDom: 'histoire_inspect_dom',
+  inspectAccessibility: 'histoire_inspect_accessibility',
+  runtimeDiagnostics: 'histoire_get_runtime_diagnostics',
   getOperation: 'histoire_get_operation',
   cancelOperation: 'histoire_cancel_operation',
 } as const satisfies Record<string, McpToolName>
+/** Admission routing shared by worker discovery and its finite parent proxy. */
+export const workerExecutionMethods = {
+  'screenshot': 'admitScreenshot',
+  'tests': 'admitTests',
+  'inspect-variant': 'inspectVariant',
+  'inspect-dom': 'inspectDom',
+  'inspect-accessibility': 'inspectAccessibility',
+  'runtime-diagnostics': 'runtimeDiagnostics',
+} as const
 /** Finite worker method identity. */
 export type WorkerMethod = keyof typeof workerMethods | 'readResource'
 /** Public DTO for every finite dispatch result; project runtime types stay private. */
@@ -42,16 +56,18 @@ const resourceResult = z.strictObject({ contents: z.array(z.union([
   z.strictObject({ uri: z.string().max(8192), mimeType: z.literal('image/png'), blob: z.string().regex(/^[A-Z0-9+/]*={0,2}$/i), _meta: z.record(z.string(), z.json()).optional() }),
 ])).max(1) })
 /** Strict requests reject all unknown fields before method dispatch. */
-const request = z.strictObject({ type: z.literal('request'), id: requestId, method: z.enum(['getProject', 'listStories', 'getStory', 'getDocs', 'getSource', 'getPreview', 'admitScreenshot', 'admitTests', 'getOperation', 'cancelOperation', 'readResource']), input: z.json() })
+const request = z.strictObject({ type: z.literal('request'), id: requestId, method: z.enum(['getProject', 'listStories', 'getStory', 'getDocs', 'getSource', 'getPreview', 'admitScreenshot', 'admitTests', 'inspectVariant', 'inspectDom', 'inspectAccessibility', 'runtimeDiagnostics', 'getOperation', 'cancelOperation', 'readResource']), input: z.json(), readTool: z.enum(MCP_READ_TOOLS).optional() })
+  .refine(message => !message.readTool || workerMethods[message.method as keyof typeof workerMethods] === message.readTool, { message: 'Worker read observation must match its finite dispatch method' })
 /** Finite parent messages. */
 export const workerParentMessageSchema = z.union([
   request,
+  z.strictObject({ type: z.literal('client-name'), name: z.string().min(1).max(128) }),
   z.strictObject({ type: z.literal('cancel'), id: requestId }),
   z.strictObject({ type: z.literal('shutdown') }),
 ])
 /** Finite child messages; method-specific result validation happens afterwards. */
 export const workerChildMessageSchema = z.union([
-  z.strictObject({ type: z.literal('boot'), project: mcpProjectSchema, executors: z.strictObject({ screenshot: z.boolean(), tests: z.boolean() }) }),
+  z.strictObject({ type: z.literal('boot'), project: mcpProjectSchema, executors: z.strictObject({ 'screenshot': z.boolean(), 'tests': z.boolean(), 'inspect-variant': z.boolean().optional(), 'inspect-dom': z.boolean().optional(), 'inspect-accessibility': z.boolean().optional(), 'runtime-diagnostics': z.boolean().optional() }) }),
   z.strictObject({ type: z.literal('result'), id: requestId, data: z.json() }),
   z.strictObject({ type: z.literal('error'), id: requestId, error: mcpErrorSchema }),
   z.strictObject({ type: z.literal('closed') }),
@@ -84,7 +100,7 @@ export function parseWorkerInput<T extends WorkerMethod>(method: T, input: unkno
 /** Validate worker output before any DTO reaches an SDK callback. */
 export function parseWorkerResult(method: WorkerMethod, data: unknown) {
   if (method === 'readResource') return resourceResult.parse(data)
-  if (['admitScreenshot', 'admitTests', 'getOperation', 'cancelOperation'].includes(method)) return mcpOperationSchema.parse(data)
+  if ([...Object.values(workerExecutionMethods), 'getOperation', 'cancelOperation'].includes(method as any)) return mcpOperationSchema.parse(data)
   const parsed = mcpToolOutputSchemas[workerMethods[method]].parse({ ok: true, data })
   if (parsed.ok) return parsed.data
   throw new Error('Invalid Histoire MCP worker result')

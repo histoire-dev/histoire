@@ -10,7 +10,10 @@ export function requestIdentity(principal: string, epoch: string, requestKey: st
 /** Fingerprint parsed defaults while preserving exact IDs and optional constraints. */
 export function requestFingerprint(kind: McpOperationKind, input: McpOperationInput) {
   const { requestKey: _key, ...parameters } = input
-  return JSON.stringify([kind, Object.keys(parameters).sort().map(key => [key, parameters[key as keyof typeof parameters]])])
+  if ('globals' in parameters && parameters.globals) {
+    parameters.globals = Object.fromEntries(Object.entries(parameters.globals).sort(([left], [right]) => left < right ? -1 : left > right ? 1 : 0))
+  }
+  return JSON.stringify([kind, Object.keys(parameters).filter(key => parameters[key as keyof typeof parameters] !== undefined).sort().map(key => [key, parameters[key as keyof typeof parameters]])])
 }
 
 /** Reconcile a lost admission response before validating a new captured target. */

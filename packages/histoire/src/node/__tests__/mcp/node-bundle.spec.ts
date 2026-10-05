@@ -34,10 +34,25 @@ describe('standalone server bundle', () => {
     expect((await readFile(output, 'utf8'))).not.toMatch(/from ['"](?:zod|@modelcontextprotocol\/)/)
   })
 
-  it('rejects dev dependency imports before emitting an artifact', async () => {
+  it.each(['vite', '@histoire/sdk', '@histoire/vue', '@histoire/app', 'vue'])('rejects %s imports before emitting an artifact', async (dependency) => {
     const entry = join(fixture.root, 'entry.mjs')
-    await writeFile(entry, 'import "vite"; export {}')
-    await expect(bundleNodeRuntime(entry, join(fixture.root, 'server.mjs'))).rejects.toThrow('Forbidden deployed runtime import: vite')
+    await writeFile(entry, `import ${JSON.stringify(dependency)}; export {}`)
+    await expect(bundleNodeRuntime(entry, join(fixture.root, 'server.mjs'))).rejects.toThrow(`Forbidden deployed runtime import: ${dependency}`)
+  })
+
+  it('allows only audited built policy and generic cleanup modules', async () => {
+    const entry = join(fixture.root, 'entry.mjs')
+    const policy = fileURLToPath(new URL('../../config/embed-built.ts', import.meta.url))
+    const cleanup = fileURLToPath(new URL('../../runtime/cleanup.ts', import.meta.url))
+    await writeFile(entry, `export {readBuiltEmbedPolicy} from ${JSON.stringify(policy)};export {hasUnconfirmedCleanup} from ${JSON.stringify(cleanup)}`)
+    const output = join(fixture.root, 'server.mjs')
+    await expect(bundleNodeRuntime(entry, output)).resolves.toBeDefined()
+    await validateNodeBundleImport(output)
+    for (const path of ['../../config/load.ts', '../../runtime/controller.ts']) {
+      const forbidden = fileURLToPath(new URL(path, import.meta.url))
+      await writeFile(entry, `import ${JSON.stringify(forbidden)};export {}`)
+      await expect(bundleNodeRuntime(entry, output)).rejects.toThrow('Forbidden deployed runtime import:')
+    }
   })
 
   it('rejects a relative project context import before following its dev graph', async () => {

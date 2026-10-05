@@ -1,6 +1,8 @@
+import type { McpOperationKind } from '../operations/types.js'
 import type { HistoireMcpProject } from '../project/facade.js'
 import type { McpOperationToolService } from '../server/operation-tools.js'
 import type { createMcpWorkerClient } from './worker-client.js'
+import { workerExecutionMethods } from './worker-protocol.js'
 
 /** Create finite read proxy; parent never evaluates project configuration or runtime. */
 export function createWorkerProject(worker: ReturnType<typeof createMcpWorkerClient>, projectId: string): HistoireMcpProject {
@@ -16,10 +18,10 @@ export function createWorkerProject(worker: ReturnType<typeof createMcpWorkerCli
 }
 
 /** Preserve shared operation discovery/results while forwarding exact capabilities. */
-export function createWorkerOperations(worker: ReturnType<typeof createMcpWorkerClient>, executors: { screenshot: boolean, tests: boolean }): McpOperationToolService {
+export function createWorkerOperations(worker: ReturnType<typeof createMcpWorkerClient>, executors: Partial<Record<McpOperationKind, boolean>>): McpOperationToolService {
   return {
-    hasExecutor: kind => executors[kind],
-    admit: (_principal, kind, input, signal) => worker.request(kind === 'screenshot' ? 'admitScreenshot' : 'admitTests', input, signal),
+    hasExecutor: kind => executors[kind] === true,
+    admit: (_principal, kind, input, signal) => worker.request(workerExecutionMethods[kind], input, signal),
     get: (_principal, operationId, signal) => worker.request('getOperation', { operationId }, signal),
     cancel: (_principal, operationId, signal) => worker.request('cancelOperation', { operationId }, signal),
     readResource: (_address, uri, _principal, signal) => worker.request('readResource', { uri }, signal),

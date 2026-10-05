@@ -62,7 +62,7 @@ export async function startHistoireStdio(options: { root: string, config?: strin
     server = serveStdio(async () => {
       const boot = await worker.ready
       const extension = createOperationServerExtension(createWorkerOperations(worker, boot.executors))
-      return createHistoireMcpServer({ project, principal, version: readHistoireVersion(), ...extension })
+      return createHistoireMcpServer({ project, principal, version: readHistoireVersion(), observeClientName: worker.setClientName, observeReadTool: worker.observeReadTool, ...extension })
     }, { onerror: error => console.error(error.message) })
   }
   // Ownership listeners exist before any asynchronous worker imports. EOF or a

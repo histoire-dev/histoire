@@ -5,7 +5,11 @@ import { spawn } from 'node:child_process'
 import { once } from 'node:events'
 import { createServer } from 'node:net'
 import { Client, StreamableHTTPClientTransport } from '@modelcontextprotocol/client'
+import { createPackageProcessEnvironment } from '../process-environment.js'
 import { MCP_BUILT_CLI } from './cli-project.js'
+
+/** Compatibility name retained for existing MCP fixtures. */
+export { createPackageProcessEnvironment as createMcpProcessEnvironment } from '../process-environment.js'
 
 /** Both revisions promised by Histoire; legacy negotiation uses SDK compatibility. */
 export const MCP_PROTOCOLS: [string, ClientOptions][] = [
@@ -25,20 +29,9 @@ export async function closeMcpFixtures(cleanup: (() => Promise<unknown>)[]) {
   if (failures.length) throw new AggregateError(failures, 'MCP fixture cleanup could not be confirmed')
 }
 
-/** Clean child environment cannot resolve optional peers through pnpm's runner shim. */
-export function createMcpProcessEnvironment(environment: NodeJS.ProcessEnv = {}) {
-  const env = { ...process.env, ...environment, BROWSER: 'none' }
-  // pnpm's executable shim sets NODE_PATH. A copied consumer must not resolve
-  // optional peers through the integration runner's development dependency tree.
-  delete env.NODE_PATH
-  delete env.NODE_OPTIONS
-  if (!environment.HISTOIRE_MCP_TOKEN) delete env.HISTOIRE_MCP_TOKEN
-  return env
-}
-
 /** Launch only owned child; bound logs, completion, startup and shutdown. */
 export function startMcpProcess(args: string[], cwd: string, environment: NodeJS.ProcessEnv = {}, entry = MCP_BUILT_CLI) {
-  const env = createMcpProcessEnvironment(environment)
+  const env = createPackageProcessEnvironment(environment)
   const child = spawn(process.env.HISTOIRE_MCP_TEST_NODE || process.execPath, [entry, ...args], { cwd, env, stdio: ['ignore', 'pipe', 'pipe'] })
   let output = ''
   const listeners = new Set<() => void>()

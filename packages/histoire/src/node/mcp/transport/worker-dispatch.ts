@@ -35,6 +35,18 @@ export async function dispatchWorkerRequest(options: { project: HistoireMcpProje
     case 'admitTests':
       result = await options.operations.admit(options.principal, 'tests', parseWorkerInput('admitTests', input), signal)
       break
+    case 'inspectVariant':
+      result = await options.operations.admit(options.principal, 'inspect-variant', parseWorkerInput('inspectVariant', input), signal)
+      break
+    case 'inspectDom':
+      result = await options.operations.admit(options.principal, 'inspect-dom', parseWorkerInput('inspectDom', input), signal)
+      break
+    case 'inspectAccessibility':
+      result = await options.operations.admit(options.principal, 'inspect-accessibility', parseWorkerInput('inspectAccessibility', input), signal)
+      break
+    case 'runtimeDiagnostics':
+      result = await options.operations.admit(options.principal, 'runtime-diagnostics', parseWorkerInput('runtimeDiagnostics', input), signal)
+      break
     case 'getOperation':
       result = await options.operations.get(options.principal, parseWorkerInput('getOperation', input).operationId, signal)
       break

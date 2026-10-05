@@ -5,6 +5,7 @@ import type { McpExecutionCapture, McpOperationOutput } from '../operations/type
 import type { McpToolInput } from '../protocol/tool-schema.js'
 import type { LaunchPreviewBrowser } from './dependencies.js'
 import { mergeHistoireTestSummaries } from '@histoire/shared'
+import { PreviewError } from '../../runtime/browser/errors.js'
 import { ExecutionError } from '../../runtime/execution-types.js'
 import { sanitizeMcpTestSummary } from '../operations/test-results.js'
 import { McpDomainError } from '../protocol/errors.js'
@@ -51,7 +52,8 @@ export function createCompiledPreviewTestTask(input: McpToolInput<'histoire_run_
             height: 800,
             colorScheme: manifest.defaultColorScheme === 'auto' ? undefined : manifest.defaultColorScheme,
             backgroundColor: manifest.backgroundColor,
-            textDirection: 'ltr',
+            textDirection: manifest.textDirection ?? 'ltr',
+            globals: manifest.globals ?? {},
             isActive: capture.isActive,
           } })
           try {
@@ -67,7 +69,7 @@ export function createCompiledPreviewTestTask(input: McpToolInput<'histoire_run_
         if (error instanceof ExecutionError) throw error
         if (timedOut || session?.timedOut) throw new McpDomainError('TIMEOUT', 'Compiled tests exceeded recorded run deadline', true)
         if (externalSignal.aborted) throw new McpDomainError('CANCELLED', 'Compiled test operation cancelled')
-        if (error instanceof McpDomainError) throw error
+        if (error instanceof McpDomainError || error instanceof PreviewError) throw error
         throw new McpDomainError('PREVIEW_NOT_READY', 'Compiled preview test operation failed', true)
       }
       finally { clearTimeout(timer) }

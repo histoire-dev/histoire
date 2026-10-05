@@ -21,7 +21,7 @@ describe('built CLI dev HTTP conformance', () => {
     const client = await connectMcpHttp(endpoint, options)
     cleanup.push(() => client.close())
     expect(client.getNegotiatedProtocolVersion()).toBe(version)
-    expect((await client.listTools()).tools).toHaveLength(10)
+    expect((await client.listTools()).tools).toHaveLength(14)
     const status = await waitMcp(() => callMcp(client, 'histoire_get_project'), value => value.data?.status === 'ready')
     expect(status.data).toMatchObject({ runtimeMode: 'dev', storyCount: 1 })
     expect(JSON.stringify(status)).not.toContain(project.root)

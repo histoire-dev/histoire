@@ -101,14 +101,14 @@ describe('owned test cancellation', () => {
     expect(vi.getTimerCount()).toBe(0)
   })
 
-  it('restores process exit status after browser assertions modify it', async () => {
+  it('keeps direct CLI runner exit status without global snapshot/restore', async () => {
     const previous = process.exitCode
     try {
       mocks.setCreateVitest(vi.fn(async () => createVitestInstanceStub({ start: async () => {
         process.exitCode = 1
       } })))
       await run(context(), { strictCleanup: true })
-      expect(process.exitCode).toBe(previous)
+      expect(process.exitCode).toBe(1)
     }
     finally { process.exitCode = previous }
   })

@@ -28,7 +28,7 @@ describe('copied Node artifact without original project', () => {
       const status = await callMcp(client, 'histoire_get_project')
       expect(status.data).toMatchObject({ runtimeMode: 'node', status: 'ready', base: '/book/', routerMode: 'history', capabilities: { screenshots: { available: false }, tests: { available: false } } })
       expect(JSON.stringify(status)).not.toContain(fixture.root)
-      expect((await client.listTools()).tools).toHaveLength(10)
+      expect((await client.listTools()).tools).toHaveLength(14)
       const stories = await callMcp(client, 'histoire_list_stories')
       expect(stories.data.items.map((story: any) => story.id)).toContain('..')
       const story = await callMcp(client, 'histoire_get_story', { storyId: '..' })

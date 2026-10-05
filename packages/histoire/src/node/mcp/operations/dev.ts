@@ -4,9 +4,11 @@ import { McpDomainError } from '../protocol/errors.js'
 import { createMcpOperations } from './store.js'
 
 /** Reuse private captured runtime without giving SDK handlers Context/Vite access. */
-export function createDevMcpOperations(project: ReturnType<typeof createDevMcpProject>, execution: ExecutionService) {
+export function createDevMcpOperations(project: ReturnType<typeof createDevMcpProject>, execution: ExecutionService, ownsExecution = true, clientIdForPrincipal?: (principal: string) => string) {
   return createMcpOperations({
     execution,
+    ownsExecution,
+    clientIdForPrincipal,
     capture() {
       const value = project.capture()
       const snapshot = value.catalog.current

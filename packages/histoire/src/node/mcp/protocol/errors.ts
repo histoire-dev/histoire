@@ -1,5 +1,6 @@
 import { ProtocolError, ResourceNotFoundError } from '@modelcontextprotocol/server'
 import { z } from 'zod/v4'
+import { PreviewError } from '../../runtime/browser/errors.js'
 import { MCP_LIMITS, mcpByteLength } from './limits.js'
 
 /** Expected application failures, shared by tools/resources and operation results. */
@@ -16,6 +17,7 @@ export const mcpErrorCodeSchema = z.enum([
   'PATH_OUTSIDE_ROOT',
   'STALE_REVISION',
   'INVALID_CURSOR',
+  'INVALID_SELECTOR',
   'CURSOR_EXPIRED',
   'DEPENDENCY_MISSING',
   'CAPABILITY_UNAVAILABLE',
@@ -77,8 +79,8 @@ export class McpDomainError extends Error {
 
 /** Project only deliberate domain errors; unknown exceptions never expose paths or secrets. */
 export function toMcpError(error: unknown): McpError {
-  if (error instanceof McpDomainError) {
-    const parsed = mcpErrorSchema.safeParse({ code: error.code, message: error.message, retryable: error.retryable, details: error.details })
+  if (error instanceof McpDomainError || error instanceof PreviewError) {
+    const parsed = mcpErrorSchema.safeParse({ code: error.code, message: error.message, retryable: error.retryable, ...(error instanceof McpDomainError ? { details: error.details } : {}) })
     if (parsed.success) {
       return parsed.data
     }

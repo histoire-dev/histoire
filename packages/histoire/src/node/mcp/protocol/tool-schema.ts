@@ -1,8 +1,10 @@
 import { z } from 'zod/v4'
 import { mcpDocsResultSchema, mcpSourceResultSchema } from './content-schema.js'
 import { mcpHandleSchema, mcpIdSchema, mcpRequestKeySchema, mcpRevisionSchema } from './ids.js'
+import { mcpInspectionInputSchemas } from './inspection-schema.js'
 import { MCP_LIMITS } from './limits.js'
 import { mcpOperationSchema } from './operation-schema.js'
+import { mcpPreviewInputFields } from './preview-input.js'
 import { mcpListStoriesResultSchema, mcpProjectSchema } from './project-schema.js'
 import { mcpOutputSchema } from './results.js'
 import { mcpPreviewResultSchema, mcpStoryResultSchema } from './story-schema.js'
@@ -60,21 +62,8 @@ export const mcpToolInputSchemas = {
     variantId: mcpIdSchema,
   }),
   /** Admit bounded screenshot operation. */
-  histoire_capture_screenshot: z.strictObject({
-    ...story,
-    /** Exact scoped target variant. */
-    variantId: mcpIdSchema,
-    /** Principal-scoped bounded retry identity. */
-    requestKey: mcpRequestKeySchema,
-    /** Captured iframe width. */
-    width: z.number().int().min(320).max(3840).default(1280),
-    /** Captured iframe height. */
-    height: z.number().int().min(240).max(2160).default(800),
-    /** Explicit theme; missing value uses configured theme. */
-    colorScheme: z.enum(['light', 'dark']).optional(),
-    /** Rendered text direction. */
-    textDirection: z.enum(['ltr', 'rtl']).default('ltr'),
-  }),
+  histoire_capture_screenshot: z.strictObject(mcpPreviewInputFields),
+  ...mcpInspectionInputSchemas,
   /** Admit story or targeted variant tests. */
   histoire_run_tests: z.strictObject({
     ...story,
@@ -109,6 +98,10 @@ export const mcpToolOutputSchemas = {
   histoire_get_preview: mcpOutputSchema(mcpPreviewResultSchema),
   histoire_capture_screenshot: mcpOutputSchema(mcpOperationSchema),
   histoire_run_tests: mcpOutputSchema(mcpOperationSchema),
+  histoire_inspect_variant: mcpOutputSchema(mcpOperationSchema),
+  histoire_inspect_dom: mcpOutputSchema(mcpOperationSchema),
+  histoire_inspect_accessibility: mcpOutputSchema(mcpOperationSchema),
+  histoire_get_runtime_diagnostics: mcpOutputSchema(mcpOperationSchema),
   histoire_get_operation: mcpOutputSchema(mcpOperationSchema),
   histoire_cancel_operation: mcpOutputSchema(mcpOperationSchema),
 } as const

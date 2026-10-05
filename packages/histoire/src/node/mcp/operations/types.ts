@@ -1,11 +1,12 @@
 import type { ExecutionHandle, ExecutionTask } from '../../runtime/execution-types.js'
+import type { McpInspectionInput, McpInspectionResult } from '../protocol/inspection-schema.js'
 import type { McpOperation, McpScreenshotResult, McpTestResult } from '../protocol/operation-schema.js'
 import type { McpToolInput } from '../protocol/tool-schema.js'
 
 /** Implemented asynchronous operation kinds. */
 export type McpOperationKind = McpOperation['kind']
 /** Parsed strict starter inputs, with protocol defaults already applied. */
-export type McpOperationInput = McpToolInput<'histoire_capture_screenshot'> | McpToolInput<'histoire_run_tests'>
+export type McpOperationInput = McpToolInput<'histoire_capture_screenshot'> | McpToolInput<'histoire_run_tests'> | McpInspectionInput
 
 /** Synchronous private authority captured before scheduling or awaiting. */
 export interface McpExecutionCapture<T> {
@@ -25,8 +26,8 @@ export interface McpExecutionCapture<T> {
 
 /** Fully sanitized result; binary artifact remains separate from JSON. */
 export interface McpOperationOutput {
-  /** Screenshot metadata or shared test result. */
-  result: McpScreenshotResult | McpTestResult
+  /** Screenshot metadata, shared test result or bounded rendered inspection. */
+  result: McpScreenshotResult | McpTestResult | McpInspectionResult
   /** Owned PNG bytes; store assigns independent artifact capability. */
   artifact?: Uint8Array
 }

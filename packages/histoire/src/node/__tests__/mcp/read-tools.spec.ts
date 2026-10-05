@@ -1,3 +1,4 @@
+import type { McpReadToolObserver } from '../../mcp/server/read-tools.js'
 import { afterEach, describe, expect, it } from 'vitest'
 import { McpDomainError } from '../../mcp/protocol/errors.js'
 import { mcpToolOutputSchemas } from '../../mcp/protocol/tool-schema.js'
@@ -12,10 +13,10 @@ describe('mcp SDK read tools', () => {
     await Promise.all(close.splice(0).reverse().map(fn => fn()))
   })
   /** Use official client with real immutable catalog and content services. */
-  async function fixture(ids?: string[]) {
+  async function fixture(ids?: string[], observeReadTool?: McpReadToolObserver) {
     const value = await createReadProjectFixture(ids)
     close.push(value.close)
-    const harness = await createMcpTestClient(() => createHistoireMcpServer({ project: value.project, principal: 'local', version: 'test-version' }))
+    const harness = await createMcpTestClient(() => createHistoireMcpServer({ project: value.project, principal: 'local', version: 'test-version', observeReadTool }))
     close.push(harness.close)
     return { ...value, client: harness.client }
   }
@@ -69,6 +70,20 @@ describe('mcp SDK read tools', () => {
     }
     const restarting = await client.callTool({ name: 'histoire_get_docs', arguments: { storyId: 'story' } })
     expect(restarting).toMatchObject({ structuredContent: { error: { code: 'PROJECT_RESTARTING', retryable: true } } })
+  })
+
+  it('observes only public tool names and scoped targets, excluding resource reads', async () => {
+    const observations: { name: string, target?: { storyId: string, variantId?: string } }[] = []
+    const { client, project } = await fixture(undefined, (name, target, run) => {
+      observations.push({ name, target })
+      return run()
+    })
+    await client.readResource({ uri: `histoire://${project.projectId}/project` })
+    expect(observations).toEqual([])
+    await client.callTool({ name: 'histoire_get_source', arguments: { storyId: 'story', startLine: 10, lineCount: 20 } })
+    expect(observations).toEqual([{ name: 'histoire_get_source', target: { storyId: 'story' } }])
+    await client.readResource({ uri: `histoire://${project.projectId}/project` })
+    expect(observations).toHaveLength(1)
   })
 
   it('distinguishes a completed empty catalog from failed collection', async () => {

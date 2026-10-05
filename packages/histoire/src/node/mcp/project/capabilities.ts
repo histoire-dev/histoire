@@ -12,6 +12,7 @@ export function detectDevMcpCapabilities(root: string): McpProject['capabilities
     content: true,
     previews: true,
     screenshots: { available: playwright, ...(!playwright ? { reason: 'Install playwright to capture screenshots' } : {}) },
+    inspection: { available: playwright, ...(!playwright ? { reason: 'Install playwright to inspect rendered variants' } : {}) },
     tests: {
       available: testsAvailable,
       engine: testsAvailable ? 'project-vitest' : 'unavailable',

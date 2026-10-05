@@ -1,3 +1,4 @@
+import type { BrowserContextOptions } from 'playwright'
 import type { LaunchPreviewBrowser } from '../../../mcp/browser/dependencies.js'
 import type { PreviewSessionOptions } from '../../../mcp/browser/session.js'
 import { vi } from 'vitest'
@@ -16,7 +17,7 @@ export function createPreviewBrowserFixture(options: { png?: Uint8Array, wait?: 
   const listeners = new Map<string, () => void>()
   const page = { on: vi.fn((event, listener) => listeners.set(event, listener)), off: vi.fn(event => listeners.delete(event)), evaluate: vi.fn(async (_callback, expected) => expected ? true : 'document'), setDefaultTimeout: vi.fn(), setDefaultNavigationTimeout: vi.fn(), goto: vi.fn(async () => {}), waitForFunction: vi.fn(options.wait ?? (async () => {})), frames: () => [main, frame], mainFrame: () => main, locator: () => ({ screenshot }) }
   const newPage = vi.fn(async () => page)
-  const newContext = vi.fn(async () => ({ newPage }))
+  const newContext = vi.fn(async (_options?: BrowserContextOptions) => ({ newPage }))
   const close = vi.fn(options.close ?? (async () => {}))
   const launch = vi.fn(async () => ({ newContext, close }))
   const session: PreviewSessionOptions = { root: '/project', host, launch: launch as unknown as LaunchPreviewBrowser, target: { origin: 'http://localhost:6006', storyId: 'story', variantId: 'variant', epoch: 'epoch', width: 480, height: 320, backgroundColor: 'transparent', textDirection: 'ltr', isActive: () => true } }

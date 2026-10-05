@@ -5,6 +5,7 @@ import { MCP_LIMITS } from '../../mcp/protocol/limits.js'
 import { createExecutionService } from '../../runtime/execution-service.js'
 import { deferred } from '../utils/mcp/deferred.js'
 import { createPreviewBrowserFixture, PREVIEW_PNG } from '../utils/mcp/preview-browser.js'
+import { createPreviewPng, padPreviewPng } from '../utils/mcp/preview-png.js'
 
 describe('isolated screenshot execution', () => {
   it('starts resources only in lane, captures PNG once, and expires host after confirmed close', async () => {
@@ -45,7 +46,7 @@ describe('isolated screenshot execution', () => {
   })
 
   it('rejects oversized or dimension-mismatched captures and still closes browser', async () => {
-    const tooLarge = createPreviewBrowserFixture({ png: new Uint8Array(MCP_LIMITS.artifactBytes + 1) })
+    const tooLarge = createPreviewBrowserFixture({ png: padPreviewPng(PREVIEW_PNG, MCP_LIMITS.artifactBytes) })
     const wrongSize = createPreviewBrowserFixture()
     wrongSize.session.target.width = 320
     for (const [fixture, code] of [[tooLarge, 'RESULT_TOO_LARGE'], [wrongSize, 'INTERNAL_ERROR']] as const) {
@@ -54,6 +55,20 @@ describe('isolated screenshot execution', () => {
       expect(fixture.close).toHaveBeenCalledOnce()
       await execution.close()
     }
+  })
+
+  it.each([1, 2, 3])('captures explicit device pixels and deterministic context at DPR %i', async (scale) => {
+    const width = scale === 3 ? 3840 : 480
+    const height = scale === 3 ? 2160 : 320
+    const fixture = createPreviewBrowserFixture({ png: createPreviewPng(width * scale, height * scale) })
+    Object.assign(fixture.session.target, { width, height, deviceScaleFactor: scale })
+    const execution = createExecutionService()
+    const output = await execution.enqueue(createScreenshotTask(fixture.session)).result
+    expect(output.result).toMatchObject({ width: width * scale, height: height * scale })
+    expect(fixture.newContext).toHaveBeenCalledWith(expect.objectContaining({ deviceScaleFactor: scale, timezoneId: 'UTC', locale: 'en-US', reducedMotion: 'reduce' }))
+    expect(fixture.screenshot).toHaveBeenCalledWith(expect.objectContaining({ scale: 'device' }))
+    expect(fixture.frame.evaluate).toHaveBeenCalledWith(expect.any(Function), true)
+    await execution.close()
   })
 
   it('detects complete PNG dimensions and rejects truncated data', () => {
@@ -84,6 +99,17 @@ describe('isolated screenshot execution', () => {
     await session.close()
     await expect(session.open(new AbortController().signal)).rejects.toMatchObject({ code: 'CANCELLED' })
     expect(fixture.launch).not.toHaveBeenCalled()
+  })
+
+  it('preview test sessions preserve story timezone, locale and styles', async () => {
+    const fixture = createPreviewBrowserFixture()
+    const session = createPreviewSession(fixture.session)
+    await session.open(new AbortController().signal)
+    const context = fixture.newContext.mock.calls[0][0]
+    expect(context).not.toHaveProperty('timezoneId')
+    expect(context).not.toHaveProperty('locale')
+    expect(fixture.frame.evaluate).toHaveBeenCalledWith(expect.any(Function), false)
+    await session.close()
   })
 
   it('uncaught preview error closes browser and fails without raw error disclosure', async () => {

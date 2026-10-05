@@ -6,9 +6,15 @@ describe('owned MCP worker protocol', () => {
   it('rejects arbitrary dispatch, unknown fields and invalid request capabilities', () => {
     const id = '550e8400-e29b-41d4-a716-446655440000:1'
     expect(workerParentMessageSchema.parse({ type: 'request', id, method: 'getProject', input: {} }).method).toBe('getProject')
+    expect(workerParentMessageSchema.parse({ type: 'request', id, method: 'getProject', input: {}, readTool: 'histoire_get_project' }).readTool).toBe('histoire_get_project')
+    expect(() => workerParentMessageSchema.parse({ type: 'request', id, method: 'getStory', input: {}, readTool: 'histoire_get_project' })).toThrow()
+    expect(() => workerParentMessageSchema.parse({ type: 'request', id, method: 'readResource', input: {}, readTool: 'histoire_get_project' })).toThrow()
     expect(() => workerParentMessageSchema.parse({ type: 'request', id, method: 'import', input: {} })).toThrow()
     expect(() => workerParentMessageSchema.parse({ type: 'request', id: 1, method: 'getProject', input: {} })).toThrow()
     expect(() => workerParentMessageSchema.parse({ type: 'shutdown', module: 'node:fs' })).toThrow()
+    expect(workerParentMessageSchema.parse({ type: 'client-name', name: 'Studio agent' })).toEqual({ type: 'client-name', name: 'Studio agent' })
+    expect(() => workerParentMessageSchema.parse({ type: 'client-name', name: 'Studio agent', token: 'private' })).toThrow()
+    expect(() => workerParentMessageSchema.parse({ type: 'client-name', name: 'x'.repeat(129) })).toThrow()
     expect(() => workerChildMessageSchema.parse({ type: 'error', id, error: { code: 'INTERNAL_ERROR', message: 'Failed', retryable: false, stack: 'private' } })).toThrow()
   })
 

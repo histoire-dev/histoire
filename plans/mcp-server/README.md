@@ -54,6 +54,9 @@ Static build remains default: `histoire build` and `histoire build --target stat
 | [13](13-deployed-preview-test-execution.md) | Tests through compiled preview runtime without project Vitest | 09, 10, 11, 12 |
 | [14](14-transport-and-framework-conformance.md) | Real transport/framework/deployment/failure-path proof | 06, 07, 09, 10, 11, 12, 13 |
 | [15](15-documentation-and-delivery-gates.md) | User docs, package/deploy smoke, CI, release checklist | 14 |
+| [16](16-capture-determinism-and-globals.md) | Planned: deterministic capture, globals, DPR, Nuxt nested base proof, shared-host guidance | 09, 12, 14; embed SDK 08 for globals delivery |
+
+Slice 16 is planned, not implemented. It folds software-factory host requirements ([factory requirements](../factory-requirements.md)) into the screenshot service shared with the embed SDK's Node `captureScreenshot`.
 
 Slices 06 and 07 can be developed independently after their prerequisites. Slice 08 can be developed alongside transport work. Slice 09's HTTP dependency is for sharing listener validation patterns and E2E infrastructure; screenshot URLs always target the Histoire UI server, never the MCP listener. Slice 10 can proceed once 08 lands. This dependency map describes implementation ownership; it does not authorize launching concurrent agents.
 

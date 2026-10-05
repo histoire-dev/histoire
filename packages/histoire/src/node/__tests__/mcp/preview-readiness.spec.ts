@@ -1,6 +1,6 @@
 import { runInNewContext } from 'node:vm'
-import { SANDBOX_READY, VARIANT_READY } from '@histoire/shared'
-import { describe, expect, it } from 'vitest'
+import { PROPS_OVERRIDE, RUNTIME_RESULT, SANDBOX_READY, VARIANT_READY } from '@histoire/shared'
+import { describe, expect, it, vi } from 'vitest'
 import { createPreviewHostRegistry } from '../../mcp/browser/preview-host.js'
 import { renderPreviewScript } from '../../mcp/browser/preview-script.js'
 import { matchesPreviewMessage } from '../../mcp/browser/readiness.js'
@@ -43,28 +43,54 @@ describe('isolated preview host authority', () => {
     }
   })
 
-  it('drops predecessor messages when same iframe WindowProxy hosts a new document', () => {
+  it.each([
+    { propsOverride: undefined, rejected: false },
+    { propsOverride: { enabled: true, message: 'Matrix cell' }, rejected: false },
+    { propsOverride: { enabled: true, message: 'Matrix cell' }, rejected: true },
+  ])('drops predecessor documents and awaits capture overrides %j', ({ propsOverride, rejected }) => {
     const origin = 'http://localhost:6006'
     const listeners = new Map<string, Array<(event: any) => void>>()
-    const frame = { style: {}, contentWindow: { __HST_PREVIEW_DOCUMENT_ID__: 'first', postMessage: () => {} } }
+    const frame = { style: {}, contentWindow: { __HST_PREVIEW_DOCUMENT_ID__: 'first', postMessage: vi.fn() } }
     const window: any = { addEventListener(event, listener) {
       const current = listeners.get(event) ?? []
       current.push(listener)
       listeners.set(event, current)
     } }
     const document = { createElement: () => frame, body: { appendChild: () => {} } }
-    const script = renderPreviewScript({ authority: { origin, storyId: '..', variantId: '雪', nonce: 'nonce', epoch: 'epoch', active: true }, sandboxUrl: `${origin}/__sandbox.html`, settings: { responsiveWidth: 320, responsiveHeight: 240, rotate: false, backgroundColor: 'transparent', checkerboard: false, textDirection: 'ltr' } })
+    const script = renderPreviewScript({ authority: { origin, storyId: '..', variantId: '雪', nonce: 'nonce', epoch: 'epoch', active: true }, sandboxUrl: `${origin}/__sandbox.html`, settings: { responsiveWidth: 320, responsiveHeight: 240, rotate: false, backgroundColor: 'transparent', checkerboard: false, textDirection: 'ltr' }, propsOverride })
     runInNewContext(script, { window, document })
-    const deliver = (type: string, documentId: string) => listeners.get('message')!.forEach(listener => listener({ origin, source: frame.contentWindow, data: { __histoire: true, type, storyId: '..', variantId: '雪', documentId } }))
+    const deliver = (type: string, documentId: string, extra = {}) => listeners.get('message')!.forEach(listener => listener({ origin, source: frame.contentWindow, data: { __histoire: true, type, storyId: '..', variantId: '雪', documentId, ...extra } }))
     deliver(SANDBOX_READY, 'first')
     deliver(VARIANT_READY, 'first')
-    expect(window.__HST_MCP_PREVIEW__.ready).toBe(true)
+    if (propsOverride) {
+      expect(window.__HST_MCP_PREVIEW__.ready).toBe(false)
+      const request = frame.contentWindow.postMessage.mock.calls.find(([value]) => value.type === PROPS_OVERRIDE)![0]
+      expect(request).toMatchObject({ props: propsOverride, documentId: 'first', storyId: '..', variantId: '雪' })
+      deliver(RUNTIME_RESULT, 'first', { requestId: 'foreign', result: { supported: true } })
+      expect(window.__HST_MCP_PREVIEW__.ready).toBe(false)
+      deliver(RUNTIME_RESULT, 'first', { requestId: request.requestId, result: { supported: !rejected } })
+      if (rejected) {
+        expect(window.__HST_MCP_PREVIEW__).toMatchObject({ ready: false, propsFailed: true })
+        deliver(VARIANT_READY, 'first')
+        deliver(RUNTIME_RESULT, 'first', { requestId: request.requestId, result: { supported: true } })
+        expect(window.__HST_MCP_PREVIEW__.ready).toBe(false)
+        expect(frame.contentWindow.postMessage.mock.calls.filter(([value]) => value.type === PROPS_OVERRIDE)).toHaveLength(1)
+      }
+    }
+    expect(window.__HST_MCP_PREVIEW__.ready).toBe(!rejected)
     frame.contentWindow.__HST_PREVIEW_DOCUMENT_ID__ = 'second'
     deliver(VARIANT_READY, 'second')
     expect(window.__HST_MCP_PREVIEW__.ready).toBe(false)
     deliver(SANDBOX_READY, 'first')
     expect(window.__HST_MCP_PREVIEW__.ready).toBe(false)
     deliver(SANDBOX_READY, 'second')
+    if (propsOverride) {
+      expect(window.__HST_MCP_PREVIEW__.ready).toBe(false)
+      const requests = frame.contentWindow.postMessage.mock.calls.filter(([value]) => value.type === PROPS_OVERRIDE)
+      deliver(RUNTIME_RESULT, 'first', { requestId: requests[0][0].requestId, result: { supported: true } })
+      expect(window.__HST_MCP_PREVIEW__.ready).toBe(false)
+      deliver(RUNTIME_RESULT, 'second', { requestId: requests[1][0].requestId, result: { supported: true } })
+    }
     expect(window.__HST_MCP_PREVIEW__).toMatchObject({ ready: true, documentId: 'second' })
   })
 })

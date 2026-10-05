@@ -1,6 +1,7 @@
 import type { Serializable } from 'node:child_process'
 import { isAbsolute } from 'node:path'
 import { z } from 'zod/v4'
+import { projectMcpUiTarget } from '../observer/target.js'
 import { toMcpError } from '../protocol/errors.js'
 import { mcpProjectIdSchema } from '../protocol/ids.js'
 import { dispatchWorkerRequest } from './worker-dispatch.js'
@@ -72,6 +73,10 @@ async function main() {
     try {
       assertWorkerFrame(raw)
       const message = workerParentMessageSchema.parse(raw)
+      if (message.type === 'client-name') {
+        runtime.setClientName(message.name)
+        return
+      }
       if (message.type === 'shutdown') {
         void close()
         return
@@ -83,7 +88,9 @@ async function main() {
       if (closing || requests.has(message.id) || requests.size >= 64) throw new Error('Invalid Histoire MCP worker request ownership')
       const abort = new AbortController()
       requests.set(message.id, abort)
-      void dispatchWorkerRequest({ project: runtime.project, operations: runtime.operations, principal }, message.method, message.input, abort.signal)
+      /** Read provenance is finite IPC metadata; ordinary resource dispatch stays unlabelled. */
+      const dispatch = () => dispatchWorkerRequest({ project: runtime.project, operations: runtime.operations, principal }, message.method, message.input, abort.signal)
+      void runtime.observeRequest(() => message.readTool ? runtime.observeReadTool(message.readTool, projectMcpUiTarget(message.input), dispatch) : dispatch())
         .then((data) => {
           if (!abort.signal.aborted && !closing) send({ type: 'result', id: message.id, data: parseWorkerResult(message.method, data) })
         })
@@ -109,7 +116,7 @@ async function main() {
   process.once('disconnect', onDisconnect)
   process.on('SIGINT', onSignal)
   process.on('SIGTERM', onSignal)
-  send({ type: 'boot', project: runtime.project.getProject(), executors: { screenshot: runtime.operations.hasExecutor('screenshot'), tests: runtime.operations.hasExecutor('tests') } })
+  send({ type: 'boot', project: runtime.project.getProject(), executors: { 'screenshot': runtime.operations.hasExecutor('screenshot'), 'tests': runtime.operations.hasExecutor('tests'), 'inspect-variant': runtime.operations.hasExecutor('inspect-variant'), 'inspect-dom': runtime.operations.hasExecutor('inspect-dom'), 'inspect-accessibility': runtime.operations.hasExecutor('inspect-accessibility'), 'runtime-diagnostics': runtime.operations.hasExecutor('runtime-diagnostics') } })
   void runtime.start().catch(error => console.error(error))
 }
 void main().catch((error) => {

@@ -1,9 +1,12 @@
-import type { ChildProcess, Serializable } from 'node:child_process'
+import type { Serializable } from 'node:child_process'
+import type { McpReadToolName } from '../server/read-tools.js'
 import type { WorkerMethod, WorkerResultMap } from './worker-protocol.js'
+import { AsyncLocalStorage } from 'node:async_hooks'
 import { fork } from 'node:child_process'
 import { randomUUID } from 'node:crypto'
+import { waitForChildExit } from '../../runtime/child-process.js'
 import { McpDomainError } from '../protocol/errors.js'
-import { assertWorkerFrame, isWorkerBinaryResult, parseWorkerInput, parseWorkerResult, workerChildMessageSchema } from './worker-protocol.js'
+import { assertWorkerFrame, isWorkerBinaryResult, parseWorkerInput, parseWorkerResult, workerChildMessageSchema, workerMethods } from './worker-protocol.js'
 
 /** One bounded parent request awaiting its exact response capability. */
 interface PendingRequest {
@@ -32,11 +35,13 @@ export function createMcpWorkerClient(options: { root: string, config?: string, 
   child.stdout?.pipe(process.stderr, { end: false })
   child.stderr?.pipe(process.stderr, { end: false })
   const pending = new Map<string, PendingRequest>()
+  const readTool = new AsyncLocalStorage<McpReadToolName>()
   const nonce = randomUUID()
   let counter = 0
   let closing: Promise<void> | undefined
   let booted = false
   let failed: Error | undefined
+  let clientName: string | undefined
   let bootResolve: (value: Extract<ReturnType<typeof workerChildMessageSchema.parse>, { type: 'boot' }>) => void
   let bootReject: (error: unknown) => void
   const ready = new Promise<Extract<ReturnType<typeof workerChildMessageSchema.parse>, { type: 'boot' }>>((resolve, reject) => {
@@ -116,12 +121,24 @@ export function createMcpWorkerClient(options: { root: string, config?: string, 
     get pid() { return child.pid },
     /** Resolves on owned child exit, including a crash. */
     exited: exit,
+    /** Forward only bounded client display name selected by SDK metadata hooks. */
+    setClientName(name: string) {
+      if (closing || failed || clientName === name) return
+      clientName = name
+      send({ type: 'client-name', name: name.slice(0, 128) })
+    },
+    /** Only SDK public read callbacks mark their corresponding IPC request. */
+    observeReadTool<T>(name: McpReadToolName, _target: unknown, run: () => T): T {
+      return readTool.run(name, run)
+    },
     /** Submit one finite bounded request; cancellation never invents a new operation. */
     async request<T extends WorkerMethod>(method: T, input: unknown, signal?: AbortSignal): Promise<WorkerResultMap[T]> {
       if (closing || failed) throw failed ?? new McpDomainError('PROJECT_CLOSED', 'Project worker is closed')
       if (pending.size >= 64) throw new McpDomainError('QUEUE_FULL', 'Worker request limit reached', true)
       signal?.throwIfAborted()
       const parsed = parseWorkerInput(method, input)
+      const publicRead = readTool.getStore()
+      const observation = publicRead && workerMethods[method as keyof typeof workerMethods] === publicRead ? { readTool: publicRead } : {}
       const id = `${nonce}:${++counter}`
       return new Promise<WorkerResultMap[T]>((resolve, reject) => {
         /** Removes ownership before forwarding cancellation to the child. */
@@ -149,7 +166,7 @@ export function createMcpWorkerClient(options: { root: string, config?: string, 
         })
         signal?.addEventListener('abort', onAbort, { once: true })
         try {
-          send({ type: 'request', id, method, input: parsed })
+          send({ type: 'request', id, method, input: parsed, ...observation })
         }
         catch (error) {
           pending.delete(id)
@@ -185,16 +202,4 @@ export function createMcpWorkerClient(options: { root: string, config?: string, 
       })()
     },
   }
-}
-
-/** Wait a bounded interval without retaining a timer after an early process exit. */
-async function waitForChildExit(child: ChildProcess, exited: Promise<void>, milliseconds: number) {
-  if (child.exitCode !== null || child.signalCode !== null) return true
-  let timer: ReturnType<typeof setTimeout>
-  try {
-    return await Promise.race([exited.then(() => true), new Promise<boolean>((resolve) => {
-      timer = setTimeout(() => resolve(false), milliseconds)
-    })])
-  }
-  finally { clearTimeout(timer) }
 }

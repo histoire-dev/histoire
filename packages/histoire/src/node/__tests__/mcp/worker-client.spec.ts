@@ -109,4 +109,20 @@ if (globalThis.counter > 1) process.send({ type: 'result', id: message.id, data:
     const result = await serving.client.callTool({ name: 'histoire_get_project', arguments: {} })
     expect(result.structuredContent).toMatchObject({ ok: true, data: { status: 'ready' } })
   })
+
+  it('marks public read tools through IPC while keeping resource reads unlabelled', async () => {
+    const worker = await fixture(`
+if (message.type !== 'request') return;
+process.send({ type: 'result', id: message.id, data: { ...project, title: message.readTool ?? 'ordinary-resource-read' } });
+`)
+    const projectId = (await worker.ready).project.projectId
+    const serving = await createMcpTestClient(() => createHistoireMcpServer({ project: createWorkerProject(worker, projectId), principal: 'stdio:test', version: '1.0.0', observeReadTool: worker.observeReadTool }))
+    close.push(serving.close)
+    const before = await serving.client.readResource({ uri: `histoire://${projectId}/project` })
+    expect(JSON.parse((before.contents[0] as { text: string }).text).title).toBe('ordinary-resource-read')
+    const tool = await serving.client.callTool({ name: 'histoire_get_project', arguments: {} })
+    expect(tool.structuredContent).toMatchObject({ ok: true, data: { title: 'histoire_get_project' } })
+    const after = await serving.client.readResource({ uri: `histoire://${projectId}/project` })
+    expect(JSON.parse((after.contents[0] as { text: string }).text).title).toBe('ordinary-resource-read')
+  })
 })

@@ -48,6 +48,8 @@ export const mcpProjectSchema = z.strictObject({
     content: z.boolean(),
     previews: z.boolean(),
     screenshots: mcpCapabilitySchema,
+    /** Fresh rendered inspection availability; optional for legacy worker DTOs. */
+    inspection: mcpCapabilitySchema.optional(),
     tests: mcpCapabilitySchema.extend({ engine: z.enum(['project-vitest', 'built-preview', 'unavailable']) }),
   }),
   /** Bounded current diagnostics. */

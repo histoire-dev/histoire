@@ -1,6 +1,6 @@
 # MCP server
 
-Histoire exposes stories, docs, source, preview URLs, screenshots, and story tests through Model Context Protocol (MCP).
+Histoire exposes stories, docs, source, preview URLs, screenshots, rendered inspection, and story tests through Model Context Protocol (MCP).
 
 ## Development HTTP
 
@@ -19,6 +19,8 @@ node -e "console.log(require('node:crypto').randomBytes(32).toString('hex'))"
 ```
 
 Keep credentials in your environment or secret manager. Histoire captures and removes this variable before loading project config.
+
+Loopback without a token trusts one local principal. When several projects or untrusted code share a network namespace, set `HISTOIRE_MCP_TOKEN` or disable MCP with `--no-mcp`.
 
 ```sh
 pnpm exec histoire dev --no-mcp
@@ -83,7 +85,7 @@ pnpm add -D playwright vitest @vitest/browser-playwright
 pnpm exec playwright install chromium
 ```
 
-Screenshots need Playwright/Chromium. Development tests additionally need Vitest 4 and `@vitest/browser-playwright`. Missing peers leave read tools available; project capabilities explain unavailable execution. Browser installation happens explicitly, never during an MCP call.
+Screenshots and rendered inspection need Playwright/Chromium. Development tests additionally need Vitest 4 and `@vitest/browser-playwright`. Missing peers leave read tools available; project capabilities explain unavailable execution. Browser installation happens explicitly, never during an MCP call.
 
 Start a job with a fresh caller-generated UUID `requestKey`:
 
@@ -99,24 +101,52 @@ Use this input with `histoire_capture_screenshot` or `histoire_run_tests`. Poll 
 
 Identical retries with the same key and parameters return the same operation during retention. A changed target returns `REQUEST_KEY_CONFLICT`. Results expire after ten minutes or earlier storage eviction; an expired result never implies a safe automatic rerun. Read large PNGs through `artifactUri`; page retained test details through the operation resource.
 
+Screenshot input also accepts integer `deviceScaleFactor` from 1 to 3 and primitive `globals`, for example `{ "theme": "contrast" }`. Width and height are CSS pixels; PNG dimensions include device scale. Captures disable animations/transitions/caret, use reduced motion, UTC and `en-US`, and settle fonts plus two animation frames. PNG bytes remain capped at 4 MiB, including at maximum dimensions. Stories read globals through `useHistoireGlobals()` from `@histoire/shared`; config `preview.globals` supplies defaults. New DPR or globals under an existing request key returns `REQUEST_KEY_CONFLICT`; key order alone does not.
+
+`sandboxUrl` needs Histoire's trusted same-origin wrapper to become ready. Use `histoire_capture_screenshot` or the shared Node SDK capture API for external screenshot automation.
+
 Development uses the project's Vitest browser runner (`project-vitest`). [Node deployments](./deploy-node.md) run the compiled embedded preview tests (`built-preview`) with Playwright, without project Vitest or runtime source collection. This covers selected story/variant tests, not project-wide tests, coverage, snapshot updates, watch mode, or CLI reporter behavior. Existing explicit test/hook deadlines still apply. A story with no tests succeeds with zero tests; failed assertions, uncollected stories, and infrastructure failures remain distinct.
 
 Each job gets a fresh browser context. Jobs share one owned execution lane; a config restart invalidates old operations and artifacts. If browser/Vitest teardown cannot be confirmed, execution stays unavailable until the process restarts. Read tools remain usable. See [MCP reference](../reference/mcp.md) for limits and error codes.
 
+## Inspect a rendered variant
+
+Four tools inspect a fresh isolated preview:
+
+- `histoire_inspect_variant`: current JSON state and framework-provided automatic prop metadata, including defaults and current values.
+- `histoire_inspect_dom`: bounded element subtree, selected attributes, text, CSS geometry and computed styles.
+- `histoire_inspect_accessibility`: Playwright ARIA snapshot with rendered roles and accessible names; no accessibility audit.
+- `histoire_get_runtime_diagnostics`: startup console, page errors, failed requests and HTTP errors, with optional observation after readiness.
+
+For example, call `histoire_inspect_dom` with:
+
+```json
+{
+  "storyId": "button",
+  "variantId": "default",
+  "requestKey": "00000000-0000-4000-8000-000000000002",
+  "selector": "button",
+  "maxNodes": 20
+}
+```
+
+Poll `histoire_get_operation` with the returned `operationId`, as for screenshots. All four accept screenshot viewport, globals, color scheme and direction settings. Inspection reports the fresh mount; it does not read unsaved control changes in an open book. Results remain bounded and report `truncated`; prop metadata depends on framework support. Diagnostics can complete with `previewReady: false` and captured mount failures. See [rendered inspection reference](../reference/mcp.md#rendered-inspection) for inputs, output fields and limits.
+
 ## Validated framework combinations
 
-Local Node.js 22 checks cover story/source discovery, preview URLs, live screenshots, Node builds, and screenshots from copied artifacts with original projects removed:
+Local checks cover story/source discovery, preview URLs, live screenshots, Node builds, and screenshots from copied artifacts with original projects removed. React and SvelteKit 3 checks use Node.js 24; earlier framework checks use Node.js 22:
 
 | Framework | Tested versions and setup |
 | --- | --- |
 | Vue 3 | Vue 3.5.26, Vite 7.3.1, `@vitejs/plugin-vue` 5.2.4 |
+| React | React 19.3.0, Vite 8.3.2, `@vitejs/plugin-react` 5.2.0 |
 | Svelte 4 | Svelte 4.2.19, Vite 5.4.21, `@sveltejs/vite-plugin-svelte` 3.1.2; existing example combination, outside Histoire's current Vite 7/8 peer range |
 | Svelte 5 | Svelte 5.55.0, Vite 8.0.3, `@sveltejs/vite-plugin-svelte` 7.0.0 |
-| SvelteKit | SvelteKit 2.55.0 with that Svelte 5/Vite 8 combination; run `svelte-kit sync` before Histoire |
+| SvelteKit | SvelteKit 3.0.0, Svelte 5.57.1, Vite 8.3.2, `@sveltejs/vite-plugin-svelte` 7.0.0; run `svelte-kit sync` before Histoire |
 | Nuxt 4 | Nuxt 4.2.2, Vue 3.5.26 |
 
 Browser tests have additional Vue fixture evidence for both `project-vitest` and `built-preview`: passing tests, skipped tests, failed assertions, explicit timeouts, no-test variants, and cancellation followed by another job. The framework screenshot checks do not establish browser-test parity for every framework. These are tested combinations, not guarantees for every plugin/version pairing.
 
 ## Hosting and scope
 
-[Build a standalone Node server](./deploy-node.md) to expose MCP alongside a deployed book. Static hosting serves the book without MCP. MCP offers no file writes, shell commands, arbitrary browser scripts, DOM automation, control-state mutation, or SSR rendering. HTTP accepts native MCP clients with exact Host/Origin validation; it does not advertise browser CORS or an OAuth authorization server.
+[Build a standalone Node server](./deploy-node.md) to expose MCP alongside a deployed book. Static hosting serves the book without MCP. MCP offers no file writes, shell commands, arbitrary browser scripts, browser interactions, control-state mutation, or SSR rendering. HTTP accepts native MCP clients with exact Host/Origin validation; it does not advertise browser CORS or an OAuth authorization server.

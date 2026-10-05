@@ -27,19 +27,25 @@ describe('portable Node manifest', () => {
     const file = createMcpStory(fixture.root, '../🐈/%2E')
     file.story.docsText = 'Inline docs\r\n'
     file.story.meta = { secret: 'do not include' }
+    file.story.matrix = { axes: { size: ['sm', 'lg'] } }
     const ctx = context([file])
     ctx.config.backgroundPresets = [{ label: 'Initial', color: '#123456' }]
+    ctx.config.preview = { textDirection: 'rtl', globals: { theme: 'contrast' } }
     const snapshot = await createNodeBuildSnapshot(ctx, await captureNodeBuildInputs(ctx))
     const manifest = createArtifactManifest(snapshot, [{ path: 'index.html', sha256: 'a'.repeat(64), bytes: 10 }], true, '1.2.3')
     expect(artifactManifestSchema.parse(manifest)).toEqual(manifest)
+    expect(manifest.stories[0].story).not.toHaveProperty('runtimeRevision')
+    expect(manifest.stories[0].story).not.toHaveProperty('matrix')
     expect(manifest.stories[0]).toMatchObject({ story: { id: '../🐈/%2E', docsAvailable: true, sourceKind: 'virtual' }, source: { kind: 'virtual' }, docs: { kind: 'text', origin: 'collected' } })
     const serialized = JSON.stringify(manifest)
     expect(serialized).not.toContain(fixture.root)
     expect(serialized).not.toContain('do not include')
-    expect(manifest).toMatchObject({ base: '/book/', backgroundColor: '#123456', mcpEnabled: false, testRuntimeIncluded: true, histoireVersion: '1.2.3', timeouts: { collect: 100, storyCollect: 20, run: 200 } })
+    expect(manifest).toMatchObject({ base: '/book/', backgroundColor: '#123456', textDirection: 'rtl', globals: { theme: 'contrast' }, mcpEnabled: false, testRuntimeIncluded: true, histoireVersion: '1.2.3', timeouts: { collect: 100, storyCollect: 20, run: 200 } })
     expect(manifest.buildId).toBe(createArtifactManifest(snapshot, manifest.publicAssets, true, '1.2.3').buildId)
     expect(createArtifactManifest(snapshot, [{ ...manifest.publicAssets[0], bytes: 11 }], true, '1.2.3').buildId).not.toBe(manifest.buildId)
     expect(createArtifactManifest({ ...snapshot, settings: { ...snapshot.settings, backgroundColor: '#ffffff' } }, manifest.publicAssets, true, '1.2.3').buildId).not.toBe(manifest.buildId)
+    expect(createArtifactManifest({ ...snapshot, settings: { ...snapshot.settings, globals: { theme: 'light' } } }, manifest.publicAssets, true, '1.2.3').buildId).not.toBe(manifest.buildId)
+    expect(artifactManifestSchema.safeParse({ ...manifest, globals: { theme: {} } }).success).toBe(false)
   })
 
   it('omits private raw source while retaining collected docs and UI source input', async () => {

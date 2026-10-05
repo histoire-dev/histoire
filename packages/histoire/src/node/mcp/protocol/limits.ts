@@ -1,5 +1,6 @@
 /** Shared admission, storage, content, and response bounds for every transport. */
 import { Buffer } from 'node:buffer'
+import { CAPTURE_LIMITS } from '../../runtime/browser/limits.js'
 
 export const MCP_LIMITS = Object.freeze({
   /** Maximum encoded ID size. */
@@ -41,11 +42,11 @@ export const MCP_LIMITS = Object.freeze({
   /** Maximum stored results and artifacts combined. */
   storageBytes: 32 * 1024 * 1024,
   /** Maximum full sanitized test result or screenshot. */
-  artifactBytes: 4 * 1024 * 1024,
+  artifactBytes: CAPTURE_LIMITS.artifactBytes,
   /** Maximum image embedded in tool content. */
   inlineImageBytes: 1024 * 1024,
   /** Preview readiness deadline. */
-  previewTimeoutMs: 30 * 1000,
+  previewTimeoutMs: CAPTURE_LIMITS.previewTimeoutMs,
   /** Owned browser shutdown deadline. */
   cleanupTimeoutMs: 10 * 1000,
 })

@@ -10,7 +10,7 @@ import { MCP_HTTP_BODY_BYTES, MCP_HTTP_CONCURRENT_CALLS } from './http-body.js'
 import { guardMcpHttp, rejectMcpHttp, validateMcpHttpPolicy } from './http-guards.js'
 
 /** Creates a guarded mounted handler usable on dev or production Node listeners. */
-export function createMcpHttpHandler(factory: McpServerFactory, policy: McpHttpPolicy) {
+export function createMcpHttpHandler(factory: McpServerFactory, policy: McpHttpPolicy, observeExchange?: (work: () => Promise<void>) => Promise<void>) {
   validateMcpHttpPolicy(policy)
   validateMcpToken(policy.token, policy.mode === 'protected-node')
   const verify = createMcpTokenVerifier(policy.token)
@@ -39,7 +39,8 @@ export function createMcpHttpHandler(factory: McpServerFactory, policy: McpHttpP
       try {
         const authenticated = request as IncomingMessage & { auth?: { token: string, clientId: string, scopes: string[] } }
         if (policy.token !== undefined) authenticated.auth = { token: policy.token, clientId: policy.principal, scopes: [] }
-        await dispatch(authenticated, response)
+        if (observeExchange) await observeExchange(() => dispatch(authenticated, response))
+        else await dispatch(authenticated, response)
       }
       finally { active-- }
     },
@@ -52,7 +53,7 @@ export function createMcpHttpHandler(factory: McpServerFactory, policy: McpHttpP
 }
 
 /** Opens one owned loopback listener; only the implicit default port can fall back. */
-export async function startDevMcpHttp(options: DevMcpOptions & { factory: McpServerFactory, principal: string, token?: string }) {
+export async function startDevMcpHttp(options: DevMcpOptions & { factory: McpServerFactory, principal: string, token?: string, observeExchange?: (work: () => Promise<void>) => Promise<void> }) {
   let transport: ReturnType<typeof createMcpHttpHandler> | undefined
   let closing: Promise<void> | undefined
   const server = createServer((request, response) => {
@@ -108,7 +109,7 @@ export async function startDevMcpHttp(options: DevMcpOptions & { factory: McpSer
     const address = server.address()
     if (!address || typeof address === 'string') throw new Error('MCP server did not bind a TCP address')
     const origin = `http://127.0.0.1:${address.port}`
-    transport = createMcpHttpHandler(options.factory, { mode: 'dev-local', origin, path: '/mcp', token: options.token, principal: options.principal })
+    transport = createMcpHttpHandler(options.factory, { mode: 'dev-local', origin, path: '/mcp', token: options.token, principal: options.principal }, options.observeExchange)
     return { server, url: `${origin}/mcp`, close }
   }
   catch (error) {

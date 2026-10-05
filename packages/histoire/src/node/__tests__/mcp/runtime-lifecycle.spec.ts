@@ -118,16 +118,19 @@ describe('owned project runtime', () => {
     expect(runtime.close).toHaveBeenCalledTimes(1)
   })
 
-  it('rejects a second project owner until first closes', async () => {
+  it('keeps independently started project owners active until each closes', async () => {
     const first = create(async () => generation())
     const second = create(async () => generation())
-    await first.start()
-    await expect(second.start()).rejects.toThrow('already owns')
+    const one = await first.start()
+    const two = await second.start()
+    expect(one.isActive()).toBe(true)
+    expect(two.isActive()).toBe(true)
     await first.close()
-    await expect(second.start()).resolves.toBeDefined()
+    expect(one.isActive()).toBe(false)
+    expect(two.isActive()).toBe(true)
   })
 
-  it('holds process ownership until late acquisition closes after cancellation', async () => {
+  it('closes late acquisition without blocking another project', async () => {
     const acquired = deferred<RuntimeGeneration>()
     const runtime = generation()
     const first = create(() => acquired.promise)
@@ -135,12 +138,12 @@ describe('owned project runtime', () => {
     const started = first.start()
     const rejected = expect(started).rejects.toThrow('closed')
     const close = first.close()
-    await expect(second.start()).rejects.toThrow('already owns')
+    const independent = await second.start()
     acquired.resolve(runtime)
     await Promise.all([close, rejected])
     expect(runtime.close).toHaveBeenCalledTimes(1)
     expect(first.current).toBeUndefined()
-    await expect(second.start()).resolves.toBeDefined()
+    expect(independent.isActive()).toBe(true)
   })
 
   it('does not lose a config edit while next generation initial collection runs', async () => {
@@ -174,8 +177,7 @@ describe('resource cleanup', () => {
     expect(start).toHaveBeenCalledTimes(1)
     await expect(first.close()).rejects.toThrow('runner teardown unconfirmed')
   })
-  it('retains process ownership after partial startup cleanup fails', async () => {
-    // Isolate this deliberately blocked process owner from other test controllers.
+  it('quarantines failed teardown to its controller while other projects can start', async () => {
     vi.resetModules()
     const { createProjectRuntimeController: createIsolated } = await import('../../runtime/controller.js')
     const failure = new RuntimeCleanupError([new Error('acquisition failed'), new Error('server close failed')], 'acquisition failed')
@@ -185,7 +187,8 @@ describe('resource cleanup', () => {
     const second = createIsolated({}, { start: async () => generation() })
     await expect(first.start()).rejects.toThrow('acquisition failed')
     expect(first.status).toBe('failed')
-    await expect(second.start()).rejects.toThrow('already owns')
+    const independent = await second.start()
+    expect(independent.isActive()).toBe(true)
     await expect(first.close()).rejects.toThrow('acquisition failed')
     await second.close()
   })

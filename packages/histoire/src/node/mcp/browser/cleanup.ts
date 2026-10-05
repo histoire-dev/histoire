@@ -1,3 +1,2 @@
-/** Reuse SDK-free confirmed browser teardown for preview and project Vitest jobs. */
-export { closePlaywrightBrowser as closePreviewBrowser } from '../../util/playwright-cleanup.js'
-export type { PlaywrightCleanupOutcome as PreviewCleanupOutcome } from '../../util/playwright-cleanup.js'
+/** Compatibility entry; canonical browser service lives under runtime/browser. */
+export * from '../../runtime/browser/cleanup.js'
