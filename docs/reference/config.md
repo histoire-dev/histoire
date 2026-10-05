@@ -59,6 +59,46 @@ export default defineConfig({
 
 Node builds record the enabled policy, with runtime `--mcp`/`--no-mcp` overrides. Node ignores this dev-only port and uses the book listener. Deployed MCP requires a strong `HISTOIRE_MCP_TOKEN`.
 
+## `embed`
+
+`{ enabled?: boolean, allowedOrigins?: string[], channels?: string[], allowOpenInEditor?: boolean, allowServerTests?: boolean }` - Default: disabled, no additional origins or channels, both command opt-ins false.
+
+Enable the [browser/Vue SDK](../guide/embedding.md) source documents and surface bridge independently of MCP:
+
+```ts
+export default defineConfig({
+  embed: {
+    enabled: true,
+    allowedOrigins: ['https://app.example.com'],
+    allowOpenInEditor: false,
+    allowServerTests: false,
+  },
+})
+```
+
+When enabled, book origin is allowed automatically. Additional origins must exactly match scheme/host/port; paths, trailing slash, wildcard, credentials, and opaque origins are invalid. Cross-origin editor and dev-server tests require their own explicit opt-ins; origin allowlisting alone does not enable them. Static books never advertise server test execution.
+
+`channels` opts into application message names matching `^[a-z][a-z0-9-]{0,31}$`, with at most 100 configured names. Names confer no command or plugin-event authority. See [application channels](../guide/embedding.md#exchange-application-messages) for story/host APIs and lifecycle limits.
+
+Built books can replace additional origins at deployment without rebuilding. Static output reads optional same-base `histoire-embed-origins.json` with `{ "version": 1, "allowedOrigins": [...] }`; Node deployment reads comma-separated `HISTOIRE_EMBED_ORIGINS`. Invalid present override permits book origin only. See [deployment headers](../guide/embedding.md#origins-and-deployment-headers) for matching `frame-ancestors`/host `frame-src` policies.
+
+## `preview`
+
+`{ globals?: Record<string, string | number | boolean | null>, textDirection?: 'ltr' | 'rtl' }` - Default: empty globals, `'ltr'`.
+
+Initial isolated runtime/capture settings. Globals contain at most 32 keys beginning with a letter, followed by letters/digits/underscore/hyphen, up to 64 characters. String values are bounded to 1 KiB; numbers must be finite. Session `settings.update()` replaces globals reactively without remounting.
+
+```ts
+export default defineConfig({
+  preview: {
+    globals: { density: 'compact', accent: 'violet' },
+    textDirection: 'ltr',
+  },
+})
+```
+
+Vue/Nuxt stories read `useHistoireGlobals()` from `histoire/client`; Svelte/vanilla use `useHistoireGlobalsStore()`. Initial appearance still comes from `theme.defaultColorScheme`. Grid variants share session globals. See [SDK settings](./sdk.md#snapshots-and-settings).
+
 ## `build.target`
 
 `'static' | 'node'` - Default: `'static'`
@@ -147,6 +187,8 @@ Customize the look of the book.
 Properties:
 
 - `title: string`: Main page title. For example: 'Acme Inc.'
+- `description: string`: Optional introduction on the home page.
+- `fonts: { sans?: string, mono?: string }`: CSS font-family overrides for interface and code text.
 - `logo: Object`: Logo configuration.
   - `square: string`: Square logo image without text.
   - `light: string`: Full logo for light theme.
@@ -522,3 +564,142 @@ export default defineConfig({
   },
 })
 ```
+
+## `theme.description`
+
+`string` - Default: unset
+
+Optional introduction on the home page in development and static builds.
+
+```ts
+export default defineConfig({
+  theme: { description: 'Components for our product interfaces.' },
+})
+```
+
+## `theme.fonts`
+
+`{ sans?: string, mono?: string }`
+
+Default: `{ sans: '"Manrope", system-ui, sans-serif', mono: '"JetBrains Mono", ui-monospace, monospace' }`.
+
+CSS font-family values for interface text and code/measurements. Manrope 400–800 and JetBrains Mono 400–500 are bundled locally with Latin and Latin Extended subsets. Overrides select a family; provide any additional font assets in your own CSS. See [workbench appearance](../guide/ui-settings.md).
+
+```ts
+export default defineConfig({
+  theme: {
+    fonts: {
+      sans: 'Inter, system-ui, sans-serif',
+      mono: '"IBM Plex Mono", monospace',
+    },
+  },
+})
+```
+
+## `ui.defaultArrange`
+
+`'grid' | 'list'` - Default: `'grid'`
+
+Initial canvas arrangement. Persisted user settings and the `arrange` URL query take precedence. Matrix remains available through the toolbar or URL. See [workbench navigation](../guide/ui-shell.md) and [settings](../guide/ui-settings.md).
+
+```ts
+export default defineConfig({
+  ui: { defaultArrange: 'list' },
+})
+```
+
+## `ui.frameBudget`
+
+`number` - Default: `24`
+
+Maximum live preview frames per canvas. Selected frames take priority; other frames outside the visible area or budget show placeholders. Matrix reserves one slot for its canonical preview. Use a positive integer. See [props matrix](../guide/ui-matrix.md).
+
+```ts
+export default defineConfig({
+  ui: { frameBudget: 12 },
+})
+```
+
+## `agents.enabled`
+
+`boolean` - Default: `false`
+
+Enable local ACP agents in development. User settings can override this project default. Enabling does not download or launch an agent: the first explicit prompt starts its process. Static builds expose no agent connection. See [ACP agents](../guide/ui-agents.md).
+
+```ts
+export default defineConfig({
+  agents: { enabled: true },
+})
+```
+
+## `agents.presets`
+
+`Array<{ id: string, name: string, command: string, args?: string[], env?: Record<string, string>, cwd?: string, default?: boolean }>` - Default: `[]`
+
+Available local launch presets. An empty list uses the built-in Claude Code (`claude-agent-acp`), Gemini CLI (`gemini --acp`), and Codex (`codex-acp`) presets. Executables must already be installed. `default` selects a preset when no agent is chosen explicitly.
+
+`env` is reserved for private user-level environment overrides. Environment values are excluded from browser config and rejected by project saves; configure them in local agent settings. See [ACP agents](../guide/ui-agents.md) and the [config codemod](./config-codemod.md).
+
+```ts
+export default defineConfig({
+  agents: {
+    presets: [
+      { id: 'local-agent', name: 'Local agent', command: 'my-acp-agent', args: ['--stdio'], default: true },
+    ],
+  },
+})
+```
+
+## `agents.permissions`
+
+`{ fileEdits?: 'ask' | 'allow-src' | 'never', terminal?: 'ask' | 'allow' | 'never' }`
+
+Default: `{ fileEdits: 'ask', terminal: 'ask' }`.
+
+Policy for agent-owned tool requests. `ask` shows a permission card; `never` denies that category. `allow-src` allows file-edit requests only when all reported paths resolve inside the project's `src` directory; other paths require a prompt. Terminal `allow` permits terminal requests. Other tool categories still require a prompt. See [ACP permissions](../guide/ui-agents.md).
+
+```ts
+export default defineConfig({
+  agents: {
+    permissions: { fileEdits: 'allow-src', terminal: 'ask' },
+  },
+})
+```
+
+## `comments.enabled`
+
+`boolean` - Default: `true`
+
+Enable local comments in development. Disabled comments perform no comment-file I/O. Static builds never read or expose the comment store. See [comments for AI](../guide/ui-comments.md).
+
+```ts
+export default defineConfig({
+  comments: { enabled: false },
+})
+```
+
+## `comments.file`
+
+`string` - Default: `'.histoire/comments.json'`
+
+Project-relative path for local comment threads. The path must stay inside the project; symlink escapes are rejected. Updates use an atomic local write. Choose whether to commit this file or ignore it. See [comment storage](../guide/ui-comments.md).
+
+```ts
+export default defineConfig({
+  comments: { file: '.histoire/review-comments.json' },
+})
+```
+
+## `build.changedSince`
+
+`string` - Default: unset
+
+Git reference used to identify added or changed stories in a built book's release updates. Unavailable Git metadata or an invalid reference omits that section. Development uses working-tree changes independently of this option. See [home and navigation](../guide/ui-navigation.md).
+
+```ts
+export default defineConfig({
+  build: { changedSince: 'v1.0.0' },
+})
+```
+
+Settings can save supported project defaults through the existing TS/JS config. See [Save to project](../guide/ui-settings.md) for its explicit preview flow and the [config codemod reference](./config-codemod.md) for editable paths and computed-value refusals. [Screenshots and MCP activity](../guide/ui-screenshots-mcp.md) use development services independently of these defaults.

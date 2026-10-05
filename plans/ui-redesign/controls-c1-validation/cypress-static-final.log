@@ -1,0 +1,191 @@
+
+DevTools listening on ws://127.0.0.1:42761/devtools/browser/f0095168-f44d-4e96-b150-f619b5db0d59
+(node:573266) ExperimentalWarning: `--experimental-loader` may be removed in the future; instead use `register()`:
+--import 'data:text/javascript,import { register } from "node:module"; import { pathToFileURL } from "node:url"; register("file%3A///home/akryum/.cache/Cypress/13.17.0/Cypress/resources/app/node_modules/ts-node/esm/transpile-only.mjs", pathToFileURL("./"));'
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:573266) [DEP0180] DeprecationWarning: fs.Stats constructor is deprecated.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+
+================================================================================
+
+  (Run Starting)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Cypress:        13.17.0                                                                        │
+  │ Browser:        Electron 118 (headless)                                                        │
+  │ Node Version:   v24.16.0 (/home/akryum/.local/share/mise/installs/node/24.16.0/bin/node)       │
+  │ Specs:          4 found (controls.cy.js, controls-overlays.cy.js, ui-workbench.cy.js, ui-revie │
+  │                 w-regressions.cy.js)                                                           │
+  │ Searched:       cypress/e2e/controls.cy.js, cypress/e2e/controls-overlays.cy.js, cypress/e2e/u │
+  │                 i-workbench.cy.js, cypress/e2e/ui-review-regressions.cy.js                     │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+                                                                                                    
+  Running:  controls.cy.js                                                                  (1 of 4)
+
+
+  Controls
+    ✓ updates text state (2243ms)
+    ✓ updates checkbox state (2667ms)
+    ✓ updates numeric state (2882ms)
+    ✓ updates long text state (2917ms)
+    ✓ updates color state (2934ms)
+
+
+  5 passing (14s)
+
+
+  (Results)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Tests:        5                                                                                │
+  │ Passing:      5                                                                                │
+  │ Failing:      0                                                                                │
+  │ Pending:      0                                                                                │
+  │ Skipped:      0                                                                                │
+  │ Screenshots:  0                                                                                │
+  │ Video:        false                                                                            │
+  │ Duration:     13 seconds                                                                       │
+  │ Spec Ran:     controls.cy.js                                                                   │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+                                                                                                    
+  Running:  controls-overlays.cy.js                                                         (2 of 4)
+
+
+  Controls overlays
+    ✓ renders long dropdowns outside the iframe and syncs keyboard selection (3343ms)
+    ✓ shrinks controls frame after conditional fields disappear and closes outside clicks (2915ms)
+    ✓ renders tooltip in the host and removes overlays on story navigation (3537ms)
+    ✓ restores focus on Escape and continues Shift+Tab inside the controls form (3012ms)
+
+
+  4 passing (13s)
+
+
+  (Results)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Tests:        4                                                                                │
+  │ Passing:      4                                                                                │
+  │ Failing:      0                                                                                │
+  │ Pending:      0                                                                                │
+  │ Skipped:      0                                                                                │
+  │ Screenshots:  0                                                                                │
+  │ Video:        false                                                                            │
+  │ Duration:     13 seconds                                                                       │
+  │ Spec Ran:     controls-overlays.cy.js                                                          │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+                                                                                                    
+  Running:  ui-workbench.cy.js                                                              (3 of 4)
+
+
+  Workbench contracts
+    ✓ persists selected pane, panel visibility, and inspector visibility (3445ms)
+    ✓ recovers canonical preview after its document reloads (2833ms)
+    ✓ shares persistent color scheme between settings and rail action (1101ms)
+    ✓ pans frames with Space and uses keyboard zoom without changing selection (3177ms)
+    ✓ persists local viewport presets and applies their logical frame size (3641ms)
+    ✓ exposes only panes and settings supported by current build mode (580ms)
+
+  Vue workbench integration
+    ✓ shows collected prop defaults and restores them after removing an override (2872ms)
+    ✓ applies matrix axes and base props to real cells and restores URL choices (8459ms)
+    ✓ detects no-hint chooser axes, switches exact base preset, and isolates long cell overrides (7737ms)
+    ✓ selects canvas variants and routes controls to selected preview (5168ms)
+    ✓ preserves docs tab deep link and reveals generated and story-file source (3512ms)
+    ✓ collects events from selected runtime and displays inline arguments (2536ms)
+    ✓ opens search with Ctrl+K, filters scopes, and navigates docs and props (4590ms)
+
+
+  13 passing (51s)
+
+
+  (Results)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Tests:        13                                                                               │
+  │ Passing:      13                                                                               │
+  │ Failing:      0                                                                                │
+  │ Pending:      0                                                                                │
+  │ Skipped:      0                                                                                │
+  │ Screenshots:  0                                                                                │
+  │ Video:        false                                                                            │
+  │ Duration:     51 seconds                                                                       │
+  │ Spec Ran:     ui-workbench.cy.js                                                               │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+                                                                                                    
+  Running:  ui-review-regressions.cy.js                                                     (4 of 4)
+
+
+  UI review regressions
+    ✓ keeps narrow Docs Search activation and explicit deep-link anchor through Ctrl+K dismissal (4067ms)
+    1) dims nonmatching frames and pans matches without changing canonical selection or document
+    ✓ retains expanded source and copies current content after unrelated theme publication (3580ms)
+    ✓ retains docs-only Markdown scroll and title after unrelated theme publication (685ms)
+    ✓ applies advertised numeric finite control as a number in actual preview (3026ms)
+    ✓ changes fixed list height with Compact while preserving gaps and distant recycled focus (8088ms)
+
+
+  5 passing (31s)
+  1 failing
+
+  1) UI review regressions
+       dims nonmatching frames and pans matches without changing canonical selection or document:
+     AssertionError: Timed out retrying after 4000ms: expected '<iframe>' to be 'visible'
+
+This element `<iframe>` is not visible because its content is being clipped by one of its parent elements, which has a CSS property of overflow: `hidden`, `scroll` or `auto`
+      at Context.eval (webpack://histoire-example-vue3/../cypress/frame-commands.js:6:3)
+
+
+
+
+  (Results)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Tests:        6                                                                                │
+  │ Passing:      5                                                                                │
+  │ Failing:      1                                                                                │
+  │ Pending:      0                                                                                │
+  │ Skipped:      0                                                                                │
+  │ Screenshots:  1                                                                                │
+  │ Video:        false                                                                            │
+  │ Duration:     30 seconds                                                                       │
+  │ Spec Ran:     ui-review-regressions.cy.js                                                      │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+  (Screenshots)
+
+  -  /home/akryum/Projects/histoire/examples/vue3/cypress/screenshots/ui-review-regre    (1800x1200)
+     ssions.cy.js/UI review regressions -- dims nonmatching frames and pans matches w               
+     ithout changing canonical selection or document (failed).png                                   
+
+
+================================================================================
+
+  (Run Finished)
+
+
+       Spec                                              Tests  Passing  Failing  Pending  Skipped  
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ ✔  controls.cy.js                           00:13        5        5        -        -        - │
+  ├────────────────────────────────────────────────────────────────────────────────────────────────┤
+  │ ✔  controls-overlays.cy.js                  00:13        4        4        -        -        - │
+  ├────────────────────────────────────────────────────────────────────────────────────────────────┤
+  │ ✔  ui-workbench.cy.js                       00:51       13       13        -        -        - │
+  ├────────────────────────────────────────────────────────────────────────────────────────────────┤
+  │ ✖  ui-review-regressions.cy.js              00:30        6        5        1        -        - │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+    ✖  1 of 4 failed (25%)                      01:49       28       27        1        -        -  
+

@@ -1,0 +1,26 @@
+
+ RUN  v4.1.10 /home/akryum/Projects/histoire/packages/histoire-protocol
+
+ ❯ src/__tests__/imports.spec.ts (2 tests | 1 failed) 119ms
+     × imports built entry without DOM globals 85ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/__tests__/imports.spec.ts > published portable graph > imports built entry without DOM globals
+Error: spawnSync /home/akryum/.local/share/mise/installs/node/24.16.0/bin/node EPERM
+ ❯ src/__tests__/imports.spec.ts:11:20
+      9| describe('published portable graph', () => {
+     10|   it('imports built entry without DOM globals', () => {
+     11|     const output = execFileSync(process.execPath, ['--input-type=modul…
+       |                    ^
+     12|       delete globalThis.window; delete globalThis.document;
+     13|       const api = await import(${JSON.stringify(new URL('../../dist/in…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 13 passed (14)
+      Tests  1 failed | 46 passed (47)
+   Start at  20:59:03
+   Duration  940ms (transform 4.18s, setup 0ms, import 6.31s, tests 375ms, environment 1ms)
+

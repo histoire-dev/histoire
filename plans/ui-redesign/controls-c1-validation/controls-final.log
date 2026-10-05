@@ -1,0 +1,12 @@
+
+ RUN  v4.1.10 /home/akryum/Projects/histoire/packages/histoire-controls
+
+Browserslist: browsers data (caniuse-lite) is 10 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+
+ Test Files  14 passed (14)
+      Tests  44 passed (44)
+   Start at  20:21:08
+   Duration  3.44s (transform 13.19s, setup 0ms, import 21.91s, tests 1.80s, environment 9.12s)
+

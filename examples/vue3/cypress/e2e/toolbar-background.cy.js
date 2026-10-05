@@ -20,13 +20,13 @@ describe('background color', () => {
   ]
 
   /**
-   * Applies the nth background preset. The popper is re-queried on every call
-   * instead of iterating over one captured button list: opening the story
-   * re-renders the toolbar, which detaches previously yielded elements.
+   * Applies nth configured preset through frame background popover.
+   * Re-query each time because runtime readiness re-renders toolbar.
    */
   function selectBackground(index) {
-    cy.get('[data-test-id="toolbar-background"]').click()
-    cy.get('[data-test-id="background-popper"]').should('be.visible').find('button').should('have.length', 6).eq(index).click()
+    cy.get('[aria-label="Background"][aria-haspopup="dialog"]').click()
+    cy.get('[data-test-id="background-popper"] button[title]').should('have.length', 7).eq(index).click()
+    cy.get('[role="dialog"][aria-label="Background"]').trigger('keydown', { eventConstructor: 'KeyboardEvent', key: 'Escape' })
   }
 
   /** Runs `assert(index)` once per background preset. */
@@ -45,6 +45,7 @@ describe('background color', () => {
   function openStory(url) {
     cy.visit(url)
     cy.get('[data-test-id="story-side-panel"]').should('be.visible')
+    cy.getPreviewIframeBody()
   }
 
   it('should provide background and contrast color (single variant)', () => {
@@ -54,12 +55,11 @@ describe('background color', () => {
     })
   })
 
-  // The whole grid renders inside a single sandbox iframe, so both the preview
-  // background and the story content live in that document.
+  // Canonical preview owns runtime contrast; frame chrome owns canvas background.
   it('should provide background and contrast color (grid)', () => {
     openStory('/story/src-components-substory-story-vue?variantId=src-components-substory-story-vue-0')
     forEachBackground((index) => {
-      cy.getPreviewIframeBody().find('[data-test-id="responsive-preview-bg"]').should('have.css', 'background-color', backgroundColorShouldBe[index])
+      cy.get('[data-frame-id] > button[aria-pressed="true"]').parent().find('[data-test-id="responsive-preview-bg"]').should('have.css', 'background-color', index === 0 ? 'rgb(255, 255, 255)' : backgroundColorShouldBe[index])
       cy.getPreviewIframeBody().find('.histoire-generic-render-story .text').should('have.css', 'color', contrastColorShouldBe[index])
     })
   })

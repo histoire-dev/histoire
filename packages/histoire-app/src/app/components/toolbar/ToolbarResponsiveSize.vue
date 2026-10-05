@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { HstButton, HstNumber } from '@histoire/controls/vue'
 import { Icon } from '@iconify/vue'
 import { usePreviewSettingsStore } from '../../stores/preview-settings'
 import { histoireConfig } from '../../util/config'
@@ -39,28 +40,31 @@ const settings = usePreviewSettingsStore().currentSettings
         </BaseCheckbox>
 
         <div class="htw-flex htw-items-center htw-gap-2 htw-px-4 htw-py-3">
-          <input
-            v-model.number="settings.responsiveWidth"
+          <HstNumber
+            v-model="settings.responsiveWidth"
             v-tooltip="'Responsive width (px)'"
-            type="number"
-            class="htw-bg-transparent htw-border htw-border-gray-200 dark:htw-border-gray-850 htw-rounded htw-w-20 htw-opacity-50 focus:htw-opacity-100 htw-flex-1 htw-min-w-0"
+            layout="inline"
+
+            class="htw-w-20 htw-opacity-50 focus:htw-opacity-100 htw-flex-1 htw-min-w-0"
             step="16"
             placeholder="Auto"
-          >
+          />
           <span class="htw-opacity-50">×</span>
-          <input
-            v-model.number="settings.responsiveHeight"
+          <HstNumber
+            v-model="settings.responsiveHeight"
             v-tooltip="'Responsive height (px)'"
-            type="number"
-            class="htw-bg-transparent htw-border htw-border-gray-200 dark:htw-border-gray-850 htw-rounded htw-w-20 htw-opacity-50 focus:htw-opacity-100 htw-flex-1 htw-min-w-0"
+            layout="inline"
+
+            class="htw-w-20 htw-opacity-50 focus:htw-opacity-100 htw-flex-1 htw-min-w-0"
             step="16"
             placeholder="Auto"
-          >
+          />
         </div>
 
-        <button
+        <HstButton
           v-for="(preset, index) in histoireConfig.responsivePresets"
           :key="index"
+          color="flat"
           class="htw-px-4 htw-py-3 htw-cursor-pointer htw-text-left htw-flex htw-gap-4"
           :class="[
             settings.responsiveWidth === preset.width && settings.responsiveHeight === preset.height
@@ -75,7 +79,7 @@ const settings = usePreviewSettingsStore().currentSettings
             <span v-if="preset.width && preset.height">x</span>
             <span v-if="preset.height">{{ preset.height }}<span v-if="!preset.width">px</span></span>
           </span>
-        </button>
+        </HstButton>
       </div>
     </template>
   </VDropdown>

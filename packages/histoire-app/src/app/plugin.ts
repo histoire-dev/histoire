@@ -1,4 +1,4 @@
-import { router } from './router.js'
+import type { Router } from 'vue-router'
 import { createDevEventApi } from './util/dev-event-api.js'
 
 /**
@@ -10,19 +10,31 @@ import { createDevEventApi } from './util/dev-event-api.js'
  * {@link createDevEventApi} so it can be exercised without a live Vite WS
  * server.
  */
-export function setupPluginApi() {
+export function setupPluginApi(router: Router) {
   if (!import.meta.hot) return
 
-  const { sendEvent } = createDevEventApi({
+  const { sendEvent, close } = createDevEventApi({
     send: payload => import.meta.hot.send('histoire:dev-event', payload),
-    onResult: listener => import.meta.hot.on('histoire:dev-event-result', listener),
+    onResult: (listener) => {
+      import.meta.hot.on('histoire:dev-event-result', listener)
+      return () => import.meta.hot.off('histoire:dev-event-result', listener)
+    },
   })
 
-  window.__HST_PLUGIN_API__ = {
+  const previous = window.__HST_PLUGIN_API__
+  const api = {
     sendEvent,
 
     openStory: (storyId: string) => {
       router.push({ name: 'story', params: { storyId } })
     },
+  }
+  window.__HST_PLUGIN_API__ = api
+  return () => {
+    close()
+    if (window.__HST_PLUGIN_API__ === api) {
+      if (previous) window.__HST_PLUGIN_API__ = previous
+      else delete window.__HST_PLUGIN_API__
+    }
   }
 }

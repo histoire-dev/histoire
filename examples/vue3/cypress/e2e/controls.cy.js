@@ -1,17 +1,19 @@
 /// <reference types="cypress" />
 
+import { visitStories } from '../../../cypress/workbench-actions.js'
+
 // The story defines a `#controls` slot, so the panel renders those custom
 // controls (labelled after the component they use) rather than the generic
 // state editors.
 describe('Controls', () => {
   const getControls = () => cy.getControlsIframeBody()
-  const getControl = label => getControls().contains('label', new RegExp(`^${label}$`))
+  const getControl = label => getControls().contains('.histoire-wrapper', new RegExp(`^${label}$`))
 
   beforeEach(() => {
-    cy.visit('/')
+    visitStories()
     cy.get('[data-test-id="story-list-item"]').contains('Controls').click()
     cy.get('[data-test-id="story-side-panel"]').should('be.visible')
-    cy.get('[data-test-id="story-side-panel"]').contains('Loading...').should('not.exist')
+    getControls().should('be.visible')
   })
 
   it('updates text state', () => {

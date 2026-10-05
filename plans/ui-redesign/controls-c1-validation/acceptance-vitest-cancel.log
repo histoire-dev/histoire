@@ -1,0 +1,9 @@
+
+ RUN  v4.1.10 /home/akryum/Projects/histoire/packages/histoire
+
+
+ Test Files  5 passed (5)
+      Tests  25 passed (25)
+   Start at  23:09:01
+   Duration  621ms (transform 938ms, setup 0ms, import 1.09s, tests 733ms, environment 0ms)
+

@@ -5,6 +5,7 @@ import { CONTROLS_APPEARANCE, CONTROLS_OVERLAY, CONTROLS_OVERLAY_REFRESH, CONTRO
 import { useEventListener, useResizeObserver } from '@vueuse/core'
 import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 import { histoireConfig } from '../util/config'
+import { getControlsAppearance } from '../util/controls-appearance'
 import { getControlsOverlayAnchor } from '../util/controls-overlay-anchor'
 import { isDark } from '../util/dark'
 
@@ -30,31 +31,7 @@ export function useControlsHost(iframe: Ref<HTMLIFrameElement | null>, props: { 
     await nextTick()
     const element = iframe.value?.parentElement
     if (!element) return
-    const style = getComputedStyle(element)
-    // Transparent iframe canvases become black under color-scheme: dark.
-    // Resolve the panel's painted surface instead of relying on transparency.
-    let background = 'transparent'
-    for (let surface: HTMLElement | null = element; surface; surface = surface.parentElement) {
-      const color = getComputedStyle(surface).backgroundColor
-      if (color !== 'transparent' && color !== 'rgba(0, 0, 0, 0)') {
-        background = color
-        break
-      }
-    }
-    const properties: Record<string, string> = {
-      '--histoire-controls-background': background,
-      '--histoire-controls-foreground': style.color,
-      '--histoire-controls-font-family': style.fontFamily,
-      '--histoire-controls-font-size': style.fontSize,
-      '--histoire-controls-line-height': style.lineHeight,
-    }
-    for (const [color, shades] of Object.entries(histoireConfig.theme.colors)) {
-      for (const shade of Object.keys(shades)) {
-        const name = `--_histoire-color-${color}-${shade}`
-        properties[name] = style.getPropertyValue(name)
-      }
-    }
-    post({ type: CONTROLS_APPEARANCE, appearance: { dark: isDark.value, properties } })
+    post({ type: CONTROLS_APPEARANCE, appearance: getControlsAppearance(element, isDark.value, histoireConfig.theme.colors) })
   }
 
   /** Resolves an overlay and optionally returns keyboard focus to its real anchor. */

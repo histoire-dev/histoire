@@ -1,0 +1,12 @@
+{
+  "extends": "./tsconfig.json",
+  "include": [
+    "src/app/App.vue",
+    "src/app/standalone/**/*.ts",
+    "src/shim.d.ts",
+    "src/virtual.d.ts"
+  ],
+  "exclude": [
+    "src/**/*.spec.ts"
+  ]
+}

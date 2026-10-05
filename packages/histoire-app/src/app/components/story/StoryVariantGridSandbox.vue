@@ -1,12 +1,14 @@
 <script lang="ts" setup>
 import type { Story, Variant } from '../../types'
 import { useResizeObserver } from '@vueuse/core'
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import StoryVariantGridSandboxItem from './StoryVariantGridSandboxItem.vue'
 
 const props = defineProps<{
   story: Story
   variant?: Variant
+  /** Actor admissions supplied by owned runtime; absent for legacy direct consumers. */
+  readyVariantIds?: ReadonlySet<string>
 }>()
 
 const emit = defineEmits<{
@@ -48,6 +50,17 @@ const columnCount = computed(() => {
 
 const visibleVariants = computed(() => props.story.variants.slice(0, maxCount.value))
 
+/** Selected actor must render before its first measured size or readiness event. */
+function admitSelectedVariant(index: number) {
+  if (index >= maxCount.value) {
+    maxCount.value = index + 1
+  }
+}
+
+// Track selection and its position in the live story list, including catalog
+// replacement/reordering. Keep the admitted prefix so sibling state survives.
+watch(() => props.variant ? props.story.variants.indexOf(props.variant) : -1, admitSelectedVariant, { immediate: true })
+
 const minHeight = computed(() => {
   if (!columnCount.value || !itemHeight.value) {
     return undefined
@@ -87,13 +100,6 @@ function updateMaxCount() {
   const newMaxCount = columnCount.value * visibleRows.value
   if (maxCount.value < newMaxCount) {
     maxCount.value = newMaxCount
-  }
-
-  if (props.variant) {
-    const index = props.story.variants.indexOf(props.variant)
-    if (index + 1 > maxCount.value) {
-      maxCount.value = index + 1
-    }
   }
 }
 
@@ -144,6 +150,7 @@ onMounted(() => {
             :story="story"
             :variant="gridVariant"
             :selected="gridVariant.id === variant?.id"
+            :ready="readyVariantIds?.has(gridVariant.id) ?? true"
             @resize="onItemResize"
             @select="emit('select', gridVariant.id)"
             @ready="emit('ready', gridVariant.id)"

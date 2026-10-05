@@ -1,0 +1,26 @@
+
+ RUN  v4.1.10 /home/akryum/Projects/histoire/packages/histoire-vue
+
+ ❯ src/__tests__/imports.spec.ts (1 test | 1 failed) 502ms
+     × imports built native components and peer controls with browser globals absent 501ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/__tests__/imports.spec.ts > native package import contract > imports built native components and peer controls with browser globals absent
+Error: spawnSync /home/akryum/.local/share/mise/installs/node/24.16.0/bin/node EPERM
+ ❯ src/__tests__/imports.spec.ts:13:20
+     11|       if(!native.HistoireProvider || !native.HistoirePreview || !nativ…
+     12|       console.log('SSR-safe');`
+     13|     const output = execFileSync(process.execPath, ['--input-type=modul…
+       |                    ^
+     14|     expect(output.trim()).toBe('SSR-safe')
+     15|   })
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 71 passed (72)
+      Tests  1 failed | 309 passed (310)
+   Start at  20:58:48
+   Duration  8.08s (transform 53.09s, setup 0ms, import 119.56s, tests 35.30s, environment 45.78s)
+

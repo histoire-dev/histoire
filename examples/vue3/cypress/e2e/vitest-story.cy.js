@@ -1,9 +1,11 @@
 /// <reference types="cypress" />
 
+import { selectCanvasVariant, visitStories } from '../../../cypress/workbench-actions.js'
+
 describe('Vitest story runtime', () => {
   it('reopens the story without losing the manual Vitest mock state', () => {
     cy.viewport(1600, 1000)
-    cy.visit('/')
+    visitStories()
     cy.openVitestStory()
 
     cy.assertMockedGreeting()
@@ -17,17 +19,13 @@ describe('Vitest story runtime', () => {
 
   it('renders custom controls of a mocked story through the controls sandbox', () => {
     cy.viewport(1600, 1000)
-    cy.visit('/')
+    visitStories()
     cy.get('[data-test-id="story-list-item"]').contains('Vitest Mocking').click()
-    cy.contains('[data-test-id="story-variant-list-item"]', 'mocked with controls').click()
+    selectCanvasVariant('mocked with controls', 'src-components-vitestmocking-story-vue-1')
 
     // The host cannot render the #controls slot of a mocked story itself —
     // it embeds a sandbox iframe that executes the story with mocks active.
-    const getControlsBody = () => cy.get('iframe[data-test-id="story-controls-sandbox"]', { timeout: 20000 })
-      .should('be.visible')
-      .its('0.contentDocument.body')
-      .should('not.be.empty')
-      .then(cy.wrap)
+    const getControlsBody = () => cy.getControlsIframeBody({ timeout: 20000 })
 
     getControlsBody().contains('Name', { timeout: 20000 })
     getControlsBody().find('input').should('have.value', 'Histoire')

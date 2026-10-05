@@ -1,0 +1,126 @@
+
+DevTools listening on ws://127.0.0.1:39285/devtools/browser/eae4b094-ccca-4639-89e9-b8f7e419545f
+(node:770578) ExperimentalWarning: `--experimental-loader` may be removed in the future; instead use `register()`:
+--import 'data:text/javascript,import { register } from "node:module"; import { pathToFileURL } from "node:url"; register("file%3A///home/akryum/.cache/Cypress/13.17.0/Cypress/resources/app/node_modules/ts-node/esm/transpile-only.mjs", pathToFileURL("./"));'
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:770578) [DEP0180] DeprecationWarning: fs.Stats constructor is deprecated.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+
+================================================================================
+
+  (Run Starting)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Cypress:        13.17.0                                                                        │
+  │ Browser:        Electron 118 (headless)                                                        │
+  │ Node Version:   v24.16.0 (/home/akryum/.local/share/mise/installs/node/24.16.0/bin/node)       │
+  │ Specs:          1 found (controls-c1.cy.js)                                                    │
+  │ Searched:       cypress/e2e/controls-c1.cy.js                                                  │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+                                                                                                    
+  Running:  controls-c1.cy.js                                                               (1 of 1)
+
+
+  C1 shared controls acceptance
+    ✓ Light Comfortable reaches native and sandbox controls (23040ms)
+    ✓ Light Compact reaches native and sandbox controls (26166ms)
+    ✓ Dark Comfortable reaches native and sandbox controls (30780ms)
+Warning: terminator_CreateInstance: Failed to CreateInstance in ICD 2.  Skipping ICD.
+    ✓ Dark Compact reaches native and sandbox controls (56582ms)
+    ✓ keeps narrow inspector and long menu usable (15256ms)
+
+
+  5 passing (3m)
+
+
+  (Results)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Tests:        5                                                                                │
+  │ Passing:      5                                                                                │
+  │ Failing:      0                                                                                │
+  │ Pending:      0                                                                                │
+  │ Skipped:      0                                                                                │
+  │ Screenshots:  29                                                                               │
+  │ Video:        false                                                                            │
+  │ Duration:     2 minutes, 32 seconds                                                            │
+  │ Spec Ran:     controls-c1.cy.js                                                                │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+  (Screenshots)
+
+  -  /home/akryum/Projects/histoire/examples/vue3/cypress/screenshots/controls-c1.cy.    (1600x1000)
+     js/c1-light-comfortable-settings.png                                                           
+  -  /home/akryum/Projects/histoire/examples/vue3/cypress/screenshots/controls-c1.cy.    (1600x1000)
+     js/c1-light-comfortable-agent-settings.png                                                     
+  -  /home/akryum/Projects/histoire/examples/vue3/cypress/screenshots/controls-c1.cy.    (1600x1000)
+     js/c1-light-comfortable-native.png                                                             
+  -  /home/akryum/Projects/histoire/examples/vue3/cypress/screenshots/controls-c1.cy.    (1600x1000)
+     js/c1-light-comfortable-matrix.png                                                             
+  -  /home/akryum/Projects/histoire/examples/vue3/cypress/screenshots/controls-c1.cy.    (1600x1000)
+     js/c1-light-comfortable-iframe-menu.png                                                        
+  -  /home/akryum/Projects/histoire/examples/vue3/cypress/screenshots/controls-c1.cy.    (1600x1000)
+     js/c1-light-comfortable-toolbar.png                                                            
+  -  /home/akryum/Projects/histoire/examples/vue3/cypress/screenshots/controls-c1.cy.    (1600x1000)
+     js/c1-light-comfortable-comments.png                                                           
+  -  /home/akryum/Projects/histoire/examples/vue3/cypress/screenshots/controls-c1.cy.    (1600x1000)
+     js/c1-light-compact-settings.png                                                               
+  -  /home/akryum/Projects/histoire/examples/vue3/cypress/screenshots/controls-c1.cy.    (1600x1000)
+     js/c1-light-compact-agent-settings.png                                                         
+  -  /home/akryum/Projects/histoire/examples/vue3/cypress/screenshots/controls-c1.cy.    (1600x1000)
+     js/c1-light-compact-native.png                                                                 
+  -  /home/akryum/Projects/histoire/examples/vue3/cypress/screenshots/controls-c1.cy.    (1600x1000)
+     js/c1-light-compact-matrix.png                                                                 
+  -  /home/akryum/Projects/histoire/examples/vue3/cypress/screenshots/controls-c1.cy.    (1600x1000)
+     js/c1-light-compact-iframe-menu.png                                                            
+  -  /home/akryum/Projects/histoire/examples/vue3/cypress/screenshots/controls-c1.cy.    (1600x1000)
+     js/c1-light-compact-toolbar.png                                                                
+  -  /home/akryum/Projects/histoire/examples/vue3/cypress/screenshots/controls-c1.cy.    (1600x1000)
+     js/c1-light-compact-comments.png                                                               
+  -  /home/akryum/Projects/histoire/examples/vue3/cypress/screenshots/controls-c1.cy.    (1600x1000)
+     js/c1-dark-comfortable-settings.png                                                            
+  -  /home/akryum/Projects/histoire/examples/vue3/cypress/screenshots/controls-c1.cy.    (1600x1000)
+     js/c1-dark-comfortable-agent-settings.png                                                      
+  -  /home/akryum/Projects/histoire/examples/vue3/cypress/screenshots/controls-c1.cy.    (1600x1000)
+     js/c1-dark-comfortable-native.png                                                              
+  -  /home/akryum/Projects/histoire/examples/vue3/cypress/screenshots/controls-c1.cy.    (1600x1000)
+     js/c1-dark-comfortable-matrix.png                                                              
+  -  /home/akryum/Projects/histoire/examples/vue3/cypress/screenshots/controls-c1.cy.    (1600x1000)
+     js/c1-dark-comfortable-iframe-menu.png                                                         
+  -  /home/akryum/Projects/histoire/examples/vue3/cypress/screenshots/controls-c1.cy.    (1600x1000)
+     js/c1-dark-comfortable-toolbar.png                                                             
+  -  /home/akryum/Projects/histoire/examples/vue3/cypress/screenshots/controls-c1.cy.    (1600x1000)
+     js/c1-dark-comfortable-comments.png                                                            
+  -  /home/akryum/Projects/histoire/examples/vue3/cypress/screenshots/controls-c1.cy.    (1600x1000)
+     js/c1-dark-compact-settings.png                                                                
+  -  /home/akryum/Projects/histoire/examples/vue3/cypress/screenshots/controls-c1.cy.    (1600x1000)
+     js/c1-dark-compact-agent-settings.png                                                          
+  -  /home/akryum/Projects/histoire/examples/vue3/cypress/screenshots/controls-c1.cy.    (1600x1000)
+     js/c1-dark-compact-native.png                                                                  
+  -  /home/akryum/Projects/histoire/examples/vue3/cypress/screenshots/controls-c1.cy.    (1600x1000)
+     js/c1-dark-compact-matrix.png                                                                  
+  -  /home/akryum/Projects/histoire/examples/vue3/cypress/screenshots/controls-c1.cy.    (1600x1000)
+     js/c1-dark-compact-iframe-menu.png                                                             
+  -  /home/akryum/Projects/histoire/examples/vue3/cypress/screenshots/controls-c1.cy.    (1600x1000)
+     js/c1-dark-compact-toolbar.png                                                                 
+  -  /home/akryum/Projects/histoire/examples/vue3/cypress/screenshots/controls-c1.cy.    (1600x1000)
+     js/c1-dark-compact-comments.png                                                                
+  -  /home/akryum/Projects/histoire/examples/vue3/cypress/screenshots/controls-c1.cy.      (820x900)
+     js/c1-narrow-iframe-menu.png                                                                   
+
+
+================================================================================
+
+  (Run Finished)
+
+
+       Spec                                              Tests  Passing  Failing  Pending  Skipped  
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ ✔  controls-c1.cy.js                        02:32        5        5        -        -        - │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+    ✔  All specs passed!                        02:32        5        5        -        -        -  
+

@@ -55,7 +55,7 @@ body {
 
 html {
   font-size: 1rem;
-  font-family: 'Noto Sans Display', system-ui, sans-serif;
+  font-family: system-ui, sans-serif;
 }
 
 @media (min-width: 640px) {

@@ -1,0 +1,36 @@
+
+ RUN  v4.1.10 /home/akryum/Projects/histoire/packages/histoire
+
+ ❯ src/node/__tests__/mcp/story-watcher-lifecycle.spec.ts (4 tests | 1 failed) 172ms
+     × ignores unmatched/ignored event paths and never recollects on unknown unlink 6ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/node/__tests__/mcp/story-watcher-lifecycle.spec.ts > story watcher lifecycle > ignores unmatched/ignored event paths and never recollects on unknown unlink
+AssertionError: expected [ 'initial.story.vue', …(2) ] to deeply equal [ 'initial.story.vue' ]
+
+- Expected
++ Received
+
+  [
+    "initial.story.vue",
++   "helper.js",
++   "ignored.story.vue",
+  ]
+
+ ❯ src/node/__tests__/mcp/story-watcher-lifecycle.spec.ts:72:66
+     70|     watcher.emit('add', 'ignored.story.vue')
+     71|     watcher.emit('unlink', 'optimizer/deps.js')
+     72|     expect(ctx.storyFiles.map((file: any) => file.relativePath)).toEqu…
+       |                                                                  ^
+     73|     expect(changed).not.toHaveBeenCalled()
+     74|     await rm(join(ctx.root, 'initial.story.vue'))
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 3 passed (4)
+   Start at  22:12:35
+   Duration  354ms (transform 39ms, setup 0ms, import 67ms, tests 172ms, environment 0ms)
+

@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { HstButton } from '@histoire/controls/vue'
 import { Icon } from '@iconify/vue'
 import { computed } from 'vue'
 import { usePreviewSettingsStore } from '../../stores/preview-settings'
@@ -43,9 +44,10 @@ const contrastColor = computed(() => getContrastColor(settings))
           Checkerboard
         </BaseCheckbox>
 
-        <button
+        <HstButton
           v-for="(option, index) in histoireConfig.backgroundPresets"
           :key="index"
+          color="flat"
           class="htw-px-4 htw-py-3 htw-cursor-pointer htw-text-left htw-flex htw-items-baseline htw-gap-4"
           :class="[
             settings.backgroundColor === option.color
@@ -67,7 +69,7 @@ const contrastColor = computed(() => getContrastColor(settings))
               <span v-if="option.contrastColor">a</span>
             </div>
           </template>
-        </button>
+        </HstButton>
       </div>
     </template>
   </VDropdown>

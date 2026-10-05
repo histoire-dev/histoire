@@ -1,0 +1,27 @@
+.histoire-provider .histoire-agent-row { border-bottom: 1px solid var(--histoire-border, #e4e4e7); }
+.histoire-provider .histoire-agent-row:last-of-type { border-bottom: 0; }
+.histoire-provider .histoire-agent-row > summary { display: flex; align-items: center; gap: 13px; padding: 17px 20px; cursor: pointer; list-style: none; }
+.histoire-provider .histoire-agent-row > summary::-webkit-details-marker { display: none; }
+.histoire-provider .histoire-agent-row > summary:focus-visible { outline: 2px solid var(--histoire-accent, #10b981); outline-offset: -3px; }
+.histoire-provider .histoire-agent-icon { width: 32px; height: 32px; flex-shrink: 0; display: grid; place-items: center; color: var(--histoire-agent-text, #6d28d9); background: var(--histoire-agent-soft, #f5f3ff); border-radius: 10px; }
+.histoire-provider .histoire-agent-identity { min-width: 0; flex: 1; display: flex; align-items: center; flex-wrap: wrap; gap: 7px; }
+.histoire-provider .histoire-agent-identity code { flex: 1 0 100%; min-width: 0; color: var(--histoire-muted, #71717a); font: 11px var(--histoire-font-mono, monospace); overflow-wrap: anywhere; }
+.histoire-provider .histoire-agent-default { padding: 2px 6px; border-radius: 6px; background: var(--histoire-subtle, #f4f4f5); color: var(--histoire-muted, #71717a); font-size: 10px; font-weight: 600; text-transform: uppercase; }
+.histoire-provider .histoire-agent-status { display: flex; align-items: center; gap: 6px; font-size: 12px; white-space: nowrap; color: var(--histoire-muted, #71717a); }
+.histoire-provider .histoire-agent-status::before { content: ''; width: 7px; height: 7px; background: currentColor; border-radius: 50%; }
+.histoire-provider .histoire-agent-status[data-state="connected"] { color: var(--histoire-accent-text, #047857); }
+.histoire-provider .histoire-agent-status[data-state="error"], .histoire-provider .histoire-agent-status[data-state="not-installed"] { color: var(--histoire-warn, #b45309); }
+.histoire-provider .histoire-agent-form { padding: 0 20px 20px 65px; display: flex; flex-direction: column; gap: 10px; }
+.histoire-provider .histoire-agent-form label, .histoire-provider .histoire-agent-form-row { display: grid; align-items: center; grid-template-columns: 125px minmax(0, 1fr); gap: 12px; }
+.histoire-provider .histoire-agent-form label > span, .histoire-provider .histoire-agent-form-row > span:first-child { color: var(--histoire-muted, #71717a); font-size: 12px; }
+.histoire-provider .histoire-agent-env { min-width: 0; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto; gap: 6px; }
+.histoire-provider .histoire-agent-form-actions { padding-inline-start: 137px; display: flex; flex-wrap: wrap; gap: 7px; }
+.histoire-provider .histoire-agent-empty { padding: 20px; color: var(--histoire-muted, #71717a); font-size: 13px; }
+.histoire-provider .histoire-agent-error { color: var(--histoire-warn, #b45309); font-size: 12px; overflow-wrap: anywhere; }
+.histoire-provider .histoire-agent-logs { max-height: 200px; overflow: auto; margin: 4px 0 0; padding: 12px; white-space: pre-wrap; overflow-wrap: anywhere; border-radius: 8px; background: var(--histoire-subtle, #f4f4f5); font: 11px/1.6 var(--histoire-font-mono, monospace); }
+.histoire-provider .histoire-agent-install { overflow-wrap: anywhere; font: 11px var(--histoire-font-mono, monospace); }
+.histoire-provider .histoire-settings-card > header > button { display: inline-flex; align-items: center; gap: 6px; }
+@media (max-width: 600px) { .histoire-provider .histoire-agent-row > summary { gap: 8px; padding: 14px; } .histoire-provider .histoire-agent-form { padding: 0 14px 16px; } .histoire-provider .histoire-agent-form label, .histoire-provider .histoire-agent-form-row { grid-template-columns: 1fr; gap: 5px; } .histoire-provider .histoire-agent-form-actions { padding-inline-start: 0; } .histoire-provider .histoire-agent-status { font-size: 11px; } }
+
+.histoire-provider .histoire-settings-row > :is(.histoire-switch, .histoire-button-group) { margin-inline-start: auto; }
+.histoire-provider .histoire-settings-row > .histoire-button-group { max-width: 65%; }

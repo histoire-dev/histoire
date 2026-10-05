@@ -1,0 +1,320 @@
+
+DevTools listening on ws://127.0.0.1:40299/devtools/browser/3cfb4ddc-79bd-4d96-9324-bbb1e4103f31
+(node:3937591) ExperimentalWarning: `--experimental-loader` may be removed in the future; instead use `register()`:
+--import 'data:text/javascript,import { register } from "node:module"; import { pathToFileURL } from "node:url"; register("file%3A///home/akryum/.cache/Cypress/13.17.0/Cypress/resources/app/node_modules/ts-node/esm/transpile-only.mjs", pathToFileURL("./"));'
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:3937591) [DEP0180] DeprecationWarning: fs.Stats constructor is deprecated.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+
+================================================================================
+
+  (Run Starting)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Cypress:        13.17.0                                                                        │
+  │ Browser:        Electron 118 (headless)                                                        │
+  │ Node Version:   v24.16.0 (/home/akryum/.local/share/mise/installs/node/24.16.0/bin/node)       │
+  │ Specs:          6 found (controls.cy.js, controls-overlays.cy.js, ui-workbench.cy.js, ui-revie │
+  │                 w-regressions.cy.js, controls-appearance.cy.js, controls-c1.cy.js)             │
+  │ Searched:       cypress/e2e/controls.cy.js, cypress/e2e/controls-overlays.cy.js, cypress/e2e/u │
+  │                 i-workbench.cy.js, cypress/e2e/ui-review-regressions.cy.js, cypress/e2e/contro │
+  │                 ls-appearance.cy.js, cypress/e2e/controls-c1.cy.js                             │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+                                                                                                    
+  Running:  controls.cy.js                                                                  (1 of 6)
+
+
+  Controls
+    ✓ updates text state (10308ms)
+    ✓ updates checkbox state (3969ms)
+    ✓ updates numeric state (3002ms)
+    ✓ updates long text state (3467ms)
+    ✓ updates color state (3169ms)
+
+
+  5 passing (24s)
+
+
+  (Results)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Tests:        5                                                                                │
+  │ Passing:      5                                                                                │
+  │ Failing:      0                                                                                │
+  │ Pending:      0                                                                                │
+  │ Skipped:      0                                                                                │
+  │ Screenshots:  0                                                                                │
+  │ Video:        false                                                                            │
+  │ Duration:     24 seconds                                                                       │
+  │ Spec Ran:     controls.cy.js                                                                   │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+                                                                                                    
+  Running:  controls-overlays.cy.js                                                         (2 of 6)
+
+
+  Controls overlays
+    ✓ renders long dropdowns outside the iframe and syncs keyboard selection (4578ms)
+    ✓ shrinks controls frame after conditional fields disappear and closes outside clicks (3958ms)
+    ✓ renders tooltip in the host and removes overlays on story navigation (3304ms)
+    ✓ restores focus on Escape and continues Shift+Tab inside the controls form (4137ms)
+
+
+  4 passing (16s)
+
+
+  (Results)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Tests:        4                                                                                │
+  │ Passing:      4                                                                                │
+  │ Failing:      0                                                                                │
+  │ Pending:      0                                                                                │
+  │ Skipped:      0                                                                                │
+  │ Screenshots:  0                                                                                │
+  │ Video:        false                                                                            │
+  │ Duration:     16 seconds                                                                       │
+  │ Spec Ran:     controls-overlays.cy.js                                                          │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+                                                                                                    
+  Running:  ui-workbench.cy.js                                                              (3 of 6)
+
+
+  Workbench contracts
+    ✓ persists selected pane, panel visibility, and inspector visibility (5835ms)
+    ✓ recovers canonical preview after its document reloads (10556ms)
+    ✓ shares persistent color scheme between settings and rail action (3657ms)
+    ✓ pans frames with Space and uses keyboard zoom without changing selection (3391ms)
+    ✓ persists local viewport presets and applies their logical frame size (6039ms)
+    ✓ exposes only panes and settings supported by current build mode (908ms)
+
+  Vue development workbench
+    ✓ persists a comment draft, resolves it, and reopens its exact thread (6669ms)
+    ✓ captures selected preview as PNG and WebP through screenshot service (8081ms)
+
+  Vue workbench integration
+    ✓ shows collected prop defaults and restores them after removing an override (3963ms)
+    ✓ applies matrix axes and base props to real cells and restores URL choices (10800ms)
+    1) detects no-hint chooser axes, switches exact base preset, and isolates long cell overrides
+Warning: terminator_CreateInstance: Failed to CreateInstance in ICD 2.  Skipping ICD.
+    ✓ selects canvas variants and routes controls to selected preview (6977ms)
+    ✓ preserves docs tab deep link and reveals generated and story-file source (5158ms)
+    ✓ collects events from selected runtime and displays inline arguments (2855ms)
+    ✓ opens search with Ctrl+K, filters scopes, and navigates docs and props (4283ms)
+
+
+  14 passing (2m)
+  1 failing
+
+  1) Vue workbench integration
+       detects no-hint chooser axes, switches exact base preset, and isolates long cell overrides:
+     AssertionError: Timed out retrying after 4000ms: expected '' to include 'Alternate preset'
+      at Context.eval (webpack://histoire-example-vue3/./cypress/e2e/ui-workbench.cy.js:132:85)
+
+
+
+
+  (Results)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Tests:        15                                                                               │
+  │ Passing:      14                                                                               │
+  │ Failing:      1                                                                                │
+  │ Pending:      0                                                                                │
+  │ Skipped:      0                                                                                │
+  │ Screenshots:  1                                                                                │
+  │ Video:        false                                                                            │
+  │ Duration:     1 minute, 32 seconds                                                             │
+  │ Spec Ran:     ui-workbench.cy.js                                                               │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+  (Screenshots)
+
+  -  /home/akryum/Projects/histoire/examples/vue3/cypress/screenshots/ui-workbench.cy    (1800x1200)
+     .js/Vue workbench integration -- detects no-hint chooser axes, switches exact ba               
+     se preset, and isolates long cell overrides (failed).png                                       
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+                                                                                                    
+  Running:  ui-review-regressions.cy.js                                                     (4 of 6)
+
+
+  UI review regressions
+    ✓ keeps narrow Docs Search activation and explicit deep-link anchor through Ctrl+K dismissal (5007ms)
+    ✓ dims nonmatching frames and pans matches without changing canonical selection or document (8239ms)
+    ✓ retains expanded source and copies current content after unrelated theme publication (3619ms)
+    ✓ retains docs-only Markdown scroll and title after unrelated theme publication (1235ms)
+    ✓ applies advertised numeric finite control as a number in actual preview (2566ms)
+    ✓ changes fixed list height with Compact while preserving gaps and distant recycled focus (7959ms)
+    ✓ captures distinct PNG pixels for matrix cells sharing same base variant (12463ms)
+
+
+  7 passing (42s)
+
+
+  (Results)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Tests:        7                                                                                │
+  │ Passing:      7                                                                                │
+  │ Failing:      0                                                                                │
+  │ Pending:      0                                                                                │
+  │ Skipped:      0                                                                                │
+  │ Screenshots:  0                                                                                │
+  │ Video:        false                                                                            │
+  │ Duration:     41 seconds                                                                       │
+  │ Spec Ran:     ui-review-regressions.cy.js                                                      │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+                                                                                                    
+  Running:  controls-appearance.cy.js                                                       (5 of 6)
+
+
+  Live controls appearance
+    ✓ updates shared palette in current controls document in both directions (5098ms)
+
+
+  1 passing (5s)
+
+
+  (Results)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Tests:        1                                                                                │
+  │ Passing:      1                                                                                │
+  │ Failing:      0                                                                                │
+  │ Pending:      0                                                                                │
+  │ Skipped:      0                                                                                │
+  │ Screenshots:  0                                                                                │
+  │ Video:        false                                                                            │
+  │ Duration:     5 seconds                                                                        │
+  │ Spec Ran:     controls-appearance.cy.js                                                        │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+                                                                                                    
+  Running:  controls-c1.cy.js                                                               (6 of 6)
+
+
+  C1 shared controls acceptance
+    ✓ Light Comfortable reaches native and sandbox controls (13573ms)
+    ✓ Light Compact reaches native and sandbox controls (13962ms)
+    ✓ Dark Comfortable reaches native and sandbox controls (12145ms)
+    ✓ Dark Compact reaches native and sandbox controls (14557ms)
+    ✓ keeps narrow inspector and long menu usable (3228ms)
+
+
+  5 passing (58s)
+
+
+  (Results)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Tests:        5                                                                                │
+  │ Passing:      5                                                                                │
+  │ Failing:      0                                                                                │
+  │ Pending:      0                                                                                │
+  │ Skipped:      0                                                                                │
+  │ Screenshots:  29                                                                               │
+  │ Video:        false                                                                            │
+  │ Duration:     57 seconds                                                                       │
+  │ Spec Ran:     controls-c1.cy.js                                                                │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+  (Screenshots)
+
+  -  /home/akryum/Projects/histoire/examples/vue3/cypress/screenshots/controls-c1.cy.    (1600x1000)
+     js/c1-light-comfortable-settings.png                                                           
+  -  /home/akryum/Projects/histoire/examples/vue3/cypress/screenshots/controls-c1.cy.    (1600x1000)
+     js/c1-light-comfortable-agent-settings.png                                                     
+  -  /home/akryum/Projects/histoire/examples/vue3/cypress/screenshots/controls-c1.cy.    (1600x1000)
+     js/c1-light-comfortable-native.png                                                             
+  -  /home/akryum/Projects/histoire/examples/vue3/cypress/screenshots/controls-c1.cy.    (1600x1000)
+     js/c1-light-comfortable-matrix.png                                                             
+  -  /home/akryum/Projects/histoire/examples/vue3/cypress/screenshots/controls-c1.cy.    (1600x1000)
+     js/c1-light-comfortable-iframe-menu.png                                                        
+  -  /home/akryum/Projects/histoire/examples/vue3/cypress/screenshots/controls-c1.cy.    (1600x1000)
+     js/c1-light-comfortable-toolbar.png                                                            
+  -  /home/akryum/Projects/histoire/examples/vue3/cypress/screenshots/controls-c1.cy.    (1600x1000)
+     js/c1-light-comfortable-comments.png                                                           
+  -  /home/akryum/Projects/histoire/examples/vue3/cypress/screenshots/controls-c1.cy.    (1600x1000)
+     js/c1-light-compact-settings.png                                                               
+  -  /home/akryum/Projects/histoire/examples/vue3/cypress/screenshots/controls-c1.cy.    (1600x1000)
+     js/c1-light-compact-agent-settings.png                                                         
+  -  /home/akryum/Projects/histoire/examples/vue3/cypress/screenshots/controls-c1.cy.    (1600x1000)
+     js/c1-light-compact-native.png                                                                 
+  -  /home/akryum/Projects/histoire/examples/vue3/cypress/screenshots/controls-c1.cy.    (1600x1000)
+     js/c1-light-compact-matrix.png                                                                 
+  -  /home/akryum/Projects/histoire/examples/vue3/cypress/screenshots/controls-c1.cy.    (1600x1000)
+     js/c1-light-compact-iframe-menu.png                                                            
+  -  /home/akryum/Projects/histoire/examples/vue3/cypress/screenshots/controls-c1.cy.    (1600x1000)
+     js/c1-light-compact-toolbar.png                                                                
+  -  /home/akryum/Projects/histoire/examples/vue3/cypress/screenshots/controls-c1.cy.    (1600x1000)
+     js/c1-light-compact-comments.png                                                               
+  -  /home/akryum/Projects/histoire/examples/vue3/cypress/screenshots/controls-c1.cy.    (1600x1000)
+     js/c1-dark-comfortable-settings.png                                                            
+  -  /home/akryum/Projects/histoire/examples/vue3/cypress/screenshots/controls-c1.cy.    (1600x1000)
+     js/c1-dark-comfortable-agent-settings.png                                                      
+  -  /home/akryum/Projects/histoire/examples/vue3/cypress/screenshots/controls-c1.cy.    (1600x1000)
+     js/c1-dark-comfortable-native.png                                                              
+  -  /home/akryum/Projects/histoire/examples/vue3/cypress/screenshots/controls-c1.cy.    (1600x1000)
+     js/c1-dark-comfortable-matrix.png                                                              
+  -  /home/akryum/Projects/histoire/examples/vue3/cypress/screenshots/controls-c1.cy.    (1600x1000)
+     js/c1-dark-comfortable-iframe-menu.png                                                         
+  -  /home/akryum/Projects/histoire/examples/vue3/cypress/screenshots/controls-c1.cy.    (1600x1000)
+     js/c1-dark-comfortable-toolbar.png                                                             
+  -  /home/akryum/Projects/histoire/examples/vue3/cypress/screenshots/controls-c1.cy.    (1600x1000)
+     js/c1-dark-comfortable-comments.png                                                            
+  -  /home/akryum/Projects/histoire/examples/vue3/cypress/screenshots/controls-c1.cy.    (1600x1000)
+     js/c1-dark-compact-settings.png                                                                
+  -  /home/akryum/Projects/histoire/examples/vue3/cypress/screenshots/controls-c1.cy.    (1600x1000)
+     js/c1-dark-compact-agent-settings.png                                                          
+  -  /home/akryum/Projects/histoire/examples/vue3/cypress/screenshots/controls-c1.cy.    (1600x1000)
+     js/c1-dark-compact-native.png                                                                  
+  -  /home/akryum/Projects/histoire/examples/vue3/cypress/screenshots/controls-c1.cy.    (1600x1000)
+     js/c1-dark-compact-matrix.png                                                                  
+  -  /home/akryum/Projects/histoire/examples/vue3/cypress/screenshots/controls-c1.cy.    (1600x1000)
+     js/c1-dark-compact-iframe-menu.png                                                             
+  -  /home/akryum/Projects/histoire/examples/vue3/cypress/screenshots/controls-c1.cy.    (1600x1000)
+     js/c1-dark-compact-toolbar.png                                                                 
+  -  /home/akryum/Projects/histoire/examples/vue3/cypress/screenshots/controls-c1.cy.    (1600x1000)
+     js/c1-dark-compact-comments.png                                                                
+  -  /home/akryum/Projects/histoire/examples/vue3/cypress/screenshots/controls-c1.cy.      (820x900)
+     js/c1-narrow-iframe-menu.png                                                                   
+
+
+================================================================================
+
+  (Run Finished)
+
+
+       Spec                                              Tests  Passing  Failing  Pending  Skipped  
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ ✔  controls.cy.js                           00:24        5        5        -        -        - │
+  ├────────────────────────────────────────────────────────────────────────────────────────────────┤
+  │ ✔  controls-overlays.cy.js                  00:16        4        4        -        -        - │
+  ├────────────────────────────────────────────────────────────────────────────────────────────────┤
+  │ ✖  ui-workbench.cy.js                       01:32       15       14        1        -        - │
+  ├────────────────────────────────────────────────────────────────────────────────────────────────┤
+  │ ✔  ui-review-regressions.cy.js              00:41        7        7        -        -        - │
+  ├────────────────────────────────────────────────────────────────────────────────────────────────┤
+  │ ✔  controls-appearance.cy.js                00:05        1        1        -        -        - │
+  ├────────────────────────────────────────────────────────────────────────────────────────────────┤
+  │ ✔  controls-c1.cy.js                        00:57        5        5        -        -        - │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+    ✖  1 of 6 failed (17%)                      03:57       37       36        1        -        -  
+

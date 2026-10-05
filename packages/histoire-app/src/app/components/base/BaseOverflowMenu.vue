@@ -2,6 +2,7 @@
 import { Icon } from '@iconify/vue'
 import { useResizeObserver } from '@vueuse/core'
 import { computed, h, onBeforeUnmount, reactive, ref } from 'vue'
+import { fitOverflowItems } from './overflow/fit.js'
 
 // Container
 
@@ -26,25 +27,7 @@ const children = ref(new Map<HTMLElement, ChildState>())
 
 const visibleChildrenCount = computed(() => {
   const c = [...children.value.values()].sort((a, b) => a.index - b.index)
-  const totalWidth = c.reduce((total, child) => total + child.width, 0)
-
-  // The overflow button is only rendered once something actually overflows, so
-  // its width must not be reserved while every child still fits: doing so hides
-  // the last child even though there is room for it (and then the button it made
-  // room for is what shows instead).
-  if (totalWidth <= containerWidth.value) {
-    return c.length
-  }
-
-  const availableWidth = containerWidth.value - overflowButtonWidth
-  let width = 0
-  for (let i = 0; i < c.length; i++) {
-    width += c[i].width
-    if (width > availableWidth) {
-      return i
-    }
-  }
-  return c.length
+  return fitOverflowItems(c, containerWidth.value, overflowButtonWidth)
 })
 
 /**

@@ -1,0 +1,64 @@
+
+DevTools listening on ws://127.0.0.1:41499/devtools/browser/4c47e710-e08d-4bb7-be32-ed1d218c9166
+(node:630857) ExperimentalWarning: `--experimental-loader` may be removed in the future; instead use `register()`:
+--import 'data:text/javascript,import { register } from "node:module"; import { pathToFileURL } from "node:url"; register("file%3A///home/akryum/.cache/Cypress/13.17.0/Cypress/resources/app/node_modules/ts-node/esm/transpile-only.mjs", pathToFileURL("./"));'
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:630857) [DEP0180] DeprecationWarning: fs.Stats constructor is deprecated.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+
+================================================================================
+
+  (Run Starting)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Cypress:        13.17.0                                                                        │
+  │ Browser:        Electron 118 (headless)                                                        │
+  │ Node Version:   v24.16.0 (/home/akryum/.local/share/mise/installs/node/24.16.0/bin/node)       │
+  │ Specs:          1 found (ui-review-regressions.cy.js)                                          │
+  │ Searched:       cypress/e2e/ui-review-regressions.cy.js                                        │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+                                                                                                    
+  Running:  ui-review-regressions.cy.js                                                     (1 of 1)
+
+
+  UI review regressions
+    ✓ keeps narrow Docs Search activation and explicit deep-link anchor through Ctrl+K dismissal (2255ms)
+    ✓ dims nonmatching frames and pans matches without changing canonical selection or document (3519ms)
+    ✓ retains expanded source and copies current content after unrelated theme publication (2762ms)
+    ✓ retains docs-only Markdown scroll and title after unrelated theme publication (373ms)
+    ✓ applies advertised numeric finite control as a number in actual preview (2118ms)
+    ✓ changes fixed list height with Compact while preserving gaps and distant recycled focus (4309ms)
+
+
+  6 passing (16s)
+
+
+  (Results)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Tests:        6                                                                                │
+  │ Passing:      6                                                                                │
+  │ Failing:      0                                                                                │
+  │ Pending:      0                                                                                │
+  │ Skipped:      0                                                                                │
+  │ Screenshots:  0                                                                                │
+  │ Video:        false                                                                            │
+  │ Duration:     15 seconds                                                                       │
+  │ Spec Ran:     ui-review-regressions.cy.js                                                      │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+================================================================================
+
+  (Run Finished)
+
+
+       Spec                                              Tests  Passing  Failing  Pending  Skipped  
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ ✔  ui-review-regressions.cy.js              00:15        6        6        -        -        - │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+    ✔  All specs passed!                        00:15        6        6        -        -        -  
+

@@ -1,0 +1,66 @@
+[1857851:1004/213301.085335:ERROR:node_bindings.cc(305)] Most NODE_OPTIONs are not supported in packaged apps. See documentation for more details.
+
+DevTools listening on ws://127.0.0.1:46207/devtools/browser/fbaefb90-30d8-45c3-8846-f21e3d340924
+(node:1858323) ExperimentalWarning: `--experimental-loader` may be removed in the future; instead use `register()`:
+--import 'data:text/javascript,import { register } from "node:module"; import { pathToFileURL } from "node:url"; register("file%3A///home/akryum/.cache/Cypress/13.17.0/Cypress/resources/app/node_modules/ts-node/esm/transpile-only.mjs", pathToFileURL("./"));'
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:1858323) [DEP0180] DeprecationWarning: fs.Stats constructor is deprecated.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+
+================================================================================
+
+  (Run Starting)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Cypress:        13.17.0                                                                        │
+  │ Browser:        Electron 118 (headless)                                                        │
+  │ Node Version:   v24.16.0 (/home/akryum/.local/share/mise/installs/node/24.16.0/bin/node)       │
+  │ Specs:          1 found (controls-c1.cy.js)                                                    │
+  │ Searched:       cypress/e2e/controls-c1.cy.js                                                  │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+                                                                                                    
+  Running:  controls-c1.cy.js                                                               (1 of 1)
+
+
+  C1 shared controls acceptance
+    ✓ keeps narrow inspector and long menu usable (5247ms)
+
+
+  1 passing (5s)
+
+
+  (Results)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Tests:        1                                                                                │
+  │ Passing:      1                                                                                │
+  │ Failing:      0                                                                                │
+  │ Pending:      0                                                                                │
+  │ Skipped:      0                                                                                │
+  │ Screenshots:  1                                                                                │
+  │ Video:        false                                                                            │
+  │ Duration:     5 seconds                                                                        │
+  │ Spec Ran:     controls-c1.cy.js                                                                │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+  (Screenshots)
+
+  -  /home/akryum/Projects/histoire/examples/vue3/cypress/screenshots/controls-c1.cy.      (820x900)
+     js/c1-narrow-iframe-menu.png                                                                   
+
+
+================================================================================
+
+  (Run Finished)
+
+
+       Spec                                              Tests  Passing  Failing  Pending  Skipped  
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ ✔  controls-c1.cy.js                        00:05        1        1        -        -        - │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+    ✔  All specs passed!                        00:05        1        1        -        -        -  
+

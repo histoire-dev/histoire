@@ -1,7 +1,6 @@
 <script lang="ts" setup>
-import type { ClientCommand } from '@histoire/shared'
+import type { ClientCommand, ClientCommandContext } from '@histoire/shared'
 import { nextTick, onMounted, reactive, ref } from 'vue'
-import { executeCommand, getCommandContext } from '../../util/commands.js'
 import BaseButton from '../base/BaseButton.vue'
 import BaseKeyboardShortcut from '../base/BaseKeyboardShortcut.vue'
 import PromptSelect from './PromptSelect.vue'
@@ -9,16 +8,13 @@ import PromptText from './PromptText.vue'
 
 const props = defineProps<{
   command: ClientCommand
+  context: ClientCommandContext
+  execute: (command: ClientCommand, params: Record<string, any>) => unknown
 }>()
 
 const emit = defineEmits<{
   (e: 'close'): void
 }>()
-
-const promptTypes = {
-  text: PromptText,
-  select: PromptSelect,
-}
 
 const answers = reactive<Record<string, any>>({})
 
@@ -34,11 +30,12 @@ for (const prompt of props.command.prompts) {
   answers[prompt.field] = defaultValue
 }
 
+/** Resolve command parameters from current answers before closing prompt form. */
 function submit() {
   const params = props.command.getParams
-    ? props.command.getParams({ ...getCommandContext(), answers })
+    ? props.command.getParams({ ...props.context, answers })
     : answers
-  executeCommand(props.command, params)
+  props.execute(props.command, params)
   emit('close')
 }
 
@@ -46,6 +43,7 @@ function submit() {
 
 const promptComps = ref<any[]>([])
 
+/** Focus next rendered input once Vue has mounted its prompt component. */
 function focusPrompt(index: number) {
   nextTick(() => {
     promptComps.value[index]?.focus?.()
@@ -67,18 +65,28 @@ onMounted(() => {
       {{ command.label }}
     </div>
 
-    <component
-      :is="promptTypes[prompt.type]"
+    <template
       v-for="(prompt, index) of command.prompts"
       :key="prompt.field"
-      ref="promptComps"
-      v-model="answers[prompt.field]"
-      :prompt="prompt"
-      :answers="answers"
-      :index="index"
-      class="hover:htw-bg-gray-500/10 focus-within:htw-bg-gray-500/5"
-      @next="focusPrompt(index + 1)"
-    />
+    >
+      <PromptText
+        v-if="prompt.type === 'text'"
+        ref="promptComps"
+        v-model="answers[prompt.field]"
+        :prompt="prompt"
+        :answers="answers"
+        class="hover:htw-bg-gray-500/10 focus-within:htw-bg-gray-500/5"
+      />
+      <PromptSelect
+        v-else-if="prompt.type === 'select'"
+        ref="promptComps"
+        v-model="answers[prompt.field]"
+        :prompt="prompt"
+        :answers="answers"
+        class="hover:htw-bg-gray-500/10 focus-within:htw-bg-gray-500/5"
+        @next="focusPrompt(index + 1)"
+      />
+    </template>
 
     <div class="htw-flex htw-justify-end htw-gap-2 htw-p-2">
       <BaseButton

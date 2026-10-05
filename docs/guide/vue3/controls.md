@@ -4,6 +4,18 @@ Controls give you the ability to interact with your components arguments.
 
 Custom `#controls` slots run in a dedicated sandbox. Their background, typography and color scheme follow the Histoire panel. Built-in dropdowns and tooltips render in the host window, so they can extend beyond the controls form.
 
+## Shared component contracts
+
+Builtin `Hst*` controls use C1 styling with bundled Manrope and JetBrains Mono fonts. No font requests leave the book. Provider appearance and density stay local; standalone controls receive C1 defaults.
+
+Wrapped fields accept `layout="stacked"`, `layout="horizontal"`, or `layout="inline"`. Text, number, textarea, select, JSON and button groups default to stacked labels; checkbox and switch rows default to horizontal. Inline fields fit toolbars and external labels without reserving label space. Prop type metadata uses `data-histoire-control-type` in normal label flow.
+
+`HstText` accepts native `type`, including `search` and `password`. Native input attributes/listeners reach the field once. Interactive controls expose `focus()`; text, textarea, number and color text fields also expose `select()`.
+
+`HstSwitch` edits Boolean state with native switch semantics. `HstCheckbox` retains Boolean and string Boolean compatibility. `HstSelect` and `HstButtonGroup` accept string/numeric arrays, records and `{ value, label, disabled? }` options. Values retain their types and local object identity. Select adds `disabled`, `placeholder`, selected-label default slot and `option` slot. Rich slots stay local; host menus receive labels and opaque IDs only. Disabled options remain visible and cannot be selected.
+
+Both controls entrypoints keep existing exports. Native Vue hosts import `@histoire/controls/vue` and its provider-scoped stylesheet; JavaScript import alone does not install global styles or theme state. Preview components retain their own styling.
+
 ## Custom overlays
 
 Use `getControlsHost()` inside a custom controls component to display a text tooltip or a dropdown in the host. The adapter is available only in the controls sandbox. Keep option values in your component and pass string IDs and labels to the host.

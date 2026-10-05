@@ -1,0 +1,18 @@
+ 26 lines: examples/cypress/frame-commands.js
+230 lines: examples/vue3/cypress/e2e/ui-workbench.cy.js
+198 lines: packages/histoire-app/src/app/components/canvas/toolbar/ScreenshotPopover.vue
+ 68 lines: packages/histoire-app/src/app/components/comments/capture.ts
+ 22 lines: packages/histoire-app/src/app/components/panes/tests/capture.ts
+166 lines: packages/histoire-app/src/app/components/panes/tests/discovery.ts
+278 lines: packages/histoire-app/src/app/components/panes/tests/model.ts
+238 lines: packages/histoire-vue/src/__tests__/workbench-tests-discovery.spec.ts
+ 59 lines: packages/histoire/src/node/__tests__/dom-env.spec.ts
+ 87 lines: packages/histoire/src/node/__tests__/mcp/story-watcher-lifecycle.spec.ts
+ 69 lines: packages/histoire/src/node/__tests__/project-test-collection.spec.ts
+263 lines: packages/histoire/src/node/__tests__/vite.spec.ts
+ 80 lines: packages/histoire/src/node/dom/env.ts
+201 lines: packages/histoire/src/node/stories.ts
+157 lines: packages/histoire/src/node/util/vitest-run.ts
+174 lines: packages/histoire/src/node/vite/core-plugin.ts
+All 16 sources at most 300 lines; no trailing whitespace.
+Temporary capture diagnostic spec removed.

@@ -1,0 +1,144 @@
+
+DevTools listening on ws://127.0.0.1:41433/devtools/browser/21b7b4c6-f0da-43e9-8295-96098a75f29d
+(node:3862892) ExperimentalWarning: `--experimental-loader` may be removed in the future; instead use `register()`:
+--import 'data:text/javascript,import { register } from "node:module"; import { pathToFileURL } from "node:url"; register("file%3A///home/akryum/.cache/Cypress/13.17.0/Cypress/resources/app/node_modules/ts-node/esm/transpile-only.mjs", pathToFileURL("./"));'
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:3862892) [DEP0180] DeprecationWarning: fs.Stats constructor is deprecated.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+
+================================================================================
+
+  (Run Starting)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Cypress:        13.17.0                                                                        │
+  │ Browser:        Electron 118 (headless)                                                        │
+  │ Node Version:   v24.16.0 (/home/akryum/.local/share/mise/installs/node/24.16.0/bin/node)       │
+  │ Specs:          3 found (controls.cy.js, controls-overlays.cy.js, ui-workbench.cy.js)          │
+  │ Searched:       cypress/e2e/controls.cy.js, cypress/e2e/controls-overlays.cy.js, cypress/e2e/u │
+  │                 i-workbench.cy.js                                                              │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+                                                                                                    
+  Running:  controls.cy.js                                                                  (1 of 3)
+
+
+  Controls
+    ✓ updates text state (3491ms)
+    ✓ updates checkbox state (2921ms)
+    ✓ updates numeric state (2959ms)
+    ✓ updates long text state (3461ms)
+    ✓ updates color state (3749ms)
+
+
+  5 passing (17s)
+
+
+  (Results)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Tests:        5                                                                                │
+  │ Passing:      5                                                                                │
+  │ Failing:      0                                                                                │
+  │ Pending:      0                                                                                │
+  │ Skipped:      0                                                                                │
+  │ Screenshots:  0                                                                                │
+  │ Video:        false                                                                            │
+  │ Duration:     16 seconds                                                                       │
+  │ Spec Ran:     controls.cy.js                                                                   │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+                                                                                                    
+  Running:  controls-overlays.cy.js                                                         (2 of 3)
+
+
+  Controls overlays
+    ✓ renders long dropdowns outside the iframe and syncs keyboard selection (4387ms)
+    ✓ shrinks controls frame after conditional fields disappear and closes outside clicks (2881ms)
+    ✓ renders tooltip in the host and removes overlays on story navigation (3519ms)
+    ✓ restores focus on Escape and continues Shift+Tab inside the controls form (3211ms)
+
+
+  4 passing (14s)
+
+
+  (Results)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Tests:        4                                                                                │
+  │ Passing:      4                                                                                │
+  │ Failing:      0                                                                                │
+  │ Pending:      0                                                                                │
+  │ Skipped:      0                                                                                │
+  │ Screenshots:  0                                                                                │
+  │ Video:        false                                                                            │
+  │ Duration:     14 seconds                                                                       │
+  │ Spec Ran:     controls-overlays.cy.js                                                          │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+                                                                                                    
+  Running:  ui-workbench.cy.js                                                              (3 of 3)
+
+
+  Workbench contracts
+    ✓ persists selected pane, panel visibility, and inspector visibility (5048ms)
+    ✓ recovers canonical preview after its document reloads (9242ms)
+    ✓ shares persistent color scheme between settings and rail action (3694ms)
+    ✓ pans frames with Space and uses keyboard zoom without changing selection (2686ms)
+    ✓ persists local viewport presets and applies their logical frame size (5392ms)
+    ✓ exposes only panes and settings supported by current build mode (991ms)
+
+  Vue development workbench
+    ✓ persists a comment draft, resolves it, and reopens its exact thread (6397ms)
+    ✓ captures selected preview as PNG and WebP through screenshot service (5208ms)
+
+  Vue workbench integration
+    ✓ shows collected prop defaults and restores them after removing an override (2885ms)
+    ✓ applies matrix axes and base props to real cells and restores URL choices (10179ms)
+    ✓ detects no-hint chooser axes, switches exact base preset, and isolates long cell overrides (15366ms)
+    ✓ selects canvas variants and routes controls to selected preview (6385ms)
+    ✓ preserves docs tab deep link and reveals generated and story-file source (5661ms)
+    ✓ collects events from selected runtime and displays inline arguments (2500ms)
+Warning: terminator_CreateInstance: Failed to CreateInstance in ICD 2.  Skipping ICD.
+    ✓ opens search with Ctrl+K, filters scopes, and navigates docs and props (5128ms)
+
+
+  15 passing (1m)
+
+
+  (Results)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Tests:        15                                                                               │
+  │ Passing:      15                                                                               │
+  │ Failing:      0                                                                                │
+  │ Pending:      0                                                                                │
+  │ Skipped:      0                                                                                │
+  │ Screenshots:  0                                                                                │
+  │ Video:        false                                                                            │
+  │ Duration:     1 minute, 27 seconds                                                             │
+  │ Spec Ran:     ui-workbench.cy.js                                                               │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+================================================================================
+
+  (Run Finished)
+
+
+       Spec                                              Tests  Passing  Failing  Pending  Skipped  
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ ✔  controls.cy.js                           00:16        5        5        -        -        - │
+  ├────────────────────────────────────────────────────────────────────────────────────────────────┤
+  │ ✔  controls-overlays.cy.js                  00:14        4        4        -        -        - │
+  ├────────────────────────────────────────────────────────────────────────────────────────────────┤
+  │ ✔  ui-workbench.cy.js                       01:27       15       15        -        -        - │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+    ✔  All specs passed!                        01:58       24       24        -        -        -  
+

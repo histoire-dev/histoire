@@ -158,7 +158,8 @@ export const useTestsStore = defineStore('tests', () => {
     // their own key when they settle.
   }
 
-  async function runCurrentVariantTests() {
+  /** Runs caller-selected engine once; preview failures never start server execution. */
+  async function runCurrentVariantTests(mode: 'preview' | 'server' = 'preview') {
     if (!storyStore.currentStory || !storyStore.currentVariant) {
       return
     }
@@ -173,7 +174,7 @@ export const useTestsStore = defineStore('tests', () => {
       return
     }
 
-    if (!definitions.value[runKey]) {
+    if (mode === 'preview' && !definitions.value[runKey]) {
       await collectCurrentVariantTests()
     }
     if ((storyEpochs.get(storyId) ?? 0) !== epoch) return
@@ -184,17 +185,10 @@ export const useTestsStore = defineStore('tests', () => {
     }
 
     try {
-      const summary = await previewRuntimeStore.runCurrentFrameTests(runKey).catch(async (originalError) => {
-        // Never start a fallback for an invalidated revision or a static app.
-        if ((storyEpochs.get(storyId) ?? 0) !== epoch || !window.__HST_PLUGIN_API__) {
-          throw originalError
-        }
-
-        return await window.__HST_PLUGIN_API__.sendEvent('runStoryTests', {
-          storyId,
-          variantId,
-        }) as HistoireTestRunSummary
-      })
+      const summary = mode === 'server'
+        ? await window.__HST_PLUGIN_API__?.sendEvent('runStoryTests', { storyId, variantId }) as HistoireTestRunSummary
+        : await previewRuntimeStore.runCurrentFrameTests(runKey)
+      if (!summary) throw new Error('Server test execution is unavailable')
 
       if ((storyEpochs.get(storyId) ?? 0) !== epoch) return
       summaries.value = {
@@ -208,7 +202,7 @@ export const useTestsStore = defineStore('tests', () => {
     }
     catch (error) {
       if ((storyEpochs.get(storyId) ?? 0) !== epoch) return
-      // Both the iframe run and the node fallback failed. Surface the failure
+      // Explicit engine failed. Surface failure
       // as a synthetic failed run in the panel — rethrowing would escape into
       // the template click handler as an unhandled rejection with zero UI
       // feedback.

@@ -1,24 +1,20 @@
 import type { Story, Variant } from '../types'
-import { unindent } from '@histoire/shared'
 import { clientSupportPlugins } from 'virtual:$histoire-support-plugins-client'
+import { getDynamicSourceCode as deriveDynamicSource } from './dynamic-source.js'
 
-export async function getSourceCode(story: Story, variant: Variant) {
-  if (variant.source) {
-    return variant.source
-  }
-  else if (variant.slots?.().source) {
-    const source = variant.slots?.().source()[0].children
-    if (source) {
-      return unindent(source)
-    }
-  }
-  else {
+/** Resolve support plugin only inside existing story runtime/standalone adapter. */
+export async function getDynamicSourceCode(story: Story, variant: Variant) {
+  return deriveDynamicSource(variant, async (target) => {
     const clientPlugin = clientSupportPlugins[story.file?.supportPluginId]
-    if (clientPlugin) {
-      const pluginModule = await clientPlugin()
-      return pluginModule.generateSourceCode(variant)
-    }
-  }
+    const pluginModule = clientPlugin ? await clientPlugin() : null
+    return pluginModule?.generateSourceCode(target)
+  })
+}
+
+/** Legacy copy action retains raw fallback; SDK dynamic mode uses helper above. */
+export async function getSourceCode(story: Story, variant: Variant) {
+  const dynamic = await getDynamicSourceCode(story, variant)
+  if (dynamic) return dynamic.body
 
   const sourceLoader = story.file?.source
   if (sourceLoader) {

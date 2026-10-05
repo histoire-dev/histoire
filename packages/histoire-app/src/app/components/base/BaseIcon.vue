@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import { Icon } from '@iconify/vue'
 import { computed } from 'vue'
+import WorkbenchIcon from '../shell/WorkbenchIcon.vue'
 
 const props = defineProps<{
   icon: string
@@ -17,9 +17,9 @@ const isUrl = computed(() => props.icon.startsWith('http') || props.icon.startsW
     :alt="icon"
     class="histoire-base-icon"
   >
-  <Icon
+  <WorkbenchIcon
     v-else
-    :icon="icon"
+    :name="icon"
     class="histoire-base-icon"
   />
 </template>

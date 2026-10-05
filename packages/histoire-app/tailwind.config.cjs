@@ -4,12 +4,10 @@ const inheritedConfig = require('../../tailwind.config.cjs')
 
 // Colors
 
-function withOpacityValue(variable) {
+/** Source color alpha and utility opacity compose without escaping owning root. */
+function withOpacityValue(variable, alphaVariable = `${variable}-alpha`) {
   return ({ opacityValue }) => {
-    if (opacityValue === undefined) {
-      return `rgb(var(${variable}))`
-    }
-    return `rgb(var(${variable}) / ${opacityValue})`
+    return `rgb(var(${variable}) / calc(var(${alphaVariable}, 1) * ${opacityValue ?? 1}))`
   }
 }
 
@@ -45,12 +43,39 @@ for (const key in defaultColors) {
   }
 }
 
+/** Semantic colors share root-scoped channels with authored workbench styles. */
+const semanticColors = Object.fromEntries([
+  'surface',
+  'canvas',
+  'home',
+  'border',
+  'chip',
+  'input',
+  'text',
+  'body',
+  'muted',
+  'accent',
+  'accent-soft',
+  'accent-text',
+  'accent-link',
+  'danger',
+  'danger-text',
+  'danger-soft',
+  'warn',
+  'agent',
+  'agent-text',
+  'agent-soft',
+  'measure',
+  'code',
+].map(name => [name, withOpacityValue(`--histoire-${name}-rgb`, `--histoire-${name}-alpha`)]))
+
 const colors = {
   ...includedDefaultColors,
   white: '#fff',
   black: '#000',
   transparent: 'transparent',
   ...themedColors,
+  ...semanticColors,
 }
 
 module.exports = {
@@ -69,6 +94,10 @@ module.exports = {
 delete module.exports.theme.extend.colors.primary
 delete module.exports.theme.extend.colors.gray
 module.exports.theme.colors = colors
+module.exports.theme.extend.fontFamily = {
+  sans: ['var(--histoire-font-sans, "Manrope", system-ui, sans-serif)'],
+  mono: ['var(--histoire-font-mono, "JetBrains Mono", ui-monospace, monospace)'],
+}
 
 module.exports.plugins.push(require('@tailwindcss/typography'))
 // prose-a:htw-text-primary-500 prose-headings:htw-mb-2 prose-headings:htw-mt-4 first:prose-headings:htw-mt-0 prose-blockquote:htw-ml-0

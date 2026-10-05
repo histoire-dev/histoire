@@ -1,0 +1,9 @@
+
+ RUN  v4.1.10 /home/akryum/Projects/histoire/packages/histoire-protocol
+
+
+ Test Files  1 passed (1)
+      Tests  2 passed (2)
+   Start at  21:00:54
+   Duration  261ms (transform 26ms, setup 0ms, import 38ms, tests 56ms, environment 0ms)
+

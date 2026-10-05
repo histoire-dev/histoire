@@ -1,9 +1,11 @@
 /// <reference types="cypress" />
 
+import { getGeneratedSource } from '../../../cypress/workbench-actions.js'
+
 describe('Codegen (Vue 3)', () => {
   it('html', () => {
     cy.visit('/story/src-components-codegen-story-vue?variantId=html')
-    cy.get('[data-test-id="story-source-code"]').should('have.text', `<h1>Title</h1>
+    getGeneratedSource().should('have.text', `<h1>Title</h1>
 <hr>
 <pre>{
   "object": {
@@ -48,7 +50,7 @@ describe('Codegen (Vue 3)', () => {
 
   it('props', () => {
     cy.visit('/story/src-components-codegen-story-vue?variantId=props')
-    cy.get('[data-test-id="story-source-code"]').should('have.text', `<input placeholder="Counter...">
+    getGeneratedSource().should('have.text', `<input placeholder="Counter...">
 <input :value="0">
 <input
   :value="0"
@@ -64,7 +66,7 @@ describe('Codegen (Vue 3)', () => {
 
   it('boolean props', () => {
     cy.visit('/story/src-components-codegen-story-vue?variantId=boolean+props')
-    cy.get('[data-test-id="story-source-code"]').should('have.text', `<BaseButton disabled>
+    getGeneratedSource().should('have.text', `<BaseButton disabled>
    Button 
 </BaseButton>
 <BaseButton :disabled="false">
@@ -74,7 +76,7 @@ describe('Codegen (Vue 3)', () => {
 
   it('click-events', () => {
     cy.visit('/story/src-components-codegen-story-vue?variantId=click-events')
-    cy.get('[data-test-id="story-source-code"]').should('have.text', `<button @click="onClick">
+    getGeneratedSource().should('have.text', `<button @click="onClick">
    Click me 
 </button>
 <button @click="onClick($event)">
@@ -87,7 +89,7 @@ describe('Codegen (Vue 3)', () => {
 
   it('v-model', () => {
     cy.visit('/story/src-components-codegen-story-vue?variantId=v-model')
-    cy.get('[data-test-id="story-source-code"]').should('have.text', `<input
+    getGeneratedSource().should('have.text', `<input
   v-model.number="state.count"
   type="number"
 >
@@ -106,7 +108,7 @@ describe('Codegen (Vue 3)', () => {
 
   it('custom-directive', () => {
     cy.visit('/story/src-components-codegen-story-vue?variantId=custom-directive')
-    cy.get('[data-test-id="story-source-code"]').should('have.text', `<button v-tooltip="'Info'">
+    getGeneratedSource().should('have.text', `<button v-tooltip="'Info'">
   A button
 </button>
 <button v-tooltip.bottom="'Info'">
@@ -130,7 +132,7 @@ describe('Codegen (Vue 3)', () => {
 
   it('slots', () => {
     cy.visit('/story/src-components-codegen-story-vue?variantId=slots')
-    cy.get('[data-test-id="story-source-code"]').should('have.text', `<ModalWithSlots>
+    getGeneratedSource().should('have.text', `<ModalWithSlots>
   <template #title>
      Title 
   </template>
@@ -143,7 +145,7 @@ describe('Codegen (Vue 3)', () => {
 
   it('slot-with-props', () => {
     cy.visit('/story/src-components-codegen-story-vue?variantId=slot-with-props')
-    cy.get('[data-test-id="story-source-code"]').should('have.text', `<SlotWithProps>
+    getGeneratedSource().should('have.text', `<SlotWithProps>
   <template #default="{ foo, object, fn }">
     <p :title="{{ foo.toString() }}">
        foo: {{ foo }}
@@ -160,7 +162,7 @@ describe('Codegen (Vue 3)', () => {
 
   it('slot-with-props-named', () => {
     cy.visit('/story/src-components-codegen-story-vue?variantId=slot-with-props-named')
-    cy.get('[data-test-id="story-source-code"]').should('have.text', `<SlotWithProps>
+    getGeneratedSource().should('have.text', `<SlotWithProps>
   <template #named="{ foo, object, fn }">
     <p :title="{{ foo.toString() }}">
        foo: {{ foo }}
@@ -177,7 +179,7 @@ describe('Codegen (Vue 3)', () => {
 
   it('list', () => {
     cy.visit('/story/src-components-codegen-story-vue?variantId=list')
-    cy.get('[data-test-id="story-source-code"]').should('have.text', `<ul>
+    getGeneratedSource().should('have.text', `<ul>
   <li>Foo</li>
   <li>Bar</li>
 </ul>`)
@@ -185,7 +187,7 @@ describe('Codegen (Vue 3)', () => {
 
   it('function', () => {
     cy.visit('/story/src-components-codegen-story-vue?variantId=function')
-    cy.get('[data-test-id="story-source-code"]').should('have.text', `<div
+    getGeneratedSource().should('have.text', `<div
   :hello="(arg1, arg2, arg3) => 'meow'.repeat(arg3)"
   :get-name="(shade) => \`\${'\\'very-'.repeat(5)}long-\${shade}\`"
 />`)

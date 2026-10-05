@@ -1,0 +1,6 @@
+dev-workbench exit 9
+Traceback (most recent call last):
+  File "/tmp/histoire-c1-state-proof.py", line 28, in <module>
+    if result.returncode: raise RuntimeError(f'{name} Cypress failed; see {result_log}')
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: dev-workbench Cypress failed; see /tmp/histoire-c1-cypress-dev-workbench.log

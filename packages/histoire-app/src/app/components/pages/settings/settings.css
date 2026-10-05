@@ -1,0 +1,21 @@
+.histoire-provider .histoire-settings-page { display: flex; height: 100%; min-height: 0; background: var(--histoire-canvas, #f0f0f3); color: var(--histoire-text, #27272a); }
+.histoire-provider .histoire-settings-nav { width: 280px; flex: 0 0 280px; display: flex; flex-direction: column; gap: 3px; padding: 20px 8px 16px; background: var(--histoire-surface, #fff); border-inline-end: 1px solid var(--histoire-border, #e4e4e7); }
+.histoire-provider .histoire-settings-nav > strong { padding: 0 10px 16px; font-size: 15px; }
+.histoire-provider .histoire-settings-nav > button { display: flex; align-items: center; gap: 10px; width: 100%; padding: 11px 10px; border: 0; border-radius: 9px; background: transparent; color: inherit; text-align: start; font: inherit; cursor: pointer; }
+.histoire-provider .histoire-settings-nav > button[aria-current="page"] { background: var(--histoire-accent-soft, #ecfdf5); color: var(--histoire-accent-text, #047857); font-weight: 600; }
+.histoire-provider .histoire-settings-nav-icon { width: 18px; color: var(--histoire-muted, #71717a); font-size: 18px; }
+.histoire-provider .histoire-settings-nav footer { margin-top: auto; padding: 16px 10px 0; font-size: 11px; color: var(--histoire-muted, #71717a); }
+.histoire-provider .histoire-settings-content { flex: 1; min-width: 0; overflow: auto; padding: 42px 6%; }
+.histoire-provider .histoire-settings-content > section { width: min(100%, 740px); margin-inline: auto; }
+.histoire-provider .histoire-settings-content h1 { font-size: 25px; font-weight: 700; margin: 0 0 22px; }
+.histoire-provider .histoire-settings-card { border: 1px solid var(--histoire-border, #e4e4e7); border-radius: 15px; background: var(--histoire-surface, #fff); margin-bottom: 18px; overflow: hidden; }
+.histoire-provider .histoire-settings-card header { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 13px 20px; border-bottom: 1px solid var(--histoire-border, #e4e4e7); }
+.histoire-provider .histoire-settings-row { display: flex; align-items: center; gap: 18px; padding: var(--histoire-settings-row-padding, 20px) 20px; border-bottom: 1px solid var(--histoire-border, #e4e4e7); }
+.histoire-provider .histoire-settings-row:last-child { border-bottom: 0; }
+.histoire-provider .histoire-settings-row > label:first-child, .histoire-provider .histoire-settings-row > strong:first-child { flex: 1; }
+.histoire-provider .histoire-settings-muted { color: var(--histoire-muted, #71717a); font-size: 12px; }
+.histoire-provider .histoire-settings-field { min-width: 0; }
+.histoire-provider .histoire-settings-project { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 10px 20px; font-size: 12px; }
+.histoire-provider .histoire-settings-diff { flex: 1 0 100%; overflow: auto; white-space: pre-wrap; max-height: 200px; font-family: var(--histoire-font-mono, monospace); font-size: 11px; }
+@media (max-width: 900px) { .histoire-provider .histoire-settings-nav { width: 210px; flex-basis: 210px; } .histoire-provider .histoire-settings-content { padding: 28px 24px; } }
+@media (max-width: 600px) { .histoire-provider .histoire-settings-page { flex-direction: column; } .histoire-provider .histoire-settings-nav { width: auto; flex-basis: auto; flex-direction: row; flex-wrap: wrap; padding: 8px; } .histoire-provider .histoire-settings-nav > strong, .histoire-provider .histoire-settings-nav footer { display: none; } .histoire-provider .histoire-settings-nav > button { width: auto; padding: 8px; font-size: 12px; } .histoire-provider .histoire-settings-nav-icon { display: none; } .histoire-provider .histoire-settings-content { padding: 24px 14px; } .histoire-provider .histoire-settings-row { gap: 8px; flex-wrap: wrap; padding: calc(var(--histoire-settings-row-padding, 20px) - 6px) 14px; } }

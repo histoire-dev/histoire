@@ -1,0 +1,9 @@
+
+ RUN  v4.1.10 /home/akryum/Projects/histoire/packages/histoire-vue
+
+
+ Test Files  3 passed (3)
+      Tests  7 passed (7)
+   Start at  20:37:55
+   Duration  1.45s (transform 1.10s, setup 0ms, import 1.61s, tests 596ms, environment 719ms)
+

@@ -1,0 +1,1748 @@
+[
+  {
+    "antipattern": "design-system-radius",
+    "name": "Radius outside DESIGN.md",
+    "description": "A border-radius value is outside the DESIGN.md rounded scale. Use a documented radius token or update the design system if the new shape is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-controls/src/components/slider/HstSlider.vue",
+    "line": 92,
+    "snippet": "border-radius: 4px is outside the DESIGN.md rounded scale",
+    "advisory": true,
+    "ignoreValue": "4px",
+    "importedBy": [
+      "HstSlider.story.vue",
+      "index.ts"
+    ]
+  },
+  {
+    "antipattern": "design-system-radius",
+    "name": "Radius outside DESIGN.md",
+    "description": "A border-radius value is outside the DESIGN.md rounded scale. Use a documented radius token or update the design system if the new shape is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/agents/agents.css",
+    "line": 1,
+    "snippet": "border-radius: 14px is outside the DESIGN.md rounded scale",
+    "advisory": true,
+    "ignoreValue": "14px",
+    "importedBy": [
+      "PermissionPrompt.vue"
+    ]
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/agents/agents.css",
+    "line": 2,
+    "snippet": "font-size: 14px is off the DESIGN.md type ramp",
+    "advisory": true,
+    "ignoreValue": "14px",
+    "importedBy": [
+      "PermissionPrompt.vue"
+    ]
+  },
+  {
+    "antipattern": "design-system-radius",
+    "name": "Radius outside DESIGN.md",
+    "description": "A border-radius value is outside the DESIGN.md rounded scale. Use a documented radius token or update the design system if the new shape is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/agents/agents.css",
+    "line": 3,
+    "snippet": "border-radius: 8px is outside the DESIGN.md rounded scale",
+    "advisory": true,
+    "ignoreValue": "8px",
+    "importedBy": [
+      "PermissionPrompt.vue"
+    ]
+  },
+  {
+    "antipattern": "design-system-radius",
+    "name": "Radius outside DESIGN.md",
+    "description": "A border-radius value is outside the DESIGN.md rounded scale. Use a documented radius token or update the design system if the new shape is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/base/popover/BasePopover.vue",
+    "line": 132,
+    "snippet": "border-radius: 12px is outside the DESIGN.md rounded scale",
+    "advisory": true,
+    "ignoreValue": "12px",
+    "importedBy": [
+      "BaseOverflowToolbar.vue",
+      "ToolbarPopover.vue"
+    ]
+  },
+  {
+    "antipattern": "design-system-radius",
+    "name": "Radius outside DESIGN.md",
+    "description": "A border-radius value is outside the DESIGN.md rounded scale. Use a documented radius token or update the design system if the new shape is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/base/popover/BasePopover.vue",
+    "line": 140,
+    "snippet": "border-radius: 6px is outside the DESIGN.md rounded scale",
+    "advisory": true,
+    "ignoreValue": "6px",
+    "importedBy": [
+      "BaseOverflowToolbar.vue",
+      "ToolbarPopover.vue"
+    ]
+  },
+  {
+    "antipattern": "design-system-radius",
+    "name": "Radius outside DESIGN.md",
+    "description": "A border-radius value is outside the DESIGN.md rounded scale. Use a documented radius token or update the design system if the new shape is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/canvas/AgentCursor.vue",
+    "line": 71,
+    "snippet": "border-radius: 6px is outside the DESIGN.md rounded scale",
+    "advisory": true,
+    "ignoreValue": "6px"
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/canvas/CanvasFrame.vue",
+    "line": 133,
+    "snippet": "font-size: 12px is off the DESIGN.md type ramp",
+    "advisory": true,
+    "ignoreValue": "12px",
+    "importedBy": [
+      "CanvasViewport.vue"
+    ]
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/canvas/CanvasHeader.vue",
+    "line": 23,
+    "snippet": "font-size: 12px is off the DESIGN.md type ramp",
+    "advisory": true,
+    "ignoreValue": "12px",
+    "importedBy": [
+      "CanvasViewport.vue"
+    ]
+  },
+  {
+    "antipattern": "design-system-radius",
+    "name": "Radius outside DESIGN.md",
+    "description": "A border-radius value is outside the DESIGN.md rounded scale. Use a documented radius token or update the design system if the new shape is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/canvas/CanvasStatus.vue",
+    "line": 30,
+    "snippet": "border-radius: 10px is outside the DESIGN.md rounded scale",
+    "advisory": true,
+    "ignoreValue": "10px",
+    "importedBy": [
+      "CanvasViewport.vue"
+    ]
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/canvas/CanvasStatus.vue",
+    "line": 30,
+    "snippet": "font-size: 12px is off the DESIGN.md type ramp",
+    "advisory": true,
+    "ignoreValue": "12px",
+    "importedBy": [
+      "CanvasViewport.vue"
+    ]
+  },
+  {
+    "antipattern": "design-system-radius",
+    "name": "Radius outside DESIGN.md",
+    "description": "A border-radius value is outside the DESIGN.md rounded scale. Use a documented radius token or update the design system if the new shape is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/canvas/CanvasViewport.vue",
+    "line": 254,
+    "snippet": "border-radius: 6px is outside the DESIGN.md rounded scale",
+    "advisory": true,
+    "ignoreValue": "6px",
+    "importedBy": [
+      "WorkbenchApp.vue"
+    ]
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/canvas/CanvasViewport.vue",
+    "line": 262,
+    "snippet": "font-size: 16px is off the DESIGN.md type ramp",
+    "advisory": true,
+    "ignoreValue": "16px",
+    "importedBy": [
+      "WorkbenchApp.vue"
+    ]
+  },
+  {
+    "antipattern": "design-system-radius",
+    "name": "Radius outside DESIGN.md",
+    "description": "A border-radius value is outside the DESIGN.md rounded scale. Use a documented radius token or update the design system if the new shape is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/canvas/CollectErrorCard.vue",
+    "line": 23,
+    "snippet": "border-radius: 12px is outside the DESIGN.md rounded scale",
+    "advisory": true,
+    "ignoreValue": "12px",
+    "importedBy": [
+      "CanvasViewport.vue"
+    ]
+  },
+  {
+    "antipattern": "design-system-radius",
+    "name": "Radius outside DESIGN.md",
+    "description": "A border-radius value is outside the DESIGN.md rounded scale. Use a documented radius token or update the design system if the new shape is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/canvas/MeasureOverlay.vue",
+    "line": 193,
+    "snippet": "border-radius: 4px is outside the DESIGN.md rounded scale",
+    "advisory": true,
+    "ignoreValue": "4px",
+    "importedBy": [
+      "WorkbenchApp.vue"
+    ]
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/canvas/matrix/MatrixInspector.vue",
+    "line": 109,
+    "snippet": "font-size: 10px is off the DESIGN.md type ramp",
+    "advisory": true,
+    "ignoreValue": "10px",
+    "importedBy": [
+      "WorkbenchApp.vue"
+    ]
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/canvas/matrix/MatrixInspector.vue",
+    "line": 112,
+    "snippet": "font-size: 12px is off the DESIGN.md type ramp",
+    "advisory": true,
+    "ignoreValue": "12px",
+    "importedBy": [
+      "WorkbenchApp.vue"
+    ]
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/canvas/matrix/MatrixInspector.vue",
+    "line": 117,
+    "snippet": "font-size: 10px is off the DESIGN.md type ramp",
+    "advisory": true,
+    "ignoreValue": "10px",
+    "importedBy": [
+      "WorkbenchApp.vue"
+    ]
+  },
+  {
+    "antipattern": "design-system-radius",
+    "name": "Radius outside DESIGN.md",
+    "description": "A border-radius value is outside the DESIGN.md rounded scale. Use a documented radius token or update the design system if the new shape is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/canvas/toolbar/ArrangeSwitch.vue",
+    "line": 18,
+    "snippet": "border-radius: 8px is outside the DESIGN.md rounded scale",
+    "advisory": true,
+    "ignoreValue": "8px",
+    "importedBy": [
+      "CanvasToolbar.vue"
+    ]
+  },
+  {
+    "antipattern": "design-system-radius",
+    "name": "Radius outside DESIGN.md",
+    "description": "A border-radius value is outside the DESIGN.md rounded scale. Use a documented radius token or update the design system if the new shape is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/canvas/toolbar/BackgroundPicker.vue",
+    "line": 76,
+    "snippet": "border-radius: 3px is outside the DESIGN.md rounded scale",
+    "advisory": true,
+    "ignoreValue": "3px",
+    "importedBy": [
+      "CanvasToolbar.vue"
+    ]
+  },
+  {
+    "antipattern": "design-system-radius",
+    "name": "Radius outside DESIGN.md",
+    "description": "A border-radius value is outside the DESIGN.md rounded scale. Use a documented radius token or update the design system if the new shape is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/canvas/toolbar/BackgroundPicker.vue",
+    "line": 81,
+    "snippet": "border-radius: 5px is outside the DESIGN.md rounded scale",
+    "advisory": true,
+    "ignoreValue": "5px",
+    "importedBy": [
+      "CanvasToolbar.vue"
+    ]
+  },
+  {
+    "antipattern": "design-system-radius",
+    "name": "Radius outside DESIGN.md",
+    "description": "A border-radius value is outside the DESIGN.md rounded scale. Use a documented radius token or update the design system if the new shape is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/canvas/toolbar/CanvasToolbar.vue",
+    "line": 100,
+    "snippet": "border-radius: 12px is outside the DESIGN.md rounded scale",
+    "advisory": true,
+    "ignoreValue": "12px",
+    "importedBy": [
+      "WorkbenchApp.vue"
+    ]
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/canvas/toolbar/ScreenshotPopover.vue",
+    "line": 183,
+    "snippet": "font-size: 12px is off the DESIGN.md type ramp",
+    "advisory": true,
+    "ignoreValue": "12px"
+  },
+  {
+    "antipattern": "design-system-radius",
+    "name": "Radius outside DESIGN.md",
+    "description": "A border-radius value is outside the DESIGN.md rounded scale. Use a documented radius token or update the design system if the new shape is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/canvas/toolbar/ScreenshotPopover.vue",
+    "line": 190,
+    "snippet": "border-radius: 5px is outside the DESIGN.md rounded scale",
+    "advisory": true,
+    "ignoreValue": "5px"
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/canvas/toolbar/ScreenshotPopover.vue",
+    "line": 193,
+    "snippet": "font-size: 10px is off the DESIGN.md type ramp",
+    "advisory": true,
+    "ignoreValue": "10px"
+  },
+  {
+    "antipattern": "design-system-radius",
+    "name": "Radius outside DESIGN.md",
+    "description": "A border-radius value is outside the DESIGN.md rounded scale. Use a documented radius token or update the design system if the new shape is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/canvas/toolbar/ToolSwitch.vue",
+    "line": 23,
+    "snippet": "border-radius: 8px is outside the DESIGN.md rounded scale",
+    "advisory": true,
+    "ignoreValue": "8px",
+    "importedBy": [
+      "CanvasToolbar.vue"
+    ]
+  },
+  {
+    "antipattern": "design-system-radius",
+    "name": "Radius outside DESIGN.md",
+    "description": "A border-radius value is outside the DESIGN.md rounded scale. Use a documented radius token or update the design system if the new shape is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/comments/CommentContext.vue",
+    "line": 24,
+    "snippet": "border-radius: 6px is outside the DESIGN.md rounded scale",
+    "advisory": true,
+    "ignoreValue": "6px",
+    "importedBy": [
+      "CommentComposer.vue",
+      "CommentThread.vue"
+    ]
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/comments/CommentThread.vue",
+    "line": 98,
+    "snippet": "font-size: 12px is off the DESIGN.md type ramp",
+    "advisory": true,
+    "ignoreValue": "12px",
+    "importedBy": [
+      "CommentsCanvasOverlay.vue",
+      "CommentsPanel.vue"
+    ]
+  },
+  {
+    "antipattern": "design-system-radius",
+    "name": "Radius outside DESIGN.md",
+    "description": "A border-radius value is outside the DESIGN.md rounded scale. Use a documented radius token or update the design system if the new shape is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/comments/CommentThread.vue",
+    "line": 101,
+    "snippet": "border-radius: 6px is outside the DESIGN.md rounded scale",
+    "advisory": true,
+    "ignoreValue": "6px",
+    "importedBy": [
+      "CommentsCanvasOverlay.vue",
+      "CommentsPanel.vue"
+    ]
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/comments/CommentThread.vue",
+    "line": 101,
+    "snippet": "font-size: 10px is off the DESIGN.md type ramp",
+    "advisory": true,
+    "ignoreValue": "10px",
+    "importedBy": [
+      "CommentsCanvasOverlay.vue",
+      "CommentsPanel.vue"
+    ]
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/comments/CommentThread.vue",
+    "line": 105,
+    "snippet": "font-size: 12px is off the DESIGN.md type ramp",
+    "advisory": true,
+    "ignoreValue": "12px",
+    "importedBy": [
+      "CommentsCanvasOverlay.vue",
+      "CommentsPanel.vue"
+    ]
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/comments/CommentsCanvasOverlay.vue",
+    "line": 116,
+    "snippet": "font-size: 12px is off the DESIGN.md type ramp",
+    "advisory": true,
+    "ignoreValue": "12px"
+  },
+  {
+    "antipattern": "design-system-radius",
+    "name": "Radius outside DESIGN.md",
+    "description": "A border-radius value is outside the DESIGN.md rounded scale. Use a documented radius token or update the design system if the new shape is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/inspector/InspectorTabs.vue",
+    "line": 52,
+    "snippet": "border-radius: 10px is outside the DESIGN.md rounded scale",
+    "advisory": true,
+    "ignoreValue": "10px",
+    "importedBy": [
+      "StoryInspector.vue"
+    ]
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/inspector/SourceDrawer.vue",
+    "line": 173,
+    "snippet": "font-size: 12px is off the DESIGN.md type ramp",
+    "advisory": true,
+    "ignoreValue": "12px",
+    "importedBy": [
+      "StoryInspector.vue"
+    ]
+  },
+  {
+    "antipattern": "design-system-radius",
+    "name": "Radius outside DESIGN.md",
+    "description": "A border-radius value is outside the DESIGN.md rounded scale. Use a documented radius token or update the design system if the new shape is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/inspector/SourceDrawer.vue",
+    "line": 175,
+    "snippet": "border-radius: 6px is outside the DESIGN.md rounded scale",
+    "advisory": true,
+    "ignoreValue": "6px",
+    "importedBy": [
+      "StoryInspector.vue"
+    ]
+  },
+  {
+    "antipattern": "design-system-radius",
+    "name": "Radius outside DESIGN.md",
+    "description": "A border-radius value is outside the DESIGN.md rounded scale. Use a documented radius token or update the design system if the new shape is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/inspector/SourceDrawer.vue",
+    "line": 181,
+    "snippet": "border-radius: 10px is outside the DESIGN.md rounded scale",
+    "advisory": true,
+    "ignoreValue": "10px",
+    "importedBy": [
+      "StoryInspector.vue"
+    ]
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/inspector/SourceDrawer.vue",
+    "line": 187,
+    "snippet": "font-size: 12px is off the DESIGN.md type ramp",
+    "advisory": true,
+    "ignoreValue": "12px",
+    "importedBy": [
+      "StoryInspector.vue"
+    ]
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/inspector/StoryInspector.vue",
+    "line": 106,
+    "snippet": "font-size: 12px is off the DESIGN.md type ramp",
+    "advisory": true,
+    "ignoreValue": "12px",
+    "importedBy": [
+      "WorkbenchApp.vue"
+    ]
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/inspector/StoryInspector.vue",
+    "line": 113,
+    "snippet": "font-size: 10px is off the DESIGN.md type ramp",
+    "advisory": true,
+    "ignoreValue": "10px",
+    "importedBy": [
+      "WorkbenchApp.vue"
+    ]
+  },
+  {
+    "antipattern": "design-system-radius",
+    "name": "Radius outside DESIGN.md",
+    "description": "A border-radius value is outside the DESIGN.md rounded scale. Use a documented radius token or update the design system if the new shape is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/inspector/StoryInspector.vue",
+    "line": 116,
+    "snippet": "border-radius: 8px is outside the DESIGN.md rounded scale",
+    "advisory": true,
+    "ignoreValue": "8px",
+    "importedBy": [
+      "WorkbenchApp.vue"
+    ]
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/inspector/StoryInspector.vue",
+    "line": 118,
+    "snippet": "font-size: 10px is off the DESIGN.md type ramp",
+    "advisory": true,
+    "ignoreValue": "10px",
+    "importedBy": [
+      "WorkbenchApp.vue"
+    ]
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/inspector/StoryInspector.vue",
+    "line": 120,
+    "snippet": "font-size: 12px is off the DESIGN.md type ramp",
+    "advisory": true,
+    "ignoreValue": "12px",
+    "importedBy": [
+      "WorkbenchApp.vue"
+    ]
+  },
+  {
+    "antipattern": "design-system-radius",
+    "name": "Radius outside DESIGN.md",
+    "description": "A border-radius value is outside the DESIGN.md rounded scale. Use a documented radius token or update the design system if the new shape is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/menu/ContextMenu.vue",
+    "line": 115,
+    "snippet": "border-radius: 12px is outside the DESIGN.md rounded scale",
+    "advisory": true,
+    "ignoreValue": "12px",
+    "importedBy": [
+      "WorkbenchApp.vue"
+    ]
+  },
+  {
+    "antipattern": "design-system-radius",
+    "name": "Radius outside DESIGN.md",
+    "description": "A border-radius value is outside the DESIGN.md rounded scale. Use a documented radius token or update the design system if the new shape is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/menu/ContextMenu.vue",
+    "line": 118,
+    "snippet": "border-radius: 12px is outside the DESIGN.md rounded scale",
+    "advisory": true,
+    "ignoreValue": "12px",
+    "importedBy": [
+      "WorkbenchApp.vue"
+    ]
+  },
+  {
+    "antipattern": "design-system-radius",
+    "name": "Radius outside DESIGN.md",
+    "description": "A border-radius value is outside the DESIGN.md rounded scale. Use a documented radius token or update the design system if the new shape is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/menu/ContextMenu.vue",
+    "line": 121,
+    "snippet": "border-radius: 6px is outside the DESIGN.md rounded scale",
+    "advisory": true,
+    "ignoreValue": "6px",
+    "importedBy": [
+      "WorkbenchApp.vue"
+    ]
+  },
+  {
+    "antipattern": "design-system-radius",
+    "name": "Radius outside DESIGN.md",
+    "description": "A border-radius value is outside the DESIGN.md rounded scale. Use a documented radius token or update the design system if the new shape is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/menu/SubMenu.vue",
+    "line": 53,
+    "snippet": "border-radius: 12px is outside the DESIGN.md rounded scale",
+    "advisory": true,
+    "ignoreValue": "12px",
+    "importedBy": [
+      "ContextMenu.vue"
+    ]
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/pages/home/BrowseSections.vue",
+    "line": 47,
+    "snippet": "font-size: 12px is off the DESIGN.md type ramp",
+    "advisory": true,
+    "ignoreValue": "12px",
+    "importedBy": [
+      "HomePage.vue"
+    ]
+  },
+  {
+    "antipattern": "design-system-radius",
+    "name": "Radius outside DESIGN.md",
+    "description": "A border-radius value is outside the DESIGN.md rounded scale. Use a documented radius token or update the design system if the new shape is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/pages/home/HomeSearch.vue",
+    "line": 28,
+    "snippet": "border-radius: 5px is outside the DESIGN.md rounded scale",
+    "advisory": true,
+    "ignoreValue": "5px",
+    "importedBy": [
+      "HomePage.vue"
+    ]
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/pages/home/HomeSearch.vue",
+    "line": 28,
+    "snippet": "font-size: 10px is off the DESIGN.md type ramp",
+    "advisory": true,
+    "ignoreValue": "10px",
+    "importedBy": [
+      "HomePage.vue"
+    ]
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/pages/home/NeedsAttention.vue",
+    "line": 44,
+    "snippet": "font-size: 10px is off the DESIGN.md type ramp",
+    "advisory": true,
+    "ignoreValue": "10px"
+  },
+  {
+    "antipattern": "design-system-radius",
+    "name": "Radius outside DESIGN.md",
+    "description": "A border-radius value is outside the DESIGN.md rounded scale. Use a documented radius token or update the design system if the new shape is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/pages/home/NeedsAttention.vue",
+    "line": 45,
+    "snippet": "border-radius: 5px is outside the DESIGN.md rounded scale",
+    "advisory": true,
+    "ignoreValue": "5px"
+  },
+  {
+    "antipattern": "design-system-radius",
+    "name": "Radius outside DESIGN.md",
+    "description": "A border-radius value is outside the DESIGN.md rounded scale. Use a documented radius token or update the design system if the new shape is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/pages/home/NeedsAttention.vue",
+    "line": 46,
+    "snippet": "border-radius: 14px is outside the DESIGN.md rounded scale",
+    "advisory": true,
+    "ignoreValue": "14px"
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/pages/home/UpdatesList.vue",
+    "line": 44,
+    "snippet": "font-size: 9px is off the DESIGN.md type ramp",
+    "advisory": true,
+    "ignoreValue": "9px",
+    "importedBy": [
+      "HomePage.vue"
+    ]
+  },
+  {
+    "antipattern": "design-system-radius",
+    "name": "Radius outside DESIGN.md",
+    "description": "A border-radius value is outside the DESIGN.md rounded scale. Use a documented radius token or update the design system if the new shape is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/pages/home/UpdatesList.vue",
+    "line": 47,
+    "snippet": "border-radius: 5px is outside the DESIGN.md rounded scale",
+    "advisory": true,
+    "ignoreValue": "5px",
+    "importedBy": [
+      "HomePage.vue"
+    ]
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/pages/home/UpdatesList.vue",
+    "line": 47,
+    "snippet": "font-size: 10px is off the DESIGN.md type ramp",
+    "advisory": true,
+    "ignoreValue": "10px",
+    "importedBy": [
+      "HomePage.vue"
+    ]
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/pages/markdown/MarkdownOutline.vue",
+    "line": 31,
+    "snippet": "font-size: 12px is off the DESIGN.md type ramp",
+    "advisory": true,
+    "ignoreValue": "12px",
+    "importedBy": [
+      "MarkdownPage.vue"
+    ]
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/pages/markdown/markdown.css",
+    "line": 6,
+    "snippet": "font-size: 12px is off the DESIGN.md type ramp",
+    "advisory": true,
+    "ignoreValue": "12px",
+    "importedBy": [
+      "MarkdownPage.vue"
+    ]
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/pages/markdown/markdown.css",
+    "line": 9,
+    "snippet": "font-size: 21px is off the DESIGN.md type ramp",
+    "advisory": true,
+    "ignoreValue": "21px",
+    "importedBy": [
+      "MarkdownPage.vue"
+    ]
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/pages/markdown/markdown.css",
+    "line": 10,
+    "snippet": "font-size: 17px is off the DESIGN.md type ramp",
+    "advisory": true,
+    "ignoreValue": "17px",
+    "importedBy": [
+      "MarkdownPage.vue"
+    ]
+  },
+  {
+    "antipattern": "design-system-radius",
+    "name": "Radius outside DESIGN.md",
+    "description": "A border-radius value is outside the DESIGN.md rounded scale. Use a documented radius token or update the design system if the new shape is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/pages/markdown/markdown.css",
+    "line": 15,
+    "snippet": "border-radius: 10px is outside the DESIGN.md rounded scale",
+    "advisory": true,
+    "ignoreValue": "10px",
+    "importedBy": [
+      "MarkdownPage.vue"
+    ]
+  },
+  {
+    "antipattern": "design-system-radius",
+    "name": "Radius outside DESIGN.md",
+    "description": "A border-radius value is outside the DESIGN.md rounded scale. Use a documented radius token or update the design system if the new shape is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/pages/markdown/markdown.css",
+    "line": 16,
+    "snippet": "border-radius: 4px is outside the DESIGN.md rounded scale",
+    "advisory": true,
+    "ignoreValue": "4px",
+    "importedBy": [
+      "MarkdownPage.vue"
+    ]
+  },
+  {
+    "antipattern": "design-system-radius",
+    "name": "Radius outside DESIGN.md",
+    "description": "A border-radius value is outside the DESIGN.md rounded scale. Use a documented radius token or update the design system if the new shape is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/pages/markdown/markdown.css",
+    "line": 17,
+    "snippet": "border-radius: 8px is outside the DESIGN.md rounded scale",
+    "advisory": true,
+    "ignoreValue": "8px",
+    "importedBy": [
+      "MarkdownPage.vue"
+    ]
+  },
+  {
+    "antipattern": "design-system-radius",
+    "name": "Radius outside DESIGN.md",
+    "description": "A border-radius value is outside the DESIGN.md rounded scale. Use a documented radius token or update the design system if the new shape is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/pages/markdown/markdown.css",
+    "line": 21,
+    "snippet": "border-radius: 12px is outside the DESIGN.md rounded scale",
+    "advisory": true,
+    "ignoreValue": "12px",
+    "importedBy": [
+      "MarkdownPage.vue"
+    ]
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/pages/settings/BackgroundsSection.vue",
+    "line": 97,
+    "snippet": "font-size: 12px is off the DESIGN.md type ramp",
+    "advisory": true,
+    "ignoreValue": "12px",
+    "importedBy": [
+      "AppearanceSection.vue"
+    ]
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/pages/settings/BackgroundsSection.vue",
+    "line": 100,
+    "snippet": "Undocumented color #d4d4d8 is outside DESIGN.md colors",
+    "advisory": true,
+    "ignoreValue": "#d4d4d8",
+    "importedBy": [
+      "AppearanceSection.vue"
+    ]
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/pages/settings/ViewportsSection.vue",
+    "line": 81,
+    "snippet": "font-size: 12px is off the DESIGN.md type ramp",
+    "advisory": true,
+    "ignoreValue": "12px",
+    "importedBy": [
+      "AppearanceSection.vue"
+    ]
+  },
+  {
+    "antipattern": "design-system-radius",
+    "name": "Radius outside DESIGN.md",
+    "description": "A border-radius value is outside the DESIGN.md rounded scale. Use a documented radius token or update the design system if the new shape is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/pages/settings/agents-settings.css",
+    "line": 6,
+    "snippet": "border-radius: 10px is outside the DESIGN.md rounded scale",
+    "advisory": true,
+    "ignoreValue": "10px",
+    "importedBy": [
+      "AgentsSection.vue"
+    ]
+  },
+  {
+    "antipattern": "design-system-radius",
+    "name": "Radius outside DESIGN.md",
+    "description": "A border-radius value is outside the DESIGN.md rounded scale. Use a documented radius token or update the design system if the new shape is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/pages/settings/agents-settings.css",
+    "line": 9,
+    "snippet": "border-radius: 6px is outside the DESIGN.md rounded scale",
+    "advisory": true,
+    "ignoreValue": "6px",
+    "importedBy": [
+      "AgentsSection.vue"
+    ]
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/pages/settings/agents-settings.css",
+    "line": 9,
+    "snippet": "font-size: 10px is off the DESIGN.md type ramp",
+    "advisory": true,
+    "ignoreValue": "10px",
+    "importedBy": [
+      "AgentsSection.vue"
+    ]
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/pages/settings/agents-settings.css",
+    "line": 10,
+    "snippet": "font-size: 12px is off the DESIGN.md type ramp",
+    "advisory": true,
+    "ignoreValue": "12px",
+    "importedBy": [
+      "AgentsSection.vue"
+    ]
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/pages/settings/agents-settings.css",
+    "line": 16,
+    "snippet": "font-size: 12px is off the DESIGN.md type ramp",
+    "advisory": true,
+    "ignoreValue": "12px",
+    "importedBy": [
+      "AgentsSection.vue"
+    ]
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/pages/settings/agents-settings.css",
+    "line": 20,
+    "snippet": "font-size: 12px is off the DESIGN.md type ramp",
+    "advisory": true,
+    "ignoreValue": "12px",
+    "importedBy": [
+      "AgentsSection.vue"
+    ]
+  },
+  {
+    "antipattern": "design-system-radius",
+    "name": "Radius outside DESIGN.md",
+    "description": "A border-radius value is outside the DESIGN.md rounded scale. Use a documented radius token or update the design system if the new shape is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/pages/settings/agents-settings.css",
+    "line": 21,
+    "snippet": "border-radius: 8px is outside the DESIGN.md rounded scale",
+    "advisory": true,
+    "ignoreValue": "8px",
+    "importedBy": [
+      "AgentsSection.vue"
+    ]
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/pages/settings/settings.css",
+    "line": 6,
+    "snippet": "font-size: 18px is off the DESIGN.md type ramp",
+    "advisory": true,
+    "ignoreValue": "18px",
+    "importedBy": [
+      "SettingsPage.vue"
+    ]
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/pages/settings/settings.css",
+    "line": 10,
+    "snippet": "font-size: 25px is off the DESIGN.md type ramp",
+    "advisory": true,
+    "ignoreValue": "25px",
+    "importedBy": [
+      "SettingsPage.vue"
+    ]
+  },
+  {
+    "antipattern": "design-system-radius",
+    "name": "Radius outside DESIGN.md",
+    "description": "A border-radius value is outside the DESIGN.md rounded scale. Use a documented radius token or update the design system if the new shape is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/pages/settings/settings.css",
+    "line": 11,
+    "snippet": "border-radius: 15px is outside the DESIGN.md rounded scale",
+    "advisory": true,
+    "ignoreValue": "15px",
+    "importedBy": [
+      "SettingsPage.vue"
+    ]
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/pages/settings/settings.css",
+    "line": 16,
+    "snippet": "font-size: 12px is off the DESIGN.md type ramp",
+    "advisory": true,
+    "ignoreValue": "12px",
+    "importedBy": [
+      "SettingsPage.vue"
+    ]
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/pages/settings/settings.css",
+    "line": 21,
+    "snippet": "font-size: 12px is off the DESIGN.md type ramp",
+    "advisory": true,
+    "ignoreValue": "12px",
+    "importedBy": [
+      "SettingsPage.vue"
+    ]
+  },
+  {
+    "antipattern": "design-system-radius",
+    "name": "Radius outside DESIGN.md",
+    "description": "A border-radius value is outside the DESIGN.md rounded scale. Use a documented radius token or update the design system if the new shape is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/panes/comments/CommentRow.vue",
+    "line": 38,
+    "snippet": "border-radius: 4px is outside the DESIGN.md rounded scale",
+    "advisory": true,
+    "ignoreValue": "4px",
+    "importedBy": [
+      "CommentsList.vue"
+    ]
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/panes/comments/CommentRow.vue",
+    "line": 38,
+    "snippet": "font-size: 10px is off the DESIGN.md type ramp",
+    "advisory": true,
+    "ignoreValue": "10px",
+    "importedBy": [
+      "CommentsList.vue"
+    ]
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/panes/comments/CommentRow.vue",
+    "line": 41,
+    "snippet": "font-size: 12px is off the DESIGN.md type ramp",
+    "advisory": true,
+    "ignoreValue": "12px",
+    "importedBy": [
+      "CommentsList.vue"
+    ]
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/panes/comments/CommentsList.vue",
+    "line": 78,
+    "snippet": "font-size: 10px is off the DESIGN.md type ramp",
+    "advisory": true,
+    "ignoreValue": "10px",
+    "importedBy": [
+      "CommentsPanel.vue"
+    ]
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/panes/comments/CommentsPanel.vue",
+    "line": 92,
+    "snippet": "font-size: 12px is off the DESIGN.md type ramp",
+    "advisory": true,
+    "ignoreValue": "12px"
+  },
+  {
+    "antipattern": "design-system-radius",
+    "name": "Radius outside DESIGN.md",
+    "description": "A border-radius value is outside the DESIGN.md rounded scale. Use a documented radius token or update the design system if the new shape is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/panes/mcp/McpActivity.vue",
+    "line": 63,
+    "snippet": "border-radius: 5px is outside the DESIGN.md rounded scale",
+    "advisory": true,
+    "ignoreValue": "5px"
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/panes/mcp/McpActivity.vue",
+    "line": 63,
+    "snippet": "font-size: 10px is off the DESIGN.md type ramp",
+    "advisory": true,
+    "ignoreValue": "10px"
+  },
+  {
+    "antipattern": "design-system-radius",
+    "name": "Radius outside DESIGN.md",
+    "description": "A border-radius value is outside the DESIGN.md rounded scale. Use a documented radius token or update the design system if the new shape is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/panes/mcp/McpActivity.vue",
+    "line": 64,
+    "snippet": "border-radius: 14px is outside the DESIGN.md rounded scale",
+    "advisory": true,
+    "ignoreValue": "14px"
+  },
+  {
+    "antipattern": "design-system-radius",
+    "name": "Radius outside DESIGN.md",
+    "description": "A border-radius value is outside the DESIGN.md rounded scale. Use a documented radius token or update the design system if the new shape is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/panes/mcp/McpActivity.vue",
+    "line": 65,
+    "snippet": "border-radius: 10px is outside the DESIGN.md rounded scale",
+    "advisory": true,
+    "ignoreValue": "10px"
+  },
+  {
+    "antipattern": "design-system-radius",
+    "name": "Radius outside DESIGN.md",
+    "description": "A border-radius value is outside the DESIGN.md rounded scale. Use a documented radius token or update the design system if the new shape is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/panes/mcp/McpActivity.vue",
+    "line": 72,
+    "snippet": "border-radius: 999px is outside the DESIGN.md rounded scale",
+    "advisory": true,
+    "ignoreValue": "999px"
+  },
+  {
+    "antipattern": "design-system-radius",
+    "name": "Radius outside DESIGN.md",
+    "description": "A border-radius value is outside the DESIGN.md rounded scale. Use a documented radius token or update the design system if the new shape is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/panes/mcp/McpActivity.vue",
+    "line": 75,
+    "snippet": "border-radius: 999px is outside the DESIGN.md rounded scale",
+    "advisory": true,
+    "ignoreValue": "999px"
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/panes/mcp/McpActivity.vue",
+    "line": 81,
+    "snippet": "font-size: 10px is off the DESIGN.md type ramp",
+    "advisory": true,
+    "ignoreValue": "10px"
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/panes/mcp/McpActivity.vue",
+    "line": 84,
+    "snippet": "font-size: 12px is off the DESIGN.md type ramp",
+    "advisory": true,
+    "ignoreValue": "12px"
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/panes/mcp/McpClients.vue",
+    "line": 40,
+    "snippet": "font-size: 12px is off the DESIGN.md type ramp",
+    "advisory": true,
+    "ignoreValue": "12px",
+    "importedBy": [
+      "McpPanel.vue"
+    ]
+  },
+  {
+    "antipattern": "design-system-radius",
+    "name": "Radius outside DESIGN.md",
+    "description": "A border-radius value is outside the DESIGN.md rounded scale. Use a documented radius token or update the design system if the new shape is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/panes/mcp/McpCurrentOperation.vue",
+    "line": 37,
+    "snippet": "border-radius: 12px is outside the DESIGN.md rounded scale",
+    "advisory": true,
+    "ignoreValue": "12px",
+    "importedBy": [
+      "McpPanel.vue"
+    ]
+  },
+  {
+    "antipattern": "design-system-radius",
+    "name": "Radius outside DESIGN.md",
+    "description": "A border-radius value is outside the DESIGN.md rounded scale. Use a documented radius token or update the design system if the new shape is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/panes/mcp/McpCurrentOperation.vue",
+    "line": 44,
+    "snippet": "border-radius: 999px is outside the DESIGN.md rounded scale",
+    "advisory": true,
+    "ignoreValue": "999px",
+    "importedBy": [
+      "McpPanel.vue"
+    ]
+  },
+  {
+    "antipattern": "design-system-radius",
+    "name": "Radius outside DESIGN.md",
+    "description": "A border-radius value is outside the DESIGN.md rounded scale. Use a documented radius token or update the design system if the new shape is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/panes/mcp/McpCurrentOperation.vue",
+    "line": 47,
+    "snippet": "border-radius: 999px is outside the DESIGN.md rounded scale",
+    "advisory": true,
+    "ignoreValue": "999px",
+    "importedBy": [
+      "McpPanel.vue"
+    ]
+  },
+  {
+    "antipattern": "design-system-radius",
+    "name": "Radius outside DESIGN.md",
+    "description": "A border-radius value is outside the DESIGN.md rounded scale. Use a documented radius token or update the design system if the new shape is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/panes/mcp/McpEndpoint.vue",
+    "line": 53,
+    "snippet": "border-radius: 12px is outside the DESIGN.md rounded scale",
+    "advisory": true,
+    "ignoreValue": "12px",
+    "importedBy": [
+      "McpPanel.vue"
+    ]
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/panes/mcp/McpEndpoint.vue",
+    "line": 54,
+    "snippet": "font-size: 12px is off the DESIGN.md type ramp",
+    "advisory": true,
+    "ignoreValue": "12px",
+    "importedBy": [
+      "McpPanel.vue"
+    ]
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/panes/mcp/McpHistory.vue",
+    "line": 43,
+    "snippet": "font-size: 12px is off the DESIGN.md type ramp",
+    "advisory": true,
+    "ignoreValue": "12px",
+    "importedBy": [
+      "McpPanel.vue"
+    ]
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/panes/mcp/McpHistory.vue",
+    "line": 49,
+    "snippet": "font-size: 12px is off the DESIGN.md type ramp",
+    "advisory": true,
+    "ignoreValue": "12px",
+    "importedBy": [
+      "McpPanel.vue"
+    ]
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/panes/mcp/McpHistory.vue",
+    "line": 57,
+    "snippet": "font-size: 10px is off the DESIGN.md type ramp",
+    "advisory": true,
+    "ignoreValue": "10px",
+    "importedBy": [
+      "McpPanel.vue"
+    ]
+  },
+  {
+    "antipattern": "design-system-radius",
+    "name": "Radius outside DESIGN.md",
+    "description": "A border-radius value is outside the DESIGN.md rounded scale. Use a documented radius token or update the design system if the new shape is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/panes/mcp/McpPanel.vue",
+    "line": 45,
+    "snippet": "border-radius: 999px is outside the DESIGN.md rounded scale",
+    "advisory": true,
+    "ignoreValue": "999px"
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/panes/mcp/McpPanel.vue",
+    "line": 48,
+    "snippet": "font-size: 12px is off the DESIGN.md type ramp",
+    "advisory": true,
+    "ignoreValue": "12px"
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/panes/search/SearchPanel.vue",
+    "line": 232,
+    "snippet": "font-size: 12px is off the DESIGN.md type ramp",
+    "advisory": true,
+    "ignoreValue": "12px",
+    "importedBy": [
+      "WorkbenchApp.vue"
+    ]
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/panes/search/SearchPanel.vue",
+    "line": 235,
+    "snippet": "font-size: 12px is off the DESIGN.md type ramp",
+    "advisory": true,
+    "ignoreValue": "12px",
+    "importedBy": [
+      "WorkbenchApp.vue"
+    ]
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/panes/search/SearchResultGroup.vue",
+    "line": 48,
+    "snippet": "font-size: 12px is off the DESIGN.md type ramp",
+    "advisory": true,
+    "ignoreValue": "12px",
+    "importedBy": [
+      "SearchPanel.vue"
+    ]
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/panes/search/SearchResultItem.vue",
+    "line": 55,
+    "snippet": "font-size: 12px is off the DESIGN.md type ramp",
+    "advisory": true,
+    "ignoreValue": "12px",
+    "importedBy": [
+      "SearchResultGroup.vue"
+    ]
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/panes/tests/TestsPanel.vue",
+    "line": 82,
+    "snippet": "font-size: 14px is off the DESIGN.md type ramp",
+    "advisory": true,
+    "ignoreValue": "14px"
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/panes/tests/TestsPanel.vue",
+    "line": 86,
+    "snippet": "font-size: 12px is off the DESIGN.md type ramp",
+    "advisory": true,
+    "ignoreValue": "12px"
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/panes/tests/TestsPanel.vue",
+    "line": 91,
+    "snippet": "font-size: 12px is off the DESIGN.md type ramp",
+    "advisory": true,
+    "ignoreValue": "12px"
+  },
+  {
+    "antipattern": "design-system-radius",
+    "name": "Radius outside DESIGN.md",
+    "description": "A border-radius value is outside the DESIGN.md rounded scale. Use a documented radius token or update the design system if the new shape is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/panes/tests/TestsSummary.vue",
+    "line": 37,
+    "snippet": "border-radius: 4px is outside the DESIGN.md rounded scale",
+    "advisory": true,
+    "ignoreValue": "4px",
+    "importedBy": [
+      "TestsPanel.vue"
+    ]
+  },
+  {
+    "antipattern": "design-system-radius",
+    "name": "Radius outside DESIGN.md",
+    "description": "A border-radius value is outside the DESIGN.md rounded scale. Use a documented radius token or update the design system if the new shape is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/shell/AppRail.vue",
+    "line": 101,
+    "snippet": "border-radius: 10px is outside the DESIGN.md rounded scale",
+    "advisory": true,
+    "ignoreValue": "10px",
+    "importedBy": [
+      "ShellLayout.vue"
+    ]
+  },
+  {
+    "antipattern": "side-tab",
+    "name": "Side-tab accent border",
+    "description": "Thick colored border on one side of a card — the most recognizable tell of AI-generated UIs. Use a subtler accent or remove it entirely.",
+    "severity": "warning",
+    "category": "slop",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/story/StoryResponsivePreview.vue",
+    "line": 128,
+    "snippet": "border-l-2",
+    "importedBy": [
+      "StoryVariantSingleIframe.vue"
+    ]
+  },
+  {
+    "antipattern": "design-system-radius",
+    "name": "Radius outside DESIGN.md",
+    "description": "A border-radius value is outside the DESIGN.md rounded scale. Use a documented radius token or update the design system if the new shape is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/standalone/style.css",
+    "line": 19,
+    "snippet": "border-radius: 4px is outside the DESIGN.md rounded scale",
+    "advisory": true,
+    "ignoreValue": "4px",
+    "importedBy": [
+      "mount.ts"
+    ]
+  },
+  {
+    "antipattern": "design-system-radius",
+    "name": "Radius outside DESIGN.md",
+    "description": "A border-radius value is outside the DESIGN.md rounded scale. Use a documented radius token or update the design system if the new shape is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/standalone/style.css",
+    "line": 32,
+    "snippet": "border-radius: 8px is outside the DESIGN.md rounded scale",
+    "advisory": true,
+    "ignoreValue": "8px",
+    "importedBy": [
+      "mount.ts"
+    ]
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/standalone/style.css",
+    "line": 33,
+    "snippet": "Undocumented color #0004 is outside DESIGN.md colors",
+    "advisory": true,
+    "ignoreValue": "#0004",
+    "importedBy": [
+      "mount.ts"
+    ]
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/standalone/style.css",
+    "line": 35,
+    "snippet": "Undocumented color #0006 is outside DESIGN.md colors",
+    "advisory": true,
+    "ignoreValue": "#0006",
+    "importedBy": [
+      "mount.ts"
+    ]
+  },
+  {
+    "antipattern": "design-system-radius",
+    "name": "Radius outside DESIGN.md",
+    "description": "A border-radius value is outside the DESIGN.md rounded scale. Use a documented radius token or update the design system if the new shape is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/standalone/style.css",
+    "line": 53,
+    "snippet": "border-radius: 8px is outside the DESIGN.md rounded scale",
+    "advisory": true,
+    "ignoreValue": "8px",
+    "importedBy": [
+      "mount.ts"
+    ]
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/standalone/style.css",
+    "line": 54,
+    "snippet": "Undocumented color #0004 is outside DESIGN.md colors",
+    "advisory": true,
+    "ignoreValue": "#0004",
+    "importedBy": [
+      "mount.ts"
+    ]
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/style/sandbox.css",
+    "line": 53,
+    "snippet": "font-size: 1.125rem is off the DESIGN.md type ramp",
+    "advisory": true,
+    "ignoreValue": "1.125rem"
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/style/sandbox.css",
+    "line": 57,
+    "snippet": "font-size: 1rem is off the DESIGN.md type ramp",
+    "advisory": true,
+    "ignoreValue": "1rem"
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/home/akryum/Projects/histoire/packages/histoire-app/src/app/style/sandbox.css",
+    "line": 63,
+    "snippet": "font-size: .875rem is off the DESIGN.md type ramp",
+    "advisory": true,
+    "ignoreValue": ".875rem"
+  }
+]

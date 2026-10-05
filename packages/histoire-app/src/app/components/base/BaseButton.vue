@@ -1,33 +1,27 @@
-<script lang="ts" setup>
+<script setup lang="ts">
+import { HstButton } from '@histoire/controls/vue'
 import { computed } from 'vue'
 import { RouterLink } from 'vue-router'
 
+defineOptions({ inheritAttrs: false })
 const props = defineProps<{
+  /** Existing router destination. */
   to?: any
+  /** Existing native link destination. */
   href?: string
+  /** Legacy primary/grey color mapping. */
   color?: string
 }>()
-
-const comp = computed(() => {
-  if (props.to) {
-    return RouterLink
-  }
-  if (props.href) {
-    return 'a'
-  }
-  return 'button'
-})
+const appearance = computed(() => props.color === 'primary' || !props.color ? 'primary' : props.color === 'flat' ? 'flat' : 'default')
 </script>
 
 <template>
-  <component
-    :is="comp"
-    class="histoire-base-button htw-rounded htw-cursor-pointer"
-    :class="{
-      'htw-bg-primary-200 dark:htw-bg-primary-800 hover:htw-bg-primary-300 dark:hover:htw-bg-primary-700': color === 'primary' || !color,
-      'htw-bg-grey-100 dark:htw-bg-grey-900 hover:htw-bg-grey-200 dark:hover:htw-bg-grey-800': color === 'grey',
-    }"
-  >
+  <RouterLink v-if="to" v-slot="{ href: destination, navigate }" :to="to" custom>
+    <HstButton v-bind="$attrs" as="a" :href="destination" :color="appearance" class="histoire-base-button" @click="navigate">
+      <slot />
+    </HstButton>
+  </RouterLink>
+  <HstButton v-else v-bind="$attrs" :as="href ? 'a' : 'button'" :href="href" :color="appearance" class="histoire-base-button">
     <slot />
-  </component>
+  </HstButton>
 </template>

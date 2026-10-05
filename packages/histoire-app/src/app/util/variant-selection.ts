@@ -1,5 +1,3 @@
-import type { Story, Variant } from '../types'
-
 /**
  * Resolves which variant a story view should put in the route when it opens
  * without a `variantId` query parameter.
@@ -21,8 +19,8 @@ import type { Story, Variant } from '../types'
  * @returns Variant id to write to the route, or `null` to leave the URL alone.
  */
 export function resolveAutoSelectedVariantId(
-  story: Story | null | undefined,
-  currentVariant: Variant | null | undefined,
+  story: { variants: readonly { id: string }[], lastSelectedVariant?: { id: string } } | null | undefined,
+  currentVariant: { id: string } | null | undefined,
 ): string | null {
   if (currentVariant || !story) {
     return null

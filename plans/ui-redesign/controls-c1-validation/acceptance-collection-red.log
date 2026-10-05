@@ -1,0 +1,58 @@
+
+ RUN  v4.1.10 /home/akryum/Projects/histoire/packages/histoire
+
+ ❯ src/node/__tests__/dom-env.spec.ts (2 tests | 1 failed | 1 skipped) 90ms
+   × releases window timers and document before restoring globals, once 89ms
+ ❯ src/node/__tests__/vite.spec.ts (12 tests | 1 failed | 11 skipped) 2489ms
+     × keeps browser mounts read-only while file updates still request collection 2488ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/node/__tests__/dom-env.spec.ts > releases window timers and document before restoring globals, once
+AssertionError: expected "vi.fn()" to be called 5 times, but got 11 times
+ ❯ src/node/__tests__/dom-env.spec.ts:17:18
+     15|     const count = tick.mock.calls.length
+     16|     await new Promise(resolve => nativeDelay(resolve, 30))
+     17|     expect(tick).toHaveBeenCalledTimes(count)
+       |                  ^
+     18|     expect(document.body).toBeNull()
+     19|     const next = createDomEnv()
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  src/node/__tests__/vite.spec.ts > getViteConfigWithPlugins > keeps browser mounts read-only while file updates still request collection
+AssertionError: expected "vi.fn()" to not be called at all, but actually been called 2 times
+
+Received:
+
+  1st vi.fn() call:
+
+    Array [
+      undefined,
+    ]
+
+  2nd vi.fn() call:
+
+    Array [
+      undefined,
+    ]
+
+
+Number of calls: 2
+
+ ❯ src/node/__tests__/vite.spec.ts:50:27
+     48|       plugin.configureServer(server)
+     49|       for (let mount = 0; mount < 3; mount++) handlers.get('histoire:m…
+     50|       expect(changed).not.toHaveBeenCalled()
+       |                           ^
+     51|       plugin.handleHotUpdate({ file: ctx.storyFiles[0].path })
+     52|       expect(changed).toHaveBeenCalledExactlyOnceWith(ctx.storyFiles[0…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  2 failed (2)
+      Tests  2 failed | 12 skipped (14)
+   Start at  22:04:56
+   Duration  3.48s (transform 455ms, setup 0ms, import 1.20s, tests 2.58s, environment 0ms)
+

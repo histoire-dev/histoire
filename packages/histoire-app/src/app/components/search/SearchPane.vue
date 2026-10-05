@@ -1,17 +1,19 @@
 <script lang="ts" setup>
 import type { ClientCommand } from '@histoire/shared'
-import type { SearchResult, SearchResultType, Story, Variant } from '../../types'
+import type { SearchResult } from '../../types'
 import type { SearchData } from './types'
+import { getControlElement, HstText } from '@histoire/controls/vue'
 import { Icon } from '@iconify/vue'
 import { useDebounce, useFocus } from '@vueuse/core'
 import Fuse from 'fuse.js'
 import { registeredCommands } from 'virtual:$histoire-commands'
-import { computed, ref, watch } from 'vue'
+import { computed, ref, shallowRef, watch } from 'vue'
 import { useCommandStore } from '../../stores/command.js'
 import { useStoryStore } from '../../stores/story'
 import { builtinCommands, getCommandContext } from '../../util/commands.js'
 import { useSelection } from '../../util/select.js'
 import BaseEmpty from '../base/BaseEmpty.vue'
+import { storyResultFactory, variantResultFactory } from './result-factories'
 import { onUpdate, searchData } from './search-title-data'
 import SearchItem from './SearchItem.vue'
 
@@ -111,7 +113,9 @@ loadDocSearchIndex()
 
 // Search
 
-const titleResults = ref<SearchResult[]>([])
+// Result lists are replaced as a whole. Avoid deep-unwrapping vue-router's
+// discriminated route objects: their optional `never` fields must stay intact.
+const titleResults = shallowRef<SearchResult[]>([])
 
 watch(rateLimitedSearch, async (value) => {
   const list: SearchResult[] = []
@@ -141,7 +145,7 @@ watch(rateLimitedSearch, async (value) => {
   titleResults.value = list
 })
 
-const docsResults = ref<SearchResult[]>([])
+const docsResults = shallowRef<SearchResult[]>([])
 
 async function searchOnDocField(query: string) {
   if (docSearchIndex) {
@@ -166,53 +170,6 @@ async function searchOnDocField(query: string) {
 }
 
 watch(rateLimitedSearch, searchOnDocField)
-
-function storyResultFactory(story: Story, rank: number, type: SearchResultType = 'title'): SearchResult {
-  return {
-    kind: 'story',
-    rank,
-    id: `story:${story.id}`,
-    title: story.title,
-    route: {
-      name: 'story',
-      params: {
-        storyId: story.id,
-      },
-      query: {
-        ...type === 'docs'
-          ? { tab: 'docs' }
-          : {},
-      },
-    },
-    path: story.file.path.slice(0, -1),
-    icon: story.icon,
-    iconColor: story.iconColor,
-  }
-}
-
-function variantResultFactory(story: Story, variant: Variant, rank: number, type: SearchResultType = 'title'): SearchResult {
-  return {
-    kind: 'variant',
-    rank,
-    id: `variant:${story.id}:${variant.id}`,
-    title: variant.title,
-    route: {
-      name: 'story',
-      params: {
-        storyId: story.id,
-      },
-      query: {
-        variantId: variant.id,
-        ...type === 'docs'
-          ? { tab: 'docs' }
-          : {},
-      },
-    },
-    path: [...story.file.path ?? [], story.title],
-    icon: variant.icon,
-    iconColor: variant.iconColor,
-  }
-}
 
 // Commands
 
@@ -286,15 +243,16 @@ const {
       class="flex-none htw-w-4 htw-h-4"
     />
 
-    <input
-      ref="input"
+    <HstText
+      :ref="value => { input = getControlElement(value) as HTMLInputElement }"
       v-model="searchInputText"
+      layout="inline"
       placeholder="Search for stories, variants..."
-      class="htw-bg-transparent htw-w-full htw-flex-1 htw-pl-0 htw-pr-6 htw-py-4 htw-outline-none"
+      class="htw-w-full htw-flex-1 htw-pl-0 htw-pr-6"
       @keydown.down.prevent="selectNext()"
       @keydown.up.prevent="selectPrevious()"
       @keydown.escape="close()"
-    >
+    />
   </div>
 
   <BaseEmpty

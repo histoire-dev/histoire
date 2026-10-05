@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import type { AutoPropComponentDefinition, PropDefinition } from '@histoire/shared'
 import type { Variant } from '../../types'
-import { HstCheckbox, HstJson, HstNumber, HstText } from '@histoire/controls'
+import { getControlComponent } from '@histoire/controls'
 import { Icon } from '@iconify/vue'
 import { computed } from 'vue'
 
@@ -11,19 +11,7 @@ const props = defineProps<{
   definition: PropDefinition
 }>()
 
-const comp = computed(() => {
-  switch (props.definition.types?.[0]) {
-    case 'string':
-      return HstText
-    case 'number':
-      return HstNumber
-    case 'boolean':
-      return HstCheckbox
-    case 'object':
-    default:
-      return HstJson
-  }
-})
+const comp = computed(() => getControlComponent(props.definition.types?.[0]))
 
 const model = computed({
   get: () => {

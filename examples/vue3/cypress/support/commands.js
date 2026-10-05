@@ -4,35 +4,19 @@
 // More info: https://on.cypress.io/custom-commands
 // ***********************************************
 
-/**
- * Yields the body of the preview iframe, waiting until the story rendered
- * something into it.
- *
- * @param {object} [options] Options forwarded to the underlying `cy.get`
- * (a longer `timeout` for stories that are slow to boot, for instance).
- */
-Cypress.Commands.add('getPreviewIframeBody', (options = {}) => cy.get('iframe[data-test-id="preview-iframe"]', options)
-  .its('0.contentDocument.body')
-  .should('not.be.empty')
-  .then(cy.wrap))
-
-/** Yields custom controls rendered in dedicated sandbox iframe. */
-Cypress.Commands.add('getControlsIframeBody', (options = {}) => cy.get('iframe[data-test-id="story-controls-sandbox"]', options)
-  .its('0.contentDocument.body')
-  .should('not.be.empty')
-  .then(cy.wrap))
+import { selectCanvasVariant } from '../../../cypress/workbench-actions.js'
+import '../../../cypress/frame-commands.js'
 
 /**
  * Opens the "Vitest Mocking" story on its first variant.
  *
- * The story has several variants, so Histoire shows the variant list and picks
- * nothing: only single-variant stories (or a story reopened during the same
- * session) get a `variantId` written to the URL automatically. The variant is
- * therefore clicked explicitly before asserting the deep link.
+ * A story-only selection shows canvas frames before choosing a canonical
+ * preview. Explicit frame chrome also works when a prior variant was remembered.
  */
 Cypress.Commands.add('openVitestStory', () => {
   cy.get('[data-test-id="story-list-item"]').contains('Vitest Mocking').click()
-  cy.contains('[data-test-id="story-variant-list-item"]', 'mocked module in story setup').click()
+  cy.location('pathname').should('include', '/story/src-components-vitestmocking-story-vue')
+  selectCanvasVariant('mocked module in story setup', 'src-components-vitestmocking-story-vue-0')
   cy.location('search').should('include', 'variantId=src-components-vitestmocking-story-vue-0')
 })
 

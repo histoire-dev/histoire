@@ -1,23 +1,26 @@
 /// <reference types="cypress" />
 
+import { getGeneratedSource, selectCanvasVariant, visitStories } from '../../../cypress/workbench-actions.js'
+
 describe('Story preview', () => {
-  it('should display the untitled variant', () => {
-    cy.visit('/')
+  beforeEach(() => {
+    visitStories()
     cy.get('[data-test-id="story-list-item"]').contains('Demo').click()
-    cy.get('[data-test-id="story-variant-list-item"]').should('have.length', 2)
-    cy.get('[data-test-id="story-variant-list-item"]').contains('untitled').click()
-    cy.get('[data-test-id="story-variant-single-view"]').contains('untitled')
+    cy.get('[data-frame-id] > button').should('have.length', 2)
+  })
+
+  it('should display the untitled variant', () => {
+    selectCanvasVariant('untitled', 'src-components-demo-story-vue-0')
+    cy.contains('[data-frame-id] > button[aria-pressed="true"]', 'untitled')
+    // Source helper waits canonical admission after selecting from story-only view.
+    getGeneratedSource().should('have.text', '<Demo message="Hello world!" />')
     cy.getPreviewIframeBody().contains('Hello world!')
-    cy.get('[data-test-id="story-source-code"]').should('have.text', '<Demo message="Hello world!" />')
   })
 
   it('should display the second variant', () => {
-    cy.visit('/')
-    cy.get('[data-test-id="story-list-item"]').contains('Demo').click()
-    cy.get('[data-test-id="story-variant-list-item"]').should('have.length', 2)
-    cy.get('[data-test-id="story-variant-list-item"]').contains('Variant 2').click()
-    cy.get('[data-test-id="story-variant-single-view"]').contains('Variant 2')
+    selectCanvasVariant('Variant 2', 'src-components-demo-story-vue-1')
+    cy.contains('[data-frame-id] > button[aria-pressed="true"]', 'Variant 2')
+    getGeneratedSource().should('have.text', '<Demo message="Meow!" />')
     cy.getPreviewIframeBody().contains('Meow!')
-    cy.get('[data-test-id="story-source-code"]').should('have.text', '<Demo message="Meow!" />')
   })
 })

@@ -1,0 +1,4 @@
+.histoire-provider .histoire-agent-permission { position: absolute; inset-inline-end: 24px; bottom: 24px; z-index: 60; width: min(440px, calc(100% - 32px)); padding: 18px; border-radius: 14px; background: var(--histoire-surface, #fff); color: var(--histoire-text, #27272a); box-shadow: var(--histoire-shadow-panel, 0 12px 36px #0003); }
+.histoire-provider .histoire-agent-permission h2 { display: flex; align-items: center; gap: 8px; margin: 0 0 12px; font-size: 14px; font-weight: 600; }
+.histoire-provider .histoire-agent-permission pre { max-height: 180px; overflow: auto; padding: 12px; margin: 0 0 14px; border-radius: 8px; background: var(--histoire-input, #f4f4f5); font: 12px/1.5 var(--histoire-font-mono, monospace); white-space: pre-wrap; overflow-wrap: anywhere; }
+.histoire-provider .histoire-agent-permission-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }

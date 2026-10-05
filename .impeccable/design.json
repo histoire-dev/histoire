@@ -1,0 +1,835 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-04T16:37:54.905309Z",
+  "title": "Design System: Histoire Workbench",
+  "extensions": {
+    "colorMeta": {
+      "canvas": {
+        "role": "neutral",
+        "displayName": "Canvas Ground",
+        "tonalRamp": [
+          "#18181b",
+          "#27272a",
+          "#3f3f46",
+          "#52525b",
+          "#71717a",
+          "#a1a1aa",
+          "#e4e4e7",
+          "#fafafa"
+        ]
+      },
+      "home": {
+        "role": "neutral",
+        "displayName": "Home Ground",
+        "tonalRamp": [
+          "#18181b",
+          "#27272a",
+          "#3f3f46",
+          "#52525b",
+          "#71717a",
+          "#a1a1aa",
+          "#e4e4e7",
+          "#fafafa"
+        ]
+      },
+      "surface": {
+        "role": "neutral",
+        "displayName": "Surface",
+        "tonalRamp": [
+          "#18181b",
+          "#27272a",
+          "#3f3f46",
+          "#52525b",
+          "#71717a",
+          "#a1a1aa",
+          "#e4e4e7",
+          "#fafafa"
+        ]
+      },
+      "border": {
+        "role": "neutral",
+        "displayName": "Edge",
+        "tonalRamp": [
+          "#18181b",
+          "#27272a",
+          "#3f3f46",
+          "#52525b",
+          "#71717a",
+          "#a1a1aa",
+          "#e4e4e7",
+          "#fafafa"
+        ]
+      },
+      "chip": {
+        "role": "neutral",
+        "displayName": "Control Track",
+        "tonalRamp": [
+          "#18181b",
+          "#27272a",
+          "#3f3f46",
+          "#52525b",
+          "#71717a",
+          "#a1a1aa",
+          "#e4e4e7",
+          "#fafafa"
+        ]
+      },
+      "input": {
+        "role": "neutral",
+        "displayName": "Input Ground",
+        "tonalRamp": [
+          "#18181b",
+          "#27272a",
+          "#3f3f46",
+          "#52525b",
+          "#71717a",
+          "#a1a1aa",
+          "#e4e4e7",
+          "#fafafa"
+        ]
+      },
+      "text": {
+        "role": "neutral",
+        "displayName": "Primary Ink",
+        "tonalRamp": [
+          "#18181b",
+          "#27272a",
+          "#3f3f46",
+          "#52525b",
+          "#71717a",
+          "#a1a1aa",
+          "#e4e4e7",
+          "#fafafa"
+        ]
+      },
+      "body": {
+        "role": "neutral",
+        "displayName": "Body Ink",
+        "tonalRamp": [
+          "#18181b",
+          "#27272a",
+          "#3f3f46",
+          "#52525b",
+          "#71717a",
+          "#a1a1aa",
+          "#e4e4e7",
+          "#fafafa"
+        ]
+      },
+      "muted": {
+        "role": "neutral",
+        "displayName": "Muted Ink",
+        "tonalRamp": [
+          "#18181b",
+          "#27272a",
+          "#3f3f46",
+          "#52525b",
+          "#71717a",
+          "#a1a1aa",
+          "#e4e4e7",
+          "#fafafa"
+        ]
+      },
+      "accent": {
+        "role": "primary",
+        "displayName": "Workbench Green",
+        "tonalRamp": [
+          "#064e3b",
+          "#065f46",
+          "#047857",
+          "#059669",
+          "#10b981",
+          "#34d399",
+          "#a7f3d0",
+          "#ecfdf5"
+        ]
+      },
+      "accent-soft": {
+        "role": "primary",
+        "displayName": "Green Tint",
+        "tonalRamp": [
+          "#064e3b",
+          "#065f46",
+          "#047857",
+          "#059669",
+          "#10b981",
+          "#34d399",
+          "#a7f3d0",
+          "#ecfdf5"
+        ]
+      },
+      "accent-text": {
+        "role": "primary",
+        "displayName": "Green State Text",
+        "tonalRamp": [
+          "#064e3b",
+          "#065f46",
+          "#047857",
+          "#059669",
+          "#10b981",
+          "#34d399",
+          "#a7f3d0",
+          "#ecfdf5"
+        ]
+      },
+      "accent-link": {
+        "role": "primary",
+        "displayName": "Green Link",
+        "tonalRamp": [
+          "#064e3b",
+          "#065f46",
+          "#047857",
+          "#059669",
+          "#10b981",
+          "#34d399",
+          "#a7f3d0",
+          "#ecfdf5"
+        ]
+      },
+      "danger": {
+        "role": "semantic",
+        "displayName": "Failure Red",
+        "tonalRamp": [
+          "#7f1d1d",
+          "#991b1b",
+          "#b91c1c",
+          "#dc2626",
+          "#ef4444",
+          "#f87171",
+          "#fecaca",
+          "#fef2f2"
+        ]
+      },
+      "danger-text": {
+        "role": "semantic",
+        "displayName": "Failure Text",
+        "tonalRamp": [
+          "#7f1d1d",
+          "#991b1b",
+          "#b91c1c",
+          "#dc2626",
+          "#ef4444",
+          "#f87171",
+          "#fecaca",
+          "#fef2f2"
+        ]
+      },
+      "danger-soft": {
+        "role": "semantic",
+        "displayName": "Failure Tint",
+        "tonalRamp": [
+          "#7f1d1d",
+          "#991b1b",
+          "#b91c1c",
+          "#dc2626",
+          "#ef4444",
+          "#f87171",
+          "#fecaca",
+          "#fef2f2"
+        ]
+      },
+      "warn": {
+        "role": "semantic",
+        "displayName": "Warning Amber",
+        "tonalRamp": [
+          "#78350f",
+          "#92400e",
+          "#b45309",
+          "#d97706",
+          "#f59e0b",
+          "#fbbf24",
+          "#fde68a",
+          "#fffbeb"
+        ]
+      },
+      "agent": {
+        "role": "semantic",
+        "displayName": "Agent Violet",
+        "tonalRamp": [
+          "#4c1d95",
+          "#5b21b6",
+          "#6d28d9",
+          "#7c3aed",
+          "#8b5cf6",
+          "#a78bfa",
+          "#ddd6fe",
+          "#f5f3ff"
+        ]
+      },
+      "agent-text": {
+        "role": "semantic",
+        "displayName": "Agent and Event Text",
+        "tonalRamp": [
+          "#4c1d95",
+          "#5b21b6",
+          "#6d28d9",
+          "#7c3aed",
+          "#8b5cf6",
+          "#a78bfa",
+          "#ddd6fe",
+          "#f5f3ff"
+        ]
+      },
+      "agent-soft": {
+        "role": "semantic",
+        "displayName": "Agent Tint",
+        "tonalRamp": [
+          "#4c1d95",
+          "#5b21b6",
+          "#6d28d9",
+          "#7c3aed",
+          "#8b5cf6",
+          "#a78bfa",
+          "#ddd6fe",
+          "#f5f3ff"
+        ]
+      },
+      "measure": {
+        "role": "semantic",
+        "displayName": "Measure Rose",
+        "tonalRamp": [
+          "#881337",
+          "#9f1239",
+          "#be123c",
+          "#e11d48",
+          "#f43f5e",
+          "#fb7185",
+          "#fecdd3",
+          "#fff1f2"
+        ]
+      },
+      "code": {
+        "role": "neutral",
+        "displayName": "Code Ground",
+        "tonalRamp": [
+          "#18181b",
+          "#27272a",
+          "#3f3f46",
+          "#52525b",
+          "#71717a",
+          "#a1a1aa",
+          "#e4e4e7",
+          "#fafafa"
+        ]
+      },
+      "canvas-dark": {
+        "role": "neutral",
+        "displayName": "Canvas Ground (Dark)",
+        "tonalRamp": [
+          "#18181b",
+          "#27272a",
+          "#3f3f46",
+          "#52525b",
+          "#71717a",
+          "#a1a1aa",
+          "#e4e4e7",
+          "#fafafa"
+        ]
+      },
+      "home-dark": {
+        "role": "neutral",
+        "displayName": "Home Ground (Dark)",
+        "tonalRamp": [
+          "#18181b",
+          "#27272a",
+          "#3f3f46",
+          "#52525b",
+          "#71717a",
+          "#a1a1aa",
+          "#e4e4e7",
+          "#fafafa"
+        ]
+      },
+      "surface-dark": {
+        "role": "neutral",
+        "displayName": "Surface (Dark)",
+        "tonalRamp": [
+          "#18181b",
+          "#27272a",
+          "#3f3f46",
+          "#52525b",
+          "#71717a",
+          "#a1a1aa",
+          "#e4e4e7",
+          "#fafafa"
+        ]
+      },
+      "border-dark": {
+        "role": "neutral",
+        "displayName": "Edge (Dark)",
+        "tonalRamp": [
+          "#18181b",
+          "#27272a",
+          "#3f3f46",
+          "#52525b",
+          "#71717a",
+          "#a1a1aa",
+          "#e4e4e7",
+          "#fafafa"
+        ]
+      },
+      "chip-dark": {
+        "role": "neutral",
+        "displayName": "Control Track (Dark)",
+        "tonalRamp": [
+          "#18181b",
+          "#27272a",
+          "#3f3f46",
+          "#52525b",
+          "#71717a",
+          "#a1a1aa",
+          "#e4e4e7",
+          "#fafafa"
+        ]
+      },
+      "input-dark": {
+        "role": "neutral",
+        "displayName": "Input Ground (Dark)",
+        "tonalRamp": [
+          "#18181b",
+          "#27272a",
+          "#3f3f46",
+          "#52525b",
+          "#71717a",
+          "#a1a1aa",
+          "#e4e4e7",
+          "#fafafa"
+        ]
+      },
+      "text-dark": {
+        "role": "neutral",
+        "displayName": "Primary Ink (Dark)",
+        "tonalRamp": [
+          "#18181b",
+          "#27272a",
+          "#3f3f46",
+          "#52525b",
+          "#71717a",
+          "#a1a1aa",
+          "#e4e4e7",
+          "#fafafa"
+        ]
+      },
+      "body-dark": {
+        "role": "neutral",
+        "displayName": "Body Ink (Dark)",
+        "tonalRamp": [
+          "#18181b",
+          "#27272a",
+          "#3f3f46",
+          "#52525b",
+          "#71717a",
+          "#a1a1aa",
+          "#e4e4e7",
+          "#fafafa"
+        ]
+      },
+      "muted-dark": {
+        "role": "neutral",
+        "displayName": "Muted Ink (Dark)",
+        "tonalRamp": [
+          "#18181b",
+          "#27272a",
+          "#3f3f46",
+          "#52525b",
+          "#71717a",
+          "#a1a1aa",
+          "#e4e4e7",
+          "#fafafa"
+        ]
+      },
+      "accent-dark": {
+        "role": "primary",
+        "displayName": "Workbench Green (Dark)",
+        "tonalRamp": [
+          "#064e3b",
+          "#065f46",
+          "#047857",
+          "#059669",
+          "#10b981",
+          "#34d399",
+          "#a7f3d0",
+          "#ecfdf5"
+        ]
+      },
+      "accent-soft-dark": {
+        "role": "primary",
+        "displayName": "Green Tint (Dark)",
+        "tonalRamp": [
+          "#064e3b",
+          "#065f46",
+          "#047857",
+          "#059669",
+          "#10b981",
+          "#34d399",
+          "#a7f3d0",
+          "#ecfdf5"
+        ]
+      },
+      "accent-text-dark": {
+        "role": "primary",
+        "displayName": "Green State Text (Dark)",
+        "tonalRamp": [
+          "#064e3b",
+          "#065f46",
+          "#047857",
+          "#059669",
+          "#10b981",
+          "#34d399",
+          "#a7f3d0",
+          "#ecfdf5"
+        ]
+      },
+      "accent-link-dark": {
+        "role": "primary",
+        "displayName": "Green Link (Dark)",
+        "tonalRamp": [
+          "#064e3b",
+          "#065f46",
+          "#047857",
+          "#059669",
+          "#10b981",
+          "#34d399",
+          "#a7f3d0",
+          "#ecfdf5"
+        ]
+      },
+      "danger-dark": {
+        "role": "semantic",
+        "displayName": "Failure Red (Dark)",
+        "tonalRamp": [
+          "#7f1d1d",
+          "#991b1b",
+          "#b91c1c",
+          "#dc2626",
+          "#ef4444",
+          "#f87171",
+          "#fecaca",
+          "#fef2f2"
+        ]
+      },
+      "danger-text-dark": {
+        "role": "semantic",
+        "displayName": "Failure Text (Dark)",
+        "tonalRamp": [
+          "#7f1d1d",
+          "#991b1b",
+          "#b91c1c",
+          "#dc2626",
+          "#ef4444",
+          "#f87171",
+          "#fecaca",
+          "#fef2f2"
+        ]
+      },
+      "danger-soft-dark": {
+        "role": "semantic",
+        "displayName": "Failure Tint (Dark)",
+        "tonalRamp": [
+          "#7f1d1d",
+          "#991b1b",
+          "#b91c1c",
+          "#dc2626",
+          "#ef4444",
+          "#f87171",
+          "#fecaca",
+          "#fef2f2"
+        ]
+      },
+      "warn-dark": {
+        "role": "semantic",
+        "displayName": "Warning Amber (Dark)",
+        "tonalRamp": [
+          "#78350f",
+          "#92400e",
+          "#b45309",
+          "#d97706",
+          "#f59e0b",
+          "#fbbf24",
+          "#fde68a",
+          "#fffbeb"
+        ]
+      },
+      "agent-text-dark": {
+        "role": "semantic",
+        "displayName": "Agent and Event Text (Dark)",
+        "tonalRamp": [
+          "#4c1d95",
+          "#5b21b6",
+          "#6d28d9",
+          "#7c3aed",
+          "#8b5cf6",
+          "#a78bfa",
+          "#ddd6fe",
+          "#f5f3ff"
+        ]
+      },
+      "agent-soft-dark": {
+        "role": "semantic",
+        "displayName": "Agent Tint (Dark)",
+        "tonalRamp": [
+          "#4c1d95",
+          "#5b21b6",
+          "#6d28d9",
+          "#7c3aed",
+          "#8b5cf6",
+          "#a78bfa",
+          "#ddd6fe",
+          "#f5f3ff"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Home Project Title",
+        "purpose": "Fluid project heading on Home."
+      },
+      "headline": {
+        "displayName": "Canvas Story Title",
+        "purpose": "Current story heading."
+      },
+      "title": {
+        "displayName": "Panel Title",
+        "purpose": "Story pane and inspector headings."
+      },
+      "body": {
+        "displayName": "Interface Body",
+        "purpose": "Workbench text and editable fields."
+      },
+      "label": {
+        "displayName": "Action Label",
+        "purpose": "Inspector tabs and emphasized actions."
+      },
+      "mono": {
+        "displayName": "Prop Metadata",
+        "purpose": "Prop names and types at control size."
+      },
+      "metadata": {
+        "displayName": "Compact Metadata",
+        "purpose": "Counts, dimensions, build details, shortcuts."
+      },
+      "code": {
+        "displayName": "Source Code",
+        "purpose": "Scrollable source drawer."
+      }
+    },
+    "shadows": [
+      {
+        "name": "light-toolbar",
+        "value": "0 1px 3px rgb(24 24 27 / 8%)",
+        "purpose": "Authored light toolbar shadow."
+      },
+      {
+        "name": "light-popover",
+        "value": "0 8px 24px rgb(24 24 27 / 10%)",
+        "purpose": "Authored light popover shadow."
+      },
+      {
+        "name": "light-panel",
+        "value": "0 16px 48px rgb(24 24 27 / 12%)",
+        "purpose": "Authored light panel shadow."
+      },
+      {
+        "name": "dark-toolbar",
+        "value": "0 1px 3px rgb(0 0 0 / 20%)",
+        "purpose": "Authored dark toolbar shadow."
+      },
+      {
+        "name": "dark-popover",
+        "value": "0 8px 24px rgb(0 0 0 / 24%)",
+        "purpose": "Authored dark popover shadow."
+      },
+      {
+        "name": "dark-panel",
+        "value": "0 16px 48px rgb(0 0 0 / 32%)",
+        "purpose": "Authored dark panel shadow."
+      },
+      {
+        "name": "toolbar-strip-local",
+        "value": "0 2px 5px rgb(0 0 0 / .07)",
+        "purpose": "Current ToolbarStrip component variant."
+      },
+      {
+        "name": "toolbar-popover-local",
+        "value": "0 12px 30px rgb(0 0 0 / .16)",
+        "purpose": "Current ToolbarPopover component variant."
+      },
+      {
+        "name": "inspector-tab-local",
+        "value": "0 1px 3px rgb(0 0 0 / .08)",
+        "purpose": "Selected inspector tab cue."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease",
+        "value": "cubic-bezier(.16, 1, .3, 1)",
+        "purpose": "Authored workbench toggle easing."
+      },
+      {
+        "name": "prop-toggle",
+        "value": "transform 120ms ease-out",
+        "purpose": "Inspector boolean switch; disabled under reduced motion."
+      },
+      {
+        "name": "watch-toggle",
+        "value": "transform .14s var(--histoire-ease)",
+        "purpose": "Project test Watch state."
+      },
+      {
+        "name": "reduced-motion-duration",
+        "value": ".01ms",
+        "purpose": "Provider animation and transition override under reduced-motion preference."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "shell-container",
+        "value": "640px"
+      },
+      {
+        "name": "home-stack",
+        "value": "1000px"
+      },
+      {
+        "name": "home-narrow",
+        "value": "600px"
+      },
+      {
+        "name": "browse-two-columns",
+        "value": "1100px"
+      },
+      {
+        "name": "settings-narrow-nav",
+        "value": "900px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Home Primary Action",
+      "kind": "button",
+      "refersTo": "home-action-primary",
+      "description": "Home action with native focus semantics.",
+      "html": "<button class=\"ds-home-primary\" type=\"button\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 32 32\" fill=\"currentColor\" aria-hidden=\"true\" focusable=\"false\"><path fill=\"currentColor\" d=\"M7 28a1 1 0 0 1-1-1V5a1 1 0 0 1 1.482-.876l20 11a1 1 0 0 1 0 1.752l-20 11A1 1 0 0 1 7 28\"/></svg>Run all tests</button>",
+      "css": ".ds-home-primary { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 16px; border: 1px solid transparent; border-radius: 10px; background: var(--histoire-accent-link, rgb(4 120 87)); color: var(--histoire-surface, rgb(255 255 255)); font: 700 13px var(--histoire-font-sans, \"Manrope\", system-ui, sans-serif); cursor: pointer; } .ds-home-primary:hover { background: var(--histoire-accent-link, rgb(4 120 87)); } .ds-home-primary:focus-visible { outline: 2px solid var(--histoire-accent, rgb(5 150 105)); outline-offset: 3px; }"
+    },
+    {
+      "name": "Home Secondary Action",
+      "kind": "button",
+      "refersTo": "home-action-secondary",
+      "description": "Home action with native focus semantics.",
+      "html": "<button class=\"ds-home-secondary\" type=\"button\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 32 32\" fill=\"currentColor\" aria-hidden=\"true\" focusable=\"false\"><path fill=\"currentColor\" d=\"m25.7 9.3l-7-7c-.2-.2-.4-.3-.7-.3H8c-1.1 0-2 .9-2 2v24c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V10c0-.3-.1-.5-.3-.7M18 4.4l5.6 5.6H18zM24 28H8V4h8v6c0 1.1.9 2 2 2h6z\"/><path fill=\"currentColor\" d=\"M10 22h12v2H10zm0-6h12v2H10z\"/></svg>Get started</button>",
+      "css": ".ds-home-secondary { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 16px; border: 1px solid var(--histoire-border, rgb(228 228 231)); border-radius: 10px; background: var(--histoire-surface, rgb(255 255 255)); color: var(--histoire-text, rgb(24 24 27)); font: 700 13px var(--histoire-font-sans, \"Manrope\", system-ui, sans-serif); cursor: pointer; } .ds-home-secondary:hover { background: var(--histoire-surface, rgb(255 255 255)); } .ds-home-secondary:focus-visible { outline: 2px solid var(--histoire-accent, rgb(5 150 105)); outline-offset: 3px; }"
+    },
+    {
+      "name": "Rail Destination",
+      "kind": "nav",
+      "refersTo": "rail-button-active",
+      "description": "Square Carbon destination with active green tint.",
+      "html": "<nav aria-label=\"Workbench\"><button class=\"ds-rail-button\" type=\"button\" aria-label=\"Stories\" title=\"Stories\" aria-pressed=\"true\"><svg width=\"22\" height=\"22\" viewBox=\"0 0 32 32\" fill=\"currentColor\" aria-hidden=\"true\" focusable=\"false\"><path fill=\"currentColor\" d=\"M26 2H8a2 2 0 0 0-2 2v4H4v2h2v5H4v2h2v5H4v2h2v4a2 2 0 0 0 2 2h18a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2m0 26H8v-4h2v-2H8v-5h2v-2H8v-5h2V8H8V4h18Z\"/><path fill=\"currentColor\" d=\"M14 8h8v2h-8zm0 7h8v2h-8zm0 7h8v2h-8z\"/></svg></button></nav>",
+      "css": ".ds-rail-button { display: grid; place-items: center; width: 40px; height: 40px; padding: 0; border: 0; border-radius: 10px; background: transparent; color: var(--histoire-muted, rgb(95 99 112)); cursor: pointer; } .ds-rail-button:hover { color: var(--histoire-text, rgb(24 24 27)); background: var(--histoire-chip, rgb(244 244 245)); } .ds-rail-button[aria-pressed=\"true\"] { color: var(--histoire-accent, rgb(5 150 105)); background: var(--histoire-accent-soft, rgb(236 253 245)); } .ds-rail-button:focus-visible { outline: 2px solid var(--histoire-accent, rgb(5 150 105)); outline-offset: 2px; } .ds-rail-button:disabled { opacity: .4; cursor: default; }"
+    },
+    {
+      "name": "Toolbar Tool",
+      "kind": "button",
+      "refersTo": "toolbar-button",
+      "description": "Compact neutral icon button used inside canvas toolbar.",
+      "html": "<button class=\"ds-toolbar-button\" type=\"button\" aria-label=\"Measure\" title=\"Measure\" aria-pressed=\"false\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 32 32\" fill=\"currentColor\" aria-hidden=\"true\" focusable=\"false\"><path fill=\"currentColor\" d=\"M29 10H3a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h26a1 1 0 0 0 1-1V11a1 1 0 0 0-1-1m-1 10H4v-8h4v4h2v-4h5v4h2v-4h5v4h2v-4h4Z\"/></svg></button>",
+      "css": ".ds-toolbar-button { display: inline-flex; align-items: center; justify-content: center; gap: 5px; min-width: 28px; height: 28px; padding: 0 5px; border: 0; border-radius: 7px; background: transparent; color: var(--histoire-muted, rgb(95 99 112)); font: 13px var(--histoire-font-sans, \"Manrope\", system-ui, sans-serif); cursor: pointer; } .ds-toolbar-button:hover,.ds-toolbar-button[aria-pressed=\"true\"] { color: var(--histoire-text, rgb(24 24 27)); background: var(--histoire-chip, rgb(244 244 245)); } .ds-toolbar-button:focus-visible { outline: 2px solid var(--histoire-accent, rgb(5 150 105)); outline-offset: 2px; } .ds-toolbar-button:disabled { opacity: .4; cursor: default; }"
+    },
+    {
+      "name": "Search Field",
+      "kind": "input",
+      "refersTo": "search-field",
+      "description": "Inset pane search with Carbon icon and mono shortcut.",
+      "html": "<label class=\"ds-search-field\"><svg width=\"17\" height=\"17\" viewBox=\"0 0 32 32\" fill=\"currentColor\" aria-hidden=\"true\" focusable=\"false\"><path fill=\"currentColor\" d=\"m29 27.586l-7.552-7.552a11.018 11.018 0 1 0-1.414 1.414L27.586 29ZM4 13a9 9 0 1 1 9 9a9.01 9.01 0 0 1-9-9\"/></svg><input type=\"search\" aria-label=\"Search\" placeholder=\"Search\"><kbd>Ctrl K</kbd></label>",
+      "css": ".ds-search-field { display: flex; align-items: center; gap: 9px; padding: 10px 12px; border: 1px solid var(--histoire-border, rgb(228 228 231)); border-radius: var(--histoire-radius-control,7px); background: var(--histoire-chip, rgb(244 244 245)); color: var(--histoire-text, rgb(24 24 27)); font: 13px var(--histoire-font-sans, \"Manrope\", system-ui, sans-serif); } .ds-search-field:focus-within { outline: 2px solid var(--histoire-accent, rgb(5 150 105)); outline-offset: -1px; } .ds-search-field input { min-width: 0; width: 100%; padding: 0; border: 0; outline: none; background: transparent; font: inherit; color: inherit; } .ds-search-field input::placeholder { color: var(--histoire-muted, rgb(95 99 112)); } .ds-search-field svg { flex: none; color: var(--histoire-muted, rgb(95 99 112)); } .ds-search-field kbd { color: var(--histoire-muted, rgb(95 99 112)); font: 11px var(--histoire-font-mono, \"JetBrains Mono\", ui-monospace, monospace); white-space: nowrap; }"
+    },
+    {
+      "name": "Selected Story Row",
+      "kind": "nav",
+      "refersTo": "story-row-selected",
+      "description": "Readable selected variant row with roving tree semantics.",
+      "html": "<div role=\"tree\" aria-label=\"Story tree\"><button class=\"ds-story-row\" type=\"button\" role=\"treeitem\" aria-level=\"1\" aria-selected=\"true\"><span class=\"ds-tree-chevron\"></span><svg width=\"16\" height=\"16\" viewBox=\"0 0 32 32\" fill=\"currentColor\" aria-hidden=\"true\" focusable=\"false\"><circle cx=\"16\" cy=\"16\" r=\"8\" fill=\"currentColor\"/></svg><span class=\"ds-story-label\">Primary</span></button></div>",
+      "css": ".ds-story-row { display: flex; align-items: center; gap: 7px; width: 100%; min-height: 31px; padding: 6px 8px; border: 0; border-radius: 8px; background: transparent; color: var(--histoire-text, rgb(24 24 27)); font: 13px var(--histoire-font-sans, \"Manrope\", system-ui, sans-serif); text-align: start; cursor: pointer; } .ds-story-row:hover { background: var(--histoire-chip, rgb(244 244 245)); } .ds-story-row[aria-selected=\"true\"] { background: var(--histoire-accent-soft, rgb(236 253 245)); color: var(--histoire-accent-text, rgb(6 95 70)); font-weight: 700; } .ds-story-row svg { flex: none; color: var(--histoire-accent, rgb(5 150 105)); } .ds-tree-chevron { width: 11px; flex: none; } .ds-story-label { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } .ds-story-row:focus-visible { outline: 2px solid var(--histoire-accent, rgb(5 150 105)); outline-offset: -2px; }"
+    },
+    {
+      "name": "Inspector Tabs",
+      "kind": "nav",
+      "refersTo": "inspector-tab-selected",
+      "description": "Text-only tabs on neutral track with selected surface lift.",
+      "html": "<div class=\"ds-inspector-tabs\" role=\"tablist\" aria-label=\"Inspector\"><button type=\"button\" role=\"tab\" aria-selected=\"true\">Props</button><button type=\"button\" role=\"tab\" aria-selected=\"false\" tabindex=\"-1\">Docs</button><button type=\"button\" role=\"tab\" aria-selected=\"false\" tabindex=\"-1\">Events</button><button type=\"button\" role=\"tab\" aria-selected=\"false\" tabindex=\"-1\">Tests</button></div>",
+      "css": ".ds-inspector-tabs { gap: 1px; display: flex; padding: 3px; margin: 0 12px 14px; border-radius: 10px; background: var(--histoire-chip, rgb(244 244 245)); } .ds-inspector-tabs button { display: flex; align-items: center; justify-content: center; flex: 1; min-width: 0; min-height: 32px; border: 0; border-radius: 7px; background: transparent; color: var(--histoire-muted, rgb(95 99 112)); cursor: pointer; font: 700 13px var(--histoire-font-sans, \"Manrope\", system-ui, sans-serif); } .ds-inspector-tabs button:hover { color: var(--histoire-text, rgb(24 24 27)); } .ds-inspector-tabs button[aria-selected=\"true\"] { color: var(--histoire-text, rgb(24 24 27)); background: var(--histoire-surface, rgb(255 255 255)); box-shadow: 0 1px 3px rgb(0 0 0 / .08); } .ds-inspector-tabs button:focus-visible { outline: 2px solid var(--histoire-accent, rgb(5 150 105)); outline-offset: 3px; }"
+    },
+    {
+      "name": "Inspector Prop Input",
+      "kind": "input",
+      "refersTo": "prop-input",
+      "description": "Body-size field with mono prop name and type.",
+      "html": "<label class=\"ds-prop-field\"><span class=\"ds-prop-label\">label</span><span class=\"ds-prop-type\">string</span><input type=\"text\" value=\"Save changes\"></label>",
+      "css": ".ds-prop-field { position: relative; display: flex; flex-direction: column; gap: 8px; margin: 0 0 18px; color: var(--histoire-text, rgb(24 24 27)); } .ds-prop-label { padding-right: 70px; font: 13px var(--histoire-font-mono, \"JetBrains Mono\", ui-monospace, monospace); } .ds-prop-type { position: absolute; top: 0; right: 0; max-width: 70px; color: var(--histoire-muted, rgb(95 99 112)); font: 13px var(--histoire-font-mono, \"JetBrains Mono\", ui-monospace, monospace); } .ds-prop-field input { min-height: 34px; padding: 7px 9px; border: 1px solid var(--histoire-border, rgb(228 228 231)); border-radius: 7px; background: var(--histoire-input, rgb(250 250 250)); color: var(--histoire-text, rgb(24 24 27)); font: 13px var(--histoire-font-sans, \"Manrope\", system-ui, sans-serif); } .ds-prop-field input:focus-visible { outline: 2px solid var(--histoire-accent, rgb(5 150 105)); outline-offset: 3px; }"
+    },
+    {
+      "name": "Browse Card",
+      "kind": "card",
+      "refersTo": "browse-card",
+      "description": "Flat catalog card with tinted Carbon icon tile.",
+      "html": "<button class=\"ds-browse-card\" type=\"button\"><span class=\"ds-browse-header\"><span class=\"ds-browse-icon\"><svg width=\"19\" height=\"19\" viewBox=\"0 0 32 32\" fill=\"currentColor\" aria-hidden=\"true\" focusable=\"false\"><path fill=\"currentColor\" d=\"m28.504 8.136l-12-7a1 1 0 0 0-1.008 0l-12 7A1 1 0 0 0 3 9v14a1 1 0 0 0 .496.864l12 7a1 1 0 0 0 1.008 0l12-7A1 1 0 0 0 29 23V9a1 1 0 0 0-.496-.864M16 3.158L26.016 9L16 14.842L5.984 9ZM5 10.74l10 5.833V28.26L5 22.426Zm12 17.52V16.574l10-5.833v11.685Z\"/></svg></span><span class=\"ds-browse-titles\"><strong>Stories</strong><span>3 stories</span></span></span></button>",
+      "css": ".ds-browse-card { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; padding: 18px; border: 1px solid var(--histoire-border, rgb(228 228 231)); border-radius: 12px; background: var(--histoire-surface, rgb(255 255 255)); color: var(--histoire-text, rgb(24 24 27)); font: 13px var(--histoire-font-sans, \"Manrope\", system-ui, sans-serif); text-align: left; cursor: pointer; } .ds-browse-header { display: flex; align-items: center; gap: 10px; width: 100%; } .ds-browse-titles { flex: 1; min-width: 0; } .ds-browse-titles strong { display: block; font-size: 13px; } .ds-browse-titles > span { display: block; margin-top: 2px; color: var(--histoire-muted, rgb(95 99 112)); font-size: 11px; } .ds-browse-icon { display: grid; flex: 0 0 36px; place-items: center; height: 36px; border-radius: 9px; background: var(--histoire-accent-soft, rgb(236 253 245)); color: var(--histoire-accent, rgb(5 150 105)); } .ds-browse-card:hover { border-color: var(--histoire-accent, rgb(5 150 105)); } .ds-browse-card:focus-visible { outline: 2px solid var(--histoire-accent, rgb(5 150 105)); outline-offset: 3px; }"
+    },
+    {
+      "name": "MCP Status Chip",
+      "kind": "chip",
+      "refersTo": "mcp-status-enabled",
+      "description": "Status word and dot use semantic green only when enabled.",
+      "html": "<span class=\"ds-mcp-status\" data-status=\"enabled\"><span aria-hidden=\"true\"></span>Running</span>",
+      "css": ".ds-mcp-status { display: inline-flex; align-items: center; gap: 5px; padding: 4px 8px; border-radius: 999px; color: var(--histoire-muted, rgb(95 99 112)); background: var(--histoire-chip, rgb(244 244 245)); font: 700 11px var(--histoire-font-sans, \"Manrope\", system-ui, sans-serif); } .ds-mcp-status[data-status=\"enabled\"] { color: var(--histoire-accent-link, rgb(4 120 87)); background: var(--histoire-accent-soft, rgb(236 253 245)); } .ds-mcp-status > span { width: 6px; height: 6px; background: currentColor; border-radius: 50%; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "C1 Spatial Workbench",
+    "overview": "C1 organizes component work as a quiet spatial workbench: a slim rail, one swappable pane, an open canvas, and a floating inspector. Flat neutral grounds keep component previews central. Sparse green marks selection, live state, focus, and successful tests.\n\nManrope carries interface labels and titles; JetBrains Mono distinguishes source, prop names, dimensions, counts, and shortcuts. Light and dark share hierarchy and geometry. Compact controls support repeated inspection without adding explanatory copy.",
+    "keyCharacteristics": [
+      "Flat neutral grounds with sparse semantic color.",
+      "Compact interface type and explicit technical metadata.",
+      "Rounded floating tools around independent preview content.",
+      "Equivalent light and dark structure with reachable narrow-layout controls."
+    ],
+    "rules": [
+      {
+        "name": "The Semantic Accent Rule",
+        "body": "Use green for actionable or selected workbench state. Keep violet specific to event counts and agent/comment activity, red specific to failure or measurement, and neutral surfaces dominant.",
+        "section": "colors"
+      },
+      {
+        "name": "The Preview Boundary Rule",
+        "body": "Scope workbench tokens and fonts to the owning provider. Component previews keep their own visual system.",
+        "section": "colors"
+      },
+      {
+        "name": "The Readable Controls Rule",
+        "body": "Keep ordinary inspector fields, prop names, types, and tabs at the body or label size. Smaller metadata styles belong to counts, breadcrumbs, shortcuts, and source.",
+        "section": "typography"
+      },
+      {
+        "name": "The Flat Ground Rule",
+        "body": "Keep page grounds, rail, and side panes flat. Use soft shadows for floating chrome and small selected-control or toggle cues.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do use semantic workbench variables so theme changes reach native SDK surfaces.",
+      "Do use bundled Carbon SVGs and text labels for inspector tabs.",
+      "Do preserve provider-relative rail, pane, toolbar, and inspector bounds.",
+      "Do keep every narrow-layout rail action and canvas tool reachable.",
+      "Do use real catalog labels and counts; unnamed Home groups receive Stories or Guides labels."
+    ],
+    "donts": [
+      "Don't apply workbench fonts or palette to story preview documents.",
+      "Don't use green or violet as decoration unrelated to state or action.",
+      "Don't add explanatory filler or replace real project content with board sample data.",
+      "Don't turn local legacy styling differences into new global tokens."
+    ]
+  }
+}

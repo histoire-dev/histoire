@@ -1,0 +1,837 @@
+Failed to resolve dependency: flexsearch, present in client 'optimizeDeps.include'
+Failed to resolve dependency: shiki, present in client 'optimizeDeps.include'
+Failed to resolve dependency: vscode-oniguruma, present in client 'optimizeDeps.include'
+Failed to resolve dependency: vscode-textmate, present in client 'optimizeDeps.include'
+Using 16 threads for story collection
+Collect stories start all
+responseMode: 'json' drops mid-call notifications. subscriptions/listen streams are always served over SSE regardless; other notifications emitted before a result are dropped.
+src/MarkdownFile.story.js 104ms (setup:65ms, execute:27ms, run:7ms)
+src/LongFile1.story.js 197ms (setup:107ms, execute:8ms, run:14ms)
+src/LongFile2.story.js 118ms (setup:41ms, execute:18ms, run:6ms)
+src/components/ContrastColor.story.vue 346ms (setup:53ms, execute:11ms, run:282ms)
+src/components/Controls.story.vue 396ms (setup:54ms, execute:6ms, run:336ms)
+src/components/ControlsOverlays.story.vue 482ms (setup:62ms, execute:25ms, run:395ms)
+src/components/DetectedStatePane.story.vue 364ms (setup:43ms, execute:7ms, run:314ms)
+[Vue warn]: Extraneous non-props attributes (data) were passed to component but could not be automatically inherited because component renders fragment or text or teleport root nodes. 
+  at <Empty.story ref="comp" data= {
+  id: 'src-components-empty-story-vue',
+  path: '/home/akryum/Projects/histoire/examples/vue3/src/components/Empty.story.vue',
+  relativePath: 'src/components/Empty.story.vue',
+  fileName: 'Empty',
+  moduleId: '/home/akryum/Projects/histoire/examples/vue3/src/components/Empty.story.vue',
+  supportPluginId: 'vue3',
+  virtual: false,
+  moduleCode: undefined
+} > 
+  at <App>
+src/components/Empty.story.vue 355ms (setup:40ms, execute:5ms, run:310ms)
+⚠️  No story found for /home/akryum/Projects/histoire/examples/vue3/src/components/Empty.story.vue
+src/components/DarkMode.story.vue 461ms (setup:42ms, execute:7ms, run:412ms)
+src/components/BaseButton.story.vue 516ms (setup:61ms, execute:17ms, run:439ms)
+src/components/ColorButton.story.vue 499ms (setup:50ms, execute:10ms, run:439ms)
+src/components/CodeGen.story.vue 530ms (setup:46ms, execute:11ms, run:474ms)
+src/components/ComplexParameter.story.vue 464ms (setup:50ms, execute:12ms, run:401ms)
+src/components/Meow.story.vue 32ms (setup:6ms, execute:0ms, run:23ms)
+src/components/Demo.story.vue 534ms (setup:57ms, execute:18ms, run:460ms)
+src/components/Introduction.story.vue 46ms (setup:7ms, execute:0ms, run:38ms)
+src/components/MarkdownLinks.story.vue 47ms (setup:6ms, execute:0ms, run:40ms)
+src/components/Docs.story.vue 535ms (setup:59ms, execute:14ms, run:462ms)
+src/components/NoVariantTag.story.vue 38ms (setup:5ms, execute:0ms, run:33ms)
+src/components/Serialize.story.vue 40ms (setup:7ms, execute:0ms, run:33ms)
+src/components/StateOption.story.vue 43ms (setup:7ms, execute:0ms, run:36ms)
+src/components/HandWrittenSource.story.vue 402ms (setup:7ms, execute:0ms, run:395ms)
+src/components/AutoStateProps.story.vue 478ms (setup:38ms, execute:8ms, run:432ms)
+src/components/SharedControls.story.vue 44ms (setup:6ms, execute:0ms, run:37ms)
+src/components/Responsive.story.vue 79ms (setup:7ms, execute:0ms, run:71ms)
+src/components/StateSetup2.story.vue 46ms (setup:5ms, execute:0ms, run:40ms)
+src/components/StoryScopedCss.story.vue 43ms (setup:6ms, execute:0ms, run:37ms)
+src/components/State.story.vue 46ms (setup:5ms, execute:0ms, run:41ms)
+src/components/StateSetup.story.vue 44ms (setup:6ms, execute:0ms, run:37ms)
+src/components/PiniaStore.story.vue 95ms (setup:7ms, execute:0ms, run:88ms)
+src/components/SubStory2.story.vue 22ms (setup:6ms, execute:0ms, run:16ms)
+src/components/HugeGrid.story.vue 129ms (setup:6ms, execute:1ms, run:123ms)
+src/components/StorySetup.story.vue 69ms (setup:5ms, execute:0ms, run:64ms)
+src/components/SubStory.story.vue 31ms (setup:6ms, execute:0ms, run:25ms)
+src/components/WrapperMetaOnStory.story.vue 30ms (setup:8ms, execute:0ms, run:22ms)
+src/components/WrapperMetaOnVariant.story.vue 30ms (setup:8ms, execute:0ms, run:22ms)
+src/components/StyleIsolation.story.vue 51ms (setup:7ms, execute:0ms, run:44ms)
+src/components/WithSass.story.vue 219ms (setup:8ms, execute:0ms, run:211ms)
+src/components/WorkbenchMatrix.story.vue 215ms (setup:8ms, execute:0ms, run:206ms)
+src/components/NestedStories/NestedButton.story.vue 215ms (setup:7ms, execute:0ms, run:207ms)
+src/components/LottieAnimation.story.vue 740ms (setup:6ms, execute:0ms, run:733ms)
+src/components/VitestLifecycle.story.vue 639ms (setup:8ms, execute:0ms, run:631ms)
+src/components/VitestMocking.story.vue 633ms (setup:7ms, execute:0ms, run:626ms)
+src/components/EventButton.story.vue 1152ms (setup:8ms, execute:0ms, run:1144ms)
+src/components/EventButtonGrid.story.vue 1110ms (setup:11ms, execute:0ms, run:1100ms)
+Collect stories end 1869ms
+  ➜  Local:   http://localhost:6011/
+  ➜  Network: http://192.168.1.14:6011/
+  ➜  Network: http://172.30.0.1:6011/
+  ➜  Network: http://172.25.0.1:6011/
+  ➜  Network: http://172.24.0.1:6011/
+  ➜  Network: http://172.23.0.1:6011/
+  ➜  Network: http://172.18.0.1:6011/
+  ➜  Network: http://172.20.0.1:6011/
+  ➜  Network: http://172.22.0.1:6011/
+  ➜  Network: http://172.19.0.1:6011/
+  ➜  Network: http://192.168.16.1:6011/
+  MCP: http://127.0.0.1:39225/mcp
+9:45:50 PM [vite] (client) ✨ new dependencies optimized: msw/browser, msw/core/http, change-case
+9:45:50 PM [vite] (client) ✨ optimized dependencies changed. reloading
+(node:2164502) MaxListenersExceededWarning: Possible EventEmitter memory leak detected. 17 unpipe listeners added to [SyncWriteStream]. MaxListeners is 10. Use emitter.setMaxListeners() to increase limit
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:2164502) MaxListenersExceededWarning: Possible EventEmitter memory leak detected. 17 error listeners added to [SyncWriteStream]. MaxListeners is 10. Use emitter.setMaxListeners() to increase limit
+(node:2164502) MaxListenersExceededWarning: Possible EventEmitter memory leak detected. 17 close listeners added to [SyncWriteStream]. MaxListeners is 10. Use emitter.setMaxListeners() to increase limit
+(node:2164502) MaxListenersExceededWarning: Possible EventEmitter memory leak detected. 17 finish listeners added to [SyncWriteStream]. MaxListeners is 10. Use emitter.setMaxListeners() to increase limit
+Collect stories start all
+src/MarkdownFile.story.js 54ms (setup:6ms, execute:0ms, run:46ms)
+src/LongFile1.story.js 75ms (setup:7ms, execute:0ms, run:40ms)
+src/LongFile2.story.js 74ms (setup:7ms, execute:0ms, run:41ms)
+[Vue warn]: Extraneous non-props attributes (data) were passed to component but could not be automatically inherited because component renders fragment or text or teleport root nodes. 
+  at <Empty.story ref="comp" data= {
+  id: 'src-components-empty-story-vue',
+  path: '/home/akryum/Projects/histoire/examples/vue3/src/components/Empty.story.vue',
+  relativePath: 'src/components/Empty.story.vue',
+  fileName: 'Empty',
+  moduleId: '/home/akryum/Projects/histoire/examples/vue3/src/components/Empty.story.vue',
+  supportPluginId: 'vue3',
+  virtual: false,
+  moduleCode: undefined
+} > 
+  at <App>
+src/components/Empty.story.vue 85ms (setup:11ms, execute:0ms, run:73ms)
+src/components/BaseButton.story.vue 116ms (setup:12ms, execute:1ms, run:104ms)
+src/components/ControlsOverlays.story.vue 116ms (setup:8ms, execute:0ms, run:108ms)
+src/components/DarkMode.story.vue 124ms (setup:11ms, execute:0ms, run:113ms)
+⚠️  No story found for /home/akryum/Projects/histoire/examples/vue3/src/components/Empty.story.vue
+src/components/DetectedStatePane.story.vue 122ms (setup:11ms, execute:0ms, run:112ms)
+src/components/ContrastColor.story.vue 132ms (setup:12ms, execute:0ms, run:120ms)
+src/components/AutoStateProps.story.vue 144ms (setup:10ms, execute:0ms, run:134ms)
+src/components/Controls.story.vue 143ms (setup:10ms, execute:0ms, run:133ms)
+src/components/HandWrittenSource.story.vue 124ms (setup:12ms, execute:0ms, run:112ms)
+src/components/Docs.story.vue 158ms (setup:10ms, execute:0ms, run:147ms)
+src/components/ColorButton.story.vue 172ms (setup:8ms, execute:0ms, run:164ms)
+src/components/EventButton.story.vue 100ms (setup:30ms, execute:0ms, run:69ms)
+src/components/ComplexParameter.story.vue 182ms (setup:9ms, execute:0ms, run:172ms)
+src/components/Demo.story.vue 194ms (setup:11ms, execute:0ms, run:183ms)
+src/components/MarkdownLinks.story.vue 58ms (setup:7ms, execute:0ms, run:51ms)
+src/components/Meow.story.vue 57ms (setup:8ms, execute:0ms, run:47ms)
+src/components/CodeGen.story.vue 220ms (setup:11ms, execute:0ms, run:209ms)
+src/components/Introduction.story.vue 88ms (setup:8ms, execute:1ms, run:79ms)
+src/components/NoVariantTag.story.vue 60ms (setup:7ms, execute:0ms, run:52ms)
+src/components/Serialize.story.vue 60ms (setup:8ms, execute:0ms, run:52ms)
+src/components/SharedControls.story.vue 78ms (setup:10ms, execute:0ms, run:68ms)
+src/components/StateOption.story.vue 64ms (setup:8ms, execute:0ms, run:56ms)
+src/components/State.story.vue 95ms (setup:6ms, execute:0ms, run:88ms)
+src/components/Responsive.story.vue 134ms (setup:8ms, execute:0ms, run:126ms)
+src/components/StateSetup.story.vue 92ms (setup:7ms, execute:0ms, run:84ms)
+src/components/HugeGrid.story.vue 172ms (setup:10ms, execute:0ms, run:161ms)
+src/components/SubStory2.story.vue 59ms (setup:8ms, execute:0ms, run:51ms)
+src/components/SubStory.story.vue 70ms (setup:8ms, execute:0ms, run:62ms)
+src/components/StoryScopedCss.story.vue 89ms (setup:7ms, execute:0ms, run:81ms)
+src/components/StorySetup.story.vue 125ms (setup:7ms, execute:0ms, run:118ms)
+src/components/StateSetup2.story.vue 124ms (setup:8ms, execute:0ms, run:116ms)
+src/components/StyleIsolation.story.vue 138ms (setup:8ms, execute:0ms, run:130ms)
+src/components/WrapperMetaOnStory.story.vue 69ms (setup:8ms, execute:0ms, run:61ms)
+src/components/WrapperMetaOnVariant.story.vue 93ms (setup:7ms, execute:0ms, run:86ms)
+src/components/PiniaStore.story.vue 260ms (setup:8ms, execute:0ms, run:252ms)
+src/components/WithSass.story.vue 246ms (setup:7ms, execute:0ms, run:239ms)
+src/components/NestedStories/NestedButton.story.vue 211ms (setup:6ms, execute:0ms, run:205ms)
+src/components/WorkbenchMatrix.story.vue 321ms (setup:9ms, execute:0ms, run:313ms)
+.histoire/tmp/dev/run-muu8dhc2-54cb6296/plugins/builtin_tailwind-tokens.2d66ae2f/Tailwind.story.js 692ms (setup:6ms, execute:0ms, run:686ms)
+9:45:57 PM [vite] (client) ✨ new dependencies optimized: vue
+9:45:57 PM [vite] (client) ✨ optimized dependencies changed. reloading
+src/components/LottieAnimation.story.vue 4026ms (setup:7ms, execute:0ms, run:4018ms)
+src/components/EventButtonGrid.story.vue 4184ms (setup:15ms, execute:0ms, run:4169ms)
+src/components/VitestLifecycle.story.vue 3937ms (setup:10ms, execute:0ms, run:3927ms)
+src/components/VitestMocking.story.vue 3904ms (setup:7ms, execute:0ms, run:3896ms)
+Collect stories end 4330ms
+Collect stories start all
+src/MarkdownFile.story.js 46ms (setup:9ms, execute:0ms, run:35ms)
+src/LongFile1.story.js 80ms (setup:10ms, execute:0ms, run:40ms)
+src/LongFile2.story.js 65ms (setup:10ms, execute:0ms, run:34ms)
+src/components/ControlsOverlays.story.vue 110ms (setup:14ms, execute:0ms, run:96ms)
+src/components/DarkMode.story.vue 110ms (setup:12ms, execute:0ms, run:97ms)
+[Vue warn]: Extraneous non-props attributes (data) were passed to component but could not be automatically inherited because component renders fragment or text or teleport root nodes. 
+  at <Empty.story ref="comp" data= {
+  id: 'src-components-empty-story-vue',
+  path: '/home/akryum/Projects/histoire/examples/vue3/src/components/Empty.story.vue',
+  relativePath: 'src/components/Empty.story.vue',
+  fileName: 'Empty',
+  moduleId: '/home/akryum/Projects/histoire/examples/vue3/src/components/Empty.story.vue',
+  supportPluginId: 'vue3',
+  virtual: false,
+  moduleCode: undefined
+} > 
+  at <App>
+src/components/Empty.story.vue 109ms (setup:16ms, execute:0ms, run:93ms)
+src/components/Controls.story.vue 127ms (setup:9ms, execute:0ms, run:117ms)
+src/components/DetectedStatePane.story.vue 126ms (setup:14ms, execute:0ms, run:112ms)
+src/components/HandWrittenSource.story.vue 124ms (setup:13ms, execute:0ms, run:111ms)
+src/components/ContrastColor.story.vue 137ms (setup:10ms, execute:0ms, run:127ms)
+⚠️  No story found for /home/akryum/Projects/histoire/examples/vue3/src/components/Empty.story.vue
+src/components/Docs.story.vue 170ms (setup:16ms, execute:0ms, run:154ms)
+src/components/AutoStateProps.story.vue 179ms (setup:12ms, execute:0ms, run:167ms)
+src/components/EventButton.story.vue 178ms (setup:10ms, execute:0ms, run:168ms)
+src/components/BaseButton.story.vue 198ms (setup:16ms, execute:0ms, run:182ms)
+src/components/ColorButton.story.vue 198ms (setup:15ms, execute:0ms, run:183ms)
+src/components/ComplexParameter.story.vue 217ms (setup:14ms, execute:0ms, run:203ms)
+src/components/Meow.story.vue 77ms (setup:8ms, execute:0ms, run:66ms)
+src/components/Demo.story.vue 234ms (setup:12ms, execute:0ms, run:222ms)
+src/components/NoVariantTag.story.vue 106ms (setup:9ms, execute:0ms, run:97ms)
+src/components/Introduction.story.vue 146ms (setup:9ms, execute:0ms, run:136ms)
+src/components/MarkdownLinks.story.vue 145ms (setup:12ms, execute:0ms, run:133ms)
+src/components/Serialize.story.vue 108ms (setup:9ms, execute:0ms, run:99ms)
+src/components/HugeGrid.story.vue 312ms (setup:11ms, execute:0ms, run:301ms)
+src/components/SharedControls.story.vue 125ms (setup:9ms, execute:0ms, run:115ms)
+src/components/State.story.vue 140ms (setup:8ms, execute:0ms, run:132ms)
+src/components/StateOption.story.vue 111ms (setup:10ms, execute:0ms, run:101ms)
+src/components/Responsive.story.vue 212ms (setup:7ms, execute:0ms, run:206ms)
+src/components/StateSetup.story.vue 135ms (setup:10ms, execute:0ms, run:124ms)
+src/components/StoryScopedCss.story.vue 129ms (setup:8ms, execute:0ms, run:121ms)
+src/components/StateSetup2.story.vue 157ms (setup:12ms, execute:0ms, run:145ms)
+src/components/StyleIsolation.story.vue 98ms (setup:9ms, execute:0ms, run:89ms)
+src/components/SubStory.story.vue 91ms (setup:10ms, execute:0ms, run:80ms)
+src/components/SubStory2.story.vue 91ms (setup:8ms, execute:0ms, run:83ms)
+src/components/WrapperMetaOnStory.story.vue 81ms (setup:8ms, execute:0ms, run:73ms)
+src/components/PiniaStore.story.vue 313ms (setup:7ms, execute:0ms, run:305ms)
+src/components/WithSass.story.vue 90ms (setup:9ms, execute:0ms, run:81ms)
+src/components/WrapperMetaOnVariant.story.vue 77ms (setup:13ms, execute:0ms, run:64ms)
+src/components/StorySetup.story.vue 248ms (setup:8ms, execute:0ms, run:240ms)
+src/components/WorkbenchMatrix.story.vue 211ms (setup:7ms, execute:0ms, run:203ms)
+src/components/NestedStories/NestedButton.story.vue 253ms (setup:6ms, execute:0ms, run:247ms)
+src/components/CodeGen.story.vue 361ms (setup:10ms, execute:0ms, run:350ms)
+src/components/VitestMocking.story.vue 492ms (setup:8ms, execute:0ms, run:483ms)
+.histoire/tmp/dev/run-muu8dhc2-54cb6296/plugins/builtin_tailwind-tokens.2d66ae2f/Tailwind.story.js 901ms (setup:9ms, execute:0ms, run:891ms)
+src/components/VitestLifecycle.story.vue 4744ms (setup:9ms, execute:0ms, run:4734ms)
+src/components/LottieAnimation.story.vue 4958ms (setup:10ms, execute:0ms, run:4948ms)
+src/components/EventButtonGrid.story.vue 5102ms (setup:10ms, execute:0ms, run:5091ms)
+Collect stories end 5247ms
+9:46:09 PM [vite] (client) ✨ new dependencies optimized: pinia
+9:46:09 PM [vite] (client) ✨ optimized dependencies changed. reloading
+Collect stories start all
+src/MarkdownFile.story.js 42ms (setup:11ms, execute:0ms, run:29ms)
+src/LongFile2.story.js 63ms (setup:10ms, execute:0ms, run:30ms)
+src/LongFile1.story.js 72ms (setup:9ms, execute:0ms, run:32ms)
+src/components/DarkMode.story.vue 167ms (setup:11ms, execute:0ms, run:155ms)
+src/components/AutoStateProps.story.vue 190ms (setup:10ms, execute:0ms, run:179ms)
+src/components/ContrastColor.story.vue 192ms (setup:13ms, execute:0ms, run:179ms)
+[Vue warn]: Extraneous non-props attributes (data) were passed to component but could not be automatically inherited because component renders fragment or text or teleport root nodes. 
+  at <Empty.story ref="comp" data= {
+  id: 'src-components-empty-story-vue',
+  path: '/home/akryum/Projects/histoire/examples/vue3/src/components/Empty.story.vue',
+  relativePath: 'src/components/Empty.story.vue',
+  fileName: 'Empty',
+  moduleId: '/home/akryum/Projects/histoire/examples/vue3/src/components/Empty.story.vue',
+  supportPluginId: 'vue3',
+  virtual: false,
+  moduleCode: undefined
+} > 
+  at <App>
+src/components/Empty.story.vue 190ms (setup:15ms, execute:0ms, run:174ms)
+src/components/BaseButton.story.vue 208ms (setup:12ms, execute:0ms, run:195ms)
+src/components/CodeGen.story.vue 208ms (setup:11ms, execute:0ms, run:196ms)
+src/components/Controls.story.vue 207ms (setup:11ms, execute:0ms, run:196ms)
+src/components/ControlsOverlays.story.vue 208ms (setup:14ms, execute:0ms, run:194ms)
+src/components/DetectedStatePane.story.vue 207ms (setup:13ms, execute:0ms, run:194ms)
+src/components/EventButton.story.vue 209ms (setup:12ms, execute:0ms, run:196ms)
+src/components/HandWrittenSource.story.vue 207ms (setup:15ms, execute:0ms, run:192ms)
+⚠️  No story found for /home/akryum/Projects/histoire/examples/vue3/src/components/Empty.story.vue
+src/components/Docs.story.vue 286ms (setup:11ms, execute:0ms, run:274ms)
+src/components/ColorButton.story.vue 385ms (setup:10ms, execute:0ms, run:375ms)
+src/components/NoVariantTag.story.vue 129ms (setup:11ms, execute:0ms, run:118ms)
+src/components/ComplexParameter.story.vue 385ms (setup:13ms, execute:0ms, run:372ms)
+src/components/Meow.story.vue 130ms (setup:11ms, execute:0ms, run:118ms)
+src/components/LottieAnimation.story.vue 179ms (setup:10ms, execute:0ms, run:168ms)
+src/components/PiniaStore.story.vue 153ms (setup:11ms, execute:0ms, run:142ms)
+src/components/Demo.story.vue 411ms (setup:13ms, execute:0ms, run:398ms)
+src/components/StateOption.story.vue 136ms (setup:12ms, execute:0ms, run:125ms)
+src/components/HugeGrid.story.vue 259ms (setup:12ms, execute:0ms, run:246ms)
+src/components/SharedControls.story.vue 213ms (setup:9ms, execute:0ms, run:204ms)
+src/components/Introduction.story.vue 277ms (setup:9ms, execute:0ms, run:268ms)
+src/components/State.story.vue 341ms (setup:10ms, execute:0ms, run:330ms)
+src/components/MarkdownLinks.story.vue 363ms (setup:11ms, execute:0ms, run:352ms)
+src/components/StateSetup2.story.vue 355ms (setup:19ms, execute:0ms, run:335ms)
+src/components/Responsive.story.vue 467ms (setup:10ms, execute:0ms, run:456ms)
+src/components/StoryScopedCss.story.vue 267ms (setup:28ms, execute:0ms, run:238ms)
+src/components/SubStory2.story.vue 157ms (setup:7ms, execute:0ms, run:151ms)
+src/components/VitestLifecycle.story.vue 189ms (setup:10ms, execute:0ms, run:179ms)
+src/components/SubStory.story.vue 206ms (setup:8ms, execute:0ms, run:198ms)
+src/components/StateSetup.story.vue 315ms (setup:12ms, execute:0ms, run:303ms)
+src/components/WrapperMetaOnStory.story.vue 186ms (setup:10ms, execute:1ms, run:175ms)
+src/components/WrapperMetaOnVariant.story.vue 148ms (setup:9ms, execute:0ms, run:139ms)
+src/components/Serialize.story.vue 154ms (setup:11ms, execute:0ms, run:143ms)
+src/components/StyleIsolation.story.vue 403ms (setup:27ms, execute:0ms, run:375ms)
+src/components/WorkbenchMatrix.story.vue 369ms (setup:10ms, execute:0ms, run:359ms)
+src/components/StorySetup.story.vue 514ms (setup:19ms, execute:1ms, run:494ms)
+src/components/NestedStories/NestedButton.story.vue 412ms (setup:7ms, execute:0ms, run:404ms)
+src/components/WithSass.story.vue 472ms (setup:10ms, execute:0ms, run:461ms)
+src/components/VitestMocking.story.vue 988ms (setup:8ms, execute:0ms, run:979ms)
+.histoire/tmp/dev/run-muu8dhc2-54cb6296/plugins/builtin_tailwind-tokens.2d66ae2f/Tailwind.story.js 1848ms (setup:9ms, execute:0ms, run:1839ms)
+src/components/EventButtonGrid.story.vue 10392ms (setup:18ms, execute:1ms, run:10374ms)
+Collect stories end 10584ms
+Collect stories start all
+src/MarkdownFile.story.js 63ms (setup:7ms, execute:0ms, run:54ms)
+src/LongFile1.story.js 88ms (setup:6ms, execute:0ms, run:55ms)
+src/LongFile2.story.js 92ms (setup:6ms, execute:0ms, run:55ms)
+src/components/DarkMode.story.vue 237ms (setup:12ms, execute:0ms, run:225ms)
+src/components/AutoStateProps.story.vue 267ms (setup:11ms, execute:0ms, run:256ms)
+src/components/ColorButton.story.vue 267ms (setup:10ms, execute:0ms, run:257ms)
+src/components/ContrastColor.story.vue 268ms (setup:16ms, execute:0ms, run:252ms)
+src/components/Docs.story.vue 276ms (setup:12ms, execute:0ms, run:264ms)
+[Vue warn]: Extraneous non-props attributes (data) were passed to component but could not be automatically inherited because component renders fragment or text or teleport root nodes. 
+  at <Empty.story ref="comp" data= {
+  id: 'src-components-empty-story-vue',
+  path: '/home/akryum/Projects/histoire/examples/vue3/src/components/Empty.story.vue',
+  relativePath: 'src/components/Empty.story.vue',
+  fileName: 'Empty',
+  moduleId: '/home/akryum/Projects/histoire/examples/vue3/src/components/Empty.story.vue',
+  supportPluginId: 'vue3',
+  virtual: false,
+  moduleCode: undefined
+} > 
+  at <App>
+src/components/Empty.story.vue 265ms (setup:20ms, execute:0ms, run:245ms)
+src/components/BaseButton.story.vue 301ms (setup:11ms, execute:0ms, run:290ms)
+src/components/Controls.story.vue 301ms (setup:10ms, execute:0ms, run:290ms)
+src/components/ControlsOverlays.story.vue 301ms (setup:10ms, execute:0ms, run:290ms)
+src/components/Demo.story.vue 302ms (setup:9ms, execute:0ms, run:292ms)
+src/components/DetectedStatePane.story.vue 301ms (setup:15ms, execute:0ms, run:286ms)
+src/components/EventButton.story.vue 299ms (setup:19ms, execute:1ms, run:279ms)
+src/components/EventButtonGrid.story.vue 298ms (setup:22ms, execute:0ms, run:275ms)
+⚠️  No story found for /home/akryum/Projects/histoire/examples/vue3/src/components/Empty.story.vue
+src/components/HandWrittenSource.story.vue 333ms (setup:20ms, execute:0ms, run:313ms)
+src/components/ComplexParameter.story.vue 519ms (setup:14ms, execute:0ms, run:505ms)
+src/components/NoVariantTag.story.vue 153ms (setup:9ms, execute:0ms, run:144ms)
+src/components/Meow.story.vue 155ms (setup:9ms, execute:0ms, run:145ms)
+src/components/Serialize.story.vue 154ms (setup:8ms, execute:0ms, run:145ms)
+src/components/LottieAnimation.story.vue 210ms (setup:6ms, execute:0ms, run:204ms)
+src/components/HugeGrid.story.vue 219ms (setup:6ms, execute:0ms, run:213ms)
+src/components/StateOption.story.vue 158ms (setup:11ms, execute:0ms, run:147ms)
+src/components/SharedControls.story.vue 185ms (setup:12ms, execute:0ms, run:173ms)
+src/components/State.story.vue 185ms (setup:11ms, execute:0ms, run:174ms)
+src/components/MarkdownLinks.story.vue 272ms (setup:7ms, execute:0ms, run:265ms)
+src/components/Introduction.story.vue 273ms (setup:7ms, execute:0ms, run:266ms)
+src/components/CodeGen.story.vue 659ms (setup:23ms, execute:0ms, run:635ms)
+src/components/StateSetup2.story.vue 241ms (setup:8ms, execute:0ms, run:233ms)
+src/components/StateSetup.story.vue 271ms (setup:11ms, execute:0ms, run:259ms)
+src/components/Responsive.story.vue 420ms (setup:8ms, execute:0ms, run:412ms)
+src/components/SubStory2.story.vue 181ms (setup:9ms, execute:0ms, run:171ms)
+src/components/StoryScopedCss.story.vue 246ms (setup:10ms, execute:0ms, run:236ms)
+src/components/SubStory.story.vue 246ms (setup:10ms, execute:0ms, run:236ms)
+src/components/WrapperMetaOnStory.story.vue 214ms (setup:8ms, execute:0ms, run:205ms)
+src/components/WrapperMetaOnVariant.story.vue 179ms (setup:8ms, execute:0ms, run:171ms)
+src/components/VitestLifecycle.story.vue 359ms (setup:7ms, execute:0ms, run:351ms)
+src/components/StyleIsolation.story.vue 412ms (setup:11ms, execute:0ms, run:400ms)
+src/components/PiniaStore.story.vue 652ms (setup:9ms, execute:0ms, run:643ms)
+src/components/NestedStories/NestedButton.story.vue 428ms (setup:6ms, execute:0ms, run:422ms)
+src/components/StorySetup.story.vue 534ms (setup:8ms, execute:0ms, run:526ms)
+src/components/WorkbenchMatrix.story.vue 503ms (setup:9ms, execute:0ms, run:494ms)
+src/components/WithSass.story.vue 543ms (setup:7ms, execute:0ms, run:535ms)
+src/components/VitestMocking.story.vue 714ms (setup:7ms, execute:0ms, run:707ms)
+.histoire/tmp/dev/run-muu8dhc2-54cb6296/plugins/builtin_tailwind-tokens.2d66ae2f/Tailwind.story.js 1605ms (setup:6ms, execute:0ms, run:1599ms)
+Collect stories end 2704ms
+Collect stories start all
+src/LongFile1.story.js 117ms (setup:6ms, execute:0ms, run:86ms)
+src/LongFile2.story.js 118ms (setup:6ms, execute:0ms, run:87ms)
+src/MarkdownFile.story.js 95ms (setup:6ms, execute:0ms, run:87ms)
+src/components/DarkMode.story.vue 244ms (setup:11ms, execute:0ms, run:233ms)
+src/components/Docs.story.vue 262ms (setup:11ms, execute:0ms, run:251ms)
+[Vue warn]: Extraneous non-props attributes (data) were passed to component but could not be automatically inherited because component renders fragment or text or teleport root nodes. 
+  at <Empty.story ref="comp" data= {
+  id: 'src-components-empty-story-vue',
+  path: '/home/akryum/Projects/histoire/examples/vue3/src/components/Empty.story.vue',
+  relativePath: 'src/components/Empty.story.vue',
+  fileName: 'Empty',
+  moduleId: '/home/akryum/Projects/histoire/examples/vue3/src/components/Empty.story.vue',
+  supportPluginId: 'vue3',
+  virtual: false,
+  moduleCode: undefined
+} > 
+  at <App>
+src/components/Empty.story.vue 243ms (setup:11ms, execute:0ms, run:232ms)
+src/components/AutoStateProps.story.vue 308ms (setup:11ms, execute:0ms, run:297ms)
+src/components/ContrastColor.story.vue 310ms (setup:10ms, execute:0ms, run:299ms)
+src/components/ComplexParameter.story.vue 308ms (setup:17ms, execute:0ms, run:290ms)
+src/components/ColorButton.story.vue 307ms (setup:19ms, execute:0ms, run:288ms)
+src/components/BaseButton.story.vue 364ms (setup:11ms, execute:0ms, run:353ms)
+src/components/CodeGen.story.vue 363ms (setup:13ms, execute:1ms, run:349ms)
+src/components/Controls.story.vue 362ms (setup:11ms, execute:0ms, run:351ms)
+src/components/ControlsOverlays.story.vue 362ms (setup:17ms, execute:0ms, run:345ms)
+⚠️  No story found for /home/akryum/Projects/histoire/examples/vue3/src/components/Empty.story.vue
+src/components/Demo.story.vue 364ms (setup:13ms, execute:0ms, run:350ms)
+src/components/EventButton.story.vue 361ms (setup:19ms, execute:0ms, run:341ms)
+src/components/HandWrittenSource.story.vue 360ms (setup:17ms, execute:0ms, run:343ms)
+src/components/HugeGrid.story.vue 414ms (setup:16ms, execute:0ms, run:398ms)
+src/components/DetectedStatePane.story.vue 391ms (setup:19ms, execute:0ms, run:371ms)
+src/components/Meow.story.vue 355ms (setup:9ms, execute:0ms, run:345ms)
+src/components/NoVariantTag.story.vue 355ms (setup:10ms, execute:0ms, run:345ms)
+src/components/LottieAnimation.story.vue 415ms (setup:7ms, execute:0ms, run:408ms)
+src/components/Serialize.story.vue 361ms (setup:8ms, execute:0ms, run:352ms)
+src/components/StateOption.story.vue 361ms (setup:8ms, execute:0ms, run:353ms)
+src/components/StoryScopedCss.story.vue 361ms (setup:8ms, execute:0ms, run:352ms)
+src/components/SharedControls.story.vue 417ms (setup:8ms, execute:0ms, run:410ms)
+src/components/StateSetup.story.vue 417ms (setup:7ms, execute:0ms, run:410ms)
+src/components/EventButtonGrid.story.vue 556ms (setup:11ms, execute:0ms, run:544ms)
+src/components/MarkdownLinks.story.vue 598ms (setup:9ms, execute:0ms, run:589ms)
+src/components/State.story.vue 498ms (setup:9ms, execute:0ms, run:489ms)
+src/components/Introduction.story.vue 596ms (setup:12ms, execute:0ms, run:583ms)
+src/components/StateSetup2.story.vue 536ms (setup:9ms, execute:0ms, run:527ms)
+src/components/StorySetup.story.vue 733ms (setup:8ms, execute:0ms, run:725ms)
+src/components/Responsive.story.vue 818ms (setup:6ms, execute:0ms, run:811ms)
+src/components/WithSass.story.vue 321ms (setup:8ms, execute:0ms, run:312ms)
+src/components/SubStory.story.vue 439ms (setup:10ms, execute:0ms, run:429ms)
+src/components/SubStory2.story.vue 285ms (setup:8ms, execute:0ms, run:276ms)
+src/components/WrapperMetaOnVariant.story.vue 335ms (setup:9ms, execute:0ms, run:325ms)
+src/components/WrapperMetaOnStory.story.vue 301ms (setup:8ms, execute:0ms, run:293ms)
+src/components/NestedStories/NestedButton.story.vue 377ms (setup:7ms, execute:0ms, run:370ms)
+src/components/PiniaStore.story.vue 1147ms (setup:10ms, execute:0ms, run:1136ms)
+src/components/StyleIsolation.story.vue 700ms (setup:10ms, execute:0ms, run:690ms)
+src/components/WorkbenchMatrix.story.vue 875ms (setup:10ms, execute:0ms, run:865ms)
+src/components/VitestMocking.story.vue 1234ms (setup:10ms, execute:0ms, run:1224ms)
+.histoire/tmp/dev/run-muu8dhc2-54cb6296/plugins/builtin_tailwind-tokens.2d66ae2f/Tailwind.story.js 2611ms (setup:9ms, execute:0ms, run:2602ms)
+src/components/VitestLifecycle.story.vue 19258ms (setup:10ms, execute:0ms, run:19248ms)
+Collect stories end 20828ms
+Collect stories start all
+src/LongFile1.story.js 140ms (setup:6ms, execute:0ms, run:117ms)
+src/LongFile2.story.js 141ms (setup:6ms, execute:0ms, run:117ms)
+src/MarkdownFile.story.js 126ms (setup:5ms, execute:0ms, run:118ms)
+src/components/ContrastColor.story.vue 253ms (setup:13ms, execute:0ms, run:240ms)
+src/components/DarkMode.story.vue 252ms (setup:11ms, execute:0ms, run:241ms)
+[Vue warn]: Extraneous non-props attributes (data) were passed to component but could not be automatically inherited because component renders fragment or text or teleport root nodes. 
+  at <Empty.story ref="comp" data= {
+  id: 'src-components-empty-story-vue',
+  path: '/home/akryum/Projects/histoire/examples/vue3/src/components/Empty.story.vue',
+  relativePath: 'src/components/Empty.story.vue',
+  fileName: 'Empty',
+  moduleId: '/home/akryum/Projects/histoire/examples/vue3/src/components/Empty.story.vue',
+  supportPluginId: 'vue3',
+  virtual: false,
+  moduleCode: undefined
+} > 
+  at <App>
+src/components/Empty.story.vue 253ms (setup:10ms, execute:0ms, run:242ms)
+src/components/Docs.story.vue 263ms (setup:9ms, execute:0ms, run:254ms)
+src/components/AutoStateProps.story.vue 292ms (setup:11ms, execute:0ms, run:281ms)
+src/components/BaseButton.story.vue 292ms (setup:11ms, execute:0ms, run:281ms)
+⚠️  No story found for /home/akryum/Projects/histoire/examples/vue3/src/components/Empty.story.vue
+src/components/Controls.story.vue 328ms (setup:10ms, execute:0ms, run:318ms)
+src/components/ControlsOverlays.story.vue 328ms (setup:10ms, execute:0ms, run:318ms)
+src/components/Demo.story.vue 329ms (setup:9ms, execute:0ms, run:320ms)
+src/components/DetectedStatePane.story.vue 327ms (setup:8ms, execute:0ms, run:319ms)
+src/components/EventButton.story.vue 329ms (setup:8ms, execute:0ms, run:320ms)
+src/components/HugeGrid.story.vue 384ms (setup:9ms, execute:0ms, run:374ms)
+src/components/Introduction.story.vue 424ms (setup:11ms, execute:0ms, run:413ms)
+src/components/LottieAnimation.story.vue 243ms (setup:8ms, execute:0ms, run:235ms)
+src/components/MarkdownLinks.story.vue 245ms (setup:7ms, execute:0ms, run:238ms)
+src/components/Meow.story.vue 246ms (setup:10ms, execute:0ms, run:233ms)
+src/components/NoVariantTag.story.vue 236ms (setup:7ms, execute:0ms, run:229ms)
+src/components/CodeGen.story.vue 657ms (setup:8ms, execute:0ms, run:649ms)
+src/components/ColorButton.story.vue 657ms (setup:8ms, execute:0ms, run:649ms)
+src/components/HandWrittenSource.story.vue 281ms (setup:8ms, execute:0ms, run:273ms)
+src/components/ComplexParameter.story.vue 657ms (setup:12ms, execute:0ms, run:645ms)
+src/components/EventButtonGrid.story.vue 289ms (setup:12ms, execute:0ms, run:277ms)
+src/components/Responsive.story.vue 254ms (setup:9ms, execute:0ms, run:245ms)
+src/components/Serialize.story.vue 254ms (setup:6ms, execute:0ms, run:248ms)
+src/components/StateSetup2.story.vue 254ms (setup:9ms, execute:0ms, run:245ms)
+src/components/SharedControls.story.vue 296ms (setup:8ms, execute:0ms, run:287ms)
+src/components/StateOption.story.vue 253ms (setup:5ms, execute:0ms, run:248ms)
+src/components/StateSetup.story.vue 476ms (setup:6ms, execute:0ms, run:471ms)
+src/components/SubStory.story.vue 320ms (setup:11ms, execute:0ms, run:308ms)
+src/components/SubStory2.story.vue 320ms (setup:10ms, execute:0ms, run:309ms)
+src/components/StoryScopedCss.story.vue 371ms (setup:7ms, execute:0ms, run:364ms)
+src/components/WrapperMetaOnStory.story.vue 308ms (setup:6ms, execute:0ms, run:301ms)
+src/components/WrapperMetaOnVariant.story.vue 308ms (setup:9ms, execute:0ms, run:299ms)
+src/components/State.story.vue 550ms (setup:9ms, execute:0ms, run:541ms)
+.histoire/tmp/dev/run-muu8dhc2-54cb6296/plugins/builtin_tailwind-tokens.2d66ae2f/Tailwind.story.js 354ms (setup:7ms, execute:0ms, run:347ms)
+src/components/StyleIsolation.story.vue 817ms (setup:7ms, execute:0ms, run:810ms)
+src/components/PiniaStore.story.vue 1156ms (setup:5ms, execute:0ms, run:1150ms)
+src/components/NestedStories/NestedButton.story.vue 809ms (setup:8ms, execute:0ms, run:801ms)
+src/components/StorySetup.story.vue 1032ms (setup:11ms, execute:0ms, run:1021ms)
+src/components/WorkbenchMatrix.story.vue 894ms (setup:8ms, execute:0ms, run:886ms)
+src/components/WithSass.story.vue 967ms (setup:6ms, execute:0ms, run:960ms)
+src/components/VitestMocking.story.vue 1582ms (setup:10ms, execute:0ms, run:1572ms)
+src/components/VitestLifecycle.story.vue 30325ms (setup:7ms, execute:0ms, run:30318ms)
+Collect stories end 31688ms
+Collect stories start all
+src/LongFile1.story.js 243ms (setup:10ms, execute:0ms, run:205ms)
+src/LongFile2.story.js 238ms (setup:10ms, execute:0ms, run:204ms)
+src/MarkdownFile.story.js 218ms (setup:9ms, execute:0ms, run:206ms)
+src/components/BaseButton.story.vue 545ms (setup:10ms, execute:0ms, run:535ms)
+src/components/ContrastColor.story.vue 545ms (setup:16ms, execute:0ms, run:529ms)
+src/components/DarkMode.story.vue 542ms (setup:15ms, execute:0ms, run:527ms)
+src/components/Docs.story.vue 548ms (setup:11ms, execute:0ms, run:537ms)
+[Vue warn]: Extraneous non-props attributes (data) were passed to component but could not be automatically inherited because component renders fragment or text or teleport root nodes. 
+  at <Empty.story ref="comp" data= {
+  id: 'src-components-empty-story-vue',
+  path: '/home/akryum/Projects/histoire/examples/vue3/src/components/Empty.story.vue',
+  relativePath: 'src/components/Empty.story.vue',
+  fileName: 'Empty',
+  moduleId: '/home/akryum/Projects/histoire/examples/vue3/src/components/Empty.story.vue',
+  supportPluginId: 'vue3',
+  virtual: false,
+  moduleCode: undefined
+} > 
+  at <App>
+src/components/Empty.story.vue 542ms (setup:18ms, execute:0ms, run:525ms)
+src/components/CodeGen.story.vue 623ms (setup:8ms, execute:0ms, run:615ms)
+src/components/Controls.story.vue 622ms (setup:8ms, execute:0ms, run:613ms)
+src/components/ControlsOverlays.story.vue 622ms (setup:11ms, execute:0ms, run:611ms)
+src/components/DetectedStatePane.story.vue 620ms (setup:10ms, execute:0ms, run:610ms)
+src/components/EventButton.story.vue 619ms (setup:15ms, execute:1ms, run:604ms)
+src/components/Demo.story.vue 624ms (setup:9ms, execute:0ms, run:615ms)
+src/components/HandWrittenSource.story.vue 619ms (setup:20ms, execute:0ms, run:598ms)
+⚠️  No story found for /home/akryum/Projects/histoire/examples/vue3/src/components/Empty.story.vue
+src/components/HugeGrid.story.vue 714ms (setup:12ms, execute:0ms, run:702ms)
+src/components/AutoStateProps.story.vue 1027ms (setup:10ms, execute:0ms, run:1017ms)
+src/components/ComplexParameter.story.vue 1146ms (setup:9ms, execute:0ms, run:1137ms)
+src/components/ColorButton.story.vue 1146ms (setup:10ms, execute:0ms, run:1135ms)
+src/components/MarkdownLinks.story.vue 401ms (setup:7ms, execute:0ms, run:393ms)
+src/components/NoVariantTag.story.vue 415ms (setup:9ms, execute:0ms, run:406ms)
+src/components/PiniaStore.story.vue 415ms (setup:8ms, execute:0ms, run:406ms)
+src/components/Serialize.story.vue 414ms (setup:9ms, execute:0ms, run:406ms)
+src/components/SharedControls.story.vue 414ms (setup:8ms, execute:0ms, run:407ms)
+src/components/Meow.story.vue 498ms (setup:9ms, execute:0ms, run:487ms)
+src/components/StateOption.story.vue 415ms (setup:8ms, execute:0ms, run:406ms)
+src/components/State.story.vue 475ms (setup:10ms, execute:0ms, run:465ms)
+src/components/Introduction.story.vue 725ms (setup:9ms, execute:0ms, run:715ms)
+src/components/EventButtonGrid.story.vue 723ms (setup:9ms, execute:0ms, run:714ms)
+src/components/StateSetup.story.vue 574ms (setup:7ms, execute:0ms, run:568ms)
+src/components/Responsive.story.vue 915ms (setup:10ms, execute:0ms, run:905ms)
+src/components/StoryScopedCss.story.vue 394ms (setup:7ms, execute:0ms, run:387ms)
+src/components/SubStory.story.vue 419ms (setup:8ms, execute:0ms, run:410ms)
+src/components/SubStory2.story.vue 418ms (setup:8ms, execute:0ms, run:411ms)
+src/components/StateSetup2.story.vue 712ms (setup:7ms, execute:0ms, run:705ms)
+src/components/VitestMocking.story.vue 486ms (setup:7ms, execute:0ms, run:478ms)
+src/components/WorkbenchMatrix.story.vue 486ms (setup:7ms, execute:0ms, run:478ms)
+src/components/WrapperMetaOnStory.story.vue 489ms (setup:8ms, execute:0ms, run:482ms)
+src/components/WrapperMetaOnVariant.story.vue 432ms (setup:7ms, execute:0ms, run:425ms)
+.histoire/tmp/dev/run-muu8dhc2-54cb6296/plugins/builtin_tailwind-tokens.2d66ae2f/Tailwind.story.js 456ms (setup:9ms, execute:0ms, run:447ms)
+src/components/VitestLifecycle.story.vue 932ms (setup:8ms, execute:3ms, run:920ms)
+src/components/StyleIsolation.story.vue 1091ms (setup:8ms, execute:0ms, run:1083ms)
+src/components/StorySetup.story.vue 1287ms (setup:9ms, execute:0ms, run:1278ms)
+src/components/WithSass.story.vue 1542ms (setup:9ms, execute:0ms, run:1532ms)
+src/components/NestedStories/NestedButton.story.vue 1560ms (setup:10ms, execute:0ms, run:1551ms)
+src/components/LottieAnimation.story.vue 45982ms (setup:9ms, execute:0ms, run:45973ms)
+Collect stories end 47900ms
+Collect stories start all
+src/LongFile1.story.js 230ms (setup:5ms, execute:0ms, run:202ms)
+src/LongFile2.story.js 225ms (setup:4ms, execute:0ms, run:203ms)
+src/MarkdownFile.story.js 208ms (setup:4ms, execute:0ms, run:203ms)
+src/components/AutoStateProps.story.vue 464ms (setup:8ms, execute:0ms, run:455ms)
+src/components/CodeGen.story.vue 464ms (setup:8ms, execute:0ms, run:456ms)
+src/components/Controls.story.vue 464ms (setup:12ms, execute:0ms, run:452ms)
+src/components/ContrastColor.story.vue 464ms (setup:10ms, execute:0ms, run:453ms)
+src/components/ColorButton.story.vue 463ms (setup:10ms, execute:0ms, run:453ms)
+src/components/DetectedStatePane.story.vue 464ms (setup:11ms, execute:0ms, run:453ms)
+src/components/Demo.story.vue 465ms (setup:8ms, execute:0ms, run:456ms)
+[Vue warn]: Extraneous non-props attributes (data) were passed to component but could not be automatically inherited because component renders fragment or text or teleport root nodes. 
+  at <Empty.story ref="comp" data= {
+  id: 'src-components-empty-story-vue',
+  path: '/home/akryum/Projects/histoire/examples/vue3/src/components/Empty.story.vue',
+  relativePath: 'src/components/Empty.story.vue',
+  fileName: 'Empty',
+  moduleId: '/home/akryum/Projects/histoire/examples/vue3/src/components/Empty.story.vue',
+  supportPluginId: 'vue3',
+  virtual: false,
+  moduleCode: undefined
+} > 
+  at <App>
+src/components/Empty.story.vue 465ms (setup:8ms, execute:0ms, run:457ms)
+src/components/ControlsOverlays.story.vue 463ms (setup:8ms, execute:0ms, run:455ms)
+src/components/EventButton.story.vue 463ms (setup:9ms, execute:0ms, run:454ms)
+src/components/HandWrittenSource.story.vue 529ms (setup:9ms, execute:0ms, run:520ms)
+src/components/DarkMode.story.vue 529ms (setup:7ms, execute:0ms, run:521ms)
+⚠️  No story found for /home/akryum/Projects/histoire/examples/vue3/src/components/Empty.story.vue
+src/components/HugeGrid.story.vue 636ms (setup:9ms, execute:0ms, run:627ms)
+src/components/Docs.story.vue 857ms (setup:10ms, execute:0ms, run:847ms)
+src/components/EventButtonGrid.story.vue 446ms (setup:7ms, execute:0ms, run:439ms)
+src/components/Introduction.story.vue 446ms (setup:7ms, execute:0ms, run:440ms)
+src/components/ComplexParameter.story.vue 1126ms (setup:7ms, execute:0ms, run:1118ms)
+src/components/LottieAnimation.story.vue 445ms (setup:6ms, execute:0ms, run:439ms)
+src/components/Meow.story.vue 446ms (setup:6ms, execute:0ms, run:440ms)
+src/components/NoVariantTag.story.vue 445ms (setup:7ms, execute:0ms, run:438ms)
+src/components/BaseButton.story.vue 1126ms (setup:7ms, execute:0ms, run:1118ms)
+src/components/Serialize.story.vue 446ms (setup:7ms, execute:0ms, run:439ms)
+src/components/State.story.vue 581ms (setup:5ms, execute:0ms, run:576ms)
+src/components/StateOption.story.vue 511ms (setup:8ms, execute:0ms, run:503ms)
+src/components/StateSetup.story.vue 414ms (setup:5ms, execute:0ms, run:409ms)
+src/components/SharedControls.story.vue 585ms (setup:6ms, execute:0ms, run:579ms)
+src/components/MarkdownLinks.story.vue 733ms (setup:6ms, execute:0ms, run:726ms)
+src/components/Responsive.story.vue 885ms (setup:5ms, execute:0ms, run:880ms)
+src/components/StoryScopedCss.story.vue 482ms (setup:10ms, execute:0ms, run:473ms)
+src/components/SubStory.story.vue 482ms (setup:6ms, execute:0ms, run:476ms)
+src/components/SubStory2.story.vue 482ms (setup:8ms, execute:0ms, run:474ms)
+src/components/StateSetup2.story.vue 768ms (setup:4ms, execute:0ms, run:763ms)
+src/components/WithSass.story.vue 559ms (setup:9ms, execute:0ms, run:549ms)
+src/components/StyleIsolation.story.vue 640ms (setup:7ms, execute:0ms, run:633ms)
+src/components/StorySetup.story.vue 641ms (setup:9ms, execute:0ms, run:631ms)
+src/components/VitestLifecycle.story.vue 640ms (setup:7ms, execute:1ms, run:633ms)
+src/components/VitestMocking.story.vue 640ms (setup:9ms, execute:0ms, run:631ms)
+src/components/WrapperMetaOnStory.story.vue 492ms (setup:5ms, execute:0ms, run:486ms)
+src/components/WrapperMetaOnVariant.story.vue 563ms (setup:5ms, execute:0ms, run:558ms)
+src/components/NestedStories/NestedButton.story.vue 676ms (setup:4ms, execute:0ms, run:671ms)
+src/components/PiniaStore.story.vue 1692ms (setup:6ms, execute:0ms, run:1686ms)
+src/components/WorkbenchMatrix.story.vue 1694ms (setup:6ms, execute:0ms, run:1687ms)
+.histoire/tmp/dev/run-muu8dhc2-54cb6296/plugins/builtin_tailwind-tokens.2d66ae2f/Tailwind.story.js 4185ms (setup:5ms, execute:0ms, run:4181ms)
+Collect stories end 6842ms
+Collect stories start all
+src/LongFile1.story.js 291ms (setup:16ms, execute:0ms, run:255ms)
+src/LongFile2.story.js 287ms (setup:10ms, execute:0ms, run:260ms)
+src/MarkdownFile.story.js 272ms (setup:12ms, execute:0ms, run:258ms)
+src/components/ContrastColor.story.vue 600ms (setup:8ms, execute:0ms, run:592ms)
+src/components/DarkMode.story.vue 599ms (setup:8ms, execute:0ms, run:591ms)
+src/components/ComplexParameter.story.vue 710ms (setup:12ms, execute:0ms, run:698ms)
+src/components/Docs.story.vue 720ms (setup:12ms, execute:0ms, run:707ms)
+[Vue warn]: Extraneous non-props attributes (data) were passed to component but could not be automatically inherited because component renders fragment or text or teleport root nodes. 
+  at <Empty.story ref="comp" data= {
+  id: 'src-components-empty-story-vue',
+  path: '/home/akryum/Projects/histoire/examples/vue3/src/components/Empty.story.vue',
+  relativePath: 'src/components/Empty.story.vue',
+  fileName: 'Empty',
+  moduleId: '/home/akryum/Projects/histoire/examples/vue3/src/components/Empty.story.vue',
+  supportPluginId: 'vue3',
+  virtual: false,
+  moduleCode: undefined
+} > 
+  at <App>
+src/components/Empty.story.vue 708ms (setup:13ms, execute:0ms, run:695ms)
+src/components/BaseButton.story.vue 806ms (setup:7ms, execute:0ms, run:798ms)
+src/components/CodeGen.story.vue 806ms (setup:7ms, execute:0ms, run:799ms)
+src/components/Controls.story.vue 806ms (setup:8ms, execute:0ms, run:797ms)
+src/components/ControlsOverlays.story.vue 805ms (setup:8ms, execute:0ms, run:798ms)
+src/components/Demo.story.vue 808ms (setup:11ms, execute:0ms, run:797ms)
+src/components/DetectedStatePane.story.vue 805ms (setup:7ms, execute:0ms, run:798ms)
+src/components/EventButtonGrid.story.vue 804ms (setup:12ms, execute:0ms, run:792ms)
+src/components/HandWrittenSource.story.vue 805ms (setup:9ms, execute:0ms, run:795ms)
+⚠️  No story found for /home/akryum/Projects/histoire/examples/vue3/src/components/Empty.story.vue
+src/components/HugeGrid.story.vue 955ms (setup:10ms, execute:0ms, run:945ms)
+src/components/AutoStateProps.story.vue 1299ms (setup:8ms, execute:0ms, run:1291ms)
+src/components/ColorButton.story.vue 1471ms (setup:10ms, execute:0ms, run:1461ms)
+src/components/Introduction.story.vue 649ms (setup:9ms, execute:0ms, run:640ms)
+src/components/MarkdownLinks.story.vue 552ms (setup:7ms, execute:0ms, run:545ms)
+src/components/Meow.story.vue 551ms (setup:6ms, execute:0ms, run:544ms)
+src/components/NoVariantTag.story.vue 540ms (setup:7ms, execute:0ms, run:533ms)
+src/components/Responsive.story.vue 540ms (setup:9ms, execute:0ms, run:531ms)
+src/components/Serialize.story.vue 540ms (setup:9ms, execute:0ms, run:530ms)
+src/components/SharedControls.story.vue 540ms (setup:10ms, execute:0ms, run:530ms)
+src/components/StateOption.story.vue 540ms (setup:7ms, execute:0ms, run:532ms)
+src/components/LottieAnimation.story.vue 718ms (setup:6ms, execute:0ms, run:712ms)
+src/components/EventButton.story.vue 816ms (setup:11ms, execute:0ms, run:805ms)
+src/components/StateSetup.story.vue 709ms (setup:7ms, execute:0ms, run:702ms)
+src/components/State.story.vue 812ms (setup:7ms, execute:0ms, run:805ms)
+src/components/StateSetup2.story.vue 821ms (setup:7ms, execute:0ms, run:813ms)
+src/components/StoryScopedCss.story.vue 684ms (setup:6ms, execute:0ms, run:678ms)
+src/components/SubStory.story.vue 598ms (setup:9ms, execute:0ms, run:589ms)
+src/components/SubStory2.story.vue 599ms (setup:6ms, execute:0ms, run:593ms)
+src/components/WithSass.story.vue 599ms (setup:7ms, execute:0ms, run:591ms)
+src/components/StorySetup.story.vue 788ms (setup:4ms, execute:0ms, run:784ms)
+src/components/WrapperMetaOnStory.story.vue 594ms (setup:8ms, execute:0ms, run:586ms)
+src/components/WrapperMetaOnVariant.story.vue 594ms (setup:6ms, execute:0ms, run:588ms)
+src/components/VitestLifecycle.story.vue 696ms (setup:5ms, execute:0ms, run:691ms)
+src/components/WorkbenchMatrix.story.vue 674ms (setup:5ms, execute:0ms, run:668ms)
+src/components/NestedStories/NestedButton.story.vue 806ms (setup:6ms, execute:0ms, run:800ms)
+.histoire/tmp/dev/run-muu8dhc2-54cb6296/plugins/builtin_tailwind-tokens.2d66ae2f/Tailwind.story.js 582ms (setup:5ms, execute:0ms, run:577ms)
+src/components/StyleIsolation.story.vue 1253ms (setup:7ms, execute:0ms, run:1245ms)
+src/components/PiniaStore.story.vue 2657ms (setup:7ms, execute:0ms, run:2650ms)
+src/components/VitestMocking.story.vue 2543ms (setup:5ms, execute:0ms, run:2537ms)
+Collect stories end 5821ms
+Collect stories start all
+src/LongFile1.story.js 392ms (setup:8ms, execute:0ms, run:369ms)
+src/LongFile2.story.js 392ms (setup:6ms, execute:0ms, run:370ms)
+src/MarkdownFile.story.js 378ms (setup:6ms, execute:0ms, run:371ms)
+src/components/ContrastColor.story.vue 795ms (setup:13ms, execute:0ms, run:782ms)
+src/components/DarkMode.story.vue 794ms (setup:13ms, execute:0ms, run:781ms)
+src/components/Docs.story.vue 800ms (setup:10ms, execute:0ms, run:789ms)
+[Vue warn]: Extraneous non-props attributes (data) were passed to component but could not be automatically inherited because component renders fragment or text or teleport root nodes. 
+  at <Empty.story ref="comp" data= {
+  id: 'src-components-empty-story-vue',
+  path: '/home/akryum/Projects/histoire/examples/vue3/src/components/Empty.story.vue',
+  relativePath: 'src/components/Empty.story.vue',
+  fileName: 'Empty',
+  moduleId: '/home/akryum/Projects/histoire/examples/vue3/src/components/Empty.story.vue',
+  supportPluginId: 'vue3',
+  virtual: false,
+  moduleCode: undefined
+} > 
+  at <App>
+src/components/Empty.story.vue 795ms (setup:9ms, execute:0ms, run:785ms)
+src/components/CodeGen.story.vue 901ms (setup:9ms, execute:0ms, run:891ms)
+src/components/Controls.story.vue 900ms (setup:9ms, execute:0ms, run:890ms)
+src/components/ControlsOverlays.story.vue 900ms (setup:13ms, execute:0ms, run:886ms)
+src/components/Demo.story.vue 900ms (setup:11ms, execute:0ms, run:889ms)
+src/components/DetectedStatePane.story.vue 899ms (setup:9ms, execute:0ms, run:890ms)
+src/components/EventButton.story.vue 900ms (setup:10ms, execute:0ms, run:890ms)
+src/components/EventButtonGrid.story.vue 899ms (setup:9ms, execute:0ms, run:890ms)
+⚠️  No story found for /home/akryum/Projects/histoire/examples/vue3/src/components/Empty.story.vue
+src/components/HandWrittenSource.story.vue 1009ms (setup:10ms, execute:0ms, run:998ms)
+src/components/AutoStateProps.story.vue 1432ms (setup:9ms, execute:0ms, run:1422ms)
+src/components/ColorButton.story.vue 1635ms (setup:10ms, execute:0ms, run:1625ms)
+src/components/BaseButton.story.vue 1758ms (setup:10ms, execute:0ms, run:1747ms)
+src/components/ComplexParameter.story.vue 1757ms (setup:9ms, execute:0ms, run:1747ms)
+src/components/MarkdownLinks.story.vue 662ms (setup:7ms, execute:0ms, run:654ms)
+src/components/Meow.story.vue 661ms (setup:6ms, execute:0ms, run:653ms)
+src/components/NoVariantTag.story.vue 660ms (setup:6ms, execute:0ms, run:654ms)
+src/components/PiniaStore.story.vue 643ms (setup:7ms, execute:0ms, run:636ms)
+src/components/Responsive.story.vue 643ms (setup:9ms, execute:0ms, run:634ms)
+src/components/Serialize.story.vue 643ms (setup:9ms, execute:0ms, run:634ms)
+src/components/State.story.vue 643ms (setup:7ms, execute:0ms, run:636ms)
+src/components/Introduction.story.vue 765ms (setup:7ms, execute:0ms, run:758ms)
+src/components/SharedControls.story.vue 730ms (setup:8ms, execute:0ms, run:722ms)
+src/components/LottieAnimation.story.vue 829ms (setup:10ms, execute:0ms, run:819ms)
+src/components/StateOption.story.vue 698ms (setup:7ms, execute:0ms, run:691ms)
+src/components/HugeGrid.story.vue 1287ms (setup:8ms, execute:0ms, run:1279ms)
+src/components/StyleIsolation.story.vue 695ms (setup:5ms, execute:0ms, run:689ms)
+src/components/StateSetup.story.vue 885ms (setup:5ms, execute:0ms, run:880ms)
+src/components/StoryScopedCss.story.vue 695ms (setup:5ms, execute:0ms, run:689ms)
+src/components/SubStory2.story.vue 597ms (setup:5ms, execute:0ms, run:592ms)
+src/components/SubStory.story.vue 608ms (setup:10ms, execute:0ms, run:598ms)
+src/components/WrapperMetaOnStory.story.vue 608ms (setup:8ms, execute:0ms, run:599ms)
+src/components/VitestMocking.story.vue 819ms (setup:5ms, execute:0ms, run:814ms)
+src/components/StateSetup2.story.vue 1022ms (setup:5ms, execute:0ms, run:1017ms)
+src/components/WrapperMetaOnVariant.story.vue 736ms (setup:4ms, execute:0ms, run:732ms)
+.histoire/tmp/dev/run-muu8dhc2-54cb6296/plugins/builtin_tailwind-tokens.2d66ae2f/Tailwind.story.js 649ms (setup:8ms, execute:0ms, run:641ms)
+src/components/VitestLifecycle.story.vue 1405ms (setup:5ms, execute:0ms, run:1400ms)
+src/components/StorySetup.story.vue 1807ms (setup:4ms, execute:0ms, run:1803ms)
+src/components/NestedStories/NestedButton.story.vue 1415ms (setup:7ms, execute:0ms, run:1408ms)
+src/components/WorkbenchMatrix.story.vue 1716ms (setup:6ms, execute:0ms, run:1709ms)
+src/components/WithSass.story.vue 1814ms (setup:10ms, execute:0ms, run:1803ms)
+Collect stories end 5458ms
+Collect stories start all
+src/LongFile1.story.js 327ms (setup:5ms, execute:0ms, run:303ms)
+src/LongFile2.story.js 320ms (setup:6ms, execute:0ms, run:302ms)
+src/MarkdownFile.story.js 309ms (setup:7ms, execute:0ms, run:301ms)
+src/components/ContrastColor.story.vue 672ms (setup:9ms, execute:0ms, run:663ms)
+src/components/DarkMode.story.vue 672ms (setup:8ms, execute:0ms, run:663ms)
+src/components/AutoStateProps.story.vue 784ms (setup:9ms, execute:0ms, run:775ms)
+src/components/ColorButton.story.vue 784ms (setup:8ms, execute:0ms, run:776ms)
+src/components/Docs.story.vue 789ms (setup:11ms, execute:0ms, run:778ms)
+[Vue warn]: Extraneous non-props attributes (data) were passed to component but could not be automatically inherited because component renders fragment or text or teleport root nodes. 
+  at <Empty.story ref="comp" data= {
+  id: 'src-components-empty-story-vue',
+  path: '/home/akryum/Projects/histoire/examples/vue3/src/components/Empty.story.vue',
+  relativePath: 'src/components/Empty.story.vue',
+  fileName: 'Empty',
+  moduleId: '/home/akryum/Projects/histoire/examples/vue3/src/components/Empty.story.vue',
+  supportPluginId: 'vue3',
+  virtual: false,
+  moduleCode: undefined
+} > 
+  at <App>
+src/components/Empty.story.vue 783ms (setup:9ms, execute:0ms, run:774ms)
+src/components/BaseButton.story.vue 919ms (setup:8ms, execute:0ms, run:911ms)
+src/components/CodeGen.story.vue 919ms (setup:8ms, execute:0ms, run:910ms)
+src/components/ControlsOverlays.story.vue 919ms (setup:9ms, execute:0ms, run:910ms)
+src/components/Controls.story.vue 918ms (setup:8ms, execute:0ms, run:911ms)
+src/components/Demo.story.vue 920ms (setup:11ms, execute:0ms, run:908ms)
+src/components/DetectedStatePane.story.vue 919ms (setup:13ms, execute:0ms, run:905ms)
+src/components/EventButton.story.vue 920ms (setup:9ms, execute:0ms, run:910ms)
+src/components/EventButtonGrid.story.vue 919ms (setup:8ms, execute:0ms, run:910ms)
+src/components/HandWrittenSource.story.vue 918ms (setup:9ms, execute:0ms, run:909ms)
+⚠️  No story found for /home/akryum/Projects/histoire/examples/vue3/src/components/Empty.story.vue
+src/components/Introduction.story.vue 707ms (setup:7ms, execute:0ms, run:700ms)
+src/components/Serialize.story.vue 685ms (setup:6ms, execute:0ms, run:679ms)
+src/components/NoVariantTag.story.vue 817ms (setup:6ms, execute:0ms, run:811ms)
+src/components/ComplexParameter.story.vue 1833ms (setup:12ms, execute:0ms, run:1821ms)
+src/components/MarkdownLinks.story.vue 686ms (setup:5ms, execute:0ms, run:680ms)
+src/components/LottieAnimation.story.vue 912ms (setup:6ms, execute:0ms, run:906ms)
+src/components/SharedControls.story.vue 781ms (setup:5ms, execute:0ms, run:775ms)
+src/components/State.story.vue 780ms (setup:7ms, execute:0ms, run:773ms)
+src/components/StateSetup.story.vue 780ms (setup:6ms, execute:0ms, run:774ms)
+src/components/Meow.story.vue 656ms (setup:5ms, execute:0ms, run:650ms)
+src/components/StorySetup.story.vue 763ms (setup:8ms, execute:0ms, run:755ms)
+src/components/StoryScopedCss.story.vue 887ms (setup:5ms, execute:0ms, run:882ms)
+src/components/StateSetup2.story.vue 1130ms (setup:4ms, execute:0ms, run:1125ms)
+src/components/HugeGrid.story.vue 1553ms (setup:6ms, execute:0ms, run:1547ms)
+src/components/Responsive.story.vue 1505ms (setup:5ms, execute:0ms, run:1500ms)
+src/components/SubStory2.story.vue 711ms (setup:5ms, execute:0ms, run:706ms)
+src/components/StateOption.story.vue 711ms (setup:5ms, execute:0ms, run:706ms)
+src/components/StyleIsolation.story.vue 945ms (setup:4ms, execute:0ms, run:941ms)
+src/components/WithSass.story.vue 705ms (setup:6ms, execute:0ms, run:698ms)
+src/components/WrapperMetaOnStory.story.vue 704ms (setup:7ms, execute:0ms, run:697ms)
+src/components/VitestLifecycle.story.vue 821ms (setup:4ms, execute:0ms, run:817ms)
+src/components/SubStory.story.vue 930ms (setup:5ms, execute:0ms, run:925ms)
+src/components/WrapperMetaOnVariant.story.vue 814ms (setup:6ms, execute:0ms, run:808ms)
+src/components/VitestMocking.story.vue 927ms (setup:5ms, execute:0ms, run:922ms)
+src/components/WorkbenchMatrix.story.vue 927ms (setup:5ms, execute:0ms, run:922ms)
+src/components/PiniaStore.story.vue 2608ms (setup:5ms, execute:0ms, run:2603ms)
+src/components/NestedStories/NestedButton.story.vue 2483ms (setup:5ms, execute:0ms, run:2478ms)
+.histoire/tmp/dev/run-muu8dhc2-54cb6296/plugins/builtin_tailwind-tokens.2d66ae2f/Tailwind.story.js 8418ms (setup:4ms, execute:0ms, run:8413ms)
+Collect stories end 12629ms
+Collect stories start all
+src/LongFile1.story.js 563ms (setup:6ms, execute:0ms, run:530ms)
+src/LongFile2.story.js 557ms (setup:8ms, execute:0ms, run:527ms)
+src/MarkdownFile.story.js 537ms (setup:6ms, execute:0ms, run:529ms)
+src/components/ContrastColor.story.vue 1095ms (setup:9ms, execute:0ms, run:1086ms)
+src/components/DarkMode.story.vue 1095ms (setup:8ms, execute:0ms, run:1086ms)
+[Vue warn]: Extraneous non-props attributes (data) were passed to component but could not be automatically inherited because component renders fragment or text or teleport root nodes. 
+  at <Empty.story ref="comp" data= {
+  id: 'src-components-empty-story-vue',
+  path: '/home/akryum/Projects/histoire/examples/vue3/src/components/Empty.story.vue',
+  relativePath: 'src/components/Empty.story.vue',
+  fileName: 'Empty',
+  moduleId: '/home/akryum/Projects/histoire/examples/vue3/src/components/Empty.story.vue',
+  supportPluginId: 'vue3',
+  virtual: false,
+  moduleCode: undefined
+} > 
+  at <App>
+src/components/Empty.story.vue 1094ms (setup:11ms, execute:0ms, run:1083ms)
+src/components/BaseButton.story.vue 1299ms (setup:7ms, execute:0ms, run:1291ms)
+src/components/ComplexParameter.story.vue 1299ms (setup:7ms, execute:0ms, run:1291ms)
+src/components/Docs.story.vue 1304ms (setup:10ms, execute:0ms, run:1294ms)
+src/components/AutoStateProps.story.vue 3096ms (setup:8ms, execute:0ms, run:3088ms)
+src/components/ColorButton.story.vue 3097ms (setup:8ms, execute:0ms, run:3089ms)
+src/components/CodeGen.story.vue 3098ms (setup:11ms, execute:0ms, run:3086ms)
+⚠️  No story found for /home/akryum/Projects/histoire/examples/vue3/src/components/Empty.story.vue
+src/components/Controls.story.vue 3096ms (setup:10ms, execute:0ms, run:3086ms)
+src/components/ControlsOverlays.story.vue 3097ms (setup:13ms, execute:0ms, run:3083ms)
+src/components/DetectedStatePane.story.vue 3099ms (setup:9ms, execute:0ms, run:3089ms)
+src/components/EventButton.story.vue 3099ms (setup:15ms, execute:0ms, run:3083ms)
+src/components/EventButtonGrid.story.vue 3097ms (setup:12ms, execute:0ms, run:3084ms)
+src/components/HugeGrid.story.vue 3161ms (setup:9ms, execute:0ms, run:3151ms)
+src/components/LottieAnimation.story.vue 1138ms (setup:8ms, execute:0ms, run:1130ms)
+src/components/Meow.story.vue 1143ms (setup:7ms, execute:0ms, run:1135ms)
+src/components/HandWrittenSource.story.vue 1361ms (setup:13ms, execute:0ms, run:1347ms)
+src/components/NoVariantTag.story.vue 1141ms (setup:9ms, execute:0ms, run:1133ms)
+src/components/PiniaStore.story.vue 1169ms (setup:8ms, execute:0ms, run:1161ms)
+src/components/Responsive.story.vue 1170ms (setup:10ms, execute:0ms, run:1160ms)
+src/components/SharedControls.story.vue 1170ms (setup:8ms, execute:0ms, run:1161ms)
+src/components/Demo.story.vue 5043ms (setup:9ms, execute:0ms, run:5034ms)
+src/components/Serialize.story.vue 1170ms (setup:10ms, execute:0ms, run:1160ms)
+src/components/State.story.vue 2442ms (setup:8ms, execute:0ms, run:2434ms)
+src/components/StateSetup2.story.vue 2441ms (setup:10ms, execute:0ms, run:2431ms)
+src/components/StoryScopedCss.story.vue 2441ms (setup:8ms, execute:0ms, run:2432ms)
+src/components/Introduction.story.vue 2858ms (setup:9ms, execute:0ms, run:2849ms)
+src/components/MarkdownLinks.story.vue 4154ms (setup:7ms, execute:0ms, run:4147ms)
+src/components/StorySetup.story.vue 4403ms (setup:10ms, execute:0ms, run:4393ms)
+src/components/SubStory.story.vue 3277ms (setup:5ms, execute:0ms, run:3272ms)
+src/components/SubStory2.story.vue 2356ms (setup:9ms, execute:0ms, run:2347ms)
+src/components/StyleIsolation.story.vue 4796ms (setup:9ms, execute:0ms, run:4786ms)
+src/components/StateSetup.story.vue 2578ms (setup:9ms, execute:0ms, run:2569ms)
+src/components/StateOption.story.vue 1282ms (setup:10ms, execute:0ms, run:1272ms)
+src/components/WrapperMetaOnVariant.story.vue 1282ms (setup:11ms, execute:0ms, run:1271ms)
+src/components/VitestLifecycle.story.vue 2750ms (setup:8ms, execute:0ms, run:2742ms)
+src/components/WrapperMetaOnStory.story.vue 3364ms (setup:8ms, execute:0ms, run:3356ms)
+src/components/WorkbenchMatrix.story.vue 7268ms (setup:7ms, execute:0ms, run:7261ms)
+src/components/NestedStories/NestedButton.story.vue 7044ms (setup:9ms, execute:0ms, run:7034ms)
+src/components/WithSass.story.vue 9518ms (setup:10ms, execute:0ms, run:9508ms)
+src/components/VitestMocking.story.vue 17046ms (setup:7ms, execute:0ms, run:17039ms)
+.histoire/tmp/dev/run-muu8dhc2-54cb6296/plugins/builtin_tailwind-tokens.2d66ae2f/Tailwind.story.js 53307ms (setup:8ms, execute:0ms, run:53299ms)
+
+<--- Last few GCs --->
+
+[2164502:0x245a4000]   615397 ms: Scavenge (interleaved) 8165.7 (8197.4) -> 8162.8 (8215.7) MB, pooled: 0 MB, 38.41 / 0.00 ms  (average mu = 0.367, current mu = 0.369) allocation failure; 
+[2164502:0x245a4000]   616543 ms: Mark-Compact (reduce) 8173.6 (8216.4) -> 8157.7 (8185.2) MB, pooled: 0 MB, 46.20 / 0.01 ms  (+ 873.2 ms in 168 steps since start of marking, biggest step 8.2 ms, walltime since start of marking 1093 ms) (average mu = 0.36
+FATAL ERROR: Ineffective mark-compacts near heap limit Allocation failed - JavaScript heap out of memory
+----- Native stack trace -----
+
+ 1: 0x744ae8 node::OOMErrorHandler(char const*, v8::OOMDetails const&) [node]
+ 2: 0xc1a4b0  [node]
+ 3: 0xc1a59f  [node]
+ 4: 0xebdda5  [node]
+ 5: 0xebddd2  [node]
+ 6: 0xebe0ca  [node]
+ 7: 0xecedca  [node]
+ 8: 0xed3170  [node]
+ 9: 0x19655d1  [node]

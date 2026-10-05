@@ -38,6 +38,7 @@ export function usePreviewIframeHost(options: PreviewIframeHostOptions) {
   /** Bumping it re-keys the iframe element, forcing a clean document mount. */
   const iframeReloadKey = ref(0)
   const isIframeLoaded = ref(false)
+  const frameDocumentId = ref(`${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`)
 
   const stateSync = createPreviewStateSync({
     getStoryId: () => options.getStory()?.id,
@@ -56,6 +57,7 @@ export function usePreviewIframeHost(options: PreviewIframeHostOptions) {
     iframe.value?.contentWindow?.postMessage({
       __histoire: true,
       ...payload,
+      documentId: frameDocumentId.value,
     }, window.location.origin)
   }
 
@@ -93,6 +95,7 @@ export function usePreviewIframeHost(options: PreviewIframeHostOptions) {
    */
   function reloadPreviewFrame() {
     isIframeLoaded.value = false
+    frameDocumentId.value = `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`
     iframeReloadKey.value++
   }
 
@@ -139,6 +142,7 @@ export function usePreviewIframeHost(options: PreviewIframeHostOptions) {
     }
 
     const message = event.data as HistoireInboundPreviewMessage
+    if (message.documentId !== frameDocumentId.value) return
 
     // Navigating the iframe reuses the same window, so a document being torn
     // down still passes the trust check above: a late readiness or state
@@ -159,6 +163,8 @@ export function usePreviewIframeHost(options: PreviewIframeHostOptions) {
       // Both readiness events carry the id of the variant that actually booted:
       // in grid mode that is not necessarily the selected one.
       case SANDBOX_READY:
+        syncSettings()
+        break
       case VARIANT_READY:
         markVariantReady(message.variantId)
         break
@@ -167,6 +173,10 @@ export function usePreviewIframeHost(options: PreviewIframeHostOptions) {
         break
     }
   })
+
+  watch(() => [options.getStory()?.id, options.mode === 'single' ? options.getCurrentVariant()?.id : null], () => {
+    frameDocumentId.value = `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`
+  }, { flush: 'sync' })
 
   const sandboxUrl = computed(() => {
     const story = options.getStory()
@@ -178,7 +188,9 @@ export function usePreviewIframeHost(options: PreviewIframeHostOptions) {
 
     // The grid document holds every variant at once; single mode pins the URL to
     // the selected variant so switching variants loads a fresh document.
-    return options.mode === 'grid' ? getSandboxUrl(story) : getSandboxUrl(story, options.getCurrentVariant() ?? undefined)
+    const url = new URL(options.mode === 'grid' ? getSandboxUrl(story) : getSandboxUrl(story, options.getCurrentVariant() ?? undefined), window.location.href)
+    url.searchParams.set('documentId', frameDocumentId.value)
+    return url.href
   })
 
   watch(sandboxUrl, () => {
@@ -237,6 +249,9 @@ export function usePreviewIframeHost(options: PreviewIframeHostOptions) {
         return
       }
 
+      // Same physical document, new story generation: pending test replies
+      // belong to its predecessor even while stateful in-place HMR is retained.
+      previewRuntimeStore.notifyFrameNavigating()
       syncPreview()
     }
     import.meta.hot.on(STORY_CHANGED_EVENT, onStoryChanged)
@@ -246,7 +261,7 @@ export function usePreviewIframeHost(options: PreviewIframeHostOptions) {
   }
 
   onMounted(() => {
-    previewRuntimeStore.setFrame(options.mode, iframe.value ?? null)
+    previewRuntimeStore.setFrame(options.mode, iframe.value ?? null, frameDocumentId.value)
   })
 
   onBeforeUnmount(() => {
@@ -255,7 +270,7 @@ export function usePreviewIframeHost(options: PreviewIframeHostOptions) {
 
   /** `@load` handler of the hosted iframe: the new document is now live. */
   function onIframeLoad() {
-    previewRuntimeStore.setFrame(options.mode, iframe.value ?? null)
+    previewRuntimeStore.setFrame(options.mode, iframe.value ?? null, frameDocumentId.value)
     isIframeLoaded.value = true
     syncPreview()
     syncSettings()

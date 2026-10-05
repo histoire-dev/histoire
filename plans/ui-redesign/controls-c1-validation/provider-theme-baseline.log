@@ -1,0 +1,62 @@
+
+ RUN  v4.1.10 /home/akryum/Projects/histoire/packages/histoire-vue
+
+ ❯ src/__tests__/provider-theme.spec.ts (3 tests | 3 failed) 6ms
+   × leaves C1 semantic defaults intact for resolved source palette (dark: false) 4ms
+   × leaves C1 semantic defaults intact for resolved source palette (dark: true) 1ms
+   × maps only customized semantic shades with shared workbench roles and alpha 1ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/__tests__/provider-theme.spec.ts > leaves C1 semantic defaults intact for resolved source palette (dark: false)
+ FAIL  src/__tests__/provider-theme.spec.ts > leaves C1 semantic defaults intact for resolved source palette (dark: true)
+AssertionError: expected [ '--histoire-background', …(5) ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   "--histoire-background",
++   "--histoire-foreground",
++   "--histoire-muted",
++   "--histoire-border",
++   "--histoire-panel",
++   "--histoire-accent",
++ ]
+
+ ❯ src/__tests__/provider-theme.spec.ts:13:81
+     11| it.each([false, true])('leaves C1 semantic defaults intact for resolve…
+     12|   const variables = getHistoireThemeVariables(config({ gray: defaultCo…
+     13|   expect(Object.keys(variables).filter(name => name.startsWith('--hist…
+       |                                                                                 ^
+     14|   expect(variables['--_histoire-color-primary-500']).toBe('16 185 129')
+     15| })
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+ FAIL  src/__tests__/provider-theme.spec.ts > maps only customized semantic shades with shared workbench roles and alpha
+AssertionError: expected undefined to be 'var(--_histoire-color-primary-500)' // Object.is equality
+
+- Expected:
+"var(--_histoire-color-primary-500)"
+
++ Received:
+undefined
+
+ ❯ src/__tests__/provider-theme.spec.ts:21:42
+     19|   const light = getHistoireThemeVariables(source, false)
+     20|   const dark = getHistoireThemeVariables(source, true)
+     21|   expect(light['--histoire-accent-rgb']).toBe('var(--_histoire-color-p…
+       |                                          ^
+     22|   expect(dark['--histoire-accent-rgb']).toBe('var(--_histoire-color-pr…
+     23|   expect(dark['--_histoire-color-primary-400-alpha']).toBe('0.50196078…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  3 failed (3)
+   Start at  20:54:55
+   Duration  494ms (transform 78ms, setup 0ms, import 106ms, tests 6ms, environment 297ms)
+

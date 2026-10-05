@@ -1,0 +1,91 @@
+Failed to resolve dependency: flexsearch, present in client 'optimizeDeps.include'
+Failed to resolve dependency: shiki, present in client 'optimizeDeps.include'
+Failed to resolve dependency: vscode-oniguruma, present in client 'optimizeDeps.include'
+Failed to resolve dependency: vscode-textmate, present in client 'optimizeDeps.include'
+Using 16 threads for story collection
+Collect stories start all
+responseMode: 'json' drops mid-call notifications. subscriptions/listen streams are always served over SSE regardless; other notifications emitted before a result are dropped.
+src/MarkdownFile.story.js 75ms (setup:44ms, execute:4ms, run:22ms)
+src/LongFile2.story.js 99ms (setup:34ms, execute:10ms, run:4ms)
+src/LongFile1.story.js 102ms (setup:35ms, execute:7ms, run:4ms)
+[Vue warn]: Extraneous non-props attributes (data) were passed to component but could not be automatically inherited because component renders fragment or text or teleport root nodes. 
+  at <Empty.story ref="comp" data= {
+  id: 'src-components-empty-story-vue',
+  path: '/home/akryum/Projects/histoire/examples/vue3/src/components/Empty.story.vue',
+  relativePath: 'src/components/Empty.story.vue',
+  fileName: 'Empty',
+  moduleId: '/home/akryum/Projects/histoire/examples/vue3/src/components/Empty.story.vue',
+  supportPluginId: 'vue3',
+  virtual: false,
+  moduleCode: undefined
+} > 
+  at <App>
+src/components/HandWrittenSource.story.vue 439ms (setup:8ms, execute:0ms, run:431ms)
+src/components/ContrastColor.story.vue 538ms (setup:33ms, execute:7ms, run:498ms)
+src/components/Controls.story.vue 529ms (setup:30ms, execute:5ms, run:494ms)
+src/components/ControlsOverlays.story.vue 520ms (setup:31ms, execute:6ms, run:483ms)
+src/components/DarkMode.story.vue 521ms (setup:29ms, execute:3ms, run:489ms)
+src/components/DetectedStatePane.story.vue 512ms (setup:34ms, execute:3ms, run:475ms)
+src/components/Empty.story.vue 535ms (setup:33ms, execute:7ms, run:495ms)
+⚠️  No story found for /home/akryum/Projects/histoire/examples/vue3/src/components/Empty.story.vue
+src/components/AutoStateProps.story.vue 553ms (setup:30ms, execute:6ms, run:517ms)
+src/components/BaseButton.story.vue 565ms (setup:33ms, execute:3ms, run:529ms)
+src/components/ColorButton.story.vue 611ms (setup:40ms, execute:6ms, run:565ms)
+src/components/ComplexParameter.story.vue 574ms (setup:35ms, execute:5ms, run:534ms)
+src/components/Meow.story.vue 25ms (setup:5ms, execute:0ms, run:17ms)
+src/components/Docs.story.vue 565ms (setup:30ms, execute:6ms, run:528ms)
+src/components/Demo.story.vue 581ms (setup:31ms, execute:5ms, run:545ms)
+src/components/NoVariantTag.story.vue 31ms (setup:6ms, execute:0ms, run:25ms)
+src/components/CodeGen.story.vue 654ms (setup:42ms, execute:19ms, run:593ms)
+src/components/Introduction.story.vue 49ms (setup:5ms, execute:0ms, run:43ms)
+src/components/MarkdownLinks.story.vue 49ms (setup:5ms, execute:0ms, run:44ms)
+src/components/Serialize.story.vue 39ms (setup:8ms, execute:0ms, run:31ms)
+src/components/StateOption.story.vue 37ms (setup:6ms, execute:0ms, run:31ms)
+src/components/StoryScopedCss.story.vue 40ms (setup:6ms, execute:0ms, run:34ms)
+src/components/SharedControls.story.vue 50ms (setup:6ms, execute:0ms, run:43ms)
+src/components/State.story.vue 51ms (setup:6ms, execute:0ms, run:44ms)
+src/components/StateSetup2.story.vue 49ms (setup:6ms, execute:0ms, run:43ms)
+src/components/StateSetup.story.vue 57ms (setup:6ms, execute:0ms, run:51ms)
+src/components/SubStory.story.vue 24ms (setup:5ms, execute:0ms, run:19ms)
+src/components/Responsive.story.vue 70ms (setup:6ms, execute:0ms, run:64ms)
+src/components/PiniaStore.story.vue 102ms (setup:7ms, execute:0ms, run:95ms)
+src/components/SubStory2.story.vue 23ms (setup:6ms, execute:0ms, run:18ms)
+src/components/HugeGrid.story.vue 110ms (setup:6ms, execute:0ms, run:104ms)
+src/components/StorySetup.story.vue 65ms (setup:5ms, execute:0ms, run:60ms)
+src/components/WrapperMetaOnStory.story.vue 23ms (setup:6ms, execute:0ms, run:17ms)
+src/components/WrapperMetaOnVariant.story.vue 26ms (setup:5ms, execute:0ms, run:22ms)
+src/components/StyleIsolation.story.vue 52ms (setup:5ms, execute:0ms, run:46ms)
+src/components/WorkbenchMatrix.story.vue 183ms (setup:6ms, execute:0ms, run:177ms)
+src/components/WithSass.story.vue 185ms (setup:6ms, execute:0ms, run:178ms)
+src/components/NestedStories/NestedButton.story.vue 173ms (setup:6ms, execute:0ms, run:166ms)
+src/components/LottieAnimation.story.vue 496ms (setup:7ms, execute:0ms, run:489ms)
+src/components/VitestLifecycle.story.vue 417ms (setup:5ms, execute:0ms, run:412ms)
+src/components/VitestMocking.story.vue 417ms (setup:6ms, execute:0ms, run:411ms)
+src/components/EventButton.story.vue 1009ms (setup:7ms, execute:0ms, run:1002ms)
+src/components/EventButtonGrid.story.vue 963ms (setup:9ms, execute:0ms, run:954ms)
+Collect stories end 1460ms
+  ➜  Local:   http://localhost:6011/
+  ➜  Network: http://192.168.1.14:6011/
+  ➜  Network: http://172.30.0.1:6011/
+  ➜  Network: http://172.25.0.1:6011/
+  ➜  Network: http://172.24.0.1:6011/
+  ➜  Network: http://172.23.0.1:6011/
+  ➜  Network: http://172.18.0.1:6011/
+  ➜  Network: http://172.20.0.1:6011/
+  ➜  Network: http://172.22.0.1:6011/
+  ➜  Network: http://172.19.0.1:6011/
+  ➜  Network: http://192.168.16.1:6011/
+  MCP: http://127.0.0.1:6007/mcp
+11:09:55 PM [vite] (client) ✨ new dependencies optimized: msw/browser, msw/core/http
+11:09:55 PM [vite] (client) ✨ optimized dependencies changed. reloading
+11:09:56 PM [vite] (client) ✨ new dependencies optimized: change-case
+11:09:56 PM [vite] (client) ✨ optimized dependencies changed. reloading
+(node:3933839) MaxListenersExceededWarning: Possible EventEmitter memory leak detected. 17 unpipe listeners added to [SyncWriteStream]. MaxListeners is 10. Use emitter.setMaxListeners() to increase limit
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:3933839) MaxListenersExceededWarning: Possible EventEmitter memory leak detected. 17 error listeners added to [SyncWriteStream]. MaxListeners is 10. Use emitter.setMaxListeners() to increase limit
+(node:3933839) MaxListenersExceededWarning: Possible EventEmitter memory leak detected. 17 close listeners added to [SyncWriteStream]. MaxListeners is 10. Use emitter.setMaxListeners() to increase limit
+(node:3933839) MaxListenersExceededWarning: Possible EventEmitter memory leak detected. 17 finish listeners added to [SyncWriteStream]. MaxListeners is 10. Use emitter.setMaxListeners() to increase limit
+11:09:59 PM [vite] (client) ✨ new dependencies optimized: vue
+11:09:59 PM [vite] (client) ✨ optimized dependencies changed. reloading
+11:10:02 PM [vite] (client) ✨ new dependencies optimized: pinia
+11:10:02 PM [vite] (client) ✨ optimized dependencies changed. reloading

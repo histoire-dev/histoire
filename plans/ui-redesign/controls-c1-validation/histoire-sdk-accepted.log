@@ -1,0 +1,9 @@
+
+ RUN  v4.1.10 /home/akryum/Projects/histoire/packages/histoire-sdk
+
+
+ Test Files  27 passed (27)
+      Tests  133 passed (133)
+   Start at  19:22:38
+   Duration  926ms (transform 8.20s, setup 0ms, import 14.37s, tests 1.18s, environment 3ms)
+

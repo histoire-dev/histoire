@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import type { Story, Variant } from '../../types'
+import { getControlElement, HstText } from '@histoire/controls/vue'
 import { applyState, clone, omit } from '@histoire/shared'
 import { Icon } from '@iconify/vue'
 import { onClickOutside, useStorage, useTimeoutFn } from '@vueuse/core'
@@ -132,14 +133,15 @@ onClickOutside(select, stopEditing)
         @select="id => applyPreset(id)"
       >
         <template #default="{ label }">
-          <input
+          <HstText
             v-if="isEditing"
-            ref="input"
+            :ref="value => { input = getControlElement(value) as HTMLInputElement }"
             v-model="presetStates.get(selectedOption).label"
+            layout="inline"
             type="text"
-            class="htw-text-inherit htw-bg-transparent htw-w-full htw-h-full htw-outline-none"
+            class="htw-w-full htw-h-full"
             @click.stop.prevent
-          >
+          />
 
           <div
             v-else

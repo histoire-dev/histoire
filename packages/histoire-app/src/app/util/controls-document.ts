@@ -2,7 +2,7 @@ import type { HistoireControlsAppearance } from '@histoire/shared'
 import { CONTROLS_APPEARANCE } from '@histoire/shared'
 
 /** Installs panel appearance before custom controls are mounted. */
-export function setupControlsDocument(host: Window, onDark: (dark: boolean) => void) {
+export function setupControlsDocument(host: Window, onDark: (dark: boolean) => void, documentId?: string) {
   document.documentElement.dataset.histoireControls = ''
 
   /** Accepts explicit theme updates only from the embedding Histoire host. */
@@ -11,6 +11,7 @@ export function setupControlsDocument(host: Window, onDark: (dark: boolean) => v
       || !event.data?.__histoire || event.data.type !== CONTROLS_APPEARANCE) {
       return
     }
+    if (documentId && event.data.documentId !== undefined && event.data.documentId !== documentId) return
     const appearance = event.data.appearance as HistoireControlsAppearance
     for (const [name, value] of Object.entries(appearance.properties)) {
       // Priority also beats globally imported story theme variables.

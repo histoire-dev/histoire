@@ -1,0 +1,185 @@
+
+ RUN  v4.1.10 /home/akryum/Projects/histoire/packages/histoire
+
+Book.story.vue 272ms (setup:36ms, execute:21ms, run:212ms)
+.histoire/tmp/dev/run-muubqein-61ef5256/plugins/owned-output.d4b39a97/Generated.story.js 12ms (setup:6ms, execute:0ms, run:7ms)
+Book.story.vue 390ms (setup:31ms, execute:246ms, run:111ms)
+Book.story.vue 385ms (setup:26ms, execute:224ms, run:132ms)
+.histoire/tmp/dev/run-muubqeia-c35d653a/plugins/owned-output.d4b39a97/Generated.story.js 36ms (setup:7ms, execute:0ms, run:29ms)
+.histoire/tmp/dev/run-muubqefq-0934d9d3/plugins/owned-output.d4b39a97/Generated.story.js 45ms (setup:7ms, execute:0ms, run:38ms)
+Book.story.vue 41ms (setup:7ms, execute:23ms, run:10ms)
+Book.story.vue 39ms (setup:17ms, execute:7ms, run:13ms)
+Book.story.vue 181ms (setup:29ms, execute:45ms, run:104ms)
+.histoire/tmp/dev/run-muubqnre-afca10b0/plugins/owned-output.d4b39a97/Generated.story.js 9ms (setup:5ms, execute:0ms, run:4ms)
+Book.story.vue 126ms (setup:26ms, execute:13ms, run:85ms)
+.histoire/tmp/dev/run-muubqylv-a0be3497/plugins/owned-output.d4b39a97/Generated.story.js 9ms (setup:5ms, execute:0ms, run:4ms)
+Book.story.vue 73ms (setup:26ms, execute:5ms, run:39ms)
+Book.story.vue 153ms (setup:38ms, execute:19ms, run:94ms)
+Book.story.vue 128ms (setup:33ms, execute:12ms, run:81ms)
+.histoire/tmp/dev/run-muubqvtq-5169885b/plugins/owned-output.d4b39a97/Generated.story.js 15ms (setup:6ms, execute:0ms, run:9ms)
+.histoire/tmp/dev/run-muubqvtx-8e08fa07/plugins/owned-output.d4b39a97/Generated.story.js 19ms (setup:7ms, execute:0ms, run:12ms)
+useNuxtApp {
+  _id: 'histoire-preview-1',
+  _scope: EffectScope {
+    detached: false,
+    _active: true,
+    _on: 0,
+    effects: [],
+    cleanups: [],
+    _isPaused: false,
+    parent: undefined
+  },
+  provide: [Function (anonymous)],
+  versions: { nuxt: [Getter], vue: [Getter] },
+  payload: {
+    data: {},
+    state: {},
+    once: Set(0) {},
+    _errors: {},
+    serverRendered: false,
+    config: { public: [Object], app: [Object] },
+    error: undefined
+  },
+  static: { data: {} },
+  runWithContext: [Function (anonymous)],
+  isHydrating: false,
+  deferHydration: [Function: deferHydration],
+  _asyncDataPromises: {},
+  _asyncData: {},
+  _payloadRevivers: {
+    NuxtError: [Function (anonymous)],
+    EmptyShallowRef: [Function (anonymous)],
+    EmptyRef: [Function (anonymous)],
+    ShallowRef: [Function (anonymous)],
+    ShallowReactive: [Function (anonymous)],
+    Ref: [Function (anonymous)],
+    Reactive: [Function (anonymous)],
+    Island: [Function (anonymous)]
+  },
+  vueApp: <ref *1> {
+    _uid: 0,
+    _component: { provide: [Object], render: [Function: render] },
+    _props: null,
+    _container: null,
+    _context: {
+      app: [Circular *1],
+      config: [Object],
+      mixins: [],
+      components: [Object],
+      directives: {},
+      provides: [Object: null prototype],
+      optionsCache: [WeakMap],
+      propsCache: [WeakMap],
+      emitsCache: [WeakMap],
+      reload: [Function (anonymous)]
+    },
+    _instance: null,
+    version: '3.5.26',
+    config: [Getter/Setter],
+    use: [Function: use],
+    mixin: [Function: mixin],
+    component: [Function: component],
+    directive: [Function: directive],
+    mount: [Function (anonymous)],
+    onUnmount: [Function: onUnmount],
+    unmount: [Function: unmount],
+    provide: [Function: provide],
+    runWithContext: [Function: runWithContext],
+    __HST_NUXT_SETUP_CONTEXT__: [Function (anonymous)],
+    __HST_NUXT_CLEANUP__: [Function: cleanup],
+    __HST_NUXT_LIFECYCLE__: [AsyncFunction (anonymous)]
+  },
+  id: 'histoire-preview-1',
+  hooks: Hookable {
+    _hooks: {
+      'app:error': [Array],
+      'app:mounted': [Array],
+      'page:start': [Array],
+      'page:finish': [Array],
+      'app:suspense:resolve': [Array],
+      'app:chunkError': [Array],
+      'app:manifest:update': [Array]
+    },
+    _before: [ [Function (anonymous)] ],
+    _after: [ [Function (anonymous)] ],
+    _deprecatedMessages: undefined,
+    _deprecatedHooks: {},
+    hook: [Function: bound hook],
+    callHook: [Function: bound callHook],
+    callHookWith: [Function: bound callHookWith]
+  },
+  hook: [Function: bound hook],
+  callHook: [Function: bound callHook],
+  _route: {
+    path: '/',
+    fullPath: '/',
+    query: [Object: null prototype] {},
+    hash: '',
+    params: {},
+    name: undefined,
+    matched: [],
+    redirectedFrom: undefined,
+    meta: {},
+    href: '/'
+  },
+  _middleware: { global: [], named: {} }
+}
+[nuxt] Could not access `toJSON`. The only available runtime config keys on the client side are `public` and `app`. See https://nuxt.com/docs/4.x/guide/going-further/runtime-config for more information.
+useNuxtApp().$config {
+  public: { configFromNuxt: 'test' },
+  app: {
+    baseURL: '/book/',
+    rootId: 'nuxt-test',
+    buildAssetsDir: '/_nuxt/',
+    cdnURL: '',
+    head: { meta: [Array], link: [], style: [], script: [], noscript: [] },
+    layoutTransition: false,
+    pageTransition: false,
+    viewTransition: false,
+    keepalive: false,
+    rootTag: 'div',
+    rootAttrs: { id: 'nuxt-test' },
+    teleportTag: 'div',
+    teleportId: 'teleports',
+    teleportAttrs: { id: 'teleports' },
+    spaLoaderTag: 'div',
+    spaLoaderAttrs: { id: '__nuxt-loader' }
+  }
+}
+useRuntimeConfig {
+  public: { configFromNuxt: 'test' },
+  app: {
+    baseURL: '/book/',
+    rootId: 'nuxt-test',
+    buildAssetsDir: '/_nuxt/',
+    cdnURL: '',
+    head: { meta: [Array], link: [], style: [], script: [], noscript: [] },
+    layoutTransition: false,
+    pageTransition: false,
+    viewTransition: false,
+    keepalive: false,
+    rootTag: 'div',
+    rootAttrs: { id: 'nuxt-test' },
+    teleportTag: 'div',
+    teleportId: 'teleports',
+    teleportAttrs: { id: 'teleports' },
+    spaLoaderTag: 'div',
+    spaLoaderAttrs: { id: '__nuxt-loader' }
+  }
+}
+app/components/AutoImport.story.vue 844ms (setup:26ms, execute:226ms, run:592ms)
+app/components/BaseButtonLink.story.vue 158ms (setup:9ms, execute:0ms, run:149ms)
+app/components/BaseButton.story.vue 47ms (setup:6ms, execute:0ms, run:41ms)
+app/components/Simple.story.vue 10ms (setup:4ms, execute:0ms, run:6ms)
+Book.story.vue 199ms (setup:34ms, execute:58ms, run:105ms)
+.histoire/tmp/dev/run-muubrbpb-ef76dbf1/plugins/owned-output.d4b39a97/Generated.story.js 9ms (setup:6ms, execute:0ms, run:3ms)
+Book.story.vue 210ms (setup:33ms, execute:47ms, run:127ms)
+.histoire/tmp/dev/run-muubrkju-a4fef620/plugins/owned-output.d4b39a97/Generated.story.js 10ms (setup:7ms, execute:0ms, run:3ms)
+(node:4103352) [DEP0187] DeprecationWarning: Passing invalid argument types to fs.existsSync is deprecated
+(Use `node --trace-deprecation ...` to show where the warning was created)
+
+ Test Files  267 passed (267)
+      Tests  1330 passed (1330)
+   Start at  23:19:32
+   Duration  80.99s (transform 6.25s, setup 0ms, import 28.11s, tests 271.89s, environment 3.31s)
+

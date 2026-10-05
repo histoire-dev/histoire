@@ -42,6 +42,10 @@ module.exports = {
                 link: '/guide/vue3/getting-started',
               },
               {
+                text: 'React',
+                link: '/guide/react/getting-started',
+              },
+              {
                 text: 'Svelte 3',
                 link: '/guide/svelte3/getting-started',
               },
@@ -67,6 +71,7 @@ module.exports = {
                 link: '/guide/testing',
               },
               { text: 'MCP server', link: '/guide/mcp' },
+              { text: 'Embedding and SDK', link: '/guide/embedding' },
               { text: 'Deploy to Node.js', link: '/guide/deploy-node' },
               {
                 text: 'Plugins',
@@ -109,6 +114,15 @@ module.exports = {
     ],
 
     sidebar: {
+      '/guide/react/': [{
+        text: 'Guide - React',
+        items: [
+          { text: 'Getting Started', link: '/guide/react/getting-started' },
+          { text: 'Stories', link: '/guide/react/stories' },
+          { text: 'State & Controls', link: '/guide/react/controls' },
+          { text: 'Hierarchy', link: '/guide/react/hierarchy' },
+        ],
+      }],
       '/reference/': [
         {
           text: 'API Reference',
@@ -117,11 +131,14 @@ module.exports = {
               text: 'Configuration reference',
               link: '/reference/config',
             },
+            { text: 'Config codemod', link: '/reference/config-codemod' },
             {
               text: 'Client API',
               link: '/reference/client',
             },
             { text: 'MCP reference', link: '/reference/mcp' },
+            { text: 'Browser and Vue SDK', link: '/reference/sdk' },
+            { text: 'Node SDK', link: '/reference/node-sdk' },
             {
               text: 'Plugin API',
               link: '/reference/plugin-api',
@@ -286,7 +303,21 @@ module.exports = {
               link: '/guide/testing',
             },
             { text: 'MCP server', link: '/guide/mcp' },
+            { text: 'Embedding and SDK', link: '/guide/embedding' },
             { text: 'Deploy to Node.js', link: '/guide/deploy-node' },
+          ],
+        },
+        {
+          text: 'Workbench',
+          items: [
+            { text: 'Shell and navigation', link: '/guide/ui-shell' },
+            { text: 'Stories, search, tests and home', link: '/guide/ui-navigation' },
+            { text: 'Inspector', link: '/guide/ui-inspector' },
+            { text: 'Props matrix', link: '/guide/ui-matrix' },
+            { text: 'Settings and project saves', link: '/guide/ui-settings' },
+            { text: 'Screenshots and MCP activity', link: '/guide/ui-screenshots-mcp' },
+            { text: 'ACP agents', link: '/guide/ui-agents' },
+            { text: 'Comments for AI', link: '/guide/ui-comments' },
           ],
         },
         {

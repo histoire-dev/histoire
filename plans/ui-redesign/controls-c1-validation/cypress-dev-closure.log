@@ -1,0 +1,161 @@
+
+DevTools listening on ws://127.0.0.1:36315/devtools/browser/3510117e-f241-409d-92e5-a08a764221eb
+(node:1441933) ExperimentalWarning: `--experimental-loader` may be removed in the future; instead use `register()`:
+--import 'data:text/javascript,import { register } from "node:module"; import { pathToFileURL } from "node:url"; register("file%3A///home/akryum/.cache/Cypress/13.17.0/Cypress/resources/app/node_modules/ts-node/esm/transpile-only.mjs", pathToFileURL("./"));'
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:1441933) [DEP0180] DeprecationWarning: fs.Stats constructor is deprecated.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+
+================================================================================
+
+  (Run Starting)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Cypress:        13.17.0                                                                        │
+  │ Browser:        Electron 118 (headless)                                                        │
+  │ Node Version:   v24.16.0 (/home/akryum/.local/share/mise/installs/node/24.16.0/bin/node)       │
+  │ Specs:          3 found (controls-appearance.cy.js, controls-c1.cy.js, ui-workbench.cy.js)     │
+  │ Searched:       cypress/e2e/controls-appearance.cy.js, cypress/e2e/controls-c1.cy.js, cypress/ │
+  │                 e2e/ui-workbench.cy.js                                                         │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+                                                                                                    
+  Running:  controls-appearance.cy.js                                                       (1 of 3)
+
+
+  Live controls appearance
+    ✓ updates shared palette in current controls document in both directions (21087ms)
+
+
+  1 passing (21s)
+
+
+  (Results)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Tests:        1                                                                                │
+  │ Passing:      1                                                                                │
+  │ Failing:      0                                                                                │
+  │ Pending:      0                                                                                │
+  │ Skipped:      0                                                                                │
+  │ Screenshots:  0                                                                                │
+  │ Video:        false                                                                            │
+  │ Duration:     21 seconds                                                                       │
+  │ Spec Ran:     controls-appearance.cy.js                                                        │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+                                                                                                    
+  Running:  controls-c1.cy.js                                                               (2 of 3)
+
+
+  C1 shared controls acceptance
+    ✓ Light Comfortable reaches native and sandbox controls (65981ms)
+Warning: terminator_CreateInstance: Failed to CreateInstance in ICD 2.  Skipping ICD.
+    1) Light Compact reaches native and sandbox controls
+    2) Dark Comfortable reaches native and sandbox controls
+    3) Dark Compact reaches native and sandbox controls
+    4) keeps narrow inspector and long menu usable
+
+
+  1 passing (6m)
+  4 failing
+
+  1) C1 shared controls acceptance
+       Light Compact reaches native and sandbox controls:
+     AssertionError: Timed out retrying after 20000ms: expected '\n  \n  \n  (() => {\n    const runner = globalThis.__vitest_browser_runner__ ?? {}\n    if (typeof runner.wrapDynamicImport !== \'function\') {\n      runner.wrapDynamicImport = loader => loader()\n    }\n    globalThis.__vitest_browser_runner__ = runner\n  })()\n  \n  \n  // Hide spammy vite messages\n  const origConsoleLog = console.log\n  console.log = (...args) => {\n    if (typeof args[0] !== \'string\' || !args[0].startsWith(\'[vite] connect\')) {\n      origConsoleLog(...args)\n    }\n  }\n  \n  \n\n' to include 'Matrix message'
+      at Context.eval (webpack://histoire-example-vue3/./cypress/e2e/controls-c1.cy.js:30:90)
+
+  2) C1 shared controls acceptance
+       Dark Comfortable reaches native and sandbox controls:
+     AssertionError: Timed out retrying after 20000ms: expected '\n  \n  \n  (() => {\n    const runner = globalThis.__vitest_browser_runner__ ?? {}\n    if (typeof runner.wrapDynamicImport !== \'function\') {\n      runner.wrapDynamicImport = loader => loader()\n    }\n    globalThis.__vitest_browser_runner__ = runner\n  })()\n  \n  \n  // Hide spammy vite messages\n  const origConsoleLog = console.log\n  console.log = (...args) => {\n    if (typeof args[0] !== \'string\' || !args[0].startsWith(\'[vite] connect\')) {\n      origConsoleLog(...args)\n    }\n  }\n  \n  \n\n' to include 'Matrix message'
+      at Context.eval (webpack://histoire-example-vue3/./cypress/e2e/controls-c1.cy.js:30:90)
+
+  3) C1 shared controls acceptance
+       Dark Compact reaches native and sandbox controls:
+     AssertionError: Timed out retrying after 20000ms: expected '\n  \n  \n  (() => {\n    const runner = globalThis.__vitest_browser_runner__ ?? {}\n    if (typeof runner.wrapDynamicImport !== \'function\') {\n      runner.wrapDynamicImport = loader => loader()\n    }\n    globalThis.__vitest_browser_runner__ = runner\n  })()\n  \n  \n  // Hide spammy vite messages\n  const origConsoleLog = console.log\n  console.log = (...args) => {\n    if (typeof args[0] !== \'string\' || !args[0].startsWith(\'[vite] connect\')) {\n      origConsoleLog(...args)\n    }\n  }\n  \n  \n\n' to include 'Matrix message'
+      at Context.eval (webpack://histoire-example-vue3/./cypress/e2e/controls-c1.cy.js:30:90)
+
+  4) C1 shared controls acceptance
+       keeps narrow inspector and long menu usable:
+     AssertionError: Timed out retrying after 20000ms: expected '<iframe>' to be 'visible'
+
+This element `<iframe>` is not visible because its parent `<div.histoire-custom-controls>` has CSS property: `opacity: 0`
+      at Context.eval (webpack://histoire-example-vue3/../cypress/frame-commands.js:22:3)
+
+
+
+
+  (Results)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Tests:        5                                                                                │
+  │ Passing:      1                                                                                │
+  │ Failing:      4                                                                                │
+  │ Pending:      0                                                                                │
+  │ Skipped:      0                                                                                │
+  │ Screenshots:  20                                                                               │
+  │ Video:        false                                                                            │
+  │ Duration:     6 minutes, 12 seconds                                                            │
+  │ Spec Ran:     controls-c1.cy.js                                                                │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+  (Screenshots)
+
+  -  /home/akryum/Projects/histoire/examples/vue3/cypress/screenshots/controls-c1.cy.    (1600x1000)
+     js/c1-light-comfortable-settings.png                                                           
+  -  /home/akryum/Projects/histoire/examples/vue3/cypress/screenshots/controls-c1.cy.    (1600x1000)
+     js/c1-light-comfortable-agent-settings.png                                                     
+  -  /home/akryum/Projects/histoire/examples/vue3/cypress/screenshots/controls-c1.cy.    (1600x1000)
+     js/c1-light-comfortable-native.png                                                             
+  -  /home/akryum/Projects/histoire/examples/vue3/cypress/screenshots/controls-c1.cy.    (1600x1000)
+     js/c1-light-comfortable-matrix.png                                                             
+  -  /home/akryum/Projects/histoire/examples/vue3/cypress/screenshots/controls-c1.cy.    (1600x1000)
+     js/c1-light-comfortable-iframe-menu.png                                                        
+  -  /home/akryum/Projects/histoire/examples/vue3/cypress/screenshots/controls-c1.cy.    (1600x1000)
+     js/c1-light-comfortable-toolbar.png                                                            
+  -  /home/akryum/Projects/histoire/examples/vue3/cypress/screenshots/controls-c1.cy.    (1600x1000)
+     js/c1-light-comfortable-comments.png                                                           
+  -  /home/akryum/Projects/histoire/examples/vue3/cypress/screenshots/controls-c1.cy.    (1600x1000)
+     js/c1-light-compact-settings.png                                                               
+  -  /home/akryum/Projects/histoire/examples/vue3/cypress/screenshots/controls-c1.cy.    (1600x1000)
+     js/c1-light-compact-agent-settings.png                                                         
+  -  /home/akryum/Projects/histoire/examples/vue3/cypress/screenshots/controls-c1.cy.    (1600x1000)
+     js/c1-light-compact-native.png                                                                 
+  -  /home/akryum/Projects/histoire/examples/vue3/cypress/screenshots/controls-c1.cy.    (1800x1200)
+     js/C1 shared controls acceptance -- Light Compact reaches native and sandbox con               
+     trols (failed).png                                                                             
+  -  /home/akryum/Projects/histoire/examples/vue3/cypress/screenshots/controls-c1.cy.    (1600x1000)
+     js/c1-dark-comfortable-settings.png                                                            
+  -  /home/akryum/Projects/histoire/examples/vue3/cypress/screenshots/controls-c1.cy.    (1600x1000)
+     js/c1-dark-comfortable-agent-settings.png                                                      
+  -  /home/akryum/Projects/histoire/examples/vue3/cypress/screenshots/controls-c1.cy.    (1600x1000)
+     js/c1-dark-comfortable-native.png                                                              
+  -  /home/akryum/Projects/histoire/examples/vue3/cypress/screenshots/controls-c1.cy.    (1800x1200)
+     js/C1 shared controls acceptance -- Dark Comfortable reaches native and sandbox                
+     controls (failed).png                                                                          
+  -  /home/akryum/Projects/histoire/examples/vue3/cypress/screenshots/controls-c1.cy.    (1600x1000)
+     js/c1-dark-compact-settings.png                                                                
+  -  /home/akryum/Projects/histoire/examples/vue3/cypress/screenshots/controls-c1.cy.    (1600x1000)
+     js/c1-dark-compact-agent-settings.png                                                          
+  -  /home/akryum/Projects/histoire/examples/vue3/cypress/screenshots/controls-c1.cy.    (1600x1000)
+     js/c1-dark-compact-native.png                                                                  
+  -  /home/akryum/Projects/histoire/examples/vue3/cypress/screenshots/controls-c1.cy.    (1800x1200)
+     js/C1 shared controls acceptance -- Dark Compact reaches native and sandbox cont               
+     rols (failed).png                                                                              
+  -  /home/akryum/Projects/histoire/examples/vue3/cypress/screenshots/controls-c1.cy.    (1800x1200)
+     js/C1 shared controls acceptance -- keeps narrow inspector and long menu usable                
+     (failed).png                                                                                   
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+                                                                                                    
+  Running:  ui-workbench.cy.js                                                              (3 of 3)
+
+
+  Workbench contracts
+    1) persists selected pane, panel visibility, and inspector visibility

@@ -2,12 +2,13 @@
 import type { Highlighter } from 'shiki'
 import type { Story, Variant } from '../../types'
 import { HstCopyIcon } from '@histoire/controls'
-import { unindent } from '@histoire/shared'
+import { getControlElement, HstButton, HstTextarea } from '@histoire/controls/vue'
 import { Icon } from '@iconify/vue'
 import { createHighlighter } from 'shiki'
 import { clientSupportPlugins } from 'virtual:$histoire-support-plugins-client'
-import { computed, markRaw, nextTick, onMounted, ref, shallowRef, watch, watchEffect } from 'vue'
+import { computed, nextTick, onMounted, ref, shallowRef, watch } from 'vue'
 import { isDark } from '../../util/dark'
+import { useDynamicSourcePanel } from '../../util/dynamic-source-panel'
 import BaseEmpty from '../base/BaseEmpty.vue'
 
 const props = defineProps<{
@@ -15,52 +16,11 @@ const props = defineProps<{
   variant: Variant
 }>()
 
-const generateSourceCodeFn = ref(null)
-
-watchEffect(async () => {
-  const clientPlugin = clientSupportPlugins[props.story.file?.supportPluginId]
-  if (clientPlugin) {
-    const pluginModule = await clientPlugin()
-    generateSourceCodeFn.value = markRaw(pluginModule.generateSourceCode)
-  }
-})
-
 const highlighter = shallowRef<Highlighter>()
-
-const dynamicSourceCode = ref('')
-const error = ref<string>(null)
-
-watch(() => [props.variant, generateSourceCodeFn.value], async () => {
-  if (!generateSourceCodeFn.value) return
-  error.value = null
-  dynamicSourceCode.value = ''
-  try {
-    if (props.variant.source) {
-      dynamicSourceCode.value = props.variant.source
-    }
-    else if (props.variant.slots?.().source) {
-      const source = props.variant.slots?.().source()[0].children
-      if (source) {
-        dynamicSourceCode.value = await unindent(source)
-      }
-    }
-    else {
-      dynamicSourceCode.value = await generateSourceCodeFn.value(props.variant)
-    }
-  }
-  catch (e) {
-    console.error(e)
-    error.value = e.message
-  }
-
-  // Auto-switch
-  if (!dynamicSourceCode.value) {
-    displayedSource.value = 'static'
-  }
-}, {
-  deep: true,
-  immediate: true,
-})
+const { dynamicSourceCode, error, displayedSource } = useDynamicSourcePanel(
+  () => props.variant,
+  () => clientSupportPlugins[props.story.file?.supportPluginId],
+)
 
 // Static file source
 
@@ -74,8 +34,6 @@ watch(() => [props.story, props.story?.file?.source], async () => {
 }, {
   immediate: true,
 })
-
-const displayedSource = ref<'dynamic' | 'static'>('dynamic')
 
 const displayedSourceCode = computed(() => {
   if (displayedSource.value === 'dynamic') {
@@ -147,8 +105,9 @@ watch(sourceHtml, async () => {
 
       <!-- Display source modes -->
       <div class="htw-flex htw-flex-none htw-gap-px htw-h-full htw-py-2">
-        <button
+        <HstButton
           v-tooltip="!dynamicSourceCode ? 'Dynamic source code is not available' : displayedSource !== 'dynamic' ? 'Switch to dynamic source' : null"
+          color="flat"
           class="htw-flex htw-items-center htw-gap-1 htw-h-full htw-px-1 htw-bg-gray-500/10 htw-rounded-l htw-transition-all htw-ease-[cubic-bezier(0,1,.6,1)] htw-duration-300 htw-overflow-hidden"
           :class="[
             displayedSource !== 'dynamic' ? 'htw-max-w-6 htw-opacity-70' : 'htw-max-w-[82px] htw-text-primary-600 dark:htw-text-primary-400',
@@ -168,9 +127,10 @@ watch(sourceHtml, async () => {
           >
             Dynamic
           </span>
-        </button>
-        <button
+        </HstButton>
+        <HstButton
           v-tooltip="!staticSourceCode ? 'Static source code is not available' : displayedSource !== 'static' ? 'Switch to static source' : null"
+          color="flat"
           class="htw-flex htw-items-center htw-gap-1 htw-h-full htw-px-1 htw-bg-gray-500/10 htw-rounded-r htw-transition-all htw-ease-[cubic-bezier(0,1,.6,1)] htw-duration-300 htw-overflow-hidden"
           :class="[
             displayedSource !== 'static' ? 'htw-max-w-6 htw-opacity-70' : 'htw-max-w-[63px] htw-text-primary-600 dark:htw-text-primary-400',
@@ -190,7 +150,7 @@ watch(sourceHtml, async () => {
           >
             Static
           </span>
-        </button>
+        </HstButton>
       </div>
 
       <HstCopyIcon
@@ -214,11 +174,12 @@ watch(sourceHtml, async () => {
       <span>Not available</span>
     </BaseEmpty>
 
-    <textarea
+    <HstTextarea
       v-else-if="!sourceHtml"
-      ref="scroller"
-      class="__histoire-code-placeholder htw-w-full htw-h-full htw-p-4 htw-outline-none htw-bg-transparent htw-resize-none htw-m-0"
-      :value="displayedSourceCode"
+      :ref="value => { scroller = getControlElement(value) as HTMLTextAreaElement }"
+      layout="inline"
+      class="__histoire-code-placeholder htw-w-full htw-h-full htw-p-4 htw-resize-none htw-m-0"
+      :model-value="displayedSourceCode"
       readonly
       data-test-id="story-source-code"
       @scroll="onScroll"

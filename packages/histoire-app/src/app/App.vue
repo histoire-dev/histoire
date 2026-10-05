@@ -1,172 +1,32 @@
-<script lang="ts">
-export default {
-  name: 'HistoireApp',
+<script setup lang="ts">
+import type { WorkbenchProps } from './standalone/workbench-types.js'
+import { HistoireProvider } from '@histoire/vue'
+import { provideHistoireTestsModel } from '@histoire/vue/internal'
+import WorkbenchApp from './components/shell/WorkbenchApp.vue'
+
+const props = defineProps<WorkbenchProps>()
+const emit = defineEmits<{ error: [error: unknown] }>()
+provideHistoireTestsModel(props.tests)
+
+/** Standalone roles override the SDK's generic inline palette; RGB channels remain theme-reactive. */
+const workbenchTheme = {
+  /** Canvas behind standalone surfaces. */
+  '--histoire-background': 'var(--histoire-canvas)',
+  /** Native panels inherit workbench text. */
+  '--histoire-foreground': 'var(--histoire-text)',
+  /** Preserve dark/custom muted channels over provider inline values. */
+  '--histoire-muted': 'rgb(var(--histoire-muted-rgb) / var(--histoire-muted-alpha, 1))',
+  /** Preserve workbench borders on native SDK content. */
+  '--histoire-border': 'rgb(var(--histoire-border-rgb) / var(--histoire-border-alpha, 1))',
+  /** Light uses primary 500; dark uses primary 400 through the authored channel mapping. */
+  '--histoire-accent': 'rgb(var(--histoire-accent-rgb) / var(--histoire-accent-alpha, 1))',
+  /** Floating native surfaces share workbench cards. */
+  '--histoire-panel': 'var(--histoire-surface)',
 }
-</script>
-
-<script lang="ts" setup>
-import type { StoryFile, Tree } from './types'
-import { useTitle } from '@vueuse/core'
-import { onUpdate, files as rawFiles, tree as rawTree } from 'virtual:$histoire-stories'
-import { computed, onMounted, ref, watch } from 'vue'
-import AppHeader from './components/app/AppHeader.vue'
-import Breadcrumb from './components/app/Breadcrumb.vue'
-import InitialLoading from './components/app/InitialLoading.vue'
-import BaseSplitPane from './components/base/BaseSplitPane.vue'
-import CommandPromptsModal from './components/command/CommandPromptsModal.vue'
-import SearchModal from './components/search/SearchModal.vue'
-import GenericMountStory from './components/story/GenericMountStory.vue'
-import StoryList from './components/tree/StoryList.vue'
-import { useCommandStore } from './stores/command'
-import { useStoryStore } from './stores/story'
-import { histoireConfig } from './util/config'
-import { onKeyboardShortcut } from './util/keyboard'
-import { mapFile } from './util/mapping'
-import { isMobile } from './util/responsive'
-
-const files = ref<StoryFile[]>(rawFiles.map(file => mapFile(file)))
-const tree = ref<Tree>(rawTree)
-
-onUpdate((newFiles: StoryFile[], newTree: Tree) => {
-  loading.value = false
-  files.value = newFiles.map((file) => {
-    const existingFile = files.value.find(f => f.id === file.id)
-    return mapFile(file, existingFile)
-  })
-  tree.value = newTree
-})
-
-const stories = computed(() => files.value.reduce((acc, file) => {
-  acc.push(file.story)
-  return acc
-}, []))
-
-// Store
-
-const storyStore = useStoryStore()
-watch(stories, (value) => {
-  storyStore.setStories(value)
-}, {
-  immediate: true,
-})
-
-useTitle(computed(() => {
-  if (storyStore.currentStory) {
-    let title = storyStore.currentStory.title
-    if (storyStore.currentVariant) {
-      title += ` › ${storyStore.currentVariant.title}`
-    }
-    return `${title} | ${histoireConfig.theme.title}`
-  }
-  return histoireConfig.theme.title
-}))
-
-// Search
-
-const loadSearch = ref(false)
-const isSearchOpen = ref(false)
-
-watch(isSearchOpen, (value) => {
-  if (value) {
-    loadSearch.value = true
-  }
-})
-
-onKeyboardShortcut(['ctrl+k', 'meta+k'], (event) => {
-  isSearchOpen.value = true
-  event.preventDefault()
-})
-
-const loading = ref(false)
-
-if (import.meta.hot && !rawFiles.length) {
-  loading.value = true
-  import.meta.hot.on('histoire:all-stories-loaded', () => {
-    loading.value = false
-  })
-}
-
-const mounted = ref(false)
-onMounted(() => {
-  mounted.value = true
-})
-
-const commandStore = useCommandStore()
 </script>
 
 <template>
-  <div
-    v-if="storyStore.currentStory && !storyStore.currentStory.file?.hasVitestMocks"
-    class="histoire-app htw-hidden"
-  >
-    <GenericMountStory
-      :key="storyStore.currentStory.id"
-      :story="storyStore.currentStory"
-    />
-  </div>
-
-  <div
-    class="htw-h-screen htw-bg-white dark:htw-bg-gray-700 dark:htw-text-gray-100"
-    :style="{
-      // Prevent flash of content
-      opacity: mounted ? 1 : 0,
-    }"
-  >
-    <div
-      v-if="isMobile"
-      class="htw-h-full htw-flex htw-flex-col htw-divide-y htw-divide-gray-100 dark:htw-divide-gray-800"
-    >
-      <AppHeader @search="isSearchOpen = true" />
-      <Breadcrumb
-        :tree="tree"
-        :stories="stories"
-      />
-      <RouterView class="htw-grow" />
-    </div>
-
-    <BaseSplitPane
-      v-else
-      save-id="main-horiz"
-      :min="5"
-      :max="50"
-      :default-split="15"
-      class="htw-h-full"
-    >
-      <template #first>
-        <div class="htw-flex htw-flex-col htw-h-full htw-bg-gray-100 dark:htw-bg-gray-750 __histoire-pane-shadow-from-right">
-          <AppHeader
-            class="htw-flex-none"
-            @search="isSearchOpen = true"
-          />
-          <StoryList
-            :tree="tree"
-            :stories="stories"
-            class="htw-flex-1"
-          />
-        </div>
-      </template>
-
-      <template #last>
-        <RouterView />
-      </template>
-    </BaseSplitPane>
-
-    <SearchModal
-      v-if="loadSearch"
-      :shown="isSearchOpen"
-      @close="isSearchOpen = false"
-    />
-
-    <CommandPromptsModal
-      v-if="__HISTOIRE_DEV__"
-      :shown="commandStore.showPromptsModal"
-      @close="commandStore.showPromptsModal = false"
-    />
-  </div>
-
-  <transition name="__histoire-fade">
-    <InitialLoading
-      v-if="loading"
-    />
-  </transition>
+  <HistoireProvider :session="session" class="histoire-app" :style="workbenchTheme" @error="emit('error', $event)">
+    <WorkbenchApp v-bind="props" @error="emit('error', $event)" />
+  </HistoireProvider>
 </template>

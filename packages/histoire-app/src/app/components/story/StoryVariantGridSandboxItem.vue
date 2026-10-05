@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import type { Story, Variant } from '../../types'
 import { HstCopyIcon } from '@histoire/controls'
+import { HstButton } from '@histoire/controls/vue'
 import { Icon } from '@iconify/vue'
 import { useResizeObserver } from '@vueuse/core'
 import { computed, ref, toRefs } from 'vue'
@@ -18,6 +19,8 @@ const props = defineProps<{
   story: Story
   variant: Variant
   selected: boolean
+  /** Runtime admission differs from initial story DOM/render callback. */
+  ready?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -32,7 +35,8 @@ const previewReady = ref(false)
 
 const { autoScroll } = useScrollOnActive(selected, el)
 
-useResizeObserver(el, () => {
+/** Publish ready dimensions even when first observer callback preceded render. */
+function publishSize() {
   if (!previewReady.value || !el.value) {
     return
   }
@@ -42,14 +46,18 @@ useResizeObserver(el, () => {
   if (selected.value) {
     autoScroll()
   }
-})
+}
+
+useResizeObserver(el, publishSize)
 
 const settings = usePreviewSettingsStore().currentSettings
 const contrastColor = computed(() => getContrastColor(settings))
 const autoApplyContrastColor = computed(() => !!histoireConfig.autoApplyContrastColor)
 
+/** Lazy grid admission needs initial size, including stable-height stories. */
 function onReady() {
   previewReady.value = true
+  publishSize()
   emit('ready')
 }
 </script>
@@ -59,11 +67,15 @@ function onReady() {
     ref="el"
     class="histoire-story-variant-grid-item htw-cursor-default htw-flex htw-flex-col htw-gap-y-1 htw-group"
     :data-histoire-variant-id="variant.id"
+    :aria-busy="ready === false"
+    :inert="ready === false ? true : undefined"
   >
     <div class="htw-flex-none htw-flex htw-items-center">
-      <button
+      <HstButton
         v-tooltip="variant.title"
+        color="flat"
         type="button"
+        :disabled="ready === false"
         class="htw-rounded htw-w-max htw-px-2 htw-py-0.5 htw-min-w-16 htw-cursor-pointer htw-flex htw-items-center htw-gap-1 htw-flex-shrink htw-bg-transparent"
         :class="{
           'hover:htw-bg-gray-200 htw-text-gray-500 dark:hover:htw-bg-gray-800': !selected,
@@ -80,7 +92,7 @@ function onReady() {
           }"
         />
         <span class="htw-truncate htw-flex-1">{{ variant.title }}</span>
-      </button>
+      </HstButton>
 
       <div class="htw-flex-none htw-ml-auto htw-hidden group-hover:htw-flex htw-items-center">
         <HstCopyIcon
@@ -115,6 +127,8 @@ function onReady() {
 
       <div
         class="htw-relative htw-h-full"
+        data-histoire-runtime-content
+        :data-histoire-variant-id="variant.id"
         :style="{
           '--histoire-contrast-color': contrastColor,
           'color': autoApplyContrastColor ? contrastColor : undefined,

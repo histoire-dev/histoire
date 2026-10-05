@@ -1,7 +1,10 @@
 <script lang="ts" setup>
 import type { HistoireControlsOverlayMessage } from '@histoire/shared'
+import { focusControlsSelectedOption, moveControlsOptionFocus, reconcileControlsOptionFocus } from '@histoire/controls'
+import { HstButton } from '@histoire/controls/vue'
 import { recomputeAllPoppers, Dropdown as VDropdown, Tooltip as VTooltip } from 'floating-vue'
 import { computed, nextTick, ref, watch } from 'vue'
+import { isDark } from '../../util/dark'
 
 /** Host overlay anchored to a virtual reference at the sandbox control's bounds. */
 const props = defineProps<{ request: HistoireControlsOverlayMessage }>()
@@ -19,28 +22,24 @@ function close(itemId?: string, restoreFocus = false, focusDirection?: 'next' | 
 async function focusSelected() {
   if (!options.value) return
   await nextTick()
-  const selected = options.value.items.findIndex(item => item.id === options.value.selectedId)
-  list.value?.querySelectorAll<HTMLButtonElement>('[role="option"]')[Math.max(0, selected)]?.focus()
+  focusControlsSelectedOption(list.value)
 }
 
 /** Provides listbox keyboard navigation and closes before Tab leaves the overlay. */
 function onKeydown(event: KeyboardEvent) {
-  if (event.key === 'Tab') {
+  if (event.key === 'Tab' || event.key === 'Escape') {
     event.preventDefault()
-    close(undefined, true, event.shiftKey ? 'previous' : 'next')
+    close(undefined, true, event.key === 'Tab' ? event.shiftKey ? 'previous' : 'next' : undefined)
     return
   }
-  const buttons = [...(list.value?.querySelectorAll<HTMLButtonElement>('[role="option"]') ?? [])]
-  const index = buttons.indexOf(document.activeElement as HTMLButtonElement)
-  let next: number
-  if (event.key === 'ArrowDown') next = (index + 1) % buttons.length
-  else if (event.key === 'ArrowUp') next = (index - 1 + buttons.length) % buttons.length
-  else if (event.key === 'Home') next = 0
-  else if (event.key === 'End') next = buttons.length - 1
-  else return
-  event.preventDefault()
-  buttons[next]?.focus()
+  moveControlsOptionFocus(list.value, event)
 }
+
+watch(options, (value) => {
+  if (!value) return
+  if (!value.items.length) close(undefined, true)
+  else reconcileControlsOptionFocus(list.value)
+}, { deep: true, flush: 'post' })
 
 watch([
   () => props.request.anchor.x,
@@ -84,23 +83,25 @@ watch([
           role="listbox"
           :aria-label="options.label ?? 'Options'"
           data-test-id="controls-overlay-select"
-          class="htw-flex htw-flex-col htw-bg-gray-50 dark:htw-bg-gray-700"
+          class="histoire-control-menu"
+          :data-histoire-control-appearance="isDark ? 'dark' : 'light'"
           @keydown="onKeydown"
         >
-          <button
+          <HstButton
             v-for="item in options.items"
             :key="item.id"
+            color="flat"
+            :data-histoire-control-appearance="isDark ? 'dark' : 'light'"
             type="button"
             role="option"
             :aria-selected="item.id === options.selectedId"
-            class="htw-bg-transparent htw-text-left htw-px-2 htw-py-1 htw-cursor-pointer hover:htw-bg-primary-100 dark:hover:htw-bg-primary-700 focus-visible:htw-bg-primary-100 dark:focus-visible:htw-bg-primary-700 htw-outline-none"
-            :class="{ 'htw-bg-primary-200 dark:htw-bg-primary-800': item.id === options.selectedId }"
-            @click="close(item.id, true)"
+            :disabled="item.disabled"
+            @click="!item.disabled && close(item.id, true)"
           >
             {{ item.label }}
-          </button>
+          </HstButton>
         </div>
-        <span v-else data-test-id="controls-overlay-tooltip">{{ tooltip?.content }}</span>
+        <span v-else class="histoire-controls-tooltip" :data-histoire-control-appearance="isDark ? 'dark' : 'light'" data-test-id="controls-overlay-tooltip">{{ tooltip?.content }}</span>
       </template>
     </component>
   </Teleport>

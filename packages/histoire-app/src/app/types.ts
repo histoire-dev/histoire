@@ -45,14 +45,7 @@ export type SearchResult = SearchResultBase & ({
   onActivate: () => unknown
 })
 
-export interface PreviewSettings {
-  responsiveWidth: number
-  responsiveHeight: number
-  rotate: boolean
-  backgroundColor: string
-  checkerboard: boolean
-  textDirection: 'ltr' | 'rtl'
-}
+export type { PreviewSettings } from '@histoire/shared'
 
 declare module 'vue' {
   interface ComponentCustomProperties {
@@ -65,7 +58,7 @@ declare global {
 
   interface Window {
     __HST_PLUGIN_API__: {
-      sendEvent: (event: string, payload: any) => Promise<any>
+      sendEvent: (event: string, payload: any, signal?: AbortSignal) => Promise<any>
       openStory: (storyId: string) => void
     }
   }

@@ -1,0 +1,29 @@
+
+ RUN  v4.1.10 /home/akryum/Projects/histoire/packages/histoire
+
+ ❯ src/node/__tests__/project-test-collection.spec.ts (4 tests | 1 failed) 118ms
+     × holds cancellation until acquired browser cleanup finishes 106ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/node/__tests__/project-test-collection.spec.ts > project definition collection > holds cancellation until acquired browser cleanup finishes
+AssertionError: expected "vi.fn()" to be called once with arguments: [ 'keyboard-input' ]
+
+Number of calls: 0
+
+ ❯ src/node/__tests__/project-test-collection.spec.ts:55:30
+     53|     abort.abort()
+     54|     await vi.waitFor(() => expect(mocks.cleanup).toHaveBeenCalledOnce(…
+     55|     expect(cancelCurrentRun).toHaveBeenCalledExactlyOnceWith('keyboard…
+       |                              ^
+     56|     expect(cancelCurrentRun).toHaveBeenCalledBefore(mocks.cleanup)
+     57|     expect(settled).toBe(false)
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 3 passed (4)
+   Start at  23:08:40
+   Duration  643ms (transform 300ms, setup 0ms, import 409ms, tests 118ms, environment 0ms)
+

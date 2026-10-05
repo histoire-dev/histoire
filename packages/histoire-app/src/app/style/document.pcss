@@ -1,0 +1,60 @@
+/* Keep document baselines below story framework utilities, including Tailwind 4 layers.
+   A dedicated layer survives Tailwind 3 compilation; native styles never import this file. */
+@layer histoire-document-reset {
+  *,
+  ::before,
+  ::after {
+    box-sizing: border-box;
+    border-width: 0;
+    border-style: solid;
+    border-color: #e5e7eb;
+  }
+
+  a,
+  input,
+  button {
+    color: inherit;
+  }
+
+  a {
+    text-decoration: inherit;
+  }
+
+  input, button {
+    font-family: inherit;
+  }
+
+  a,
+  button {
+    user-select: none;
+  }
+}
+
+@layer base {
+  body,
+  pre {
+    margin: 0;
+  }
+
+  html,
+  body,
+  #app {
+    height: 100%;
+  }
+
+  html {
+    font-family: system-ui, sans-serif;
+    font-size: 1rem;
+  }
+
+  body {
+    font-size: 1.125rem;
+  }
+
+  @media (min-width: 640px) {
+    body {
+      font-size: .875rem;
+    }
+  }
+
+}

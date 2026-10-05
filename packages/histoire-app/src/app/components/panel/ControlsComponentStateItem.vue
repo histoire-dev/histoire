@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import type { Variant } from '../../types'
-import { HstCheckbox, HstJson, HstNumber, HstText } from '@histoire/controls'
+import { getControlComponent } from '@histoire/controls'
 import { computed } from 'vue'
 
 const props = defineProps<{
@@ -8,19 +8,7 @@ const props = defineProps<{
   item: string
 }>()
 
-const comp = computed(() => {
-  switch (typeof props.variant.state[props.item]) {
-    case 'string':
-      return HstText
-    case 'number':
-      return HstNumber
-    case 'boolean':
-      return HstCheckbox
-    case 'object':
-    default:
-      return HstJson
-  }
-})
+const comp = computed(() => getControlComponent(typeof props.variant.state[props.item]))
 
 const model = computed({
   get: () => {

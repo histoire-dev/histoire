@@ -6,9 +6,11 @@ describe('Story render', () => {
     cy.getPreviewIframeBody().contains('Simple story in Nuxt NuxtLink')
   })
 
-  it('should render an empty `nuxt-test` app', () => {
+  it('should render isolated variant app without extra Nuxt entry root', () => {
     cy.visit('/story/app-components-simple-story-vue?variantId=_default')
-    cy.getPreviewIframeBody().find('#nuxt-test[data-v-app]').should('be.empty')
+    cy.getPreviewIframeBody().contains('Simple story in Nuxt')
+    cy.getPreviewIframeBody().find('[data-histoire-runtime-content]').should('have.length', 1)
+    cy.getPreviewIframeBody().find('#nuxt-test').should('not.exist')
   })
 
   it('should render auto-imported components', () => {
@@ -17,7 +19,7 @@ describe('Story render', () => {
   })
 
   it('should render NuxtLink', () => {
-    cy.visit('/story/app-components-basebuttonlink-story-vue?variantId=_default')
+    cy.visit('/story/app-components-basebuttonlink-story-vue?variantId=app-components-basebuttonlink-story-vue-0')
     cy.getPreviewIframeBody().find('.histoire-generic-render-story a').contains('Hello world')
   })
 

@@ -1,0 +1,31 @@
+/* Defaults reset at each provider; nested embeds do not inherit compact chrome. */
+.histoire-provider {
+  --histoire-settings-row-padding: 20px;
+  --histoire-viewport-row-padding: 13px;
+  --histoire-list-row-padding: 10px;
+  --histoire-comment-row-padding: 12px;
+  --histoire-mcp-row-padding: 8px;
+  --histoire-story-row-padding: 6px;
+  --histoire-test-row-padding: 9px;
+  --histoire-test-heading-padding: 10px;
+  --histoire-control-height: 34px;
+  --histoire-control-padding: 7px;
+  --histoire-control-wrapper-padding: 8px;
+  --histoire-control-gap: 8px;
+  --histoire-control-margin: 10px;
+}
+.histoire-shell-layout[data-density="compact"] {
+  --histoire-settings-row-padding: 14px;
+  --histoire-viewport-row-padding: 9px;
+  --histoire-list-row-padding: 6px;
+  --histoire-comment-row-padding: 8px;
+  --histoire-mcp-row-padding: 5px;
+  --histoire-story-row-padding: 4px;
+  --histoire-test-row-padding: 7px;
+  --histoire-test-heading-padding: 8px;
+  --histoire-control-height: 28px;
+  --histoire-control-padding: 4px;
+  --histoire-control-wrapper-padding: 6px;
+  --histoire-control-gap: 6px;
+  --histoire-control-margin: 6px;
+}

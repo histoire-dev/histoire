@@ -1,0 +1,58 @@
+# Independent inspector / Markdown review — round 2
+
+Reviewed 2026-10-04 in `/home/akryum/Projects/histoire`. Read-only review; no repository source/document edits, Git operations, builds, typechecks, servers, browsers or Cypress runs. Probe sources/config/log stay under `/tmp/histoire-ui-review-round-2/inspector/`. Root owns browser acceptance; project Tests backend belongs to separate reviewer.
+
+## Verified findings
+
+### 1. [P2] Reset state leaves saved preset selected after runtime clears selection
+
+- Source: `/home/akryum/Projects/histoire/packages/histoire-vue/src/components/controls/HistoireControls.ts:140-142`; dependent presentation at `StatePresets.ts:68-84,90-95`.
+- Trigger: apply/restore a saved preset, edit state, then use inspector's **Reset state** button beside preset select.
+- Runtime's `state.reset` restores initial state and calls `clearSelection()` (`packages/histoire/src/node/virtual/preview-runtime/runtime-service.ts:39-41`). Button bypasses StatePresets' owned reset action. StatePresets watches source/document identity, deliberately ignoring state publications; it retains selected saved ID. Select still displays Saved and preset menu remains eligible for Rename/Delete although runtime and persisted selection now represent Initial state.
+- Mounted proof uses actual `HistoireControls`/`StatePresets`, real SDK session, existing shared `sourceFixture`, and actual `createRuntimeStatePresets` owner. After Reset, canonical count is 5 and runtime list has no selectedId; native select still equals `preset-1`, failing expected empty Initial state value. Probe: `review.spec.ts`, test `shows Initial state after inspector Reset state clears runtime preset selection`.
+- Fix boundary: route external Reset through same owner-guarded StatePresets reset action, or refresh/clear selection after acknowledged current reset. Preserve existing document-generation guard and unrelated-state draft retention; avoid broad state watchers that discard menus/drafts.
+- Missing regression: selected saved preset plus edited state, external Reset, assert initial state and Initial state select/menu ownership; delayed reset overtaken by source/target change must not publish stale acknowledgment. Existing `controls-panel.spec.ts` resets through select only and misses external button.
+
+### 2. [P2] Copy link loses heading anchor reached through rendered Markdown links
+
+- Source: `/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/pages/markdown/MarkdownPage.vue:123,129`, with copy builder at `82-90`; native local-anchor handling in `/home/akryum/Projects/histoire/packages/histoire-vue/src/components/docs/HistoireDocs.ts:68-71`.
+- Trigger: open document without URL hash, click heading's `#` permalink or an inline `href="#next"` link, then click **Copy link**. Also affects narrow layouts where outline is hidden and links provide local navigation.
+- HistoireDocs prevents default URL mutation and scrolls owning page correctly, but communicates no local-anchor change to MarkdownPage. Only outline selection updates `currentAnchor`; Copy link retains empty/previous anchor and sends readers to wrong reading position.
+- Mounted production proof: both heading-link and inline-link move page scrollTop by 200, then copied URL has empty hash instead of `#install` / `#next`. Positive-control outline selection copies `#install` correctly. Three parameterized probes; one passes and two fail. Matches documented `ui-navigation.md` contract: Copy link preserves current URL and heading anchor.
+- Fix boundary: add provider-scoped local-anchor notification to authoritative HistoireDocs renderer and consume it in MarkdownPage, or own exact local link activation at page boundary without duplicating renderer/link routing. Keep host URL/document scrolling ownership unchanged. Reset copied feedback when anchor changes.
+- Missing regression: heading permalink and inline local link followed by Copy link in history/hash route modes; preserve exact encoded heading IDs and route while retaining outline positive case.
+
+### 3. [P2] Successful variant navigation renders Source failure while ACK is pending
+
+- Source: `/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/inspector/SourceDrawer.vue:24,128-129`; native explicit dynamic-source behavior at `/home/akryum/Projects/histoire/packages/histoire-vue/src/components/source/HistoireSource.ts:31-35,42`.
+- Trigger: keep generated Source drawer expanded, select another variant while selection acknowledgment is still pending.
+- Drawer availability checks variant metadata only. HistoireSource remains mounted and rereads as runtime enters non-ready state, producing `PREVIEW_NOT_READY: Dynamic source requires ready preview`. Drawer renders role=alert plus **Retry source**, and emits error to host. Pending readiness is expected; visible failure and retry action are not evidence of failed navigation/source generation. It clears once ACK succeeds, but remains visible for duration of a slow successful selection and leaks already-emitted failure to host (`mountStandaloneApp` logs errors).
+- Mounted proof delays actual fixture's `selection.select` ACK, without rejecting it. Before ACK resolves, captured view is `{ errors: ['Dynamic source requires ready preview'], alert: 'Dynamic source requires ready preview', retry: true }`; expected no errors/alert/retry. Finalizer resolves ACK successfully. Probe: `waits for selection readiness without reporting successful navigation as Source failure`.
+- Fix boundary: standalone SourceDrawer should defer native dynamic-source mount/read and show readiness/loading state until selected runtime is ready. Keep independent native HistoireSource's explicit unavailable-preview errors and real generation failures intact; existing `content-panels.spec.ts` intentionally expects unavailable-preview error when standalone readiness flow is absent.
+- Missing regression: expanded dynamic Source, delayed successful variant ACK, no error/retry while waiting, then replacement source appears; real rejected source generation still offers Retry. Raw Story file source remains independent of runtime readiness.
+
+### 4. [P3] Source clipboard/editor failures publish after selected owner changes
+
+- Source: `/home/akryum/Projects/histoire/packages/histoire-app/src/app/components/inspector/SourceDrawer.vue:66,70-72`.
+- Trigger: begin Copy source or Open source in editor, change selection, then predecessor operation rejects.
+- Copy success checks exact captured content, but catch emits unconditionally. Editor catch has no source/target/lifetime guard. Replacement inspector/host receives predecessor's unrelated failure. Current standalone host logs it; embedding/error consumers can display stale feedback. MarkdownPage already guards equivalent actions via `usePageOwnership`.
+- Mounted proof separately delays clipboard and editor operations, selects successor target, clears any baseline readiness-transition errors, rejects old operation, then observes one error event (`Clipboard denied for predecessor` / `Editor unavailable for predecessor`) from still-mounted replacement drawer. Both independent probes fail expected no stale publication.
+- Fix boundary: capture source/selection/content owner and lifetime before each action; publish failure only while that exact owner survives. Reuse existing page ownership utility or a shared equivalent rather than invent parallel ownership checks. Preserve reporting for current-owner failures.
+- Missing regression: clipboard/editor rejection after target/source change plus current-owner failure and unmount controls. Existing content ownership tests cover reads, not deferred action failures.
+
+## Covered scope and evidence
+
+- Read current README refinements, architecture, contracts, slices 06/11, user documentation, and historical closed inspector findings as context only.
+- Inspected Component Inspector plus Props/Docs/Events/Source/Markdown PNGs in both themes. Source establishes one-row breadcrumb, floating close action, tab ARIA/keyboard behavior, dev/static Tests gating, finite exact-scalar editors, preset menu, inline events, SDK docs/source composition, scoped anchors, outline lifecycle and same-group pager. No pixel/layout/browser acceptance claim.
+- Source read includes StoryInspector, InspectorHeader/Tabs, PropsTab, SourceDrawer/state, MarkdownPage/Outline/Pager/outline DOM/navigation, native controls/presets/docs/source/events, standalone routing/Markdown transition, page ownership, runtime preset/storage services, and shared renderer.
+- Inspector Tests integration reviewed only at chrome/native handoff: current target/source project-result projection and dev/static tab availability. Project collection/run/watch behavior delegated to separate reviewer.
+- Existing focused command A: `PATH=/home/akryum/.local/share/mise/installs/node/24.16.0/bin:/home/akryum/.local/share/pnpm/.tools/pnpm/10.33.0/bin:$PATH pnpm --filter @histoire/vue exec vitest run --maxWorkers=2 src/__tests__/workbench-content-ownership.spec.ts src/__tests__/controls-prop-values.spec.ts src/__tests__/presets-menu.spec.ts src/__tests__/presets-ownership.spec.ts src/__tests__/events-panel.spec.ts src/__tests__/docs-anchors.spec.ts src/__tests__/standalone-docs-links.spec.ts src/__tests__/workbench-markdown-transition.spec.ts src/__tests__/docs-content.spec.ts src/__tests__/docs-story-links.spec.ts src/__tests__/content-panels.spec.ts src/__tests__/content-owner.spec.ts`: **12 files, 45 tests passed**.
+- Existing focused command B: same PATH, `pnpm --filter @histoire/vue exec vitest run --maxWorkers=2 src/__tests__/controls-panel.spec.ts src/__tests__/workbench-navigation.spec.ts src/__tests__/controls-view-lifecycle.spec.ts src/__tests__/controls-replica-lifecycle.spec.ts src/__tests__/controls-json-state.spec.ts src/__tests__/controls-edit-ack.spec.ts`: **6 files, 23 tests passed**.
+- Final independent probe command: same PATH, `pnpm --filter @histoire/vue exec vitest run --config /tmp/histoire-ui-review-round-2/inspector/vite.config.mts --maxWorkers=2`: **1 file, 7 tests; 1 positive control passed, 6 failed**, representing four findings above. Evidence: `/tmp/histoire-ui-review-round-2/inspector/review.spec.ts`, `/tmp/histoire-ui-review-round-2/inspector/probes.log`.
+- Temporary config extends repository native Vue compiler/test config; no blanket source aliases. Existing emitted package consumer paths remain exercised. Initial external `.ts` config caused CJS/top-level-await startup failure; switching temporary config to `.mts` fixed it. External probe's package self-import required absolute emitted `histoire-vue/dist/index.js`; no repository mutation/build. These startup issues are environment setup, not product findings.
+
+## Limits / coverage concerns
+
+- No real browser/Cypress, controls iframe execution, live clipboard denial, editor launch, static hosting, cross-framework run, visual comparison or production source server used. Findings are mounted component + real SDK/runtime-owner behavior; fixtures replace transports and HTML provenance.
+- Source-only preservation concern, not promoted: legacy `panel/StatePresets.vue:81-85` supports overwriting selected preset's saved state; new PresetMenu/runtime API offers only new-save/rename/delete/apply, and save always mints another ID (`embed/adapters/state-presets.ts:98-106`). Current refinement scope does not explicitly discuss this removed legacy action. Requires product contract decision or additional production behavior proof before treating as acceptance blocker.
+- No relevant prior memory evidence used. No changes made to shared dirty checkout.

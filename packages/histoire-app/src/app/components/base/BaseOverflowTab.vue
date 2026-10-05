@@ -1,10 +1,13 @@
 <script lang="ts">
 import { defineComponent } from 'vue'
+import { routerLinkProps } from './router-link-props'
 
 export default defineComponent({
   inheritAttrs: false,
 
   props: {
+    ...routerLinkProps,
+
     exact: {
       type: Boolean,
       default: false,
@@ -23,6 +26,7 @@ export default defineComponent({
     v-slot="{ isActive, isExactActive, href, navigate }"
     class="histoire-base-overflow-tab"
     v-bind="$attrs"
+    :to="to"
     custom
   >
     <a

@@ -1,0 +1,9 @@
+
+ RUN  v4.1.10 /home/akryum/Projects/histoire/packages/histoire-plugin-react
+
+
+ Test Files  7 passed (7)
+      Tests  39 passed (39)
+   Start at  20:22:33
+   Duration  1.47s (transform 2.17s, setup 0ms, import 4.37s, tests 941ms, environment 1.62s)
+

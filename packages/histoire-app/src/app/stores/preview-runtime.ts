@@ -8,7 +8,7 @@ import type {
 } from '@histoire/shared'
 import type { PendingRequest } from '../util/preview-request'
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { onScopeDispose, ref } from 'vue'
 import { histoireConfig } from '../util/config'
 import { COLLECT_TESTS, RUN_TESTS, TEST_DEFINITIONS, TEST_RESULT } from '../util/const'
 import { isTrustedPreviewFrameMessage } from '../util/preview-message'
@@ -32,105 +32,110 @@ type RunTestsMessage = HistoireRunTestsPayload & HistoireMessageMarker & { type:
 /** Default budget for a whole test run inside the iframe (user code). */
 const DEFAULT_RUN_TIMEOUT = 300_000
 
-let listenersReady = false
-let collectCounter = 0
-let runCounter = 0
-
-// Module scope, not store scope: the `message` listener below is installed once
-// for the whole module, so slots owned by one store instance would be invisible
-// to it as soon as a second pinia instance created another store — its requests
-// could then never settle.
-const frames = ref<Record<PreviewMode, HTMLIFrameElement | null>>({
-  single: null,
-  grid: null,
-})
-let pendingRun: PendingRequest<HistoireTestRunSummary> | null = null
-let pendingCollection: PendingRequest<HistoireTestCollectionResult> | null = null
-
-function getCurrentFrame() {
-  return frames.value.single ?? frames.value.grid
-}
-
-function getCurrentFrameOrigin(frame: HTMLIFrameElement) {
-  try {
-    return new URL(frame.src || window.location.href, window.location.href).origin
-  }
-  catch {
-    // Never broadcast to '*': the same-origin live preview always lives on the
-    // host origin, so fall back to it instead of any origin.
-    return window.location.origin
-  }
-}
-
-/**
- * Rejects in-flight collection/run promises with an explicit reason so the
- * UI does not stay locked on the previous request after an iframe unmount.
- */
-function abortPendingRequests(reason: string) {
-  if (pendingCollection) {
-    const aborted = pendingCollection
-    pendingCollection = null
-    aborted.reject(new Error(reason))
-  }
-
-  if (pendingRun) {
-    const aborted = pendingRun
-    pendingRun = null
-    aborted.reject(new Error(reason))
-  }
-}
-
-/** Installs the single listener settling the replies of the preview iframe. */
-function installReplyListener() {
-  if (listenersReady || typeof window === 'undefined') {
-    return
-  }
-
-  listenersReady = true
-  window.addEventListener('message', (event) => {
-    // Defense-in-depth: only trust messages from the current preview frame and
-    // our own origin (subsumes the legacy `__histoire` marker check) before we
-    // resolve any pending collection/run promise by requestId/runId.
-    if (!isTrustedPreviewFrameMessage(event, getCurrentFrame())) {
-      return
-    }
-
-    if (event.data.type === TEST_DEFINITIONS) {
-      // Untrusted postMessage data: typed against the reply contract, but
-      // every field still defaulted in case the iframe answers a partial one.
-      const reply = event.data as Partial<HistoireTestDefinitionsPayload>
-      settleReply(
-        pendingCollection,
-        () => { pendingCollection = null },
-        reply.requestId,
-        reply.variantKey,
-        () => ({
-          definitions: reply.definitions ?? [],
-          error: reply.error ?? null,
-        }),
-      )
-      return
-    }
-
-    if (event.data.type === TEST_RESULT) {
-      const reply = event.data as Partial<HistoireTestResultPayload>
-      settleReply(
-        pendingRun,
-        () => { pendingRun = null },
-        reply.runId,
-        reply.variantKey,
-        () => reply.summary as HistoireTestRunSummary,
-      )
-    }
-  })
-}
-
 export const usePreviewRuntimeStore = defineStore('preview-runtime', () => {
+  let listenersReady = false
+  let collectCounter = 0
+  let runCounter = 0
+
+  // Each store owns its frames and requests; independent Pinia adapters coexist.
+  const frames = ref<Record<PreviewMode, HTMLIFrameElement | null>>({
+    single: null,
+    grid: null,
+  })
+  const documents = new WeakMap<HTMLIFrameElement, string>()
+  let pendingRun: PendingRequest<HistoireTestRunSummary> | null = null
+  let pendingCollection: PendingRequest<HistoireTestCollectionResult> | null = null
+
+  function getCurrentFrame() {
+    return frames.value.single ?? frames.value.grid
+  }
+
+  function getCurrentFrameOrigin(frame: HTMLIFrameElement) {
+    try {
+      return new URL(frame.src || window.location.href, window.location.href).origin
+    }
+    catch {
+      // Never broadcast to '*': the same-origin live preview always lives on the
+      // host origin, so fall back to it instead of any origin.
+      return window.location.origin
+    }
+  }
+
+  /**
+   * Rejects in-flight collection/run promises with an explicit reason so the
+   * UI does not stay locked on the previous request after an iframe unmount.
+   */
+  function abortPendingRequests(reason: string) {
+    if (pendingCollection) {
+      const aborted = pendingCollection
+      pendingCollection = null
+      aborted.reject(new Error(reason))
+    }
+
+    if (pendingRun) {
+      const aborted = pendingRun
+      pendingRun = null
+      aborted.reject(new Error(reason))
+    }
+  }
+
+  /** Installs the single listener settling the replies of the preview iframe. */
+  function installReplyListener() {
+    if (listenersReady || typeof window === 'undefined') {
+      return
+    }
+
+    listenersReady = true
+    const listener = (event: MessageEvent) => {
+      // Defense-in-depth: only trust messages from the current preview frame and
+      // our own origin (subsumes the legacy `__histoire` marker check) before we
+      // resolve any pending collection/run promise by requestId/runId.
+      const frame = getCurrentFrame()
+      if (!isTrustedPreviewFrameMessage(event, frame) || (frame && documents.has(frame) && event.data.documentId !== documents.get(frame))) {
+        return
+      }
+
+      if (event.data.type === TEST_DEFINITIONS) {
+        // Untrusted postMessage data: typed against the reply contract, but
+        // every field still defaulted in case the iframe answers a partial one.
+        const reply = event.data as Partial<HistoireTestDefinitionsPayload>
+        settleReply(
+          pendingCollection,
+          () => { pendingCollection = null },
+          reply.requestId,
+          reply.variantKey,
+          () => ({
+            definitions: reply.definitions ?? [],
+            error: reply.error ?? null,
+          }),
+        )
+        return
+      }
+
+      if (event.data.type === TEST_RESULT) {
+        const reply = event.data as Partial<HistoireTestResultPayload>
+        settleReply(
+          pendingRun,
+          () => { pendingRun = null },
+          reply.runId,
+          reply.variantKey,
+          () => reply.summary as HistoireTestRunSummary,
+        )
+      }
+    }
+    window.addEventListener('message', listener)
+    onScopeDispose(() => {
+      window.removeEventListener('message', listener)
+      abortPendingRequests('Preview adapter disposed before completing the request.')
+    })
+  }
+
   installReplyListener()
 
-  function setFrame(mode: PreviewMode, frame: HTMLIFrameElement | null) {
+  function setFrame(mode: PreviewMode, frame: HTMLIFrameElement | null, documentId?: string) {
     const previous = frames.value[mode]
     frames.value[mode] = frame
+    if (frame && documentId) documents.set(frame, documentId)
 
     if (frame === null && !getCurrentFrame()) {
       // No iframe is mounted anymore — abort any in-flight requests so the

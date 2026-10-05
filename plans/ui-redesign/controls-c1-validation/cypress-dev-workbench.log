@@ -1,0 +1,206 @@
+[2088603:1004/214151.185035:ERROR:node_bindings.cc(305)] Most NODE_OPTIONs are not supported in packaged apps. See documentation for more details.
+
+DevTools listening on ws://127.0.0.1:40713/devtools/browser/c7f84dac-97b0-463c-8182-6d027b603889
+(node:2088883) ExperimentalWarning: `--experimental-loader` may be removed in the future; instead use `register()`:
+--import 'data:text/javascript,import { register } from "node:module"; import { pathToFileURL } from "node:url"; register("file%3A///home/akryum/.cache/Cypress/13.17.0/Cypress/resources/app/node_modules/ts-node/esm/transpile-only.mjs", pathToFileURL("./"));'
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:2088883) [DEP0180] DeprecationWarning: fs.Stats constructor is deprecated.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+
+================================================================================
+
+  (Run Starting)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Cypress:        13.17.0                                                                        │
+  │ Browser:        Electron 118 (headless)                                                        │
+  │ Node Version:   v24.16.0 (/home/akryum/.local/share/mise/installs/node/24.16.0/bin/node)       │
+  │ Specs:          1 found (ui-workbench.cy.js)                                                   │
+  │ Searched:       cypress/e2e/ui-workbench.cy.js                                                 │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+                                                                                                    
+  Running:  ui-workbench.cy.js                                                              (1 of 1)
+
+
+  Workbench contracts
+    1) persists selected pane, panel visibility, and inspector visibility
+    2) recovers canonical preview after its document reloads
+    ✓ shares persistent color scheme between settings and rail action (11213ms)
+    ✓ pans frames with Space and uses keyboard zoom without changing selection (5224ms)
+    ✓ persists local viewport presets and applies their logical frame size (12924ms)
+    ✓ exposes only panes and settings supported by current build mode (2372ms)
+
+  Vue development workbench
+    ✓ persists a comment draft, resolves it, and reopens its exact thread (13616ms)
+    ✓ captures selected preview as PNG and WebP through screenshot service (17648ms)
+
+  Vue workbench integration
+    3) shows collected prop defaults and restores them after removing an override
+    4) applies matrix axes and base props to real cells and restores URL choices
+    5) detects no-hint chooser axes, switches exact base preset, and isolates long cell overrides
+Warning: terminator_CreateInstance: Failed to CreateInstance in ICD 2.  Skipping ICD.
+    6) selects canvas variants and routes controls to selected preview
+    7) preserves docs tab deep link and reveals generated and story-file source
+    8) collects events from selected runtime and displays inline arguments
+    9) opens search with Ctrl+K, filters scopes, and navigates docs and props
+
+
+  6 passing (2m)
+  9 failing
+
+  1) Workbench contracts
+       persists selected pane, panel visibility, and inspector visibility:
+
+      AssertionError: Timed out retrying after 4000ms: owning preview readiness: expected '<div.histoire-primary-frame>' to have attribute 'aria-busy' with the value 'false', but the value was 'true'
+      + expected - actual
+
+      -'true'
+      +'false'
+      
+      at Context.eval (webpack://histoire-example-vue3/../cypress/frame-commands.js:9:82)
+
+  2) Workbench contracts
+       recovers canonical preview after its document reloads:
+
+      AssertionError: Timed out retrying after 4000ms: owning preview readiness: expected '<div.histoire-primary-frame>' to have attribute 'aria-busy' with the value 'false', but the value was 'true'
+      + expected - actual
+
+      -'true'
+      +'false'
+      
+      at Context.eval (webpack://histoire-example-vue3/../cypress/frame-commands.js:9:82)
+
+  3) Vue workbench integration
+       shows collected prop defaults and restores them after removing an override:
+
+      AssertionError: Timed out retrying after 4000ms: owning preview readiness: expected '<div.histoire-primary-frame>' to have attribute 'aria-busy' with the value 'false', but the value was 'true'
+      + expected - actual
+
+      -'true'
+      +'false'
+      
+      at Context.eval (webpack://histoire-example-vue3/../cypress/frame-commands.js:9:82)
+
+  4) Vue workbench integration
+       applies matrix axes and base props to real cells and restores URL choices:
+
+      AssertionError: Timed out retrying after 4000ms: owning preview readiness: expected '<div.histoire-primary-frame>' to have attribute 'aria-busy' with the value 'false', but the value was 'true'
+      + expected - actual
+
+      -'true'
+      +'false'
+      
+      at Context.eval (webpack://histoire-example-vue3/../cypress/frame-commands.js:9:82)
+
+  5) Vue workbench integration
+       detects no-hint chooser axes, switches exact base preset, and isolates long cell overrides:
+     AssertionError: Timed out retrying after 4000ms: expected '<button.histoire-button.histoire-toolbar-button>' not to be 'disabled'
+      at Context.eval (webpack://histoire-example-vue3/./cypress/e2e/ui-workbench.cy.js:113:42)
+
+  6) Vue workbench integration
+       selects canvas variants and routes controls to selected preview:
+
+      AssertionError: Timed out retrying after 4000ms: owning preview readiness: expected '<div.histoire-primary-frame>' to have attribute 'aria-busy' with the value 'false', but the value was 'true'
+      + expected - actual
+
+      -'true'
+      +'false'
+      
+      at Context.eval (webpack://histoire-example-vue3/../cypress/frame-commands.js:9:82)
+
+  7) Vue workbench integration
+       preserves docs tab deep link and reveals generated and story-file source:
+
+      AssertionError: Timed out retrying after 4000ms: owning preview readiness: expected '<div.histoire-primary-frame>' to have attribute 'aria-busy' with the value 'false', but the value was 'true'
+      + expected - actual
+
+      -'true'
+      +'false'
+      
+      at Context.eval (webpack://histoire-example-vue3/../cypress/frame-commands.js:9:82)
+
+  8) Vue workbench integration
+       collects events from selected runtime and displays inline arguments:
+
+      AssertionError: Timed out retrying after 4000ms: owning preview readiness: expected '<div.histoire-primary-frame>' to have attribute 'aria-busy' with the value 'false', but the value was 'true'
+      + expected - actual
+
+      -'true'
+      +'false'
+      
+      at Context.eval (webpack://histoire-example-vue3/../cypress/frame-commands.js:9:82)
+
+  9) Vue workbench integration
+       opens search with Ctrl+K, filters scopes, and navigates docs and props:
+
+      AssertionError: Timed out retrying after 4000ms: owning preview readiness: expected '<div.histoire-primary-frame>' to have attribute 'aria-busy' with the value 'false', but the value was 'true'
+      + expected - actual
+
+      -'true'
+      +'false'
+      
+      at Context.eval (webpack://histoire-example-vue3/../cypress/frame-commands.js:9:82)
+
+
+
+
+  (Results)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Tests:        15                                                                               │
+  │ Passing:      6                                                                                │
+  │ Failing:      9                                                                                │
+  │ Pending:      0                                                                                │
+  │ Skipped:      0                                                                                │
+  │ Screenshots:  9                                                                                │
+  │ Video:        false                                                                            │
+  │ Duration:     2 minutes, 28 seconds                                                            │
+  │ Spec Ran:     ui-workbench.cy.js                                                               │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+  (Screenshots)
+
+  -  /home/akryum/Projects/histoire/examples/vue3/cypress/screenshots/ui-workbench.cy    (1800x1200)
+     .js/Workbench contracts -- persists selected pane, panel visibility, and inspect               
+     or visibility (failed).png                                                                     
+  -  /home/akryum/Projects/histoire/examples/vue3/cypress/screenshots/ui-workbench.cy    (1800x1200)
+     .js/Workbench contracts -- recovers canonical preview after its document reloads               
+      (failed).png                                                                                  
+  -  /home/akryum/Projects/histoire/examples/vue3/cypress/screenshots/ui-workbench.cy    (1800x1200)
+     .js/Vue workbench integration -- shows collected prop defaults and restores them               
+      after removing an override (failed).png                                                       
+  -  /home/akryum/Projects/histoire/examples/vue3/cypress/screenshots/ui-workbench.cy    (1800x1200)
+     .js/Vue workbench integration -- applies matrix axes and base props to real cell               
+     s and restores URL choices (failed).png                                                        
+  -  /home/akryum/Projects/histoire/examples/vue3/cypress/screenshots/ui-workbench.cy    (1800x1200)
+     .js/Vue workbench integration -- detects no-hint chooser axes, switches exact ba               
+     se preset, and isolates long cell overrides (failed).png                                       
+  -  /home/akryum/Projects/histoire/examples/vue3/cypress/screenshots/ui-workbench.cy    (1800x1200)
+     .js/Vue workbench integration -- selects canvas variants and routes controls to                
+     selected preview (failed).png                                                                  
+  -  /home/akryum/Projects/histoire/examples/vue3/cypress/screenshots/ui-workbench.cy    (1800x1200)
+     .js/Vue workbench integration -- preserves docs tab deep link and reveals genera               
+     ted and story-file source (failed).png                                                         
+  -  /home/akryum/Projects/histoire/examples/vue3/cypress/screenshots/ui-workbench.cy    (1800x1200)
+     .js/Vue workbench integration -- collects events from selected runtime and displ               
+     ays inline arguments (failed).png                                                              
+  -  /home/akryum/Projects/histoire/examples/vue3/cypress/screenshots/ui-workbench.cy    (1800x1200)
+     .js/Vue workbench integration -- opens search with Ctrl+K, filters scopes, and n               
+     avigates docs and props (failed).png                                                           
+
+
+================================================================================
+
+  (Run Finished)
+
+
+       Spec                                              Tests  Passing  Failing  Pending  Skipped  
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ ✖  ui-workbench.cy.js                       02:28       15        6        9        -        - │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+    ✖  1 of 1 failed (100%)                     02:28       15        6        9        -        -  
+

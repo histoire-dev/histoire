@@ -1,4 +1,7 @@
+import type { HistoireEventSendMessage, HistoireTarget } from '@histoire/protocol'
 import { EVENT_SEND } from './const'
+import { cleanEventPayload } from './event-payload.js'
+import { publishRuntimeEvent, resolveRuntimeEventTarget } from './runtime-events.js'
 
 /**
  * Public `histoire/client` API: records an event fired by a story so it shows
@@ -9,15 +12,20 @@ import { EVENT_SEND } from './const'
  * the events store.
  *
  * @param name Event name displayed in the panel.
- * @param argument Event payload; DOM events are flattened first (see {@link stringifyEvent}).
+ * @param argument Event payload; DOM members are cleaned by {@link cleanEventPayload}.
+ * @param target Explicit structured actor for delayed object-only events in a multi-variant grid.
  */
-export async function logEvent(name: string, argument) {
+export async function logEvent(name: string, argument: unknown, target?: HistoireTarget) {
   console.log('[histoire] Event fired', { name, argument })
   const event = {
     name,
-    argument: JSON.parse(stringifyEvent(argument)), // Needed for HTMLEvent that can't be cloned
+    argument: cleanEventPayload(argument),
   }
   if (location.href.includes('__sandbox')) {
+    const message: HistoireEventSendMessage & Partial<HistoireTarget> = { type: EVENT_SEND, ...resolveRuntimeEventTarget(argument, target), event }
+    // Same publisher as readiness/state: it stamps current selection version
+    // and resolves actual embedding window even when a test runner patches parent.
+    if (publishRuntimeEvent(message)) return
     // The host only dispatches frame messages carrying the `__histoire` marker
     // (`isTrustedPreviewFrameMessage`), so without it every event logged from a
     // story is silently dropped and never reaches the panel.
@@ -26,29 +34,13 @@ export async function logEvent(name: string, argument) {
     // would leak event payloads to any cross-origin page embedding the sandbox.
     window.parent?.postMessage({
       __histoire: true,
-      type: EVENT_SEND,
-      event,
+      ...message,
+      // A WindowProxy survives navigation; attribute events to current document.
+      documentId: (window as Window & { __HST_PREVIEW_DOCUMENT_ID__?: string }).__HST_PREVIEW_DOCUMENT_ID__,
     }, window.location.origin)
   }
   else {
     const { useEventsStore } = await import('../stores/events.js')
     useEventsStore().addEvent(event)
   }
-}
-
-/**
- * Serializes an event-like object to JSON, keeping inherited accessor
- * properties (DOM events expose everything on their prototype) and replacing
- * values that cannot cross a structured-clone boundary.
- */
-function stringifyEvent(e) {
-  const obj = {}
-  for (const k in e) {
-    obj[k] = e[k]
-  }
-  return JSON.stringify(obj, (k, v) => {
-    if (v instanceof Node) return 'Node'
-    if (v instanceof Window) return 'Window'
-    return v
-  }, ' ')
 }

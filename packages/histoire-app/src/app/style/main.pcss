@@ -1,4 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Display&display=swap');
 @import 'floating-vue/dist/style.css';
 @import '@histoire/controls/dist/index.es.css';
 
@@ -6,65 +5,16 @@
 @import 'transitions.pcss';
 @import 'controls.css';
 
-*,
-::before,
-::after {
-  box-sizing: border-box;
-  border-width: 0;
-  border-style: solid;
-  border-color: #e5e7eb;
-}
-
-a,
-input,
-button {
-  color: inherit;
-}
-
-a {
-  text-decoration: inherit;
-}
-
-input, button {
-  font-family: inherit;
-}
-
-a,
-button {
-  user-select: none;
-}
+@import 'document.pcss';
+@import 'fonts.pcss';
+@import '../../../../histoire-vue/src/styles/style.css';
+@import 'tokens.pcss';
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
-  body,
-  pre {
-    margin: 0;
-  }
-
-  html,
-  body,
-  #app {
-    height: 100%;
-  }
-
-  html {
-    font-family: 'Noto Sans Display', system-ui, sans-serif;
-    font-size: 1rem;
-  }
-
-  body {
-    font-size: 1.125rem;
-  }
-
-  @media (min-width: 640px) {
-    body {
-      font-size: .875rem;
-    }
-  }
-
   .__histoire-render-story:not(.__histoire-render-custom-controls) {
     overflow: auto;
     min-height: 100%;

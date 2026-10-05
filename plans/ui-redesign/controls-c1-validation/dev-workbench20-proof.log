@@ -1,0 +1,44 @@
+Traceback (most recent call last):
+  File "/tmp/histoire-c1-state-proof.py", line 25, in <module>
+    result=subprocess.run(['node_modules/.bin/cypress','run','--config','baseUrl=http://localhost:6011,retries=0'+(',defaultCommandTimeout=20000' if name=='dev-workbench20' else ''),'--spec',spec,'--env',settings],cwd=project,env=env,stdout=test_output,stderr=subprocess.STDOUT,timeout=600)
+  File "/usr/lib64/python3.14/subprocess.py", line 557, in run
+    stdout, stderr = process.communicate(input, timeout=timeout)
+                     ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib64/python3.14/subprocess.py", line 1221, in communicate
+    stdout, stderr = self._communicate(input, endtime, timeout)
+                     ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib64/python3.14/subprocess.py", line 2179, in _communicate
+    self.wait(timeout=self._remaining_time(endtime))
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib64/python3.14/subprocess.py", line 1279, in wait
+    return self._wait(timeout=timeout)
+           ~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/usr/lib64/python3.14/subprocess.py", line 2076, in _wait
+    raise TimeoutExpired(self.args, timeout)
+subprocess.TimeoutExpired: Command '['node_modules/.bin/cypress', 'run', '--config', 'baseUrl=http://localhost:6011,retries=0,defaultCommandTimeout=20000', '--spec', 'cypress/e2e/ui-workbench.cy.js', '--env', 'workbenchMode=dev']' timed out after 600 seconds
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/tmp/histoire-c1-state-proof.py", line 34, in <module>
+    try: server.wait(timeout=25)
+         ~~~~~~~~~~~^^^^^^^^^^^^
+  File "/usr/lib64/python3.14/subprocess.py", line 1279, in wait
+    return self._wait(timeout=timeout)
+           ~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/usr/lib64/python3.14/subprocess.py", line 2076, in _wait
+    raise TimeoutExpired(self.args, timeout)
+subprocess.TimeoutExpired: Command '['node_modules/.bin/histoire', 'dev', '--port', '6011', '--config', '/tmp/histoire-c1-isolated.config.ts']' timed out after 25 seconds
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/tmp/histoire-c1-state-proof.py", line 37, in <module>
+    server.wait(timeout=10)
+    ~~~~~~~~~~~^^^^^^^^^^^^
+  File "/usr/lib64/python3.14/subprocess.py", line 1279, in wait
+    return self._wait(timeout=timeout)
+           ~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/usr/lib64/python3.14/subprocess.py", line 2076, in _wait
+    raise TimeoutExpired(self.args, timeout)
+subprocess.TimeoutExpired: Command '['node_modules/.bin/histoire', 'dev', '--port', '6011', '--config', '/tmp/histoire-c1-isolated.config.ts']' timed out after 10 seconds

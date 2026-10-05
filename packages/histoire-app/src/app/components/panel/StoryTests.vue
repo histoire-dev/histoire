@@ -13,6 +13,7 @@ const testsStore = useTestsStore()
 const definitions = computed(() => testsStore.currentDefinitions)
 const summary = computed(() => testsStore.currentSummary)
 const tests = computed(() => testsStore.currentTests)
+const serverAvailable = computed(() => typeof window !== 'undefined' && !!window.__HST_PLUGIN_API__)
 </script>
 
 <template>
@@ -32,9 +33,17 @@ const tests = computed(() => testsStore.currentTests)
         color="primary"
         class="htw-px-3 htw-py-1.5 htw-text-sm"
         :disabled="testsStore.currentRunning"
-        @click="testsStore.runCurrentVariantTests()"
+        @click="testsStore.runCurrentVariantTests('preview')"
       >
-        {{ testsStore.currentRunning ? 'Running…' : 'Run tests' }}
+        {{ testsStore.currentRunning ? 'Running…' : 'Run preview' }}
+      </BaseButton>
+      <BaseButton
+        v-if="serverAvailable"
+        class="htw-px-3 htw-py-1.5 htw-text-sm"
+        :disabled="testsStore.currentRunning"
+        @click="testsStore.runCurrentVariantTests('server')"
+      >
+        Run server
       </BaseButton>
     </div>
 

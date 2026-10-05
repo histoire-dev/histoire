@@ -4,8 +4,8 @@ import { markRaw, toRaw } from 'vue'
 /**
  * Resolves the component of a story file.
  *
- * `virtual:$histoire-stories` exposes `component` as a loader (`() =>
- * import(...)`) so the story module goes through the Vitest dynamic-import
+ * `virtual:$histoire-stories` exposes `component.__asyncLoader` so the story
+ * module goes through the Vitest dynamic-import
  * wrapper. The support plugins mounting the story — and the docs panel reading
  * the compiled `<docs>` block — need the resolved component instead: rendering
  * the loader directly makes Vue treat it as a functional component and paint
@@ -35,16 +35,9 @@ export async function resolveStoryFileComponent(file: StoryFile): Promise<any> {
   else if (component.__asyncLoader) {
     component = await component.__asyncLoader()
   }
-  else if (typeof component === 'function') {
-    try {
-      component = await component()
-    }
-    catch (e) {
-      // A support plugin may expose a component that is a class or a plain
-      // render function, which calling would throw on: keep the original.
-      return rawFile.component
-    }
-  }
+  // A function can be a React/Svelte component. Only explicit loaders may be
+  // invoked here; executing a component would replace it with its rendered node
+  // and can also run React hooks outside their owning root.
 
   if (component?.default) {
     component = component.default

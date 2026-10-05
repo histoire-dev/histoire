@@ -1,0 +1,17 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "design-system-font",
+        "value": "style",
+        "files": [
+          "packages/histoire/src/node/__tests__/mcp/inspection-browser.spec.ts"
+        ],
+        "createdAt": "2026-10-04T18:07:53.295Z",
+        "reason": "Agent: synthetic fontFamily in getComputedStyle mock verifies 512-character truncation; test fixture, no UI font choice"
+      }
+    ]
+  }
+}

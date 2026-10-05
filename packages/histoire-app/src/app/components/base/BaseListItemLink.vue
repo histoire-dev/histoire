@@ -1,10 +1,13 @@
 <script lang="ts">
 import { defineComponent } from 'vue'
+import { routerLinkProps } from './router-link-props'
 
 export default defineComponent({
   inheritAttrs: false,
 
   props: {
+    ...routerLinkProps,
+
     isActive: {
       type: Boolean,
       default: undefined,
@@ -33,6 +36,7 @@ export default defineComponent({
     v-slot="{ isActive: linkIsActive, href, navigate }"
     class="histoire-base-list-item-link"
     v-bind="$attrs"
+    :to="to"
     custom
   >
     <a

@@ -1,0 +1,7 @@
+export { analyzeConfigPath } from './analyze.js'
+export { createConfig } from './create.js'
+export { editConfig } from './edit.js'
+export { assertConfigPatches, assertConfigPath, CONFIG_EDITABLE_PATHS } from './paths.js'
+export type { ConfigAccessOptions, ConfigLocation, ConfigPatch, ConfigPathAnalysis, JsonValue } from './types.js'
+export { cleanupConfigBackups, configFileHash, hashConfigCode, restoreConfigBackup, writeConfig } from './write.js'
+export type { WriteConfigOptions } from './write.js'

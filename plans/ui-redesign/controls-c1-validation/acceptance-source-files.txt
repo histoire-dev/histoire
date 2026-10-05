@@ -1,0 +1,16 @@
+examples/cypress/frame-commands.js
+examples/vue3/cypress/e2e/ui-workbench.cy.js
+packages/histoire-app/src/app/components/canvas/toolbar/ScreenshotPopover.vue
+packages/histoire-app/src/app/components/comments/capture.ts
+packages/histoire-app/src/app/components/panes/tests/capture.ts
+packages/histoire-app/src/app/components/panes/tests/discovery.ts
+packages/histoire-app/src/app/components/panes/tests/model.ts
+packages/histoire-vue/src/__tests__/workbench-tests-discovery.spec.ts
+packages/histoire/src/node/__tests__/dom-env.spec.ts
+packages/histoire/src/node/__tests__/mcp/story-watcher-lifecycle.spec.ts
+packages/histoire/src/node/__tests__/project-test-collection.spec.ts
+packages/histoire/src/node/__tests__/vite.spec.ts
+packages/histoire/src/node/dom/env.ts
+packages/histoire/src/node/stories.ts
+packages/histoire/src/node/util/vitest-run.ts
+packages/histoire/src/node/vite/core-plugin.ts

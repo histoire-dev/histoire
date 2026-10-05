@@ -1,22 +1,22 @@
 /// <reference types="cypress" />
 
+import { selectCanvasVariant } from '../../../cypress/workbench-actions.js'
+
 describe('BaseButton grid detection', () => {
+  /** Opens canonical playground and waits until runtime admits controls. */
   function openBaseButtonStory() {
     cy.visit('/story/src-components-basebutton-story-vue?variantId=src-components-basebutton-story-vue-0')
     cy.get('[data-test-id="story-side-panel"]').should('be.visible')
+    cy.getPreviewIframeBody()
   }
 
-  function selectGridVariant(title, variantId) {
-    cy.getPreviewIframeBody().contains('button', title).click({ force: true })
-    cy.location('search').should('include', `variantId=${variantId}`)
-  }
-
+  /** Checks detected component count without relying on decorative layout. */
   function expectDetectedProps(componentCount) {
-    cy.get('[data-test-id="story-controls-detected-props"]').should('have.length', componentCount)
+    cy.get('[aria-label="Controls"] fieldset').should('have.length', componentCount)
   }
 
   function expectNoDetectedState() {
-    cy.get('[data-test-id="story-controls-detected-state"]').should('not.exist')
+    cy.get('[aria-label="Controls"] .histoire-generic-controls > label').should('not.exist')
   }
 
   beforeEach(() => {
@@ -39,11 +39,11 @@ describe('BaseButton grid detection', () => {
 
     // The other variants declare neither init state nor controls: only the
     // detected props of the component they render.
-    selectGridVariant('big green button', 'src-components-basebutton-story-vue-1')
+    selectCanvasVariant('big green button', 'src-components-basebutton-story-vue-1')
     expectDetectedProps(1)
     expectNoDetectedState()
 
-    selectGridVariant('small red button', 'src-components-basebutton-story-vue-2')
+    selectCanvasVariant('small red button', 'src-components-basebutton-story-vue-2')
     expectDetectedProps(1)
     expectNoDetectedState()
   })

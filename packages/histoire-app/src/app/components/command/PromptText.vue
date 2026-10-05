@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import type { TextPrompt } from '@histoire/shared'
+import { getControlElement, HstText } from '@histoire/controls/vue'
 import { computed, ref, watch } from 'vue'
 
 const props = defineProps<{
@@ -54,12 +55,13 @@ watch(defaultValue, (value) => {
           class="htw-opacity-70"
         >*</span>
       </span>
-      <input
-        ref="input"
+      <HstText
+        :ref="value => { input = getControlElement(value) as HTMLInputElement }"
         v-model="model"
-        class="htw-bg-transparent htw-w-full htw-p-2 htw-border htw-border-gray-500/50 focus:htw-border-primary-500/50 htw-rounded htw-outline-none"
+        layout="inline"
+        class="htw-w-full"
         :required="prompt.required"
-      >
+      />
     </label>
   </div>
 </template>

@@ -1,0 +1,26 @@
+
+ RUN  v4.1.10 /home/akryum/Projects/histoire/packages/histoire-vue
+
+ ❯ src/__tests__/workbench-tests-discovery.spec.ts (11 tests | 1 failed) 904ms
+     × pauses discovery for concurrent captures and resumes only after final owner releases 56ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/__tests__/workbench-tests-discovery.spec.ts > project test discovery > pauses discovery for concurrent captures and resumes only after final owner releases
+TypeError: model.suspendDiscovery is not a function
+ ❯ src/__tests__/workbench-tests-discovery.spec.ts:136:27
+    134|     try {
+    135|       await vi.waitFor(() => expect(collectProject).toHaveBeenCalledOn…
+    136|       const first = model.suspendDiscovery()
+       |                           ^
+    137|       const second = model.suspendDiscovery()
+    138|       expect(collectProject.mock.calls[0][0].aborted).toBe(true)
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 10 passed (11)
+   Start at  22:55:34
+   Duration  2.43s (transform 774ms, setup 0ms, import 1.05s, tests 904ms, environment 355ms)
+

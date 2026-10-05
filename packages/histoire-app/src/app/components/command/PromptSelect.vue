@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import type { SelectPrompt, SelectPromptOption } from '@histoire/shared'
+import { getControlElement, HstButton, HstText } from '@histoire/controls/vue'
 import { Icon } from '@iconify/vue'
 import { computed, ref, watchEffect } from 'vue'
 import { useSelection } from '../../util/select.js'
@@ -85,12 +86,13 @@ function selectIndex(index: number) {
 
 <template>
   <div class="histoire-prompt-select htw-relative htw-group">
-    <input
+    <HstText
       v-model="model"
+      layout="inline"
       :required="prompt.required"
       tabindex="-1"
       class="htw-absolute htw-inset-0 htw-opacity-0 htw-pointer-events-none"
-    >
+    />
     <label class="htw-flex htw-flex-col htw-gap-2 htw-p-2">
       <span class="htw-px-2 htw-flex">
         <span>{{ prompt.label }}</span>
@@ -103,20 +105,22 @@ function selectIndex(index: number) {
           Press <BaseKeyboardShortcut shortcut="Space" /> to select
         </span>
       </span>
-      <input
-        ref="input"
+      <HstText
+        :ref="value => { input = getControlElement(value) as HTMLInputElement }"
         v-model="search"
-        class="htw-bg-transparent htw-w-full htw-p-2 htw-border htw-border-gray-500/50 focus:htw-border-primary-500/50 htw-rounded htw-outline-none"
+        layout="inline"
+        class="htw-w-full"
         @keydown.down.prevent="selectNext()"
         @keydown.up.prevent="selectPrevious()"
         @keydown.space.prevent="selectIndex(selectedIndex)"
-      >
+      />
     </label>
 
     <div class="htw-overflow-auto max-h-[300px] htw-mb-2">
-      <button
+      <HstButton
         v-for="(option, index) of formattedOptions"
         :key="option.value"
+        color="flat"
         type="button"
         tabindex="-1"
         :class="[
@@ -136,7 +140,7 @@ function selectIndex(index: number) {
           icon="carbon:checkmark"
           class="htw-w-4 htw-h-4 htw-text-primary-500"
         />
-      </button>
+      </HstButton>
     </div>
   </div>
 </template>

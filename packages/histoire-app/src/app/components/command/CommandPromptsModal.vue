@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { defineAsyncComponent } from 'vue'
 import { useCommandStore } from '../../stores/command.js'
+import { executeCommand, getCommandContext } from '../../util/commands.js'
 
 const CommandPrompts = defineAsyncComponent(() => import('./CommandPrompts.vue'))
 
@@ -34,6 +35,8 @@ const commandStore = useCommandStore()
     <div class="htw-bg-white dark:htw-bg-gray-900 md:htw-mt-16 md:htw-mx-auto htw-w-screen htw-max-w-[512px] htw-max-h-[80vh] htw-overflow-y-auto htw-scroll-smooth htw-shadow-xl htw-border htw-border-gray-200 dark:htw-border-gray-750 htw-rounded-lg htw-relative htw-divide-y htw-divide-gray-200 dark:htw-divide-gray-850">
       <CommandPrompts
         :command="commandStore.selectedCommand"
+        :context="getCommandContext()"
+        :execute="executeCommand"
         @close="close()"
       />
     </div>

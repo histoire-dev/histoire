@@ -1,0 +1,255 @@
+[2170245:1004/214545.895753:ERROR:node_bindings.cc(305)] Most NODE_OPTIONs are not supported in packaged apps. See documentation for more details.
+
+DevTools listening on ws://127.0.0.1:39381/devtools/browser/a5d61d3a-8297-4ecc-92fc-579a3f261e24
+(node:2171061) ExperimentalWarning: `--experimental-loader` may be removed in the future; instead use `register()`:
+--import 'data:text/javascript,import { register } from "node:module"; import { pathToFileURL } from "node:url"; register("file%3A///home/akryum/.cache/Cypress/13.17.0/Cypress/resources/app/node_modules/ts-node/esm/transpile-only.mjs", pathToFileURL("./"));'
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:2171061) [DEP0180] DeprecationWarning: fs.Stats constructor is deprecated.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+
+================================================================================
+
+  (Run Starting)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Cypress:        13.17.0                                                                        │
+  │ Browser:        Electron 118 (headless)                                                        │
+  │ Node Version:   v24.16.0 (/home/akryum/.local/share/mise/installs/node/24.16.0/bin/node)       │
+  │ Specs:          1 found (ui-workbench.cy.js)                                                   │
+  │ Searched:       cypress/e2e/ui-workbench.cy.js                                                 │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+                                                                                                    
+  Running:  ui-workbench.cy.js                                                              (1 of 1)
+
+
+  Workbench contracts
+    1) persists selected pane, panel visibility, and inspector visibility
+    ✓ recovers canonical preview after its document reloads (20487ms)
+    ✓ shares persistent color scheme between settings and rail action (20137ms)
+    ✓ pans frames with Space and uses keyboard zoom without changing selection (16225ms)
+Warning: terminator_CreateInstance: Failed to CreateInstance in ICD 2.  Skipping ICD.
+    ✓ persists local viewport presets and applies their logical frame size (50167ms)
+    ✓ exposes only panes and settings supported by current build mode (11274ms)
+
+  Vue development workbench
+    ✓ persists a comment draft, resolves it, and reopens its exact thread (72616ms)
+    ✓ captures selected preview as PNG and WebP through screenshot service (63487ms)
+
+  Vue workbench integration
+    2) shows collected prop defaults and restores them after removing an override
+    3) applies matrix axes and base props to real cells and restores URL choices
+    4) detects no-hint chooser axes, switches exact base preset, and isolates long cell overrides
+    5) selects canvas variants and routes controls to selected preview
+    6) preserves docs tab deep link and reveals generated and story-file source
+    7) collects events from selected runtime and displays inline arguments
+    8) opens search with Ctrl+K, filters scopes, and navigates docs and props
+
+
+  7 passing (11m)
+  8 failing
+
+  1) Workbench contracts
+       persists selected pane, panel visibility, and inspector visibility:
+     CypressError: Timed out retrying after 20000ms: `cy.contains()` failed because the page updated as a result of this command, but you tried to continue the command chain. The subject is no longer attached to the DOM, and Cypress cannot requery the page after commands such as `cy.contains()`.
+
+Common situations why this happens:
+  - Your JS framework re-rendered asynchronously
+  - Your app code reacted to an event firing and removed the element
+
+You can typically solve this by breaking up a chain. For example, rewrite:
+
+> `cy.get('button').click().should('have.class', 'active')`
+
+to
+
+> `cy.get('button').as('btn').click()`
+> `cy.get('@btn').should('have.class', 'active')`
+
+https://on.cypress.io/element-has-detached-from-dom
+      at isAttached (http://localhost:6011/__cypress/runner/cypress_runner.js:144980:58)
+      at validateType (http://localhost:6011/__cypress/runner/cypress_runner.js:144850:9)
+      at Object.isType (http://localhost:6011/__cypress/runner/cypress_runner.js:144885:7)
+      at <unknown> (http://localhost:6011/__cypress/runner/cypress_runner.js:132102:22)
+      at Object.subjectFn (http://localhost:6011/__cypress/runner/cypress_runner.js:143866:16)
+      at $Cy.verifyUpcomingAssertions (http://localhost:6011/__cypress/runner/cypress_runner.js:143205:31)
+      at onRetry (http://localhost:6011/__cypress/runner/cypress_runner.js:143857:15)
+      at tryCatcher (http://localhost:6011/__cypress/runner/cypress_runner.js:1830:23)
+      at Promise.attempt.Promise.try (http://localhost:6011/__cypress/runner/cypress_runner.js:4338:29)
+      at whenStable (http://localhost:6011/__cypress/runner/cypress_runner.js:143744:68)
+      at <unknown> (http://localhost:6011/__cypress/runner/cypress_runner.js:143685:14)
+      at tryCatcher (http://localhost:6011/__cypress/runner/cypress_runner.js:1830:23)
+      at Promise._settlePromiseFromHandler (http://localhost:6011/__cypress/runner/cypress_runner.js:1542:31)
+      at Promise._settlePromise (http://localhost:6011/__cypress/runner/cypress_runner.js:1599:18)
+      at Promise._settlePromise0 (http://localhost:6011/__cypress/runner/cypress_runner.js:1644:10)
+      at Promise._settlePromises (http://localhost:6011/__cypress/runner/cypress_runner.js:1724:18)
+      at Promise._fulfill (http://localhost:6011/__cypress/runner/cypress_runner.js:1668:18)
+      at <unknown> (http://localhost:6011/__cypress/runner/cypress_runner.js:5473:46)
+  From Your Spec Code:
+      at Context.eval (webpack://histoire-example-vue3/../cypress/workbench-contract.js:39:32)
+
+  2) Vue workbench integration
+       shows collected prop defaults and restores them after removing an override:
+
+      AssertionError: Timed out retrying after 20000ms: owning preview readiness: expected '<div.histoire-primary-frame>' to have attribute 'aria-busy' with the value 'false', but the value was 'true'
+      + expected - actual
+
+      -'true'
+      +'false'
+      
+      at Context.eval (webpack://histoire-example-vue3/../cypress/frame-commands.js:9:82)
+
+  3) Vue workbench integration
+       applies matrix axes and base props to real cells and restores URL choices:
+
+      Timed out retrying after 20000ms
+      + expected - actual
+
+      -[ undefined, undefined, undefined, undefined ]
+      +[ 'Matrix message · enabled=false · emphasized=false',
+      +  'Matrix message · enabled=false · emphasized=true',
+      +  'Matrix message · enabled=true · emphasized=false',
+      +  'Matrix message · enabled=true · emphasized=true' ]
+      
+      at Context.eval (webpack://histoire-example-vue3/./cypress/e2e/ui-workbench.cy.js:81:29)
+
+  4) Vue workbench integration
+       detects no-hint chooser axes, switches exact base preset, and isolates long cell overrides:
+     AssertionError: Timed out retrying after 20000ms: expected '<button.histoire-button.histoire-toolbar-button>' not to be 'disabled'
+      at Context.eval (webpack://histoire-example-vue3/./cypress/e2e/ui-workbench.cy.js:113:42)
+
+  5) Vue workbench integration
+       selects canvas variants and routes controls to selected preview:
+
+      AssertionError: Timed out retrying after 20000ms: owning preview readiness: expected '<div.histoire-primary-frame>' to have attribute 'aria-busy' with the value 'false', but the value was 'true'
+      + expected - actual
+
+      -'true'
+      +'false'
+      
+      at Context.eval (webpack://histoire-example-vue3/../cypress/frame-commands.js:9:82)
+
+  6) Vue workbench integration
+       preserves docs tab deep link and reveals generated and story-file source:
+
+      AssertionError: Timed out retrying after 20000ms: owning preview readiness: expected '<div.histoire-primary-frame>' to have attribute 'aria-busy' with the value 'false', but the value was 'true'
+      + expected - actual
+
+      -'true'
+      +'false'
+      
+      at Context.eval (webpack://histoire-example-vue3/../cypress/frame-commands.js:9:82)
+
+  7) Vue workbench integration
+       collects events from selected runtime and displays inline arguments:
+     CypressError: Timed out after waiting `60000ms` for your remote page to load.
+
+Your page did not fire its `load` event within `60000ms`.
+
+You can try increasing the `pageLoadTimeout` value in `cypress.config.mjs` to wait longer.
+
+Browsers will not fire the `load` event until all stylesheets and scripts are done downloading.
+
+When this `load` event occurs, Cypress will continue running commands.
+      at timedOutWaitingForPageLoad (http://localhost:6011/__cypress/runner/cypress_runner.js:130639:64)
+      at <unknown> (http://localhost:6011/__cypress/runner/cypress_runner.js:131624:16)
+      at tryCatcher (http://localhost:6011/__cypress/runner/cypress_runner.js:1830:23)
+      at <unknown> (http://localhost:6011/__cypress/runner/cypress_runner.js:4209:41)
+      at tryCatcher (http://localhost:6011/__cypress/runner/cypress_runner.js:1830:23)
+      at Promise._settlePromiseFromHandler (http://localhost:6011/__cypress/runner/cypress_runner.js:1542:31)
+      at Promise._settlePromise (http://localhost:6011/__cypress/runner/cypress_runner.js:1599:18)
+      at Promise._settlePromise0 (http://localhost:6011/__cypress/runner/cypress_runner.js:1644:10)
+      at Promise._settlePromises (http://localhost:6011/__cypress/runner/cypress_runner.js:1720:18)
+      at _drainQueueStep (http://localhost:6011/__cypress/runner/cypress_runner.js:2430:12)
+      at _drainQueue (http://localhost:6011/__cypress/runner/cypress_runner.js:2423:9)
+      at Async._drainQueues (http://localhost:6011/__cypress/runner/cypress_runner.js:2439:5)
+      at Async.drainQueues (http://localhost:6011/__cypress/runner/cypress_runner.js:2309:14)
+  From Your Spec Code:
+      at Context.eval (webpack://histoire-example-vue3/./cypress/e2e/ui-workbench.cy.js:186:7)
+
+  8) Vue workbench integration
+       opens search with Ctrl+K, filters scopes, and navigates docs and props:
+     CypressError: Timed out after waiting `60000ms` for your remote page to load.
+
+Your page did not fire its `load` event within `60000ms`.
+
+You can try increasing the `pageLoadTimeout` value in `cypress.config.mjs` to wait longer.
+
+Browsers will not fire the `load` event until all stylesheets and scripts are done downloading.
+
+When this `load` event occurs, Cypress will continue running commands.
+      at timedOutWaitingForPageLoad (http://localhost:6011/__cypress/runner/cypress_runner.js:130639:64)
+      at <unknown> (http://localhost:6011/__cypress/runner/cypress_runner.js:131624:16)
+      at tryCatcher (http://localhost:6011/__cypress/runner/cypress_runner.js:1830:23)
+      at <unknown> (http://localhost:6011/__cypress/runner/cypress_runner.js:4209:41)
+      at tryCatcher (http://localhost:6011/__cypress/runner/cypress_runner.js:1830:23)
+      at Promise._settlePromiseFromHandler (http://localhost:6011/__cypress/runner/cypress_runner.js:1542:31)
+      at Promise._settlePromise (http://localhost:6011/__cypress/runner/cypress_runner.js:1599:18)
+      at Promise._settlePromise0 (http://localhost:6011/__cypress/runner/cypress_runner.js:1644:10)
+      at Promise._settlePromises (http://localhost:6011/__cypress/runner/cypress_runner.js:1720:18)
+      at _drainQueueStep (http://localhost:6011/__cypress/runner/cypress_runner.js:2430:12)
+      at _drainQueue (http://localhost:6011/__cypress/runner/cypress_runner.js:2423:9)
+      at Async._drainQueues (http://localhost:6011/__cypress/runner/cypress_runner.js:2439:5)
+      at Async.drainQueues (http://localhost:6011/__cypress/runner/cypress_runner.js:2309:14)
+  From Your Spec Code:
+      at Context.eval (webpack://histoire-example-vue3/./cypress/e2e/ui-workbench.cy.js:199:7)
+
+
+
+
+  (Results)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Tests:        15                                                                               │
+  │ Passing:      7                                                                                │
+  │ Failing:      8                                                                                │
+  │ Pending:      0                                                                                │
+  │ Skipped:      0                                                                                │
+  │ Screenshots:  8                                                                                │
+  │ Video:        false                                                                            │
+  │ Duration:     10 minutes, 41 seconds                                                           │
+  │ Spec Ran:     ui-workbench.cy.js                                                               │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+  (Screenshots)
+
+  -  /home/akryum/Projects/histoire/examples/vue3/cypress/screenshots/ui-workbench.cy    (1800x1200)
+     .js/Workbench contracts -- persists selected pane, panel visibility, and inspect               
+     or visibility (failed).png                                                                     
+  -  /home/akryum/Projects/histoire/examples/vue3/cypress/screenshots/ui-workbench.cy    (1800x1200)
+     .js/Vue workbench integration -- shows collected prop defaults and restores them               
+      after removing an override (failed).png                                                       
+  -  /home/akryum/Projects/histoire/examples/vue3/cypress/screenshots/ui-workbench.cy    (1800x1200)
+     .js/Vue workbench integration -- applies matrix axes and base props to real cell               
+     s and restores URL choices (failed).png                                                        
+  -  /home/akryum/Projects/histoire/examples/vue3/cypress/screenshots/ui-workbench.cy    (1800x1200)
+     .js/Vue workbench integration -- detects no-hint chooser axes, switches exact ba               
+     se preset, and isolates long cell overrides (failed).png                                       
+  -  /home/akryum/Projects/histoire/examples/vue3/cypress/screenshots/ui-workbench.cy    (1800x1200)
+     .js/Vue workbench integration -- selects canvas variants and routes controls to                
+     selected preview (failed).png                                                                  
+  -  /home/akryum/Projects/histoire/examples/vue3/cypress/screenshots/ui-workbench.cy    (1800x1200)
+     .js/Vue workbench integration -- preserves docs tab deep link and reveals genera               
+     ted and story-file source (failed).png                                                         
+  -  /home/akryum/Projects/histoire/examples/vue3/cypress/screenshots/ui-workbench.cy    (1800x1200)
+     .js/Vue workbench integration -- collects events from selected runtime and displ               
+     ays inline arguments (failed).png                                                              
+  -  /home/akryum/Projects/histoire/examples/vue3/cypress/screenshots/ui-workbench.cy    (1800x1200)
+     .js/Vue workbench integration -- opens search with Ctrl+K, filters scopes, and n               
+     avigates docs and props (failed).png                                                           
+
+
+================================================================================
+
+  (Run Finished)
+
+
+       Spec                                              Tests  Passing  Failing  Pending  Skipped  
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ ✖  ui-workbench.cy.js                       10:41       15        7        8        -        - │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+    ✖  1 of 1 failed (100%)                     10:41       15        7        8        -        -  
+

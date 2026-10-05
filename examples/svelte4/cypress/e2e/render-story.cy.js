@@ -1,5 +1,7 @@
 /// <reference types="cypress" />
 
+import { getCanvasVariantBody } from '../../../cypress/workbench-actions.js'
+
 describe('Story render', () => {
   it('should display the story content', () => {
     cy.visit('/story/src-meow-story-svelte?variantId=src-meow-story-svelte-0')
@@ -8,9 +10,9 @@ describe('Story render', () => {
 
   it('should display the story content (grid)', () => {
     cy.visit('/story/src-cars-story-svelte')
-    cy.getPreviewIframeBody().find('[data-test-id="sandbox-render"]').contains('🚗')
-    cy.getPreviewIframeBody().find('[data-test-id="sandbox-render"]').contains('🏎️')
-    cy.getPreviewIframeBody().find('[data-test-id="sandbox-render"]').contains('🚜')
+    getCanvasVariantBody('src-cars-story-svelte', 'src-cars-story-svelte-0').contains('🚗')
+    getCanvasVariantBody('src-cars-story-svelte', 'src-cars-story-svelte-1').contains('🏎️')
+    getCanvasVariantBody('src-cars-story-svelte', 'src-cars-story-svelte-2').contains('🚜')
   })
 })
 

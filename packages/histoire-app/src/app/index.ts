@@ -1,37 +1,15 @@
-import FloatingVue from 'floating-vue'
-import { createPinia } from 'pinia'
-import { createApp } from 'vue'
-import App from './App.vue'
-import { setupPluginApi } from './plugin.js'
-import { router } from './router'
+import { HistoireSdkError } from '@histoire/protocol'
+import { bookBase, loadDescriptor, subscribeSource } from 'virtual:$histoire-local-source'
+import { mountStandaloneApp } from './standalone/mount.js'
 import './util/vitest-mocker-shim'
 import 'virtual:$histoire-vitest-browser-runtime'
 import 'virtual:$histoire-theme'
 
 export { default as StoryVariantGridSandbox } from './components/story/StoryVariantGridSandbox.vue'
 
-export async function mountMainApp() {
-  const app = createApp(App)
-  app.use(createPinia())
-  app.use(FloatingVue, {
-    overflowPadding: 4,
-    arrowPadding: 8,
-    themes: {
-      tooltip: {
-        distance: 8,
-      },
-      dropdown: {
-        computeTransformOrigin: true,
-        distance: 8,
-      },
-    },
-  })
-  app.use(router)
-  app.mount('#app')
-
-  if (import.meta.hot) {
-    import.meta.hot.send('histoire:mount', {})
-
-    /* #__PURE__ */ setupPluginApi()
-  }
+/** Existing bundle mounts #app; first-party consumers may provide explicit element or selector. */
+export function mountMainApp(target: string | HTMLElement = '#app') {
+  const container = typeof target === 'string' ? document.querySelector<HTMLElement>(target) : target
+  if (!container) throw new HistoireSdkError('INVALID_ARGUMENT', 'Standalone mount target unavailable')
+  return mountStandaloneApp({ container, url: new URL(bookBase, container.ownerDocument.defaultView!.location.origin).href, loadDescriptor, subscribe: subscribeSource })
 }

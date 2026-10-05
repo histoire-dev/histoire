@@ -1,0 +1,203 @@
+
+ RUN  v4.1.10 /home/akryum/Projects/histoire/packages/histoire
+
+(node:2938932) [DEP0187] DeprecationWarning: Passing invalid argument types to fs.existsSync is deprecated
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ❯ src/node/__tests__/vitest-browser-config.spec.ts (7 tests | 1 failed) 26050ms
+   × reuses the dep-optimizer cache between runs instead of forcing prebundles 15167ms
+useNuxtApp {
+  _id: 'histoire-preview-1',
+  _scope: EffectScope {
+    detached: false,
+    _active: true,
+    _on: 0,
+    effects: [],
+    cleanups: [],
+    _isPaused: false,
+    parent: undefined
+  },
+  provide: [Function (anonymous)],
+  versions: { nuxt: [Getter], vue: [Getter] },
+  payload: {
+    data: {},
+    state: {},
+    once: Set(0) {},
+    _errors: {},
+    serverRendered: false,
+    config: { public: [Object], app: [Object] },
+    error: undefined
+  },
+  static: { data: {} },
+  runWithContext: [Function (anonymous)],
+  isHydrating: false,
+  deferHydration: [Function: deferHydration],
+  _asyncDataPromises: {},
+  _asyncData: {},
+  _payloadRevivers: {
+    NuxtError: [Function (anonymous)],
+    EmptyShallowRef: [Function (anonymous)],
+    EmptyRef: [Function (anonymous)],
+    ShallowRef: [Function (anonymous)],
+    ShallowReactive: [Function (anonymous)],
+    Ref: [Function (anonymous)],
+    Reactive: [Function (anonymous)],
+    Island: [Function (anonymous)]
+  },
+  vueApp: <ref *1> {
+    _uid: 0,
+    _component: { provide: [Object], render: [Function: render] },
+    _props: null,
+    _container: null,
+    _context: {
+      app: [Circular *1],
+      config: [Object],
+      mixins: [],
+      components: [Object],
+      directives: {},
+      provides: [Object: null prototype],
+      optionsCache: [WeakMap],
+      propsCache: [WeakMap],
+      emitsCache: [WeakMap],
+      reload: [Function (anonymous)]
+    },
+    _instance: null,
+    version: '3.5.26',
+    config: [Getter/Setter],
+    use: [Function: use],
+    mixin: [Function: mixin],
+    component: [Function: component],
+    directive: [Function: directive],
+    mount: [Function (anonymous)],
+    onUnmount: [Function: onUnmount],
+    unmount: [Function: unmount],
+    provide: [Function: provide],
+    runWithContext: [Function: runWithContext],
+    __HST_NUXT_SETUP_CONTEXT__: [Function (anonymous)],
+    __HST_NUXT_CLEANUP__: [Function: cleanup],
+    __HST_NUXT_LIFECYCLE__: [AsyncFunction (anonymous)]
+  },
+  id: 'histoire-preview-1',
+  hooks: Hookable {
+    _hooks: {
+      'app:error': [Array],
+      'app:mounted': [Array],
+      'page:start': [Array],
+      'page:finish': [Array],
+      'app:suspense:resolve': [Array],
+      'app:chunkError': [Array],
+      'app:manifest:update': [Array]
+    },
+    _before: [ [Function (anonymous)] ],
+    _after: [ [Function (anonymous)] ],
+    _deprecatedMessages: undefined,
+    _deprecatedHooks: {},
+    hook: [Function: bound hook],
+    callHook: [Function: bound callHook],
+    callHookWith: [Function: bound callHookWith]
+  },
+  hook: [Function: bound hook],
+  callHook: [Function: bound callHook],
+  _route: {
+    path: '/',
+    fullPath: '/',
+    query: [Object: null prototype] {},
+    hash: '',
+    params: {},
+    name: undefined,
+    matched: [],
+    redirectedFrom: undefined,
+    meta: {},
+    href: '/'
+  },
+  _middleware: { global: [], named: {} }
+}
+[nuxt] Could not access `toJSON`. The only available runtime config keys on the client side are `public` and `app`. See https://nuxt.com/docs/4.x/guide/going-further/runtime-config for more information.
+useNuxtApp().$config {
+  public: { configFromNuxt: 'test' },
+  app: {
+    baseURL: '/book/',
+    rootId: 'nuxt-test',
+    buildAssetsDir: '/_nuxt/',
+    cdnURL: '',
+    head: { meta: [Array], link: [], style: [], script: [], noscript: [] },
+    layoutTransition: false,
+    pageTransition: false,
+    viewTransition: false,
+    keepalive: false,
+    rootTag: 'div',
+    rootAttrs: { id: 'nuxt-test' },
+    teleportTag: 'div',
+    teleportId: 'teleports',
+    teleportAttrs: { id: 'teleports' },
+    spaLoaderTag: 'div',
+    spaLoaderAttrs: { id: '__nuxt-loader' }
+  }
+}
+useRuntimeConfig {
+  public: { configFromNuxt: 'test' },
+  app: {
+    baseURL: '/book/',
+    rootId: 'nuxt-test',
+    buildAssetsDir: '/_nuxt/',
+    cdnURL: '',
+    head: { meta: [Array], link: [], style: [], script: [], noscript: [] },
+    layoutTransition: false,
+    pageTransition: false,
+    viewTransition: false,
+    keepalive: false,
+    rootTag: 'div',
+    rootAttrs: { id: 'nuxt-test' },
+    teleportTag: 'div',
+    teleportId: 'teleports',
+    teleportAttrs: { id: 'teleports' },
+    spaLoaderTag: 'div',
+    spaLoaderAttrs: { id: '__nuxt-loader' }
+  }
+}
+app/components/AutoImport.story.vue 1109ms (setup:42ms, execute:271ms, run:796ms)
+app/components/BaseButton.story.vue 83ms (setup:8ms, execute:1ms, run:74ms)
+app/components/BaseButtonLink.story.vue 285ms (setup:7ms, execute:0ms, run:278ms)
+app/components/Simple.story.vue 39ms (setup:9ms, execute:0ms, run:29ms)
+Book.story.vue 246ms (setup:53ms, execute:40ms, run:149ms)
+.histoire/tmp/dev/run-muu3a20o-7be25b22/plugins/owned-output.d4b39a97/Generated.story.js 63ms (setup:15ms, execute:0ms, run:48ms)
+.histoire/tmp/dev/run-muu39zx5-ca9787f6/plugins/owned-output.d4b39a97/Generated.story.js 285ms (setup:38ms, execute:242ms, run:5ms)
+.histoire/tmp/dev/run-muu39zsj-b815c145/plugins/owned-output.d4b39a97/Generated.story.js 282ms (setup:41ms, execute:235ms, run:6ms)
+Book.story.vue 158ms (setup:6ms, execute:0ms, run:150ms)
+Book.story.vue 169ms (setup:6ms, execute:0ms, run:161ms)
+Book.story.vue 29ms (setup:12ms, execute:6ms, run:11ms)
+Book.story.vue 46ms (setup:14ms, execute:14ms, run:16ms)
+Book.story.vue 205ms (setup:43ms, execute:41ms, run:118ms)
+.histoire/tmp/dev/run-muu3aijr-b514ff0d/plugins/owned-output.d4b39a97/Generated.story.js 12ms (setup:7ms, execute:0ms, run:5ms)
+Book.story.vue 153ms (setup:44ms, execute:24ms, run:81ms)
+Book.story.vue 136ms (setup:42ms, execute:10ms, run:82ms)
+.histoire/tmp/dev/run-muu3akcg-8ad90859/plugins/owned-output.d4b39a97/Generated.story.js 20ms (setup:9ms, execute:0ms, run:11ms)
+.histoire/tmp/dev/run-muu3akc6-72429875/plugins/owned-output.d4b39a97/Generated.story.js 18ms (setup:8ms, execute:0ms, run:10ms)
+Book.story.vue 196ms (setup:41ms, execute:42ms, run:110ms)
+.histoire/tmp/dev/run-muu3au0d-b75e4853/plugins/owned-output.d4b39a97/Generated.story.js 13ms (setup:9ms, execute:0ms, run:4ms)
+Book.story.vue 240ms (setup:48ms, execute:66ms, run:123ms)
+.histoire/tmp/dev/run-muu3b01m-6771b587/plugins/owned-output.d4b39a97/Generated.story.js 9ms (setup:5ms, execute:0ms, run:3ms)
+Book.story.vue 88ms (setup:36ms, execute:9ms, run:41ms)
+Book.story.vue 166ms (setup:38ms, execute:16ms, run:110ms)
+.histoire/tmp/dev/run-muu3b86k-1c22ce36/plugins/owned-output.d4b39a97/Generated.story.js 8ms (setup:5ms, execute:0ms, run:3ms)
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/node/__tests__/vitest-browser-config.spec.ts > reuses the dep-optimizer cache between runs instead of forcing prebundles
+Error: Test timed out in 15000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ src/node/__tests__/vitest-browser-config.spec.ts:52:1
+     50| })
+     51|
+     52| it('reuses the dep-optimizer cache between runs instead of forcing pre…
+       | ^
+     53|   const ctx = createContext()
+     54|   const collection = await getHistoireBrowserRunConfig(ctx, { collecti…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 264 passed (265)
+      Tests  1 failed | 1318 passed (1319)
+   Start at  19:22:42
+   Duration  86.31s (transform 92.83s, setup 0ms, import 226.04s, tests 417.89s, environment 5.85s)
+

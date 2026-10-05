@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 /** Long menu exercises host placement independently of controls form height. */
-const options = Array.from({ length: 50 }, (_, value) => ({ value, label: `Option ${value}` }))
+const options = Array.from({ length: 50 }, (_, value) => ({ value, label: value === 48 ? `Option 48: ${'A long label preserved in full. '.repeat(5)}` : `Option ${value}`, disabled: value === 5 }))
 
 /** State synchronized between controls sandbox and preview. */
 function initState() {
