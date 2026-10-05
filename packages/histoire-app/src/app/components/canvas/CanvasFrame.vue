@@ -100,9 +100,9 @@ function openMenu(event: MouseEvent | KeyboardEvent) {
 
 <template>
   <section class="histoire-canvas-frame" :class="{ 'is-selected': selected, 'is-stale': stale, 'is-list': arrange === 'list', 'is-highlighted': highlighted, 'is-dimmed': dimmed }" :style="position" :data-frame-id="frame.id" @contextmenu.prevent="openMenu">
-    <HstButton color="flat" class="histoire-frame-label" :aria-pressed="selected" :disabled="!canSelect" @click="select" @keydown="onKeyDown">
-      <span>{{ variant.title }}</span><WorkbenchIcon v-if="status === 'error'" name="error-filled" :size="12" class="is-error" /><WorkbenchIcon v-else-if="testIcon" :name="testIcon" :size="12" :class="{ 'is-error': test?.failed || test?.error }" />
-    </HstButton>
+    <button type="button" class="histoire-frame-label" :aria-pressed="selected" :disabled="!canSelect" @click="select" @keydown="onKeyDown">
+      <span :title="variant.title">{{ variant.title }}</span><WorkbenchIcon v-if="status === 'error'" name="error-filled" :size="12" class="is-error" /><WorkbenchIcon v-else-if="testIcon" :name="testIcon" :size="12" :class="{ 'is-error': test?.failed || test?.error }" />
+    </button>
     <div class="histoire-frame-body" data-test-id="responsive-preview-bg" :style="{ height: `${height * canvas.effectiveZoom}px`, background }" @click="select">
       <div class="histoire-frame-content" :style="previewStyle">
         <CanvasReplicaPreview v-if="live && !selected" ref="replica" :frame-id="frame.id" :story-id="frame.storyId" :variant-id="frame.variantId" :preview-base="previewBase" @status="updateStatus" />
@@ -126,8 +126,31 @@ function openMenu(event: MouseEvent | KeyboardEvent) {
 <style scoped>
 .histoire-canvas-frame { position: absolute; min-width: 0; }
 .is-dimmed { opacity: .35; }
-.histoire-frame-label { width: 100%; height: 28px; display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 0 0 8px; color: var(--histoire-muted); text-align: left; }
-.histoire-frame-label span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* Frame labels keep selection semantics without shared button pressed surfaces. */
+.histoire-frame-label {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin: 0;
+  padding: 0 0 8px;
+  border: 0;
+  background: transparent;
+  color: var(--histoire-muted);
+  font: inherit;
+  font-size: 13px;
+  line-height: 20px;
+  text-align: left;
+  cursor: pointer;
+}
+.histoire-frame-label span { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.histoire-canvas-frame:not(.is-selected):not(.is-highlighted) .histoire-frame-label:enabled:hover { color: var(--histoire-text); }
+.histoire-frame-label:focus-visible { outline: 2px solid var(--histoire-accent); outline-offset: 2px; }
+.histoire-frame-label:disabled { opacity: .45; cursor: default; }
 .is-selected .histoire-frame-label { color: var(--histoire-accent); font-weight: 700; }
 .histoire-frame-label svg { color: var(--histoire-accent); } .histoire-frame-label svg.is-error { color: var(--histoire-danger); }
 .histoire-frame-body { position: relative; width: 100%; overflow: hidden; border: 1px solid var(--histoire-border); border-radius: 7px; background: white; }
