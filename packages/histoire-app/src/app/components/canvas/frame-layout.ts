@@ -1,6 +1,16 @@
 import type { CanvasRect, CanvasSize } from './pan/usePanZoom.js'
 import { getHistoireTargetKey } from '@histoire/protocol'
 
+/** Rendered height of the interactive title above every preview frame. */
+export const CANVAS_FRAME_LABEL_HEIGHT = 28
+
+/** Grid retains its existing vertical reserve for frame chrome. */
+const GRID_FRAME_LABEL_RESERVE = 32
+/** Default rendered separation between neighboring grid frames. */
+const GRID_FRAME_GAP = 24
+/** List keeps grid rhythm plus the requested extra variant separation. */
+const LIST_FRAME_GAP = GRID_FRAME_GAP + 64
+
 /** Canvas identity stays stable when mounted frames change. */
 export interface CanvasFrameLayout extends CanvasRect {
   /** Stable key scoped to story and variant. */
@@ -13,17 +23,19 @@ export interface CanvasFrameLayout extends CanvasRect {
 
 /** Lay out frames independently of their preview runtime and visibility. */
 export function layoutCanvasFrames(storyId: string, variantIds: readonly string[], size: CanvasSize, arrange: 'grid' | 'list', columns = 3, chromeScale = 1): CanvasFrameLayout[] {
-  const count = arrange === 'list' ? 1 : Math.max(1, columns)
+  const list = arrange === 'list'
+  const count = list ? 1 : Math.max(1, columns)
   const scale = Math.max(0.1, chromeScale)
-  const labelWidth = arrange === 'list' ? 144 / scale : 0
-  const labelHeight = arrange === 'list' ? 0 : 32 / scale
+  // Frame chrome stays readable at every zoom while previews retain logical dimensions.
+  const labelHeight = (list ? CANVAS_FRAME_LABEL_HEIGHT : GRID_FRAME_LABEL_RESERVE) / scale
+  const gap = (list ? LIST_FRAME_GAP : GRID_FRAME_GAP) / scale
   return variantIds.map((variantId, index) => ({
     id: getHistoireTargetKey({ storyId, variantId }),
     storyId,
     variantId,
-    x: (index % count) * (size.width + 24 / scale),
-    y: Math.floor(index / count) * (size.height + labelHeight + 24 / scale),
-    width: size.width + labelWidth,
+    x: (index % count) * (size.width + GRID_FRAME_GAP / scale),
+    y: Math.floor(index / count) * (size.height + labelHeight + gap),
+    width: size.width,
     height: size.height + labelHeight,
   }))
 }

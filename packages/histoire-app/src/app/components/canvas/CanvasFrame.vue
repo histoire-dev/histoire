@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { HistoireCatalogVariant } from '@histoire/sdk'
-import type { CanvasFrameLayout } from './frame-layout.js'
 import type { CanvasRect } from './pan/usePanZoom.js'
 import { HstButton } from '@histoire/controls/vue'
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
@@ -10,6 +9,7 @@ import PulsatingDisc from '../base/PulsatingDisc.vue'
 import { useWorkbenchTestsModel } from '../panes/tests/model.js'
 import WorkbenchIcon from '../shell/WorkbenchIcon.vue'
 import CanvasReplicaPreview from './CanvasReplicaPreview.vue'
+import { CANVAS_FRAME_LABEL_HEIGHT, type CanvasFrameLayout } from './frame-layout.js'
 import { isFrameMenuShortcut, openFrameMenu } from './frame-menu.js'
 
 const props = defineProps<{
@@ -32,8 +32,6 @@ const props = defineProps<{
   height: number
   /** Known collection failure keeps existing preview visible but inactive. */
   stale?: boolean
-  /** List places readable name beside preview, matching workbench reference. */
-  arrange?: 'grid' | 'list'
   /** Exact search match highlight. */
   highlighted?: boolean
   /** Active-query nonmatches dim without disabling native frame interaction. */
@@ -49,7 +47,12 @@ const testIcon = computed(() => test.value?.failed || test.value?.error ? 'error
 const replica = ref<{ retry: () => Promise<void> }>()
 const status = ref<'loading' | 'ready' | 'error'>('loading')
 const error = ref<unknown>()
-const position = computed(() => ({ left: `${props.frame.x * canvas.effectiveZoom + canvas.panOffset.x}px`, top: `${props.frame.y * canvas.effectiveZoom + canvas.panOffset.y}px`, width: `${props.width * canvas.effectiveZoom + (props.arrange === 'list' ? 144 : 0)}px` }))
+const position = computed(() => ({
+  'left': `${props.frame.x * canvas.effectiveZoom + canvas.panOffset.x}px`,
+  'top': `${props.frame.y * canvas.effectiveZoom + canvas.panOffset.y}px`,
+  'width': `${props.width * canvas.effectiveZoom}px`,
+  '--histoire-frame-label-height': `${CANVAS_FRAME_LABEL_HEIGHT}px`,
+}))
 const previewStyle = computed(() => ({ width: `${props.width}px`, height: `${props.height}px`, transform: `scale(${canvas.effectiveZoom})` }))
 const background = computed(() => {
   const color = canvas.frameBackgrounds[props.frame.id]?.backgroundColor ?? canvas.frameBackground
@@ -58,15 +61,25 @@ const background = computed(() => {
 const canSelect = computed(() => !props.stale)
 let unregister = () => {}
 
+/** Returns logical preview coordinates beneath frame title chrome. */
+function previewRect() {
+  return {
+    x: props.frame.x,
+    y: props.frame.y + CANVAS_FRAME_LABEL_HEIGHT / canvas.effectiveZoom,
+    width: props.width,
+    height: props.height,
+  }
+}
+
 /** Register placeholder geometry before passive document readiness. */
 function register() {
   unregister()
-  unregister = registry.registerFrame({ id: props.frame.id, storyId: props.frame.storyId, variantId: props.frame.variantId, fitBounds: props.fitBounds ? zoom => props.fitBounds?.(zoom) ?? props.frame : undefined, rect: { x: props.frame.x + (props.arrange === 'list' ? 144 / canvas.effectiveZoom : 0), y: props.frame.y + (props.arrange === 'list' ? 0 : 28 / canvas.effectiveZoom), width: props.width, height: props.height } })
+  unregister = registry.registerFrame({ id: props.frame.id, storyId: props.frame.storyId, variantId: props.frame.variantId, fitBounds: props.fitBounds ? zoom => props.fitBounds?.(zoom) ?? props.frame : undefined, rect: previewRect() })
 }
 onMounted(register)
 watch(() => [props.frame, props.width, props.height, canvas.effectiveZoom], () => {
   const existing = registry.getFrame(props.frame.id)
-  if (existing) existing.rect = { x: props.frame.x + (props.arrange === 'list' ? 144 / canvas.effectiveZoom : 0), y: props.frame.y + (props.arrange === 'list' ? 0 : 28 / canvas.effectiveZoom), width: props.width, height: props.height }
+  if (existing) existing.rect = previewRect()
 })
 watch(() => props.stale, (stale) => {
   const frame = registry.getFrame(props.frame.id)
@@ -111,7 +124,7 @@ function openMenu(event: MouseEvent | KeyboardEvent) {
 </script>
 
 <template>
-  <section class="histoire-canvas-frame" :class="{ 'is-selected': selected, 'is-stale': stale, 'is-list': arrange === 'list', 'is-highlighted': highlighted, 'is-dimmed': dimmed }" :style="position" :data-frame-id="frame.id" @contextmenu.prevent="openMenu">
+  <section class="histoire-canvas-frame" :class="{ 'is-selected': selected, 'is-stale': stale, 'is-highlighted': highlighted, 'is-dimmed': dimmed }" :style="position" :data-frame-id="frame.id" @contextmenu.prevent="openMenu">
     <button type="button" class="histoire-frame-label" :aria-pressed="selected" :disabled="!canSelect" @click="select" @keydown="onKeyDown">
       <span class="histoire-frame-title" :title="variant.title">{{ variant.title }}</span><WorkbenchIcon v-if="status === 'error'" name="error-filled" :size="12" class="is-error" /><PulsatingDisc v-else-if="test?.running" :size="12" /><WorkbenchIcon v-else-if="testIcon" :name="testIcon" :size="12" :class="{ 'is-error': test?.failed || test?.error }" />
     </button>
@@ -144,7 +157,7 @@ function openMenu(event: MouseEvent | KeyboardEvent) {
   box-sizing: border-box;
   width: 100%;
   min-width: 0;
-  height: 28px;
+  height: var(--histoire-frame-label-height);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -167,7 +180,6 @@ function openMenu(event: MouseEvent | KeyboardEvent) {
 .is-selected .histoire-frame-label { color: var(--histoire-accent); font-weight: 700; }
 .histoire-frame-label :is(svg, .histoire-pulsating-disc) { color: var(--histoire-accent); } .histoire-frame-label svg.is-error { color: var(--histoire-danger); }
 .histoire-frame-body { position: relative; width: 100%; overflow: hidden; border: 1px solid var(--histoire-border); border-radius: 7px; background: white; }
-.is-list { display: flex; align-items: center; gap: 0; } .is-list .histoire-frame-label { width: 144px; flex: none; justify-content: flex-start; padding: 0 12px 0 0; } .is-list .histoire-frame-body { flex: 1; min-width: 0; }
 .is-highlighted .histoire-frame-label { color: var(--histoire-accent); } .is-highlighted .histoire-frame-body { border-color: var(--histoire-accent); }
 .histoire-frame-content { transform-origin: top left; }
 .histoire-frame-select { position: absolute; inset: 0; cursor: pointer; }

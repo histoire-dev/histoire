@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { HistoireCatalogStory, HistoireSession } from '@histoire/sdk'
-import type { CanvasFrameLayout } from './frame-layout.js'
 import { HstButton } from '@histoire/controls/vue'
 import { PREVIEW_SETTINGS_SYNC } from '@histoire/shared'
 import { HistoirePreview, useHistoireSession, useHistoireSnapshot } from '@histoire/vue'
@@ -10,16 +9,16 @@ import { createCanvasStore, getCanvasStorage } from '../../stores/canvas.js'
 import { useMatrixStore } from '../../stores/matrix.js'
 import { useUiSettingsStore } from '../../stores/settings.js'
 import { getSearchFrameState } from '../panes/search/frame-navigation.js'
+import { canvasRectsOverlap } from './canvas-overlay-occlusion.js'
 import CanvasFrame from './CanvasFrame.vue'
 import CanvasHeader from './CanvasHeader.vue'
 import CanvasStatus from './CanvasStatus.vue'
-import { canvasRectsOverlap } from './canvas-overlay-occlusion.js'
 import CollectErrorCard from './CollectErrorCard.vue'
 import { useCanvasFrameAdmission } from './frame-admission.js'
 import { createCanvasArrangement } from './frame-arrangement.js'
 import { watchCanvasFrameFocus } from './frame-focus.js'
 import { bindCanvasFrameInteractions } from './frame-interactions.js'
-import { canvasFrameBounds, layoutCanvasFrames } from './frame-layout.js'
+import { CANVAS_FRAME_LABEL_HEIGHT, canvasFrameBounds, type CanvasFrameLayout, layoutCanvasFrames } from './frame-layout.js'
 import { createCanvasReplicaPromotion } from './frame-promotion.js'
 import { createCanvasFrameState } from './frame-state.js'
 import FrameGrid from './FrameGrid.vue'
@@ -98,7 +97,10 @@ const live = useCanvasFrameAdmission({
 /** Transform logical preview bounds for the mounted iframe only. */
 const primaryPosition = computed(() => {
   const frame = selectedFrame.value
-  return { left: `${(frame?.x ?? 0) * canvas.effectiveZoom + canvas.panOffset.x + (renderedArrange.value === 'list' ? 145 : 1)}px`, top: `${(frame?.y ?? 0) * canvas.effectiveZoom + canvas.panOffset.y + (renderedArrange.value === 'list' ? 1 : 29)}px` }
+  return {
+    left: `${(frame?.x ?? 0) * canvas.effectiveZoom + canvas.panOffset.x + 1}px`,
+    top: `${(frame?.y ?? 0) * canvas.effectiveZoom + canvas.panOffset.y + CANVAS_FRAME_LABEL_HEIGHT + 1}px`,
+  }
 })
 const primaryShown = computed(() => Boolean(primaryVisible.value && selectedFrame.value && renderedArrange.value !== 'matrix'))
 const primaryStyle = computed(() => ({ ...primaryPosition.value, width: `${size.value.width}px`, height: `${size.value.height}px`, transform: `scale(${canvas.effectiveZoom})`, visibility: primaryShown.value ? 'visible' as const : 'hidden' as const, pointerEvents: primaryVisible.value ? undefined : 'none' }))
@@ -319,7 +321,7 @@ defineExpose({ canvas, registry })
     <slot v-if="renderedArrange === 'matrix'" name="matrix" :canvas="canvas" :frames="registry" :size="size" :content-insets="contentInsets" :frame-budget="frameBudget" :preview-base="previewBase" />
     <component :is="renderedArrange === 'list' ? FrameList : FrameGrid" v-else :frames="frames">
       <template #default="{ frame, index }">
-        <CanvasFrame :frame="frame" :fit-bounds="zoom => layoutFrames(zoom)[index]" :variant="story!.variants[index]" :selected="frame.id === selectedFrame?.id" :retain-replica="frame.id === promotedFrameId" :live="live.has(frame.id)" :preview-base="previewBase" :width="size.width" :height="size.height" :stale="diagnostics.length > 0" :arrange="renderedArrange === 'list' ? 'list' : 'grid'" v-bind="getSearchFrameState(frame.id, !!searchActive, highlightedTargets)" @select="selectVariant" @promote="promoteVariant" @contextmenu="(event, target) => emit('contextmenu', event, target)" />
+        <CanvasFrame :frame="frame" :fit-bounds="zoom => layoutFrames(zoom)[index]" :variant="story!.variants[index]" :selected="frame.id === selectedFrame?.id" :retain-replica="frame.id === promotedFrameId" :live="live.has(frame.id)" :preview-base="previewBase" :width="size.width" :height="size.height" :stale="diagnostics.length > 0" v-bind="getSearchFrameState(frame.id, !!searchActive, highlightedTargets)" @select="selectVariant" @promote="promoteVariant" @contextmenu="(event, target) => emit('contextmenu', event, target)" />
       </template>
     </component>
     <div ref="primaryContainer" class="histoire-canvas-primary" :class="{ 'is-stale': diagnostics.length, 'is-dimmed': primarySearch.dimmed }" :style="primaryStyle">

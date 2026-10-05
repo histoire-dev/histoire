@@ -14,6 +14,6 @@ defineProps<{ frames: readonly CanvasFrameLayout[] }>()
 </template>
 
 <style scoped>
-.histoire-frame-list { display: flex; flex-direction: column; gap: 24px; }
+.histoire-frame-list { display: flex; flex-direction: column; }
 .histoire-frame-list-row { min-width: 0; }
 </style>
