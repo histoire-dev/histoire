@@ -1,0 +1,25 @@
+{
+  "name": "react-example",
+  "type": "module",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "story:dev": "histoire dev",
+    "story:build": "histoire build",
+    "story:preview": "histoire preview --port 4567",
+    "story:test": "histoire test"
+  },
+  "dependencies": { "react": "^19.0.0", "react-dom": "^19.0.0" },
+  "devDependencies": {
+    "@histoire/plugin-react": "workspace:*",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@vitejs/plugin-react": "^5.2.0",
+    "@vitest/browser-playwright": "4.1.10",
+    "histoire": "workspace:*",
+    "playwright": "^1.58.0",
+    "typescript": "catalog:",
+    "vite": "^8.0.12",
+    "vitest": "4.1.10"
+  }
+}

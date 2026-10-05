@@ -1,12 +1,16 @@
-import antfu from '@antfu/eslint-config'
+import antfu, { react } from '@antfu/eslint-config'
 import pluginCypress from 'eslint-plugin-cypress/flat'
 
 export default antfu({
+  react: false,
   ignores: [
     '**/histoire-dist/',
     '**/generated/',
     '**/public/',
     '**/.svelte-kit/',
+    '.impeccable/hook.cache.json',
+    // Offline Carbon subset is generated from Iconify's package data.
+    'packages/histoire-shared/src/icons/carbon-icons.json',
   ],
 }, {
   rules: {
@@ -29,4 +33,10 @@ export default antfu({
   plugins: {
     cypress: pluginCypress,
   },
-}, pluginCypress.configs.globals)
+}, pluginCypress.configs.globals, ...await react({
+  files: ['packages/histoire-plugin-react/**/*.{ts,tsx}', 'examples/react/**/*.{ts,tsx,jsx}'],
+  overrides: {
+    // Framework adapters support React 18, which still requires Context.Provider.
+    'react/no-context-provider': 'off',
+  },
+}))

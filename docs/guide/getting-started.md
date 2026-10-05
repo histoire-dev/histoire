@@ -56,7 +56,7 @@ Histoire is an Open-Source project supported by our sponsors - thank you!
 | [Svelte →](./svelte3/getting-started.md) | `4+` | ✅ | - | 🏗️ |
 | Solid | - | - | - | - |
 | Angular | - | - | - | - |
-| React | - | - ([Alternative](https://www.ladle.dev)) | - | - |
+| [React →](./react/getting-started.md) | `18 / 19` | ✅ | - | - |
 
 **<u>Support</u> means the following is available*:
 - Collect and render stories
