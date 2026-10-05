@@ -109,6 +109,7 @@ const primaryErrorStyle = computed(() => ({ ...primaryPosition.value, width: `${
 let mutation: MutationObserver | undefined
 let primaryRegistration = ''
 let primaryIframe: HTMLIFrameElement | undefined
+let iframeActivatedFrameId: string | undefined
 let stopInteractions = () => {}
 let initialFocusPending = true
 const { insets: contentInsets, headerBounds, measure } = useCanvasGeometry({
@@ -218,16 +219,31 @@ function selectVariant(variantId: string) {
 }
 
 /** Promote exact ready replica only while its isolated session still names that target. */
-function promoteVariant(frameId: string) {
+function promoteVariant(frameId: string): Promise<void> {
   const entry = registry.getFrame(frameId)
-  if (!entry) return
+  if (!entry) return Promise.resolve()
   const replica = entry.session
   const state = replica?.getSnapshot()
   if (!replica || state?.stale || state?.runtime.status !== 'ready' || state.selection?.storyId !== entry.storyId || state.selection.variantId !== entry.variantId) {
-    selectVariant(entry.variantId)
-    return
+    return promotion.selectCanonical({ storyId: entry.storyId, variantId: entry.variantId })
   }
-  void promotion.promote({ id: entry.id, storyId: entry.storyId, variantId: entry.variantId, session: replica })
+  return promotion.promote({ id: entry.id, storyId: entry.storyId, variantId: entry.variantId, session: replica })
+}
+
+/** Select another ready grid/list preview while leaving its original click untouched. */
+function activatePreview(iframe: HTMLIFrameElement) {
+  if (renderedArrange.value === 'matrix' || snapshot.value.stale || diagnostics.value.length) return
+  const entry = [...registry.frames.values()].find(frame => frame.iframe === iframe)
+  const selected = snapshot.value.selection
+  if (!entry || (entry.storyId === selected?.storyId && entry.variantId === selected.variantId)) return
+  const state = entry.session?.getSnapshot()
+  if (!state || state.stale || state.runtime.status !== 'ready' || state.selection?.storyId !== entry.storyId || state.selection.variantId !== entry.variantId) return
+  const targetId = entry.id
+  iframeActivatedFrameId = targetId
+  void promoteVariant(targetId).finally(async () => {
+    await nextTick()
+    if (iframeActivatedFrameId === targetId) iframeActivatedFrameId = undefined
+  })
 }
 
 /** Clicking canvas background gives keyboard pan scope without stealing control focus. */
@@ -290,7 +306,18 @@ watch([
   () => [headerBounds.value?.top, headerBounds.value?.bottom],
   () => [...registry.frames.values()].map(frame => frame.iframe),
 ], updateHeaderOcclusion, { flush: 'post', immediate: true })
-watchCanvasFrameFocus({ getFrame: () => selectedFrame.value, getArrange: () => renderedArrange.value, focusFrame: canvas.focusFrame, registerPrimary })
+watchCanvasFrameFocus({
+  getFrame: () => selectedFrame.value,
+  getArrange: () => renderedArrange.value,
+  focusFrame: canvas.focusFrame,
+  selectFrame: canvas.selectFrame,
+  shouldRevealFrame: (frame) => {
+    if (iframeActivatedFrameId !== frame.id) return true
+    iframeActivatedFrameId = undefined
+    return false
+  },
+  registerPrimary,
+})
 watch(() => [snapshot.value.runtime.status, snapshot.value.runtime.runtimeId, canvas.frameBackgrounds[selectedFrame.value?.id ?? ''], primaryVisible.value, promotedFrameId.value], registerPrimary, { deep: true, flush: 'post' })
 watch(() => registry.frames.get(selectedFrame.value?.id ?? ''), registerPrimary, { flush: 'post' })
 // Source collection errors and Matrix entry retire promotion; primary teardown does not.
@@ -298,7 +325,7 @@ watch(() => [snapshot.value.selection?.storyId, snapshot.value.selection?.varian
   promotion.synchronize(storyId && variantId ? { storyId, variantId } : null, hasDiagnostics || arrange === 'matrix')
 }, { flush: 'sync' })
 onMounted(() => {
-  if (viewport.value) stopInteractions = bindCanvasFrameInteractions(viewport.value, pointer, space, onWheel)
+  if (viewport.value) stopInteractions = bindCanvasFrameInteractions(viewport.value, pointer, space, onWheel, activatePreview)
   mutation = new MutationObserver(registerPrimary)
   if (primaryContainer.value) mutation.observe(primaryContainer.value, { childList: true, subtree: true, attributes: true, attributeFilter: ['src'] })
   measure()

@@ -2,7 +2,7 @@ import type { usePointerPan } from './pan/usePointerPan.js'
 import type { useSpacePan } from './pan/useSpacePan.js'
 
 /** Same-origin sandbox events do not bubble across iframe document boundary. */
-export function bindCanvasFrameInteractions(root: HTMLElement, pointer: ReturnType<typeof usePointerPan>, space: ReturnType<typeof useSpacePan>, wheel: (event: WheelEvent) => void) {
+export function bindCanvasFrameInteractions(root: HTMLElement, pointer: ReturnType<typeof usePointerPan>, space: ReturnType<typeof useSpacePan>, wheel: (event: WheelEvent) => void, activate?: (iframe: HTMLIFrameElement, event: PointerEvent) => void) {
   const cleanups = new Map<HTMLIFrameElement, () => void>()
 
   /** Map iframe CSS pixels into parent browser pixels before pan/zoom math. */
@@ -23,7 +23,10 @@ export function bindCanvasFrameInteractions(root: HTMLElement, pointer: ReturnTy
       }
       catch { return }
       if (!document) return
-      const down = (event: PointerEvent) => pointer.onPointerDown(mapPointer(event, iframe))
+      const down = (event: PointerEvent) => {
+        const panning = pointer.onPointerDown(mapPointer(event, iframe))
+        if (event.button === 0 && !panning && !pointer.isPanning.value) activate?.(iframe, event)
+      }
       const move = (event: PointerEvent) => pointer.onPointerMove(mapPointer(event, iframe))
       const up = (event: PointerEvent) => pointer.onPointerUp(mapPointer(event, iframe))
       const scroll = (event: WheelEvent) => {

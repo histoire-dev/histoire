@@ -9,6 +9,10 @@ export interface CanvasFrameFocusOptions {
   getArrange: () => 'grid' | 'list' | 'matrix'
   /** Bring selected frame into view without changing selected variant. */
   focusFrame: (frame: CanvasFrameLayout) => void
+  /** Update selected frame without moving the canvas. */
+  selectFrame: (frame: CanvasFrameLayout) => void
+  /** Allow input-originated selection to retain the user's current viewport. */
+  shouldRevealFrame?: (frame: CanvasFrameLayout) => boolean
   /** Refresh physical primary document registration after identity changes. */
   registerPrimary: () => void
 }
@@ -18,7 +22,10 @@ export function watchCanvasFrameFocus(options: CanvasFrameFocusOptions) {
   // Scalar sources keep zoom-created frame objects from retriggering selection focus.
   return watch([() => options.getFrame()?.id, options.getArrange], ([, arrange]) => {
     const frame = options.getFrame()
-    if (frame && arrange !== 'matrix') options.focusFrame(frame)
+    if (frame && arrange !== 'matrix') {
+      if (options.shouldRevealFrame?.(frame) === false) options.selectFrame(frame)
+      else options.focusFrame(frame)
+    }
     options.registerPrimary()
   }, { flush: 'post' })
 }

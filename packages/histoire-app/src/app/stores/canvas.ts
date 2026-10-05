@@ -163,9 +163,13 @@ export function createCanvasStore(options: { storage?: CanvasStorage } = {}) {
     // Automatic selection visibility must not turn the user's Fit preference into numeric zoom.
     if (dx || dy) state.panOffset = { x: state.panOffset.x + dx, y: state.panOffset.y + dy }
   }
+  /** Synchronize selected frame identity without moving the canvas. */
+  function selectFrame(frame: CanvasFrameLayout) {
+    state.selectedFrame = frame.id
+  }
   /** Bring URL-selected frame into unobstructed canvas area. */
   function focusFrame(frame: CanvasFrameLayout) {
-    state.selectedFrame = frame.id
+    selectFrame(frame)
     revealFrame(frame)
   }
   /** Fit selection and fixed chrome using the same available viewport as canvas Fit. */
@@ -187,7 +191,7 @@ export function createCanvasStore(options: { storage?: CanvasStorage } = {}) {
     state.panOffset = transform.offset
     save()
   }
-  return Object.assign(state, { setZoom, setArrangement, fit, setGeometry, panBy, setPanOffset, revealFrame, focusFrame, zoomToFrame,
+  return Object.assign(state, { setZoom, setArrangement, fit, setGeometry, panBy, setPanOffset, revealFrame, selectFrame, focusFrame, zoomToFrame,
     /** Choose persistent pointer mode. */
     setTool(tool: CanvasPreferences['tool']) {
       state.tool = tool

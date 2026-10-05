@@ -6,6 +6,46 @@ import { canvasToClient, clientToCanvas } from '../../../../histoire-app/src/app
 import { createCanvasStore } from '../../../../histoire-app/src/app/stores/canvas.js'
 
 describe('canvas selection focus binding', () => {
+  it('selects iframe-activated frames without revealing them', async () => {
+    const frames = layoutCanvasFrames('story', ['first', 'second'], { width: 720, height: 640 }, 'grid')
+    const current = ref(frames[0])
+    const arrange = ref<'grid' | 'list' | 'matrix'>('grid')
+    const activatedFrameId = ref<string>()
+    const canvas = createCanvasStore()
+    canvas.setGeometry({ width: 320, height: 240 }, canvasFrameBounds(frames), 0)
+    canvas.setZoom(1)
+    canvas.setPanOffset({ x: 0, y: 0 })
+    const initialOffset = { ...canvas.panOffset }
+    const focusFrame = vi.fn(canvas.focusFrame)
+    const selectFrame = vi.fn(canvas.selectFrame)
+    const registerPrimary = vi.fn()
+    const stop = watchCanvasFrameFocus({
+      getFrame: () => current.value,
+      getArrange: () => arrange.value,
+      focusFrame,
+      selectFrame,
+      shouldRevealFrame: frame => frame.id !== activatedFrameId.value,
+      registerPrimary,
+    })
+
+    try {
+      activatedFrameId.value = frames[1].id
+      current.value = frames[1]
+      await nextTick()
+      expect(selectFrame).toHaveBeenCalledExactlyOnceWith(frames[1])
+      expect(canvas.selectedFrame).toBe(frames[1].id)
+      expect(canvas.panOffset).toEqual(initialOffset)
+      expect(focusFrame).not.toHaveBeenCalled()
+
+      activatedFrameId.value = undefined
+      current.value = frames[0]
+      await nextTick()
+      expect(focusFrame).toHaveBeenCalledExactlyOnceWith(frames[0])
+      expect(canvas.panOffset).not.toEqual(initialOffset)
+    }
+    finally { stop() }
+  })
+
   it('fits once on List entry then only reveals later selections', async () => {
     const canvas = createCanvasStore()
     const selectedId = ref('first')
@@ -16,7 +56,7 @@ describe('canvas selection focus binding', () => {
     const focusFrame = vi.fn(canvas.focusFrame)
     const fitFrame = vi.fn(canvas.zoomToFrame)
     const registerPrimary = vi.fn()
-    const stop = watchCanvasFrameFocus({ getFrame: () => selected.value, getArrange: () => arrange.value, focusFrame, fitFrame, registerPrimary })
+    const stop = watchCanvasFrameFocus({ getFrame: () => selected.value, getArrange: () => arrange.value, focusFrame, selectFrame: canvas.selectFrame, fitFrame, registerPrimary })
     try {
       const cursor = { x: 600, y: 450 }
       const worldPoint = clientToCanvas(cursor, canvas.effectiveZoom, canvas.panOffset)
