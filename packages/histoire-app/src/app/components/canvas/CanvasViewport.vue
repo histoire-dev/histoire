@@ -18,7 +18,7 @@ import { useCanvasFrameAdmission } from './frame-admission.js'
 import { createCanvasArrangement } from './frame-arrangement.js'
 import { watchCanvasFrameFocus } from './frame-focus.js'
 import { bindCanvasFrameInteractions } from './frame-interactions.js'
-import { canvasFrameBounds, type CanvasFrameLayout, layoutCanvasFrames } from './frame-layout.js'
+import { canvasFrameBounds, type CanvasFrameLayout, layoutCanvasFrames, visibleCanvasFrames } from './frame-layout.js'
 import { watchCanvasSelectedSession } from './frame-selection.js'
 import { createCanvasFrameState } from './frame-state.js'
 import FrameGrid from './FrameGrid.vue'
@@ -74,14 +74,28 @@ const size = computed(() => {
 function layoutFrames(zoom = canvas.effectiveZoom) {
   return story.value ? layoutCanvasFrames(story.value.id, story.value.variants.map(variant => variant.id), size.value, renderedArrange.value === 'list' ? 'list' : 'grid', 3, zoom) : []
 }
+/** Resolve selection-fit geometry by stable target after visible-frame filtering. */
+function fitBoundsForFrame(frame: CanvasFrameLayout, zoom: number): CanvasFrameLayout {
+  return layoutFrames(zoom).find(candidate => candidate.id === frame.id) ?? frame
+}
+
 const frames = computed(() => layoutFrames())
+const canvasViewport = computed(() => {
+  const origin = clientToCanvas({ x: 0, y: 0 }, canvas.effectiveZoom, canvas.panOffset)
+  return { ...origin, width: Math.max(0, canvas.viewport.width - props.inspectorWidth) / canvas.effectiveZoom, height: canvas.viewport.height / canvas.effectiveZoom }
+})
 const selectedFrame = computed(() => frames.value.find(frame => frame.variantId === (snapshot.value.selection?.variantId ?? (diagnostics.value.length ? cachedVariantId.value : null))))
+/** Bound canvas DOM to visible frames while retaining selected inspector ownership. */
+const renderedFrames = computed(() => {
+  const visible = visibleCanvasFrames(frames.value, canvasViewport.value)
+  const selected = selectedFrame.value
+  if (!selected || visible.some(frame => frame.id === selected.id)) return visible
+  return [...visible, selected].sort((first, second) => first.y - second.y || first.x - second.x)
+})
+const variantsById = computed(() => new Map(story.value?.variants.map(variant => [variant.id, variant]) ?? []))
 const live = useCanvasFrameAdmission({
   frames: () => frames.value,
-  viewport: () => {
-    const origin = clientToCanvas({ x: 0, y: 0 }, canvas.effectiveZoom, canvas.panOffset)
-    return { ...origin, width: Math.max(0, canvas.viewport.width - props.inspectorWidth) / canvas.effectiveZoom, height: canvas.viewport.height / canvas.effectiveZoom }
-  },
+  viewport: () => canvasViewport.value,
   budget: () => props.frameBudget,
   selected: () => selectedFrame.value?.id ?? null,
   moving: () => canvas.panning,
@@ -239,9 +253,9 @@ defineExpose({ canvas, registry })
       </slot>
     </div>
     <slot v-if="renderedArrange === 'matrix'" name="matrix" :canvas="canvas" :frames="registry" :size="size" :content-insets="contentInsets" :frame-budget="frameBudget" :preview-base="previewBase" />
-    <component :is="renderedArrange === 'list' ? FrameList : FrameGrid" v-else :frames="frames">
-      <template #default="{ frame, index }">
-        <CanvasFrame :frame="frame" :fit-bounds="zoom => layoutFrames(zoom)[index]" :variant="story!.variants[index]" :selected="frame.id === selectedFrame?.id" :live="live.has(frame.id)" :preview-base="previewBase" :width="size.width" :height="size.height" :stale="diagnostics.length > 0" v-bind="getSearchFrameState(frame.id, !!searchActive, highlightedTargets)" @select="selectVariant" @contextmenu="(event, target) => emit('contextmenu', event, target)" />
+    <component :is="renderedArrange === 'list' ? FrameList : FrameGrid" v-else :frames="renderedFrames">
+      <template #default="{ frame }">
+        <CanvasFrame :frame="frame" :fit-bounds="zoom => fitBoundsForFrame(frame, zoom)" :variant="variantsById.get(frame.variantId)!" :selected="frame.id === selectedFrame?.id" :live="live.has(frame.id)" :preview-base="previewBase" :width="size.width" :height="size.height" :stale="diagnostics.length > 0" v-bind="getSearchFrameState(frame.id, !!searchActive, highlightedTargets)" @select="selectVariant" @contextmenu="(event, target) => emit('contextmenu', event, target)" />
       </template>
     </component>
     <CanvasMatrixPrimary :active="renderedArrange === 'matrix'" :width="size.width" :height="size.height" @error="emit('error', $event)" />

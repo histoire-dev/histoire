@@ -7,6 +7,8 @@ import { defineComponent, h, ref } from 'vue'
 import CanvasFrame from '../../../histoire-app/src/app/components/canvas/CanvasFrame.vue'
 import CanvasMatrixPrimary from '../../../histoire-app/src/app/components/canvas/CanvasMatrixPrimary.vue'
 import CanvasViewport from '../../../histoire-app/src/app/components/canvas/CanvasViewport.vue'
+import { layoutCanvasFrames, visibleCanvasFrames } from '../../../histoire-app/src/app/components/canvas/frame-layout.js'
+import { clientToCanvas } from '../../../histoire-app/src/app/components/canvas/pan/usePanZoom.js'
 import { createContextMenu, provideContextMenu } from '../../../histoire-app/src/app/composables/context-menu.js'
 import { createMatrixStore, provideMatrix } from '../../../histoire-app/src/app/stores/matrix.js'
 import { deferred, sourceFixture } from '../../../histoire-sdk/src/__tests__/fixtures/session.js'
@@ -25,8 +27,8 @@ afterEach(async () => {
 })
 
 /** Mount genuine frame lifecycle with existing SDK transport and controlled native geometry. */
-async function lifetimeFixture(budget = 2) {
-  window.localStorage.setItem('_histoire-ui-canvas', JSON.stringify({ zoom: 0.5 }))
+async function lifetimeFixture(budget = 2, variantCount = 2, zoom = 0.5) {
+  window.localStorage.setItem('_histoire-ui-canvas', JSON.stringify({ zoom }))
   resizeObserverFixture()
   vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockImplementation(function (this: HTMLElement) {
     const width = this.classList.contains('histoire-canvas-viewport') ? 1800 : 0
@@ -34,6 +36,12 @@ async function lifetimeFixture(budget = 2) {
     return { x: 0, y: 0, top: 0, left: 0, right: width, bottom: height, width, height, toJSON: () => ({}) }
   })
   const source = sourceFixture()
+  if (variantCount > 2) {
+    source.descriptor.catalog.stories[0].variants = Array.from({ length: variantCount }, (_, index) => ({
+      id: index === 0 ? 'c' : `variant-${index}`,
+      title: `Variant ${index}`,
+    }))
+  }
   const canonical = createHistoireSessionWithAdapters({ url: 'https://book.example/' }, source.adapters)
   await canonical.connect()
   await canonical.selection.select({ storyId: 'a:b', variantId: 'c' })
@@ -134,5 +142,43 @@ describe('canvas frame runtime lifetime', () => {
     await flushPromises()
     expect(test.source.adapters.mount).toHaveBeenCalledTimes(2)
     expect(test.wrapper.getComponent(CanvasMatrixPrimary).props('active')).toBe(true)
+  })
+
+  it('bounds frame DOM to viewport plus selected inspector owner for large stories', async () => {
+    const test = await lifetimeFixture(2, 1000, 0.1)
+    const firstWindow = test.wrapper.findAllComponents(CanvasFrame)
+
+    expect(firstWindow.length).toBeGreaterThan(0)
+    expect(firstWindow.length).toBeLessThan(30)
+    expect(firstWindow.some(frame => frame.props('frame').variantId === 'c')).toBe(true)
+
+    const first = firstWindow[0]
+    const variants = test.source.descriptor.catalog.stories[0].variants
+    const lastFrame = layoutCanvasFrames('a:b', variants.map(variant => variant.id), {
+      width: first.props('width'),
+      height: first.props('height'),
+    }, 'grid', 3, test.canvas.effectiveZoom).at(-1)!
+    test.canvas.panOffset = { x: 0, y: 500 - lastFrame.y * test.canvas.effectiveZoom }
+    await flushPromises()
+
+    const finalWindow = test.wrapper.findAllComponents(CanvasFrame)
+    expect(finalWindow.length).toBeGreaterThan(0)
+    expect(finalWindow.length).toBeLessThan(30)
+    expect(finalWindow.some(frame => frame.props('frame').variantId === 'variant-999')).toBe(true)
+    expect(finalWindow.some(frame => frame.props('frame').variantId === 'c')).toBe(true)
+
+    const allFrames = layoutCanvasFrames('a:b', variants.map(variant => variant.id), {
+      width: first.props('width'),
+      height: first.props('height'),
+    }, 'grid', 3, test.canvas.effectiveZoom)
+    const origin = clientToCanvas({ x: 0, y: 0 }, test.canvas.effectiveZoom, test.canvas.panOffset)
+    const visible = visibleCanvasFrames(allFrames, {
+      ...origin,
+      width: test.canvas.viewport.width / test.canvas.effectiveZoom,
+      height: test.canvas.viewport.height / test.canvas.effectiveZoom,
+    })
+    const expected = new Set(visible.map(frame => frame.variantId))
+    expected.add('c')
+    expect(new Set(finalWindow.map(frame => frame.props('frame').variantId))).toEqual(expected)
   })
 })

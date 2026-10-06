@@ -1,6 +1,6 @@
 import { getHistoireTargetKey } from '@histoire/protocol'
 import { describe, expect, it } from 'vitest'
-import { canvasFrameBounds, layoutCanvasFrames, liveCanvasFrames } from '../../../../histoire-app/src/app/components/canvas/frame-layout.js'
+import { canvasFrameBounds, layoutCanvasFrames, liveCanvasFrames, visibleCanvasFrames } from '../../../../histoire-app/src/app/components/canvas/frame-layout.js'
 
 describe('canvas frame admission', () => {
   it('enforces budget while keeping selected frame alive outside viewport', () => {
@@ -55,6 +55,20 @@ describe('canvas frame admission', () => {
 
     expect([...liveCanvasFrames(frames, { x: 0, y: 0, width: 180, height: 100 }, 2, null, 0)]).toEqual(['left', 'middle'])
     expect([...liveCanvasFrames(frames, { x: 120, y: 0, width: 180, height: 100 }, 2, null, 0)]).toEqual(['right', 'middle'])
+  })
+
+  it('returns only frames intersecting a distant computed viewport', () => {
+    const ids = Array.from({ length: 60_006 }, (_, index) => String(index))
+    const frames = layoutCanvasFrames('story', ids, { width: 200, height: 180 }, 'grid')
+    const rowStart = 20_001 * 3
+    const visible = visibleCanvasFrames(frames, {
+      x: 0,
+      y: frames[rowStart].y + 10,
+      width: 700,
+      height: 100,
+    })
+
+    expect(visible.map(frame => frame.variantId)).toEqual(['60003', '60004', '60005'])
   })
 
   it('normalizes fractional and non-finite budgets before admitting frames', () => {

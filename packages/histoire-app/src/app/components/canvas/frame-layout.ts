@@ -48,6 +48,33 @@ export function canvasFrameBounds(frames: readonly CanvasRect[]): CanvasRect {
   return { x, y, width: Math.max(...frames.map(frame => frame.x + frame.width)) - x, height: Math.max(...frames.map(frame => frame.y + frame.height)) - y }
 }
 
+/**
+ * Return only intersecting frames; monotonic layout rows let binary search skip distant rows.
+ */
+export function visibleCanvasFrames(frames: readonly CanvasFrameLayout[], viewport: CanvasRect): CanvasFrameLayout[] {
+  if (!frames.length || viewport.width <= 0 || viewport.height <= 0) return []
+
+  const viewportBottom = viewport.y + viewport.height
+  let low = 0
+  let high = frames.length
+  while (low < high) {
+    const middle = Math.floor((low + high) / 2)
+    if (frames[middle].y + frames[middle].height <= viewport.y) low = middle + 1
+    else high = middle
+  }
+  const start = low
+
+  high = frames.length
+  while (low < high) {
+    const middle = Math.floor((low + high) / 2)
+    if (frames[middle].y < viewportBottom) low = middle + 1
+    else high = middle
+  }
+
+  const viewportRight = viewport.x + viewport.width
+  return frames.slice(start, low).filter(frame => frame.x < viewportRight && frame.x + frame.width > viewport.x)
+}
+
 /** Calculate a frame's rendered area inside the actual viewport. */
 function visibleArea(frame: CanvasRect, viewport: CanvasRect): number {
   const width = Math.max(0, Math.min(frame.x + frame.width, viewport.x + viewport.width) - Math.max(frame.x, viewport.x))

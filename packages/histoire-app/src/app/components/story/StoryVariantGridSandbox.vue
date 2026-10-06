@@ -1,8 +1,9 @@
 <script lang="ts" setup>
 import type { Story, Variant } from '../../types'
 import { useResizeObserver } from '@vueuse/core'
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, onMounted, ref, shallowRef, watch } from 'vue'
 import StoryVariantGridSandboxItem from './StoryVariantGridSandboxItem.vue'
+import { VirtualGridGeometry } from './virtual-grid.js'
 
 const props = defineProps<{
   story: Story
@@ -17,13 +18,15 @@ const emit = defineEmits<{
 }>()
 
 const gap = 16
+const padding = 16
+const initialRowHeight = 320
 const el = ref<HTMLDivElement>()
-const gridEl = ref<HTMLDivElement>()
-const itemHeight = ref(0)
-const maxCount = ref(10)
-const visibleRows = ref(0)
-const gridColumnWidth = ref(1)
 const viewWidth = ref(1)
+const viewHeight = ref(0)
+const scrollTop = ref(0)
+const geometry = shallowRef(new VirtualGridGeometry(props.story.variants.length, 1, gap, initialRowHeight))
+const geometryVersion = ref(0)
+const variantHeights = new Map<string, number>()
 
 const gridTemplateWidth = computed(() => {
   if (props.story.layout.type !== 'grid') {
@@ -43,84 +46,143 @@ const gridTemplateWidth = computed(() => {
   return layoutWidth
 })
 
+const gridColumnWidth = computed(() => {
+  if (gridTemplateWidth.value.endsWith('%')) {
+    return viewWidth.value * Number.parseInt(gridTemplateWidth.value) / 100 - gap
+  }
+
+  return Number.parseInt(gridTemplateWidth.value)
+})
+
 const columnCount = computed(() => {
   const count = Math.floor((viewWidth.value + gap) / (gridColumnWidth.value + gap * 2))
   return Math.max(1, Math.min(props.story.variants.length, count))
 })
 
-const visibleVariants = computed(() => props.story.variants.slice(0, maxCount.value))
+const variantIndexes = computed(() => new Map(props.story.variants.map((variant, index) => [variant.id, index])))
+const selectedIndex = computed(() => props.variant ? variantIndexes.value.get(props.variant.id) ?? -1 : -1)
+const currentGeometry = computed(() => ({ geometry: geometry.value, revision: geometryVersion.value }))
+const canvasTop = computed(() => Math.max(0, (viewHeight.value - currentGeometry.value.geometry.totalHeight - padding * 2) / 2))
+const canvasHeight = computed(() => currentGeometry.value.geometry.totalHeight + padding * 2)
 
-/** Selected actor must render before its first measured size or readiness event. */
-function admitSelectedVariant(index: number) {
-  if (index >= maxCount.value) {
-    maxCount.value = index + 1
+const visibleRows = computed(() => {
+  const current = currentGeometry.value.geometry
+  const viewportTop = scrollTop.value - canvasTop.value - padding
+  const range = current.visibleRange(viewportTop, viewHeight.value)
+  const rows = []
+
+  for (let rowIndex = range.start; rowIndex < range.end; rowIndex++) {
+    const start = rowIndex * columnCount.value
+    rows.push({
+      index: rowIndex,
+      top: current.rowTop(rowIndex),
+      variants: props.story.variants.slice(start, start + columnCount.value),
+    })
+  }
+
+  return rows
+})
+
+/** Captures the first visible row position while measured heights adjust offsets. */
+function captureScrollAnchor(): { rowIndex: number, offset: number } | undefined {
+  const current = currentGeometry.value.geometry
+  if (!el.value || !current.rowCount) return
+
+  const viewportTop = scrollTop.value - canvasTop.value - padding
+  const range = current.visibleRange(viewportTop, viewHeight.value)
+  const rowIndex = Math.min(range.start, current.rowCount - 1)
+  return {
+    rowIndex,
+    offset: scrollTop.value - canvasTop.value - padding - current.rowTop(rowIndex),
   }
 }
 
-// Track selection and its position in the live story list, including catalog
-// replacement/reordering. Keep the admitted prefix so sibling state survives.
-watch(() => props.variant ? props.story.variants.indexOf(props.variant) : -1, admitSelectedVariant, { immediate: true })
+/** Restores captured row position after an estimate or measurement changes. */
+function restoreScrollAnchor(anchor: { rowIndex: number, offset: number } | undefined): void {
+  if (!anchor || !el.value) return
 
-const minHeight = computed(() => {
-  if (!columnCount.value || !itemHeight.value) {
-    return undefined
+  const current = currentGeometry.value.geometry
+  const top = Math.max(0, canvasTop.value + padding + current.rowTop(anchor.rowIndex) + anchor.offset)
+  el.value.scrollTop = top
+  scrollTop.value = el.value.scrollTop
+}
+
+/** Resolves exact row height once every variant in that row has reported size. */
+function measureRow(rowIndex: number): void {
+  const start = rowIndex * columnCount.value
+  const variants = props.story.variants.slice(start, start + columnCount.value)
+  if (!variants.length) return
+
+  let height = 0
+  for (const variant of variants) {
+    const measuredHeight = variantHeights.get(variant.id)
+    if (measuredHeight === undefined) return
+    height = Math.max(height, measuredHeight)
   }
 
-  return `${Math.ceil(props.story.variants.length / columnCount.value) * (itemHeight.value + gap) - gap}px`
-})
+  geometry.value.setRowHeight(rowIndex, height)
+}
 
-function updateSize() {
-  if (!el.value) {
-    return
+/** Records variant size and updates sparse row offsets without losing scroll position. */
+function onItemResize(variantId: string, _width: number, height: number): void {
+  const index = variantIndexes.value.get(variantId)
+  if (index === undefined || !Number.isFinite(height) || height <= 0) return
+  if (variantHeights.get(variantId) === height) return
+
+  const anchor = captureScrollAnchor()
+  variantHeights.set(variantId, height)
+  if (height > geometry.value.estimatedRowHeight) {
+    geometry.value.setEstimatedRowHeight(height)
   }
+  measureRow(Math.floor(index / columnCount.value))
+  geometryVersion.value++
+  restoreScrollAnchor(anchor)
+}
 
+/** Updates computed viewport geometry from the actual scroll container. */
+function updateViewport(): void {
+  if (!el.value) return
   viewWidth.value = el.value.clientWidth
-
-  if (!gridEl.value) {
-    return
-  }
-
-  if (gridTemplateWidth.value.endsWith('%')) {
-    gridColumnWidth.value = viewWidth.value * Number.parseInt(gridTemplateWidth.value) / 100 - gap
-  }
-  else {
-    gridColumnWidth.value = Number.parseInt(gridTemplateWidth.value)
-  }
+  viewHeight.value = el.value.clientHeight
+  scrollTop.value = el.value.scrollTop
 }
 
-function updateMaxCount() {
-  if (!el.value || !itemHeight.value) {
-    return
-  }
-
-  const height = el.value.clientHeight
-  const scrollTop = el.value.scrollTop
-  visibleRows.value = Math.ceil((height + scrollTop + gap) / (itemHeight.value + gap))
-
-  const newMaxCount = columnCount.value * visibleRows.value
-  if (maxCount.value < newMaxCount) {
-    maxCount.value = newMaxCount
-  }
+/** Mirrors user scrolling into the exact virtual row range. */
+function onScroll(): void {
+  if (el.value) scrollTop.value = el.value.scrollTop
 }
 
-function onItemResize(_width: number, height: number) {
-  if (itemHeight.value < height) {
-    itemHeight.value = height
-    updateMaxCount()
-  }
+/** Scrolls selected row into view before it is mounted in the virtual window. */
+function scrollSelectedVariantIntoView(): void {
+  if (!el.value || selectedIndex.value < 0) return
+
+  const current = currentGeometry.value.geometry
+  const rowIndex = Math.floor(selectedIndex.value / columnCount.value)
+  const rowTop = canvasTop.value + padding + current.rowTop(rowIndex)
+  const rowBottom = rowTop + current.rowHeight(rowIndex)
+  const viewportTop = el.value.scrollTop
+  const viewportBottom = viewportTop + el.value.clientHeight
+  if (rowTop >= viewportTop && rowBottom <= viewportBottom) return
+
+  el.value.scrollTop = Math.max(0, rowTop - Math.max(0, (el.value.clientHeight - current.rowHeight(rowIndex)) / 2))
+  scrollTop.value = el.value.scrollTop
 }
 
-useResizeObserver(el, () => {
-  updateMaxCount()
-  updateSize()
-})
+/** Clears layout-specific measurements after story, width, or column changes. */
+function resetGeometry(): void {
+  variantHeights.clear()
+  geometry.value = new VirtualGridGeometry(props.story.variants.length, columnCount.value, gap, initialRowHeight)
+  geometryVersion.value++
+}
 
-useResizeObserver(gridEl, () => {
-  updateSize()
-})
+watch(() => [props.story.id, variantIndexes.value, columnCount.value, gridColumnWidth.value], resetGeometry)
+watch([selectedIndex, columnCount, gridColumnWidth], scrollSelectedVariantIntoView, { flush: 'post' })
+
+useResizeObserver(el, updateViewport)
 
 onMounted(() => {
-  updateSize()
+  updateViewport()
+  scrollSelectedVariantIntoView()
 })
 </script>
 
@@ -128,30 +190,33 @@ onMounted(() => {
   <div
     ref="el"
     class="htw-overflow-y-auto htw-flex htw-h-full"
-    @scroll="updateMaxCount()"
+    @scroll="onScroll"
   >
-    <div
-      class="htw-flex htw-w-0 htw-flex-1 htw-mx-4"
-    >
+    <div class="htw-flex htw-w-0 htw-flex-1 htw-mx-4">
       <div
-        class="htw-m-auto"
-        :style="{ minHeight }"
+        class="htw-relative htw-my-auto htw-flex-none htw-w-full"
+        :style="{ height: `${canvasHeight}px` }"
       >
         <div
-          ref="gridEl"
-          class="htw-grid htw-gap-4 htw-my-4"
+          v-for="row of visibleRows"
+          :key="row.index"
+          class="htw-absolute htw-grid htw-gap-4"
+          :data-histoire-grid-row="row.index"
           :style="{
+            top: `${padding + row.top}px`,
+            left: '50%',
+            transform: 'translateX(-50%)',
             gridTemplateColumns: `repeat(${columnCount}, ${gridColumnWidth}px)`,
           }"
         >
           <StoryVariantGridSandboxItem
-            v-for="gridVariant of visibleVariants"
+            v-for="gridVariant of row.variants"
             :key="gridVariant.id"
             :story="story"
             :variant="gridVariant"
             :selected="gridVariant.id === variant?.id"
             :ready="readyVariantIds?.has(gridVariant.id) ?? true"
-            @resize="onItemResize"
+            @resize="(width, height) => onItemResize(gridVariant.id, width, height)"
             @select="emit('select', gridVariant.id)"
             @ready="emit('ready', gridVariant.id)"
           />

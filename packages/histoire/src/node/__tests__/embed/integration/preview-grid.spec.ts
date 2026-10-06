@@ -11,19 +11,42 @@ function initial() { return { count:4, callback:()=>'callback', model:new Model(
 <Variant id="one" :meta="{owner:'one'}" :init-state="initial"><template #default="{state}"><button @click="state.count++">one:{{state.count}}:{{globals.token}}:{{state.callback()}}:{{state.model.value}}</button></template></Variant>
 <Variant id="two" :meta="{owner:'two'}" :init-state="initial"><template #default="{state}"><button @click="state.count++">two:{{state.count}}:{{globals.token}}</button></template></Variant>
 </Story></template><style>html.runtime-dark button { background:#111827;color:white } html:not(.runtime-dark) button {background:white;color:#111827} button{padding:12px}</style>`
-/** One 24-cell fixture covers lazy scrolling and direct distant selection. */
-const lazyGridStory = `<template><Story id="scroll-grid" :layout="{type:'grid',width:260}">${Array.from({ length: 24 }, (_, index) => `<Variant id="cell-${index}"><button style="height:180px">Cell ${index}</button></Variant>`).join('')}</Story></template>`
+/** Large variable-height fixture covers bounded rendering and distant selection. */
+const lazyGridStory = `<template><Story id="scroll-grid" :layout="{type:'grid',width:260}">${Array.from({ length: 1000 }, (_, index) => `<Variant id="cell-${index}"><button style="height:${180 + index % 3 * 40}px">Cell ${index}</button></Variant>`).join('')}</Story></template>`
 const setup = `export function setupVue3({app,variant,globals}) { if(variant && typeof window!=='undefined') { window.__SETUP_VARIANTS__ ??= []; window.__SETUP_VARIANTS__.push({id:variant.id,meta:variant.meta.owner,globals}); app.provide('variant-owner',variant.id) } }`
 
 /** Scroll actual grid overflow owner, independent of reusable UI class names. */
 function scrollGrid(frame: any, bottom: boolean) {
   return frame.evaluate((toBottom) => {
-    let element = document.querySelector<HTMLElement>('[data-histoire-runtime-content]')?.parentElement
+    let element = document.querySelector<HTMLElement>('[data-histoire-runtime-content]')
     while (element && !(/auto|scroll/.test(getComputedStyle(element).overflowY) && element.scrollHeight > element.clientHeight)) element = element.parentElement
     if (!element) throw new Error('Grid scroll owner absent')
     element.scrollTop = toBottom ? element.scrollHeight : 0
     return { top: element.scrollTop, height: element.scrollHeight, viewport: element.clientHeight }
   }, bottom)
+}
+
+/** Reports mounted cards and whether each card intersects its scroll viewport. */
+function snapshotGrid(frame: any) {
+  return frame.evaluate(() => {
+    let scrollElement = document.querySelector<HTMLElement>('[data-histoire-runtime-content]')
+    while (scrollElement && !(/auto|scroll/.test(getComputedStyle(scrollElement).overflowY) && scrollElement.scrollHeight > scrollElement.clientHeight)) scrollElement = scrollElement.parentElement
+    if (!scrollElement) throw new Error('Grid scroll owner absent')
+
+    const viewport = scrollElement.getBoundingClientRect()
+    return {
+      scrollTop: scrollElement.scrollTop,
+      scrollHeight: scrollElement.scrollHeight,
+      viewportHeight: scrollElement.clientHeight,
+      items: [...document.querySelectorAll<HTMLElement>('[data-histoire-runtime-content]')].map((item) => {
+        const rect = item.getBoundingClientRect()
+        return {
+          id: item.getAttribute('data-histoire-variant-id'),
+          intersects: rect.bottom > viewport.top && rect.top < viewport.bottom,
+        }
+      }),
+    }
+  })
 }
 
 describe('real preview/grid runtime ownership', () => {
@@ -160,7 +183,7 @@ describe('real preview/grid runtime ownership', () => {
     }
   })
 
-  it('admits directly selected lazy cell without caller scrolling or resizing', async () => {
+  it('keeps 1,000-variant runtime DOM viewport-bounded and scrolls selected cells into view', async () => {
     const fixture = await createEmbedBridgeFixture({ story: lazyGridStory })
     const page = await fixture.browser.newPage()
     const errors: string[] = []
@@ -170,16 +193,22 @@ describe('real preview/grid runtime ownership', () => {
       await page.evaluate(`(async()=>{const {createHistoireSession}=await import('/sdk.js');window.session=createHistoireSession({url:${JSON.stringify(fixture.bookUrl)}});await session.connect();await session.selection.select({storyId:'scroll-grid',variantId:'cell-0'});window.primary=session.mount(document.querySelector('#mount'),{surface:'grid'});await primary.ready})()`)
       const sandbox = page.frames().find(frame => frame.url().includes('__sandbox.html'))!
       const roots = sandbox.locator('[data-histoire-runtime-content]')
-      await expect.poll(() => roots.count()).toBe(10)
-      // Drain initial source/container observers; they must not accidentally
-      // rescue selection that has no corresponding reactive admission.
-      await page.waitForTimeout(1000)
+      await expect.poll(async () => (await snapshotGrid(sandbox)).items.length).toBeGreaterThan(0)
+      const initial = await snapshotGrid(sandbox)
+      expect(initial.items.length).toBeLessThan(30)
+      expect(initial.items.every(item => item.intersects)).toBe(true)
+      expect(initial.items.some(item => item.id === 'cell-0')).toBe(true)
       const hostBox = await page.locator('#mount').boundingBox()
       const runtimeId = await page.evaluate('session.getSnapshot().runtime.runtimeId')
-      await page.evaluate('window.selecting=session.selection.select({storyId:"scroll-grid",variantId:"cell-23"});void selecting.catch(()=>{})')
-      await expect.poll(() => page.evaluate('({status:session.getSnapshot().runtime.status,target:session.getSnapshot().selection.variantId})'), { timeout: 5000 }).toEqual({ status: 'ready', target: 'cell-23' })
+      await page.evaluate('window.selecting=session.selection.select({storyId:"scroll-grid",variantId:"cell-999"});void selecting.catch(()=>{})')
+      await expect.poll(() => page.evaluate('({status:session.getSnapshot().runtime.status,target:session.getSnapshot().selection.variantId})'), { timeout: 5000 }).toEqual({ status: 'ready', target: 'cell-999' })
       await page.evaluate('selecting')
-      expect(await roots.count()).toBe(24)
+      await expect.poll(async () => (await snapshotGrid(sandbox)).items.some(item => item.id === 'cell-999')).toBe(true)
+      const selected = await snapshotGrid(sandbox)
+      expect(selected.items.length).toBeLessThan(30)
+      expect(selected.items.every(item => item.intersects)).toBe(true)
+      expect(selected.items.some(item => item.id === 'cell-0')).toBe(false)
+      expect(await roots.count()).toBe(selected.items.length)
       expect(await page.locator('#mount').boundingBox()).toEqual(hostBox)
       expect(await page.evaluate('session.getSnapshot().runtime.runtimeId')).toBe(runtimeId)
       await page.evaluate('session.dispose()')
@@ -191,7 +220,7 @@ describe('real preview/grid runtime ownership', () => {
     }
   })
 
-  it('replaces visible geometry during inner-grid scrolling and admits newly rendered lazy cells', async () => {
+  it('replaces mounted rows while scrolling a large grid in both directions', async () => {
     const fixture = await createEmbedBridgeFixture({ story: lazyGridStory })
     const page = await fixture.browser.newPage()
     const errors: string[] = []
@@ -201,26 +230,32 @@ describe('real preview/grid runtime ownership', () => {
       await page.evaluate(`(async()=>{ const {createHistoireSession}=await import('/sdk.js'); window.session=createHistoireSession({url:${JSON.stringify(fixture.bookUrl)}}); await session.connect(); await session.selection.select({storyId:'scroll-grid',variantId:'cell-0'}); window.primary=session.mount(document.querySelector('#mount'),{surface:'grid'}); await primary.ready })()`)
       const sandbox = page.frames().find(frame => frame.url().includes('__sandbox.html'))!
       const roots = sandbox.locator('[data-histoire-runtime-content]')
-      await expect.poll(() => roots.count()).toBe(10)
+      await expect.poll(async () => (await snapshotGrid(sandbox)).items.length).toBeGreaterThan(0)
       const initial = await page.evaluate('session.getSnapshot().runtime.viewports')
       expect(initial.length).toBeGreaterThanOrEqual(2)
       expect(initial.every(viewport => viewport.target.storyId === 'scroll-grid')).toBe(true)
       const runtimeId = await page.evaluate('session.getSnapshot().runtime.runtimeId')
-      // Initial selected-cell resize can restore its position while siblings
-      // finish mounting. Keep explicit scrolling until lazy admission completes.
       await expect.poll(async () => {
         await scrollGrid(sandbox, true)
-        return roots.count()
-      }).toBe(24)
-      await expect.poll(() => page.evaluate('session.getSnapshot().runtime.viewports.some(viewport=>viewport.target.variantId==="cell-23")')).toBe(true)
+        return (await snapshotGrid(sandbox)).items.some(item => item.id === 'cell-999')
+      }).toBe(true)
+      const bottom = await snapshotGrid(sandbox)
+      expect(bottom.items.length).toBeLessThan(30)
+      expect(bottom.items.every(item => item.intersects)).toBe(true)
+      expect(bottom.items.some(item => item.id === 'cell-0')).toBe(false)
+      expect(await roots.count()).toBe(bottom.items.length)
+      await expect.poll(() => page.evaluate('session.getSnapshot().runtime.viewports.some(viewport=>viewport.target.variantId==="cell-999")')).toBe(true)
       const scrolled = await page.evaluate('session.getSnapshot().runtime.viewports')
       expect(scrolled.some(viewport => initial.some(old => old.target.variantId === viewport.target.variantId))).toBe(false)
       expect(await page.evaluate('session.getSnapshot().runtime.viewport')).toBe(null)
-      await page.evaluate('session.selection.select({storyId:"scroll-grid",variantId:"cell-23"})')
-      await expect.poll(() => page.evaluate('session.getSnapshot().runtime.viewport?.target.variantId')).toBe('cell-23')
       await scrollGrid(sandbox, false)
+      await expect.poll(async () => (await snapshotGrid(sandbox)).items.some(item => item.id === 'cell-0')).toBe(true)
+      const top = await snapshotGrid(sandbox)
+      expect(top.items.length).toBeLessThan(30)
+      expect(top.items.every(item => item.intersects)).toBe(true)
+      expect(top.items.some(item => item.id === 'cell-999')).toBe(false)
+      expect(await roots.count()).toBe(top.items.length)
       await expect.poll(() => page.evaluate('session.getSnapshot().runtime.viewports.some(viewport=>viewport.target.variantId==="cell-0")')).toBe(true)
-      expect(await page.evaluate('session.getSnapshot().runtime.viewports.some(viewport=>viewport.target.variantId==="cell-23")')).toBe(false)
       expect(await page.evaluate('session.getSnapshot().runtime.runtimeId')).toBe(runtimeId)
       await page.evaluate('session.dispose()')
       expect(await page.locator('iframe').count()).toBe(0)
