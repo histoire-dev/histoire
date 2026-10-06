@@ -105,6 +105,9 @@ onBeforeUnmount(() => disposers.forEach(dispose => dispose()))
     <BaseOverflowToolbarItem id="inspector">
       <slot name="inspector" />
     </BaseOverflowToolbarItem>
+    <BaseOverflowToolbarItem id="ui" separator-before>
+      <slot name="ui" />
+    </BaseOverflowToolbarItem>
   </BaseOverflowToolbar>
 </template>
 

@@ -52,7 +52,9 @@ const props = withDefaults(defineProps<{
   searchActive?: boolean
   /** Comment placement intercepts preview input without changing persistent tool enum. */
   commentMode?: boolean
-}>(), { arrange: 'grid', baseArrange: 'grid', arrangementOverride: false, inspectorWidth: 0 })
+  /** Hide workbench chrome while retaining story frames and coordinate labels. */
+  uiHidden?: boolean
+}>(), { arrange: 'grid', baseArrange: 'grid', arrangementOverride: false, inspectorWidth: 0, uiHidden: false })
 const emit = defineEmits<{ error: [error: unknown], contextmenu: [event: MouseEvent | KeyboardEvent, frame: CanvasFrameLayout], framePointer: [target: { storyId: string, variantId: string, frameKey: string, point: { x: number, y: number }, clientPoint: { x: number, y: number } }], selectedSession: [session: HistoireSession | undefined] }>()
 const session = useHistoireSession()
 const snapshot = useHistoireSnapshot()
@@ -218,7 +220,7 @@ watch(() => snapshot.value.selection?.variantId, (value) => {
 watch(renderedArrange, (arrangement) => {
   if (viewBinding.isActiveStory(story.value?.id)) canvas.setArrangement(arrangement)
 }, { flush: 'sync', immediate: true })
-watch([frames, () => props.inspectorWidth, renderedArrange, story, panning], measure, { flush: 'post' })
+watch([frames, () => props.inspectorWidth, () => props.uiHidden, renderedArrange, story, panning], measure, { flush: 'post' })
 watch([
   () => [canvas.effectiveZoom, canvas.panOffset.x, canvas.panOffset.y],
   () => [headerBounds.value?.top, headerBounds.value?.bottom],
@@ -251,10 +253,10 @@ defineExpose({ canvas, registry })
 
 <template>
   <div ref="viewport" class="histoire-canvas-viewport" :class="{ 'is-panning': panning, 'is-dragging': canvas.panning, 'is-commenting': commentMode }" :style="{ '--histoire-canvas-inspector-reserve': `${inspectorWidth}px` }" role="region" aria-label="Story canvas" tabindex="-1" @wheel="viewportEvents.onWheel" @contextmenu="viewportEvents.openCanvasMenu" @keydown="viewportEvents.openCanvasMenu" @pointerdown.capture="viewportEvents.framePointer" @pointerdown="viewportEvents.pointerDown" @pointermove="pointer.onPointerMove" @pointerup="pointer.onPointerUp" @pointercancel="pointer.onPointerCancel">
-    <div ref="toolbar" class="histoire-canvas-toolbar-host">
+    <div v-if="!uiHidden" ref="toolbar" class="histoire-canvas-toolbar-host">
       <slot name="toolbar" :canvas="canvas" :frames="registry" />
     </div>
-    <div v-if="story" ref="header" class="histoire-canvas-header" :class="{ 'is-obscured': headerObscured }">
+    <div v-if="story && !uiHidden" ref="header" class="histoire-canvas-header" :class="{ 'is-obscured': headerObscured }">
       <slot name="header" :story="story">
         <CanvasHeader :story="story" :can-open-in-editor="canOpenInEditor" @open-in-editor="openInEditor" />
       </slot>
@@ -267,10 +269,10 @@ defineExpose({ canvas, registry })
     </component>
     <CanvasMatrixPrimary :active="renderedArrange === 'matrix'" :width="size.width" :height="size.height" @error="emit('error', $event)" />
     <div v-if="commentMode" class="histoire-comment-capture" @pointerdown="viewportEvents.framePointer" />
-    <slot name="overlays" :canvas="canvas" :frames="registry" :selected-frame="selectedFrame" />
-    <CollectErrorCard v-if="diagnostics.length" :errors="diagnostics" />
-    <CanvasStatus v-if="panning" ref="panHint" :pan="true" />
-    <div v-if="!story" class="histoire-canvas-empty">
+    <slot v-if="!uiHidden" name="overlays" :canvas="canvas" :frames="registry" :selected-frame="selectedFrame" />
+    <CollectErrorCard v-if="diagnostics.length && !uiHidden" :errors="diagnostics" />
+    <CanvasStatus v-if="panning && !uiHidden" ref="panHint" :pan="true" />
+    <div v-if="!story && !uiHidden" class="histoire-canvas-empty">
       <WorkbenchEmptyState icon="document" title="Select a story" />
     </div>
   </div>

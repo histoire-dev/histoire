@@ -149,8 +149,8 @@ export interface HistoireRuntimeFocusMessage extends HistoireStoryScopedMessage 
   type: typeof RUNTIME_FOCUS
   /** Whether owned story document currently has focus. */
   focused: boolean
-  /** Explicit search shortcut; other keys stay inside story. */
-  action?: 'search'
+  /** Explicit host UI action; other keys stay inside story. */
+  action?: 'search' | 'toggle-ui'
 }
 
 /** Host request: collect the tests a variant registers. */

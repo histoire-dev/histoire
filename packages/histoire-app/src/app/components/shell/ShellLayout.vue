@@ -68,23 +68,23 @@ useHistoireResource(() => {
 </script>
 
 <template>
-  <div class="histoire-shell-layout" :data-panel-open="shell.panelOpen.value && shell.pane.value !== 'home'" :style="{ '--histoire-panel-width': `${shell.panelWidth.value}px` }">
-    <AppRail :panel-id="panelId" :home-href="homeHref" :home-active="homeActive" :logo-href="logoHref" :logos="logos" :settings-available="settingsAvailable" :settings-active="settingsActive" :hide-theme="hideTheme" :badges="badges" @home="emit('home')" @pane="emit('pane', $event)" @settings="emit('settings')" @error="emit('error', $event)" />
-    <HstButton v-if="shell.narrow.value && shell.panelOpen.value && shell.pane.value !== 'home'" color="flat" class="histoire-shell-backdrop" type="button" aria-label="Close side panel" @click="shell.togglePanel" />
-    <SidePanelHost v-if="shell.panelOpen.value && shell.pane.value !== 'home'" :id="panelId" :pane="shell.pane.value">
+  <div class="histoire-shell-layout" :data-panel-open="shell.panelOpen.value && shell.pane.value !== 'home'" :data-ui-hidden="shell.uiHidden.value" :style="{ '--histoire-panel-width': `${shell.panelWidth.value}px` }">
+    <AppRail v-if="!shell.uiHidden.value" :panel-id="panelId" :home-href="homeHref" :home-active="homeActive" :logo-href="logoHref" :logos="logos" :settings-available="settingsAvailable" :settings-active="settingsActive" :hide-theme="hideTheme" :badges="badges" @home="emit('home')" @pane="emit('pane', $event)" @settings="emit('settings')" @error="emit('error', $event)" />
+    <HstButton v-if="!shell.uiHidden.value && shell.narrow.value && shell.panelOpen.value && shell.pane.value !== 'home'" color="flat" class="histoire-shell-backdrop" type="button" aria-label="Close side panel" @click="shell.togglePanel" />
+    <SidePanelHost v-if="!shell.uiHidden.value && shell.panelOpen.value && shell.pane.value !== 'home'" :id="panelId" :pane="shell.pane.value">
       <slot :name="shell.pane.value" />
     </SidePanelHost>
     <main class="histoire-shell-main">
       <slot name="main">
         <slot />
       </slot>
-      <InspectorFrame v-if="showInspector && shell.inspectorOpen.value && $slots.inspector" :id="inspectorId" @close="shell.toggleInspector">
+      <InspectorFrame v-if="!shell.uiHidden.value && showInspector && shell.inspectorOpen.value && $slots.inspector" :id="inspectorId" @close="shell.toggleInspector">
         <template v-if="$slots['inspector-header']" #header>
           <slot name="inspector-header" />
         </template>
         <slot name="inspector" />
       </InspectorFrame>
-      <slot name="overlays" />
+      <slot v-if="!shell.uiHidden.value" name="overlays" />
     </main>
   </div>
 </template>
@@ -92,11 +92,13 @@ useHistoireResource(() => {
 <style scoped>
 .histoire-shell-layout { display: grid; grid-template-columns: 56px minmax(0, 1fr); width: 100%; min-width: 0; min-height: 0; height: 100%; color: var(--histoire-text); background: var(--histoire-canvas); font-family: var(--histoire-font-sans, Manrope, system-ui, sans-serif); font-size: 13px; }
 .histoire-shell-layout[data-panel-open="true"] { grid-template-columns: 56px var(--histoire-panel-width, 280px) minmax(0, 1fr); }
+.histoire-shell-layout[data-ui-hidden="true"] { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr); }
 .histoire-shell-main { display: flex; flex-direction: column; position: relative; min-width: 0; min-height: 0; overflow: hidden; }
 .histoire-shell-backdrop { position: absolute; inset: 0 0 56px; z-index: 70; padding: 0; }
 @container (max-width: 640px) {
   .histoire-shell-layout, .histoire-shell-layout[data-panel-open="true"] { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) 56px; }
   .histoire-shell-main { grid-row: 1; }
   .histoire-shell-layout :deep(.histoire-app-rail) { grid-row: 2; z-index: 90; }
+  .histoire-shell-layout[data-ui-hidden="true"] { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr); }
 }
 </style>

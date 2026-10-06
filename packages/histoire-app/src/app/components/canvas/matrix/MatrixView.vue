@@ -26,6 +26,8 @@ const props = defineProps<{
   previewBase: string
   /** Measured fixed chrome; matrix adds its own axis-control reservation once. */
   contentInsets?: CanvasContentInsets
+  /** Hide matrix controls and guidance while retaining coordinate labels. */
+  uiHidden?: boolean
 }>()
 const emit = defineEmits<{ axes: [value: { rows: string, cols: string }], error: [error: unknown] }>()
 const canvas = useCanvasStore()
@@ -41,7 +43,7 @@ function layoutFrames(zoom = canvas.effectiveZoom) {
   return layoutMatrixFrames(matrix.cells.value, { storyId: story.value?.id ?? '', variantId: baseVariant.value ?? '', rows: rowValues.value, cols: colValues.value, size: props.size, zoom })
 }
 const frames = computed(() => layoutFrames())
-const topInset = computed(() => Math.max(MATRIX_TOP_INSET, props.contentInsets?.topInset ?? 0))
+const topInset = computed(() => Math.max(props.uiHidden ? MATRIX_COLUMN_HEADER : MATRIX_TOP_INSET, props.contentInsets?.topInset ?? 0))
 const insets = computed(() => ({ topInset: topInset.value, bottomInset: props.contentInsets?.bottomInset ?? 0 }))
 const live = useCanvasFrameAdmission({
   frames: () => frames.value,
@@ -86,13 +88,13 @@ onMounted(() => {
 
 <template>
   <div class="histoire-matrix-view">
-    <div class="histoire-matrix-axis-position">
+    <div v-if="!uiHidden" class="histoire-matrix-axis-position">
       <MatrixAxisBar @axes="emit('axes', $event)" />
     </div>
-    <p v-if="!matrix.available.value" class="histoire-matrix-empty">
+    <p v-if="!uiHidden && !matrix.available.value" class="histoire-matrix-empty">
       Waiting for two finite prop axes. Boolean props and matrix hints supply values.
     </p>
-    <p v-else-if="!matrix.cells.value.length" class="histoire-matrix-empty">
+    <p v-else-if="!uiHidden && !matrix.cells.value.length" class="histoire-matrix-empty">
       No values selected. Enable row and column values in Props.
     </p>
     <div v-else class="histoire-matrix-board" :style="{ top: `${topInset}px` }">

@@ -97,7 +97,7 @@ export function validateBridgeEventPayload(event: HistoireBridgeEvent, value: un
   }
   else if (event === 'focus.changed') {
     fields(input, ['focused', 'direction', 'action'])
-    if (typeof input.focused !== 'boolean' || (input.direction !== undefined && !['next', 'previous'].includes(input.direction as string)) || (input.action !== undefined && input.action !== 'search') || (input.action !== undefined && input.direction !== undefined)) invalid('Invalid focus state')
+    if (typeof input.focused !== 'boolean' || (input.direction !== undefined && !['next', 'previous'].includes(input.direction as string)) || (input.action !== undefined && !['search', 'toggle-ui'].includes(input.action as string)) || (input.action !== undefined && input.direction !== undefined)) invalid('Invalid focus state')
   }
   else if (event === 'channel.message') {
     validateHostChannelPayload(input, true)

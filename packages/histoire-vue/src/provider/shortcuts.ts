@@ -4,6 +4,15 @@ import { useHistoireContext, useHistoireResource } from './context.js'
 
 /** First-party standalone dialog can reveal owned search before native focus occurs. */
 export const HISTOIRE_SEARCH_FOCUS = 'histoire:search-focus'
+/** Owned source-frame intent toggles chrome in its exact standalone provider. */
+export const HISTOIRE_TOGGLE_UI = 'histoire:toggle-ui'
+
+/** Dispatch the finite UI-toggle intent on its owning provider root. */
+export function requestHistoireUiToggle(root: HTMLElement | null): void {
+  if (!root) return
+  const Event = root.ownerDocument.defaultView?.Event
+  if (Event) root.dispatchEvent(new Event(HISTOIRE_TOGGLE_UI, { cancelable: true }))
+}
 
 /** Owned source-frame intent focuses only this provider's first independent search part. */
 export function focusHistoireSearch(root: HTMLElement | null): void {

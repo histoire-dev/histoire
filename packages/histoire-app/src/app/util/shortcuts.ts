@@ -30,6 +30,7 @@ export type ShortcutReference = Pick<ShortcutDefinition, 'id' | 'label' | 'keys'
 /** One source defines built-in bindings; active surfaces bind handlers by identity. */
 const builtins: readonly ShortcutReference[] = [
   { id: 'global.search', label: 'Search', keys: ['mod+k'], scope: 'global' },
+  { id: 'global.toggle-ui', label: 'Toggle UI', keys: ['mod+shift+h'], scope: 'global' },
   { id: 'global.theme', label: 'Toggle dark mode', keys: ['mod+shift+d'], scope: 'global' },
   { id: 'canvas.select', label: 'Select tool', keys: ['v'], scope: 'canvas' },
   { id: 'canvas.pan', label: 'Pan tool', keys: ['h'], scope: 'canvas' },

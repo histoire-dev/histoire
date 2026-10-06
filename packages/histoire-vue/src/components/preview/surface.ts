@@ -3,7 +3,7 @@ import { HistoireSdkError } from '@histoire/protocol'
 import { isHistoirePrimaryMountActive, subscribeHistoireMountEvents } from '@histoire/sdk/internal'
 import { defineComponent, h, onMounted, shallowRef } from 'vue'
 import { useHistoireContext, useHistoireResource } from '../../provider/context.js'
-import { focusHistoireSearch } from '../../provider/shortcuts.js'
+import { focusHistoireSearch, requestHistoireUiToggle } from '../../provider/shortcuts.js'
 
 /** Build native primary wrapper around SDK-owned source runtime; no host story imports. */
 export function createHistoirePrimary(name: string, surface: 'preview' | 'grid') {
@@ -76,7 +76,10 @@ export function createHistoirePrimary(name: string, surface: 'preview' | 'grid')
           mount = session.mount(container.value, { surface })
           stopReadiness = session.subscribe(synchronizeReadiness)
           stopFocus = subscribeHistoireMountEvents(mount, (event) => {
-            if (event.event === 'focus.changed' && (event.payload as { action?: string }).action === 'search') focusHistoireSearch(context.root.value)
+            if (event.event !== 'focus.changed') return
+            const action = (event.payload as { action?: string }).action
+            if (action === 'search') focusHistoireSearch(context.root.value)
+            else if (action === 'toggle-ui') requestHistoireUiToggle(context.root.value)
           })
           mount.ready.then(() => {
             if (removed) return

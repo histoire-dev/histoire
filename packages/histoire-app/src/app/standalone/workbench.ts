@@ -4,7 +4,7 @@ import type { ShortcutScope } from '../util/shortcuts.js'
 import type { WorkbenchCanvas, WorkbenchProps } from './workbench-types.js'
 import { getHistoireTargetKey } from '@histoire/protocol'
 import { useHistoireSnapshot } from '@histoire/vue'
-import { HISTOIRE_SEARCH_FOCUS, useHistoireContext, useHistoireResource } from '@histoire/vue/internal'
+import { HISTOIRE_SEARCH_FOCUS, HISTOIRE_TOGGLE_UI, useHistoireContext, useHistoireResource } from '@histoire/vue/internal'
 import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import { getRegisteredFrameTarget } from '../components/canvas/frame-target.js'
 import { createSearchFrameNavigation } from '../components/panes/search/frame-navigation.js'
@@ -149,6 +149,23 @@ export function useWorkbench(props: WorkbenchProps, error: (error: unknown) => v
   const story = computed(() => snapshot.value.catalog.stories.find(item => item.id === snapshot.value.selection?.storyId))
   const markdownTransition = createWorkbenchMarkdownTransition(props.session)
   useHistoireResource(markdownTransition.close)
+  let root: HTMLElement | null = null
+  /** @returns Whether canvas chrome can be hidden or hidden chrome can be restored. */
+  const canToggleUi = () => shell.uiHidden.value || (route.value.name === 'story' && Boolean(story.value && !story.value.docsOnly) && !markdownTransition.visible.value)
+  /** Close transient interactions before removing their owning chrome. */
+  function toggleUi(): void {
+    if (!canToggleUi()) return
+    const wasHidden = shell.uiHidden.value
+    const activeElement = context.root.value?.ownerDocument.activeElement
+    menu.close()
+    if (dev) dev.commentMode.value = false
+    shell.toggleUi()
+    // Keep subsequent provider-scoped shortcuts reachable after their focused control unmounts.
+    if (!wasHidden && activeElement?.tagName !== 'IFRAME') {
+      void nextTick(() => root?.querySelector<HTMLElement>('.histoire-canvas-viewport')?.focus({ preventScroll: true }))
+    }
+  }
+  useHistoireResource(shortcuts.bind('global.toggle-ui', toggleUi, { allowInput: true, enabled: canToggleUi }))
   const arrangementState = createWorkbenchArrangement({
     query: () => route.value.query.arrange,
     storyId: () => story.value?.id,
@@ -188,7 +205,6 @@ export function useWorkbench(props: WorkbenchProps, error: (error: unknown) => v
       showPane('stories')
     }
   }, { immediate: true })
-  let root: HTMLElement | null = null
   /** Frame shortcuts require exact registered chrome/menu; other panes retain globals only. */
   function shortcutScopes(target: Element): readonly ShortcutScope[] {
     if (route.value.name !== 'story' || story.value?.docsOnly) return ['global']
@@ -218,14 +234,22 @@ export function useWorkbench(props: WorkbenchProps, error: (error: unknown) => v
     event.preventDefault()
     void openSearch().catch(error)
   }
+  /** Current owned iframe intent toggles only this workbench's chrome. */
+  function requestToggleUi(event: Event) {
+    if (event.target !== root) return
+    event.preventDefault()
+    toggleUi()
+  }
   onMounted(() => {
     root = context.root.value
     root?.addEventListener('keydown', keydown)
     root?.addEventListener(HISTOIRE_SEARCH_FOCUS, requestSearch)
+    root?.addEventListener(HISTOIRE_TOGGLE_UI, requestToggleUi)
   })
   useHistoireResource(() => {
     root?.removeEventListener('keydown', keydown)
     root?.removeEventListener(HISTOIRE_SEARCH_FOCUS, requestSearch)
+    root?.removeEventListener(HISTOIRE_TOGGLE_UI, requestToggleUi)
   })
   /** Open without toggling an already visible pane closed. */
   function showPane(pane: 'stories' | 'search' | 'tests' | 'comments' | 'mcp') {
@@ -289,5 +313,5 @@ export function useWorkbench(props: WorkbenchProps, error: (error: unknown) => v
     const action = actions.entries.get('open-isolated')
     if (action && target.variantId) void actions.run(action, { ...target, variantId: target.variantId, frameKey: getHistoireTargetKey(target) })
   }
-  return { snapshot, route, shell, settings, presets, matrix, projectTests, project, mcp, dev, menu, actions, canvas, search, searchQuery, searchActive, searchMatches, highlighted, story, markdown: markdownTransition.visible, arrange, baseArrange, arrangementOverride, badges, showPane, activatePane, openSearch, closeSearch, panel, setArrange, setAxes, navigate, searchSelected, testsSelected, nextMatch: searchMatches.next, previousMatch: searchMatches.previous, runAll, openIsolated }
+  return { snapshot, route, shell, settings, presets, matrix, projectTests, project, mcp, dev, menu, actions, canvas, shortcuts, search, searchQuery, searchActive, searchMatches, highlighted, story, markdown: markdownTransition.visible, arrange, baseArrange, arrangementOverride, badges, showPane, activatePane, openSearch, closeSearch, toggleUi, panel, setArrange, setAxes, navigate, searchSelected, testsSelected, nextMatch: searchMatches.next, previousMatch: searchMatches.previous, runAll, openIsolated }
 }

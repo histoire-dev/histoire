@@ -53,7 +53,7 @@ export function publishRuntimeEvent(message: RuntimeEventMessage): boolean {
 }
 
 /** Capture actor before framework handlers; no Promise/timer monkey patches or async ambient ownership. */
-export function installRuntimeEventScope(storyId: () => string | undefined, publishFocus?: (focused: boolean, action?: 'search') => void, publishEvent?: (message: RuntimeEventMessage) => void): () => void {
+export function installRuntimeEventScope(storyId: () => string | undefined, publishFocus?: (focused: boolean, action?: 'search' | 'toggle-ui') => void, publishEvent?: (message: RuntimeEventMessage) => void): () => void {
   const scope: RuntimeEventScope = { storyId, publishEvent }
   globals()[key] = scope
   const types = ['click', 'dblclick', 'input', 'change', 'submit', 'keydown', 'keyup', 'pointerdown', 'pointerup', 'focusin', 'focusout']
@@ -67,12 +67,15 @@ export function installRuntimeEventScope(storyId: () => string | undefined, publ
     scope.actor = actor
     scope.event = event
   }
-  /** Only finite search shortcut leaves owned iframe; remaining host/story keys remain untouched. */
+  /** Only finite search and chrome-toggle shortcuts leave owned iframe. */
   function keydown(event: KeyboardEvent) {
-    if (!publishFocus || event.defaultPrevented || event.altKey || !(event.ctrlKey || event.metaKey) || event.key.toLowerCase() !== 'k') return
+    if (!publishFocus || event.defaultPrevented || event.altKey || !(event.ctrlKey || event.metaKey)) return
+    const key = event.key.toLowerCase()
+    const action = event.shiftKey && key === 'h' ? 'toggle-ui' : key === 'k' ? 'search' : undefined
+    if (!action) return
     event.preventDefault()
     event.stopPropagation()
-    publishFocus(true, 'search')
+    publishFocus(true, action)
   }
   const focus = () => publishFocus?.(true)
   const blur = () => publishFocus?.(false)

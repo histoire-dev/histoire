@@ -37,6 +37,7 @@ export function createShell(options: {
   storage?: ShellStorage
 }) {
   const state = shallowRef<ShellState>({ pane: 'stories', panelOpen: true, inspectorOpen: true, panelWidth: PANEL_WIDTH_DEFAULT, inspectorWidth: INSPECTOR_WIDTH_DEFAULT })
+  const uiHidden = shallowRef(false)
   const narrow = shallowRef(false)
   const containerWidth = shallowRef(0)
   const inspectorAvailable = shallowRef(false)
@@ -87,6 +88,10 @@ export function createShell(options: {
   function toggleInspector(): void {
     update({ inspectorOpen: !state.value.inspectorOpen })
   }
+  /** Hide workbench chrome for this page session without persisting the choice. */
+  function toggleUi(): void {
+    if (!closed) uiHidden.value = !uiHidden.value
+  }
   /** Container width, rather than global window, defines narrow fallback. */
   function setNarrow(width: number): void {
     if (!closed && Number.isFinite(width) && width > 0) {
@@ -125,6 +130,8 @@ export function createShell(options: {
     panelOpen: computed(() => state.value.panelOpen),
     /** Current inspector visibility preference. */
     inspectorOpen: computed(() => state.value.inspectorOpen),
+    /** Whether workbench chrome is temporarily hidden. */
+    uiHidden: computed(() => uiHidden.value),
     /** Current container responsive state. */
     narrow: computed(() => narrow.value),
     /** Effective pane width within the measured provider. */
@@ -140,6 +147,7 @@ export function createShell(options: {
     selectPane,
     togglePanel,
     toggleInspector,
+    toggleUi,
     setNarrow,
     setInspectorAvailable,
     setPanelWidth,
