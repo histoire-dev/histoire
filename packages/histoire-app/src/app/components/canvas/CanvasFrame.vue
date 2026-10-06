@@ -20,10 +20,8 @@ const props = defineProps<{
   variant: HistoireCatalogVariant
   /** Live-budget admission; placeholders preserve target and layout. */
   live: boolean
-  /** Canonical selected frame; it may retain a promoted replica runtime. */
+  /** Canonical selection changes chrome and inspector, never runtime ownership. */
   selected: boolean
-  /** Selected canvas frame keeps its ready isolated runtime after promotion. */
-  retainReplica?: boolean
   /** Absolute configured source base. */
   previewBase: string
   /** Preview logical dimensions before canvas scaling. */
@@ -36,7 +34,7 @@ const props = defineProps<{
   /** Active-query nonmatches dim without disabling native frame interaction. */
   dimmed?: boolean
 }>()
-const emit = defineEmits<{ select: [variantId: string], promote: [frameId: string], contextmenu: [event: MouseEvent | KeyboardEvent, frame: CanvasFrameLayout] }>()
+const emit = defineEmits<{ select: [variantId: string], contextmenu: [event: MouseEvent | KeyboardEvent, frame: CanvasFrameLayout] }>()
 const canvas = useCanvasStore()
 const registry = useCanvasFrames()
 const menu = useContextMenu()
@@ -95,15 +93,9 @@ function updateStatus(value: typeof status.value, detail?: unknown) {
   error.value = detail
 }
 
-/** Ready replicas retain their document while all paused states use canonical selection. */
+/** All frame states use canonical selection while their admitted runtime stays mounted. */
 function select() {
-  if (!canSelect.value) return
-  if (!props.selected && props.live && status.value === 'ready') {
-    emit('promote', props.frame.id)
-  }
-  else {
-    emit('select', props.variant.id)
-  }
+  if (canSelect.value) emit('select', props.variant.id)
 }
 
 /** Native menu key opens same chrome menu as pointer context menu. */
@@ -128,16 +120,16 @@ function openMenu(event: MouseEvent | KeyboardEvent) {
       <span class="histoire-frame-title" :title="variant.title">{{ variant.title }}</span><BuiltinIcon v-if="status === 'error'" icon="error-filled" :size="12" class="is-error" /><PulsatingDisc v-else-if="test?.running" :size="12" /><BuiltinIcon v-else-if="testIcon" :icon="testIcon" :size="12" :class="{ 'is-error': test?.failed || test?.error }" />
     </button>
     <div class="histoire-frame-body" data-test-id="responsive-preview-bg" :style="{ height: `${height * canvas.effectiveZoom}px`, background }" @click="select">
-      <div class="histoire-frame-content" :style="previewStyle">
-        <CanvasReplicaPreview v-if="live && (!selected || retainReplica)" ref="replica" :frame-id="frame.id" :story-id="frame.storyId" :variant-id="frame.variantId" :preview-base="previewBase" @status="updateStatus" />
+      <div class="histoire-frame-content" :style="previewStyle" :aria-busy="status !== 'ready'" :inert="status !== 'ready' || stale ? true : undefined">
+        <CanvasReplicaPreview v-if="live" ref="replica" :frame-id="frame.id" :story-id="frame.storyId" :variant-id="frame.variantId" :preview-base="previewBase" @status="updateStatus" />
       </div>
       <div v-if="!live" class="histoire-frame-placeholder">
         {{ variant.title }}
       </div>
-      <div v-else-if="!selected && status === 'loading'" class="histoire-frame-placeholder">
+      <div v-else-if="status === 'loading'" class="histoire-frame-placeholder">
         Loading preview…
       </div>
-      <div v-else-if="!selected && status === 'error'" class="histoire-frame-error" role="alert">
+      <div v-else-if="status === 'error'" class="histoire-frame-error" role="alert">
         <span>{{ error instanceof Error ? error.message : 'Preview unavailable' }}</span><HstButton color="default" @click.stop="replica?.retry()">
           Retry
         </HstButton>
@@ -150,7 +142,8 @@ function openMenu(event: MouseEvent | KeyboardEvent) {
 
 <style scoped>
 .histoire-canvas-frame { position: absolute; min-width: 0; }
-.is-dimmed { opacity: .35; }
+.is-dimmed:not(.is-selected) { opacity: .35; }
+.is-dimmed.is-selected .histoire-frame-content { opacity: .35; }
 /* Frame labels keep selection semantics without shared button pressed surfaces. */
 .histoire-frame-label {
   box-sizing: border-box;
@@ -179,6 +172,9 @@ function openMenu(event: MouseEvent | KeyboardEvent) {
 .is-selected .histoire-frame-label { color: var(--histoire-accent); font-weight: 700; }
 .histoire-frame-label :is(svg, .histoire-pulsating-disc) { color: var(--histoire-accent); } .histoire-frame-label svg.is-error { color: var(--histoire-danger); }
 .histoire-frame-body { position: relative; width: 100%; overflow: hidden; border: 1px solid var(--histoire-border); border-radius: 7px; background: white; }
+/* Unscaled chrome owns selection so every runtime state keeps a two-pixel ring. */
+.is-selected .histoire-frame-body { border-color: var(--histoire-accent); }
+.is-selected .histoire-frame-body::after { content: ''; position: absolute; inset: 0; border-radius: inherit; box-shadow: inset 0 0 0 1px var(--histoire-accent); pointer-events: none; z-index: 3; }
 .is-highlighted .histoire-frame-label { color: var(--histoire-accent); } .is-highlighted .histoire-frame-body { border-color: var(--histoire-accent); }
 .histoire-frame-content { transform-origin: top left; }
 .histoire-frame-select { position: absolute; inset: 0; cursor: pointer; }

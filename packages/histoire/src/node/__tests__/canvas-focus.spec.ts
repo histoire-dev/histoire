@@ -18,14 +18,12 @@ describe('canvas selection focus binding', () => {
     const initialOffset = { ...canvas.panOffset }
     const focusFrame = vi.fn(canvas.focusFrame)
     const selectFrame = vi.fn(canvas.selectFrame)
-    const registerPrimary = vi.fn()
     const stop = watchCanvasFrameFocus({
       getFrame: () => current.value,
       getArrange: () => arrange.value,
       focusFrame,
       selectFrame,
       shouldRevealFrame: frame => frame.id !== activatedFrameId.value,
-      registerPrimary,
     })
 
     try {
@@ -46,7 +44,7 @@ describe('canvas selection focus binding', () => {
     finally { stop() }
   })
 
-  it('fits once on List entry then only reveals later selections', async () => {
+  it('reveals selection across arrangements without changing zoom', async () => {
     const canvas = createCanvasStore()
     const selectedId = ref('first')
     const arrange = ref<'grid' | 'list' | 'matrix'>('grid')
@@ -54,9 +52,7 @@ describe('canvas selection focus binding', () => {
     const selected = computed(() => frames.value.find(frame => frame.variantId === selectedId.value))
     canvas.setGeometry({ width: 1200, height: 900 }, canvasFrameBounds(frames.value), 380)
     const focusFrame = vi.fn(canvas.focusFrame)
-    const fitFrame = vi.fn(canvas.zoomToFrame)
-    const registerPrimary = vi.fn()
-    const stop = watchCanvasFrameFocus({ getFrame: () => selected.value, getArrange: () => arrange.value, focusFrame, selectFrame: canvas.selectFrame, fitFrame, registerPrimary })
+    const stop = watchCanvasFrameFocus({ getFrame: () => selected.value, getArrange: () => arrange.value, focusFrame, selectFrame: canvas.selectFrame })
     try {
       const cursor = { x: 600, y: 450 }
       const worldPoint = clientToCanvas(cursor, canvas.effectiveZoom, canvas.panOffset)
@@ -71,17 +67,16 @@ describe('canvas selection focus binding', () => {
       arrange.value = 'matrix'
       await nextTick()
       expect(focusFrame).toHaveBeenCalledTimes(1)
-      expect(fitFrame).not.toHaveBeenCalled()
+      expect(canvas.zoom).toBe(1)
       arrange.value = 'list'
       await nextTick()
       expect(focusFrame).toHaveBeenCalledTimes(2)
-      expect(fitFrame).toHaveBeenCalledOnce()
+      expect(canvas.zoom).toBe(1)
       expect(canvas.zoom).toBe(canvas.effectiveZoom)
       selectedId.value = 'third'
       await nextTick()
       expect(focusFrame).toHaveBeenCalledTimes(3)
-      expect(fitFrame).toHaveBeenCalledOnce()
-      expect(registerPrimary).toHaveBeenCalledTimes(4)
+      expect(canvas.zoom).toBe(1)
     }
     finally { stop() }
   })

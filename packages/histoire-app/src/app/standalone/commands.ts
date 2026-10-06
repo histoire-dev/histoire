@@ -2,31 +2,38 @@ import type { HistoireSearchResult } from '@histoire/protocol'
 import type { HistoireSession } from '@histoire/sdk/internal'
 import type { ClientCommand, ClientCommandContext } from '@histoire/shared'
 import type { Router } from 'vue-router'
+import type { StandaloneRuntimeBinding } from './runtime-binding.js'
 import { getHistoireTargetKey } from '@histoire/protocol'
 import { requestHistoireOpenInEditor } from '@histoire/sdk/internal'
 import { registeredCommands } from 'virtual:$histoire-commands'
 import { files, onUpdate } from 'virtual:$histoire-stories'
-import { shallowRef } from 'vue'
+import { shallowRef, watch } from 'vue'
 import { createBuiltinCommands } from '../util/builtin-commands.js'
 import { mapFile } from '../util/mapping.js'
 import { createStandaloneClientActions } from './client-actions.js'
 
 /** Standalone plugin commands retain legacy context while story modules stay sandbox-owned. */
-export function createStandaloneCommands(session: HistoireSession, router: Router) {
+export function createStandaloneCommands(session: HistoireSession, router: Router, runtime?: StandaloneRuntimeBinding) {
   const metadata = shallowRef(files.map(file => mapFile(file)))
   const snapshot = shallowRef(session.getSnapshot())
   const active = shallowRef(true)
   // Visibility depends on canonical state/capabilities, not only query changes.
   // This publication is shared by every reactive list/context consumer.
   const stopSnapshot = session.subscribe(value => snapshot.value = value)
-  const actions = createStandaloneClientActions(session)
+  let actions = createStandaloneClientActions(session)
+  const stopRuntime = runtime
+    ? watch(runtime.current, (owner) => {
+        actions.close()
+        if (owner.getSnapshot().status !== 'disposed') actions = createStandaloneClientActions(owner)
+      }, { immediate: true, flush: 'sync' })
+    : () => {}
   // Virtual metadata subscriptions survive HMR, and are owned by this bootstrap.
   const off = onUpdate((files) => {
     if (active.value) metadata.value = files.map(file => mapFile(file))
   })
   /** showIf/getParams receive read-only state; only clientAction gets an owned editable projection. */
   function context(): ClientCommandContext {
-    const current = snapshot.value
+    const current = runtime?.snapshot.value ?? snapshot.value
     const collected = metadata.value.find(file => file.story.id === current.selection?.storyId)?.story
     const variants = collected?.variants.map(variant => Object.freeze({ ...variant, state: variant.id === current.selection?.variantId ? current.state?.value ?? Object.freeze({}) : Object.freeze({}) }))
     const story = collected ? Object.freeze({ ...collected, variants }) : undefined
@@ -65,6 +72,7 @@ export function createStandaloneCommands(session: HistoireSession, router: Route
       if (!active.value) return
       active.value = false
       stopSnapshot()
+      stopRuntime()
       actions.close()
       off?.()
     } }

@@ -16,6 +16,20 @@ function matrixSnapshot(variantId: string | null = 'c', message = 'First') {
 }
 
 describe('matrix metadata runtime ownership', () => {
+  it('allows ordinary frame edits to replace metadata after canonical primary retires', () => {
+    const store = createMatrixStore()
+    const current = matrixSnapshot('c', 'Canonical')
+    store.synchronize(current)
+    expect(store.base.value.message).toBe('Canonical')
+    current.runtime.status = 'absent'
+    current.state = null
+    store.synchronize(current)
+    const observer = store.registerRuntimeObserver()
+    observer.capture(matrixSnapshot('c', 'Edited ordinary frame'))
+    expect(store.base.value.message).toBe('Edited ordinary frame')
+    observer.close()
+    store.close()
+  })
   it('bootstraps restored chooser Matrix intent through ordinary previews and retains empty filters', () => {
     const saved = JSON.stringify({ rows: 'enabled', cols: 'emphasized', rowValues: [], base: {} })
     const store = createMatrixStore({ storage: { getItem: () => saved, setItem: () => {} } })

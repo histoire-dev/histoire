@@ -22,7 +22,7 @@ export interface CanvasFrameRegistration {
   iframe?: HTMLIFrameElement | null
   /** Parent-minted document identity read from active sandbox URL. */
   documentId?: string | null
-  /** Owning isolated session; selected frame points to canonical provider. */
+  /** Exact mounted frame owner; selection does not transfer runtime ownership. */
   session?: HistoireSession
   /** Complete displayed matrix props; capture snapshots these without canonical mutation. */
   propsOverride?: Record<string, unknown>

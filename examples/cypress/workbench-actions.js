@@ -1,7 +1,7 @@
 /// <reference types="cypress" />
 
-import { primaryPreviewFrame } from './workbench-contract.js'
 import { getSelectedPreviewIframe } from './frame-commands.js'
+import { primaryPreviewFrame } from './workbench-contract.js'
 
 /** Opens Home and reveals Stories without toggling an already expanded pane closed. */
 export function visitStories() {
@@ -29,8 +29,10 @@ export function getCanvasVariantBody(storyId, variantId) {
   const key = JSON.stringify([storyId, variantId])
   return cy.get(`[data-frame-id='${key}']`).then(($frame) => {
     const selected = $frame.children('button').attr('aria-pressed') === 'true'
-    return (selected ? getSelectedPreviewIframe() : cy.wrap($frame).find('iframe[title="Histoire preview"]'))
-      .its('0.contentDocument.body')
+    const iframe = selected
+      ? getSelectedPreviewIframe()
+      : cy.wrap($frame).find('iframe[title="Histoire preview"]').should($frames => expect($frames[0].closest('[aria-busy]')).to.have.attr('aria-busy', 'false'))
+    return iframe.its('0.contentDocument.body')
       .should('not.be.empty')
       .then(cy.wrap)
   })

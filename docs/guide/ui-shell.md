@@ -10,6 +10,8 @@ Select (V), Pan (H), and Measure (M) share the canvas toolbar's tool switch; one
 
 Canvas zoom is saved locally for Grid, List, and Props matrix independently. **Fit** recalculates for current arrangement. With **Sync zoom across stories** disabled, selecting another story resets only active arrangement to Fit.
 
+Selecting a Grid or List variant changes its canvas border and inspector while admitted variants keep their existing documents and local state. This applies to canvas, sidebar, search, and browser history navigation. `ui.frameBudget` still limits live variants: eviction, explicit retry, story removal, or executable source changes can replace a document. Returning to an evicted variant restores its retained editable state; DOM-only state survives while its document remains admitted.
+
 Static builds include Home, Stories, Search, appearance controls, panel collapse, and Settings. Dev-only destinations are omitted. Opening a static book with an old dev pane preference restores Stories.
 
 Press **Ctrl/⌘ Shift D** to switch light/dark appearance. **Ctrl/⌘ K** retains the story and command palette. The existing `theme.hideColorSchemeSwitch` option controls the appearance switch.

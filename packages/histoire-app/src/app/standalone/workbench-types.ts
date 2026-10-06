@@ -5,6 +5,7 @@ import type { CanvasStore } from '../stores/canvas.js'
 import type { createStandaloneCommands } from './commands.js'
 import type { createStandaloneFolders } from './folders.js'
 import type { createStandaloneNavigation } from './navigation.js'
+import type { StandaloneRuntimeBinding } from './runtime-binding.js'
 
 /** Public exposed canvas surface used by standalone frame actions. */
 export interface WorkbenchCanvas {
@@ -18,6 +19,8 @@ export interface WorkbenchCanvas {
 export interface WorkbenchProps {
   /** Canonical session, already connected by bootstrap. */
   session: HistoireSession
+  /** Bootstrap runtime consumers follow selected admitted frame without moving it. */
+  runtime: StandaloneRuntimeBinding
   /** Standalone URL adapter. */
   navigation: ReturnType<typeof createStandaloneNavigation>
   /** Existing folder persistence adapter. */

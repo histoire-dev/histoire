@@ -67,6 +67,10 @@ interface HistoireConfig {
 
 ## Preview protocol additions
 
+Grid/List runtime lifetime belongs to each admitted exact story/variant frame, including initially selected variant. Canonical session owns navigation, catalog and settings; selected frame's ready session owns inspector operations. Selection through canvas, iframe input, tree, search or history never transfers mounts or replaces admitted documents. Frame chrome owns a fixed two-CSS-pixel selection ring independently of iframe zoom/readiness. Source-generation changes, eviction and explicit retry can replace documents; ordinary frame state is seeded before readiness and capture. Matrix cells never write their prop overrides into ordinary retained state, and Matrix alone reserves its hidden canonical runtime slot.
+
+Standalone plugin commands and automatic test collection follow that same selected runtime binding. Source or route retirement closes their operations without closing the retained frame.
+
 Portable catalog stories optionally expose `runtimeRevision`, a SHA-256 digest of canonical source bytes plus captured executable metadata (variants, layout, matrix hints, support plugin and module identity). Within one source epoch, identical explicit digests let existing frames retain their document across unrelated source publications while rebinding to the new source revision. Changed digests or epochs remount the actor; descriptors without a digest conservatively remount on source revision changes. Digests expose no source text. MCP and Node artifact story metadata retain their existing allowlist and omit this UI field.
 
 Standalone single previews retain their same-story runtime document when selecting another variant, preserving runtime-owned variant state. `PREVIEW_SYNC` advances `selectionVersion`; a newly keyed renderer must report fresh readiness. Every sandbox reply carries that version so queued predecessor state/readiness cannot publish after returning to the same variant. Story/source replacement still remints the document. Host mirrors never initialize source state.

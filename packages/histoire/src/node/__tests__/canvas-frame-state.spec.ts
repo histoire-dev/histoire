@@ -4,6 +4,38 @@ import { sourceFixture } from '../../../../histoire-sdk/src/__tests__/fixtures/s
 import { createHistoireSessionWithAdapters } from '../../../../histoire-sdk/src/session/controller.js'
 
 describe('passive canvas state projection', () => {
+  it('captures each observed frame independently without changing canonical state', async () => {
+    const source = sourceFixture()
+    const firstSource = sourceFixture()
+    const secondSource = sourceFixture()
+    const canonical = createHistoireSessionWithAdapters({ url: 'https://book.test/' }, source.adapters)
+    const first = createHistoireSessionWithAdapters({ url: 'https://book.test/' }, firstSource.adapters)
+    const second = createHistoireSessionWithAdapters({ url: 'https://book.test/' }, secondSource.adapters)
+    await Promise.all([canonical.connect(), first.connect(), second.connect()])
+    const firstTarget = { storyId: 'a:b', variantId: 'c' }
+    const secondTarget = { storyId: 'a:b', variantId: 'other' }
+    await first.selection.select(firstTarget)
+    await second.selection.select(secondTarget)
+    await Promise.all([first.mount({} as HTMLElement, { surface: 'preview' }).ready, second.mount({} as HTMLElement, { surface: 'preview' }).ready])
+    const retained = createCanvasFrameState(canonical)
+    try {
+      const stopFirst = retained.observe(first)
+      retained.observe(second)
+      await first.state.patch({ label: 'First frame' })
+      await second.state.patch({ label: 'Second frame' })
+      expect(retained.getPatch(firstTarget)).toMatchObject({ label: 'First frame' })
+      expect(retained.getPatch(secondTarget)).toMatchObject({ label: 'Second frame' })
+      expect(canonical.getSnapshot().state).toBeNull()
+      stopFirst()
+      await first.state.patch({ label: 'Retired observer' })
+      expect(retained.getPatch(firstTarget)).toMatchObject({ label: 'First frame' })
+    }
+    finally {
+      retained.dispose()
+      await Promise.all([canonical.dispose(), first.dispose(), second.dispose()])
+    }
+  })
+
   it('retains Gamma for recreated passive target while canonical Alpha remains authoritative', async () => {
     const first = { storyId: 'a:b', variantId: 'c' }
     const second = { storyId: 'a:b', variantId: 'other' }
@@ -19,6 +51,7 @@ describe('passive canvas state projection', () => {
     await canonical.mount({} as HTMLElement, { surface: 'preview' }).ready
     const retained = createCanvasFrameState(canonical)
     try {
+      retained.observe(canonical)
       await canonical.state.patch({ label: 'Gamma' })
       expect(canonical.getSnapshot().state?.value).toHaveProperty('_hPropDefs')
       expect(retained.getPatch(first)).not.toHaveProperty('_hPropDefs')
@@ -56,6 +89,7 @@ describe('passive canvas state projection', () => {
     await canonical.mount({} as HTMLElement, { surface: 'preview' }).ready
     const retained = createCanvasFrameState(canonical)
     try {
+      retained.observe(canonical)
       await canonical.state.patch({ label: 'Gamma' })
       source.descriptor.revision = 'unrelated-publication'
       source.emitCatalog()

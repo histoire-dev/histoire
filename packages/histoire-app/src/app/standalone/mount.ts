@@ -1,6 +1,5 @@
 import type { HistoireSourceDescriptor } from '@histoire/protocol'
 import { HistoireSdkError } from '@histoire/protocol'
-import { createHistoireTestsModel } from '@histoire/vue/internal'
 import { createApp, nextTick } from 'vue'
 import App from '../App.vue'
 import { setupPluginApi } from '../plugin.js'
@@ -10,9 +9,10 @@ import { installStandaloneDocument } from './document.js'
 import { createStandaloneFolders } from './folders.js'
 import { createStandaloneNavigation } from './navigation.js'
 import { restoreStandalonePreferences } from './preferences.js'
+import { createStandaloneRuntimeBinding } from './runtime-binding.js'
+import { createStandaloneRuntimeTests } from './runtime-tests.js'
 import { createStandaloneSelection } from './selection.js'
 import { createStandaloneSession } from './session.js'
-import { createStandaloneTests } from './tests.js'
 import './style.css'
 
 /** Standalone entry owns its controller and joins resource teardown at explicit caller target. */
@@ -38,17 +38,19 @@ export function mountStandaloneApp(options: {
     abort.signal.throwIfAborted()
     const selection = createStandaloneSelection(core)
     resources.push(selection.close)
+    const runtime = createStandaloneRuntimeBinding(selection.session)
+    resources.push(runtime.close)
     const navigation = createStandaloneNavigation(selection, { base: new URL(options.url).pathname, mode: histoireConfig.routerMode ?? 'history', error: console.error, dev: __HISTOIRE_DEV__ })
     resources.push(navigation.close)
     const folders = createStandaloneFolders(selection.session, window)
     resources.push(folders.close)
-    const commands = createStandaloneCommands(selection.session, navigation.router)
+    const commands = createStandaloneCommands(selection.session, navigation.router, runtime)
     resources.push(commands.close)
-    const tests = createStandaloneTests(selection.session, createHistoireTestsModel(selection.session))
+    const tests = createStandaloneRuntimeTests(runtime)
     resources.push(tests.close)
     const document = installStandaloneDocument(selection.session, window.document, () => navigation.router.currentRoute.value.name === 'story', histoireConfig.theme.title)
     resources.push(document.close, navigation.router.afterEach(document.synchronize))
-    const app = createApp(App, { session: selection.session, navigation, folders, commands, tests: tests.model, previewBase: options.url, hostWindow: window, onError: console.error })
+    const app = createApp(App, { session: selection.session, runtime, navigation, folders, commands, tests: tests.model, previewBase: options.url, hostWindow: window, onError: console.error })
     let mounted = false
     resources.push(() => {
       if (mounted) app.unmount()

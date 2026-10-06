@@ -64,6 +64,8 @@ export function createMatrixRuntime(onCapture: () => void) {
     current = snapshot
     for (const [key, entry] of projections) {
       if (entry.target.storyId !== snapshot.selection?.storyId || getCanvasTargetGeneration(snapshot, entry.target) !== entry.generation) projections.delete(key)
+      // A retired Matrix primary cannot keep precedence over later ordinary-frame edits.
+      else if (snapshot.runtime.status !== 'ready' || snapshot.state?.runtimeId !== snapshot.runtime.runtimeId) entry.canonical = false
     }
     capture(snapshot, true)
   }

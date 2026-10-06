@@ -1,25 +1,25 @@
 <script setup lang="ts">
 import type { HistoireCatalogStory, HistoireSession } from '@histoire/sdk'
-import { HstButton } from '@histoire/controls/vue'
-import { PREVIEW_SETTINGS_SYNC } from '@histoire/shared'
-import { HistoirePreview, useHistoireSession, useHistoireSnapshot } from '@histoire/vue'
+import { useHistoireSession, useHistoireSnapshot } from '@histoire/vue'
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, shallowRef, watch } from 'vue'
 import { createCanvasFrames, provideCanvas, provideCanvasPointerPan } from '../../composables/canvas-settings.js'
 import { createCanvasStore, getCanvasStorage } from '../../stores/canvas.js'
 import { useMatrixStore } from '../../stores/matrix.js'
 import { useUiSettingsStore } from '../../stores/settings.js'
 import { getSearchFrameState } from '../panes/search/frame-navigation.js'
+import WorkbenchEmptyState from '../shell/WorkbenchEmptyState.vue'
 import { canvasOverlayIsOccluded } from './canvas-overlay-occlusion.js'
 import CanvasFrame from './CanvasFrame.vue'
 import CanvasHeader from './CanvasHeader.vue'
+import CanvasMatrixPrimary from './CanvasMatrixPrimary.vue'
 import CanvasStatus from './CanvasStatus.vue'
 import CollectErrorCard from './CollectErrorCard.vue'
 import { useCanvasFrameAdmission } from './frame-admission.js'
 import { createCanvasArrangement } from './frame-arrangement.js'
 import { watchCanvasFrameFocus } from './frame-focus.js'
 import { bindCanvasFrameInteractions } from './frame-interactions.js'
-import { CANVAS_FRAME_LABEL_HEIGHT, canvasFrameBounds, type CanvasFrameLayout, layoutCanvasFrames } from './frame-layout.js'
-import { createCanvasReplicaPromotion } from './frame-promotion.js'
+import { canvasFrameBounds, type CanvasFrameLayout, layoutCanvasFrames } from './frame-layout.js'
+import { watchCanvasSelectedSession } from './frame-selection.js'
 import { createCanvasFrameState } from './frame-state.js'
 import FrameGrid from './FrameGrid.vue'
 import FrameList from './FrameList.vue'
@@ -31,7 +31,7 @@ import { useCanvasGeometry } from './useCanvasGeometry.js'
 const props = withDefaults(defineProps<{
   /** Absolute source base supplied by standalone adapter. */
   previewBase: string
-  /** Approved maximum live frames, including canonical primary. */
+  /** Approved maximum live frames, including selected frame. */
   frameBudget: number
   /** URL arrangement provided by narrow standalone navigation adapter. */
   arrange?: 'grid' | 'list' | 'matrix'
@@ -44,19 +44,13 @@ const props = withDefaults(defineProps<{
   /** Comment placement intercepts preview input without changing persistent tool enum. */
   commentMode?: boolean
 }>(), { arrange: 'grid', inspectorWidth: 0 })
-const emit = defineEmits<{ error: [error: unknown], contextmenu: [event: MouseEvent | KeyboardEvent, frame: CanvasFrameLayout], framePointer: [target: { storyId: string, variantId: string, frameKey: string, point: { x: number, y: number }, clientPoint: { x: number, y: number } }], replicaSession: [session: HistoireSession | undefined] }>()
+const emit = defineEmits<{ error: [error: unknown], contextmenu: [event: MouseEvent | KeyboardEvent, frame: CanvasFrameLayout], framePointer: [target: { storyId: string, variantId: string, frameKey: string, point: { x: number, y: number }, clientPoint: { x: number, y: number } }], selectedSession: [session: HistoireSession | undefined] }>()
 const session = useHistoireSession()
 const snapshot = useHistoireSnapshot()
 const viewport = ref<HTMLElement>()
 const toolbar = ref<HTMLElement>()
 const header = ref<HTMLElement>()
 const panHint = ref<InstanceType<typeof CanvasStatus>>()
-const primaryContainer = ref<HTMLElement>()
-const primary = ref<{ unmount: () => Promise<void> }>()
-const primaryVisible = ref(true)
-const primaryKey = ref(0)
-const primaryError = shallowRef<unknown>()
-const promotedFrameId = ref<string>()
 const cachedStory = shallowRef<HistoireCatalogStory>()
 const cachedVariantId = ref<string | null>(null)
 const currentStory = computed(() => snapshot.value.catalog.stories.find(story => story.id === snapshot.value.selection?.storyId))
@@ -82,7 +76,6 @@ function layoutFrames(zoom = canvas.effectiveZoom) {
 }
 const frames = computed(() => layoutFrames())
 const selectedFrame = computed(() => frames.value.find(frame => frame.variantId === (snapshot.value.selection?.variantId ?? (diagnostics.value.length ? cachedVariantId.value : null))))
-const primarySearch = computed(() => getSearchFrameState(selectedFrame.value?.id, Boolean(props.searchActive && renderedArrange.value !== 'matrix'), props.highlightedTargets))
 const live = useCanvasFrameAdmission({
   frames: () => frames.value,
   viewport: () => {
@@ -94,21 +87,6 @@ const live = useCanvasFrameAdmission({
   moving: () => canvas.panning,
   context: () => JSON.stringify([story.value?.id, renderedArrange.value, size.value.width, size.value.height, canvas.viewport.width, canvas.viewport.height, props.inspectorWidth]),
 })
-/** Transform logical preview bounds for the mounted iframe only. */
-const primaryPosition = computed(() => {
-  const frame = selectedFrame.value
-  return {
-    left: `${(frame?.x ?? 0) * canvas.effectiveZoom + canvas.panOffset.x + 1}px`,
-    top: `${(frame?.y ?? 0) * canvas.effectiveZoom + canvas.panOffset.y + CANVAS_FRAME_LABEL_HEIGHT + 1}px`,
-  }
-})
-const primaryShown = computed(() => Boolean(primaryVisible.value && selectedFrame.value && renderedArrange.value !== 'matrix'))
-const primaryStyle = computed(() => ({ ...primaryPosition.value, width: `${size.value.width}px`, height: `${size.value.height}px`, transform: `scale(${canvas.effectiveZoom})`, visibility: primaryShown.value ? 'visible' as const : 'hidden' as const, pointerEvents: primaryVisible.value ? undefined : 'none' }))
-/** Error chrome shares preview screen bounds but never inherits iframe zoom. */
-const primaryErrorStyle = computed(() => ({ ...primaryPosition.value, width: `${size.value.width * canvas.effectiveZoom}px`, height: `${size.value.height * canvas.effectiveZoom}px` }))
-let mutation: MutationObserver | undefined
-let primaryRegistration = ''
-let primaryIframe: HTMLIFrameElement | undefined
 let iframeActivatedFrameId: string | undefined
 let stopInteractions = () => {}
 let initialFocusPending = true
@@ -147,57 +125,11 @@ function updateHeaderOcclusion(): void {
   headerObscured.value = Boolean(headerRect && canvasOverlayIsOccluded(headerRect, [...frameSurfaces, ...labelSurfaces]))
 }
 
-/** Clear canonical document registration without removing a retained replica entry. */
-function clearPrimaryRegistration() {
-  const previous = registry.getFrame(primaryRegistration)
-  if (previous?.iframe === primaryIframe && previous?.session === session) {
-    previous.iframe = null
-    previous.documentId = null
-    previous.session = undefined
-  }
-  primaryRegistration = ''
-  primaryIframe = undefined
-}
-
-/** Register selected physical document; src identity changes on runtime navigation. */
-function registerPrimary() {
-  if (!primaryVisible.value || promotedFrameId.value) {
-    clearPrimaryRegistration()
-    return
-  }
-  const frame = selectedFrame.value
-  const iframe = primaryContainer.value?.querySelector('iframe')
-  if (primaryRegistration && (primaryRegistration !== frame?.id || primaryIframe !== iframe)) clearPrimaryRegistration()
-  const entry = frame && registry.getFrame(frame.id)
-  if (!entry || !iframe) return
-  primaryRegistration = frame.id
-  primaryIframe = iframe
-  iframe.setAttribute('data-test-id', 'preview-iframe')
-  entry.iframe = iframe
-  entry.documentId = snapshot.value.runtime.status === 'ready' ? new URL(iframe.src).searchParams.get('documentId') : null
-  entry.session = diagnostics.value.length ? undefined : session
-  const override = canvas.frameBackgrounds[frame.id]
-  if (override && snapshot.value.runtime.status === 'ready') registry.postToFrame(frame.id, { type: PREVIEW_SETTINGS_SYNC, settings: { ...snapshot.value.settings, ...override } })
-}
-
-/** Keep a ready passive document selected while canonical session owns only route state. */
-const promotion = createCanvasReplicaPromotion({
-  async detachPrimary() {
-    await primary.value?.unmount()
-    primaryVisible.value = false
-    await nextTick()
-    registerPrimary()
-  },
-  restorePrimary() {
-    primaryVisible.value = true
-  },
-  select: target => session.selection.select(target),
-  active: (frame) => {
-    promotedFrameId.value = frame?.id
-    emit('replicaSession', frame?.session)
-  },
-  current: () => session.getSnapshot().selection,
-  error: error => emit('error', error),
+const stopSelectedSession = watchCanvasSelectedSession({
+  snapshot: () => snapshot.value,
+  registry,
+  unavailable: () => diagnostics.value.length > 0 || renderedArrange.value === 'matrix',
+  publish: owner => emit('selectedSession', owner),
 })
 
 /** Wheel pans normally; modifier zoom remains anchored at local cursor position. */
@@ -213,21 +145,10 @@ function onWheel(event: WheelEvent) {
   }
 }
 
-/** Paused-frame activation preserves route contract through canonical standalone selection facade. */
-function selectVariant(variantId: string) {
-  if (story.value) void promotion.selectCanonical({ storyId: story.value.id, variantId })
-}
-
-/** Promote exact ready replica only while its isolated session still names that target. */
-function promoteVariant(frameId: string): Promise<void> {
-  const entry = registry.getFrame(frameId)
-  if (!entry) return Promise.resolve()
-  const replica = entry.session
-  const state = replica?.getSnapshot()
-  if (!replica || state?.stale || state?.runtime.status !== 'ready' || state.selection?.storyId !== entry.storyId || state.selection.variantId !== entry.variantId) {
-    return promotion.selectCanonical({ storyId: entry.storyId, variantId: entry.variantId })
-  }
-  return promotion.promote({ id: entry.id, storyId: entry.storyId, variantId: entry.variantId, session: replica })
+/** Frame activation changes canonical route without moving or replacing its runtime. */
+function selectVariant(variantId: string): Promise<void> {
+  if (!story.value) return Promise.resolve()
+  return session.selection.select({ storyId: story.value.id, variantId }).catch(error => emit('error', error))
 }
 
 /** Select another ready grid/list preview while leaving its original click untouched. */
@@ -240,7 +161,7 @@ function activatePreview(iframe: HTMLIFrameElement) {
   if (!state || state.stale || state.runtime.status !== 'ready' || state.selection?.storyId !== entry.storyId || state.selection.variantId !== entry.variantId) return
   const targetId = entry.id
   iframeActivatedFrameId = targetId
-  void promoteVariant(targetId).finally(async () => {
+  void selectVariant(entry.variantId).finally(async () => {
     await nextTick()
     if (iframeActivatedFrameId === targetId) iframeActivatedFrameId = undefined
   })
@@ -251,28 +172,6 @@ function pointerDown(event: PointerEvent) {
   const target = event.target as Element | null
   if (!target?.closest('button, a[href], input, textarea, select, summary, [contenteditable], [role="button"]')) viewport.value?.focus({ preventScroll: true })
   pointer.onPointerDown(event)
-}
-
-/** Retry releases actual canonical ownership before replacement mount. */
-async function retryPrimary() {
-  try {
-    await primary.value?.unmount()
-    primaryError.value = undefined
-    primaryKey.value++
-  }
-  catch (error) { emit('error', error) }
-}
-
-/** A ready mounted document owns resolution of every prior primary error. */
-function readyPrimary() {
-  primaryError.value = undefined
-  registerPrimary()
-}
-
-/** Render runtime errors in canvas chrome, never inside transformed preview content. */
-function failPrimary(error: unknown) {
-  primaryError.value = error
-  emit('error', error)
 }
 
 /** Comment placement captures exact registered document coordinates. */
@@ -316,23 +215,13 @@ watchCanvasFrameFocus({
     iframeActivatedFrameId = undefined
     return false
   },
-  registerPrimary,
 })
-watch(() => [snapshot.value.runtime.status, snapshot.value.runtime.runtimeId, canvas.frameBackgrounds[selectedFrame.value?.id ?? ''], primaryVisible.value, promotedFrameId.value], registerPrimary, { deep: true, flush: 'post' })
-watch(() => registry.frames.get(selectedFrame.value?.id ?? ''), registerPrimary, { flush: 'post' })
-// Source collection errors and Matrix entry retire promotion; primary teardown does not.
-watch(() => [snapshot.value.selection?.storyId, snapshot.value.selection?.variantId, diagnostics.value.length > 0, renderedArrange.value] as const, ([storyId, variantId, hasDiagnostics, arrange]) => {
-  promotion.synchronize(storyId && variantId ? { storyId, variantId } : null, hasDiagnostics || arrange === 'matrix')
-}, { flush: 'sync' })
 onMounted(() => {
   if (viewport.value) stopInteractions = bindCanvasFrameInteractions(viewport.value, pointer, space, onWheel, activatePreview)
-  mutation = new MutationObserver(registerPrimary)
-  if (primaryContainer.value) mutation.observe(primaryContainer.value, { childList: true, subtree: true, attributes: true, attributeFilter: ['src'] })
   measure()
 })
 onBeforeUnmount(() => {
-  promotion.close()
-  mutation?.disconnect()
+  stopSelectedSession()
   stopInteractions()
   frameState.dispose()
 })
@@ -352,31 +241,16 @@ defineExpose({ canvas, registry })
     <slot v-if="renderedArrange === 'matrix'" name="matrix" :canvas="canvas" :frames="registry" :size="size" :content-insets="contentInsets" :frame-budget="frameBudget" :preview-base="previewBase" />
     <component :is="renderedArrange === 'list' ? FrameList : FrameGrid" v-else :frames="frames">
       <template #default="{ frame, index }">
-        <CanvasFrame :frame="frame" :fit-bounds="zoom => layoutFrames(zoom)[index]" :variant="story!.variants[index]" :selected="frame.id === selectedFrame?.id" :retain-replica="frame.id === promotedFrameId" :live="live.has(frame.id)" :preview-base="previewBase" :width="size.width" :height="size.height" :stale="diagnostics.length > 0" v-bind="getSearchFrameState(frame.id, !!searchActive, highlightedTargets)" @select="selectVariant" @promote="promoteVariant" @contextmenu="(event, target) => emit('contextmenu', event, target)" />
+        <CanvasFrame :frame="frame" :fit-bounds="zoom => layoutFrames(zoom)[index]" :variant="story!.variants[index]" :selected="frame.id === selectedFrame?.id" :live="live.has(frame.id)" :preview-base="previewBase" :width="size.width" :height="size.height" :stale="diagnostics.length > 0" v-bind="getSearchFrameState(frame.id, !!searchActive, highlightedTargets)" @select="selectVariant" @contextmenu="(event, target) => emit('contextmenu', event, target)" />
       </template>
     </component>
-    <div ref="primaryContainer" class="histoire-canvas-primary" :class="{ 'is-stale': diagnostics.length, 'is-dimmed': primarySearch.dimmed }" :style="primaryStyle">
-      <HistoirePreview v-if="primaryVisible" :key="primaryKey" ref="primary" @ready="readyPrimary" @error="failPrimary">
-        <template #loading>
-          <div class="histoire-primary-loading">
-            Loading preview…
-          </div>
-        </template>
-        <!-- HistoirePreview emits errors; canvas chrome renders them outside iframe transform. -->
-        <template #error />
-      </HistoirePreview>
-    </div>
-    <div v-if="primaryError && primaryShown" class="histoire-primary-error" :class="{ 'is-stale': diagnostics.length, 'is-dimmed': primarySearch.dimmed }" :style="primaryErrorStyle" role="alert">
-      <span>{{ primaryError instanceof Error ? primaryError.message : 'Preview unavailable' }}</span><HstButton color="default" @click="retryPrimary">
-        Retry
-      </HstButton>
-    </div>
+    <CanvasMatrixPrimary :active="renderedArrange === 'matrix'" :width="size.width" :height="size.height" @error="emit('error', $event)" />
     <div v-if="commentMode" class="histoire-comment-capture" @pointerdown="framePointer" />
     <slot name="overlays" :canvas="canvas" :frames="registry" :selected-frame="selectedFrame" />
     <CollectErrorCard v-if="diagnostics.length" :errors="diagnostics" />
     <CanvasStatus v-if="panning" ref="panHint" :pan="true" />
     <div v-if="!story" class="histoire-canvas-empty">
-      Select story
+      <WorkbenchEmptyState icon="document" title="Select a story" />
     </div>
   </div>
 </template>
@@ -388,19 +262,10 @@ defineExpose({ canvas, registry })
 .histoire-canvas-toolbar-host:dir(rtl) { transform: translateX(50%); }
 .histoire-canvas-header { position: absolute; inset-inline: var(--histoire-canvas-info-inset) calc(var(--histoire-canvas-inspector-reserve) + var(--histoire-canvas-info-inset)); top: 88px; z-index: 1; container-type: inline-size; pointer-events: none; transition: opacity 160ms ease-out; }
 .histoire-canvas-header.is-obscured { opacity: 0; }
-/* Primary preview layers above frame chrome, so it owns visible selected-frame outline. */
-.histoire-canvas-primary { position: absolute; transform-origin: top left; overflow: hidden; border-radius: 6px; outline: 2px solid var(--histoire-accent); outline-offset: 0; }
-.histoire-canvas-primary.is-dimmed { opacity: .35; }
-.histoire-canvas-primary :deep(.histoire-primary), .histoire-canvas-primary :deep(.histoire-primary-frame) { width: 100%; height: 100%; min-height: 0; }
 .is-panning { cursor: grab; } .is-dragging { cursor: grabbing; }
-.is-panning .histoire-canvas-primary, .is-panning :deep(iframe) { pointer-events: none; }
+.is-panning :deep(iframe) { pointer-events: none; }
 .histoire-frame-list :deep(.histoire-canvas-frame) { pointer-events: auto; }
 .histoire-comment-capture { position: absolute; inset: 76px 0 40px; cursor: crosshair; }
-.is-stale { opacity: .4; pointer-events: none; }
-.histoire-primary-loading { position: absolute; inset: 0; display: grid; place-items: center; color: var(--histoire-muted); font-size: 16px; }
-.histoire-primary-error { position: absolute; z-index: 2; display: grid; place-items: center; gap: 16px; box-sizing: border-box; padding: 24px; color: var(--histoire-danger); background: var(--histoire-danger-soft); font-size: 16px; }
-.histoire-primary-error.is-dimmed { opacity: .35; }
-.histoire-primary-error button { padding: 8px 16px; color: inherit; }
 .histoire-canvas-empty { position: absolute; inset: 0; display: grid; place-items: center; color: var(--histoire-muted); pointer-events: none; }
 @media (prefers-reduced-motion: reduce) { .histoire-canvas-header { transition: none; } }
 </style>

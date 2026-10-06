@@ -16,32 +16,35 @@ interface RetainedFrameState {
   value: Record<string, unknown>
 }
 
-/** Retain canonical edits for display replicas without letting passive state become authority. */
+/** Retain editable state from exact frame owners; canonical session supplies source authority. */
 export function createCanvasFrameState(canonical: HistoireSession) {
   const entries = new Map<string, RetainedFrameState>()
-  let lastState: CanvasSourceSnapshot['state'] | undefined
+  const seen = new WeakSet<object>()
+  const observers = new Set<() => void>()
   let closed = false
-  /** Catalog invalidation runs before state capture; reused mirrors are never fresh authority. */
-  function capture(snapshot: CanvasSourceSnapshot): void {
+  /** Source invalidation never recaptures an old runtime mirror as new defaults. */
+  function invalidate(snapshot: CanvasSourceSnapshot): void {
     for (const [key, entry] of entries) {
       if (getCanvasTargetGeneration(snapshot, entry.target) !== entry.generation) entries.delete(key)
     }
+  }
+  /** Only a ready exact runtime can update its target's retained editable fields. */
+  function capture(snapshot: CanvasSourceSnapshot): void {
     const state = snapshot.state
-    if (state === lastState) return
-    lastState = state
-    if (!state || snapshot.runtime.status !== 'ready' || state.runtimeId !== snapshot.runtime.runtimeId
+    if (closed || !state || snapshot.runtime.status !== 'ready' || state.runtimeId !== snapshot.runtime.runtimeId
       || state.target.storyId !== snapshot.selection?.storyId || state.target.variantId !== snapshot.selection?.variantId || Array.isArray(state.value)) {
       return
     }
     const generation = getCanvasTargetGeneration(snapshot, state.target)
-    if (!generation) return
+    if (!generation || generation !== getCanvasTargetGeneration(canonical.getSnapshot(), state.target)) return
+    if (seen.has(state)) return
+    seen.add(state)
     // Array roots were rejected above; cloning makes this retained record independently mutable.
     const value = structuredClone(state.value) as Record<string, unknown>
     delete value._hPropDefs
     entries.set(getHistoireTargetKey(state.target), { target: { ...state.target }, generation, value })
   }
-  capture(canonical.getSnapshot())
-  const stop = canonical.subscribe(capture)
+  const stop = canonical.subscribe(invalidate)
   /** Read a detached patch only while canonical source still owns cached story generation. */
   function getPatch(target: HistoireTarget): Record<string, unknown> | undefined {
     const entry = entries.get(getHistoireTargetKey(target))
@@ -49,7 +52,22 @@ export function createCanvasFrameState(canonical: HistoireSession) {
   }
   return {
     getPatch,
-    /** Seed only ready passive document for same target and source; canonical session is untouched. */
+    /** Observe only after seeding, so boot defaults cannot overwrite retained edits. */
+    observe(owner: HistoireSession): () => void {
+      if (closed) return () => {}
+      let active = true
+      const unsubscribe = owner.subscribe(snapshot => active && capture(snapshot))
+      /** Retired callbacks cannot capture late state from their former owner. */
+      function release(): void {
+        active = false
+        unsubscribe()
+        observers.delete(release)
+      }
+      observers.add(release)
+      capture(owner.getSnapshot())
+      return release
+    },
+    /** Restore ready exact runtime before observing its state, without selecting another target. */
     async seed(replica: HistoireSession, target: HistoireTarget): Promise<void> {
       const destination = replica.getSnapshot()
       const entry = entries.get(getHistoireTargetKey(target))
@@ -64,6 +82,7 @@ export function createCanvasFrameState(canonical: HistoireSession) {
     dispose(): void {
       closed = true
       stop()
+      for (const release of observers) release()
       entries.clear()
     },
   }

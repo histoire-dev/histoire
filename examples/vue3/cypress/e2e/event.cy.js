@@ -39,13 +39,13 @@ describe('Event (iframe)', () => {
       previewFrame = $frame[0]
     })
 
-    getCanvasVariantBody(storyId, variantId).find('button').contains(/^Click$/).click()
+    getCanvasVariantBody(storyId, variantId).find('button').contains('Click').click()
 
     cy.location('search').should('include', `variantId=${variantId}`)
     cy.get(`[data-frame-id='${frameKey}'] > button[aria-pressed="true"]`).should('be.visible')
     cy.get(frameSelector).should(($frame) => {
       expect($frame[0]).to.equal(previewFrame)
     })
-    cy.get('[data-test-id="event-item"]').should('have.length', 1).contains(/^Click$/)
+    cy.get('[data-test-id="event-item"]').should('have.length', 1).contains('Click')
   })
 })

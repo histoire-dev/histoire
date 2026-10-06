@@ -37,7 +37,7 @@ const CommentsPanel = __HISTOIRE_DEV__ ? defineAsyncComponent(() => import('../p
 const CommentsCanvasOverlay = __HISTOIRE_DEV__ ? defineAsyncComponent(() => import('../comments/CommentsCanvasOverlay.vue')) : undefined
 const PermissionPrompt = __HISTOIRE_DEV__ ? defineAsyncComponent(() => import('../agents/PermissionPrompt.vue')) : undefined
 const commentOverlay = dev?.commentOverlay ?? ref()
-const replicaSession = shallowRef<HistoireSession>()
+const selectedSession = shallowRef<HistoireSession>()
 const inspector = computed(() => route.value.name === 'story' && !story.value?.docsOnly)
 const isolated = computed(() => {
   const target = snapshot.value.selection
@@ -58,9 +58,10 @@ function fitVariant(target: HistoireTarget): void {
   if (frame) current.canvas.zoomToFrame(frame.fitBounds ?? frame.rect)
 }
 
-/** Bind inspector to retained preview session only for canvas replica promotion. */
-function setReplicaSession(session: HistoireSession | undefined): void {
-  replicaSession.value = session
+/** Bind inspector to exact selected ready frame for every navigation path. */
+function setSelectedSession(session: HistoireSession | undefined): void {
+  props.runtime.bind(session)
+  selectedSession.value = session
 }
 </script>
 
@@ -84,7 +85,7 @@ function setReplicaSession(session: HistoireSession | undefined): void {
     <template #main>
       <SettingsPage v-if="route.name === 'settings'" :section="typeof route.params.section === 'string' ? route.params.section : undefined" :build-info="buildInfo" @section="workbench.navigate('settings', $event)" />
       <MarkdownPage v-else-if="route.name === 'story' && markdown" :anchor="route.hash" @select="shell.closePanelAfterSelection" @error="emit('error', $event)" />
-      <CanvasViewport v-else-if="route.name === 'story'" ref="canvas" :preview-base="previewBase" :frame-budget="histoireConfig.ui?.frameBudget ?? 6" :arrange="arrange" :highlighted-targets="highlighted" :search-active="searchActive" :comment-mode="dev?.commentMode.value" :inspector-width="shell.inspectorOpen.value && !shell.narrow.value ? shell.inspectorWidth.value + 24 : 0" @replica-session="setReplicaSession" @frame-pointer="dev?.pickComment($event)" @error="emit('error', $event)">
+      <CanvasViewport v-else-if="route.name === 'story'" ref="canvas" :preview-base="previewBase" :frame-budget="histoireConfig.ui?.frameBudget ?? 6" :arrange="arrange" :highlighted-targets="highlighted" :search-active="searchActive" :comment-mode="dev?.commentMode.value" :inspector-width="shell.inspectorOpen.value && !shell.narrow.value ? shell.inspectorWidth.value + 24 : 0" @selected-session="setSelectedSession" @frame-pointer="dev?.pickComment($event)" @error="emit('error', $event)">
         <template #toolbar>
           <CanvasToolbar :arrange="arrange" :matrix-available="matrix.available.value" :match-count="searchMatches.count.value" :match-position="searchMatches.position.value" @previous-match="workbench.previousMatch" @next-match="workbench.nextMatch" @arrange="workbench.setArrange" @edit-presets="workbench.navigate('settings', 'viewports')">
             <template #screenshot="slot">
@@ -113,7 +114,7 @@ function setReplicaSession(session: HistoireSession | undefined): void {
       </HomePage>
     </template>
     <template #inspector>
-      <HistoireProvider v-if="replicaSession" class="histoire-replica-inspector" :session="replicaSession" @error="emit('error', $event)">
+      <HistoireProvider v-if="selectedSession" class="histoire-selected-inspector" :session="selectedSession" @error="emit('error', $event)">
         <StoryInspector :active-tab="typeof route.query.tab === 'string' ? route.query.tab : ''" :docs-anchor="route.hash" :isolated-href="isolated" :project-test-session="props.session" @panel="workbench.panel" @close="shell.toggleInspector" @error="emit('error', $event)" />
       </HistoireProvider>
       <StoryInspector v-else :active-tab="typeof route.query.tab === 'string' ? route.query.tab : ''" :docs-anchor="route.hash" :isolated-href="isolated" :project-test-session="props.session" @panel="workbench.panel" @close="shell.toggleInspector" @error="emit('error', $event)">

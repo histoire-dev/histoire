@@ -29,7 +29,7 @@ async function frameFixture(selected = false) {
   const story = source.descriptor.catalog.stories[0]
   const variant = story.variants[0]
   const frame = layoutCanvasFrames(story.id, [variant.id], { width: 208, height: 180 }, 'grid')[0]
-  const props = reactive({ frame, variant, selected, live: true, retainReplica: false, stale: false, previewBase: 'https://book.example/', width: 208, height: 180 })
+  const props = reactive({ frame, variant, selected, live: true, stale: false, previewBase: 'https://book.example/', width: 208, height: 180 })
   const Host = defineComponent({
     setup() {
       provideCanvas(canvas, frames)
@@ -59,12 +59,11 @@ async function frameFixture(selected = false) {
 }
 
 describe('canvas frame header interaction', () => {
-  it('promotes exact ready live replica', async () => {
+  it('selects exact ready frame without changing runtime ownership', async () => {
     const test = await frameFixture()
     await test.ready()
     test.header.element.click()
-    expect(test.component.emitted('promote')).toEqual([[test.props.frame.id]])
-    expect(test.component.emitted('select')).toBeUndefined()
+    expect(test.component.emitted('select')).toEqual([[test.props.variant.id]])
     expect(test.header.attributes('aria-pressed')).toBe('false')
   })
 
@@ -74,13 +73,23 @@ describe('canvas frame header interaction', () => {
     expect(test.component.find('.histoire-frame-select').exists()).toBe(false)
   })
 
-  it('retains promoted replica when frame becomes selected', async () => {
-    const test = await frameFixture()
+  it.each([false, true])('keeps initially selected=%s runtime through selection changes', async (selected) => {
+    const test = await frameFixture(selected)
     await test.ready()
-    test.props.selected = true
-    test.props.retainReplica = true
+    const original = test.component.getComponent(CanvasReplicaPreview).vm
+    for (const value of [!selected, selected, !selected]) {
+      test.props.selected = value
+      await nextTick()
+      expect(test.component.getComponent(CanvasReplicaPreview).vm).toBe(original)
+    }
+  })
+
+  it('exposes failures on initially selected frame', async () => {
+    const test = await frameFixture(true)
+    test.component.getComponent(CanvasReplicaPreview).vm.$emit('status', 'error', new Error('Variant failed'))
     await nextTick()
-    expect(test.component.findComponent(CanvasReplicaPreview).exists()).toBe(true)
+    expect(test.component.get('[role="alert"]').text()).toContain('Variant failed')
+    expect(test.component.get('[role="alert"]').element.closest('[inert]')).toBeNull()
   })
 
   it.each(['loading', 'budget-excluded'] as const)('selects %s passive preview through its title', async (state) => {

@@ -2,11 +2,13 @@
 import type { HistoireSession } from '@histoire/sdk'
 import { PROPS_OVERRIDE, RUNTIME_RESULT } from '@histoire/shared'
 import { useHistoireSession, useHistoireSnapshot } from '@histoire/vue'
+import { useEventListener } from '@vueuse/core'
 import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useCanvasFrames, useCanvasFrameState, useCanvasStore } from '../../composables/canvas-settings.js'
 import { useMatrixStore } from '../../stores/matrix.js'
 import { createCanvasReplicaSession } from './frame-replica.js'
 import { createCanvasPropsRequestId } from './frame-requests.js'
+import { observeCanvasFrameRuntime } from './frame-runtime.js'
 
 const props = defineProps<{
   /** Stable canvas frame identifier. */
@@ -27,6 +29,7 @@ const registry = useCanvasFrames()
 const frameState = useCanvasFrameState()
 const matrix = useMatrixStore()
 const container = ref<HTMLElement>()
+const ready = ref(false)
 let replica: HistoireSession | undefined
 let closing = false
 let generation = 0
@@ -40,7 +43,7 @@ let rejectProps = (_error: unknown) => {}
 let overrideDocument = ''
 const nextPropsRequestId = createCanvasPropsRequestId()
 
-/** Canonical settings seed passive runtime without exposing passive state to inspector. */
+/** Canonical settings apply to every exact frame without sharing editable variant state. */
 function settings() {
   const value = snapshot.value.settings
   const background = store.frameBackgrounds[props.frameId]
@@ -48,14 +51,28 @@ function settings() {
 }
 
 /** Publish actual iframe identity for finite measure/comment requests. */
-function registerDocument() {
+function registerDocument(available = false) {
   const entry = registry.getFrame(props.frameId)
   const iframe = container.value?.querySelector('iframe')
   if (!entry || !iframe) return
   iframe.setAttribute('data-test-id', 'preview-iframe-passive')
   entry.iframe = iframe
-  entry.documentId = replica?.getSnapshot().runtime.status === 'ready' ? new URL(iframe.src).searchParams.get('documentId') : null
-  entry.session = replica
+  entry.documentId = available ? new URL(iframe.src).searchParams.get('documentId') : null
+  entry.session = available ? replica : undefined
+}
+
+/** Keep unavailable pixels registered for geometry without granting runtime authority. */
+function loading(): void {
+  ready.value = false
+  registerDocument()
+  emit('status', 'loading')
+}
+
+/** Failed frame keeps retry local and releases inspector/document authority. */
+function fail(error?: unknown): void {
+  ready.value = false
+  registerDocument()
+  emit('status', 'error', error)
 }
 
 /** Matrix feature replies must belong to this currently registered document. */
@@ -68,7 +85,7 @@ function receive(event: MessageEvent) {
   if (event.data.error || !event.data.result?.supported) {
     const error = new Error('Props matrix unavailable in this preview runtime')
     rejectProps(error)
-    emit('status', 'error', error)
+    fail(error)
   }
   else {
     resolveProps()
@@ -94,14 +111,14 @@ function overrideProps() {
     propsRequest = ''
     const error = new Error('Props matrix unavailable in this preview runtime')
     rejectProps(error)
-    emit('status', 'error', error)
+    fail(error)
   }, 3000)
 }
 
 /** Each retry closes previous source/session before acquiring another document. */
 async function start() {
   const version = ++generation
-  emit('status', 'loading')
+  loading()
   try {
     stop()
     closeObserver()
@@ -118,28 +135,27 @@ async function start() {
     if (closing || version !== generation || !container.value) return
     const observer = !props.propsOverride ? matrix.registerRuntimeObserver() : undefined
     closeObserver = () => observer?.close()
-    stop = current.subscribe((value) => {
-      if (closing || version !== generation) return
-      observer?.capture(value)
-      registerDocument()
-      emit('status', value.runtime.status === 'ready' ? 'ready' : value.runtime.status === 'failed' ? 'error' : 'loading')
-      if (value.runtime.status === 'ready' && value.runtime.runtimeId && value.runtime.runtimeId !== overrideDocument) {
-        overrideDocument = value.runtime.runtimeId
-        overrideProps()
-      }
+    stop = observeCanvasFrameRuntime(current, {
+      state: props.propsOverride ? undefined : frameState,
+      loading,
+      error: fail,
+      ready(value) {
+        if (closing || version !== generation) return
+        observer?.capture(value)
+        registerDocument(true)
+        if (value.runtime.runtimeId && value.runtime.runtimeId !== overrideDocument) {
+          overrideDocument = value.runtime.runtimeId
+          overrideProps()
+        }
+        ready.value = true
+        emit('status', 'ready')
+      },
     })
     const mount = current.mount(container.value, { surface: 'preview' })
     await mount.ready
-    if (closing || version !== generation) return
-    observer?.capture(current.getSnapshot())
-    // Fresh display replicas receive last canonical edit for their own exact target only.
-    if (!props.propsOverride) await frameState?.seed(current, { storyId: props.storyId, variantId: props.variantId })
-    if (closing || version !== generation) return
-    registerDocument()
-    emit('status', 'ready')
   }
   catch (error) {
-    if (!closing && version === generation) emit('status', 'error', error)
+    if (!closing && version === generation) fail(error)
   }
 }
 
@@ -147,10 +163,8 @@ watch(settings, () => {
   void replica?.settings.update(settings()).catch(() => {})
 }, { deep: true })
 watch(() => props.propsOverride, overrideProps, { deep: true })
-onMounted(() => {
-  window.addEventListener('message', receive)
-  void start()
-})
+useEventListener('message', receive)
+onMounted(() => void start())
 onBeforeUnmount(() => {
   closing = true
   generation++
@@ -158,7 +172,6 @@ onBeforeUnmount(() => {
   closeObserver()
   clearTimeout(propsTimeout)
   rejectProps(new Error('Preview detached'))
-  window.removeEventListener('message', receive)
   const entry = registry.getFrame(props.frameId)
   if (entry?.iframe && container.value?.contains(entry.iframe)) {
     entry.iframe = null
@@ -178,7 +191,7 @@ defineExpose({ retry: start, getSource })
 </script>
 
 <template>
-  <div ref="container" class="histoire-canvas-replica" />
+  <div ref="container" class="histoire-canvas-replica" :aria-busy="!ready" :inert="!ready ? true : undefined" />
 </template>
 
 <style scoped>

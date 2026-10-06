@@ -115,7 +115,7 @@ describe('canvas zoom preferences', () => {
       props: { session },
       attachTo: document.body,
       slots: { default: () => h(Host) },
-      global: { stubs: { HistoirePreview: true, CanvasFrame: true, MatrixCell: true, MatrixAxisBar: true } },
+      global: { stubs: { CanvasFrame: true, MatrixCell: true, MatrixAxisBar: true } },
     })
     const canvas = (wrapper.getComponent(CanvasViewport).vm as unknown as { canvas: CanvasStore }).canvas
 

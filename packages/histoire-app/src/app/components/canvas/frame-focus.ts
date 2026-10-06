@@ -5,7 +5,7 @@ import { watch } from 'vue'
 export interface CanvasFrameFocusOptions {
   /** Current selected frame; zoom can regenerate its layout object. */
   getFrame: () => CanvasFrameLayout | undefined
-  /** Arrangement changes may reveal the previously hidden canonical primary. */
+  /** Arrangement changes may reveal selected frame in another layout. */
   getArrange: () => 'grid' | 'list' | 'matrix'
   /** Bring selected frame into view without changing selected variant. */
   focusFrame: (frame: CanvasFrameLayout) => void
@@ -13,8 +13,6 @@ export interface CanvasFrameFocusOptions {
   selectFrame: (frame: CanvasFrameLayout) => void
   /** Allow input-originated selection to retain the user's current viewport. */
   shouldRevealFrame?: (frame: CanvasFrameLayout) => boolean
-  /** Refresh physical primary document registration after identity changes. */
-  registerPrimary: () => void
 }
 
 /** Bind focus to canonical selection while matrix retains its own passive-cell selection. */
@@ -26,6 +24,5 @@ export function watchCanvasFrameFocus(options: CanvasFrameFocusOptions) {
       if (options.shouldRevealFrame?.(frame) === false) options.selectFrame(frame)
       else options.focusFrame(frame)
     }
-    options.registerPrimary()
   }, { flush: 'post' })
 }

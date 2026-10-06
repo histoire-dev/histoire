@@ -82,3 +82,68 @@ describe('Grid state isolation', () => {
     cy.getPreviewIframeBody().find('[data-test-id="shared-controls-state"]').should('contain', 'Retained document')
   })
 })
+
+describe('Variant document retention', () => {
+  const storyId = 'src-components-codegen-story-vue'
+
+  /** Read one exact document without relying on selected iframe ordering. */
+  const frame = variantId => cy.get(`[data-frame-id='${JSON.stringify([storyId, variantId])}']`)
+
+  beforeEach(() => {
+    cy.viewport(1600, 1000)
+    cy.visit(`/story/${storyId}?variantId=html`, {
+      onBeforeLoad(window) {
+        window.localStorage.setItem('_histoire-ui-canvas', JSON.stringify({ zoom: 0.5 }))
+        window.localStorage.setItem('_histoire-ui-shell', JSON.stringify({ pane: 'stories', panelOpen: true, inspectorOpen: false }))
+      },
+    })
+    cy.getPreviewIframeBody().find('input[placeholder="Enter your phone number"]').type('123456')
+    for (const variantId of ['html', 'props']) {
+      frame(variantId).find('iframe').should('be.visible').then(($iframe) => {
+        const iframe = $iframe[0]
+        cy.wrap({ iframe, document: iframe.contentDocument, documentId: new URL(iframe.src).searchParams.get('documentId') }).as(variantId)
+      })
+    }
+  })
+
+  /** Both predecessor and destination must retain actual source-owned documents. */
+  function retainedDocuments() {
+    for (const variantId of ['html', 'props']) {
+      cy.get(`@${variantId}`).then((original) => {
+        frame(variantId).find('iframe').should(($iframe) => {
+          expect($iframe[0]).to.equal(original.iframe)
+          expect($iframe[0].isConnected).to.equal(true)
+          expect($iframe[0].contentDocument).to.equal(original.document)
+          expect(new URL($iframe[0].src).searchParams.get('documentId')).to.equal(original.documentId)
+        })
+      })
+    }
+    getCanvasVariantBody(storyId, 'html').find('input[placeholder="Enter your phone number"]').should('have.value', '123456')
+  }
+
+  it('retains first and destination variants through canvas, Back and Forward selections', () => {
+    getCanvasVariantBody(storyId, 'props').find('input').first().click()
+    cy.location('search').should('include', 'variantId=props')
+    retainedDocuments()
+    getCanvasVariantBody(storyId, 'html').find('input[placeholder="Enter your phone number"]').click()
+    cy.location('search').should('include', 'variantId=html')
+    retainedDocuments()
+    cy.go('back')
+    cy.location('search').should('include', 'variantId=props')
+    retainedDocuments()
+    cy.go('forward')
+    cy.location('search').should('include', 'variantId=html')
+    retainedDocuments()
+  })
+
+  it('retains admitted documents through sidebar and search selections', () => {
+    cy.contains('[data-test-id="story-list-variant"]', /^props$/).click()
+    cy.location('search').should('include', 'variantId=props')
+    retainedDocuments()
+    cy.get('[aria-label="Workbench"] [aria-label="Search"]').click()
+    cy.get('[aria-label="Search stories, docs and props"]').type('html')
+    cy.contains('[data-test-id="search-item"][data-search-kind="variant"] strong', /Code gen › html$/).click()
+    cy.location('search').should('include', 'variantId=html')
+    retainedDocuments()
+  })
+})

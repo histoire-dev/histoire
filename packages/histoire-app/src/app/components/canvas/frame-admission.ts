@@ -10,7 +10,7 @@ export interface CanvasFrameAdmissionOptions {
   frames: () => readonly CanvasFrameLayout[]
   /** Visible logical viewport after pan, zoom, and fixed chrome reserves. */
   viewport: () => CanvasRect
-  /** Available live slots; zero reserves every slot for the canonical preview. */
+  /** Available live document slots; zero leaves only frame placeholders. */
   budget: () => number
   /** Explicit selection always bypasses movement deferral. */
   selected: () => string | null

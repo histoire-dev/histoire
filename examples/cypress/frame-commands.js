@@ -1,17 +1,19 @@
 /**
- * Yields selected retained replica before canonical primary fallback.
+ * Yields exact selected ready frame, including native single-surface hosts.
  * @param {object} [options] Options forwarded to `cy.get`, including timeout.
  */
 export function getSelectedPreviewIframe(options = {}) {
-  return cy.get('body', options).then(($body) => {
-    const retained = $body.find('.histoire-canvas-frame.is-selected iframe[title="Histoire preview"]')
-    if (retained.length) return cy.wrap(retained.eq(0))
-    return cy.get('[aria-busy] iframe[title="Histoire preview"]', { timeout: 20000, ...options })
-      .should(($frames) => {
-        // Story DOM may paint before framework readiness admits runtime input.
-        expect($frames[0].closest('[aria-busy]'), 'owning preview readiness').to.have.attr('aria-busy', 'false')
-      })
-  }).should('be.visible')
+  return cy.get('iframe[title="Histoire preview"]', { timeout: 20000, ...options })
+    .filter((_, iframe) => {
+      const frame = iframe.closest('[data-frame-id]')
+      return frame ? frame.classList.contains('is-selected') : Boolean(iframe.closest('[aria-busy]'))
+    })
+    .should('have.length', 1)
+    .should(($frames) => {
+      // Loaded story DOM cannot accept input until retained-state restoration finishes.
+      expect($frames[0].closest('[aria-busy]'), 'owning preview readiness').to.have.attr('aria-busy', 'false')
+    })
+    .should('be.visible')
 }
 
 /**

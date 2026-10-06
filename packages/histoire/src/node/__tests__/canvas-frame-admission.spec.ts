@@ -37,9 +37,9 @@ describe('settled canvas frame admission', () => {
     const test = admissionFixture()
     expect([...test.live.value]).toEqual([test.frames.value[0].id])
     expect(test.calculate).toHaveBeenCalledTimes(1)
-    test.state.y = 124
+    test.state.y = test.frames.value[1].y
     vi.advanceTimersByTime(100)
-    test.state.y = 248
+    test.state.y = test.frames.value[2].y
     vi.advanceTimersByTime(149)
     expect(test.calculate).toHaveBeenCalledTimes(1)
     expect([...test.live.value]).toEqual([test.frames.value[0].id])
@@ -51,7 +51,7 @@ describe('settled canvas frame admission', () => {
   it('keeps previews while pointer remains held and admits final viewport on release', () => {
     const test = admissionFixture()
     test.state.moving = true
-    test.state.y = 248
+    test.state.y = test.frames.value[2].y
     vi.advanceTimersByTime(1000)
     expect(test.calculate).toHaveBeenCalledTimes(1)
     expect([...test.live.value]).toEqual([test.frames.value[0].id])
@@ -63,7 +63,7 @@ describe('settled canvas frame admission', () => {
   it('prioritizes explicit selection and enforces budget changes without waiting for movement', () => {
     const test = admissionFixture()
     test.state.moving = true
-    test.state.y = 248
+    test.state.y = test.frames.value[2].y
     test.state.selected = test.frames.value[1].id
     expect([...test.live.value]).toEqual([test.frames.value[1].id])
     test.state.budget = 2
@@ -75,8 +75,9 @@ describe('settled canvas frame admission', () => {
 
   it('invalidates queued old-story admission immediately when context changes', () => {
     const test = admissionFixture()
-    test.state.y = 248
+    test.state.y = test.frames.value[2].y
     test.frames.value = layout.layoutCanvasFrames('other', ['a'], { width: 100, height: 100 }, 'list')
+    test.state.y = 0
     test.state.context = 'other'
     expect([...test.live.value]).toEqual([test.frames.value[0].id])
     const calls = test.calculate.mock.calls.length
@@ -86,7 +87,7 @@ describe('settled canvas frame admission', () => {
 
   it('cancels scheduled admission when owner scope is disposed', () => {
     const test = admissionFixture()
-    test.state.y = 248
+    test.state.y = test.frames.value[2].y
     scope.stop()
     vi.advanceTimersByTime(1000)
     expect(test.calculate).toHaveBeenCalledTimes(1)
