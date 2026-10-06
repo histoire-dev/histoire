@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { WorkbenchTestsSummary } from './types.js'
+import { BuiltinIcon } from '@histoire/controls/vue'
 import { computed } from 'vue'
-import WorkbenchIcon from '../../shell/WorkbenchIcon.vue'
 
 /** Current assertion totals and explicit batch progress. */
 const props = defineProps<{ summary: WorkbenchTestsSummary, running: boolean, completed: number, total: number }>()
@@ -20,9 +20,9 @@ const duration = computed(() => `${(props.summary.duration / 1000).toFixed(1)}s`
       <span v-else class="empty" />
     </div>
     <output class="test-summary-counts" aria-live="polite">
-      <span class="passed" :aria-label="`${summary.passed} passed`"><WorkbenchIcon name="checkmark-filled" />{{ summary.passed }}</span>
-      <span class="failed" :aria-label="`${summary.failed} failed`"><WorkbenchIcon name="error-filled" />{{ summary.failed }}</span>
-      <span class="skipped" :aria-label="`${summary.skipped} skipped`"><WorkbenchIcon name="subtract" />{{ summary.skipped }}</span>
+      <span class="passed" :aria-label="`${summary.passed} passed`"><BuiltinIcon icon="checkmark-filled" :size="16" />{{ summary.passed }}</span>
+      <span class="failed" :aria-label="`${summary.failed} failed`"><BuiltinIcon icon="error-filled" :size="16" />{{ summary.failed }}</span>
+      <span class="skipped" :aria-label="`${summary.skipped} skipped`"><BuiltinIcon icon="subtract" :size="16" />{{ summary.skipped }}</span>
       <span class="duration">{{ running ? `${completed}/${total}` : duration }}</span>
     </output>
     <p v-if="summary.stale || summary.notCollected" class="test-summary-extra">

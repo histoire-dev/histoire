@@ -1,9 +1,8 @@
 <script setup lang="ts">
-import { HstButton, HstSwitch, HstText } from '@histoire/controls/vue'
+import { BuiltinIcon, HstButton, HstSwitch, HstText } from '@histoire/controls/vue'
 import { ACP_INSTALL_HINTS } from '@histoire/shared'
 import { computed, ref, watch } from 'vue'
 import { useAgentsStore } from '../../../stores/agents.js'
-import WorkbenchIcon from '../../shell/WorkbenchIcon.vue'
 
 /** Stable public preset identity; credentials use a separate write-only action. */
 const props = defineProps<{ agentId: string }>()
@@ -83,10 +82,10 @@ function remove(): void {
 <template>
   <details v-if="preset" class="histoire-agent-row" :open="preset.default">
     <summary>
-      <span class="histoire-agent-icon"><WorkbenchIcon name="bot" :size="20" /></span>
+      <span class="histoire-agent-icon"><BuiltinIcon icon="bot" :size="20" /></span>
       <span class="histoire-agent-identity"><strong>{{ preset.name }}</strong><span v-if="preset.default" class="histoire-agent-default">Default</span><code>{{ [preset.command, ...(preset.args ?? [])].join(' ') }}</code></span>
       <span class="histoire-agent-status" :data-state="status?.state ?? 'disabled'">{{ labels[status?.state ?? 'disabled'] }}</span>
-      <WorkbenchIcon name="chevron-down" :size="16" />
+      <BuiltinIcon icon="chevron-down" :size="16" />
     </summary>
     <form class="histoire-agent-form" @submit.prevent="save">
       <label><span>Name</span><HstText v-model="name" layout="inline" class="histoire-settings-field" :aria-label="`${preset.name} name`" /></label>

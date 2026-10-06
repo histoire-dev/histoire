@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import type { Story, Tree } from '../../types'
-import { Icon } from '@iconify/vue'
+import { BuiltinIcon } from '@histoire/controls/vue'
 import { computed, ref, watch } from 'vue'
 import { useStoryStore } from '../../stores/story'
 import StoryList from '../tree/StoryList.vue'
@@ -53,7 +53,7 @@ watch(story, () => {
           </span>
         </template>
         <span class="htw-flex htw-items-center htw-gap-2">
-          <Icon
+          <BuiltinIcon
             :icon="story.icon ?? 'carbon:cube'"
             class="htw-w-5 htw-h-5 htw-flex-none"
             :class="{
@@ -71,7 +71,7 @@ watch(story, () => {
         Select a story...
       </template>
 
-      <Icon
+      <BuiltinIcon
         icon="carbon:chevron-sort"
         class="htw-w-5 htw-h-5 htw-shrink-0 htw-ml-auto"
       />

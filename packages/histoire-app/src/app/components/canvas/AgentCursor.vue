@@ -1,9 +1,9 @@
 <script setup lang="ts">
+import { BuiltinIcon } from '@histoire/controls/vue'
 import { useHistoireSnapshot } from '@histoire/vue'
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useCanvasFrames, useCanvasStore } from '../../composables/canvas-settings.js'
 import { useMcpStore } from '../../stores/mcp.js'
-import WorkbenchIcon from '../shell/WorkbenchIcon.vue'
 import { getMcpCursor } from './agent-cursor.js'
 
 const mcp = useMcpStore()
@@ -58,7 +58,7 @@ onBeforeUnmount(() => {
 <template>
   <div ref="layer" class="histoire-agent-cursor-layer" :style="{ right: `${canvas.inspectorWidth}px` }" aria-hidden="true">
     <div v-if="position && mcp.current" class="histoire-agent-cursor" :style="{ left: `${position.x}px`, top: `${position.y}px` }">
-      <WorkbenchIcon name="cursor-1" :size="20" />
+      <BuiltinIcon icon="cursor-1" :size="20" />
       <span>{{ mcp.clientName(mcp.current.clientId) }} · {{ mcp.current.tool }}</span>
     </div>
   </div>

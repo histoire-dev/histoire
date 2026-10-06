@@ -1,9 +1,9 @@
 <script setup lang="ts">
+import { BuiltinIcon } from '@histoire/controls/vue'
 import { computed } from 'vue'
 import { mcpTimeAgo } from '../../../stores/mcp-activity.js'
 import { useMcpStore } from '../../../stores/mcp.js'
 import WorkbenchVirtualList from '../../lists/WorkbenchVirtualList.vue'
-import WorkbenchIcon from '../../shell/WorkbenchIcon.vue'
 
 const store = useMcpStore()
 
@@ -23,7 +23,7 @@ const rows = computed(() => {
     <WorkbenchVirtualList v-else :items="rows" :min-item-size="47" list-tag="ul" item-tag="li" page-mode>
       <template #default="{ item: { client, active } }">
         <div class="histoire-mcp-client-row">
-          <span class="histoire-mcp-client-icon" :data-active="active"><WorkbenchIcon name="bot" :size="20" /></span>
+          <span class="histoire-mcp-client-icon" :data-active="active"><BuiltinIcon icon="bot" :size="20" /></span>
           <span class="histoire-mcp-client-details">
             <strong>{{ client.name }}</strong>
             <span>{{ client.transport }} · {{ active ? mcpTimeAgo(client.connectedAt, store.now) : `idle ${mcpTimeAgo(client.lastSeenAt, store.now)}` }}</span>

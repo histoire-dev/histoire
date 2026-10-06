@@ -5,7 +5,7 @@ export default {
 </script>
 
 <script lang="ts" setup>
-import { Icon } from '@iconify/vue'
+import { BuiltinIcon } from '@histoire/controls/vue'
 import { useClipboard } from '@vueuse/core'
 import { VTooltip as vTooltip } from 'floating-vue'
 
@@ -19,7 +19,7 @@ const action = () => copy(props.content)
 </script>
 
 <template>
-  <Icon
+  <BuiltinIcon
     v-tooltip="{
       content: 'Copied!',
       triggers: [],

@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import type { AutoPropComponentDefinition } from '@histoire/shared'
 import type { Variant } from '../../types'
-import { Icon } from '@iconify/vue'
+import { BuiltinIcon } from '@histoire/controls/vue'
 import ControlsComponentPropItem from './ControlsComponentPropItem.vue'
 
 defineProps<{
@@ -16,7 +16,7 @@ defineProps<{
     data-test-id="story-controls-detected-props"
   >
     <div class="htw-font-mono htw-p-2 htw-flex htw-items-center htw-gap-1">
-      <Icon
+      <BuiltinIcon
         v-tooltip="'Auto-detected props'"
         icon="carbon:flash"
         class="htw-w-4 htw-h-4 htw-text-primary-500 htw-flex-none"

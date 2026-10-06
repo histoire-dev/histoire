@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { HstButton } from '@histoire/controls/vue'
-import WorkbenchIcon from '../shell/WorkbenchIcon.vue'
+import { BuiltinIcon, HstButton } from '@histoire/controls/vue'
 
 defineProps<{
   /** Selected story's catalog title. */
@@ -16,14 +15,14 @@ defineEmits<{ close: [] }>()
 <template>
   <header class="inspector-header">
     <div class="inspector-header-titles">
-      <span v-if="variantTitle && variantTitle !== storyTitle" class="inspector-story-title"><span>{{ storyTitle }}</span><WorkbenchIcon name="chevron-right" :size="12" /></span>
+      <span v-if="variantTitle && variantTitle !== storyTitle" class="inspector-story-title"><span>{{ storyTitle }}</span><BuiltinIcon icon="chevron-right" :size="12" /></span>
       <h2>{{ variantTitle || storyTitle }}</h2>
     </div>
     <a v-if="isolatedHref" :href="isolatedHref" target="_blank" rel="noopener noreferrer" class="inspector-icon-button" aria-label="Open isolated preview" title="Open isolated preview">
-      <WorkbenchIcon name="launch" />
+      <BuiltinIcon icon="launch" :size="16" />
     </a>
     <HstButton color="flat" type="button" class="inspector-icon-button" aria-label="Close inspector" title="Close inspector" @click="$emit('close')">
-      <WorkbenchIcon name="close" />
+      <BuiltinIcon icon="close" :size="16" />
     </HstButton>
   </header>
 </template>

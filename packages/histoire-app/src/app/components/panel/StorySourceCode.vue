@@ -2,8 +2,7 @@
 import type { Highlighter } from 'shiki'
 import type { Story, Variant } from '../../types'
 import { HstCopyIcon } from '@histoire/controls'
-import { getControlElement, HstButton, HstTextarea } from '@histoire/controls/vue'
-import { Icon } from '@iconify/vue'
+import { BuiltinIcon, getControlElement, HstButton, HstTextarea } from '@histoire/controls/vue'
 import { createHighlighter } from 'shiki'
 import { clientSupportPlugins } from 'virtual:$histoire-support-plugins-client'
 import { computed, nextTick, onMounted, ref, shallowRef, watch } from 'vue'
@@ -115,7 +114,7 @@ watch(sourceHtml, async () => {
           ]"
           @click="dynamicSourceCode && (displayedSource = 'dynamic')"
         >
-          <Icon
+          <BuiltinIcon
             icon="carbon:flash"
             class="htw-w-4 htw-h-4 htw-flex-none"
           />
@@ -138,7 +137,7 @@ watch(sourceHtml, async () => {
           ]"
           @click="staticSourceCode && (displayedSource = 'static')"
         >
-          <Icon
+          <BuiltinIcon
             icon="carbon:document"
             class="htw-w-4 htw-h-4 htw-flex-none"
           />
@@ -167,7 +166,7 @@ watch(sourceHtml, async () => {
     </div>
 
     <BaseEmpty v-else-if="!displayedSourceCode">
-      <Icon
+      <BuiltinIcon
         icon="carbon:code-hide"
         class="htw-w-8 htw-h-8 htw-opacity-50 htw-mb-6"
       />

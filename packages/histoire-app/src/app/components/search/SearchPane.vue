@@ -2,8 +2,7 @@
 import type { ClientCommand } from '@histoire/shared'
 import type { SearchResult } from '../../types'
 import type { SearchData } from './types'
-import { getControlElement, HstText } from '@histoire/controls/vue'
-import { Icon } from '@iconify/vue'
+import { BuiltinIcon, getControlElement, HstText } from '@histoire/controls/vue'
 import { useDebounce, useFocus } from '@vueuse/core'
 import Fuse from 'fuse.js'
 import { registeredCommands } from 'virtual:$histoire-commands'
@@ -238,7 +237,7 @@ const {
     class="histoire-search-pane htw-flex htw-items-center htw-gap-4 htw-pl-6 htw-border htw-border-transparent focus-visible:htw-border-primary-500"
     @click="focused = true"
   >
-    <Icon
+    <BuiltinIcon
       icon="carbon:search"
       class="flex-none htw-w-4 htw-h-4"
     />

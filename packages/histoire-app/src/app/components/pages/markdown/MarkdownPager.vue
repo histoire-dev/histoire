@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import type { HistoireCatalogStory, HistoireSelectionInput } from '@histoire/protocol'
-import { HstButton } from '@histoire/controls/vue'
-import WorkbenchIcon from '../../shell/WorkbenchIcon.vue'
+import { BuiltinIcon, HstButton } from '@histoire/controls/vue'
 
 defineProps<{
   /** Previous guide in same-group tree order. */
@@ -18,10 +17,10 @@ defineEmits<{
 <template>
   <nav v-if="previous || next" class="histoire-markdown-pager" aria-label="Documentation pages">
     <HstButton v-if="previous" color="flat" type="button" @click="$emit('select', { storyId: previous.id, variantId: null })">
-      <WorkbenchIcon name="chevron-left" /><div><small>Previous</small><strong>{{ previous.title }}</strong></div>
+      <BuiltinIcon icon="chevron-left" :size="16" /><div><small>Previous</small><strong>{{ previous.title }}</strong></div>
     </HstButton>
     <HstButton v-if="next" color="flat" type="button" class="next" @click="$emit('select', { storyId: next.id, variantId: null })">
-      <div><small>Next</small><strong>{{ next.title }}</strong></div><WorkbenchIcon name="chevron-right" />
+      <div><small>Next</small><strong>{{ next.title }}</strong></div><BuiltinIcon icon="chevron-right" :size="16" />
     </HstButton>
   </nav>
 </template>

@@ -1,10 +1,9 @@
 <script setup lang="ts">
 import type { UiComment, UiCommentAgent } from '@histoire/shared'
-import { HstButton, HstText } from '@histoire/controls/vue'
+import { BuiltinIcon, HstButton, HstText } from '@histoire/controls/vue'
 import { computed, ref } from 'vue'
 import { useWorkbenchComments } from '../../stores/comments.js'
 import PulsatingDisc from '../base/PulsatingDisc.vue'
-import WorkbenchIcon from '../shell/WorkbenchIcon.vue'
 import CommentContext from './CommentContext.vue'
 import { commentAge } from './presentation.js'
 
@@ -55,18 +54,18 @@ function submit() {
     <CommentContext :title="title" :comment="comment" />
     <div class="thread-messages">
       <article class="thread-message">
-        <span class="avatar"><WorkbenchIcon name="user-avatar" /></span>
+        <span class="avatar"><BuiltinIcon icon="user-avatar" :size="16" /></span>
         <div><header><strong>You</strong><time :datetime="comment.createdAt" :title="comment.createdAt">{{ commentAge(comment.createdAt) }}</time></header><p>{{ comment.body }}</p></div>
       </article>
       <article v-for="(message, index) in comment.thread" :key="index" class="thread-message" :class="{ 'agent-message': message.author === 'agent' }">
-        <span class="avatar"><WorkbenchIcon :name="message.author === 'agent' ? 'bot' : 'user-avatar'" /></span>
+        <span class="avatar"><BuiltinIcon :icon="message.author === 'agent' ? 'bot' : 'user-avatar'" :size="16" /></span>
         <div>
           <header><strong>{{ message.author === 'agent' ? agentName(message.agentId) : 'You' }}</strong><time :datetime="message.at" :title="message.at">{{ commentAge(message.at) }}</time></header><p>{{ message.body }}</p>
-          <code v-for="change in message.changes" :key="change.file" class="file-change"><WorkbenchIcon name="code" />{{ change.file }} <span class="added">+{{ change.added }}</span><span class="removed">-{{ change.removed }}</span></code>
+          <code v-for="change in message.changes" :key="change.file" class="file-change"><BuiltinIcon icon="code" :size="16" />{{ change.file }} <span class="added">+{{ change.added }}</span><span class="removed">-{{ change.removed }}</span></code>
         </div>
       </article>
       <article v-if="busy && streamed" class="thread-message agent-message" aria-live="polite">
-        <span class="avatar"><WorkbenchIcon name="bot" /></span><div><header><strong>{{ agentName(comment.agentId) }}</strong></header><p>{{ streamed }}</p></div>
+        <span class="avatar"><BuiltinIcon icon="bot" :size="16" /></span><div><header><strong>{{ agentName(comment.agentId) }}</strong></header><p>{{ streamed }}</p></div>
       </article>
       <p v-if="busy" class="agent-working" role="status">
         <PulsatingDisc />{{ agentName(comment.agentId) }} is working…
@@ -75,13 +74,13 @@ function submit() {
     <form class="thread-actions" @submit.prevent="submit">
       <HstText v-model="reply" layout="inline" aria-label="Reply to comment" placeholder="Reply…" maxlength="8192" :disabled="disabled || busy" />
       <HstButton v-if="reply.trim()" color="flat" type="submit" :disabled="disabled || busy" aria-label="Send reply">
-        <WorkbenchIcon name="send-alt-filled" />
+        <BuiltinIcon icon="send-alt-filled" :size="16" />
       </HstButton>
       <HstButton color="flat" type="button" class="resolve" :disabled="disabled" @click="emit('resolve', comment.status !== 'resolved')">
-        <WorkbenchIcon :name="comment.status === 'resolved' ? 'renew' : 'checkmark'" />{{ comment.status === 'resolved' ? 'Reopen' : 'Resolve' }}
+        <BuiltinIcon :icon="comment.status === 'resolved' ? 'renew' : 'checkmark'" :size="16" />{{ comment.status === 'resolved' ? 'Reopen' : 'Resolve' }}
       </HstButton>
       <HstButton color="flat" type="button" class="delete" :disabled="disabled || busy" aria-label="Delete comment" @click="emit('remove')">
-        <WorkbenchIcon name="trash-can" />
+        <BuiltinIcon icon="trash-can" :size="16" />
       </HstButton>
     </form>
   </section>

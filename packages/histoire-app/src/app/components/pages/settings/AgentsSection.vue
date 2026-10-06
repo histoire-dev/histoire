@@ -1,11 +1,10 @@
 <script setup lang="ts">
 import type { UiAgentSettings } from '@histoire/shared'
-import { HstButton, HstButtonGroup, HstSwitch } from '@histoire/controls/vue'
+import { BuiltinIcon, HstButton, HstButtonGroup, HstSwitch } from '@histoire/controls/vue'
 import { ACP_PRESETS } from '@histoire/shared'
 import { computed, shallowRef } from 'vue'
 import { useAgentsStore } from '../../../stores/agents.js'
 import { histoireConfig } from '../../../util/config.js'
-import WorkbenchIcon from '../../shell/WorkbenchIcon.vue'
 import AgentPresetRow from './AgentPresetRow.vue'
 import SaveToProject from './SaveToProject.vue'
 import './agents-settings.css'
@@ -54,7 +53,7 @@ function saved(path: 'presets' | 'permissions'): void {
     <div class="histoire-settings-card">
       <header>
         <strong>Agents</strong><HstButton color="default" type="button" class="histoire-settings-action" :disabled="agents.pending.value || !agents.connected.value || state.presets.length >= 32" @click="addAgent">
-          <WorkbenchIcon name="add" :size="14" />Add agent
+          <BuiltinIcon icon="add" :size="14" />Add agent
         </HstButton>
       </header>
       <AgentPresetRow v-for="preset in state.presets" :key="preset.id" :agent-id="preset.id" />
@@ -65,19 +64,19 @@ function saved(path: 'presets' | 'permissions'): void {
     </div>
     <div class="histoire-settings-card">
       <div class="histoire-settings-row">
-        <WorkbenchIcon name="edit" :size="18" /><strong>File edits</strong><HstButtonGroup layout="inline" aria-label="File edit policy" :model-value="state.permissions.fileEdits ?? 'ask'" :options="filePolicies" :disabled="agents.pending.value" @update:model-value="agents.configure({ permissions: { ...state.permissions, fileEdits: $event } })" />
+        <BuiltinIcon icon="edit" :size="18" /><strong>File edits</strong><HstButtonGroup layout="inline" aria-label="File edit policy" :model-value="state.permissions.fileEdits ?? 'ask'" :options="filePolicies" :disabled="agents.pending.value" @update:model-value="agents.configure({ permissions: { ...state.permissions, fileEdits: $event } })" />
       </div>
       <div class="histoire-settings-row">
-        <WorkbenchIcon name="terminal" :size="18" /><strong>Terminal commands</strong><HstButtonGroup layout="inline" aria-label="Terminal policy" :model-value="state.permissions.terminal ?? 'ask'" :options="terminalPolicies" :disabled="agents.pending.value" @update:model-value="agents.configure({ permissions: { ...state.permissions, terminal: $event } })" />
+        <BuiltinIcon icon="terminal" :size="18" /><strong>Terminal commands</strong><HstButtonGroup layout="inline" aria-label="Terminal policy" :model-value="state.permissions.terminal ?? 'ask'" :options="terminalPolicies" :disabled="agents.pending.value" @update:model-value="agents.configure({ permissions: { ...state.permissions, terminal: $event } })" />
       </div>
       <div class="histoire-settings-row">
-        <WorkbenchIcon name="chat" :size="18" /><strong>Canvas comments go to</strong><HstButtonGroup layout="inline" aria-label="Comment destination" :model-value="state.context.askEachTime" :options="[{ value: false, label: 'Default agent' }, { value: true, label: 'Ask each time' }]" :disabled="agents.pending.value" @update:model-value="agents.configure({ context: { ...state.context, askEachTime: $event } })" />
+        <BuiltinIcon icon="chat" :size="18" /><strong>Canvas comments go to</strong><HstButtonGroup layout="inline" aria-label="Comment destination" :model-value="state.context.askEachTime" :options="[{ value: false, label: 'Default agent' }, { value: true, label: 'Ask each time' }]" :disabled="agents.pending.value" @update:model-value="agents.configure({ context: { ...state.context, askEachTime: $event } })" />
       </div>
       <SaveToProject path="agents.permissions" :value="state.permissions" :project-value="projectPermissions" :local="JSON.stringify(state.permissions) !== JSON.stringify(projectPermissions)" @reset="agents.resetProject(['agents.permissions'])" @saved="saved('permissions')" />
     </div>
     <div class="histoire-settings-card">
       <div v-for="option in contextOptions" :key="option.key" class="histoire-settings-row">
-        <WorkbenchIcon :name="option.icon" :size="18" /><strong>{{ option.label }}</strong><HstSwitch layout="inline" :aria-label="option.label" :model-value="state.context[option.key]" :disabled="agents.pending.value" @update:model-value="agents.configure({ context: { ...state.context, [option.key]: $event } })" />
+        <BuiltinIcon :icon="option.icon" :size="18" /><strong>{{ option.label }}</strong><HstSwitch layout="inline" :aria-label="option.label" :model-value="state.context[option.key]" :disabled="agents.pending.value" @update:model-value="agents.configure({ context: { ...state.context, [option.key]: $event } })" />
       </div>
     </div>
     <p v-if="agents.error.value" role="alert" class="histoire-agent-error">

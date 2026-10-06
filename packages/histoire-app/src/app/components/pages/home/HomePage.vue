@@ -1,12 +1,11 @@
 <script setup lang="ts">
 import type { HistoireSelectionInput, HistoireTarget } from '@histoire/protocol'
 import type { HistoireBuildInfo } from '@histoire/shared'
-import { HstButton } from '@histoire/controls/vue'
+import { BuiltinIcon, HstButton } from '@histoire/controls/vue'
 import { useHistoireSession, useHistoireSnapshot } from '@histoire/vue'
 import { computed, defineAsyncComponent } from 'vue'
 import { histoireConfig } from '../../../util/config.js'
 import { useWorkbenchTestsModel } from '../../panes/tests/model.js'
-import WorkbenchIcon from '../../shell/WorkbenchIcon.vue'
 import BrowseSections from './BrowseSections.vue'
 import { browseSections, orderedStories } from './catalog.js'
 import GuidesList from './GuidesList.vue'
@@ -68,10 +67,10 @@ function start(): void {
         </div>
         <div class="histoire-home-actions">
           <HstButton v-if="first" color="flat" type="button" :class="{ primary: !dev }" @click="start">
-            <WorkbenchIcon name="document" />Get started
+            <BuiltinIcon icon="document" :size="16" />Get started
           </HstButton>
           <HstButton v-if="dev && projectTests?.canRun.value" color="primary" type="button" class="primary" :disabled="projectTests.running.value" @click="emit('runTests')">
-            <WorkbenchIcon name="play-filled-alt" />Run all tests
+            <BuiltinIcon icon="play-filled-alt" :size="16" />Run all tests
           </HstButton>
         </div>
       </div>

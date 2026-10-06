@@ -7,7 +7,7 @@ describe('comment thread drafts', () => {
   it('scopes unsent replies to their thread while retaining a same-thread draft through updates', async () => {
     const first = commentFixture({ agentId: 'first-agent' })
     const second = commentFixture({ agentId: 'second-agent' })
-    const wrapper = mount(CommentThread, { props: { comment: first, title: 'First', agents: [] }, global: { stubs: { CommentContext: true, WorkbenchIcon: true } } })
+    const wrapper = mount(CommentThread, { props: { comment: first, title: 'First', agents: [] }, global: { stubs: { CommentContext: true, BuiltinIcon: true } } })
     try {
       await wrapper.get('input').setValue('Instruction for first comment')
       await wrapper.setProps({ comment: second, title: 'Second' })

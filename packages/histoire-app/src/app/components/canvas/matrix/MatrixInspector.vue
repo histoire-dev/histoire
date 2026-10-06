@@ -1,12 +1,11 @@
 <script setup lang="ts">
 import type { MatrixAxis, MatrixValue } from '../../../util/matrix.js'
-import { HstButton, HstSelect } from '@histoire/controls/vue'
+import { BuiltinIcon, HstButton, HstSelect } from '@histoire/controls/vue'
 import { useHistoireContext, useHistoireResource } from '@histoire/vue/internal'
 import { computed, ref, watch } from 'vue'
 import { useSelection } from '../../../composables/selection.js'
 import { useMatrixStore } from '../../../stores/matrix.js'
 import { filterMatrixValues, matrixVariantSnippet } from '../../../util/matrix.js'
-import WorkbenchIcon from '../../shell/WorkbenchIcon.vue'
 import MatrixBaseProp from './MatrixBaseProp.vue'
 
 const emit = defineEmits<{ error: [error: unknown] }>()
@@ -62,10 +61,10 @@ async function copyVariant(): Promise<void> {
 <template>
   <div class="histoire-matrix-inspector">
     <div class="histoire-matrix-preset">
-      <WorkbenchIcon name="bookmark" :size="15" />
+      <BuiltinIcon icon="bookmark" :size="15" />
       <HstSelect title="Base preset" layout="horizontal" :model-value="variant?.id ?? story?.variants[0]?.id" :options="(story?.variants ?? []).map(item => ({ value: item.id, label: item.title }))" @update:model-value="preset" />
       <HstButton color="flat" type="button" aria-label="Reset matrix base props" @click="reset">
-        <WorkbenchIcon name="reset" :size="16" />
+        <BuiltinIcon icon="reset" :size="16" />
       </HstButton>
     </div>
     <div class="histoire-matrix-selected">

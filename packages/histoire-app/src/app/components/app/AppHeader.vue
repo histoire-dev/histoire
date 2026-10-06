@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Icon } from '@iconify/vue'
+import { BuiltinIcon } from '@histoire/controls/vue'
 import { computed } from 'vue'
 import { histoireConfig } from '../../util/config'
 import { isDark, toggleDark } from '../../util/dark'
@@ -43,7 +43,7 @@ onKeyboardShortcut(['ctrl+shift+d', 'meta+shift+d'], (event) => {
         data-test-id="search-btn"
         @click="$emit('search')"
       >
-        <Icon
+        <BuiltinIcon
           icon="carbon:search"
           class="htw-w-6 htw-h-6 sm:htw-w-4 sm:htw-h-4"
         />
@@ -55,7 +55,7 @@ onKeyboardShortcut(['ctrl+shift+d', 'meta+shift+d'], (event) => {
         class="htw-p-2 sm:htw-p-1 hover:htw-text-primary-500 dark:hover:htw-text-primary-400 htw-cursor-pointer htw-text-gray-900 dark:htw-text-gray-100"
         @click="toggleDark()"
       >
-        <Icon
+        <BuiltinIcon
           :icon="themeIcon"
           class="htw-w-6 htw-h-6 sm:htw-w-4 sm:htw-h-4"
         />

@@ -37,20 +37,20 @@ measure colors stay independent of project palettes.
 
 ## Icons
 
-`components/shell/WorkbenchIcon.vue` accepts `name` (a Carbon name without a
-prefix) and optional `size` (pixels or a CSS length, default 16). It renders SVG
-from a bundled subset. Unknown names produce an empty glyph and a development
-warning. `BaseIcon` retains existing image URL support and delegates glyphs to
-the same offline component.
+`@histoire/controls/vue` exports the single `BuiltinIcon` renderer. Its `icon`
+prop accepts a bundled Carbon name (prefixed or bare), another Iconify
+identifier, or an image URL/path. Known Carbon glyphs and compatibility aliases
+render from bundled data without network access; other icon namespaces continue
+through Iconify. `size` accepts pixels or a CSS length, while explicit `width`
+and `height` can override either dimension.
 
 The Vue-free canonical collection/helper lives in
 `packages/histoire-shared/src/icons/`, exposed through
-`@histoire/shared/dist/icons/index.js`. Workbench and built-in controls use the
-same data; controls render it directly without importing Iconify. `util/icons.ts`
-retains the workbench compatibility exports and registers that collection for
-older first-party `Icon` components. Legacy MDI, Fluent, and Remix first-party
-names resolve to Carbon aliases. User-authored story components keep their own
-icon integrations.
+`@histoire/shared/dist/icons/index.js`. `BuiltinIcon` uses this shared data and
+registers the collection for user stories that import Iconify directly. The
+workbench utility retains compatibility exports, and legacy MDI, Fluent, and
+Remix first-party names resolve to Carbon aliases. User-authored story
+components keep their own icon integrations.
 
 Add glyphs to `packages/histoire-shared/src/icons/icon-names.json`, then run
 from the repository root:

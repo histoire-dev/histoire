@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { Icon } from '@iconify/vue'
+import { BuiltinIcon } from '@histoire/controls/vue'
 import { computed } from 'vue'
 
 const props = defineProps<{
@@ -36,7 +36,7 @@ const colorClasses = computed(() => {
       icon ? 'htw-ps-1' : 'htw-ps-2',
     ] "
   >
-    <Icon
+    <BuiltinIcon
       v-if="icon"
       :icon="icon"
     />

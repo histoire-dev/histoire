@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import type { PropType } from 'vue'
 import type { Story, Variant } from '../../types'
-import { Icon } from '@iconify/vue'
+import { BuiltinIcon } from '@histoire/controls/vue'
 import { computed, ref, watch } from 'vue'
 import BaseEmpty from '../base/BaseEmpty.vue'
 import ControlsComponentProps from './ControlsComponentProps.vue'
@@ -97,7 +97,7 @@ function isEmptyStateObject(value: unknown) {
     </div>
 
     <BaseEmpty v-else-if="ready && controlsKind === 'state' && !variant.state?._hPropDefs?.length">
-      <Icon
+      <BuiltinIcon
         icon="carbon:audio-console"
         class="htw-w-8 htw-h-8 htw-opacity-50 htw-mb-6"
       />

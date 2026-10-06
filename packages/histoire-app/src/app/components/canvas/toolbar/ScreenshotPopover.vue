@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { UiChannelError, UiScreenshotFile, UiScreenshotRequest } from '@histoire/shared'
-import { HstButton, HstButtonGroup } from '@histoire/controls/vue'
+import { BuiltinIcon, HstButton, HstButtonGroup } from '@histoire/controls/vue'
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { useCanvasFrames, useCanvasStore } from '../../../composables/canvas-settings.js'
 import { catalogTargetLabel } from '../../../util/catalog-target.js'
@@ -8,7 +8,6 @@ import { screenshotFileDetails } from '../../../util/screenshot-file.js'
 import { snapshotScreenshotTargets } from '../../../util/screenshot-targets.js'
 import { onUiDisconnect, onUiEvent, sendUiEvent } from '../../../util/ui-channel.js'
 import { useCaptureDiscoveryPause } from '../../panes/tests/capture.js'
-import WorkbenchIcon from '../../shell/WorkbenchIcon.vue'
 import { useCanvasPreviewSettings } from './session-settings.js'
 import ToolbarPopover from './ToolbarPopover.vue'
 
@@ -155,7 +154,7 @@ onBeforeUnmount(() => {
         <span>Save to</span><code>.histoire/screenshots/</code>
       </div>
       <HstButton v-if="!requestId" color="primary" type="button" class="screenshot-capture" :disabled="!targets.length" @click="capture">
-        <WorkbenchIcon name="camera" />Capture {{ targets.length }} frame{{ targets.length === 1 ? '' : 's' }}
+        <BuiltinIcon icon="camera" :size="16" />Capture {{ targets.length }} frame{{ targets.length === 1 ? '' : 's' }}
       </HstButton>
       <HstButton v-else color="primary" type="button" class="screenshot-capture" @click="cancel">
         Cancel capture
@@ -172,7 +171,7 @@ onBeforeUnmount(() => {
         </p>
         <div v-for="file in recentFiles" :key="file.path" class="recent-capture">
           <img :src="imageUrl(file)" alt="" loading="lazy"><span :title="file.metadata"><strong>{{ file.label }}</strong><small><time v-if="file.capturedAt" :datetime="file.capturedAt">{{ file.time }}</time><code>{{ file.shortName }}</code></small></span><HstButton color="flat" type="button" :aria-label="`Copy path for ${file.label}`" :title="copied === file.path ? 'Copied' : 'Copy path'" @click="copyPath(file.path)">
-            <WorkbenchIcon :name="copied === file.path ? 'checkmark' : 'copy'" />
+            <BuiltinIcon :icon="copied === file.path ? 'checkmark' : 'copy'" :size="16" />
           </HstButton>
         </div>
       </template>

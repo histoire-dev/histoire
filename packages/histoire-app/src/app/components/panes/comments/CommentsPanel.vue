@@ -2,13 +2,12 @@
 import type { UiComment, UiCommentAgent } from '@histoire/shared'
 import type { WorkbenchComments } from '../../../stores/comments.js'
 import type { CommentsFilter } from '../../comments/presentation.js'
-import { HstButton, HstButtonGroup, HstSelect } from '@histoire/controls/vue'
+import { BuiltinIcon, HstButton, HstButtonGroup, HstSelect } from '@histoire/controls/vue'
 import { useHistoireContext, useHistoireResource } from '@histoire/vue/internal'
 import { computed, ref, shallowRef } from 'vue'
 import CommentThread from '../../comments/CommentThread.vue'
 import { useCommentDestination } from '../../comments/destination.js'
 import { filterComments, groupComments } from '../../comments/presentation.js'
-import WorkbenchIcon from '../../shell/WorkbenchIcon.vue'
 import CommentsList from './CommentsList.vue'
 
 const props = defineProps<{
@@ -51,7 +50,7 @@ function sendDrafts() {
   <section class="comments-panel" aria-label="Comments">
     <header class="comments-heading">
       <h2>Comments</h2><HstButton color="flat" type="button" aria-label="Show resolved comment pins" :aria-pressed="model.showResolved.value" @click="model.toggleResolved">
-        <WorkbenchIcon name="filter" />
+        <BuiltinIcon icon="filter" :size="16" />
       </HstButton>
     </header>
     <HstButtonGroup v-model="filter" layout="inline" class="comments-filters" aria-label="Comment status" :options="filterOptions" />
@@ -73,11 +72,11 @@ function sendDrafts() {
     <footer>
       <template v-if="agents.length">
         <HstSelect layout="inline" :model-value="agentId" aria-label="Bulk comment agent" placeholder="Choose agent" :options="agents.map(agent => ({ value: agent.id, label: agent.name }))" @update:model-value="choose" /><HstButton color="flat" type="button" :disabled="!drafts.length || !agentId || !model.available.value" @click="sendDrafts">
-          <WorkbenchIcon name="send-alt-filled" />Send {{ drafts.length }} open
+          <BuiltinIcon icon="send-alt-filled" :size="16" />Send {{ drafts.length }} open
         </HstButton>
       </template>
       <HstButton v-else color="flat" type="button" @click="emit('setupAgent')">
-        <WorkbenchIcon name="bot" />Set up an agent
+        <BuiltinIcon icon="bot" :size="16" />Set up an agent
       </HstButton>
     </footer>
   </section>

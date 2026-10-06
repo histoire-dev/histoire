@@ -1,9 +1,8 @@
 <script setup lang="ts">
 import type { WorkbenchTestRow } from './types.js'
-import { HstButton } from '@histoire/controls/vue'
+import { BuiltinIcon, HstButton } from '@histoire/controls/vue'
 import { computed } from 'vue'
 import PulsatingDisc from '../../base/PulsatingDisc.vue'
-import WorkbenchIcon from '../../shell/WorkbenchIcon.vue'
 
 /** One actual collected variant or diagnostic; unknown diagnostics stay visible. */
 const props = defineProps<{ row: WorkbenchTestRow, selected: boolean }>()
@@ -17,7 +16,7 @@ const status = computed(() => props.row.notCollected ? 'not collected' : props.r
 <template>
   <HstButton color="flat" type="button" class="test-row" :class="{ failed: row.failed, warning: row.notCollected, passed: !row.failed && row.summary?.passed }" :aria-current="selected ? 'true' : undefined" :aria-label="`${row.storyTitle} / ${row.variantTitle ?? status}, ${status}`" :disabled="!row.selectable" :title="row.error ? String(row.error) : undefined" @click="emit('select', row)">
     <PulsatingDisc v-if="running" />
-    <WorkbenchIcon v-else :name="icon" />
+    <BuiltinIcon v-else :icon="icon" :size="16" />
     <span class="test-row-title">{{ row.variantTitle ?? row.storyTitle }}</span>
     <span v-if="row.notCollected" class="test-row-detail">not collected</span>
     <span v-else-if="row.stale" class="test-row-detail">outdated</span>

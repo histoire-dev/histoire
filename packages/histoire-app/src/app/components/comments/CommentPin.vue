@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { HstButton } from '@histoire/controls/vue'
-import WorkbenchIcon from '../shell/WorkbenchIcon.vue'
+import { BuiltinIcon, HstButton } from '@histoire/controls/vue'
 
 defineProps<{
   /** Stable visible annotation ordinal. */
@@ -20,7 +19,7 @@ const emit = defineEmits<{
 
 <template>
   <HstButton color="flat" type="button" class="comment-pin" :class="{ active, draft }" :aria-label="temporary ? 'Current comment draft' : `Open comment ${number}`" :aria-pressed="active" @click.stop="emit('select')">
-    <WorkbenchIcon v-if="temporary" name="add" :size="14" />
+    <BuiltinIcon v-if="temporary" icon="add" :size="14" />
     <template v-else>
       {{ number }}
     </template>

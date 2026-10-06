@@ -1,10 +1,9 @@
 <script setup lang="ts">
 import type { HistoireTarget } from '@histoire/protocol'
 import type { WorkbenchTestRow } from './types.js'
-import { HstButton } from '@histoire/controls/vue'
+import { BuiltinIcon, HstButton } from '@histoire/controls/vue'
 import { computed, ref } from 'vue'
 import WorkbenchVirtualList from '../../lists/WorkbenchVirtualList.vue'
-import WorkbenchIcon from '../../shell/WorkbenchIcon.vue'
 import TestsTreeRow from './TestsTreeRow.vue'
 
 /** Catalog rows remain ordered by source, grouped by exact story identity. */
@@ -61,8 +60,8 @@ function toggle(storyId: string) {
     <WorkbenchVirtualList v-else :items="visible" :item-size="40" list-tag="ul" item-tag="li">
       <template #default="{ item }">
         <HstButton v-if="item.kind === 'heading'" color="flat" type="button" class="test-story-heading" :aria-expanded="!closed.has(item.id)" @click="toggle(item.id)">
-          <WorkbenchIcon :name="closed.has(item.id) ? 'chevron-right' : 'chevron-down'" />
-          <WorkbenchIcon :name="item.failed ? 'error-filled' : item.stale ? 'renew' : item.passed ? 'checkmark-filled' : 'subtract'" :class="{ failed: item.failed, passed: item.passed }" />
+          <BuiltinIcon :icon="closed.has(item.id) ? 'chevron-right' : 'chevron-down'" :size="16" />
+          <BuiltinIcon :icon="item.failed ? 'error-filled' : item.stale ? 'renew' : item.passed ? 'checkmark-filled' : 'subtract'" :class="{ failed: item.failed, passed: item.passed }" :size="16" />
           <strong>{{ item.title }}</strong>
           <span>{{ item.count }} / {{ item.total }}</span>
         </HstButton>

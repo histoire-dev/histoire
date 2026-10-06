@@ -4,13 +4,12 @@ import type { ClientCommand } from '@histoire/shared'
 import type { createStandaloneCommands } from '../../../standalone/commands.js'
 import type { WorkbenchSearchState } from './controller.js'
 import type { SearchScope, WorkbenchSearchResult } from './query.js'
-import { HstButton } from '@histoire/controls/vue'
+import { BuiltinIcon, HstButton } from '@histoire/controls/vue'
 import { getHistoireTargetKey } from '@histoire/protocol'
 import { useHistoireContext, useHistoireResource } from '@histoire/vue/internal'
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, shallowRef, watch } from 'vue'
 import CommandPrompts from '../../command/CommandPrompts.vue'
 import WorkbenchVirtualList from '../../lists/WorkbenchVirtualList.vue'
-import WorkbenchIcon from '../../shell/WorkbenchIcon.vue'
 import { getSearchCommandDomId, SEARCH_ACTIVE_RESULT_ID, SEARCH_RESULTS_ID } from './accessibility.js'
 import { createWorkbenchSearchController } from './controller.js'
 import { getSearchActivationResult, getSearchFrameMatches } from './query.js'
@@ -192,7 +191,7 @@ function keydown(event: KeyboardEvent) {
   <!-- Keep workbench layout independent of the portable SDK search styles. -->
   <section class="workbench-search" aria-label="Search" :aria-busy="state.loading" data-test-id="search-modal" @keydown="keydown">
     <label class="search-input">
-      <WorkbenchIcon name="search" aria-hidden="true" />
+      <BuiltinIcon icon="search" aria-hidden="true" :size="16" />
       <input
         ref="input"
         v-model="query"
@@ -221,7 +220,7 @@ function keydown(event: KeyboardEvent) {
         <WorkbenchVirtualList ref="commandList" :items="commandRows" :min-item-size="40" page-mode list-tag="ul" item-tag="li">
           <template #default="{ item, index: position }">
             <HstButton :id="getSearchCommandDomId(item.command.id)" color="flat" type="button" data-test-id="search-item" data-search-kind="command" :class="{ active: index === ordered.length + position }" @focus="index = ordered.length + position" @click="activateCommand(item.command)">
-              <WorkbenchIcon name="terminal" />{{ item.command.label }}
+              <BuiltinIcon icon="terminal" :size="16" />{{ item.command.label }}
             </HstButton>
           </template>
         </WorkbenchVirtualList>

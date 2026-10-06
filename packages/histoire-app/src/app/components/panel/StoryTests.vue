@@ -1,6 +1,6 @@
 <script lang="ts" setup>
+import { BuiltinIcon } from '@histoire/controls/vue'
 import { formatTestError } from '@histoire/shared'
-import { Icon } from '@iconify/vue'
 import { computed } from 'vue'
 import { useTestsStore } from '../../stores/tests'
 import BaseButton from '../base/BaseButton.vue'
@@ -49,7 +49,7 @@ const serverAvailable = computed(() => typeof window !== 'undefined' && !!window
 
     <div class="htw-flex-1 htw-overflow-auto">
       <BaseEmpty v-if="testsStore.currentCollecting && !definitions.length">
-        <Icon
+        <BuiltinIcon
           icon="carbon:progress-bar-round"
           class="htw-w-8 htw-h-8 htw-opacity-50 htw-mb-2"
         />
@@ -60,7 +60,7 @@ const serverAvailable = computed(() => typeof window !== 'undefined' && !!window
         v-else-if="testsStore.currentCollectError && !definitions.length"
         data-test-id="story-tests-collect-error"
       >
-        <Icon
+        <BuiltinIcon
           icon="carbon:warning-alt"
           class="htw-w-8 htw-h-8 htw-opacity-50 htw-mb-2 htw-text-red-500 dark:htw-text-red-400"
         />
@@ -69,7 +69,7 @@ const serverAvailable = computed(() => typeof window !== 'undefined' && !!window
       </BaseEmpty>
 
       <BaseEmpty v-else-if="!definitions.length && !testsStore.currentRunning">
-        <Icon
+        <BuiltinIcon
           icon="carbon:test-tool"
           class="htw-w-8 htw-h-8 htw-opacity-50 htw-mb-2"
         />
@@ -77,7 +77,7 @@ const serverAvailable = computed(() => typeof window !== 'undefined' && !!window
       </BaseEmpty>
 
       <BaseEmpty v-else-if="testsStore.currentRunning && !definitions.length">
-        <Icon
+        <BuiltinIcon
           icon="carbon:progress-bar-round"
           class="htw-w-8 htw-h-8 htw-opacity-50 htw-mb-2"
         />

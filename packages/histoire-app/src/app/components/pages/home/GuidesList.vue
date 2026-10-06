@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import type { HistoireCatalogStory, HistoireSelectionInput } from '@histoire/protocol'
-import { HstButton } from '@histoire/controls/vue'
-import WorkbenchIcon from '../../shell/WorkbenchIcon.vue'
+import { BuiltinIcon, HstButton } from '@histoire/controls/vue'
 
 defineProps<{
   /** Documentation-only stories in real tree order. */
@@ -17,9 +16,9 @@ defineEmits<{
   <section v-if="guides.length" class="histoire-guides">
     <h2>Guides</h2>
     <HstButton v-for="guide in guides" :key="guide.id" color="flat" type="button" @click="$emit('select', { storyId: guide.id, variantId: null })">
-      <WorkbenchIcon name="document" />
+      <BuiltinIcon icon="document" :size="16" />
       <span>{{ guide.title }}</span>
-      <WorkbenchIcon name="chevron-right" />
+      <BuiltinIcon icon="chevron-right" :size="16" />
     </HstButton>
   </section>
 </template>

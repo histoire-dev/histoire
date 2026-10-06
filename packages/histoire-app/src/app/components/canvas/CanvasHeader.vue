@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { HistoireCatalogStory } from '@histoire/sdk'
-import WorkbenchIcon from '../shell/WorkbenchIcon.vue'
+import { BuiltinIcon } from '@histoire/controls/vue'
 import CanvasStatus from './CanvasStatus.vue'
 
 defineProps<{
@@ -13,7 +13,7 @@ defineProps<{
   <header class="histoire-canvas-heading">
     <div><h1>{{ story.title }}</h1><span>{{ story.variants.length }} {{ story.variants.length === 1 ? 'variant' : 'variants' }}</span></div>
     <div class="histoire-canvas-metadata">
-      <span v-if="story.relativePath" class="histoire-canvas-file"><WorkbenchIcon name="code" :size="14" /><span>{{ story.relativePath }}</span></span>
+      <span v-if="story.relativePath" class="histoire-canvas-file"><BuiltinIcon icon="code" :size="14" /><span>{{ story.relativePath }}</span></span>
       <CanvasStatus :pan="false" />
     </div>
   </header>

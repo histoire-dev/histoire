@@ -1,5 +1,4 @@
-import { histoireCarbonIcons, histoireIconNames } from '@histoire/shared/dist/icons/index.js'
-import { addCollection } from '@iconify/vue'
+import { histoireIconNames } from '@histoire/shared/dist/icons/index.js'
 
 export { getHistoireIcon as getWorkbenchIcon } from '@histoire/shared/dist/icons/index.js'
 export type { HistoireIconData as WorkbenchIconData } from '@histoire/shared/dist/icons/index.js'
@@ -8,6 +7,3 @@ export type { HistoireIconData as WorkbenchIconData } from '@histoire/shared/dis
 export const workbenchIconNames = histoireIconNames
 /** Iconify-compatible map retained for older first-party components. */
 export const workbenchIcons = Object.fromEntries(workbenchIconNames.map(name => [name, `carbon:${name}`]))
-
-// Existing first-party Icon components share the same cache as WorkbenchIcon.
-addCollection(histoireCarbonIcons)

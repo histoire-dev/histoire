@@ -1,7 +1,7 @@
 <script lang="ts">
 import type { PropType, Ref } from 'vue'
 import type { Story } from '../../types'
-import { Icon } from '@iconify/vue'
+import { BuiltinIcon } from '@histoire/controls/vue'
 import { markdownFiles } from 'virtual:$histoire-markdown-files'
 import { computed, nextTick, ref, toRefs, watch, watchEffect } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
@@ -181,7 +181,7 @@ const filePath = computed(() => story.value.file?.docsFilePath ?? (props.standal
     <BaseEmpty
       v-if="!renderedDoc"
     >
-      <Icon
+      <BuiltinIcon
         icon="carbon:document-unknown"
         class="htw-w-8 htw-h-8 htw-opacity-50 htw-mb-6"
       />

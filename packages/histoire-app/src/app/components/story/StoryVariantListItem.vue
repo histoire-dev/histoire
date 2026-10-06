@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import type { PropType } from 'vue'
 import type { Variant } from '../../types'
-import { Icon } from '@iconify/vue'
+import { BuiltinIcon } from '@histoire/controls/vue'
 import { ref, toRefs } from 'vue'
 import { useScrollOnActive } from '../../util/scroll'
 import { useCurrentVariantRoute } from '../../util/variant'
@@ -32,7 +32,7 @@ useScrollOnActive(isActive, el)
       :is-active="isActive"
       class="htw-px-2 htw-py-2 md:htw-py-1.5 htw-m-1 htw-rounded-sm htw-flex htw-items-center htw-gap-2"
     >
-      <Icon
+      <BuiltinIcon
         :icon="variant.icon ?? 'carbon:cube'"
         class="htw-w-5 htw-h-5 sm:htw-w-4 sm:htw-h-4 htw-flex-none"
         :class="{

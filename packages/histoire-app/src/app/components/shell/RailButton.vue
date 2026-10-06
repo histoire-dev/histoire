@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { HstButton } from '@histoire/controls/vue'
-import WorkbenchIcon from './WorkbenchIcon.vue'
+import { BuiltinIcon, HstButton } from '@histoire/controls/vue'
 
 defineProps<{
   /** Accessible action label, also shown in native tooltip. */
@@ -37,7 +36,7 @@ defineProps<{
     :data-test-id="testId"
     :disabled="disabled"
   >
-    <WorkbenchIcon :name="icon" :size="22" />
+    <BuiltinIcon :icon="icon" :size="22" />
     <span v-if="badge" class="histoire-rail-badge" :data-tone="badgeTone" aria-hidden="true" />
   </HstButton>
 </template>

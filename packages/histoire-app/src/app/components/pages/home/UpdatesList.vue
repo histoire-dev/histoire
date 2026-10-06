@@ -1,9 +1,8 @@
 <script setup lang="ts">
 import type { HistoireCatalogStory, HistoireSelectionInput } from '@histoire/protocol'
 import type { HistoireBuildInfo } from '@histoire/shared'
-import { HstButton } from '@histoire/controls/vue'
+import { BuiltinIcon, HstButton } from '@histoire/controls/vue'
 import { computed, ref } from 'vue'
-import WorkbenchIcon from '../../shell/WorkbenchIcon.vue'
 
 const props = defineProps<{
   /** Published change identities; omitted when Git diff is unavailable. */
@@ -29,7 +28,7 @@ const visible = computed(() => expanded.value ? changes.value : changes.value.sl
   <section v-if="changes.length" class="histoire-updates">
     <h2>{{ dev ? 'Changed since last commit' : 'Updated in this release' }} <small v-if="dev">DEV</small></h2>
     <HstButton v-for="change in visible" :key="change.storyId" color="flat" type="button" @click="$emit('select', change.story.docsOnly ? { storyId: change.storyId, variantId: null } : { storyId: change.storyId })">
-      <WorkbenchIcon :name="change.story.docsOnly ? 'document' : 'cube'" />
+      <BuiltinIcon :icon="change.story.docsOnly ? 'document' : 'cube'" :size="16" />
       <span>{{ change.story.title }}</span>
       <small>{{ change.kind === 'new' ? 'New' : 'Changed' }}</small>
     </HstButton>

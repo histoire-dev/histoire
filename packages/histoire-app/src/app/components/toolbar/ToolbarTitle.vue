@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import type { Variant } from '../../types'
-import { Icon } from '@iconify/vue'
+import { BuiltinIcon } from '@histoire/controls/vue'
 
 defineProps<{
   variant: Variant
@@ -9,7 +9,7 @@ defineProps<{
 
 <template>
   <div class="histoire-toolbar-title htw-flex htw-items-center htw-gap-1 htw-text-gray-500 htw-flex-1 htw-truncate htw-min-w-0">
-    <Icon
+    <BuiltinIcon
       :icon="variant.icon ?? 'carbon:cube'"
       class="htw-w-4 htw-h-4 htw-opacity-50"
       :class="[

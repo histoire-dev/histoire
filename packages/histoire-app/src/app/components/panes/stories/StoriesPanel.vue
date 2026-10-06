@@ -2,12 +2,11 @@
 import type { HistoireSelectionInput, HistoireSourceIdentity, HistoireTarget } from '@histoire/protocol'
 import type { createStandaloneFolders } from '../../../standalone/folders.js'
 import type { StoryTreeRow } from './tree.js'
-import { HstButton } from '@histoire/controls/vue'
+import { BuiltinIcon, HstButton } from '@histoire/controls/vue'
 import { useHistoireContext, useHistoireResource } from '@histoire/vue/internal'
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, shallowRef, watch } from 'vue'
 import { histoireConfig } from '../../../util/config.js'
 import WorkbenchVirtualList from '../../lists/WorkbenchVirtualList.vue'
-import WorkbenchIcon from '../../shell/WorkbenchIcon.vue'
 import { useWorkbenchTestsModel } from '../tests/model.js'
 import { createStoryTreeRows, nextTreeFocus } from './tree.js'
 
@@ -225,13 +224,13 @@ function icon(row: StoryTreeRow): string {
             @click="row.kind === 'folder' ? toggle(row) : select(row)"
             @dblclick="fit(row)"
           >
-            <WorkbenchIcon v-if="row.expanded !== undefined" :name="row.expanded ? 'chevron-down' : 'chevron-right'" class="stories-chevron" />
+            <BuiltinIcon v-if="row.expanded !== undefined" :icon="row.expanded ? 'chevron-down' : 'chevron-right'" class="stories-chevron" :size="16" />
             <span v-else class="stories-chevron" />
-            <WorkbenchIcon :name="icon(row)" class="stories-icon" :style="{ color: row.kind === 'story' ? row.story?.iconColor : undefined }" />
+            <BuiltinIcon :icon="icon(row)" class="stories-icon" :style="{ color: row.kind === 'story' ? row.story?.iconColor : undefined }" :size="16" />
             <span class="stories-label">{{ row.title }}</span>
             <span v-if="row.kind === 'story' && !row.story?.docsOnly" class="stories-variants">{{ row.story?.variants.length }}</span>
-            <WorkbenchIcon v-if="hasDiagnostic(row)" name="warning-alt-filled" class="stories-warning" />
-            <WorkbenchIcon v-if="testsFailing(row)" name="error-filled" class="stories-failing" />
+            <BuiltinIcon v-if="hasDiagnostic(row)" icon="warning-alt-filled" class="stories-warning" :size="16" />
+            <BuiltinIcon v-if="testsFailing(row)" icon="error-filled" class="stories-failing" :size="16" />
           </HstButton>
         </template>
       </WorkbenchVirtualList>

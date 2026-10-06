@@ -1,7 +1,6 @@
 <script lang="ts" setup>
 import type { SelectPrompt, SelectPromptOption } from '@histoire/shared'
-import { getControlElement, HstButton, HstText } from '@histoire/controls/vue'
-import { Icon } from '@iconify/vue'
+import { BuiltinIcon, getControlElement, HstButton, HstText } from '@histoire/controls/vue'
 import { computed, ref, watchEffect } from 'vue'
 import { useSelection } from '../../util/select.js'
 import BaseKeyboardShortcut from '../base/BaseKeyboardShortcut.vue'
@@ -135,7 +134,7 @@ function selectIndex(index: number) {
       >
         <span class="htw-flex-1">{{ option.label }}</span>
 
-        <Icon
+        <BuiltinIcon
           v-if="model === option.value"
           icon="carbon:checkmark"
           class="htw-w-4 htw-h-4 htw-text-primary-500"

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Icon } from '@iconify/vue'
+import { BuiltinIcon } from '@histoire/controls/vue'
 
 const props = defineProps({
   icon: {
@@ -19,7 +19,7 @@ const props = defineProps({
 
 <template>
   <div class="htw-p-2 htw-flex htw-items-center htw-gap-x-2">
-    <Icon
+    <BuiltinIcon
       :icon="props.icon"
       class="htw-text-2xl htw-text-gray-700 dark:htw-text-gray-300 htw-flex-none"
     />

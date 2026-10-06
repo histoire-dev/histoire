@@ -1,10 +1,9 @@
 <script setup lang="ts">
-import { HstButton, HstText } from '@histoire/controls/vue'
+import { BuiltinIcon, HstButton, HstText } from '@histoire/controls/vue'
 import { computed, ref, watch } from 'vue'
 import { useCanvasStore } from '../../../composables/canvas-settings.js'
 import { usePresetConfigStore } from '../../../stores/presets-config.js'
 import { histoireConfig } from '../../../util/config.js'
-import WorkbenchIcon from '../../shell/WorkbenchIcon.vue'
 import { useCanvasPreviewSettings } from './session-settings.js'
 import { parseViewportSize, viewportDimensions } from './settings.js'
 import ToolbarPopover from './ToolbarPopover.vue'
@@ -47,16 +46,16 @@ function responsive() {
 <template>
   <ToolbarPopover id="viewport" :open="open" label="Viewport" icon="laptop" :width="280" @update:open="emit('update:open', $event)">
     <template #trigger>
-      <span class="viewport-size">{{ dimensions.width }}</span><WorkbenchIcon name="chevron-down" :size="12" />
+      <span class="viewport-size">{{ dimensions.width }}</span><BuiltinIcon icon="chevron-down" :size="12" />
     </template>
     <p class="popover-title">
       Viewport
     </p>
     <HstButton color="flat" class="popover-row" @click="responsive">
-      <WorkbenchIcon name="arrows-horizontal" />Responsive<span class="popover-meta">fill</span>
+      <BuiltinIcon icon="arrows-horizontal" :size="16" />Responsive<span class="popover-meta">fill</span>
     </HstButton>
     <HstButton v-for="(option, index) in presets" :key="index" color="flat" class="popover-row" :aria-pressed="snapshot.settings.responsiveWidth === option.width && snapshot.settings.responsiveHeight === (option.height ?? null)" @click="preset(option.width, option.height)">
-      <WorkbenchIcon :name="option.width < 500 ? 'mobile' : option.width < 900 ? 'tablet' : 'screen'" /><span>{{ option.label }}</span><span class="popover-meta">{{ option.width }}<template v-if="option.height"> × {{ option.height }}</template></span>
+      <BuiltinIcon :icon="option.width < 500 ? 'mobile' : option.width < 900 ? 'tablet' : 'screen'" :size="16" /><span>{{ option.label }}</span><span class="popover-meta">{{ option.width }}<template v-if="option.height"> × {{ option.height }}</template></span>
     </HstButton>
     <div class="popover-divider" />
     <form class="viewport-custom" @submit.prevent="custom">
@@ -69,7 +68,7 @@ function responsive() {
       {{ error }}
     </p>
     <HstButton color="flat" class="popover-row viewport-edit" @click="emit('update:open', null); emit('editPresets')">
-      <WorkbenchIcon name="settings" />Edit presets…
+      <BuiltinIcon icon="settings" :size="16" />Edit presets…
     </HstButton>
   </ToolbarPopover>
 </template>

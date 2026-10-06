@@ -1,6 +1,5 @@
 <script lang="ts" setup>
-import { HstButton, HstNumber } from '@histoire/controls/vue'
-import { Icon } from '@iconify/vue'
+import { BuiltinIcon, HstButton, HstNumber } from '@histoire/controls/vue'
 import { usePreviewSettingsStore } from '../../stores/preview-settings'
 import { histoireConfig } from '../../util/config'
 import BaseCheckbox from '../base/BaseCheckbox.vue'
@@ -23,11 +22,11 @@ const settings = usePreviewSettingsStore().currentSettings
         'htw-cursor-pointer hover:htw-text-primary-500': histoireConfig.responsivePresets?.length,
       }"
     >
-      <Icon
+      <BuiltinIcon
         icon="carbon:devices"
         class="htw-w-4 htw-h-4 htw-opacity-50 group-hover:htw-opacity-100"
       />
-      <Icon
+      <BuiltinIcon
         icon="carbon:caret-down"
         class="htw-w-4 htw-h-4 htw-opacity-50 group-hover:htw-opacity-100"
       />

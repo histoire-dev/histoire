@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Variant } from '@histoire/shared'
-import { Icon } from '@iconify/vue'
+import { BuiltinIcon } from '@histoire/controls/vue'
 import { computed } from 'vue'
 import ControlsComponentStateItem from './ControlsComponentStateItem.vue'
 
@@ -33,7 +33,7 @@ const stateKeys = computed(() => Object.keys(props.variant.state || {})
     data-test-id="story-controls-detected-state"
   >
     <div class="htw-p-2 htw-flex htw-items-center htw-gap-1">
-      <Icon
+      <BuiltinIcon
         v-tooltip="'Auto-detected state'"
         icon="carbon:data-vis-1"
         class="htw-w-4 htw-h-4 htw-text-primary-500 htw-flex-none"

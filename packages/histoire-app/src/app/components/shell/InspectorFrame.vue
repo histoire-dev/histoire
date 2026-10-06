@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import { HstButton } from '@histoire/controls/vue'
+import { BuiltinIcon, HstButton } from '@histoire/controls/vue'
 import { useShell } from '../../composables/shell.js'
 import PanelResizeHandle from './PanelResizeHandle.vue'
-import WorkbenchIcon from './WorkbenchIcon.vue'
 
 defineProps<{
   /** Inspector region controlled by its resize separator. */
@@ -20,7 +19,7 @@ const shell = useShell()
     <header v-if="$slots.header" class="histoire-inspector-frame-header">
       <slot name="header" />
       <HstButton color="flat" type="button" aria-label="Close inspector" @click="emit('close')">
-        <WorkbenchIcon name="close" :size="18" />
+        <BuiltinIcon icon="close" :size="18" />
       </HstButton>
     </header>
     <div class="histoire-inspector-frame-content">

@@ -1,10 +1,9 @@
 <script setup lang="ts">
 import type { HistoireSelectionInput } from '@histoire/protocol'
-import { HstButton } from '@histoire/controls/vue'
+import { BuiltinIcon, HstButton } from '@histoire/controls/vue'
 import { useHistoireSnapshot } from '@histoire/vue'
 import { computed } from 'vue'
 import { useWorkbenchTestsModel } from '../../panes/tests/model.js'
-import WorkbenchIcon from '../../shell/WorkbenchIcon.vue'
 
 defineEmits<{
   /** Activate exact collected story/variant related to issue. */
@@ -29,10 +28,10 @@ const issues = computed(() => {
     <h2>Needs attention <span>{{ issues.length }}</span><small>DEV</small></h2>
     <div class="histoire-attention-card">
       <div v-for="issue in issues" :key="issue.id" class="histoire-attention-row">
-        <WorkbenchIcon :name="issue.warning ? 'warning-alt-filled' : 'error-filled'" :class="issue.warning ? 'warning' : 'danger'" />
+        <BuiltinIcon :icon="issue.warning ? 'warning-alt-filled' : 'error-filled'" :class="issue.warning ? 'warning' : 'danger'" :size="16" />
         <div><strong>{{ issue.title }}</strong><p>{{ issue.message }}</p></div>
         <HstButton v-if="issue.target" color="flat" type="button" @click="$emit('select', issue.target)">
-          <WorkbenchIcon name="launch" />View
+          <BuiltinIcon icon="launch" :size="16" />View
         </HstButton>
       </div>
     </div>

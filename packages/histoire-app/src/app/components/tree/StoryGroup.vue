@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import type { Story, TreeFolder, TreeGroup, TreeLeaf } from '../../types'
-import { Icon } from '@iconify/vue'
+import { BuiltinIcon } from '@histoire/controls/vue'
 import { computed } from 'vue'
 import { useFolderStore } from '../../stores/folder'
 import StoryListFolder from './StoryListFolder.vue'
@@ -39,7 +39,7 @@ function toggleOpen() {
         @keyup.enter="toggleOpen"
         @keyup.space="toggleOpen"
       >
-        <Icon
+        <BuiltinIcon
           :icon="isFolderOpen ? 'ri:subtract-line' : 'ri:add-line'"
           class="htw-w-4 htw-h-4 htw-ml-4 htw-rounded-sm htw-border htw-border-gray-500/40"
         />

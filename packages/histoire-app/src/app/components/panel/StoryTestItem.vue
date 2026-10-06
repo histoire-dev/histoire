@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import type { HistoireResolvedTestCase } from '@histoire/shared'
-import { Icon } from '@iconify/vue'
+import { BuiltinIcon } from '@histoire/controls/vue'
 import { computed } from 'vue'
 import StoryTestErrorItem from './StoryTestErrorItem.vue'
 
@@ -68,7 +68,7 @@ const icon = computed(() => {
     data-test-id="story-test-row"
   >
     <div class="htw-flex htw-items-center htw-justify-between htw-gap-3">
-      <Icon
+      <BuiltinIcon
         :icon
         :class="textClass"
       />

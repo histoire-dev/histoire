@@ -1,8 +1,8 @@
 <script setup lang="ts">
+import { BuiltinIcon } from '@histoire/controls/vue'
 import { useHistoireSnapshot } from '@histoire/vue'
 import { computed } from 'vue'
 import { useCanvasStore } from '../../composables/canvas-settings.js'
-import WorkbenchIcon from '../shell/WorkbenchIcon.vue'
 
 defineProps<{
   /** Temporary pan mode includes Space without persisting tool change. */
@@ -23,7 +23,7 @@ const size = computed(() => {
     </div>
   </div>
   <div v-else class="histoire-canvas-status">
-    <WorkbenchIcon name="laptop" :size="14" /><span>{{ size }} · {{ Math.round(canvas.effectiveZoom * 100) }}% · {{ snapshot.settings.backgroundColor }}</span>
+    <BuiltinIcon icon="laptop" :size="14" /><span>{{ size }} · {{ Math.round(canvas.effectiveZoom * 100) }}% · {{ snapshot.settings.backgroundColor }}</span>
   </div>
 </template>
 

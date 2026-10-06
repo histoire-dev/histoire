@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import { HstButton } from '@histoire/controls/vue'
+import { BuiltinIcon, HstButton } from '@histoire/controls/vue'
 import { computed, useAttrs, useId } from 'vue'
 import { useOverflowToolbar } from '../../base/overflow/context.js'
-import WorkbenchIcon from '../../shell/WorkbenchIcon.vue'
 
 /** Uniform canvas control with native button semantics. */
 const props = withDefaults(defineProps<{
@@ -34,7 +33,7 @@ function click(): void {
 
 <template>
   <HstButton color="flat" type="button" class="histoire-toolbar-button" :role="role" :tabindex="overflow ? -1 : undefined" :aria-label="label" :title="description ?? (shortcut ? `${label} (${shortcut})` : label)" :aria-describedby="description ? descriptionId : undefined" :aria-pressed="role || pressed === undefined ? undefined : pressed" :aria-checked="role && role !== 'menuitem' ? pressed : undefined" :disabled="disabled" @click="click">
-    <WorkbenchIcon v-if="icon" :name="icon" />
+    <BuiltinIcon v-if="icon" :icon="icon" :size="16" />
     <span class="toolbar-action-label">{{ label }}</span>
     <span v-if="$slots.default" class="toolbar-action-value"><slot /></span>
     <span v-if="shortcut" class="toolbar-action-shortcut">{{ shortcut }}</span>

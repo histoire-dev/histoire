@@ -1,10 +1,9 @@
 <script setup lang="ts">
-import { HstButton } from '@histoire/controls/vue'
+import { BuiltinIcon, HstButton } from '@histoire/controls/vue'
 import { useHistoireSnapshot } from '@histoire/vue'
 import { computed } from 'vue'
 import { isMcpOperationCancellable, mcpOperationIcon, mcpOperationProgress, mcpTargetLabel, mcpTimeAgo } from '../../../stores/mcp-activity.js'
 import { useMcpStore } from '../../../stores/mcp.js'
-import WorkbenchIcon from '../../shell/WorkbenchIcon.vue'
 
 defineEmits<{
   /** Focus shared MCP pane without changing route or Follow preference. */
@@ -28,19 +27,19 @@ const recent = computed(() => store.history.slice(0, 3))
     <div class="histoire-mcp-activity-card">
       <div v-if="current" class="histoire-mcp-activity-current" aria-live="polite">
         <div>
-          <WorkbenchIcon name="bot" />
+          <BuiltinIcon icon="bot" :size="16" />
           <strong :title="store.clientName(current.clientId)">{{ store.clientName(current.clientId) }}</strong>
           <code :title="current.tool">{{ current.tool }}</code>
           <span v-if="progress">{{ progress.done }} / {{ progress.total }}</span>
           <HstButton v-if="cancellable" color="flat" type="button" :disabled="store.cancelling.includes(current.id)" aria-label="Cancel operation" @click="store.cancel(current.id)">
-            <WorkbenchIcon name="stop-filled" :size="12" />
+            <BuiltinIcon icon="stop-filled" :size="12" />
           </HstButton>
         </div>
         <progress v-if="progress" :value="progress.done" :max="progress.total" aria-label="Operation progress" />
       </div>
       <ul v-if="recent.length">
         <li v-for="operation in recent" :key="operation.id" :data-state="operation.state">
-          <span class="histoire-mcp-activity-status" :aria-label="operation.state"><WorkbenchIcon :name="mcpOperationIcon(operation)" :size="13" /></span>
+          <span class="histoire-mcp-activity-status" :aria-label="operation.state"><BuiltinIcon :icon="mcpOperationIcon(operation)" :size="13" /></span>
           <code :title="operation.tool">{{ operation.tool }}</code>
           <span class="histoire-mcp-activity-target" :title="mcpTargetLabel(operation.target, snapshot.catalog)">{{ mcpTargetLabel(operation.target, snapshot.catalog) || store.clientName(operation.clientId) }}</span>
           <time :datetime="operation.endedAt ?? operation.startedAt">{{ mcpTimeAgo(operation.endedAt ?? operation.startedAt, store.now) }}</time>

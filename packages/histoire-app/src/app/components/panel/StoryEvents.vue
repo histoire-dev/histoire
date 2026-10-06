@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { Icon } from '@iconify/vue'
+import { BuiltinIcon } from '@histoire/controls/vue'
 import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import { useEventsStore } from '../../stores/events'
 import BaseEmpty from '../base/BaseEmpty.vue'
@@ -31,7 +31,7 @@ const eventsElement = ref<HTMLDivElement>()
     <BaseEmpty
       v-if="!hasEvents"
     >
-      <Icon
+      <BuiltinIcon
         icon="carbon:event-schedule"
         class="htw-w-8 htw-h-8 htw-opacity-50 htw-mb-6"
       />

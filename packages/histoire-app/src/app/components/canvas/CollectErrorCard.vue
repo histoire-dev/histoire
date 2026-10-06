@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { HistoireDiagnostic } from '@histoire/sdk'
-import WorkbenchIcon from '../shell/WorkbenchIcon.vue'
+import { BuiltinIcon } from '@histoire/controls/vue'
 
 defineProps<{
   /** Completed collection diagnostics for current story. */
@@ -10,7 +10,7 @@ defineProps<{
 
 <template>
   <section class="histoire-collect-errors" role="alert">
-    <WorkbenchIcon name="error-filled" :size="18" />
+    <BuiltinIcon icon="error-filled" :size="18" />
     <div>
       <strong>Story collection failed</strong><div v-for="(error, index) in errors" :key="index">
         <code v-if="error.relativePath">{{ error.relativePath }}</code><p>{{ error.message }}</p>

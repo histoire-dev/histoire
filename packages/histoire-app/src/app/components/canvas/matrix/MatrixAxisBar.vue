@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import { HstButton, HstSelect } from '@histoire/controls/vue'
+import { BuiltinIcon, HstButton, HstSelect } from '@histoire/controls/vue'
 import { useMatrixStore } from '../../../stores/matrix.js'
-import WorkbenchIcon from '../../shell/WorkbenchIcon.vue'
 
 const emit = defineEmits<{ axes: [value: { rows: string, cols: string }] }>()
 const matrix = useMatrixStore()
@@ -23,7 +22,7 @@ function swap(): void {
   <div class="histoire-matrix-axis-bar" @pointerdown.stop @wheel.stop>
     <HstSelect title="Rows" layout="horizontal" :model-value="matrix.rows.value" :options="matrix.usableAxes.value.map(axis => ({ value: axis.name, label: axis.name, disabled: axis.name === matrix.cols.value }))" @update:model-value="select('rows', $event)" />
     <HstButton color="flat" type="button" aria-label="Swap matrix axes" @click="swap">
-      <WorkbenchIcon name="arrows-horizontal" :size="16" />
+      <BuiltinIcon icon="arrows-horizontal" :size="16" />
     </HstButton>
     <HstSelect title="Columns" layout="horizontal" :model-value="matrix.cols.value" :options="matrix.usableAxes.value.map(axis => ({ value: axis.name, label: axis.name, disabled: axis.name === matrix.rows.value }))" @update:model-value="select('cols', $event)" />
     <span class="histoire-matrix-base-summary">Base props <code v-for="(value, name) in matrix.base.value" :key="name">{{ name }}={{ JSON.stringify(value) }}</code></span>

@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { HstButton } from '@histoire/controls/vue'
-import WorkbenchIcon from '../../shell/WorkbenchIcon.vue'
+import { BuiltinIcon, HstButton } from '@histoire/controls/vue'
 
 defineProps<{
   /** Real catalog preview-story count. */
@@ -16,7 +15,7 @@ defineEmits<{
 
 <template>
   <HstButton color="flat" type="button" class="histoire-home-search" @click="$emit('search')">
-    <WorkbenchIcon name="search" />
+    <BuiltinIcon icon="search" :size="16" />
     <span>Search {{ stories }} stories and {{ guides }} docs pages</span>
     <kbd>Ctrl K</kbd>
   </HstButton>

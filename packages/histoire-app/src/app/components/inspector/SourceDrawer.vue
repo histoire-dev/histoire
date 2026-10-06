@@ -1,12 +1,11 @@
 <script setup lang="ts">
 import type { HistoireSourceContent } from '@histoire/protocol'
-import { HstButton, HstButtonGroup } from '@histoire/controls/vue'
+import { BuiltinIcon, HstButton, HstButtonGroup } from '@histoire/controls/vue'
 import { requestHistoireOpenInEditor } from '@histoire/sdk/internal'
 import { HistoireSource } from '@histoire/vue'
 import { computed, nextTick, ref, shallowRef, useId, watch } from 'vue'
 import { useSelection } from '../../composables/selection.js'
 import { usePageOwnership } from '../pages/home/ownership.js'
-import WorkbenchIcon from '../shell/WorkbenchIcon.vue'
 import { findChangedSourceLine } from './state.js'
 
 const emit = defineEmits<{ error: [error: unknown] }>()
@@ -122,19 +121,19 @@ function status(value: { status: 'idle' | 'loading' | 'ready' | 'error' }) {
   <section ref="root" class="inspector-source" :class="{ 'is-expanded': expanded }" aria-label="Source">
     <div class="inspector-source-header">
       <HstButton color="flat" type="button" class="inspector-source-toggle" :aria-expanded="expanded" :aria-controls="drawerId" @click="expanded = !expanded">
-        <WorkbenchIcon name="code" />
+        <BuiltinIcon icon="code" :size="16" />
         <strong>Source</strong>
       </HstButton>
       <HstButtonGroup v-if="expanded" v-model="mode" layout="inline" class="inspector-source-modes" aria-label="Source mode" :options="[{ value: 'dynamic', label: 'Variant' }, { value: 'raw', label: 'Story file' }]" />
       <span v-else class="inspector-source-file" :title="story?.relativePath">{{ fileLabel }}</span>
       <HstButton v-if="expanded" color="flat" type="button" class="inspector-source-action" :disabled="!content" :aria-label="copied ? 'Source copied' : 'Copy source'" :title="copied ? 'Copied' : 'Copy source'" @click="copy">
-        <WorkbenchIcon :name="copied ? 'checkmark' : 'copy'" />
+        <BuiltinIcon :icon="copied ? 'checkmark' : 'copy'" :size="16" />
       </HstButton>
       <HstButton v-if="expanded && snapshot.capabilities.openInEditor.available && snapshot.source?.mode === 'dev'" color="flat" type="button" class="inspector-source-action" aria-label="Open source in editor" title="Open source in editor" @click="editor">
-        <WorkbenchIcon name="launch" />
+        <BuiltinIcon icon="launch" :size="16" />
       </HstButton>
       <HstButton color="flat" type="button" class="inspector-source-action" :aria-label="expanded ? 'Collapse source' : 'Expand source'" :aria-expanded="expanded" @click="expanded = !expanded">
-        <WorkbenchIcon :name="expanded ? 'chevron-down' : 'chevron-up'" :size="12" />
+        <BuiltinIcon :icon="expanded ? 'chevron-down' : 'chevron-up'" :size="12" />
       </HstButton>
     </div>
     <div v-if="expanded" :id="drawerId" class="inspector-source-body">

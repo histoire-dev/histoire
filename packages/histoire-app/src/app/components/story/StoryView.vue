@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { Icon } from '@iconify/vue'
+import { BuiltinIcon } from '@histoire/controls/vue'
 import { ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useStoryStore } from '../../stores/story'
@@ -60,7 +60,7 @@ function scrollDocsToTop() {
     v-if="!storyStore.currentStory"
     class="histoire-story-view histoire-no-story"
   >
-    <Icon
+    <BuiltinIcon
       icon="carbon:software-resource-resource"
       class="htw-w-16 htw-h-16 htw-opacity-50"
     />

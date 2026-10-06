@@ -1,11 +1,10 @@
 <script setup lang="ts">
-import { HstSwitch } from '@histoire/controls/vue'
+import { BuiltinIcon, HstSwitch } from '@histoire/controls/vue'
 import { useHistoireSnapshot } from '@histoire/vue'
 import { computed } from 'vue'
 import { mcpOperationIcon, mcpTargetLabel, mcpTimeAgo } from '../../../stores/mcp-activity.js'
 import { useMcpStore } from '../../../stores/mcp.js'
 import WorkbenchVirtualList from '../../lists/WorkbenchVirtualList.vue'
-import WorkbenchIcon from '../../shell/WorkbenchIcon.vue'
 
 const store = useMcpStore()
 const snapshot = useHistoireSnapshot()
@@ -25,7 +24,7 @@ const rows = computed(() => store.history.map(operation => ({ key: operation.id,
     <WorkbenchVirtualList v-else :items="rows" :min-item-size="45" list-tag="ul" item-tag="li" page-mode>
       <template #default="{ item: { operation } }">
         <div class="histoire-mcp-history-row" :data-state="operation.state">
-          <span class="histoire-mcp-history-status" :aria-label="operation.state"><WorkbenchIcon :name="mcpOperationIcon(operation)" /></span>
+          <span class="histoire-mcp-history-status" :aria-label="operation.state"><BuiltinIcon :icon="mcpOperationIcon(operation)" :size="16" /></span>
           <span class="histoire-mcp-history-detail">
             <code :title="operation.tool">{{ operation.tool }}</code>
             <span>{{ mcpTargetLabel(operation.target, snapshot.catalog) || store.clientName(operation.clientId) }}{{ operation.state === 'failed' ? ' · failed' : operation.state === 'cancelled' ? ' · cancelled' : '' }}</span>

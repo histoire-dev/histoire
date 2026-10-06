@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import type { Ref } from 'vue'
 import type { Variant } from '../../types'
-import { Icon } from '@iconify/vue'
+import { BuiltinIcon } from '@histoire/controls/vue'
 import { useEventListener } from '@vueuse/core'
 import { VTooltip as vTooltip } from 'floating-vue'
 import { computed, onUnmounted, ref } from 'vue'
@@ -182,7 +182,7 @@ const sizeTooltip = computed(() => `${responsiveWidth.value ?? 'Auto'} × ${resp
               v-tooltip.right="sizeTooltip"
               class="htw-absolute htw-w-4 htw-top-0 htw-bottom-4 htw-right-0 hover:htw-bg-primary-500/30 htw-flex htw-items-center htw-justify-center htw-cursor-ew-resize htw-group hover:htw-text-primary-500"
             >
-              <Icon
+              <BuiltinIcon
                 icon="mdi:drag-vertical-variant"
                 class="htw-w-4 htw-h-4 htw-opacity-20 group-hover:htw-opacity-90"
               />
@@ -192,7 +192,7 @@ const sizeTooltip = computed(() => `${responsiveWidth.value ?? 'Auto'} × ${resp
               v-tooltip.bottom="sizeTooltip"
               class="htw-absolute htw-h-4 htw-left-0 htw-right-4 htw-bottom-0 hover:htw-bg-primary-500/30 htw-flex htw-items-center htw-justify-center htw-cursor-ns-resize htw-group hover:htw-text-primary-500"
             >
-              <Icon
+              <BuiltinIcon
                 icon="mdi:drag-horizontal-variant"
                 class="htw-w-4 htw-h-4 htw-opacity-20 group-hover:htw-opacity-90"
               />

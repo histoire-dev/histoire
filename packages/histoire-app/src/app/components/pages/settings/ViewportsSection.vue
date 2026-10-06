@@ -1,11 +1,10 @@
 <script setup lang="ts">
 import type { ResponsivePreset } from '@histoire/shared'
 import type { PresetOwner } from '../../../stores/presets-config.js'
-import { HstButton, HstNumber, HstText } from '@histoire/controls/vue'
+import { BuiltinIcon, HstButton, HstNumber, HstText } from '@histoire/controls/vue'
 import { defineAsyncComponent, ref } from 'vue'
 import { usePresetConfigStore } from '../../../stores/presets-config.js'
 import { histoireConfig } from '../../../util/config.js'
-import WorkbenchIcon from '../../shell/WorkbenchIcon.vue'
 
 const props = defineProps<{ embedded?: boolean }>()
 const SaveToProject = __HISTOIRE_DEV__ ? defineAsyncComponent(() => import('./SaveToProject.vue')) : undefined
@@ -45,12 +44,12 @@ function save(): void {
         </HstButton>
       </header>
       <div v-for="(preset, index) in presets.responsivePresets.value" :key="presets.viewportKey(index)" class="histoire-settings-row histoire-viewport-row">
-        <WorkbenchIcon :name="preset.width < 600 ? 'mobile' : preset.width < 1000 ? 'tablet' : preset.width < 1280 ? 'laptop' : 'screen'" :size="17" /><strong>{{ preset.label }}</strong><code>{{ preset.width }} × {{ preset.height ?? 'Auto' }}</code>
+        <BuiltinIcon :icon="preset.width < 600 ? 'mobile' : preset.width < 1000 ? 'tablet' : preset.width < 1280 ? 'laptop' : 'screen'" :size="17" /><strong>{{ preset.label }}</strong><code>{{ preset.width }} × {{ preset.height ?? 'Auto' }}</code>
         <HstButton color="default" class="histoire-settings-action" type="button" :aria-label="`Edit ${preset.label}`" @click="edit(index)">
-          <WorkbenchIcon name="edit" :size="15" />
+          <BuiltinIcon icon="edit" :size="15" />
         </HstButton>
         <HstButton color="default" class="histoire-settings-action" type="button" :aria-label="`Remove ${preset.label}`" @click="presets.removeViewport(index)">
-          <WorkbenchIcon name="trash-can" :size="15" />
+          <BuiltinIcon icon="trash-can" :size="15" />
         </HstButton>
       </div>
       <form v-if="editing !== null" class="histoire-settings-row" @submit.prevent="save">

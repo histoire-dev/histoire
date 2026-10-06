@@ -2,9 +2,9 @@
 import type { HistoireCatalogStory } from '@histoire/protocol'
 import type { UiComment, UiCommentAgent } from '@histoire/shared'
 import type { CommentsGroup } from '../../comments/presentation.js'
+import { BuiltinIcon } from '@histoire/controls/vue'
 import { computed } from 'vue'
 import WorkbenchVirtualList from '../../lists/WorkbenchVirtualList.vue'
-import WorkbenchIcon from '../../shell/WorkbenchIcon.vue'
 import CommentRow from './CommentRow.vue'
 
 const props = defineProps<{
@@ -67,7 +67,7 @@ const rows = computed<(CommentHeading | CommentItem)[]>(() => {
   <WorkbenchVirtualList :items="rows" :min-item-size="34" page-mode>
     <template #default="{ item }">
       <h3 v-if="item.kind === 'heading'">
-        <WorkbenchIcon name="cube" />{{ item.title }}<small v-if="item.orphaned">Orphaned</small>
+        <BuiltinIcon icon="cube" :size="16" />{{ item.title }}<small v-if="item.orphaned">Orphaned</small>
       </h3>
       <CommentRow v-else :comment="item.comment" :number="item.number" :title="item.title" :active="activeId === item.key" :agents="agents" @select="emit('select', item.comment)" />
     </template>

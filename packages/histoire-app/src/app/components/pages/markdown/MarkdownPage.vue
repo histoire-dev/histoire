@@ -1,10 +1,9 @@
 <script setup lang="ts">
 import type { HistoireDocsContent, HistoireSelectionInput, HistoireTarget } from '@histoire/protocol'
-import { HstButton } from '@histoire/controls/vue'
+import { BuiltinIcon, HstButton } from '@histoire/controls/vue'
 import { requestHistoireOpenInEditor } from '@histoire/sdk/internal'
 import { HistoireDocs, useHistoireSession, useHistoireSnapshot } from '@histoire/vue'
 import { computed, nextTick, ref, watch } from 'vue'
-import WorkbenchIcon from '../../shell/WorkbenchIcon.vue'
 import { usePageOwnership } from '../home/ownership.js'
 import MarkdownOutline from './MarkdownOutline.vue'
 import MarkdownPager from './MarkdownPager.vue'
@@ -116,16 +115,16 @@ async function select(target: HistoireSelectionInput): Promise<void> {
   <main ref="root" class="histoire-markdown-page" data-histoire-docs-scroll>
     <div class="histoire-markdown-actions">
       <HstButton v-if="canEdit" color="default" type="button" @click="edit">
-        <WorkbenchIcon name="edit" />Edit .md
+        <BuiltinIcon icon="edit" :size="16" />Edit .md
       </HstButton>
       <HstButton color="default" type="button" :aria-label="copied ? 'Link copied' : 'Copy link'" :title="copied ? 'Link copied' : 'Copy link'" @click="copyLink">
-        <WorkbenchIcon :name="copied ? 'checkmark-filled' : 'link'" />
+        <BuiltinIcon :icon="copied ? 'checkmark-filled' : 'link'" :size="16" />
       </HstButton>
     </div>
     <div class="histoire-markdown-layout">
       <article class="histoire-markdown-article">
         <p class="histoire-markdown-path">
-          <WorkbenchIcon name="document" />{{ path ?? story?.relativePath ?? story?.title }}
+          <BuiltinIcon icon="document" :size="16" />{{ path ?? story?.relativePath ?? story?.title }}
         </p>
         <h1 v-if="!story?.content.docs || (loaded && !titleInContent)">
           {{ story?.title }}

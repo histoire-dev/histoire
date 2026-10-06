@@ -1,10 +1,9 @@
 <script setup lang="ts">
 import type { UiComment, UiCommentAgent } from '@histoire/shared'
-import { HstButton } from '@histoire/controls/vue'
+import { BuiltinIcon, HstButton } from '@histoire/controls/vue'
 import { computed } from 'vue'
 import PulsatingDisc from '../../base/PulsatingDisc.vue'
 import { commentAge } from '../../comments/presentation.js'
-import WorkbenchIcon from '../../shell/WorkbenchIcon.vue'
 
 const props = defineProps<{
   /** Persisted annotation. */
@@ -34,7 +33,7 @@ const status = computed(() => props.comment.status === 'draft' ? 'Not sent yet' 
       <span class="row-body">{{ comment.body }}</span>
       <span class="row-status" :class="{ neutral: comment.status === 'draft' || comment.status === 'resolved' }">
         <PulsatingDisc v-if="comment.status === 'working'" :size="13" />
-        <WorkbenchIcon v-else :name="comment.status === 'draft' ? 'edit' : comment.status === 'resolved' ? 'checkmark' : 'bot'" />{{ status }}
+        <BuiltinIcon v-else :icon="comment.status === 'draft' ? 'edit' : comment.status === 'resolved' ? 'checkmark' : 'bot'" :size="16" />{{ status }}
       </span>
     </span>
   </HstButton>

@@ -1,10 +1,9 @@
 <script setup lang="ts">
-import { HstButton } from '@histoire/controls/vue'
+import { BuiltinIcon, HstButton } from '@histoire/controls/vue'
 import { useClipboard } from '@vueuse/core'
 import { computed, ref } from 'vue'
 import { mcpClientConfig, mcpStdioClientConfig } from '../../../stores/mcp-activity.js'
 import { useMcpStore } from '../../../stores/mcp.js'
-import WorkbenchIcon from '../../shell/WorkbenchIcon.vue'
 
 const store = useMcpStore()
 const { copy, copied } = useClipboard({ legacy: true })
@@ -34,7 +33,7 @@ async function copyValue(kind: 'endpoint' | 'http' | 'stdio') {
     <div v-if="store.endpoint">
       <code :title="store.endpoint">{{ store.endpoint }}</code>
       <HstButton color="flat" type="button" :aria-label="copied && copyKind === 'endpoint' ? 'Endpoint copied' : 'Copy endpoint'" @click="copyValue('endpoint')">
-        <WorkbenchIcon :name="copied && copyKind === 'endpoint' ? 'checkmark' : 'copy'" />
+        <BuiltinIcon :icon="copied && copyKind === 'endpoint' ? 'checkmark' : 'copy'" :size="16" />
       </HstButton>
     </div>
     <nav aria-label="Copy MCP client configuration">

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { Icon } from '@iconify/vue'
+import { BuiltinIcon } from '@histoire/controls/vue'
 import { computed } from 'vue'
 import { useStoryStore } from '../../stores/story'
 import { isMobile } from '../../util/responsive'
@@ -38,7 +38,7 @@ const variant = computed(() => storyStore.currentVariant)
         @click="$emit('openVariantMenu')"
       >
         <template v-if="variant">
-          <Icon
+          <BuiltinIcon
             :icon="variant.icon ?? 'carbon:cube'"
             class="htw-w-5 htw-h-5 htw-flex-none"
             :class="{
@@ -52,7 +52,7 @@ const variant = computed(() => storyStore.currentVariant)
           Select a variant...
         </template>
 
-        <Icon
+        <BuiltinIcon
           icon="carbon:chevron-sort"
           class="htw-w-5 htw-h-5 htw-shrink-0 htw-ml-auto"
         />

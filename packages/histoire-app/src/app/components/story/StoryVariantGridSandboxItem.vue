@@ -1,8 +1,7 @@
 <script lang="ts" setup>
 import type { Story, Variant } from '../../types'
 import { HstCopyIcon } from '@histoire/controls'
-import { HstButton } from '@histoire/controls/vue'
-import { Icon } from '@iconify/vue'
+import { BuiltinIcon, HstButton } from '@histoire/controls/vue'
 import { useResizeObserver } from '@vueuse/core'
 import { computed, ref, toRefs } from 'vue'
 import { usePreviewSettingsStore } from '../../stores/preview-settings'
@@ -83,7 +82,7 @@ function onReady() {
         }"
         @click="emit('select')"
       >
-        <Icon
+        <BuiltinIcon
           :icon="variant.icon ?? 'carbon:cube'"
           class="htw-w-4 htw-h-4 htw-opacity-50"
           :class="{

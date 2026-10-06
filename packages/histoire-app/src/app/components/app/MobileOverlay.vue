@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { Icon } from '@iconify/vue'
+import { BuiltinIcon } from '@histoire/controls/vue'
 
 defineProps<{
   title: string
@@ -21,7 +21,7 @@ const emit = defineEmits<{ (e: 'close'): void }>()
           class="htw-p-1 hover:htw-text-primary-500 dark:hover:htw-text-primary-400 htw-cursor-pointer"
           @click="emit('close')"
         >
-          <Icon
+          <BuiltinIcon
             icon="carbon:close"
             class="htw-w-8 htw-h-8 htw-shrink-0"
           />

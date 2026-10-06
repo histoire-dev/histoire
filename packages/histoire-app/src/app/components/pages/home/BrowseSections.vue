@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import type { HistoireSelectionInput } from '@histoire/protocol'
 import type { BrowseSection } from './catalog.js'
-import { HstButton } from '@histoire/controls/vue'
-import WorkbenchIcon from '../../shell/WorkbenchIcon.vue'
+import { BuiltinIcon, HstButton } from '@histoire/controls/vue'
 
 defineProps<{
   /** Real top-level folder/group counts and destinations. */
@@ -22,7 +21,7 @@ defineEmits<{
     <div class="histoire-browse-grid">
       <HstButton v-for="section in sections" :key="section.id" color="flat" type="button" class="histoire-browse-card" @click="$emit('select', section.target)">
         <div class="histoire-browse-card-header">
-          <span class="histoire-browse-icon"><WorkbenchIcon :name="section.stories ? 'cube' : 'document'" /></span>
+          <span class="histoire-browse-icon"><BuiltinIcon :icon="section.stories ? 'cube' : 'document'" :size="16" /></span>
           <div><strong>{{ section.title }}</strong><span>{{ section.stories }} {{ section.stories === 1 ? 'story' : 'stories' }}<template v-if="section.variants"> · {{ section.variants }} variants</template><template v-if="section.guides"> · {{ section.guides }} guides</template></span></div>
           <slot name="status" :section="section" />
         </div>

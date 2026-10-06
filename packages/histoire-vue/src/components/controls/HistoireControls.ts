@@ -1,8 +1,7 @@
 import type { HistoireBridgePublication, HistoireControlsOverlayMessage, HistoireControlsOverlayResult } from '@histoire/protocol'
 import type { HistoireMount } from '@histoire/sdk'
 import type { HistoireStatePresetsHandle } from './StatePresets.js'
-import { Icon } from '@iconify/vue'
-import { HstButton, restoreControlsFocus } from '@histoire/controls/vue'
+import { BuiltinIcon, HstButton, restoreControlsFocus } from '@histoire/controls/vue'
 import { configureHistoireMountControls, postHistoireMountEvent, subscribeHistoireMountEvents } from '@histoire/sdk/internal'
 import { defineComponent, h, onMounted, shallowRef, watch } from 'vue'
 import { useHistoireSnapshot } from '../../composables/snapshot.js'
@@ -144,7 +143,7 @@ export const HistoireControls = defineComponent({
             h(StatePresets, { ref: presets, compact: props.compactPresets }),
             h(HstButton, { 'color': 'flat', 'type': 'button', 'class': 'histoire-controls-reset', 'aria-label': 'Reset state', 'title': 'Reset state', 'disabled': !presets.value || presets.value.busy(), 'onClick': () => {
               void presets.value?.reset()
-            } }, { default: () => h(Icon, { icon: 'carbon:reset', width: 16, height: 16, 'aria-hidden': 'true' }) }),
+            } }, { default: () => h(BuiltinIcon, { 'icon': 'carbon:reset', 'width': 16, 'height': 16, 'aria-hidden': 'true' }) }),
           ]), h(GenericControls, { showState: hasControls.value !== true })],
       failure.value
         ? h('div', { class: 'histoire-controls-failure' }, [

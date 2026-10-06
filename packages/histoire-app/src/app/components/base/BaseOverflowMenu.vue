@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { Icon } from '@iconify/vue'
+import { BuiltinIcon } from '@histoire/controls/vue'
 import { useResizeObserver } from '@vueuse/core'
 import { computed, h, onBeforeUnmount, reactive, ref } from 'vue'
 import { fitOverflowItems } from './overflow/fit.js'
@@ -92,7 +92,7 @@ function ChildrenSlice(props, { slots }) {
         role="button"
         class="htw-cursor-pointer hover:htw-bg-primary-50 dark:hover:htw-bg-primary-900 htw-w-8 htw-h-full htw-flex htw-items-center htw-justify-center htw-absolute htw-top-0 htw-right-0"
       >
-        <Icon
+        <BuiltinIcon
           icon="carbon:caret-down"
           class="htw-w-4 htw-h-4 htw-opacity-50 group-hover:htw-opacity-100"
         />

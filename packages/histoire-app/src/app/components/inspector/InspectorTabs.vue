@@ -1,9 +1,8 @@
 <script setup lang="ts">
 import type { InspectorTab } from './state.js'
-import { HstButton } from '@histoire/controls/vue'
+import { BuiltinIcon, HstButton } from '@histoire/controls/vue'
 import { computed, ref } from 'vue'
 import PulsatingDisc from '../base/PulsatingDisc.vue'
-import WorkbenchIcon from '../shell/WorkbenchIcon.vue'
 import { getInspectorTabs } from './state.js'
 
 const props = defineProps<{
@@ -43,7 +42,7 @@ function navigate(event: KeyboardEvent) {
       <span v-if="tab.value === 'events' && eventCount" class="inspector-event-count" :aria-label="`${eventCount} unseen events`">{{ eventCount }}</span>
       <span v-if="tab.value === 'tests' && testStatus !== 'idle'" :class="`inspector-test-${testStatus}`" role="img" :aria-label="`Tests ${testStatus}`">
         <PulsatingDisc v-if="testStatus === 'running'" :size="12" />
-        <WorkbenchIcon v-else :name="testStatus === 'passed' ? 'checkmark' : 'close'" :size="12" />
+        <BuiltinIcon v-else :icon="testStatus === 'passed' ? 'checkmark' : 'close'" :size="12" />
       </span>
       <span v-else-if="tab.value === 'tests' && testCount" class="inspector-test-count" :aria-label="`${testCount} collected tests`">{{ testCount }}</span>
     </HstButton>

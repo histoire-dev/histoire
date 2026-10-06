@@ -1,8 +1,8 @@
 <script setup lang="ts">
+import { BuiltinIcon } from '@histoire/controls/vue'
 import { useHistoireSnapshot } from '@histoire/vue'
 import { computed } from 'vue'
 import { useWorkbenchTestsModel } from '../../panes/tests/model.js'
-import WorkbenchIcon from '../../shell/WorkbenchIcon.vue'
 
 const props = defineProps<{
   /** Exact identities of stories in this section. */
@@ -21,5 +21,5 @@ const status = computed(() => {
 </script>
 
 <template>
-  <span v-if="status" :aria-label="status.label" :title="status.label" :style="{ color: status.color }"><WorkbenchIcon :name="status.name" :size="13" /></span>
+  <span v-if="status" :aria-label="status.label" :title="status.label" :style="{ color: status.color }"><BuiltinIcon :icon="status.name" :size="13" /></span>
 </template>

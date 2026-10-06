@@ -1,7 +1,6 @@
 <script lang="ts" setup>
 import type { SearchResult } from '../../types.js'
-import { Icon } from '@iconify/vue'
-import BaseIcon from '../base/BaseIcon.vue'
+import { BuiltinIcon } from '@histoire/controls/vue'
 
 defineProps<{
   result: SearchResult
@@ -21,7 +20,7 @@ const kindLabels = {
 </script>
 
 <template>
-  <BaseIcon
+  <BuiltinIcon
     :icon="result.icon ?? defaultIcons[result.kind]"
     class="htw-w-4 htw-h-4"
     :class="[
@@ -55,7 +54,7 @@ const kindLabels = {
         :key="index"
         class="htw-flex htw-items-center htw-gap-0.5"
       >
-        <Icon
+        <BuiltinIcon
           v-if="index > 0"
           icon="carbon:chevron-right"
           class="htw-w-4 htw-h-4 htw-mt-0.5 htw-opacity-50"

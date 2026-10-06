@@ -1,8 +1,7 @@
 <script lang="ts" setup>
 import type { Story, Variant } from '../../types'
-import { getControlElement, HstText } from '@histoire/controls/vue'
+import { BuiltinIcon, getControlElement, HstText } from '@histoire/controls/vue'
 import { applyState, clone, omit } from '@histoire/shared'
-import { Icon } from '@iconify/vue'
 import { onClickOutside, useStorage, useTimeoutFn } from '@vueuse/core'
 import { computed, nextTick, onMounted, ref } from 'vue'
 import { toRawDeep } from '../../util/state'
@@ -150,7 +149,7 @@ onClickOutside(select, stopEditing)
             <span class="htw-flex-1 htw-truncate">
               {{ label }}
             </span>
-            <Icon
+            <BuiltinIcon
               v-if="canEdit"
               v-tooltip="'Rename this preset'"
               icon="carbon:edit"
@@ -165,7 +164,7 @@ onClickOutside(select, stopEditing)
             <span
               class="htw-flex-1 htw-truncate"
             >{{ label }}</span>
-            <Icon
+            <BuiltinIcon
               v-if="value !== DEFAULT_ID"
               v-tooltip="'Delete this preset'"
               icon="carbon:trash-can"
@@ -176,7 +175,7 @@ onClickOutside(select, stopEditing)
         </template>
       </BaseSelect>
     </div>
-    <Icon
+    <BuiltinIcon
       v-tooltip="savedNotif ? 'Saved!' : canEdit ? 'Save to preset' : null"
       :icon="savedNotif ? 'carbon:checkmark' : 'carbon:save'"
       class="htw-cursor-pointer htw-w-4 htw-h-4 hover:htw-text-primary-500 dark:hover:htw-text-primary-400 htw-text-gray-900 dark:htw-text-gray-100"
@@ -185,13 +184,13 @@ onClickOutside(select, stopEditing)
       ]"
       @click="savePreset()"
     />
-    <Icon
+    <BuiltinIcon
       v-tooltip="'Create new preset'"
       icon="carbon:add-alt"
       class="htw-cursor-pointer htw-w-4 htw-h-4 hover:htw-text-primary-500 htw-opacity-50 hover:htw-opacity-100 dark:hover:htw-text-primary-400 htw-text-gray-900 dark:htw-text-gray-100"
       @click="createPreset()"
     />
-    <Icon
+    <BuiltinIcon
       v-tooltip="'Reset to initial state'"
       icon="carbon:reset"
       class="htw-cursor-pointer htw-w-4 htw-h-4 hover:htw-text-primary-500 htw-opacity-50 hover:htw-opacity-100 dark:hover:htw-text-primary-400 htw-text-gray-900 dark:htw-text-gray-100"

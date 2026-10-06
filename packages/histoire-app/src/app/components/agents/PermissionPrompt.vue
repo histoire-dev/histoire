@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import { getControlElement, HstButton } from '@histoire/controls/vue'
+import { BuiltinIcon, getControlElement, HstButton } from '@histoire/controls/vue'
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { useAgentsStore } from '../../stores/agents.js'
-import WorkbenchIcon from '../shell/WorkbenchIcon.vue'
 import './agents.css'
 
 /** Provider owns permission authority; static/embedded surfaces omit it. */
@@ -34,7 +33,7 @@ onBeforeUnmount(restoreFocus)
 <template>
   <section v-if="request" class="histoire-agent-permission" role="alertdialog" aria-labelledby="histoire-agent-permission-title" aria-describedby="histoire-agent-permission-detail" @keydown.esc.prevent="agents?.reply(request.requestId, false)">
     <h2 id="histoire-agent-permission-title">
-      <WorkbenchIcon name="bot" :size="18" />{{ name }} requests permission
+      <BuiltinIcon icon="bot" :size="18" />{{ name }} requests permission
     </h2>
     <pre id="histoire-agent-permission-detail">{{ request.detail }}</pre>
     <div class="histoire-agent-permission-actions">

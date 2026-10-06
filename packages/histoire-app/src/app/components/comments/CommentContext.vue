@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { UiComment, UiCommentDraft } from '@histoire/shared'
-import WorkbenchIcon from '../shell/WorkbenchIcon.vue'
+import { BuiltinIcon } from '@histoire/controls/vue'
 
 defineProps<{
   /** Human-readable story and variant. */
@@ -12,10 +12,10 @@ defineProps<{
 
 <template>
   <header class="comment-context">
-    <span><WorkbenchIcon name="cube" />{{ title }}</span>
-    <code v-if="comment.anchor.selector"><WorkbenchIcon name="code" />{{ comment.anchor.selector }}</code>
-    <span v-if="comment.props && Object.keys(comment.props).length"><WorkbenchIcon name="settings-adjust" />{{ Object.keys(comment.props).length }} props</span>
-    <span v-if="comment.screenshot" :title="comment.screenshot"><WorkbenchIcon name="camera" />screenshot</span>
+    <span><BuiltinIcon icon="cube" :size="16" />{{ title }}</span>
+    <code v-if="comment.anchor.selector"><BuiltinIcon icon="code" :size="16" />{{ comment.anchor.selector }}</code>
+    <span v-if="comment.props && Object.keys(comment.props).length"><BuiltinIcon icon="settings-adjust" :size="16" />{{ Object.keys(comment.props).length }} props</span>
+    <span v-if="comment.screenshot" :title="comment.screenshot"><BuiltinIcon icon="camera" :size="16" />screenshot</span>
   </header>
 </template>
 

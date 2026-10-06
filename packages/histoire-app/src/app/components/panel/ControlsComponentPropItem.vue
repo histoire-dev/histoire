@@ -2,7 +2,7 @@
 import type { AutoPropComponentDefinition, PropDefinition } from '@histoire/shared'
 import type { Variant } from '../../types'
 import { getControlComponent } from '@histoire/controls'
-import { Icon } from '@iconify/vue'
+import { BuiltinIcon } from '@histoire/controls/vue'
 import { computed } from 'vue'
 
 const props = defineProps<{
@@ -48,7 +48,7 @@ const canReset = computed(() => props.variant.state?._hPropState?.[props.compone
     :title="`${definition.name}${canReset ? ' *' : ''}`"
   >
     <template #actions>
-      <Icon
+      <BuiltinIcon
         v-tooltip="'Remove override'"
         icon="carbon:erase"
         class="htw-cursor-pointer htw-w-4 htw-h-4 hover:htw-text-primary-500 dark:hover:htw-text-primary-400 htw-text-gray-900 dark:htw-text-gray-100"

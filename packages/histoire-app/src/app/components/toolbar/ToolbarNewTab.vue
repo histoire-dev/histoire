@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import type { Story, Variant } from '../../types'
-import { Icon } from '@iconify/vue'
+import { BuiltinIcon } from '@histoire/controls/vue'
 import { computed } from 'vue'
 import { getSandboxUrl } from '../../util/sandbox'
 
@@ -21,7 +21,7 @@ const sandboxUrl = computed(() => {
     target="_blank"
     class="histoire-toolbar-new-tab htw-flex htw-items-center htw-gap-1 htw-h-full htw-px-2 hover:htw-text-primary-500 htw-opacity-50 hover:htw-opacity-100 dark:hover:htw-text-primary-400 htw-text-gray-900 dark:htw-text-gray-100"
   >
-    <Icon
+    <BuiltinIcon
       icon="carbon:launch"
       class="htw-w-4 htw-h-4"
     />

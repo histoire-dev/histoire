@@ -1,12 +1,11 @@
 <script setup lang="ts">
 import type { HistoireTarget } from '@histoire/protocol'
 import type { WorkbenchTestRow } from './types.js'
-import { HstButton, HstSwitch } from '@histoire/controls/vue'
+import { BuiltinIcon, HstButton, HstSwitch } from '@histoire/controls/vue'
 import { getHistoireTargetKey } from '@histoire/protocol'
 import { useHistoireSnapshot } from '@histoire/vue'
 import { useHistoireContext, useHistoireResource } from '@histoire/vue/internal'
 import { computed, ref } from 'vue'
-import WorkbenchIcon from '../../shell/WorkbenchIcon.vue'
 import { useWorkbenchTestsModel } from './model.js'
 import TestsFilter from './TestsFilter.vue'
 import TestsSummary from './TestsSummary.vue'
@@ -43,10 +42,10 @@ async function select(row: WorkbenchTestRow) {
     <header>
       <h2>Tests</h2>
       <HstButton v-if="model?.running.value" color="primary" type="button" class="run-tests" @click="model.cancel()">
-        <WorkbenchIcon name="stop-filled-alt" />Stop
+        <BuiltinIcon icon="stop-filled-alt" :size="16" />Stop
       </HstButton>
       <HstButton v-else color="primary" type="button" class="run-tests" :disabled="!model?.canRun.value" @click="model?.runAll()">
-        <WorkbenchIcon name="play-filled-alt" />Run all
+        <BuiltinIcon icon="play-filled-alt" :size="16" />Run all
       </HstButton>
     </header>
     <template v-if="model">
@@ -63,7 +62,7 @@ async function select(row: WorkbenchTestRow) {
       </p>
       <TestsTree v-else-if="model.discoveryStatus.value !== 'error' || model.visibleRows.value.length" :rows="model.visibleRows.value" :filter="filter" :selected="snapshot.selection" @select="select" />
       <footer>
-        <WorkbenchIcon name="view" />
+        <BuiltinIcon icon="view" :size="16" />
         <span>Watch mode</span>
         <HstSwitch layout="inline" aria-label="Watch tests" :model-value="model.watchTests.value" :disabled="!model.canRun.value" @update:model-value="model.setWatch($event)" />
       </footer>

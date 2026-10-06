@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import type { WorkbenchSearchResult } from './query.js'
-import { HstButton } from '@histoire/controls/vue'
+import { BuiltinIcon, HstButton } from '@histoire/controls/vue'
 import { computed } from 'vue'
-import WorkbenchIcon from '../../shell/WorkbenchIcon.vue'
 import { getSearchResultDomId } from './accessibility.js'
 
 const props = defineProps<{
@@ -36,7 +35,7 @@ const detail = computed(() => props.result.excerpt || props.result.path.slice(0,
 
 <template>
   <HstButton :id="getSearchResultDomId(result.id)" color="flat" type="button" class="search-result" :class="{ active }" data-test-id="search-item" :data-search-kind="result.kind" :aria-current="selected ? 'true' : undefined" @focus="emit('focus')" @click="emit('activate', $event.metaKey || $event.ctrlKey)">
-    <WorkbenchIcon :name="result.kind === 'docs' ? 'document' : result.kind === 'prop' ? 'settings-adjust' : 'cube'" class="result-icon" :style="{ color: result.iconColor }" />
+    <BuiltinIcon :icon="result.kind === 'docs' ? 'document' : result.kind === 'prop' ? 'settings-adjust' : 'cube'" class="result-icon" :style="{ color: result.iconColor }" :size="16" />
     <span class="result-copy">
       <strong><template v-for="(piece, index) in pieces" :key="index"><mark v-if="piece.matched">{{ piece.text }}</mark><template v-else>{{ piece.text }}</template></template></strong>
       <small v-if="detail">{{ detail }}</small>

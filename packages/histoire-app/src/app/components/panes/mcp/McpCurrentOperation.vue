@@ -1,10 +1,9 @@
 <script setup lang="ts">
-import { HstButton } from '@histoire/controls/vue'
+import { BuiltinIcon, HstButton } from '@histoire/controls/vue'
 import { useHistoireSnapshot } from '@histoire/vue'
 import { computed } from 'vue'
 import { isMcpOperationCancellable, mcpOperationProgress, mcpTargetLabel } from '../../../stores/mcp-activity.js'
 import { useMcpStore } from '../../../stores/mcp.js'
-import WorkbenchIcon from '../../shell/WorkbenchIcon.vue'
 
 const store = useMcpStore()
 const snapshot = useHistoireSnapshot()
@@ -16,11 +15,11 @@ const cancelling = computed(() => operation.value && store.cancelling.includes(o
 <template>
   <section v-if="operation" class="histoire-mcp-current" aria-label="Current MCP operation" aria-live="polite">
     <div class="histoire-mcp-operation-heading">
-      <WorkbenchIcon name="time" />
+      <BuiltinIcon icon="time" :size="16" />
       <code>{{ operation.tool }}</code>
       <span :title="mcpTargetLabel(operation.target, snapshot.catalog)">{{ mcpTargetLabel(operation.target, snapshot.catalog) }}</span>
       <HstButton v-if="isMcpOperationCancellable(operation)" color="flat" type="button" :disabled="cancelling" :aria-label="cancelling ? 'Cancelling operation' : 'Cancel operation'" @click="store.cancel(operation.id)">
-        <WorkbenchIcon name="stop-filled" :size="14" />
+        <BuiltinIcon icon="stop-filled" :size="14" />
       </HstButton>
     </div>
     <progress v-if="progress" :value="progress.done" :max="progress.total" aria-label="Operation progress" />

@@ -1,9 +1,8 @@
 <script setup lang="ts">
 import type { UiCommentAgent, UiCommentDraft } from '@histoire/shared'
-import { getControlElement, HstButton, HstSelect, HstTextarea } from '@histoire/controls/vue'
+import { BuiltinIcon, getControlElement, HstButton, HstSelect, HstTextarea } from '@histoire/controls/vue'
 import { onMounted, ref, watch } from 'vue'
 import PulsatingDisc from '../base/PulsatingDisc.vue'
-import WorkbenchIcon from '../shell/WorkbenchIcon.vue'
 import CommentContext from './CommentContext.vue'
 import { useCommentDestination } from './destination.js'
 
@@ -50,19 +49,19 @@ function send() {
     <footer>
       <HstButton color="flat" type="button" class="icon-button" :disabled="capturing" :aria-label="capturing ? 'Capturing screenshot' : 'Attach screenshot'" @click="emit('attach')">
         <PulsatingDisc v-if="capturing" />
-        <WorkbenchIcon v-else name="camera" />
+        <BuiltinIcon v-else icon="camera" :size="16" />
       </HstButton>
       <HstButton color="flat" type="button" class="save-draft" :disabled="!body.trim() || capturing" @click="emit('save', { ...draft, body })">
         Save draft
       </HstButton>
       <template v-if="usable.length">
-        <label class="agent-picker"><WorkbenchIcon name="bot" /><HstSelect layout="inline" :model-value="agentId" aria-label="Comment agent" placeholder="Choose agent" :options="usable.map(agent => ({ value: agent.id, label: agent.name }))" @update:model-value="choose" /></label>
+        <label class="agent-picker"><BuiltinIcon icon="bot" :size="16" /><HstSelect layout="inline" :model-value="agentId" aria-label="Comment agent" placeholder="Choose agent" :options="usable.map(agent => ({ value: agent.id, label: agent.name }))" @update:model-value="choose" /></label>
         <HstButton color="primary" type="submit" class="send-button" :disabled="!body.trim() || !agentId || capturing">
-          <WorkbenchIcon name="send-alt-filled" />Send
+          <BuiltinIcon icon="send-alt-filled" :size="16" />Send
         </HstButton>
       </template>
       <HstButton v-else color="primary" type="button" class="send-button" @click="emit('setupAgent')">
-        <WorkbenchIcon name="bot" />Set up an agent
+        <BuiltinIcon icon="bot" :size="16" />Set up an agent
       </HstButton>
     </footer>
   </form>

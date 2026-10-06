@@ -1,6 +1,5 @@
 <script lang="ts" setup>
-import { HstButton } from '@histoire/controls/vue'
-import { Icon } from '@iconify/vue'
+import { BuiltinIcon, HstButton } from '@histoire/controls/vue'
 import { computed } from 'vue'
 import { usePreviewSettingsStore } from '../../stores/preview-settings'
 import { histoireConfig } from '../../util/config'
@@ -29,7 +28,7 @@ const contrastColor = computed(() => getContrastColor(settings))
       >
         <span v-if="contrastColor">a</span>
       </div>
-      <Icon
+      <BuiltinIcon
         icon="carbon:caret-down"
         class="htw-w-4 htw-h-4 htw-opacity-50 group-hover:htw-opacity-100"
       />

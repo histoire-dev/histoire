@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import type { Story } from '../../types'
+import { BuiltinIcon } from '@histoire/controls/vue'
 import { resolveStoryRouteId } from '@histoire/shared'
-import { Icon } from '@iconify/vue'
 import { computed, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { useScrollOnActive } from '../../util/scroll'
@@ -41,7 +41,7 @@ useScrollOnActive(isActive, el)
       class="htw-pl-0.5 htw-pr-2 htw-py-2 md:htw-py-1.5 htw-mx-1 htw-rounded-sm"
     >
       <span class="bind-tree-margin htw-flex htw-items-center htw-gap-2 htw-pl-4 htw-min-w-0">
-        <Icon
+        <BuiltinIcon
           :icon="story.icon ?? 'carbon:cube'"
           class="htw-w-5 htw-h-5 sm:htw-w-4 sm:htw-h-4 htw-flex-none"
           :class="{
