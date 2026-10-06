@@ -47,6 +47,51 @@ describe('workbench frame actions', () => {
     expect(menu.state.target).toBeNull()
   })
 
+  it('captures virtual context targets and runs actions against their copied identity', async () => {
+    const menu = createContextMenu()
+    const run = vi.fn()
+    const action = { id: 'folder.expand', label: 'Expand folder', icon: 'folder-open', run }
+    menu.register(action)
+    const path = ['components']
+    const target = { kind: 'folder' as const, label: 'components', key: 'folder:components', path, expanded: false }
+    const focus = vi.fn()
+    const event = { key: 'ContextMenu', preventDefault: vi.fn(), stopPropagation: vi.fn(), currentTarget: { focus, getBoundingClientRect: () => ({ left: 20, top: 40 }) } } as unknown as KeyboardEvent
+
+    expect(menu.open(event, target, [action.id])).toBe(true)
+    path.push('recycled')
+    expect(menu.state.context).toMatchObject({ kind: 'folder', path: ['components'], expanded: false })
+    expect(menu.state.x).toBe(36)
+    await menu.run(action, menu.state.context!)
+    expect(run).toHaveBeenCalledWith(expect.objectContaining({ kind: 'folder', path: ['components'] }))
+    menu.close(true)
+    expect(focus).toHaveBeenCalledOnce()
+  })
+
+  it('leaves nested iframe context menus native', () => {
+    const previous = Object.getOwnPropertyDescriptor(globalThis, 'Element')
+    class IframeElement {
+      closest(selector: string) {
+        expect(selector.split(', ')).toContain('iframe')
+        return this
+      }
+    }
+    Object.defineProperty(globalThis, 'Element', { configurable: true, value: IframeElement })
+    try {
+      const menu = createContextMenu()
+      const iframe = new IframeElement()
+      const event = { target: iframe, preventDefault: vi.fn(), stopPropagation: vi.fn(), currentTarget: {} } as unknown as MouseEvent
+
+      expect(menu.open(event, { storyId: 'story', variantId: 'variant', frameKey: 'frame' })).toBe(false)
+      expect(event.preventDefault).not.toHaveBeenCalled()
+      expect(event.stopPropagation).not.toHaveBeenCalled()
+      expect(menu.state.context).toBeNull()
+    }
+    finally {
+      if (previous) Object.defineProperty(globalThis, 'Element', previous)
+      else Reflect.deleteProperty(globalThis, 'Element')
+    }
+  })
+
   it('copies exact context target through same session source service as source panel', async () => {
     const fixture = sourceFixture()
     const session = createHistoireSessionWithAdapters({ url: 'https://book.example/' }, fixture.adapters)

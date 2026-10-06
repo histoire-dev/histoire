@@ -2,18 +2,31 @@
 import type { HistoireTarget } from '@histoire/protocol'
 import type { WorkbenchTestRow } from './types.js'
 import { BuiltinIcon, HstButton } from '@histoire/controls/vue'
+import { useHistoireResource } from '@histoire/vue/internal'
 import { computed, ref } from 'vue'
+import { isContextMenuShortcut, useContextMenu } from '../../../composables/context-menu.js'
 import WorkbenchVirtualList from '../../lists/WorkbenchVirtualList.vue'
+
 import TestsTreeRow from './TestsTreeRow.vue'
 
 /** Catalog rows remain ordered by source, grouped by exact story identity. */
 const props = defineProps<{ rows: readonly WorkbenchTestRow[], filter: 'failing' | 'all' | 'changed', selected: HistoireTarget | null }>()
 const emit = defineEmits<{ select: [row: WorkbenchTestRow] }>()
+const menu = useContextMenu()
 /** One fixed-height row in the flattened virtual project explorer. */
 type TestTreeEntry =
   | { key: string, kind: 'heading', id: string, title: string, failed: boolean, stale: boolean, passed: boolean, count: number, total: number }
   | { key: string, kind: 'test', row: WorkbenchTestRow }
 const closed = ref(new Set<string>())
+const menuDisposers = [
+  menu?.register({ id: 'tests.expand-group', label: 'Expand story tests', icon: 'chevron-down', available: target => target.kind === 'test-group' && !target.expanded, run: (target) => {
+    if (target.kind === 'test-group' && target.storyId) toggle(target.storyId)
+  } }),
+  menu?.register({ id: 'tests.collapse-group', label: 'Collapse story tests', icon: 'chevron-up', available: target => target.kind === 'test-group' && target.expanded, run: (target) => {
+    if (target.kind === 'test-group' && target.storyId) toggle(target.storyId)
+  } }),
+].filter((dispose): dispose is () => void => Boolean(dispose))
+useHistoireResource(() => menuDisposers.forEach(dispose => dispose()))
 const visible = computed<TestTreeEntry[]>(() => {
   const groups = new Map<string, WorkbenchTestRow[]>()
   for (const row of props.rows) {
@@ -50,6 +63,16 @@ function toggle(storyId: string) {
   if (!next.delete(storyId)) next.add(storyId)
   closed.value = next
 }
+
+/** Context group identity remains stable when its virtual row is recycled. */
+function openGroupMenu(event: MouseEvent | KeyboardEvent, item: Extract<TestTreeEntry, { kind: 'heading' }>): void {
+  menu?.open(event, { kind: 'test-group', key: item.key, storyId: item.id, label: item.title, expanded: !closed.value.has(item.id) }, [closed.value.has(item.id) ? 'tests.expand-group' : 'tests.collapse-group'])
+}
+
+/** Group disclosure remains keyboard accessible through native menu keys. */
+function onGroupKeydown(event: KeyboardEvent, item: Extract<TestTreeEntry, { kind: 'heading' }>): void {
+  if (isContextMenuShortcut(event)) openGroupMenu(event, item)
+}
 </script>
 
 <template>
@@ -59,7 +82,7 @@ function toggle(storyId: string) {
     </p>
     <WorkbenchVirtualList v-else :items="visible" :item-size="40" list-tag="ul" item-tag="li">
       <template #default="{ item }">
-        <HstButton v-if="item.kind === 'heading'" color="flat" type="button" class="test-story-heading" :aria-expanded="!closed.has(item.id)" @click="toggle(item.id)">
+        <HstButton v-if="item.kind === 'heading'" color="flat" type="button" class="test-story-heading" :aria-expanded="!closed.has(item.id)" @click="toggle(item.id)" @contextmenu="openGroupMenu($event, item)" @keydown="onGroupKeydown($event, item)">
           <BuiltinIcon :icon="closed.has(item.id) ? 'chevron-right' : 'chevron-down'" :size="16" />
           <BuiltinIcon :icon="item.failed ? 'error-filled' : item.stale ? 'renew' : item.passed ? 'checkmark-filled' : 'subtract'" :class="{ failed: item.failed, passed: item.passed }" :size="16" />
           <strong>{{ item.title }}</strong>

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { BuiltinIcon, HstButton } from '@histoire/controls/vue'
+import { isContextMenuShortcut } from '../../composables/context-menu.js'
 
 defineProps<{
   /** Selected story's catalog title. */
@@ -9,11 +10,16 @@ defineProps<{
   /** Standalone adapter's isolated preview URL. */
   isolatedHref?: string
 }>()
-defineEmits<{ close: [] }>()
+const emit = defineEmits<{ close: [], contextmenu: [event: MouseEvent | KeyboardEvent] }>()
+
+/** Header actions expose their story context menu to keyboard users. */
+function onKeydown(event: KeyboardEvent): void {
+  if (isContextMenuShortcut(event)) emit('contextmenu', event)
+}
 </script>
 
 <template>
-  <header class="inspector-header">
+  <header class="inspector-header" @contextmenu="$emit('contextmenu', $event)" @keydown="onKeydown">
     <div class="inspector-header-titles">
       <span v-if="variantTitle && variantTitle !== storyTitle" class="inspector-story-title"><span>{{ storyTitle }}</span><BuiltinIcon icon="chevron-right" :size="12" /></span>
       <h2>{{ variantTitle || storyTitle }}</h2>

@@ -73,7 +73,7 @@ export function useWorkbench(props: WorkbenchProps, error: (error: unknown) => v
     mcp.connect()
     useHistoireResource(mcp.close)
   }
-  const menu = createContextMenu()
+  const menu = createContextMenu({ error })
   provideContextMenu(menu)
   const canvas = ref<WorkbenchCanvas>()
   const actions = createFrameActions({
@@ -87,6 +87,27 @@ export function useWorkbench(props: WorkbenchProps, error: (error: unknown) => v
     error,
   })
   provideFrameActions(actions)
+  menu.register({ id: 'control.copy-name', label: 'Copy control name', icon: 'copy', group: 'copy', available: target => target.kind === 'control', run: (target) => {
+    if (target.kind === 'control') return actions.copyText(target.label)
+  } })
+  menu.register({ id: 'control.reset-override', label: 'Remove prop override', icon: 'reset', group: 'control', available: target => target.kind === 'control' && target.controlKind === 'prop' && Boolean(target.resetElement?.isConnected && !target.resetElement.disabled), run: (target) => {
+    if (target.kind === 'control') target.resetElement?.click()
+  } })
+  menu.register({ id: 'control.reset-state', label: 'Reset state', icon: 'reset', group: 'control', available: target => target.kind === 'control' && target.controlKind === 'state' && Boolean(target.resetElement?.isConnected && !target.resetElement.disabled), run: (target) => {
+    if (target.kind === 'control') target.resetElement?.click()
+  } })
+  menu.register({ id: 'context.copy-link', label: 'Copy link', icon: 'link', group: 'copy', available: target => 'selection' in target && !('frame' in target && target.frame), run: (target) => {
+    if (!('selection' in target)) return
+    const selection = target.selection
+    const exact = 'variantId' in selection && selection.variantId !== undefined ? selection as HistoireTarget : { storyId: selection.storyId, variantId: null }
+    const url = new URL(props.navigation.href(exact), props.hostWindow.location.href).href
+    return actions.copyText(url)
+  } })
+  menu.register({ id: 'stories.select', label: 'Select story', icon: 'cursor-1', group: 'open', available: target => target.kind === 'story' && 'selection' in target && !('frame' in target && target.frame), run: async (target) => {
+    if (!('selection' in target)) return
+    await props.session.selection.select(target.selection)
+    showPane('stories')
+  } })
   const dev = __HISTOIRE_DEV__
     ? useWorkbenchDev({
         session: props.session,
@@ -98,6 +119,24 @@ export function useWorkbench(props: WorkbenchProps, error: (error: unknown) => v
         error,
       })
     : undefined
+  if (dev) {
+    menu.register({ id: 'comment.open', label: 'Open comment', icon: 'chat', group: 'open', available: target => target.kind === 'comment' && dev.comments.comments.value.some(comment => comment.id === target.key), run: async (target) => {
+      if (target.kind !== 'comment') return
+      const comment = dev.comments.comments.value.find(item => item.id === target.key)
+      if (comment) await dev.selectComment(comment)
+    } })
+    menu.register({ id: 'comment.resolve', label: 'Resolve comment', icon: 'checkmark', group: 'comment', available: target => target.kind === 'comment' && dev.comments.comments.value.some(comment => comment.id === target.key && comment.status !== 'resolved'), run: (target) => {
+      if (target.kind === 'comment') dev.comments.resolve(target.key, true)
+    } })
+    menu.register({ id: 'comment.reopen', label: 'Reopen comment', icon: 'renew', group: 'comment', available: target => target.kind === 'comment' && dev.comments.comments.value.some(comment => comment.id === target.key && comment.status === 'resolved'), run: (target) => {
+      if (target.kind === 'comment') dev.comments.resolve(target.key, false)
+    } })
+    menu.register({ id: 'comment.copy-text', label: 'Copy comment text', icon: 'copy', group: 'copy', available: target => target.kind === 'comment' && dev.comments.comments.value.some(comment => comment.id === target.key), run: (target) => {
+      if (target.kind !== 'comment') return
+      const comment = dev.comments.comments.value.find(item => item.id === target.key)
+      if (comment) return actions.copyText(comment.body)
+    } })
+  }
   const search = ref<{ focus: () => void | Promise<void>, search: (query: string) => void }>()
   const highlighted = ref<string[]>([])
   const searchQuery = ref('')

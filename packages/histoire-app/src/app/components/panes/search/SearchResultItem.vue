@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import type { WorkbenchSearchResult } from './query.js'
 import { BuiltinIcon, HstButton } from '@histoire/controls/vue'
+import { getHistoireTargetKey } from '@histoire/protocol'
 import { computed } from 'vue'
+import { isContextMenuShortcut, useContextMenu } from '../../../composables/context-menu.js'
+
 import { getSearchResultDomId } from './accessibility.js'
 
 const props = defineProps<{
@@ -20,6 +23,7 @@ const emit = defineEmits<{
   /** Synchronize keyboard highlight on native row focus. */
   focus: []
 }>()
+const menu = useContextMenu()
 /** Variant context names its story without duplicating folder path text. */
 const title = computed(() => props.result.kind === 'variant' && props.result.path.length ? `${props.result.path.at(-1)} › ${props.result.title}` : props.result.title)
 /** Literal text ranges never render index excerpts as HTML. */
@@ -31,10 +35,27 @@ const pieces = computed(() => {
 })
 /** Compact contextual second line mirrors the result boards. */
 const detail = computed(() => props.result.excerpt || props.result.path.slice(0, props.result.kind === 'variant' ? -1 : undefined).join(' › '))
+
+/** Search menu retains result identity and leaves anchor-aware activation to its owner. */
+function openMenu(event: MouseEvent | KeyboardEvent): void {
+  const target = props.result.target
+  menu?.open(event, {
+    kind: 'search-result',
+    key: props.result.id,
+    label: title.value,
+    selection: target,
+    frame: target.variantId ? { storyId: target.storyId, variantId: target.variantId, frameKey: getHistoireTargetKey(target) } : undefined,
+  }, ['search.open-result', 'context.copy-link'])
+}
+
+/** Open the row menu from the keyboard without hijacking other row shortcuts. */
+function onKeydown(event: KeyboardEvent): void {
+  if (isContextMenuShortcut(event)) openMenu(event)
+}
 </script>
 
 <template>
-  <HstButton :id="getSearchResultDomId(result.id)" color="flat" type="button" class="search-result" :class="{ active }" data-test-id="search-item" :data-search-kind="result.kind" :aria-current="selected ? 'true' : undefined" @focus="emit('focus')" @click="emit('activate', $event.metaKey || $event.ctrlKey)">
+  <HstButton :id="getSearchResultDomId(result.id)" color="flat" type="button" class="search-result" :class="{ active }" data-test-id="search-item" :data-search-kind="result.kind" :aria-current="selected ? 'true' : undefined" @focus="emit('focus')" @click="emit('activate', $event.metaKey || $event.ctrlKey)" @contextmenu="openMenu" @keydown="onKeydown">
     <BuiltinIcon :icon="result.kind === 'docs' ? 'document' : result.kind === 'prop' ? 'settings-adjust' : 'cube'" class="result-icon" :style="{ color: result.iconColor }" :size="16" />
     <span class="result-copy">
       <strong><template v-for="(piece, index) in pieces" :key="index"><mark v-if="piece.matched">{{ piece.text }}</mark><template v-else>{{ piece.text }}</template></template></strong>

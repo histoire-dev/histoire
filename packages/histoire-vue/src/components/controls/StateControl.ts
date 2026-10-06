@@ -16,6 +16,7 @@ export const StateControl = defineComponent({
       const state = snapshot.value.state?.value as Record<string, unknown> | undefined
       if (!state || !Object.hasOwn(state, props.field)) return null
       return renderHistoireControl(typeof state[props.field], {
+        'class': 'histoire-state-control',
         'title': props.field,
         'data-histoire-control-type': typeof state[props.field],
         'modelValue': edit.value.value,

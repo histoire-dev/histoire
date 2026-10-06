@@ -101,7 +101,6 @@ function select() {
 /** Native menu key opens same chrome menu as pointer context menu. */
 function onKeyDown(event: KeyboardEvent) {
   if (isFrameMenuShortcut(event)) {
-    event.preventDefault()
     openMenu(event)
   }
 }
@@ -115,7 +114,7 @@ function openMenu(event: MouseEvent | KeyboardEvent) {
 </script>
 
 <template>
-  <section class="histoire-canvas-frame" :class="{ 'is-selected': selected, 'is-stale': stale, 'is-highlighted': highlighted, 'is-dimmed': dimmed }" :style="position" :data-frame-id="frame.id" @contextmenu.prevent="openMenu">
+  <section class="histoire-canvas-frame" :class="{ 'is-selected': selected, 'is-stale': stale, 'is-highlighted': highlighted, 'is-dimmed': dimmed }" :style="position" :data-frame-id="frame.id" @contextmenu="openMenu">
     <button type="button" class="histoire-frame-label" data-canvas-overlay-occluder :aria-pressed="selected" :disabled="!canSelect" @click="select" @keydown="onKeyDown">
       <span class="histoire-frame-title" :title="variant.title">{{ variant.title }}</span><BuiltinIcon v-if="status === 'error'" icon="error-filled" :size="12" class="is-error" /><PulsatingDisc v-else-if="test?.running" :size="12" /><BuiltinIcon v-else-if="testIcon" :icon="testIcon" :size="12" :class="{ 'is-error': test?.failed || test?.error }" />
     </button>

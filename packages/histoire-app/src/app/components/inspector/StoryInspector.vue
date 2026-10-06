@@ -5,6 +5,7 @@ import type { HistoireSession } from '@histoire/sdk'
 import { HistoireDocs, HistoireEvents, HistoireTests } from '@histoire/vue'
 import { useHistoireContext, useProvidedHistoireTestsModel } from '@histoire/vue/internal'
 import { computed, ref, useId, watch } from 'vue'
+import { isContextMenuShortcut, useContextMenu } from '../../composables/context-menu.js'
 import { useSelection } from '../../composables/selection.js'
 import { useWorkbenchTestsModel } from '../panes/tests/model.js'
 import InspectorHeader from './InspectorHeader.vue'
@@ -29,6 +30,7 @@ const emit = defineEmits<{ panel: [value: InspectorTab], close: [], error: [erro
 const { session, snapshot, story, variant } = useSelection()
 const context = useHistoireContext()
 const id = useId()
+const menu = useContextMenu()
 const tests = useProvidedHistoireTestsModel(session)
 const projectTests = useWorkbenchTestsModel(props.projectTestSession ?? session)
 /** Project results are displayed only for exact selected target and current source. */
@@ -68,11 +70,38 @@ function select(value: InspectorTab) {
 }
 </script>
 
+/** Inspector target menus reuse exact frame capabilities for selected variants. */
+function openSelectionMenu(event: MouseEvent | KeyboardEvent): void {
+  const target = snapshot.value.selection
+  if (!target || !menu) return
+  const frame = target.variantId ? { storyId: target.storyId, variantId: target.variantId, frameKey: getHistoireTargetKey(target) } : undefined
+  const variantTitle = target.variantId ? story.value?.variants.find(item => item.id === target.variantId)?.title : undefined
+  menu.open(event, { kind: 'inspector', label: `${story.value?.title ?? target.storyId}${variantTitle ? ` › ${variantTitle}` : ''}`, selection: target, frame }, ['context.copy-link'])
+}
+
+/** Prop and state rows expose only their supported reset/copy operations. */
+function openControlMenu(event: MouseEvent | KeyboardEvent): void {
+  if ('key' in event && !isContextMenuShortcut(event)) return
+  if (typeof Element === 'undefined' || !(event.target instanceof Element) || !menu) return
+  const element = event.target.closest<HTMLElement>('.histoire-prop-control, .histoire-state-control')
+  if (!element) {
+    openSelectionMenu(event)
+    return
+  }
+  const controlKind = element.classList.contains('histoire-prop-control') ? 'prop' : 'state'
+  const label = element.getAttribute('title')?.replace(/ \*$/, '') || element.getAttribute('aria-label') || 'Control'
+  const resetElement = controlKind === 'prop'
+    ? element.querySelector<HTMLButtonElement>('.histoire-prop-control-reset') ?? undefined
+    : element.closest('.histoire-controls')?.querySelector<HTMLButtonElement>('.histoire-controls-reset') ?? undefined
+  const actions = ['control.copy-name', controlKind === 'prop' ? 'control.reset-override' : 'control.reset-state']
+  menu.open(event, { kind: 'control', key: `${controlKind}:${label}`, label, controlKind, element, resetElement }, actions)
+}
+
 <template>
   <section class="story-inspector" data-test-id="story-side-panel" aria-label="Story inspector">
-    <InspectorHeader :story-title="story?.title || 'Story'" :variant-title="variantTitle || variant?.title" :isolated-href="isolatedHref" @close="emit('close')" />
+    <InspectorHeader :story-title="story?.title || 'Story'" :variant-title="variantTitle || variant?.title" :isolated-href="isolatedHref" @close="emit('close')" @contextmenu="openSelectionMenu" />
     <InspectorTabs :id-prefix="id" :active-tab="active" :tests-enabled="testsEnabled" :event-count="unseen" :test-count="testCount" :test-status="testStatus" @select="select" />
-    <div :id="`${id}-panel-${active || 'props'}`" class="inspector-content" data-histoire-docs-scroll role="tabpanel" :aria-labelledby="`${id}-tab-${active || 'props'}`">
+    <div :id="`${id}-panel-${active || 'props'}`" class="inspector-content" data-histoire-docs-scroll role="tabpanel" :aria-labelledby="`${id}-tab-${active || 'props'}`" @contextmenu="openControlMenu" @keydown="openControlMenu">
       <PropsTab v-if="active === ''" @error="emit('error', $event)">
         <template v-if="$slots['matrix-props'] || $slots.matrix" #matrix>
           <slot name="matrix-props">
@@ -99,7 +128,7 @@ function select(value: InspectorTab) {
         <HistoireTests :summary="cachedSummary" :collection="cachedCollection" :running="testEntry?.running" @error="emit('error', $event)" />
       </template>
     </div>
-    <SourceDrawer @error="emit('error', $event)" />
+    <SourceDrawer @error="emit('error', $event)" @contextmenu="openSelectionMenu" />
   </section>
 </template>
 

@@ -1,20 +1,41 @@
 <script setup lang="ts">
 import type { WorkbenchTestRow } from './types.js'
 import { BuiltinIcon, HstButton } from '@histoire/controls/vue'
+import { getHistoireTargetKey } from '@histoire/protocol'
 import { computed } from 'vue'
+import { isContextMenuShortcut, useContextMenu } from '../../../composables/context-menu.js'
 import PulsatingDisc from '../../base/PulsatingDisc.vue'
 
 /** One actual collected variant or diagnostic; unknown diagnostics stay visible. */
 const props = defineProps<{ row: WorkbenchTestRow, selected: boolean }>()
 const emit = defineEmits<{ select: [row: WorkbenchTestRow] }>()
+const menu = useContextMenu()
 /** Collection warnings retain priority over an active test operation. */
 const running = computed(() => !props.row.notCollected && props.row.running)
 const icon = computed(() => props.row.notCollected ? 'warning-alt-filled' : props.row.stale ? 'renew' : props.row.failed ? 'error-filled' : props.row.summary?.passed ? 'checkmark-filled' : 'subtract')
 const status = computed(() => props.row.notCollected ? 'not collected' : props.row.stale ? 'outdated' : props.row.running ? 'running' : props.row.failed ? 'tests failing' : props.row.summary ? 'tests completed' : 'not run')
+
+/** Project test menu keeps exact target when current selection differs. */
+function openMenu(event: MouseEvent | KeyboardEvent): void {
+  if (!props.row.selectable || !props.row.target.variantId) return
+  const target = props.row.target
+  menu?.open(event, {
+    kind: 'test',
+    key: props.row.key,
+    label: `${props.row.storyTitle} › ${props.row.variantTitle ?? target.variantId}`,
+    selection: target,
+    frame: { storyId: target.storyId, variantId: target.variantId, frameKey: getHistoireTargetKey(target) },
+  }, ['context.copy-link'])
+}
+
+/** Expose test-row actions with ContextMenu and Shift+F10. */
+function onKeydown(event: KeyboardEvent): void {
+  if (isContextMenuShortcut(event)) openMenu(event)
+}
 </script>
 
 <template>
-  <HstButton color="flat" type="button" class="test-row" :class="{ failed: row.failed, warning: row.notCollected, passed: !row.failed && row.summary?.passed }" :aria-current="selected ? 'true' : undefined" :aria-label="`${row.storyTitle} / ${row.variantTitle ?? status}, ${status}`" :disabled="!row.selectable" :title="row.error ? String(row.error) : undefined" @click="emit('select', row)">
+  <HstButton color="flat" type="button" class="test-row" :class="{ failed: row.failed, warning: row.notCollected, passed: !row.failed && row.summary?.passed }" :aria-current="selected ? 'true' : undefined" :aria-label="`${row.storyTitle} / ${row.variantTitle ?? status}, ${status}`" :disabled="!row.selectable" :title="row.error ? String(row.error) : undefined" @click="emit('select', row)" @contextmenu="openMenu" @keydown="onKeydown">
     <PulsatingDisc v-if="running" />
     <BuiltinIcon v-else :icon="icon" :size="16" />
     <span class="test-row-title">{{ row.variantTitle ?? row.storyTitle }}</span>

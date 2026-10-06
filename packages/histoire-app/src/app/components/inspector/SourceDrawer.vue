@@ -4,11 +4,18 @@ import { BuiltinIcon, HstButton, HstButtonGroup } from '@histoire/controls/vue'
 import { requestHistoireOpenInEditor } from '@histoire/sdk/internal'
 import { HistoireSource } from '@histoire/vue'
 import { computed, nextTick, ref, shallowRef, useId, watch } from 'vue'
+import { isContextMenuShortcut } from '../../composables/context-menu.js'
 import { useSelection } from '../../composables/selection.js'
 import { usePageOwnership } from '../pages/home/ownership.js'
 import { findChangedSourceLine } from './state.js'
 
-const emit = defineEmits<{ error: [error: unknown] }>()
+const emit = defineEmits<{ error: [error: unknown], contextmenu: [event: MouseEvent | KeyboardEvent] }>()
+
+/** Source header actions share selected story context through native menu keys. */
+function onHeaderKeydown(event: KeyboardEvent): void {
+  if (isContextMenuShortcut(event)) emit('contextmenu', event)
+}
+
 const { session, snapshot, story, variant } = useSelection()
 const ownership = usePageOwnership(session)
 const drawerId = `${useId()}-source-content`
@@ -119,7 +126,7 @@ function status(value: { status: 'idle' | 'loading' | 'ready' | 'error' }) {
 
 <template>
   <section ref="root" class="inspector-source" :class="{ 'is-expanded': expanded }" aria-label="Source">
-    <div class="inspector-source-header">
+    <div class="inspector-source-header" @contextmenu="emit('contextmenu', $event)" @keydown="onHeaderKeydown">
       <HstButton color="flat" type="button" class="inspector-source-toggle" :aria-expanded="expanded" :aria-controls="drawerId" @click="expanded = !expanded">
         <BuiltinIcon icon="code" :size="16" />
         <strong>Source</strong>

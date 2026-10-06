@@ -3,11 +3,14 @@ import type { UiComment, UiCommentAgent } from '@histoire/shared'
 import type { WorkbenchComments } from '../../../stores/comments.js'
 import type { CommentsFilter } from '../../comments/presentation.js'
 import { BuiltinIcon, HstButton, HstButtonGroup, HstSelect } from '@histoire/controls/vue'
+import { getHistoireTargetKey } from '@histoire/protocol'
 import { useHistoireContext, useHistoireResource } from '@histoire/vue/internal'
 import { computed, ref, shallowRef } from 'vue'
+import { useContextMenu } from '../../../composables/context-menu.js'
 import CommentThread from '../../comments/CommentThread.vue'
 import { useCommentDestination } from '../../comments/destination.js'
 import { filterComments, groupComments } from '../../comments/presentation.js'
+
 import CommentsList from './CommentsList.vue'
 
 const props = defineProps<{
@@ -23,6 +26,7 @@ const emit = defineEmits<{
   setupAgent: []
 }>()
 const { session } = useHistoireContext()
+const menu = useContextMenu()
 const snapshot = shallowRef(session.getSnapshot())
 useHistoireResource(session.subscribe(value => snapshot.value = value))
 const filter = ref<CommentsFilter>('open')
@@ -39,6 +43,19 @@ const orphan = computed(() => props.model.selected.value && !snapshot.value.cata
 function select(comment: UiComment) {
   props.model.open(comment.id)
   emit('select', comment)
+}
+
+/** Comment actions retain exact comment and variant identities across virtualization. */
+function openCommentMenu(event: MouseEvent | KeyboardEvent, comment: UiComment, title: string): void {
+  const target = { storyId: comment.storyId, variantId: comment.variantId }
+  menu?.open(event, {
+    kind: 'comment',
+    key: comment.id,
+    label: `${comment.storyId} › ${title}`,
+    selection: target,
+    status: comment.status,
+    frame: { ...target, frameKey: getHistoireTargetKey(target) },
+  }, ['comment.open', 'comment.resolve', 'comment.reopen', 'comment.copy-text'])
 }
 /** Accepted bulk sends require a fresh destination under ask-each-time policy. */
 function sendDrafts() {
@@ -64,7 +81,7 @@ function sendDrafts() {
       {{ model.error.value }}
     </p>
     <div class="comments-scroll">
-      <CommentsList :groups="groups" :comments="model.comments.value" :stories="snapshot.catalog.stories" :active-id="model.activeId.value" :agents="agents" @select="select" /><p v-if="!visible.length && model.available.value" class="comments-notice">
+      <CommentsList :groups="groups" :comments="model.comments.value" :stories="snapshot.catalog.stories" :active-id="model.activeId.value" :agents="agents" @select="select" @contextmenu="openCommentMenu" /><p v-if="!visible.length && model.available.value" class="comments-notice">
         No {{ filter === 'all' ? '' : `${filter} ` }}comments
       </p>
     </div>

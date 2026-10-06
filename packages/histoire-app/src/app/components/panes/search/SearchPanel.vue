@@ -8,6 +8,7 @@ import { BuiltinIcon, HstButton } from '@histoire/controls/vue'
 import { getHistoireTargetKey } from '@histoire/protocol'
 import { useHistoireContext, useHistoireResource } from '@histoire/vue/internal'
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, shallowRef, watch } from 'vue'
+import { useContextMenu } from '../../../composables/context-menu.js'
 import CommandPrompts from '../../command/CommandPrompts.vue'
 import WorkbenchVirtualList from '../../lists/WorkbenchVirtualList.vue'
 import { getSearchCommandDomId, SEARCH_ACTIVE_RESULT_ID, SEARCH_RESULTS_ID } from './accessibility.js'
@@ -39,6 +40,7 @@ const emit = defineEmits<{
 }>()
 const context = useHistoireContext()
 const snapshot = shallowRef(context.session.getSnapshot())
+const menu = useContextMenu()
 useHistoireResource(context.session.subscribe(value => snapshot.value = value))
 const input = ref<HTMLInputElement | null>(null)
 const query = ref('')
@@ -70,6 +72,19 @@ const activeCursor = computed(() => {
 })
 const commandList = ref<{ reveal: (key: string) => Promise<void> }>()
 watch(() => commands.value[index.value - ordered.value.length]?.id, key => key && void commandList.value?.reveal(key), { flush: 'post' })
+const unregisterOpenResult = menu?.register({
+  id: 'search.open-result',
+  label: 'Open result',
+  icon: 'launch',
+  group: 'open',
+  available: target => target.kind === 'search-result' && Boolean(ordered.value.some(result => result.id === target.key)),
+  run: async (target) => {
+    if (target.kind !== 'search-result') return
+    const result = ordered.value.find(item => item.id === target.key)
+    if (result) await activate(result)
+  },
+})
+if (unregisterOpenResult) useHistoireResource(unregisterOpenResult)
 const currentStory = computed(() => snapshot.value.catalog.stories.find(story => story.id === snapshot.value.selection?.storyId))
 const matches = computed(() => query.value.trim() ? getSearchFrameMatches(results.value, currentStory.value) : [])
 watch(matches, value => emit('highlight', value), { immediate: true })

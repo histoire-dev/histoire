@@ -62,7 +62,6 @@ function updateStatus(value: typeof status.value, detail?: unknown): void {
 /** Native menu keys use same target capture as ordinary canvas frame chrome. */
 function onKeyDown(event: KeyboardEvent): void {
   if (!isFrameMenuShortcut(event)) return
-  event.preventDefault()
   openMenu(event)
 }
 
@@ -77,7 +76,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <section class="histoire-matrix-cell" :style="position" :data-frame-id="frame.id" :data-selected="matrix.selectedCell.value?.key === cell.key" @contextmenu.prevent="openMenu">
+  <section class="histoire-matrix-cell" :style="position" :data-frame-id="frame.id" :data-selected="matrix.selectedCell.value?.key === cell.key" @contextmenu="openMenu">
     <div class="histoire-matrix-cell-content" :style="style">
       <CanvasReplicaPreview v-if="live" :key="variantId" ref="preview" :frame-id="frame.id" :story-id="frame.storyId" :variant-id="variantId" :preview-base="previewBase" :props-override="cell.props" @status="updateStatus" />
     </div>

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { WorkbenchContextAction } from '../../composables/context-menu.js'
 import type { FrameAction } from '../../util/frame-actions.js'
 import { getControlElement, HstButton, HstTextarea } from '@histoire/controls/vue'
 import { useHistoireSnapshot } from '@histoire/vue'
@@ -18,22 +19,33 @@ const shortcuts = useShortcutRegistry()
 const menu = ref<HTMLElement | null>(null)
 const recovery = ref<HTMLTextAreaElement | null>(null)
 const position = ref({ left: 0, top: 0 })
-const target = computed(() => state?.state.target ?? null)
-const actions = computed(() => {
+type MenuEntry = { kind: 'frame', action: FrameAction, disabled?: string } | { kind: 'context', action: WorkbenchContextAction, disabled?: string }
+const target = computed(() => state?.state.context ?? null)
+const frameTarget = computed(() => state?.state.target ?? null)
+const actions = computed<MenuEntry[]>(() => {
   void snapshot.value
-  return target.value ? registry?.list(target.value) ?? [] : []
+  const current = target.value
+  if (!current) return []
+  const currentFrame = frameTarget.value
+  const frame = currentFrame ? registry?.list(currentFrame).map(action => ({ kind: 'frame' as const, action, disabled: action.disabled?.(currentFrame) })) ?? [] : []
+  const contextual = state?.list(current).map(action => ({ kind: 'context' as const, action, disabled: action.disabled?.(current) })) ?? []
+  return [...frame, ...contextual]
 })
 const label = computed(() => {
-  const story = snapshot.value.catalog.stories.find(item => item.id === target.value?.storyId)
-  const variant = story?.variants.find(item => item.id === target.value?.variantId)
-  return `${story?.title ?? target.value?.storyId} › ${variant?.title ?? target.value?.variantId}`
+  const frame = frameTarget.value
+  if (!frame) return target.value?.label ?? ''
+  const story = snapshot.value.catalog.stories.find(item => item.id === frame.storyId)
+  const variant = story?.variants.find(item => item.id === frame.variantId)
+  return `${story?.title ?? frame.storyId} › ${variant?.title ?? frame.variantId}`
 })
 
 /** Run captured frame target even when selection changes before asynchronous action finishes. */
-function run(action: FrameAction) {
+function run(entry: MenuEntry) {
   const captured = target.value
+  const frame = frameTarget.value
   state?.close()
-  if (captured) void registry?.run(action, captured)
+  if (entry.kind === 'frame' && frame) void registry?.run(entry.action, frame)
+  else if (entry.kind === 'context' && captured) void state?.run(entry.action, captured)
 }
 
 /** Root arrow navigation skips disabled items and hidden submenu descendants. */
@@ -63,8 +75,8 @@ function outside(event: PointerEvent) {
 
 /** Children use same source-mode/capability visibility rules as root actions. */
 function children(action: FrameAction): readonly FrameAction[] {
-  if (!target.value) return []
-  const current = target.value
+  if (!frameTarget.value) return []
+  const current = frameTarget.value
   return (action.children?.(current) ?? []).filter(item => (!item.devOnly || snapshot.value.source?.mode === 'dev') && item.available?.(current) !== false)
 }
 
@@ -90,14 +102,14 @@ onBeforeUnmount(() => document.removeEventListener('pointerdown', outside, true)
 
 <template>
   <Teleport :to="context.overlay.value ?? context.root.value ?? 'body'">
-    <div v-if="target && registry" ref="menu" class="histoire-context-menu histoire-control-popover" role="menu" :aria-label="label" :style="{ left: `${position.left}px`, top: `${position.top}px` }" @keydown="keyboard">
+    <div v-if="target && actions.length" ref="menu" class="histoire-context-menu histoire-control-popover" role="menu" :aria-label="label" :style="{ left: `${position.left}px`, top: `${position.top}px` }" @keydown="keyboard">
       <p class="context-target">
         {{ label }}
       </p>
-      <template v-for="(action, index) in actions" :key="action.id">
-        <div v-if="index && actions[index - 1].group !== action.group" class="menu-divider" role="separator" />
-        <SubMenu v-if="action.children" :action="action" :items="children(action)" :target="target" @action="run" />
-        <MenuItem v-else :label="action.label" :icon="action.icon" :disabled="action.disabled?.(target)" :shortcut="action.shortcut ? shortcuts?.hint(action.shortcut) : undefined" :ai="action.group === 'ai'" @click="run(action)" />
+      <template v-for="(entry, index) in actions" :key="`${entry.kind}:${entry.action.id}`">
+        <div v-if="index && actions[index - 1].action.group !== entry.action.group" class="menu-divider" role="separator" />
+        <SubMenu v-if="entry.kind === 'frame' && entry.action.children && frameTarget" :action="entry.action" :items="children(entry.action)" :target="frameTarget" @action="run({ kind: 'frame', action: $event })" />
+        <MenuItem v-else :label="entry.action.label" :icon="entry.action.icon" :disabled="entry.disabled" :shortcut="entry.kind === 'frame' && entry.action.shortcut ? shortcuts?.hint(entry.action.shortcut) : undefined" :ai="entry.action.group === 'ai'" @click="run(entry)" />
       </template>
     </div>
     <div v-if="registry?.manualCopy.value !== null && registry?.manualCopy.value !== undefined" class="histoire-copy-recovery histoire-control-popover" role="alert">

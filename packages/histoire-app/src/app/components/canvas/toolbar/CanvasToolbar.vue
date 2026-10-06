@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onBeforeUnmount, ref, shallowRef } from 'vue'
 import { useCanvasFrames, useCanvasStore } from '../../../composables/canvas-settings.js'
-import { useContextMenu } from '../../../composables/context-menu.js'
+import { isContextMenuShortcut, useContextMenu } from '../../../composables/context-menu.js'
 import { registerFrameShortcuts, useFrameActions } from '../../../util/frame-actions.js'
 import { useShortcutRegistry } from '../../../util/shortcuts.js'
 import BaseOverflowToolbar from '../../base/overflow/BaseOverflowToolbar.vue'
@@ -46,6 +46,18 @@ function setOpen(value: string | null) {
   open.value = value
 }
 
+/** Toolbar context actions use selected frame identity without changing selection. */
+function openSelectedFrameMenu(event: MouseEvent | KeyboardEvent): void {
+  if ('key' in event && !isContextMenuShortcut(event)) return
+  const frame = canvas.selectedFrame ? frames.getFrame(canvas.selectedFrame) : null
+  if (!frame) return
+  menu?.open(event, {
+    kind: 'toolbar',
+    label: `${frame.storyId} › ${frame.variantId}`,
+    frame: { storyId: frame.storyId, variantId: frame.variantId, frameKey: frame.id },
+  })
+}
+
 if (shortcuts) {
   disposers.push(registerCanvasShortcuts(shortcuts, canvas, frames))
   if (actions) {
@@ -62,7 +74,7 @@ onBeforeUnmount(() => disposers.forEach(dispose => dispose()))
 </script>
 
 <template>
-  <BaseOverflowToolbar ref="toolbar" class="histoire-canvas-toolbar" label="Canvas tools" overflow-label="More canvas tools" :overlay-target="overlayTarget" :bounds="bounds" @update:open="value => { if (!value) setOpen(null) }" @wheel.stop @pointerdown.stop>
+  <BaseOverflowToolbar ref="toolbar" class="histoire-canvas-toolbar" label="Canvas tools" overflow-label="More canvas tools" :overlay-target="overlayTarget" :bounds="bounds" @update:open="value => { if (!value) setOpen(null) }" @contextmenu="openSelectedFrameMenu" @keydown="openSelectedFrameMenu" @wheel.stop @pointerdown.stop>
     <BaseOverflowToolbarItem v-if="matchCount" id="search">
       <SearchMatchStepper :count="matchCount" :position="matchPosition ?? 0" @previous="emit('previousMatch')" @next="emit('nextMatch')" />
     </BaseOverflowToolbarItem>

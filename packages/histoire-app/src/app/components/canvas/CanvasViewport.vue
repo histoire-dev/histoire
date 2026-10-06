@@ -3,6 +3,7 @@ import type { HistoireCatalogStory, HistoireSession } from '@histoire/sdk'
 import { useHistoireSession, useHistoireSnapshot } from '@histoire/vue'
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, shallowRef, watch } from 'vue'
 import { createCanvasFrames, provideCanvas, provideCanvasPointerPan } from '../../composables/canvas-settings.js'
+import { useContextMenu } from '../../composables/context-menu.js'
 import { createCanvasStore, getCanvasStorage } from '../../stores/canvas.js'
 import { useMatrixStore } from '../../stores/matrix.js'
 import { useUiSettingsStore } from '../../stores/settings.js'
@@ -47,6 +48,7 @@ const props = withDefaults(defineProps<{
 const emit = defineEmits<{ error: [error: unknown], contextmenu: [event: MouseEvent | KeyboardEvent, frame: CanvasFrameLayout], framePointer: [target: { storyId: string, variantId: string, frameKey: string, point: { x: number, y: number }, clientPoint: { x: number, y: number } }], selectedSession: [session: HistoireSession | undefined] }>()
 const session = useHistoireSession()
 const snapshot = useHistoireSnapshot()
+const contextMenu = useContextMenu()
 const viewport = ref<HTMLElement>()
 const toolbar = ref<HTMLElement>()
 const header = ref<HTMLElement>()
@@ -165,6 +167,14 @@ function selectVariant(variantId: string): Promise<void> {
   return session.selection.select({ storyId: story.value.id, variantId }).catch(error => emit('error', error))
 }
 
+/** Blank canvas uses selected frame actions; child surfaces keep their own menus. */
+function openCanvasMenu(event: MouseEvent | KeyboardEvent): void {
+  if (event.target !== viewport.value) return
+  const frame = selectedFrame.value
+  if (!frame) return
+  contextMenu?.open(event, { storyId: frame.storyId, variantId: frame.variantId, frameKey: frame.id })
+}
+
 /** Select another ready grid/list preview while leaving its original click untouched. */
 function activatePreview(iframe: HTMLIFrameElement) {
   if (renderedArrange.value === 'matrix' || snapshot.value.stale || diagnostics.value.length) return
@@ -243,7 +253,7 @@ defineExpose({ canvas, registry })
 </script>
 
 <template>
-  <div ref="viewport" class="histoire-canvas-viewport" :class="{ 'is-panning': panning, 'is-dragging': canvas.panning, 'is-commenting': commentMode }" :style="{ '--histoire-canvas-inspector-reserve': `${inspectorWidth}px` }" role="region" aria-label="Story canvas" tabindex="-1" @wheel="onWheel" @pointerdown.capture="framePointer" @pointerdown="pointerDown" @pointermove="pointer.onPointerMove" @pointerup="pointer.onPointerUp" @pointercancel="pointer.onPointerCancel">
+  <div ref="viewport" class="histoire-canvas-viewport" :class="{ 'is-panning': panning, 'is-dragging': canvas.panning, 'is-commenting': commentMode }" :style="{ '--histoire-canvas-inspector-reserve': `${inspectorWidth}px` }" role="region" aria-label="Story canvas" tabindex="-1" @wheel="onWheel" @contextmenu="openCanvasMenu" @keydown="openCanvasMenu" @pointerdown.capture="framePointer" @pointerdown="pointerDown" @pointermove="pointer.onPointerMove" @pointerup="pointer.onPointerUp" @pointercancel="pointer.onPointerCancel">
     <div ref="toolbar" class="histoire-canvas-toolbar-host">
       <slot name="toolbar" :canvas="canvas" :frames="registry" />
     </div>

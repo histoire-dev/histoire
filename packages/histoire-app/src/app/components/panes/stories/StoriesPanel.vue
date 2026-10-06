@@ -5,8 +5,10 @@ import type { StoryTreeRow } from './tree.js'
 import { BuiltinIcon, HstButton } from '@histoire/controls/vue'
 import { useHistoireContext, useHistoireResource } from '@histoire/vue/internal'
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, shallowRef, watch } from 'vue'
+import { isContextMenuShortcut, useContextMenu } from '../../../composables/context-menu.js'
 import { histoireConfig } from '../../../util/config.js'
 import WorkbenchVirtualList from '../../lists/WorkbenchVirtualList.vue'
+
 import { useWorkbenchTestsModel } from '../tests/model.js'
 import { createStoryTreeRows, nextTreeFocus } from './tree.js'
 
@@ -23,6 +25,7 @@ const emit = defineEmits<{
   error: [error: unknown]
 }>()
 const { session } = useHistoireContext()
+const menu = useContextMenu()
 const snapshot = shallowRef(session.getSnapshot())
 useHistoireResource(session.subscribe(value => snapshot.value = value))
 const tests = useWorkbenchTestsModel()
@@ -41,6 +44,15 @@ useHistoireResource(() => {
 const rows = computed(() => createStoryTreeRows(snapshot.value.catalog, snapshot.value.selection, props.folders.expandedPaths.value, collapsedStory.value !== snapshot.value.selection?.storyId))
 const items = computed(() => rows.value.filter(row => row.kind !== 'group'))
 const title = computed(() => histoireConfig.theme.title ?? 'Stories')
+const menuDisposers = [
+  menu?.register({ id: 'stories.folder.expand', label: 'Expand folder', icon: 'folder-open', available: target => target.kind === 'folder' && !target.expanded && Boolean(target.path), run: (target) => {
+    if (target.kind === 'folder' && target.path) props.folders.toggle({ path: target.path, open: true })
+  } }),
+  menu?.register({ id: 'stories.folder.collapse', label: 'Collapse folder', icon: 'folder', available: target => target.kind === 'folder' && target.expanded && Boolean(target.path), run: (target) => {
+    if (target.kind === 'folder' && target.path) props.folders.toggle({ path: target.path, open: false })
+  } }),
+].filter((dispose): dispose is () => void => Boolean(dispose))
+useHistoireResource(() => menuDisposers.forEach(dispose => dispose()))
 
 watch(items, (value) => {
   if (value.some(row => row.key === focused.value)) return
@@ -125,6 +137,21 @@ function toggle(row: StoryTreeRow): void {
   if (row.kind === 'story' && row.story?.id === snapshot.value.selection?.storyId) collapsedStory.value = row.expanded ? row.story.id : ''
 }
 
+/** Open on immutable row identity so virtual-list recycling cannot retarget actions. */
+function openMenu(event: MouseEvent | KeyboardEvent, row: StoryTreeRow): void {
+  if (!menu) return
+  if (row.kind === 'folder' && row.path) {
+    menu.open(event, { kind: 'folder', key: row.key, label: row.title, path: [...row.path], expanded: Boolean(row.expanded) }, [row.expanded ? 'stories.folder.collapse' : 'stories.folder.expand'])
+    return
+  }
+  if (!row.target || row.kind === 'group') return
+  const selection: HistoireSelectionInput = 'variantId' in row.target ? { ...row.target } : { storyId: row.target.storyId }
+  const frame = row.kind === 'variant' && 'variantId' in row.target && row.target.variantId
+    ? { storyId: row.target.storyId, variantId: row.target.variantId, frameKey: JSON.stringify([row.target.storyId, row.target.variantId]) }
+    : undefined
+  menu.open(event, { kind: 'story', key: row.key, label: row.title, selection, frame }, ['stories.select', 'context.copy-link'])
+}
+
 /** Variant rows retain an exact frame target; stories and folders have no single frame. */
 function fit(row: StoryTreeRow): void {
   if (row.kind !== 'variant' || !row.target || !('variantId' in row.target) || row.target.variantId === null) return
@@ -139,6 +166,10 @@ async function focus(key: string): Promise<void> {
 
 /** Tree keyboard follows visible rows and never leaks arrow keys into canvas. */
 async function onKeydown(event: KeyboardEvent, row: StoryTreeRow): Promise<void> {
+  if (isContextMenuShortcut(event)) {
+    openMenu(event, row)
+    return
+  }
   if (!['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Home', 'End', 'Enter', ' '].includes(event.key)) return
   event.preventDefault()
   if (event.key === 'Enter' || event.key === ' ') {
@@ -223,6 +254,7 @@ function icon(row: StoryTreeRow): string {
             @keydown="onKeydown($event, row)"
             @click="row.kind === 'folder' ? toggle(row) : select(row)"
             @dblclick="fit(row)"
+            @contextmenu="openMenu($event, row)"
           >
             <BuiltinIcon v-if="row.expanded !== undefined" :icon="row.expanded ? 'chevron-down' : 'chevron-right'" class="stories-chevron" :size="16" />
             <span v-else class="stories-chevron" />

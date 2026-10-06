@@ -22,6 +22,8 @@ const props = defineProps<{
 const emit = defineEmits<{
   /** Reveal exact known or orphan thread. */
   select: [comment: UiComment]
+  /** Preserve comment identity when a virtual row forwards its context menu. */
+  contextmenu: [event: MouseEvent | KeyboardEvent, comment: UiComment, title: string]
 }>()
 /** Flattened headings retain their own recycling pool and story identity. */
 interface CommentHeading {
@@ -69,7 +71,7 @@ const rows = computed<(CommentHeading | CommentItem)[]>(() => {
       <h3 v-if="item.kind === 'heading'">
         <BuiltinIcon icon="cube" :size="16" />{{ item.title }}<small v-if="item.orphaned">Orphaned</small>
       </h3>
-      <CommentRow v-else :comment="item.comment" :number="item.number" :title="item.title" :active="activeId === item.key" :agents="agents" @select="emit('select', item.comment)" />
+      <CommentRow v-else :comment="item.comment" :number="item.number" :title="item.title" :active="activeId === item.key" :agents="agents" @select="emit('select', item.comment)" @contextmenu="emit('contextmenu', $event, item.comment, item.title)" />
     </template>
   </WorkbenchVirtualList>
 </template>

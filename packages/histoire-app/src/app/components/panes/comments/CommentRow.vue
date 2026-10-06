@@ -2,6 +2,7 @@
 import type { UiComment, UiCommentAgent } from '@histoire/shared'
 import { BuiltinIcon, HstButton } from '@histoire/controls/vue'
 import { computed } from 'vue'
+import { isContextMenuShortcut } from '../../../composables/context-menu.js'
 import PulsatingDisc from '../../base/PulsatingDisc.vue'
 import { commentAge } from '../../comments/presentation.js'
 
@@ -20,13 +21,20 @@ const props = defineProps<{
 const emit = defineEmits<{
   /** Open this exact annotation; orphan rows remain readable. */
   select: []
+  /** Delegate target-specific context actions to comments panel owner. */
+  contextmenu: [event: MouseEvent | KeyboardEvent]
 }>()
 const agent = computed(() => props.agents.find(agent => agent.id === props.comment.agentId)?.name ?? props.comment.agentId ?? 'Agent')
 const status = computed(() => props.comment.status === 'draft' ? 'Not sent yet' : props.comment.status === 'resolved' ? 'Resolved' : props.comment.status === 'replied' ? `${agent.value} replied` : props.comment.status === 'sent' ? `${agent.value} queued` : `${agent.value} is working…`)
+
+/** Comment rows retain native menu access without intercepting ordinary keys. */
+function onKeydown(event: KeyboardEvent): void {
+  if (isContextMenuShortcut(event)) emit('contextmenu', event)
+}
 </script>
 
 <template>
-  <HstButton color="flat" type="button" class="comment-row" :class="{ active }" :aria-current="active ? 'true' : undefined" @click="emit('select')">
+  <HstButton color="flat" type="button" class="comment-row" :class="{ active }" :aria-current="active ? 'true' : undefined" @click="emit('select')" @contextmenu="emit('contextmenu', $event)" @keydown="onKeydown">
     <span class="row-pin" :class="{ draft: comment.status === 'draft' }">{{ number }}</span>
     <span class="row-content">
       <span class="row-title"><strong>{{ title }}</strong><time :datetime="comment.updatedAt" :title="comment.updatedAt">{{ commentAge(comment.updatedAt) }}</time></span>
