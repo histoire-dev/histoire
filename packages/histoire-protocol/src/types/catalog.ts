@@ -83,8 +83,15 @@ export interface HistoireSearchResult {
   kind: 'story' | 'variant' | 'docs'
   /** Display label. */
   title: string
-  /** Existing source ranking. */
+  /** Consecutive source order after relevance sorting and deduplication. */
   rank: number
+  /** Optional matching evidence shared by source search and loaded props. */
+  match?: {
+    /** Whether literal matching or typo fallback produced this result. */
+    mode: 'literal' | 'fuzzy'
+    /** Comparable relevance score; lower values sort first. */
+    score: number
+  }
   /** Optional plain text excerpt. */
   excerpt?: string
   /** Panel-local documentation anchor. */

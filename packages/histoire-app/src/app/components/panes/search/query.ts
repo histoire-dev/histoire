@@ -1,14 +1,15 @@
 import type { HistoireCatalogStory, HistoireSearchResult, HistoireTarget } from '@histoire/protocol'
 import { getHistoireTargetKey } from '@histoire/protocol'
+import { matchSearchText } from '../../../../embed/search-match.js'
 
 /** Available local result scopes. */
 export type SearchScope = 'all' | 'stories' | 'docs' | 'props'
 
-/** Standalone search decorates ranked source results without rebuilding its Fuse index. */
+/** Workbench search decorates ranked source results without rebuilding its title index. */
 export interface WorkbenchSearchResult {
   /** Exact tuple and result kind, never a separator-parsed identity. */
   id: string
-  /** Result group and activation behavior. */
+  /** Result kind and activation behavior. */
   kind: HistoireSearchResult['kind'] | 'prop'
   /** Exact session activation target. */
   target: HistoireTarget
@@ -22,6 +23,8 @@ export interface WorkbenchSearchResult {
   iconColor?: string
   /** Original ranked result, preserved for documentation anchors. */
   source?: HistoireSearchResult
+  /** Shared relevance used when merging source results and loaded props. */
+  match?: HistoireSearchResult['match']
 }
 
 /** Only metadata needed for client-side props search is retained. */
@@ -42,12 +45,19 @@ export interface LoadedProps {
   names: readonly LoadedPropName[]
 }
 
-/** Project title results in source order; every source rank/anchor remains unchanged. */
+/** Project source results in order while treating docs-only entries as documents. */
 export function projectSearchResults(results: readonly HistoireSearchResult[], stories: readonly HistoireCatalogStory[]): WorkbenchSearchResult[] {
-  return results.map((source) => {
+  const seen = new Set<string>()
+  return results.flatMap((source) => {
     const story = stories.find(story => story.id === source.target.storyId)
+    if (story?.docsOnly && source.kind === 'variant') return []
     const kind = story?.docsOnly && source.kind === 'story' ? 'docs' : source.kind
-    return { id: JSON.stringify([source.target.storyId, source.target.variantId, source.kind, source.anchor]), kind, target: source.target, title: source.title, path: story?.path ?? [], excerpt: source.excerpt, iconColor: story?.iconColor, source }
+    // Title/body hits share one action; keep the winning source's anchor intact.
+    const key = JSON.stringify([source.target.storyId, source.target.variantId, kind])
+    if (seen.has(key)) return []
+    seen.add(key)
+    const id = JSON.stringify([source.target.storyId, source.target.variantId, kind, source.anchor])
+    return [{ id, kind, target: source.target, title: source.title, path: story?.path ?? [], excerpt: source.excerpt, iconColor: story?.iconColor, source, match: source.match }]
   })
 }
 
@@ -71,23 +81,27 @@ export function readPropNames(value: Readonly<Record<string, unknown>> | readonl
   })
 }
 
-/** Props search covers already-loaded names only; source title ranking is untouched. */
+/** Props use shared matching over loaded metadata without mounting another runtime. */
 export function matchLoadedProps(loaded: readonly LoadedProps[], stories: readonly HistoireCatalogStory[], query: string): WorkbenchSearchResult[] {
-  const text = query.trim().toLocaleLowerCase()
-  if (!text) return []
-  return loaded.flatMap(({ target, names }) => {
+  if (query.startsWith('>')) return []
+  const candidates = loaded.flatMap(({ target, names }) => {
     const story = stories.find(story => story.id === target.storyId)
     if (!story || !story.variants.some(variant => variant.id === target.variantId)) return []
-    return names.filter(prop => `${prop.name} ${prop.component}`.toLocaleLowerCase().includes(text)).map(prop => ({
-      id: JSON.stringify([target.storyId, target.variantId, 'prop', prop.component, prop.name]),
-      kind: 'prop' as const,
-      target,
-      title: prop.name,
-      path: story.path,
-      excerpt: [prop.component, prop.types.join(' | ')].filter(Boolean).join(' · '),
-      iconColor: story.iconColor,
+    return names.map(prop => ({
+      item: {
+        id: JSON.stringify([target.storyId, target.variantId, 'prop', prop.component, prop.name]),
+        kind: 'prop' as const,
+        target,
+        title: prop.name,
+        path: story.path,
+        excerpt: [prop.component, prop.types.join(' | ')].filter(Boolean).join(' · '),
+        iconColor: story.iconColor,
+      },
+      titles: [prop.name],
+      context: prop.component,
     }))
   })
+  return matchSearchText(candidates, query).map(({ item, match }) => ({ ...item, match }))
 }
 
 /** Highlight only selected story frames; story hits include every collected variant. */

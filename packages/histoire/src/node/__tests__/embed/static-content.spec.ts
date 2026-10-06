@@ -1,6 +1,7 @@
 import { readFile, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
+import { searchEmbedData } from '../../../../../histoire-app/src/embed/search.js'
 import { prepareEmbedOutput, writeEmbedDescriptor } from '../../virtual/embed/output.js'
 import { createEmbedSource } from '../../virtual/embed/source.js'
 import { createEmbedSourceFixture } from '../utils/embed/source.js'
@@ -26,6 +27,32 @@ describe('lazy static content assets', () => {
     const search = JSON.parse(await readFile(join(fixture.root, descriptor.assets.search), 'utf8'))
     expect(search.docs[0]).toMatchObject({ target: { storyId: fixture.story.story.id, variantId: null }, text: 'lazy-doc-body' })
     expect(JSON.stringify(search)).not.toContain(fixture.root)
+  })
+
+  it('omits synthetic default variants from docs-only search while retaining title and docs hits', async () => {
+    fixture.story.story.title = 'Introduction'
+    fixture.story.story.variants = [{ id: '_default', title: 'default' }]
+    await fixture.catalog.publish(fixture.context)
+    const source = createEmbedSource(fixture.context, fixture.catalog)
+    const storyId = fixture.story.story.id
+    expect(searchEmbedData(source.getSearch(), 'default')).toContainEqual(expect.objectContaining({
+      kind: 'variant',
+      target: { storyId, variantId: '_default' },
+    }))
+
+    fixture.story.story.docsOnly = true
+    await fixture.catalog.publish(fixture.context)
+    const docsOnlySearch = source.getSearch()
+
+    expect(docsOnlySearch.titles).toContainEqual(expect.objectContaining({
+      kind: 'docs',
+      target: { storyId, variantId: null },
+    }))
+    expect(searchEmbedData(docsOnlySearch, 'default')).toEqual([])
+    expect(searchEmbedData(docsOnlySearch, 'lazy-doc-body')).toContainEqual(expect.objectContaining({
+      kind: 'docs',
+      target: { storyId, variantId: null },
+    }))
   })
 
   it('changes immutable docs URL when renderer output changes with identical Markdown text', async () => {

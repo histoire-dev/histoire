@@ -19,10 +19,14 @@ describe('workbench search projections', () => {
   })
 
   it('places docs-only title hits in Docs scope and activates Docs without mutating ranked source', () => {
-    const docs = { ...story, id: 'guide', docsOnly: true, variants: [] }
+    const docs = { ...story, id: 'guide', docsOnly: true, variants: [{ id: '_default', title: 'default' }] }
     const source: HistoireSearchResult = { target: { storyId: docs.id, variantId: null }, kind: 'story', title: 'Guide', rank: 4, anchor: '#welcome' }
-    const results = projectSearchResults([source], [docs])
-    expect(results).toMatchObject([{ kind: 'docs', source }])
+    const syntheticVariant: HistoireSearchResult = { target: { storyId: docs.id, variantId: '_default' }, kind: 'variant', title: 'default', rank: 5 }
+    const documentText: HistoireSearchResult = { target: { storyId: docs.id, variantId: null }, kind: 'docs', title: 'Guide', excerpt: 'Welcome', rank: 6, anchor: '#body-match' }
+    const results = projectSearchResults([source, syntheticVariant, documentText], [docs])
+    expect(results[0]).toMatchObject({ kind: 'docs', source })
+    expect(results.map(result => result.source)).toEqual([source])
+    expect(results.map(result => result.kind)).toEqual(['docs'])
     expect(getSearchFrameMatches(results, docs)).toEqual([])
     expect(getSearchActivationResult(results[0])).toEqual({ ...source, kind: 'docs' })
     expect(source.kind).toBe('story')
@@ -45,6 +49,36 @@ describe('workbench search projections', () => {
 })
 
 describe('workbench search request ownership', () => {
+  it('retires pending query results when source revision changes', async () => {
+    vi.useFakeTimers()
+    const fixture = sourceFixture()
+    const session = createHistoireSessionWithAdapters({ url: 'https://book.example/' }, fixture.adapters)
+    await session.connect()
+    const earlier = deferred<readonly HistoireSearchResult[]>()
+    const current = deferred<readonly HistoireSearchResult[]>()
+    fixture.request.mockReturnValueOnce(earlier.promise).mockReturnValueOnce(current.promise)
+    let state: WorkbenchSearchState | undefined
+    const controller = createWorkbenchSearchController(session, value => state = value)
+    try {
+      controller.search('needle')
+      await vi.advanceTimersByTimeAsync(50)
+      fixture.descriptor.revision = 'replacement-search'
+      fixture.emitCatalog()
+      expect(state?.results).toEqual([])
+      await vi.advanceTimersByTimeAsync(50)
+      current.resolve([{ target: { storyId: 'a:b', variantId: null }, kind: 'story', title: 'Current', rank: 0 }])
+      await vi.advanceTimersByTimeAsync(0)
+      earlier.resolve([{ target: { storyId: 'a:b', variantId: null }, kind: 'story', title: 'Retired', rank: 0 }])
+      await vi.advanceTimersByTimeAsync(0)
+      expect(state?.results.map(result => result.title)).toEqual(['Current'])
+    }
+    finally {
+      controller.close()
+      await session.dispose()
+      vi.useRealTimers()
+    }
+  })
+
   it('debounces requests and ignores earlier query completion', async () => {
     vi.useFakeTimers()
     const fixture = sourceFixture()

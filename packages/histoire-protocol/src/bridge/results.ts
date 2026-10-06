@@ -89,6 +89,10 @@ export function validateBridgeResult(command: HistoireBridgeCommand, value: unkn
       const result = wireRecord(entry)
       validateHistoireTarget(result.target)
       if (!['story', 'variant', 'docs'].includes(result.kind as string) || typeof result.title !== 'string' || typeof result.rank !== 'number' || !Number.isFinite(result.rank)) invalid('Invalid search result')
+      if (result.match !== undefined) {
+        const match = wireRecord(result.match)
+        if (!['literal', 'fuzzy'].includes(match.mode as string) || typeof match.score !== 'number' || !Number.isFinite(match.score) || match.score < 0) invalid('Invalid search matching evidence')
+      }
       for (const key of ['excerpt', 'anchor']) {
         if (result[key] !== undefined && typeof result[key] !== 'string') invalid('Invalid search excerpt')
       }

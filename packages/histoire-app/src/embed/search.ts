@@ -1,8 +1,8 @@
-import type { HistoireSearchResult, HistoireSourceSearchData, HistoireSourceSearchRow } from '@histoire/protocol'
+import type { HistoireSearchResult, HistoireSourceSearchData } from '@histoire/protocol'
 import { HistoireSdkError, validateHistoireTarget, validateWireValue } from '@histoire/protocol'
-import Fuse from 'fuse.js'
+import { matchSearchText } from './search-match.js'
 
-/** Validates structured source search rows before existing Fuse ranking processes text. */
+/** Validates structured source search rows before shared relevance matching. */
 export function validateEmbedSearch(value: unknown): HistoireSourceSearchData {
   validateWireValue(value, { kind: 'descriptor', name: 'search' })
   const data = value as HistoireSourceSearchData
@@ -14,20 +14,19 @@ export function validateEmbedSearch(value: unknown): HistoireSourceSearchData {
   return data
 }
 
-/** Preserves title-first/then-docs ranking and exact tuple identity from standalone search. */
+/** Searches titles and full docs together, preserving separate story/document actions. */
 export function searchEmbedData(data: HistoireSourceSearchData, query: string): readonly HistoireSearchResult[] {
-  const search = (rows: readonly HistoireSourceSearchRow[]) => new Fuse([...rows], { keys: ['text'] }).search(query)
+  const candidates = [
+    ...data.titles.map(item => ({ item, titles: [item.title], context: item.text })),
+    ...data.docs.map(item => ({ item, titles: [item.title], context: item.text })),
+  ]
   const seen = new Set<string>()
   const results: HistoireSearchResult[] = []
-  for (const rows of [data.titles, data.docs]) {
-    let rank = 0
-    for (const { item } of search(rows)) {
-      const key = JSON.stringify([item.target.storyId, item.target.variantId])
-      if (!seen.has(key)) {
-        results.push({ target: item.target, kind: item.kind, title: item.title, rank })
-        seen.add(key)
-      }
-      rank++
+  for (const { item, match } of matchSearchText(candidates, query)) {
+    const key = JSON.stringify([item.target.storyId, item.target.variantId, item.kind])
+    if (!seen.has(key)) {
+      results.push({ target: item.target, kind: item.kind, title: item.title, rank: results.length, match })
+      seen.add(key)
     }
   }
   return results

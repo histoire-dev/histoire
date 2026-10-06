@@ -14,7 +14,7 @@ import { getSearchCommandDomId, SEARCH_ACTIVE_RESULT_ID, SEARCH_RESULTS_ID } fro
 import { createWorkbenchSearchController } from './controller.js'
 import { getSearchActivationResult, getSearchFrameMatches } from './query.js'
 import SearchEmpty from './SearchEmpty.vue'
-import SearchResultGroup from './SearchResultGroup.vue'
+import SearchResultList from './SearchResultList.vue'
 import SearchScopes from './SearchScopes.vue'
 
 const props = defineProps<{
@@ -54,13 +54,10 @@ useHistoireResource(() => {
 const selectedCommand = shallowRef<ClientCommand | null>(null)
 const commands = computed(() => snapshot.value.source?.mode === 'dev' && query.value.startsWith('>') ? props.commands.list(query.value.slice(1).trim()) : [])
 const results = computed(() => state.value.results.filter(result => scope.value === 'all' || (scope.value === 'stories' ? result.kind === 'story' || result.kind === 'variant' : result.kind === (scope.value === 'props' ? 'prop' : 'docs'))))
-const groups = computed(() => [
-  { title: 'Variants', results: results.value.filter(result => result.kind === 'story' || result.kind === 'variant') },
-  { title: 'Props', results: results.value.filter(result => result.kind === 'prop') },
-  { title: 'Docs', results: results.value.filter(result => result.kind === 'docs') },
-])
-const ordered = computed(() => groups.value.flatMap(group => group.results))
+const ordered = results
 const index = ref(0)
+/** Default cursor follows ranking until keyboard or native row focus owns a result. */
+let hasCursorIntent = false
 const activeId = computed(() => ordered.value[index.value]?.id)
 const commandRows = computed(() => commands.value.map(command => ({ key: command.id, command })))
 /** Screen readers need exact keyboard intent while native focus remains in input. */
@@ -82,13 +79,16 @@ onBeforeUnmount(() => {
 })
 watch(query, (value) => {
   activationGeneration++
+  hasCursorIntent = false
   emit('query', value)
   search.search(value)
   index.value = 0
   selectedCommand.value = null
 }, { flush: 'sync' })
 watch([ordered, commands], ([rows, actions], [oldRows, oldActions]) => {
-  if (!oldRows.length && !oldActions.length) {
+  // Loaded props can arrive before source results. Until the user navigates,
+  // first Enter must follow the strongest current result rather than that prop.
+  if (!hasCursorIntent) {
     index.value = 0
     return
   }
@@ -97,6 +97,22 @@ watch([ordered, commands], ([rows, actions], [oldRows, oldActions]) => {
   // cannot acquire Enter merely by occupying the former array position.
   index.value = previous ? [...rows.map(row => row.id), ...actions.map(command => command.id)].indexOf(previous) : -1
 }, { flush: 'sync' })
+
+/** Native result focus claims exact identity, never a retired row's old position. */
+function focusResult(id: string) {
+  const position = ordered.value.findIndex(result => result.id === id)
+  if (position < 0) return
+  hasCursorIntent = true
+  index.value = position
+}
+
+/** Command focus uses its live registry ID across reactive availability changes. */
+function focusCommand(id: string) {
+  const position = commands.value.findIndex(command => command.id === id)
+  if (position < 0) return
+  hasCursorIntent = true
+  index.value = ordered.value.length + position
+}
 
 /** Pane openings and explicit search shortcuts share the mounted input focus action. */
 async function focus() {
@@ -181,9 +197,16 @@ function keydown(event: KeyboardEvent) {
   event.preventDefault()
   const count = ordered.value.length + commands.value.length
   if (!count) return
-  if (event.key === 'ArrowDown' || event.key === 'ArrowUp') index.value = index.value < 0 ? event.key === 'ArrowDown' ? 0 : count - 1 : (index.value + (event.key === 'ArrowDown' ? 1 : -1) + count) % count
-  else if (ordered.value[index.value]) void activate(ordered.value[index.value], event.metaKey || event.ctrlKey)
-  else if (commands.value[index.value - ordered.value.length]) activateCommand(commands.value[index.value - ordered.value.length])
+  if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+    hasCursorIntent = true
+    index.value = index.value < 0 ? event.key === 'ArrowDown' ? 0 : count - 1 : (index.value + (event.key === 'ArrowDown' ? 1 : -1) + count) % count
+  }
+  else if (ordered.value[index.value]) {
+    void activate(ordered.value[index.value], event.metaKey || event.ctrlKey)
+  }
+  else if (commands.value[index.value - ordered.value.length]) {
+    activateCommand(commands.value[index.value - ordered.value.length])
+  }
 }
 </script>
 
@@ -214,12 +237,12 @@ function keydown(event: KeyboardEvent) {
       {{ activeCursor.label }}
     </p>
     <div :id="SEARCH_RESULTS_ID">
-      <SearchResultGroup :groups="groups" :query="query" :active-id="activeId" :selection="snapshot.selection" @activate="activate" @focus="index = ordered.findIndex(result => result.id === $event)" />
+      <SearchResultList :results="ordered" :query="query" :active-id="activeId" :selection="snapshot.selection" @activate="activate" @focus="focusResult" />
       <section v-if="commands.length" class="command-results" aria-label="Commands">
         <h3>Commands</h3>
         <WorkbenchVirtualList ref="commandList" :items="commandRows" :min-item-size="40" page-mode list-tag="ul" item-tag="li">
           <template #default="{ item, index: position }">
-            <HstButton :id="getSearchCommandDomId(item.command.id)" color="flat" type="button" data-test-id="search-item" data-search-kind="command" :class="{ active: index === ordered.length + position }" @focus="index = ordered.length + position" @click="activateCommand(item.command)">
+            <HstButton :id="getSearchCommandDomId(item.command.id)" color="flat" type="button" data-test-id="search-item" data-search-kind="command" :class="{ active: index === ordered.length + position }" @focus="focusCommand(item.command.id)" @click="activateCommand(item.command)">
               <BuiltinIcon icon="terminal" :size="16" />{{ item.command.label }}
             </HstButton>
           </template>

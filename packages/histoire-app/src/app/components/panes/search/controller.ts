@@ -1,6 +1,7 @@
 import type { HistoireSession } from '@histoire/sdk/internal'
 import type { LoadedProps, WorkbenchSearchResult } from './query.js'
 import { getHistoireTargetKey } from '@histoire/protocol'
+import { rankSearchMatches } from '../../../../embed/search-match.js'
 import { matchLoadedProps, projectSearchResults, readPropNames } from './query.js'
 
 /** Local search request publication; metadata and source never cross provider lifetimes. */
@@ -9,13 +10,13 @@ export interface WorkbenchSearchState {
   query: string
   /** Debounced source search is in flight. */
   loading: boolean
-  /** Ranked source results followed by runtime prop names. */
+  /** Source results and runtime prop names share one relevance order. */
   results: readonly WorkbenchSearchResult[]
   /** Non-blocking transport/index notice. */
   error: unknown
 }
 
-/** Keep source Fuse ranking and generation guards in one standalone request owner. */
+/** Merge shared relevance while retaining generation guards in one request owner. */
 export function createWorkbenchSearchController(session: HistoireSession, publish: (state: WorkbenchSearchState) => void) {
   let active = true
   let generation = 0
@@ -33,7 +34,9 @@ export function createWorkbenchSearchController(session: HistoireSession, publis
   }
   /** Publish current query only; prop updates do not request another source index. */
   function update() {
-    if (active) publish({ query, loading, error, results: [...ranked, ...matchLoadedProps([...loaded.values()], session.getSnapshot().catalog.stories, query)] })
+    // Keep source candidates intact: later runtime definitions can suppress
+    // fallback, and removing those definitions must reveal it without refetching.
+    if (active) publish({ query, loading, error, results: rankSearchMatches([...ranked, ...matchLoadedProps([...loaded.values()], session.getSnapshot().catalog.stories, query)]) })
   }
   /** Only ready canonical state may add runtime-owned prop metadata. */
   function observe(snapshot: ReturnType<HistoireSession['getSnapshot']>) {

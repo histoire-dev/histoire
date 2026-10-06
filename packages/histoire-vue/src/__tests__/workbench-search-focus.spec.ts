@@ -35,7 +35,7 @@ describe('workbench Search focus and controls', () => {
     const host = defineComponent({
       setup() {
         provideShell(shell)
-        return () => h(ShellLayout, { homeHref: '/' }, {
+        return () => h(ShellLayout, { homeHref: '/', onPane: shell.selectPane }, {
           search: () => h(SearchPanel, { commands }),
         })
       },
