@@ -1,3 +1,4 @@
+import type { HistoireBridgePublication } from '@histoire/protocol'
 import type { HistoirePresetAction } from '@histoire/sdk/internal'
 import { createHistoireSessionWithAdapters, registerHistoireSessionInternals } from '@histoire/sdk/internal'
 import { mount } from '@vue/test-utils'
@@ -179,13 +180,20 @@ describe('native controls state ownership', () => {
     await session.connect()
     await session.selection.select({ storyId: 'a:b', variantId: 'c' })
     const wrapper = mount(HistoireProvider, { props: { session }, slots: { default: () => h(HistoireControls) } })
-    expect(wrapper.text()).toContain('Preview unavailable')
+    expect(wrapper.text()).toContain('Variant unavailable')
     expect(fixture.adapters.mount).not.toHaveBeenCalled()
     wrapper.unmount()
     await session.dispose()
   })
   it('routes generic edits to primary and never claims primary through controls mount', async () => {
     const fixture = sourceFixture()
+    const definitions = [{ index: 0, name: 'Button', props: [{ name: 'label', types: ['string'], value: 'Primary' }] }]
+    const dispatch = fixture.request.getMockImplementation()!
+    fixture.request.mockImplementation(async (command, payload) => {
+      const result = await dispatch(command, payload)
+      if (result && 'value' in result) result.value._hPropDefs = definitions
+      return result
+    })
     const session = createHistoireSessionWithAdapters({ url: 'https://book.example/' }, fixture.adapters)
     await session.connect()
     await session.selection.select({ storyId: 'a:b', variantId: 'c' })
@@ -198,12 +206,54 @@ describe('native controls state ownership', () => {
     })
     const wrapper = mount(HistoireProvider, { props: { session }, slots: { default: () => h(HistoireControls) } })
     await vi.waitFor(() => expect(wrapper.find('input[type=number]').exists()).toBe(true))
+    expect(wrapper.find('input[aria-label="label"]').exists()).toBe(true)
     const input = wrapper.find('input[type=number]')
     await input.setValue('12')
     await vi.waitFor(() => expect(session.getSnapshot().state?.value).toMatchObject({ count: 12 }))
+    await wrapper.get('input[aria-label="label"]').setValue('Secondary')
+    await vi.waitFor(() => expect(session.getSnapshot().state?.value._hPropState).toMatchObject({ 0: { label: 'Secondary' } }))
     expect(session.getSnapshot().runtime.mountId).toBe(primary.id)
     wrapper.unmount()
     controlsMount.mockRestore()
     await session.dispose()
+  })
+  it('renders detected props after active custom controls', async () => {
+    const fixture = sourceFixture()
+    const definitions = [{ index: 0, name: 'Button', props: [{ name: 'label', types: ['string'], value: 'Primary' }] }]
+    const dispatch = fixture.request.getMockImplementation()!
+    fixture.request.mockImplementation(async (command, payload) => {
+      const result = await dispatch(command, payload)
+      if (result && 'value' in result) result.value._hPropDefs = definitions
+      return result
+    })
+    const originalMount = fixture.adapters.mount
+    let publish = (_event: HistoireBridgePublication) => {}
+    let mountId = ''
+    fixture.adapters.mount = (context) => {
+      const surface = originalMount(context)
+      if (context.surface !== 'controls') return surface
+      mountId = context.mountId
+      return { ...surface, channel: { subscribe(listener) { publish = listener; return () => {} }, post() {} } }
+    }
+    const session = createHistoireSessionWithAdapters({ url: 'https://book.example/' }, fixture.adapters)
+    await session.connect()
+    await session.selection.select({ storyId: 'a:b', variantId: 'c' })
+    await session.mount(document.createElement('div'), { surface: 'preview' }).ready
+    await session.state.get()
+    const wrapper = mount(HistoireProvider, { props: { session }, slots: { default: () => h(HistoireControls) } })
+    try {
+      await vi.waitFor(() => expect(mountId).not.toBe(''))
+      const snapshot = session.getSnapshot()
+      publish({ protocolVersion: 1, kind: 'event', sessionId: 'session', connectionId: 'controls', mountId, sourceId: snapshot.source!.sourceId, epoch: snapshot.source!.epoch, revision: snapshot.source!.revision, runtimeId: snapshot.runtime.runtimeId!, target: snapshot.selection!, event: 'controls.height', sequence: 0, payload: { hasControls: true, height: 32 } })
+      await vi.waitFor(() => expect(wrapper.find('input[aria-label="label"]').exists()).toBe(true))
+      const controls = wrapper.get('.histoire-controls').element
+      const ordered = Array.from(controls.querySelectorAll('.histoire-custom-controls, input[aria-label="label"]'))
+      expect(ordered.map(element => element.classList.contains('histoire-custom-controls') ? 'custom' : element.getAttribute('aria-label'))).toEqual(['custom', 'label'])
+      expect(wrapper.find('input[type=number]').exists()).toBe(false)
+    }
+    finally {
+      wrapper.unmount()
+      await session.dispose()
+    }
   })
 })
