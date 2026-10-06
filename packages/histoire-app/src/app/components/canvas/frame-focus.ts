@@ -20,8 +20,10 @@ export function watchCanvasFrameFocus(options: CanvasFrameFocusOptions) {
   // Scalar sources keep zoom-created frame objects from retriggering selection focus.
   return watch([() => options.getFrame()?.id, options.getArrange], ([, arrange]) => {
     const frame = options.getFrame()
-    if (frame && arrange !== 'matrix') {
-      if (options.shouldRevealFrame?.(frame) === false) options.selectFrame(frame)
+    if (frame) {
+      const shouldReveal = options.shouldRevealFrame?.(frame)
+      if (arrange === 'matrix') return
+      if (shouldReveal === false) options.selectFrame(frame)
       else options.focusFrame(frame)
     }
   }, { flush: 'post' })

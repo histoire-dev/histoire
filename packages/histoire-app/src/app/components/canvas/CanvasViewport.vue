@@ -7,6 +7,7 @@ import { useContextMenu } from '../../composables/context-menu.js'
 import { createCanvasStore, getCanvasStorage } from '../../stores/canvas.js'
 import { useMatrixStore } from '../../stores/matrix.js'
 import { useUiSettingsStore } from '../../stores/settings.js'
+import { useStoryCanvasViews } from '../../stores/story-canvas-views.js'
 import { getSearchFrameState } from '../panes/search/frame-navigation.js'
 import WorkbenchEmptyState from '../shell/WorkbenchEmptyState.vue'
 import { canvasOverlayIsOccluded } from './canvas-overlay-occlusion.js'
@@ -27,7 +28,9 @@ import FrameList from './FrameList.vue'
 import { clientToCanvas } from './pan/usePanZoom.js'
 import { usePointerPan } from './pan/usePointerPan.js'
 import { useSpacePan } from './pan/useSpacePan.js'
+import { bindStoryCanvasView } from './story-view-binding.js'
 import { useCanvasGeometry } from './useCanvasGeometry.js'
+import { createCanvasViewportEvents } from './viewport-events.js'
 
 const props = withDefaults(defineProps<{
   /** Absolute source base supplied by standalone adapter. */
@@ -36,6 +39,10 @@ const props = withDefaults(defineProps<{
   frameBudget: number
   /** URL arrangement provided by narrow standalone navigation adapter. */
   arrange?: 'grid' | 'list' | 'matrix'
+  /** Arrangement resolved without an explicit URL override. */
+  baseArrange?: 'grid' | 'list' | 'matrix'
+  /** Whether a valid URL arrangement overrides remembered story views. */
+  arrangementOverride?: boolean
   /** Floating inspector width excluded from fit geometry. */
   inspectorWidth?: number
   /** Exact JSON tuple target keys emitted by search pane. */
@@ -44,7 +51,7 @@ const props = withDefaults(defineProps<{
   searchActive?: boolean
   /** Comment placement intercepts preview input without changing persistent tool enum. */
   commentMode?: boolean
-}>(), { arrange: 'grid', inspectorWidth: 0 })
+}>(), { arrange: 'grid', baseArrange: 'grid', arrangementOverride: false, inspectorWidth: 0 })
 const emit = defineEmits<{ error: [error: unknown], contextmenu: [event: MouseEvent | KeyboardEvent, frame: CanvasFrameLayout], framePointer: [target: { storyId: string, variantId: string, frameKey: string, point: { x: number, y: number }, clientPoint: { x: number, y: number } }], selectedSession: [session: HistoireSession | undefined] }>()
 const session = useHistoireSession()
 const snapshot = useHistoireSnapshot()
@@ -64,6 +71,16 @@ const frameState = createCanvasFrameState(session)
 const settings = useUiSettingsStore()
 const renderedArrange = createCanvasArrangement(() => props.arrange, useMatrixStore())
 provideCanvas(canvas, registry, frameState)
+const viewBinding = bindStoryCanvasView({
+  getStoryId: () => story.value?.id,
+  getArrangement: () => props.arrange,
+  getRenderedArrangement: () => renderedArrange.value,
+  getBaseArrangement: () => props.baseArrange,
+  hasArrangementOverride: () => props.arrangementOverride,
+  getSyncZoom: () => settings?.state.syncZoom ?? false,
+  canvas,
+  views: useStoryCanvasViews(),
+})
 const space = useSpacePan({ getTool: () => canvas.tool, getRoot: () => viewport.value })
 const pointer = usePointerPan({ getTool: () => canvas.tool, getSpace: () => space.held.value, getOffset: () => canvas.panOffset, setOffset: canvas.setPanOffset, onActive: value => canvas.panning = value })
 provideCanvasPointerPan(pointer)
@@ -95,6 +112,17 @@ const renderedFrames = computed(() => {
   return [...visible, selected].sort((first, second) => first.y - second.y || first.x - second.x)
 })
 const variantsById = computed(() => new Map(story.value?.variants.map(variant => [variant.id, variant]) ?? []))
+const viewportEvents = createCanvasViewportEvents({
+  getViewport: () => viewport.value,
+  frames: registry,
+  canvas,
+  pointer,
+  getSelectedFrame: () => selectedFrame.value,
+  getCommentMode: () => !!props.commentMode,
+  isPanning: () => panning.value,
+  openMenu: (event, target) => contextMenu?.open(event, target),
+  emitFramePointer: target => emit('framePointer', target),
+})
 const live = useCanvasFrameAdmission({
   frames: () => frames.value,
   viewport: () => canvasViewport.value,
@@ -121,7 +149,7 @@ const { insets: contentInsets, headerBounds, measure } = useCanvasGeometry({
     canvas.setGeometry(size, canvasFrameBounds(frames.value), props.inspectorWidth, insets)
     // Selection can arrive before the host has measurable dimensions; reveal it once ready.
     if (initialFocusPending && selectedFrame.value && size.width > props.inspectorWidth && size.height > (insets.topInset ?? 0) + (insets.bottomInset ?? 0)) {
-      canvas.focusFrame(selectedFrame.value)
+      viewBinding.focusInitialFrame(selectedFrame.value)
       initialFocusPending = false
     }
   },
@@ -148,31 +176,10 @@ const stopSelectedSession = watchCanvasSelectedSession({
   publish: owner => emit('selectedSession', owner),
 })
 
-/** Wheel pans normally; modifier zoom remains anchored at local cursor position. */
-function onWheel(event: WheelEvent) {
-  if (!viewport.value) return
-  event.preventDefault()
-  if (event.ctrlKey || event.metaKey) {
-    const rect = viewport.value.getBoundingClientRect()
-    canvas.setZoom(canvas.effectiveZoom * Math.exp(-event.deltaY * 0.002), { x: event.clientX - rect.left, y: event.clientY - rect.top })
-  }
-  else {
-    canvas.panBy({ x: -event.deltaX, y: -event.deltaY })
-  }
-}
-
 /** Frame activation changes canonical route without moving or replacing its runtime. */
 function selectVariant(variantId: string): Promise<void> {
   if (!story.value) return Promise.resolve()
   return session.selection.select({ storyId: story.value.id, variantId }).catch(error => emit('error', error))
-}
-
-/** Blank canvas uses selected frame actions; child surfaces keep their own menus. */
-function openCanvasMenu(event: MouseEvent | KeyboardEvent): void {
-  if (event.target !== viewport.value) return
-  const frame = selectedFrame.value
-  if (!frame) return
-  contextMenu?.open(event, { storyId: frame.storyId, variantId: frame.variantId, frameKey: frame.id })
 }
 
 /** Select another ready grid/list preview while leaving its original click untouched. */
@@ -191,38 +198,16 @@ function activatePreview(iframe: HTMLIFrameElement) {
   })
 }
 
-/** Clicking canvas background gives keyboard pan scope without stealing control focus. */
-function pointerDown(event: PointerEvent) {
-  const target = event.target as Element | null
-  if (!target?.closest('button, a[href], input, textarea, select, summary, [contenteditable], [role="button"]')) viewport.value?.focus({ preventScroll: true })
-  pointer.onPointerDown(event)
-}
-
-/** Comment placement captures exact registered document coordinates. */
-function framePointer(event: PointerEvent) {
-  if (!props.commentMode || event.button !== 0 || panning.value || (event.target as Element)?.closest('.histoire-canvas-toolbar, button, input, textarea, select, [contenteditable]')) return
-  const clientPoint = { x: event.clientX, y: event.clientY }
-  for (const frame of registry.frames.values()) {
-    const point = registry.clientToFrame(frame.id, clientPoint)
-    if (!point || point.x < 0 || point.y < 0 || point.x > frame.rect.width || point.y > frame.rect.height) continue
-    event.preventDefault()
-    event.stopPropagation()
-    emit('framePointer', { storyId: frame.storyId, variantId: frame.variantId, frameKey: frame.id, point, clientPoint })
-    return
-  }
-}
-
 watch(currentStory, (value) => {
   if (value) cachedStory.value = value
 }, { immediate: true })
-watch(() => currentStory.value?.id, (value, previous) => {
-  if (value && previous && !settings?.state.syncZoom) canvas.fit()
-})
 watch(() => snapshot.value.selection?.variantId, (value) => {
   if (value) cachedVariantId.value = value
 }, { immediate: true })
 // Matrix may temporarily render as Grid while its axes are unavailable; zoom follows actual canvas content.
-watch(renderedArrange, arrangement => canvas.setArrangement(arrangement), { flush: 'sync', immediate: true })
+watch(renderedArrange, (arrangement) => {
+  if (viewBinding.isActiveStory(story.value?.id)) canvas.setArrangement(arrangement)
+}, { flush: 'sync', immediate: true })
 watch([frames, () => props.inspectorWidth, renderedArrange, story, panning], measure, { flush: 'post' })
 watch([
   () => [canvas.effectiveZoom, canvas.panOffset.x, canvas.panOffset.y],
@@ -235,16 +220,18 @@ watchCanvasFrameFocus({
   focusFrame: canvas.focusFrame,
   selectFrame: canvas.selectFrame,
   shouldRevealFrame: (frame) => {
+    if (!viewBinding.shouldRevealFrame(frame)) return false
     if (iframeActivatedFrameId !== frame.id) return true
     iframeActivatedFrameId = undefined
     return false
   },
 })
 onMounted(() => {
-  if (viewport.value) stopInteractions = bindCanvasFrameInteractions(viewport.value, pointer, space, onWheel, activatePreview)
+  if (viewport.value) stopInteractions = bindCanvasFrameInteractions(viewport.value, pointer, space, viewportEvents.onWheel, activatePreview)
   measure()
 })
 onBeforeUnmount(() => {
+  viewBinding.dispose()
   stopSelectedSession()
   stopInteractions()
   frameState.dispose()
@@ -253,7 +240,7 @@ defineExpose({ canvas, registry })
 </script>
 
 <template>
-  <div ref="viewport" class="histoire-canvas-viewport" :class="{ 'is-panning': panning, 'is-dragging': canvas.panning, 'is-commenting': commentMode }" :style="{ '--histoire-canvas-inspector-reserve': `${inspectorWidth}px` }" role="region" aria-label="Story canvas" tabindex="-1" @wheel="onWheel" @contextmenu="openCanvasMenu" @keydown="openCanvasMenu" @pointerdown.capture="framePointer" @pointerdown="pointerDown" @pointermove="pointer.onPointerMove" @pointerup="pointer.onPointerUp" @pointercancel="pointer.onPointerCancel">
+  <div ref="viewport" class="histoire-canvas-viewport" :class="{ 'is-panning': panning, 'is-dragging': canvas.panning, 'is-commenting': commentMode }" :style="{ '--histoire-canvas-inspector-reserve': `${inspectorWidth}px` }" role="region" aria-label="Story canvas" tabindex="-1" @wheel="viewportEvents.onWheel" @contextmenu="viewportEvents.openCanvasMenu" @keydown="viewportEvents.openCanvasMenu" @pointerdown.capture="viewportEvents.framePointer" @pointerdown="viewportEvents.pointerDown" @pointermove="pointer.onPointerMove" @pointerup="pointer.onPointerUp" @pointercancel="pointer.onPointerCancel">
     <div ref="toolbar" class="histoire-canvas-toolbar-host">
       <slot name="toolbar" :canvas="canvas" :frames="registry" />
     </div>
@@ -269,7 +256,7 @@ defineExpose({ canvas, registry })
       </template>
     </component>
     <CanvasMatrixPrimary :active="renderedArrange === 'matrix'" :width="size.width" :height="size.height" @error="emit('error', $event)" />
-    <div v-if="commentMode" class="histoire-comment-capture" @pointerdown="framePointer" />
+    <div v-if="commentMode" class="histoire-comment-capture" @pointerdown="viewportEvents.framePointer" />
     <slot name="overlays" :canvas="canvas" :frames="registry" :selected-frame="selectedFrame" />
     <CollectErrorCard v-if="diagnostics.length" :errors="diagnostics" />
     <CanvasStatus v-if="panning" ref="panHint" :pan="true" />

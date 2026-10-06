@@ -52,7 +52,8 @@ describe('canvas selection focus binding', () => {
     const selected = computed(() => frames.value.find(frame => frame.variantId === selectedId.value))
     canvas.setGeometry({ width: 1200, height: 900 }, canvasFrameBounds(frames.value), 380)
     const focusFrame = vi.fn(canvas.focusFrame)
-    const stop = watchCanvasFrameFocus({ getFrame: () => selected.value, getArrange: () => arrange.value, focusFrame, selectFrame: canvas.selectFrame })
+    const shouldRevealFrame = vi.fn(() => true)
+    const stop = watchCanvasFrameFocus({ getFrame: () => selected.value, getArrange: () => arrange.value, focusFrame, selectFrame: canvas.selectFrame, shouldRevealFrame })
     try {
       const cursor = { x: 600, y: 450 }
       const worldPoint = clientToCanvas(cursor, canvas.effectiveZoom, canvas.panOffset)
@@ -67,6 +68,7 @@ describe('canvas selection focus binding', () => {
       arrange.value = 'matrix'
       await nextTick()
       expect(focusFrame).toHaveBeenCalledTimes(1)
+      expect(shouldRevealFrame).toHaveBeenCalledTimes(2)
       expect(canvas.zoom).toBe(1)
       arrange.value = 'list'
       await nextTick()

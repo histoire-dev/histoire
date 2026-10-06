@@ -14,7 +14,7 @@ const settings = useUiSettingsStore()
 const shortcuts = useShortcutRegistry()
 const label = computed(() => canvas.zoom === 'fit' ? 'Fit' : `${Math.round(canvas.zoom * 100)}%`)
 
-/** Zoom ownership respects optional per-frame synchronization preference. */
+/** Zoom ownership respects optional per-story synchronization preference. */
 function zoom(value: number | 'fit') {
   canvas.setZoom(value)
   emit('update:open', null)
@@ -44,7 +44,7 @@ function selection() {
     </HstButton>
     <template v-if="settings">
       <div class="popover-divider" />
-      <label class="popover-row zoom-sync">Sync zoom across frames<HstSwitch layout="inline" :model-value="settings.state.syncZoom" @update:model-value="settings.update({ syncZoom: $event })" /></label>
+      <label class="popover-row zoom-sync">Sync zoom across stories<HstSwitch layout="inline" :model-value="settings.state.syncZoom" @update:model-value="settings.update({ syncZoom: $event })" /></label>
     </template>
   </ToolbarPopover>
 </template>

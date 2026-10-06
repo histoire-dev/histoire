@@ -18,11 +18,12 @@ import { createPresetConfigStore, providePresetConfigStore } from '../stores/pre
 import { createProjectConfigStore, provideProjectConfigStore } from '../stores/project-config.js'
 import { createUiSettingsStore, provideUiSettingsStore } from '../stores/settings.js'
 import { createShell } from '../stores/shell.js'
+import { createStoryCanvasViews, provideStoryCanvasViews } from '../stores/story-canvas-views.js'
 import { histoireConfig } from '../util/config.js'
 import { createFrameActions, provideFrameActions } from '../util/frame-actions.js'
 import { createShortcutRegistry, provideShortcutRegistry } from '../util/shortcuts.js'
 import { onUiEvent, sendUiEvent } from '../util/ui-channel.js'
-import { resolveWorkbenchArrangement } from './arrangement.js'
+import { createWorkbenchArrangement } from './arrangement.js'
 import { createWorkbenchMarkdownTransition } from './markdown-transition.js'
 import { useWorkbenchDev } from './workbench-dev.js'
 import { activateWorkspacePane, type WorkspacePane } from './workbench-navigation.js'
@@ -42,6 +43,8 @@ export function useWorkbench(props: WorkbenchProps, error: (error: unknown) => v
   useHistoireResource(shell.close)
   const settings = createUiSettingsStore({ storage, warn: console.warn })
   provideUiSettingsStore(settings)
+  const storyCanvasViews = createStoryCanvasViews()
+  provideStoryCanvasViews(storyCanvasViews)
   const presets = createPresetConfigStore({ storage, config: () => histoireConfig, warn: console.warn })
   providePresetConfigStore(presets)
   const matrix = createMatrixStore({ storage })
@@ -146,7 +149,16 @@ export function useWorkbench(props: WorkbenchProps, error: (error: unknown) => v
   const story = computed(() => snapshot.value.catalog.stories.find(item => item.id === snapshot.value.selection?.storyId))
   const markdownTransition = createWorkbenchMarkdownTransition(props.session)
   useHistoireResource(markdownTransition.close)
-  const arrange = computed(() => resolveWorkbenchArrangement(route.value.query.arrange, story.value?.layout?.type, settings.defaultArrange.value, histoireConfig.ui?.defaultArrange))
+  const arrangementState = createWorkbenchArrangement({
+    query: () => route.value.query.arrange,
+    storyId: () => story.value?.id,
+    storyLayout: () => story.value?.layout?.type,
+    localDefault: () => settings.defaultArrange.value,
+    projectDefault: () => histoireConfig.ui?.defaultArrange,
+    syncZoom: () => settings.state.syncZoom,
+    views: storyCanvasViews,
+  })
+  const { arrangement: arrange, base: baseArrange, override: arrangementOverride } = arrangementState
   const searchActive = computed(() => Boolean(searchQuery.value.trim() && !searchQuery.value.startsWith('>') && snapshot.value.status === 'ready' && !snapshot.value.stale))
   const searchMatches = createSearchFrameNavigation({
     getStory: () => story.value,
@@ -277,5 +289,5 @@ export function useWorkbench(props: WorkbenchProps, error: (error: unknown) => v
     const action = actions.entries.get('open-isolated')
     if (action && target.variantId) void actions.run(action, { ...target, variantId: target.variantId, frameKey: getHistoireTargetKey(target) })
   }
-  return { snapshot, route, shell, settings, presets, matrix, projectTests, project, mcp, dev, menu, actions, canvas, search, searchQuery, searchActive, searchMatches, highlighted, story, markdown: markdownTransition.visible, arrange, badges, showPane, activatePane, openSearch, closeSearch, panel, setArrange, setAxes, navigate, searchSelected, testsSelected, nextMatch: searchMatches.next, previousMatch: searchMatches.previous, runAll, openIsolated }
+  return { snapshot, route, shell, settings, presets, matrix, projectTests, project, mcp, dev, menu, actions, canvas, search, searchQuery, searchActive, searchMatches, highlighted, story, markdown: markdownTransition.visible, arrange, baseArrange, arrangementOverride, badges, showPane, activatePane, openSearch, closeSearch, panel, setArrange, setAxes, navigate, searchSelected, testsSelected, nextMatch: searchMatches.next, previousMatch: searchMatches.previous, runAll, openIsolated }
 }

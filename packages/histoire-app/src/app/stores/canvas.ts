@@ -15,7 +15,17 @@ export type CanvasZoom = number | 'fit'
 /** Locally persisted zoom preference for every available canvas arrangement. */
 export type CanvasZoomByArrange = Record<CanvasArrangement, CanvasZoom>
 
-/** Saved canvas preferences; transform and selection belong to current mount. */
+/** Session-owned view state saved separately for each story. */
+export interface CanvasViewSnapshot {
+  /** Requested arrangement, before any temporary Matrix fallback. */
+  arrangement: CanvasArrangement
+  /** Independent zoom preference for each arrangement. */
+  zoomByArrange: CanvasZoomByArrange
+  /** Canvas translation in viewport CSS pixels. */
+  panOffset: CanvasPoint
+}
+
+/** Persistent canvas preferences; per-story transforms use workbench memory. */
 export interface CanvasPreferences {
   /** Independent zoom preference for Grid, List, and Matrix. */
   zoomByArrange: CanvasZoomByArrange
@@ -146,6 +156,18 @@ export function createCanvasStore(options: { storage?: CanvasStorage } = {}) {
     state.panOffset = offset
     setActiveZoom(state.effectiveZoom)
   }
+  /** Capture view state without geometry, selection, tool, or frame preferences. */
+  function snapshotView(arrangement = state.arrangement): CanvasViewSnapshot {
+    return { arrangement, zoomByArrange: { ...state.zoomByArrange }, panOffset: { ...state.panOffset } }
+  }
+  /** Restore view state before measuring new story geometry. */
+  function restoreView(snapshot: CanvasViewSnapshot) {
+    state.zoomByArrange = { ...snapshot.zoomByArrange }
+    state.arrangement = snapshot.arrangement
+    state.zoom = state.zoomByArrange[snapshot.arrangement]
+    if (state.zoom !== 'fit') state.effectiveZoom = state.zoom
+    state.panOffset = { ...snapshot.panOffset }
+  }
   /** Reveal logical frame bounds without changing canonical frame selection. */
   function revealFrame(frame: CanvasFrameLayout) {
     const content = contentRect()
@@ -191,7 +213,7 @@ export function createCanvasStore(options: { storage?: CanvasStorage } = {}) {
     state.panOffset = transform.offset
     save()
   }
-  return Object.assign(state, { setZoom, setArrangement, fit, setGeometry, panBy, setPanOffset, revealFrame, selectFrame, focusFrame, zoomToFrame,
+  return Object.assign(state, { setZoom, setArrangement, fit, setGeometry, panBy, setPanOffset, snapshotView, restoreView, revealFrame, selectFrame, focusFrame, zoomToFrame,
     /** Choose persistent pointer mode. */
     setTool(tool: CanvasPreferences['tool']) {
       state.tool = tool
