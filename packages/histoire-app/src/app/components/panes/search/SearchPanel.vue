@@ -4,7 +4,7 @@ import type { ClientCommand } from '@histoire/shared'
 import type { createStandaloneCommands } from '../../../standalone/commands.js'
 import type { WorkbenchSearchState } from './controller.js'
 import type { SearchScope, WorkbenchSearchResult } from './query.js'
-import { getControlElement, HstButton, HstText } from '@histoire/controls/vue'
+import { HstButton } from '@histoire/controls/vue'
 import { getHistoireTargetKey } from '@histoire/protocol'
 import { useHistoireContext, useHistoireResource } from '@histoire/vue/internal'
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, shallowRef, watch } from 'vue'
@@ -14,6 +14,7 @@ import WorkbenchIcon from '../../shell/WorkbenchIcon.vue'
 import { getSearchCommandDomId, SEARCH_ACTIVE_RESULT_ID, SEARCH_RESULTS_ID } from './accessibility.js'
 import { createWorkbenchSearchController } from './controller.js'
 import { getSearchActivationResult, getSearchFrameMatches } from './query.js'
+import SearchEmpty from './SearchEmpty.vue'
 import SearchResultGroup from './SearchResultGroup.vue'
 import SearchScopes from './SearchScopes.vue'
 
@@ -191,17 +192,25 @@ function keydown(event: KeyboardEvent) {
   <!-- Keep workbench layout independent of the portable SDK search styles. -->
   <section class="workbench-search" aria-label="Search" :aria-busy="state.loading" data-test-id="search-modal" @keydown="keydown">
     <label class="search-input">
-      <WorkbenchIcon name="search" />
-      <HstText :ref="value => { input = getControlElement(value) as HTMLInputElement }" v-model="query" layout="inline" type="search" aria-label="Search stories, docs and props" :aria-controls="SEARCH_RESULTS_ID" :aria-describedby="activeCursor ? SEARCH_ACTIVE_RESULT_ID : undefined" placeholder="Search…" autocomplete="off" />
-      <kbd>esc</kbd>
+      <WorkbenchIcon name="search" aria-hidden="true" />
+      <input
+        ref="input"
+        v-model="query"
+        class="search-query"
+        type="search"
+        aria-label="Search stories, docs and props"
+        :aria-controls="SEARCH_RESULTS_ID"
+        :aria-describedby="activeCursor ? SEARCH_ACTIVE_RESULT_ID : undefined"
+        placeholder="Search…"
+        autocomplete="off"
+      >
+      <kbd aria-hidden="true">esc</kbd>
     </label>
     <SearchScopes v-model="scope" />
     <p v-if="state.error" class="notice" role="status">
       Search index unavailable. Loaded props remain searchable.
     </p>
-    <p v-if="query.trim() && !state.loading && !ordered.length && !commands.length" class="empty">
-      No matches
-    </p>
+    <SearchEmpty v-if="query.trim() && !state.loading && !ordered.length && !commands.length" :query="query.trim()" :scope="scope" @widen="scope = 'all'" />
     <p v-if="activeCursor" :id="SEARCH_ACTIVE_RESULT_ID" class="search-active-result" role="status" aria-live="polite" data-search-active-result>
       {{ activeCursor.label }}
     </p>
@@ -224,12 +233,14 @@ function keydown(event: KeyboardEvent) {
 
 <style scoped>
 .workbench-search { flex: 1; padding: 14px 10px; overflow: auto; min-width: 0; min-height: 0; background: var(--histoire-surface); color: var(--histoire-text); }
-.search-.histoire-text { flex: 1; min-width: 0; }
-.search-input:focus-within { outline: 2px solid var(--histoire-accent); outline-offset: -1px; }
-.search-input svg { color: var(--histoire-muted); width: 17px; height: 17px; flex: none; }
-.search-input .histoire-text { flex: 1; min-width: 0; }
-kbd { color: var(--histoire-muted); font: 11px var(--histoire-font-mono, monospace); }
-.notice, .empty { margin: 20px 10px; color: var(--histoire-muted); font-size: 12px; }
+.search-input { display: flex; align-items: center; gap: 12px; box-sizing: border-box; width: 100%; min-width: 0; height: 40px; padding: 0 12px; margin: 0 0 6px; border: 1px solid var(--histoire-border); border-radius: 12px; background: var(--histoire-input); color: var(--histoire-text); }
+.search-input:focus-within { border-color: var(--histoire-accent); box-shadow: 0 0 0 1px var(--histoire-accent); }
+.search-input svg { color: var(--histoire-muted); width: 18px; height: 18px; flex: none; }
+.search-query { flex: 1; min-width: 0; height: 100%; padding: 0; border: 0; outline: 0; background: transparent; color: inherit; font: inherit; appearance: none; -webkit-appearance: none; }
+.search-query::placeholder { color: var(--histoire-muted); opacity: 1; }
+.search-query::-webkit-search-cancel-button { display: none; -webkit-appearance: none; }
+kbd { flex: none; color: var(--histoire-muted); font: 11px var(--histoire-font-mono, monospace); }
+.notice { margin: 20px 10px; color: var(--histoire-muted); font-size: 12px; }
 .search-active-result { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 .command-results { margin-top: 22px; }
 .command-results h3 { padding: 0 10px; color: var(--histoire-muted); font-size: 12px; }
