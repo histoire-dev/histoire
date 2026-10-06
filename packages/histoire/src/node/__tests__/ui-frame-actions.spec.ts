@@ -6,6 +6,23 @@ import { sourceFixture } from '../../../../histoire-sdk/src/__tests__/fixtures/s
 import { createHistoireSessionWithAdapters } from '../../../../histoire-sdk/src/session/controller.js'
 
 describe('workbench frame actions', () => {
+  it('sends only the selected story target when opening a captured frame in the editor', async () => {
+    const fixture = sourceFixture()
+    fixture.request.mockImplementation(async command => command === 'openInEditor' ? null : undefined)
+    const session = createHistoireSessionWithAdapters({ url: 'https://book.example/' }, fixture.adapters)
+    await session.connect()
+    const error = vi.fn()
+    const actions = createFrameActions({ session, link: () => '', reveal: vi.fn(), error })
+    const target = { storyId: 'a:b', variantId: 'c', frameKey: 'captured-frame' }
+
+    try {
+      await actions.run(actions.entries.get('open-editor')!, target)
+      expect(error).not.toHaveBeenCalled()
+      expect(fixture.request).toHaveBeenCalledWith('openInEditor', { storyId: 'a:b', variantId: 'c' }, expect.any(Object))
+    }
+    finally { await session.dispose() }
+  })
+
   it.each(['One', 'JSON {', 'State {value}', 'A & "quoted" <value> {literal}'])('saves Svelte source with literal title %s without serializing state', async (title) => {
     const fixture = sourceFixture()
     fixture.descriptor.catalog.stories[0].supportPluginId = '@histoire/plugin-svelte'

@@ -124,7 +124,7 @@ export function createFrameActions(options: FrameActionOptions) {
       if (options.open) options.open(url)
       else window.open(url, '_blank', 'noopener')
     } },
-    { id: 'open-editor', label: 'Open in editor', icon: 'code', group: 'open', shortcut: 'frame.editor', devOnly: true, available: () => options.session.getSnapshot().capabilities.openInEditor.available, run: target => requestHistoireOpenInEditor(options.session, target) },
+    { id: 'open-editor', label: 'Open in editor', icon: 'code', group: 'open', shortcut: 'frame.editor', devOnly: true, available: () => options.session.getSnapshot().capabilities.openInEditor.available, run: target => requestHistoireOpenInEditor(options.session, { storyId: target.storyId, variantId: target.variantId }) },
     { id: 'reveal', label: 'Reveal in tree', icon: 'tree-view', group: 'open', run: options.reveal },
     { id: 'copy-source', label: 'Copy source', icon: 'copy', group: 'copy', shortcut: 'frame.source', available: (target) => {
       const snapshot = session(target).getSnapshot()
