@@ -16,6 +16,8 @@ import HstButton from './button/HstButton.vue'
 const props = defineProps<{
   /** Text or asynchronous text producer copied by this action. */
   content: string | (() => Awaitable<string>)
+  /** Action-specific accessible name; defaults to Copy. */
+  label?: string
 }>()
 
 const { copy, copied } = useClipboard()
@@ -30,12 +32,12 @@ defineExpose({ focus })
 /** Resolve current content before writing to clipboard. */
 async function action() {
   const content = typeof props.content === 'function' ? await props.content() : props.content
-  copy(content)
+  await copy(content)
 }
 </script>
 
 <template>
-  <HstButton ref="button" color="flat" :aria-label="copied ? 'Copied' : 'Copy'" @click="action">
+  <HstButton ref="button" color="flat" :aria-label="copied ? 'Copied' : label ?? 'Copy'" @click="action">
     <BuiltinIcon
       v-tooltip="{
         content: 'Copied!',

@@ -40,6 +40,8 @@ export function createCleanupStack() {
   const cleanups: RuntimeCleanup[] = []
   let closing: Promise<void> | undefined
   return {
+    /** Shutdown admission fence, visible before asynchronous disposers finish. */
+    get isClosing() { return closing !== undefined },
     /** Registers an owned resource while acquisition is still active. */
     add(cleanup: RuntimeCleanup) {
       if (closing) {

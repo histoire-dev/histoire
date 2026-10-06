@@ -74,6 +74,12 @@ export async function watchStories(context: Context) {
   let rejectReady: (error: unknown) => void
   const ready = new Promise<void>((resolveReady, reject) => {
     rejectReady = reject
+    // An automatic-only book has no physical paths. Chokidar never emits
+    // ready for an empty watch list, so there is no scan to await.
+    if (!baseWatchPaths.length) {
+      readySettled = true
+      resolveReady()
+    }
     watcher.once('ready', () => {
       readySettled = true
       resolveReady()

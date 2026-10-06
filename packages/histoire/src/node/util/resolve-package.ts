@@ -14,13 +14,14 @@ const require = createRequire(import.meta.url)
  * @param id The module id to resolve.
  * @returns The resolved path, or `null` when neither install has it.
  */
-export function tryResolveDependency(root: string, id: string): string | null {
+export function tryResolveDependency(root: string, id: string, options: { fallback?: boolean } = {}): string | null {
   try {
     return require.resolve(id, {
       paths: [root],
     })
   }
   catch {
+    if (options.fallback === false) return null
     try {
       return require.resolve(id)
     }

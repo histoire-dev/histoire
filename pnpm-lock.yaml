@@ -568,6 +568,12 @@ importers:
       playwright:
         specifier: ^1.0.0
         version: 1.59.1
+      postcss:
+        specifier: 'catalog:'
+        version: 8.5.6
+      postcss-selector-parser:
+        specifier: ^6.1.2
+        version: 6.1.2
       sade:
         specifier: ^1.8.1
         version: 1.8.1

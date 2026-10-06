@@ -1,6 +1,7 @@
 import type { ModuleLoader } from '@histoire/shared'
 import type { ViteDevServer } from 'vite'
-import { resolve } from 'pathe'
+import { readFile } from 'node:fs/promises'
+import { isAbsolute, resolve } from 'pathe'
 import pc from 'picocolors'
 import { ViteNodeRunner } from 'vite-node/client'
 import { ViteNodeServer } from 'vite-node/server'
@@ -16,6 +17,7 @@ export function useModuleLoader(options: UseModuleLoaderOptions): ModuleLoader {
   const { server } = options
 
   const node = new ViteNodeServer(server as any)
+  const cssResolver = server.config.createResolver({ extensions: ['.css', '.pcss', '.postcss'], mainFields: ['style'], conditions: ['style'] })
 
   const runner = new ViteNodeRunner({
     root: server.config.root,
@@ -49,10 +51,45 @@ export function useModuleLoader(options: UseModuleLoaderOptions): ModuleLoader {
     // Noop
   }
 
+  /** Prefer CSS package exports while preserving Vite aliases and virtual modules. */
+  async function resolveId(id: string, importer?: string) {
+    if (importer && /\.(?:css|pcss|postcss)$/.test(importer)) {
+      const css = await cssResolver(id, importer)
+      if (css) return css
+    }
+    return (await server.pluginContainer.resolveId(id, importer))?.id ?? null
+  }
+
+  /** Load plugin-authored raw CSS rather than Vite's browser JS representation. */
+  async function loadSource(id: string) {
+    const loaded = await server.pluginContainer.load(id)
+    const code = typeof loaded === 'string' ? loaded : loaded && loaded.code
+    return { code: code ?? await readFile(id, 'utf8'), dependencies: getDependencies(id) }
+  }
+
+  /** Follow module graph and vite-node imports without traversing cycles twice. */
+  function getDependencies(id: string): string[] {
+    const visited = new Set<string>()
+    const pending = [id]
+    while (pending.length) {
+      const current = pending.pop()!
+      if (visited.has(current)) continue
+      visited.add(current)
+      for (const module of server.moduleGraph.getModuleById(current)?.importedModules ?? []) {
+        if (module.id) pending.push(module.id)
+      }
+      for (const imported of runner.moduleCache.get(current)?.imports ?? []) pending.push(imported)
+    }
+    return [...visited].filter(file => isAbsolute(file) && !file.includes('?'))
+  }
+
   return {
     clearCache,
     loadModule,
     destroy,
+    resolveId,
+    loadSource,
+    getDependencies,
   }
 }
 

@@ -33,6 +33,12 @@ export interface ModuleLoader {
   clearCache: () => void
   loadModule: (file: string) => Promise<any>
   destroy: () => void
+  /** Resolve imports through owning Vite container, including CSS aliases. */
+  resolveId?: (id: string, importer?: string) => Promise<string | null>
+  /** Load raw source before transforms, including virtual stylesheets. */
+  loadSource?: (id: string) => Promise<{ code: string, dependencies: string[] }>
+  /** Transitive dependencies loaded for a module. */
+  getDependencies?: (id: string) => string[]
 }
 
 /** Trusted configuration ownership available before dev/build plugin APIs exist. */
@@ -63,6 +69,10 @@ export interface PluginApiBase {
 
   getStories: () => ServerStory[]
   addStoryFile: (file: string) => void
+  /** Remove owned generated story and announce inventory change. */
+  removeStoryFile: (file: string) => void
+  /** Whether captured runtime still accepts writes and publication. */
+  isActive: () => boolean
 
   getConfig: () => HistoireConfig
 }

@@ -37,6 +37,15 @@ describe('story watcher lifecycle', () => {
     expect(changed).not.toHaveBeenCalled()
   })
 
+  it('settles an empty physical inventory for automatic-only books', async () => {
+    const ctx = await project()
+    ctx.config.storyMatch = []
+    const watcher = await watchStories(ctx)
+    cleanups.push(() => watcher.close())
+    await watcher.ready
+    expect(ctx.storyFiles).toEqual([])
+  })
+
   it('keeps different roots independently watched and rejects duplicate context watchers', async () => {
     const firstContext = await project()
     const first = await watchStories(firstContext)

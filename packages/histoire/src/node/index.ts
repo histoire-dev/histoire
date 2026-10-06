@@ -1,3 +1,5 @@
+export { tailwindTokens } from './builtin-plugins/tailwind-tokens.js'
+export type { TailwindTokensOptions } from './builtin-plugins/tailwind-tokens.js'
 export { defaultColors } from './colors.js'
 export * from './config/index.js'
 export * from './plugin.js'

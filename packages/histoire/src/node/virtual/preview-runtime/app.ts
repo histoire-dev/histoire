@@ -99,10 +99,10 @@ export function previewApp() {
       }
     }
 
-    async function waitForVariantSnapshot() {
+    async function waitForVariantSnapshot(waitForPaint = true) {
       await nextTick()
       await nextTick()
-      await new Promise(resolve => requestAnimationFrame(resolve))
+      if (waitForPaint) await new Promise(resolve => requestAnimationFrame(resolve))
     }
 
     /** A mounted actor can acknowledge restored intent without remounting its story state. */
@@ -210,7 +210,9 @@ ${previewMessageHandler()}
       },
       markVariantReady,
       async markControlsReady(variantId) {
-        await waitForVariantSnapshot()
+        // Controls can start below their panel viewport. Waiting for paint
+        // deadlocks offscreen iframes whose animation frames are suspended.
+        await waitForVariantSnapshot(false)
         // Enable outbound edit sync WITHOUT pushing the boot state snapshot:
         // This controls replica never publishes boot defaults: primary preview
         // runtime owns state. Host relays its latest serializable mirror after

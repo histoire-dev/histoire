@@ -1,66 +1,30 @@
 <script lang="ts">
-export default {
-  name: 'HstTokenList',
-}
+export default { name: 'HstTokenList' }
 </script>
 
 <script lang="ts" setup>
-import { computed, ref } from 'vue'
+import { computed } from 'vue'
 import { useControlsTheme } from '../../utils'
-import HstCopyIcon from '../HstCopyIcon.vue'
+import HstTokenDetails from './HstTokenDetails.vue'
+import { processTokens } from './tokens'
 
 const dark = useControlsTheme()
-
 const props = defineProps<{
+  /** Token values, preserving original slot payloads. */
   tokens: Record<string, string | number | any[] | Record<string, any>>
-  getName?: (key: string, value: string | number | any[] | Record<string, any>) => string
+  /** Optional utility or token name formatter. */
+  getName?: (key: string, value: any) => string
+  /** Literal search across displayed names and values. */
+  search?: string
 }>()
-
-const processedTokens = computed(() => {
-  const list = props.tokens
-  const getName = props.getName
-  return Object.entries(list).map(([key, value]) => {
-    const name = getName ? getName(key, value) : key
-    return {
-      key,
-      name,
-      value: typeof value === 'number' ? value.toString() : value,
-    }
-  })
-})
-
-const hover = ref<string>(null)
+/** Filter without changing original value shapes. */
+const processedTokens = computed(() => processTokens(props.tokens, props.getName, props.search))
 </script>
 
 <template>
-  <div
-    v-for="token of processedTokens"
-    :key="token.key"
-    :data-histoire-control-appearance="dark ? 'dark' : 'light'"
-    class="histoire-token-list htw-flex htw-flex-col htw-gap-2 htw-my-8"
-    @mouseenter="hover = token.key"
-    @mouseleave="hover = null"
-  >
-    <slot
-      :token="token"
-    />
-    <div class="htw-mx-4">
-      <div class="htw-flex htw-gap-1">
-        <pre class="htw-my-0 htw-truncate htw-shrink">{{ token.name }}</pre>
-        <HstCopyIcon
-          v-if="hover === token.key"
-          :content="token.name"
-          class="htw-flex-none"
-        />
-      </div>
-      <div class="htw-flex htw-gap-1">
-        <pre class="htw-my-0 htw-opacity-50 htw-truncate htw-shrink">{{ token.value }}</pre>
-        <HstCopyIcon
-          v-if="hover === token.key"
-          :content="typeof token.value === 'string' ? token.value : JSON.stringify(token.value)"
-          class="htw-flex-none"
-        />
-      </div>
-    </div>
+  <slot v-if="!processedTokens.length" name="empty" />
+  <div v-for="token of processedTokens" :key="token.key" :data-histoire-control-appearance="dark ? 'dark' : 'light'" class="histoire-token-list htw-flex htw-flex-col htw-gap-2 htw-my-8">
+    <slot :token="token" />
+    <HstTokenDetails :name="token.name" :value="token.value" class="htw-mx-4" />
   </div>
 </template>

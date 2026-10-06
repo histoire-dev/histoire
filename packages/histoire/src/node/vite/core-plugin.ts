@@ -3,6 +3,7 @@ import type { Context } from '../context.js'
 import type { BrowserRuntimePaths } from './resolve-paths.js'
 import { dirname, join } from 'pathe'
 import { APP_PATH } from '../alias.js'
+import { tailwindRuntimeDirectory } from '../builtin-plugins/tailwind/template.js'
 import { getContextRegistry } from '../runtime/registry.js'
 import { installUiHttpRouter } from '../server/ui-channel/http.js'
 import { notifyStoryChange } from '../stories.js'
@@ -109,6 +110,8 @@ export function createHistoireVitePlugin(ctx: Context, options: HistoireVitePlug
           fs: {
             allow: [
               APP_PATH,
+              tailwindRuntimeDirectory,
+              resolveHistoireAppBundledDir(),
               tempDir,
               ctx.resolvedViteConfig.root,
               ctx.root,

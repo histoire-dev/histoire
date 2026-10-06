@@ -65,9 +65,10 @@ export { configureControlsApp, getControlElement } from './field.js'
 export { createPropOverridePatch, getControlComponent, getControlStateKeys } from './model.js'
 export type { HstControlOptions } from './options.js'
 export { getControlsAppearance } from './overlay/appearance.js'
-
 export { focusControlsSelectedOption, moveControlsOptionFocus, reconcileControlsOptionFocus, restoreControlsFocus } from './overlay/focus.js'
+
 export * from './types.js'
+export { useControlsTheme } from './utils.js'
 
 export { getControlsHost } from '@histoire/shared'
 export type { HistoireControlsOverlay, HistoireControlsOverlayHandle, HistoireControlsOverlayResult } from '@histoire/shared'

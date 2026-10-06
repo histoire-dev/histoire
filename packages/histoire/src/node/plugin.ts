@@ -17,7 +17,7 @@ import fs from 'fs-extra'
 import path from 'pathe'
 import pc from 'picocolors'
 import { getContextRegistry } from './runtime/registry.js'
-import { addStory, removeStory } from './stories.js'
+import { addStory, notifyStoryChange, notifyStoryListChange, removeStory } from './stories.js'
 import { toTempPathSegment } from './util/temp-paths.js'
 
 export class BasePluginApi implements PluginApiBase {
@@ -59,8 +59,25 @@ export class BasePluginApi implements PluginApiBase {
   }
 
   addStoryFile(file: string) {
+    if (!this.isActive()) return
     removeStory(this.ctx, file)
-    addStory(this.ctx, file)
+    const story = addStory(this.ctx, file)
+    notifyStoryListChange(this.ctx)
+    notifyStoryChange(this.ctx, story)
+  }
+
+  /** Removes one owned story without touching another plugin's inventory. */
+  removeStoryFile(file: string) {
+    if (!this.isActive()) return
+    removeStory(this.ctx, file)
+    notifyStoryListChange(this.ctx)
+    notifyStoryChange(this.ctx)
+  }
+
+  /** Captured cleanup and execution ownership jointly fence publication. */
+  isActive() {
+    const registry = getContextRegistry(this.ctx)
+    return !registry.cleanup.isClosing && (registry.execution?.isActive() ?? true)
   }
 
   getStories(): ServerStory[] {
