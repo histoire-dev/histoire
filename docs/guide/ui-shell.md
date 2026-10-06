@@ -12,6 +12,8 @@ Canvas zoom is saved locally for Grid, List, and Props matrix independently. **F
 
 Selecting a Grid or List variant changes its canvas border and inspector while admitted variants keep their existing documents and local state. This applies to canvas, sidebar, search, and browser history navigation. `ui.frameBudget` still limits live variants: eviction, explicit retry, story removal, or executable source changes can replace a document. Returning to an evicted variant restores its retained editable state; DOM-only state survives while its document remains admitted.
 
+Props show a loading skeleton until the selected document reports custom-control availability. Generic state editors appear only when that document has no authored controls, avoiding temporary duplicate editors during startup.
+
 Static builds include Home, Stories, Search, appearance controls, panel collapse, and Settings. Dev-only destinations are omitted. Opening a static book with an old dev pane preference restores Stories.
 
 Press **Ctrl/⌘ Shift D** to switch light/dark appearance. **Ctrl/⌘ K** retains the story and command palette. The existing `theme.hideColorSchemeSwitch` option controls the appearance switch.
@@ -21,6 +23,8 @@ Panel and inspector preferences use `_histoire-ui-shell`. Story URLs and their `
 ## Internal shell contracts
 
 Each standalone workbench owns a `createShell` instance and provides it through `provideShell`. Components read the narrow `useShell` contract. Persistence attaches to the caller's own document storage, and `close` retires observers without disposing its session.
+
+`WorkbenchLoadingSkeleton` provides reusable loading rows with an accessible `label` and configurable `rows` count. Its pulse respects reduced-motion preferences. Use it while content is pending; `WorkbenchEmptyState` represents settled empty areas.
 
 `ShellLayout` accepts `stories`, `search`, `tests`, `comments`, `mcp`, `main`, `inspector`, and `overlays` slots. Optional `inspector-header` adds a frame-owned header and close button; inspector content that supplies its own header uses only `inspector`.
 

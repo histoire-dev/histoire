@@ -147,3 +147,19 @@ describe('Variant document retention', () => {
     retainedDocuments()
   })
 })
+
+describe('Inspector controls readiness', () => {
+  it('shows loading skeleton until first variant resolves authored controls', () => {
+    cy.viewport(1600, 1000)
+    cy.intercept({ pathname: '/__sandbox.html', query: { controls: 'true' } }, (request) => {
+      request.continue(response => response.setDelay(2500))
+    })
+    cy.visit('/story/src-components-basebutton-story-vue?variantId=src-components-basebutton-story-vue-0')
+    cy.get('[data-test-id="story-controls"] [role="status"][aria-label="Loading controls"]').should('be.visible')
+    cy.get('[data-test-id="story-controls"] input, [data-test-id="story-controls"] textarea').should('not.exist')
+    cy.screenshot('inspector-controls-loading', { disableTimersAndAnimations: false })
+    cy.getControlsIframeBody({ timeout: 20000 }).find('button[aria-label="Color"]').should('contain', 'Default')
+    cy.get('[data-test-id="story-controls"] [aria-label="Loading controls"]').should('not.exist')
+    cy.get('[data-test-id="story-controls"] textarea').should('not.exist')
+  })
+})

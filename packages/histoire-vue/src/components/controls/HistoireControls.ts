@@ -136,7 +136,7 @@ export const HistoireControls = defineComponent({
       removed = true
       return unmount()
     })
-    return () => h('section', { 'class': 'histoire-controls', 'aria-label': 'Controls' }, [
+    return () => h('section', { 'class': 'histoire-controls', 'aria-label': 'Controls', 'aria-busy': snapshot.value.runtime.status === 'ready' && hasControls.value === undefined }, [
       snapshot.value.runtime.status !== 'ready' || !snapshot.value.selection?.variantId
         ? (slots.unavailable?.() ?? h('div', { role: 'status' }, 'Preview unavailable'))
         : [h('div', { class: 'histoire-controls-presets' }, [
@@ -144,7 +144,12 @@ export const HistoireControls = defineComponent({
             h(HstButton, { 'color': 'flat', 'type': 'button', 'class': 'histoire-controls-reset', 'aria-label': 'Reset state', 'title': 'Reset state', 'disabled': !presets.value || presets.value.busy(), 'onClick': () => {
               void presets.value?.reset()
             } }, { default: () => h(BuiltinIcon, { 'icon': 'carbon:reset', 'width': 16, 'height': 16, 'aria-hidden': 'true' }) }),
-          ]), h(GenericControls, { showState: hasControls.value !== true })],
+          ]),
+          // Unknown availability cannot decide between detected state and authored
+          // controls. Wait for this document's controls.height publication.
+          hasControls.value === undefined
+            ? (slots.loading?.() ?? h('div', { role: 'status' }, 'Loading controls'))
+            : h(GenericControls, { showState: hasControls.value === false })],
       failure.value
         ? h('div', { class: 'histoire-controls-failure' }, [
             h('p', { role: 'alert' }, `Custom controls unavailable: ${(failure.value as Error)?.message ?? String(failure.value)}`),

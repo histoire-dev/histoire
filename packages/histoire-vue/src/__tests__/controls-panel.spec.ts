@@ -197,6 +197,7 @@ describe('native controls state ownership', () => {
       throw new Error('Custom surface not supplied by test source')
     })
     const wrapper = mount(HistoireProvider, { props: { session }, slots: { default: () => h(HistoireControls) } })
+    await vi.waitFor(() => expect(wrapper.find('input[type=number]').exists()).toBe(true))
     const input = wrapper.find('input[type=number]')
     await input.setValue('12')
     await vi.waitFor(() => expect(session.getSnapshot().state?.value).toMatchObject({ count: 12 }))

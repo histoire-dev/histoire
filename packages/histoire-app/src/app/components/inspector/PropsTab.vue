@@ -1,17 +1,22 @@
 <script setup lang="ts">
-import { HistoireControls } from '@histoire/vue'
+import { HistoireControls, useHistoireSnapshot } from '@histoire/vue'
+import WorkbenchEmptyState from '../shell/WorkbenchEmptyState.vue'
+import WorkbenchLoadingSkeleton from '../shell/WorkbenchLoadingSkeleton.vue'
 
 defineEmits<{ error: [error: unknown] }>()
+const snapshot = useHistoireSnapshot()
 </script>
 
 <template>
   <section class="inspector-props" data-test-id="story-controls" aria-label="Props">
     <slot name="matrix">
       <HistoireControls compact-presets @error="$emit('error', $event)">
+        <template #loading>
+          <WorkbenchLoadingSkeleton label="Loading controls" :rows="4" />
+        </template>
         <template #unavailable>
-          <p class="inspector-empty">
-            Select a ready preview to edit props.
-          </p>
+          <WorkbenchLoadingSkeleton v-if="snapshot.status === 'ready' && snapshot.selection?.variantId && !snapshot.stale && snapshot.runtime.status !== 'failed'" label="Loading controls" :rows="4" />
+          <WorkbenchEmptyState v-else icon="cursor-1" title="Select a variant" />
         </template>
       </HistoireControls>
     </slot>
@@ -20,7 +25,6 @@ defineEmits<{ error: [error: unknown] }>()
 
 <style scoped>
 .inspector-props { min-width: 0; }
-.inspector-empty { margin: 24px 16px; color: var(--histoire-muted); font-size: 13px; }
 /* Row padding contributes to the content gutter; hover backgrounds extend around it. */
 .inspector-props :deep(.histoire-controls) { padding: 0 calc(var(--histoire-inspector-gutter, 16px) - var(--histoire-control-wrapper-padding, 8px)) 16px; }
 .inspector-props :deep(.histoire-state-presets) { margin: 2px 0 20px; }
