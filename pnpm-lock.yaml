@@ -1162,6 +1162,9 @@ importers:
       '@histoire/sdk':
         specifier: workspace:^
         version: link:../histoire-sdk
+      '@iconify/vue':
+        specifier: ^4.1.2
+        version: 4.3.0(vue@3.5.26(typescript@5.6.3))
       dompurify:
         specifier: ^3.4.16
         version: 3.4.16

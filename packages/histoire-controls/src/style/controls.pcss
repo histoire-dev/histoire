@@ -35,10 +35,19 @@
 .histoire-wrapper[data-layout="horizontal"] { flex-direction: row; align-items: center; }
 .histoire-control-label { width: 100%; display: flex; align-items: baseline; gap: 8px; min-width: 0; font-family: var(--histoire-font-mono, "JetBrains Mono", ui-monospace, monospace); }
 .histoire-control-title { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.histoire-control-label-actions { display: inline-flex; flex: none; align-items: center; }
 .histoire-control-type { margin-inline-start: auto; color: var(--histoire-control-resolved-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .histoire-control-content { display: flex; align-items: center; gap: 6px; min-width: 0; width: 100%; }
 .histoire-control-value { display: block; flex: 1; min-width: 0; max-width: 100%; }
 .histoire-control-actions { display: inline-flex; flex: none; align-items: center; gap: 4px; }
+.histoire-prop-control .histoire-control-label-actions { visibility: hidden; opacity: 0; pointer-events: none; }
+.histoire-prop-control:hover .histoire-control-label-actions,
+.histoire-prop-control:focus-within .histoire-control-label-actions { visibility: visible; opacity: 1; pointer-events: auto; }
+.histoire-prop-control .histoire-control-label,
+.histoire-prop-control-unavailable .histoire-control-label { align-items: center; }
+.histoire-prop-control-reset { width: 24px; height: 24px; padding: 0; border-radius: 6px; }
+.histoire-prop-control-reset-icon { display: block; flex: none; color: var(--histoire-control-resolved-text); }
+.histoire-prop-control-unavailable { display: flex; flex-direction: column; gap: var(--histoire-control-gap, 8px); padding: var(--histoire-control-wrapper-padding, 8px); margin: 0 0 var(--histoire-control-margin, 10px); }
 .histoire-wrapper[data-layout="horizontal"] .histoire-control-label { width: auto; flex: none; }
 .histoire-wrapper[data-layout="horizontal"] .histoire-control-content { width: auto; flex: 1; }
 .histoire-wrapper[data-layout="horizontal"]:has(.histoire-switch-input, .histoire-simple-checkbox) .histoire-control-label { flex: 1; }
@@ -46,7 +55,7 @@
 .histoire-control-field, .histoire-select-trigger, .__histoire-json-code { box-sizing: border-box; width: 100%; min-width: 0; min-height: var(--histoire-control-height, 34px); margin: 0; padding: var(--histoire-control-padding, 7px) 9px; border: 1px solid var(--histoire-control-resolved-border); border-radius: 7px; background: var(--histoire-control-resolved-input); color: inherit; font: inherit; }
 textarea.histoire-control-field { resize: vertical; }
 .histoire-control-field::placeholder { color: var(--histoire-control-resolved-muted); opacity: 1; }
-:is(.histoire-control-field, .histoire-select-trigger):focus-visible, .__histoire-json-code:focus-within { outline: 2px solid var(--histoire-control-resolved-accent); outline-offset: 2px; }
+:is(.histoire-control-field, .histoire-select-trigger):focus, .__histoire-json-code:focus-within { outline: none; border-color: var(--histoire-control-resolved-accent); }
 .histoire-button { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-width: 0; padding: var(--histoire-control-padding, 7px) 10px; border: 1px solid var(--histoire-control-resolved-border); border-radius: 9px; background: var(--histoire-control-resolved-surface); cursor: pointer; }
 .histoire-button[data-color="flat"]:is([aria-pressed="true"], [aria-selected="true"], [aria-current="page"], [aria-checked="true"]) { background: var(--histoire-control-resolved-chip); color: var(--histoire-control-resolved-text); }
 .histoire-button[data-color="primary"] { border-color: transparent; background: var(--histoire-control-resolved-accent); color: var(--histoire-control-resolved-on-accent); }
@@ -84,7 +93,6 @@ textarea.histoire-control-field { resize: vertical; }
 
 :is(.histoire-token-grid, .histoire-token-list, .histoire-color-shades, .histoire-controls-floating-tooltip, .histoire-control-popover, .histoire-button-group-options) pre { font-family: var(--histoire-font-mono, "JetBrains Mono", ui-monospace, monospace); font-size: 13px; }
 .histoire-control-content:has(.histoire-switch-input, .histoire-simple-checkbox) .histoire-control-value { flex: none; }
-
 .histoire-color-fields { display: flex; gap: 6px; }
 .histoire-color-fields > input[type="color"] { flex: none; width: var(--histoire-control-height, 34px); height: var(--histoire-control-height, 34px); padding: 2px; border: 1px solid var(--histoire-control-resolved-border); border-radius: 7px; background: var(--histoire-control-resolved-input); }
 

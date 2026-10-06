@@ -1,3 +1,4 @@
+import BuiltinIconVue from './components/BuiltinIcon.vue'
 import HstButtonVue from './components/button/HstButton.vue'
 import HstButtonGroupVue from './components/button/HstButtonGroup.vue'
 import HstCheckboxVue from './components/checkbox/HstCheckbox.vue'
@@ -19,6 +20,7 @@ import './style/controls.pcss'
 
 export const HstButton = HstButtonVue
 export const HstButtonGroup = HstButtonGroupVue
+export const BuiltinIcon = BuiltinIconVue
 export const HstCheckbox = HstCheckboxVue
 export const HstCheckboxList = HstCheckboxListVue
 export const HstSwitch = HstSwitchVue

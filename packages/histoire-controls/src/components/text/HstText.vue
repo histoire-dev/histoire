@@ -24,6 +24,9 @@ defineExpose({ focus, select, element: input })
 <template>
   <HstWrapper :title="title" :layout="layout" :control-id="id()" class="histoire-text" :class="attrs.class" :style="attrs.style" :data-histoire-control-type="attrs['data-histoire-control-type']">
     <input ref="input" v-bind="fieldAttrs()" :type="type ?? 'text'" :value="modelValue" class="histoire-control-field" @input="emit('update:modelValue', ($event.target as HTMLInputElement).value)">
+    <template v-if="$slots['label-actions']" #label-actions>
+      <slot name="label-actions" />
+    </template>
     <template v-if="$slots.actions" #actions>
       <slot name="actions" />
     </template>

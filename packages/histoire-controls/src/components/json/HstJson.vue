@@ -58,6 +58,7 @@ let editorView: EditorView
 const internalValue = ref('')
 const invalidValue = ref(false)
 const editorElement = ref<HTMLInputElement>()
+let externalDocument: string | null = null
 
 /** CodeMirror keeps edit semantics while its chrome uses shared control palette. */
 const editorTheme = EditorView.theme({
@@ -137,11 +138,18 @@ watch(() => props.modelValue, () => {
   }
 
   if (!sameDocument) {
-    editorView.dispatch({ changes: [{ from: 0, to: editorView.state.doc.length, insert: JSON.stringify(props.modelValue, null, 2) }] })
+    externalDocument = JSON.stringify(props.modelValue, null, 2)
+    editorView.dispatch({ changes: [{ from: 0, to: editorView.state.doc.length, insert: externalDocument }] })
   }
 }, { deep: true })
 
 watch(() => internalValue.value, () => {
+  // External prop projections rewrite CodeMirror's document but are not user edits.
+  if (internalValue.value === externalDocument) {
+    externalDocument = null
+    return
+  }
+  externalDocument = null
   invalidValue.value = false
   try {
     emit('update:modelValue', JSON.parse(internalValue.value))
@@ -168,6 +176,9 @@ watch(() => internalValue.value, () => {
       v-bind="{ ...$attrs, class: null, style: null }"
     />
 
+    <template v-if="$slots['label-actions']" #label-actions>
+      <slot name="label-actions" />
+    </template>
     <template v-if="invalidValue || $slots.actions" #actions>
       <BuiltinIcon
         v-if="invalidValue"

@@ -38,6 +38,9 @@ const emit = defineEmits<{ 'update:modelValue': [value: any] }>()
         {{ option.label }}
       </HstButton>
     </div>
+    <template v-if="$slots['label-actions']" #label-actions>
+      <slot name="label-actions" />
+    </template>
     <template v-if="$slots.actions" #actions>
       <slot name="actions" />
     </template>

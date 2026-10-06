@@ -30,14 +30,62 @@ describe('runtime-collected prop values', () => {
     const { session, wrapper } = await setup(definitions)
     try {
       const input = wrapper.get('input[aria-label="message"]')
+      const reset = wrapper.get('button[aria-label="Remove message override"]')
       expect((input.element as HTMLInputElement).value).toBe('Hello from story')
+      expect(reset.element.querySelector('path')?.getAttribute('d')).toBeTruthy()
+      expect(reset.attributes('disabled')).toBeDefined()
       expect(session.getSnapshot().state?.value._hPropState).toBeUndefined()
       await input.setValue('Edited greeting')
-      await vi.waitFor(() => expect(session.getSnapshot().state?.value._hPropState[0].message).toBe('Edited greeting'))
-      await wrapper.get('button[aria-label="Remove message override"]').trigger('click')
+      await vi.waitFor(() => {
+        expect(session.getSnapshot().state?.value._hPropState[0].message).toBe('Edited greeting')
+        expect(reset.attributes('disabled')).toBeUndefined()
+      })
+
+      const title = wrapper.get('label').element
+      const header = title.parentElement!
+      const action = reset.element.parentElement!
+      const type = Array.from(header.children).find(child => child.textContent === 'string')!
+      expect(reset.element.closest('label')).toBeNull()
+      expect(action.parentElement).toBe(header)
+      expect(Array.from(header.children).indexOf(action)).toBe(Array.from(header.children).indexOf(title) + 1)
+      expect(Array.from(header.children).indexOf(type)).toBe(Array.from(header.children).indexOf(action) + 1)
+
+      await reset.trigger('click')
       await vi.waitFor(() => {
         expect((wrapper.get('input[aria-label="message"]').element as HTMLInputElement).value).toBe('Hello from story')
         expect(session.getSnapshot().state?.value._hPropState[0]).toEqual({})
+      })
+      expect(session.getSnapshot().state?.value._hPropDefs).toEqual(definitions)
+    }
+    finally {
+      wrapper.unmount()
+      await session.dispose()
+    }
+  })
+
+  it('resets number and boolean props independently', async () => {
+    const definitions = [{ index: 0, name: 'Button', props: [
+      { name: 'size', types: ['number'], value: 12 },
+      { name: 'disabled', types: ['boolean'], value: false },
+    ] }]
+    const { session, wrapper } = await setup(definitions)
+    try {
+      await session.state.patch({ _hPropState: { 0: { size: 24, disabled: true } } })
+      await vi.waitFor(() => {
+        expect((wrapper.get('input[aria-label="size"]').element as HTMLInputElement).value).toBe('24')
+        expect((wrapper.get('input[role="switch"][aria-label="disabled"]').element as HTMLInputElement).checked).toBe(true)
+      })
+
+      await wrapper.get('button[aria-label="Remove size override"]').trigger('click')
+      await vi.waitFor(() => {
+        expect(session.getSnapshot().state?.value._hPropState[0]).toEqual({ disabled: true })
+        expect((wrapper.get('input[aria-label="size"]').element as HTMLInputElement).value).toBe('12')
+      })
+
+      await wrapper.get('button[aria-label="Remove disabled override"]').trigger('click')
+      await vi.waitFor(() => {
+        expect(session.getSnapshot().state?.value._hPropState[0]).toEqual({})
+        expect((wrapper.get('input[role="switch"][aria-label="disabled"]').element as HTMLInputElement).checked).toBe(false)
       })
       expect(session.getSnapshot().state?.value._hPropDefs).toEqual(definitions)
     }

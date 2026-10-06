@@ -24,6 +24,9 @@ defineExpose({ focus, element: input })
 <template>
   <HstWrapper :title="title" :layout="layout ?? 'horizontal'" :control-id="id()" class="histoire-switch" :class="attrs.class" :style="attrs.style" :data-histoire-control-type="attrs['data-histoire-control-type']">
     <input ref="input" v-bind="fieldAttrs()" type="checkbox" role="switch" :checked="Boolean(modelValue)" :disabled="disabled" class="histoire-switch-input" @change="!disabled && emit('update:modelValue', ($event.target as HTMLInputElement).checked)" @keydown.enter.prevent="!disabled && emit('update:modelValue', !modelValue)">
+    <template v-if="$slots['label-actions']" #label-actions>
+      <slot name="label-actions" />
+    </template>
     <template v-if="$slots.actions" #actions>
       <slot name="actions" />
     </template>

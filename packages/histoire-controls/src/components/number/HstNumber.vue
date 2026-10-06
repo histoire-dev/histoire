@@ -107,6 +107,9 @@ onUnmounted(() => {
       class="histoire-control-field"
     >
 
+    <template v-if="$slots['label-actions']" #label-actions>
+      <slot name="label-actions" />
+    </template>
     <template v-if="$slots.actions" #actions>
       <slot name="actions" />
     </template>

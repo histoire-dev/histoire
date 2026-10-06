@@ -39,6 +39,7 @@
     "@histoire/controls": "workspace:^",
     "@histoire/protocol": "workspace:^",
     "@histoire/sdk": "workspace:^",
+    "@iconify/vue": "^4.1.2",
     "dompurify": "^3.4.16",
     "floating-vue": "5.2.2",
     "shiki": "^3.0.0",

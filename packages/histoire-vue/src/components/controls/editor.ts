@@ -7,17 +7,24 @@ import { h, toRaw } from 'vue'
  * JSON editors cannot round-trip every cloneable state graph. Never rewrite
  * unsupported values into strings or omit fields to make them editable.
  */
-export function renderHistoireControl(type: string | undefined, props: Record<string, unknown>, slots?: { actions: () => VNode }): VNode {
+export function renderHistoireControl(type: string | undefined, props: Record<string, unknown>, slots?: { 'label-actions'?: () => VNode }): VNode {
   const component = getControlComponent(type)
   if (component === HstJson && props.modelValue !== undefined) {
     try {
       measureWireValue(toRaw(props.modelValue), { mode: 'json', maxBytes: HISTOIRE_WIRE_LIMITS.state })
     }
     catch {
-      return h('div', { 'role': 'group', 'aria-label': props['aria-label'] ?? props.title }, [
-        h('span', String(props.title ?? '')),
+      const hasLabelActions = !!slots?.['label-actions']
+      const label = [h('span', { class: 'histoire-control-title' }, String(props.title ?? ''))]
+      if (hasLabelActions) {
+        label.push(
+          h('span', { class: 'histoire-control-label-actions' }, slots?.['label-actions']?.()),
+          h('span', { class: 'histoire-control-type' }, String(props['data-histoire-control-type'] ?? 'unknown')),
+        )
+      }
+      return h('div', { 'role': 'group', 'class': hasLabelActions ? [props.class, 'histoire-prop-control-unavailable'] : undefined, 'aria-label': props['aria-label'] ?? props.title }, [
+        h('span', { class: 'histoire-control-label' }, label),
         h('output', 'JSON editing unavailable'),
-        slots?.actions(),
       ])
     }
   }

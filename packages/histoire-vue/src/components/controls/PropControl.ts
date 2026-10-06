@@ -1,6 +1,6 @@
 import type { HistoireMatrixValue } from '@histoire/protocol'
 import type { PropType } from 'vue'
-import { createPropOverridePatch, HstButton, HstButtonGroup } from '@histoire/controls/vue'
+import { BuiltinIcon, createPropOverridePatch, HstButton, HstButtonGroup } from '@histoire/controls/vue'
 import { getHistoireFiniteMatrixValues } from '@histoire/protocol'
 import { defineComponent, h } from 'vue'
 import { useHistoireSnapshot } from '../../composables/snapshot.js'
@@ -49,6 +49,7 @@ export const PropControl = defineComponent({
       const overrides = (state?._hPropState as Record<number, Record<string, unknown>> | undefined)?.[props.index]
       const present = !!overrides && Object.hasOwn(overrides, props.definition.name)
       const control = {
+        'class': 'histoire-prop-control',
         'title': `${props.definition.name}${present ? ' *' : ''}`,
         'aria-label': props.definition.name,
         'data-histoire-control-type': props.definition.types?.join(' | ') || 'unknown',
@@ -56,14 +57,18 @@ export const PropControl = defineComponent({
         'placeholder': present ? undefined : props.definition.default,
         'onUpdate:modelValue': patch,
       }
-      const slots = { actions: () => h(HstButton, { 'color': 'flat', 'type': 'button', 'disabled': !present, 'aria-label': `Remove ${props.definition.name} override`, 'onClick': () => patch(undefined, true) }, { default: () => 'Reset' }) }
+      const slots = {
+        'label-actions': () => h(HstButton, { 'color': 'flat', 'type': 'button', 'class': 'histoire-prop-control-reset', 'disabled': !present, 'aria-label': `Remove ${props.definition.name} override`, 'onClick': () => patch(undefined, true) }, {
+          default: () => h(BuiltinIcon, { icon: 'carbon:reset', width: 16, height: 16, class: 'histoire-prop-control-reset-icon' }),
+        }),
+      }
       const values = getHistoireFiniteMatrixValues(props.definition.values ?? props.definition.enum)
       if (values?.length) {
         const selected = values.findIndex(value => value === edit.value.value)
         // String option tokens retain exact typed scalars in runtime-owned patches.
         return h(HstButtonGroup, {
           ...control,
-          'class': 'histoire-prop-control-finite',
+          'class': 'histoire-prop-control histoire-prop-control-finite',
           'modelValue': selected < 0 ? undefined : String(selected),
           'options': values.map((value, index) => ({ value: String(index), label: typeof value === 'string' && values.some(other => typeof other !== 'string' && String(other) === value) ? JSON.stringify(value) : String(value) })),
           'onUpdate:modelValue': (token: string) => {

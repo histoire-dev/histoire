@@ -21,6 +21,7 @@ const dark = useControlsTheme()
   <component :is="layout === 'inline' ? 'span' : tag" class="histoire-wrapper" :class="$attrs.class" :style="$attrs.style" :data-layout="layout" :data-histoire-control-appearance="dark ? 'dark' : 'light'" :data-histoire-control-type="$attrs['data-histoire-control-type']" v-bind="Object.fromEntries(Object.entries($attrs).filter(([key]) => !['class', 'style', 'data-histoire-control-type'].includes(key)))">
     <span v-if="layout !== 'inline' && (title || $slots.title || $attrs['data-histoire-control-type'])" class="histoire-control-label">
       <component :is="controlId ? 'label' : 'span'" v-tooltip="{ content: title, placement: 'left', distance: 12 }" :for="controlId" class="histoire-control-title"><slot name="title">{{ title }}</slot></component>
+      <span v-if="$slots['label-actions']" class="histoire-control-label-actions" @click.stop @mousedown.stop @pointerdown.stop><slot name="label-actions" /></span>
       <span v-if="$attrs['data-histoire-control-type']" class="histoire-control-type">{{ $attrs['data-histoire-control-type'] }}</span>
     </span>
     <span class="histoire-control-content"><span class="histoire-control-value"><slot /></span><span v-if="$slots.actions" class="histoire-control-actions" @click.stop @mousedown.stop @pointerdown.stop><slot name="actions" /></span></span>

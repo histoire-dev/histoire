@@ -13,7 +13,12 @@ describe('generic controls JSON eligibility', () => {
     fixture.request.mockImplementation(async (command, payload) => {
       const result = await request(command, payload)
       // Automatic prop definitions are supplied by runtime, never host patch.
-      if (result && 'value' in result) result.value._hPropDefs = [{ index: 0, name: 'Component', props: [{ name: 'config', types: ['object'] }] }]
+      if (result && 'value' in result) {
+        result.value._hPropDefs = [{ index: 0, name: 'Component', props: [
+          { name: 'config', types: ['object'] },
+          { name: 'settings', types: ['object'], value: { enabled: false } },
+        ] }]
+      }
       return result
     })
     const session = createHistoireSessionWithAdapters({ url: 'https://book.example/' }, fixture.adapters)
@@ -23,11 +28,16 @@ describe('generic controls JSON eligibility', () => {
     const cycle: Record<string, unknown> = { title: 'Cycle' }
     cycle.self = cycle
     const value = kind === 'cycle' ? cycle : 12n
-    await session.state.patch({ graph: value, _hPropState: { 0: { config: value } } })
+    await session.state.patch({ graph: value, _hPropState: { 0: { config: value, settings: { enabled: true } } } })
     let wrapper: ReturnType<typeof mount> | undefined
     try {
       wrapper = mount(HistoireProvider, { props: { session }, slots: { default: () => h(GenericControls) } })
+      await nextTick()
       expect(wrapper.findAll('output').map(output => output.text())).toEqual(['JSON editing unavailable', 'JSON editing unavailable'])
+      const settingsReset = wrapper.get('button[aria-label="Remove settings override"]')
+      expect(settingsReset.attributes('disabled')).toBeUndefined()
+      await settingsReset.trigger('click')
+      await vi.waitFor(() => expect(session.getSnapshot().state?.value._hPropState[0]).toEqual({ config: value }))
       await wrapper.get('input[type=number]').setValue('9')
       await vi.waitFor(() => expect(session.getSnapshot().state?.value.count).toBe(9))
       const canonical = await session.state.get()
