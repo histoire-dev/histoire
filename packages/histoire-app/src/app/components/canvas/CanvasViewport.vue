@@ -10,6 +10,7 @@ import { useUiSettingsStore } from '../../stores/settings.js'
 import { useStoryCanvasViews } from '../../stores/story-canvas-views.js'
 import { getSearchFrameState } from '../panes/search/frame-navigation.js'
 import WorkbenchEmptyState from '../shell/WorkbenchEmptyState.vue'
+import { createCanvasHeaderEditor } from './canvas-header-editor.js'
 import { canvasOverlayIsOccluded } from './canvas-overlay-occlusion.js'
 import CanvasFrame from './CanvasFrame.vue'
 import CanvasHeader from './CanvasHeader.vue'
@@ -155,6 +156,15 @@ const { insets: contentInsets, headerBounds, measure } = useCanvasGeometry({
   },
 })
 const headerObscured = ref(false)
+const { canOpenInEditor, openInEditor } = createCanvasHeaderEditor({
+  session,
+  snapshot: () => snapshot.value,
+  currentStory: () => currentStory.value,
+  displayedStory: () => story.value,
+  hasCollectionError: () => diagnostics.value.length > 0,
+  isObscured: () => headerObscured.value,
+  reportError: error => emit('error', error),
+})
 
 /** Give mounted preview content and variant-label controls priority over fixed header metadata. */
 function updateHeaderOcclusion(): void {
@@ -246,7 +256,7 @@ defineExpose({ canvas, registry })
     </div>
     <div v-if="story" ref="header" class="histoire-canvas-header" :class="{ 'is-obscured': headerObscured }">
       <slot name="header" :story="story">
-        <CanvasHeader :story="story" />
+        <CanvasHeader :story="story" :can-open-in-editor="canOpenInEditor" @open-in-editor="openInEditor" />
       </slot>
     </div>
     <slot v-if="renderedArrange === 'matrix'" name="matrix" :canvas="canvas" :frames="registry" :size="size" :content-insets="contentInsets" :frame-budget="frameBudget" :preview-base="previewBase" />
