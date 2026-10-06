@@ -40,9 +40,10 @@
 .histoire-control-content { display: flex; align-items: center; gap: 6px; min-width: 0; width: 100%; }
 .histoire-control-value { display: block; flex: 1; min-width: 0; max-width: 100%; }
 .histoire-control-actions { display: inline-flex; flex: none; align-items: center; gap: 4px; }
+.histoire-prop-control { border-radius: var(--histoire-radius-button, 9px); }
+.histoire-prop-control:is(:hover, :focus-within) { background: color-mix(in srgb, var(--histoire-control-resolved-text) 3%, transparent); }
 .histoire-prop-control .histoire-control-label-actions { visibility: hidden; opacity: 0; pointer-events: none; }
-.histoire-prop-control:hover .histoire-control-label-actions,
-.histoire-prop-control:focus-within .histoire-control-label-actions { visibility: visible; opacity: 1; pointer-events: auto; }
+.histoire-prop-control:is(:hover, :focus-within) .histoire-control-label-actions { visibility: visible; opacity: 1; pointer-events: auto; }
 .histoire-prop-control .histoire-control-label,
 .histoire-prop-control-unavailable .histoire-control-label { align-items: center; }
 .histoire-prop-control-reset { width: 24px; height: 24px; padding: 0; border-radius: 6px; }

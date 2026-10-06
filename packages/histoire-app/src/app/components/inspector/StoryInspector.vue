@@ -104,23 +104,23 @@ function select(value: InspectorTab) {
 </template>
 
 <style scoped>
-.story-inspector { display: flex; flex-direction: column; width: 100%; height: 100%; min-width: 0; min-height: 0; overflow: hidden; color: var(--histoire-text); background: var(--histoire-surface); }
+.story-inspector { --histoire-inspector-gutter: 16px; display: flex; flex-direction: column; width: 100%; height: 100%; min-width: 0; min-height: 0; overflow: hidden; color: var(--histoire-text); background: var(--histoire-surface); }
 .inspector-content { flex: 1; min-height: 0; overflow: auto; }
 .inspector-empty { margin: 24px 16px; color: var(--histoire-muted); font-size: 12px; }
-.inspector-test-failure { margin: 0 16px 14px; color: var(--histoire-danger-text); font-size: 12px; white-space: pre-wrap; overflow-wrap: anywhere; }
-.inspector-content :deep(.histoire-docs) { padding: 2px 16px 20px; color: var(--histoire-body); font-size: 12px; line-height: 1.7; }
+.inspector-test-failure { margin: 0 var(--histoire-inspector-gutter) 14px; color: var(--histoire-danger-text); font-size: 12px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.inspector-content :deep(.histoire-docs) { padding: 2px var(--histoire-inspector-gutter) 20px; color: var(--histoire-body); font-size: 12px; line-height: 1.7; }
 .inspector-content :deep(.histoire-docs :is(h1,h2,h3,h4)) { color: var(--histoire-text); font-weight: 800; }
 .inspector-content :deep(.histoire-docs table) { width: 100%; font-size: 11px; border-collapse: collapse; }
 .inspector-content :deep(.histoire-docs :is(th,td)) { padding: 9px; text-align: left; border-bottom: 1px solid var(--histoire-border); }
-.inspector-content :deep(.histoire-events) { position: relative; padding: 2px 16px 16px; }
-.inspector-content :deep(.histoire-events-count) { position: absolute; top: 9px; left: 16px; color: var(--histoire-muted); font-size: 10px; }
+.inspector-content :deep(.histoire-events) { position: relative; padding: 2px var(--histoire-inspector-gutter) 16px; }
+.inspector-content :deep(.histoire-events-count) { position: absolute; top: 9px; inset-inline-start: var(--histoire-inspector-gutter); color: var(--histoire-muted); font-size: 10px; }
 .inspector-content :deep(.histoire-events > button) { display: block; margin-left: auto; border: 0; border-radius: 7px; background: var(--histoire-chip); padding: 7px 10px; font-size: 11px; font-weight: 700; cursor: pointer; }
 .inspector-content :deep(.histoire-events ol) { padding: 0; list-style: none; }
 .inspector-content :deep(.histoire-event-row) { padding: 10px; border-radius: 8px; background: var(--histoire-chip); font: 11px var(--histoire-font-mono); }
 .inspector-content :deep(.histoire-events li button) { display: flex; gap: 8px; width: 100%; border: 0; padding: 0; text-align: left; background: transparent; cursor: pointer; }
 .inspector-content :deep(.histoire-events time) { margin-left: auto; color: var(--histoire-muted); font-size: 10px; }
 .inspector-content :deep(.histoire-event-argument) { margin: 8px 0 0; max-height: 120px; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere; color: var(--histoire-muted); font: 10px/1.6 var(--histoire-font-mono); }
-.inspector-content :deep(.histoire-tests) { padding: 2px 16px 16px; font-size: 12px; }
+.inspector-content :deep(.histoire-tests) { padding: 2px var(--histoire-inspector-gutter) 16px; font-size: 12px; }
 .inspector-content :deep(.histoire-tests-actions button) { border-color: var(--histoire-border); background: var(--histoire-chip); border-radius: 7px; font-size: 11px; }
 .inspector-content :deep(.histoire-test-row) { padding: 10px 0; border-bottom: 1px solid var(--histoire-border); }
 .inspector-content :deep(.histoire-tests :is(pre,summary)) { white-space: pre-wrap; overflow-wrap: anywhere; font: 11px/1.6 var(--histoire-font-mono); }

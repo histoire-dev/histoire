@@ -80,7 +80,7 @@ export function createPreviewHost(options: PreviewHostOptions) {
   }
 
   async function mount() {
-    const wrappers: Component[] = []
+    const wrappers: Array<{ component: Component, controls: boolean }> = []
     let resolveRoot: () => void
     let rejectRoot: (error: Error) => void
     // Suspense can resolve synchronously inside app.mount; install waiter first.
@@ -105,9 +105,11 @@ export function createPreviewHost(options: PreviewHostOptions) {
           renderContext: options.renderContext,
         })
 
+        const controlsSlot = options.renderContext.slotName === 'controls'
         for (const wrapper of wrappers) {
+          if (controlsSlot && !wrapper.controls) continue
           const child = vnode
-          vnode = h(wrapper, {
+          vnode = h(wrapper.component, {
             story: options.getStory(),
             variant: options.getVariant(),
           }, () => child)
@@ -136,8 +138,8 @@ export function createPreviewHost(options: PreviewHostOptions) {
       globals: useHistoireGlobals(),
       story: options.getStory(),
       variant: options.getVariant(),
-      addWrapper: (wrapper) => {
-        wrappers.unshift(wrapper)
+      addWrapper: (wrapper, wrapperOptions) => {
+        wrappers.unshift({ component: wrapper, controls: wrapperOptions?.controls ?? true })
       },
     }
 

@@ -27,5 +27,6 @@ export const setupVue3 = defineSetupVue3(({ app, addWrapper }) => {
     },
   })
 
-  addWrapper(WrapperGlobal)
+  // Apply this decorative wrapper only to story rendering.
+  addWrapper(WrapperGlobal, { controls: false })
 })

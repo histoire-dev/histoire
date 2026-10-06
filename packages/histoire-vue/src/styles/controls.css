@@ -10,7 +10,7 @@
 .histoire-provider .histoire-prop-control-finite .histoire-button { flex: 1 1 6rem; min-width: 0; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .histoire-provider .histoire-custom-controls { min-width: 0; }
 .histoire-provider .histoire-custom-controls > iframe { display: block; width: 100%; min-height: 0; border: 0; }
-.histoire-provider .histoire-controls-presets { display: flex; align-items: center; gap: 6px; min-width: 0; }
+.histoire-provider .histoire-controls-presets { display: flex; align-items: center; gap: 6px; min-width: 0; padding-inline: var(--histoire-control-wrapper-padding, 8px); }
 .histoire-provider .histoire-controls-presets > .histoire-state-presets { flex: 1; }
 .histoire-provider .histoire-controls-reset { flex: none; width: 32px; height: 32px; padding: 0; }
 .histoire-provider .histoire-controls-anchor { position: absolute; pointer-events: none; }

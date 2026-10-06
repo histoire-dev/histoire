@@ -28,7 +28,7 @@ defineEmits<{ close: [] }>()
 </template>
 
 <style scoped>
-.inspector-header { display: flex; align-items: center; gap: 8px; padding: 16px 16px 14px; }
+.inspector-header { display: flex; align-items: center; gap: 8px; padding: 16px var(--histoire-inspector-gutter, 16px) 14px; }
 .inspector-header-titles { display: flex; align-items: center; gap: 6px; flex: 1; min-width: 0; }
 .inspector-story-title { display: flex; align-items: center; gap: 4px; min-width: 0; max-width: 50%; color: var(--histoire-muted); font-size: 13px; white-space: nowrap; }
 .inspector-story-title > span { overflow: hidden; text-overflow: ellipsis; }
