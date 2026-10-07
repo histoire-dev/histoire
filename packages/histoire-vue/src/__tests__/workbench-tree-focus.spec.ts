@@ -1,9 +1,11 @@
 import type { HistoireTarget } from '@histoire/protocol'
+import { getHistoireTargetKey } from '@histoire/protocol'
 import { createHistoireSessionWithAdapters } from '@histoire/sdk/internal'
 import { mount } from '@vue/test-utils'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { defineComponent, h, nextTick } from 'vue'
 import StoriesPanel from '../../../histoire-app/src/app/components/panes/stories/StoriesPanel.vue'
+import { createContextMenu, provideContextMenu } from '../../../histoire-app/src/app/composables/context-menu.js'
 import { createStandaloneFolders } from '../../../histoire-app/src/app/standalone/folders.js'
 import { createUiSettingsStore, provideUiSettingsStore } from '../../../histoire-app/src/app/stores/settings.js'
 import { deferred, sourceFixture } from '../../../histoire-sdk/src/__tests__/fixtures/session.js'
@@ -27,10 +29,12 @@ async function tree(density: 'comfortable' | 'compact', options: { count?: numbe
   await session.selection.select({ storyId: 'story-0', variantId: 'default' })
   const folders = createStandaloneFolders(session, window)
   const settings = createUiSettingsStore({})
+  const menu = createContextMenu()
   settings.update({ density })
   const Owner = defineComponent({
     setup() {
       provideUiSettingsStore(settings)
+      provideContextMenu(menu)
       return () => h(HistoireProvider, { session }, { default: () => h(StoriesPanel, { folders, onError: options.onError, onFit: options.onFit }) })
     },
   })
@@ -39,6 +43,7 @@ async function tree(density: 'comfortable' | 'compact', options: { count?: numbe
     wrapper,
     session,
     fixture,
+    menu,
     /** Retire DOM resources before their canonical session. */
     async close() {
       wrapper.unmount()
@@ -49,6 +54,38 @@ async function tree(density: 'comfortable' | 'compact', options: { count?: numbe
 }
 
 describe('production story tree keyboard focus', () => {
+  it('opens shared frame menu for variants without changing selection', async () => {
+    const owner = await tree('comfortable', {
+      count: 1,
+      variants: [{ id: 'default', title: 'Default' }, { id: 'other', title: 'Other' }],
+    })
+    try {
+      await vi.waitFor(() => expect(owner.wrapper.text()).toContain('Other'))
+      const other = owner.wrapper.findAll('[role=treeitem]').find(row => row.text() === 'Other')!
+      const selection = { storyId: 'story-0', variantId: 'other' }
+      const frame = { ...selection, frameKey: getHistoireTargetKey(selection) }
+      const pointer = new MouseEvent('contextmenu', { bubbles: true, cancelable: true, clientX: 40, clientY: 80 })
+      other.element.dispatchEvent(pointer)
+      await nextTick()
+      expect(pointer.defaultPrevented).toBe(true)
+      expect(owner.menu.state.target).toEqual(frame)
+      expect(owner.menu.state.context).toEqual({
+        kind: 'frame',
+        label: 'story-0 › other',
+        frame,
+        selection,
+      })
+      expect(owner.session.getSnapshot().selection).toEqual({ storyId: 'story-0', variantId: 'default' })
+
+      const keyboard = new KeyboardEvent('keydown', { key: 'ContextMenu', bubbles: true, cancelable: true })
+      other.element.dispatchEvent(keyboard)
+      await nextTick()
+      expect(keyboard.defaultPrevented).toBe(true)
+      expect(owner.menu.state.target).toEqual(frame)
+    }
+    finally { await owner.close() }
+  })
+
   it('scrolls an explicitly revealed selected variant into the virtual list', async () => {
     const viewport = virtualViewport(true)
     const owner = await tree('comfortable')

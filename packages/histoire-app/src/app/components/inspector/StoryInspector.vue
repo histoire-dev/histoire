@@ -1,13 +1,14 @@
 <script setup lang="ts">
+import type { HistoireSession } from '@histoire/sdk'
 import type { InspectorTab } from './state.js'
 import { getHistoireTargetKey } from '@histoire/protocol'
-import type { HistoireSession } from '@histoire/sdk'
 import { HistoireDocs, HistoireEvents, HistoireTests } from '@histoire/vue'
 import { useHistoireContext, useProvidedHistoireTestsModel } from '@histoire/vue/internal'
 import { computed, ref, useId, watch } from 'vue'
 import { isContextMenuShortcut, useContextMenu } from '../../composables/context-menu.js'
 import { useSelection } from '../../composables/selection.js'
 import { useWorkbenchTestsModel } from '../panes/tests/model.js'
+import WorkbenchEmptyState from '../shell/WorkbenchEmptyState.vue'
 import InspectorHeader from './InspectorHeader.vue'
 import InspectorTabs from './InspectorTabs.vue'
 import PropsTab from './PropsTab.vue'
@@ -29,8 +30,8 @@ const props = defineProps<{
 const emit = defineEmits<{ panel: [value: InspectorTab], close: [], error: [error: unknown] }>()
 const { session, snapshot, story, variant } = useSelection()
 const context = useHistoireContext()
-const id = useId()
 const menu = useContextMenu()
+const id = useId()
 const tests = useProvidedHistoireTestsModel(session)
 const projectTests = useWorkbenchTestsModel(props.projectTestSession ?? session)
 /** Project results are displayed only for exact selected target and current source. */
@@ -68,7 +69,6 @@ function select(value: InspectorTab) {
   context.panels.clear()
   emit('panel', normalizeInspectorTab(value, testsEnabled.value))
 }
-</script>
 
 /** Inspector target menus reuse exact frame capabilities for selected variants. */
 function openSelectionMenu(event: MouseEvent | KeyboardEvent): void {
@@ -96,6 +96,7 @@ function openControlMenu(event: MouseEvent | KeyboardEvent): void {
   const actions = ['control.copy-name', controlKind === 'prop' ? 'control.reset-override' : 'control.reset-state']
   menu.open(event, { kind: 'control', key: `${controlKind}:${label}`, label, controlKind, element, resetElement }, actions)
 }
+</script>
 
 <template>
   <section class="story-inspector" data-test-id="story-side-panel" aria-label="Story inspector">
@@ -111,15 +112,11 @@ function openControlMenu(event: MouseEvent | KeyboardEvent): void {
       </PropsTab>
       <template v-else-if="active === 'docs'">
         <HistoireDocs v-if="story?.content.docs" :anchor="docsAnchor" @error="emit('error', $event)" />
-        <p v-else class="inspector-empty">
-          No documentation for this story.
-        </p>
+        <WorkbenchEmptyState v-else icon="document-blank" title="No documentation" />
       </template>
       <template v-else-if="active === 'events'">
-        <HistoireEvents inline-details />
-        <p v-if="!events.length" class="inspector-empty">
-          No events yet.
-        </p>
+        <HistoireEvents v-if="events.length" inline-details />
+        <WorkbenchEmptyState v-else icon="flash" title="No events yet" />
       </template>
       <template v-else-if="testsEnabled && active === 'tests'">
         <p v-if="cachedFailure" class="inspector-test-failure" role="alert">
@@ -135,7 +132,6 @@ function openControlMenu(event: MouseEvent | KeyboardEvent): void {
 <style scoped>
 .story-inspector { --histoire-inspector-gutter: 16px; display: flex; flex-direction: column; width: 100%; height: 100%; min-width: 0; min-height: 0; overflow: hidden; color: var(--histoire-text); background: var(--histoire-surface); }
 .inspector-content { flex: 1; min-height: 0; overflow: auto; }
-.inspector-empty { margin: 24px 16px; color: var(--histoire-muted); font-size: 12px; }
 .inspector-test-failure { margin: 0 var(--histoire-inspector-gutter) 14px; color: var(--histoire-danger-text); font-size: 12px; white-space: pre-wrap; overflow-wrap: anywhere; }
 .inspector-content :deep(.histoire-docs) { padding: 2px var(--histoire-inspector-gutter) 20px; color: var(--histoire-body); font-size: 12px; line-height: 1.7; }
 .inspector-content :deep(.histoire-docs :is(h1,h2,h3,h4)) { color: var(--histoire-text); font-weight: 800; }

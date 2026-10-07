@@ -17,6 +17,9 @@ describe('shared Explorer composition', () => {
     const wrapper = mount(HistoireProvider, { props: { session }, slots: { default: () => h(HistoireExplorer, { showNavigation: false, showSearch: false, showToolbar: false, showPanels: false }) } })
     try {
       await vi.waitFor(() => expect(session.getSnapshot().runtime.status).toBe('ready'))
+      expect(wrapper.get('[aria-label="Histoire canvas"]').exists()).toBe(true)
+      expect(wrapper.get('[aria-label="Show single variant"]').text()).toBe('Single')
+      expect(wrapper.get('[aria-label="Show variant grid"]').text()).toBe('Grid')
       await selectControl(wrapper, 'second', 'Variant')
       await vi.waitFor(() => expect(session.getSnapshot().selection).toEqual({ storyId: 'a:b', variantId: 'second' }))
       expect(fixture.adapters.mount).toHaveBeenCalledOnce()

@@ -11,10 +11,11 @@ import { computed, nextTick, onBeforeUnmount, onMounted, ref, shallowRef, watch 
 import { useContextMenu } from '../../../composables/context-menu.js'
 import CommandPrompts from '../../command/CommandPrompts.vue'
 import WorkbenchVirtualList from '../../lists/WorkbenchVirtualList.vue'
+import WorkbenchEmptyState from '../../shell/WorkbenchEmptyState.vue'
+
 import { getSearchCommandDomId, SEARCH_ACTIVE_RESULT_ID, SEARCH_RESULTS_ID } from './accessibility.js'
 import { createWorkbenchSearchController } from './controller.js'
 import { getSearchActivationResult, getSearchFrameMatches } from './query.js'
-import SearchEmpty from './SearchEmpty.vue'
 import SearchResultList from './SearchResultList.vue'
 import SearchScopes from './SearchScopes.vue'
 
@@ -39,8 +40,8 @@ const emit = defineEmits<{
   error: [error: unknown]
 }>()
 const context = useHistoireContext()
-const snapshot = shallowRef(context.session.getSnapshot())
 const menu = useContextMenu()
+const snapshot = shallowRef(context.session.getSnapshot())
 useHistoireResource(context.session.subscribe(value => snapshot.value = value))
 const input = ref<HTMLInputElement | null>(null)
 const query = ref('')
@@ -71,7 +72,6 @@ const activeCursor = computed(() => {
   return command ? { label: `${command.label}, command, ${index.value + 1} of ${count}` } : undefined
 })
 const commandList = ref<{ reveal: (key: string) => Promise<void> }>()
-watch(() => commands.value[index.value - ordered.value.length]?.id, key => key && void commandList.value?.reveal(key), { flush: 'post' })
 const unregisterOpenResult = menu?.register({
   id: 'search.open-result',
   label: 'Open result',
@@ -85,6 +85,7 @@ const unregisterOpenResult = menu?.register({
   },
 })
 if (unregisterOpenResult) useHistoireResource(unregisterOpenResult)
+watch(() => commands.value[index.value - ordered.value.length]?.id, key => key && void commandList.value?.reveal(key), { flush: 'post' })
 const currentStory = computed(() => snapshot.value.catalog.stories.find(story => story.id === snapshot.value.selection?.storyId))
 const matches = computed(() => query.value.trim() ? getSearchFrameMatches(results.value, currentStory.value) : [])
 watch(matches, value => emit('highlight', value), { immediate: true })
@@ -247,7 +248,16 @@ function keydown(event: KeyboardEvent) {
     <p v-if="state.error" class="notice" role="status">
       Search index unavailable. Loaded props remain searchable.
     </p>
-    <SearchEmpty v-if="query.trim() && !state.loading && !ordered.length && !commands.length" :query="query.trim()" :scope="scope" @widen="scope = 'all'" />
+    <WorkbenchEmptyState v-if="query.trim() && !state.loading && !ordered.length && !commands.length" icon="search" title="No matches">
+      Nothing for <q class="search-empty-query">{{ query.trim() }}</q><template v-if="scope !== 'all'">
+        in {{ scope }}
+      </template>
+      <template v-if="scope !== 'all'" #actions>
+        <HstButton color="flat" @click="scope = 'all'">
+          Search everything
+        </HstButton>
+      </template>
+    </WorkbenchEmptyState>
     <p v-if="activeCursor" :id="SEARCH_ACTIVE_RESULT_ID" class="search-active-result" role="status" aria-live="polite" data-search-active-result>
       {{ activeCursor.label }}
     </p>
@@ -278,6 +288,7 @@ function keydown(event: KeyboardEvent) {
 .search-query::-webkit-search-cancel-button { display: none; -webkit-appearance: none; }
 kbd { flex: none; color: var(--histoire-muted); font: 11px var(--histoire-font-mono, monospace); }
 .notice { margin: 20px 10px; color: var(--histoire-muted); font-size: 12px; }
+.search-empty-query { color: var(--histoire-text); }
 .search-active-result { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 .command-results { margin-top: 22px; }
 .command-results h3 { padding: 0 10px; color: var(--histoire-muted); font-size: 12px; }

@@ -3,6 +3,7 @@ import type { HistoireSelectionInput, HistoireSourceIdentity, HistoireTarget } f
 import type { createStandaloneFolders } from '../../../standalone/folders.js'
 import type { StoryTreeRow } from './tree.js'
 import { BuiltinIcon, HstButton } from '@histoire/controls/vue'
+import { getHistoireTargetKey } from '@histoire/protocol'
 import { useHistoireContext, useHistoireResource } from '@histoire/vue/internal'
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, shallowRef, watch } from 'vue'
 import { isContextMenuShortcut, useContextMenu } from '../../../composables/context-menu.js'
@@ -140,16 +141,17 @@ function toggle(row: StoryTreeRow): void {
 /** Open on immutable row identity so virtual-list recycling cannot retarget actions. */
 function openMenu(event: MouseEvent | KeyboardEvent, row: StoryTreeRow): void {
   if (!menu) return
+  if (row.kind === 'variant' && row.target && 'variantId' in row.target && row.target.variantId !== null) {
+    menu.open(event, { storyId: row.target.storyId, variantId: row.target.variantId, frameKey: getHistoireTargetKey(row.target) })
+    return
+  }
   if (row.kind === 'folder' && row.path) {
     menu.open(event, { kind: 'folder', key: row.key, label: row.title, path: [...row.path], expanded: Boolean(row.expanded) }, [row.expanded ? 'stories.folder.collapse' : 'stories.folder.expand'])
     return
   }
   if (!row.target || row.kind === 'group') return
   const selection: HistoireSelectionInput = 'variantId' in row.target ? { ...row.target } : { storyId: row.target.storyId }
-  const frame = row.kind === 'variant' && 'variantId' in row.target && row.target.variantId
-    ? { storyId: row.target.storyId, variantId: row.target.variantId, frameKey: JSON.stringify([row.target.storyId, row.target.variantId]) }
-    : undefined
-  menu.open(event, { kind: 'story', key: row.key, label: row.title, selection, frame }, ['stories.select', 'context.copy-link'])
+  menu.open(event, { kind: 'story', key: row.key, label: row.title, selection }, ['stories.select', 'context.copy-link'])
 }
 
 /** Variant rows retain an exact frame target; stories and folders have no single frame. */
