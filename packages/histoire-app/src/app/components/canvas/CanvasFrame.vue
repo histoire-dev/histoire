@@ -9,6 +9,7 @@ import { getBackgroundStyle } from '../../util/background.js'
 import PulsatingDisc from '../base/PulsatingDisc.vue'
 import { useWorkbenchTestsModel } from '../panes/tests/model.js'
 
+import CanvasLoadingIndicator from './CanvasLoadingIndicator.vue'
 import CanvasReplicaPreview from './CanvasReplicaPreview.vue'
 import { CANVAS_FRAME_LABEL_HEIGHT, type CanvasFrameLayout } from './frame-layout.js'
 import { isFrameMenuShortcut, openFrameMenu } from './frame-menu.js'
@@ -128,8 +129,8 @@ function openMenu(event: MouseEvent | KeyboardEvent) {
       <div v-if="!live" class="histoire-frame-placeholder">
         {{ variant.title }}
       </div>
-      <div v-else-if="status === 'loading'" class="histoire-frame-placeholder">
-        Loading variant…
+      <div v-else-if="status === 'loading'" class="histoire-frame-placeholder" role="status" aria-label="Loading variant">
+        <CanvasLoadingIndicator />
       </div>
       <div v-else-if="status === 'error'" class="histoire-frame-error" role="alert">
         <span>{{ error instanceof Error ? error.message : 'Variant unavailable' }}</span><HstButton color="default" @click.stop="replica?.retry()">

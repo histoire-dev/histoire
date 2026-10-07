@@ -85,7 +85,7 @@ function receive(event: MessageEvent) {
   clearTimeout(propsTimeout)
   propsRequest = ''
   if (event.data.error || !event.data.result?.supported) {
-    const error = new Error('Props matrix unavailable in this preview runtime')
+    const error = new Error('Props matrix unavailable for this variant.')
     rejectProps(error)
     fail(error)
   }
@@ -106,12 +106,12 @@ function overrideProps() {
   void propsReady.catch(() => {})
   propsRequest = nextPropsRequestId()
   if (!registry.postToFrame(props.frameId, { type: PROPS_OVERRIDE, variantId: props.variantId, props: props.propsOverride, requestId: propsRequest })) {
-    rejectProps(new Error('Preview unavailable'))
+    rejectProps(new Error('Variant unavailable.'))
     return
   }
   propsTimeout = setTimeout(() => {
     propsRequest = ''
-    const error = new Error('Props matrix unavailable in this preview runtime')
+    const error = new Error('Props matrix unavailable for this variant.')
     rejectProps(error)
     fail(error)
   }, 3000)
@@ -185,7 +185,7 @@ onBeforeUnmount(() => {
 /** Dynamic codegen waits until this isolated cell acknowledged its current props. */
 async function getSource() {
   await propsReady
-  if (!replica || closing) throw new Error('Preview unavailable')
+  if (!replica || closing) throw new Error('Variant unavailable.')
   const source = await replica.source.get({ storyId: props.storyId, variantId: props.variantId, mode: 'dynamic' })
   return source.body
 }
