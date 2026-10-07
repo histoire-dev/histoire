@@ -1,0 +1,1927 @@
+{
+  "baseUrl": "http://127.0.0.1:6079",
+  "fixture": "Tailwind generated story, Single view, real story-tree clicks cycling border-color/text-color/background-color",
+  "viewport": "1400x900",
+  "warmups": 5,
+  "timedSwitches": 30,
+  "summary": {
+    "medianReadyLatencyMs": 1504.8999999985099,
+    "p95ReadyLatencyMs": 2899.0999999940395,
+    "medianInputDelayMs": null,
+    "medianPostReadyLongTaskMs": 1434.6500000022352,
+    "p95PostReadyLongTaskMs": 3293.1999999955297,
+    "timedSwitchCount": 30
+  },
+  "canvasSandboxDocumentRequests": 1,
+  "additionalCanvasSandboxDocumentRequests": 0,
+  "browserState": {
+    "iframeCount": 2,
+    "canvasFrameCount": 1,
+    "replicaCount": 1,
+    "replacedFrames": 0,
+    "documentId": "histoire-muy3u0ti-2xf26uugy1n:mount:1:document:1b2ede5c-6cc0-4107-9350-1d738f9c73d9",
+    "note": "iframeCount includes separate Histoire custom-controls iframe; canvasFrameCount and replicaCount refer to one selected canvas frame."
+  },
+  "sandboxDocuments": [
+    "http://127.0.0.1:6079/__sandbox.html?storyId=tailwind&variantId=background-color&grid=false&documentId=histoire-muy3u0ti-2xf26uugy1n%3Amount%3A1%3Adocument%3A1b2ede5c-6cc0-4107-9350-1d738f9c73d9&selectionVersion=0&embed=true&standalone=true&nativeScroll=true",
+    "http://127.0.0.1:6079/__sandbox.html?storyId=tailwind&variantId=background-color&controls=true&documentId=histoire-muy3u0ti-2xf26uugy1n%3Amount%3A2%3Acontrols%3A1",
+    "http://127.0.0.1:6079/__sandbox.html?storyId=tailwind&variantId=border-color&controls=true&documentId=histoire-muy3u0ti-2xf26uugy1n%3Amount%3A3%3Acontrols%3A1",
+    "http://127.0.0.1:6079/__sandbox.html?storyId=tailwind&variantId=text-color&controls=true&documentId=histoire-muy3u0ti-2xf26uugy1n%3Amount%3A4%3Acontrols%3A1",
+    "http://127.0.0.1:6079/__sandbox.html?storyId=tailwind&variantId=background-color&controls=true&documentId=histoire-muy3u0ti-2xf26uugy1n%3Amount%3A5%3Acontrols%3A1",
+    "http://127.0.0.1:6079/__sandbox.html?storyId=tailwind&variantId=border-color&controls=true&documentId=histoire-muy3u0ti-2xf26uugy1n%3Amount%3A6%3Acontrols%3A1",
+    "http://127.0.0.1:6079/__sandbox.html?storyId=tailwind&variantId=text-color&controls=true&documentId=histoire-muy3u0ti-2xf26uugy1n%3Amount%3A7%3Acontrols%3A1",
+    "http://127.0.0.1:6079/__sandbox.html?storyId=tailwind&variantId=background-color&controls=true&documentId=histoire-muy3u0ti-2xf26uugy1n%3Amount%3A8%3Acontrols%3A1",
+    "http://127.0.0.1:6079/__sandbox.html?storyId=tailwind&variantId=border-color&controls=true&documentId=histoire-muy3u0ti-2xf26uugy1n%3Amount%3A9%3Acontrols%3A1",
+    "http://127.0.0.1:6079/__sandbox.html?storyId=tailwind&variantId=text-color&controls=true&documentId=histoire-muy3u0ti-2xf26uugy1n%3Amount%3A10%3Acontrols%3A1",
+    "http://127.0.0.1:6079/__sandbox.html?storyId=tailwind&variantId=background-color&controls=true&documentId=histoire-muy3u0ti-2xf26uugy1n%3Amount%3A11%3Acontrols%3A1",
+    "http://127.0.0.1:6079/__sandbox.html?storyId=tailwind&variantId=border-color&controls=true&documentId=histoire-muy3u0ti-2xf26uugy1n%3Amount%3A12%3Acontrols%3A1",
+    "http://127.0.0.1:6079/__sandbox.html?storyId=tailwind&variantId=text-color&controls=true&documentId=histoire-muy3u0ti-2xf26uugy1n%3Amount%3A13%3Acontrols%3A1",
+    "http://127.0.0.1:6079/__sandbox.html?storyId=tailwind&variantId=background-color&controls=true&documentId=histoire-muy3u0ti-2xf26uugy1n%3Amount%3A14%3Acontrols%3A1",
+    "http://127.0.0.1:6079/__sandbox.html?storyId=tailwind&variantId=border-color&controls=true&documentId=histoire-muy3u0ti-2xf26uugy1n%3Amount%3A15%3Acontrols%3A1",
+    "http://127.0.0.1:6079/__sandbox.html?storyId=tailwind&variantId=text-color&controls=true&documentId=histoire-muy3u0ti-2xf26uugy1n%3Amount%3A16%3Acontrols%3A1",
+    "http://127.0.0.1:6079/__sandbox.html?storyId=tailwind&variantId=background-color&controls=true&documentId=histoire-muy3u0ti-2xf26uugy1n%3Amount%3A17%3Acontrols%3A1",
+    "http://127.0.0.1:6079/__sandbox.html?storyId=tailwind&variantId=border-color&controls=true&documentId=histoire-muy3u0ti-2xf26uugy1n%3Amount%3A18%3Acontrols%3A1",
+    "http://127.0.0.1:6079/__sandbox.html?storyId=tailwind&variantId=text-color&controls=true&documentId=histoire-muy3u0ti-2xf26uugy1n%3Amount%3A19%3Acontrols%3A1",
+    "http://127.0.0.1:6079/__sandbox.html?storyId=tailwind&variantId=background-color&controls=true&documentId=histoire-muy3u0ti-2xf26uugy1n%3Amount%3A20%3Acontrols%3A1",
+    "http://127.0.0.1:6079/__sandbox.html?storyId=tailwind&variantId=border-color&controls=true&documentId=histoire-muy3u0ti-2xf26uugy1n%3Amount%3A21%3Acontrols%3A1",
+    "http://127.0.0.1:6079/__sandbox.html?storyId=tailwind&variantId=text-color&controls=true&documentId=histoire-muy3u0ti-2xf26uugy1n%3Amount%3A22%3Acontrols%3A1",
+    "http://127.0.0.1:6079/__sandbox.html?storyId=tailwind&variantId=background-color&controls=true&documentId=histoire-muy3u0ti-2xf26uugy1n%3Amount%3A23%3Acontrols%3A1",
+    "http://127.0.0.1:6079/__sandbox.html?storyId=tailwind&variantId=border-color&controls=true&documentId=histoire-muy3u0ti-2xf26uugy1n%3Amount%3A24%3Acontrols%3A1",
+    "http://127.0.0.1:6079/__sandbox.html?storyId=tailwind&variantId=text-color&controls=true&documentId=histoire-muy3u0ti-2xf26uugy1n%3Amount%3A25%3Acontrols%3A1",
+    "http://127.0.0.1:6079/__sandbox.html?storyId=tailwind&variantId=background-color&controls=true&documentId=histoire-muy3u0ti-2xf26uugy1n%3Amount%3A26%3Acontrols%3A1",
+    "http://127.0.0.1:6079/__sandbox.html?storyId=tailwind&variantId=border-color&controls=true&documentId=histoire-muy3u0ti-2xf26uugy1n%3Amount%3A27%3Acontrols%3A1",
+    "http://127.0.0.1:6079/__sandbox.html?storyId=tailwind&variantId=text-color&controls=true&documentId=histoire-muy3u0ti-2xf26uugy1n%3Amount%3A28%3Acontrols%3A1",
+    "http://127.0.0.1:6079/__sandbox.html?storyId=tailwind&variantId=background-color&controls=true&documentId=histoire-muy3u0ti-2xf26uugy1n%3Amount%3A29%3Acontrols%3A1",
+    "http://127.0.0.1:6079/__sandbox.html?storyId=tailwind&variantId=border-color&controls=true&documentId=histoire-muy3u0ti-2xf26uugy1n%3Amount%3A30%3Acontrols%3A1",
+    "http://127.0.0.1:6079/__sandbox.html?storyId=tailwind&variantId=text-color&controls=true&documentId=histoire-muy3u0ti-2xf26uugy1n%3Amount%3A31%3Acontrols%3A1",
+    "http://127.0.0.1:6079/__sandbox.html?storyId=tailwind&variantId=background-color&controls=true&documentId=histoire-muy3u0ti-2xf26uugy1n%3Amount%3A32%3Acontrols%3A1",
+    "http://127.0.0.1:6079/__sandbox.html?storyId=tailwind&variantId=border-color&controls=true&documentId=histoire-muy3u0ti-2xf26uugy1n%3Amount%3A33%3Acontrols%3A1",
+    "http://127.0.0.1:6079/__sandbox.html?storyId=tailwind&variantId=text-color&controls=true&documentId=histoire-muy3u0ti-2xf26uugy1n%3Amount%3A34%3Acontrols%3A1",
+    "http://127.0.0.1:6079/__sandbox.html?storyId=tailwind&variantId=background-color&controls=true&documentId=histoire-muy3u0ti-2xf26uugy1n%3Amount%3A35%3Acontrols%3A1",
+    "http://127.0.0.1:6079/__sandbox.html?storyId=tailwind&variantId=border-color&controls=true&documentId=histoire-muy3u0ti-2xf26uugy1n%3Amount%3A36%3Acontrols%3A1",
+    "http://127.0.0.1:6079/__sandbox.html?storyId=tailwind&variantId=text-color&controls=true&documentId=histoire-muy3u0ti-2xf26uugy1n%3Amount%3A37%3Acontrols%3A1"
+  ],
+  "switches": [
+    {
+      "targetId": "border-color",
+      "label": "Border Color",
+      "inputStart": 6000.20000000298,
+      "handlerTime": 6027.20000000298,
+      "readyTime": 6612.5,
+      "latencyMs": 612.2999999970198,
+      "inputDelayMs": null,
+      "postReadyLongTaskMsUntilNextClick": 721.8000000044703,
+      "frameCount": 1,
+      "replicaCount": 1,
+      "documentId": "histoire-muy3u0ti-2xf26uugy1n:mount:1:document:1b2ede5c-6cc0-4107-9350-1d738f9c73d9",
+      "phase": "warmup"
+    },
+    {
+      "targetId": "text-color",
+      "label": "Text Color",
+      "inputStart": 7431.20000000298,
+      "handlerTime": 7446.20000000298,
+      "readyTime": 8113.29999999702,
+      "latencyMs": 682.0999999940395,
+      "inputDelayMs": null,
+      "postReadyLongTaskMsUntilNextClick": 568.5,
+      "frameCount": 1,
+      "replicaCount": 1,
+      "documentId": "histoire-muy3u0ti-2xf26uugy1n:mount:1:document:1b2ede5c-6cc0-4107-9350-1d738f9c73d9",
+      "phase": "warmup"
+    },
+    {
+      "targetId": "background-color",
+      "label": "Background Color",
+      "inputStart": 8796,
+      "handlerTime": 8813.5,
+      "readyTime": 9372.10000000149,
+      "latencyMs": 576.1000000014901,
+      "inputDelayMs": null,
+      "postReadyLongTaskMsUntilNextClick": 720.0,
+      "frameCount": 1,
+      "replicaCount": 1,
+      "documentId": "histoire-muy3u0ti-2xf26uugy1n:mount:1:document:1b2ede5c-6cc0-4107-9350-1d738f9c73d9",
+      "phase": "warmup"
+    },
+    {
+      "targetId": "border-color",
+      "label": "Border Color",
+      "inputStart": 10141.79999999702,
+      "handlerTime": 10156.89999999851,
+      "readyTime": 10979.20000000298,
+      "latencyMs": 837.4000000059605,
+      "inputDelayMs": null,
+      "postReadyLongTaskMsUntilNextClick": 684.5,
+      "frameCount": 1,
+      "replicaCount": 1,
+      "documentId": "histoire-muy3u0ti-2xf26uugy1n:mount:1:document:1b2ede5c-6cc0-4107-9350-1d738f9c73d9",
+      "phase": "warmup"
+    },
+    {
+      "targetId": "text-color",
+      "label": "Text Color",
+      "inputStart": 11746.89999999851,
+      "handlerTime": 11764.39999999851,
+      "readyTime": 12464.10000000149,
+      "latencyMs": 717.2000000029802,
+      "inputDelayMs": null,
+      "postReadyLongTaskMsUntilNextClick": 610.2999999970198,
+      "frameCount": 1,
+      "replicaCount": 1,
+      "documentId": "histoire-muy3u0ti-2xf26uugy1n:mount:1:document:1b2ede5c-6cc0-4107-9350-1d738f9c73d9",
+      "phase": "warmup"
+    },
+    {
+      "targetId": "background-color",
+      "label": "Background Color",
+      "inputStart": 13163.89999999851,
+      "handlerTime": 13176.5,
+      "readyTime": 13976.29999999702,
+      "latencyMs": 812.3999999985099,
+      "inputDelayMs": null,
+      "postReadyLongTaskMsUntilNextClick": 983.5999999940395,
+      "frameCount": 1,
+      "replicaCount": 1,
+      "documentId": "histoire-muy3u0ti-2xf26uugy1n:mount:1:document:1b2ede5c-6cc0-4107-9350-1d738f9c73d9",
+      "phase": "timed"
+    },
+    {
+      "targetId": "border-color",
+      "label": "Border Color",
+      "inputStart": 15071.79999999702,
+      "handlerTime": 15083.79999999702,
+      "readyTime": 15685.5,
+      "latencyMs": 613.7000000029802,
+      "inputDelayMs": null,
+      "postReadyLongTaskMsUntilNextClick": 632.1999999955297,
+      "frameCount": 1,
+      "replicaCount": 1,
+      "documentId": "histoire-muy3u0ti-2xf26uugy1n:mount:1:document:1b2ede5c-6cc0-4107-9350-1d738f9c73d9",
+      "phase": "timed"
+    },
+    {
+      "targetId": "text-color",
+      "label": "Text Color",
+      "inputStart": 16379.70000000298,
+      "handlerTime": 16395.29999999702,
+      "readyTime": 17232.89999999851,
+      "latencyMs": 853.1999999955297,
+      "inputDelayMs": null,
+      "postReadyLongTaskMsUntilNextClick": 1016.2000000029802,
+      "frameCount": 1,
+      "replicaCount": 1,
+      "documentId": "histoire-muy3u0ti-2xf26uugy1n:mount:1:document:1b2ede5c-6cc0-4107-9350-1d738f9c73d9",
+      "phase": "timed"
+    },
+    {
+      "targetId": "background-color",
+      "label": "Background Color",
+      "inputStart": 18348.5,
+      "handlerTime": 18370.5,
+      "readyTime": 19240.29999999702,
+      "latencyMs": 891.7999999970198,
+      "inputDelayMs": null,
+      "postReadyLongTaskMsUntilNextClick": 1018.8999999985099,
+      "frameCount": 1,
+      "replicaCount": 1,
+      "documentId": "histoire-muy3u0ti-2xf26uugy1n:mount:1:document:1b2ede5c-6cc0-4107-9350-1d738f9c73d9",
+      "phase": "timed"
+    },
+    {
+      "targetId": "border-color",
+      "label": "Border Color",
+      "inputStart": 20383.60000000149,
+      "handlerTime": 20403.5,
+      "readyTime": 21303,
+      "latencyMs": 919.3999999985099,
+      "inputDelayMs": null,
+      "postReadyLongTaskMsUntilNextClick": 807.5,
+      "frameCount": 1,
+      "replicaCount": 1,
+      "documentId": "histoire-muy3u0ti-2xf26uugy1n:mount:1:document:1b2ede5c-6cc0-4107-9350-1d738f9c73d9",
+      "phase": "timed"
+    },
+    {
+      "targetId": "text-color",
+      "label": "Text Color",
+      "inputStart": 22165.60000000149,
+      "handlerTime": 22186.20000000298,
+      "readyTime": 23061.79999999702,
+      "latencyMs": 896.1999999955297,
+      "inputDelayMs": null,
+      "postReadyLongTaskMsUntilNextClick": 704.5,
+      "frameCount": 1,
+      "replicaCount": 1,
+      "documentId": "histoire-muy3u0ti-2xf26uugy1n:mount:1:document:1b2ede5c-6cc0-4107-9350-1d738f9c73d9",
+      "phase": "timed"
+    },
+    {
+      "targetId": "background-color",
+      "label": "Background Color",
+      "inputStart": 23844.60000000149,
+      "handlerTime": 23863.39999999851,
+      "readyTime": 24462,
+      "latencyMs": 617.3999999985099,
+      "inputDelayMs": null,
+      "postReadyLongTaskMsUntilNextClick": 813.3999999985099,
+      "frameCount": 1,
+      "replicaCount": 1,
+      "documentId": "histoire-muy3u0ti-2xf26uugy1n:mount:1:document:1b2ede5c-6cc0-4107-9350-1d738f9c73d9",
+      "phase": "timed"
+    },
+    {
+      "targetId": "border-color",
+      "label": "Border Color",
+      "inputStart": 25364.39999999851,
+      "handlerTime": 25380.29999999702,
+      "readyTime": 26165.70000000298,
+      "latencyMs": 801.3000000044703,
+      "inputDelayMs": null,
+      "postReadyLongTaskMsUntilNextClick": 814.7000000029802,
+      "frameCount": 1,
+      "replicaCount": 1,
+      "documentId": "histoire-muy3u0ti-2xf26uugy1n:mount:1:document:1b2ede5c-6cc0-4107-9350-1d738f9c73d9",
+      "phase": "timed"
+    },
+    {
+      "targetId": "text-color",
+      "label": "Text Color",
+      "inputStart": 27064.10000000149,
+      "handlerTime": 27081.5,
+      "readyTime": 28217.79999999702,
+      "latencyMs": 1153.6999999955297,
+      "inputDelayMs": null,
+      "postReadyLongTaskMsUntilNextClick": 1485.5,
+      "frameCount": 1,
+      "replicaCount": 1,
+      "documentId": "histoire-muy3u0ti-2xf26uugy1n:mount:1:document:1b2ede5c-6cc0-4107-9350-1d738f9c73d9",
+      "phase": "timed"
+    },
+    {
+      "targetId": "background-color",
+      "label": "Background Color",
+      "inputStart": 29815.79999999702,
+      "handlerTime": 29838.29999999702,
+      "readyTime": 30895,
+      "latencyMs": 1079.2000000029802,
+      "inputDelayMs": null,
+      "postReadyLongTaskMsUntilNextClick": 964.2000000029802,
+      "frameCount": 1,
+      "replicaCount": 1,
+      "documentId": "histoire-muy3u0ti-2xf26uugy1n:mount:1:document:1b2ede5c-6cc0-4107-9350-1d738f9c73d9",
+      "phase": "timed"
+    },
+    {
+      "targetId": "border-color",
+      "label": "Border Color",
+      "inputStart": 31955.29999999702,
+      "handlerTime": 31976.10000000149,
+      "readyTime": 32870.10000000149,
+      "latencyMs": 914.8000000044703,
+      "inputDelayMs": null,
+      "postReadyLongTaskMsUntilNextClick": 1268.3999999985099,
+      "frameCount": 1,
+      "replicaCount": 1,
+      "documentId": "histoire-muy3u0ti-2xf26uugy1n:mount:1:document:1b2ede5c-6cc0-4107-9350-1d738f9c73d9",
+      "phase": "timed"
+    },
+    {
+      "targetId": "text-color",
+      "label": "Text Color",
+      "inputStart": 34336.10000000149,
+      "handlerTime": 34381.10000000149,
+      "readyTime": 36117.39999999851,
+      "latencyMs": 1781.2999999970198,
+      "inputDelayMs": null,
+      "postReadyLongTaskMsUntilNextClick": 2664.39999999851,
+      "frameCount": 1,
+      "replicaCount": 1,
+      "documentId": "histoire-muy3u0ti-2xf26uugy1n:mount:1:document:1b2ede5c-6cc0-4107-9350-1d738f9c73d9",
+      "phase": "timed"
+    },
+    {
+      "targetId": "background-color",
+      "label": "Background Color",
+      "inputStart": 39107.10000000149,
+      "handlerTime": 39147.5,
+      "readyTime": 41947.10000000149,
+      "latencyMs": 2840,
+      "inputDelayMs": null,
+      "postReadyLongTaskMsUntilNextClick": 1358.0999999940395,
+      "frameCount": 1,
+      "replicaCount": 1,
+      "documentId": "histoire-muy3u0ti-2xf26uugy1n:mount:1:document:1b2ede5c-6cc0-4107-9350-1d738f9c73d9",
+      "phase": "timed"
+    },
+    {
+      "targetId": "border-color",
+      "label": "Border Color",
+      "inputStart": 43526.20000000298,
+      "handlerTime": 43578.79999999702,
+      "readyTime": 44977.39999999851,
+      "latencyMs": 1451.1999999955297,
+      "inputDelayMs": null,
+      "postReadyLongTaskMsUntilNextClick": 1932.3000000044703,
+      "frameCount": 1,
+      "replicaCount": 1,
+      "documentId": "histoire-muy3u0ti-2xf26uugy1n:mount:1:document:1b2ede5c-6cc0-4107-9350-1d738f9c73d9",
+      "phase": "timed"
+    },
+    {
+      "targetId": "text-color",
+      "label": "Text Color",
+      "inputStart": 47041.70000000298,
+      "handlerTime": 47119.60000000149,
+      "readyTime": 49940.79999999702,
+      "latencyMs": 2899.0999999940395,
+      "inputDelayMs": null,
+      "postReadyLongTaskMsUntilNextClick": 1482.6000000089407,
+      "frameCount": 1,
+      "replicaCount": 1,
+      "documentId": "histoire-muy3u0ti-2xf26uugy1n:mount:1:document:1b2ede5c-6cc0-4107-9350-1d738f9c73d9",
+      "phase": "timed"
+    },
+    {
+      "targetId": "background-color",
+      "label": "Background Color",
+      "inputStart": 51677.79999999702,
+      "handlerTime": 51696.70000000298,
+      "readyTime": 53371.29999999702,
+      "latencyMs": 1693.5,
+      "inputDelayMs": null,
+      "postReadyLongTaskMsUntilNextClick": 1638.5,
+      "frameCount": 1,
+      "replicaCount": 1,
+      "documentId": "histoire-muy3u0ti-2xf26uugy1n:mount:1:document:1b2ede5c-6cc0-4107-9350-1d738f9c73d9",
+      "phase": "timed"
+    },
+    {
+      "targetId": "border-color",
+      "label": "Border Color",
+      "inputStart": 55175.60000000149,
+      "handlerTime": 55194.79999999702,
+      "readyTime": 56800.79999999702,
+      "latencyMs": 1625.1999999955297,
+      "inputDelayMs": null,
+      "postReadyLongTaskMsUntilNextClick": 2305.2000000029802,
+      "frameCount": 1,
+      "replicaCount": 1,
+      "documentId": "histoire-muy3u0ti-2xf26uugy1n:mount:1:document:1b2ede5c-6cc0-4107-9350-1d738f9c73d9",
+      "phase": "timed"
+    },
+    {
+      "targetId": "text-color",
+      "label": "Text Color",
+      "inputStart": 59286.5,
+      "handlerTime": 59323.20000000298,
+      "readyTime": 61418,
+      "latencyMs": 2131.5,
+      "inputDelayMs": null,
+      "postReadyLongTaskMsUntilNextClick": 2780.5999999940395,
+      "frameCount": 1,
+      "replicaCount": 1,
+      "documentId": "histoire-muy3u0ti-2xf26uugy1n:mount:1:document:1b2ede5c-6cc0-4107-9350-1d738f9c73d9",
+      "phase": "timed"
+    },
+    {
+      "targetId": "background-color",
+      "label": "Background Color",
+      "inputStart": 64469.10000000149,
+      "handlerTime": 64491.79999999702,
+      "readyTime": 65934,
+      "latencyMs": 1464.8999999985099,
+      "inputDelayMs": null,
+      "postReadyLongTaskMsUntilNextClick": 2071.5,
+      "frameCount": 1,
+      "replicaCount": 1,
+      "documentId": "histoire-muy3u0ti-2xf26uugy1n:mount:1:document:1b2ede5c-6cc0-4107-9350-1d738f9c73d9",
+      "phase": "timed"
+    },
+    {
+      "targetId": "border-color",
+      "label": "Border Color",
+      "inputStart": 68131,
+      "handlerTime": 68312.89999999851,
+      "readyTime": 71554.89999999851,
+      "latencyMs": 3423.89999999851,
+      "inputDelayMs": null,
+      "postReadyLongTaskMsUntilNextClick": 1705.5,
+      "frameCount": 1,
+      "replicaCount": 1,
+      "documentId": "histoire-muy3u0ti-2xf26uugy1n:mount:1:document:1b2ede5c-6cc0-4107-9350-1d738f9c73d9",
+      "phase": "timed"
+    },
+    {
+      "targetId": "text-color",
+      "label": "Text Color",
+      "inputStart": 73443.10000000149,
+      "handlerTime": 73542.29999999702,
+      "readyTime": 74751.70000000298,
+      "latencyMs": 1308.6000000014901,
+      "inputDelayMs": null,
+      "postReadyLongTaskMsUntilNextClick": 1732.2999999970198,
+      "frameCount": 1,
+      "replicaCount": 1,
+      "documentId": "histoire-muy3u0ti-2xf26uugy1n:mount:1:document:1b2ede5c-6cc0-4107-9350-1d738f9c73d9",
+      "phase": "timed"
+    },
+    {
+      "targetId": "background-color",
+      "label": "Background Color",
+      "inputStart": 76633.70000000298,
+      "handlerTime": 76722.39999999851,
+      "readyTime": 78347.60000000149,
+      "latencyMs": 1713.8999999985099,
+      "inputDelayMs": null,
+      "postReadyLongTaskMsUntilNextClick": 3293.1999999955297,
+      "frameCount": 1,
+      "replicaCount": 1,
+      "documentId": "histoire-muy3u0ti-2xf26uugy1n:mount:1:document:1b2ede5c-6cc0-4107-9350-1d738f9c73d9",
+      "phase": "timed"
+    },
+    {
+      "targetId": "border-color",
+      "label": "Border Color",
+      "inputStart": 81867.20000000298,
+      "handlerTime": 81904.29999999702,
+      "readyTime": 83826.60000000149,
+      "latencyMs": 1959.3999999985099,
+      "inputDelayMs": null,
+      "postReadyLongTaskMsUntilNextClick": 2328.4999999925494,
+      "frameCount": 1,
+      "replicaCount": 1,
+      "documentId": "histoire-muy3u0ti-2xf26uugy1n:mount:1:document:1b2ede5c-6cc0-4107-9350-1d738f9c73d9",
+      "phase": "timed"
+    },
+    {
+      "targetId": "text-color",
+      "label": "Text Color",
+      "inputStart": 86535.70000000298,
+      "handlerTime": 86558.29999999702,
+      "readyTime": 88923.10000000149,
+      "latencyMs": 2387.39999999851,
+      "inputDelayMs": null,
+      "postReadyLongTaskMsUntilNextClick": 1368.1000000014901,
+      "frameCount": 1,
+      "replicaCount": 1,
+      "documentId": "histoire-muy3u0ti-2xf26uugy1n:mount:1:document:1b2ede5c-6cc0-4107-9350-1d738f9c73d9",
+      "phase": "timed"
+    },
+    {
+      "targetId": "background-color",
+      "label": "Background Color",
+      "inputStart": 90456.60000000149,
+      "handlerTime": 90512.39999999851,
+      "readyTime": 92030.39999999851,
+      "latencyMs": 1573.7999999970198,
+      "inputDelayMs": null,
+      "postReadyLongTaskMsUntilNextClick": 3042.39999999851,
+      "frameCount": 1,
+      "replicaCount": 1,
+      "documentId": "histoire-muy3u0ti-2xf26uugy1n:mount:1:document:1b2ede5c-6cc0-4107-9350-1d738f9c73d9",
+      "phase": "timed"
+    },
+    {
+      "targetId": "border-color",
+      "label": "Border Color",
+      "inputStart": 95386.70000000298,
+      "handlerTime": 95410.39999999851,
+      "readyTime": 97226.79999999702,
+      "latencyMs": 1840.0999999940395,
+      "inputDelayMs": null,
+      "postReadyLongTaskMsUntilNextClick": 1578.2000000029802,
+      "frameCount": 1,
+      "replicaCount": 1,
+      "documentId": "histoire-muy3u0ti-2xf26uugy1n:mount:1:document:1b2ede5c-6cc0-4107-9350-1d738f9c73d9",
+      "phase": "timed"
+    },
+    {
+      "targetId": "text-color",
+      "label": "Text Color",
+      "inputStart": 98981.39999999851,
+      "handlerTime": 99004.70000000298,
+      "readyTime": 100526.29999999702,
+      "latencyMs": 1544.8999999985099,
+      "inputDelayMs": null,
+      "postReadyLongTaskMsUntilNextClick": 1113.8000000044703,
+      "frameCount": 1,
+      "replicaCount": 1,
+      "documentId": "histoire-muy3u0ti-2xf26uugy1n:mount:1:document:1b2ede5c-6cc0-4107-9350-1d738f9c73d9",
+      "phase": "timed"
+    },
+    {
+      "targetId": "background-color",
+      "label": "Background Color",
+      "inputStart": 101811.29999999702,
+      "handlerTime": 101840.5,
+      "readyTime": 104203.39999999851,
+      "latencyMs": 2392.10000000149,
+      "inputDelayMs": null,
+      "postReadyLongTaskMsUntilNextClick": 4443.79999999702,
+      "frameCount": 1,
+      "replicaCount": 1,
+      "documentId": "histoire-muy3u0ti-2xf26uugy1n:mount:1:document:1b2ede5c-6cc0-4107-9350-1d738f9c73d9",
+      "phase": "timed"
+    },
+    {
+      "targetId": "border-color",
+      "label": "Border Color",
+      "inputStart": 108897.60000000149,
+      "handlerTime": 108918.29999999702,
+      "readyTime": 110482.39999999851,
+      "latencyMs": 1584.7999999970198,
+      "inputDelayMs": null,
+      "postReadyLongTaskMsUntilNextClick": 1386.6999999955297,
+      "frameCount": 1,
+      "replicaCount": 1,
+      "documentId": "histoire-muy3u0ti-2xf26uugy1n:mount:1:document:1b2ede5c-6cc0-4107-9350-1d738f9c73d9",
+      "phase": "timed"
+    },
+    {
+      "targetId": "text-color",
+      "label": "Text Color",
+      "inputStart": 112100.10000000149,
+      "handlerTime": 112117.39999999851,
+      "readyTime": 113274,
+      "latencyMs": 1173.8999999985099,
+      "inputDelayMs": null,
+      "postReadyLongTaskMsUntilNextClick": 1158.5,
+      "frameCount": 1,
+      "replicaCount": 1,
+      "documentId": "histoire-muy3u0ti-2xf26uugy1n:mount:1:document:1b2ede5c-6cc0-4107-9350-1d738f9c73d9",
+      "phase": "timed"
+    }
+  ],
+  "longTasks": [
+    {
+      "startTime": 2200.7999999970198,
+      "duration": 305
+    },
+    {
+      "startTime": 4188.5,
+      "duration": 400
+    },
+    {
+      "startTime": 4589.10000000149,
+      "duration": 175
+    },
+    {
+      "startTime": 4772.20000000298,
+      "duration": 104
+    },
+    {
+      "startTime": 4949.79999999702,
+      "duration": 98
+    },
+    {
+      "startTime": 5062,
+      "duration": 124
+    },
+    {
+      "startTime": 5214.29999999702,
+      "duration": 93
+    },
+    {
+      "startTime": 5310.10000000149,
+      "duration": 521
+    },
+    {
+      "startTime": 5831.39999999851,
+      "duration": 80
+    },
+    {
+      "startTime": 6007.60000000149,
+      "duration": 85
+    },
+    {
+      "startTime": 6098.60000000149,
+      "duration": 342
+    },
+    {
+      "startTime": 6441.10000000149,
+      "duration": 69
+    },
+    {
+      "startTime": 6518.29999999702,
+      "duration": 56
+    },
+    {
+      "startTime": 6613.79999999702,
+      "duration": 63
+    },
+    {
+      "startTime": 6686.20000000298,
+      "duration": 69
+    },
+    {
+      "startTime": 6759.5,
+      "duration": 75
+    },
+    {
+      "startTime": 6837.20000000298,
+      "duration": 129
+    },
+    {
+      "startTime": 6967.89999999851,
+      "duration": 371
+    },
+    {
+      "startTime": 7431.39999999851,
+      "duration": 64
+    },
+    {
+      "startTime": 7507,
+      "duration": 379
+    },
+    {
+      "startTime": 7886.89999999851,
+      "duration": 94
+    },
+    {
+      "startTime": 7989.89999999851,
+      "duration": 89
+    },
+    {
+      "startTime": 8114.10000000149,
+      "duration": 63
+    },
+    {
+      "startTime": 8180.29999999702,
+      "duration": 55
+    },
+    {
+      "startTime": 8288.79999999702,
+      "duration": 55
+    },
+    {
+      "startTime": 8345.89999999851,
+      "duration": 383
+    },
+    {
+      "startTime": 8801,
+      "duration": 70
+    },
+    {
+      "startTime": 8882,
+      "duration": 329
+    },
+    {
+      "startTime": 9211.10000000149,
+      "duration": 74
+    },
+    {
+      "startTime": 9292.20000000298,
+      "duration": 51
+    },
+    {
+      "startTime": 9372.70000000298,
+      "duration": 76
+    },
+    {
+      "startTime": 9452.5,
+      "duration": 72
+    },
+    {
+      "startTime": 9528.20000000298,
+      "duration": 77
+    },
+    {
+      "startTime": 9609.10000000149,
+      "duration": 415
+    },
+    {
+      "startTime": 10024.89999999851,
+      "duration": 65
+    },
+    {
+      "startTime": 10141.89999999851,
+      "duration": 72
+    },
+    {
+      "startTime": 10230.20000000298,
+      "duration": 504
+    },
+    {
+      "startTime": 10734.29999999702,
+      "duration": 109
+    },
+    {
+      "startTime": 10847.70000000298,
+      "duration": 73
+    },
+    {
+      "startTime": 10980.5,
+      "duration": 72
+    },
+    {
+      "startTime": 11064.60000000149,
+      "duration": 63
+    },
+    {
+      "startTime": 11137.89999999851,
+      "duration": 73
+    },
+    {
+      "startTime": 11218,
+      "duration": 395
+    },
+    {
+      "startTime": 11613,
+      "duration": 75
+    },
+    {
+      "startTime": 11757.89999999851,
+      "duration": 59
+    },
+    {
+      "startTime": 11831.70000000298,
+      "duration": 354
+    },
+    {
+      "startTime": 12186.39999999851,
+      "duration": 155
+    },
+    {
+      "startTime": 12346.10000000149,
+      "duration": 69
+    },
+    {
+      "startTime": 12465.29999999702,
+      "duration": 70
+    },
+    {
+      "startTime": 12544.60000000149,
+      "duration": 60
+    },
+    {
+      "startTime": 12623.39999999851,
+      "duration": 55
+    },
+    {
+      "startTime": 12685.79999999702,
+      "duration": 360
+    },
+    {
+      "startTime": 13046,
+      "duration": 61
+    },
+    {
+      "startTime": 13172.20000000298,
+      "duration": 51
+    },
+    {
+      "startTime": 13232.79999999702,
+      "duration": 490
+    },
+    {
+      "startTime": 13723.60000000149,
+      "duration": 97
+    },
+    {
+      "startTime": 13822.89999999851,
+      "duration": 74
+    },
+    {
+      "startTime": 13998.39999999851,
+      "duration": 139
+    },
+    {
+      "startTime": 14150.29999999702,
+      "duration": 261
+    },
+    {
+      "startTime": 14415.79999999702,
+      "duration": 90
+    },
+    {
+      "startTime": 14506.5,
+      "duration": 482
+    },
+    {
+      "startTime": 15072.20000000298,
+      "duration": 53
+    },
+    {
+      "startTime": 15137.39999999851,
+      "duration": 363
+    },
+    {
+      "startTime": 15500.79999999702,
+      "duration": 87
+    },
+    {
+      "startTime": 15590.89999999851,
+      "duration": 60
+    },
+    {
+      "startTime": 15686.20000000298,
+      "duration": 66
+    },
+    {
+      "startTime": 15755.5,
+      "duration": 65
+    },
+    {
+      "startTime": 15825.89999999851,
+      "duration": 70
+    },
+    {
+      "startTime": 15897.60000000149,
+      "duration": 362
+    },
+    {
+      "startTime": 16260,
+      "duration": 64
+    },
+    {
+      "startTime": 16390.10000000149,
+      "duration": 71
+    },
+    {
+      "startTime": 16473.89999999851,
+      "duration": 535
+    },
+    {
+      "startTime": 17010,
+      "duration": 92
+    },
+    {
+      "startTime": 17110.60000000149,
+      "duration": 74
+    },
+    {
+      "startTime": 17239.29999999702,
+      "duration": 78
+    },
+    {
+      "startTime": 17326.89999999851,
+      "duration": 60
+    },
+    {
+      "startTime": 17396,
+      "duration": 83
+    },
+    {
+      "startTime": 17480.89999999851,
+      "duration": 704
+    },
+    {
+      "startTime": 18185.29999999702,
+      "duration": 71
+    },
+    {
+      "startTime": 18350.29999999702,
+      "duration": 81
+    },
+    {
+      "startTime": 18444.10000000149,
+      "duration": 524
+    },
+    {
+      "startTime": 18968.60000000149,
+      "duration": 129
+    },
+    {
+      "startTime": 19102.5,
+      "duration": 83
+    },
+    {
+      "startTime": 19241.60000000149,
+      "duration": 298
+    },
+    {
+      "startTime": 19547.70000000298,
+      "duration": 77
+    },
+    {
+      "startTime": 19640.89999999851,
+      "duration": 85
+    },
+    {
+      "startTime": 19734.5,
+      "duration": 465
+    },
+    {
+      "startTime": 20200.10000000149,
+      "duration": 77
+    },
+    {
+      "startTime": 20386.60000000149,
+      "duration": 89
+    },
+    {
+      "startTime": 20493.39999999851,
+      "duration": 532
+    },
+    {
+      "startTime": 21025.60000000149,
+      "duration": 125
+    },
+    {
+      "startTime": 21157.89999999851,
+      "duration": 88
+    },
+    {
+      "startTime": 21304.20000000298,
+      "duration": 112
+    },
+    {
+      "startTime": 21422.20000000298,
+      "duration": 95
+    },
+    {
+      "startTime": 21522.79999999702,
+      "duration": 76
+    },
+    {
+      "startTime": 21601.60000000149,
+      "duration": 426
+    },
+    {
+      "startTime": 22028.39999999851,
+      "duration": 78
+    },
+    {
+      "startTime": 22165.70000000298,
+      "duration": 193
+    },
+    {
+      "startTime": 22374.79999999702,
+      "duration": 496
+    },
+    {
+      "startTime": 22871.39999999851,
+      "duration": 82
+    },
+    {
+      "startTime": 22962.20000000298,
+      "duration": 61
+    },
+    {
+      "startTime": 23067.79999999702,
+      "duration": 77
+    },
+    {
+      "startTime": 23150.20000000298,
+      "duration": 68
+    },
+    {
+      "startTime": 23228.79999999702,
+      "duration": 64
+    },
+    {
+      "startTime": 23300.60000000149,
+      "duration": 415
+    },
+    {
+      "startTime": 23716.29999999702,
+      "duration": 63
+    },
+    {
+      "startTime": 23845.89999999851,
+      "duration": 77
+    },
+    {
+      "startTime": 23933.79999999702,
+      "duration": 324
+    },
+    {
+      "startTime": 24258.20000000298,
+      "duration": 93
+    },
+    {
+      "startTime": 24353.89999999851,
+      "duration": 64
+    },
+    {
+      "startTime": 24462.5,
+      "duration": 74
+    },
+    {
+      "startTime": 24541.10000000149,
+      "duration": 144
+    },
+    {
+      "startTime": 24685.20000000298,
+      "duration": 69
+    },
+    {
+      "startTime": 24759.10000000149,
+      "duration": 66
+    },
+    {
+      "startTime": 24827.5,
+      "duration": 379
+    },
+    {
+      "startTime": 25206.70000000298,
+      "duration": 66
+    },
+    {
+      "startTime": 25364.89999999851,
+      "duration": 83
+    },
+    {
+      "startTime": 25466.5,
+      "duration": 464
+    },
+    {
+      "startTime": 25931.39999999851,
+      "duration": 101
+    },
+    {
+      "startTime": 26041.89999999851,
+      "duration": 64
+    },
+    {
+      "startTime": 26166.79999999702,
+      "duration": 102
+    },
+    {
+      "startTime": 26282,
+      "duration": 66
+    },
+    {
+      "startTime": 26354,
+      "duration": 68
+    },
+    {
+      "startTime": 26424.70000000298,
+      "duration": 495
+    },
+    {
+      "startTime": 26920.20000000298,
+      "duration": 78
+    },
+    {
+      "startTime": 27075.79999999702,
+      "duration": 82
+    },
+    {
+      "startTime": 27172.5,
+      "duration": 590
+    },
+    {
+      "startTime": 27763.39999999851,
+      "duration": 152
+    },
+    {
+      "startTime": 27920.20000000298,
+      "duration": 106
+    },
+    {
+      "startTime": 28087.10000000149,
+      "duration": 131
+    },
+    {
+      "startTime": 28219,
+      "duration": 348
+    },
+    {
+      "startTime": 28578.70000000298,
+      "duration": 80
+    },
+    {
+      "startTime": 28659.5,
+      "duration": 78
+    },
+    {
+      "startTime": 28745,
+      "duration": 98
+    },
+    {
+      "startTime": 28849.20000000298,
+      "duration": 703
+    },
+    {
+      "startTime": 29553.10000000149,
+      "duration": 95
+    },
+    {
+      "startTime": 29657.79999999702,
+      "duration": 66
+    },
+    {
+      "startTime": 29821.10000000149,
+      "duration": 98
+    },
+    {
+      "startTime": 29940.89999999851,
+      "duration": 673
+    },
+    {
+      "startTime": 30614.60000000149,
+      "duration": 117
+    },
+    {
+      "startTime": 30741.20000000298,
+      "duration": 88
+    },
+    {
+      "startTime": 30896,
+      "duration": 100
+    },
+    {
+      "startTime": 31004.60000000149,
+      "duration": 85
+    },
+    {
+      "startTime": 31102.60000000149,
+      "duration": 96
+    },
+    {
+      "startTime": 31201,
+      "duration": 589
+    },
+    {
+      "startTime": 31791,
+      "duration": 89
+    },
+    {
+      "startTime": 31970.89999999851,
+      "duration": 78
+    },
+    {
+      "startTime": 32051.10000000149,
+      "duration": 366
+    },
+    {
+      "startTime": 32417.70000000298,
+      "duration": 76
+    },
+    {
+      "startTime": 32497.20000000298,
+      "duration": 135
+    },
+    {
+      "startTime": 32778.60000000149,
+      "duration": 60
+    },
+    {
+      "startTime": 32886.29999999702,
+      "duration": 63
+    },
+    {
+      "startTime": 32955,
+      "duration": 128
+    },
+    {
+      "startTime": 33101.29999999702,
+      "duration": 83
+    },
+    {
+      "startTime": 33187.29999999702,
+      "duration": 848
+    },
+    {
+      "startTime": 34036,
+      "duration": 107
+    },
+    {
+      "startTime": 34341.70000000298,
+      "duration": 147
+    },
+    {
+      "startTime": 34515.20000000298,
+      "duration": 1074
+    },
+    {
+      "startTime": 35589.5,
+      "duration": 218
+    },
+    {
+      "startTime": 35826.60000000149,
+      "duration": 161
+    },
+    {
+      "startTime": 36118.39999999851,
+      "duration": 129
+    },
+    {
+      "startTime": 36261,
+      "duration": 89
+    },
+    {
+      "startTime": 36359.89999999851,
+      "duration": 138
+    },
+    {
+      "startTime": 36509.79999999702,
+      "duration": 1652
+    },
+    {
+      "startTime": 38162.79999999702,
+      "duration": 355
+    },
+    {
+      "startTime": 38579,
+      "duration": 283
+    },
+    {
+      "startTime": 39129.10000000149,
+      "duration": 173
+    },
+    {
+      "startTime": 39347.10000000149,
+      "duration": 1230
+    },
+    {
+      "startTime": 40577.60000000149,
+      "duration": 1040
+    },
+    {
+      "startTime": 41622.5,
+      "duration": 101
+    },
+    {
+      "startTime": 41852,
+      "duration": 96
+    },
+    {
+      "startTime": 41994.10000000149,
+      "duration": 97
+    },
+    {
+      "startTime": 42112.10000000149,
+      "duration": 106
+    },
+    {
+      "startTime": 42231.10000000149,
+      "duration": 883
+    },
+    {
+      "startTime": 43114.60000000149,
+      "duration": 114
+    },
+    {
+      "startTime": 43237.5,
+      "duration": 105
+    },
+    {
+      "startTime": 43526.60000000149,
+      "duration": 200
+    },
+    {
+      "startTime": 43747.29999999702,
+      "duration": 797
+    },
+    {
+      "startTime": 44544.79999999702,
+      "duration": 154
+    },
+    {
+      "startTime": 44715.70000000298,
+      "duration": 162
+    },
+    {
+      "startTime": 44978.79999999702,
+      "duration": 118
+    },
+    {
+      "startTime": 45109.79999999702,
+      "duration": 95
+    },
+    {
+      "startTime": 45214,
+      "duration": 111
+    },
+    {
+      "startTime": 45336.20000000298,
+      "duration": 1079
+    },
+    {
+      "startTime": 46415.79999999702,
+      "duration": 222
+    },
+    {
+      "startTime": 46661.60000000149,
+      "duration": 231
+    },
+    {
+      "startTime": 47043.29999999702,
+      "duration": 310
+    },
+    {
+      "startTime": 47383.79999999702,
+      "duration": 1301
+    },
+    {
+      "startTime": 48685.5,
+      "duration": 164
+    },
+    {
+      "startTime": 48854,
+      "duration": 820
+    },
+    {
+      "startTime": 49774.79999999702,
+      "duration": 109
+    },
+    {
+      "startTime": 49888,
+      "duration": 54
+    },
+    {
+      "startTime": 49992.60000000149,
+      "duration": 96
+    },
+    {
+      "startTime": 50094.20000000298,
+      "duration": 335
+    },
+    {
+      "startTime": 50452.70000000298,
+      "duration": 918
+    },
+    {
+      "startTime": 51371.29999999702,
+      "duration": 114
+    },
+    {
+      "startTime": 51678.29999999702,
+      "duration": 150
+    },
+    {
+      "startTime": 51852.20000000298,
+      "duration": 1037
+    },
+    {
+      "startTime": 52889.39999999851,
+      "duration": 177
+    },
+    {
+      "startTime": 53095.39999999851,
+      "duration": 156
+    },
+    {
+      "startTime": 53372.10000000149,
+      "duration": 110
+    },
+    {
+      "startTime": 53516.79999999702,
+      "duration": 179
+    },
+    {
+      "startTime": 53699.10000000149,
+      "duration": 1122
+    },
+    {
+      "startTime": 54821.79999999702,
+      "duration": 101
+    },
+    {
+      "startTime": 54955.20000000298,
+      "duration": 110
+    },
+    {
+      "startTime": 55178.29999999702,
+      "duration": 114
+    },
+    {
+      "startTime": 55311.10000000149,
+      "duration": 772
+    },
+    {
+      "startTime": 56083.60000000149,
+      "duration": 182
+    },
+    {
+      "startTime": 56290,
+      "duration": 120
+    },
+    {
+      "startTime": 56528.29999999702,
+      "duration": 202
+    },
+    {
+      "startTime": 56836.5,
+      "duration": 125
+    },
+    {
+      "startTime": 56968.5,
+      "duration": 156
+    },
+    {
+      "startTime": 57125.29999999702,
+      "duration": 1890
+    },
+    {
+      "startTime": 59033.70000000298,
+      "duration": 99
+    },
+    {
+      "startTime": 59288,
+      "duration": 184
+    },
+    {
+      "startTime": 59473.10000000149,
+      "duration": 85
+    },
+    {
+      "startTime": 59562.89999999851,
+      "duration": 957
+    },
+    {
+      "startTime": 60520.89999999851,
+      "duration": 244
+    },
+    {
+      "startTime": 60866.39999999851,
+      "duration": 269
+    },
+    {
+      "startTime": 61166,
+      "duration": 265
+    },
+    {
+      "startTime": 61431.5,
+      "duration": 221
+    },
+    {
+      "startTime": 61766.29999999702,
+      "duration": 664
+    },
+    {
+      "startTime": 62437.89999999851,
+      "duration": 1546
+    },
+    {
+      "startTime": 63984.79999999702,
+      "duration": 215
+    },
+    {
+      "startTime": 64214.89999999851,
+      "duration": 99
+    },
+    {
+      "startTime": 64469.20000000298,
+      "duration": 114
+    },
+    {
+      "startTime": 64608,
+      "duration": 883
+    },
+    {
+      "startTime": 65492.10000000149,
+      "duration": 185
+    },
+    {
+      "startTime": 65686.10000000149,
+      "duration": 126
+    },
+    {
+      "startTime": 65935.20000000298,
+      "duration": 131
+    },
+    {
+      "startTime": 66088.89999999851,
+      "duration": 127
+    },
+    {
+      "startTime": 66227.29999999702,
+      "duration": 341
+    },
+    {
+      "startTime": 66581.29999999702,
+      "duration": 1034
+    },
+    {
+      "startTime": 67615.39999999851,
+      "duration": 99
+    },
+    {
+      "startTime": 67725.10000000149,
+      "duration": 160
+    },
+    {
+      "startTime": 68133.39999999851,
+      "duration": 475
+    },
+    {
+      "startTime": 68621,
+      "duration": 1079
+    },
+    {
+      "startTime": 69700.39999999851,
+      "duration": 162
+    },
+    {
+      "startTime": 69871.70000000298,
+      "duration": 217
+    },
+    {
+      "startTime": 70190.29999999702,
+      "duration": 763
+    },
+    {
+      "startTime": 71497.20000000298,
+      "duration": 58
+    },
+    {
+      "startTime": 71591.89999999851,
+      "duration": 105
+    },
+    {
+      "startTime": 71697.70000000298,
+      "duration": 500
+    },
+    {
+      "startTime": 72220.39999999851,
+      "duration": 103
+    },
+    {
+      "startTime": 72326.39999999851,
+      "duration": 767
+    },
+    {
+      "startTime": 73094.20000000298,
+      "duration": 135
+    },
+    {
+      "startTime": 73447.10000000149,
+      "duration": 220
+    },
+    {
+      "startTime": 73669.10000000149,
+      "duration": 749
+    },
+    {
+      "startTime": 74418.79999999702,
+      "duration": 131
+    },
+    {
+      "startTime": 74565.10000000149,
+      "duration": 84
+    },
+    {
+      "startTime": 74752.70000000298,
+      "duration": 215
+    },
+    {
+      "startTime": 74996,
+      "duration": 211
+    },
+    {
+      "startTime": 75221.39999999851,
+      "duration": 97
+    },
+    {
+      "startTime": 75330.20000000298,
+      "duration": 827
+    },
+    {
+      "startTime": 76157.89999999851,
+      "duration": 106
+    },
+    {
+      "startTime": 76280.60000000149,
+      "duration": 193
+    },
+    {
+      "startTime": 76639.10000000149,
+      "duration": 182
+    },
+    {
+      "startTime": 76846.20000000298,
+      "duration": 905
+    },
+    {
+      "startTime": 77752,
+      "duration": 143
+    },
+    {
+      "startTime": 77906.20000000298,
+      "duration": 171
+    },
+    {
+      "startTime": 78180.60000000149,
+      "duration": 112
+    },
+    {
+      "startTime": 78407,
+      "duration": 262
+    },
+    {
+      "startTime": 78707.10000000149,
+      "duration": 1488
+    },
+    {
+      "startTime": 80195.60000000149,
+      "duration": 250
+    },
+    {
+      "startTime": 80463.89999999851,
+      "duration": 485
+    },
+    {
+      "startTime": 80949.70000000298,
+      "duration": 718
+    },
+    {
+      "startTime": 81668,
+      "duration": 56
+    },
+    {
+      "startTime": 81870.10000000149,
+      "duration": 136
+    },
+    {
+      "startTime": 82029.29999999702,
+      "duration": 1088
+    },
+    {
+      "startTime": 83117.70000000298,
+      "duration": 170
+    },
+    {
+      "startTime": 83299.70000000298,
+      "duration": 125
+    },
+    {
+      "startTime": 83526.79999999702,
+      "duration": 176
+    },
+    {
+      "startTime": 83746.79999999702,
+      "duration": 80
+    },
+    {
+      "startTime": 83884.79999999702,
+      "duration": 224
+    },
+    {
+      "startTime": 84155.70000000298,
+      "duration": 176
+    },
+    {
+      "startTime": 84333.10000000149,
+      "duration": 1512
+    },
+    {
+      "startTime": 85845.89999999851,
+      "duration": 199
+    },
+    {
+      "startTime": 86156.5,
+      "duration": 198
+    },
+    {
+      "startTime": 86539,
+      "duration": 95
+    },
+    {
+      "startTime": 86657.39999999851,
+      "duration": 1026
+    },
+    {
+      "startTime": 87683.60000000149,
+      "duration": 181
+    },
+    {
+      "startTime": 87870.20000000298,
+      "duration": 111
+    },
+    {
+      "startTime": 88085,
+      "duration": 657
+    },
+    {
+      "startTime": 88977.39999999851,
+      "duration": 102
+    },
+    {
+      "startTime": 89092.20000000298,
+      "duration": 128
+    },
+    {
+      "startTime": 89228.20000000298,
+      "duration": 913
+    },
+    {
+      "startTime": 90141.89999999851,
+      "duration": 170
+    },
+    {
+      "startTime": 90457.29999999702,
+      "duration": 184
+    },
+    {
+      "startTime": 90643.70000000298,
+      "duration": 961
+    },
+    {
+      "startTime": 91605.20000000298,
+      "duration": 155
+    },
+    {
+      "startTime": 91775.20000000298,
+      "duration": 136
+    },
+    {
+      "startTime": 92032.29999999702,
+      "duration": 115
+    },
+    {
+      "startTime": 92158.20000000298,
+      "duration": 271
+    },
+    {
+      "startTime": 92436.39999999851,
+      "duration": 2443
+    },
+    {
+      "startTime": 94907.70000000298,
+      "duration": 212
+    },
+    {
+      "startTime": 95409,
+      "duration": 122
+    },
+    {
+      "startTime": 95547.89999999851,
+      "duration": 1273
+    },
+    {
+      "startTime": 96821,
+      "duration": 135
+    },
+    {
+      "startTime": 96968.20000000298,
+      "duration": 122
+    },
+    {
+      "startTime": 97227.70000000298,
+      "duration": 124
+    },
+    {
+      "startTime": 97386.60000000149,
+      "duration": 119
+    },
+    {
+      "startTime": 97515.79999999702,
+      "duration": 144
+    },
+    {
+      "startTime": 97660.79999999702,
+      "duration": 1065
+    },
+    {
+      "startTime": 98778.29999999702,
+      "duration": 104
+    },
+    {
+      "startTime": 98982.5,
+      "duration": 124
+    },
+    {
+      "startTime": 99134.10000000149,
+      "duration": 822
+    },
+    {
+      "startTime": 99956.60000000149,
+      "duration": 153
+    },
+    {
+      "startTime": 100117.20000000298,
+      "duration": 124
+    },
+    {
+      "startTime": 100342.10000000149,
+      "duration": 128
+    },
+    {
+      "startTime": 100476,
+      "duration": 52
+    },
+    {
+      "startTime": 100568.5,
+      "duration": 103
+    },
+    {
+      "startTime": 100685.79999999702,
+      "duration": 93
+    },
+    {
+      "startTime": 100786.70000000298,
+      "duration": 771
+    },
+    {
+      "startTime": 101558.39999999851,
+      "duration": 116
+    },
+    {
+      "startTime": 101811.39999999851,
+      "duration": 117
+    },
+    {
+      "startTime": 101962.5,
+      "duration": 1310
+    },
+    {
+      "startTime": 103273.20000000298,
+      "duration": 306
+    },
+    {
+      "startTime": 103679.79999999702,
+      "duration": 474
+    },
+    {
+      "startTime": 104205.79999999702,
+      "duration": 446
+    },
+    {
+      "startTime": 104666.70000000298,
+      "duration": 138
+    },
+    {
+      "startTime": 104813.60000000149,
+      "duration": 2254
+    },
+    {
+      "startTime": 107123.60000000149,
+      "duration": 1497
+    },
+    {
+      "startTime": 108620.79999999702,
+      "duration": 91
+    },
+    {
+      "startTime": 108900.5,
+      "duration": 93
+    },
+    {
+      "startTime": 109014.5,
+      "duration": 1090
+    },
+    {
+      "startTime": 110105.39999999851,
+      "duration": 137
+    },
+    {
+      "startTime": 110256.70000000298,
+      "duration": 109
+    },
+    {
+      "startTime": 110483.5,
+      "duration": 121
+    },
+    {
+      "startTime": 110616.39999999851,
+      "duration": 89
+    },
+    {
+      "startTime": 110714.79999999702,
+      "duration": 95
+    },
+    {
+      "startTime": 110820.79999999702,
+      "duration": 846
+    },
+    {
+      "startTime": 111667.10000000149,
+      "duration": 96
+    },
+    {
+      "startTime": 111784.89999999851,
+      "duration": 131
+    },
+    {
+      "startTime": 112108.70000000298,
+      "duration": 83
+    },
+    {
+      "startTime": 112208.29999999702,
+      "duration": 743
+    },
+    {
+      "startTime": 112951.70000000298,
+      "duration": 141
+    },
+    {
+      "startTime": 113097.20000000298,
+      "duration": 96
+    },
+    {
+      "startTime": 113281.20000000298,
+      "duration": 116
+    },
+    {
+      "startTime": 113412.29999999702,
+      "duration": 101
+    },
+    {
+      "startTime": 113523.5,
+      "duration": 90
+    },
+    {
+      "startTime": 113622.5,
+      "duration": 907
+    },
+    {
+      "startTime": 114529.89999999851,
+      "duration": 116
+    }
+  ],
+  "eventTimings": []
+}

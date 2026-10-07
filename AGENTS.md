@@ -10,3 +10,8 @@
   - `title`: short headline, no trailing period.
   - Default slot: optional detail line. `actions` slot: optional follow-up buttons (flat `HstButton` gets accent color).
   - Example: `<WorkbenchEmptyState icon="search" title="No matches">Nothing for <q>{{ query }}</q></WorkbenchEmptyState>`.
+
+- Panel and text loading placeholders must use `WorkbenchLoadingState` from `packages/histoire-app/src/app/components/shell/WorkbenchLoadingState.vue`.
+  - `title`: short headline naming operation in progress. Default slot: optional detail.
+  - Matches empty-state layout with existing loading animation and no icon badge background.
+  - Keep controls skeletons, canvas loaders, inline button/tab/row indicators, and startup progress screen in their specialized forms.

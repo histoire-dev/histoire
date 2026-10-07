@@ -1,8 +1,8 @@
 # Props matrix
 
-Choose **Arrange → Matrix** to preview every combination of two finite prop axes. Histoire detects Boolean component props, complete finite `values`/`enum` runtime metadata, and top-level Boolean variant state automatically. Two usable domains enable Matrix without a story declaration. Free text, numeric samples, nested state, and default values do not become axes automatically.
+Choose **Props matrix** to display every combination of two finite prop axes. This arrangement is always accessible. While Histoire reads prop values, the canvas shows a loading state. If fewer than two usable axes exist, it explains the requirement, names any detected axis, and directs you to declare finite values in `Story matrix.axes`. Each axis needs at least two distinct values. Histoire detects Boolean component props, complete finite `values`/`enum` runtime metadata, and top-level Boolean variant state automatically. Free text, numeric samples, nested state, and default values do not become axes automatically.
 
-When no frame is selected, detection uses the first variant's existing admitted preview. It does not mount extra previews or select a variant. Discovery survives entering Matrix, and source changes invalidate metadata from older executable revisions. A selected variant's current runtime supplies its own base defaults.
+When no frame is selected, Matrix keeps one hidden runtime for the first variant to discover props without selecting a variant or changing the URL. With a selected variant, its hidden canonical runtime supplies prop metadata and base defaults. Discovery also uses existing admitted frames in other arrangements. Source changes invalidate metadata from older executable revisions, and the canvas updates automatically when usable axes arrive.
 
 Use explicit hints for domains absent from runtime metadata, or to replace an automatically detected domain:
 

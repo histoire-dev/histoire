@@ -19,10 +19,13 @@ these font variables on workbench roots.
 
 `fonts.pcss` loads bundled variable Manrope at weights 400–800 and JetBrains
 Mono at weights 400–500. Both use Latin/Latin Extended WOFF2 subsets and
-`font-display: swap`. Local files under `fonts/` are copied to `dist/fonts/`
-beside the generated stylesheet, so source development and published builds
-resolve the same relative URLs without external font services. Full SIL Open
-Font License texts and pinned upstream versions accompany the font files.
+`font-display: swap`. Shared controls own the stylesheet and local assets under
+`packages/histoire-controls/src/style/{fonts.pcss,fonts/}`; the app's
+`fonts.pcss` imports that stylesheet. App copying emits those files to
+`dist/fonts/` beside the generated stylesheet, so source development and
+published builds resolve the same relative URLs without external font services.
+Full SIL Open Font License texts and pinned upstream versions accompany the
+font files.
 
 Refresh these assets after updating the Fontsource development dependencies:
 
@@ -66,6 +69,35 @@ retain the upstream Carbon icon license alongside the shared data.
 Standalone `App.vue` supplies semantic provider roles as references to C1 RGB
 channels. This overrides the SDK's generic inline primary-600 accent while
 preserving dark primary-400, custom palette alpha, and portable SDK styling.
+
+## Stylesheet ownership
+
+Workbench panes and inspector tabs share `--histoire-pane-gutter` (16px),
+defined in `density.css` and retained in compact mode. Use this inset for
+headers, filters, content surfaces, and footers. Lists subtract their row's
+horizontal padding from the outer inset so row content aligns with headers.
+Place segmented-control spacing on a native container; inline control
+wrappers reset their own margins and padding.
+
+`main.pcss` composes document styles, controls, native Vue surfaces, tokens, and
+fonts in their existing order. `document.pcss` owns the standalone document
+reset; reusable native surfaces do not import it. `sandbox.css` owns the story
+runtime document baseline and retains controls/runtime Tailwind utilities.
+Generated Markdown still uses `__histoire-code` and `htw-` utilities, so code
+and prose compatibility rules remain in `main.pcss`.
+
+Native `HistoireStoryTree` variant counts belong to
+`packages/histoire-vue/src/styles/navigation.css`, scoped to the provider's
+tree. The superseded standalone header, search dialog, command modal, home,
+split-pane shadows, and tab/mobile/startup transitions have no current source
+consumers; their standalone stylesheet and transition stylesheet were removed.
+Current workbench empty/loading states retain
+`components/shell/workbench-state.css` and component-owned styling.
+
+`scripts/copy.mjs` preserves source assets and shared licensed fonts.
+`scripts/watchAndCopy.mjs` removes only the emitted target of an unlinked source
+asset or font. Fresh app builds recreate `dist`; build entry paths, aliases,
+Tailwind generation, and reusable CSS boundaries remain unchanged.
 
 ## Tests
 

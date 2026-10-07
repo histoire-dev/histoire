@@ -2,7 +2,7 @@
 
 All paths are relative to the repository root. `app/` means `packages/histoire-app/src/app`.
 
-## Current shape (implemented 2026-10-03)
+## Current shape (redesign implemented 2026-10-03; legacy cleanup 2026-10-07)
 
 - **Entry and shell.** `app/index.ts` delegates to `standalone/mount.ts`. The standalone entry connects a session, installs route/preferences/folder/command/test/document adapters, and mounts `App.vue`. `App` wraps `components/shell/WorkbenchApp.vue` in `@histoire/vue`'s `HistoireProvider`. Rail, side panel, canvas, inspector, home, Markdown, and settings share that provider.
 - **Routes.** `standalone/navigation.ts` owns `/`, `/story/:storyId?`, and `/settings/:section?`. Existing `variantId`, `tab`, docs-anchor, and hash/history behavior remain at this adapter boundary. Optional `arrange`, `rows`, and `cols` queries restore canvas/matrix choices; no workbench store reads a global router singleton.
@@ -14,7 +14,8 @@ All paths are relative to the repository root. `app/` means `packages/histoire-a
 - **MCP and ACP.** MCP retains its loopback listener, authentication, queue, browser/session services, and screenshot/test executors in `packages/histoire/src/node/mcp/`. The workbench observes/cancels through the dev channel. `node/acp/` owns optional local agent subprocesses and permission mediation; no process starts until an explicit prompt.
 - **Static build.** Existing bundle, sandbox, catalog/content, and `histoire.json` outputs remain. Build metadata is projected through `node/virtual/build-info.ts`. With `__HISTOIRE_DEV__` false, dev panes and Node-backed channels are absent; comment files and private agent environment values are not read into static output.
 - **Config loading and writing.** Existing jiti/plugin config loading remains unchanged. `node/config/codemod/` analyzes and edits supported literal paths for explicit project saves, with revision/path guards, refusal of computed values, and backup/restart handling. It is a separate writer, not a new config format.
-- **Styling.** `app/style/tokens.pcss` defines root-scoped semantic tokens and maps existing project palette overrides. Standalone `App.vue` overrides generic SDK inline roles with references to those semantic channels; portable SDK providers retain their styling. Manrope and JetBrains Mono assets/licenses live in `app/style/fonts/`, with `fonts.pcss` loading local subsets. `packages/histoire-shared/src/icons/` supplies one offline Carbon subset/helper to the workbench and built-in controls. Legacy runtime modules and Tailwind-prefixed controls remain available to the SDK adapter.
+- **Styling.** `app/style/tokens.pcss` defines root-scoped semantic tokens and maps existing project palette overrides. Standalone `App.vue` overrides generic SDK inline roles with references to those semantic channels; portable SDK providers retain their styling. Shared Manrope and JetBrains Mono assets/licenses live in `packages/histoire-controls/src/style/fonts/`; app `fonts.pcss` imports the controls-owned font stylesheet and app copying emits assets beside `dist/style.css`. Native tree count styling belongs to `packages/histoire-vue/src/styles/navigation.css`. Obsolete standalone header/dialog/home CSS, split-pane shadows, and old tab/mobile/startup transitions are removed. `packages/histoire-shared/src/icons/` supplies one offline Carbon subset/helper to the workbench and built-in controls. Generated runtime modules, controls/commands/Markdown Tailwind utilities, document resets, and provider-scoped reusable styles retain their owners.
+- **Runtime compatibility.** Required app dist paths remain available to generated story/test runtimes. `util/sandbox.ts` uses the configured deployment base and shared URL builder without importing a router. Public `logEvent` retains runtime actor attribution and its lazy host fallback through a minimal `stores/events.ts`; that compatibility store owns no global selection and does not feed workbench events. Superseded shell, host story viewer, inspector, search, toolbar adapters, tree, and global story/router/test state are removed; session-owned workbench surfaces remain authoritative.
 
 ## Hard constraints
 
@@ -26,12 +27,12 @@ All paths are relative to the repository root. `app/` means `packages/histoire-a
 
 ## Implemented structure
 
-Legacy dist/runtime modules stay where required by their consumers. The standalone workbench uses these new seams:
+Required dist/runtime modules stay where generated consumers import them; obsolete UI modules are removed. The standalone workbench uses these seams:
 
 | Area | Location | Role |
 | --- | --- | --- |
 | Standalone integration | `app/standalone/` | Session mount, route/storage adapters, provider factories, resource teardown |
-| Tokens, fonts, icons | `app/style/{tokens,fonts}.pcss`, `app/style/fonts/`, `packages/histoire-shared/src/icons/`, `app/util/icons.ts` | Palette mapping, local font assets, shared offline Carbon registry |
+| Tokens, fonts, icons | `app/style/{tokens,fonts}.pcss`, `packages/histoire-controls/src/style/{fonts.pcss,fonts/}`, `packages/histoire-shared/src/icons/`, `app/util/icons.ts` | Palette mapping, shared local font assets, shared offline Carbon registry |
 | Shell | `app/components/shell/`, `app/stores/shell.ts`, `app/composables/shell.ts` | Rail/panel/inspector chrome and provider-local visibility |
 | Tree | `app/components/panes/stories/` | Catalog tree, folder adapter, filter, keyboard navigation |
 | Canvas | `app/components/canvas/`, `app/components/canvas/pan/`, `app/stores/canvas.ts` | Layout, budget, pan/zoom, canonical preview and passive frames |

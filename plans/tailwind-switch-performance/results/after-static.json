@@ -1,0 +1,823 @@
+{
+  "nodeVersion": "v24.16.0",
+  "chromiumVersion": "147.0.7727.15",
+  "baseUrl": "http://127.0.0.1:6083",
+  "fixture": "Tailwind generated story, Single view, real story-tree clicks cycling border-color/text-color/background-color",
+  "viewport": "1400x900",
+  "warmups": 5,
+  "timedSwitches": 30,
+  "summary": {
+    "medianReadyLatencyMs": 93.89999999850988,
+    "p95ReadyLatencyMs": 130,
+    "medianInputDelayMs": 7.699999995529652,
+    "medianPostReadyLongTaskMs": 0,
+    "p95PostReadyLongTaskMs": 6.399999998509884
+  },
+  "canvasSandboxDocumentRequests": 1,
+  "initialCanvasSandboxDocumentRequests": 1,
+  "canvasSandboxDocumentRequestsDuringSwitches": 0,
+  "additionalCanvasSandboxDocumentRequests": 0,
+  "browserState": {
+    "iframeCount": 2,
+    "canvasFrameCount": 1,
+    "replicaCount": 1,
+    "replacedFrames": 0,
+    "documentId": "histoire-muy5trpy-tgke34hqr79:mount:1:document:dba0b734-41b0-4673-9bd9-7043a14e3654"
+  },
+  "sandboxDocuments": [
+    "http://127.0.0.1:6083/__sandbox.html?storyId=tailwind&variantId=background-color&grid=false&documentId=histoire-muy5trpy-tgke34hqr79%3Amount%3A1%3Adocument%3Adba0b734-41b0-4673-9bd9-7043a14e3654&selectionVersion=0&embed=true&standalone=true&nativeScroll=true"
+  ],
+  "switches": [
+    {
+      "phase": "warmup",
+      "targetId": "border-color",
+      "label": "Border Color",
+      "inputStart": 596,
+      "handlerTime": 603,
+      "readyTime": 719.5,
+      "latencyMs": 123.5,
+      "inputDelayMs": 6.899999998509884,
+      "postReadyLongTaskMsUntilNextClick": 0,
+      "frameCount": 1,
+      "replicaCount": 1,
+      "documentId": "histoire-muy5trpy-tgke34hqr79:mount:1:document:dba0b734-41b0-4673-9bd9-7043a14e3654"
+    },
+    {
+      "phase": "warmup",
+      "targetId": "text-color",
+      "label": "Text Color",
+      "inputStart": 794.8999999985099,
+      "handlerTime": 808.1999999955297,
+      "readyTime": 900.3999999985099,
+      "latencyMs": 105.5,
+      "inputDelayMs": 13.299999997019768,
+      "postReadyLongTaskMsUntilNextClick": 2.600000001490116,
+      "frameCount": 1,
+      "replicaCount": 1,
+      "documentId": "histoire-muy5trpy-tgke34hqr79:mount:1:document:dba0b734-41b0-4673-9bd9-7043a14e3654"
+    },
+    {
+      "phase": "warmup",
+      "targetId": "background-color",
+      "label": "Background Color",
+      "inputStart": 962.5999999940395,
+      "handlerTime": 971.5,
+      "readyTime": 1075.1999999955297,
+      "latencyMs": 112.60000000149012,
+      "inputDelayMs": 8.900000005960464,
+      "postReadyLongTaskMsUntilNextClick": 0,
+      "frameCount": 1,
+      "replicaCount": 1,
+      "documentId": "histoire-muy5trpy-tgke34hqr79:mount:1:document:dba0b734-41b0-4673-9bd9-7043a14e3654"
+    },
+    {
+      "phase": "warmup",
+      "targetId": "border-color",
+      "label": "Border Color",
+      "inputStart": 1130.1999999955297,
+      "handlerTime": 1142,
+      "readyTime": 1230.0999999940395,
+      "latencyMs": 99.89999999850988,
+      "inputDelayMs": 11.700000002980232,
+      "postReadyLongTaskMsUntilNextClick": 3.7000000029802322,
+      "frameCount": 1,
+      "replicaCount": 1,
+      "documentId": "histoire-muy5trpy-tgke34hqr79:mount:1:document:dba0b734-41b0-4673-9bd9-7043a14e3654"
+    },
+    {
+      "phase": "warmup",
+      "targetId": "text-color",
+      "label": "Text Color",
+      "inputStart": 1295.5999999940395,
+      "handlerTime": 1308,
+      "readyTime": 1410.6999999955297,
+      "latencyMs": 115.10000000149012,
+      "inputDelayMs": 12.400000005960464,
+      "postReadyLongTaskMsUntilNextClick": 0,
+      "frameCount": 1,
+      "replicaCount": 1,
+      "documentId": "histoire-muy5trpy-tgke34hqr79:mount:1:document:dba0b734-41b0-4673-9bd9-7043a14e3654"
+    },
+    {
+      "phase": "timed",
+      "targetId": "background-color",
+      "label": "Background Color",
+      "inputStart": 1462.1999999955297,
+      "handlerTime": 1470.5999999940395,
+      "readyTime": 1564.5,
+      "latencyMs": 102.30000000447035,
+      "inputDelayMs": 8.399999998509884,
+      "postReadyLongTaskMsUntilNextClick": 0,
+      "frameCount": 1,
+      "replicaCount": 1,
+      "documentId": "histoire-muy5trpy-tgke34hqr79:mount:1:document:dba0b734-41b0-4673-9bd9-7043a14e3654"
+    },
+    {
+      "phase": "timed",
+      "targetId": "border-color",
+      "label": "Border Color",
+      "inputStart": 1616.1999999955297,
+      "handlerTime": 1625.5,
+      "readyTime": 1723.2999999970198,
+      "latencyMs": 107.10000000149012,
+      "inputDelayMs": 9.300000004470348,
+      "postReadyLongTaskMsUntilNextClick": 4.899999998509884,
+      "frameCount": 1,
+      "replicaCount": 1,
+      "documentId": "histoire-muy5trpy-tgke34hqr79:mount:1:document:dba0b734-41b0-4673-9bd9-7043a14e3654"
+    },
+    {
+      "phase": "timed",
+      "targetId": "text-color",
+      "label": "Text Color",
+      "inputStart": 1795.2999999970198,
+      "handlerTime": 1805.6999999955297,
+      "readyTime": 1921,
+      "latencyMs": 125.70000000298023,
+      "inputDelayMs": 10.299999997019768,
+      "postReadyLongTaskMsUntilNextClick": 0,
+      "frameCount": 1,
+      "replicaCount": 1,
+      "documentId": "histoire-muy5trpy-tgke34hqr79:mount:1:document:dba0b734-41b0-4673-9bd9-7043a14e3654"
+    },
+    {
+      "phase": "timed",
+      "targetId": "background-color",
+      "label": "Background Color",
+      "inputStart": 1994.5999999940395,
+      "handlerTime": 2002.5,
+      "readyTime": 2088.7999999970198,
+      "latencyMs": 94.20000000298023,
+      "inputDelayMs": 7.9000000059604645,
+      "postReadyLongTaskMsUntilNextClick": 0,
+      "frameCount": 1,
+      "replicaCount": 1,
+      "documentId": "histoire-muy5trpy-tgke34hqr79:mount:1:document:dba0b734-41b0-4673-9bd9-7043a14e3654"
+    },
+    {
+      "phase": "timed",
+      "targetId": "border-color",
+      "label": "Border Color",
+      "inputStart": 2146.5,
+      "handlerTime": 2156.89999999851,
+      "readyTime": 2240.0999999940395,
+      "latencyMs": 93.59999999403954,
+      "inputDelayMs": 10.399999998509884,
+      "postReadyLongTaskMsUntilNextClick": 4.9000000059604645,
+      "frameCount": 1,
+      "replicaCount": 1,
+      "documentId": "histoire-muy5trpy-tgke34hqr79:mount:1:document:dba0b734-41b0-4673-9bd9-7043a14e3654"
+    },
+    {
+      "phase": "timed",
+      "targetId": "text-color",
+      "label": "Text Color",
+      "inputStart": 2310.7999999970198,
+      "handlerTime": 2321.5,
+      "readyTime": 2440.7999999970198,
+      "latencyMs": 130,
+      "inputDelayMs": 10.700000002980232,
+      "postReadyLongTaskMsUntilNextClick": 0,
+      "frameCount": 1,
+      "replicaCount": 1,
+      "documentId": "histoire-muy5trpy-tgke34hqr79:mount:1:document:dba0b734-41b0-4673-9bd9-7043a14e3654"
+    },
+    {
+      "phase": "timed",
+      "targetId": "background-color",
+      "label": "Background Color",
+      "inputStart": 2522.5,
+      "handlerTime": 2537.6999999955297,
+      "readyTime": 2619.5999999940395,
+      "latencyMs": 97.09999999403954,
+      "inputDelayMs": 15.199999995529652,
+      "postReadyLongTaskMsUntilNextClick": 0,
+      "frameCount": 1,
+      "replicaCount": 1,
+      "documentId": "histoire-muy5trpy-tgke34hqr79:mount:1:document:dba0b734-41b0-4673-9bd9-7043a14e3654"
+    },
+    {
+      "phase": "timed",
+      "targetId": "border-color",
+      "label": "Border Color",
+      "inputStart": 2677.39999999851,
+      "handlerTime": 2684.5999999940395,
+      "readyTime": 2769.7999999970198,
+      "latencyMs": 92.39999999850988,
+      "inputDelayMs": 7.199999995529652,
+      "postReadyLongTaskMsUntilNextClick": 0,
+      "frameCount": 1,
+      "replicaCount": 1,
+      "documentId": "histoire-muy5trpy-tgke34hqr79:mount:1:document:dba0b734-41b0-4673-9bd9-7043a14e3654"
+    },
+    {
+      "phase": "timed",
+      "targetId": "text-color",
+      "label": "Text Color",
+      "inputStart": 2844.1999999955297,
+      "handlerTime": 2851.39999999851,
+      "readyTime": 2938.5999999940395,
+      "latencyMs": 94.39999999850988,
+      "inputDelayMs": 7.200000002980232,
+      "postReadyLongTaskMsUntilNextClick": 6.399999998509884,
+      "frameCount": 1,
+      "replicaCount": 1,
+      "documentId": "histoire-muy5trpy-tgke34hqr79:mount:1:document:dba0b734-41b0-4673-9bd9-7043a14e3654"
+    },
+    {
+      "phase": "timed",
+      "targetId": "background-color",
+      "label": "Background Color",
+      "inputStart": 3010.89999999851,
+      "handlerTime": 3022.2999999970198,
+      "readyTime": 3126,
+      "latencyMs": 115.10000000149012,
+      "inputDelayMs": 11.299999997019768,
+      "postReadyLongTaskMsUntilNextClick": 0,
+      "frameCount": 1,
+      "replicaCount": 1,
+      "documentId": "histoire-muy5trpy-tgke34hqr79:mount:1:document:dba0b734-41b0-4673-9bd9-7043a14e3654"
+    },
+    {
+      "phase": "timed",
+      "targetId": "border-color",
+      "label": "Border Color",
+      "inputStart": 3196,
+      "handlerTime": 3203.7999999970198,
+      "readyTime": 3281,
+      "latencyMs": 85,
+      "inputDelayMs": 7.699999995529652,
+      "postReadyLongTaskMsUntilNextClick": 0,
+      "frameCount": 1,
+      "replicaCount": 1,
+      "documentId": "histoire-muy5trpy-tgke34hqr79:mount:1:document:dba0b734-41b0-4673-9bd9-7043a14e3654"
+    },
+    {
+      "phase": "timed",
+      "targetId": "text-color",
+      "label": "Text Color",
+      "inputStart": 3345.0999999940395,
+      "handlerTime": 3351.0999999940395,
+      "readyTime": 3421.89999999851,
+      "latencyMs": 76.80000000447035,
+      "inputDelayMs": 6,
+      "postReadyLongTaskMsUntilNextClick": 0,
+      "frameCount": 1,
+      "replicaCount": 1,
+      "documentId": "histoire-muy5trpy-tgke34hqr79:mount:1:document:dba0b734-41b0-4673-9bd9-7043a14e3654"
+    },
+    {
+      "phase": "timed",
+      "targetId": "background-color",
+      "label": "Background Color",
+      "inputStart": 3477.89999999851,
+      "handlerTime": 3485,
+      "readyTime": 3566.7999999970198,
+      "latencyMs": 88.89999999850988,
+      "inputDelayMs": 7.100000001490116,
+      "postReadyLongTaskMsUntilNextClick": 0,
+      "frameCount": 1,
+      "replicaCount": 1,
+      "documentId": "histoire-muy5trpy-tgke34hqr79:mount:1:document:dba0b734-41b0-4673-9bd9-7043a14e3654"
+    },
+    {
+      "phase": "timed",
+      "targetId": "border-color",
+      "label": "Border Color",
+      "inputStart": 3627.7999999970198,
+      "handlerTime": 3635.39999999851,
+      "readyTime": 3727.39999999851,
+      "latencyMs": 99.60000000149012,
+      "inputDelayMs": 7.600000001490116,
+      "postReadyLongTaskMsUntilNextClick": 8.400000005960464,
+      "frameCount": 1,
+      "replicaCount": 1,
+      "documentId": "histoire-muy5trpy-tgke34hqr79:mount:1:document:dba0b734-41b0-4673-9bd9-7043a14e3654"
+    },
+    {
+      "phase": "timed",
+      "targetId": "text-color",
+      "label": "Text Color",
+      "inputStart": 3778.89999999851,
+      "handlerTime": 3798,
+      "readyTime": 3910.6999999955297,
+      "latencyMs": 131.79999999701977,
+      "inputDelayMs": 19.100000001490116,
+      "postReadyLongTaskMsUntilNextClick": 0,
+      "frameCount": 1,
+      "replicaCount": 1,
+      "documentId": "histoire-muy5trpy-tgke34hqr79:mount:1:document:dba0b734-41b0-4673-9bd9-7043a14e3654"
+    },
+    {
+      "phase": "timed",
+      "targetId": "background-color",
+      "label": "Background Color",
+      "inputStart": 3995.1999999955297,
+      "handlerTime": 4002.5,
+      "readyTime": 4084.2999999970198,
+      "latencyMs": 89.10000000149012,
+      "inputDelayMs": 7.300000004470348,
+      "postReadyLongTaskMsUntilNextClick": 0,
+      "frameCount": 1,
+      "replicaCount": 1,
+      "documentId": "histoire-muy5trpy-tgke34hqr79:mount:1:document:dba0b734-41b0-4673-9bd9-7043a14e3654"
+    },
+    {
+      "phase": "timed",
+      "targetId": "border-color",
+      "label": "Border Color",
+      "inputStart": 4144.39999999851,
+      "handlerTime": 4151.5,
+      "readyTime": 4232.19999999553,
+      "latencyMs": 87.79999999701977,
+      "inputDelayMs": 7.100000001490116,
+      "postReadyLongTaskMsUntilNextClick": 5,
+      "frameCount": 1,
+      "replicaCount": 1,
+      "documentId": "histoire-muy5trpy-tgke34hqr79:mount:1:document:dba0b734-41b0-4673-9bd9-7043a14e3654"
+    },
+    {
+      "phase": "timed",
+      "targetId": "text-color",
+      "label": "Text Color",
+      "inputStart": 4278.69999999553,
+      "handlerTime": 4292.39999999851,
+      "readyTime": 4392.89999999851,
+      "latencyMs": 114.20000000298023,
+      "inputDelayMs": 13.700000002980232,
+      "postReadyLongTaskMsUntilNextClick": 0,
+      "frameCount": 1,
+      "replicaCount": 1,
+      "documentId": "histoire-muy5trpy-tgke34hqr79:mount:1:document:dba0b734-41b0-4673-9bd9-7043a14e3654"
+    },
+    {
+      "phase": "timed",
+      "targetId": "background-color",
+      "label": "Background Color",
+      "inputStart": 4461.79999999702,
+      "handlerTime": 4468.69999999553,
+      "readyTime": 4549.79999999702,
+      "latencyMs": 88,
+      "inputDelayMs": 6.899999998509884,
+      "postReadyLongTaskMsUntilNextClick": 0,
+      "frameCount": 1,
+      "replicaCount": 1,
+      "documentId": "histoire-muy5trpy-tgke34hqr79:mount:1:document:dba0b734-41b0-4673-9bd9-7043a14e3654"
+    },
+    {
+      "phase": "timed",
+      "targetId": "border-color",
+      "label": "Border Color",
+      "inputStart": 4610.89999999851,
+      "handlerTime": 4619.0999999940395,
+      "readyTime": 4702,
+      "latencyMs": 91.10000000149012,
+      "inputDelayMs": 8.199999995529652,
+      "postReadyLongTaskMsUntilNextClick": 5.600000001490116,
+      "frameCount": 1,
+      "replicaCount": 1,
+      "documentId": "histoire-muy5trpy-tgke34hqr79:mount:1:document:dba0b734-41b0-4673-9bd9-7043a14e3654"
+    },
+    {
+      "phase": "timed",
+      "targetId": "text-color",
+      "label": "Text Color",
+      "inputStart": 4761.19999999553,
+      "handlerTime": 4772.5,
+      "readyTime": 4870,
+      "latencyMs": 108.80000000447035,
+      "inputDelayMs": 11.200000002980232,
+      "postReadyLongTaskMsUntilNextClick": 0,
+      "frameCount": 1,
+      "replicaCount": 1,
+      "documentId": "histoire-muy5trpy-tgke34hqr79:mount:1:document:dba0b734-41b0-4673-9bd9-7043a14e3654"
+    },
+    {
+      "phase": "timed",
+      "targetId": "background-color",
+      "label": "Background Color",
+      "inputStart": 4927.19999999553,
+      "handlerTime": 4933.5,
+      "readyTime": 5002.79999999702,
+      "latencyMs": 75.60000000149012,
+      "inputDelayMs": 6.300000004470348,
+      "postReadyLongTaskMsUntilNextClick": 0,
+      "frameCount": 1,
+      "replicaCount": 1,
+      "documentId": "histoire-muy5trpy-tgke34hqr79:mount:1:document:dba0b734-41b0-4673-9bd9-7043a14e3654"
+    },
+    {
+      "phase": "timed",
+      "targetId": "border-color",
+      "label": "Border Color",
+      "inputStart": 5060.5,
+      "handlerTime": 5066.79999999702,
+      "readyTime": 5144,
+      "latencyMs": 83.5,
+      "inputDelayMs": 6.299999997019768,
+      "postReadyLongTaskMsUntilNextClick": 4.5,
+      "frameCount": 1,
+      "replicaCount": 1,
+      "documentId": "histoire-muy5trpy-tgke34hqr79:mount:1:document:dba0b734-41b0-4673-9bd9-7043a14e3654"
+    },
+    {
+      "phase": "timed",
+      "targetId": "text-color",
+      "label": "Text Color",
+      "inputStart": 5211.79999999702,
+      "handlerTime": 5223.5,
+      "readyTime": 5321.0999999940395,
+      "latencyMs": 109.29999999701977,
+      "inputDelayMs": 11.700000002980232,
+      "postReadyLongTaskMsUntilNextClick": 0,
+      "frameCount": 1,
+      "replicaCount": 1,
+      "documentId": "histoire-muy5trpy-tgke34hqr79:mount:1:document:dba0b734-41b0-4673-9bd9-7043a14e3654"
+    },
+    {
+      "phase": "timed",
+      "targetId": "background-color",
+      "label": "Background Color",
+      "inputStart": 5378.19999999553,
+      "handlerTime": 5387.29999999702,
+      "readyTime": 5458.5,
+      "latencyMs": 80.30000000447035,
+      "inputDelayMs": 9.100000001490116,
+      "postReadyLongTaskMsUntilNextClick": 0,
+      "frameCount": 1,
+      "replicaCount": 1,
+      "documentId": "histoire-muy5trpy-tgke34hqr79:mount:1:document:dba0b734-41b0-4673-9bd9-7043a14e3654"
+    },
+    {
+      "phase": "timed",
+      "targetId": "border-color",
+      "label": "Border Color",
+      "inputStart": 5510.5999999940395,
+      "handlerTime": 5517.19999999553,
+      "readyTime": 5596.69999999553,
+      "latencyMs": 86.10000000149012,
+      "inputDelayMs": 6.600000001490116,
+      "postReadyLongTaskMsUntilNextClick": 5.700000002980232,
+      "frameCount": 1,
+      "replicaCount": 1,
+      "documentId": "histoire-muy5trpy-tgke34hqr79:mount:1:document:dba0b734-41b0-4673-9bd9-7043a14e3654"
+    },
+    {
+      "phase": "timed",
+      "targetId": "text-color",
+      "label": "Text Color",
+      "inputStart": 5644.19999999553,
+      "handlerTime": 5655.79999999702,
+      "readyTime": 5761.29999999702,
+      "latencyMs": 117.10000000149012,
+      "inputDelayMs": 11.600000001490116,
+      "postReadyLongTaskMsUntilNextClick": 0,
+      "frameCount": 1,
+      "replicaCount": 1,
+      "documentId": "histoire-muy5trpy-tgke34hqr79:mount:1:document:dba0b734-41b0-4673-9bd9-7043a14e3654"
+    },
+    {
+      "phase": "timed",
+      "targetId": "background-color",
+      "label": "Background Color",
+      "inputStart": 5827.89999999851,
+      "handlerTime": 5834.5,
+      "readyTime": 5911.79999999702,
+      "latencyMs": 83.89999999850988,
+      "inputDelayMs": 6.600000001490116,
+      "postReadyLongTaskMsUntilNextClick": 0,
+      "frameCount": 1,
+      "replicaCount": 1,
+      "documentId": "histoire-muy5trpy-tgke34hqr79:mount:1:document:dba0b734-41b0-4673-9bd9-7043a14e3654"
+    },
+    {
+      "phase": "timed",
+      "targetId": "border-color",
+      "label": "Border Color",
+      "inputStart": 5961.69999999553,
+      "handlerTime": 5968.5999999940395,
+      "readyTime": 6049,
+      "latencyMs": 87.30000000447035,
+      "inputDelayMs": 6.899999998509884,
+      "postReadyLongTaskMsUntilNextClick": 2.100000001490116,
+      "frameCount": 1,
+      "replicaCount": 1,
+      "documentId": "histoire-muy5trpy-tgke34hqr79:mount:1:document:dba0b734-41b0-4673-9bd9-7043a14e3654"
+    },
+    {
+      "phase": "timed",
+      "targetId": "text-color",
+      "label": "Text Color",
+      "inputStart": 6111.19999999553,
+      "handlerTime": 6118.5,
+      "readyTime": 6230.5999999940395,
+      "latencyMs": 119.39999999850988,
+      "inputDelayMs": 7.200000002980232,
+      "postReadyLongTaskMsUntilNextClick": 0,
+      "frameCount": 1,
+      "replicaCount": 1,
+      "documentId": "histoire-muy5trpy-tgke34hqr79:mount:1:document:dba0b734-41b0-4673-9bd9-7043a14e3654"
+    }
+  ],
+  "longTasks": [
+    {
+      "startTime": 85.29999999701977,
+      "duration": 187
+    },
+    {
+      "startTime": 600.0999999940395,
+      "duration": 70
+    },
+    {
+      "startTime": 968.8999999985099,
+      "duration": 61
+    },
+    {
+      "startTime": 1304.2999999970198,
+      "duration": 63
+    },
+    {
+      "startTime": 1800.6999999955297,
+      "duration": 68
+    },
+    {
+      "startTime": 2316.5999999940395,
+      "duration": 76
+    },
+    {
+      "startTime": 3015.7999999970198,
+      "duration": 60
+    },
+    {
+      "startTime": 3789.5999999940395,
+      "duration": 68
+    },
+    {
+      "startTime": 4287.39999999851,
+      "duration": 60
+    },
+    {
+      "startTime": 4766.79999999702,
+      "duration": 59
+    },
+    {
+      "startTime": 5219,
+      "duration": 54
+    },
+    {
+      "startTime": 5650.0999999940395,
+      "duration": 62
+    },
+    {
+      "startTime": 6116.29999999702,
+      "duration": 63
+    }
+  ],
+  "eventTimings": [
+    {
+      "treeKey": "[\"variant\",\"tailwind\",\"border-color\"]",
+      "startTime": 596,
+      "processingStart": 602.8999999985099,
+      "processingEnd": 669.6999999955297,
+      "duration": 80
+    },
+    {
+      "treeKey": "[\"variant\",\"tailwind\",\"text-color\"]",
+      "startTime": 794.8999999985099,
+      "processingStart": 808.1999999955297,
+      "processingEnd": 846.0999999940395,
+      "duration": 64
+    },
+    {
+      "treeKey": "[\"variant\",\"tailwind\",\"background-color\"]",
+      "startTime": 962.5999999940395,
+      "processingStart": 971.5,
+      "processingEnd": 1029.5,
+      "duration": 80
+    },
+    {
+      "treeKey": "[\"variant\",\"tailwind\",\"border-color\"]",
+      "startTime": 1130.1999999955297,
+      "processingStart": 1141.8999999985099,
+      "processingEnd": 1179.0999999940395,
+      "duration": 64
+    },
+    {
+      "treeKey": "[\"variant\",\"tailwind\",\"text-color\"]",
+      "startTime": 1295.5999999940395,
+      "processingStart": 1308,
+      "processingEnd": 1367.0999999940395,
+      "duration": 96
+    },
+    {
+      "treeKey": "[\"variant\",\"tailwind\",\"background-color\"]",
+      "startTime": 1462.1999999955297,
+      "processingStart": 1470.5999999940395,
+      "processingEnd": 1509.6999999955297,
+      "duration": 64
+    },
+    {
+      "treeKey": "[\"variant\",\"tailwind\",\"border-color\"]",
+      "startTime": 1616.1999999955297,
+      "processingStart": 1625.5,
+      "processingEnd": 1665.5999999940395,
+      "duration": 80
+    },
+    {
+      "treeKey": "[\"variant\",\"tailwind\",\"text-color\"]",
+      "startTime": 1795.2999999970198,
+      "processingStart": 1805.5999999940395,
+      "processingEnd": 1868.5999999940395,
+      "duration": 96
+    },
+    {
+      "treeKey": "[\"variant\",\"tailwind\",\"background-color\"]",
+      "startTime": 1994.5999999940395,
+      "processingStart": 2002.5,
+      "processingEnd": 2042.0999999940395,
+      "duration": 64
+    },
+    {
+      "treeKey": "[\"variant\",\"tailwind\",\"border-color\"]",
+      "startTime": 2146.5,
+      "processingStart": 2156.89999999851,
+      "processingEnd": 2195.39999999851,
+      "duration": 64
+    },
+    {
+      "treeKey": "[\"variant\",\"tailwind\",\"text-color\"]",
+      "startTime": 2310.7999999970198,
+      "processingStart": 2321.5,
+      "processingEnd": 2392.6999999955297,
+      "duration": 104
+    },
+    {
+      "treeKey": "[\"variant\",\"tailwind\",\"background-color\"]",
+      "startTime": 2522.5,
+      "processingStart": 2537.6999999955297,
+      "processingEnd": 2573.2999999970198,
+      "duration": 72
+    },
+    {
+      "treeKey": "[\"variant\",\"tailwind\",\"border-color\"]",
+      "startTime": 2677.39999999851,
+      "processingStart": 2684.5999999940395,
+      "processingEnd": 2720.5999999940395,
+      "duration": 64
+    },
+    {
+      "treeKey": "[\"variant\",\"tailwind\",\"text-color\"]",
+      "startTime": 2844.1999999955297,
+      "processingStart": 2851.39999999851,
+      "processingEnd": 2892.0999999940395,
+      "duration": 64
+    },
+    {
+      "treeKey": "[\"variant\",\"tailwind\",\"background-color\"]",
+      "startTime": 3010.89999999851,
+      "processingStart": 3022.1999999955297,
+      "processingEnd": 3075.5,
+      "duration": 88
+    },
+    {
+      "treeKey": "[\"variant\",\"tailwind\",\"border-color\"]",
+      "startTime": 3196,
+      "processingStart": 3203.6999999955297,
+      "processingEnd": 3237.39999999851,
+      "duration": 64
+    },
+    {
+      "treeKey": "[\"variant\",\"tailwind\",\"text-color\"]",
+      "startTime": 3345.0999999940395,
+      "processingStart": 3351.0999999940395,
+      "processingEnd": 3382.6999999955297,
+      "duration": 48
+    },
+    {
+      "treeKey": "[\"variant\",\"tailwind\",\"background-color\"]",
+      "startTime": 3477.89999999851,
+      "processingStart": 3485,
+      "processingEnd": 3523,
+      "duration": 64
+    },
+    {
+      "treeKey": "[\"variant\",\"tailwind\",\"border-color\"]",
+      "startTime": 3627.7999999970198,
+      "processingStart": 3635.39999999851,
+      "processingEnd": 3675.5,
+      "duration": 64
+    },
+    {
+      "treeKey": "[\"variant\",\"tailwind\",\"text-color\"]",
+      "startTime": 3778.89999999851,
+      "processingStart": 3798,
+      "processingEnd": 3857.7999999970198,
+      "duration": 96
+    },
+    {
+      "treeKey": "[\"variant\",\"tailwind\",\"background-color\"]",
+      "startTime": 3995.1999999955297,
+      "processingStart": 4002.5,
+      "processingEnd": 4039.89999999851,
+      "duration": 64
+    },
+    {
+      "treeKey": "[\"variant\",\"tailwind\",\"border-color\"]",
+      "startTime": 4144.39999999851,
+      "processingStart": 4151.5,
+      "processingEnd": 4188.69999999553,
+      "duration": 64
+    },
+    {
+      "treeKey": "[\"variant\",\"tailwind\",\"text-color\"]",
+      "startTime": 4278.69999999553,
+      "processingStart": 4292.39999999851,
+      "processingEnd": 4347.29999999702,
+      "duration": 80
+    },
+    {
+      "treeKey": "[\"variant\",\"tailwind\",\"background-color\"]",
+      "startTime": 4461.79999999702,
+      "processingStart": 4468.69999999553,
+      "processingEnd": 4505.39999999851,
+      "duration": 64
+    },
+    {
+      "treeKey": "[\"variant\",\"tailwind\",\"border-color\"]",
+      "startTime": 4610.89999999851,
+      "processingStart": 4619.0999999940395,
+      "processingEnd": 4656.19999999553,
+      "duration": 64
+    },
+    {
+      "treeKey": "[\"variant\",\"tailwind\",\"text-color\"]",
+      "startTime": 4761.19999999553,
+      "processingStart": 4772.39999999851,
+      "processingEnd": 4825.69999999553,
+      "duration": 80
+    },
+    {
+      "treeKey": "[\"variant\",\"tailwind\",\"background-color\"]",
+      "startTime": 4927.19999999553,
+      "processingStart": 4933.5,
+      "processingEnd": 4966,
+      "duration": 48
+    },
+    {
+      "treeKey": "[\"variant\",\"tailwind\",\"border-color\"]",
+      "startTime": 5060.5,
+      "processingStart": 5066.79999999702,
+      "processingEnd": 5103.89999999851,
+      "duration": 64
+    },
+    {
+      "treeKey": "[\"variant\",\"tailwind\",\"text-color\"]",
+      "startTime": 5211.79999999702,
+      "processingStart": 5223.5,
+      "processingEnd": 5273.19999999553,
+      "duration": 80
+    },
+    {
+      "treeKey": "[\"variant\",\"tailwind\",\"background-color\"]",
+      "startTime": 5378.19999999553,
+      "processingStart": 5387.29999999702,
+      "processingEnd": 5421.0999999940395,
+      "duration": 64
+    },
+    {
+      "treeKey": "[\"variant\",\"tailwind\",\"border-color\"]",
+      "startTime": 5510.5999999940395,
+      "processingStart": 5517.19999999553,
+      "processingEnd": 5551.5,
+      "duration": 72
+    },
+    {
+      "treeKey": "[\"variant\",\"tailwind\",\"text-color\"]",
+      "startTime": 5644.19999999553,
+      "processingStart": 5655.79999999702,
+      "processingEnd": 5711.79999999702,
+      "duration": 88
+    },
+    {
+      "treeKey": "[\"variant\",\"tailwind\",\"background-color\"]",
+      "startTime": 5827.89999999851,
+      "processingStart": 5834.5,
+      "processingEnd": 5867.89999999851,
+      "duration": 64
+    },
+    {
+      "treeKey": "[\"variant\",\"tailwind\",\"border-color\"]",
+      "startTime": 5961.69999999553,
+      "processingStart": 5968.5999999940395,
+      "processingEnd": 6002.19999999553,
+      "duration": 64
+    },
+    {
+      "treeKey": "[\"variant\",\"tailwind\",\"text-color\"]",
+      "startTime": 6111.19999999553,
+      "processingStart": 6118.39999999851,
+      "processingEnd": 6179.5999999940395,
+      "duration": 88
+    }
+  ]
+}

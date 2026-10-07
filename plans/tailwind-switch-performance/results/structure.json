@@ -1,0 +1,39 @@
+{
+  "method": "Separate 5-warmup/30-switch runs with --observe-hidden-mounts; timing from these instrumented runs is not compared.",
+  "beforeStatic": {
+    "hiddenMountStats": {
+      "added": 35,
+      "peakMounted": 1,
+      "peakTailwindSamples": 238
+    },
+    "initialCanvasTailwindSamples": 237
+  },
+  "dev": {
+    "initialCanvasSandboxDocumentRequests": 1,
+    "canvasSandboxDocumentRequestsDuringSwitches": 0,
+    "replacedFrames": 0,
+    "iframeCount": 2,
+    "canvasFrameCount": 1,
+    "replicaCount": 1,
+    "hiddenMountStats": {
+      "added": 0,
+      "peakMounted": 0,
+      "peakTailwindSamples": 0
+    },
+    "initialCanvasTailwindSamples": 15
+  },
+  "static": {
+    "initialCanvasSandboxDocumentRequests": 1,
+    "canvasSandboxDocumentRequestsDuringSwitches": 0,
+    "replacedFrames": 0,
+    "iframeCount": 2,
+    "canvasFrameCount": 1,
+    "replicaCount": 1,
+    "hiddenMountStats": {
+      "added": 0,
+      "peakMounted": 0,
+      "peakTailwindSamples": 0
+    },
+    "initialCanvasTailwindSamples": 15
+  }
+}
