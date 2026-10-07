@@ -344,8 +344,10 @@ Background color of the story preview.
 Each object in the array is a preset with the following properties:
 
 - `label: string`: Label for the preset.
-- `color: string`: Color of the preset.
+- `color: string`: CSS color, `transparent`, `$checkerboard` (light checkerboard), or `$checkerboard-dark` (dark checkerboard).
 - `contrastColor?: string`: Contrast color of preset
+
+Toolbar always includes both checkerboard choices after configured colors. Configured checkerboard presets can override their labels and text contrast colors. Their palettes remain fixed, and image exports retain transparency.
 
 Default values are shown in the example below:
 

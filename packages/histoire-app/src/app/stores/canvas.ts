@@ -2,6 +2,7 @@ import type { CanvasFrameLayout } from '../components/canvas/frame-layout.js'
 import type { CanvasFitOptions, CanvasPoint, CanvasRect, CanvasSize } from '../components/canvas/pan/usePanZoom.js'
 import type { SingleViewportState } from '../components/canvas/single-viewport.js'
 import type { SingleZoomListener } from '../components/canvas/single-zoom.js'
+import type { CanvasBackground } from '../util/background.js'
 import { reactive } from 'vue'
 import { canvasContentRect, clampZoom, fitCanvas, zoomAroundPoint } from '../components/canvas/pan/usePanZoom.js'
 import { fitSingleViewport } from '../components/canvas/single-zoom.js'
@@ -56,7 +57,7 @@ export type CanvasContentInsets = Pick<CanvasFitOptions, 'topInset' | 'bottomIns
 /** Create independent canvas state; nearest shell provides instance to its tools. */
 export function createCanvasStore(options: { storage?: CanvasStorage, singleViewport?: SingleViewportState } = {}) {
   const preferences = readCanvasPreferences(options.storage)
-  const state = reactive({ ...preferences, singleViewport: options.singleViewport ?? { mode: 'responsive' as const }, singleViewportSize: { width: 1, height: 1 }, arrangement: 'grid' as CanvasArrangement, zoom: preferences.zoomByArrange.grid, effectiveZoom: typeof preferences.zoomByArrange.grid === 'number' ? preferences.zoomByArrange.grid : 1, panOffset: { x: 32, y: 32 }, selectedFrame: null as string | null, viewport: { width: 0, height: 0 }, bounds: { x: 0, y: 0, width: 0, height: 0 }, inspectorWidth: 0, contentInsets: { topInset: 0, bottomInset: 0 }, frameBackgrounds: {} as Record<string, { backgroundColor: string, checkerboard: boolean }>, panning: false })
+  const state = reactive({ ...preferences, singleViewport: options.singleViewport ?? { mode: 'responsive' as const }, singleViewportSize: { width: 1, height: 1 }, arrangement: 'grid' as CanvasArrangement, zoom: preferences.zoomByArrange.grid, effectiveZoom: typeof preferences.zoomByArrange.grid === 'number' ? preferences.zoomByArrange.grid : 1, panOffset: { x: 32, y: 32 }, selectedFrame: null as string | null, viewport: { width: 0, height: 0 }, bounds: { x: 0, y: 0, width: 0, height: 0 }, inspectorWidth: 0, contentInsets: { topInset: 0, bottomInset: 0 }, frameBackgrounds: {} as Record<string, CanvasBackground>, panning: false })
   let singleArea: CanvasSize = { width: 0, height: 0 }
   const singleZoomListeners = new Set<SingleZoomListener>()
   /** Notify native scroll ownership before replacing the rendered scale. */
@@ -235,7 +236,7 @@ export function createCanvasStore(options: { storage?: CanvasStorage, singleView
       save()
     },
     /** Keep selected-only backgrounds independent of project preview settings. */
-    setFrameBackground(id: string, backgroundColor: string, checkerboard = false) { state.frameBackgrounds[id] = { backgroundColor, checkerboard } } })
+    setFrameBackground(id: string, backgroundColor: string, checkerboard = false, checkerboardTheme: CanvasBackground['checkerboardTheme'] = 'light') { state.frameBackgrounds[id] = { backgroundColor, checkerboard, checkerboardTheme } } })
 }
 
 /** Injectable canvas backing inferred from constructor. */

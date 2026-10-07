@@ -11,6 +11,7 @@ export const usePreviewSettingsStore = defineStore('preview-settings', () => {
     rotate: false,
     backgroundColor: 'transparent',
     checkerboard: false,
+    checkerboardTheme: 'light',
     textDirection: 'ltr',
   }
   const currentSettings = isEmbeddedRuntime ? ref(defaults) : useStorage<PreviewSettings>('_histoire-sandbox-settings-v3', defaults)

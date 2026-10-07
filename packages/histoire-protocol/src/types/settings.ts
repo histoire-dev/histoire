@@ -10,6 +10,8 @@ export interface PreviewSettings {
   backgroundColor: string
   /** Show transparent-background checkerboard. */
   checkerboard: boolean
+  /** Checkerboard palette; omitted legacy values use light. */
+  checkerboardTheme?: 'light' | 'dark'
   /** Text direction in isolated story document. */
   textDirection: 'ltr' | 'rtl'
 }
@@ -30,5 +32,5 @@ export type HistoireSettingsPatch = Partial<HistoireSettings>
 
 /** Fresh defaults prevent globals shared between sessions. */
 export function createDefaultHistoireSettings(): HistoireSettings {
-  return { responsiveWidth: 720, responsiveHeight: null, rotate: false, backgroundColor: 'transparent', checkerboard: false, textDirection: 'ltr', colorScheme: 'auto', globals: {} }
+  return { responsiveWidth: 720, responsiveHeight: null, rotate: false, backgroundColor: 'transparent', checkerboard: false, checkerboardTheme: 'light', textDirection: 'ltr', colorScheme: 'auto', globals: {} }
 }

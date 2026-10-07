@@ -3,6 +3,7 @@ import type { UiChannelError, UiScreenshotFile, UiScreenshotRequest } from '@his
 import { BuiltinIcon, HstButton, HstButtonGroup } from '@histoire/controls/vue'
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { useCanvasFrames, useCanvasStore } from '../../../composables/canvas-settings.js'
+import { getBackgroundCapture } from '../../../util/background.js'
 import { catalogTargetLabel } from '../../../util/catalog-target.js'
 import { screenshotFileDetails } from '../../../util/screenshot-file.js'
 import { snapshotScreenshotTargets } from '../../../util/screenshot-targets.js'
@@ -79,7 +80,7 @@ function capture() {
   requestId.value = identity()
   try {
     const captured = snapshotScreenshotTargets(targets.value)
-    if (sendUiEvent('histoire:ui:screenshot', { requestId: requestId.value, targets: captured, viewport: { width: Math.round(viewport.width), height: Math.round(viewport.height) }, scale: scale.value, format: format.value, background: background.checkerboard ? '$checkerboard' : background.backgroundColor })) return
+    if (sendUiEvent('histoire:ui:screenshot', { requestId: requestId.value, targets: captured, viewport: { width: Math.round(viewport.width), height: Math.round(viewport.height) }, scale: scale.value, format: format.value, background: getBackgroundCapture(background) })) return
     requestId.value = null
     error.value = { code: 'unavailable', message: 'Screenshot service unavailable' }
   }

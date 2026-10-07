@@ -81,6 +81,24 @@ async function lifetimeFixture(budget = 2, variantCount = 2, zoom = 0.5) {
 }
 
 describe('canvas frame runtime lifetime', () => {
+  it('delivers global theme and isolated overrides to retained runtime documents', async () => {
+    const test = await lifetimeFixture()
+    await test.canonical.settings.update({ backgroundColor: 'transparent', checkerboard: true, checkerboardTheme: 'dark' })
+    await flushPromises()
+    const first = test.wrapper.findAllComponents(CanvasFrame)[0]
+    const id = first.props('frame').id
+    expect(test.children.every(child => child.session.getSnapshot().settings.checkerboardTheme === 'dark')).toBe(true)
+    test.canvas.setFrameBackground(id, 'transparent', true, 'light')
+    await flushPromises()
+    const child = test.children.find(child => child.session.getSnapshot().selection?.variantId === first.props('frame').variantId)!
+    expect(child.session.getSnapshot().settings.checkerboardTheme).toBe('light')
+    expect(test.children.filter(value => value !== child).every(value => value.session.getSnapshot().settings.checkerboardTheme === 'dark')).toBe(true)
+    expect(test.canonical.getSnapshot().settings.checkerboardTheme).toBe('dark')
+    delete test.canvas.frameBackgrounds[id]
+    await flushPromises()
+    expect(child.session.getSnapshot().settings.checkerboardTheme).toBe('dark')
+  })
+
   it('shows only selected Single variant and resizes its owned document without remounting', async () => {
     const test = await lifetimeFixture()
     test.arrange.value = 'single'

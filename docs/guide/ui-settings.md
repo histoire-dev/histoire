@@ -8,6 +8,8 @@ Compact density reduces row and control spacing in Settings, rail panes, and the
 
 Viewport and background edits override project presets locally. Removing a project preset hides it for this browser. Reset to project removes that collection's local edits and restores current project defaults. Toolbar pickers use the same merged collections. A null or omitted viewport height means Auto; project saves preserve existing null heights.
 
+Background picker includes Light checkerboard and Dark checkerboard after configured colors. All frames updates the shared background and clears frame overrides; Selected changes only the selected frame. Shared choices persist in this browser, while frame overrides last for the current canvas. Checkerboard palettes stay independent of the workbench color scheme. PNG exports and comment captures keep transparent pixels instead of including the pattern.
+
 Local presets keep a stable identity across renames and restarts. Reusing an old label creates a separate preset. Updated project defaults remain live for untouched rows; explicit local edits keep precedence.
 
 ## Save to project

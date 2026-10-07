@@ -64,6 +64,7 @@ describe('canvas toolbar overflow integration', () => {
       test.canvas.singleViewportSize = { width: 848, height: 748 }
       test.frames.registerFrame({ id: 'frame', storyId: 'a:b', variantId: 'c', rect: { x: 0, y: 0, width: 848, height: 748 } })
       test.canvas.selectedFrame = 'frame'
+      test.canvas.setFrameBackground('frame', 'transparent', true, 'dark')
       test.canvas.setZoom(0.5)
       await test.geometry.flush()
       button('Screenshot').click()
@@ -71,7 +72,7 @@ describe('canvas toolbar overflow integration', () => {
       const capture = [...document.querySelectorAll<HTMLButtonElement>('button')].find(value => value.textContent?.trim() === 'Capture 1 frame')!
       capture.click()
       await test.geometry.flush()
-      expect(send).toHaveBeenCalledWith('histoire:ui:screenshot', expect.objectContaining({ targets: [{ storyId: 'a:b', variantId: 'c' }], viewport: { width: 848, height: 748 }, scale: 1 }))
+      expect(send).toHaveBeenCalledWith('histoire:ui:screenshot', expect.objectContaining({ targets: [{ storyId: 'a:b', variantId: 'c' }], viewport: { width: 848, height: 748 }, scale: 1, background: '$checkerboard' }))
       button('Rotate viewport').click()
       await test.geometry.flush()
       expect(test.canvas.singleViewport.mode).toBe('fixed')

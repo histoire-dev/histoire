@@ -4,7 +4,8 @@ import type { CanvasFrameState } from '../components/canvas/frame-state.js'
 import type { CanvasPoint, CanvasRect } from '../components/canvas/pan/usePanZoom.js'
 import type { usePointerPan } from '../components/canvas/pan/usePointerPan.js'
 import type { CanvasStore } from '../stores/canvas.js'
-import { inject, provide, shallowReactive } from 'vue'
+import { useHistoireSnapshot } from '@histoire/vue'
+import { computed, inject, provide, shallowReactive } from 'vue'
 
 /** Current mounted frame geometry and isolated document identity. */
 export interface CanvasFrameRegistration {
@@ -95,6 +96,13 @@ export function useCanvasStore(): CanvasStore {
 
 /** Narrow name used by native and standalone tools. */
 export const useCanvasSettings = useCanvasStore
+
+/** Resolve complete frame override or canonical background without duplicating persistence. */
+export function useCanvasFrameBackground(frameId: () => string) {
+  const canvas = useCanvasStore()
+  const snapshot = useHistoireSnapshot()
+  return computed(() => canvas.frameBackgrounds[frameId()] ?? snapshot.value.settings)
+}
 
 /** Read nearest canvas frame registry for measuring, comments and screenshots. */
 export function useCanvasFrames(): CanvasFrames {

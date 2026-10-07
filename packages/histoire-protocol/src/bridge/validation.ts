@@ -51,7 +51,7 @@ export function validateEmbedOrigin(value: unknown): string {
 export function validateSettingsPatch(value: unknown): HistoireSettingsPatch {
   measureWireValue(value)
   const input = wireRecord(value)
-  const allowed = ['responsiveWidth', 'responsiveHeight', 'rotate', 'backgroundColor', 'checkerboard', 'textDirection', 'colorScheme', 'globals']
+  const allowed = ['responsiveWidth', 'responsiveHeight', 'rotate', 'backgroundColor', 'checkerboard', 'checkerboardTheme', 'textDirection', 'colorScheme', 'globals']
   if (Object.keys(input).some(key => !allowed.includes(key))) invalid('Unknown preview setting')
   for (const key of ['responsiveWidth', 'responsiveHeight']) {
     const item = input[key]
@@ -61,6 +61,7 @@ export function validateSettingsPatch(value: unknown): HistoireSettingsPatch {
     if (input[key] !== undefined && typeof input[key] !== 'boolean') invalid('Expected boolean setting')
   }
   if (input.backgroundColor !== undefined && typeof input.backgroundColor !== 'string') invalid('Expected background string')
+  if (input.checkerboardTheme !== undefined && !['light', 'dark'].includes(input.checkerboardTheme as string)) invalid('Invalid checkerboard theme')
   if (input.textDirection !== undefined && !['ltr', 'rtl'].includes(input.textDirection as string)) invalid('Invalid text direction')
   if (input.colorScheme !== undefined && !['light', 'dark', 'auto'].includes(input.colorScheme as string)) invalid('Invalid color scheme')
   if (input.globals !== undefined) {

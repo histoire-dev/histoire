@@ -18,8 +18,9 @@ describe('canvas toolbar settings', () => {
   })
 
   it('maps checkerboard preset through protocol and validates custom hex colors', () => {
-    expect(backgroundPatch('$checkerboard')).toEqual({ backgroundColor: 'transparent', checkerboard: true })
-    expect(backgroundPatch('#F0a', false, true)).toEqual({ backgroundColor: '#F0a', checkerboard: false })
+    expect(backgroundPatch('$checkerboard')).toEqual({ backgroundColor: 'transparent', checkerboard: true, checkerboardTheme: 'light' })
+    expect(backgroundPatch('$checkerboard-dark')).toEqual({ backgroundColor: 'transparent', checkerboard: true, checkerboardTheme: 'dark' })
+    expect(backgroundPatch('#F0a', false, true)).toEqual({ backgroundColor: '#F0a', checkerboard: false, checkerboardTheme: 'light' })
     expect(backgroundPatch('red', false, true)).toBeNull()
   })
 })

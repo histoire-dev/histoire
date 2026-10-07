@@ -1,4 +1,5 @@
 import type { HistoireSettings, HistoireSettingsPatch } from '@histoire/protocol'
+import { checkerboardTheme } from '../../../util/background.js'
 
 /** Validate user dimensions before mutating canonical preview settings. */
 export function parseViewportSize(width: string | number, height: string | number): HistoireSettingsPatch | null {
@@ -19,5 +20,6 @@ export function viewportDimensions(settings: Pick<HistoireSettings, 'responsiveW
 /** Checker presets use existing protocol flags; freeform input permits only hex colors. */
 export function backgroundPatch(color: string, checkerboard = false, custom = false): HistoireSettingsPatch | null {
   if (custom && !/^#(?:[\da-f]{3}|[\da-f]{4}|[\da-f]{6}|[\da-f]{8})$/i.test(color)) return null
-  return { backgroundColor: color === '$checkerboard' ? 'transparent' : color, checkerboard: color === '$checkerboard' || checkerboard }
+  const theme = checkerboardTheme(color)
+  return { backgroundColor: theme ? 'transparent' : color, checkerboard: !!theme || checkerboard, checkerboardTheme: theme ?? 'light' }
 }

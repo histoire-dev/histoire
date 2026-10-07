@@ -197,5 +197,7 @@ defineExpose({ retry: start, getSource })
 </template>
 
 <style scoped>
-.histoire-canvas-replica { width: 100%; height: 100%; }
+/* A dark host scheme makes browsers paint light story iframes opaque. Keep
+   inspection backing visible while story documents own their own appearance. */
+.histoire-canvas-replica { width: 100%; height: 100%; color-scheme: normal; }
 </style>

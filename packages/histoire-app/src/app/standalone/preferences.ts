@@ -27,8 +27,8 @@ export async function restoreStandalonePreferences(session: HistoireSession, win
     if (current === previous) return
     previous = current
     try {
-      const { responsiveWidth, responsiveHeight, rotate, backgroundColor, checkerboard, textDirection } = snapshot.settings as HistoireSettings
-      storage?.setItem(sandboxKey, JSON.stringify({ responsiveWidth, responsiveHeight, rotate, backgroundColor, checkerboard, textDirection }))
+      const { responsiveWidth, responsiveHeight, rotate, backgroundColor, checkerboard, checkerboardTheme, textDirection } = snapshot.settings as HistoireSettings
+      storage?.setItem(sandboxKey, JSON.stringify({ responsiveWidth, responsiveHeight, rotate, backgroundColor, checkerboard, checkerboardTheme, textDirection }))
       colors?.setItem(colorKey, snapshot.settings.colorScheme)
     }
     catch { /* Storage denial never changes runtime/canonical state ownership. */ }

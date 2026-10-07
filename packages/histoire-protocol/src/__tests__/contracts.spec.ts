@@ -20,6 +20,12 @@ describe('portable trust boundary', () => {
       expect(() => validateSettingsPatch(value)).toThrow()
     }
   })
+  it('accepts checkerboard themes and rejects unsupported palettes', () => {
+    for (const checkerboardTheme of ['light', 'dark'] as const) {
+      expect(validateSettingsPatch({ checkerboard: true, checkerboardTheme })).toEqual({ checkerboard: true, checkerboardTheme })
+    }
+    for (const checkerboardTheme of ['auto', null, false, 1]) expect(() => validateSettingsPatch({ checkerboardTheme })).toThrow()
+  })
   it('validates command, payload, version and owner before accepting envelope', () => {
     const message = { ...owner, kind: 'request', requestId: 'request', command: 'catalog.getStory', payload: { storyId: 'colon:story' } }
     expect(validateBridgeEnvelope(message, owner, 'data')).toEqual(message)

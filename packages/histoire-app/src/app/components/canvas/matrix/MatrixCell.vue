@@ -4,9 +4,10 @@ import type { CanvasFrameLayout } from '../frame-layout.js'
 import type { CanvasRect } from '../pan/usePanZoom.js'
 import { HstButton } from '@histoire/controls/vue'
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
-import { useCanvasFrames, useCanvasStore } from '../../../composables/canvas-settings.js'
+import { useCanvasFrameBackground, useCanvasFrames, useCanvasStore } from '../../../composables/canvas-settings.js'
 import { useContextMenu } from '../../../composables/context-menu.js'
 import { useMatrixStore } from '../../../stores/matrix.js'
+import { getBackgroundStyle } from '../../../util/background.js'
 import CanvasReplicaPreview from '../CanvasReplicaPreview.vue'
 import { isFrameMenuShortcut, openFrameMenu } from '../frame-menu.js'
 import { watchMatrixFrameRegistration } from './matrix-registration.js'
@@ -26,6 +27,7 @@ const props = defineProps<{
   previewBase: string
 }>()
 const canvas = useCanvasStore()
+const background = useCanvasFrameBackground(() => props.frame.id)
 const registry = useCanvasFrames()
 const matrix = useMatrixStore()
 const menu = useContextMenu()
@@ -76,7 +78,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <section class="histoire-matrix-cell" :style="position" :data-frame-id="frame.id" :data-selected="matrix.selectedCell.value?.key === cell.key" @contextmenu="openMenu">
+  <section class="histoire-matrix-cell" :style="{ ...position, ...getBackgroundStyle(background) }" :data-frame-id="frame.id" :data-selected="matrix.selectedCell.value?.key === cell.key" @contextmenu="openMenu">
     <div class="histoire-matrix-cell-content" :style="style">
       <CanvasReplicaPreview v-if="live" :key="variantId" ref="preview" :frame-id="frame.id" :story-id="frame.storyId" :variant-id="variantId" :preview-base="previewBase" :props-override="cell.props" @status="updateStatus" />
     </div>

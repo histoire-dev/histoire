@@ -77,6 +77,37 @@ describe('explicit standalone policies', () => {
     }
   })
 
+  it('persists dark checkerboard and restores legacy light settings', async () => {
+    const fixture = sourceFixture()
+    const core = createHistoireSessionWithAdapters({ url: 'https://book.example/' }, fixture.adapters)
+    await core.connect()
+    window.localStorage.clear()
+    window.sessionStorage.clear()
+    window.localStorage.setItem('_histoire-sandbox-settings-v3', JSON.stringify({ checkerboard: true }))
+    const close = await restoreStandalonePreferences(core, window, false)
+    try {
+      expect(core.getSnapshot().settings).toMatchObject({ checkerboard: true, checkerboardTheme: 'light' })
+      await core.settings.update({ checkerboardTheme: 'dark' })
+      expect(JSON.parse(window.localStorage.getItem('_histoire-sandbox-settings-v3')!)).toMatchObject({ checkerboard: true, checkerboardTheme: 'dark' })
+      const restored = createHistoireSessionWithAdapters({ url: 'https://book.example/' }, sourceFixture().adapters)
+      await restored.connect()
+      const stop = await restoreStandalonePreferences(restored, window, false)
+      try {
+        expect(restored.getSnapshot().settings).toMatchObject({ checkerboard: true, checkerboardTheme: 'dark' })
+      }
+      finally {
+        stop()
+        await restored.dispose()
+      }
+    }
+    finally {
+      close()
+      await core.dispose()
+      window.localStorage.clear()
+      window.sessionStorage.clear()
+    }
+  })
+
   it('reads legacy storage only through standalone adapter and detaches persistence on close', async () => {
     const fixture = sourceFixture()
     const core = createHistoireSessionWithAdapters({ url: 'https://book.example/' }, fixture.adapters)

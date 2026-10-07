@@ -18,6 +18,7 @@ describe('uI capture appearance parity', () => {
     const active = () => true
     const options = resolveUiScreenshotTarget(context, server, active, 'epoch', request, target)
     expect(options.target).toEqual({ origin: 'http://127.0.0.1:6006', ...target, epoch: 'epoch', width: 1024, height: 640, deviceScaleFactor: 3, globals: { locale: 'fr' }, colorScheme: 'dark', textDirection: 'ltr', backgroundColor: 'transparent', isActive: active })
+    expect(resolveUiScreenshotTarget(context, server, active, 'epoch', { ...request, background: '$checkerboard-dark' }, target).target.backgroundColor).toBe('transparent')
     expect(options.host.open(options.target).url).toContain('/book/__histoire/preview/')
     expect(() => resolveUiScreenshotTarget(context, server, active, 'epoch', request, { ...target, variantId: 'missing' })).toThrow('target unavailable')
     expect(() => resolveUiScreenshotTarget(context, server, () => false, 'epoch', request, target)).toThrow('target unavailable')

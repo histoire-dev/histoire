@@ -5,6 +5,7 @@ import { HstButton, HstText } from '@histoire/controls/vue'
 import { useHistoireSession, useHistoireSnapshot } from '@histoire/vue'
 import { defineAsyncComponent, ref } from 'vue'
 import { usePresetConfigStore } from '../../../stores/presets-config.js'
+import { getBackgroundPreset, getBackgroundPresetStyle } from '../../../util/background.js'
 import { histoireConfig } from '../../../util/config.js'
 import { backgroundPatch } from '../../canvas/toolbar/settings.js'
 
@@ -60,7 +61,7 @@ function save(): void {
     </header>
     <div class="histoire-background-presets">
       <div v-for="(preset, index) in presets.backgroundPresets.value" :key="presets.backgroundKey(index)" class="histoire-background-preset">
-        <HstButton color="flat" type="button" :class="{ checker: preset.color === '$checkerboard' || preset.color === 'transparent' }" :style="{ backgroundColor: preset.color === '$checkerboard' ? undefined : preset.color, color: preset.contrastColor }" :aria-label="`Select ${preset.label} background`" :aria-pressed="preset.color === '$checkerboard' ? snapshot.settings.checkerboard : snapshot.settings.backgroundColor === preset.color" @click="select(preset.color)">
+        <HstButton color="flat" type="button" :style="getBackgroundPresetStyle(preset)" :aria-label="`Select ${preset.label} background`" :aria-pressed="getBackgroundPreset(snapshot.settings) === preset.color" @click="select(preset.color)">
           Aa
         </HstButton>
         <span>{{ preset.label }}</span><div class="histoire-background-actions">
@@ -97,7 +98,6 @@ function save(): void {
 .histoire-background-preset { width: 100px; display: flex; flex-direction: column; text-align: center; gap: 6px; font-size: 12px; }
 .histoire-background-preset > button { width: 100%; height: 60px; font-weight: 600; }
 .histoire-background-preset > button[aria-pressed=true] { outline: 2px solid var(--histoire-accent, #10b981); outline-offset: 2px; }
-.histoire-background-preset > .checker { background-image: conic-gradient(#d4d4d8 25%, white 0 50%, #d4d4d8 0 75%, white 0); background-size: 14px 14px; }
 .histoire-background-actions { display: flex; justify-content: center; gap: 8px; }
 .histoire-background-actions button { color: var(--histoire-muted, #71717a); }
 </style>

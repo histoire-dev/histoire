@@ -3,8 +3,9 @@ import type { HistoireCatalogVariant } from '@histoire/sdk'
 import type { CanvasRect } from './pan/usePanZoom.js'
 import { BuiltinIcon, HstButton } from '@histoire/controls/vue'
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
-import { useCanvasFrames, useCanvasStore } from '../../composables/canvas-settings.js'
+import { useCanvasFrameBackground, useCanvasFrames, useCanvasStore } from '../../composables/canvas-settings.js'
 import { useContextMenu } from '../../composables/context-menu.js'
+import { getBackgroundStyle } from '../../util/background.js'
 import PulsatingDisc from '../base/PulsatingDisc.vue'
 import { useWorkbenchTestsModel } from '../panes/tests/model.js'
 
@@ -56,10 +57,7 @@ const position = computed(() => ({
   '--histoire-frame-label-height': `${CANVAS_FRAME_LABEL_HEIGHT}px`,
 }))
 const previewStyle = computed(() => ({ width: `${props.width}px`, height: `${props.height}px`, transform: `scale(${scale.value})` }))
-const background = computed(() => {
-  const color = canvas.frameBackgrounds[props.frame.id]?.backgroundColor ?? canvas.frameBackground
-  return color === 'transparent' ? '#fff' : color
-})
+const background = useCanvasFrameBackground(() => props.frame.id)
 const canSelect = computed(() => !props.stale)
 let unregister = () => {}
 
@@ -123,7 +121,7 @@ function openMenu(event: MouseEvent | KeyboardEvent) {
     <button v-if="!single" type="button" class="histoire-frame-label" data-canvas-overlay-occluder :aria-pressed="selected" :disabled="!canSelect" @click="select" @keydown="onKeyDown">
       <span class="histoire-frame-title" :title="variant.title">{{ variant.title }}</span><BuiltinIcon v-if="status === 'error'" icon="error-filled" :size="12" class="is-error" /><PulsatingDisc v-else-if="test?.running" :size="12" /><BuiltinIcon v-else-if="testIcon" :icon="testIcon" :size="12" :class="{ 'is-error': test?.failed || test?.error }" />
     </button>
-    <div class="histoire-frame-body" data-test-id="responsive-preview-bg" :style="{ height: `${height * scale}px`, background }" @click="select">
+    <div class="histoire-frame-body" data-test-id="responsive-preview-bg" :style="{ height: `${height * scale}px`, ...getBackgroundStyle(background) }" @click="select">
       <div class="histoire-frame-content" :style="previewStyle" :aria-busy="status !== 'ready'" :inert="status !== 'ready' || stale ? true : undefined">
         <CanvasReplicaPreview v-if="live" ref="replica" :frame-id="frame.id" :story-id="frame.storyId" :variant-id="frame.variantId" :preview-base="previewBase" :viewport="single ? { width, height } : undefined" @status="updateStatus" />
       </div>

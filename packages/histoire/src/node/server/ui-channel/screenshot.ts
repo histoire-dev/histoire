@@ -40,7 +40,8 @@ function sendScreenshotResult(channel: UiChannelServer, result: UiScreenshotResu
 export function resolveUiScreenshotTarget(ctx: Context, server: ViteDevServer, isActive: () => boolean, epoch: string, request: UiScreenshotRequest, target: UiScreenshotRequest['targets'][number]) {
   const story = ctx.storyFiles.find(file => file.story?.id === target.storyId)?.story
   if (!isActive() || !story || story.docsOnly || !story.variants.some(variant => variant.id === target.variantId)) throw new Error('Screenshot target unavailable')
-  const configuredBackground = ['transparent', '$checkerboard', ...ctx.config.backgroundPresets.map(preset => preset.color)].includes(request.background)
+  const checkerboard = ['$checkerboard', '$checkerboard-dark'].includes(request.background)
+  const configuredBackground = checkerboard || ['transparent', ...ctx.config.backgroundPresets.map(preset => preset.color)].includes(request.background)
   if (!configuredBackground && !/^#(?:[\da-f]{3}|[\da-f]{4}|[\da-f]{6}|[\da-f]{8})$/i.test(request.background)) throw new Error('Screenshot background unavailable')
   const address = server.resolvedUrls?.local[0]
   if (!address) throw new Error('Preview server unavailable')
@@ -57,7 +58,7 @@ export function resolveUiScreenshotTarget(ctx: Context, server: ViteDevServer, i
       globals: ctx.config.preview?.globals ?? {},
       colorScheme: ctx.config.theme.defaultColorScheme === 'auto' ? undefined : ctx.config.theme.defaultColorScheme,
       textDirection: 'ltr' as const,
-      backgroundColor: request.background === '$checkerboard' ? 'transparent' : request.background,
+      backgroundColor: checkerboard ? 'transparent' : request.background,
       isActive,
     },
   }

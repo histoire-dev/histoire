@@ -3,6 +3,7 @@ import type { CanvasStore } from '../../stores/canvas.js'
 import type { WorkbenchComments } from '../../stores/comments.js'
 import { getHistoireTargetKey } from '@histoire/protocol'
 import { onBeforeUnmount, ref } from 'vue'
+import { getBackgroundCapture } from '../../util/background.js'
 import { onUiDisconnect, onUiEvent, sendUiEvent } from '../../util/ui-channel.js'
 import { useCaptureDiscoveryPause } from '../panes/tests/capture.js'
 
@@ -53,7 +54,7 @@ export function useCommentScreenshot(model: WorkbenchComments, frames: CanvasFra
       requestId.value = `comment-${crypto.randomUUID()}`
       owner = draft.id
       try {
-        const accepted = sendUiEvent('histoire:ui:screenshot', { requestId: requestId.value, targets: [{ storyId: draft.storyId, variantId: draft.variantId }], viewport: { width: Math.round(frame.rect.width), height: Math.round(frame.rect.height) }, scale: 1, format: 'png', background: background.checkerboard ? '$checkerboard' : background.backgroundColor })
+        const accepted = sendUiEvent('histoire:ui:screenshot', { requestId: requestId.value, targets: [{ storyId: draft.storyId, variantId: draft.variantId }], viewport: { width: Math.round(frame.rect.width), height: Math.round(frame.rect.height) }, scale: 1, format: 'png', background: getBackgroundCapture(background) })
         if (!accepted) throw new Error('Screenshot unavailable')
         timeout = setTimeout(() => {
           clear(true)

@@ -35,6 +35,8 @@ describe('untrusted result/publication DTOs', () => {
     const state = createEmbedCyclicState()
     snapshot.state = { target: { storyId: 'a:b', variantId: 'c' }, runtimeId: 'runtime', value: state }
     expect(validateHistoireSnapshot(snapshot)).toBe(snapshot)
+    const { checkerboardTheme: _theme, ...legacy } = snapshot.settings
+    expect(validateHistoireSnapshot({ ...snapshot, settings: { ...legacy, checkerboard: true } }).settings.checkerboard).toBe(true)
     expect(() => validateHistoireSnapshot({ ...snapshot, settings: {} })).toThrow()
     expect(() => validateHistoireSourceDescriptor({ ...descriptor, capabilities: {} })).toThrow()
     const story = descriptor.catalog.stories[0]
