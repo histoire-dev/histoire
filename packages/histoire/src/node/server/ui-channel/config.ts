@@ -75,7 +75,7 @@ function validateSetting(patch: ConfigPatch): void {
     requireValid(['auto', 'light', 'dark'].includes(value as string))
   }
   else if (patch.path === 'ui.defaultArrange') {
-    requireValid(['grid', 'list'].includes(value as string))
+    requireValid(['single', 'grid', 'list'].includes(value as string))
   }
   else if (patch.path === 'responsivePresets') {
     requireValid(Array.isArray(value) && value.every((item) => {

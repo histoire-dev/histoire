@@ -19,6 +19,7 @@ export function projectCatalog(stories: readonly CatalogStory[], diagnostics: re
       supportPluginId: story.supportPluginId,
       ...(story.runtimeRevision ? { runtimeRevision: story.runtimeRevision } : {}),
       docsOnly: story.docsOnly,
+      ...(typeof extra?.layoutExplicit === 'boolean' ? { layoutExplicit: extra.layoutExplicit } : {}),
       ...(matrix ? { matrix } : {}),
       ...(story.group == null ? {} : { group: story.group }),
       ...(typeof extra?.icon === 'string' ? { icon: extra.icon } : {}),

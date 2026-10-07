@@ -4,6 +4,7 @@ import { computed, ref, watch } from 'vue'
 import { useCanvasStore } from '../../../composables/canvas-settings.js'
 import { usePresetConfigStore } from '../../../stores/presets-config.js'
 import { histoireConfig } from '../../../util/config.js'
+
 import { useCanvasPreviewSettings } from './session-settings.js'
 import { parseViewportSize, viewportDimensions } from './settings.js'
 import ToolbarPopover from './ToolbarPopover.vue'
@@ -14,17 +15,19 @@ const { snapshot, update } = useCanvasPreviewSettings()
 const canvas = useCanvasStore()
 const presetsOwner = usePresetConfigStore()
 const presets = computed(() => presetsOwner?.responsivePresets.value ?? histoireConfig.responsivePresets ?? [])
-const dimensions = computed(() => viewportDimensions(snapshot.value.settings))
+const displayedSettings = computed(() => canvas.arrangement === 'single' ? { ...snapshot.value.settings, responsiveWidth: canvas.singleViewportSize.width, responsiveHeight: canvas.singleViewportSize.height, rotate: false } : snapshot.value.settings)
+const dimensions = computed(() => viewportDimensions(displayedSettings.value))
 const customWidth = ref('')
 const customHeight = ref('')
 const error = ref('')
-watch(() => snapshot.value.settings, (settings) => {
+watch(displayedSettings, (settings) => {
   customWidth.value = String(settings.responsiveWidth)
   customHeight.value = settings.responsiveHeight === null ? '' : String(settings.responsiveHeight)
 }, { immediate: true })
 
 /** Named preset sizes retain logical orientation and use existing settings persistence. */
 function preset(width: number, height?: number | null) {
+  if (canvas.arrangement === 'single') canvas.singleViewport.mode = 'fixed'
   update({ responsiveWidth: width, responsiveHeight: height ?? null, rotate: false })
   emit('update:open', null)
 }
@@ -33,12 +36,16 @@ function preset(width: number, height?: number | null) {
 function custom() {
   const patch = parseViewportSize(customWidth.value, customHeight.value)
   error.value = patch ? '' : 'Use whole pixels from 1 to 16384.'
-  if (patch) update(patch)
+  if (patch) {
+    if (canvas.arrangement === 'single') canvas.singleViewport.mode = 'fixed'
+    update(patch)
+  }
 }
 
 /** Responsive option fills available canvas width using bounded current root dimensions. */
 function responsive() {
-  update({ responsiveWidth: Math.max(1, Math.round(canvas.viewport.width - canvas.inspectorWidth - 64)), responsiveHeight: null, rotate: false })
+  if (canvas.arrangement === 'single') canvas.singleViewport.mode = 'responsive'
+  else update({ responsiveWidth: Math.max(1, Math.round(canvas.viewport.width - canvas.inspectorWidth - 64)), responsiveHeight: null, rotate: false })
   emit('update:open', null)
 }
 </script>
@@ -51,10 +58,10 @@ function responsive() {
     <p class="popover-title">
       Viewport
     </p>
-    <HstButton color="flat" class="popover-row" @click="responsive">
+    <HstButton color="flat" class="popover-row" :aria-pressed="canvas.arrangement === 'single' && canvas.singleViewport.mode === 'responsive'" @click="responsive">
       <BuiltinIcon icon="arrows-horizontal" :size="16" />Responsive<span class="popover-meta">fill</span>
     </HstButton>
-    <HstButton v-for="(option, index) in presets" :key="index" color="flat" class="popover-row" :aria-pressed="snapshot.settings.responsiveWidth === option.width && snapshot.settings.responsiveHeight === (option.height ?? null)" @click="preset(option.width, option.height)">
+    <HstButton v-for="(option, index) in presets" :key="index" color="flat" class="popover-row" :aria-pressed="(canvas.arrangement !== 'single' || canvas.singleViewport.mode === 'fixed') && snapshot.settings.responsiveWidth === option.width && snapshot.settings.responsiveHeight === (option.height ?? null)" @click="preset(option.width, option.height)">
       <BuiltinIcon :icon="option.width < 500 ? 'mobile' : option.width < 900 ? 'tablet' : 'screen'" :size="16" /><span>{{ option.label }}</span><span class="popover-meta">{{ option.width }}<template v-if="option.height"> × {{ option.height }}</template></span>
     </HstButton>
     <div class="popover-divider" />

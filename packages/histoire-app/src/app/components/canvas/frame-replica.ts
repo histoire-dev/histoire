@@ -6,9 +6,11 @@ import { createStandaloneSession } from '../../standalone/session.js'
 export function createCanvasReplicaSession(canonical: HistoireSession, previewBase: string, options: {
   /** Matrix flag belongs to isolated runtime mount; source URL stays strict. */
   matrix?: boolean
+  /** Native Single documents retain browser scrolling inside fixed dimensions. */
+  nativeScroll?: boolean
 } = {}): HistoireSession {
   const original = getHistoireSessionDescriptor(canonical)
-  return createStandaloneSession({ url: previewBase, matrix: options.matrix, loadDescriptor: async () => original, subscribe(listener) {
+  return createStandaloneSession({ url: previewBase, matrix: options.matrix, nativeScroll: options.nativeScroll, loadDescriptor: async () => original, subscribe(listener) {
     const initial = canonical.getSnapshot()
     let generation = JSON.stringify([initial.status, initial.source])
     return canonical.subscribe((snapshot) => {

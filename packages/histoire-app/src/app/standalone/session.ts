@@ -15,6 +15,8 @@ export function createStandaloneSession(options: {
   url: string
   /** Internal passive matrix runtime mode; never part of public source book URL. */
   matrix?: boolean
+  /** Internal document presentation flag, separate from public source identity. */
+  nativeScroll?: boolean
   /** First-party virtual reader; never public descriptor discovery. */
   loadDescriptor: () => Promise<HistoireSourceDescriptor>
   /** Completed Vite publication listener, absent in static books. */
@@ -22,6 +24,7 @@ export function createStandaloneSession(options: {
 }) {
   const runtimeBase = new URL(options.url)
   if (options.matrix) runtimeBase.searchParams.set('matrix', 'true')
+  if (options.nativeScroll) runtimeBase.searchParams.set('nativeScroll', 'true')
   return createHistoireSessionWithAdapters({ url: options.url }, {
     connect: async ({ signal }) => createEmbedSourceConnection({ url: options.url, descriptor: await options.loadDescriptor(), actionBase: '__histoire/local/', signal, subscribe: options.subscribe }),
     mount: context => mountLocalHistoireSurface(context, runtimeBase.href, true),

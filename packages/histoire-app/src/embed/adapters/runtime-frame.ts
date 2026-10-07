@@ -138,6 +138,7 @@ export function createEmbedRuntimeFrame(context: EmbedSurfaceContext, layout: 's
     url.searchParams.set('selectionVersion', String(owner.selectionVersion))
     url.searchParams.set('embed', 'true')
     if (context.standalone) url.searchParams.set('standalone', 'true')
+    if (context.standalone && base.searchParams.get('nativeScroll') === 'true') url.searchParams.set('nativeScroll', 'true')
     if (context.standalone && base.searchParams.get('matrix') === 'true') url.searchParams.set('matrix', 'true')
     iframe.src = url.href
     if (!iframe.isConnected) context.container.append(iframe)

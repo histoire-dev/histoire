@@ -79,6 +79,21 @@ describe('canvas transforms', () => {
 })
 
 describe('canvas pointer pan', () => {
+  it('disables native document gestures while still releasing previous pointer capture', () => {
+    let enabled = true
+    const target = { setPointerCapture: vi.fn(), hasPointerCapture: () => true, releasePointerCapture: vi.fn() } as unknown as Element
+    const pan = usePointerPan({ enabled: () => enabled, getTool: () => 'pan', getSpace: () => false, getOffset: () => ({ x: 0, y: 0 }), setOffset: vi.fn() })
+    const event = { ...pointer(7, 0, 0, 0), currentTarget: target } as PointerEvent
+    expect(pan.onPointerDown(event)).toBe(true)
+    enabled = false
+    pan.release()
+    expect(pan.isPanning.value).toBe(false)
+    expect(target.releasePointerCapture).toHaveBeenCalledWith(7)
+    const middle = { ...pointer(8, 1, 0, 0), currentTarget: target } as PointerEvent
+    expect(pan.onPointerDown(middle)).toBe(false)
+    expect(middle.preventDefault).not.toHaveBeenCalled()
+  })
+
   it.each([
     { tool: 'select', space: true, button: 0 },
     { tool: 'select', space: false, button: 1 },

@@ -7,6 +7,7 @@ import { useCanvasFrames, useCanvasStore } from '../../composables/canvas-settin
 import { useContextMenu } from '../../composables/context-menu.js'
 import PulsatingDisc from '../base/PulsatingDisc.vue'
 import { useWorkbenchTestsModel } from '../panes/tests/model.js'
+
 import CanvasReplicaPreview from './CanvasReplicaPreview.vue'
 import { CANVAS_FRAME_LABEL_HEIGHT, type CanvasFrameLayout } from './frame-layout.js'
 import { isFrameMenuShortcut, openFrameMenu } from './frame-menu.js'
@@ -14,6 +15,8 @@ import { isFrameMenuShortcut, openFrameMenu } from './frame-menu.js'
 const props = defineProps<{
   /** Complete canvas target and logical bounds. */
   frame: CanvasFrameLayout
+  /** Single uses a scaled native document without camera positioning or frame labels. */
+  presentation?: 'frame' | 'single'
   /** Complete chrome and preview geometry at selection's candidate zoom. */
   fitBounds?: (zoom: number) => CanvasRect
   /** Collected variant display metadata. */
@@ -44,13 +47,15 @@ const testIcon = computed(() => test.value?.failed || test.value?.error ? 'error
 const replica = ref<{ retry: () => Promise<void> }>()
 const status = ref<'loading' | 'ready' | 'error'>('loading')
 const error = ref<unknown>()
+const single = computed(() => props.presentation === 'single')
+const scale = computed(() => canvas.effectiveZoom)
 const position = computed(() => ({
-  'left': `${props.frame.x * canvas.effectiveZoom + canvas.panOffset.x}px`,
-  'top': `${props.frame.y * canvas.effectiveZoom + canvas.panOffset.y}px`,
-  'width': `${props.width * canvas.effectiveZoom}px`,
+  'left': single.value ? undefined : `${props.frame.x * canvas.effectiveZoom + canvas.panOffset.x}px`,
+  'top': single.value ? undefined : `${props.frame.y * canvas.effectiveZoom + canvas.panOffset.y}px`,
+  'width': `${props.width * scale.value}px`,
   '--histoire-frame-label-height': `${CANVAS_FRAME_LABEL_HEIGHT}px`,
 }))
-const previewStyle = computed(() => ({ width: `${props.width}px`, height: `${props.height}px`, transform: `scale(${canvas.effectiveZoom})` }))
+const previewStyle = computed(() => ({ width: `${props.width}px`, height: `${props.height}px`, transform: `scale(${scale.value})` }))
 const background = computed(() => {
   const color = canvas.frameBackgrounds[props.frame.id]?.backgroundColor ?? canvas.frameBackground
   return color === 'transparent' ? '#fff' : color
@@ -62,7 +67,7 @@ let unregister = () => {}
 function previewRect() {
   return {
     x: props.frame.x,
-    y: props.frame.y + CANVAS_FRAME_LABEL_HEIGHT / canvas.effectiveZoom,
+    y: props.frame.y + (single.value ? 0 : CANVAS_FRAME_LABEL_HEIGHT / scale.value),
     width: props.width,
     height: props.height,
   }
@@ -114,22 +119,22 @@ function openMenu(event: MouseEvent | KeyboardEvent) {
 </script>
 
 <template>
-  <section class="histoire-canvas-frame" :class="{ 'is-selected': selected, 'is-stale': stale, 'is-highlighted': highlighted, 'is-dimmed': dimmed }" :style="position" :data-frame-id="frame.id" @contextmenu="openMenu">
-    <button type="button" class="histoire-frame-label" data-canvas-overlay-occluder :aria-pressed="selected" :disabled="!canSelect" @click="select" @keydown="onKeyDown">
+  <section class="histoire-canvas-frame" :class="{ 'is-single': single, 'is-selected': selected, 'is-stale': stale, 'is-highlighted': highlighted, 'is-dimmed': dimmed }" :style="position" :data-frame-id="frame.id" @contextmenu="openMenu">
+    <button v-if="!single" type="button" class="histoire-frame-label" data-canvas-overlay-occluder :aria-pressed="selected" :disabled="!canSelect" @click="select" @keydown="onKeyDown">
       <span class="histoire-frame-title" :title="variant.title">{{ variant.title }}</span><BuiltinIcon v-if="status === 'error'" icon="error-filled" :size="12" class="is-error" /><PulsatingDisc v-else-if="test?.running" :size="12" /><BuiltinIcon v-else-if="testIcon" :icon="testIcon" :size="12" :class="{ 'is-error': test?.failed || test?.error }" />
     </button>
-    <div class="histoire-frame-body" data-test-id="responsive-preview-bg" :style="{ height: `${height * canvas.effectiveZoom}px`, background }" @click="select">
+    <div class="histoire-frame-body" data-test-id="responsive-preview-bg" :style="{ height: `${height * scale}px`, background }" @click="select">
       <div class="histoire-frame-content" :style="previewStyle" :aria-busy="status !== 'ready'" :inert="status !== 'ready' || stale ? true : undefined">
-        <CanvasReplicaPreview v-if="live" ref="replica" :frame-id="frame.id" :story-id="frame.storyId" :variant-id="frame.variantId" :preview-base="previewBase" @status="updateStatus" />
+        <CanvasReplicaPreview v-if="live" ref="replica" :frame-id="frame.id" :story-id="frame.storyId" :variant-id="frame.variantId" :preview-base="previewBase" :viewport="single ? { width, height } : undefined" @status="updateStatus" />
       </div>
       <div v-if="!live" class="histoire-frame-placeholder">
         {{ variant.title }}
       </div>
       <div v-else-if="status === 'loading'" class="histoire-frame-placeholder">
-        Loading preview…
+        Loading variant…
       </div>
       <div v-else-if="status === 'error'" class="histoire-frame-error" role="alert">
-        <span>{{ error instanceof Error ? error.message : 'Preview unavailable' }}</span><HstButton color="default" @click.stop="replica?.retry()">
+        <span>{{ error instanceof Error ? error.message : 'Variant unavailable' }}</span><HstButton color="default" @click.stop="replica?.retry()">
           Retry
         </HstButton>
       </div>
@@ -141,6 +146,9 @@ function openMenu(event: MouseEvent | KeyboardEvent) {
 
 <style scoped>
 .histoire-canvas-frame { position: absolute; min-width: 0; }
+.histoire-canvas-frame.is-single { position: relative; overflow: hidden; border-radius: 7px; }
+.is-single .histoire-frame-body { border: 0; }
+.is-single .histoire-frame-body::after { display: none; }
 .is-dimmed:not(.is-selected) { opacity: .35; }
 .is-dimmed.is-selected .histoire-frame-content { opacity: .35; }
 /* Frame labels keep selection semantics without shared button pressed surfaces. */

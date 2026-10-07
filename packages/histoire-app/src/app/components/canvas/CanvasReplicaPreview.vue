@@ -18,6 +18,8 @@ const props = defineProps<{
   variantId: string
   /** Configured standalone source base, independent of route. */
   previewBase: string
+  /** Native Single dimensions, already resolved for orientation. */
+  viewport?: { width: number, height: number }
   /** Matrix cell prop projection; never writes into canonical session. */
   propsOverride?: Record<string, unknown>
 }>()
@@ -47,7 +49,7 @@ const nextPropsRequestId = createCanvasPropsRequestId()
 function settings() {
   const value = snapshot.value.settings
   const background = store.frameBackgrounds[props.frameId]
-  return { ...value, ...(background ?? {}) }
+  return { ...value, ...(background ?? {}), ...(props.viewport ? { responsiveWidth: props.viewport.width, responsiveHeight: props.viewport.height, rotate: false } : {}) }
 }
 
 /** Publish actual iframe identity for finite measure/comment requests. */
@@ -126,7 +128,7 @@ async function start() {
     replica = undefined
     if (previous) await previous.dispose()
     if (closing || version !== generation || !container.value) return
-    const current = createCanvasReplicaSession(canonical, props.previewBase, { matrix: !!props.propsOverride })
+    const current = createCanvasReplicaSession(canonical, props.previewBase, { matrix: !!props.propsOverride, nativeScroll: !!props.viewport })
     replica = current
     await current.connect()
     if (closing || version !== generation) return

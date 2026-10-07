@@ -40,6 +40,7 @@ export function createCanvasViewportEvents(options: {
 }) {
   /** Wheel pans normally; modifier zoom stays anchored at local cursor position. */
   function onWheel(event: WheelEvent): void {
+    if (options.canvas.arrangement === 'single' && !event.ctrlKey && !event.metaKey) return
     const viewport = options.getViewport()
     if (!viewport) return
     event.preventDefault()

@@ -88,8 +88,12 @@ watch(() => props.model.draft.value?.id, () => {
 onMounted(() => {
   resize()
   window.addEventListener('resize', resize)
+  window.addEventListener('scroll', resize, true)
 })
-onBeforeUnmount(() => window.removeEventListener('resize', resize))
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', resize)
+  window.removeEventListener('scroll', resize, true)
+})
 </script>
 
 <template>

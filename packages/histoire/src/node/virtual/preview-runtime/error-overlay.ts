@@ -58,6 +58,8 @@ function createRuntimeErrorBlock(message) {
 }
 
 window.addEventListener('error', event => {
+  // Browsers defer resize notifications to another frame; this is not a story exception.
+  if (event.error == null && ['ResizeObserver loop completed with undelivered notifications.', 'ResizeObserver loop limit exceeded'].includes(event.message)) return
   renderRuntimeError(event.error ?? event.message)
 })
 

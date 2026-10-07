@@ -35,6 +35,21 @@ describe('completed runtime catalog publication', () => {
     off()
   })
 
+  it('projects layout provenance without mutating old completed snapshots', async () => {
+    const file = createMcpStory(fixture.root)
+    file.story.layout = { type: 'single' }
+    file.story.layoutExplicit = true
+    const ctx = createMcpContext(fixture.root, [file])
+    const catalog = createRuntimeCatalog({ ...MCP_PROJECT_OPTIONS, root: fixture.root })
+    await catalog.publish(ctx)
+    const first = catalog.current.catalog.stories[0]
+    expect(first).toMatchObject({ layout: { type: 'single' }, layoutExplicit: true })
+    file.story.layoutExplicit = false
+    await catalog.publish(ctx)
+    expect(catalog.current.catalog.stories[0].layoutExplicit).toBe(false)
+    expect(first.layoutExplicit).toBe(true)
+  })
+
   it('distinguishes successful empty, partial and failed batches and rejects ambiguous exact IDs', async () => {
     const files = [createMcpStory(fixture.root, 'a', 'a.js'), createMcpStory(fixture.root, 'b', 'b.js')]
     const ctx = createMcpContext(fixture.root, files)

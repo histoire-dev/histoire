@@ -21,7 +21,7 @@ import ZoomMenu from './ZoomMenu.vue'
 /** Optional tools arrive through named slots without coupling toolbar to dev services. */
 defineProps<{
   /** Active arrangement from standalone route/preferences. */
-  arrange: 'grid' | 'list' | 'matrix'
+  arrange: 'single' | 'grid' | 'list' | 'matrix'
   /** Collected runtime supports exact matrix cells. */
   matrixAvailable?: boolean
   /** Matching current-story frame count. */
@@ -29,7 +29,7 @@ defineProps<{
   /** Independent reveal cursor position. */
   matchPosition?: number
 }>()
-const emit = defineEmits<{ arrange: [value: 'grid' | 'list' | 'matrix'], editPresets: [], previousMatch: [], nextMatch: [] }>()
+const emit = defineEmits<{ arrange: [value: 'single' | 'grid' | 'list' | 'matrix'], editPresets: [], previousMatch: [], nextMatch: [] }>()
 const canvas = useCanvasStore()
 const frames = useCanvasFrames()
 const { snapshot, update } = useCanvasPreviewSettings()
@@ -44,6 +44,18 @@ const disposers: (() => void)[] = []
 /** Extension slots share same open identity as viewport, zoom and background. */
 function setOpen(value: string | null) {
   open.value = value
+}
+
+/** Rotation fixes responsive Single dimensions before swapping orientation. */
+function rotateViewport(): void {
+  if (canvas.arrangement === 'single' && canvas.singleViewport.mode === 'responsive') {
+    const size = canvas.singleViewportSize
+    canvas.singleViewport.mode = 'fixed'
+    update({ responsiveWidth: size.width, responsiveHeight: size.height, rotate: true })
+  }
+  else {
+    update({ rotate: !snapshot.value.settings.rotate })
+  }
 }
 
 /** Toolbar context actions use selected frame identity without changing selection. */
@@ -86,7 +98,7 @@ onBeforeUnmount(() => disposers.forEach(dispose => dispose()))
     </BaseOverflowToolbarItem>
     <BaseOverflowToolbarItem id="viewport" separator-before>
       <ViewportMenu v-model:open="open" @edit-presets="emit('editPresets')" />
-      <ToolbarButton label="Rotate viewport" icon="rotate" :pressed="snapshot.settings.rotate" @click="update({ rotate: !snapshot.settings.rotate })" />
+      <ToolbarButton label="Rotate viewport" icon="rotate" :pressed="snapshot.settings.rotate" @click="rotateViewport" />
     </BaseOverflowToolbarItem>
     <BaseOverflowToolbarItem id="zoom" separator-before>
       <ToolbarButton label="Zoom out" icon="zoom-out" @click="canvas.setZoom(canvas.effectiveZoom / 1.25)" />

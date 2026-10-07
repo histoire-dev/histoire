@@ -48,6 +48,8 @@ export interface HistoireCatalogStory {
   docsOnly: boolean
   /** Preview layout advertised by source. */
   layout?: { type: 'single' | 'grid', iframe?: boolean }
+  /** Explicit layout declaration, absent on older sources. */
+  layoutExplicit?: boolean
   /** Finite prop domains for two-axis preview matrices. */
   matrix?: HistoireMatrixHint
   /** Support plugin identity without loader. */

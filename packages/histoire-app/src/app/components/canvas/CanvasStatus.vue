@@ -11,6 +11,7 @@ defineProps<{
 const snapshot = useHistoireSnapshot()
 const canvas = useCanvasStore()
 const size = computed(() => {
+  if (canvas.arrangement === 'single') return `${canvas.singleViewportSize.width} × ${canvas.singleViewportSize.height}`
   const value = snapshot.value.settings
   return value.rotate ? `${value.responsiveHeight ?? 'Auto'} × ${value.responsiveWidth}` : `${value.responsiveWidth} × ${value.responsiveHeight ?? 'Auto'}`
 })

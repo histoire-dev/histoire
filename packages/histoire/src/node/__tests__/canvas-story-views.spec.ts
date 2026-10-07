@@ -16,6 +16,7 @@ function createBinding(initialStory = 'first', initialView: { baseArrangement?: 
     query: () => routeArrangement.value,
     storyId: () => storyId.value,
     storyLayout: () => baseArrangement.value,
+    layoutExplicit: () => true,
     localDefault: () => undefined,
     projectDefault: () => undefined,
     syncZoom: () => syncZoom.value,
@@ -38,10 +39,32 @@ function createBinding(initialStory = 'first', initialView: { baseArrangement?: 
 
 /** Create a plain view value for arrangement-precedence tests. */
 function view(arrangement: CanvasArrangement): CanvasViewSnapshot {
-  return { arrangement, zoomByArrange: { grid: 1, list: 0.5, matrix: 'fit' }, panOffset: { x: 18, y: -24 } }
+  return { arrangement, zoomByArrange: { single: 'fit', grid: 1, list: 0.5, matrix: 'fit' }, panOffset: { x: 18, y: -24 } }
 }
 
 describe('story canvas views', () => {
+  it('restores Single zoom per story and shares it only while synchronization is enabled', async () => {
+    const state = createBinding('first', { baseArrangement: 'single' })
+    state.canvas.setArrangement('single')
+    state.canvas.setZoom(0.5)
+    state.storyId.value = 'second'
+    await nextTick()
+    expect(state.canvas.zoom).toBe('fit')
+    state.canvas.setZoom(0.75)
+    state.storyId.value = 'first'
+    await nextTick()
+    expect(state.canvas.zoom).toBe(0.5)
+    state.syncZoom.value = true
+    state.storyId.value = 'second'
+    await nextTick()
+    expect(state.canvas.zoom).toBe(0.5)
+    state.canvas.setZoom(2)
+    expect(state.views.getShared()?.zoomByArrange.single).toBe(2)
+    state.syncZoom.value = false
+    expect(state.canvas.zoom).toBe(0.75)
+    state.binding.dispose()
+  })
+
   it('restores independent zoom and camera position when returning to a story', async () => {
     const state = createBinding()
     state.canvas.setZoom(2)

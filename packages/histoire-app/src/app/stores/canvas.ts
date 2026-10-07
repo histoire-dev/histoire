@@ -1,13 +1,20 @@
 import type { CanvasFrameLayout } from '../components/canvas/frame-layout.js'
 import type { CanvasFitOptions, CanvasPoint, CanvasRect, CanvasSize } from '../components/canvas/pan/usePanZoom.js'
+import type { SingleViewportState } from '../components/canvas/single-viewport.js'
+import type { SingleZoomListener } from '../components/canvas/single-zoom.js'
 import { reactive } from 'vue'
 import { canvasContentRect, clampZoom, fitCanvas, zoomAroundPoint } from '../components/canvas/pan/usePanZoom.js'
+import { fitSingleViewport } from '../components/canvas/single-zoom.js'
+
+import { readCanvasPreferences } from './canvas-preferences.js'
+
+export { getCanvasStorage } from './canvas-preferences.js'
 
 /** Persistent canvas pointer mode. */
 export type CanvasTool = 'select' | 'pan' | 'measure'
 
 /** Canvas arrangements each retain their own local zoom preference. */
-export type CanvasArrangement = 'grid' | 'list' | 'matrix'
+export type CanvasArrangement = 'single' | 'grid' | 'list' | 'matrix'
 
 /** Logical scale or automatic extent fitting. */
 export type CanvasZoom = number | 'fit'
@@ -27,7 +34,7 @@ export interface CanvasViewSnapshot {
 
 /** Persistent canvas preferences; per-story transforms use workbench memory. */
 export interface CanvasPreferences {
-  /** Independent zoom preference for Grid, List, and Matrix. */
+  /** Independent zoom preference for each arrangement. */
   zoomByArrange: CanvasZoomByArrange
   /** Persistent pointer mode. */
   tool: CanvasTool
@@ -46,48 +53,17 @@ export interface CanvasStorage {
 /** Fixed canvas chrome belongs to layout geometry, never saved user preferences. */
 export type CanvasContentInsets = Pick<CanvasFitOptions, 'topInset' | 'bottomInset'>
 
-const CANVAS_ARRANGEMENTS: readonly CanvasArrangement[] = ['grid', 'list', 'matrix']
-
-/** Converts persisted input into a supported canvas zoom preference. */
-function readZoom(value: unknown): CanvasZoom | undefined {
-  if (value === 'fit') return value
-  return typeof value === 'number' && Number.isFinite(value) ? clampZoom(value) : undefined
-}
-
-/** Creates independent default zoom preferences rather than sharing mutable state. */
-function defaultZoomByArrange(zoom: CanvasZoom = 'fit'): CanvasZoomByArrange {
-  return { grid: zoom, list: zoom, matrix: zoom }
-}
-
-/** Storage getter itself may throw in sandboxed or private browsing contexts. */
-export function getCanvasStorage(window?: Pick<Window, 'localStorage'>): CanvasStorage | undefined {
-  try {
-    return window?.localStorage
-  }
-  catch { return undefined }
-}
-
-/** Validate saved values without trusting obsolete or corrupt local preferences. */
-function readPreferences(storage?: CanvasStorage): CanvasPreferences {
-  const defaults: CanvasPreferences = { zoomByArrange: defaultZoomByArrange(), tool: 'select', frameBackground: 'transparent' }
-  try {
-    const saved = JSON.parse(storage?.getItem('_histoire-ui-canvas') ?? 'null')
-    if (!saved || typeof saved !== 'object') return defaults
-    // Legacy measurement could coexist with Pan; preserve its intent as the exclusive tool.
-    const tool: CanvasTool = saved.tool === 'measure' || saved.measure === true ? 'measure' : saved.tool === 'pan' ? 'pan' : 'select'
-    // Legacy books saved one zoom. Fan it out so every arrangement opens at the familiar scale.
-    const legacyZoom = readZoom(saved.zoom) ?? 'fit'
-    const savedZooms = saved.zoomByArrange && typeof saved.zoomByArrange === 'object' ? saved.zoomByArrange : {}
-    const zoomByArrange = Object.fromEntries(CANVAS_ARRANGEMENTS.map(arrangement => [arrangement, readZoom(savedZooms[arrangement]) ?? legacyZoom])) as CanvasZoomByArrange
-    return { zoomByArrange, tool, frameBackground: typeof saved.frameBackground === 'string' ? saved.frameBackground : defaults.frameBackground }
-  }
-  catch { return defaults }
-}
-
 /** Create independent canvas state; nearest shell provides instance to its tools. */
-export function createCanvasStore(options: { storage?: CanvasStorage } = {}) {
-  const preferences = readPreferences(options.storage)
-  const state = reactive({ ...preferences, arrangement: 'grid' as CanvasArrangement, zoom: preferences.zoomByArrange.grid, effectiveZoom: preferences.zoomByArrange.grid === 'fit' ? 1 : preferences.zoomByArrange.grid, panOffset: { x: 32, y: 32 }, selectedFrame: null as string | null, viewport: { width: 0, height: 0 }, bounds: { x: 0, y: 0, width: 0, height: 0 }, inspectorWidth: 0, contentInsets: { topInset: 0, bottomInset: 0 }, frameBackgrounds: {} as Record<string, { backgroundColor: string, checkerboard: boolean }>, panning: false })
+export function createCanvasStore(options: { storage?: CanvasStorage, singleViewport?: SingleViewportState } = {}) {
+  const preferences = readCanvasPreferences(options.storage)
+  const state = reactive({ ...preferences, singleViewport: options.singleViewport ?? { mode: 'responsive' as const }, singleViewportSize: { width: 1, height: 1 }, arrangement: 'grid' as CanvasArrangement, zoom: preferences.zoomByArrange.grid, effectiveZoom: typeof preferences.zoomByArrange.grid === 'number' ? preferences.zoomByArrange.grid : 1, panOffset: { x: 32, y: 32 }, selectedFrame: null as string | null, viewport: { width: 0, height: 0 }, bounds: { x: 0, y: 0, width: 0, height: 0 }, inspectorWidth: 0, contentInsets: { topInset: 0, bottomInset: 0 }, frameBackgrounds: {} as Record<string, { backgroundColor: string, checkerboard: boolean }>, panning: false })
+  let singleArea: CanvasSize = { width: 0, height: 0 }
+  const singleZoomListeners = new Set<SingleZoomListener>()
+  /** Notify native scroll ownership before replacing the rendered scale. */
+  function applySingleZoom(zoom: number, point?: CanvasPoint, fit = false) {
+    state.effectiveZoom = zoom
+    singleZoomListeners.forEach(listener => listener(zoom, point, fit))
+  }
   /** Share unobstructed geometry between fitting, zoom anchors and selection reveal. */
   function contentRect() {
     return canvasContentRect(state.viewport, { inspectorWidth: state.inspectorWidth, ...state.contentInsets })
@@ -95,7 +71,7 @@ export function createCanvasStore(options: { storage?: CanvasStorage } = {}) {
   /** Persist only contract preferences; failures leave usable current-session state. */
   function save() {
     try {
-      options.storage?.setItem('_histoire-ui-canvas', JSON.stringify({ zoomByArrange: state.zoomByArrange, tool: state.tool, frameBackground: state.frameBackground }))
+      options.storage?.setItem('_histoire-ui-canvas', JSON.stringify({ version: 3, zoomByArrange: state.zoomByArrange, tool: state.tool, frameBackground: state.frameBackground }))
     }
     catch { /* Private browsing storage can be unavailable. */ }
   }
@@ -110,12 +86,17 @@ export function createCanvasStore(options: { storage?: CanvasStorage } = {}) {
     state.arrangement = arrangement
     const zoom = state.zoomByArrange[arrangement]
     state.zoom = zoom
-    if (zoom !== 'fit') state.effectiveZoom = zoom
+    if (typeof zoom === 'number') state.effectiveZoom = zoom
+    else if (arrangement === 'single') fit()
     save()
   }
   /** Recompute transform when fit is selected or geometry changes. */
   function fit() {
     setActiveZoom('fit')
+    if (state.arrangement === 'single') {
+      if (singleArea.width && singleArea.height) applySingleZoom(fitSingleViewport(singleArea, state.singleViewportSize), undefined, true)
+      return save()
+    }
     // Setup runs before ResizeObserver measures; fitting an empty viewport would lock at 10%.
     const content = contentRect()
     if (!content.width || !content.height) return save()
@@ -127,6 +108,12 @@ export function createCanvasStore(options: { storage?: CanvasStorage } = {}) {
   /** Switch zoom around current visible point rather than jumping canvas origin. */
   function setZoom(value: number | 'fit', point?: CanvasPoint) {
     if (value === 'fit') return fit()
+    if (state.arrangement === 'single') {
+      const zoom = clampZoom(value)
+      setActiveZoom(zoom)
+      applySingleZoom(zoom, point)
+      return save()
+    }
     const content = contentRect()
     const transform = zoomAroundPoint(state.effectiveZoom, value, state.panOffset, point ?? { x: content.x + content.width / 2, y: content.y + content.height / 2 })
     setActiveZoom(transform.zoom)
@@ -134,11 +121,17 @@ export function createCanvasStore(options: { storage?: CanvasStorage } = {}) {
     state.panOffset = transform.offset
     save()
   }
+  /** Publish unscaled Single geometry; numeric zoom stays fixed during resizing. */
+  function setSingleGeometry(area: CanvasSize, size: CanvasSize) {
+    singleArea = area
+    state.singleViewportSize = size
+    if (state.arrangement === 'single' && state.zoom === 'fit') fit()
+  }
   /** Geometry comes from canvas adapter, never transformed DOM dimensions. */
   function setGeometry(viewport: CanvasSize, bounds: CanvasRect, inspectorWidth = 0, insets: CanvasContentInsets = {}) {
     const nextInsets = { topInset: Math.max(0, insets.topInset ?? 0), bottomInset: Math.max(0, insets.bottomInset ?? 0) }
     // Moving between arrangements moves their content origin while keeping explicit zoom and pan.
-    if (state.zoom !== 'fit') state.panOffset = { x: state.panOffset.x, y: state.panOffset.y + nextInsets.topInset - state.contentInsets.topInset }
+    if (state.arrangement !== 'single' && typeof state.zoom === 'number' && nextInsets.topInset !== state.contentInsets.topInset) state.panOffset = { x: state.panOffset.x, y: state.panOffset.y + nextInsets.topInset - state.contentInsets.topInset }
     state.viewport = viewport
     state.bounds = bounds
     state.inspectorWidth = inspectorWidth
@@ -148,11 +141,13 @@ export function createCanvasStore(options: { storage?: CanvasStorage } = {}) {
   }
   /** Shift canvas without changing selected variant. */
   function panBy(delta: CanvasPoint) {
+    if (state.arrangement === 'single') return
     state.panOffset = { x: state.panOffset.x + delta.x, y: state.panOffset.y + delta.y }
     setActiveZoom(state.effectiveZoom)
   }
   /** Update drag-owned translation while retaining the active arrangement's effective scale. */
   function setPanOffset(offset: CanvasPoint) {
+    if (state.arrangement === 'single') return
     state.panOffset = offset
     setActiveZoom(state.effectiveZoom)
   }
@@ -165,11 +160,18 @@ export function createCanvasStore(options: { storage?: CanvasStorage } = {}) {
     state.zoomByArrange = { ...snapshot.zoomByArrange }
     state.arrangement = snapshot.arrangement
     state.zoom = state.zoomByArrange[snapshot.arrangement]
-    if (state.zoom !== 'fit') state.effectiveZoom = state.zoom
+    if (typeof state.zoom === 'number') {
+      if (state.arrangement === 'single') applySingleZoom(state.zoom)
+      else state.effectiveZoom = state.zoom
+    }
+    else if (state.arrangement === 'single') {
+      fit()
+    }
     state.panOffset = { ...snapshot.panOffset }
   }
   /** Reveal logical frame bounds without changing canonical frame selection. */
   function revealFrame(frame: CanvasFrameLayout) {
+    if (state.arrangement === 'single') return
     const content = contentRect()
     if (!content.width || !content.height) return
     const zoom = state.effectiveZoom
@@ -196,6 +198,7 @@ export function createCanvasStore(options: { storage?: CanvasStorage } = {}) {
   }
   /** Fit selection and fixed chrome using the same available viewport as canvas Fit. */
   function zoomToFrame(frame: CanvasRect | ((zoom: number) => CanvasRect)) {
+    if (state.arrangement === 'single') return fit()
     const content = contentRect()
     if (!content.width || !content.height) return
     const options = { padding: 32, inspectorWidth: state.inspectorWidth, ...state.contentInsets }
@@ -213,7 +216,14 @@ export function createCanvasStore(options: { storage?: CanvasStorage } = {}) {
     state.panOffset = transform.offset
     save()
   }
-  return Object.assign(state, { setZoom, setArrangement, fit, setGeometry, panBy, setPanOffset, snapshotView, restoreView, revealFrame, selectFrame, focusFrame, zoomToFrame,
+  return Object.assign(state, { setZoom, setArrangement, fit, setGeometry, setSingleGeometry, panBy, setPanOffset, snapshotView, restoreView, revealFrame, selectFrame, focusFrame, zoomToFrame,
+    /** Subscribe one mounted native scroll owner; cleanup retires its captured element. */
+    onSingleZoom(listener: SingleZoomListener): () => void {
+      singleZoomListeners.add(listener)
+      return () => {
+        singleZoomListeners.delete(listener)
+      }
+    },
     /** Choose persistent pointer mode. */
     setTool(tool: CanvasPreferences['tool']) {
       state.tool = tool

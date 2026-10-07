@@ -36,7 +36,7 @@ function selection() {
     <HstButton color="flat" class="popover-row" :aria-pressed="canvas.zoom === 'fit'" @click="zoom('fit')">
       Fit to canvas<span class="popover-meta">{{ shortcuts?.hint('canvas.fit') || '⇧1' }}</span>
     </HstButton>
-    <HstButton color="flat" class="popover-row" :disabled="!canvas.selectedFrame" @click="selection">
+    <HstButton color="flat" class="popover-row" :disabled="!canvas.selectedFrame" :aria-pressed="canvas.arrangement === 'single' && canvas.zoom === 'fit'" @click="selection">
       Zoom to selection<span class="popover-meta">{{ shortcuts?.hint('canvas.selection') || '⇧2' }}</span>
     </HstButton>
     <HstButton v-for="value in [.25, .5, 1, 2]" :key="value" color="flat" class="popover-row" :aria-pressed="canvas.zoom === value" @click="zoom(value)">

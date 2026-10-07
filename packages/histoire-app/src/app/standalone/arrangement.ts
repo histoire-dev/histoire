@@ -2,8 +2,9 @@ import type { StoryCanvasViews } from '../stores/story-canvas-views.js'
 import { computed } from 'vue'
 
 /** Preserve story layout defaults on legacy URLs, with explicit URL overrides first. */
-export function resolveWorkbenchArrangement(query: unknown, storyLayout: unknown, localDefault?: 'grid' | 'list', projectDefault?: 'grid' | 'list'): 'grid' | 'list' | 'matrix' {
-  if (query === 'grid' || query === 'list' || query === 'matrix') return query
+export function resolveWorkbenchArrangement(query: unknown, storyLayout: unknown, localDefault?: 'single' | 'grid' | 'list', projectDefault?: 'single' | 'grid' | 'list', layoutExplicit = false): 'single' | 'grid' | 'list' | 'matrix' {
+  if (query === 'single' || query === 'grid' || query === 'list' || query === 'matrix') return query
+  if (storyLayout === 'single' && layoutExplicit) return 'single'
   if (storyLayout === 'grid' || storyLayout === 'list') return storyLayout
   return localDefault ?? projectDefault ?? 'grid'
 }
@@ -16,16 +17,18 @@ export function createWorkbenchArrangement(options: {
   storyId: () => string | undefined
   /** Story-declared default arrangement. */
   storyLayout: () => unknown
+  /** Explicit declaration before collection fallback; absent on older sources. */
+  layoutExplicit?: () => boolean | undefined
   /** Local user default. */
-  localDefault: () => 'grid' | 'list' | undefined
+  localDefault: () => 'single' | 'grid' | 'list' | undefined
   /** Project default. */
-  projectDefault: () => 'grid' | 'list' | undefined
+  projectDefault: () => 'single' | 'grid' | 'list' | undefined
   /** Current cross-story view mode. */
   syncZoom: () => boolean
   /** Workbench-scoped in-memory view snapshots. */
   views: StoryCanvasViews
 }) {
-  const base = computed(() => resolveWorkbenchArrangement(undefined, options.storyLayout(), options.localDefault(), options.projectDefault()))
+  const base = computed(() => resolveWorkbenchArrangement(undefined, options.storyLayout(), options.localDefault(), options.projectDefault(), options.layoutExplicit?.() === true))
   const override = computed(() => isArrangement(options.query()))
   const arrangement = computed(() => {
     const query = options.query()
@@ -38,6 +41,6 @@ export function createWorkbenchArrangement(options: {
 }
 
 /** Test whether a route query names a supported canvas arrangement. */
-function isArrangement(value: unknown): value is 'grid' | 'list' | 'matrix' {
-  return value === 'grid' || value === 'list' || value === 'matrix'
+function isArrangement(value: unknown): value is 'single' | 'grid' | 'list' | 'matrix' {
+  return value === 'single' || value === 'grid' || value === 'list' || value === 'matrix'
 }

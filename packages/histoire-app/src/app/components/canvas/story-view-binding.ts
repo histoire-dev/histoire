@@ -136,6 +136,7 @@ export function bindStoryCanvasView(options: StoryCanvasViewBindingOptions) {
 
   // Keep the latest view ready before route changes or conditional unmounts.
   const stopView = watch(() => [
+    canvas.zoomByArrange.single,
     canvas.zoomByArrange.grid,
     canvas.zoomByArrange.list,
     canvas.zoomByArrange.matrix,

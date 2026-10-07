@@ -1,0 +1,72 @@
+import { describe, expect, it } from 'vitest'
+import { resolveSingleViewport, singleVariantArea } from '../../../../histoire-app/src/app/components/canvas/single-viewport.js'
+import { createCanvasStore } from '../../../../histoire-app/src/app/stores/canvas.js'
+import { memoryStorage } from './utils/settings-storage.js'
+
+describe('single variant geometry and camera', () => {
+  it('fills unobstructed area and preserves oversized fixed dimensions at native scale', () => {
+    const area = singleVariantArea({ width: 1200, height: 900 }, { topInset: 120, bottomInset: 0 }, 320, false)
+    expect(area).toEqual({ x: 16, y: 136, width: 848, height: 748 })
+    const settings = { responsiveWidth: 1600, responsiveHeight: 1000, rotate: false }
+    expect(resolveSingleViewport(area, settings, 'responsive')).toEqual({ width: 848, height: 748 })
+    expect(resolveSingleViewport(area, settings, 'fixed')).toEqual({ width: 1600, height: 1000 })
+    expect(resolveSingleViewport(area, { ...settings, responsiveHeight: null }, 'fixed')).toEqual({ width: 1600, height: 748 })
+    expect(resolveSingleViewport(area, { ...settings, rotate: true }, 'fixed')).toEqual({ width: 1000, height: 1600 })
+    expect(singleVariantArea({ width: 1200, height: 900 }, {}, 0, true)).toEqual({ x: 0, y: 0, width: 1200, height: 900 })
+  })
+
+  it('fits oversized Single viewports without changing logical dimensions or camera pan', () => {
+    const storage = memoryStorage()
+    storage.setItem('_histoire-ui-canvas', JSON.stringify({ version: 2, zoomByArrange: { grid: 0.5, list: 'fit', matrix: 'fit', single: 2 } }))
+    const canvas = createCanvasStore({ storage })
+    const offset = { ...canvas.panOffset }
+    canvas.setArrangement('single')
+    expect(canvas.zoom).toBe('fit')
+    canvas.setSingleGeometry({ width: 800, height: 600 }, { width: 1600, height: 1000 })
+    expect(canvas.effectiveZoom).toBe(0.5)
+    expect(canvas.singleViewportSize).toEqual({ width: 1600, height: 1000 })
+    canvas.setZoom(2)
+    canvas.setSingleGeometry({ width: 600, height: 400 }, { width: 1600, height: 1000 })
+    expect(canvas.effectiveZoom).toBe(2)
+    canvas.fit()
+    expect(canvas.effectiveZoom).toBe(0.375)
+    canvas.setSingleGeometry({ width: 600, height: 400 }, { width: 300, height: 200 })
+    expect(canvas.effectiveZoom).toBe(1)
+    canvas.fit()
+    canvas.panBy({ x: 100, y: 20 })
+    canvas.setPanOffset({ x: 80, y: 60 })
+    canvas.zoomToFrame({ x: 0, y: 0, width: 200, height: 100 })
+    canvas.focusFrame({ id: 'frame', storyId: 'story', variantId: 'variant', x: 1000, y: 1000, width: 200, height: 100 })
+    expect(canvas.zoomByArrange).toEqual({ single: 'fit', grid: 0.5, list: 'fit', matrix: 'fit' })
+    expect(canvas.panOffset).toEqual(offset)
+    expect(canvas.selectedFrame).toBe('frame')
+    canvas.setArrangement('grid')
+    expect(canvas.effectiveZoom).toBe(0.5)
+    expect(canvas.panOffset).toEqual(offset)
+  })
+
+  it('remembers independent Single manual zoom and migrates old forced zoom to Fit', () => {
+    const storage = memoryStorage()
+    storage.setItem('_histoire-ui-canvas', JSON.stringify({ version: 2, zoomByArrange: { single: 1, list: 'fit' } }))
+    const canvas = createCanvasStore({ storage })
+    expect(canvas.zoomByArrange.single).toBe('fit')
+    expect(canvas.zoomByArrange.list).toBe('fit')
+    canvas.setArrangement('single')
+    canvas.setZoom(0.75)
+    const snapshot = canvas.snapshotView()
+    canvas.setZoom(4)
+    canvas.restoreView(snapshot)
+    expect(canvas.effectiveZoom).toBe(0.75)
+    canvas.setZoom(0.75)
+    const restored = createCanvasStore({ storage })
+    restored.setArrangement('single')
+    expect(restored.effectiveZoom).toBe(0.75)
+    expect(restored.zoomByArrange.list).toBe('fit')
+    restored.setZoom(0)
+    expect(restored.effectiveZoom).toBe(0.1)
+    restored.setZoom(10)
+    expect(restored.effectiveZoom).toBe(4)
+    restored.fit()
+    expect(restored.zoom).toBe('fit')
+  })
+})

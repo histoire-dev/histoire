@@ -24,7 +24,7 @@ export async function createTailwindBook(version: 3 | 4, mode: 'dev' | 'static')
   try {
     hosts = await createEmbedHosts({ html: '<!doctype html><div id="mount" style="width:640px;height:480px"></div><div id="controls" style="width:400px;height:240px"></div><div id="second" style="width:400px;height:300px"></div>' })
     await fixture.write('vite.config.ts', `export default {base:'/',optimizeDeps:{noDiscovery:true,exclude:['msw/browser','msw/core/http']},server:{host:'127.0.0.1',open:false,hmr:{port:0}}}`)
-    await fixture.write('histoire.config.ts', `export default {storyMatch:[],mcp:false,collectMaxThreads:1,embed:{enabled:true,allowedOrigins:[${JSON.stringify(hosts.hostOrigin)}]}}`)
+    await fixture.write('histoire.config.ts', `export default {routerMode:'hash',storyMatch:[],mcp:false,collectMaxThreads:1,embed:{enabled:true,allowedOrigins:[${JSON.stringify(hosts.hostOrigin)}]}}`)
     if (version === 3) {
       await fixture.write('tailwind.config.cjs', `module.exports={prefix:'ac-',theme:{colors:{brand:'#123456'},fontSize:{lg:['20px',{lineHeight:'1.5'}]},fontFamily:{sans:[['Inter','sans-serif'],{fontFeatureSettings:'"cv11"',fontVariationSettings:'"wght" 650'}]}}}`)
     }

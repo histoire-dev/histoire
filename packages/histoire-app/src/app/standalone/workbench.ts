@@ -170,6 +170,7 @@ export function useWorkbench(props: WorkbenchProps, error: (error: unknown) => v
     query: () => route.value.query.arrange,
     storyId: () => story.value?.id,
     storyLayout: () => story.value?.layout?.type,
+    layoutExplicit: () => story.value?.layoutExplicit,
     localDefault: () => settings.defaultArrange.value,
     projectDefault: () => histoireConfig.ui?.defaultArrange,
     syncZoom: () => settings.state.syncZoom,
@@ -281,7 +282,7 @@ export function useWorkbench(props: WorkbenchProps, error: (error: unknown) => v
     void props.navigation.panel(value).catch(error)
   }
   /** Additive arrangement URL rejects unknown values at read time. */
-  function setArrange(value: 'grid' | 'list' | 'matrix') {
+  function setArrange(value: 'single' | 'grid' | 'list' | 'matrix') {
     void props.navigation.query({ arrange: value }).catch(error)
   }
   /** Matrix axes remain URL-restorable without inventing variant IDs. */

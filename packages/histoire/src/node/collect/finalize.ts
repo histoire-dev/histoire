@@ -3,6 +3,7 @@ import type { Context } from '../context.js'
 import { relative } from 'pathe'
 import { createPath } from '../tree.js'
 
+/** Normalize layout while retaining whether author/project supplied it. */
 export function finalizeCollectedStoryFile(storyFile: ServerStoryFile, ctx: Context, storyData: ServerStory = storyFile.story) {
   if (!storyData) {
     return
@@ -15,6 +16,9 @@ export function finalizeCollectedStoryFile(storyFile: ServerStoryFile, ctx: Cont
       }
     }
   }
+
+  // Finalization can repeat; its own fallback must never become an author declaration.
+  storyData.layoutExplicit ??= !!storyData.layout
 
   if (!storyData.layout) {
     storyData.layout = { type: 'single', iframe: true }

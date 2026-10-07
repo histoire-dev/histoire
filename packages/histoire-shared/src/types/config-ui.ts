@@ -21,7 +21,7 @@ export interface HistoireUiConfig {
   /** Canvas defaults; persisted user settings take precedence. */
   ui?: {
     /** Initial arrangement when story layout and URL omit it. */
-    defaultArrange?: 'grid' | 'list'
+    defaultArrange?: 'single' | 'grid' | 'list'
     /** Maximum simultaneously live preview frames. Defaults to 6. */
     frameBudget?: number
   }

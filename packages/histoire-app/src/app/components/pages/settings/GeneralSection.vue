@@ -12,7 +12,7 @@ const settings = useUiSettingsStore()!
   <section>
     <h1>General</h1><div class="histoire-settings-card">
       <div class="histoire-settings-row">
-        <strong>Default arrangement</strong><HstButtonGroup layout="inline" aria-label="Default arrangement" :model-value="settings.defaultArrange.value ?? histoireConfig.ui?.defaultArrange ?? 'grid'" :options="[{ value: 'grid', label: 'Grid' }, { value: 'list', label: 'List' }]" @update:model-value="settings.setArrange($event)" />
+        <strong>Default arrangement</strong><HstButtonGroup layout="inline" aria-label="Default arrangement" :model-value="settings.defaultArrange.value ?? histoireConfig.ui?.defaultArrange ?? 'grid'" :options="[{ value: 'single', label: 'Single variant' }, { value: 'grid', label: 'Grid' }, { value: 'list', label: 'List' }]" @update:model-value="settings.setArrange($event)" />
       </div>
       <SaveToProject v-if="SaveToProject" path="ui.defaultArrange" :value="settings.defaultArrange.value ?? histoireConfig.ui?.defaultArrange ?? 'grid'" :project-value="histoireConfig.ui?.defaultArrange" :local="settings.defaultArrange.value !== undefined" @reset="settings.setArrange(undefined)" @saved="settings.setArrange(undefined)" />
       <div class="histoire-settings-row">

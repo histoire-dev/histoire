@@ -163,6 +163,7 @@ watch(owner, (current, previous) => {
 onMounted(() => {
   window.addEventListener('message', measurement.receive)
   window.addEventListener('resize', resize)
+  window.addEventListener('scroll', resize, true)
 })
 onBeforeUnmount(() => {
   retireInput()
@@ -170,6 +171,7 @@ onBeforeUnmount(() => {
   stopSession()
   window.removeEventListener('message', measurement.receive)
   window.removeEventListener('resize', resize)
+  window.removeEventListener('scroll', resize, true)
 })
 </script>
 

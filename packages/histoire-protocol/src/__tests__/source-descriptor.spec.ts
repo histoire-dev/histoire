@@ -3,6 +3,18 @@ import { createEmbedFrameAncestors, mergeEmbedFrameAncestors, resolveEmbedOrigin
 import { createProtocolDescriptor } from './fixtures/catalog.js'
 
 describe('portable source descriptor policy', () => {
+  it('accepts old catalogs and validates explicit layout provenance', () => {
+    const descriptor = createProtocolDescriptor()
+    expect(validateHistoireSourceDescriptor(descriptor)).toBe(descriptor)
+    const story = descriptor.catalog.stories[0]
+    for (const layoutExplicit of [true, false]) {
+      const catalog = { ...descriptor.catalog, stories: [{ ...story, layoutExplicit }] }
+      expect(() => validateHistoireSourceDescriptor({ ...descriptor, catalog })).not.toThrow()
+    }
+    const catalog = { ...descriptor.catalog, stories: [{ ...story, layoutExplicit: 'single' }] }
+    expect(() => validateHistoireSourceDescriptor({ ...descriptor, catalog })).toThrow('Invalid layout provenance')
+  })
+
   it('validates safe lazy references and exact deployment origins', () => {
     const descriptor = {
       ...createProtocolDescriptor(),

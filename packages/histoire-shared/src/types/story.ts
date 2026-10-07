@@ -175,6 +175,8 @@ export interface ServerStory {
   group?: string
   variants: ServerVariant[]
   layout?: StoryLayout
+  /** Story or defaultStoryProps declared layout before collection fallback. */
+  layoutExplicit?: boolean
   /** Explicit finite values for props matrix axes. */
   matrix?: HistoireMatrixHint
   icon?: string

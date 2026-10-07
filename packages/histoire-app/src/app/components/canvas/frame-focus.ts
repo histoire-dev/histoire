@@ -6,7 +6,7 @@ export interface CanvasFrameFocusOptions {
   /** Current selected frame; zoom can regenerate its layout object. */
   getFrame: () => CanvasFrameLayout | undefined
   /** Arrangement changes may reveal selected frame in another layout. */
-  getArrange: () => 'grid' | 'list' | 'matrix'
+  getArrange: () => 'single' | 'grid' | 'list' | 'matrix'
   /** Bring selected frame into view without changing selected variant. */
   focusFrame: (frame: CanvasFrameLayout) => void
   /** Update selected frame without moving the canvas. */

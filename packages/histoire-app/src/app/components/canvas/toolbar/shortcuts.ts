@@ -7,7 +7,7 @@ import { canMeasureFrame } from '../measure-owner.js'
 export function registerCanvasShortcuts(shortcuts: ReturnType<typeof createShortcutRegistry>, canvas: CanvasStore, frames: CanvasFrames): () => void {
   const dispose = [
     shortcuts.bind('canvas.select', () => canvas.setTool('select')),
-    shortcuts.bind('canvas.pan', () => canvas.setTool('pan')),
+    shortcuts.bind('canvas.pan', () => canvas.setTool('pan'), { enabled: () => canvas.arrangement !== 'single' }),
     shortcuts.bind('canvas.measure', () => canvas.setTool('measure'), { enabled: () => canMeasureFrame(canvas.selectedFrame ? frames.getFrame(canvas.selectedFrame) : null) }),
     shortcuts.bind('canvas.fit', () => canvas.fit()),
     shortcuts.bind('canvas.actual', () => canvas.setZoom(1)),

@@ -2,6 +2,8 @@ import { computed, getCurrentInstance, onBeforeUnmount, onMounted, ref } from 'v
 
 /** Optional access to the selected tool without mutating its persisted state. */
 export interface SpacePanOptions {
+  /** Keep native Space behavior in document presentations. */
+  enabled?: () => boolean
   /** Reads the toolbar tool used when Space is released. */
   getTool?: () => string
   /** Owning canvas; keyboard events outside it never acquire pan state. */
@@ -46,6 +48,7 @@ export function useSpacePan(options: SpacePanOptions = {}) {
 
   /** Enables temporary pan outside text inputs. */
   function onKeyDown(event: KeyboardEvent) {
+    if (options.enabled?.() === false) return
     if ((event.code !== 'Space' && event.key !== ' ') || !owns(event.target) || isInteractiveTarget(event.target)) return
     event.preventDefault()
     held.value = true

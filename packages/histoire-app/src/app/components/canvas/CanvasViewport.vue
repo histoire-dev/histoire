@@ -11,10 +11,10 @@ import { useStoryCanvasViews } from '../../stores/story-canvas-views.js'
 import { getSearchFrameState } from '../panes/search/frame-navigation.js'
 import WorkbenchEmptyState from '../shell/WorkbenchEmptyState.vue'
 import { createCanvasHeaderEditor } from './canvas-header-editor.js'
-import { canvasOverlayIsOccluded } from './canvas-overlay-occlusion.js'
 import CanvasFrame from './CanvasFrame.vue'
 import CanvasHeader from './CanvasHeader.vue'
 import CanvasMatrixPrimary from './CanvasMatrixPrimary.vue'
+import CanvasSingleVariant from './CanvasSingleVariant.vue'
 import CanvasStatus from './CanvasStatus.vue'
 import CollectErrorCard from './CollectErrorCard.vue'
 import { useCanvasFrameAdmission } from './frame-admission.js'
@@ -29,8 +29,11 @@ import FrameList from './FrameList.vue'
 import { clientToCanvas } from './pan/usePanZoom.js'
 import { usePointerPan } from './pan/usePointerPan.js'
 import { useSpacePan } from './pan/useSpacePan.js'
+import { selectedSingleFrame } from './single-viewport.js'
 import { bindStoryCanvasView } from './story-view-binding.js'
 import { useCanvasGeometry } from './useCanvasGeometry.js'
+import { useCanvasHeaderOcclusion } from './useCanvasHeaderOcclusion.js'
+import { useSingleVariantGeometry } from './useSingleVariantGeometry.js'
 import { createCanvasViewportEvents } from './viewport-events.js'
 
 const props = withDefaults(defineProps<{
@@ -39,9 +42,9 @@ const props = withDefaults(defineProps<{
   /** Approved maximum live frames, including selected frame. */
   frameBudget: number
   /** URL arrangement provided by narrow standalone navigation adapter. */
-  arrange?: 'grid' | 'list' | 'matrix'
+  arrange?: 'single' | 'grid' | 'list' | 'matrix'
   /** Arrangement resolved without an explicit URL override. */
-  baseArrange?: 'grid' | 'list' | 'matrix'
+  baseArrange?: 'single' | 'grid' | 'list' | 'matrix'
   /** Whether a valid URL arrangement overrides remembered story views. */
   arrangementOverride?: boolean
   /** Floating inspector width excluded from fit geometry. */
@@ -68,10 +71,10 @@ const cachedVariantId = ref<string | null>(null)
 const currentStory = computed(() => snapshot.value.catalog.stories.find(story => story.id === snapshot.value.selection?.storyId))
 const diagnostics = computed(() => snapshot.value.catalog.diagnostics.filter(error => error.code === 'COLLECTION_FAILED' && (error.storyId === (currentStory.value?.id ?? cachedStory.value?.id) || error.relativePath === (currentStory.value?.relativePath ?? cachedStory.value?.relativePath))))
 const story = computed(() => currentStory.value ?? (diagnostics.value.length ? cachedStory.value : undefined))
-const canvas = createCanvasStore({ storage: getCanvasStorage(typeof window === 'undefined' ? undefined : window) })
+const settings = useUiSettingsStore()
+const canvas = createCanvasStore({ singleViewport: settings?.singleViewport, storage: getCanvasStorage(typeof window === 'undefined' ? undefined : window) })
 const registry = createCanvasFrames(canvas)
 const frameState = createCanvasFrameState(session)
-const settings = useUiSettingsStore()
 const renderedArrange = createCanvasArrangement(() => props.arrange, useMatrixStore())
 provideCanvas(canvas, registry, frameState)
 const viewBinding = bindStoryCanvasView({
@@ -84,16 +87,23 @@ const viewBinding = bindStoryCanvasView({
   canvas,
   views: useStoryCanvasViews(),
 })
-const space = useSpacePan({ getTool: () => canvas.tool, getRoot: () => viewport.value })
-const pointer = usePointerPan({ getTool: () => canvas.tool, getSpace: () => space.held.value, getOffset: () => canvas.panOffset, setOffset: canvas.setPanOffset, onActive: value => canvas.panning = value })
+/** Document mode keeps native scroll/input and suspends camera gestures. */
+const cameraEnabled = () => renderedArrange.value !== 'single'
+const space = useSpacePan({ enabled: cameraEnabled, getTool: () => canvas.tool, getRoot: () => viewport.value })
+const pointer = usePointerPan({ enabled: cameraEnabled, getTool: () => canvas.tool, getSpace: () => space.held.value, getOffset: () => canvas.panOffset, setOffset: canvas.setPanOffset, onActive: value => canvas.panning = value })
 provideCanvasPointerPan(pointer)
-const panning = computed(() => canvas.tool === 'pan' || space.held.value || canvas.panning)
+const panning = computed(() => cameraEnabled() && (canvas.tool === 'pan' || space.held.value || canvas.panning))
 const size = computed(() => {
   const settings = snapshot.value.settings
   return { width: settings.rotate && settings.responsiveHeight ? settings.responsiveHeight : settings.responsiveWidth, height: settings.rotate ? settings.responsiveWidth : settings.responsiveHeight ?? 640 }
 })
+const { area: singleArea, size: singleSize, measure: measureSingle } = useSingleVariantGeometry(canvas, { settings: () => snapshot.value.settings, inspectorWidth: () => props.inspectorWidth, hidden: () => props.uiHidden })
 /** Reuse arrangement geometry for rendering and target-zoom selection fitting. */
 function layoutFrames(zoom = canvas.effectiveZoom) {
+  if (renderedArrange.value === 'single') {
+    const variantId = snapshot.value.selection?.variantId ?? (diagnostics.value.length ? cachedVariantId.value : null)
+    return selectedSingleFrame(story.value, variantId, singleSize.value)
+  }
   return story.value ? layoutCanvasFrames(story.value.id, story.value.variants.map(variant => variant.id), size.value, renderedArrange.value === 'list' ? 'list' : 'grid', 3, zoom) : []
 }
 /** Resolve selection-fit geometry by stable target after visible-frame filtering. */
@@ -144,6 +154,7 @@ const { insets: contentInsets, headerBounds, measure } = useCanvasGeometry({
   footer: () => panHint.value?.$el,
   temporaryPan: () => space.held.value || canvas.panning,
   onMeasure(size, insets) {
+    if (renderedArrange.value === 'single') return measureSingle(size, insets)
     if (renderedArrange.value === 'matrix') {
       canvas.viewport = size
       canvas.inspectorWidth = props.inspectorWidth
@@ -157,7 +168,7 @@ const { insets: contentInsets, headerBounds, measure } = useCanvasGeometry({
     }
   },
 })
-const headerObscured = ref(false)
+const headerObscured = useCanvasHeaderOcclusion({ header: () => header.value, viewport: () => viewport.value, canvas, registry, bounds: () => headerBounds.value })
 const { canOpenInEditor, openInEditor } = createCanvasHeaderEditor({
   session,
   snapshot: () => snapshot.value,
@@ -167,19 +178,6 @@ const { canOpenInEditor, openInEditor } = createCanvasHeaderEditor({
   isObscured: () => headerObscured.value,
   reportError: error => emit('error', error),
 })
-
-/** Give mounted preview content and variant-label controls priority over fixed header metadata. */
-function updateHeaderOcclusion(): void {
-  const headerRect = header.value?.getBoundingClientRect()
-  const frameSurfaces = [...registry.frames.values()].flatMap((frame) => {
-    const iframe = frame.iframe
-    return iframe?.isConnected ? [iframe.getBoundingClientRect()] : []
-  })
-  const labelSurfaces = [...(viewport.value?.querySelectorAll<HTMLElement>('[data-canvas-overlay-occluder]') ?? [])]
-    .filter(label => label.isConnected)
-    .map(label => label.getBoundingClientRect())
-  headerObscured.value = Boolean(headerRect && canvasOverlayIsOccluded(headerRect, [...frameSurfaces, ...labelSurfaces]))
-}
 
 const stopSelectedSession = watchCanvasSelectedSession({
   snapshot: () => snapshot.value,
@@ -218,14 +216,13 @@ watch(() => snapshot.value.selection?.variantId, (value) => {
 }, { immediate: true })
 // Matrix may temporarily render as Grid while its axes are unavailable; zoom follows actual canvas content.
 watch(renderedArrange, (arrangement) => {
+  if (arrangement === 'single') {
+    pointer.release()
+    space.release()
+  }
   if (viewBinding.isActiveStory(story.value?.id)) canvas.setArrangement(arrangement)
 }, { flush: 'sync', immediate: true })
 watch([frames, () => props.inspectorWidth, () => props.uiHidden, renderedArrange, story, panning], measure, { flush: 'post' })
-watch([
-  () => [canvas.effectiveZoom, canvas.panOffset.x, canvas.panOffset.y],
-  () => [headerBounds.value?.top, headerBounds.value?.bottom],
-  () => [...registry.frames.values()].map(frame => frame.iframe),
-], updateHeaderOcclusion, { flush: 'post', immediate: true })
 watchCanvasFrameFocus({
   getFrame: () => selectedFrame.value,
   getArrange: () => renderedArrange.value,
@@ -252,7 +249,7 @@ defineExpose({ canvas, registry })
 </script>
 
 <template>
-  <div ref="viewport" class="histoire-canvas-viewport" :class="{ 'is-panning': panning, 'is-dragging': canvas.panning, 'is-commenting': commentMode }" :style="{ '--histoire-canvas-inspector-reserve': `${inspectorWidth}px` }" role="region" aria-label="Story canvas" tabindex="-1" @wheel="viewportEvents.onWheel" @contextmenu="viewportEvents.openCanvasMenu" @keydown="viewportEvents.openCanvasMenu" @pointerdown.capture="viewportEvents.framePointer" @pointerdown="viewportEvents.pointerDown" @pointermove="pointer.onPointerMove" @pointerup="pointer.onPointerUp" @pointercancel="pointer.onPointerCancel">
+  <div ref="viewport" class="histoire-canvas-viewport" :class="{ 'is-single': renderedArrange === 'single', 'is-panning': panning, 'is-dragging': canvas.panning, 'is-commenting': commentMode }" :style="{ '--histoire-canvas-inspector-reserve': `${inspectorWidth}px` }" role="region" aria-label="Story canvas" tabindex="-1" @wheel="viewportEvents.onWheel" @contextmenu="viewportEvents.openCanvasMenu" @keydown="viewportEvents.openCanvasMenu" @pointerdown.capture="viewportEvents.framePointer" @pointerdown="viewportEvents.pointerDown" @pointermove="pointer.onPointerMove" @pointerup="pointer.onPointerUp" @pointercancel="pointer.onPointerCancel">
     <div v-if="!uiHidden" ref="toolbar" class="histoire-canvas-toolbar-host">
       <slot name="toolbar" :canvas="canvas" :frames="registry" />
     </div>
@@ -261,7 +258,8 @@ defineExpose({ canvas, registry })
         <CanvasHeader :story="story" :can-open-in-editor="canOpenInEditor" @open-in-editor="openInEditor" />
       </slot>
     </div>
-    <slot v-if="renderedArrange === 'matrix'" name="matrix" :canvas="canvas" :frames="registry" :size="size" :content-insets="contentInsets" :frame-budget="frameBudget" :preview-base="previewBase" />
+    <CanvasSingleVariant v-if="renderedArrange === 'single' && story" :area="singleArea" :frame="selectedFrame" :variant="selectedFrame ? variantsById.get(selectedFrame.variantId) : undefined" :preview-base="previewBase" :stale="diagnostics.length > 0" @contextmenu="(event, target) => emit('contextmenu', event, target)" />
+    <slot v-else-if="renderedArrange === 'matrix'" name="matrix" :canvas="canvas" :frames="registry" :size="size" :content-insets="contentInsets" :frame-budget="frameBudget" :preview-base="previewBase" />
     <component :is="renderedArrange === 'list' ? FrameList : FrameGrid" v-else :frames="renderedFrames">
       <template #default="{ frame }">
         <CanvasFrame :frame="frame" :fit-bounds="zoom => fitBoundsForFrame(frame, zoom)" :variant="variantsById.get(frame.variantId)!" :selected="frame.id === selectedFrame?.id" :live="live.has(frame.id)" :preview-base="previewBase" :width="size.width" :height="size.height" :stale="diagnostics.length > 0" v-bind="getSearchFrameState(frame.id, !!searchActive, highlightedTargets)" @select="selectVariant" @contextmenu="(event, target) => emit('contextmenu', event, target)" />
@@ -285,6 +283,7 @@ defineExpose({ canvas, registry })
 .histoire-canvas-toolbar-host:dir(rtl) { transform: translateX(50%); }
 .histoire-canvas-header { position: absolute; inset-inline: var(--histoire-canvas-info-inset) calc(var(--histoire-canvas-inspector-reserve) + var(--histoire-canvas-info-inset)); top: 88px; z-index: 1; container-type: inline-size; pointer-events: none; transition: opacity 160ms ease-out; }
 .histoire-canvas-header.is-obscured { opacity: 0; }
+.histoire-canvas-viewport.is-single { touch-action: auto; }
 .is-panning { cursor: grab; } .is-dragging { cursor: grabbing; }
 .is-panning :deep(iframe) { pointer-events: none; }
 .histoire-frame-list :deep(.histoire-canvas-frame) { pointer-events: auto; }

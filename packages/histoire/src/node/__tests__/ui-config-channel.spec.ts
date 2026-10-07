@@ -46,6 +46,19 @@ async function project(code?: string) {
 }
 
 describe('project settings channel', () => {
+  it('saves Single variant as project default through config channel', async () => {
+    const fixture = await project('export default { ui: { defaultArrange: "grid" } }\n')
+    try {
+      await fixture.request('histoire:ui:config-save', { patches: [{ path: 'ui.defaultArrange', value: 'single' }], expectedHash: await configFileHash(fixture.file, { root: fixture.root }) })
+      expect(fixture.messages.at(-1).saved).toEqual(['ui.defaultArrange'])
+      expect((await loadConfigFile(fixture.file)).ui.defaultArrange).toBe('single')
+      expect(() => validateConfigSave({ patches: [{ path: 'ui.defaultArrange', value: 'matrix' }] })).toThrow('Invalid config value for ui.defaultArrange')
+    }
+    finally {
+      await fixture.channel.close()
+    }
+  })
+
   it('rejects arbitrary keys, local preferences and agent environments before file access', () => {
     expect(() => validateConfigRead({ paths: ['vite'] })).toThrow('not editable')
     expect(() => validateConfigSave({ patches: [{ path: 'density', value: 'compact' }] })).toThrow('not editable')

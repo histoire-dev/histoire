@@ -3,6 +3,8 @@ import { getCurrentInstance, onBeforeUnmount, ref } from 'vue'
 
 /** Store-independent pointer panning state. */
 export interface PointerPanOptions {
+  /** Native document presentations disable camera gestures. */
+  enabled?: () => boolean
   /** Reads the selected toolbar tool. */
   getTool: () => string
   /** Reads temporary Space pan state. */
@@ -42,6 +44,7 @@ export function usePointerPan(options: PointerPanOptions) {
 
   /** Begins an accepted pan and prevents native middle-click autoscroll. */
   function onPointerDown(event: PointerEvent): boolean {
+    if (options.enabled?.() === false) return false
     if (pointerId !== null || !isPanGesture(event.button, options.getTool(), options.getSpace())) return false
     event.preventDefault()
     pointerId = event.pointerId

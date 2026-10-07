@@ -598,9 +598,9 @@ export default defineConfig({
 
 ## `ui.defaultArrange`
 
-`'grid' | 'list'` - Default: `'grid'`
+`'single' | 'grid' | 'list'` - Default: `'grid'`
 
-Initial canvas arrangement. Persisted user settings and the `arrange` URL query take precedence. Matrix remains available through the toolbar or URL. See [workbench navigation](../guide/ui-shell.md) and [settings](../guide/ui-settings.md).
+Initial canvas arrangement for stories without explicit layout. Explicit `layout.type: 'single'` selects Single variant; explicit grid layout selects Grid. A recognized `arrange` URL query and remembered story/shared view take precedence over story layout. Local defaults take precedence over project defaults for stories without explicit layout. Matrix remains available through the toolbar or URL. See [workbench navigation](../guide/ui-shell.md) and [settings](../guide/ui-settings.md).
 
 ```ts
 export default defineConfig({

@@ -1,4 +1,5 @@
 import type { InjectionKey } from 'vue'
+import type { SingleViewportState } from '../components/canvas/single-viewport.js'
 import { inject, provide, reactive, ref } from 'vue'
 
 /** Small storage interface lets standalone persist while embeddings stay memory-only. */
@@ -42,7 +43,8 @@ export function normalizeSettingsSection(section: unknown, dev: boolean): string
 export function createUiSettingsStore(options: { storage?: SettingsStorage, warn?: (message: string) => void }) {
   const defaults: UiSettings = { density: 'comfortable', syncZoom: false, watchTests: false }
   const state = reactive({ ...defaults })
-  const defaultArrange = ref<'grid' | 'list' | undefined>()
+  const singleViewport = reactive<SingleViewportState>({ mode: 'responsive' })
+  const defaultArrange = ref<'single' | 'grid' | 'list' | undefined>()
   try {
     const raw = options.storage?.getItem('_histoire-ui-settings')
     if (raw) {
@@ -53,7 +55,7 @@ export function createUiSettingsStore(options: { storage?: SettingsStorage, warn
     const arrange = options.storage?.getItem('_histoire-ui-arrange')
     if (arrange) {
       const value = JSON.parse(arrange)
-      if (value === 'grid' || value === 'list') defaultArrange.value = value
+      if (value === 'single' || value === 'grid' || value === 'list') defaultArrange.value = value
     }
   }
   catch {
@@ -74,9 +76,10 @@ export function createUiSettingsStore(options: { storage?: SettingsStorage, warn
   return {
     state,
     defaultArrange,
+    singleViewport,
     update,
     /** Arrangement override is separate from the documented local-only settings shape. */
-    setArrange(value: 'grid' | 'list' | undefined): void {
+    setArrange(value: 'single' | 'grid' | 'list' | undefined): void {
       defaultArrange.value = value
       try {
         if (value) options.storage?.setItem('_histoire-ui-arrange', JSON.stringify(value))

@@ -5,6 +5,8 @@
  */
 export function previewAppRoot() {
   return `const root = document.createElement('div')
+// Static embed CSS clips its own host; native Single sandbox must scroll its document.
+if (new URLSearchParams(window.location.search).get('nativeScroll') === 'true') document.body.style.overflow = 'auto'
 root.id = 'app'
 document.body.innerHTML = ''
 document.body.appendChild(root)

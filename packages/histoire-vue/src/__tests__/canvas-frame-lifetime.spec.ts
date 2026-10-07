@@ -11,6 +11,7 @@ import { layoutCanvasFrames, visibleCanvasFrames } from '../../../histoire-app/s
 import { clientToCanvas } from '../../../histoire-app/src/app/components/canvas/pan/usePanZoom.js'
 import { createContextMenu, provideContextMenu } from '../../../histoire-app/src/app/composables/context-menu.js'
 import { createMatrixStore, provideMatrix } from '../../../histoire-app/src/app/stores/matrix.js'
+import { createStoryCanvasViews, provideStoryCanvasViews } from '../../../histoire-app/src/app/stores/story-canvas-views.js'
 import { deferred, sourceFixture } from '../../../histoire-sdk/src/__tests__/fixtures/session.js'
 import { canvasRuntimeFixture } from './fixtures/canvas-runtime.js'
 import { resizeObserverFixture } from './fixtures/resize-observer.js'
@@ -29,10 +30,11 @@ afterEach(async () => {
 /** Mount genuine frame lifecycle with existing SDK transport and controlled native geometry. */
 async function lifetimeFixture(budget = 2, variantCount = 2, zoom = 0.5) {
   window.localStorage.setItem('_histoire-ui-canvas', JSON.stringify({ zoom }))
-  resizeObserverFixture()
+  const resize = resizeObserverFixture()
+  const dimensions = { width: 1800, height: 1000 }
   vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockImplementation(function (this: HTMLElement) {
-    const width = this.classList.contains('histoire-canvas-viewport') ? 1800 : 0
-    const height = width ? 1000 : 0
+    const width = this.classList.contains('histoire-canvas-viewport') ? dimensions.width : 0
+    const height = width ? dimensions.height : 0
     return { x: 0, y: 0, top: 0, left: 0, right: width, bottom: height, width, height, toJSON: () => ({}) }
   })
   const source = sourceFixture()
@@ -55,9 +57,10 @@ async function lifetimeFixture(budget = 2, variantCount = 2, zoom = 0.5) {
   })
   const matrix = createMatrixStore()
   const menu = createContextMenu()
-  const arrange = ref<'grid' | 'list' | 'matrix'>('grid')
+  const arrange = ref<'single' | 'grid' | 'list' | 'matrix'>('grid')
   const Host = defineComponent({
     setup() {
+      provideStoryCanvasViews(createStoryCanvasViews())
       provideMatrix(matrix)
       provideContextMenu(menu)
       return () => h(CanvasViewport, { arrange: arrange.value, previewBase: 'https://book.example/', frameBudget: budget })
@@ -74,10 +77,53 @@ async function lifetimeFixture(budget = 2, variantCount = 2, zoom = 0.5) {
     await canonical.dispose()
   }
   await flushPromises()
-  return { wrapper, viewport, canvas, canonical, source, children, matrix, arrange, prepareChild }
+  return { wrapper, viewport, resize, dimensions, canvas, canonical, source, children, matrix, arrange, prepareChild }
 }
 
 describe('canvas frame runtime lifetime', () => {
+  it('shows only selected Single variant and resizes its owned document without remounting', async () => {
+    const test = await lifetimeFixture()
+    test.arrange.value = 'single'
+    await flushPromises()
+    expect(test.wrapper.findAllComponents(CanvasFrame)).toHaveLength(1)
+    const frame = test.wrapper.getComponent(CanvasFrame)
+    const iframe = frame.get('iframe').element
+    expect(frame.props('width')).toBe(1768)
+    expect(frame.props('height')).toBe(968)
+    test.dimensions.width = 1200
+    test.resize.deliver()
+    await flushPromises()
+    expect(test.wrapper.getComponent(CanvasFrame).props('width')).toBe(1168)
+    expect(test.wrapper.getComponent(CanvasFrame).get('iframe').element).toBe(iframe)
+    test.canvas.singleViewport.mode = 'fixed'
+    await test.canonical.settings.update({ responsiveWidth: 390, responsiveHeight: 844 })
+    await flushPromises()
+    expect(test.wrapper.getComponent(CanvasFrame).get('iframe').element).toBe(iframe)
+    expect(test.wrapper.getComponent(CanvasFrame).props('width')).toBe(390)
+    expect(test.wrapper.getComponent(CanvasFrame).props('height')).toBe(844)
+    const owner = test.children.at(-1)!
+    expect(owner.session.getSnapshot().settings).toMatchObject({ responsiveWidth: 390, responsiveHeight: 844, rotate: false })
+    test.canvas.setZoom(0.5)
+    await flushPromises()
+    expect(test.wrapper.getComponent(CanvasFrame).get('iframe').element).toBe(iframe)
+    expect(owner.session.getSnapshot().settings).toMatchObject({ responsiveWidth: 390, responsiveHeight: 844 })
+    expect(test.wrapper.getComponent(CanvasFrame).props('width')).toBe(390)
+    const zoomWheel = new WheelEvent('wheel', { deltaY: -100, ctrlKey: true, cancelable: true, bubbles: true })
+    test.viewport.element.dispatchEvent(zoomWheel)
+    await flushPromises()
+    expect(zoomWheel.defaultPrevented).toBe(true)
+    expect(test.canvas.effectiveZoom).toBeGreaterThan(0.5)
+    expect(test.wrapper.getComponent(CanvasFrame).get('iframe').element).toBe(iframe)
+    await test.canonical.selection.select({ storyId: 'a:b', variantId: 'other' })
+    await flushPromises()
+    expect(test.wrapper.findAll('iframe')).toHaveLength(1)
+    expect(test.wrapper.getComponent(CanvasFrame).props('frame').variantId).toBe('other')
+    expect(test.viewport.emitted('selectedSession')?.at(-1)).toEqual([test.children.at(-1)!.session])
+    const wheel = new WheelEvent('wheel', { deltaY: 100, cancelable: true, bubbles: true })
+    test.viewport.element.dispatchEvent(wheel)
+    expect(wheel.defaultPrevented).toBe(false)
+  })
+
   it('keeps predecessor and destination documents across canvas and canonical selection', async () => {
     const test = await lifetimeFixture()
     const frames = test.wrapper.findAllComponents(CanvasFrame)

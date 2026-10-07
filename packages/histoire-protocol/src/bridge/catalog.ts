@@ -53,6 +53,7 @@ export function validateHistoireCatalogStory(value: unknown): HistoireCatalogSto
   }
   validateRelativeLabel(input.relativePath)
   if (input.runtimeRevision !== undefined && (typeof input.runtimeRevision !== 'string' || !/^[a-f0-9]{64}$/.test(input.runtimeRevision))) invalid('Invalid story runtime revision')
+  if (input.layoutExplicit !== undefined && typeof input.layoutExplicit !== 'boolean') invalid('Invalid layout provenance')
   if (input.layout !== undefined) {
     const layout = wireRecord(input.layout)
     if (!['single', 'grid'].includes(layout.type as string) || (layout.iframe !== undefined && typeof layout.iframe !== 'boolean')) invalid('Invalid story layout')

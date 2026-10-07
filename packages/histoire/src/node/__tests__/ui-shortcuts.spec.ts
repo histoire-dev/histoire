@@ -10,6 +10,29 @@ function keyboard(key: string, modifiers: Partial<KeyboardEvent> = {}) {
 }
 
 describe('workbench shortcut registry', () => {
+  it.each(['single', 'grid', 'list', 'matrix'] as const)('selection shortcut respects %s zoom ownership', (arrangement) => {
+    const registry = createShortcutRegistry()
+    const canvas = createCanvasStore()
+    const frames = createCanvasFrames(canvas)
+    const rect = { x: 1000, y: 3000, width: 720, height: 640 }
+    frames.registerFrame({ id: 'frame', storyId: 'story', variantId: 'variant', rect })
+    canvas.setArrangement(arrangement)
+    canvas.setGeometry({ width: 1200, height: 900 }, rect)
+    canvas.setSingleGeometry({ width: 800, height: 600 }, rect)
+    canvas.selectedFrame = 'frame'
+    canvas.setZoom(0.5)
+    const remove = registerCanvasShortcuts(registry, canvas, frames)
+    try {
+      expect(registry.handle(keyboard('@', { code: 'Digit2', shiftKey: true }), ['canvas'], false)).toBe(true)
+      expect(canvas.zoom).toBe(arrangement === 'single' ? 'fit' : canvas.effectiveZoom)
+      expect(registry.handle(keyboard('!', { code: 'Digit1', shiftKey: true }), ['canvas'], false)).toBe(true)
+      expect(canvas.zoom).toBe('fit')
+      expect(registry.handle(keyboard(')', { code: 'Digit0', shiftKey: true }), ['canvas'], false)).toBe(true)
+      expect(canvas.zoom).toBe(1)
+    }
+    finally { remove() }
+  })
+
   it('rejects equivalent bindings in same scope and permits different scopes', () => {
     const registry = createShortcutRegistry()
     registry.register({ id: 'search', label: 'Search', keys: ['mod+k'], scope: 'global', handler: vi.fn() })

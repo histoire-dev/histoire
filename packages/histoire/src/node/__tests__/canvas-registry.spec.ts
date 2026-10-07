@@ -4,8 +4,12 @@ import { createCanvasFrames } from '../../../../histoire-app/src/app/composables
 import { createCanvasStore, getCanvasStorage } from '../../../../histoire-app/src/app/stores/canvas.js'
 
 describe('canvas frame registry', () => {
-  it('converts transformed pointer coordinates and addresses current same-origin document', () => {
-    const registry = createCanvasFrames(createCanvasStore())
+  it.each(['single', 'grid'] as const)('converts transformed %s coordinates and addresses current same-origin document', (arrangement) => {
+    const canvas = createCanvasStore()
+    canvas.setArrangement(arrangement)
+    canvas.setZoom(0.2)
+    const registry = createCanvasFrames(canvas)
+    expect(registry.zoom).toBe(0.2)
     const postMessage = vi.fn()
     const iframe = { contentWindow: { postMessage }, ownerDocument: { defaultView: { location: { origin: 'https://book.test' } } }, getBoundingClientRect: () => ({ left: 100, top: 200, width: 200, height: 120 }) } as unknown as HTMLIFrameElement
     registry.registerFrame({ id: 'frame', storyId: 'story', variantId: 'variant', rect: { x: 0, y: 0, width: 1000, height: 600 }, iframe, documentId: 'current' })
@@ -52,7 +56,7 @@ describe('canvas preference ownership', () => {
     store.selectedFrame = 'frame'
     store.panBy({ x: 50, y: 20 })
     store.setTool('select')
-    expect(JSON.parse(setItem.mock.calls.at(-1)![1])).toEqual({ zoom: 4, tool: 'select', frameBackground: 'white' })
+    expect(JSON.parse(setItem.mock.calls.at(-1)![1])).toEqual({ version: 3, zoomByArrange: { single: 'fit', grid: 4, list: 4, matrix: 4 }, tool: 'select', frameBackground: 'white' })
     expect(createCanvasStore().selectedFrame).toBe(null)
   })
 
@@ -62,7 +66,7 @@ describe('canvas preference ownership', () => {
     const canvas = createCanvasStore({ storage })
     canvas.setTool(tool)
     expect(createCanvasStore({ storage }).tool).toBe(tool)
-    expect(JSON.parse(saved!)).toEqual({ zoom: 'fit', tool, frameBackground: 'transparent' })
+    expect(JSON.parse(saved!)).toEqual({ version: 3, zoomByArrange: { single: 'fit', grid: 'fit', list: 'fit', matrix: 'fit' }, tool, frameBackground: 'transparent' })
   })
 
   it.each([

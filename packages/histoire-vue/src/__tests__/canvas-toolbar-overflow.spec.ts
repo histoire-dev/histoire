@@ -1,3 +1,4 @@
+import type { CanvasArrangement } from '../../../histoire-app/src/app/stores/canvas.js'
 import { createHistoireSessionWithAdapters } from '@histoire/sdk/internal'
 import { HistoireProvider } from '@histoire/vue'
 import { mount } from '@vue/test-utils'
@@ -30,8 +31,8 @@ async function fixture() {
   await session.connect()
   const canvas = createCanvasStore()
   const frames = createCanvasFrames(canvas)
-  const arrange = ref<'grid' | 'list' | 'matrix'>('grid')
-  const arrangement = vi.fn((value: 'grid' | 'list' | 'matrix') => arrange.value = value)
+  const arrange = ref<CanvasArrangement>('grid')
+  const arrangement = vi.fn((value: CanvasArrangement) => arrange.value = value)
   const wheel = vi.fn()
   const pointer = vi.fn()
   const Host = defineComponent({
@@ -44,7 +45,7 @@ async function fixture() {
   })
   const wrapper = mount(HistoireProvider, { props: { session }, attachTo: document.body, slots: { default: () => h(Host) } })
   await geometry.flush()
-  return { wrapper, geometry, session, canvas, frames, arrangement, wheel, pointer }
+  return { wrapper, geometry, session, canvas, frames, arrange, arrangement, wheel, pointer }
 }
 
 /** Resolve a genuine native action whether inline or teleported into dropdown. */
@@ -55,6 +56,33 @@ function button(label: string): HTMLButtonElement {
 }
 
 describe('canvas toolbar overflow integration', () => {
+  it('uses native Single dimensions for capture and responsive rotation', async () => {
+    const test = await fixture()
+    try {
+      test.arrange.value = 'single'
+      test.canvas.setArrangement('single')
+      test.canvas.singleViewportSize = { width: 848, height: 748 }
+      test.frames.registerFrame({ id: 'frame', storyId: 'a:b', variantId: 'c', rect: { x: 0, y: 0, width: 848, height: 748 } })
+      test.canvas.selectedFrame = 'frame'
+      test.canvas.setZoom(0.5)
+      await test.geometry.flush()
+      button('Screenshot').click()
+      await test.geometry.flush()
+      const capture = [...document.querySelectorAll<HTMLButtonElement>('button')].find(value => value.textContent?.trim() === 'Capture 1 frame')!
+      capture.click()
+      await test.geometry.flush()
+      expect(send).toHaveBeenCalledWith('histoire:ui:screenshot', expect.objectContaining({ targets: [{ storyId: 'a:b', variantId: 'c' }], viewport: { width: 848, height: 748 }, scale: 1 }))
+      button('Rotate viewport').click()
+      await test.geometry.flush()
+      expect(test.canvas.singleViewport.mode).toBe('fixed')
+      expect(test.session.getSnapshot().settings).toMatchObject({ responsiveWidth: 848, responsiveHeight: 748, rotate: true })
+    }
+    finally {
+      test.wrapper.unmount()
+      await test.session.dispose()
+    }
+  })
+
   it('keeps Measure in exclusive tool group through selection and overflow transitions', async () => {
     const test = await fixture()
     const iframe = document.createElement('iframe')
