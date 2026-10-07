@@ -1,19 +1,23 @@
-import type { HistoireSerializedTestDefinition } from '@histoire/shared'
+import type { HistoireSerializedTestDefinition, HistoireTestRegistration } from '@histoire/shared'
 import type { VariantSession } from './session.js'
-import type { VariantTestSessionOptions } from './types.js'
+import type { SessionStoryFile, VariantTestSessionOptions } from './types.js'
 import { serializeTestDefinitions } from '@histoire/shared'
+import { isGeneratedStoryKnownEmpty } from '../../generated-story-metadata.js'
 import { createMissingHandlerError, getMatchingDefinition } from './definitions.js'
 import { createExclusiveQueue } from './exclusive.js'
+import { withRegistry } from './registry.js'
 import { runPreviewDefinition } from './run-preview-definition.js'
 import { runSingleDefinition } from './run-single-definition.js'
 import { runSessionTests } from './run.js'
 import { createVariantSession } from './session.js'
 import { createStoryModuleCache } from './story-modules.js'
 import { enterHistoireTestTask } from './test-task.js'
+import { getStoryVariant } from './variant.js'
 import { getVitestWorkerState } from './worker-state.js'
 
 export { getMatchingDefinition } from './definitions.js'
 export type { VariantSession } from './session.js'
+export { hasVanillaSetupHooks } from './setup-hooks.js'
 export type { SerializedStoryFile, VariantTestSessionOptions } from './types.js'
 
 /**
@@ -35,9 +39,13 @@ export function createVariantTestSession(options: VariantTestSessionOptions) {
   const runExclusive = createExclusiveQueue()
 
   /** Mounts a variant and collects its tests; the caller owns the cleanup. */
-  async function openVariantSession(storyId: string, variantId: string): Promise<VariantSession> {
+  async function openVariantSession(
+    storyId: string,
+    variantId: string,
+    storyFile?: SessionStoryFile,
+  ): Promise<VariantSession> {
     return createVariantSession(
-      await storyModules.createSessionStoryFile(storyId),
+      storyFile ?? await storyModules.createSessionStoryFile(storyId),
       variantId,
       {
         offscreenRenderMount: options.offscreenRenderMount ?? false,
@@ -58,7 +66,42 @@ export function createVariantTestSession(options: VariantTestSessionOptions) {
    */
   async function collectVariantTests(storyId: string, variantId: string): Promise<HistoireSerializedTestDefinition[]> {
     return runExclusive(async () => {
-      const session = await openVariantSession(storyId, variantId)
+      const storyFile = await storyModules.createSessionStoryFile(storyId)
+      const setupProbe = options.canSkipKnownEmptyCollection
+      if (
+        setupProbe
+        && !storyFile.importedDefinitions.length
+        && isGeneratedStoryKnownEmpty(storyFile.file.component)
+        && !hasStorySetupApp(storyFile.file.component)
+      ) {
+        const setupRegistrations: HistoireTestRegistration[] = []
+        let canSkip = setupProbe === true
+
+        if (typeof setupProbe === 'function') {
+          try {
+            await withRegistry(setupRegistrations, true, async () => {
+              canSkip = await setupProbe()
+            })
+          }
+          catch {
+            // If the probe fails, leave setup imports and errors to real mounts.
+            canSkip = false
+          }
+
+          if (setupRegistrations.length) {
+            storyModules.rememberSetupModuleRegistrations(storyId, setupRegistrations)
+            storyFile.importedDefinitions.push(...setupRegistrations)
+          }
+        }
+
+        if (canSkip && !setupRegistrations.length) {
+          // Validate against current catalog metadata before taking the shortcut.
+          getStoryVariant(storyFile.file, variantId)
+          return []
+        }
+      }
+
+      const session = await openVariantSession(storyId, variantId, storyFile)
 
       try {
         return serializeTestDefinitions(session.definitions)
@@ -137,4 +180,22 @@ export function createVariantTestSession(options: VariantTestSessionOptions) {
     runPreviewTestCase,
     runVariantTests,
   }
+}
+
+/**
+ * Checks generated raw story options for setup callbacks that can register tests.
+ * @param component Imported story component object.
+ */
+function hasStorySetupApp(component: unknown) {
+  if (!component || typeof component !== 'object') {
+    return false
+  }
+
+  const story = component as {
+    setupApp?: unknown
+    variants?: Array<{ setupApp?: unknown }>
+  }
+
+  return typeof story.setupApp === 'function'
+    || Boolean(story.variants?.some(variant => typeof variant.setupApp === 'function'))
 }

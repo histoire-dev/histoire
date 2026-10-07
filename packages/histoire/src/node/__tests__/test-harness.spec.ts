@@ -19,6 +19,7 @@ const STUB_SESSION_ID = '/stub/histoire/virtual/variant-test-session.js'
 interface HarnessSessionOptions {
   files: { id: string, moduleId: string }[]
   mountTimeoutMs: number
+  canSkipKnownEmptyCollection: () => Promise<boolean>
   moduleLoaders: Record<string, () => Promise<unknown>>
   runWithDynamicImport: (loader: () => any) => any
 }
@@ -34,7 +35,7 @@ function generateHarness(files = previewRuntimeStubStoryFiles) {
  * @param source Generated harness module source.
  */
 function evaluateHarness(source: string): HarnessSessionOptions {
-  const { code } = transformSync(source, { loader: 'js', format: 'cjs' })
+  const { code } = transformSync(source, { loader: 'js', format: 'cjs', target: 'es2018' })
 
   let captured: HarnessSessionOptions | undefined
   const requireStub = (id: string) => {
@@ -65,6 +66,7 @@ describe('test harness generator', () => {
     // The harness installs the global vitest aliases at module scope.
     delete (globalThis as any).vi
     delete (globalThis as any).vitest
+    delete (globalThis as any).__vitest_browser_runner__
   })
 
   it('bakes one module loader per story, keyed by the exact story id', () => {
@@ -109,5 +111,30 @@ describe('test harness generator', () => {
 
     expect(files).toEqual([])
     expect(Object.keys(moduleLoaders)).toEqual([])
+  })
+
+  it('passes lazy setup namespace probing into the session', () => {
+    const source = buildTestHarnessSource({
+      variantTestSessionId: STUB_SESSION_ID,
+      files: previewRuntimeStubStoryFiles,
+      mountTimeoutMs: 30_000,
+    })
+    const options = evaluateHarness(source)
+
+    expect(options.canSkipKnownEmptyCollection).toBeTypeOf('function')
+    expect(source).toContain('import(\'virtual:$histoire-generated-global-setup\')')
+    expect(source).toContain('import(\'virtual:$histoire-setup\')')
+    expect(source).toContain('hasVanillaSetupHooks(generatedSetup, setup)')
+  })
+
+  it('keeps setup-module imports lazy and falls back when probe import fails', () => {
+    const source = buildTestHarnessSource({
+      variantTestSessionId: STUB_SESSION_ID,
+      files: previewRuntimeStubStoryFiles,
+      mountTimeoutMs: 30_000,
+    })
+
+    expect(source).toContain('async function canSkipKnownEmptyCollection()')
+    expect(source).toContain('return false')
   })
 })

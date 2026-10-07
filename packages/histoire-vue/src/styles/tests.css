@@ -3,10 +3,11 @@
 .histoire-provider .histoire-tests-run-group{display:inline-flex;align-items:stretch;overflow:hidden;border:1px solid var(--histoire-control-resolved-border);border-radius:9px;background:var(--histoire-control-resolved-input)}
 .histoire-provider .histoire-tests-run-group .histoire-button{border:0;border-radius:0;background:transparent}
 .histoire-provider .histoire-tests-run-group .histoire-button:not(:disabled):hover{background:var(--histoire-control-resolved-chip)}
-.histoire-provider .histoire-tests-run-trigger{min-width:32px;padding-inline:8px!important;border-inline-start:1px solid var(--histoire-control-resolved-border)!important}
+.histoire-provider .histoire-tests-run-trigger{--histoire-icon-button-size:32px;border-inline-start:1px solid var(--histoire-control-resolved-border)!important}
 .histoire-provider .histoire-tests-run-menu{min-width:156px}
 .histoire-provider .histoire-tests-run-menu .histoire-button{width:100%;justify-content:flex-start;text-align:start}
-.histoire-provider .histoire-tests button{color:inherit;padding:6px 10px;}
+.histoire-provider .histoire-tests button{color:inherit;}
+.histoire-provider .histoire-tests button:not(.histoire-icon-button){padding:6px 10px;}
 .histoire-provider .histoire-tests button:disabled{}
 .histoire-provider .histoire-tests ul{margin:0;padding:0}
 .histoire-provider .histoire-tests pre{white-space:pre-wrap;overflow-wrap:anywhere}

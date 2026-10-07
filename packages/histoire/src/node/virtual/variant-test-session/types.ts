@@ -66,4 +66,9 @@ export interface VariantTestSessionOptions {
    * of the story over the actual preview.
    */
   offscreenRenderMount?: boolean
+  /**
+   * Probes actual vanilla hooks only for a trusted generated story with no
+   * import-time tests. Defaults to false so unknown setup cannot skip tests.
+   */
+  canSkipKnownEmptyCollection?: boolean | (() => Promise<boolean>)
 }

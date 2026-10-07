@@ -33,6 +33,8 @@ function getSerializedFile(files: SerializedStoryFile[], storyId: string) {
 export function createStoryModuleCache(options: StoryModuleCacheOptions) {
   const importedStoryCache = new Map<string, ImportedStoryModule>()
   const storyModuleVersions = new Map<string, number>()
+  /** One-time project setup imports are separate from variant state and survive story HMR. */
+  const setupModuleRegistrations = new Map<string, HistoireTestRegistration[]>()
 
   /**
    * Clears the cached imported story module for a specific story so the next
@@ -53,6 +55,25 @@ export function createStoryModuleCache(options: StoryModuleCacheOptions) {
    */
   function getStoryModuleVersion(storyId: string) {
     return storyModuleVersions.get(storyId)
+  }
+
+  /**
+   * Retains test registrations emitted while lazily probing setup modules.
+   * These virtual modules are native-import cached across story invalidation.
+   * @param storyId Story whose collection first observed the registrations.
+   * @param registrations Registrations emitted by the setup-module import.
+   */
+  function rememberSetupModuleRegistrations(storyId: string, registrations: HistoireTestRegistration[]) {
+    const retained = setupModuleRegistrations.get(storyId) ?? []
+    const additions = registrations.filter(registration => !retained.includes(registration))
+
+    if (!additions.length) {
+      return
+    }
+
+    retained.push(...additions)
+    setupModuleRegistrations.set(storyId, retained)
+    importedStoryCache.get(storyId)?.definitions.push(...additions)
   }
 
   /**
@@ -101,6 +122,15 @@ export function createStoryModuleCache(options: StoryModuleCacheOptions) {
    */
   async function createSessionStoryFile(storyId: string, testing = true): Promise<SessionStoryFile> {
     const imported = await loadImportedStory(storyId, testing)
+    const importedDefinitions = imported.definitions.slice()
+
+    // Story invalidation replaces its module cache, while project setup modules
+    // remain native-import cached. Reattach their captured registrations once.
+    for (const registration of setupModuleRegistrations.get(storyId) ?? []) {
+      if (!importedDefinitions.includes(registration)) {
+        importedDefinitions.push(registration)
+      }
+    }
 
     return {
       file: mapStoryFile({
@@ -108,7 +138,7 @@ export function createStoryModuleCache(options: StoryModuleCacheOptions) {
         component: imported.component,
         source: async () => ({ default: '' }),
       }) as StoryFile,
-      importedDefinitions: imported.definitions.slice(),
+      importedDefinitions,
     }
   }
 
@@ -116,5 +146,6 @@ export function createStoryModuleCache(options: StoryModuleCacheOptions) {
     createSessionStoryFile,
     getStoryModuleVersion,
     invalidateStory,
+    rememberSetupModuleRegistrations,
   }
 }

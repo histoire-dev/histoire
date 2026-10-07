@@ -1,9 +1,9 @@
 import { getHistoireTargetKey } from '@histoire/protocol'
-import { mount } from '@vue/test-utils'
 import { describe, expect, it } from 'vitest'
 import { emptyTestEntry, projectTestRows } from '../../../histoire-app/src/app/components/panes/tests/projection.js'
 import TestsTree from '../../../histoire-app/src/app/components/panes/tests/TestsTree.vue'
 import { createEmbedDescriptor } from '../../../histoire/src/node/__tests__/utils/embed/catalog.js'
+import { mountTestsTree } from './fixtures/tests-tree.js'
 import { virtualViewport } from './fixtures/virtual-viewport.js'
 
 /** Project rows from real catalog and entry helpers, including collection-error diagnostics. */
@@ -21,10 +21,8 @@ describe('production TestsTree collection diagnostics', () => {
   it('reveals collapsed group diagnostics and restores disclosure with exact target activation', async () => {
     virtualViewport()
     const normalRows = rows()
-    const wrapper = mount(TestsTree, {
-      props: { rows: normalRows, filter: 'failing', selected: null },
-      attachTo: document.body,
-    })
+    const owner = await mountTestsTree({ rows: normalRows, filter: 'failing', selected: null })
+    const wrapper = owner.wrapper
     try {
       await wrapper.setProps({ filter: 'all' })
       await wrapper.get('.test-story-heading').trigger('click')
@@ -35,12 +33,12 @@ describe('production TestsTree collection diagnostics', () => {
       expect(wrapper.findAll('.test-row')).toHaveLength(2)
       expect(wrapper.findAll('.test-row')[1].attributes('title')).toContain('Secondary collection failed')
       await wrapper.findAll('.test-row')[1].trigger('click')
-      expect(wrapper.emitted('select')?.[0]).toEqual([diagnosticRows[1]])
+      expect(wrapper.getComponent(TestsTree).emitted('select')?.[0]).toEqual([diagnosticRows[1]])
       await wrapper.setProps({ rows: normalRows, filter: 'all' })
       expect(wrapper.get('.test-story-heading').attributes('aria-expanded')).toBe('false')
       await wrapper.get('.test-story-heading').trigger('click')
       expect(wrapper.findAll('.test-row')).toHaveLength(2)
     }
-    finally { wrapper.unmount() }
+    finally { await owner.close() }
   })
 })

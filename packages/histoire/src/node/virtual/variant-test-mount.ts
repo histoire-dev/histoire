@@ -8,6 +8,7 @@ import FloatingVue from '@histoire/vendors/floating-vue'
 import { createPinia } from '@histoire/vendors/pinia'
 import { createApp, h, nextTick } from '@histoire/vendors/vue'
 import { applyOffscreenHostStyle } from './offscreen-host.js'
+import { getStoryVariant } from './variant-test-session/variant.js'
 
 interface RenderMountOptions {
   /** Positions the render host off the viewport so it stays invisible to the user. */
@@ -58,7 +59,7 @@ export async function bootstrapVariant(
   withRegistry: WithRegistry,
   timeoutMs: number,
 ): Promise<BootstrappedVariant> {
-  const variant = getVariant(file, variantId)
+  const variant = getStoryVariant(file, variantId)
   const host = createHost()
   const registrations: HistoireTestRegistration[] = []
   const app = createTestApp(() => h('div', { class: 'htw-sandbox-hidden' }, [h(GenericMountStory, {
@@ -94,7 +95,7 @@ export async function mountRenderVariant(
   withRegistry: WithRegistry,
   options: RenderMountOptions,
 ): Promise<MountedRenderVariant> {
-  const variant = getVariant(file, variantId)
+  const variant = getStoryVariant(file, variantId)
   const host = createHost()
   if (options.offscreen) {
     applyOffscreenHostStyle(host)
@@ -160,14 +161,6 @@ export async function mountRenderVariant(
       cleanupMountedApp(app, host)
     },
   }
-}
-
-function getVariant(file: StoryFile, variantId: string) {
-  const variant = file.story.variants.find(item => item.id === variantId)
-  if (!variant) {
-    throw new Error(`Unknown histoire variant "${variantId}" in story "${file.story?.id}"`)
-  }
-  return variant
 }
 
 function createTestApp(render: () => any) {

@@ -6,6 +6,7 @@ import { getHistoireTargetKey } from '@histoire/protocol'
 import { useHistoireSnapshot } from '@histoire/vue'
 import { useHistoireContext, useHistoireResource } from '@histoire/vue/internal'
 import { computed, ref, useId } from 'vue'
+import WorkbenchLoadingState from '../../shell/WorkbenchLoadingState.vue'
 
 import { useWorkbenchTestsModel } from './model.js'
 import TestsFilter from './TestsFilter.vue'
@@ -59,9 +60,7 @@ async function select(row: WorkbenchTestRow) {
       <HstButton v-if="model.discoveryStatus.value === 'error'" color="flat" type="button" class="retry-collection" @click="model.retryCollection()">
         Retry collection
       </HstButton>
-      <p v-if="model.discoveryStatus.value === 'collecting' && !model.visibleRows.value.length" class="test-status" role="status">
-        Collecting tests…
-      </p>
+      <WorkbenchLoadingState v-if="model.discoveryStatus.value === 'collecting' && !model.visibleRows.value.length" title="Collecting tests…" />
       <TestsTree v-else-if="model.discoveryStatus.value !== 'error' || model.visibleRows.value.length" :rows="model.visibleRows.value" :filter="filter" :selected="snapshot.selection" @select="select" />
       <footer>
         <label :for="watchModeId" class="watch-mode-row" :class="{ disabled: !model.canRun.value }">
@@ -79,14 +78,13 @@ async function select(row: WorkbenchTestRow) {
 
 <style scoped>
 .tests-panel { display: flex; flex-direction: column; height: 100%; min-height: 0; background: var(--histoire-surface); color: var(--histoire-text); }
-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px; }
+header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px var(--histoire-pane-gutter, 16px); }
 h2 { margin: 0; font-size: 14px; font-weight: 800; }
 .run-tests { display: inline-flex; align-items: center; gap: 6px; padding: 8px 10px; font-weight: 750; }
-.test-issue { margin: 10px 16px; color: var(--histoire-danger-text); font-size: 12px; overflow-wrap: anywhere; white-space: pre-line; }
-.test-status, .retry-collection { margin: 10px 16px; }
-.retry-collection { align-self: flex-start; }
+.test-issue { margin: 10px var(--histoire-pane-gutter, 16px); color: var(--histoire-danger-text); font-size: 12px; overflow-wrap: anywhere; white-space: pre-line; }
+.retry-collection { margin: 10px var(--histoire-pane-gutter, 16px); align-self: flex-start; }
 footer { margin-top: auto; border-top: 1px solid var(--histoire-border); }
-.watch-mode-row { display: flex; align-items: center; gap: 9px; box-sizing: border-box; inline-size: 100%; min-inline-size: 0; padding: 14px 16px; cursor: pointer; }
+.watch-mode-row { display: flex; align-items: center; gap: 9px; box-sizing: border-box; inline-size: 100%; min-inline-size: 0; padding: 14px var(--histoire-pane-gutter, 16px); cursor: pointer; }
 .watch-mode-row:hover { background: var(--histoire-chip); }
 .watch-mode-row.disabled { cursor: default; }
 .watch-mode-row.disabled:hover { background: transparent; }

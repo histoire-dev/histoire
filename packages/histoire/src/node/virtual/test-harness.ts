@@ -3,6 +3,7 @@ import type { PreviewRuntimeStoryFile } from './preview-runtime/preamble.js'
 import { createRequire } from 'node:module'
 import { getStoryCollectTimeout } from '../util/test-timeouts.js'
 import { buildStoryModuleLoaders, getRuntimeStoryFiles } from './preview-runtime/index.js'
+import { generatedKnownEmptySetupProbe } from './variant-test-session/setup-hooks.js'
 import { VITEST_DYNAMIC_IMPORT_SNIPPET } from './vitest-runner-bootstrap.js'
 
 const require = createRequire(import.meta.url)
@@ -31,7 +32,7 @@ export function buildTestHarnessSource({ variantTestSessionId, files, mountTimeo
 
   return `
 import 'virtual:$histoire-theme'
-import { createVariantTestSession } from ${JSON.stringify(variantTestSessionId)}
+import { createVariantTestSession, hasVanillaSetupHooks } from ${JSON.stringify(variantTestSessionId)}
 
 const files = ${JSON.stringify(files)}
 const moduleLoaders = {
@@ -43,11 +44,14 @@ globalThis.vitest ??= globalThis.vi
 
 ${VITEST_DYNAMIC_IMPORT_SNIPPET}
 
+${generatedKnownEmptySetupProbe()}
+
 const variantTestSession = createVariantTestSession({
   files,
   mountTimeoutMs: ${mountTimeoutMs},
   moduleLoaders,
   runWithDynamicImport: runWithVitestDynamicImport,
+  canSkipKnownEmptyCollection,
 })
 
 export async function collectVariantTests(storyId, variantId) {

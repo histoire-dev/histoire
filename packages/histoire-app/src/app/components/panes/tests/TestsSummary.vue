@@ -33,7 +33,7 @@ const duration = computed(() => `${(props.summary.duration / 1000).toFixed(1)}s`
 </template>
 
 <style scoped>
-.test-summary { padding: 0 16px; }
+.test-summary { padding: 0 var(--histoire-pane-gutter, 16px); }
 .test-summary-bar { display: flex; gap: 2px; height: 6px; overflow: hidden; border-radius: 4px; background: var(--histoire-chip); }
 .test-summary-bar span { min-width: 0; }
 .test-summary-bar .passed { background: var(--histoire-accent); }

@@ -8,9 +8,12 @@ const filters = [{ value: 'failing', label: 'Failing' }, { value: 'all', label: 
 </script>
 
 <template>
-  <HstButtonGroup layout="inline" class="test-filters" aria-label="Filter tests" :model-value="modelValue" :options="filters" @update:model-value="emit('update:modelValue', $event)" />
+  <div class="test-filters">
+    <HstButtonGroup layout="inline" aria-label="Filter tests" :model-value="modelValue" :options="filters" @update:model-value="emit('update:modelValue', $event)" />
+  </div>
 </template>
 
 <style scoped>
-.test-filters { display: flex; margin: 15px 12px 11px; }
+.test-filters { display: flex; flex: none; padding: 12px var(--histoire-pane-gutter, 16px); }
+.test-filters :deep(.histoire-button-group) { width: 100%; }
 </style>

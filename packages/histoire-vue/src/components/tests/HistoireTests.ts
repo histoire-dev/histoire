@@ -152,6 +152,7 @@ export const HistoireTests = defineComponent({
                 'ref': (value: unknown) => { actionTrigger.value = getControlElement(value) as HTMLButtonElement | null },
                 'type': 'button',
                 'class': 'histoire-tests-run-trigger',
+                'iconOnly': true,
                 'aria-label': 'More test actions',
                 'aria-haspopup': 'menu',
                 'aria-expanded': actionsOpen.value,

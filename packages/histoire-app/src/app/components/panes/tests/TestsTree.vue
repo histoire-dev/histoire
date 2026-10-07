@@ -95,7 +95,7 @@ function onGroupKeydown(event: KeyboardEvent, item: Extract<TestTreeEntry, { kin
 </template>
 
 <style scoped>
-.tests-tree { flex: 1; min-height: 0; overflow: hidden; padding: 0 8px 12px; }
+.tests-tree { flex: 1; min-height: 0; overflow: hidden; padding: 0 calc(var(--histoire-pane-gutter, 16px) - 8px) 16px; }
 .tests-empty { padding: 20px 8px; color: var(--histoire-muted); }
 .test-story-heading { display: flex; align-items: center; gap: 8px; width: 100%; height: var(--histoire-virtual-row-height, 39px); padding: var(--histoire-test-heading-padding, 10px) 8px; color: var(--histoire-text); line-height: 18px; text-align: left; }
 .test-story-heading strong { flex: 1; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-weight: 750; }

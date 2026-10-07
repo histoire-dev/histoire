@@ -9,6 +9,9 @@ export function resolvedGeneratedGlobalSetup(ctx: Context) {
       `${ctx.config.setupCode.map((c, index) => `import * as setup_${index} from '${GENERATED_SETUP_CODE}${ID_SEPARATOR}${index}'`).join('\n')}`,
       // List
       `const setupList = [${ctx.config.setupCode.map((c, index) => `setup_${index}`).join(', ')}]`,
+      // Private metadata consumed by generated test collection; wrapper export
+      // alone is insufficient because it exists even when no vanilla hook does.
+      `export const hasSetupVanilla = setupList.some(setup => typeof setup?.setupVanilla === 'function')`,
       // Setups
       ...ctx.supportPlugins.map(p => p.setupFn).flat().map(fnName => `export async function ${fnName} (payload) {
         for (const setup of setupList) {
@@ -20,6 +23,6 @@ export function resolvedGeneratedGlobalSetup(ctx: Context) {
     ].join('\n')
   }
   else {
-    return ''
+    return 'export const hasSetupVanilla = false'
   }
 }

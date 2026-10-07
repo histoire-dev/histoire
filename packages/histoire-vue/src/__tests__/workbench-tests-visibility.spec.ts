@@ -1,9 +1,8 @@
 import { getHistoireTargetKey } from '@histoire/protocol'
-import { mount } from '@vue/test-utils'
 import { describe, expect, it } from 'vitest'
 import { emptyTestEntry, isVisibleTestRow, projectTestRows } from '../../../histoire-app/src/app/components/panes/tests/projection.js'
-import TestsTree from '../../../histoire-app/src/app/components/panes/tests/TestsTree.vue'
 import { createEmbedDescriptor } from '../../../histoire/src/node/__tests__/utils/embed/catalog.js'
+import { mountTestsTree } from './fixtures/tests-tree.js'
 import { virtualViewport } from './fixtures/virtual-viewport.js'
 
 describe('project test visibility', () => {
@@ -17,7 +16,8 @@ describe('project test visibility', () => {
     const visible = rows.filter(isVisibleTestRow)
     expect(visible.map(row => row.target)).toEqual([target, { storyId: 'Broken.story.vue', variantId: null }])
     virtualViewport()
-    const wrapper = mount(TestsTree, { props: { rows: visible, filter: 'all', selected: null }, attachTo: document.body })
+    const owner = await mountTestsTree({ rows: visible, filter: 'all', selected: null })
+    const wrapper = owner.wrapper
     try {
       expect(wrapper.text()).toContain('First')
       expect(wrapper.text()).not.toContain('Second')
@@ -28,7 +28,7 @@ describe('project test visibility', () => {
       await wrapper.setProps({ rows: [] })
       expect(wrapper.text()).toBe('No tests')
     }
-    finally { wrapper.unmount() }
+    finally { await owner.close() }
   })
 
   it('uses current empty collection over historical results and catalog hint', () => {
