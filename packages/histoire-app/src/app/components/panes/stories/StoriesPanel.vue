@@ -229,11 +229,11 @@ function testsFailing(row: StoryTreeRow): boolean {
   return tests?.rows.value.some(test => test.failed && !test.stale && test.target.storyId === row.target?.storyId && (row.kind !== 'variant' || test.target.variantId === (row.target as HistoireTarget).variantId)) ?? false
 }
 
-/** Docs use document icon; selected variants inherit accent through currentColor. */
+/** Preserve custom story icons; docs and stories receive distinct defaults. */
 function icon(row: StoryTreeRow): string {
   if (row.kind === 'folder') return 'folder'
   if (row.kind === 'variant') return 'dot-mark'
-  return row.story?.docsOnly ? 'document' : 'cube'
+  return row.story?.icon ?? (row.story?.docsOnly ? 'document' : 'cube')
 }
 </script>
 

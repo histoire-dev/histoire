@@ -36,14 +36,17 @@ describe('builtin icon', () => {
     expect(iconifyMock.addCollection).toHaveBeenCalledWith(histoireCarbonIcons)
   })
 
-  it('renders known prefixed and bare Carbon glyphs locally without network access', () => {
+  it.each([
+    ['carbon:home', 'home'],
+    ['mdi:tailwind', 'mdi:tailwind'],
+  ])('renders bundled glyph %s locally without network access', (icon, canonical) => {
     const fetch = vi.fn(() => Promise.reject(new Error('Network unavailable')))
     vi.stubGlobal('fetch', fetch)
 
-    const prefixed = mount(BuiltinIcon, { props: { icon: 'carbon:home' } })
-    const bare = mount(BuiltinIcon, { props: { icon: 'home' } })
+    const prefixed = mount(BuiltinIcon, { props: { icon } })
+    const bare = mount(BuiltinIcon, { props: { icon: canonical } })
     const expectedSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
-    expectedSvg.innerHTML = getHistoireIcon('home')?.body ?? ''
+    expectedSvg.innerHTML = getHistoireIcon(canonical)?.body ?? ''
 
     try {
       expect(prefixed.element.tagName).toBe('svg')

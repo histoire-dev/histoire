@@ -28,7 +28,7 @@ const isImageSource = computed(() => props.icon.startsWith('http')
   || props.icon.startsWith('.')
   || props.icon.startsWith('/'))
 
-/** Resolve known Carbon glyphs and compatibility aliases from bundled data. */
+/** Resolve known glyphs and compatibility aliases from bundled data. */
 const glyph = computed(() => isImageSource.value ? undefined : getHistoireIcon(props.icon))
 const requestedWidth = computed(() => props.width ?? props.size)
 const requestedHeight = computed(() => props.height ?? props.size)

@@ -51,7 +51,7 @@ export function createTailwindStory(snapshot: TailwindSnapshot, EmptyState: any)
     id: snapshot.source.id,
     title: snapshot.source.title,
     group: 'design-system',
-    icon: 'carbon:color-palette',
+    icon: 'mdi:tailwind',
     responsiveDisabled: true,
     layout: { type: 'single', iframe: true },
     variants: [

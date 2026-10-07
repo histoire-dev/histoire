@@ -26,4 +26,13 @@ describe('offline workbench icons', () => {
     expect(getWorkbenchIcon('ri:add-line')).toEqual(getWorkbenchIcon('add'))
     expect(getWorkbenchIcon('mdi:drag-vertical-variant')).toEqual(getWorkbenchIcon('draggable'))
   })
+
+  it('resolves Tailwind logo offline without substituting a generic glyph', async () => {
+    const { getWorkbenchIcon } = await import('../../../../histoire-app/src/app/util/icons.js')
+    const logo = getWorkbenchIcon('mdi:tailwind')
+    expect(logo?.body).toContain('<path')
+    expect(logo).toMatchObject({ width: 24, height: 24 })
+    expect(logo).not.toEqual(getWorkbenchIcon('cube'))
+    expect(logo).not.toEqual(getWorkbenchIcon('color-palette'))
+  })
 })

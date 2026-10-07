@@ -1,4 +1,5 @@
 import type { HistoireTarget } from '@histoire/protocol'
+import { BuiltinIcon } from '@histoire/controls/vue'
 import { getHistoireTargetKey } from '@histoire/protocol'
 import { createHistoireSessionWithAdapters } from '@histoire/sdk/internal'
 import { mount } from '@vue/test-utils'
@@ -54,6 +55,24 @@ async function tree(density: 'comfortable' | 'compact', options: { count?: numbe
 }
 
 describe('production story tree keyboard focus', () => {
+  it.each([
+    { icon: 'mdi:tailwind', expected: 'mdi:tailwind' },
+    { icon: undefined, expected: 'cube' },
+  ])('uses story icon $expected', async ({ icon, expected }) => {
+    const owner = await tree('comfortable', {
+      count: 1,
+      prepare: (fixture) => {
+        if (icon) fixture.descriptor.catalog.stories[0].icon = icon
+      },
+    })
+    try {
+      await vi.waitFor(() => expect(owner.wrapper.findAll('[role=treeitem]').length).toBeGreaterThan(0))
+      const row = owner.wrapper.get('[data-test-id="story-list-item"]')
+      expect(row.findAllComponents(BuiltinIcon).map(component => component.props('icon'))).toContain(expected)
+    }
+    finally { await owner.close() }
+  })
+
   it('opens shared frame menu for variants without changing selection', async () => {
     const owner = await tree('comfortable', {
       count: 1,
