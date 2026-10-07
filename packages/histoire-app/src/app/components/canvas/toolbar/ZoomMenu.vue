@@ -45,7 +45,7 @@ function selection() {
     </HstButton>
     <template v-if="settings">
       <div class="popover-divider" />
-      <label class="popover-row zoom-sync">Sync zoom across stories<HstSwitch layout="inline" :model-value="settings.state.syncZoom" @update:model-value="settings.update({ syncZoom: $event })" /></label>
+      <label class="popover-row zoom-sync">Sync zoom across stories<HstSwitch class="zoom-sync-switch" layout="inline" :model-value="settings.state.syncZoom" @update:model-value="settings.update({ syncZoom: $event })" /></label>
     </template>
   </ToolbarPopover>
 </template>
@@ -53,4 +53,5 @@ function selection() {
 <style scoped>
 .zoom-label { color: var(--histoire-text); font-family: var(--histoire-font-mono); font-size: 11px; min-width: 29px; }
 .zoom-sync { cursor: default !important; }
+.zoom-sync .zoom-sync-switch { margin-inline-start: auto; }
 </style>
