@@ -150,6 +150,34 @@ describe('canvas overlay geometry', () => {
     })
   })
 
+  it('scrolls a revealed canvas variant into the Stories tree', () => {
+    const storyId = 'src-components-workbenchmatrix-story-vue'
+    const variantId = 'alternate'
+    const rowKey = JSON.stringify(['variant', storyId, variantId])
+    const frameKey = JSON.stringify([storyId, variantId])
+    visitCanvas(`/story/${storyId}?variantId=default&arrange=grid`)
+    cy.viewport(1200, 700)
+    cy.get('.stories-tree .vue-recycle-scroller').should(($scroller) => {
+      const viewport = $scroller[0].getBoundingClientRect()
+      const row = [...$scroller[0].querySelectorAll('[data-tree-key]')].find(element => element.getAttribute('data-tree-key') === rowKey)
+      const bounds = row?.getBoundingClientRect()
+      const visible = Boolean(bounds && bounds.top >= viewport.top && bounds.bottom <= viewport.bottom)
+      expect(visible, 'target variant starts outside the Stories viewport').to.equal(false)
+    })
+    cy.get(canvas).find('[data-frame-id]').filter((_, element) => element.getAttribute('data-frame-id') === frameKey).rightclick('center', { force: true })
+    cy.contains('[role="menuitem"]', /^Reveal in tree$/).click()
+    cy.get('.stories-tree .vue-recycle-scroller').should(($scroller) => {
+      const viewport = $scroller[0].getBoundingClientRect()
+      const row = [...$scroller[0].querySelectorAll('[data-tree-key]')].find(element => element.getAttribute('data-tree-key') === rowKey)
+      expect(row, 'exact variant row').to.not.equal(null)
+      if (!row) return
+      const bounds = row.getBoundingClientRect()
+      expect(bounds.top, 'row top within Stories viewport').to.be.at.least(viewport.top)
+      expect(bounds.bottom, 'row bottom within Stories viewport').to.be.at.most(viewport.bottom)
+    })
+    cy.location('search').should('include', `variantId=${variantId}`)
+  })
+
   it('defaults List to selection fit and follows later selection', () => {
     visitCanvas(matrix.replace('&arrange=matrix', ''))
     cy.get('button[aria-label="List"]').click()

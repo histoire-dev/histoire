@@ -1,5 +1,6 @@
 import type { HistoireTarget } from '@histoire/protocol'
 import type { ProjectConfigState } from '../stores/project-config.js'
+import type { FrameActionTarget } from '../util/frame-actions.js'
 import type { ShortcutScope } from '../util/shortcuts.js'
 import type { WorkbenchCanvas, WorkbenchProps } from './workbench-types.js'
 import { getHistoireTargetKey } from '@histoire/protocol'
@@ -29,7 +30,7 @@ import { useWorkbenchDev } from './workbench-dev.js'
 import { activateWorkspacePane, type WorkspacePane } from './workbench-navigation.js'
 
 /** Bind standalone adapters once, keeping every store owned by this provider. */
-export function useWorkbench(props: WorkbenchProps, error: (error: unknown) => void) {
+export function useWorkbench(props: WorkbenchProps, error: (error: unknown) => void, revealVariant: (target: FrameActionTarget) => void | Promise<void>) {
   const context = useHistoireContext()
   const snapshot = useHistoireSnapshot()
   const route = props.navigation.router.currentRoute
@@ -85,6 +86,8 @@ export function useWorkbench(props: WorkbenchProps, error: (error: unknown) => v
     reveal: async (target) => {
       await props.session.selection.select(target)
       showPane('stories')
+      await nextTick()
+      await revealVariant(target)
     },
     frameSession: target => canvas.value?.registry.getFrame(target.frameKey)?.session ?? null,
     error,

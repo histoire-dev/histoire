@@ -30,7 +30,7 @@ const snapshot = shallowRef(session.getSnapshot())
 useHistoireResource(session.subscribe(value => snapshot.value = value))
 const tests = useWorkbenchTestsModel()
 const tree = ref<HTMLElement>()
-const virtualList = ref<{ focus: (key: string) => Promise<void> }>()
+const virtualList = ref<{ focus: (key: string) => Promise<void>, reveal: (key: string) => Promise<void> }>()
 const focused = ref('')
 const treeTabStop = ref(false)
 const collapsedStory = ref('')
@@ -163,6 +163,21 @@ async function focus(key: string): Promise<void> {
   focused.value = key
   await virtualList.value?.focus(key)
 }
+
+/** Expand target ancestry, then scroll its exact current variant row into view. */
+async function revealVariant(target: { storyId: string, variantId: string }): Promise<void> {
+  if (!active || snapshot.value.selection?.storyId !== target.storyId || snapshot.value.selection.variantId !== target.variantId) return
+  props.folders.revealStory(target.storyId)
+  collapsedStory.value = ''
+  await nextTick()
+  if (!active || snapshot.value.selection?.storyId !== target.storyId || snapshot.value.selection.variantId !== target.variantId) return
+  const row = items.value.find((item) => {
+    if (item.kind !== 'variant' || !item.target || !('variantId' in item.target)) return false
+    return item.target.storyId === target.storyId && item.target.variantId === target.variantId
+  })
+  if (row) await virtualList.value?.reveal(row.key)
+}
+defineExpose({ revealVariant })
 
 /** Tree keyboard follows visible rows and never leaks arrow keys into canvas. */
 async function onKeydown(event: KeyboardEvent, row: StoryTreeRow): Promise<void> {

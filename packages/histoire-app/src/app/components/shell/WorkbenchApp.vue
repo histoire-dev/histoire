@@ -2,6 +2,7 @@
 import type { HistoireTarget } from '@histoire/protocol'
 import type { HistoireSession } from '@histoire/sdk'
 import type { WorkbenchProps } from '../../standalone/workbench-types.js'
+import type { FrameActionTarget } from '../../util/frame-actions.js'
 import { getHistoireTargetKey, getSandboxRelativeUrl } from '@histoire/protocol'
 import { HistoireProvider } from '@histoire/vue'
 import { computed, defineAsyncComponent, ref, shallowRef } from 'vue'
@@ -25,7 +26,12 @@ import ShellLayout from './ShellLayout.vue'
 
 const props = defineProps<WorkbenchProps>()
 const emit = defineEmits<{ error: [error: unknown] }>()
-const workbench = useWorkbench(props, error => emit('error', error))
+const storiesPanel = ref<InstanceType<typeof StoriesPanel>>()
+/** Delegate to the Stories panel after workbench pane mount settles. */
+function revealStoryVariant(target: FrameActionTarget): Promise<void> {
+  return storiesPanel.value?.revealVariant(target) ?? Promise.resolve()
+}
+const workbench = useWorkbench(props, error => emit('error', error), revealStoryVariant)
 const buildInfo = useWorkbenchBuildInfo()
 const { snapshot, route, shell, settings, matrix, mcp, dev, search, canvas, shortcuts, highlighted, searchQuery, searchActive, searchMatches, story, markdown, arrange, baseArrange, arrangementOverride, badges } = workbench
 const TestsPanel = __HISTOIRE_DEV__ ? defineAsyncComponent(() => import('../panes/tests/TestsPanel.vue')) : undefined
@@ -68,7 +74,7 @@ function setSelectedSession(session: HistoireSession | undefined): void {
 <template>
   <ShellLayout :home-href="navigation.router.resolve({ name: 'home' }).href" :home-active="route.name === 'home'" :logo-href="histoireConfig.theme.logoHref" :logos="customLogos" settings-available :settings-active="route.name === 'settings'" :hide-theme="histoireConfig.theme.hideColorSchemeSwitch" :show-inspector="inspector" :badges="badges" :data-density="settings.state.density" @home="workbench.navigate('home')" @pane="activatePane" @settings="workbench.navigate('settings')" @error="emit('error', $event)">
     <template #stories>
-      <StoriesPanel :folders="folders" @select="shell.closePanelAfterSelection" @fit="fitVariant" @error="emit('error', $event)" />
+      <StoriesPanel ref="storiesPanel" :folders="folders" @select="shell.closePanelAfterSelection" @fit="fitVariant" @error="emit('error', $event)" />
     </template>
     <template #search>
       <SearchPanel ref="search" :commands="commands" @select="workbench.searchSelected" @isolated="workbench.openIsolated" @highlight="highlighted = $event" @query="searchQuery = $event" @next-match="workbench.nextMatch" @close="workbench.closeSearch" @error="emit('error', $event)" />

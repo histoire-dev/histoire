@@ -27,16 +27,24 @@ export function createStandaloneFolders(session: HistoireSession, window: Window
     walk(session.getSnapshot().catalog.tree, [])
     expandedPaths.value = paths
   }
+  /** Set expanded state for real ancestor folders without publishing a half-update. */
+  function expandStoryAncestors(storyId: string): void {
+    const story = session.getSnapshot().catalog.stories.find(item => item.id === storyId)
+    if (!story) return
+    for (let index = 1; index < story.path.length; index++) values.set(story.path.slice(0, index).join('␜'), true)
+  }
+  /** Open real parent folders for explicit reveal, even when selection stays unchanged. */
+  function revealStory(storyId: string): void {
+    expandStoryAncestors(storyId)
+    publish()
+  }
   /** Deep-link navigation opens each real ancestor and preserves standalone preference. */
   function synchronize() {
     const snapshot = session.getSnapshot()
     const identity = JSON.stringify([snapshot.source?.epoch, snapshot.source?.revision, snapshot.selection?.storyId])
     if (identity === owner) return
     owner = identity
-    const story = snapshot.catalog.stories.find(story => story.id === snapshot.selection?.storyId)
-    if (story) {
-      for (let index = 1; index < story.path.length; index++) values.set(story.path.slice(0, index).join('␜'), true)
-    }
+    if (snapshot.selection) expandStoryAncestors(snapshot.selection.storyId)
     publish()
   }
   const close = session.subscribe(synchronize)
@@ -50,5 +58,5 @@ export function createStandaloneFolders(session: HistoireSession, window: Window
         storage?.setItem('_histoire-tree-state', JSON.stringify([...values]))
       }
       catch { /* Persistence cannot block navigation. */ }
-    }, close }
+    }, revealStory, close }
 }

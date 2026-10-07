@@ -8,6 +8,31 @@ import { HistoireStoryTree } from '../components/tree/HistoireStoryTree.js'
 import { HistoireProvider } from '../provider/HistoireProvider.js'
 
 describe('standalone folder adapter', () => {
+  it('reopens a selected story ancestor when explicitly revealing it', async () => {
+    const fixture = sourceFixture()
+    const story = fixture.descriptor.catalog.stories[0]
+    story.path = ['Nested', story.title]
+    fixture.descriptor.catalog.tree = [{ kind: 'folder', title: 'Nested', children: [{ kind: 'story', storyId: story.id, title: story.title }] }]
+    const session = createHistoireSessionWithAdapters({ url: 'https://book.example/' }, fixture.adapters)
+    await session.connect()
+    window.localStorage.removeItem('_histoire-tree-state')
+    const folders = createStandaloneFolders(session, window)
+    try {
+      await session.selection.select({ storyId: story.id, variantId: 'c' })
+      folders.toggle({ path: ['Nested'], open: false })
+      expect(folders.expandedPaths.value).toEqual([])
+
+      folders.revealStory(story.id)
+
+      expect(folders.expandedPaths.value).toEqual([['Nested']])
+    }
+    finally {
+      folders.close()
+      await session.dispose()
+      window.localStorage.removeItem('_histoire-tree-state')
+    }
+  })
+
   it('retains folded preferences across settings updates and opens known deep-link ancestors', async () => {
     const fixture = sourceFixture()
     const story = fixture.descriptor.catalog.stories[0]

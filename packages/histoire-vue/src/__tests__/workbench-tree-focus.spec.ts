@@ -49,6 +49,48 @@ async function tree(density: 'comfortable' | 'compact', options: { count?: numbe
 }
 
 describe('production story tree keyboard focus', () => {
+  it('scrolls an explicitly revealed selected variant into the virtual list', async () => {
+    const viewport = virtualViewport(true)
+    const owner = await tree('comfortable')
+    try {
+      await new Promise<void>(resolve => requestAnimationFrame(() => requestAnimationFrame(() => resolve())))
+      const scroller = owner.wrapper.get('.vue-recycle-scroller').element as HTMLElement
+      scroller.scrollTop = 0
+      viewport.deliverScroll()
+
+      const target = { storyId: 'story-999', variantId: 'default' }
+      await owner.session.selection.select(target)
+      await vi.waitFor(() => expect(owner.session.getSnapshot().selection).toEqual(target))
+      await nextTick()
+      const targetKey = JSON.stringify(['variant', target.storyId, target.variantId])
+      expect(owner.wrapper.findAll('[data-tree-key]').some(row => row.attributes('data-tree-key') === targetKey)).toBe(false)
+
+      const stories = owner.wrapper.findComponent(StoriesPanel).vm as unknown as {
+        revealVariant: (value: typeof target) => Promise<void>
+      }
+      await stories.revealVariant(target)
+      viewport.deliverScroll()
+
+      await vi.waitFor(() => expect(owner.wrapper.findAll('[data-tree-key]').some(row => row.attributes('data-tree-key') === targetKey)).toBe(true))
+      expect(scroller.scrollTop).toBeGreaterThan(0)
+      expect(owner.session.getSnapshot().selection).toEqual(target)
+
+      const storyKey = JSON.stringify(['story', target.storyId])
+      const story = owner.wrapper.findAll('[data-tree-key]').find(row => row.attributes('data-tree-key') === storyKey)!
+      await story.trigger('keydown', { key: 'ArrowLeft' })
+      await nextTick()
+      expect(owner.wrapper.findAll('[data-tree-key]').some(row => row.attributes('data-tree-key') === targetKey)).toBe(false)
+
+      await stories.revealVariant(target)
+      viewport.deliverScroll()
+      await vi.waitFor(() => expect(owner.wrapper.findAll('[data-tree-key]').some(row => row.attributes('data-tree-key') === targetKey)).toBe(true))
+      expect(owner.session.getSnapshot().selection).toEqual(target)
+    }
+    finally {
+      await owner.close()
+    }
+  })
+
   it('emits exact variant target on double-click without changing ordinary selection', async () => {
     const fit = vi.fn()
     const owner = await tree('comfortable', {
