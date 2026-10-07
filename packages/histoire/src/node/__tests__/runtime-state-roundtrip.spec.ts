@@ -1,23 +1,18 @@
 import { applyVariantStateUpdate, createVariantStateSyncGuards } from '@histoire/shared'
 import { describe, expect, it } from 'vitest'
 import { nextTick, reactive, watch } from 'vue'
-import { createPreviewStateSync } from '../../../../histoire-app/src/app/util/preview-state-sync.js'
 import { toRawDeep } from '../../../../histoire-app/src/app/util/state.js'
 
-describe('serialized preview state round trips', () => {
+describe('serialized runtime state round trips', () => {
   it('preserves runtime callbacks when host edits another field or seeds controls', () => {
     const onClick = () => 'clicked'
     const runtime = { id: 'variant', state: { count: 0, items: [{ label: 'row', onClick }], callbacks: [onClick, 'initial'] } }
-    const host = { id: 'variant', previewReady: true, state: {} as any }
-    const sync = createPreviewStateSync({
-      getStoryId: () => 'story',
-      getCurrentVariant: () => host as any,
-      getVariantById: () => host as any,
-      postMessage: message => applyVariantStateUpdate({ ...message, getVariantById: () => runtime }),
-    })
-    sync.applyIncomingState('variant', toRawDeep(runtime.state, true))
+    const host = { state: {} as any }
+    // Runtime snapshots seed host controls; subsequent serialized host patches
+    // must preserve callbacks owned by runtime and controls documents.
+    applyVariantStateUpdate({ variantId: 'variant', state: toRawDeep(runtime.state, true), getVariantById: () => host })
     host.state.count = 1
-    sync.syncCurrentVariantState()
+    applyVariantStateUpdate({ variantId: 'variant', state: toRawDeep(host.state, true), getVariantById: () => runtime })
     expect(runtime.state.count).toBe(1)
     expect(runtime.state.items[0].onClick).toBe(onClick)
     expect(runtime.state.callbacks).toEqual([onClick, 'initial'])

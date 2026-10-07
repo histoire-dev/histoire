@@ -1,16 +1,15 @@
 import { describe, expect, it } from 'vitest'
-import { readAppSource } from './utils/app-source.js'
 import { readNodeSources } from './utils/node-source.js'
 import { generatePreviewRuntimeSource } from './utils/preview-runtime-source.js'
 
 /**
  * Source-level guards, deliberately NOT behavioral.
  *
- * All three actors are untestable glue from here: the invalidation calls live
+ * The invalidation calls live
  * inside closures over a running Vite dev server (`ViteDevServer.moduleGraph` +
  * its WS), the self-healing reload lives in a generated source string that only
- * runs inside a browser sandbox, and the grid remount lives in a `.vue`
- * single-file component this Node suite cannot compile.
+ * runs inside a browser sandbox. Current host remount/readiness is exercised by
+ * `embed/runtime-frame-revisions.spec.ts`.
  *
  * The server half is asserted over the whole `server` sub-tree (see
  * `server-dev-event.spec.ts` for the same pattern) so splitting or moving those
@@ -56,23 +55,5 @@ describe('preview runtime staleness', () => {
     expect(source).toContain('attemptStaleRuntimeReload(`variant:${selection.storyId}:${selection.variantId}`)')
     // A successful selection clears the guard so later staleness can reload again.
     expect(source).toContain('clearStaleRuntimeReloadGuard()')
-  })
-
-  it('reloads the grid iframe (and marks preview pending) when the variant list changes', () => {
-    const source = readAppSource('app/components/story/StoryVariantGrid.vue')
-
-    // Grid mode has no per-variant selection to miss inside the iframe, so the
-    // host must force a fresh mount when variants are added/removed/renamed.
-    expect(source).toContain('variants.map(variant => variant.id)')
-
-    // On a variant-list change the host must mark readiness pending BEFORE the
-    // remount, otherwise previewReady stays stale-true from the previous list
-    // while the fresh iframe boots and test collection posts into a dead frame.
-    const block = source.match(/if \(variantIds !== previousVariantIds\) \{([\s\S]*?)\n {2}\}/)?.[1]
-    expect(block).toBeTruthy()
-    const markIndex = block!.indexOf('markStoryPreviewPending()')
-    const reloadIndex = block!.indexOf('reloadPreviewFrame()')
-    expect(markIndex).toBeGreaterThan(-1)
-    expect(reloadIndex).toBeGreaterThan(markIndex)
   })
 })

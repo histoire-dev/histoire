@@ -13,7 +13,6 @@ import { createStandaloneRuntimeBinding } from './runtime-binding.js'
 import { createStandaloneRuntimeTests } from './runtime-tests.js'
 import { createStandaloneSelection } from './selection.js'
 import { createStandaloneSession } from './session.js'
-import './style.css'
 
 /** Standalone entry owns its controller and joins resource teardown at explicit caller target. */
 export function mountStandaloneApp(options: {

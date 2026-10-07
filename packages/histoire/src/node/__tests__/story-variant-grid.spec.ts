@@ -1,48 +1,7 @@
 import { describe, expect, it } from 'vitest'
-import { readAppSource, readAppSourceEntries } from './utils/app-source.js'
 import { generatePreviewRuntimeSource } from './utils/preview-runtime-source.js'
 
-/**
- * Source-level guards, deliberately NOT behavioral.
- *
- * The preview half lives in a generated source string whose imports only exist
- * inside a live browser sandbox, and the host half in `.vue` single-file
- * components this Node suite cannot compile. The composable they share IS
- * driven behaviorally, in `preview-iframe-host.spec.ts`; what is pinned here is
- * that the story views keep delegating to it, plus the readiness bookkeeping
- * baked into the generated runtime.
- */
-
-describe('story views', () => {
-  it('keep the preview iframe protocol in one shared composable', () => {
-    // The readiness/state/selection protocol used to be copy-pasted in both
-    // story views and drifted between them.
-    const host = readAppSource('app/util/preview-iframe-host.ts')
-
-    // Vite hot listeners persist for the module's lifetime: without `off`,
-    // every story navigation leaks one handler holding the unmounted instance.
-    expect(host).toContain('import.meta.hot.on(STORY_CHANGED_EVENT, onStoryChanged)')
-    expect(host).toContain('import.meta.hot?.off(STORY_CHANGED_EVENT, onStoryChanged)')
-
-    // Scanned over the whole story component directory rather than the two
-    // known views, so a third view cannot grow its own copy unnoticed.
-    const views = readAppSourceEntries('app/components/story')
-    expect(views.length).toBeGreaterThanOrEqual(2)
-
-    for (const [path, source] of views) {
-      expect(source, path).not.toContain('import.meta.hot')
-      expect(source, path).not.toContain(`useEventListener(window, 'message'`)
-    }
-
-    // And the two iframe-hosting views really do use the composable.
-    for (const view of [
-      'app/components/story/StoryVariantGrid.vue',
-      'app/components/story/StoryVariantSingleIframe.vue',
-    ]) {
-      expect(readAppSource(view), view).toContain('usePreviewIframeHost({')
-    }
-  })
-})
+/** Guards for generated runtime readiness; host behavior lives in runtime-frame suites. */
 
 describe('preview runtime readiness bookkeeping', () => {
   const source = generatePreviewRuntimeSource()

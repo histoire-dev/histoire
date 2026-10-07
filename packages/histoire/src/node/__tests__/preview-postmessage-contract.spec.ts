@@ -6,14 +6,13 @@ import { generatePreviewRuntimeSource } from './utils/preview-runtime-source.js'
  * Whole-tree guard on the host <-> preview iframe postMessage contract.
  *
  * Every message crossing that boundary must carry the `__histoire` marker (both
- * sides drop messages without it, see `isTrustedFrameMessage`) and must name an
+ * sides drop messages without it) and must name an
  * explicit target origin (never '*', which would leak state/event/test payloads
  * to any cross-origin page embedding the same-origin sandbox).
  *
- * Both halves of the channel live where this Node suite cannot execute them:
- * the host half is spread over `.vue` single-file components, the preview half
- * is a generated source string. So the invariant is asserted at the source
- * level — but over the WHOLE app tree plus the generated runtime, so a new call
+ * Behavioral runtime-frame suites prove acceptance and ownership. This guard
+ * also checks retained helper, iframe-adapter and generated-runtime call sites
+ * at the source level — over the WHOLE app source tree, so a new call
  * site cannot silently opt out and a file move cannot quietly disable it.
  */
 
@@ -122,7 +121,7 @@ function findPostMessageCalls(location: string, source: string): PostMessageCall
 
 /** Every scanned source: the app tree plus the generated preview runtime. */
 const scannedSources: [string, string][] = [
-  ...readAppSourceEntries('app'),
+  ...readAppSourceEntries(),
   ['<generated preview runtime>', generatePreviewRuntimeSource()],
 ]
 
@@ -133,12 +132,16 @@ const postingSources = scannedSources.filter(([location]) => allCalls.some(call 
 
 describe('host <-> preview postMessage contract', () => {
   it('scans every call site of both halves of the channel', () => {
-    // Sanity check on the scanner itself: if it silently matched nothing, every
-    // assertion below would pass vacuously.
-    expect(postingSources.length).toBeGreaterThanOrEqual(4)
-    expect(allCalls.length).toBeGreaterThanOrEqual(5)
-    // The preview half must be in there, not only the host half.
-    expect(allCalls.some(call => call.location === '<generated preview runtime>')).toBe(true)
+    // Name retained boundary owners instead of counting retired UI call sites.
+    // Without these checks the invariants below could pass vacuously or miss
+    // primary/controls/worker documents that live outside the app subfolder.
+    expect(postingSources.map(([location]) => location)).toEqual(expect.arrayContaining([
+      'app/util/events.ts',
+      'embed/adapters/runtime-frame.ts',
+      'embed/adapters/controls-replica.ts',
+      'embed/adapters/test-workers.ts',
+      '<generated preview runtime>',
+    ]))
   })
 
   it('never posts to a wildcard target origin', () => {
