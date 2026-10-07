@@ -5,7 +5,7 @@ import { BuiltinIcon, HstButton, HstSwitch } from '@histoire/controls/vue'
 import { getHistoireTargetKey } from '@histoire/protocol'
 import { useHistoireSnapshot } from '@histoire/vue'
 import { useHistoireContext, useHistoireResource } from '@histoire/vue/internal'
-import { computed, ref } from 'vue'
+import { computed, ref, useId } from 'vue'
 import { useWorkbenchTestsModel } from './model.js'
 import TestsFilter from './TestsFilter.vue'
 import TestsSummary from './TestsSummary.vue'
@@ -16,6 +16,7 @@ const { session } = useHistoireContext()
 const snapshot = useHistoireSnapshot()
 const model = useWorkbenchTestsModel()
 const filter = ref<'failing' | 'all' | 'changed'>('failing')
+const watchModeId = `histoire-watch-tests-${useId()}`
 let active = true
 useHistoireResource(() => {
   active = false
@@ -62,9 +63,11 @@ async function select(row: WorkbenchTestRow) {
       </p>
       <TestsTree v-else-if="model.discoveryStatus.value !== 'error' || model.visibleRows.value.length" :rows="model.visibleRows.value" :filter="filter" :selected="snapshot.selection" @select="select" />
       <footer>
-        <BuiltinIcon icon="view" :size="16" />
-        <span>Watch mode</span>
-        <HstSwitch layout="inline" aria-label="Watch tests" :model-value="model.watchTests.value" :disabled="!model.canRun.value" @update:model-value="model.setWatch($event)" />
+        <label :for="watchModeId" class="watch-mode-row" :class="{ disabled: !model.canRun.value }">
+          <BuiltinIcon icon="view" :size="16" />
+          <span>Watch mode</span>
+          <HstSwitch :id="watchModeId" layout="inline" aria-label="Watch tests" :model-value="model.watchTests.value" :disabled="!model.canRun.value" @update:model-value="model.setWatch($event)" />
+        </label>
       </footer>
     </template>
     <p v-else class="test-issue">
@@ -81,7 +84,12 @@ h2 { margin: 0; font-size: 14px; font-weight: 800; }
 .test-issue { margin: 10px 16px; color: var(--histoire-danger-text); font-size: 12px; overflow-wrap: anywhere; white-space: pre-line; }
 .test-status, .retry-collection { margin: 10px 16px; }
 .retry-collection { align-self: flex-start; }
-footer { display: flex; align-items: center; gap: 9px; margin-top: auto; padding: 14px 16px; border-top: 1px solid var(--histoire-border); }
-footer > svg { color: var(--histoire-muted); }
-footer > span { flex: 1; font-weight: 700; font-size: 12px; }
+footer { margin-top: auto; border-top: 1px solid var(--histoire-border); }
+.watch-mode-row { display: flex; align-items: center; gap: 9px; box-sizing: border-box; inline-size: 100%; min-inline-size: 0; padding: 14px 16px; cursor: pointer; }
+.watch-mode-row:hover { background: var(--histoire-chip); }
+.watch-mode-row.disabled { cursor: default; }
+.watch-mode-row.disabled:hover { background: transparent; }
+.watch-mode-row > svg { flex: none; color: var(--histoire-muted); }
+.watch-mode-row > span { flex: 1; min-inline-size: 0; font-size: 12px; font-weight: 700; }
+.watch-mode-row :deep(.histoire-switch) { flex: none; }
 </style>
