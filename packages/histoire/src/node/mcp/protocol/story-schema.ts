@@ -18,6 +18,8 @@ export const mcpStorySchema = z.strictObject({
   treePath: z.array(z.string()),
   /** Registered physical or virtual relative path. */
   filePath: mcpRelativePathSchema,
+  /** Ownership of the registered story file. */
+  fileOrigin: z.enum(['project', 'generated', 'external']).optional(),
   /** Existing framework support identifier. */
   supportPluginId: z.string(),
   /** Optional navigation group. */

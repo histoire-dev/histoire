@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { HistoireDocsContent, HistoireSelectionInput, HistoireTarget } from '@histoire/protocol'
 import { BuiltinIcon, HstButton } from '@histoire/controls/vue'
-import { requestHistoireOpenInEditor } from '@histoire/sdk/internal'
+import { canOpenHistoireTargetInEditor, requestHistoireOpenInEditor } from '@histoire/sdk/internal'
 import { HistoireDocs, useHistoireSession, useHistoireSnapshot } from '@histoire/vue'
 import { computed, nextTick, ref, watch } from 'vue'
 
@@ -35,7 +35,7 @@ const loaded = ref(false)
 const empty = ref(false)
 const copied = ref(false)
 const currentAnchor = ref(props.anchor)
-const canEdit = computed(() => __HISTOIRE_DEV__ && snapshot.value.source?.mode === 'dev' && snapshot.value.capabilities.openInEditor.available)
+const canEdit = computed(() => __HISTOIRE_DEV__ && canOpenHistoireTargetInEditor(snapshot.value))
 watch(() => props.anchor, value => currentAnchor.value = value)
 
 /** Preserve rendered IDs while avoiding double encoding copied local anchors. */

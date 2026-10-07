@@ -12,6 +12,7 @@ export function resolvedStories(ctx: Context) {
       id: file.id,
       path: file.treePath,
       filePath: file.relativePath,
+      fileOrigin: file.fileOrigin ?? 'project',
       story: file.story,
       supportPluginId: file.supportPluginId,
       docsFilePath: file.markdownFile?.relativePath,

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { HistoireCatalogStory } from '@histoire/sdk'
 import { BuiltinIcon } from '@histoire/controls/vue'
+import { isHistoireProjectFileOrigin } from '@histoire/protocol'
 import { computed } from 'vue'
 import CanvasStatus from './CanvasStatus.vue'
 
@@ -12,17 +13,18 @@ const props = withDefaults(defineProps<{
 }>(), { canOpenInEditor: false })
 const emit = defineEmits<{ openInEditor: [] }>()
 const editorLabel = computed(() => `Open ${props.story.relativePath ?? ''} in editor`)
+const showFile = computed(() => !!props.story.relativePath && isHistoireProjectFileOrigin(props.story.fileOrigin))
 </script>
 
 <template>
   <header class="histoire-canvas-heading">
     <div><h1>{{ story.title }}</h1><span>{{ story.variants.length }} {{ story.variants.length === 1 ? 'variant' : 'variants' }}</span></div>
     <div class="histoire-canvas-metadata">
-      <button v-if="canOpenInEditor && story.relativePath" type="button" class="histoire-canvas-file histoire-canvas-file-action" :aria-label="editorLabel" :title="editorLabel" @pointerdown.stop @click="emit('openInEditor')">
+      <button v-if="showFile && canOpenInEditor" type="button" class="histoire-canvas-file histoire-canvas-file-action" :aria-label="editorLabel" :title="editorLabel" @pointerdown.stop @click="emit('openInEditor')">
         <BuiltinIcon class="histoire-canvas-file-icon" icon="code" :size="14" />
         <span>{{ story.relativePath }}</span>
       </button>
-      <span v-else-if="story.relativePath" class="histoire-canvas-file"><BuiltinIcon icon="code" :size="14" /><span>{{ story.relativePath }}</span></span>
+      <span v-else-if="showFile" class="histoire-canvas-file"><BuiltinIcon icon="code" :size="14" /><span>{{ story.relativePath }}</span></span>
       <CanvasStatus :pan="false" />
     </div>
   </header>

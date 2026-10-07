@@ -141,6 +141,18 @@ describe('independent session navigation', () => {
     await Promise.all(sessions.map(session => session.dispose()))
   })
 
+  it.each(['generated', 'external'] as const)('omits toolbar editor action for %s stories', async (fileOrigin) => {
+    const fixture = sourceFixture()
+    fixture.descriptor.catalog.stories[0].fileOrigin = fileOrigin
+    const session = createHistoireSessionWithAdapters({ url: 'https://book.example/' }, fixture.adapters)
+    await session.connect()
+    await session.selection.select({ storyId: 'a:b', variantId: 'c' })
+    const wrapper = mount(HistoireProvider, { props: { session }, slots: { default: () => h(HistoireToolbar) } })
+    expect(wrapper.findAll('button').some(button => button.text() === 'Open in editor')).toBe(false)
+    wrapper.unmount()
+    await session.dispose()
+  })
+
   it('reveals absent owning search from current source document and rejects stale focus', async () => {
     const fixture = sourceFixture()
     let receive = (_event: any) => {}

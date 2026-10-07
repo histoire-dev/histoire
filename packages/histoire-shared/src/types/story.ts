@@ -1,4 +1,4 @@
-import type { HistoireMatrixHint, HistoireMatrixValue } from '@histoire/protocol'
+import type { HistoireMatrixHint, HistoireMatrixValue, HistoireStoryFileOrigin } from '@histoire/protocol'
 
 export interface StoryFile {
   id: string
@@ -7,6 +7,8 @@ export interface StoryFile {
   story: Story
   path: string[]
   filePath: string
+  /** Ownership of the registered file relative to the user project. */
+  fileOrigin?: HistoireStoryFileOrigin
   hasVitestMocks?: boolean
   docsFilePath?: string
   source: () => Promise<{ default: string }>
@@ -120,6 +122,8 @@ export interface ServerStoryFile {
    * Relative path
    */
   relativePath: string
+  /** Ownership of the registered file relative to the user project. */
+  fileOrigin?: HistoireStoryFileOrigin
   /**
    * File name without extension
    */

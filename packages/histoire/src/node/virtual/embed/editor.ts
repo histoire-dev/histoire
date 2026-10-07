@@ -1,6 +1,6 @@
 import type { HistoireSourceDescriptor } from '@histoire/protocol'
 import type { CatalogSnapshot } from '../../runtime/catalog/types.js'
-import { HistoireSdkError, validateHistoireTarget, validateWireValue } from '@histoire/protocol'
+import { HistoireSdkError, isHistoireProjectFileOrigin, validateHistoireTarget, validateWireValue } from '@histoire/protocol'
 import { lookupStory, lookupTarget } from '../../runtime/catalog/lookup.js'
 
 /** Resolve registered private physical source; no arbitrary file/path/URL arguments. */
@@ -12,7 +12,10 @@ export function resolveEmbedEditorTarget(snapshot: CatalogSnapshot, descriptor: 
   validateHistoireTarget(input.target)
   if (input.epoch !== descriptor.epoch || input.revision !== descriptor.revision || snapshot.epoch !== input.epoch || snapshot.revision !== input.revision) throw new HistoireSdkError('STALE_REVISION', 'Editor source publication changed')
   const { story } = input.target.variantId === null ? lookupStory(snapshot, input.target.storyId) : lookupTarget(snapshot, input.target.storyId, input.target.variantId)
-  const source = snapshot.contents.get(story.filePath)?.source
+  if (!isHistoireProjectFileOrigin(story.fileOrigin)) throw new HistoireSdkError('CAPABILITY_UNAVAILABLE', 'Editor is unavailable for non-project stories')
+  const content = snapshot.contents.get(story.filePath)
+  if (story.docsOnly && content?.docs?.absolutePath) return content.docs.absolutePath
+  const source = content?.source
   if (source?.kind !== 'file' || !source.absolutePath) throw new HistoireSdkError('CAPABILITY_UNAVAILABLE', 'Collected target has no physical editor source')
   return source.absolutePath
 }

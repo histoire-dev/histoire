@@ -36,7 +36,7 @@ describe('portable Node manifest', () => {
     expect(artifactManifestSchema.parse(manifest)).toEqual(manifest)
     expect(manifest.stories[0].story).not.toHaveProperty('runtimeRevision')
     expect(manifest.stories[0].story).not.toHaveProperty('matrix')
-    expect(manifest.stories[0]).toMatchObject({ story: { id: '../🐈/%2E', docsAvailable: true, sourceKind: 'virtual' }, source: { kind: 'virtual' }, docs: { kind: 'text', origin: 'collected' } })
+    expect(manifest.stories[0]).toMatchObject({ story: { id: '../🐈/%2E', fileOrigin: 'project', docsAvailable: true, sourceKind: 'virtual' }, source: { kind: 'virtual' }, docs: { kind: 'text', origin: 'collected' } })
     const serialized = JSON.stringify(manifest)
     expect(serialized).not.toContain(fixture.root)
     expect(serialized).not.toContain('do not include')
@@ -46,6 +46,15 @@ describe('portable Node manifest', () => {
     expect(createArtifactManifest({ ...snapshot, settings: { ...snapshot.settings, backgroundColor: '#ffffff' } }, manifest.publicAssets, true, '1.2.3').buildId).not.toBe(manifest.buildId)
     expect(createArtifactManifest({ ...snapshot, settings: { ...snapshot.settings, globals: { theme: 'light' } } }, manifest.publicAssets, true, '1.2.3').buildId).not.toBe(manifest.buildId)
     expect(artifactManifestSchema.safeParse({ ...manifest, globals: { theme: {} } }).success).toBe(false)
+  })
+
+  it.each(['project', 'generated', 'external'] as const)('preserves %s story provenance in Node artifacts', async (fileOrigin) => {
+    const file = createMcpStory(fixture.root)
+    file.fileOrigin = fileOrigin
+    const ctx = context([file])
+    const snapshot = await createNodeBuildSnapshot(ctx, await captureNodeBuildInputs(ctx))
+    const manifest = createArtifactManifest(snapshot, [], true, '1.2.3')
+    expect(artifactManifestSchema.parse(manifest).stories[0].story.fileOrigin).toBe(fileOrigin)
   })
 
   it('omits private raw source while retaining collected docs and UI source input', async () => {

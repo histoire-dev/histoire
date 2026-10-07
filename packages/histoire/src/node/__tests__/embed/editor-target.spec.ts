@@ -1,3 +1,5 @@
+import { writeFile } from 'node:fs/promises'
+import { join } from 'node:path'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { resolveEmbedEditorTarget } from '../../virtual/embed/editor.js'
 import { createEmbedSource } from '../../virtual/embed/source.js'
@@ -22,5 +24,28 @@ describe('finite embed editor target', () => {
     const descriptor = createEmbedSource(fixture.context, fixture.catalog).getDescriptor()
     descriptor.mode = 'static'
     expect(() => resolveEmbedEditorTarget(fixture.catalog.current!, descriptor, {})).toThrow('Editor is available only in dev')
+  })
+
+  it.each(['generated', 'external'] as const)('rejects %s story files before editor acquisition', async (fileOrigin) => {
+    fixture.story.fileOrigin = fileOrigin
+    await fixture.catalog.publish(fixture.context)
+    const descriptor = createEmbedSource(fixture.context, fixture.catalog).getDescriptor()
+    const target = { storyId: fixture.story.story.id, variantId: fixture.story.story.variants[0].id }
+    const input = { target, epoch: descriptor.epoch, revision: descriptor.revision }
+    expect(() => resolveEmbedEditorTarget(fixture.catalog.current!, descriptor, input)).toThrow('Editor is unavailable for non-project stories')
+  })
+
+  it('opens the physical Markdown owner of a project standalone story', async () => {
+    const markdownPath = join(fixture.root, 'Guide.story.md')
+    await writeFile(markdownPath, '# Guide')
+    fixture.story.virtual = true
+    fixture.story.moduleCode = 'export default {}'
+    fixture.story.fileOrigin = 'project'
+    fixture.story.story.docsOnly = true
+    fixture.story.markdownFile = { id: 'guide', relativePath: 'Guide.story.md', absolutePath: markdownPath, isRelatedToStory: false, content: '# Guide', frontmatter: {}, html: '<h1>Guide</h1>' }
+    await fixture.catalog.publish(fixture.context)
+    const descriptor = createEmbedSource(fixture.context, fixture.catalog).getDescriptor()
+    const input = { target: { storyId: fixture.story.story.id, variantId: null }, epoch: descriptor.epoch, revision: descriptor.revision }
+    expect(resolveEmbedEditorTarget(fixture.catalog.current!, descriptor, input)).toBe(markdownPath)
   })
 })

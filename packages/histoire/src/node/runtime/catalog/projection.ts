@@ -16,6 +16,7 @@ export function projectCatalog(stories: readonly CatalogStory[], diagnostics: re
       title: story.title,
       path: Object.freeze(story.treePath.slice()),
       relativePath: story.filePath,
+      fileOrigin: story.fileOrigin,
       supportPluginId: story.supportPluginId,
       ...(story.runtimeRevision ? { runtimeRevision: story.runtimeRevision } : {}),
       docsOnly: story.docsOnly,

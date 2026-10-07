@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { createEmbedFrameAncestors, mergeEmbedFrameAncestors, resolveEmbedOrigins, validateHistoireSourceDescriptor } from '../index.js'
+import { createEmbedFrameAncestors, isHistoireProjectFileOrigin, mergeEmbedFrameAncestors, resolveEmbedOrigins, validateHistoireSourceDescriptor } from '../index.js'
 import { createProtocolDescriptor } from './fixtures/catalog.js'
 
 describe('portable source descriptor policy', () => {
@@ -13,6 +13,19 @@ describe('portable source descriptor policy', () => {
     }
     const catalog = { ...descriptor.catalog, stories: [{ ...story, layoutExplicit: 'single' }] }
     expect(() => validateHistoireSourceDescriptor({ ...descriptor, catalog })).toThrow('Invalid layout provenance')
+  })
+
+  it('validates story file provenance while keeping legacy catalogs project-compatible', () => {
+    const descriptor = createProtocolDescriptor()
+    const story = descriptor.catalog.stories[0]
+    expect(isHistoireProjectFileOrigin(story.fileOrigin)).toBe(true)
+    for (const fileOrigin of ['project', 'generated', 'external'] as const) {
+      const catalog = { ...descriptor.catalog, stories: [{ ...story, fileOrigin }] }
+      expect(() => validateHistoireSourceDescriptor({ ...descriptor, catalog })).not.toThrow()
+      expect(isHistoireProjectFileOrigin(fileOrigin)).toBe(fileOrigin === 'project')
+    }
+    const catalog = { ...descriptor.catalog, stories: [{ ...story, fileOrigin: 'dependency' }] }
+    expect(() => validateHistoireSourceDescriptor({ ...descriptor, catalog })).toThrow('Invalid story file origin')
   })
 
   it('validates safe lazy references and exact deployment origins', () => {

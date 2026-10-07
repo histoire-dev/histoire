@@ -33,6 +33,15 @@ describe('first-party source metadata', () => {
     await expect(requestHistoireOpenInEditor(session, { storyId: 'a:b', variantId: 'c' })).rejects.toMatchObject({ code: 'CAPABILITY_UNAVAILABLE' })
     await session.dispose()
   })
+  it.each(['generated', 'external'] as const)('rejects editor requests for %s story files before transport', async (fileOrigin) => {
+    const fixture = sourceFixture()
+    fixture.descriptor.catalog.stories[0].fileOrigin = fileOrigin
+    const session = createHistoireSessionWithAdapters({ url: 'https://book.example/' }, fixture.adapters)
+    await session.connect()
+    await expect(requestHistoireOpenInEditor(session, { storyId: 'a:b', variantId: 'c' })).rejects.toMatchObject({ code: 'CAPABILITY_UNAVAILABLE' })
+    expect(fixture.request).not.toHaveBeenCalledWith('openInEditor', expect.anything(), expect.anything())
+    await session.dispose()
+  })
   it('exposes synchronously failing proxy delegates as observed rejected operations', async () => {
     const session = {} as any
     registerHistoireSessionInternals(session, { descriptor: () => {

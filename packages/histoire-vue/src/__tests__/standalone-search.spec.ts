@@ -26,6 +26,22 @@ vi.mock('virtual:$histoire-commands', () => ({ registeredCommands: [
 vi.mock('virtual:$histoire-stories', () => ({ files: [{ component: {}, story: { id: 'a:b', title: 'First', variants: [{ id: 'c', title: 'One' }] } }], onUpdate: () => () => {} }))
 
 describe('standalone combined search navigation', () => {
+  it.each(['generated', 'external'] as const)('omits editor command for %s stories', async (fileOrigin) => {
+    const fixture = sourceFixture()
+    fixture.descriptor.catalog.stories[0].fileOrigin = fileOrigin
+    const session = createHistoireSessionWithAdapters({ url: 'https://book.example/' }, fixture.adapters)
+    await session.connect()
+    await session.selection.select({ storyId: 'a:b', variantId: 'c' })
+    const commands = createStandaloneCommands(session, createRouter({ history: createMemoryHistory(), routes: [] }))
+    try {
+      expect(commands.list('Open file').map(command => command.id)).not.toContain('builtin:open-in-editor')
+    }
+    finally {
+      commands.close()
+      await session.dispose()
+    }
+  })
+
   it('matches configured searchText aliases while retaining live command visibility', async () => {
     const fixture = sourceFixture()
     const session = createHistoireSessionWithAdapters({ url: 'https://book.example/' }, fixture.adapters)

@@ -30,11 +30,19 @@ describe('project catalog', () => {
     catalog.markUpdating()
     const page = catalog.list({})
     expect(page.updating).toBe(true)
-    expect(page.items[0]).toEqual({ id: 'story-a', title: 'A', treePath: ['Folder', 'A'], filePath: 'a.story.js', supportPluginId: 'vue', docsOnly: false, variants: [{ id: 'default', title: 'Default' }], docsAvailable: false, sourceAvailable: true, sourceKind: 'virtual' })
+    expect(page.items[0]).toEqual({ id: 'story-a', title: 'A', treePath: ['Folder', 'A'], filePath: 'a.story.js', fileOrigin: 'project', supportPluginId: 'vue', docsOnly: false, variants: [{ id: 'default', title: 'Default' }], docsAvailable: false, sourceAvailable: true, sourceKind: 'virtual' })
     expect(JSON.stringify(page)).not.toContain('secret')
     await catalog.publish(context(root, [file]))
     expect(catalog.list({}).items[0].title).toBe('Changed midway')
     expect(catalog.list({}).updating).toBe(false)
+  })
+
+  it.each(['project', 'generated', 'external'] as const)('publishes %s story provenance through the MCP schema', async (fileOrigin) => {
+    const file = story(root)
+    file.fileOrigin = fileOrigin
+    const catalog = createProjectCatalog({ projectId, epoch, root })
+    await catalog.publish(context(root, [file]))
+    expect(mcpListStoriesResultSchema.parse(catalog.list({})).items[0].fileOrigin).toBe(fileOrigin)
   })
 
   it('distinguishes empty and failed collection and recovers without stale executable targets', async () => {

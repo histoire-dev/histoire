@@ -22,7 +22,7 @@ afterEach(async () => {
 })
 
 /** Mount canvas header with a connected canonical source and controlled geometry. */
-async function editorFixture(options: { available?: boolean, target?: { storyId: string, variantId: string | null } } = {}) {
+async function editorFixture(options: { available?: boolean, fileOrigin?: 'project' | 'generated' | 'external', target?: { storyId: string, variantId: string | null } } = {}) {
   resizeObserverFixture()
   vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockImplementation(function (this: HTMLElement) {
     const width = this.classList.contains('histoire-canvas-viewport') ? 1800 : 0
@@ -32,7 +32,7 @@ async function editorFixture(options: { available?: boolean, target?: { storyId:
   const source = sourceFixture()
   const target = options.target ?? { storyId: 'a:b', variantId: 'c' }
   source.descriptor.capabilities.openInEditor = { available: options.available ?? true }
-  source.descriptor.catalog.stories = source.descriptor.catalog.stories.map(story => story.id === target.storyId ? { ...story, relativePath: filePath } : story)
+  source.descriptor.catalog.stories = source.descriptor.catalog.stories.map(story => story.id === target.storyId ? { ...story, relativePath: filePath, ...(options.fileOrigin ? { fileOrigin: options.fileOrigin } : {}) } : story)
   const session = createHistoireSessionWithAdapters({ url: 'https://book.example/' }, source.adapters)
   await session.connect()
   await session.selection.select(target)
@@ -99,6 +99,16 @@ describe('canvas header editor action', () => {
 
     expect(test.wrapper.text()).toContain(filePath)
     expect(test.wrapper.find(`button[aria-label="Open ${filePath} in editor"]`).exists()).toBe(false)
+    expect(test.source.request).not.toHaveBeenCalledWith('openInEditor', expect.anything(), expect.anything())
+  })
+
+  it.each(['generated', 'external'] as const)('omits file row and editor request for %s stories', async (fileOrigin) => {
+    const test = await editorFixture({ fileOrigin })
+
+    expect(test.wrapper.find('.histoire-canvas-file').exists()).toBe(false)
+    expect(test.wrapper.text()).not.toContain(filePath)
+    await test.viewport.vm.openInEditor?.()
+    await flushPromises()
     expect(test.source.request).not.toHaveBeenCalledWith('openInEditor', expect.anything(), expect.anything())
   })
 

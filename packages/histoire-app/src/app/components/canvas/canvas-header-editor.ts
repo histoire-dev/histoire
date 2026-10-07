@@ -1,6 +1,7 @@
 import type { HistoireSnapshot, HistoireSourceIdentity, HistoireTarget } from '@histoire/protocol'
 import type { HistoireCatalogStory, HistoireSession } from '@histoire/sdk'
-import { requestHistoireOpenInEditor } from '@histoire/sdk/internal'
+import { isHistoireProjectFileOrigin } from '@histoire/protocol'
+import { canOpenHistoireTargetInEditor, requestHistoireOpenInEditor } from '@histoire/sdk/internal'
 import { computed } from 'vue'
 
 /** Inputs read from CanvasViewport's canonical session and displayed header state. */
@@ -38,8 +39,9 @@ export function createCanvasHeaderEditor(options: CanvasHeaderEditorOptions) {
     const selection = state.selection
     const source = state.source
     if (!story || options.displayedStory()?.id !== story.id || options.hasCollectionError() || options.isObscured()) return null
+    if (!isHistoireProjectFileOrigin(story.fileOrigin)) return null
     if (!selection || selection.storyId !== story.id || state.status !== 'ready' || state.stale) return null
-    if (!source || source.mode !== 'dev' || !state.capabilities.openInEditor.available) return null
+    if (!source || !canOpenHistoireTargetInEditor(state, selection)) return null
     return {
       target: { storyId: selection.storyId, variantId: selection.variantId },
       source: { sourceId: source.sourceId, epoch: source.epoch, revision: source.revision },
@@ -62,6 +64,7 @@ export function createCanvasHeaderEditor(options: CanvasHeaderEditorOptions) {
       && selection.variantId === captured.target.variantId
       && options.currentStory()?.id === captured.target.storyId
       && options.displayedStory()?.id === captured.target.storyId
+      && isHistoireProjectFileOrigin(options.currentStory()?.fileOrigin)
       && !options.hasCollectionError()
   }
 

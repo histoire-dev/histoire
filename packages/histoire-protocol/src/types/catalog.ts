@@ -2,6 +2,14 @@ import type { HistoireMatrixHint } from '../helpers/matrix.js'
 import type { HistoireCapabilities, HistoireTarget } from './common.js'
 import type { HistoireEmbedPolicy, HistoireSourceAssets, HistoireSourceConfig } from './source-descriptor.js'
 
+/** Ownership of one collected story file relative to the user project. */
+export type HistoireStoryFileOrigin = 'project' | 'generated' | 'external'
+
+/** Legacy descriptors omitted provenance and represented ordinary project stories. */
+export function isHistoireProjectFileOrigin(origin: HistoireStoryFileOrigin | undefined): boolean {
+  return origin === undefined || origin === 'project'
+}
+
 /** Projected collection issue without internal stack/path/context. */
 export interface HistoireDiagnostic {
   /** Stable diagnostic kind. */
@@ -58,6 +66,8 @@ export interface HistoireCatalogStory {
   runtimeRevision?: string
   /** Relative project file label. */
   relativePath?: string
+  /** File ownership; absent only on compatible older source descriptors. */
+  fileOrigin?: HistoireStoryFileOrigin
   /** Collected variants in selection order. */
   variants: readonly HistoireCatalogVariant[]
   /** Available static documentation and source. */

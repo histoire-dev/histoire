@@ -4,7 +4,7 @@ import type { ClientCommand, ClientCommandContext } from '@histoire/shared'
 import type { Router } from 'vue-router'
 import type { StandaloneRuntimeBinding } from './runtime-binding.js'
 import { getHistoireTargetKey } from '@histoire/protocol'
-import { requestHistoireOpenInEditor } from '@histoire/sdk/internal'
+import { canOpenHistoireTargetInEditor, requestHistoireOpenInEditor } from '@histoire/sdk/internal'
 import { registeredCommands } from 'virtual:$histoire-commands'
 import { files, onUpdate } from 'virtual:$histoire-stories'
 import { shallowRef, watch } from 'vue'
@@ -46,7 +46,7 @@ export function createStandaloneCommands(session: HistoireSession, router: Route
     const current = context()
     const text = query.toLowerCase()
     return [...createBuiltinCommands(context, () => {}), ...registeredCommands].filter(command => (command.id === 'builtin:open-in-editor'
-      ? Boolean(snapshot.value.selection && snapshot.value.capabilities.openInEditor.available)
+      ? canOpenHistoireTargetInEditor(snapshot.value)
       : !command.showIf || command.showIf(current)) && (command.label.toLowerCase().includes(text) || command.searchText?.toLowerCase().includes(text)))
   }
   /** Standalone adapts successful docs activation to its existing route and preserves other query preferences. */
@@ -60,7 +60,7 @@ export function createStandaloneCommands(session: HistoireSession, router: Route
   function execute(command: ClientCommand, params: Record<string, any>): Promise<unknown> {
     if (command.id === 'builtin:open-in-editor') {
       const target = session.getSnapshot().selection
-      return actions.execute({ ...command, clientAction: () => target ? requestHistoireOpenInEditor(session, target) : undefined }, params, context())
+      return actions.execute({ ...command, clientAction: () => target && canOpenHistoireTargetInEditor(session.getSnapshot(), target) ? requestHistoireOpenInEditor(session, target) : undefined }, params, context())
     }
     return actions.execute(command, params, context(), () => {
       if (import.meta.hot) import.meta.hot.send('histoire:dev-command', { id: command.id, params })

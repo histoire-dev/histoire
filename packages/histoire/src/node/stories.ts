@@ -5,6 +5,7 @@ import chokidar from 'chokidar'
 import { globby } from 'globby'
 import micromatch from 'micromatch'
 import { basename, relative, resolve } from 'pathe'
+import { isPathWithinRoot } from './runtime/content/files.js'
 import { getContextRegistry } from './runtime/registry.js'
 
 /** Registers collection feedback for one captured project context. */
@@ -142,6 +143,7 @@ function getAbsoluteFilePath(context: Context, relativeFilePath: string) {
 /** Registers one physical or generated story without duplicating its path. */
 export function addStory(context: Context, relativeFilePath: string, virtualModuleCode?: string) {
   const absoluteFilePath = getAbsoluteFilePath(context, relativeFilePath)
+  const tempDir = getContextRegistry(context).tempDir
   // Plugin output paths are absolute after project isolation. Keep the actual
   // loader path while publishing a root-relative inventory/build label.
   const relativePath = relative(context.root, absoluteFilePath)
@@ -177,6 +179,7 @@ export function addStory(context: Context, relativeFilePath: string, virtualModu
     id: fileId, // The file id will be changed by the story id after it is collected
     path: absoluteFilePath,
     relativePath,
+    fileOrigin: isPathWithinRoot(tempDir, absoluteFilePath) ? 'generated' : isPathWithinRoot(context.root, absoluteFilePath) ? 'project' : 'external',
     fileName,
     moduleId: virtualModuleCode ? `virtual:story:${absoluteFilePath}` : absoluteFilePath,
     supportPluginId,

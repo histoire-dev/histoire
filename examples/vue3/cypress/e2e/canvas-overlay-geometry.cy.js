@@ -109,8 +109,18 @@ describe('canvas overlay geometry', () => {
     })
   }
 
-  it('fits generated Tailwind story after switching story-only Grid to List', () => {
-    visitCanvas('/story/tailwind?variantId')
+  it('hides editor actions for generated Tailwind story and keeps List navigation', () => {
+    visitCanvas('/story/tailwind?variantId=background-color')
+    cy.get(`${canvas} .histoire-canvas-file`).should('not.exist')
+    cy.get('[aria-label="Expand source"]').click()
+    cy.get('[aria-label="Open source in editor"]').should('not.exist')
+    cy.get(`${canvas} [data-frame-id]`).first().rightclick('center', { force: true })
+    cy.contains('[role="menuitem"] span', /^Open in editor$/).should('not.exist')
+    cy.get('body').type('{esc}')
+    cy.get('[aria-label="Workbench"] [aria-label="Search"]').focus().trigger('keydown', { eventConstructor: 'KeyboardEvent', key: 'k', code: 'KeyK', ctrlKey: true })
+    cy.get('[aria-label="Search stories, docs and props"]').should('be.focused').type('Open file')
+    cy.contains('[data-test-id="search-modal"] button', /^Open file in editor$/).should('not.exist')
+    cy.get('[aria-label="Search stories, docs and props"]').type('{esc}')
     cy.get('button[aria-label="List"]').click()
     cy.location('search').should('include', 'variantId=background-color')
     cy.get('button[aria-label="Zoom level"]').should('contain', 'Selection')
@@ -119,6 +129,13 @@ describe('canvas overlay geometry', () => {
 
   it('preserves saved 67% zoom and places initial Code gen frame below header', () => {
     visitCanvas(codegen, 0.67)
+    cy.get(`${canvas} .histoire-canvas-file`).should('exist')
+    cy.request({ url: '/__histoire/local/descriptor.json', failOnStatusCode: false }).then((response) => {
+      if (response.status !== 200 || response.body.mode !== 'dev') return
+      cy.get(`${canvas} [data-frame-id]`).first().rightclick('center', { force: true })
+      cy.contains('[role="menuitem"] span', /^Open in editor$/).should('exist')
+      cy.get('body').type('{esc}')
+    })
     cy.get('button[aria-label="Zoom level"]').should('contain', '67%')
     assertFrames('.histoire-canvas-frame.is-selected', false)
     cy.screenshot('canvas-overlay-saved-zoom')

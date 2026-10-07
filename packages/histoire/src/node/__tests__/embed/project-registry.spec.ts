@@ -3,6 +3,7 @@ import { closeContext } from '../../context.js'
 import { onMarkdownListChange } from '../../markdown/events.js'
 import { createMarkdownFileManager } from '../../markdown/files.js'
 import { createMarkdownRenderer } from '../../markdown/renderer.js'
+import { getContextRegistry } from '../../runtime/registry.js'
 import { addStory, notifyStoryChange, onStoryChange, removeStory } from '../../stories.js'
 import { createMcpContext, createMcpProjectFixture } from '../utils/mcp/project.js'
 
@@ -49,6 +50,7 @@ describe('project-owned registry events', () => {
       manager.update('Guide.story.md')
       manager.finishInitialScan()
       expect(first.storyFiles[0].virtual).toBe(true)
+      expect(first.storyFiles[0].fileOrigin).toBe('project')
       expect(first.markdownFiles[0].html).toContain('Documentation')
       manager.remove('Guide.story.md')
       expect(first.storyFiles).toHaveLength(0)
@@ -63,13 +65,18 @@ describe('project-owned registry events', () => {
     }
   })
 
-  it('keeps absolute generated stories project-relative for catalog and build consumers', () => {
+  it('classifies project, generated and external story ownership', () => {
     const ctx = context('/project')
-    const generated = addStory(ctx, '/project/.histoire/tmp/plugins/Tailwind.story.js')
-    expect(generated.path).toBe('/project/.histoire/tmp/plugins/Tailwind.story.js')
-    expect(generated.relativePath).toBe('.histoire/tmp/plugins/Tailwind.story.js')
-    expect(addStory(ctx, '.histoire/tmp/plugins/Tailwind.story.js')).toBe(generated)
+    const project = addStory(ctx, 'src/Project.story.js')
+    const generatedPath = `${getContextRegistry(ctx).tempDir}/plugins/Tailwind.story.js`
+    const generated = addStory(ctx, generatedPath)
+    const external = addStory(ctx, '/dependency/Packaged.story.js')
+    expect(project.fileOrigin).toBe('project')
+    expect(generated.path).toBe(generatedPath)
+    expect(generated.fileOrigin).toBe('generated')
+    expect(external.fileOrigin).toBe('external')
+    expect(addStory(ctx, generated.relativePath)).toBe(generated)
     removeStory(ctx, generated.relativePath)
-    expect(ctx.storyFiles).toHaveLength(0)
+    expect(ctx.storyFiles).toEqual([project, external])
   })
 })

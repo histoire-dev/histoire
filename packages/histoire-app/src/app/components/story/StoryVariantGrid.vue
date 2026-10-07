@@ -92,6 +92,7 @@ watch(() => [
       <DevOnlyToolbarOpenInEditor
         v-if="__HISTOIRE_DEV__"
         :file="storyStore.currentStory.file?.filePath"
+        :file-origin="storyStore.currentStory.file?.fileOrigin"
         tooltip="Edit story in editor"
       />
     </div>

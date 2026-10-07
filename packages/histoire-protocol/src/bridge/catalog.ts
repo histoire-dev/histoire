@@ -52,6 +52,7 @@ export function validateHistoireCatalogStory(value: unknown): HistoireCatalogSto
     if (input[key] !== undefined && typeof input[key] !== 'string') invalid('Invalid catalog metadata')
   }
   validateRelativeLabel(input.relativePath)
+  if (input.fileOrigin !== undefined && !['project', 'generated', 'external'].includes(input.fileOrigin as string)) invalid('Invalid story file origin')
   if (input.runtimeRevision !== undefined && (typeof input.runtimeRevision !== 'string' || !/^[a-f0-9]{64}$/.test(input.runtimeRevision))) invalid('Invalid story runtime revision')
   if (input.layoutExplicit !== undefined && typeof input.layoutExplicit !== 'boolean') invalid('Invalid layout provenance')
   if (input.layout !== undefined) {

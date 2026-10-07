@@ -174,6 +174,7 @@ const filePath = computed(() => story.value.file?.docsFilePath ?? (props.standal
       <DevOnlyToolbarOpenInEditor
         v-if="filePath"
         :file="filePath"
+        :file-origin="story.file?.fileOrigin"
         tooltip="Edit docs in editor"
       />
     </div>

@@ -23,6 +23,21 @@ describe('workbench frame actions', () => {
     finally { await session.dispose() }
   })
 
+  it.each(['generated', 'external'] as const)('hides editor action for %s story files', async (fileOrigin) => {
+    const fixture = sourceFixture()
+    fixture.descriptor.catalog.stories[0].fileOrigin = fileOrigin
+    const session = createHistoireSessionWithAdapters({ url: 'https://book.example/' }, fixture.adapters)
+    await session.connect()
+    const actions = createFrameActions({ session, link: () => '', reveal: vi.fn() })
+    const target = { storyId: 'a:b', variantId: 'c', frameKey: 'frame' }
+    try {
+      expect(actions.list(target).map(action => action.id)).not.toContain('open-editor')
+      await actions.run(actions.entries.get('open-editor')!, target)
+      expect(fixture.request).not.toHaveBeenCalledWith('openInEditor', expect.anything(), expect.anything())
+    }
+    finally { await session.dispose() }
+  })
+
   it.each(['One', 'JSON {', 'State {value}', 'A & "quoted" <value> {literal}'])('saves Svelte source with literal title %s without serializing state', async (title) => {
     const fixture = sourceFixture()
     fixture.descriptor.catalog.stories[0].supportPluginId = '@histoire/plugin-svelte'

@@ -1,6 +1,7 @@
 import type { HistoireSettingsPatch, HistoireSourceConfig } from '@histoire/protocol'
 import { HstButton, HstSelect, HstSwitch, HstText } from '@histoire/controls/vue'
-import { getHistoireSessionDescriptor, requestHistoireOpenInEditor } from '@histoire/sdk/internal'
+import { isHistoireProjectFileOrigin } from '@histoire/protocol'
+import { canOpenHistoireTargetInEditor, getHistoireSessionDescriptor, requestHistoireOpenInEditor } from '@histoire/sdk/internal'
 import { defineComponent, h, ref, watch } from 'vue'
 import { useHistoireSnapshot } from '../../composables/snapshot.js'
 import { useHistoireContext } from '../../provider/context.js'
@@ -24,7 +25,7 @@ export const HistoireToolbar = defineComponent({
     /** First-party finite editor action names only collected story target. */
     function editor() {
       const target = snapshot.value.selection
-      if (target) void requestHistoireOpenInEditor(session, target).catch(error => emit('error', error))
+      if (target && canOpenHistoireTargetInEditor(snapshot.value, target)) void requestHistoireOpenInEditor(session, target).catch(error => emit('error', error))
     }
     return () => {
       const settings = snapshot.value.settings
@@ -33,6 +34,9 @@ export const HistoireToolbar = defineComponent({
         config = getHistoireSessionDescriptor(session).config
       }
       catch { /* Disconnected/SSR provider still displays current local preferences. */ }
+      const selection = snapshot.value.selection
+      const selectedStory = snapshot.value.catalog.stories.find(story => story.id === selection?.storyId)
+      const showEditor = !selection || (!!selectedStory && isHistoireProjectFileOrigin(selectedStory.fileOrigin))
       return h('section', { 'class': 'histoire-toolbar', 'aria-label': 'Histoire toolbar' }, [
         h(HstText, { 'layout': 'inline', 'aria-label': 'Viewport width', 'type': 'number', 'min': 1, 'modelValue': width.value, 'onUpdate:modelValue': (value: string) => width.value = value, 'onChange': () => update({ responsiveWidth: Number(width.value) }) }),
         h(HstText, { 'layout': 'inline', 'aria-label': 'Viewport height', 'type': 'number', 'min': 1, 'modelValue': height.value, 'onUpdate:modelValue': (value: string) => height.value = value, 'onChange': () => update({ responsiveHeight: height.value ? Number(height.value) : null }) }),
@@ -45,7 +49,7 @@ export const HistoireToolbar = defineComponent({
         h(HstSwitch, { 'title': 'Checkerboard', 'modelValue': settings.checkerboard, 'onUpdate:modelValue': (value: boolean) => update({ checkerboard: value }) }),
         h(HstSelect, { 'layout': 'inline', 'aria-label': 'Direction', 'modelValue': settings.textDirection, 'options': [{ value: 'ltr', label: 'LTR' }, { value: 'rtl', label: 'RTL' }], 'onUpdate:modelValue': (value: 'ltr' | 'rtl') => update({ textDirection: value }) }),
         config?.theme.hideColorSchemeSwitch ? null : h(HstSelect, { 'layout': 'inline', 'aria-label': 'Appearance', 'modelValue': settings.colorScheme, 'options': ['auto', 'light', 'dark'], 'onUpdate:modelValue': (value: 'light' | 'dark' | 'auto') => update({ colorScheme: value }) }),
-        h(HstButton, { color: 'flat', type: 'button', disabled: !snapshot.value.capabilities.openInEditor.available || !snapshot.value.selection, onClick: editor }, { default: () => 'Open in editor' }),
+        showEditor ? h(HstButton, { color: 'flat', type: 'button', disabled: !canOpenHistoireTargetInEditor(snapshot.value, selection), onClick: editor }, { default: () => 'Open in editor' }) : null,
       ])
     }
   },

@@ -53,6 +53,7 @@ export async function captureCatalogSnapshot(ctx: Context, options: SnapshotOpti
       title: file.story.title,
       treePath: file.treePath ?? [file.story.title],
       filePath: file.relativePath.replace(/\\/g, '/'),
+      fileOrigin: file.fileOrigin ?? 'project',
       supportPluginId: file.supportPluginId,
       ...(runtimeRevision ? { runtimeRevision } : {}),
       docsOnly: file.story.docsOnly === true,

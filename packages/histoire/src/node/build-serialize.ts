@@ -1,4 +1,4 @@
-import type { HistoireBuildInfo, ServerStory } from '@histoire/shared'
+import type { HistoireBuildInfo, ServerStory, ServerStoryFile } from '@histoire/shared'
 import type { Context } from './context.js'
 import type { BuiltCaptureMetadata } from './runtime/catalog/build-metadata.js'
 import { fileHasVitestMocks } from './util/story-vitest.js'
@@ -7,6 +7,7 @@ interface SerializedStory extends Omit<ServerStory, 'docsText'> {
   /** Only kept for stories whose docs are unreachable in the built app. */
   docsText?: string
   relativePath: string
+  fileOrigin?: ServerStoryFile['fileOrigin']
   supportPluginId: string
   treePath?: string[]
   virtual?: boolean
@@ -51,6 +52,7 @@ export function getSerializedStoryData(ctx: Context): SerializedStoryData {
         ...story,
         ...(keepDocsText ? { docsText } : {}),
         relativePath: storyFile.relativePath,
+        fileOrigin: storyFile.fileOrigin ?? 'project',
         supportPluginId: storyFile.supportPluginId,
         treePath: storyFile.treePath,
         virtual: storyFile.virtual,

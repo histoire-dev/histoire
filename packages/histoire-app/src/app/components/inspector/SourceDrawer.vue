@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { HistoireSourceContent } from '@histoire/protocol'
 import { BuiltinIcon, HstButton, HstButtonGroup } from '@histoire/controls/vue'
-import { requestHistoireOpenInEditor } from '@histoire/sdk/internal'
+import { canOpenHistoireTargetInEditor, requestHistoireOpenInEditor } from '@histoire/sdk/internal'
 import { HistoireSource } from '@histoire/vue'
 import { computed, nextTick, ref, shallowRef, useId, watch } from 'vue'
 import { isContextMenuShortcut } from '../../composables/context-menu.js'
@@ -35,6 +35,7 @@ const available = computed(() => mode.value === 'raw' ? story.value?.content.raw
 const dynamicReady = computed(() => mode.value === 'raw' || (snapshot.value.status === 'ready' && !snapshot.value.stale && snapshot.value.runtime.status === 'ready'))
 const waitingForPreview = computed(() => mode.value === 'dynamic' && !!available.value && !dynamicReady.value)
 const fileLabel = computed(() => story.value?.relativePath?.split('/').pop() || '')
+const canEdit = computed(() => canOpenHistoireTargetInEditor(snapshot.value))
 
 // Vue compares scalar watch sources; a freshly allocated tuple would reset on every SDK publication.
 watch([
@@ -88,6 +89,7 @@ async function copy() {
 
 /** Finite dev capability opens exactly selected story, never a supplied path. */
 function editor() {
+  if (!canEdit.value) return
   const owner = ownership.capture()
   const target = owner.selection
   if (target && ownership.owns(owner)) {
@@ -137,7 +139,7 @@ function status(value: { status: 'idle' | 'loading' | 'ready' | 'error' }) {
       <HstButton v-if="expanded" color="flat" type="button" class="inspector-source-action" :disabled="!content" :aria-label="copied ? 'Source copied' : 'Copy source'" :title="copied ? 'Copied' : 'Copy source'" @click="copy">
         <BuiltinIcon :icon="copied ? 'checkmark' : 'copy'" :size="16" />
       </HstButton>
-      <HstButton v-if="expanded && snapshot.capabilities.openInEditor.available && snapshot.source?.mode === 'dev'" color="flat" type="button" class="inspector-source-action" aria-label="Open source in editor" title="Open source in editor" @click="editor">
+      <HstButton v-if="expanded && canEdit" color="flat" type="button" class="inspector-source-action" aria-label="Open source in editor" title="Open source in editor" @click="editor">
         <BuiltinIcon icon="launch" :size="16" />
       </HstButton>
       <HstButton color="flat" type="button" class="inspector-source-action" :aria-label="expanded ? 'Collapse source' : 'Expand source'" :aria-expanded="expanded" @click="expanded = !expanded">

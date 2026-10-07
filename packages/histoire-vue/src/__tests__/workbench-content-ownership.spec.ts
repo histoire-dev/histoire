@@ -21,6 +21,33 @@ async function setup() {
 }
 
 describe('workbench content ownership', () => {
+  it.each(['generated', 'external'] as const)('hides editor actions but keeps source controls for %s stories', async (fileOrigin) => {
+    const fixture = sourceFixture()
+    fixture.descriptor.catalog.stories[0].fileOrigin = fileOrigin
+    fixture.descriptor.catalog.stories[2].fileOrigin = fileOrigin
+    const session = createHistoireSessionWithAdapters({ url: 'https://book.example/' }, fixture.adapters)
+    await session.connect()
+    await session.selection.select({ storyId: 'a:b', variantId: 'c' })
+    const preview = session.mount(document.createElement('div'), { surface: 'preview' })
+    await preview.ready
+    const source = mount(HistoireProvider, { props: { session }, slots: { default: () => h(SourceDrawer) } })
+    try {
+      await source.get('[aria-label="Expand source"]').trigger('click')
+      expect(source.find('[aria-label="Open source in editor"]').exists()).toBe(false)
+      expect(source.find('[aria-label="Copy source"]').exists()).toBe(true)
+      expect(source.text()).toContain('Story file')
+      await session.selection.select({ storyId: 'docs', variantId: null })
+      const markdown = mount(HistoireProvider, { props: { session }, slots: { default: () => h(MarkdownPage) } })
+      expect(markdown.text()).not.toContain('Edit .md')
+      markdown.unmount()
+    }
+    finally {
+      source.unmount()
+      await preview.unmount()
+      await session.dispose()
+    }
+  })
+
   it('preserves current generated source and copy after unrelated SDK publications', async () => {
     const { fixture, session, preview } = await setup()
     const read = vi.spyOn(session.source, 'get').mockImplementation(async options => ({ ...options, epoch: 'epoch-1', revision: 'revision-1', origin: options.mode === 'raw' ? 'file' : 'dynamic', body: options.mode === 'raw' ? 'story source' : `count=${session.getSnapshot().state?.value.count}`, language: 'text' }))

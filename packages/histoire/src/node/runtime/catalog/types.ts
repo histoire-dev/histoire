@@ -1,4 +1,4 @@
-import type { HistoireCatalog, HistoireMatrixHint } from '@histoire/protocol'
+import type { HistoireCatalog, HistoireMatrixHint, HistoireStoryFileOrigin } from '@histoire/protocol'
 import type { Context } from '../../context.js'
 import type { ContentReader, StoryContentEntry } from '../content/types.js'
 
@@ -12,6 +12,8 @@ export interface CatalogStory {
   treePath: string[]
   /** Portable project-relative label. */
   filePath: string
+  /** Ownership of the collected story file. */
+  fileOrigin: HistoireStoryFileOrigin
   /** Framework support ID. */
   supportPluginId: string
   /** Canonical source plus executable metadata digest, without exposing private content. */

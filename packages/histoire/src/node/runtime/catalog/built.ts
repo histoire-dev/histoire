@@ -54,12 +54,13 @@ export async function readBuiltPreviewSnapshot(directory: string) {
     if (await getBuiltCaptureIdentity(publicRoot, catalog, settings) !== buildId) throw new Error('Built capture identity differs from runtime assets/catalog')
   }
   const stories: CatalogStory[] = node
-    ? node.manifest.stories.map(record => record.story)
+    ? node.manifest.stories.map(record => ({ ...record.story, fileOrigin: record.story.fileOrigin ?? 'project' }))
     : data.stories.map(story => ({
         id: story.id,
         title: story.title,
         treePath: story.treePath ?? [story.title],
         filePath: story.relativePath,
+        fileOrigin: story.fileOrigin ?? 'project',
         supportPluginId: story.supportPluginId,
         docsOnly: story.docsOnly === true,
         matrix: normalizeHistoireMatrixHint(story.matrix),

@@ -2,7 +2,7 @@ import type { HistoireSession } from '@histoire/sdk'
 import type { InjectionKey } from 'vue'
 import type { createShortcutRegistry } from './shortcuts.js'
 import { getSandboxRelativeUrl } from '@histoire/protocol'
-import { requestHistoireOpenInEditor } from '@histoire/sdk/internal'
+import { canOpenHistoireTargetInEditor, requestHistoireOpenInEditor } from '@histoire/sdk/internal'
 import { inject, provide, shallowReactive, shallowRef } from 'vue'
 import { createFrameVariantSource } from './frame-variant-source.js'
 
@@ -126,7 +126,7 @@ export function createFrameActions(options: FrameActionOptions) {
       if (options.open) options.open(url)
       else window.open(url, '_blank', 'noopener')
     } },
-    { id: 'open-editor', label: 'Open in editor', icon: 'code', group: 'open', shortcut: 'frame.editor', devOnly: true, available: () => options.session.getSnapshot().capabilities.openInEditor.available, run: target => requestHistoireOpenInEditor(options.session, { storyId: target.storyId, variantId: target.variantId }) },
+    { id: 'open-editor', label: 'Open in editor', icon: 'code', group: 'open', shortcut: 'frame.editor', devOnly: true, available: target => canOpenHistoireTargetInEditor(options.session.getSnapshot(), target), run: target => requestHistoireOpenInEditor(options.session, { storyId: target.storyId, variantId: target.variantId }) },
     { id: 'reveal', label: 'Reveal in tree', icon: 'tree-view', group: 'open', run: options.reveal },
     { id: 'copy-source', label: 'Copy source', icon: 'copy', group: 'copy', shortcut: 'frame.source', available: (target) => {
       const snapshot = session(target).getSnapshot()

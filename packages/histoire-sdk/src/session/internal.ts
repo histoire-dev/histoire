@@ -1,7 +1,7 @@
-import type { HistoirePresetAction, HistoirePresetList, HistoireSelectionInput, HistoireSourceDescriptor, HistoireTarget } from '@histoire/protocol'
+import type { HistoirePresetAction, HistoirePresetList, HistoireSelectionInput, HistoireSessionStatus, HistoireSourceDescriptor, HistoireStoryFileOrigin, HistoireTarget } from '@histoire/protocol'
 import type { HistoireMount, HistoireSession } from '../types.js'
 import type { SessionContext } from './context.js'
-import { HistoireSdkError, validateBridgePayload } from '@histoire/protocol'
+import { HistoireSdkError, isHistoireProjectFileOrigin, validateBridgePayload } from '@histoire/protocol'
 import { observeOperation } from './ownership.js'
 import { request } from './request.js'
 import { primaryRuntime } from './state.js'
@@ -31,6 +31,22 @@ interface SessionInternals {
 }
 const sessions = new WeakMap<HistoireSession, SessionInternals>()
 const internalsKey = Symbol.for('@histoire/sdk/session-internals/protocol-1')
+
+/** Read-only snapshot fields required to decide editor-action visibility. */
+interface EditorActionSnapshot {
+  /** Current connection state. */
+  readonly status: HistoireSessionStatus
+  /** Whether current catalog no longer matches source revision. */
+  readonly stale: boolean
+  /** Connected source mode, when available. */
+  readonly source: { readonly mode: 'dev' | 'static' } | null
+  /** Current editor capability state. */
+  readonly capabilities: { readonly openInEditor: { readonly available: boolean } }
+  /** Current catalog stories needed for provenance lookup. */
+  readonly catalog: { readonly stories: readonly { readonly id: string, readonly fileOrigin?: HistoireStoryFileOrigin }[] }
+  /** Current story target, when selected. */
+  readonly selection: Readonly<HistoireTarget> | null
+}
 
 /** Separate SDK/native bundles resolve delegates on same owned controller, never global active state. */
 function internals(session: HistoireSession): SessionInternals | undefined {
@@ -77,6 +93,7 @@ export function bindHistoireSessionInternals(session: HistoireSession, context: 
       validateBridgePayload('openInEditor', target)
       context.assertCapability('openInEditor')
       const story = context.story(target.storyId)
+      if (!isHistoireProjectFileOrigin(story.fileOrigin)) throw new HistoireSdkError('CAPABILITY_UNAVAILABLE', 'Editor is unavailable for non-project stories')
       if (target.variantId != null) assertVariant(story, target.variantId)
       return request<null>(context, context.assertConnected(), 'openInEditor', target)
     },
@@ -105,6 +122,13 @@ export function getHistoireSessionDescriptor(session: HistoireSession) {
   const entry = internals(session)
   if (!entry) throw new HistoireSdkError('NOT_CONNECTED', 'First-party session metadata unavailable')
   return entry.descriptor()
+}
+
+/** Current target can expose an editor action only for a ready project-owned dev story. */
+export function canOpenHistoireTargetInEditor(snapshot: EditorActionSnapshot, target: Readonly<HistoireTarget> | null = snapshot.selection): boolean {
+  if (!target || snapshot.status !== 'ready' || snapshot.stale || snapshot.source?.mode !== 'dev' || !snapshot.capabilities.openInEditor.available) return false
+  const story = snapshot.catalog.stories.find(story => story.id === target.storyId)
+  return !!story && isHistoireProjectFileOrigin(story.fileOrigin)
 }
 
 /** Capture current primary through existing operation guards; no implicit runtime creation. */

@@ -5,10 +5,11 @@ import { getSerializedStoryData } from '../build-serialize.js'
  * Builds a one-story context, optionally with a virtual module source (used to
  * detect vitest mocks).
  */
-function createContext(moduleCode?: string) {
+function createContext(moduleCode?: string, fileOrigin?: 'project' | 'generated' | 'external') {
   return {
     storyFiles: [{
       relativePath: 'src/components/Example.story.vue',
+      fileOrigin,
       supportPluginId: 'vue3',
       treePath: ['Example'],
       virtual: !!moduleCode,
@@ -46,5 +47,13 @@ describe('getSerializedStoryData', () => {
     // <docs> block never reaches the app: without this the Docs tab of a
     // vitest-mocked story is blank in a built app.
     expect(data.stories[0].docsText).toBe('A very long extracted documentation text')
+  })
+
+  it.each(['project', 'generated', 'external'] as const)('serializes %s story file provenance', (fileOrigin) => {
+    expect(getSerializedStoryData(createContext(undefined, fileOrigin)).stories[0].fileOrigin).toBe(fileOrigin)
+  })
+
+  it('defaults legacy server records to project ownership', () => {
+    expect(getSerializedStoryData(createContext()).stories[0].fileOrigin).toBe('project')
   })
 })

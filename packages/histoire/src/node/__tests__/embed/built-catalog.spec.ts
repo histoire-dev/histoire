@@ -29,19 +29,30 @@ describe('immutable built preview targets', () => {
     const snapshot = await readBuiltPreviewSnapshot(join(copied.root, 'copy'))
     expect(snapshot).toMatchObject({ mode: 'static', base: '/book/', buildId: original.capture.buildId, capture: { available: true }, defaults: { colorScheme: 'dark', backgroundColor: '#fff', textDirection: 'ltr', globals: {} } })
     expect(snapshot.getTarget('a:b', 'c:d').variant.id).toBe('c:d')
+    expect(snapshot.catalog.stories[0].fileOrigin).toBe('project')
     expect(Object.isFrozen(snapshot.catalog.stories)).toBe(true)
     expect(JSON.stringify(snapshot.catalog)).not.toContain(original.fixture.root)
   })
 
   it('keeps legacy outputs browsable but rejects capture and malformed/tampered metadata', async () => {
     const output = await staticOutput()
-    await writeFile(join(output.outputRoot, 'histoire.json'), JSON.stringify(output.data))
-    expect((await readBuiltPreviewSnapshot(output.outputRoot)).capture).toMatchObject({ available: false, reason: 'CAPABILITY_UNAVAILABLE' })
+    const legacy = { ...output.data, stories: output.data.stories.map(({ fileOrigin: _fileOrigin, ...story }) => story) }
+    await writeFile(join(output.outputRoot, 'histoire.json'), JSON.stringify(legacy))
+    const legacySnapshot = await readBuiltPreviewSnapshot(output.outputRoot)
+    expect(legacySnapshot.capture).toMatchObject({ available: false, reason: 'CAPABILITY_UNAVAILABLE' })
+    expect(legacySnapshot.catalog.stories[0].fileOrigin).toBe('project')
     await writeFile(join(output.outputRoot, 'histoire.json'), JSON.stringify({ ...output.data, capture: { ...output.capture, buildId: 'bad' } }))
     await expect(readBuiltPreviewSnapshot(output.outputRoot)).rejects.toThrow('malformed')
     await writeFile(join(output.outputRoot, 'histoire.json'), JSON.stringify({ ...output.data, capture: output.capture }))
     await writeFile(join(output.outputRoot, 'asset.js'), 'changed')
     await expect(readBuiltPreviewSnapshot(output.outputRoot)).rejects.toThrow('identity')
+  })
+
+  it('retains generated provenance in static catalog metadata', async () => {
+    const output = await staticOutput()
+    output.data.stories[0].fileOrigin = 'generated'
+    await writeFile(join(output.outputRoot, 'histoire.json'), JSON.stringify(output.data))
+    expect((await readBuiltPreviewSnapshot(output.outputRoot)).catalog.stories[0].fileOrigin).toBe('generated')
   })
 
   it('excludes identity-bearing metadata from asset hash without hiding runtime changes', async () => {
