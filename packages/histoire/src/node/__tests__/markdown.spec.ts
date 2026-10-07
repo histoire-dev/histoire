@@ -1,85 +1,59 @@
-import type { Context } from '../context.js'
-import { createWriteStream, existsSync, unlinkSync, writeFileSync } from 'node:fs'
+import { readFile, unlink } from 'node:fs/promises'
 import path from 'node:path'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { closeContext, createContext } from '../context.js'
 import { createMarkdownFilesWatcher } from '../markdown.js'
 import { watchStories } from '../stories.js'
+import { createMarkdownProject } from './utils/markdown-project.js'
 
-describe('markdown', async () => {
-  vi.spyOn(process, 'cwd').mockReturnValue(path.resolve(__dirname, './markdown'))
-
-  let ctx: Context
+describe('markdown', () => {
+  let project: Awaited<ReturnType<typeof createMarkdownProject>>
   let storyWatcher: Awaited<ReturnType<typeof watchStories>>
   let markdownWatcher: Awaited<ReturnType<typeof createMarkdownFilesWatcher>> | undefined
-  const missingStoryFile = path.resolve(__dirname, './markdown/test3.story.md')
 
   beforeEach(async () => {
-    ctx = await createContext({
-      mode: 'dev',
-    })
-
-    // create watch stories to set context root etc.
-    storyWatcher = await watchStories(ctx)
+    project = await createMarkdownProject()
+    for (const file of ['test1.story.md', 'test2.story.md']) {
+      await project.write(await readFile(path.resolve(__dirname, 'markdown', file), 'utf8'), file)
+    }
+    storyWatcher = await watchStories(project.ctx)
+    await storyWatcher.ready
   })
 
   afterEach(async () => {
-    if (markdownWatcher) {
-      await markdownWatcher.stop()
-      markdownWatcher = undefined
-    }
+    await markdownWatcher?.stop()
+    markdownWatcher = undefined
     await storyWatcher.close()
-    await closeContext(ctx)
-
-    if (existsSync(missingStoryFile)) {
-      unlinkSync(missingStoryFile)
-    }
+    await project.close()
   })
 
-  it('should not throw error or depend on - resolve order for linking', async () => {
-    // FileWatcher should pickup the test markdown files (test1 and test2)
-    // test1 links to test2 (issue previously as test1 resolved first)
-    // test 2 links to test1
-    markdownWatcher = await createMarkdownFilesWatcher(ctx)
-    expect(ctx.markdownFiles.length).toEqual(2)
+  it('renders both forward and backward links after discovering every target', async () => {
+    markdownWatcher = await createMarkdownFilesWatcher(project.ctx)
+    const { markdownFiles } = project.ctx
+    expect(markdownFiles).toHaveLength(2)
+    expect(markdownFiles.find(file => file.relativePath === 'test1.story.md').html).toContain('href="/story/test2-story-js"')
+    expect(markdownFiles.find(file => file.relativePath === 'test2.story.md').html).toContain('href="/story/test1-story-js"')
   })
 
-  it('should render html from md', async () => {
-    markdownWatcher = await createMarkdownFilesWatcher(ctx)
-    expect(ctx.markdownFiles[0].html).toContain('<p>')
+  it('rejects missing Markdown links during initial scan', async () => {
+    await project.write('[Missing](./test4.story.md)', 'test3.story.md')
+    await expect(createMarkdownFilesWatcher(project.ctx)).rejects.toThrow('[md] Cannot find story file')
   })
 
-  it('should throw error on missing [md] story file.', async () => {
-    const writer = createWriteStream(missingStoryFile)
-    // link to missing file.
-    writer.write(
-      '<!-- File should link to test1 file. -->\n'
-      + '# Test3\n\n'
-      + 'Link to test 4\n'
-      + '[TEST](./test4.story.md)\n',
-    )
-    writer.end()
-    await new Promise(resolve => writer.on('finish', resolve))
-
-    // create markdownWatcher and check for error
-    await expect(createMarkdownFilesWatcher(ctx)).rejects.toThrowError()
-  })
-
-  it('updates standalone frontmatter, HTML and virtual module without duplicate records', async () => {
-    writeFileSync(missingStoryFile, '---\nid: original\ntitle: Original\n---\nFirst body\n')
-    markdownWatcher = await createMarkdownFilesWatcher(ctx)
-    const file = ctx.markdownFiles.find(file => file.absolutePath === missingStoryFile)
+  it('updates standalone metadata and HTML in place, then removes its virtual story', async () => {
+    await project.write('---\nid: original\ntitle: Original\n---\nFirst body\n', 'test3.story.md')
+    markdownWatcher = await createMarkdownFilesWatcher(project.ctx)
+    const file = project.ctx.markdownFiles.find(file => file.relativePath === 'test3.story.md')
     const story = file.storyFile
-    writeFileSync(missingStoryFile, '---\nid: changed\ntitle: Changed\n---\nSecond body\n')
+    await project.write('---\nid: changed\ntitle: Changed\n---\nSecond body\n', 'test3.story.md')
     await vi.waitFor(() => expect(file.content).toContain('Second body'))
     expect(file.html).toContain('Second body')
     expect(file.storyFile).toBe(story)
     expect(story.moduleCode).toContain('"id":"changed"')
     expect(story.moduleCode).toContain('"title":"Changed"')
-    expect(ctx.markdownFiles.filter(file => file.absolutePath === missingStoryFile)).toHaveLength(1)
-    expect(ctx.storyFiles.filter(file => file.relativePath === 'test3.story.js')).toHaveLength(1)
-    unlinkSync(missingStoryFile)
-    await vi.waitFor(() => expect(ctx.markdownFiles.includes(file)).toBe(false))
-    expect(ctx.storyFiles.includes(story)).toBe(false)
+    expect(project.ctx.markdownFiles.filter(file => file.relativePath === 'test3.story.md')).toHaveLength(1)
+    expect(project.ctx.storyFiles.filter(file => file.relativePath === 'test3.story.js')).toHaveLength(1)
+    await unlink(path.join(project.ctx.root, 'test3.story.md'))
+    await vi.waitFor(() => expect(project.ctx.markdownFiles.includes(file)).toBe(false))
+    expect(project.ctx.storyFiles.includes(story)).toBe(false)
   })
 })

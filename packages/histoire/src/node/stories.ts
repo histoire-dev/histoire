@@ -7,6 +7,8 @@ import micromatch from 'micromatch'
 import { basename, relative, resolve } from 'pathe'
 import { isPathWithinRoot } from './runtime/content/files.js'
 import { getContextRegistry } from './runtime/registry.js'
+import { createStoryIgnore } from './util/story-ignore.js'
+import { HISTOIRE_TEMP_PATH } from './util/temp-paths.js'
 
 /** Registers collection feedback for one captured project context. */
 export function onStoryChange(ctx: Context, handler: (file?: ServerStoryFile) => unknown) {
@@ -38,9 +40,7 @@ export async function watchStories(context: Context) {
     return segments.slice(0, segments.findIndex(segment => segment.includes('*'))).join('/') || '.'
   })))
 
-  const resolvedStoryIgnored = context.config.storyIgnored.map((pattern) => {
-    return resolve(context.root, pattern)
-  })
+  const isIgnored = createStoryIgnore(context)
 
   const resolveStoryMatch = context.config.storyMatch.map((pattern) => {
     return resolve(context.root, pattern)
@@ -49,14 +49,14 @@ export async function watchStories(context: Context) {
   /** Recheck event paths because rename/unlink notifications can lack scan stats. */
   function matchesStory(file: string): boolean {
     const absolute = getAbsoluteFilePath(context, file)
-    return !resolvedStoryIgnored.some(pattern => micromatch.isMatch(absolute, pattern))
+    return !isIgnored(absolute)
       && resolveStoryMatch.some(pattern => micromatch.isMatch(absolute, pattern))
   }
 
   const watcher = chokidar.watch(baseWatchPaths, {
     cwd: context.root,
     ignored: (path, stats) => {
-      if (resolvedStoryIgnored.some(pattern => micromatch.isMatch(path, pattern))) {
+      if (isIgnored(path)) {
         return true
       }
       if (resolveStoryMatch.some(pattern => micromatch.isMatch(path, pattern))) {
@@ -201,7 +201,7 @@ export function removeStory(context: Context, relativeFilePath: string) {
 export async function findAllStories(context: Context) {
   const files = await globby(context.config.storyMatch, {
     cwd: context.root,
-    ignore: context.config.storyIgnored,
+    ignore: [...context.config.storyIgnored, `${HISTOIRE_TEMP_PATH}/**`],
   })
   context.storyFiles.length = 0
   for (const file of files) {

@@ -39,6 +39,7 @@ export async function devCommand(options: DevOptions) {
   process.on('SIGINT', onSignal)
   process.on('SIGTERM', onSignal)
   try {
+    console.log(pc.blue('Starting Histoire...'))
     await session.controller.start()
     return { ...session, get mcp() {
       return session.mcp

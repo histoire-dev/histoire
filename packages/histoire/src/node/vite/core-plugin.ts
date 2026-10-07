@@ -8,6 +8,7 @@ import { getContextRegistry } from '../runtime/registry.js'
 import { installUiHttpRouter } from '../server/ui-channel/http.js'
 import { notifyStoryChange } from '../stories.js'
 import { resolveHistoireAppBundledDir } from '../util/resolve-histoire-app.js'
+import { createOptimizerCacheIgnore } from '../util/story-ignore.js'
 import { createEmbedMiddleware } from '../virtual/embed/middleware.js'
 import { createAppHtmlMiddleware, createSandboxHtmlMiddleware } from './dev-html.js'
 import { createMcpPreviewHtmlMiddleware } from './mcp-preview-html.js'
@@ -127,7 +128,9 @@ export function createHistoireVitePlugin(ctx: Context, options: HistoireVitePlug
             ],
           },
           watch: {
-            ignored: [`!**/node_modules/.histoire/**`, '**/vite.config.*'],
+            // Every run owns its optimizer cache, but older caches can remain
+            // beside it. Watch plugin sources while pruning all cache folders.
+            ignored: [`!**/node_modules/.histoire/**`, '**/vite.config.*', createOptimizerCacheIgnore(ctx)],
           },
           hmr: command === 'build' ? false : !isServer,
         },

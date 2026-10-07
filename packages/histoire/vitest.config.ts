@@ -12,6 +12,9 @@ export default defineConfig({
       // their reactivity needs an explicit path to the very entry the stores
       // themselves resolve (one shared Vue instance).
       'vue': resolve(currentDir, '../histoire-app/node_modules/vue/index.mjs'),
+      // Real compatibility-store tests share this Pinia dependency and the
+      // same Vue alias as app sources, without importing vendor-bundled Vue.
+      'pinia': resolve(currentDir, '../histoire-vendors/node_modules/pinia/dist/pinia.mjs'),
       // App sources resolve Vue Router through Vite's vendor alias. Mirror it
       // here so route-adapter specs exercise the same bundled dependency.
       'vue-router': '@histoire/vendors/vue-router',

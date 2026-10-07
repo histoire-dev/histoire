@@ -67,8 +67,7 @@ export async function createServer(ctx: Context, options: CreateServerOptions = 
     await waitForRuntimeWork(storyWatcher.ready, options.signal)
     checkActive()
     // Markdown associations require the complete story scan, including siblings.
-    const { stop: stopMdFileWatcher } = await createMarkdownFilesWatcher(ctx, options.signal)
-    cleanup.add(stopMdFileWatcher)
+    await createMarkdownFilesWatcher(ctx, options.signal)
     checkActive()
 
     const moduleLoader = useModuleLoader({ server: nodeServer })

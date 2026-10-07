@@ -1,6 +1,14 @@
 import { createHash, randomUUID } from 'node:crypto'
 import { normalize, resolve } from 'pathe'
 
+/** Reserved generated run directory, shared only as a parent of isolated outputs. */
+export const HISTOIRE_TEMP_PATH = '.histoire/tmp'
+
+/** Resolves generated output ancestry without acquiring or deleting a run. */
+export function getProjectTempDir(root: string) {
+  return resolve(root, HISTOIRE_TEMP_PATH)
+}
+
 /**
  * Builds the temp directory owned by a single run.
  *
@@ -11,7 +19,7 @@ import { normalize, resolve } from 'pathe'
  * @param kind Name of the generated artifacts, used as parent directory.
  */
 export function getRunTempDir(root: string, kind: string) {
-  return resolve(root, '.histoire', 'tmp', kind, `run-${Date.now().toString(36)}-${randomUUID().slice(0, 8)}`)
+  return resolve(getProjectTempDir(root), kind, `run-${Date.now().toString(36)}-${randomUUID().slice(0, 8)}`)
 }
 
 /**

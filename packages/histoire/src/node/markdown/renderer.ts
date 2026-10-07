@@ -6,23 +6,19 @@ import attrs from 'markdown-it-attrs'
 import { full as emoji } from 'markdown-it-emoji'
 import path from 'pathe'
 import pc from 'picocolors'
-import { bundledLanguages, createHighlighter } from 'shiki'
 import { hashContent } from '../runtime/content/hash.js'
 import { captureInlineDocs } from '../runtime/content/inline.js'
-import { getContextRegistry } from '../runtime/registry.js'
 import { readStorySource } from '../story-source.js'
 import { slugify } from '../util/slugify.js'
+import { assertMarkdownActive, getMarkdownHighlighter } from './highlighter.js'
+import { renderMarkdown } from './render.js'
 
 /** Creates existing Markdown renderer and story-aware relative link handling. */
 export async function createMarkdownRenderer(ctx: Context) {
-  const highlighter = await createHighlighter({
-    themes: ['github-dark'],
-    langs: Object.keys(bundledLanguages), // not ideal but markdown-it does not provide async highlight
-  })
-  getContextRegistry(ctx).cleanup.add(() => highlighter.dispose())
+  const highlighter = getMarkdownHighlighter(ctx)
 
   const md = new MarkdownIt({
-    highlight: (code, lang) => `<div class="htw-relative htw-not-prose __histoire-code"><div class="htw-absolute htw-top-0 htw-right-0 htw-text-xs htw-text-white/40">${lang}</div>${highlighter.codeToHtml(code, { theme: 'github-dark', lang })}</div>`,
+    highlight: (code, lang) => `<div class="htw-relative htw-not-prose __histoire-code"><div class="htw-absolute htw-top-0 htw-right-0 htw-text-xs htw-text-white/40">${lang}</div>${highlighter.highlight(code, lang)}</div>`,
     linkify: true,
     html: true,
     breaks: false,
@@ -108,25 +104,30 @@ export async function createMarkdownPlugins(ctx: Context) {
   const plugins: VitePlugin[] = []
   const md = await createMarkdownRendererWithPlugins(ctx)
 
-  // @TODO extract
   plugins.push({
     name: 'histoire-vue-docs-block',
     async transform(code, id) {
       if (!id.includes('?vue&type=docs')) return
       if (!id.includes('lang.md')) return
       const file = id.substring(0, id.indexOf('?vue'))
-      const html = md.render(code, {
-        file,
-      })
       const registered = ctx.storyFiles.find(story => story.path === file || story.moduleId === file)
+      const sourceFile = registered ?? { path: file }
+      let capturedSource: string | undefined
       try {
-        const source = await readStorySource(registered ?? { path: file })
-        if (source != null) captureInlineDocs(ctx, file, { html, text: code, sourceSha256: hashContent(source) })
+        capturedSource = await readStorySource(sourceFile)
+      }
+      catch { /* Synthetic transforms can lack readable source. */ }
+      const html = await renderMarkdown(ctx, md, code, { file })
+      try {
+        const source = await readStorySource(sourceFile)
+        assertMarkdownActive(ctx)
+        if (source != null && source === capturedSource) captureInlineDocs(ctx, file, { html, text: code, sourceSha256: hashContent(source) })
       }
       catch {
         // Some custom Vue transforms use synthetic IDs without registered raw
         // source. Preserve their existing rendered docs and omit fresh capture.
       }
+      assertMarkdownActive(ctx)
       return `export default Comp => {
         Comp.doc = ${JSON.stringify(html)}
       }`
