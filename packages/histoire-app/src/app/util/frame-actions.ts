@@ -93,6 +93,8 @@ export function createFrameActions(options: FrameActionOptions) {
   }
   const variantSource = createFrameVariantSource({ session: options.session, resolve: target => options.frameSession ? options.frameSession(target) : options.session, error: options.error })
   const registry = { entries, manualCopy,
+    /** Shared clipboard path keeps manual recovery available to all workbench menus. */
+    copyText: copy,
     /** Duplicate actions fail early; disposer cannot unregister replacement. */
     registerFrameAction(action: FrameAction): () => void {
       if (entries.has(action.id)) throw new Error(`Duplicate frame action: ${action.id}`)

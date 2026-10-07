@@ -10,10 +10,10 @@ describe('Vitest lifecycle and runtime state', () => {
   previewTest('collects module-scope tests and runs soft assertions and setup cleanup', () => {
     cy.contains('[role="tab"]', 'Tests').click()
     cy.contains('5 collected', { timeout: 20000 })
-    cy.contains('button', 'Run preview').click()
+    cy.contains('button', 'Run in browser').click()
     cy.contains('5 passed · 0 failed · 0 skipped', { timeout: 20000 })
     // Running again must reuse module registrations without retaining hook resources.
-    cy.contains('button', 'Run preview').click()
+    cy.contains('button', 'Run in browser').click()
     cy.contains('5 passed · 0 failed · 0 skipped', { timeout: 20000 })
   })
 

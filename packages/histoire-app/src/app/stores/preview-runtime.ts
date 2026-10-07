@@ -126,7 +126,7 @@ export const usePreviewRuntimeStore = defineStore('preview-runtime', () => {
     window.addEventListener('message', listener)
     onScopeDispose(() => {
       window.removeEventListener('message', listener)
-      abortPendingRequests('Preview adapter disposed before completing the request.')
+      abortPendingRequests('Test runner was disposed before completing the request.')
     })
   }
 
@@ -174,7 +174,7 @@ export const usePreviewRuntimeStore = defineStore('preview-runtime', () => {
       setPending: (request) => { pendingCollection = request },
       getFrame: getCurrentFrame,
       nextId: () => `${++collectCounter}`,
-      timeoutMessage: 'Preview iframe did not return collected tests in time.',
+      timeoutMessage: 'Browser did not return collected tests in time.',
       variantKey,
       post: (frame, requestId) => {
         const message: CollectTestsMessage = {
@@ -200,7 +200,7 @@ export const usePreviewRuntimeStore = defineStore('preview-runtime', () => {
       setPending: (request) => { pendingRun = request },
       getFrame: getCurrentFrame,
       nextId: () => `${++runCounter}`,
-      timeoutMessage: 'Preview iframe did not return test results in time.',
+      timeoutMessage: 'Browser did not return test results in time.',
       // A run executes the story's own tests: anything shorter than the
       // configured run budget would fail a suite that is merely slow, and the
       // failure escalates to a full headless run of the SAME tests while the

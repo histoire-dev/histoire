@@ -3,7 +3,7 @@ import { DEFAULT_THEME_FONTS } from '@histoire/shared'
 import { tailwindTokens } from '../builtin-plugins/tailwind-tokens.js'
 import { vanillaSupport } from '../builtin-plugins/vanilla-support/plugin.js'
 import { defaultColors } from '../colors.js'
-import { DEFAULT_COLLECT_TIMEOUT, DEFAULT_RUN_TIMEOUT, DEFAULT_STORY_COLLECT_TIMEOUT } from '../util/test-timeouts.js'
+import { DEFAULT_COLLECT_TIMEOUT, DEFAULT_RUN_TIMEOUT, DEFAULT_STORY_COLLECT_TIMEOUT, DEFAULT_TEST_MAX_WORKERS } from '../util/test-timeouts.js'
 
 /**
  * Builds a fresh default Histoire configuration.
@@ -128,6 +128,7 @@ export function getDefaultConfig(): HistoireConfig {
       collectTimeout: DEFAULT_COLLECT_TIMEOUT,
       storyCollectTimeout: DEFAULT_STORY_COLLECT_TIMEOUT,
       runTimeout: DEFAULT_RUN_TIMEOUT,
+      maxWorkers: DEFAULT_TEST_MAX_WORKERS,
     },
     vite: (config) => {
       // Remove vite:legacy plugins https://github.com/histoire-dev/histoire/issues/156

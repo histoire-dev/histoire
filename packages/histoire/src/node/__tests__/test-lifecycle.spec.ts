@@ -33,7 +33,7 @@ afterEach(() => {
 })
 
 describe('runHistoireTests lifecycle', () => {
-  it('forces single-run invariants over raw vitest args', async () => {
+  it('forces single-run invariants and configured worker limit over raw vitest args', async () => {
     const story = createRunTestsStoryFile({
       id: 'invariant-story',
       variantId: 'invariant-variant',
@@ -50,11 +50,12 @@ describe('runHistoireTests lifecycle', () => {
       options: {
         watch: true,
         config: './evil.config.ts',
+        maxWorkers: 99,
       },
     } as any)
     const consoleWarn = vi.spyOn(console, 'warn').mockImplementation(() => {})
 
-    await runHistoireTests(createRunTestsContext([story]), { rawVitestArgs: ['--watch', '--config', './evil.config.ts'] })
+    await runHistoireTests(createRunTestsContext([story], { test: { maxWorkers: 2 } } as Partial<Context['config']>), { rawVitestArgs: ['--watch', '--config', './evil.config.ts', '--maxWorkers', '99'] })
 
     // Watch mode is unsupported (the runner is torn down after the first
     // pass) and user configs must never replace the generated one.
@@ -62,6 +63,7 @@ describe('runHistoireTests lifecycle', () => {
     expect(vitestOptions.watch).toBe(false)
     expect(vitestOptions.run).toBe(true)
     expect(vitestOptions.config).toBe(false)
+    expect(vitestOptions.maxWorkers).toBe(2)
     expect(consoleWarn).toHaveBeenCalledWith(expect.stringContaining('does not support watch mode'))
     consoleWarn.mockRestore()
   })

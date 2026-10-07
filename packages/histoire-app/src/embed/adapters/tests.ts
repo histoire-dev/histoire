@@ -4,11 +4,16 @@ import type { createRuntimeRequests } from './runtime-requests.js'
 import { COLLECT_TESTS, HistoireSdkError, RUN_TESTS } from '@histoire/protocol'
 
 /** Existing preview runner has no cooperative body abort; cancellation retires actual document. */
-export function createEmbedPreviewTests(requests: ReturnType<typeof createRuntimeRequests>, retire: (capture: HistoireRequestCapture) => void) {
+export function createEmbedPreviewTests(
+  requests: ReturnType<typeof createRuntimeRequests>,
+  retire: (capture: HistoireRequestCapture) => void,
+  runIsolated?: (capture: HistoireRequestCapture) => Promise<HistoireTestRunSummary>,
+) {
   return {
     /** Selection/document and runtime deadlines remain owned by existing sandbox adapter. */
     async request(command: 'tests.collect' | 'tests.run', capture: HistoireRequestCapture): Promise<HistoireTestCollectionResult | HistoireTestRunSummary> {
       capture.signal.throwIfAborted()
+      if (command === 'tests.run' && runIsolated) return await runIsolated(capture)
       const abort = () => retire(capture)
       capture.signal.addEventListener('abort', abort, { once: true })
       try {

@@ -80,7 +80,25 @@ it('bakes the collection flag matching the kind of run', async () => {
   // Story modules run one file at a time while collecting: they execute real
   // story setup (mocks, global setup) in a shared page.
   expect(collection.viteConfig.test.fileParallelism).toBe(false)
+  expect(collection.viteConfig.test.maxWorkers).toBe(1)
   expect(test.viteConfig.test.fileParallelism).toBeUndefined()
+  expect(test.viteConfig.test.maxWorkers).toBe(ctx.config.test?.maxWorkers)
+})
+
+it('uses the configured worker ceiling for browser test runs', async () => {
+  const ctx = createContext()
+  ctx.config.test!.maxWorkers = 2
+
+  const test = await getHistoireBrowserRunConfig(ctx, { collecting: false, entries: [] })
+
+  expect(test.viteConfig.test.maxWorkers).toBe(2)
+})
+
+it('rejects an invalid configured worker ceiling', async () => {
+  const ctx = createContext()
+  ctx.config.test!.maxWorkers = 0
+
+  await expect(getHistoireBrowserRunConfig(ctx, { collecting: false, entries: [] })).rejects.toThrow('Expected test.maxWorkers to be a positive integer')
 })
 
 it('runs against the Vitest major its @internal patches were verified on', async () => {

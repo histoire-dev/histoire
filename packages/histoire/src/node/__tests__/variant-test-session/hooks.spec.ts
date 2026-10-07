@@ -75,6 +75,32 @@ describe('createVariantTestSession suite lifecycle', () => {
     ])
   })
 
+  it('runs suite hooks inside every isolated in-book case', async () => {
+    const order: string[] = []
+    runStorySetup(runtime.mounts.renderRegistrations, () => {
+      collectBeforeAll(() => order.push('beforeAll'))
+      collectAfterAll(() => order.push('afterAll'))
+      collectIt('first', () => order.push('first'))
+      collectIt('second', () => order.push('second'))
+    })
+
+    const session = runtime.createVariantTestSession(createSessionOptions())
+    const definitions = await session.collectVariantTests(STORY_ID, VARIANT_ID)
+    const first = await session.runPreviewTestCase(STORY_ID, VARIANT_ID, definitions[0])
+    const second = await session.runPreviewTestCase(STORY_ID, VARIANT_ID, definitions[1])
+
+    expect(first.passed).toBe(1)
+    expect(second.passed).toBe(1)
+    expect(order).toEqual([
+      'beforeAll',
+      'first',
+      'afterAll',
+      'beforeAll',
+      'second',
+      'afterAll',
+    ])
+  })
+
   it('does not enter child suites after a parent beforeAll fails', async () => {
     const order: string[] = []
     runStorySetup(runtime.mounts.renderRegistrations, () => {

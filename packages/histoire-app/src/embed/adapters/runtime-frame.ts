@@ -1,7 +1,7 @@
 import type { HistoireRuntimeSnapshot, HistoireStateSnapshot, HistoireTarget, HistoireViewport } from '@histoire/protocol'
 import type { HistoireRequestCapture } from '@histoire/sdk/internal'
 import type { EmbedSurfaceContext } from '../surfaces.js'
-import { EVENT_SEND, HistoireSdkError, HOST_CHANNEL_MESSAGE, PREVIEW_SETTINGS_SYNC, PREVIEW_SYNC, RUNTIME_FAILED, RUNTIME_FOCUS, RUNTIME_LAYOUT, RUNTIME_REQUEST, RUNTIME_RESULT, SELECT_VARIANT, STATE_SYNC, TEST_DEFINITIONS, TEST_RESULT, validateHistoireStateSnapshot, validateHistoireViewports, validateWireValue, VARIANT_READY } from '@histoire/protocol'
+import { COLLECT_TESTS, EVENT_SEND, HistoireSdkError, HOST_CHANNEL_MESSAGE, PREVIEW_SETTINGS_SYNC, PREVIEW_SYNC, RUNTIME_FAILED, RUNTIME_FOCUS, RUNTIME_LAYOUT, RUNTIME_REQUEST, RUNTIME_RESULT, SELECT_VARIANT, STATE_SYNC, TEST_DEFINITIONS, TEST_RESULT, validateHistoireStateSnapshot, validateHistoireViewports, validateWireValue, VARIANT_READY } from '@histoire/protocol'
 import { createEmbedHostChannels } from './channels.js'
 import { createRuntimeDocumentId, createRuntimeDocumentOwner } from './document.js'
 import { mapRuntimeViewport } from './geometry.js'
@@ -10,6 +10,7 @@ import { createRuntimeReadiness } from './runtime-readiness.js'
 import { createRuntimeRequests } from './runtime-requests.js'
 import { createRuntimeRevisionOwner } from './runtime-revision.js'
 import { createStalePreview } from './stale-preview.js'
+import { createEmbedTestWorkers } from './test-workers.js'
 import { createEmbedPreviewTests } from './tests.js'
 
 /** Existing same-origin story sandbox, owned by one parent-backed primary surface. */
@@ -17,7 +18,7 @@ export function createEmbedRuntimeFrame(context: EmbedSurfaceContext, layout: 's
   const owner = createRuntimeDocumentOwner()
   const iframe = context.container.ownerDocument.createElement('iframe')
   context.container.style.cssText = 'margin:0;width:100%;height:100%;overflow:auto;display:flex;align-items:flex-start;'
-  iframe.title = 'Histoire preview'
+  iframe.title = 'Histoire variant'
   iframe.style.cssText = 'border:0;display:block;flex:none;max-width:100%;'
   const base = new URL(context.sourceBase ?? './', window.location.href)
   const stalePreview = createStalePreview(iframe, context.standalone)
@@ -33,6 +34,21 @@ export function createEmbedRuntimeFrame(context: EmbedSurfaceContext, layout: 's
   let scheduledLayout = 0
   const readiness = createRuntimeReadiness(context.descriptor.config.storyCollectTimeout ?? 30_000, fail)
   const requests = createRuntimeRequests(post, Math.max(context.descriptor.config.runTimeout ?? 300_000, context.descriptor.config.storyCollectTimeout ?? 30_000))
+  const testWorkers = createEmbedTestWorkers({
+    container: context.container,
+    maxWorkers: context.descriptor.config.testMaxWorkers ?? 1,
+    timeoutMs: context.descriptor.config.runTimeout ?? 300_000,
+    createDocumentId: () => createRuntimeDocumentId(context.bridge.getOwner().mountId),
+    createUrl(target, documentId) {
+      const url = new URL('__sandbox.html', base)
+      url.searchParams.set('storyId', target.storyId)
+      url.searchParams.set('variantId', target.variantId)
+      url.searchParams.set('documentId', documentId)
+      url.searchParams.set('embed', 'true')
+      url.searchParams.set('testWorker', 'true')
+      return url.href
+    },
+  })
   const loading = createRuntimeLoadRecovery(settings, () => active && !retired && owner.id && selected && context.standalone && layout === 'single' ? owner.selectionVersion : null, () => {
     requests.invalidate()
     states.clear()
@@ -50,6 +66,10 @@ export function createEmbedRuntimeFrame(context: EmbedSurfaceContext, layout: 's
       if (!keepFrame) iframe.remove()
       publish('stale')
     })
+  }, async (capture) => {
+    const collected = await requests.request(COLLECT_TESTS, { command: 'tests.collect' }, capture)
+    if (collected.error) throw new HistoireSdkError('COLLECTION_FAILED', collected.error.message ?? String(collected.error))
+    return await testWorkers.run(capture, collected.definitions ?? [])
   })
 
   /** Sandbox remains same-origin with wrapper; outer cross-origin bridge stays separate. */
@@ -102,6 +122,7 @@ export function createEmbedRuntimeFrame(context: EmbedSurfaceContext, layout: 's
   }
   /** Revoke document, requests and channels before retaining pixels or removing DOM. */
   function retireRuntime(status: 'stale' | 'absent', keepFrame = false, publishNow = true) {
+    testWorkers.cancel()
     requests.invalidate(status === 'stale' ? 'PREVIEW_NOT_READY' : 'RUNTIME_CHANGED')
     readiness.retire('Runtime document retired')
     channels.close()
@@ -261,7 +282,7 @@ export function createEmbedRuntimeFrame(context: EmbedSurfaceContext, layout: 's
     async request(command: string, payload: any, capture: HistoireRequestCapture) {
       capture.signal.throwIfAborted()
       if (command === 'selection.select') synchronize()
-      if (stalePreview.retained) throw new HistoireSdkError('PREVIEW_NOT_READY', 'Retained preview has no active runtime')
+      if (stalePreview.retained) throw new HistoireSdkError('PREVIEW_NOT_READY', 'Variant is no longer active.')
       if (command === 'selection.select') {
         if (owner.id) await readiness.promise
         return null
@@ -288,6 +309,7 @@ export function createEmbedRuntimeFrame(context: EmbedSurfaceContext, layout: 's
       active = false
       unsubscribe()
       retireRuntime('absent', false, false)
+      testWorkers.close()
       window.removeEventListener('message', receive)
       window.removeEventListener('resize', refreshLayout)
       document.removeEventListener('scroll', refreshLayout, true)

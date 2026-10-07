@@ -12,7 +12,7 @@ import { collectStoriesBrowser } from '../story-collection/index.js'
 import { loadProjectVitest } from '../util/project-vitest.js'
 import { getRunTempDir } from '../util/temp-paths.js'
 import { throwIfTestAborted } from '../util/test-abort.js'
-import { getRunTimeout } from '../util/test-timeouts.js'
+import { getRunTimeout, getTestMaxWorkers } from '../util/test-timeouts.js'
 import { assertVitestRunHasNoUnhandledErrors } from '../util/vitest-errors.js'
 import { runVitestAttempts } from '../util/vitest-run.js'
 import { debugVitestBrowserLifecycle } from '../vitest-browser-config/index.js'
@@ -145,6 +145,9 @@ async function runTests(ctx: Context, options: RunHistoireTestsOptions, specRoot
           include,
           ...runtimeConfig.vitestOptions,
           ...vitestOptions,
+          // Keep raw Vitest flags useful while retaining Histoire's configured
+          // concurrency ceiling for generated browser specs.
+          maxWorkers: getTestMaxWorkers(ctx),
           // Invariants last so raw vitest args cannot override them: the run
           // must use Histoire's generated config (a user `--config` module
           // would replace it), and watch mode is unsupported — the runner is

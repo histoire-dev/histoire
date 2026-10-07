@@ -3,10 +3,12 @@ import {
   COLLECT_TESTS,
   HOST_CHANNEL_MESSAGE,
   PREVIEW_SYNC,
+  RUN_TEST_CASE,
   RUN_TESTS,
   RUNTIME_REQUEST,
   SELECT_VARIANT,
   STATE_SYNC,
+  TEST_CASE_RESULT,
   TEST_DEFINITIONS,
   TEST_RESULT,
 } from '../../../../histoire-app/src/app/util/const.js'
@@ -118,6 +120,22 @@ describe('preview runtime inbound message guard', () => {
       type: TEST_RESULT,
       runId: '2',
       variantKey: 'story-a:variant-a',
+    }))
+  })
+
+  it('runs one hidden-document case only for the selected runtime', async () => {
+    const runtime = createPreviewRuntime()
+    const definition = { id: '0', name: 'case', fullName: 'suite > case' }
+
+    await runtime.deliver({ __histoire: true, type: RUN_TEST_CASE, documentId: 'old', runId: 'run', definition })
+    expect(runtime.runPreviewTestCase).not.toHaveBeenCalled()
+
+    await runtime.deliver({ __histoire: true, type: RUN_TEST_CASE, documentId: 'document', runId: 'run', definition })
+    expect(runtime.runPreviewTestCase).toHaveBeenCalledWith('story-a', 'variant-a', definition)
+    expect(runtime.postToParent).toHaveBeenLastCalledWith(expect.objectContaining({
+      type: TEST_CASE_RESULT,
+      runId: 'run',
+      definition,
     }))
   })
 

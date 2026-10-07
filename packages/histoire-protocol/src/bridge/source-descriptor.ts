@@ -37,13 +37,14 @@ export function validateSourceDescriptorFields(input: Record<string, unknown>): 
   }
   if (input.config !== undefined) {
     const config = wireRecord(input.config)
-    keys(config, ['title', 'theme', 'responsivePresets', 'backgroundPresets', 'autoApplyContrastColor', 'storyCollectTimeout', 'runTimeout', 'globals', 'textDirection'])
+    keys(config, ['title', 'theme', 'responsivePresets', 'backgroundPresets', 'autoApplyContrastColor', 'storyCollectTimeout', 'runTimeout', 'testMaxWorkers', 'globals', 'textDirection'])
     if (config.globals !== undefined) validateSettingsPatch({ globals: config.globals })
     if (config.textDirection !== undefined) validateSettingsPatch({ textDirection: config.textDirection })
     if (typeof config.title !== 'string' || typeof config.autoApplyContrastColor !== 'boolean') invalid('Invalid source config')
     for (const key of ['storyCollectTimeout', 'runTimeout']) {
       if (config[key] !== undefined && (typeof config[key] !== 'number' || !Number.isFinite(config[key]) || (config[key] as number) <= 0)) invalid('Invalid source deadline')
     }
+    if (config.testMaxWorkers !== undefined && (!Number.isSafeInteger(config.testMaxWorkers) || (config.testMaxWorkers as number) < 1)) invalid('Invalid source test worker limit')
     const theme = wireRecord(config.theme)
     keys(theme, ['defaultColorScheme', 'darkClass', 'hideColorSchemeSwitch', 'colors'])
     validateSettingsPatch({ colorScheme: theme.defaultColorScheme })

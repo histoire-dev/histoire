@@ -45,7 +45,7 @@ describeTests('Preview tests panel', () => {
     cy.assertMockedGreeting()
 
     openTestsPanel()
-    cy.contains('button', 'Run preview').should('be.visible')
+    cy.contains('button', 'Run in browser').should('be.visible')
     cy.get('[aria-label="Histoire tests"] li').should('have.length', 3)
     // The runnable tests start as "Not run"; the `it.skip` one is known to be
     // skipped before anything runs, so it reports that from the start.
@@ -53,7 +53,7 @@ describeTests('Preview tests panel', () => {
     cy.contains('[aria-label="Histoire tests"] li', 'tracks calls through the mocked module function').contains('Not run')
     cy.contains('[aria-label="Histoire tests"] li', 'fails').contains('Skipped')
 
-    cy.contains('button', 'Run preview').click()
+    cy.contains('button', 'Run in browser').click()
     cy.get('[aria-label="Histoire tests"] li').should('have.length', 3)
     cy.contains('[aria-label="Histoire tests"] li', 'renders the mocked dependency output').contains('passed')
     cy.contains('[aria-label="Histoire tests"] li', 'tracks calls through the mocked module function').contains('passed')

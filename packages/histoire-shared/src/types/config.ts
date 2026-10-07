@@ -236,6 +236,13 @@ export interface HistoireConfig extends HistoireUiConfig {
      * @default 300000
      */
     runTimeout?: number
+    /**
+     * Maximum number of test cases allowed to execute at once.
+     *
+     * Defaults to the parallelism available to the current machine. Applies to
+     * both the Vitest browser runner and in-book test execution.
+     */
+    maxWorkers?: number
   }
 }
 

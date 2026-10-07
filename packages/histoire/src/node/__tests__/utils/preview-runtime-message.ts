@@ -5,11 +5,13 @@ import {
   HOST_CHANNEL_MESSAGE,
   PREVIEW_SETTINGS_SYNC,
   PREVIEW_SYNC,
+  RUN_TEST_CASE,
   RUN_TESTS,
   RUNTIME_REQUEST,
   SANDBOX_READY,
   SELECT_VARIANT,
   STATE_SYNC,
+  TEST_CASE_RESULT,
   TEST_DEFINITIONS,
   TEST_RESULT,
 } from '../../../../../histoire-app/src/app/util/const.js'
@@ -33,6 +35,7 @@ export function createPreviewRuntime(options: { onCollect?: () => void, onRun?: 
     options.onRun?.()
     return { total: 1, passed: 1, failed: 0, skipped: 0, tests: [] }
   })
+  const runPreviewTestCase = vi.fn(async () => ({ ok: true, total: 1, passed: 1, failed: 0, skipped: 0, errors: [], tests: [] }))
   const setCollectedTestDefinitions = vi.fn()
   const syncSelection = vi.fn(async () => {})
   const channelReceive = vi.fn()
@@ -81,10 +84,12 @@ export function createPreviewRuntime(options: { onCollect?: () => void, onRun?: 
     variantStateGuards: {},
     PREVIEW_SETTINGS_SYNC,
     PREVIEW_SYNC,
+    RUN_TEST_CASE,
     RUN_TESTS,
     SANDBOX_READY,
     SELECT_VARIANT,
     STATE_SYNC,
+    TEST_CASE_RESULT,
     TEST_DEFINITIONS,
     TEST_RESULT,
     postToParent,
@@ -94,8 +99,9 @@ export function createPreviewRuntime(options: { onCollect?: () => void, onRun?: 
     variant,
     gridSelectedVariantId,
     gridSelectionVersion: undefined,
-    variantTestSession: { collectVariantTests },
+    variantTestSession: { collectVariantTests, runPreviewTestCase },
     runVariantTests,
+    runPreviewTestCase,
     setCollectedTestDefinitions,
     serializeTestError: (error: Error) => ({ message: error.message }),
     createFailedRunSummary: () => ({ total: 0, passed: 0, failed: 1, skipped: 0, tests: [] }),
@@ -112,6 +118,7 @@ export function createPreviewRuntime(options: { onCollect?: () => void, onRun?: 
     postToParent,
     collectVariantTests,
     runVariantTests,
+    runPreviewTestCase,
     syncSelection,
     channelReceive,
     handleRuntimeRequest,

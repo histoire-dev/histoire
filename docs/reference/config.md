@@ -567,6 +567,22 @@ export default defineConfig({
 })
 ```
 
+## `test.maxWorkers`
+
+`number` - Default: available CPU parallelism
+
+Maximum number of tests Histoire runs concurrently. Applies to both
+`histoire test` and tests run from a book. Browser cases run in separate
+hidden story documents, so each gets a fresh mount and suite lifecycle.
+
+```ts
+export default defineConfig({
+  test: {
+    maxWorkers: 4,
+  },
+})
+```
+
 ## `theme.description`
 
 `string` - Default: unset

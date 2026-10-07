@@ -2,8 +2,10 @@ import type { HistoireHostChannelPayload } from '../channels.js'
 import type { HistoireControlsAppearanceMessage, HistoireControlsOverlayMessage, HistoireControlsOverlayRefreshMessage, HistoireControlsOverlayResultMessage } from './controls.js'
 import type {
   HistoireCollectTestsPayload,
+  HistoireRunTestCasePayload,
   HistoireRunTestsPayload,
   HistoireSerializedTestDefinition,
+  HistoireTestCaseResultPayload,
   HistoireTestError,
   HistoireTestRunSummary,
 } from './test.js'
@@ -27,8 +29,10 @@ export const CONTROLS_READY = '__histoire:controls-ready'
 export const CONTROLS_RESIZE = '__histoire:controls-resize'
 export const COLLECT_TESTS = '__histoire:collect-tests'
 export const RUN_TESTS = '__histoire:run-tests'
+export const RUN_TEST_CASE = '__histoire:run-test-case'
 export const TEST_DEFINITIONS = '__histoire:test-definitions'
 export const TEST_RESULT = '__histoire:test-result'
+export const TEST_CASE_RESULT = '__histoire:test-case-result'
 export const RUNTIME_REQUEST = '__histoire:runtime-request'
 export const RUNTIME_RESULT = '__histoire:runtime-result'
 export const RUNTIME_FAILED = '__histoire:runtime-failed'
@@ -163,6 +167,11 @@ export type HistoireRunTestsMessage = HistoireRunTestsPayload & {
   type: typeof RUN_TESTS
 }
 
+/** Host request for one case in a dedicated hidden runtime document. */
+export type HistoireRunTestCaseMessage = HistoireRunTestCasePayload & {
+  type: typeof RUN_TEST_CASE
+}
+
 /** Preview reply to {@link HistoireCollectTestsMessage}. */
 export type HistoireTestDefinitionsMessage = HistoireCollectTestsPayload & {
   type: typeof TEST_DEFINITIONS
@@ -177,6 +186,11 @@ export type HistoireTestResultMessage = HistoireRunTestsPayload & {
   summary: HistoireTestRunSummary
 }
 
+/** Hidden runtime reply for one isolated test case. */
+export type HistoireTestCaseResultMessage = HistoireTestCaseResultPayload & {
+  type: typeof TEST_CASE_RESULT
+}
+
 /** Every message the host posts into the preview iframe. */
 export type HistoireHostMessage =
   | HistoireHostChannelPreviewMessage
@@ -189,6 +203,7 @@ export type HistoireHostMessage =
   | HistoireSelectVariantMessage
   | HistoireCollectTestsMessage
   | HistoireRunTestsMessage
+  | HistoireRunTestCaseMessage
   | HistoireRuntimeRequestMessage
 
 /** Every message the preview iframe posts back to the host. */
@@ -205,6 +220,7 @@ export type HistoirePreviewMessage =
   | HistoireRuntimeFocusMessage
   | HistoireTestDefinitionsMessage
   | HistoireTestResultMessage
+  | HistoireTestCaseResultMessage
 
 /**
  * An inbound preview message as it is actually received: the payload crossed a

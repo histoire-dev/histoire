@@ -25,6 +25,8 @@ export interface HistoireSourceConfig {
   storyCollectTimeout?: number
   /** Existing source test execution budget in milliseconds. */
   runTimeout?: number
+  /** Maximum in-book test workers; projected from `test.maxWorkers`. */
+  testMaxWorkers?: number
   /** Source defaults for host-owned primitive globals. */
   globals?: HistoireSettings['globals']
   /** Source initial preview/capture direction. */

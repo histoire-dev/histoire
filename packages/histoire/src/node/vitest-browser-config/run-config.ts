@@ -2,6 +2,7 @@ import type { Plugin as VitePlugin } from 'vite'
 import type { Context } from '../context.js'
 import type { VitestBrowserRuntimeConfigResult } from './index.js'
 import { resolve } from 'pathe'
+import { getTestMaxWorkers } from '../util/test-timeouts.js'
 import { RESOLVED_TEST_HARNESS_ID, TEST_HARNESS_ID } from '../virtual/index.js'
 import { getViteConfigWithPlugins } from '../vite/index.js'
 import { createVitestBrowserRuntimeConfig } from './index.js'
@@ -76,6 +77,9 @@ export async function getHistoireBrowserRunConfig(
           },
         }
       : {
+          test: {
+            maxWorkers: getTestMaxWorkers(ctx),
+          },
           resolveAlias: {
             [TEST_HARNESS_ID]: RESOLVED_TEST_HARNESS_ID,
           },

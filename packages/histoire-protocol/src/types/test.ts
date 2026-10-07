@@ -82,6 +82,20 @@ export interface HistoireRunTestsPayload extends HistoireTestRequestAuthority {
   variantKey?: string | null
 }
 
+/** One isolated in-book test case request, kept internal to Histoire surfaces. */
+export interface HistoireRunTestCasePayload extends HistoireTestRequestAuthority {
+  /** Correlates a hidden runtime document with its one scheduled case. */
+  runId: string
+  /** Definition collected from the selected visible runtime. */
+  definition: HistoireSerializedTestDefinition
+}
+
+/** Result produced by one isolated in-book test case request. */
+export interface HistoireTestCaseResultPayload extends HistoireRunTestCasePayload {
+  /** Complete one-case summary, merged by the host in collection order. */
+  summary: HistoireTestRunSummary
+}
+
 /** Portable serialized test data; callbacks stay runtime-local. */
 export interface HistoireTestDefinitionsPayload extends HistoireCollectTestsPayload {
   /** Serialized collected definitions. */

@@ -3,6 +3,7 @@ import fs from 'node:fs'
 import path from 'pathe'
 import pc from 'picocolors'
 import { resolveEmbedConfig } from './embed.js'
+import { getTestMaxWorkers } from '../util/test-timeouts.js'
 
 /**
  * Resolves the file paths held by the config against the project root and
@@ -14,6 +15,7 @@ import { resolveEmbedConfig } from './embed.js'
 export async function processConfig(ctx: Context) {
   const { config, root } = ctx
   config.embed = resolveEmbedConfig(config.embed)
+  getTestMaxWorkers(ctx)
 
   // Resolve files paths
 

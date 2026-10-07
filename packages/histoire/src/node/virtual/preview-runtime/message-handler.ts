@@ -43,7 +43,7 @@ export function previewMessageHandler() {
       }
       // Automation requests retain exact tuple and document identity. Existing
       // UI callers omit these additive fields and keep their current protocol.
-      if (event.data.type === COLLECT_TESTS || event.data.type === RUN_TESTS) {
+      if (event.data.type === COLLECT_TESTS || event.data.type === RUN_TESTS || event.data.type === RUN_TEST_CASE) {
         if (event.data.documentId !== undefined && event.data.documentId !== previewDocumentId) return
         if (event.data.storyId !== undefined && event.data.storyId !== story.value?.id) return
         if (event.data.variantId !== undefined && event.data.variantId !== variant.value?.id) return
@@ -231,6 +231,35 @@ export function previewMessageHandler() {
             variantId: runVariant.id,
             mcpNonce: event.data.mcpNonce,
             mcpEpoch: event.data.mcpEpoch,
+            summary: createFailedRunSummary(runStory.id, runVariant.id, error),
+          })
+        }
+      }
+      else if (event.data?.type === RUN_TEST_CASE) {
+        if (!story.value || !variant.value || !event.data.definition || typeof event.data.runId !== 'string') {
+          return
+        }
+
+        const runStory = story.value
+        const runVariant = variant.value
+        try {
+          const summary = await variantTestSession.runPreviewTestCase(runStory.id, runVariant.id, event.data.definition)
+          postToParent({
+            type: TEST_CASE_RESULT,
+            runId: event.data.runId,
+            storyId: runStory.id,
+            variantId: runVariant.id,
+            definition: event.data.definition,
+            summary,
+          })
+        }
+        catch (error) {
+          postToParent({
+            type: TEST_CASE_RESULT,
+            runId: event.data.runId,
+            storyId: runStory.id,
+            variantId: runVariant.id,
+            definition: event.data.definition,
             summary: createFailedRunSummary(runStory.id, runVariant.id, error),
           })
         }

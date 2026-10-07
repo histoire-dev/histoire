@@ -1,11 +1,34 @@
 import type { EmbedSurfaceContext } from '../surfaces.js'
 import { HistoireProvider } from '@histoire/vue'
-import { HistoireTests } from '@histoire/vue/internal'
-import { createApp, h } from 'vue'
+import { createHistoireTestsCollector, createHistoireTestsModel, HistoireTests, provideHistoireTestsModel } from '@histoire/vue/internal'
+import { createApp, defineComponent, h } from 'vue'
 
-/** Test view consumes parent session; only explicit user actions execute tests. */
+/** Test view collects definitions automatically but leaves assertion execution explicit. */
 export function createEmbedTestsView(context: EmbedSurfaceContext) {
-  const app = createApp({ render: () => h(HistoireProvider, { session: context.session }, { default: () => h(HistoireTests) }) })
-  app.mount(context.container)
-  return { ready: Promise.resolve(), close: () => app.unmount() }
+  const model = createHistoireTestsModel(context.session)
+  const collector = createHistoireTestsCollector(context.session, model)
+  const Root = defineComponent({
+    /** Provides one session-scoped model to the collector and native panel. */
+    setup: () => {
+      provideHistoireTestsModel(model)
+      return () => h(HistoireProvider, { session: context.session }, { default: () => h(HistoireTests) })
+    },
+  })
+  const app = createApp(Root)
+  try {
+    app.mount(context.container)
+  }
+  catch (error) {
+    collector.close()
+    app.unmount()
+    throw error
+  }
+  return {
+    ready: Promise.resolve(),
+    /** Retires collection before unmounting provider-owned native controls. */
+    close: () => {
+      collector.close()
+      app.unmount()
+    },
+  }
 }

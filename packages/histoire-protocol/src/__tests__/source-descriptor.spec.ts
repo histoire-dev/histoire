@@ -31,6 +31,10 @@ describe('portable source descriptor policy', () => {
     }
     expect(() => validateHistoireSourceDescriptor({ ...descriptor, config: { ...descriptor.config, loader: 'private' } })).toThrow()
     expect(() => validateHistoireSourceDescriptor({ ...descriptor, config: { ...descriptor.config, theme: { darkClass: 'dark' } } })).toThrow()
+    expect(validateHistoireSourceDescriptor({ ...descriptor, config: { ...descriptor.config, testMaxWorkers: 2 } })).toBeDefined()
+    for (const testMaxWorkers of [0, -1, 1.5, Number.NaN]) {
+      expect(() => validateHistoireSourceDescriptor({ ...descriptor, config: { ...descriptor.config, testMaxWorkers } })).toThrow('Invalid source test worker limit')
+    }
   })
 
   it('replaces baked list and fails closed for malformed present deployment override', () => {

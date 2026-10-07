@@ -5,7 +5,7 @@ import { createEmbedSurfaceCapabilities } from '@histoire/app/dist/embed/capabil
 import { validateHistoireSourceDescriptor } from '@histoire/protocol'
 import { resolveEmbedConfig } from '../../config/embed.js'
 import { hasProjectVitest } from '../../util/has-vitest.js'
-import { DEFAULT_RUN_TIMEOUT, DEFAULT_STORY_COLLECT_TIMEOUT } from '../../util/test-timeouts.js'
+import { DEFAULT_RUN_TIMEOUT, DEFAULT_STORY_COLLECT_TIMEOUT, getTestMaxWorkers } from '../../util/test-timeouts.js'
 import { projectEmbedCatalog } from './catalog.js'
 import { projectEmbedAssets } from './content.js'
 import { getEmbedSourceId } from './identity.js'
@@ -60,6 +60,7 @@ export function createEmbedDescriptor(ctx: Context, snapshot: CatalogSnapshot, m
       autoApplyContrastColor: ctx.config.autoApplyContrastColor ?? false,
       storyCollectTimeout: ctx.config.test?.storyCollectTimeout ?? DEFAULT_STORY_COLLECT_TIMEOUT,
       runTimeout: ctx.config.test?.runTimeout ?? DEFAULT_RUN_TIMEOUT,
+      testMaxWorkers: getTestMaxWorkers(ctx),
       globals: ctx.config.preview?.globals ?? {},
       textDirection: ctx.config.preview?.textDirection ?? 'ltr',
     },

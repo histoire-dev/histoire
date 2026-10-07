@@ -4,6 +4,7 @@ import type { VariantTestSessionOptions } from './types.js'
 import { serializeTestDefinitions } from '@histoire/shared'
 import { createMissingHandlerError, getMatchingDefinition } from './definitions.js'
 import { createExclusiveQueue } from './exclusive.js'
+import { runPreviewDefinition } from './run-preview-definition.js'
 import { runSingleDefinition } from './run-single-definition.js'
 import { runSessionTests } from './run.js'
 import { createVariantSession } from './session.js'
@@ -111,6 +112,20 @@ export function createVariantTestSession(options: VariantTestSessionOptions) {
     })
   }
 
+  /** Runs one case in a fresh hidden preview document. */
+  async function runPreviewTestCase(storyId: string, variantId: string, definition: HistoireSerializedTestDefinition) {
+    return runExclusive(async () => {
+      const session = await openVariantSession(storyId, variantId)
+
+      try {
+        return await runPreviewDefinition(session, storyId, variantId, definition)
+      }
+      finally {
+        session.cleanup()
+      }
+    })
+  }
+
   return {
     collectVariantTests,
     loadStoryFile,
@@ -119,6 +134,7 @@ export function createVariantTestSession(options: VariantTestSessionOptions) {
     getStoryModuleVersion: storyModules.getStoryModuleVersion,
     invalidateStory: storyModules.invalidateStory,
     runCollectedTest,
+    runPreviewTestCase,
     runVariantTests,
   }
 }
