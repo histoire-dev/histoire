@@ -30,10 +30,16 @@ describe('BaseButton grid detection', () => {
     // controls replace the generic editors for its own state, and the detected
     // props of the rendered component are listed next to them.
     cy.getControlsIframeBody().within(() => {
-      cy.contains('label', /^Disabled$/).should('be.visible')
-      cy.contains('label', 'Color').should('be.visible')
-      cy.contains('label', 'Size').should('be.visible')
+      cy.get('[role="checkbox"][aria-label="Disabled"]').should('be.visible').and('have.attr', 'aria-checked', 'false')
+      cy.get('button[aria-label="Color"][aria-haspopup="listbox"]').should('be.visible')
+      cy.get('button[aria-label="Size"][aria-haspopup="listbox"]').should('be.visible')
     })
+    // Accessible custom controls update the exact selected runtime, not only
+    // their own appearance inside the controls replica.
+    cy.getControlsIframeBody().find('[role="checkbox"][aria-label="Disabled"]').click().should('have.attr', 'aria-checked', 'true')
+    cy.getPreviewIframeBody().contains('button', 'Click me').should('be.disabled')
+    cy.getControlsIframeBody().find('[role="checkbox"][aria-label="Disabled"]').click().should('have.attr', 'aria-checked', 'false')
+    cy.getPreviewIframeBody().contains('button', 'Click me').should('not.be.disabled')
     expectDetectedProps(1)
     expectNoDetectedState()
 

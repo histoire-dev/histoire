@@ -1,11 +1,11 @@
 import type { HistoireSearchResult, HistoireSnapshot, HistoireTarget } from '@histoire/protocol'
 import type { HistoireSessionAdapters, HistoireSourceConnection } from '../adapters/types.js'
 import type { HistoireSession, HistoireSessionOptions } from '../types.js'
-import { HistoireSdkError, validateHistoireSourceDescriptor, validateSettingsPatch } from '@histoire/protocol'
+import { HistoireSdkError, validateSettingsPatch } from '@histoire/protocol'
 import { createSessionChannels } from './channels.js'
 import { SessionContext } from './context.js'
 import { clearEvents } from './events.js'
-import { bindHistoireSessionInternals } from './internal.js'
+import { acceptHistoireSourceDescriptor, bindHistoireSessionInternals, isAcceptedHistoireSourceDescriptor } from './internal.js'
 import { mountSurface } from './mounts.js'
 import { receiveNotification } from './notifications.js'
 import { observeOperation } from './ownership.js'
@@ -75,11 +75,13 @@ export function createHistoireSessionWithAdapters(options: HistoireSessionOption
       }
       try {
         if (connection.descriptor.protocolVersion !== 1 || connection.descriptor.descriptorVersion !== 1) throw new HistoireSdkError('PROTOCOL_MISMATCH', 'Unsupported source descriptor version.')
-        validateHistoireSourceDescriptor(connection.descriptor)
+        const descriptor = isAcceptedHistoireSourceDescriptor(connection.descriptor)
+          ? connection.descriptor
+          : acceptHistoireSourceDescriptor(connection.descriptor)
         context.connection = connection
-        context.descriptor = context.copy(connection.descriptor)
-        context.engine = context.copy(connection.descriptor.capabilities)
-        const catalog = context.copy(connection.descriptor.catalog)
+        context.descriptor = descriptor
+        context.engine = context.copy(descriptor.capabilities)
+        const catalog = context.copy(descriptor.catalog)
         const saved = context.persistence.read()
         const settings = context.copy({ ...context.snapshot.settings, ...validateSettingsPatch(connection.initialSettings ?? {}), ...saved, ...context.explicitSettings })
         const selected = reconcileSelection(context, catalog)
@@ -87,7 +89,7 @@ export function createHistoireSessionWithAdapters(options: HistoireSessionOption
         context.publish({
           status: 'ready',
           stale: false,
-          source: context.copy({ sourceId: connection.descriptor.sourceId, url: context.url, mode: connection.descriptor.mode, epoch: connection.descriptor.epoch, revision: connection.descriptor.revision }),
+          source: context.copy({ sourceId: descriptor.sourceId, url: context.url, mode: descriptor.mode, epoch: descriptor.epoch, revision: descriptor.revision }),
           catalog,
           diagnostics: catalog.diagnostics,
           selection: context.copy(selected),

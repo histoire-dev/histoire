@@ -258,14 +258,27 @@ describe('canvas overlay geometry', () => {
     })
   }
 
-  it('fits Matrix between its fixed controls and footer', () => {
-    visitCanvas(matrix)
+  it('fits Matrix on every entry between its fixed controls and footer', () => {
+    visitCanvas(matrix.replace('&arrange=matrix', '&arrange=grid'), 1.77)
+    cy.get('[aria-label="Props matrix"]').should('not.be.disabled').click()
     // Axes arrive after runtime readiness; iframe existence alone does not imply ready cells.
     cy.get('.histoire-matrix-cell', { timeout: 20000 }).should('have.length', 4)
+    cy.get('button[aria-label="Zoom level"]').should('contain', 'Fit')
+    assertFrames('.histoire-matrix-cell')
+    zoomAction('200%')
+    cy.get('button[aria-label="Zoom level"]').should('contain', '200%')
+    cy.get('[aria-label="Grid"]').click()
+    cy.get('button[aria-label="Zoom level"]').should('contain', '177%')
+    cy.get('[aria-label="Props matrix"]').click()
+    cy.get('button[aria-label="Zoom level"]').should('contain', 'Fit')
+    assertFrames('.histoire-matrix-cell')
+    zoomAction('200%')
+    cy.reload()
+    cy.get('.histoire-matrix-cell', { timeout: 20000 }).should('have.length', 4)
+    cy.get('button[aria-label="Zoom level"]').should('contain', 'Fit')
     assertFrames('.histoire-matrix-cell')
     cy.get('[aria-label="Close inspector"]').click()
     cy.viewport(1000, 760)
-    zoomAction('Fit to canvas')
     assertFrames('.histoire-matrix-cell')
   })
 

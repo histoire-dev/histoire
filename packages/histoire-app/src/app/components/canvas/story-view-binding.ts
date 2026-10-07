@@ -89,6 +89,8 @@ export function bindStoryCanvasView(options: StoryCanvasViewBindingOptions) {
         }
         else if (previousStoryId) {
           saveActive(previousStoryId, true)
+          // Matrix story entry discards inherited zoom after capturing the outgoing view.
+          if (options.getRenderedArrangement() === 'matrix') canvas.resetZoom()
           restoredStoryId = storyId
           restoredInitialFocusStoryId = storyId
         }

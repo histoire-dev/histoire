@@ -1,3 +1,5 @@
+import { createHistoireSessionWithAdapters } from '@histoire/sdk/internal'
+import { HistoireProvider } from '@histoire/vue'
 import { mount } from '@vue/test-utils'
 import { describe, expect, it, vi } from 'vitest'
 import { defineComponent, h, nextTick, ref } from 'vue'
@@ -10,6 +12,7 @@ import { createCanvasStore } from '../../../histoire-app/src/app/stores/canvas.j
 import { createMatrixStore, provideMatrix } from '../../../histoire-app/src/app/stores/matrix.js'
 import { registerFrameShortcuts } from '../../../histoire-app/src/app/util/frame-actions.js'
 import { createShortcutRegistry } from '../../../histoire-app/src/app/util/shortcuts.js'
+import { sourceFixture } from '../../../histoire-sdk/src/__tests__/fixtures/session.js'
 
 describe('embedded canvas Space ownership', () => {
   it('handles bubbled Space after mounting its window listener', async () => {
@@ -70,7 +73,9 @@ describe('matrix cell frame input', () => {
         return () => h(MatrixCell, { cell, frame, live: false, variantId: variant.value, previewBase: 'https://book.test/' })
       },
     })
-    const wrapper = mount(Host, { attachTo: document.body })
+    const session = createHistoireSessionWithAdapters({ url: 'https://book.test/' }, sourceFixture().adapters)
+    await session.connect()
+    const wrapper = mount(HistoireProvider, { props: { session }, slots: { default: () => h(Host) }, attachTo: document.body })
     try {
       const section = wrapper.get('.histoire-matrix-cell')
       const select = wrapper.get('.histoire-matrix-cell-select')
@@ -92,6 +97,7 @@ describe('matrix cell frame input', () => {
     finally {
       wrapper.unmount()
       matrix.close()
+      await session.dispose()
     }
   })
 

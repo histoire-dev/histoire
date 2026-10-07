@@ -2,6 +2,7 @@
 import type { CanvasFrameRegistration } from '../../../../histoire-app/src/app/composables/canvas-settings.js'
 import { VARIANT_READY } from '@histoire/protocol'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { createMeasureController, sameMeasureOwner } from '../../../../histoire-app/src/app/components/canvas/measure-controller.js'
 import { getMeasureOwner } from '../../../../histoire-app/src/app/components/canvas/measure-owner.js'
 import { createRuntimeFrameFixture, publishFrameMessage } from './utils/embed/runtime-frame.js'
 
@@ -16,6 +17,25 @@ async function readyFrame() {
 }
 
 describe('measure preview owner', () => {
+  it('retires locked measurement when the same document returns under a new registration', async () => {
+    const fixture = await readyFrame()
+    try {
+      let frame = fixture.frame
+      const getOwner = () => getMeasureOwner(frame, fixture.session.getSnapshot(), true)
+      const initial = getOwner()!
+      const controller = createMeasureController({ getOwner, post: () => true })
+      controller.toggle({ x: 1, y: 1 })
+      expect(controller.locked.value).toBe(true)
+      frame = { ...frame }
+      expect(sameMeasureOwner(initial, getOwner())).toBe(false)
+      controller.synchronize()
+      expect(controller.locked.value).toBe(false)
+      expect(controller.result.value).toBeNull()
+      controller.close()
+    }
+    finally { await fixture.close() }
+  })
+
   beforeEach(() => vi.stubGlobal('ResizeObserver', class {
     /** Geometry is tested separately; this fixture owns only runtime lifetime. */
     observe = vi.fn()

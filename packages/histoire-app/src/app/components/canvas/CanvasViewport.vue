@@ -5,7 +5,6 @@ import { computed, nextTick, onBeforeUnmount, onMounted, ref, shallowRef, watch 
 import { createCanvasFrames, provideCanvas, provideCanvasPointerPan } from '../../composables/canvas-settings.js'
 import { useContextMenu } from '../../composables/context-menu.js'
 import { createCanvasStore, getCanvasStorage } from '../../stores/canvas.js'
-import { useMatrixStore } from '../../stores/matrix.js'
 import { useUiSettingsStore } from '../../stores/settings.js'
 import { useStoryCanvasViews } from '../../stores/story-canvas-views.js'
 import { getSearchFrameState } from '../panes/search/frame-navigation.js'
@@ -18,11 +17,11 @@ import CanvasSingleVariant from './CanvasSingleVariant.vue'
 import CanvasStatus from './CanvasStatus.vue'
 import CollectErrorCard from './CollectErrorCard.vue'
 import { useCanvasFrameAdmission } from './frame-admission.js'
-import { createCanvasArrangement } from './frame-arrangement.js'
 import { watchCanvasFrameFocus } from './frame-focus.js'
 import { bindCanvasFrameInteractions } from './frame-interactions.js'
-import { canvasFrameBounds, type CanvasFrameLayout, layoutCanvasFrames, visibleCanvasFrames } from './frame-layout.js'
+import { canvasFrameBounds, type CanvasFrameLayout, layoutCanvasFrames, rankCanvasStartupFrames, visibleCanvasFrames } from './frame-layout.js'
 import { watchCanvasListDefaultSelection, watchCanvasSelectedSession } from './frame-selection.js'
+import { provideCanvasStartupCoordinator } from './frame-startup-coordinator.js'
 import { createCanvasFrameState } from './frame-state.js'
 import FrameGrid from './FrameGrid.vue'
 import FrameList from './FrameList.vue'
@@ -75,7 +74,9 @@ const settings = useUiSettingsStore()
 const canvas = createCanvasStore({ singleViewport: settings?.singleViewport, storage: getCanvasStorage(typeof window === 'undefined' ? undefined : window) })
 const registry = createCanvasFrames(canvas)
 const frameState = createCanvasFrameState(session)
-const renderedArrange = createCanvasArrangement(() => props.arrange, useMatrixStore())
+const renderedArrange = computed(() => props.arrange)
+/** Failure belongs to the hidden runtime; usable axes still take precedence in Matrix. */
+const matrixDiscoveryFailed = ref(false)
 provideCanvas(canvas, registry, frameState)
 const viewBinding = bindStoryCanvasView({
   getStoryId: () => story.value?.id,
@@ -142,6 +143,8 @@ const live = useCanvasFrameAdmission({
   moving: () => canvas.panning,
   context: () => JSON.stringify([story.value?.id, renderedArrange.value, size.value.width, size.value.height, canvas.viewport.width, canvas.viewport.height, props.inspectorWidth]),
 })
+const startupOrder = computed(() => rankCanvasStartupFrames(frames.value, [...live.value], selectedFrame.value?.id ?? null))
+provideCanvasStartupCoordinator(startupOrder)
 let iframeActivatedFrameId: string | undefined
 let stopInteractions = () => {}
 let initialFocusPending = true
@@ -167,7 +170,7 @@ const { insets: contentInsets, headerBounds, measure } = useCanvasGeometry({
     }
   },
 })
-const headerObscured = useCanvasHeaderOcclusion({ header: () => header.value, viewport: () => viewport.value, canvas, registry, bounds: () => headerBounds.value })
+const headerObscured = useCanvasHeaderOcclusion({ header: () => header.value, viewport: () => viewport.value, canvas, registry, bounds: () => headerBounds.value, enabled: () => renderedArrange.value !== 'matrix' })
 const { canOpenInEditor, openInEditor } = createCanvasHeaderEditor({
   session,
   snapshot: () => snapshot.value,
@@ -261,13 +264,13 @@ defineExpose({ canvas, registry })
       </slot>
     </div>
     <CanvasSingleVariant v-if="renderedArrange === 'single' && story" ref="singleVariant" :area="singleArea" :frame="selectedFrame" :variant="selectedVariant" :preview-base="previewBase" :stale="diagnostics.length > 0" :resizable="singleResizable" @resize="resizeSingleViewport" @contextmenu="(event, target) => emit('contextmenu', event, target)" />
-    <slot v-else-if="renderedArrange === 'matrix'" name="matrix" :canvas="canvas" :frames="registry" :size="size" :content-insets="contentInsets" :frame-budget="frameBudget" :preview-base="previewBase" />
+    <slot v-else-if="renderedArrange === 'matrix'" name="matrix" :canvas="canvas" :frames="registry" :size="size" :content-insets="contentInsets" :frame-budget="frameBudget" :preview-base="previewBase" :discovery-failed="matrixDiscoveryFailed" />
     <component :is="renderedArrange === 'list' ? FrameList : FrameGrid" v-else :frames="renderedFrames">
       <template #default="{ frame }">
         <CanvasFrame :frame="frame" :fit-bounds="zoom => fitBoundsForFrame(frame, zoom)" :variant="variantsById.get(frame.variantId)!" :selected="frame.id === selectedFrame?.id" :live="live.has(frame.id)" :preview-base="previewBase" :width="size.width" :height="size.height" :stale="diagnostics.length > 0" v-bind="getSearchFrameState(frame.id, !!searchActive, highlightedTargets)" @select="selectVariant" @contextmenu="(event, target) => emit('contextmenu', event, target)" />
       </template>
     </component>
-    <CanvasMatrixPrimary :active="renderedArrange === 'matrix'" :width="size.width" :height="size.height" @error="emit('error', $event)" />
+    <CanvasMatrixPrimary :active="renderedArrange === 'matrix'" :preview-base="previewBase" :width="size.width" :height="size.height" @status="matrixDiscoveryFailed = $event === 'error'" @error="emit('error', $event)" />
     <div v-if="commentMode" class="histoire-comment-capture" @pointerdown="viewportEvents.framePointer" />
     <slot v-if="!uiHidden" name="overlays" :canvas="canvas" :frames="registry" :selected-frame="selectedFrame" />
     <CollectErrorCard v-if="diagnostics.length && !uiHidden" :errors="diagnostics" />

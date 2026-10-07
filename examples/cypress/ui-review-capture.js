@@ -67,7 +67,7 @@ export function captureMatrixCell(emphasized, alias) {
   cy.get('@screenshotReplies', { timeout: 60000 }).should((replies) => {
     const reply = replies.find(reply => reply.requestId === requestId)
     expect(reply, 'result for exact capture request').to.be.an('object')
-    expect(reply).not.to.have.property('error')
+    expect(reply, JSON.stringify(reply.error ?? 'Capture succeeded')).not.to.have.property('error')
     expect(reply.errors ?? []).to.have.length(0)
     expect(reply.files).to.have.length(1)
     expect(reply.files[0]).to.include({ storyId, variantId: 'default', frameKey })

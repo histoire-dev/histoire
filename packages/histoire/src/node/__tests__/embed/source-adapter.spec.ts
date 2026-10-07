@@ -2,6 +2,8 @@ import { readFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { createEmbedSourceConnection } from '../../../../../histoire-app/src/embed/source.js'
+import { createHistoireSessionWithAdapters, getAcceptedHistoireSessionDescriptor } from '../../../../../histoire-sdk/dist/internal.js'
+import { sourceFixture } from '../../../../../histoire-sdk/src/__tests__/fixtures/session.js'
 import { prepareEmbedOutput, writeEmbedDescriptor } from '../../virtual/embed/output.js'
 import { createEmbedSource } from '../../virtual/embed/source.js'
 import { createEmbedSourceFixture } from '../utils/embed/source.js'
@@ -73,8 +75,9 @@ describe('first-party data-only source adapter', () => {
   })
 
   it('reads supplied standalone projection without public bridge discovery or origin overrides', async () => {
-    const descriptor = createEmbedSource(fixture.context, fixture.catalog).getDescriptor()
+    const descriptor = structuredClone(createEmbedSource(fixture.context, fixture.catalog).getDescriptor())
     descriptor.capabilities.openInEditor = { available: true }
+    const acceptedTitle = descriptor.catalog.stories[0].title
     const requests: string[] = []
     const fetcher: typeof fetch = async (input) => {
       requests.push(new URL(String(input)).pathname)
@@ -82,14 +85,33 @@ describe('first-party data-only source adapter', () => {
     }
     const connection = await createEmbedSourceConnection({ url: 'https://book.test/nested/book/', descriptor, actionBase: '__histoire/local/', fetcher })
     try {
+      descriptor.catalog.stories[0].title = 'Mutated by caller after admission'
       expect(requests).toEqual([])
       expect(connection.allowedOrigins).toEqual([])
+      expect(connection.descriptor.catalog.stories[0].title).toBe(acceptedTitle)
       const capture = { sessionId: 'local', connectionId: connection.id, sourceId: descriptor.sourceId, epoch: descriptor.epoch, revision: descriptor.revision, signal: new AbortController().signal }
       await connection.request('openInEditor', { storyId: fixture.story.story.id, variantId: null }, capture)
       expect(requests).toEqual(['/nested/book/__histoire/local/editor'])
     }
     finally {
       await connection.close()
+    }
+  })
+
+  /** Embed-only portable fields stay mandatory when a descriptor has an SDK brand. */
+  it('rejects SDK-accepted descriptors that omit required embed fields', async () => {
+    const source = sourceFixture()
+    const session = createHistoireSessionWithAdapters({ url: 'https://book.test/nested/book/' }, source.adapters)
+    await session.connect()
+
+    try {
+      const accepted = getAcceptedHistoireSessionDescriptor(session)
+      expect(accepted.embed).toBeUndefined()
+      await expect(createEmbedSourceConnection({ url: 'https://book.test/nested/book/', descriptor: accepted }))
+        .rejects.toThrow('Source descriptor lacks required portable fields')
+    }
+    finally {
+      await session.dispose()
     }
   })
 })

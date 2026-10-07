@@ -40,7 +40,7 @@ export class SessionContext {
   snapshot: HistoireSnapshot = initialSnapshot()
   /** Negotiated engine support before runtime readiness filtering. */
   engine: HistoireCapabilities | null = null
-  /** Current detached source metadata; never mutate adapter-owned descriptor getters. */
+  /** Current SDK-accepted immutable descriptor, detached from adapter-owned input. */
   descriptor: HistoireSourceDescriptor | null = null
   /** Active data bridge, absent until explicit connect. */
   connection: HistoireSourceConnection | null = null

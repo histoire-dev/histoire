@@ -27,5 +27,5 @@ export function getMeasureOwner(frame: CanvasFrameRegistration | null, snapshot:
   const iframe = frame.iframe
   const host = iframe.ownerDocument.defaultView!
   const source = snapshot.source
-  return { frameId: frame.id, storyId: frame.storyId, variantId: frame.variantId, documentId: frame.documentId, source: iframe.contentWindow!, origin: host.location.origin, generation: JSON.stringify([source.url, source.sourceId, source.epoch, source.revision, snapshot.runtime.mountId]) }
+  return { registration: frame, frameId: frame.id, storyId: frame.storyId, variantId: frame.variantId, documentId: frame.documentId, source: iframe.contentWindow!, origin: host.location.origin, generation: JSON.stringify([source.url, source.sourceId, source.epoch, source.revision, snapshot.runtime.mountId]) }
 }

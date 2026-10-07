@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { SingleResizeAxis, SingleResizeSize } from './single-resize.js'
-import { useEventListener } from '@vueuse/core'
-import { computed, onBeforeUnmount, watch } from 'vue'
+import { useElementBounding, useEventListener } from '@vueuse/core'
+import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { createSingleResizeController, SINGLE_RESIZE_MAX, SINGLE_RESIZE_MIN } from './single-resize.js'
 
 const props = defineProps<{
@@ -28,6 +28,20 @@ const emit = defineEmits<{
 
 const ownerDocument = computed(() => props.frame?.ownerDocument)
 const ownerWindow = computed(() => ownerDocument.value?.defaultView ?? undefined)
+/** Pointer input clears keyboard focus feedback even when programmatic focus persists. */
+const keyboardInput = ref(false)
+const surfaceBounds = useElementBounding(() => props.surface)
+const frameBounds = useElementBounding(() => props.frame)
+/** Project scroll content into its sibling overlay without extending scroll bounds. */
+const position = computed(() => ({
+  left: `${frameBounds.left.value - surfaceBounds.left.value}px`,
+  top: `${frameBounds.top.value - surfaceBounds.top.value}px`,
+  width: `${frameBounds.width.value}px`,
+  height: `${frameBounds.height.value}px`,
+  visibility: frameBounds.width.value > 0 && frameBounds.height.value > 0 ? 'visible' as const : 'hidden' as const,
+}))
+// Surface resizing or moving can recenter the frame without resizing the frame itself.
+watch([surfaceBounds.left, surfaceBounds.top, surfaceBounds.width, surfaceBounds.height, () => props.size.width, () => props.size.height, () => props.zoom], frameBounds.update, { flush: 'post' })
 
 const controller = createSingleResizeController({
   getSize: () => props.size,
@@ -64,6 +78,8 @@ function keyDown(axis: 'width' | 'height', event: KeyboardEvent): void {
 useEventListener(ownerDocument, 'pointermove', controller.onPointerMove, { capture: true, passive: false })
 useEventListener(ownerDocument, ['pointerup', 'pointercancel'], controller.onPointerEnd, { capture: true })
 useEventListener(ownerWindow, 'blur', () => controller.release())
+useEventListener(ownerDocument, 'keydown', () => keyboardInput.value = true, { capture: true })
+useEventListener(ownerDocument, 'pointerdown', () => keyboardInput.value = false, { capture: true })
 watch(controller.active, active => emit('update:active', active), { immediate: true })
 onBeforeUnmount(() => {
   controller.close()
@@ -72,7 +88,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div class="histoire-single-resize-handles" :data-active="controller.active.value">
+  <div class="histoire-single-resize-handles" :style="position" :data-active="controller.active.value" :data-keyboard-input="keyboardInput">
     <div
       class="histoire-single-resize-handle is-width"
       data-test-id="single-resize-width"
@@ -115,17 +131,17 @@ onBeforeUnmount(() => {
 </template>
 
 <style scoped>
-.histoire-single-resize-handles { position: absolute; inset: 0; z-index: 4; pointer-events: none; }
-.histoire-single-resize-handle { position: absolute; pointer-events: auto; touch-action: none; user-select: none; }
+.histoire-single-resize-handles { position: absolute; z-index: 4; pointer-events: none; }
+.histoire-single-resize-handle { --resize-color: transparent; position: absolute; pointer-events: auto; touch-action: none; user-select: none; outline: none; }
+.histoire-single-resize-handle:focus { outline: none; }
 .histoire-single-resize-handle::after { content: ''; position: absolute; border-radius: 1px; background: transparent; }
-.histoire-single-resize-handle:hover::after, .histoire-single-resize-handle:focus-visible::after, .histoire-single-resize-handles[data-active="true"] .histoire-single-resize-handle::after { background: var(--histoire-accent); }
-.histoire-single-resize-handle:focus-visible { outline: 2px solid var(--histoire-accent); outline-offset: -2px; }
-/* Grips must not create scrollbars or false camera overflow when frame fits exactly. */
-.is-width { inset-block: 0 12px; inset-inline-end: 0; width: 12px; cursor: ew-resize; }
-.is-width::after { inset-block: 0; inset-inline-start: 5px; width: 2px; }
-.is-height { inset-inline: 0 12px; bottom: 0; height: 12px; cursor: ns-resize; }
-.is-height::after { inset-inline: 0; top: 5px; height: 2px; }
-.is-both { inset-inline-end: 0; bottom: 0; width: 18px; height: 18px; cursor: nwse-resize; }
-.is-both::after { inset-inline-end: 5px; bottom: 5px; width: 6px; height: 6px; border-inline-end: 2px solid transparent; border-bottom: 2px solid transparent; background: transparent !important; }
-.is-both:hover::after, .histoire-single-resize-handles[data-active="true"] .is-both::after { border-color: var(--histoire-accent); }
+/* The outside mark also indicates keyboard focus without outlining the full hit area. */
+.histoire-single-resize-handle:hover, .histoire-single-resize-handles[data-keyboard-input="true"] .histoire-single-resize-handle:focus-visible, .histoire-single-resize-handles[data-active="true"] .histoire-single-resize-handle { --resize-color: var(--histoire-accent); }
+/* Center hit areas on marks that remain 1px outside the physical frame. */
+.is-width { inset-block: 0 12px; inset-inline-end: -8px; width: 12px; cursor: ew-resize; }
+.is-width::after { inset-block: 0; inset-inline-start: 5px; width: 2px; background: var(--resize-color); }
+.is-height { inset-inline: 0 12px; bottom: -8px; height: 12px; cursor: ns-resize; }
+.is-height::after { inset-inline: 0; top: 5px; height: 2px; background: var(--resize-color); }
+.is-both { inset-inline-end: -13px; bottom: -13px; width: 18px; height: 18px; cursor: nwse-resize; }
+.is-both::after { inset-inline-end: 6px; bottom: 6px; box-sizing: border-box; width: 6px; height: 6px; border-inline-end: 2px solid var(--resize-color); border-bottom: 2px solid var(--resize-color); }
 </style>

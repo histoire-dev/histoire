@@ -18,7 +18,47 @@ function drag(selector, deltaX, deltaY) {
   })
 }
 
+/** Browser hit testing must reach the grip from its visible mark outside the frame. */
+function assertOutsideHit(selector) {
+  cy.get(selector).should(($handle) => {
+    const document = $handle[0].ownerDocument
+    const frame = document.querySelector('[data-frame-id]').getBoundingClientRect()
+    const clientX = selector === heightHandle ? frame.left + frame.width / 2 : frame.right + (selector === cornerHandle ? 4 : 2)
+    const clientY = selector === widthHandle ? frame.top + frame.height / 2 : frame.bottom + (selector === cornerHandle ? 4 : 2)
+    expect(document.elementFromPoint(clientX, clientY), 'outside divider receives pointer').to.equal($handle[0])
+  })
+}
+
 describe('single variant resizing', () => {
+  it('accepts pointer input on outside dividers without adding scroll overflow', () => {
+    visitSingle()
+    setSingleViewportSize(400, 300)
+    cy.get('button[aria-label="Zoom level"]').click()
+    cy.contains('[role="dialog"] button', /^100%/).click()
+
+    for (const selector of [widthHandle, heightHandle, cornerHandle]) {
+      assertOutsideHit(selector)
+      drag(selector, selector === heightHandle ? 0 : 16, selector === widthHandle ? 0 : 16)
+      cy.get(widthHandle).should('have.attr', 'aria-valuenow', selector === cornerHandle ? '464' : '432')
+      cy.get(heightHandle).should('have.attr', 'aria-valuenow', selector === widthHandle ? '300' : selector === heightHandle ? '316' : '332')
+    }
+    cy.get('.histoire-single-variant').should(($surface) => {
+      expect($surface[0].scrollWidth).to.equal($surface[0].clientWidth)
+      expect($surface[0].scrollHeight).to.equal($surface[0].clientHeight)
+    })
+
+    setSingleViewportSize(1600, 1200)
+    cy.get('.histoire-single-variant').scrollTo('bottomRight')
+    for (const selector of [widthHandle, heightHandle, cornerHandle]) assertOutsideHit(selector)
+    cy.get('.histoire-single-variant').then(($surface) => {
+      const width = $surface[0].clientWidth
+      cy.viewport(1100, 700)
+      cy.get('.histoire-single-variant').should($current => expect($current[0].clientWidth).to.be.lessThan(width))
+      cy.get('.histoire-single-variant').scrollTo('bottomRight')
+      assertOutsideHit(cornerHandle)
+    })
+  })
+
   it('resizes with pointer and keyboard, retains document, and persists canonical dimensions', () => {
     visitSingle()
     cy.get('[data-frame-id] iframe').then(($iframe) => {
@@ -55,9 +95,9 @@ describe('single variant resizing', () => {
 
     setSingleViewportSize(2000, 1200)
     cy.get('button[aria-label="Viewport"]').click()
-    cy.contains('[role="dialog"] button', /^Responsive/).click()
+    cy.contains('[role="dialog"] button', /^Fill viewport/).click()
     cy.get(widthHandle).should(($handle) => {
-      const surface = $handle[0].closest('.histoire-single-variant')
+      const surface = $handle[0].ownerDocument.querySelector('.histoire-single-variant')
       expect(Number($handle.attr('aria-valuenow')), 'Responsive width').to.equal(surface.clientWidth)
     })
   })

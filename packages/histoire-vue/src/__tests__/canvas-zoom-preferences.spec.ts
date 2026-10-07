@@ -108,7 +108,7 @@ describe('canvas zoom preferences', () => {
     expect(storage.value('_histoire-ui-canvas')).toMatchObject({ version: 3 })
   })
 
-  it('keeps independent persistent zoom slots for Grid, List, and Matrix', () => {
+  it('keeps Grid and List zoom preferences while resetting Matrix on entry', () => {
     const storage = createStorage()
     const canvas = createCanvasStore({ storage })
 
@@ -126,11 +126,11 @@ describe('canvas zoom preferences', () => {
     expect(canvas.zoom).toBe(0.75)
     canvas.fit()
     canvas.setArrangement('matrix')
-    expect(canvas.zoom).toBe(1)
+    expect(canvas.zoom).toBe('fit')
 
     const saved = {
       version: 3,
-      zoomByArrange: { single: 'fit', grid: 0.5, list: 'fit', matrix: 1 },
+      zoomByArrange: { single: 'fit', grid: 0.5, list: 'fit', matrix: 'fit' },
       tool: 'select',
       frameBackground: 'transparent',
     }
@@ -142,10 +142,35 @@ describe('canvas zoom preferences', () => {
     restored.setArrangement('list')
     expect(restored.zoom).toBe('fit')
     restored.setArrangement('matrix')
-    expect(restored.zoom).toBe(1)
+    expect(restored.zoom).toBe('fit')
   })
 
-  it('migrates a legacy zoom into every arrangement slot', () => {
+  it('replaces saved Matrix zoom on entry without fitting outgoing geometry', () => {
+    const storage = createStorage({ '_histoire-ui-canvas': { version: 3, zoomByArrange: { grid: 0.5, list: 0.75, matrix: 1.77 } } })
+    const canvas = createCanvasStore({ storage })
+    canvas.setGeometry({ width: 1000, height: 800 }, { x: 0, y: 0, width: 100, height: 100 })
+    const offset = { ...canvas.panOffset }
+    canvas.setArrangement('matrix')
+    expect(canvas.zoom).toBe('fit')
+    expect(canvas.effectiveZoom).toBe(0.5)
+    expect(canvas.panOffset).toEqual(offset)
+    expect(storage.value('_histoire-ui-canvas')).toMatchObject({ zoomByArrange: { matrix: 'fit' } })
+    canvas.setGeometry({ width: 1000, height: 800 }, { x: 0, y: 0, width: 2000, height: 1000 })
+    expect(canvas.effectiveZoom).toBeCloseTo(0.468)
+    canvas.setZoom(1.77)
+    canvas.setArrangement('matrix')
+    canvas.setGeometry({ width: 900, height: 700 }, { x: 0, y: 0, width: 2000, height: 1000 })
+    expect(canvas.zoom).toBe(1.77)
+    canvas.panBy({ x: 10, y: 20 })
+    expect(canvas.zoom).toBe(1.77)
+    canvas.setArrangement('grid')
+    expect(canvas.zoom).toBe(0.5)
+    canvas.setArrangement('matrix')
+    expect(canvas.zoom).toBe('fit')
+    expect(canvas.zoomByArrange).toEqual({ single: 'fit', grid: 0.5, list: 0.75, matrix: 'fit' })
+  })
+
+  it('reads legacy shared zoom but replaces Matrix preference on entry', () => {
     const storage = createStorage({
       '_histoire-ui-canvas': { zoom: 0.67, tool: 'pan', frameBackground: '#123456' },
     })
@@ -153,12 +178,12 @@ describe('canvas zoom preferences', () => {
 
     expect(canvas.zoomByArrange).toEqual({ single: 'fit', grid: 0.67, list: 0.67, matrix: 0.67 })
     canvas.setArrangement('matrix')
-    expect(canvas.zoom).toBe(0.67)
+    expect(canvas.zoom).toBe('fit')
     canvas.setTool('measure')
 
     expect(storage.value('_histoire-ui-canvas')).toEqual({
       version: 3,
-      zoomByArrange: { single: 'fit', grid: 0.67, list: 0.67, matrix: 0.67 },
+      zoomByArrange: { single: 'fit', grid: 0.67, list: 0.67, matrix: 'fit' },
       tool: 'measure',
       frameBackground: '#123456',
     })
@@ -180,7 +205,7 @@ describe('canvas zoom preferences', () => {
     expect(canvas.frameBackground).toBe('#abcdef')
   })
 
-  it('switches CanvasViewport through saved Grid, List, and Matrix zoom slots', async () => {
+  it('switches CanvasViewport through saved zoom slots and fits Matrix on entry', async () => {
     window.localStorage.setItem('_histoire-ui-canvas', JSON.stringify({ zoomByArrange: { grid: 0.5, list: 0.75, matrix: 1 } }))
     resizeObserverFixture()
     const fixture = sourceFixture()
@@ -217,7 +242,7 @@ describe('canvas zoom preferences', () => {
       arrange.value = 'matrix'
       await nextTick()
       await flushPromises()
-      expect(canvas.zoom).toBe(1)
+      expect(canvas.zoom).toBe('fit')
 
       arrange.value = 'grid'
       await nextTick()

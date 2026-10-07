@@ -8,8 +8,8 @@ import { computed } from 'vue'
 export interface CanvasHeaderEditorOptions {
   /** Current session owning the selected catalog target. */
   session: HistoireSession
-  /** Returns latest canonical session snapshot. */
-  snapshot: () => HistoireSnapshot
+  /** Reads editor ownership and admission without requiring mutable state payloads. */
+  snapshot: () => Pick<HistoireSnapshot, 'status' | 'stale' | 'source' | 'selection' | 'capabilities' | 'catalog'>
   /** Returns the story currently present in the canonical catalog. */
   currentStory: () => HistoireCatalogStory | undefined
   /** Returns metadata currently displayed by the canvas header. */

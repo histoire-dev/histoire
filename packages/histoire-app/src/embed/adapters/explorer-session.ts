@@ -2,7 +2,7 @@ import type { HistoireBridgeCommand, HistoireRuntimeSnapshot } from '@histoire/p
 import type { HistoireMount, HistoireRequestCapture, HistoireSession, HistoireSessionCommand, HistoireSurfaceConnection } from '@histoire/sdk/internal'
 import type { EmbedSurfaceContext } from '../surfaces.js'
 import { HistoireSdkError } from '@histoire/protocol'
-import { bindHistoireMountChannel, getHistoireSessionDescriptor, registerHistoireSessionInternals, requestHistoireOpenInEditor, requestHistoireStatePreset } from '@histoire/sdk/internal'
+import { bindHistoireMountChannel, getAcceptedHistoireSessionDescriptor, getHistoireSessionDescriptor, registerHistoireSessionInternals, requestHistoireOpenInEditor, requestHistoireStatePreset } from '@histoire/sdk/internal'
 import { mountLocalHistoireSurface } from './local-mount.js'
 
 /** Explorer iframe's nested parts share outer primary reservation and canonical parent proxy. */
@@ -104,7 +104,7 @@ export function createExplorerViewSession(context: EmbedSurfaceContext) {
   }, createHiddenPreview() {
     throw new HistoireSdkError('RUNTIME_IN_USE', 'Explorer owns visible primary runtime')
   } }
-  registerHistoireSessionInternals(session, { descriptor: () => getHistoireSessionDescriptor(context.session), presets: action => requestHistoireStatePreset(context.session, action), openInEditor: target => requestHistoireOpenInEditor(context.session, target), selectionSettled: () => selected, primaryMountActive: mount => active && children.has(mount) && mount.id === context.bridge.getOwner().mountId && !!primary && !primaryClosing })
+  registerHistoireSessionInternals(session, { descriptor: () => getHistoireSessionDescriptor(context.session), acceptedDescriptor: () => getAcceptedHistoireSessionDescriptor(context.session), presets: action => requestHistoireStatePreset(context.session, action), openInEditor: target => requestHistoireOpenInEditor(context.session, target), selectionSettled: () => selected, primaryMountActive: mount => active && children.has(mount) && mount.id === context.bridge.getOwner().mountId && !!primary && !primaryClosing })
   /** Selection already changed canonical parent; wait only for its explicitly composed inner primary. */
   function waitPrimary(capture: HistoireRequestCapture): Promise<HistoireSurfaceConnection> {
     return new Promise((resolve, reject) => {

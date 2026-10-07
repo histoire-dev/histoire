@@ -1,9 +1,10 @@
 import type { HistoirePresetAction, HistoirePresetList, HistoireSelectionInput, HistoireSessionStatus, HistoireSourceDescriptor, HistoireStoryFileOrigin, HistoireTarget } from '@histoire/protocol'
 import type { HistoireMount, HistoireSession } from '../types.js'
 import type { SessionContext } from './context.js'
-import { HistoireSdkError, isHistoireProjectFileOrigin, validateBridgePayload } from '@histoire/protocol'
+import { HistoireSdkError, isHistoireProjectFileOrigin, validateBridgePayload, validateHistoireSourceDescriptor } from '@histoire/protocol'
 import { observeOperation } from './ownership.js'
 import { request } from './request.js'
+import { copyProjection, freezeProjection } from './snapshot.js'
 import { primaryRuntime } from './state.js'
 import { assertVariant } from './variant.js'
 
@@ -20,6 +21,8 @@ export interface HistoireStoryLink {
 /** One first-party registry for source metadata and finite runtime/UI actions. */
 interface SessionInternals {
   descriptor: () => HistoireSourceDescriptor
+  /** Exact immutable descriptor accepted by the owning controller. */
+  acceptedDescriptor?: () => HistoireSourceDescriptor
   presets: (input: HistoirePresetAction) => Promise<HistoirePresetList>
   openInEditor?: (target: HistoireTarget) => Promise<null>
   docsPolicy?: 'trusted-local'
@@ -31,6 +34,7 @@ interface SessionInternals {
 }
 const sessions = new WeakMap<HistoireSession, SessionInternals>()
 const internalsKey = Symbol.for('@histoire/sdk/session-internals/protocol-1')
+const acceptedDescriptors = new WeakSet<object>()
 
 /** Read-only snapshot fields required to decide editor-action visibility. */
 interface EditorActionSnapshot {
@@ -57,6 +61,19 @@ function internals(session: HistoireSession): SessionInternals | undefined {
 export function registerHistoireSessionInternals(session: HistoireSession, delegates: SessionInternals): void {
   sessions.set(session, delegates)
   if (!Object.hasOwn(session, internalsKey)) Object.defineProperty(session, internalsKey, { get: () => sessions.get(session), enumerable: false })
+}
+
+/** Fully validate, detach, and freeze one source descriptor before branding it accepted. */
+export function acceptHistoireSourceDescriptor(value: unknown): HistoireSourceDescriptor {
+  const descriptor = copyProjection(validateHistoireSourceDescriptor(value))
+  freezeProjection(descriptor)
+  acceptedDescriptors.add(descriptor)
+  return descriptor
+}
+
+/** Checks identity against SDK-minted immutable projections; shape alone never grants trust. */
+export function isAcceptedHistoireSourceDescriptor(value: unknown): value is HistoireSourceDescriptor {
+  return typeof value === 'object' && value !== null && acceptedDescriptors.has(value)
 }
 
 /** Select one known docs link through explicit standalone adapter or router-free native controller. */
@@ -88,6 +105,10 @@ export function bindHistoireSessionInternals(session: HistoireSession, context: 
     descriptor() {
       context.assertConnected()
       return structuredClone(context.descriptor!)
+    },
+    acceptedDescriptor() {
+      context.assertConnected()
+      return context.descriptor!
     },
     async openInEditor(target) {
       validateBridgePayload('openInEditor', target)
@@ -122,6 +143,14 @@ export function getHistoireSessionDescriptor(session: HistoireSession) {
   const entry = internals(session)
   if (!entry) throw new HistoireSdkError('NOT_CONNECTED', 'First-party session metadata unavailable')
   return entry.descriptor()
+}
+
+/** Returns branded metadata when module copies agree, else uses the detached legacy delegate. */
+export function getAcceptedHistoireSessionDescriptor(session: HistoireSession): HistoireSourceDescriptor {
+  const entry = internals(session)
+  if (!entry) throw new HistoireSdkError('NOT_CONNECTED', 'Accepted first-party session metadata unavailable')
+  const descriptor = entry.acceptedDescriptor?.()
+  return isAcceptedHistoireSourceDescriptor(descriptor) ? descriptor : entry.descriptor()
 }
 
 /** Current target can expose an editor action only for a ready project-owned dev story. */

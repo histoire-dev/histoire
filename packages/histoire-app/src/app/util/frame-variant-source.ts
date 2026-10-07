@@ -1,9 +1,11 @@
 import type { HistoireTarget } from '@histoire/protocol'
 import type { HistoireSession } from '@histoire/sdk'
+import type { CanvasFrameRegistration } from '../composables/canvas-settings.js'
 import type { FrameActionTarget } from './frame-actions.js'
 import { HistoireSdkError } from '@histoire/protocol'
 import { getHistoireSessionDescriptor } from '@histoire/sdk/internal'
 import { shallowReactive } from 'vue'
+import { captureFrameRegistration } from '../components/canvas/frame-registration.js'
 import { matrixVariantSnippet } from './matrix.js'
 
 /** Observe SDK's exact recursively readonly snapshot contract. */
@@ -48,6 +50,8 @@ export function createFrameVariantSource(options: {
   session: HistoireSession
   /** Resolve exact current frame; null never falls back to a different canonical target. */
   resolve: (target: FrameActionTarget) => HistoireSession | null
+  /** Optional frame-bound callers pin the logical activation as well as session. */
+  registration?: (target: FrameActionTarget) => CanvasFrameRegistration | null
   /** Current-owner failures are surfaced through existing provider. */
   error?: (error: unknown) => void
 }) {
@@ -76,22 +80,25 @@ export function createFrameVariantSource(options: {
     /** Generate markup from exact ready runtime; no raw fallback or serialized-state template. */
     async generate(target: FrameActionTarget): Promise<{ text: string, isCurrent: () => boolean } | undefined> {
       const owner = captureFrameSourceOwner(() => options.resolve(target), target)
-      if (!owner || !available(target)) return
+      const activation = options.registration && captureFrameRegistration(() => options.registration!(target))
+      if (!owner || (options.registration && !activation) || !available(target)) return
+      /** Both source generation and logical activation must survive every await. */
+      const isCurrent = () => owner.isCurrent() && (!activation || activation.isCurrent())
       const story = owner.snapshot.catalog.stories.find(story => story.id === target.storyId)
       const variant = story?.variants.find(variant => variant.id === target.variantId)
       if (!variant) return
       try {
         const source = await owner.session.source.get({ storyId: target.storyId, variantId: target.variantId, mode: 'dynamic' })
-        if (!owner.isCurrent()) return
+        if (!isCurrent()) return
         if (source.mode !== 'dynamic' || source.storyId !== target.storyId || source.variantId !== target.variantId
           || source.epoch !== owner.snapshot.source!.epoch || source.revision !== owner.snapshot.source!.revision) {
           throw new HistoireSdkError('RUNTIME_CHANGED', 'Variant source belongs to another target or generation.')
         }
         const tag = story?.supportPluginId?.includes('svelte') ? 'Hst.Variant' : 'Variant'
-        return { text: matrixVariantSnippet(variant.title, source.body, tag), isCurrent: owner.isCurrent }
+        return { text: matrixVariantSnippet(variant.title, source.body, tag), isCurrent }
       }
       catch (error) {
-        if (!owner.isCurrent()) return
+        if (!isCurrent()) return
         if (error && typeof error === 'object' && 'code' in error && error.code === 'SOURCE_UNAVAILABLE') {
           unavailable.set(target.frameKey, { session: owner.session, generation: owner.generation, state: owner.snapshot.state })
         }

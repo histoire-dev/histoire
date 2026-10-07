@@ -1,5 +1,5 @@
 import type { HistoireSession } from '@histoire/sdk'
-import { getHistoireSessionDescriptor } from '@histoire/sdk/internal'
+import { getAcceptedHistoireSessionDescriptor } from '@histoire/sdk/internal'
 import { createStandaloneSession } from '../../standalone/session.js'
 
 /** Reuse source/runtime adapters with isolated passive selection, state and events. */
@@ -9,20 +9,22 @@ export function createCanvasReplicaSession(canonical: HistoireSession, previewBa
   /** Native Single documents retain browser scrolling inside fixed dimensions. */
   nativeScroll?: boolean
 } = {}): HistoireSession {
-  const original = getHistoireSessionDescriptor(canonical)
+  const original = getAcceptedHistoireSessionDescriptor(canonical)
   return createStandaloneSession({ url: previewBase, matrix: options.matrix, nativeScroll: options.nativeScroll, loadDescriptor: async () => original, subscribe(listener) {
     const initial = canonical.getSnapshot()
-    let generation = JSON.stringify([initial.status, initial.source])
+    let generationStatus = initial.status
+    let generationSource = initial.source
     return canonical.subscribe((snapshot) => {
-      const current = JSON.stringify([snapshot.status, snapshot.source])
-      if (current === generation) return
-      generation = current
+      // Source snapshots are replaced for every accepted catalog publication.
+      // Avoid calling the detached cross-copy fallback on unrelated state changes.
+      if (snapshot.status === generationStatus && snapshot.source === generationSource) return
+      generationStatus = snapshot.status
+      generationSource = snapshot.source
       if (snapshot.status !== 'ready' || !snapshot.source) {
         listener(null)
       }
       else {
-        const descriptor = getHistoireSessionDescriptor(canonical)
-        listener(descriptor)
+        listener(getAcceptedHistoireSessionDescriptor(canonical))
       }
     })
   } })

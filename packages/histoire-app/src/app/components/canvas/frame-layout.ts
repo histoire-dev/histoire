@@ -95,3 +95,27 @@ export function liveCanvasFrames(frames: readonly CanvasFrameLayout[], viewport:
     .sort((first, second) => second.area - first.area || first.index - second.index)
   return new Set([...(selectedFrame ? [selectedFrame] : []), ...candidates.map(candidate => candidate.frame)].slice(0, limit).map(frame => frame.id))
 }
+
+/** Order only admitted startup targets by center distance from selected or first admitted anchor. */
+export function rankCanvasStartupFrames(frames: readonly CanvasFrameLayout[], admittedFrameIds: readonly string[], selectedFrameId: string | null): string[] {
+  const layoutIndex = new Map<string, number>(frames.map((frame, index): [string, number] => [frame.id, index]))
+  const byId = new Map<string, CanvasFrameLayout>(frames.map((frame): [string, CanvasFrameLayout] => [frame.id, frame]))
+  const admitted = [...new Set(admittedFrameIds)].filter(id => byId.has(id))
+  if (!admitted.length) return []
+
+  // Without a selection, admission order already encodes visible-area and layout priority.
+  const anchorId = selectedFrameId && admitted.includes(selectedFrameId) ? selectedFrameId : admitted[0]
+  const anchor = byId.get(anchorId)!
+  const centerX = anchor.x + anchor.width / 2
+  const centerY = anchor.y + anchor.height / 2
+  const distances = new Map<string, number>(admitted.map((id): [string, number] => {
+    const frame = byId.get(id)!
+    const dx = frame.x + frame.width / 2 - centerX
+    const dy = frame.y + frame.height / 2 - centerY
+    return [id, dx * dx + dy * dy]
+  }))
+
+  return [anchorId, ...admitted.filter(id => id !== anchorId).sort((first, second) => {
+    return distances.get(first)! - distances.get(second)! || layoutIndex.get(first)! - layoutIndex.get(second)!
+  })]
+}

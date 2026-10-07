@@ -41,7 +41,6 @@ export const HistoireProvider = defineComponent({
       snapshot.value = value
     }
     let stop = props.session.subscribe(synchronize)
-    let observer: ResizeObserver | undefined
     let removed = false
     let stopMedia: (() => void) | undefined
 
@@ -92,6 +91,42 @@ export const HistoireProvider = defineComponent({
       generation.value++
     }, { flush: 'sync' })
 
+    /** Keep one size observer bound to the current provider root. */
+    const stopRootSize = watch(root, (element, _previous, onCleanup) => {
+      if (!element) {
+        size.value = { width: 0, height: 0 }
+        return
+      }
+
+      const observedRoot = element
+      let active = true
+      /** Reject queued callbacks after replacement, including A/B/A root reuse. */
+      function publish(width: number, height: number) {
+        if (!active || removed || root.value !== observedRoot) return
+        size.value = { width, height }
+      }
+
+      // Initial measurement runs after DOM update, outside descendant render.
+      const bounds = observedRoot.getBoundingClientRect()
+      publish(bounds.width, bounds.height)
+
+      const Observer = observedRoot.ownerDocument.defaultView?.ResizeObserver
+      if (!Observer) {
+        onCleanup(() => active = false)
+        return
+      }
+      const observer = new Observer((entries) => {
+        if (!active || removed || root.value !== observedRoot) return
+        const content = entries.find(entry => entry.target === observedRoot)?.contentRect
+        if (content) publish(content.width, content.height)
+      })
+      onCleanup(() => {
+        active = false
+        observer.disconnect()
+      })
+      observer.observe(observedRoot)
+    }, { flush: 'post', immediate: true })
+
     onMounted(() => {
       if (!root.value) return
       const media = root.value.ownerDocument.defaultView?.matchMedia?.('(prefers-color-scheme: dark)')
@@ -101,20 +136,10 @@ export const HistoireProvider = defineComponent({
         media.addEventListener('change', change)
         stopMedia = () => media.removeEventListener('change', change)
       }
-      const bounds = root.value.getBoundingClientRect()
-      size.value = { width: bounds.width, height: bounds.height }
-      const Observer = root.value.ownerDocument.defaultView?.ResizeObserver
-      if (Observer) {
-        observer = new Observer((entries) => {
-          const bounds = entries[0]?.contentRect
-          if (bounds) size.value = { width: bounds.width, height: bounds.height }
-        })
-        observer.observe(root.value)
-      }
     })
     onBeforeUnmount(() => {
       removed = true
-      observer?.disconnect()
+      stopRootSize()
       stopMedia?.()
       stop()
       for (const dispose of Array.from(resources)) dispose()

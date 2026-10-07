@@ -1,11 +1,16 @@
 import type { HistoireSourceDescriptor } from '@histoire/protocol'
 import { HistoireSdkError, resolveEmbedOrigins, validateHistoireSourceDescriptor } from '@histoire/protocol'
+import { isAcceptedHistoireSourceDescriptor } from '@histoire/sdk/internal'
 import { readEmbedJson } from './fetch.js'
 
-/** Requires complete first-party source fields after shared wire-shape validation. */
+/** Requires embed fields; only SDK-branded immutable values skip repeated wire traversal. */
 export function validateEmbedDescriptor(value: unknown): HistoireSourceDescriptor {
   const version = (value as { descriptorVersion?: unknown })?.descriptorVersion
   if (version !== 1) throw new HistoireSdkError('PROTOCOL_MISMATCH', 'Unsupported source descriptor version')
+  if (isAcceptedHistoireSourceDescriptor(value)) {
+    if (!value.embed || !value.assets || !value.config) throw new HistoireSdkError('PROTOCOL_MISMATCH', 'Source descriptor lacks required portable fields')
+    return value
+  }
   const descriptor = validateHistoireSourceDescriptor(value)
   if (!descriptor.embed || !descriptor.assets || !descriptor.config) throw new HistoireSdkError('PROTOCOL_MISMATCH', 'Source descriptor lacks required portable fields')
   return descriptor

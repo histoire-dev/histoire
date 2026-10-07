@@ -1,14 +1,17 @@
 <script setup lang="ts">
 import type { HistoireSession } from '@histoire/sdk'
-import { PROPS_OVERRIDE, RUNTIME_RESULT } from '@histoire/shared'
+import { subscribeHistoireMountEvents } from '@histoire/sdk/internal'
 import { useHistoireSession, useHistoireSnapshot } from '@histoire/vue'
+import { focusHistoireSearch, requestHistoireUiToggle, useHistoireContext } from '@histoire/vue/internal'
 import { useEventListener } from '@vueuse/core'
 import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useCanvasFrames, useCanvasFrameState, useCanvasStore } from '../../composables/canvas-settings.js'
 import { useMatrixStore } from '../../stores/matrix.js'
+import { createCanvasPropsOverrideController } from './frame-props-override.js'
 import { createCanvasReplicaSession } from './frame-replica.js'
 import { createCanvasPropsRequestId } from './frame-requests.js'
-import { observeCanvasFrameRuntime } from './frame-runtime.js'
+import { type CanvasStartupRequest, useCanvasStartupCoordinator } from './frame-startup-coordinator.js'
+import { createCanvasReplicaTargetSelector, createCanvasStartupReadiness, observeCanvasStartupRuntime, waitForCanvasStartup } from './frame-startup-lifecycle.js'
 
 const props = defineProps<{
   /** Stable canvas frame identifier. */
@@ -25,34 +28,54 @@ const props = defineProps<{
 }>()
 const emit = defineEmits<{ status: [status: 'loading' | 'ready' | 'error', error?: unknown] }>()
 const canonical = useHistoireSession()
+const context = useHistoireContext()
 const snapshot = useHistoireSnapshot()
 const store = useCanvasStore()
 const registry = useCanvasFrames()
 const frameState = useCanvasFrameState()
 const matrix = useMatrixStore()
+const startupCoordinator = useCanvasStartupCoordinator()
 const container = ref<HTMLElement>()
 const ready = ref(false)
 let replica: HistoireSession | undefined
 let closing = false
 let generation = 0
+let connected = false
+let directController: AbortController | undefined
+let directStartup: Promise<void> | undefined
 let stop = () => {}
+let stopFocus = () => {}
 let closeObserver = () => {}
-let propsRequest = ''
-let propsTimeout: ReturnType<typeof setTimeout> | undefined
-let propsReady = Promise.resolve()
-let resolveProps = () => {}
-let rejectProps = (_error: unknown) => {}
+let startupRequest: CanvasStartupRequest | undefined
 let overrideDocument = ''
-const nextPropsRequestId = createCanvasPropsRequestId()
+const targetSelector = createCanvasReplicaTargetSelector({
+  activation: () => ({
+    session: replica,
+    generation,
+    target: { storyId: props.storyId, variantId: props.variantId },
+    connected,
+    closing,
+  }),
+  settings,
+  loading,
+  fail,
+})
+const propsOverride = createCanvasPropsOverrideController({
+  frames: registry,
+  frameId: () => props.frameId,
+  projection: () => ({ variantId: props.variantId, props: props.propsOverride }),
+  nextRequestId: createCanvasPropsRequestId(),
+  fail,
+})
 
-/** Canonical settings apply to every exact frame without sharing editable variant state. */
+/** Apply canonical settings and frame-local presentation overrides. */
 function settings() {
   const value = snapshot.value.settings
   const background = store.frameBackgrounds[props.frameId]
   return { ...value, ...(background ?? {}), ...(props.viewport ? { responsiveWidth: props.viewport.width, responsiveHeight: props.viewport.height, rotate: false } : {}) }
 }
 
-/** Publish actual iframe identity for finite measure/comment requests. */
+/** Publish iframe identity for finite measure and comment requests. */
 function registerDocument(available = false) {
   const entry = registry.getFrame(props.frameId)
   const iframe = container.value?.querySelector('iframe')
@@ -63,117 +86,161 @@ function registerDocument(available = false) {
   entry.session = available ? replica : undefined
 }
 
-/** Keep unavailable pixels registered for geometry without granting runtime authority. */
+/** Register loading geometry without granting runtime authority. */
 function loading(): void {
   ready.value = false
   registerDocument()
   emit('status', 'loading')
 }
 
-/** Failed frame keeps retry local and releases inspector/document authority. */
+/** Keep failure local and release inspector/document authority. */
 function fail(error?: unknown): void {
   ready.value = false
   registerDocument()
   emit('status', 'error', error)
 }
 
-/** Matrix feature replies must belong to this currently registered document. */
-function receive(event: MessageEvent) {
-  const frame = registry.getFrame(props.frameId)
-  if (!propsRequest || event.source !== frame?.iframe?.contentWindow || event.origin !== window.location.origin || !event.data?.__histoire || event.data.documentId !== frame.documentId) return
-  if (event.data.type !== RUNTIME_RESULT || event.data.requestId !== propsRequest) return
-  clearTimeout(propsTimeout)
-  propsRequest = ''
-  if (event.data.error || !event.data.result?.supported) {
-    const error = new Error('Props matrix unavailable for this variant.')
-    rejectProps(error)
-    fail(error)
-  }
-  else {
-    resolveProps()
-  }
-}
-
-/** Complete override set restores removed prop values in source-owned runtime. */
-function overrideProps() {
-  if (!props.propsOverride) return
-  clearTimeout(propsTimeout)
-  rejectProps(new Error('Props override superseded'))
-  propsReady = new Promise<void>((resolve, reject) => {
-    resolveProps = resolve
-    rejectProps = reject
-  })
-  void propsReady.catch(() => {})
-  propsRequest = nextPropsRequestId()
-  if (!registry.postToFrame(props.frameId, { type: PROPS_OVERRIDE, variantId: props.variantId, props: props.propsOverride, requestId: propsRequest })) {
-    rejectProps(new Error('Variant unavailable.'))
-    return
-  }
-  propsTimeout = setTimeout(() => {
-    propsRequest = ''
-    const error = new Error('Props matrix unavailable for this variant.')
-    rejectProps(error)
-    fail(error)
-  }, 3000)
-}
-
-/** Each retry closes previous source/session before acquiring another document. */
-async function start() {
+/** Queue Grid/List acquisition; keep Single and Matrix lifetimes direct. */
+async function start(): Promise<void> {
+  startupRequest?.cancel()
+  startupRequest = undefined
+  directController?.abort()
+  const previousDirect = directStartup
   const version = ++generation
   loading()
+  const direct = !startupCoordinator || !!props.propsOverride || !!props.viewport || store.arrangement === 'single'
+  if (direct) {
+    const controller = new AbortController()
+    directController = controller
+    const pending = (async () => {
+      if (previousDirect) await previousDirect
+      if (closing || version !== generation) return
+      await startOwned(version, controller.signal)
+    })()
+    const owned = pending.catch(() => {})
+    directStartup = owned
+    await owned
+    if (directStartup === owned) directStartup = undefined
+    if (directController === controller) directController = undefined
+    return
+  }
+  const request = startupCoordinator.request(props.frameId, async (signal) => {
+    if (previousDirect) await previousDirect
+    signal.throwIfAborted()
+    await startOwned(version, signal)
+  })
+  startupRequest = request
   try {
+    await request.completion
+  }
+  catch {}
+}
+
+/** Acquire session and finish only after restored host readiness. */
+async function startOwned(version: number, signal: AbortSignal): Promise<void> {
+  const readiness = createCanvasStartupReadiness(signal)
+  let current: HistoireSession | undefined
+  connected = false
+  targetSelector.invalidate()
+  try {
+    signal.throwIfAborted()
     stop()
+    stopFocus()
     closeObserver()
     const previous = replica
     replica = undefined
     if (previous) await previous.dispose()
+    signal.throwIfAborted()
     if (closing || version !== generation || !container.value) return
-    const current = createCanvasReplicaSession(canonical, props.previewBase, { matrix: !!props.propsOverride, nativeScroll: !!props.viewport })
+    current = createCanvasReplicaSession(canonical, props.previewBase, { matrix: !!props.propsOverride, nativeScroll: !!props.viewport })
     replica = current
-    await current.connect()
+    await waitForCanvasStartup(current.connect(), signal)
     if (closing || version !== generation) return
-    await current.selection.select({ storyId: props.storyId, variantId: props.variantId })
-    await current.settings.update(settings())
+    connected = true
+    await waitForCanvasStartup(targetSelector.select(true, false), signal)
     if (closing || version !== generation || !container.value) return
     const observer = !props.propsOverride ? matrix.registerRuntimeObserver() : undefined
     closeObserver = () => observer?.close()
-    stop = observeCanvasFrameRuntime(current, {
+    stop = observeCanvasStartupRuntime({
+      owner: current,
+      canonical,
       state: props.propsOverride ? undefined : frameState,
+      target: () => ({ storyId: props.storyId, variantId: props.variantId }),
+      document: () => container.value?.querySelector('iframe')?.contentDocument,
+      isCurrent: () => !closing && version === generation && replica === current,
+      isStartupPending: () => !ready.value,
       loading,
-      error: fail,
+      error(error) {
+        fail(error)
+        readiness.fail(error)
+      },
+      startupFailure: error => readiness.fail(error),
       ready(value) {
-        if (closing || version !== generation) return
         observer?.capture(value)
         registerDocument(true)
         if (value.runtime.runtimeId && value.runtime.runtimeId !== overrideDocument) {
           overrideDocument = value.runtime.runtimeId
-          overrideProps()
+          propsOverride.update()
         }
         ready.value = true
         emit('status', 'ready')
+        readiness.ready()
       },
     })
     const mount = current.mount(container.value, { surface: 'preview' })
-    await mount.ready
+    // Generation guards keep retired mounts from targeting their former provider chrome.
+    stopFocus = subscribeHistoireMountEvents(mount, (event) => {
+      if (closing || version !== generation || replica !== current || event.event !== 'focus.changed') return
+      const action = (event.payload as { action?: string }).action
+      if (action === 'search') focusHistoireSearch(context.root.value)
+      else if (action === 'toggle-ui') requestHistoireUiToggle(context.root.value)
+    })
+    const intent = targetSelector.currentIntent()
+    const mounted = mount.ready.catch((error) => {
+      // A new selection owns its own readiness; the initial mount promise retires.
+      if (intent === targetSelector.currentIntent()) throw error
+    })
+    await waitForCanvasStartup(Promise.all([mounted, readiness.promise]).then(() => {}), signal)
   }
   catch (error) {
-    if (!closing && version === generation) fail(error)
+    readiness.fail(error)
+    if (current && replica === current) {
+      stop()
+      stop = () => {}
+      stopFocus()
+      stopFocus = () => {}
+      closeObserver()
+      closeObserver = () => {}
+      replica = undefined
+      connected = false
+      await current.dispose().catch(() => {})
+    }
+    if (!signal.aborted && !closing && version === generation) fail(error)
+    throw error
+  }
+  finally {
+    readiness.dispose()
   }
 }
 
 watch(settings, () => {
-  void replica?.settings.update(settings()).catch(() => {})
+  if (connected) void replica?.settings.update(settings()).catch(() => {})
 }, { deep: true })
-watch(() => props.propsOverride, overrideProps, { deep: true })
-useEventListener('message', receive)
+watch(() => [props.storyId, props.variantId], () => void targetSelector.select())
+watch(() => props.propsOverride, propsOverride.update, { deep: true })
+useEventListener('message', propsOverride.receive)
 onMounted(() => void start())
 onBeforeUnmount(() => {
+  startupRequest?.cancel()
+  startupRequest = undefined
+  directController?.abort()
+  directController = undefined
   closing = true
   generation++
   stop()
+  stopFocus()
   closeObserver()
-  clearTimeout(propsTimeout)
-  rejectProps(new Error('Preview detached'))
+  propsOverride.dispose()
   const entry = registry.getFrame(props.frameId)
   if (entry?.iframe && container.value?.contains(entry.iframe)) {
     entry.iframe = null
@@ -182,12 +249,11 @@ onBeforeUnmount(() => {
   }
   void replica?.dispose().catch(() => {})
 })
-/** Dynamic codegen waits until this isolated cell acknowledged its current props. */
+/** Wait for current prop acknowledgement before dynamic code generation. */
 async function getSource() {
-  await propsReady
+  await propsOverride.wait()
   if (!replica || closing) throw new Error('Variant unavailable.')
-  const source = await replica.source.get({ storyId: props.storyId, variantId: props.variantId, mode: 'dynamic' })
-  return source.body
+  return (await replica.source.get({ storyId: props.storyId, variantId: props.variantId, mode: 'dynamic' })).body
 }
 defineExpose({ retry: start, getSource })
 </script>
@@ -197,7 +263,6 @@ defineExpose({ retry: start, getSource })
 </template>
 
 <style scoped>
-/* A dark host scheme makes browsers paint light story iframes opaque. Keep
-   inspection backing visible while story documents own their own appearance. */
+/* Keep a dark host from painting light story iframes opaque. */
 .histoire-canvas-replica { width: 100%; height: 100%; color-scheme: normal; }
 </style>

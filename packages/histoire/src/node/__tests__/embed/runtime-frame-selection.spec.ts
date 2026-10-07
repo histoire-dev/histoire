@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { PREVIEW_SYNC, STATE_SYNC, VARIANT_READY } from '@histoire/protocol'
+import { PREVIEW_SYNC, RUNTIME_REQUEST, RUNTIME_RESULT, STATE_SYNC, VARIANT_READY } from '@histoire/protocol'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { createRuntimeFrameFixture, publishFrameMessage } from '../utils/embed/runtime-frame.js'
 
@@ -13,6 +13,32 @@ describe('standalone story document selection', () => {
     })
   })
   afterEach(() => vi.unstubAllGlobals())
+
+  it('keeps boot metadata and acknowledged edit without echoing host mirror into runtime', async () => {
+    const fixture = await createRuntimeFrameFixture({ standalone: true })
+    const frame = fixture.container.querySelector('iframe')!
+    const post = vi.spyOn(frame.contentWindow!, 'postMessage').mockImplementation(() => {})
+    const definitions = [{ name: 'count', type: 'number' }]
+    try {
+      frame.dispatchEvent(new Event('load'))
+      publishFrameMessage(frame, STATE_SYNC, undefined, { state: { count: 7, _hPropDefs: definitions } })
+      publishFrameMessage(frame, VARIANT_READY)
+      await fixture.primary.ready
+      expect(fixture.session.getSnapshot().state?.value).toEqual({ count: 7, _hPropDefs: definitions })
+      expect(post.mock.calls.some(([message]) => message.type === STATE_SYNC || message.type === RUNTIME_REQUEST)).toBe(false)
+      const edit = fixture.session.state.patch({ count: 8 })
+      await vi.waitFor(() => expect(post.mock.calls.some(([message]) => message.type === RUNTIME_REQUEST)).toBe(true))
+      const request = post.mock.calls.find(([message]) => message.type === RUNTIME_REQUEST)![0]
+      expect(request).toMatchObject({ command: 'state.patch', payload: { count: 8 } })
+      publishFrameMessage(frame, RUNTIME_RESULT, undefined, { requestId: request.requestId, result: { count: 8, _hPropDefs: definitions } })
+      await edit
+      post.mockClear()
+      publishFrameMessage(frame, STATE_SYNC, undefined, { state: { count: 8, _hPropDefs: definitions } })
+      expect(fixture.session.getSnapshot().state?.value).toEqual({ count: 8, _hPropDefs: definitions })
+      expect(post.mock.calls.some(([message]) => message.type === STATE_SYNC || message.type === RUNTIME_REQUEST)).toBe(false)
+    }
+    finally { await fixture.close() }
+  })
 
   it.each([false, true])('first iframe load preserves initial SDK mount, including ready bootstrap: %s', async (readyBeforeLoad) => {
     const fixture = await createRuntimeFrameFixture({ standalone: true })

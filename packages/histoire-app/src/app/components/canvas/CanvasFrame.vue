@@ -78,6 +78,12 @@ function register() {
   unregister = registry.registerFrame({ id: props.frame.id, storyId: props.frame.storyId, variantId: props.frame.variantId, fitBounds: props.fitBounds ? zoom => props.fitBounds?.(zoom) ?? props.frame : undefined, rect: previewRect() })
 }
 onMounted(register)
+watch(() => props.frame.id, () => {
+  // A retained Single document changes logical ownership before child selection.
+  status.value = 'loading'
+  error.value = undefined
+  register()
+}, { flush: 'sync' })
 watch(() => [props.frame, props.width, props.height, canvas.effectiveZoom], () => {
   const existing = registry.getFrame(props.frame.id)
   if (existing) existing.rect = previewRect()

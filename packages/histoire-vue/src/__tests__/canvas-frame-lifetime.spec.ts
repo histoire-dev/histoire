@@ -1,86 +1,20 @@
-import type { CanvasStore } from '../../../histoire-app/src/app/stores/canvas.js'
-import { createHistoireSessionWithAdapters } from '@histoire/sdk/internal'
-import { HistoireProvider } from '@histoire/vue'
-import { flushPromises, mount } from '@vue/test-utils'
+import { flushPromises } from '@vue/test-utils'
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { defineComponent, h, ref } from 'vue'
 import CanvasFrame from '../../../histoire-app/src/app/components/canvas/CanvasFrame.vue'
 import CanvasMatrixPrimary from '../../../histoire-app/src/app/components/canvas/CanvasMatrixPrimary.vue'
-import CanvasViewport from '../../../histoire-app/src/app/components/canvas/CanvasViewport.vue'
 import { layoutCanvasFrames, visibleCanvasFrames } from '../../../histoire-app/src/app/components/canvas/frame-layout.js'
 import { clientToCanvas } from '../../../histoire-app/src/app/components/canvas/pan/usePanZoom.js'
-import { createContextMenu, provideContextMenu } from '../../../histoire-app/src/app/composables/context-menu.js'
-import { createMatrixStore, provideMatrix } from '../../../histoire-app/src/app/stores/matrix.js'
-import { createStoryCanvasViews, provideStoryCanvasViews } from '../../../histoire-app/src/app/stores/story-canvas-views.js'
-import { deferred, sourceFixture } from '../../../histoire-sdk/src/__tests__/fixtures/session.js'
-import { canvasRuntimeFixture } from './fixtures/canvas-runtime.js'
-import { resizeObserverFixture } from './fixtures/resize-observer.js'
+import { deferred } from '../../../histoire-sdk/src/__tests__/fixtures/session.js'
+import { canvasLifetimeFixture } from './fixtures/canvas-lifetime.js'
 
 const replica = vi.hoisted(() => ({ create: vi.fn() }))
 vi.mock('../../../histoire-app/src/app/components/canvas/frame-replica.js', () => ({ createCanvasReplicaSession: replica.create }))
-let dispose: (() => Promise<void>) | undefined
+const lifetimeFixture = canvasLifetimeFixture.bind(null, replica.create)
 afterEach(async () => {
-  await dispose?.()
-  dispose = undefined
   window.localStorage.clear()
   vi.restoreAllMocks()
   vi.unstubAllGlobals()
 })
-
-/** Mount genuine frame lifecycle with existing SDK transport and controlled native geometry. */
-async function lifetimeFixture(budget = 2, variantCount = 2, zoom = 0.5, responsiveDisabled = false) {
-  window.localStorage.setItem('_histoire-ui-canvas', JSON.stringify({ zoom }))
-  const resize = resizeObserverFixture()
-  const dimensions = { width: 1800, height: 1000 }
-  vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockImplementation(function (this: HTMLElement) {
-    const width = this.classList.contains('histoire-canvas-viewport') ? dimensions.width : 0
-    const height = width ? dimensions.height : 0
-    return { x: 0, y: 0, top: 0, left: 0, right: width, bottom: height, width, height, toJSON: () => ({}) }
-  })
-  const source = sourceFixture()
-  source.descriptor.catalog.stories[0].variants[0].responsiveDisabled = responsiveDisabled
-  if (variantCount > 2) {
-    source.descriptor.catalog.stories[0].variants = Array.from({ length: variantCount }, (_, index) => ({
-      id: index === 0 ? 'c' : `variant-${index}`,
-      title: `Variant ${index}`,
-    }))
-  }
-  const canonical = createHistoireSessionWithAdapters({ url: 'https://book.example/' }, source.adapters)
-  await canonical.connect()
-  await canonical.selection.select({ storyId: 'a:b', variantId: 'c' })
-  const children: ReturnType<typeof canvasRuntimeFixture>[] = []
-  const prepareChild = vi.fn((_child: ReturnType<typeof canvasRuntimeFixture>) => {})
-  replica.create.mockImplementation(() => {
-    const child = canvasRuntimeFixture()
-    prepareChild(child)
-    children.push(child)
-    return child.session
-  })
-  const matrix = createMatrixStore()
-  const menu = createContextMenu()
-  const arrange = ref<'single' | 'grid' | 'list' | 'matrix'>('grid')
-  const uiHidden = ref(false)
-  const Host = defineComponent({
-    setup() {
-      provideStoryCanvasViews(createStoryCanvasViews())
-      provideMatrix(matrix)
-      provideContextMenu(menu)
-      return () => h(CanvasViewport, { arrange: arrange.value, previewBase: 'https://book.example/', frameBudget: budget, uiHidden: uiHidden.value })
-    },
-  })
-  const wrapper = mount(HistoireProvider, { props: { session: canonical }, attachTo: document.body, slots: { default: () => h(Host) } })
-  const viewport = wrapper.getComponent(CanvasViewport)
-  const canvas = (viewport.vm as unknown as { canvas: CanvasStore }).canvas
-  dispose = async () => {
-    wrapper.unmount()
-    wrapper.element.remove()
-    await flushPromises()
-    matrix.close()
-    await canonical.dispose()
-  }
-  await flushPromises()
-  return { wrapper, viewport, resize, dimensions, canvas, canonical, source, children, matrix, arrange, prepareChild, uiHidden }
-}
 
 describe('canvas frame runtime lifetime', () => {
   it('delivers global theme and isolated overrides to retained runtime documents', async () => {
@@ -113,7 +47,8 @@ describe('canvas frame runtime lifetime', () => {
     test.dimensions.width = 1200
     test.resize.deliver()
     await flushPromises()
-    expect(test.wrapper.getComponent(CanvasFrame).props('width')).toBe(1168)
+    // Native resize publication waits for the next animation frame.
+    await vi.waitFor(() => expect(test.wrapper.getComponent(CanvasFrame).props('width')).toBe(1168))
     expect(test.wrapper.getComponent(CanvasFrame).get('iframe').element).toBe(iframe)
     test.canvas.singleViewport.mode = 'fixed'
     await test.canonical.settings.update({ responsiveWidth: 390, responsiveHeight: 844 })
@@ -138,6 +73,14 @@ describe('canvas frame runtime lifetime', () => {
     await flushPromises()
     expect(test.wrapper.findAll('iframe')).toHaveLength(1)
     expect(test.wrapper.getComponent(CanvasFrame).props('frame').variantId).toBe('other')
+    expect(test.wrapper.getComponent(CanvasFrame).get('iframe').element).toBe(iframe)
+    expect(test.children.at(-1)).toBe(owner)
+    expect(owner.session.getSnapshot().selection?.variantId).toBe('other')
+    await test.canonical.selection.select({ storyId: 'a:b', variantId: 'c' })
+    await flushPromises()
+    expect(test.wrapper.getComponent(CanvasFrame).get('iframe').element).toBe(iframe)
+    expect(test.children.at(-1)).toBe(owner)
+    expect(owner.session.getSnapshot().selection?.variantId).toBe('c')
     expect(test.viewport.emitted('selectedSession')?.at(-1)).toEqual([test.children.at(-1)!.session])
     const wheel = new WheelEvent('wheel', { deltaY: 100, cancelable: true, bubbles: true })
     test.viewport.element.dispatchEvent(wheel)

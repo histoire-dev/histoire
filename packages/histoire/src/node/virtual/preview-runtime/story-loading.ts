@@ -1,3 +1,4 @@
+import { generatedKnownEmptySetupProbe } from '../variant-test-session/setup-hooks.js'
 import { VITEST_DYNAMIC_IMPORT_SNIPPET } from '../vitest-runner-bootstrap.js'
 
 /**
@@ -12,6 +13,8 @@ import { VITEST_DYNAMIC_IMPORT_SNIPPET } from '../vitest-runner-bootstrap.js'
 export function previewStoryLoading(mountTimeoutMs: number) {
   return `${VITEST_DYNAMIC_IMPORT_SNIPPET}
 
+${generatedKnownEmptySetupProbe()}
+
 const variantTestSession = createVariantTestSession({
   files,
   mountTimeoutMs: ${mountTimeoutMs},
@@ -19,6 +22,7 @@ const variantTestSession = createVariantTestSession({
   runWithDynamicImport: runWithVitestDynamicImport,
   ensureEnvironment: ensureVitestPreviewEnvironment,
   offscreenRenderMount: true,
+  canSkipKnownEmptyCollection,
 })
 
 const STALE_RELOAD_GUARD_KEY = '__histoire_preview_stale_reload__'

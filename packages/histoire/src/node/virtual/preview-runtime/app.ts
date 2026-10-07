@@ -125,55 +125,72 @@ export function previewApp() {
       runtimeLayout.refresh()
     }
 
+    /** Loads the selected story and presentation dependencies before exposing readiness.
+     * @param nextSelection Host-owned story, variant, and grid selection.
+     * @returns Current selection token when applied, or null when superseded/reloading.
+     */
     async function syncSelection(nextSelection) {
       const token = ++selectionToken
+      const nextGrid = !!nextSelection.grid
       if (selection.storyId !== nextSelection.storyId || selection.variantId !== nextSelection.variantId) clearPropsOverrides()
       selection.storyId = nextSelection.storyId ?? null
       selectionState.storyId = selection.storyId
       selection.variantId = nextSelection.variantId ?? null
-      selection.grid = !!nextSelection.grid
+      // A single-story selection can leave grid mode immediately. Entering grid
+      // mode waits until its component is loaded below, so Vue never renders an
+      // undefined component while that import is pending.
+      if (!nextGrid) selection.grid = false
       gridSelectedVariantId.value = nextSelection.variantId ?? null
       clearRuntimeTestDefinitions()
       if (!selection.storyId) {
         stopVariantStateWatchers()
+        selection.grid = nextGrid
         file.value = null
-        return
+        return selectionToken === token ? token : null
       }
 
-      let nextFile
-      try {
-        nextFile = await loadStoryFile(selection.storyId)
-      }
-      catch (error) {
+      // Fetch story and grid modules together, but handle story collection
+      // staleness separately from a failed grid chunk.
+      const [fileResult, gridResult] = await Promise.allSettled([
+        loadStoryFile(selection.storyId),
+        nextGrid ? ensureGridComponent() : Promise.resolve(),
+      ])
+
+      if (selectionToken !== token) return null
+
+      if (fileResult.status === 'rejected') {
         // Unknown story: the baked metadata predates the latest collection
         // (e.g. a story file added while this iframe was running).
         if (attemptStaleRuntimeReload(\`story:\${selection.storyId}\`)) {
-          return
+          return null
         }
-        throw error
+        throw fileResult.reason
+      }
+      if (gridResult.status === 'rejected') throw gridResult.reason
+
+      const nextFile = fileResult.value
+      selection.grid = nextGrid
+
+      const hasUnknownVariant = selection.variantId
+        && !nextFile.story.variants.some(item => item.id === selection.variantId)
+
+      if (hasUnknownVariant) {
+        // Unknown variant on a known story: same staleness, same recovery.
+        if (attemptStaleRuntimeReload(\`variant:\${selection.storyId}:\${selection.variantId}\`)) {
+          return null
+        }
+        // The reload was declined (already attempted for this selection, so
+        // the variant is genuinely gone): the guard must stay armed, or the
+        // next PREVIEW_SYNC would reload the whole iframe all over again.
+      }
+      else {
+        clearStaleRuntimeReloadGuard()
       }
 
-      if (selectionToken === token) {
-        const hasUnknownVariant = selection.variantId
-          && !nextFile.story.variants.some(item => item.id === selection.variantId)
-
-        if (hasUnknownVariant) {
-          // Unknown variant on a known story: same staleness, same recovery.
-          if (attemptStaleRuntimeReload(\`variant:\${selection.storyId}:\${selection.variantId}\`)) {
-            return
-          }
-          // The reload was declined (already attempted for this selection, so
-          // the variant is genuinely gone): the guard must stay armed, or the
-          // next PREVIEW_SYNC would reload the whole iframe all over again.
-        }
-        else {
-          clearStaleRuntimeReloadGuard()
-        }
-
-        file.value = nextFile
-        syncVariantStateWatchers(nextFile.story)
-        await nextTick()
-      }
+      file.value = nextFile
+      syncVariantStateWatchers(nextFile.story)
+      await nextTick()
+      return selectionToken === token ? token : null
     }
 
 ${previewRuntimeService()}
@@ -187,7 +204,8 @@ ${previewMessageHandler()}
       if (initialSelection.storyId) {
         // Wait for the initial selection to load before announcing readiness so
         // the host receives the resolved variantId, not a stale null.
-        void syncSelection(initialSelection).then(() => {
+        void syncSelection(initialSelection).then((syncedToken) => {
+          if (syncedToken === null || syncedToken !== selectionToken) return
           postToParent({ type: SANDBOX_READY, storyId: story.value?.id, variantId: variant.value?.id })
         }).catch(error => { renderRuntimeError(error) })
       }

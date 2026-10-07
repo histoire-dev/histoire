@@ -1,3 +1,4 @@
+import { fileURLToPath } from 'node:url'
 import { build, transformSync } from 'esbuild'
 import { describe, expect, it } from 'vitest'
 import { generatePreviewRuntimeSource, HOSTILE_STORY_ID, previewRuntimeStubStoryFiles } from './utils/preview-runtime-source.js'
@@ -12,6 +13,69 @@ function parseAsModule(source: string) {
 }
 
 describe('preview runtime generation', () => {
+  it('keeps grid-only modules behind selection readiness', () => {
+    const source = generatePreviewRuntimeSource()
+    const gridModule = '/stub/histoire-app/dist/bundled/components/story/StoryVariantGridSandbox.vue.js'
+
+    expect(source).not.toContain(`import StoryVariantGridSandbox from ${JSON.stringify(gridModule)}`)
+    expect(source).toContain(`await import(${JSON.stringify(gridModule)})`)
+
+    const selectionStart = source.indexOf('async function syncSelection(nextSelection)')
+    const selectionEnd = source.indexOf('async function handleRuntimeRequest', selectionStart)
+    const selection = source.slice(selectionStart, selectionEnd)
+    const dependencies = selection.indexOf('Promise.allSettled')
+    const gridLoad = selection.indexOf('nextGrid ? ensureGridComponent()')
+    const storyMount = selection.indexOf('file.value = nextFile')
+    expect(dependencies).toBeGreaterThanOrEqual(0)
+    expect(gridLoad).toBeGreaterThan(dependencies)
+    expect(storyMount).toBeGreaterThan(dependencies)
+
+    const previewSyncStart = source.indexOf('if (event.data?.type === PREVIEW_SYNC)')
+    const previewSyncEnd = source.indexOf('else if (event.data?.type === STATE_SYNC)', previewSyncStart)
+    const previewSync = source.slice(previewSyncStart, previewSyncEnd)
+    expect(previewSync.indexOf('await syncSelection(event.data)')).toBeLessThan(previewSync.indexOf('postToParent({ type: SANDBOX_READY'))
+  })
+
+  it('links built runtime and public app entries without the legacy routing state graph', async () => {
+    const appDirectory = fileURLToPath(new URL('../../../../histoire-app/dist/', import.meta.url))
+    const source = generatePreviewRuntimeSource().replaceAll('/stub/histoire-app/dist/', appDirectory)
+    const output = await build({
+      stdin: {
+        contents: `${source}
+export { logEvent, isDark, toggleDark, useHostChannel, useHistoireGlobals, useHistoireGlobalsStore } from ${JSON.stringify(`${appDirectory}bundle-index.js`)}
+import ${JSON.stringify(`${appDirectory}bundled/reusable.js`)}
+import ${JSON.stringify(`${appDirectory}bundled/index.js`)}
+`,
+        loader: 'js',
+        resolveDir: appDirectory,
+      },
+      bundle: true,
+      format: 'esm',
+      platform: 'browser',
+      write: false,
+      metafile: true,
+      plugins: [{
+        name: 'retained-app-output-boundary',
+        /** Link app outputs while preserving their virtual/package boundaries. */
+        setup(builder) {
+          // Only app outputs belong to this check. Virtual story/test modules
+          // and package dependencies have their own runtime/consumer fixtures.
+          builder.onResolve({ filter: /.*/ }, (args) => {
+            if (args.path.startsWith(appDirectory) || args.path.startsWith('.')) return
+            return { path: args.path, external: true }
+          })
+        },
+      }],
+    })
+    const modules = Object.keys(output.metafile!.inputs).join('\n')
+    // Dynamic imports are traversed too: logEvent's lazy compatibility store
+    // must never pull route views or a second selected-story owner into clients.
+    expect(modules).not.toMatch(/histoire-app\/dist\/bundled\/(?:router\.js|stores\/(?:story|folder|tests|preview-runtime)\.js)/)
+    expect(modules).not.toMatch(/histoire-app\/dist\/bundled\/components\/(?:panel|search|tree)\//)
+    const exports = Object.values(output.metafile!.outputs).flatMap(value => value.exports)
+    expect(exports).toEqual(expect.arrayContaining(['logEvent', 'isDark', 'toggleDark', 'useHostChannel', 'useHistoireGlobals', 'useHistoireGlobalsStore']))
+  })
+
   it('binds preview vendor imports to Histoire dependencies instead of consumer root', async () => {
     for (const hasVitest of [true, false]) {
       const source = generatePreviewRuntimeSource(hasVitest)
@@ -129,5 +193,14 @@ describe('preview runtime generation', () => {
     // The preview iframe already shows the story; the test session's render
     // mount must never appear as a visible duplicate over it.
     expect(generatePreviewRuntimeSource()).toContain('offscreenRenderMount: true')
+  })
+
+  it('probes actual setup exports before allowing the trusted empty shortcut', () => {
+    const source = generatePreviewRuntimeSource()
+
+    expect(source).toContain('import(\'virtual:$histoire-generated-global-setup\')')
+    expect(source).toContain('import(\'virtual:$histoire-setup\')')
+    expect(source).toContain('hasVanillaSetupHooks(generatedSetup, setup)')
+    expect(source).toContain('  canSkipKnownEmptyCollection,')
   })
 })

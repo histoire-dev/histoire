@@ -112,11 +112,26 @@ describe('background color', () => {
     cy.get('[aria-label="Light checkerboard"]').should('have.attr', 'aria-pressed', 'false')
   })
 
+  it('changes inspection backing on generated Tailwind typography', () => {
+    cy.visit('/story/tailwind?variantId=font-family&arrange=grid')
+    // Token books boot several documents; wait for selected owner before shared iframe helper.
+    cy.get('.histoire-canvas-frame.is-selected .histoire-canvas-replica', { timeout: 30000 }).should('have.attr', 'aria-busy', 'false')
+    cy.getPreviewIframeBody().contains('htw-font-sans')
+    cy.get('[aria-label="Zoom level"]').click()
+    cy.contains('button', 'Zoom to selection').click()
+    for (const label of ['Dark checkerboard', 'Light checkerboard', 'Transparent']) {
+      cy.get('[aria-label="Background"][aria-haspopup="dialog"]').click()
+      cy.get(`button[aria-label="${label}"]`).click().should('have.attr', 'aria-pressed', 'true')
+      cy.get('[role="dialog"][aria-label="Background"]').trigger('keydown', { eventConstructor: 'KeyboardEvent', key: 'Escape' })
+      cy.screenshot(`tailwind-${label.toLowerCase().replaceAll(' ', '-')}`)
+    }
+  })
+
   // Canonical preview owns runtime contrast; frame chrome owns canvas background.
   it('should provide background and contrast color (grid)', () => {
     openStory('/story/src-components-substory-story-vue?variantId=src-components-substory-story-vue-0')
     forEachBackground((index) => {
-      cy.get('[data-frame-id] > button[aria-pressed="true"]').parent().find('[data-test-id="responsive-preview-bg"]').should('have.css', 'background-color', index === 0 ? 'rgb(255, 255, 255)' : backgroundColorShouldBe[index])
+      cy.get('[data-frame-id] > button[aria-pressed="true"]').parent().find('[data-test-id="responsive-preview-bg"]').should('have.css', 'background-color', backgroundColorShouldBe[index])
       cy.getPreviewIframeBody().find('.histoire-generic-render-story .text').should('have.css', 'color', contrastColorShouldBe[index])
     })
   })

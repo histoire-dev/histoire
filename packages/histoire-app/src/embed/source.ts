@@ -2,6 +2,7 @@ import type { HistoireSourceSearchData } from '@histoire/protocol'
 import type { HistoireRequestCapture, HistoireSessionCommand } from '@histoire/sdk/internal'
 import type { EmbedSourceConnection, EmbedSourceOptions } from './types.js'
 import { HistoireSdkError, validateBridgePayload, validateBridgeResult, validateWireValue } from '@histoire/protocol'
+import { isAcceptedHistoireSourceDescriptor } from '@histoire/sdk/internal'
 import { loadEmbedDescriptor, loadEmbedOrigins, validateEmbedDescriptor } from './descriptor.js'
 import { readEmbedJson, waitEmbedSourceWork } from './fetch.js'
 import { searchEmbedData, validateEmbedSearch } from './search.js'
@@ -15,7 +16,8 @@ export async function createEmbedSourceConnection(options: EmbedSourceOptions): 
   const base = new URL(options.url)
   if (!['http:', 'https:'].includes(base.protocol) || base.username || base.password || base.search || base.hash || !base.pathname.endsWith('/')) throw new HistoireSdkError('INVALID_ARGUMENT', 'Expected HTTP(S) book base URL')
   const fetcher = options.fetcher ?? globalThis.fetch.bind(globalThis)
-  let descriptor = options.descriptor ? structuredClone(validateEmbedDescriptor(options.descriptor)) : await loadEmbedDescriptor(base, fetcher, options.signal)
+  let descriptor = options.descriptor ? validateEmbedDescriptor(options.descriptor) : await loadEmbedDescriptor(base, fetcher, options.signal)
+  if (options.descriptor && !isAcceptedHistoireSourceDescriptor(descriptor)) descriptor = structuredClone(descriptor)
   const allowedOrigins = options.descriptor ? [] : await loadEmbedOrigins(base, descriptor, fetcher, options.signal)
   const actionBase = options.actionBase ?? '__histoire/embed/'
   if (!['__histoire/embed/', '__histoire/local/'].includes(actionBase)) throw new HistoireSdkError('INVALID_ARGUMENT', 'Unknown first-party action route')

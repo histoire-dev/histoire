@@ -56,8 +56,10 @@ export function previewMessageHandler() {
           if (!Number.isSafeInteger(event.data.selectionVersion) || event.data.selectionVersion < previewSelectionVersion) return
           previewSelectionVersion = event.data.selectionVersion
         }
+        let syncedToken
         try {
-          await syncSelection(event.data)
+          syncedToken = await syncSelection(event.data)
+          if (syncedToken === null || syncedToken !== selectionToken) return
         }
         catch (error) {
           // A failed selection (story that stayed unknown after the reload
@@ -69,7 +71,9 @@ export function previewMessageHandler() {
         // Reload can restore the URL's same actor after its initial ready event.
         if (!initialSelection.controls && !selection.grid && currentVariant && variant.value === currentVariant && frameworkReadyVariants.has(currentVariant)) {
           await markVariantReady(currentVariant.id)
+          if (selectionToken !== syncedToken) return
         }
+        if (selectionToken !== syncedToken) return
         postVariantStateSnapshot(story.value?.id, variant.value)
         postToParent({ type: SANDBOX_READY, storyId: story.value?.id, variantId: variant.value?.id })
       }

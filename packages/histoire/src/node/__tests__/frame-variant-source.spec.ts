@@ -16,6 +16,28 @@ async function readyFrame(variantId = target.variantId, fixture = sourceFixture(
 }
 
 describe('owning frame variant source', () => {
+  it.each(['resolve', 'reject'] as const)('drops late source %s after logical activation changes in the same document', async (settlement) => {
+    const original = await readyFrame()
+    const pending = deferred<any>()
+    let registration = { id: 'frame', ...target, rect: { x: 0, y: 0, width: 100, height: 100 }, session: original.session }
+    original.fixture.request.mockImplementationOnce(() => pending.promise)
+    const copy = vi.fn()
+    const error = vi.fn()
+    const actions = createFrameActions({ session: original.session, frameSession: () => original.session, frameRegistration: () => registration, copy, error, link: () => '', reveal: vi.fn() })
+    try {
+      const running = actions.run(actions.entries.get('save-props')!, target)
+      await vi.waitFor(() => expect(original.fixture.request).toHaveBeenCalledWith('source.get', expect.anything(), expect.anything()))
+      registration = { ...registration }
+      if (settlement === 'reject') pending.reject(new Error('Retired source failure'))
+      else pending.resolve({ storyId: target.storyId, variantId: target.variantId, mode: 'dynamic', epoch: 'epoch-1', revision: 'revision-1', origin: 'file', body: 'old source' })
+      await running
+      expect(copy).not.toHaveBeenCalled()
+      expect(error).not.toHaveBeenCalled()
+      expect(actions.manualCopy.value).toBeNull()
+    }
+    finally { await original.session.dispose() }
+  })
+
   it('uses passive source generator while canonical selection stays unchanged', async () => {
     const canonical = await readyFrame()
     const passive = await readyFrame('other')
@@ -80,7 +102,7 @@ describe('owning frame variant source', () => {
     try {
       const action = actions.entries.get('save-props')!
       expect(actions.list({ ...target, variantId: 'other' })).toContain(action)
-      expect(action.disabled?.(target)).toBe('Wait for preview to finish loading.')
+      expect(action.disabled?.(target)).toBe('Wait for the variant to finish loading.')
       await actions.run(action, { ...target, variantId: 'other' })
       expect(canonical.session.getSnapshot().selection?.variantId).toBe('c')
       expect(copy).not.toHaveBeenCalled()

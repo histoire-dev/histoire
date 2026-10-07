@@ -2,6 +2,9 @@ import { createRequire } from 'node:module'
 import { join } from 'node:path'
 import { MCP_REPOSITORY_ROOT } from '../mcp/cli-project.js'
 
+/** Ready selected workbench actor; excludes hidden canonical and sibling runtimes. */
+export const STANDALONE_SELECTED_FRAME = '.histoire-canvas-frame.is-selected [aria-busy="false"] iframe[title="Histoire variant"]'
+
 /** Real browser launcher shared by embed conformance; remote WebKit works on unsupported hosts. */
 export async function launchEmbedBrowser() {
   const require = createRequire(join(MCP_REPOSITORY_ROOT, 'examples/vue3/package.json'))

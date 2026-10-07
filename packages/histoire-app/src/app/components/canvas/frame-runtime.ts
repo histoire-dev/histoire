@@ -7,6 +7,8 @@ import { getCanvasTargetGeneration } from './frame-source.js'
 export interface CanvasFrameRuntimeOptions {
   /** Ordinary variant cache; Matrix override cells deliberately omit it. */
   state?: CanvasFrameState
+  /** Physical document owns freshest retained state; URL/runtime ID can survive a reload. */
+  document?: () => Document | null | undefined
   /** Runtime is unavailable or restoring retained state. */
   loading: () => void
   /** Exact document has finished restoration and can accept inspector operations. */
@@ -22,6 +24,8 @@ export function observeCanvasFrameRuntime(owner: HistoireSession, options: Canva
   let initialized = ''
   let preparing = ''
   let stopState = () => {}
+  let stateDocument: Document | null | undefined
+  const restored = new Set<string>()
 
   /** Runtime ID, exact target, and executable source jointly fence async restoration. */
   function identity(snapshot: ReturnType<HistoireSession['getSnapshot']>): string {
@@ -36,8 +40,17 @@ export function observeCanvasFrameRuntime(owner: HistoireSession, options: Canva
   async function initialize(key: string, token: number): Promise<void> {
     try {
       const target = owner.getSnapshot().selection!
-      await options.state?.seed(owner, target)
+      const document = options.document?.()
+      if (document !== stateDocument) {
+        stateDocument = document
+        restored.clear()
+      }
+      // A reused document retains newer edits than the asynchronous host mirror.
+      // Seed each target once, but always seed again after physical navigation.
+      if (!document || !restored.has(key)) await options.state?.seed(owner, target)
       if (!active || token !== generation || identity(owner.getSnapshot()) !== key) return
+      if (document !== options.document?.()) return
+      if (document) restored.add(key)
       initialized = key
       preparing = ''
       stopState = options.state?.observe(owner) ?? (() => {})

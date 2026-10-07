@@ -43,6 +43,56 @@ function view(arrangement: CanvasArrangement): CanvasViewSnapshot {
 }
 
 describe('story canvas views', () => {
+  it.each([false, true])('fits Matrix on saved story entry, navigation, and remount with sync=%s', async (sync) => {
+    const views = createStoryCanvasViews()
+    const saved = view('matrix')
+    saved.zoomByArrange.matrix = 1.77
+    views.saveStory('first', saved)
+    views.saveStory('second', saved)
+    const state = createBinding('first', {}, views)
+    try {
+      expect(state.canvas.zoom).toBe('fit')
+      expect(saved.zoomByArrange.matrix).toBe(1.77)
+      expect(state.canvas.zoomByArrange.grid).toBe(1)
+      expect(state.canvas.zoomByArrange.list).toBe(0.5)
+      state.canvas.setZoom(2)
+      state.syncZoom.value = sync
+      expect(state.canvas.zoom).toBe(2)
+      state.storyId.value = 'second'
+      await nextTick()
+      expect(state.canvas.zoom).toBe('fit')
+      expect(views.getStory('first')?.zoomByArrange.matrix).toBe(2)
+      state.canvas.setZoom(0.25)
+      state.storyId.value = 'first'
+      await nextTick()
+      expect(state.canvas.zoom).toBe('fit')
+      state.canvas.setZoom(1.77)
+    }
+    finally { state.binding.dispose() }
+    const restored = createBinding('first', {}, views)
+    try {
+      expect(restored.canvas.arrangement).toBe('matrix')
+      expect(restored.canvas.zoom).toBe('fit')
+      expect(restored.canvas.zoomByArrange.list).toBe(0.5)
+    }
+    finally { restored.binding.dispose() }
+  })
+
+  it('restores detached Matrix snapshots without fitting outgoing story bounds', () => {
+    const canvas = createCanvasStore()
+    canvas.setZoom(0.5)
+    canvas.setGeometry({ width: 1000, height: 800 }, { x: 0, y: 0, width: 100, height: 100 })
+    const saved = view('matrix')
+    saved.zoomByArrange.matrix = 1.77
+    canvas.restoreView(saved)
+    expect(canvas.zoom).toBe('fit')
+    expect(canvas.effectiveZoom).toBe(0.5)
+    expect(canvas.panOffset).toEqual(saved.panOffset)
+    expect(saved.zoomByArrange.matrix).toBe(1.77)
+    canvas.setGeometry({ width: 1000, height: 800 }, { x: 0, y: 0, width: 2000, height: 1000 })
+    expect(canvas.effectiveZoom).toBeCloseTo(0.468)
+  })
+
   it('restores Single zoom per story and shares it only while synchronization is enabled', async () => {
     const state = createBinding('first', { baseArrangement: 'single' })
     state.canvas.setArrangement('single')

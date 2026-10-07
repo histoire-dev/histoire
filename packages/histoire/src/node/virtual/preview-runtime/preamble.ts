@@ -80,7 +80,6 @@ import { ModuleMocker, ModuleMockerMSWInterceptor } from ${JSON.stringify(vitest
 import FloatingVue from ${JSON.stringify(histoireVendorIds.floatingVue)}
 import { createPinia } from ${JSON.stringify(histoireVendorIds.pinia)}
 import { computed, createApp, defineComponent, h, nextTick, onMounted, reactive, ref, watch } from ${JSON.stringify(histoireVendorIds.vue)}
-import StoryVariantGridSandbox from ${app('components/story/StoryVariantGridSandbox.vue.js')}
 import GenericMountStory from ${app('components/story/GenericMountStory.vue.js')}
 import GenericRenderStory from ${app('components/story/GenericRenderStory.vue.js')}
 import { setupPluginApi } from ${app('plugin.js')}
@@ -99,10 +98,28 @@ import { createRuntimeStatePresets } from ${app('../embed/adapters/state-presets
 import { createStandalonePresetStorage } from ${app('../embed/app/standalone/presets.js')}
 import { observeRuntimeLayout } from ${app('../embed/adapters/layout.js')}
 import { ELEMENT_PICK_REQUEST, ELEMENT_PICK_RESULT, MEASURE_REQUEST, MEASURE_RESULT, PROPS_OVERRIDE, applyVariantStateUpdate, createControlsOverlayBridge, createControlsStateRevision, createFailedRunSummary, createVariantStateSyncGuards, getVariantStateKey, measureWireValue, serializeTestError } from ${JSON.stringify(histoireSharedId)}
-import { createVariantTestSession } from ${JSON.stringify(variantTestSessionId)}
+import { createVariantTestSession, hasVanillaSetupHooks } from ${JSON.stringify(variantTestSessionId)}
 ${hasVitestPreview
   ? `import { createStaticPreviewMockRpc, createStaticPreviewMswOptions, enableStaticPreviewMockInterception } from ${JSON.stringify(staticMockRuntimeId)}`
   : ''}
+
+let StoryVariantGridSandbox
+let gridComponentPromise
+/** Load grid presentation only when the selected runtime layout needs it. */
+async function ensureGridComponent() {
+  if (StoryVariantGridSandbox) return
+  if (!gridComponentPromise) {
+    gridComponentPromise = (async () => {
+      const module = await import(${app('components/story/StoryVariantGridSandbox.vue.js')})
+      StoryVariantGridSandbox = module.default
+    })()
+      .catch((error) => {
+        gridComponentPromise = undefined
+        throw error
+      })
+  }
+  await gridComponentPromise
+}
 
 const TEST_DEFINITIONS_KEY = ${JSON.stringify(TEST_DEFINITIONS_KEY)}
 const STORY_CHANGED_EVENT = ${JSON.stringify(STORY_CHANGED_EVENT)}

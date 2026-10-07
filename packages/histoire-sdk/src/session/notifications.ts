@@ -1,7 +1,9 @@
+import type { HistoireSourceDescriptor } from '@histoire/protocol'
 import type { HistoireSessionNotification } from '../adapters/types.js'
 import type { SessionContext } from './context.js'
-import { validateHistoireEvent, validateHistoireSourceDescriptor, validateHistoireStateSnapshot, validateHistoireViewports, validateWireValue } from '@histoire/protocol'
+import { validateHistoireEvent, validateHistoireStateSnapshot, validateHistoireViewports, validateWireValue } from '@histoire/protocol'
 import { appendEvent } from './events.js'
+import { acceptHistoireSourceDescriptor, isAcceptedHistoireSourceDescriptor } from './internal.js'
 import { publishRuntime } from './runtime.js'
 import { reconcileSelection } from './selection.js'
 import { sendCurrentSettings } from './settings.js'
@@ -13,17 +15,19 @@ export function receiveNotification(context: SessionContext, notification: Histo
   if (context.snapshot.status !== 'ready' || notification.connectionId !== connectionId || notification.sourceId !== context.snapshot.source?.sourceId) return
   if (mountId && (!mount?.active || notification.mountId !== mountId || context.primaryId !== mountId)) return
   if (notification.type === 'catalog' && !mountId) {
+    let descriptor: HistoireSourceDescriptor
     try {
-      validateHistoireSourceDescriptor(notification.descriptor)
+      descriptor = isAcceptedHistoireSourceDescriptor(notification.descriptor)
+        ? notification.descriptor
+        : acceptHistoireSourceDescriptor(notification.descriptor)
     }
     catch {
       context.publish({ stale: true })
       return
     }
-    const descriptor = notification.descriptor
     if (descriptor.sourceId !== context.snapshot.source.sourceId || descriptor.epoch !== notification.epoch || descriptor.revision !== notification.revision) return
     // One source descriptor remains canonical for first-party config getters.
-    context.descriptor = context.copy(descriptor)
+    context.descriptor = descriptor
     const changed = descriptor.epoch !== context.snapshot.source.epoch || descriptor.revision !== context.snapshot.source.revision
     if (changed) context.operations.reject('STALE_REVISION', 'Source publication changed.')
     context.engine = context.copy(descriptor.capabilities)

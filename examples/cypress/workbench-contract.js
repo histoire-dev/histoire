@@ -9,18 +9,27 @@ const canvas = '[aria-label="Story canvas"]'
 /** Exact selected frame readiness excludes every unselected live document. */
 export const primaryPreviewFrame = '.histoire-canvas-frame.is-selected [aria-busy="false"] iframe[title="Histoire variant"]'
 
+/** Admit only exact fixture-authored Carbon icons, never fonts or mixed builtin requests. */
+function isExternalStoryIcon(value, icons = []) {
+  const url = new URL(value)
+  if (!['api.iconify.design', 'api.simplesvg.com', 'api.unisvg.com'].includes(url.hostname) || url.pathname !== '/carbon.json') return false
+  const names = url.searchParams.get('icons')?.split(',')
+  return Boolean(names?.length && names.every(name => icons.includes(`carbon:${name}`)))
+}
+
 /**
  * Exercises framework-independent workbench contracts against real previews.
- * @param {{ path: string, previewText: string }} example Existing story fixture.
+ * @param {{ path: string, previewText: string, externalStoryIcons?: string[] }} example Existing story fixture; optional exact user-authored Carbon icons may use their remote source.
  */
 export function describeWorkbenchContract(example) {
   if (Cypress.env('workbenchMode') !== 'dev') {
     let externalRequests
     beforeEach(() => {
       externalRequests = []
-      // Include nested controls documents; offline builds must supply every builtin asset.
-      cy.intercept({ url: /^https?:\/\/(?:api\.iconify\.design|fonts\.googleapis\.com|fonts\.gstatic\.com)\// }, (request) => {
-        externalRequests.push(request.url)
+      // Fixture-authored icons keep their normal external integration. Builtin
+      // icons and every font still require packaged assets, including in frames.
+      cy.intercept({ url: /^https?:\/\/(?:api\.iconify\.design|api\.simplesvg\.com|api\.unisvg\.com|fonts\.googleapis\.com|fonts\.gstatic\.com)\// }, (request) => {
+        if (!isExternalStoryIcon(request.url, example.externalStoryIcons)) externalRequests.push(request.url)
         request.destroy()
       })
     })

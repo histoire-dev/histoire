@@ -38,9 +38,9 @@ h1 { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowra
 span { color: var(--histoire-muted); font-size: 12px; }
 .histoire-canvas-heading > div > span { flex-shrink: 0; white-space: nowrap; }
 .histoire-canvas-heading > .histoire-canvas-metadata { display: flex; flex: 0 1 45%; flex-direction: column; align-self: flex-start; align-items: stretch; gap: 3px; min-width: 0; }
-.histoire-canvas-file { display: flex; inline-size: 100%; min-width: 0; align-items: center; justify-content: flex-end; gap: 8px; overflow: hidden; white-space: nowrap; font-family: var(--histoire-font-mono, "JetBrains Mono", monospace); }
+.histoire-canvas-file { display: flex; inline-size: 100%; min-width: 0; align-items: center; justify-content: flex-end; gap: 8px; overflow: hidden; white-space: nowrap; font: inherit; font-family: var(--histoire-font-mono, "JetBrains Mono", monospace); }
 .histoire-canvas-file > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
-.histoire-canvas-file-action { box-sizing: border-box; margin: 0; padding: 0; border: 0; background: transparent; color: inherit; font: inherit; text-align: inherit; cursor: pointer; pointer-events: auto; }
+.histoire-canvas-file-action { box-sizing: border-box; margin: 0; padding: 0; border: 0; background: transparent; color: inherit; text-align: inherit; cursor: pointer; pointer-events: auto; }
 .histoire-canvas-file-icon { color: var(--histoire-muted); }
 .histoire-canvas-file-action:hover .histoire-canvas-file-icon { color: var(--histoire-accent); }
 .histoire-canvas-file-action:hover > span { color: var(--histoire-accent); }

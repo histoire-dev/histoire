@@ -1,5 +1,6 @@
 import type { HistoireSession } from '@histoire/sdk'
 import type { InjectionKey } from 'vue'
+import type { CanvasFrameRegistration } from '../composables/canvas-settings.js'
 import type { createShortcutRegistry } from './shortcuts.js'
 import { getSandboxRelativeUrl } from '@histoire/protocol'
 import { canOpenHistoireTargetInEditor, requestHistoireOpenInEditor } from '@histoire/sdk/internal'
@@ -50,6 +51,8 @@ export interface FrameActionOptions {
   reveal: (target: FrameActionTarget) => unknown | Promise<unknown>
   /** Resolve frame-specific independent runtime, if mounted. */
   frameSession?: (target: FrameActionTarget) => HistoireSession | null
+  /** Logical activation invalidates pending actions even when a document is reused. */
+  frameRegistration?: (target: FrameActionTarget) => CanvasFrameRegistration | null
   /** Clipboard abstraction used by behavior tests and native host. */
   copy?: (text: string) => Promise<void>
   /** Opening isolated preview stays native and explicit. */
@@ -91,7 +94,7 @@ export function createFrameActions(options: FrameActionOptions) {
   function dev() {
     return options.session.getSnapshot().source?.mode === 'dev'
   }
-  const variantSource = createFrameVariantSource({ session: options.session, resolve: target => options.frameSession ? options.frameSession(target) : options.session, error: options.error })
+  const variantSource = createFrameVariantSource({ session: options.session, resolve: target => options.frameSession ? options.frameSession(target) : options.session, registration: options.frameRegistration, error: options.error })
   const registry = { entries, manualCopy,
     /** Shared clipboard path keeps manual recovery available to all workbench menus. */
     copyText: copy,

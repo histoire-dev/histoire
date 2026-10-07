@@ -31,14 +31,14 @@ export function getBackgroundPreset(settings: CanvasBackground): string {
   return settings.checkerboard ? checkerboards[settings.checkerboardTheme ?? 'light'].color : settings.backgroundColor
 }
 
-/** Paint opaque inspection tiles beneath runtime content at displayed canvas scale. */
+/** Paint inspection tiles at displayed scale; transparency reveals canvas backing. */
 export function getBackgroundStyle(settings: CanvasBackground): CSSProperties {
-  if (!settings.checkerboard) return { backgroundColor: settings.backgroundColor === 'transparent' ? '#fff' : settings.backgroundColor, backgroundImage: 'none', backgroundSize: undefined }
+  if (!settings.checkerboard) return { backgroundColor: settings.backgroundColor, backgroundImage: 'none', backgroundSize: undefined }
   const palette = checkerboards[settings.checkerboardTheme ?? 'light']
   return {
     backgroundColor: palette.base,
     backgroundImage: `conic-gradient(${palette.alternate} 25%, ${palette.base} 0 50%, ${palette.alternate} 0 75%, ${palette.base} 0)`,
-    backgroundSize: '12px 12px',
+    backgroundSize: '24px 24px',
   }
 }
 

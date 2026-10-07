@@ -48,7 +48,8 @@ export function getGeneratedSource() {
       cy.get('[aria-label="Expand source"]').click()
     }
   })
-  return cy.get('[data-test-id="story-source-code"] pre code', { timeout: 20000 })
+  // Source remains readable when syntax highlighting uses its plain-text fallback.
+  return cy.get('[data-test-id="story-source-code"] .histoire-source-content', { timeout: 20000 })
 }
 
 /** Select original value through shared menu's accessible option label. */

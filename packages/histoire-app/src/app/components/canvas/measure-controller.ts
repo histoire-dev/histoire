@@ -5,6 +5,8 @@ import { readonly, ref, shallowRef } from 'vue'
 
 /** A measurement belongs to one exact physical preview and source publication. */
 export interface MeasureOwner {
+  /** Logical frame activation, distinct from retained physical document. */
+  registration?: object
   /** Canvas registration key, including local matrix cell identity. */
   frameId: string
   /** Exact catalog story. */
@@ -36,7 +38,7 @@ let instanceCounter = 0
 export function sameMeasureOwner(first: MeasureOwner | null, second: MeasureOwner | null): boolean {
   return first === second || Boolean(first && second && first.frameId === second.frameId && first.storyId === second.storyId
     && first.variantId === second.variantId && first.documentId === second.documentId && first.source === second.source
-    && first.origin === second.origin && first.generation === second.generation)
+    && first.origin === second.origin && first.generation === second.generation && first.registration === second.registration)
 }
 
 /** Reject incomplete geometry before guide arithmetic can produce NaN. */

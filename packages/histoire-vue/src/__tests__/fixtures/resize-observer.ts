@@ -3,13 +3,15 @@ import { vi } from 'vitest'
 /** Deliver controlled native resize notifications without duplicating observer stubs. */
 export function resizeObserverFixture() {
   const observers = new Set<{ callback: ResizeObserverCallback, targets: Set<Element> }>()
+  const history = new Set<{ callback: ResizeObserverCallback, targets: Set<Element> }>()
   vi.stubGlobal('ResizeObserver', class {
     /** Callback and observed elements belong to one component instance. */
     state: { callback: ResizeObserverCallback, targets: Set<Element> }
-    /** Retain callback until owning component disconnects. */
+    /** Keep callback history for queued-notification lifecycle tests. */
     constructor(callback: ResizeObserverCallback) {
       this.state = { callback, targets: new Set() }
       observers.add(this.state)
+      history.add(this.state)
     }
 
     /** Observe a mounted element. */
@@ -28,5 +30,14 @@ export function resizeObserverFixture() {
     count: () => observers.size,
     /** Inspect observation ownership when conditional elements are replaced. */
     targets: () => new Set([...observers].flatMap(observer => [...observer.targets])),
+    /** Invoke retained callbacks to model notifications queued before disconnect. */
+    notifyAll(entries: ResizeObserverEntry[]) {
+      for (const observer of history) observer.callback(entries, {} as ResizeObserver)
+    },
+    /** Invoke one retained observer callback by creation order. */
+    notifyObserver(index: number, entries: ResizeObserverEntry[]) {
+      const observer = [...history][index]
+      observer?.callback(entries, {} as ResizeObserver)
+    },
   }
 }

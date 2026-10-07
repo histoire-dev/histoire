@@ -14,7 +14,7 @@ export { getCanvasStorage } from './canvas-preferences.js'
 /** Persistent canvas pointer mode. */
 export type CanvasTool = 'select' | 'pan' | 'measure'
 
-/** Canvas arrangements each retain their own local zoom preference. */
+/** Canvas arrangements retain local zoom preferences; Matrix resets to Fit on entry. */
 export type CanvasArrangement = 'single' | 'grid' | 'list' | 'matrix'
 
 /** Logical scale, whole-canvas fit, or List selection fitting. */
@@ -85,11 +85,12 @@ export function createCanvasStore(options: { storage?: CanvasStorage, singleView
     state.zoom = zoom
     state.zoomByArrange[state.arrangement] = zoom
   }
-  /** Restore one view's zoom preference before its replacement geometry is measured. */
+  /** Restore remembered zoom except Matrix, which enters Fit before measuring new geometry. */
   function setArrangement(arrangement: CanvasArrangement) {
     if (state.arrangement === arrangement) return
     state.arrangement = arrangement
     selectionBounds = undefined
+    if (arrangement === 'matrix') return resetZoom()
     const zoom = state.zoomByArrange[arrangement]
     state.zoom = zoom
     if (typeof zoom === 'number') state.effectiveZoom = zoom
@@ -167,12 +168,13 @@ export function createCanvasStore(options: { storage?: CanvasStorage, singleView
   function snapshotView(arrangement = state.arrangement): CanvasViewSnapshot {
     return { arrangement, zoomByArrange: { ...state.zoomByArrange }, panOffset: { ...state.panOffset } }
   }
-  /** Restore view state before measuring new story geometry. */
+  /** Restore detached view state; Matrix enters Fit and awaits destination geometry. */
   function restoreView(snapshot: CanvasViewSnapshot) {
     state.zoomByArrange = { ...snapshot.zoomByArrange }
     state.arrangement = snapshot.arrangement
     state.zoom = state.zoomByArrange[snapshot.arrangement]
     selectionBounds = undefined
+    if (state.arrangement === 'matrix') resetZoom()
     if (typeof state.zoom === 'number') {
       if (state.arrangement === 'single') applySingleZoom(state.zoom)
       else state.effectiveZoom = state.zoom
@@ -252,12 +254,12 @@ export function createCanvasStore(options: { storage?: CanvasStorage, singleView
     setActiveZoom('selection')
     fitSelection()
   }
-  /** Unsaved story views use the active arrangement's automatic default. */
+  /** Story entry defaults defer List/Matrix fitting until destination geometry arrives. */
   function resetZoom() {
-    if (state.arrangement !== 'list') return fit()
+    if (state.arrangement !== 'list' && state.arrangement !== 'matrix') return fit()
     // Story transitions must wait for destination geometry instead of fitting the old story.
     selectionBounds = undefined
-    setActiveZoom('selection')
+    setActiveZoom(state.arrangement === 'matrix' ? 'fit' : 'selection')
     save()
   }
   return Object.assign(state, { setZoom, setArrangement, fit, resetZoom, setGeometry, setSingleGeometry, panBy, setPanOffset, snapshotView, restoreView, revealFrame, selectFrame, focusFrame, zoomToFrame, zoomToSelection,

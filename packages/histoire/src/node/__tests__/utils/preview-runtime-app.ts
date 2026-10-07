@@ -6,7 +6,17 @@ import { previewComponents } from '../../virtual/preview-runtime/components.js'
 import { previewHostMessaging } from '../../virtual/preview-runtime/host-messaging.js'
 
 /** Execute actual generated Vue app, rendering framework actors with controlled frame timing. */
-export function createPreviewRuntimeApp(options: { storyId?: string, variantId?: string, documentId?: string, onMessage?: (message: Record<string, any>) => void } = {}) {
+export function createPreviewRuntimeApp(options: {
+  storyId?: string
+  variantId?: string
+  documentId?: string
+  /** Starts the initial selection in grid presentation mode. */
+  grid?: boolean
+  /** Resolves the generated runtime's grid component after a test-controlled delay. */
+  loadGridComponent?: () => Promise<vue.Component>
+  /** Receives messages posted by the generated runtime. */
+  onMessage?: (message: Record<string, any>) => void
+} = {}) {
   const messages: Record<string, any>[] = []
   const callbacks: FrameRequestCallback[] = []
   const actorReady: (() => void)[] = []
@@ -26,7 +36,7 @@ export function createPreviewRuntimeApp(options: { storyId?: string, variantId?:
     ...protocol,
     createVariantStateSyncGuards,
     getVariantStateKey,
-    initialSelection: { storyId, variantId, grid: false },
+    initialSelection: { storyId, variantId, grid: options.grid === true },
     selectionState: {},
     histoireConfig: {},
     window: {
@@ -61,6 +71,12 @@ export function createPreviewRuntimeApp(options: { storyId?: string, variantId?:
         return () => vue.h('p', props.variant.id)
       },
     }),
+    StoryVariantGridSandbox: undefined,
+  }
+  /** Resolves the generated runtime's lazy grid import through a controlled test gate. */
+  scope.ensureGridComponent = async () => {
+    if (!options.loadGridComponent) throw new Error('Grid component loader unavailable in runtime fixture')
+    scope.StoryVariantGridSandbox = await options.loadGridComponent()
   }
   const globals = new Proxy(scope, {
     has: () => true,
@@ -70,6 +86,8 @@ export function createPreviewRuntimeApp(options: { storyId?: string, variantId?:
   const app = new Function('scope', `with (scope) { ${previewHostMessaging()}\n${previewComponents()}\n${previewApp()}\nreturn app }`)(globals) as vue.App
   app.mount(container)
   return {
+    /** Runtime-owned root supports rendering assertions without consulting global page state. */
+    container,
     messages,
     /** Returning cached variant still waits for its newly mounted renderer. */
     pauseRendering() { paused = true },
@@ -86,9 +104,14 @@ export function createPreviewRuntimeApp(options: { storyId?: string, variantId?:
         for (const callback of callbacks.splice(0)) callback(index)
       }
     },
-    /** Exact trusted host identity exercises production dispatch guard. */
-    select(variantId: string, selectionVersion: number) {
-      return listener!({ source: host, origin: window.location.origin, data: { __histoire: true, type: protocol.PREVIEW_SYNC, storyId, variantId, documentId: options.documentId ?? 'document', selectionVersion, grid: false } })
+    /**
+     * Deliver a trusted selection update, including a layout change to grid mode.
+     * @param variantId Id of the selected story variant.
+     * @param selectionVersion Monotone version used to reject stale selection messages.
+     * @param grid Requests grid layout when true.
+     */
+    select(variantId: string, selectionVersion: number, grid = false) {
+      return listener!({ source: host, origin: window.location.origin, data: { __histoire: true, type: protocol.PREVIEW_SYNC, storyId, variantId, documentId: options.documentId ?? 'document', selectionVersion, grid } })
     },
     /** Vue watchers and fixture elements belong to this app alone. */
     close() {

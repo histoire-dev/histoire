@@ -156,7 +156,7 @@ describe('native provider ownership', () => {
     const wrapper = mount(HistoireProvider, { props: { session }, slots: { default: () => h(Child) } })
     await nextTick()
     expect(context!.overlay.value?.parentElement).toBe(context!.root.value)
-    callback!([{ contentRect: { width: 420, height: 240 } }] as ResizeObserverEntry[], {} as ResizeObserver)
+    callback!([{ target: context!.root.value!, contentRect: { width: 420, height: 240 } }] as ResizeObserverEntry[], {} as ResizeObserver)
     expect(context!.size.value).toEqual({ width: 420, height: 240 })
     wrapper.unmount()
     expect(disconnect).toHaveBeenCalledOnce()

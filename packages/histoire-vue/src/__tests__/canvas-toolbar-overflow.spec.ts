@@ -38,7 +38,7 @@ async function fixture() {
   const Host = defineComponent({
     setup() {
       provideCanvas(canvas, frames)
-      return () => h('div', { class: 'toolbar-test-host histoire-canvas-viewport', onWheel: wheel, onPointerdown: pointer }, h(CanvasToolbar, { arrange: arrange.value, matrixAvailable: true, onArrange: arrangement }, {
+      return () => h('div', { class: 'toolbar-test-host histoire-canvas-viewport', onWheel: wheel, onPointerdown: pointer }, h(CanvasToolbar, { arrange: arrange.value, onArrange: arrangement }, {
         screenshot: (slot: { open: string | null, setOpen: (value: string | null) => void }) => h(ScreenshotPopover, { 'storyId': 'a:b', 'variantId': 'c', 'open': slot.open, 'onUpdate:open': slot.setOpen }),
       }))
     },

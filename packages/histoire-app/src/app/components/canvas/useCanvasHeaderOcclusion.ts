@@ -15,13 +15,20 @@ export function useCanvasHeaderOcclusion(options: {
   registry: CanvasFrames
   /** Measured header bounds trigger invalidation after chrome resize. */
   bounds: () => unknown
+  /** Fixed presentations can keep metadata visible regardless of overlap. */
+  enabled?: () => boolean
 }) {
   const obscured = ref(false)
   watch([
+    () => options.enabled?.() ?? true,
     () => [options.canvas.effectiveZoom, options.canvas.panOffset.x, options.canvas.panOffset.y],
     options.bounds,
     () => [...options.registry.frames.values()].map(frame => frame.iframe),
   ], () => {
+    if (options.enabled?.() === false) {
+      obscured.value = false
+      return
+    }
     const header = options.header()?.getBoundingClientRect()
     const documents = [...options.registry.frames.values()].flatMap(frame => frame.iframe?.isConnected ? [frame.iframe.getBoundingClientRect()] : [])
     const labels = [...(options.viewport()?.querySelectorAll<HTMLElement>('[data-canvas-overlay-occluder]') ?? [])].filter(label => label.isConnected).map(label => label.getBoundingClientRect())
