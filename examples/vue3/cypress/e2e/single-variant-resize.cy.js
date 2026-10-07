@@ -1,23 +1,10 @@
 /// <reference types="cypress" />
 
-const story = '/story/src-components-responsive-story-vue?variantId=src-components-responsive-story-vue-0&arrange=single'
+import { setSingleViewportSize, visitSingle } from '../../../cypress/single-variant.js'
+
 const widthHandle = '[aria-label="Resize viewport width"]'
 const heightHandle = '[aria-label="Resize viewport height"]'
 const cornerHandle = '[data-test-id="single-resize-both"]'
-
-/** Start from deterministic standalone and canvas preferences. */
-function visitSingle() {
-  cy.viewport(1400, 900)
-  cy.visit(story, {
-    onBeforeLoad(window) {
-      window.localStorage.removeItem('_histoire-sandbox-settings-v3')
-      window.localStorage.setItem('_histoire-ui-canvas', JSON.stringify({ version: 3, zoomByArrange: { single: 'fit', grid: 'fit', list: 'selection', matrix: 'fit' }, tool: 'select', frameBackground: 'transparent' }))
-      window.localStorage.setItem('_histoire-ui-shell', JSON.stringify({ pane: 'stories', panelOpen: false, inspectorOpen: false, panelWidth: 280, inspectorWidth: 344 }))
-    },
-  })
-  cy.get('[data-frame-id] iframe').should('be.visible')
-  cy.get(widthHandle).should('be.visible')
-}
 
 /** Drag one grip through native pointer capture and document listeners. */
 function drag(selector, deltaX, deltaY) {
@@ -32,7 +19,7 @@ function drag(selector, deltaX, deltaY) {
 }
 
 describe('single variant resizing', () => {
-  it('resizes with pointer and keyboard, retains document, and restores persisted dimensions', () => {
+  it('resizes with pointer and keyboard, retains document, and persists canonical dimensions', () => {
     visitSingle()
     cy.get('[data-frame-id] iframe').then(($iframe) => {
       const iframe = $iframe[0]
@@ -54,17 +41,24 @@ describe('single variant resizing', () => {
       cy.get('[data-frame-id] iframe').should($current => expect($current[0], 'retained variant document').to.equal(iframe))
     })
 
-    cy.get(widthHandle).invoke('attr', 'aria-valuenow').as('savedWidth')
-    cy.get(heightHandle).invoke('attr', 'aria-valuenow').as('savedHeight')
+    cy.get(widthHandle).invoke('attr', 'aria-valuenow').as('savedWidth', { type: 'static' })
+    cy.get(heightHandle).invoke('attr', 'aria-valuenow').as('savedHeight', { type: 'static' })
     cy.reload()
     cy.get(widthHandle).should('be.visible')
-    cy.get('@savedWidth').then(width => cy.get(widthHandle).should('have.attr', 'aria-valuenow', width))
-    cy.get('@savedHeight').then(height => cy.get(heightHandle).should('have.attr', 'aria-valuenow', height))
+    // Single-mode sizing intent is workbench memory; canonical dimensions persist separately.
+    cy.get('@savedWidth').then(width => cy.window().should((window) => {
+      expect(JSON.parse(window.localStorage.getItem('_histoire-sandbox-settings-v3')).responsiveWidth).to.equal(Number(width))
+    }))
+    cy.get('@savedHeight').then(height => cy.window().should((window) => {
+      expect(JSON.parse(window.localStorage.getItem('_histoire-sandbox-settings-v3')).responsiveHeight).to.equal(Number(height))
+    }))
 
+    setSingleViewportSize(2000, 1200)
     cy.get('button[aria-label="Viewport"]').click()
     cy.contains('[role="dialog"] button', /^Responsive/).click()
-    cy.get('@savedWidth').then(savedWidth => cy.get(widthHandle).should(($handle) => {
-      expect($handle.attr('aria-valuenow'), 'Responsive width').not.to.equal(savedWidth)
-    }))
+    cy.get(widthHandle).should(($handle) => {
+      const surface = $handle[0].closest('.histoire-single-variant')
+      expect(Number($handle.attr('aria-valuenow')), 'Responsive width').to.equal(surface.clientWidth)
+    })
   })
 })

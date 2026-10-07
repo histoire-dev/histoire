@@ -27,12 +27,11 @@ import { createCanvasFrameState } from './frame-state.js'
 import FrameGrid from './FrameGrid.vue'
 import FrameList from './FrameList.vue'
 import { type CanvasSize, clientToCanvas } from './pan/usePanZoom.js'
-import { usePointerPan } from './pan/usePointerPan.js'
-import { useSpacePan } from './pan/useSpacePan.js'
 import { selectedSingleFrame, singleViewportSettings } from './single-viewport.js'
 import { bindStoryCanvasView } from './story-view-binding.js'
 import { useCanvasGeometry } from './useCanvasGeometry.js'
 import { useCanvasHeaderOcclusion } from './useCanvasHeaderOcclusion.js'
+import { useCanvasPan } from './useCanvasPan.js'
 import { useSingleVariantGeometry } from './useSingleVariantGeometry.js'
 import { createCanvasViewportEvents } from './viewport-events.js'
 
@@ -66,6 +65,7 @@ const viewport = ref<HTMLElement>()
 const toolbar = ref<HTMLElement>()
 const header = ref<HTMLElement>()
 const panHint = ref<InstanceType<typeof CanvasStatus>>()
+const singleVariant = ref<InstanceType<typeof CanvasSingleVariant>>()
 const cachedStory = shallowRef<HistoireCatalogStory>()
 const cachedVariantId = ref<string | null>(null)
 const currentStory = computed(() => snapshot.value.catalog.stories.find(story => story.id === snapshot.value.selection?.storyId))
@@ -87,12 +87,6 @@ const viewBinding = bindStoryCanvasView({
   canvas,
   views: useStoryCanvasViews(),
 })
-/** Document mode keeps native scroll/input and suspends camera gestures. */
-const cameraEnabled = () => renderedArrange.value !== 'single'
-const space = useSpacePan({ enabled: cameraEnabled, getTool: () => canvas.tool, getRoot: () => viewport.value })
-const pointer = usePointerPan({ enabled: cameraEnabled, getTool: () => canvas.tool, getSpace: () => space.held.value, getOffset: () => canvas.panOffset, setOffset: canvas.setPanOffset, onActive: value => canvas.panning = value })
-provideCanvasPointerPan(pointer)
-const panning = computed(() => cameraEnabled() && (canvas.tool === 'pan' || space.held.value || canvas.panning))
 const size = computed(() => {
   const settings = snapshot.value.settings
   return { width: settings.rotate && settings.responsiveHeight ? settings.responsiveHeight : settings.responsiveWidth, height: settings.rotate ? settings.responsiveWidth : settings.responsiveHeight ?? 640 }
@@ -120,6 +114,8 @@ const variantsById = computed(() => new Map(story.value?.variants.map(variant =>
 const selectedFrame = computed(() => frames.value.find(frame => frame.variantId === (snapshot.value.selection?.variantId ?? (diagnostics.value.length ? cachedVariantId.value : null))))
 const selectedVariant = computed(() => selectedFrame.value ? variantsById.value.get(selectedFrame.value.variantId) : undefined)
 const singleResizable = computed(() => !props.uiHidden && !selectedVariant.value?.responsiveDisabled)
+const { space, pointer, panning } = useCanvasPan({ canvas, viewport: () => viewport.value, arrangement: () => renderedArrange.value, frameId: () => selectedFrame.value?.id, single: () => singleVariant.value })
+provideCanvasPointerPan(pointer)
 /** Bound canvas DOM to visible frames while retaining selected inspector ownership. */
 const renderedFrames = computed(() => {
   const visible = visibleCanvasFrames(frames.value, canvasViewport.value)
@@ -154,7 +150,7 @@ const { insets: contentInsets, headerBounds, measure } = useCanvasGeometry({
   toolbar: () => toolbar.value,
   header: () => header.value,
   footer: () => panHint.value?.$el,
-  temporaryPan: () => space.held.value || canvas.panning,
+  temporaryPan: () => renderedArrange.value === 'single' ? panning.value : space.held.value || canvas.panning,
   onMeasure(size, insets) {
     if (renderedArrange.value === 'single') return measureSingle(size, insets)
     if (renderedArrange.value === 'matrix') {
@@ -226,10 +222,6 @@ watch(() => snapshot.value.selection?.variantId, (value) => {
 }, { immediate: true })
 // Matrix may temporarily render as Grid while its axes are unavailable; zoom follows actual canvas content.
 watch(renderedArrange, (arrangement) => {
-  if (arrangement === 'single') {
-    pointer.release()
-    space.release()
-  }
   if (viewBinding.isActiveStory(story.value?.id)) canvas.setArrangement(arrangement)
 }, { flush: 'sync', immediate: true })
 watch([frames, () => selectedFrame.value?.id, () => props.inspectorWidth, () => props.uiHidden, renderedArrange, story, panning], measure, { flush: 'post' })
@@ -268,7 +260,7 @@ defineExpose({ canvas, registry })
         <CanvasHeader :story="story" :can-open-in-editor="canOpenInEditor" @open-in-editor="openInEditor" />
       </slot>
     </div>
-    <CanvasSingleVariant v-if="renderedArrange === 'single' && story" :area="singleArea" :frame="selectedFrame" :variant="selectedVariant" :preview-base="previewBase" :stale="diagnostics.length > 0" :resizable="singleResizable" @resize="resizeSingleViewport" @contextmenu="(event, target) => emit('contextmenu', event, target)" />
+    <CanvasSingleVariant v-if="renderedArrange === 'single' && story" ref="singleVariant" :area="singleArea" :frame="selectedFrame" :variant="selectedVariant" :preview-base="previewBase" :stale="diagnostics.length > 0" :resizable="singleResizable" @resize="resizeSingleViewport" @contextmenu="(event, target) => emit('contextmenu', event, target)" />
     <slot v-else-if="renderedArrange === 'matrix'" name="matrix" :canvas="canvas" :frames="registry" :size="size" :content-insets="contentInsets" :frame-budget="frameBudget" :preview-base="previewBase" />
     <component :is="renderedArrange === 'list' ? FrameList : FrameGrid" v-else :frames="renderedFrames">
       <template #default="{ frame }">

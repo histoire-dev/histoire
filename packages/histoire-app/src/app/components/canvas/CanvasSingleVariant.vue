@@ -7,6 +7,7 @@ import { useCanvasStore } from '../../composables/canvas-settings.js'
 import WorkbenchEmptyState from '../shell/WorkbenchEmptyState.vue'
 import CanvasFrame from './CanvasFrame.vue'
 import SingleVariantResizeHandles from './SingleVariantResizeHandles.vue'
+import { useSingleVariantPan } from './useSingleVariantPan.js'
 import { useSingleVariantZoom } from './useSingleVariantZoom.js'
 
 const props = defineProps<{
@@ -29,6 +30,8 @@ const frameShell = ref<HTMLElement>()
 const resizing = ref(false)
 const canvas = useCanvasStore()
 useSingleVariantZoom(canvas, surface, { area: () => props.area, size: () => props.frame, frameId: () => props.frame?.id })
+const pan = useSingleVariantPan(surface, { area: () => props.area, size: () => props.frame, zoom: () => canvas.effectiveZoom, resizing: () => resizing.value })
+defineExpose(pan)
 
 /** Freeze Responsive and Fit only after one effective direct-resize change. */
 function startResize(): void {

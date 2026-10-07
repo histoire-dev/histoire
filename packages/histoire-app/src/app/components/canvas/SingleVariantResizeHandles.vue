@@ -120,11 +120,12 @@ onBeforeUnmount(() => {
 .histoire-single-resize-handle::after { content: ''; position: absolute; border-radius: 1px; background: transparent; }
 .histoire-single-resize-handle:hover::after, .histoire-single-resize-handle:focus-visible::after, .histoire-single-resize-handles[data-active="true"] .histoire-single-resize-handle::after { background: var(--histoire-accent); }
 .histoire-single-resize-handle:focus-visible { outline: 2px solid var(--histoire-accent); outline-offset: -2px; }
-.is-width { inset-block: 0 12px; inset-inline-end: -6px; width: 12px; cursor: ew-resize; }
+/* Grips must not create scrollbars or false camera overflow when frame fits exactly. */
+.is-width { inset-block: 0 12px; inset-inline-end: 0; width: 12px; cursor: ew-resize; }
 .is-width::after { inset-block: 0; inset-inline-start: 5px; width: 2px; }
-.is-height { inset-inline: 0 12px; bottom: -6px; height: 12px; cursor: ns-resize; }
+.is-height { inset-inline: 0 12px; bottom: 0; height: 12px; cursor: ns-resize; }
 .is-height::after { inset-inline: 0; top: 5px; height: 2px; }
-.is-both { inset-inline-end: -6px; bottom: -6px; width: 18px; height: 18px; cursor: nwse-resize; }
+.is-both { inset-inline-end: 0; bottom: 0; width: 18px; height: 18px; cursor: nwse-resize; }
 .is-both::after { inset-inline-end: 5px; bottom: 5px; width: 6px; height: 6px; border-inline-end: 2px solid transparent; border-bottom: 2px solid transparent; background: transparent !important; }
 .is-both:hover::after, .histoire-single-resize-handles[data-active="true"] .is-both::after { border-color: var(--histoire-accent); }
 </style>

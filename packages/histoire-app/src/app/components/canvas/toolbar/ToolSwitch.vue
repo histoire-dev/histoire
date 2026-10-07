@@ -13,8 +13,8 @@ const measureAvailable = computed(() => canMeasureFrame(canvas.selectedFrame ? f
 
 <template>
   <div class="histoire-tool-switch histoire-button-group-options" role="group" aria-label="Canvas tool">
-    <ToolbarButton menu-role="menuitemradio" label="Select" icon="cursor-1" :shortcut="shortcuts?.hint('canvas.select')" :pressed="canvas.tool === 'select' || (canvas.arrangement === 'single' && canvas.tool === 'pan')" @click="canvas.setTool('select')" />
-    <ToolbarButton v-if="canvas.arrangement !== 'single'" menu-role="menuitemradio" label="Pan" icon="move" :shortcut="shortcuts?.hint('canvas.pan')" :pressed="canvas.tool === 'pan'" @click="canvas.setTool('pan')" />
+    <ToolbarButton menu-role="menuitemradio" label="Select" icon="cursor-1" :shortcut="shortcuts?.hint('canvas.select')" :pressed="canvas.tool === 'select'" @click="canvas.setTool('select')" />
+    <ToolbarButton menu-role="menuitemradio" label="Pan" icon="move" :shortcut="shortcuts?.hint('canvas.pan')" :pressed="canvas.tool === 'pan'" @click="canvas.setTool('pan')" />
     <ToolbarButton menu-role="menuitemradio" label="Measure" icon="ruler" :shortcut="shortcuts?.hint('canvas.measure')" :pressed="canvas.tool === 'measure'" :disabled="!measureAvailable" :description="measureAvailable ? undefined : 'Measurement isn’t available for this story'" @click="canvas.setTool('measure')" />
   </div>
 </template>

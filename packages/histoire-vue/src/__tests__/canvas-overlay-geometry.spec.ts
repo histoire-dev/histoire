@@ -76,6 +76,7 @@ async function canvasFixture(zoom: number | 'fit' = 'fit', initialHeight = 900, 
   /** Native observer delivery and Vue feedback settle fixed-pixel frame layout. */
   async function resize() {
     observers.deliver()
+    await new Promise(requestAnimationFrame)
     await flushPromises()
   }
   return { wrapper, component, canvas, geometry, observers, fixture, session, matrix, arrange, inspectorWidth, resize }

@@ -30,6 +30,8 @@ export function useCanvasGeometry(options: CanvasGeometryOptions) {
   const headerBounds = shallowRef<CanvasHeaderBounds>()
   const elements = [options.viewport, options.toolbar, options.header, options.footer]
   let observer: ResizeObserver | undefined
+  let scheduled = 0
+  let active = true
   const observed = new Set<HTMLElement>()
 
   /** Ignore empty slot hosts and absent or hidden chrome. */
@@ -54,6 +56,15 @@ export function useCanvasGeometry(options: CanvasGeometryOptions) {
     options.onMeasure({ width: viewport.width, height: viewport.height }, insets.value)
   }
 
+  /** Geometry publication can resize descendants; defer beyond native observer delivery. */
+  function scheduleMeasure(): void {
+    if (!active || scheduled) return
+    scheduled = requestAnimationFrame(() => {
+      scheduled = 0
+      if (active) measure()
+    })
+  }
+
   /** Rebind conditional headers and component roots while retaining one observer owner. */
   function observe() {
     if (!observer) return
@@ -75,10 +86,12 @@ export function useCanvasGeometry(options: CanvasGeometryOptions) {
 
   watch(elements, observe, { flush: 'post' })
   onMounted(() => {
-    observer = new ResizeObserver(measure)
+    observer = new ResizeObserver(scheduleMeasure)
     observe()
   })
   onBeforeUnmount(() => {
+    active = false
+    cancelAnimationFrame(scheduled)
     observer?.disconnect()
     observed.clear()
   })
