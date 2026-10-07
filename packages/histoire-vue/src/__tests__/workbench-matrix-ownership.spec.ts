@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest'
-import { createCanvasArrangement } from '../../../histoire-app/src/app/components/canvas/frame-arrangement.js'
 import { createMatrixStore } from '../../../histoire-app/src/app/stores/matrix.js'
 import { createEmbedSnapshot } from '../../../histoire/src/node/__tests__/utils/embed/catalog.js'
 
@@ -30,33 +29,53 @@ describe('matrix metadata runtime ownership', () => {
     observer.close()
     store.close()
   })
-  it('bootstraps restored chooser Matrix intent through ordinary previews and retains empty filters', () => {
+  it('retains chooser preferences through discovery and source invalidation', () => {
     const saved = JSON.stringify({ rows: 'enabled', cols: 'emphasized', rowValues: [], base: {} })
     const store = createMatrixStore({ storage: { getItem: () => saved, setItem: () => {} } })
     const chooser = matrixSnapshot(null)
-    const rendered = createCanvasArrangement(() => 'matrix', store)
     store.synchronize(chooser)
-    expect(rendered.value).toBe('grid')
+    expect(store.metadataReady.value).toBe(false)
     const observer = store.registerRuntimeObserver()
     observer.capture(matrixSnapshot())
-    expect(rendered.value).toBe('matrix')
+    expect(store.metadataReady.value).toBe(true)
     expect(store.cells.value).toEqual([])
     expect(chooser.selection?.variantId).toBeNull()
     observer.close()
     store.synchronize(chooser)
-    expect(rendered.value).toBe('matrix')
     chooser.source!.epoch = 'epoch-2'
     store.synchronize(chooser)
-    expect(rendered.value).toBe('grid')
+    expect(store.metadataReady.value).toBe(false)
     const successor = store.registerRuntimeObserver()
     successor.capture(matrixSnapshot())
-    expect(rendered.value).toBe('grid')
+    expect(store.metadataReady.value).toBe(false)
     const current = matrixSnapshot()
     current.source!.epoch = 'epoch-2'
     successor.capture(current)
-    expect(rendered.value).toBe('matrix')
+    expect(store.metadataReady.value).toBe(true)
     expect(store.rowValues.value).toEqual([])
     successor.close()
+    store.close()
+  })
+
+  it('finishes discovery even when ready runtime has zero or one usable axes', () => {
+    const store = createMatrixStore()
+    const chooser = matrixSnapshot(null)
+    store.synchronize(chooser)
+    expect(store.metadataReady.value).toBe(false)
+    const observer = store.registerRuntimeObserver()
+    const empty = matrixSnapshot()
+    empty.state!.value = { message: 'Open string domain' }
+    observer.capture(empty)
+    expect(store.metadataReady.value).toBe(true)
+    expect(store.usableAxes.value).toEqual([])
+    expect(store.available.value).toBe(false)
+    const single = matrixSnapshot()
+    single.state!.value = { disabled: false, color: 'green' }
+    observer.capture(single)
+    expect(store.metadataReady.value).toBe(true)
+    expect(store.usableAxes.value).toEqual([{ name: 'disabled', values: [false, true] }])
+    expect(store.available.value).toBe(false)
+    observer.close()
     store.close()
   })
 

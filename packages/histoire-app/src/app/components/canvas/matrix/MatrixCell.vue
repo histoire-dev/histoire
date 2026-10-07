@@ -83,7 +83,7 @@ onBeforeUnmount(() => {
     <div class="histoire-matrix-cell-content" :style="style">
       <CanvasReplicaPreview v-if="live" :key="variantId" ref="preview" :frame-id="frame.id" :story-id="frame.storyId" :variant-id="variantId" :preview-base="previewBase" :props-override="cell.props" @status="updateStatus" />
     </div>
-    <HstButton color="flat" class="histoire-matrix-cell-select" type="button" :aria-label="`Select matrix cell ${cell.row} · ${cell.col}`" :aria-pressed="matrix.selectedCell.value?.key === cell.key" @click="matrix.selectCell(cell.key)" @keydown="onKeyDown" />
+    <button class="histoire-matrix-cell-select" type="button" :aria-label="`Select matrix cell ${cell.row} · ${cell.col}`" :aria-pressed="matrix.selectedCell.value?.key === cell.key" @click="matrix.selectCell(cell.key)" @keydown="onKeyDown" />
     <span v-if="!live" class="histoire-matrix-cell-placeholder">Not rendered</span>
     <div v-else-if="status === 'loading'" class="histoire-matrix-cell-loading" role="status" aria-label="Loading variant">
       <CanvasLoadingIndicator />
@@ -101,8 +101,9 @@ onBeforeUnmount(() => {
 .histoire-matrix-cell { position: absolute; overflow: hidden; border: 1px solid var(--histoire-border); border-radius: 7px; background: white; }
 .histoire-matrix-cell[data-selected="true"] { outline: 2px solid var(--histoire-accent); outline-offset: -1px; }
 .histoire-matrix-cell-content { transform-origin: top left; }
-.histoire-matrix-cell-select { position: absolute; inset: 0; width: 100%; padding: 0; }
-.histoire-matrix-cell-select:focus-visible { outline-offset: -3px; }
+/* Full-frame hit target stays transparent instead of inheriting control hover/pressed fills. */
+.histoire-matrix-cell-select { position: absolute; inset: 0; width: 100%; margin: 0; padding: 0; border: 0; border-radius: inherit; background: transparent; cursor: pointer; appearance: none; }
+.histoire-matrix-cell-select:focus-visible { outline: 2px solid var(--histoire-accent); outline-offset: -3px; }
 .histoire-matrix-cell-placeholder, .histoire-matrix-cell-loading, .histoire-matrix-cell-error { position: absolute; inset: 0; display: grid; place-content: center; gap: 8px; padding: 12px; color: var(--histoire-muted); background: var(--histoire-input); font-size: 11px; text-align: center; pointer-events: none; }
 .histoire-matrix-cell-error { color: var(--histoire-danger); background: var(--histoire-danger-soft); }
 .histoire-matrix-cell-error button { padding: 3px 8px; color: inherit; pointer-events: auto; }

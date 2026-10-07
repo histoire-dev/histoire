@@ -10,6 +10,7 @@ import { useCanvasFrameAdmission } from '../frame-admission.js'
 import { canvasContentRect, clientToCanvas } from '../pan/usePanZoom.js'
 import { layoutMatrixFrames, MATRIX_COLUMN_HEADER, MATRIX_ROW_GUTTER, MATRIX_TOP_INSET, matrixLayoutBounds } from './matrix-layout.js'
 import { watchMatrixFrameSelection } from './matrix-selection.js'
+import MatrixAvailabilityState from './MatrixAvailabilityState.vue'
 import MatrixAxisBar from './MatrixAxisBar.vue'
 import MatrixCell from './MatrixCell.vue'
 
@@ -28,6 +29,8 @@ const props = defineProps<{
   contentInsets?: CanvasContentInsets
   /** Hide matrix controls and guidance while retaining coordinate labels. */
   uiHidden?: boolean
+  /** Current hidden discovery runtime failed before usable axes arrived. */
+  discoveryFailed?: boolean
 }>()
 const emit = defineEmits<{ axes: [value: { rows: string, cols: string }], error: [error: unknown] }>()
 const canvas = useCanvasStore()
@@ -88,15 +91,12 @@ onMounted(() => {
 
 <template>
   <div class="histoire-matrix-view">
-    <div v-if="!uiHidden" class="histoire-matrix-axis-position">
+    <div v-if="!uiHidden && matrix.available.value" class="histoire-matrix-axis-position">
       <MatrixAxisBar @axes="emit('axes', $event)" />
     </div>
-    <p v-if="!uiHidden && !matrix.available.value" class="histoire-matrix-empty">
-      Waiting for two finite prop axes. Boolean props and matrix hints supply values.
-    </p>
-    <p v-else-if="!uiHidden && !matrix.cells.value.length" class="histoire-matrix-empty">
-      No values selected. Enable row and column values in Props.
-    </p>
+    <div v-if="!uiHidden && (!matrix.available.value || !matrix.cells.value.length)" class="histoire-matrix-empty">
+      <MatrixAvailabilityState :failed="discoveryFailed" />
+    </div>
     <div v-else class="histoire-matrix-board" :style="{ top: `${topInset}px` }">
       <!-- Keep world coordinates unchanged while clipping beneath fixed chrome. -->
       <div class="histoire-matrix-board-world" :style="{ top: `${-topInset}px` }">
@@ -117,5 +117,6 @@ onMounted(() => {
 .histoire-matrix-row-label, .histoire-matrix-col-label { position: absolute; overflow: hidden; color: var(--histoire-muted); font-family: var(--histoire-font-mono); font-size: 11px; white-space: nowrap; text-overflow: ellipsis; }
 .histoire-matrix-row-label { transform: translateY(-50%); padding-inline-end: 12px; }
 .histoire-matrix-col-label { text-align: center; }
-.histoire-matrix-empty { position: absolute; top: 184px; inset-inline-start: var(--histoire-canvas-info-inset); inline-size: min(40ch, calc(100% - var(--histoire-canvas-inspector-reserve) - 72px)); margin: 0; color: var(--histoire-muted); }
+.histoire-matrix-empty { position: absolute; inset: 184px calc(var(--histoire-canvas-inspector-reserve) + var(--histoire-canvas-info-inset)) 24px var(--histoire-canvas-info-inset); display: grid; place-items: center; overflow: auto; }
+.histoire-matrix-empty :deep(.workbench-state) { max-width: 52ch; margin: 24px 0; }
 </style>

@@ -32,6 +32,8 @@ export function createMatrixStore(options: { storage?: MatrixStorage } = {}) {
   const storyId = shallowRef('')
   const axes = shallowRef<readonly MatrixAxis[]>([])
   const props = shallowRef<readonly MatrixProp[]>([])
+  /** A ready projection can contain zero axes; availability is a separate question. */
+  const metadataReady = shallowRef(false)
   const state = shallowRef<MatrixPreferences>({ rows: '', cols: '', base: {} })
   const provisional = shallowRef<Pick<MatrixPreferences, 'rows' | 'cols' | 'rowValues' | 'colValues'>>()
   const effective = computed(() => ({ ...state.value, ...provisional.value }))
@@ -95,12 +97,13 @@ export function createMatrixStore(options: { storage?: MatrixStorage } = {}) {
     update({ ...axisPreferences(row, col, effective.value), base })
   }
   /** Source publications update candidates, retaining saved edits per exact story. */
-  function activate(id: string, candidates: readonly MatrixAxis[], base: Record<string, unknown>, query: { rows?: string, cols?: string } = {}, hints: readonly string[] = [], fields?: readonly MatrixProp[], metadataReady = true): void {
+  function activate(id: string, candidates: readonly MatrixAxis[], base: Record<string, unknown>, query: { rows?: string, cols?: string } = {}, hints: readonly string[] = [], fields?: readonly MatrixProp[], ready = true): void {
     if (closed) return
     const changed = storyId.value !== id
     storyId.value = id
     axes.value = candidates
     props.value = fields ?? discoverMatrixProps(base)
+    metadataReady.value = ready
     hintedNames = hints
     // Preset/runtime values seed untouched props. Only explicit edits survive
     // a preset switch, and defaults are never mistaken for persisted overrides.
@@ -118,7 +121,7 @@ export function createMatrixStore(options: { storage?: MatrixStorage } = {}) {
       state.value = { rows: typeof saved?.rows === 'string' ? saved.rows : '', cols: typeof saved?.cols === 'string' ? saved.cols : '', rowValues: Array.isArray(saved?.rowValues) ? saved.rowValues : undefined, colValues: Array.isArray(saved?.colValues) ? saved.colValues : undefined, base: Object.fromEntries(Object.entries(saved?.base ?? {}).filter(([name]) => isMatrixPropName(name))) }
     }
     provisional.value = undefined
-    if (metadataReady) {
+    if (ready) {
       selectAxes(query.rows, query.cols)
     }
     else {
@@ -138,6 +141,7 @@ export function createMatrixStore(options: { storage?: MatrixStorage } = {}) {
       storyId.value = ''
       axes.value = []
       props.value = []
+      metadataReady.value = false
       selectedKey.value = undefined
       provisional.value = undefined
       return
@@ -147,7 +151,7 @@ export function createMatrixStore(options: { storage?: MatrixStorage } = {}) {
     const hints = snapshot.status === 'ready' && !snapshot.stale && snapshot.source ? story.matrix : undefined
     activate(story.id, discoverMatrixAxes(definitions, hints), projection?.base ?? {}, currentQuery, Object.keys(hints?.axes ?? {}), projection?.props ?? [], Boolean(projection))
   }
-  /** Grid mode discovers candidates using exact source, runtime and target ownership. */
+  /** All arrangements discover candidates using exact source, runtime and target ownership. */
   function synchronize(snapshot: HistoireReadonly<HistoireSnapshot>, query: { rows?: string, cols?: string } = {}): void {
     if (closed) return
     currentSnapshot = snapshot
@@ -206,6 +210,7 @@ export function createMatrixStore(options: { storage?: MatrixStorage } = {}) {
   /** Dispose local registrations; caller retains canonical session. */
   function close(): void {
     closed = true
+    metadataReady.value = false
     runtime.close()
     currentSnapshot = undefined
     sources.clear()
@@ -213,7 +218,7 @@ export function createMatrixStore(options: { storage?: MatrixStorage } = {}) {
     records.clear()
     storage = undefined
   }
-  return { storyId: computed(() => storyId.value), axes: computed(() => axes.value), props: computed(() => props.value), usableAxes, rowAxis, colAxis, cells, selectedCell, canCopy, rows: computed(() => effective.value.rows), cols: computed(() => effective.value.cols), rowValues: computed(() => effective.value.rowValues), colValues: computed(() => effective.value.colValues), base: baseProps, available: computed(() => usableAxes.value.length >= 2), activate, synchronize, selectAxes, setFilter, setBase, resetBase, swapAxes, selectCell, registerSource, sourceForSelected, registerRuntimeObserver: runtime.registerRuntimeObserver, restore, close }
+  return { storyId: computed(() => storyId.value), axes: computed(() => axes.value), props: computed(() => props.value), metadataReady: computed(() => metadataReady.value), usableAxes, rowAxis, colAxis, cells, selectedCell, canCopy, rows: computed(() => effective.value.rows), cols: computed(() => effective.value.cols), rowValues: computed(() => effective.value.rowValues), colValues: computed(() => effective.value.colValues), base: baseProps, available: computed(() => usableAxes.value.length >= 2), activate, synchronize, selectAxes, setFilter, setBase, resetBase, swapAxes, selectCell, registerSource, sourceForSelected, registerRuntimeObserver: runtime.registerRuntimeObserver, restore, close }
 }
 
 /** Injectable state belongs to one workbench, independent of canonical selection. */

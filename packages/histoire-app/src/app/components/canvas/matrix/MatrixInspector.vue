@@ -2,10 +2,11 @@
 import type { MatrixAxis, MatrixValue } from '../../../util/matrix.js'
 import { BuiltinIcon, HstButton, HstSelect } from '@histoire/controls/vue'
 import { useHistoireContext, useHistoireResource } from '@histoire/vue/internal'
-import { computed, ref, watch } from 'vue'
+import { computed, ref, useId, watch } from 'vue'
 import { useSelection } from '../../../composables/selection.js'
 import { useMatrixStore } from '../../../stores/matrix.js'
 import { filterMatrixValues, matrixVariantSnippet } from '../../../util/matrix.js'
+import WorkbenchEmptyState from '../../shell/WorkbenchEmptyState.vue'
 
 import MatrixBaseProp from './MatrixBaseProp.vue'
 
@@ -15,6 +16,8 @@ const context = useHistoireContext()
 const { session, story, variant } = useSelection()
 const copying = ref(false)
 const copied = ref(false)
+/** Connect toolbar label to the inline preset select. */
+const presetId = `histoire-matrix-preset-${useId()}`
 const fields = computed(() => matrix.props.value.filter(prop => prop.name !== matrix.rows.value && prop.name !== matrix.cols.value))
 const dimensions = computed(() => ([{ id: 'rows' as const, axis: matrix.rowAxis.value, filter: matrix.rowValues.value }, { id: 'cols' as const, axis: matrix.colAxis.value, filter: matrix.colValues.value }]).filter(dimension => dimension.axis))
 let active = true
@@ -62,14 +65,35 @@ async function copyVariant(): Promise<void> {
 <template>
   <div class="histoire-matrix-inspector">
     <div class="histoire-matrix-preset">
-      <BuiltinIcon icon="bookmark" :size="15" />
-      <HstSelect title="Base preset" layout="horizontal" :model-value="variant?.id ?? story?.variants[0]?.id" :options="(story?.variants ?? []).map(item => ({ value: item.id, label: item.title }))" @update:model-value="preset" />
-      <HstButton color="flat" type="button" aria-label="Reset matrix base props" @click="reset">
+      <label :for="presetId" class="histoire-matrix-preset-label">
+        <BuiltinIcon icon="bookmark" :size="16" />
+        <span>Base preset</span>
+      </label>
+      <HstSelect
+        :id="presetId"
+        title="Base preset"
+        layout="inline"
+        :model-value="variant?.id ?? story?.variants[0]?.id"
+        :options="(story?.variants ?? []).map(item => ({ value: item.id, label: item.title }))"
+        @update:model-value="preset"
+      />
+      <HstButton icon-only color="flat" type="button" aria-label="Reset matrix base props" title="Reset matrix base props" @click="reset">
         <BuiltinIcon icon="reset" :size="16" />
       </HstButton>
     </div>
     <div class="histoire-matrix-selected">
-      <span>Selected cell <strong>{{ matrix.selectedCell.value ? `${matrix.selectedCell.value.row} · ${matrix.selectedCell.value.col}` : 'None' }}</strong></span>
+      <span>Selected cell</span>
+      <dl v-if="matrix.selectedCell.value" class="histoire-matrix-selected-values">
+        <div>
+          <dt><code>{{ matrix.rowAxis.value!.name }}</code></dt>
+          <dd>{{ String(matrix.selectedCell.value.row) }}</dd>
+        </div>
+        <div>
+          <dt><code>{{ matrix.colAxis.value!.name }}</code></dt>
+          <dd>{{ String(matrix.selectedCell.value.col) }}</dd>
+        </div>
+      </dl>
+      <WorkbenchEmptyState v-else icon="grid" title="No cell selected" />
       <HstButton color="flat" type="button" :disabled="!matrix.canCopy.value || copying" @click="copyVariant">
         {{ copied ? 'Copied' : copying ? 'Copying…' : 'Save as variant' }}
       </HstButton>
@@ -98,14 +122,38 @@ async function copyVariant(): Promise<void> {
 </template>
 
 <style scoped>
-.histoire-matrix-inspector { padding: 0 16px 16px; }
-.histoire-matrix-preset > .histoire-select { flex: 1; }
-.histoire-matrix-preset { display: flex; align-items: center; gap: 8px; min-height: 34px; margin: 2px 0 14px;  }
-.histoire-matrix-preset > svg { color: var(--histoire-muted); }
-.histoire-matrix-preset > button { display: grid; place-items: center; width: 32px; height: 32px; }
-.histoire-matrix-selected { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 9px 10px; border-radius: 7px; background: var(--histoire-chip); font-size: 11px; color: var(--histoire-muted); }
-.histoire-matrix-selected strong { color: var(--histoire-text); }
-.histoire-matrix-selected button { white-space: nowrap; }
+.histoire-matrix-inspector { padding: 0 var(--histoire-inspector-gutter, 16px) 16px; }
+.histoire-matrix-preset {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  margin: 2px 0 20px;
+}
+.histoire-matrix-preset-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex: none;
+  color: var(--histoire-muted);
+  font-size: 12px;
+  white-space: nowrap;
+}
+.histoire-matrix-preset > .histoire-select {
+  flex: 1;
+  min-width: 0;
+}
+.histoire-matrix-preset > button {
+  color: var(--histoire-muted);
+}
+.histoire-matrix-selected { display: flex; flex-direction: column; gap: 10px; min-width: 0; padding: 12px; border: 1px solid var(--histoire-border); border-radius: var(--histoire-radius-panel); background: transparent; font-size: 11px; color: var(--histoire-muted); }
+.histoire-matrix-selected-values { display: flex; flex-direction: column; gap: 8px; margin: 0; color: var(--histoire-text); }
+.histoire-matrix-selected-values > div { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; }
+.histoire-matrix-selected-values :is(dt,dd) { min-width: 0; margin: 0; overflow-wrap: anywhere; }
+.histoire-matrix-selected-values code { font-family: var(--histoire-font-mono); }
+.histoire-matrix-selected-values dd { text-align: right; }
+.histoire-matrix-selected > .workbench-empty-state { margin: 8px 0; }
+.histoire-matrix-selected > button { width: 100%; white-space: nowrap; }
 .histoire-matrix-inspector h3 { margin: 22px 0 14px; color: var(--histoire-muted); font-size: 10px; font-weight: 800; text-transform: uppercase; }
 .histoire-matrix-axis-filter { margin-bottom: 16px; }
 .histoire-matrix-filter-title { display: flex; justify-content: space-between; gap: 8px; margin-bottom: 8px; font-family: var(--histoire-font-mono); font-size: 11px; }
