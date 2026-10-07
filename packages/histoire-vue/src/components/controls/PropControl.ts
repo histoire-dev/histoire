@@ -58,7 +58,7 @@ export const PropControl = defineComponent({
         'onUpdate:modelValue': patch,
       }
       const slots = {
-        'label-actions': () => h(HstButton, { 'color': 'flat', 'type': 'button', 'class': 'histoire-prop-control-reset', 'disabled': !present, 'aria-label': `Remove ${props.definition.name} override`, 'onClick': () => patch(undefined, true) }, {
+        'label-actions': () => h(HstButton, { 'color': 'flat', 'type': 'button', 'class': 'histoire-prop-control-reset', 'iconOnly': true, 'disabled': !present, 'aria-label': `Remove ${props.definition.name} override`, 'onClick': () => patch(undefined, true) }, {
           default: () => h(BuiltinIcon, { icon: 'carbon:reset', width: 16, height: 16, class: 'histoire-prop-control-reset-icon' }),
         }),
       }

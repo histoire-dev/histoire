@@ -8,6 +8,8 @@ defineProps<{
   color?: 'default' | 'primary' | 'flat'
   /** Link adapters retain native anchor semantics with same shared appearance. */
   as?: 'button' | 'a'
+  /** Square action containing only an icon or compact status indicator. */
+  iconOnly?: boolean
 }>()
 const dark = useControlsTheme()
 const button = ref<HTMLButtonElement | HTMLAnchorElement>()
@@ -19,7 +21,7 @@ defineExpose({ focus, element: button })
 </script>
 
 <template>
-  <component :is="as ?? 'button'" ref="button" :type="as === 'a' ? undefined : 'button'" class="histoire-button" :data-color="color ?? 'default'" :data-histoire-control-appearance="dark ? 'dark' : 'light'">
+  <component :is="as ?? 'button'" ref="button" :type="as === 'a' ? undefined : 'button'" class="histoire-button" :class="{ 'histoire-icon-button': iconOnly }" :data-color="color ?? 'default'" :data-histoire-control-appearance="dark ? 'dark' : 'light'">
     <slot />
   </component>
 </template>

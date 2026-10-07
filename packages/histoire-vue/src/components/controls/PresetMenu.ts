@@ -140,7 +140,7 @@ export const PresetMenu = defineComponent({
       onApplyHide: () => { visible = false },
       onHide: () => close(),
     }, {
-      default: () => h(HstButton, { 'color': 'flat', 'ref': (value: any) => { trigger.value = getControlElement(value) as HTMLButtonElement | null }, 'type': 'button', 'class': 'histoire-preset-trigger', 'aria-label': 'Manage presets', 'aria-haspopup': 'menu', 'aria-expanded': shown.value, 'disabled': props.disabled, 'onClick': () => shown.value ? close(true) : open(), 'onKeydown': (event: KeyboardEvent) => {
+      default: () => h(HstButton, { 'color': 'flat', 'ref': (value: any) => { trigger.value = getControlElement(value) as HTMLButtonElement | null }, 'type': 'button', 'class': 'histoire-preset-trigger', 'iconOnly': true, 'aria-label': 'Manage presets', 'aria-haspopup': 'menu', 'aria-expanded': shown.value, 'disabled': props.disabled, 'onClick': () => shown.value ? close(true) : open(), 'onKeydown': (event: KeyboardEvent) => {
         if (event.key !== 'ArrowDown' && event.key !== 'ArrowUp') return
         event.preventDefault()
         event.stopPropagation()

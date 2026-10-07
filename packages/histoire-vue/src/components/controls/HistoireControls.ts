@@ -141,14 +141,14 @@ export const HistoireControls = defineComponent({
         ? (slots.unavailable?.() ?? h('div', { role: 'status' }, 'Variant unavailable'))
         : h('div', { class: 'histoire-controls-presets' }, [
             h(StatePresets, { ref: presets, compact: props.compactPresets }),
-            h(HstButton, { 'color': 'flat', 'type': 'button', 'class': 'histoire-controls-reset', 'aria-label': 'Reset state', 'title': 'Reset state', 'disabled': !presets.value || presets.value.busy(), 'onClick': () => {
+            h(HstButton, { 'color': 'flat', 'type': 'button', 'class': 'histoire-controls-reset', 'iconOnly': true, 'aria-label': 'Reset state', 'title': 'Reset state', 'disabled': !presets.value || presets.value.busy(), 'onClick': () => {
               void presets.value?.reset()
             } }, { default: () => h(BuiltinIcon, { 'icon': 'carbon:reset', 'width': 16, 'height': 16, 'aria-hidden': 'true' }) }),
           ]),
       // Keep custom controls before detected props in Story Inspector and Explorer.
       // Unknown availability keeps this frame visible long enough for runtime readiness.
       h('div', { 'ref': container, 'class': 'histoire-custom-controls', 'data-test-id': 'story-controls-sandbox', 'style': hasControls.value === undefined
-        ? { position: 'fixed', left: '0', top: '0', opacity: 0, pointerEvents: 'none', width: `${context.root.value?.clientWidth ?? 420}px`, height: '32px', zIndex: -2147483647 }
+        ? { position: 'fixed', left: '0', top: '0', opacity: 0, pointerEvents: 'none', width: `${context.root.value ? context.size.value.width : 420}px`, height: '32px', zIndex: -2147483647 }
         : { visibility: hasControls.value ? 'visible' : 'hidden', height: hasControls.value ? 'auto' : '1px' } }),
       failure.value
         ? h('div', { class: 'histoire-controls-failure' }, [

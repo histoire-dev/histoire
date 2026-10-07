@@ -1,7 +1,7 @@
 import { createHistoireSessionWithAdapters } from '@histoire/sdk/internal'
 import { mount } from '@vue/test-utils'
 import { describe, expect, it, vi } from 'vitest'
-import { h, nextTick } from 'vue'
+import { h } from 'vue'
 import { sourceFixture } from '../../../histoire-sdk/src/__tests__/fixtures/session.js'
 import { GenericControls } from '../components/controls/GenericControls.js'
 import { HistoireProvider } from '../provider/HistoireProvider.js'
@@ -32,7 +32,7 @@ describe('generic controls JSON eligibility', () => {
     let wrapper: ReturnType<typeof mount> | undefined
     try {
       wrapper = mount(HistoireProvider, { props: { session }, slots: { default: () => h(GenericControls) } })
-      await nextTick()
+      await vi.waitFor(() => expect(wrapper?.find('button[aria-label="Remove settings override"]').exists()).toBe(true))
       expect(wrapper.findAll('output').map(output => output.text())).toEqual(['JSON editing unavailable', 'JSON editing unavailable'])
       const settingsReset = wrapper.get('button[aria-label="Remove settings override"]')
       expect(settingsReset.attributes('disabled')).toBeUndefined()
@@ -48,10 +48,10 @@ describe('generic controls JSON eligibility', () => {
       await wrapper.get('button[aria-label="Remove config override"]').trigger('click')
       await vi.waitFor(() => expect(session.getSnapshot().state?.value._hPropState[0]).toEqual({}))
       await session.state.patch({ graph: { editable: true } })
-      await nextTick()
+      await vi.waitFor(() => expect(wrapper.findAll('.cm-editor').length).toBeGreaterThan(0))
       expect(wrapper.text()).not.toContain('JSON editing unavailable')
       await session.state.patch({ graph: value })
-      await nextTick()
+      await vi.waitFor(() => expect(wrapper.text()).toContain('JSON editing unavailable'))
       expect(wrapper.text()).toContain('JSON editing unavailable')
       const current = session.getSnapshot().state!.value.graph
       if (kind === 'cycle') expect(current.self).toBe(current)

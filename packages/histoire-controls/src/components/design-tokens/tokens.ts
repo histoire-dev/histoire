@@ -21,7 +21,17 @@ export function flattenTokenShades(shades: Record<string, unknown>, path = '', r
   return result
 }
 
+/** Normalized token object passed through grid/list sample slots. */
+export interface ProcessedToken {
+  /** Stable source key used for search, rendering, and focus retention. */
+  key: string
+  /** Displayed token name. */
+  name: string
+  /** Original value shape, except numbers are normalized to strings. */
+  value: any
+}
+
 /** Normalize records once for grids/lists while preserving existing slot value contracts. */
-export function processTokens(tokens: Record<string, any>, getName?: (key: string, value: any) => string, search?: string) {
+export function processTokens(tokens: Record<string, any>, getName?: (key: string, value: any) => string, search?: string): ProcessedToken[] {
   return Object.entries(tokens).map(([key, value]) => ({ key, name: getName ? getName(key, value) : key, value: typeof value === 'number' ? String(value) : value })).filter(token => matchesToken(token.name, token.value, search))
 }

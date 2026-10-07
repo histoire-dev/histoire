@@ -6,6 +6,7 @@ export default { name: 'HstTokenGrid' }
 import { computed } from 'vue'
 import { useControlsTheme } from '../../utils'
 import HstTokenDetails from './HstTokenDetails.vue'
+import HstTokenVirtualRows from './HstTokenVirtualRows.vue'
 import { processTokens } from './tokens'
 
 const dark = useControlsTheme()
@@ -18,7 +19,9 @@ const props = withDefaults(defineProps<{
   getName?: (key: string, value: any) => string
   /** Literal search across displayed names and values. */
   search?: string
-}>(), { colSize: 180 })
+  /** Render a bounded native-document window for large generated token sets. */
+  virtualize?: boolean
+}>(), { colSize: 180, virtualize: false })
 /** Filter without assuming values have string length. */
 const processedTokens = computed(() => processTokens(props.tokens, props.getName, props.search))
 const colSizePx = computed(() => `${props.colSize}px`)
@@ -26,7 +29,22 @@ const colSizePx = computed(() => `${props.colSize}px`)
 
 <template>
   <slot v-if="!processedTokens.length" name="empty" />
-  <div :data-histoire-control-appearance="dark ? 'dark' : 'light'" class="histoire-token-grid htw-bind-col-size htw-grid htw-gap-4 htw-m-4" :style="{ '--histoire-col-size': colSizePx }">
+  <HstTokenVirtualRows
+    v-else-if="virtualize"
+    :tokens="processedTokens"
+    :col-size="colSize"
+    :dark="dark"
+    layout="grid"
+    class="histoire-token-grid htw-m-4"
+  >
+    <template #default="{ token }">
+      <div class="htw-flex htw-flex-col htw-gap-2 htw-min-w-0">
+        <slot :token="token" />
+        <HstTokenDetails :name="token.name" :value="token.value" :max-characters="colSize / 8" />
+      </div>
+    </template>
+  </HstTokenVirtualRows>
+  <div v-else :data-histoire-control-appearance="dark ? 'dark' : 'light'" class="histoire-token-grid htw-bind-col-size htw-grid htw-gap-4 htw-m-4" :style="{ '--histoire-col-size': colSizePx }">
     <div v-for="token of processedTokens" :key="token.key" class="htw-flex htw-flex-col htw-gap-2 htw-min-w-0">
       <slot :token="token" />
       <HstTokenDetails :name="token.name" :value="token.value" :max-characters="colSize / 8" />

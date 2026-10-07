@@ -1,5 +1,6 @@
 import type { MountApi, StoryOptions } from '../../vanilla-support/types.js'
 import type { TailwindSnapshot, TailwindTokenCategory } from '../types.js'
+import { markGeneratedStoryKnownEmpty } from '../../../generated-story-metadata.js'
 import { HstCopyIcon, HstNumber, HstText, HstTextarea, HstTokenGrid, HstTokenList, useControlsTheme } from '../../../vendors/controls.js'
 import { createApp, h } from '../../../vendors/vue.js'
 import { renderTokenSample, tailwindSampleCss } from './render.js'
@@ -17,8 +18,9 @@ function mount(api: MountApi, render: () => any, canvas = false) {
   const app = createApp({
     setup() {
       const dark = useControlsTheme()
+      // Canvas owns inspection backing; an opaque wrapper hides colors and checkerboards.
       return () => canvas
-        ? h('section', { 'class': 'histoire-wrapper histoire-tailwind-book', 'data-histoire-control-appearance': dark.value ? 'dark' : 'light', 'style': { background: 'var(--histoire-control-resolved-surface)', minHeight: '100vh', padding: '1px' } }, render())
+        ? h('section', { 'class': 'histoire-wrapper histoire-tailwind-book', 'data-histoire-control-appearance': dark.value ? 'dark' : 'light', 'style': { minHeight: '100vh', padding: '1px' } }, render())
         : render()
     },
   })
@@ -47,7 +49,7 @@ function controls(category: TailwindTokenCategory, state: Record<string, any>) {
 
 /** Generate compatible vanilla story while keeping immutable theme data separate from state. */
 export function createTailwindStory(snapshot: TailwindSnapshot, EmptyState: any): StoryOptions {
-  return {
+  const story: StoryOptions = {
     id: snapshot.source.id,
     title: snapshot.source.title,
     group: 'design-system',
@@ -55,20 +57,23 @@ export function createTailwindStory(snapshot: TailwindSnapshot, EmptyState: any)
     responsiveDisabled: true,
     layout: { type: 'single', iframe: true },
     variants: [
-      ...snapshot.categories.map(category => ({
-        id: category.id,
-        title: category.title,
-        icon: category.kind.startsWith('text') ? 'carbon:text-font' : 'carbon:color-palette',
-        onMount(api: MountApi) {
-          mount(api, () => {
-            const byKey = new Map(category.tokens.map(token => [token.key, token]))
-            const component = ['text', 'padding', 'margin', 'width', 'height', 'value'].includes(category.kind) ? HstTokenList : HstTokenGrid
-            return h('div', { 'data-tailwind-source': snapshot.source.id }, [
+      ...snapshot.categories.map((category) => {
+        // These immutable projections belong to category metadata, not render/update work.
+        const byKey = new Map(category.tokens.map(token => [token.key, token]))
+        const tokens = Object.fromEntries(category.tokens.map(token => [token.key, token.value]))
+        const component = ['text', 'padding', 'margin', 'width', 'height', 'value'].includes(category.kind) ? HstTokenList : HstTokenGrid
+        return {
+          id: category.id,
+          title: category.title,
+          icon: category.kind.startsWith('text') ? 'carbon:text-font' : 'carbon:color-palette',
+          onMount(api: MountApi) {
+            mount(api, () => h('div', { 'data-tailwind-source': snapshot.source.id }, [
               h('style', tailwindSampleCss),
               h(component, {
-                tokens: Object.fromEntries(category.tokens.map(token => [token.key, token.value])),
+                tokens,
                 getName: key => byKey.get(key)!.name,
                 search: api.state.search,
+                virtualize: true,
               }, {
                 default: ({ token }) => {
                   const entry = byKey.get(token.key)!
@@ -84,11 +89,11 @@ export function createTailwindStory(snapshot: TailwindSnapshot, EmptyState: any)
                 },
                 empty: () => h(EmptyState, { icon: 'search', title: 'No matching tokens' }),
               }),
-            ])
-          }, true)
-        },
-        onMountControls(api: MountApi) { mount(api, () => controls(category, api.state)) },
-      })),
+            ]), true)
+          },
+          onMountControls(api: MountApi) { mount(api, () => controls(category, api.state)) },
+        }
+      }),
       {
         id: 'full-config',
         title: 'Full Config',
@@ -97,4 +102,5 @@ export function createTailwindStory(snapshot: TailwindSnapshot, EmptyState: any)
       },
     ],
   }
+  return markGeneratedStoryKnownEmpty(story)
 }

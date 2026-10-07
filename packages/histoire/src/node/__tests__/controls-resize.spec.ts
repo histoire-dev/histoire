@@ -21,18 +21,20 @@ describe('controls intrinsic sizing', () => {
     }
     const runtime = runInNewContext(`${previewAppRoot()}; ({ root, observeControlsResize })`, {
       document,
+      window,
+      URLSearchParams,
       ResizeObserver: ControlsResizeObserver,
       postToParent: post,
       CONTROLS_RESIZE: 'resize',
-      initialSelection: { controls: false },
+      initialSelection: { controls: false, storyId: 'story', variantId: 'variant' },
     })
     const measure = vi.spyOn(runtime.root, 'getBoundingClientRect').mockReturnValue({ height: 180.5 })
     Object.defineProperty(document.documentElement, 'scrollHeight', { configurable: true, value: 800 })
     runtime.observeControlsResize()
     expect(observe).toHaveBeenCalledWith(runtime.root)
-    expect(post).toHaveBeenLastCalledWith({ type: 'resize', height: 181 })
+    expect(post).toHaveBeenLastCalledWith({ type: 'resize', storyId: 'story', variantId: 'variant', height: 181 })
     measure.mockReturnValue({ height: 60 })
     resize!()
-    expect(post).toHaveBeenLastCalledWith({ type: 'resize', height: 60 })
+    expect(post).toHaveBeenLastCalledWith({ type: 'resize', storyId: 'story', variantId: 'variant', height: 60 })
   })
 })

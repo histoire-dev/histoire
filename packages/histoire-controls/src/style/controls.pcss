@@ -46,7 +46,7 @@
 .histoire-prop-control:is(:hover, :focus-within) .histoire-control-label-actions { visibility: visible; opacity: 1; pointer-events: auto; }
 .histoire-prop-control .histoire-control-label,
 .histoire-prop-control-unavailable .histoire-control-label { align-items: center; }
-.histoire-prop-control-reset { width: 24px; height: 24px; padding: 0; border-radius: 6px; }
+.histoire-prop-control-reset { --histoire-icon-button-size: 24px; border-radius: 6px; }
 .histoire-prop-control-reset-icon { display: block; flex: none; color: var(--histoire-control-resolved-text); }
 .histoire-prop-control-unavailable { display: flex; flex-direction: column; gap: var(--histoire-control-gap, 8px); padding: var(--histoire-control-wrapper-padding, 8px); margin: 0 0 var(--histoire-control-margin, 10px); }
 .histoire-wrapper[data-layout="horizontal"] .histoire-control-label { width: auto; flex: none; }
@@ -73,6 +73,20 @@ textarea.histoire-control-field { resize: vertical; }
 .histoire-button-group-options { display: flex; flex-wrap: nowrap; gap: 3px; min-width: 0; padding: 3px; border-radius: 7px; background: var(--histoire-control-resolved-chip); }
 .histoire-button-group-options .histoire-button { flex: 1 1 0; min-width: 0; max-width: 100%; padding: max(2px, calc((var(--histoire-control-height, 34px) - 24px) / 2)) 8px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; border: 0; border-radius: 6px; color: var(--histoire-control-resolved-muted); }
 .histoire-button-group-options .histoire-button:is([aria-pressed="true"], [aria-selected="true"]) { color: var(--histoire-control-resolved-text); background: var(--histoire-control-resolved-surface); box-shadow: 0 1px 3px rgb(0 0 0 / .08); font-weight: 700; }
+/* Bound both axes so flex/grid stretching and surrounding button padding cannot
+   turn an icon action into a rectangle. Hosts customize only the shared size. */
+.histoire-button.histoire-icon-button, a.histoire-icon-button {
+  box-sizing: border-box;
+  display: inline-flex; align-items: center; justify-content: center;
+  flex: none;
+  width: var(--histoire-icon-button-size, var(--histoire-control-height, 32px));
+  height: var(--histoire-icon-button-size, var(--histoire-control-height, 32px));
+  min-width: var(--histoire-icon-button-size, var(--histoire-control-height, 32px));
+  max-width: var(--histoire-icon-button-size, var(--histoire-control-height, 32px));
+  min-height: var(--histoire-icon-button-size, var(--histoire-control-height, 32px));
+  max-height: var(--histoire-icon-button-size, var(--histoire-control-height, 32px));
+  padding: 0;
+}
 .histoire-switch-input { appearance: none; display: block; flex: none; width: 36px; height: 20px; margin: 0; border: 0; border-radius: 12px; background: var(--histoire-control-resolved-border); cursor: pointer; }
 .histoire-switch-input::before { content: ''; display: block; width: 16px; height: 16px; margin: 2px; border-radius: 50%; background: #fff; box-shadow: 0 1px 2px rgb(0 0 0 / .14); transition: transform 120ms ease-out; }
 .histoire-switch-input:checked { background: var(--histoire-control-resolved-accent); }

@@ -113,7 +113,7 @@ describe('tailwind Single variant workbench', () => {
       await expect.poll(() => surface.evaluate(element => [element.scrollLeft, element.scrollTop])).toEqual([0, 0])
       await page.setViewportSize({ width: 1400, height: 1000 })
       await page.getByRole('button', { name: 'Viewport', exact: true }).click()
-      await page.getByRole('button', { name: 'Responsive', exact: false }).click()
+      await page.getByRole('button', { name: 'Fill viewport', exact: false }).click()
       await expect.poll(() => runtime().evaluate('innerWidth')).toBeGreaterThan(390)
       expect(await iframe.getAttribute('src')).toBe(documentUrl)
       await expect.poll(() => !!controls(), { timeout: 15_000 }).toBe(true)
