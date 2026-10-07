@@ -3,6 +3,7 @@ import type { Highlighter } from 'shiki'
 import type { Story, Variant } from '../../types'
 import { HstCopyIcon } from '@histoire/controls'
 import { BuiltinIcon, getControlElement, HstButton, HstTextarea } from '@histoire/controls/vue'
+
 import { createHighlighter } from 'shiki'
 import { clientSupportPlugins } from 'virtual:$histoire-support-plugins-client'
 import { computed, nextTick, onMounted, ref, shallowRef, watch } from 'vue'

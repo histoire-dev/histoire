@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import type { SelectPrompt, SelectPromptOption } from '@histoire/shared'
 import { BuiltinIcon, getControlElement, HstButton, HstText } from '@histoire/controls/vue'
+
 import { computed, ref, watchEffect } from 'vue'
 import { useSelection } from '../../util/select.js'
 import BaseKeyboardShortcut from '../base/BaseKeyboardShortcut.vue'

@@ -7,6 +7,7 @@ import { computed, nextTick, ref, shallowRef, useId, watch } from 'vue'
 import { isContextMenuShortcut } from '../../composables/context-menu.js'
 import { useSelection } from '../../composables/selection.js'
 import { usePageOwnership } from '../pages/home/ownership.js'
+
 import { findChangedSourceLine } from './state.js'
 
 const emit = defineEmits<{ error: [error: unknown], contextmenu: [event: MouseEvent | KeyboardEvent] }>()

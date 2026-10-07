@@ -4,6 +4,7 @@ import { BuiltinIcon, HstButton } from '@histoire/controls/vue'
 import { requestHistoireOpenInEditor } from '@histoire/sdk/internal'
 import { HistoireDocs, useHistoireSession, useHistoireSnapshot } from '@histoire/vue'
 import { computed, nextTick, ref, watch } from 'vue'
+
 import { usePageOwnership } from '../home/ownership.js'
 import MarkdownOutline from './MarkdownOutline.vue'
 import MarkdownPager from './MarkdownPager.vue'

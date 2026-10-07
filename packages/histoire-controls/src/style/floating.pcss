@@ -2,5 +2,9 @@
 .v-popper { line-height: normal; }
 .v-popper__inner:has(.histoire-control-menu, .histoire-controls-options, .histoire-controls-tooltip, .histoire-control-popover) { display: flex; flex-direction: column; background: transparent; border: 0; box-shadow: none; overflow: visible; }
 .v-popper__inner > :is(.histoire-control-menu, .histoire-controls-options) { flex: 0 1 auto; min-height: 0; max-height: min(360px, 80vh); }
+.v-popper__popper:has(:is(.histoire-control-menu, .histoire-controls-options)[data-histoire-control-appearance="light"]) .v-popper__arrow-inner { border-color: var(--histoire-control-surface, var(--histoire-surface, #fff)); }
+.v-popper__popper:has(:is(.histoire-control-menu, .histoire-controls-options)[data-histoire-control-appearance="light"]) .v-popper__arrow-outer { border-color: var(--histoire-control-border, var(--histoire-border, #e4e4e7)); }
+.v-popper__popper:has(:is(.histoire-control-menu, .histoire-controls-options)[data-histoire-control-appearance="dark"]) .v-popper__arrow-inner { border-color: var(--histoire-control-surface, var(--histoire-surface, #16171b)); }
+.v-popper__popper:has(:is(.histoire-control-menu, .histoire-controls-options)[data-histoire-control-appearance="dark"]) .v-popper__arrow-outer { border-color: var(--histoire-control-border, var(--histoire-border, #26282d)); }
 .v-popper__popper:focus-visible { outline: none; }
 @media (prefers-reduced-motion: reduce) { .v-popper__wrapper { transition: none !important; } }

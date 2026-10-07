@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { BuiltinIcon, HstButton } from '@histoire/controls/vue'
+
 import { computed } from 'vue'
 import { usePreviewSettingsStore } from '../../stores/preview-settings'
 import { histoireConfig } from '../../util/config'

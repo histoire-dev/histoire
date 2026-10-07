@@ -6,6 +6,7 @@ import { computed, ref, watch } from 'vue'
 import { useSelection } from '../../../composables/selection.js'
 import { useMatrixStore } from '../../../stores/matrix.js'
 import { filterMatrixValues, matrixVariantSnippet } from '../../../util/matrix.js'
+
 import MatrixBaseProp from './MatrixBaseProp.vue'
 
 const emit = defineEmits<{ error: [error: unknown] }>()

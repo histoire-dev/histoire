@@ -9,6 +9,7 @@ import { screenshotFileDetails } from '../../../util/screenshot-file.js'
 import { snapshotScreenshotTargets } from '../../../util/screenshot-targets.js'
 import { onUiDisconnect, onUiEvent, sendUiEvent } from '../../../util/ui-channel.js'
 import { useCaptureDiscoveryPause } from '../../panes/tests/capture.js'
+
 import { useCanvasPreviewSettings } from './session-settings.js'
 import ToolbarPopover from './ToolbarPopover.vue'
 

@@ -3,6 +3,7 @@ import type { ClientCommand } from '@histoire/shared'
 import type { SearchResult } from '../../types'
 import type { SearchData } from './types'
 import { BuiltinIcon, getControlElement, HstText } from '@histoire/controls/vue'
+
 import { useDebounce, useFocus } from '@vueuse/core'
 import Fuse from 'fuse.js'
 import { registeredCommands } from 'virtual:$histoire-commands'

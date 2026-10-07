@@ -6,6 +6,7 @@ import { getHistoireTargetKey } from '@histoire/protocol'
 import { useHistoireSnapshot } from '@histoire/vue'
 import { useHistoireContext, useHistoireResource } from '@histoire/vue/internal'
 import { computed, ref, useId } from 'vue'
+
 import { useWorkbenchTestsModel } from './model.js'
 import TestsFilter from './TestsFilter.vue'
 import TestsSummary from './TestsSummary.vue'

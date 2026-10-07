@@ -3,6 +3,7 @@ import type { InspectorTab } from './state.js'
 import { BuiltinIcon, HstButton } from '@histoire/controls/vue'
 import { computed, ref } from 'vue'
 import PulsatingDisc from '../base/PulsatingDisc.vue'
+
 import { getInspectorTabs } from './state.js'
 
 const props = defineProps<{

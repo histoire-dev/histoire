@@ -2,6 +2,7 @@
 import type { Story, Variant } from '../../types'
 import { HstCopyIcon } from '@histoire/controls'
 import { BuiltinIcon, HstButton } from '@histoire/controls/vue'
+
 import { useResizeObserver } from '@vueuse/core'
 import { computed, ref, toRefs } from 'vue'
 import { usePreviewSettingsStore } from '../../stores/preview-settings'

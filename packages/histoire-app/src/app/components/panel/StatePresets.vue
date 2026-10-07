@@ -2,6 +2,7 @@
 import type { Story, Variant } from '../../types'
 import { BuiltinIcon, getControlElement, HstText } from '@histoire/controls/vue'
 import { applyState, clone, omit } from '@histoire/shared'
+
 import { onClickOutside, useStorage, useTimeoutFn } from '@vueuse/core'
 import { computed, nextTick, onMounted, ref } from 'vue'
 import { toRawDeep } from '../../util/state'

@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { BuiltinIcon, HstButton, HstNumber } from '@histoire/controls/vue'
+
 import { usePreviewSettingsStore } from '../../stores/preview-settings'
 import { histoireConfig } from '../../util/config'
 import BaseCheckbox from '../base/BaseCheckbox.vue'

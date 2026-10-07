@@ -2,6 +2,7 @@
 import { BuiltinIcon, getControlElement, HstButton } from '@histoire/controls/vue'
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { useAgentsStore } from '../../stores/agents.js'
+
 import './agents.css'
 
 /** Provider owns permission authority; static/embedded surfaces omit it. */

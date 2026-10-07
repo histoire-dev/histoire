@@ -6,6 +6,7 @@ import { useHistoireSession, useHistoireSnapshot } from '@histoire/vue'
 import { computed, defineAsyncComponent } from 'vue'
 import { histoireConfig } from '../../../util/config.js'
 import { useWorkbenchTestsModel } from '../../panes/tests/model.js'
+
 import BrowseSections from './BrowseSections.vue'
 import { browseSections, orderedStories } from './catalog.js'
 import GuidesList from './GuidesList.vue'

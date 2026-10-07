@@ -5,6 +5,7 @@ import { ACP_PRESETS } from '@histoire/shared'
 import { computed, shallowRef } from 'vue'
 import { useAgentsStore } from '../../../stores/agents.js'
 import { histoireConfig } from '../../../util/config.js'
+
 import AgentPresetRow from './AgentPresetRow.vue'
 import SaveToProject from './SaveToProject.vue'
 import './agents-settings.css'
