@@ -44,7 +44,7 @@ describe('independent docs/source panels', () => {
     expect(wrapper.find('script').exists()).toBe(false)
     expect(test.fixture.adapters.mount).not.toHaveBeenCalled()
     await wrapper.findAll('button')[1].trigger('click')
-    await vi.waitFor(() => expect(wrapper.get('[role="alert"]').text()).toBe('Dynamic source requires ready preview'))
+    await vi.waitFor(() => expect(wrapper.get('[role="alert"]').text()).toBe('Wait for the variant to finish loading before viewing its source.'))
     expect(read).toHaveBeenCalledTimes(1)
     expect(read.mock.calls[0][0].mode).toBe('raw')
     wrapper.unmount()

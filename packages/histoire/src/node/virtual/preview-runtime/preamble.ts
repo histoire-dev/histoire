@@ -85,7 +85,7 @@ import GenericMountStory from ${app('components/story/GenericMountStory.vue.js')
 import GenericRenderStory from ${app('components/story/GenericRenderStory.vue.js')}
 import { setupPluginApi } from ${app('plugin.js')}
 import { usePreviewSettingsStore } from ${app('stores/preview-settings.js')}
-import { COLLECT_TESTS, CONTROLS_READY, CONTROLS_RESIZE, HOST_CHANNEL_MESSAGE, PREVIEW_SETTINGS_SYNC, PREVIEW_SYNC, RUN_TESTS, RUNTIME_REQUEST, RUNTIME_RESULT, RUNTIME_FAILED, RUNTIME_LAYOUT, RUNTIME_FOCUS, SANDBOX_READY, SELECT_VARIANT, STATE_SYNC, TEST_DEFINITIONS, TEST_RESULT, VARIANT_READY } from ${app('util/const.js')}
+import { COLLECT_TESTS, CONTROLS_READY, CONTROLS_RESIZE, HOST_CHANNEL_MESSAGE, PREVIEW_SETTINGS_SYNC, PREVIEW_SYNC, RUN_TEST_CASE, RUN_TESTS, RUNTIME_REQUEST, RUNTIME_RESULT, RUNTIME_FAILED, RUNTIME_LAYOUT, RUNTIME_FOCUS, SANDBOX_READY, SELECT_VARIANT, STATE_SYNC, TEST_CASE_RESULT, TEST_DEFINITIONS, TEST_RESULT, VARIANT_READY } from ${app('util/const.js')}
 import { histoireConfig } from ${app('util/config.js')}
 import { isDark } from ${app('util/dark.js')}
 import { setupControlsDocument } from ${app('util/controls-document.js')}

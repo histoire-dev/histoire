@@ -43,7 +43,7 @@ export function createStandaloneClientActions(session: HistoireSession) {
       guard()
       const patch = state?.patch()
       if (patch) {
-        if (captured.runtime.status !== 'ready' || !captured.runtime.runtimeId || !captured.selection?.variantId) throw new HistoireSdkError('PREVIEW_NOT_READY', 'Command edits require a selected ready primary preview.')
+        if (captured.runtime.status !== 'ready' || !captured.runtime.runtimeId || !captured.selection?.variantId) throw new HistoireSdkError('PREVIEW_NOT_READY', 'Select a variant before editing.')
         await session.state.patch(patch)
       }
       return result

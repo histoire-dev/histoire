@@ -70,7 +70,7 @@ export function waitForRuntime(context: SessionContext, signal: AbortSignal): Pr
       }
       else if (['failed', 'stale', 'absent'].includes(context.snapshot.runtime.status)) {
         cleanup()
-        reject(new HistoireSdkError('PREVIEW_NOT_READY', 'Preview became unavailable before readiness.'))
+      reject(new HistoireSdkError('PREVIEW_NOT_READY', 'Variant became unavailable before loading completed.'))
       }
     }
     if (signal.aborted) {
@@ -81,7 +81,7 @@ export function waitForRuntime(context: SessionContext, signal: AbortSignal): Pr
     signal.addEventListener('abort', onAbort, { once: true })
     timer = setTimeout(() => {
       cleanup()
-      reject(new HistoireSdkError('TIMEOUT', 'Preview readiness timed out.'))
+      reject(new HistoireSdkError('TIMEOUT', 'Variant loading timed out.'))
     }, context.connection?.descriptor.config?.storyCollectTimeout ?? 30_000)
     check()
   })

@@ -63,7 +63,7 @@ export interface FrameRequestOptions<T> {
  */
 export class VariantMismatchError extends Error {
   constructor(requestedVariantKey: string | null | undefined, repliedVariantKey: unknown) {
-    super(`Preview iframe answered about variant "${String(repliedVariantKey)}" instead of the requested "${String(requestedVariantKey)}".`)
+    super(`Browser returned results for variant "${String(repliedVariantKey)}" instead of the requested "${String(requestedVariantKey)}".`)
     this.name = 'VariantMismatchError'
   }
 }
@@ -176,7 +176,7 @@ export async function requestFromFrame<T>(options: FrameRequestOptions<T>): Prom
 
     const frame = options.getFrame()
     if (!frame?.contentWindow) {
-      throw new Error('Preview iframe is not ready yet.')
+      throw new Error('Browser is not ready yet.')
     }
 
     try {

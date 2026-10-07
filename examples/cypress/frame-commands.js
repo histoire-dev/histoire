@@ -3,7 +3,7 @@
  * @param {object} [options] Options forwarded to `cy.get`, including timeout.
  */
 export function getSelectedPreviewIframe(options = {}) {
-  return cy.get('iframe[title="Histoire preview"]', { timeout: 20000, ...options })
+  return cy.get('iframe[title="Histoire variant"]', { timeout: 20000, ...options })
     .filter((_, iframe) => {
       const frame = iframe.closest('[data-frame-id]')
       return frame ? frame.classList.contains('is-selected') : Boolean(iframe.closest('[aria-busy]'))

@@ -5,7 +5,7 @@ export { RUNTIME_FAILED, RUNTIME_FOCUS, RUNTIME_LAYOUT, RUNTIME_REQUEST, RUNTIME
 export type { HistoireRuntimeFocusMessage, HistoireRuntimeRequestMessage } from '@histoire/protocol'
 export { HOST_CHANNEL_MESSAGE } from '@histoire/protocol'
 export type { HistoireHostChannelPreviewMessage } from '@histoire/protocol'
-export { COLLECT_TESTS, CONTROLS_READY, CONTROLS_RESIZE, EVENT_SEND, PREVIEW_SETTINGS_SYNC, PREVIEW_SYNC, RUN_TESTS, SANDBOX_READY, SELECT_VARIANT, STATE_SYNC, TEST_DEFINITIONS, TEST_RESULT, VARIANT_READY } from '@histoire/protocol'
+export { COLLECT_TESTS, CONTROLS_READY, CONTROLS_RESIZE, EVENT_SEND, PREVIEW_SETTINGS_SYNC, PREVIEW_SYNC, RUN_TEST_CASE, RUN_TESTS, SANDBOX_READY, SELECT_VARIANT, STATE_SYNC, TEST_CASE_RESULT, TEST_DEFINITIONS, TEST_RESULT, VARIANT_READY } from '@histoire/protocol'
 export type { HistoireCollectTestsMessage, HistoireControlsReadyMessage, HistoireControlsResizeMessage, HistoireEventSendMessage, HistoireMessageMarker, HistoirePreviewSettingsSyncMessage, HistoirePreviewSyncMessage, HistoireRunTestsMessage, HistoireSandboxReadyMessage, HistoireSelectVariantMessage, HistoireStateSyncMessage, HistoireTestDefinitionsMessage, HistoireTestResultMessage, HistoireVariantReadyMessage } from '@histoire/protocol'
 
 /** Request element metrics using frame-local CSS pixels. */

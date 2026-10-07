@@ -32,7 +32,7 @@ export const HistoireSource = defineComponent({
     }, async () => {
       const value = session.getSnapshot()
       if (!value.selection) return null
-      if (mode.value === 'dynamic' && value.runtime.status !== 'ready') throw new HistoireSdkError('PREVIEW_NOT_READY', 'Dynamic source requires ready preview')
+      if (mode.value === 'dynamic' && value.runtime.status !== 'ready') throw new HistoireSdkError('PREVIEW_NOT_READY', 'Wait for the variant to finish loading before viewing its source.')
       const content = await session.source.get({ storyId: value.selection.storyId, ...(mode.value === 'dynamic' && value.selection.variantId ? { variantId: value.selection.variantId } : {}), mode: mode.value })
       return prepareHistoireSource(content, dark.value)
     }, (value) => {

@@ -35,7 +35,7 @@ const serverAvailable = computed(() => typeof window !== 'undefined' && !!window
         :disabled="testsStore.currentRunning"
         @click="testsStore.runCurrentVariantTests('preview')"
       >
-        {{ testsStore.currentRunning ? 'Running…' : 'Run preview' }}
+        {{ testsStore.currentRunning ? 'Running…' : 'Run in browser' }}
       </BaseButton>
       <BaseButton
         v-if="serverAvailable"

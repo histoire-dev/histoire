@@ -66,7 +66,7 @@ describe('canvas preference ownership', () => {
     const canvas = createCanvasStore({ storage })
     canvas.setTool(tool)
     expect(createCanvasStore({ storage }).tool).toBe(tool)
-    expect(JSON.parse(saved!)).toEqual({ version: 3, zoomByArrange: { single: 'fit', grid: 'fit', list: 'fit', matrix: 'fit' }, tool, frameBackground: 'transparent' })
+    expect(JSON.parse(saved!)).toEqual({ version: 3, zoomByArrange: { single: 'fit', grid: 'fit', list: 'selection', matrix: 'fit' }, tool, frameBackground: 'transparent' })
   })
 
   it.each([

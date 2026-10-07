@@ -115,7 +115,7 @@ export function useHostChannel(name: string): HistoireStoryHostChannel {
   if (actor) scope!.actors.set(node!, actor)
   /** Dormant handles cannot create listeners or turn collection into story execution. */
   function assertOwner() {
-    if (!scope || !node || !target) throw new HistoireSdkError('CAPABILITY_UNAVAILABLE', 'Host channel requires story initialization inside a preview.')
+    if (!scope || !node || !target) throw new HistoireSdkError('CAPABILITY_UNAVAILABLE', 'Host channel requires story initialization inside a variant.')
     if (!scope.active || registry()[key] !== scope || !node.isConnected) throw new HistoireSdkError('RUNTIME_CHANGED', 'Host channel runtime was retired.')
     if (!scope.names.includes(name)) throw new HistoireSdkError('CAPABILITY_UNAVAILABLE', 'Host channel is not enabled.', { name })
     if (!actor?.active) throw new HistoireSdkError('RUNTIME_CHANGED', 'Host channel actor was retired.')

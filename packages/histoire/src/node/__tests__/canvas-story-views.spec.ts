@@ -39,7 +39,7 @@ function createBinding(initialStory = 'first', initialView: { baseArrangement?: 
 
 /** Create a plain view value for arrangement-precedence tests. */
 function view(arrangement: CanvasArrangement): CanvasViewSnapshot {
-  return { arrangement, zoomByArrange: { single: 'fit', grid: 1, list: 0.5, matrix: 'fit' }, panOffset: { x: 18, y: -24 } }
+  return { arrangement, zoomByArrange: { single: 1, grid: 1, list: 0.5, matrix: 'fit' }, panOffset: { x: 18, y: -24 } }
 }
 
 describe('story canvas views', () => {

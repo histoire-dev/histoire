@@ -27,7 +27,7 @@ watch(displayedSettings, (settings) => {
 
 /** Named preset sizes retain logical orientation and use existing settings persistence. */
 function preset(width: number, height?: number | null) {
-  if (canvas.arrangement === 'single') canvas.singleViewport.mode = 'fixed'
+  if (canvas.arrangement === 'single') canvas.setSingleViewportMode('fixed')
   update({ responsiveWidth: width, responsiveHeight: height ?? null, rotate: false })
   emit('update:open', null)
 }
@@ -37,14 +37,14 @@ function custom() {
   const patch = parseViewportSize(customWidth.value, customHeight.value)
   error.value = patch ? '' : 'Use whole pixels from 1 to 16384.'
   if (patch) {
-    if (canvas.arrangement === 'single') canvas.singleViewport.mode = 'fixed'
+    if (canvas.arrangement === 'single') canvas.setSingleViewportMode('fixed')
     update(patch)
   }
 }
 
 /** Responsive option fills available canvas width using bounded current root dimensions. */
 function responsive() {
-  if (canvas.arrangement === 'single') canvas.singleViewport.mode = 'responsive'
+  if (canvas.arrangement === 'single') canvas.setSingleViewportMode('responsive')
   else update({ responsiveWidth: Math.max(1, Math.round(canvas.viewport.width - canvas.inspectorWidth - 64)), responsiveHeight: null, rotate: false })
   emit('update:open', null)
 }

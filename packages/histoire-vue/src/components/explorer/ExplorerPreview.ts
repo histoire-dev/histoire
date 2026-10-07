@@ -73,12 +73,12 @@ export const ExplorerPreview = defineComponent({
     return () => {
       const story = snapshot.value.catalog.stories.find(story => story.id === snapshot.value.selection?.storyId)
       const showingRuntime = mode.value === 'preview' || mode.value === 'grid'
-      return h('main', { 'class': 'histoire-explorer-preview', 'aria-label': 'Histoire preview' }, [
+      return h('main', { 'class': 'histoire-explorer-preview', 'aria-label': 'Histoire canvas' }, [
         mode.value === 'docs' ? h(HistoireDocs, { key: 'docs', anchor: props.docsAnchor, onError: error => emit('error', error) }) : mode.value === 'empty' ? slots.empty?.() : null,
         showingRuntime
           ? h('div', { class: 'histoire-explorer-layout' }, [
               snapshot.value.selection?.variantId && story ? h(HstSelect, { 'layout': 'inline', 'aria-label': 'Variant', 'modelValue': snapshot.value.selection.variantId, 'onUpdate:modelValue': selectVariant, 'options': story.variants.map(variant => ({ value: variant.id, label: variant.title })) }) : null,
-              h(HstButton, { 'color': 'flat', 'type': 'button', 'aria-label': 'Show single preview', 'aria-pressed': layout.value === 'preview', 'onClick': () => void select('preview') }, { default: () => 'Preview' }),
+              h(HstButton, { 'color': 'flat', 'type': 'button', 'aria-label': 'Show single variant', 'aria-pressed': layout.value === 'preview', 'onClick': () => void select('preview') }, { default: () => 'Single' }),
               h(HstButton, { 'color': 'flat', 'type': 'button', 'aria-label': 'Show variant grid', 'aria-pressed': layout.value === 'grid', 'onClick': () => void select('grid') }, { default: () => 'Grid' }),
             ])
           : null,

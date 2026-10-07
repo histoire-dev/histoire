@@ -33,7 +33,7 @@ export function renderPreviewScript(options: PreviewScriptOptions): string {
     const state = window.__HST_MCP_PREVIEW__ = { ...options.authority, ready: false, sandbox: false, variant: false, propsApplied: !options.propsOverride, propsRequest: '', propsVersion: 0, propsFailed: false };
     const frame = document.createElement('iframe');
     frame.id = 'histoire-mcp-preview';
-    frame.title = 'Histoire preview';
+  frame.title = 'Histoire variant';
     frame.style.cssText = 'display:block;border:0;width:100vw;height:100vh';
     frame.style.backgroundColor = options.settings.backgroundColor;
     state.currentDocumentId = () => {

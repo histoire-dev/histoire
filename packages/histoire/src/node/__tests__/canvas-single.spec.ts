@@ -17,7 +17,7 @@ describe('single variant geometry and camera', () => {
 
   it('fits oversized Single viewports without changing logical dimensions or camera pan', () => {
     const storage = memoryStorage()
-    storage.setItem('_histoire-ui-canvas', JSON.stringify({ version: 2, zoomByArrange: { grid: 0.5, list: 'fit', matrix: 'fit', single: 2 } }))
+    storage.setItem('_histoire-ui-canvas', JSON.stringify({ version: 2, zoomByArrange: { grid: 0.5, list: 'selection', matrix: 'fit', single: 2 } }))
     const canvas = createCanvasStore({ storage })
     const offset = { ...canvas.panOffset }
     canvas.setArrangement('single')
@@ -32,12 +32,12 @@ describe('single variant geometry and camera', () => {
     expect(canvas.effectiveZoom).toBe(0.375)
     canvas.setSingleGeometry({ width: 600, height: 400 }, { width: 300, height: 200 })
     expect(canvas.effectiveZoom).toBe(1)
-    canvas.fit()
+    canvas.resetZoom()
     canvas.panBy({ x: 100, y: 20 })
     canvas.setPanOffset({ x: 80, y: 60 })
-    canvas.zoomToFrame({ x: 0, y: 0, width: 200, height: 100 })
+    canvas.zoomToSelection({ x: 0, y: 0, width: 200, height: 100 })
     canvas.focusFrame({ id: 'frame', storyId: 'story', variantId: 'variant', x: 1000, y: 1000, width: 200, height: 100 })
-    expect(canvas.zoomByArrange).toEqual({ single: 'fit', grid: 0.5, list: 'fit', matrix: 'fit' })
+    expect(canvas.zoomByArrange).toEqual({ single: 'fit', grid: 0.5, list: 'selection', matrix: 'fit' })
     expect(canvas.panOffset).toEqual(offset)
     expect(canvas.selectedFrame).toBe('frame')
     canvas.setArrangement('grid')
@@ -66,7 +66,7 @@ describe('single variant geometry and camera', () => {
     expect(restored.effectiveZoom).toBe(0.1)
     restored.setZoom(10)
     expect(restored.effectiveZoom).toBe(4)
-    restored.fit()
+    restored.resetZoom()
     expect(restored.zoom).toBe('fit')
   })
 })

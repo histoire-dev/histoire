@@ -30,7 +30,7 @@ describe('Event (iframe)', () => {
     const storyId = 'src-components-eventbuttongrid-story-vue'
     const variantId = `${storyId}-1`
     const frameKey = JSON.stringify([storyId, variantId])
-    const frameSelector = `[data-frame-id='${frameKey}'] iframe[title="Histoire preview"]`
+    const frameSelector = `[data-frame-id='${frameKey}'] iframe[title="Histoire variant"]`
     let previewFrame
 
     cy.visit(`/story/${storyId}?variantId=${storyId}-0&tab=events`)

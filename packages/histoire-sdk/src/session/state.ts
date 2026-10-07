@@ -7,7 +7,7 @@ import { request, waitForRuntime } from './request.js'
 export function primaryRuntime(context: SessionContext) {
   context.selected()
   const primary = context.primaryId ? context.mounts.get(context.primaryId) : undefined
-  if (!primary?.active || context.snapshot.runtime.status !== 'ready' || !context.snapshot.runtime.runtimeId) throw new HistoireSdkError('PREVIEW_NOT_READY', 'A selected ready primary preview is required.')
+  if (!primary?.active || context.snapshot.runtime.status !== 'ready' || !context.snapshot.runtime.runtimeId) throw new HistoireSdkError('PREVIEW_NOT_READY', 'A ready variant runtime is required.')
   return primary
 }
 
@@ -38,8 +38,8 @@ export async function patchState(context: SessionContext, patch: Record<string, 
   validateWireValue(patch, { kind: 'request', name: 'state.patch' })
   const capturedPatch = context.copy(patch)
   const primary = context.primaryId ? context.mounts.get(context.primaryId) : undefined
-  if (!primary?.active) throw new HistoireSdkError('PREVIEW_NOT_READY', 'A primary preview is required.')
-  if (!['ready', 'mounting'].includes(context.snapshot.runtime.status)) throw new HistoireSdkError('PREVIEW_NOT_READY', 'Preview is unavailable; explicit reload is required.')
+  if (!primary?.active) throw new HistoireSdkError('PREVIEW_NOT_READY', 'Select a variant before editing state.')
+  if (!['ready', 'mounting'].includes(context.snapshot.runtime.status)) throw new HistoireSdkError('PREVIEW_NOT_READY', 'Wait for the variant to finish loading before editing state.')
   const connection = context.connection
   const source = context.snapshot.source!
   const selectionVersion = context.selectionVersion

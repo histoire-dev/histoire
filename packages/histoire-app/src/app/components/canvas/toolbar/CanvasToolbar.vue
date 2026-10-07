@@ -50,7 +50,7 @@ function setOpen(value: string | null) {
 function rotateViewport(): void {
   if (canvas.arrangement === 'single' && canvas.singleViewport.mode === 'responsive') {
     const size = canvas.singleViewportSize
-    canvas.singleViewport.mode = 'fixed'
+    canvas.setSingleViewportMode('fixed')
     update({ responsiveWidth: size.width, responsiveHeight: size.height, rotate: true })
   }
   else {

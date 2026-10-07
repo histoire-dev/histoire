@@ -7,7 +7,7 @@ const inspector = '[data-test-id="story-side-panel"]'
 /** Canvas region owns pointer gestures and keyboard tool shortcuts. */
 const canvas = '[aria-label="Story canvas"]'
 /** Exact selected frame readiness excludes every unselected live document. */
-export const primaryPreviewFrame = '.histoire-canvas-frame.is-selected [aria-busy="false"] iframe[title="Histoire preview"]'
+export const primaryPreviewFrame = '.histoire-canvas-frame.is-selected [aria-busy="false"] iframe[title="Histoire variant"]'
 
 /**
  * Exercises framework-independent workbench contracts against real previews.

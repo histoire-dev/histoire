@@ -22,7 +22,7 @@ export async function getSource(context: SessionContext, input: { storyId: strin
   if (input.mode === 'raw') return context.copy(await request(context, context.assertConnected(), 'source.get', payload))
   const selected = context.selected()
   const variantId = input.variantId ?? (selected.storyId === input.storyId ? selected.variantId : null)
-  if (selected.storyId !== input.storyId || selected.variantId !== variantId) throw new HistoireSdkError('PREVIEW_NOT_READY', 'Dynamic source requires matching selected preview.')
+    if (selected.storyId !== input.storyId || selected.variantId !== variantId) throw new HistoireSdkError('PREVIEW_NOT_READY', 'Dynamic source requires the selected variant.')
   const primary = primaryRuntime(context)
   return context.copy(await request(context, primary.transport, 'source.get', { ...payload, variantId }, { kind: 'runtime', mountId: primary.handle.id }))
 }

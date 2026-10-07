@@ -43,7 +43,7 @@ Run once:
 pnpm histoire test
 ```
 
-Histoire supports `describe`/`suite`, `it`/`test`, `.only`, `.skip`, `.todo`, standard before/after lifecycle hooks, `onTestFinished`, and `onTestFailed`. Benchmarks are ignored. Each case run by `histoire test` gets fresh story mount; suite hooks therefore surround each isolated mount rather than sharing mutable mounted state between cases.
+Histoire supports `describe`/`suite`, `it`/`test`, `.only`, `.skip`, `.todo`, standard before/after lifecycle hooks, `onTestFinished`, and `onTestFailed`. Benchmarks are ignored. Each case gets a fresh story mount in both `histoire test` and in-book runs; suite hooks therefore surround each isolated mount rather than sharing mutable mounted state between cases. Set [`test.maxWorkers`](../reference/config.md#test-maxworkers) to limit concurrent cases; default uses available CPU parallelism.
 
 Low-level Vitest runner classes, snapshot assertions, artifacts, and fake timers are not available inside embedded story runner. Unsupported calls fail with explicit error instead of silently passing. Keep tests needing those APIs in regular Vitest spec files.
 

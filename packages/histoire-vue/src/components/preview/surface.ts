@@ -107,7 +107,7 @@ export function createHistoirePrimary(name: string, surface: 'preview' | 'grid')
         // the viewport measurable while preventing input that cannot be owned yet.
         h('div', { 'ref': container, 'class': 'histoire-primary-frame', 'aria-busy': !ready.value && !error.value, 'inert': ready.value ? undefined : true }),
         error.value
-          ? (slots.error?.({ error: error.value }) ?? h('div', { role: 'alert', class: 'histoire-primary-status' }, error.value instanceof Error ? error.value.message : 'Preview failed'))
+          ? (slots.error?.({ error: error.value }) ?? h('div', { role: 'alert', class: 'histoire-primary-status' }, error.value instanceof Error ? error.value.message : 'Variant failed to render.'))
           : !ready.value ? slots.loading?.() : null,
       ])
     },

@@ -73,7 +73,7 @@ describe('Grid state isolation', () => {
     cy.location('search').should('include', `variantId=${thirdVariantId}`)
     thirdFrame().children('button').should('have.attr', 'aria-pressed', 'true')
     cy.get('@retainedPreview').then((iframe) => {
-      thirdFrame().find('iframe[title="Histoire preview"]').should(($current) => {
+      thirdFrame().find('iframe[title="Histoire variant"]').should(($current) => {
         expect($current[0]).to.equal(iframe[0] ?? iframe)
       })
     })

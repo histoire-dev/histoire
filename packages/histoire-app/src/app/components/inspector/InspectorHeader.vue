@@ -24,7 +24,7 @@ function onKeydown(event: KeyboardEvent): void {
       <span v-if="variantTitle && variantTitle !== storyTitle" class="inspector-story-title"><span>{{ storyTitle }}</span><BuiltinIcon icon="chevron-right" :size="12" /></span>
       <h2>{{ variantTitle || storyTitle }}</h2>
     </div>
-    <a v-if="isolatedHref" :href="isolatedHref" target="_blank" rel="noopener noreferrer" class="inspector-icon-button" aria-label="Open isolated preview" title="Open isolated preview">
+    <a v-if="isolatedHref" :href="isolatedHref" target="_blank" rel="noopener noreferrer" class="inspector-icon-button" aria-label="Open in new tab" title="Open in new tab">
       <BuiltinIcon icon="launch" :size="16" />
     </a>
     <HstButton color="flat" type="button" class="inspector-icon-button" aria-label="Close inspector" title="Close inspector" @click="$emit('close')">

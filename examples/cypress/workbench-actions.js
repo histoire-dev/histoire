@@ -31,7 +31,7 @@ export function getCanvasVariantBody(storyId, variantId) {
     const selected = $frame.children('button').attr('aria-pressed') === 'true'
     const iframe = selected
       ? getSelectedPreviewIframe()
-      : cy.wrap($frame).find('iframe[title="Histoire preview"]').should($frames => expect($frames[0].closest('[aria-busy]')).to.have.attr('aria-busy', 'false'))
+      : cy.wrap($frame).find('iframe[title="Histoire variant"]').should($frames => expect($frames[0].closest('[aria-busy]')).to.have.attr('aria-busy', 'false'))
     return iframe.its('0.contentDocument.body')
       .should('not.be.empty')
       .then(cy.wrap)

@@ -1,7 +1,7 @@
 import type { HistoireTestMode } from '@histoire/protocol'
 import type { Story, Variant } from './story.js'
 
-export type { HistoireCollectTestsPayload, HistoireResolvedTestCase, HistoireRunTestsPayload, HistoireSerializedTestDefinition, HistoireSerializedTestError, HistoireTestCaseResult, HistoireTestCaseResultInput, HistoireTestCollectionResult, HistoireTestDefinitionsPayload, HistoireTestError, HistoireTestMode, HistoireTestRequestAuthority, HistoireTestResultPayload, HistoireTestRunSummary, HistoireUncollectedStory } from '@histoire/protocol'
+export type { HistoireCollectTestsPayload, HistoireResolvedTestCase, HistoireRunTestCasePayload, HistoireRunTestsPayload, HistoireSerializedTestDefinition, HistoireSerializedTestError, HistoireTestCaseResult, HistoireTestCaseResultInput, HistoireTestCaseResultPayload, HistoireTestCollectionResult, HistoireTestDefinitionsPayload, HistoireTestError, HistoireTestMode, HistoireTestRequestAuthority, HistoireTestResultPayload, HistoireTestRunSummary, HistoireUncollectedStory } from '@histoire/protocol'
 
 /** Story-owned test execution contract; never sent through wire. */
 export interface HistoireTestContext {

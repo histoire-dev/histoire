@@ -127,7 +127,7 @@ describe('canvas toolbar overflow integration', () => {
       test.frames.getFrame('frame')!.documentId = 'foreign'
       await test.geometry.flush()
       expect(button('Measure').disabled).toBe(true)
-      expect(button('Measure').title).toBe('Measure requires a mounted same-origin frame')
+      expect(button('Measure').title).toBe('Measurement isn’t available for this story')
     }
     finally {
       test.wrapper.unmount()

@@ -71,7 +71,7 @@ export function createFrameVariantSource(options: {
     available,
     /** Loading/paused frames retain clear readiness feedback without mutating selection. */
     disabled(target: FrameActionTarget): string | undefined {
-      return captureFrameSourceOwner(() => options.resolve(target), target) ? undefined : 'Wait for preview to finish loading.'
+      return captureFrameSourceOwner(() => options.resolve(target), target) ? undefined : 'Wait for the variant to finish loading.'
     },
     /** Generate markup from exact ready runtime; no raw fallback or serialized-state template. */
     async generate(target: FrameActionTarget): Promise<{ text: string, isCurrent: () => boolean } | undefined> {
