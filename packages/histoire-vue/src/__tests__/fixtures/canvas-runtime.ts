@@ -11,7 +11,7 @@ export function canvasRuntimeFixture() {
       const surface = mount(context)
       if (context.surface !== 'preview') return surface
       const iframe = document.createElement('iframe')
-      iframe.title = 'Histoire preview'
+      iframe.title = 'Histoire variant'
       iframe.src = 'about:blank?documentId=document-1'
       context.container.append(iframe)
       const close = surface.close

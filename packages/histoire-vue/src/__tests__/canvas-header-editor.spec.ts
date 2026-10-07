@@ -6,6 +6,7 @@ import { defineComponent, h } from 'vue'
 import CanvasViewport from '../../../histoire-app/src/app/components/canvas/CanvasViewport.vue'
 import { createContextMenu, provideContextMenu } from '../../../histoire-app/src/app/composables/context-menu.js'
 import { createMatrixStore, provideMatrix } from '../../../histoire-app/src/app/stores/matrix.js'
+import { createStoryCanvasViews, provideStoryCanvasViews } from '../../../histoire-app/src/app/stores/story-canvas-views.js'
 import { deferred, sourceFixture } from '../../../histoire-sdk/src/__tests__/fixtures/session.js'
 import { resizeObserverFixture } from './fixtures/resize-observer.js'
 
@@ -40,6 +41,7 @@ async function editorFixture(options: { available?: boolean, target?: { storyId:
   const contextMenu = createContextMenu()
   const Host = defineComponent({
     setup() {
+      provideStoryCanvasViews(createStoryCanvasViews())
       provideMatrix(matrix)
       provideContextMenu(contextMenu)
       return () => h(CanvasViewport, { arrange: 'grid', previewBase: 'https://book.example/', frameBudget: 1 })

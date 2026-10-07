@@ -28,7 +28,7 @@ afterEach(async () => {
 })
 
 /** Mount genuine frame lifecycle with existing SDK transport and controlled native geometry. */
-async function lifetimeFixture(budget = 2, variantCount = 2, zoom = 0.5) {
+async function lifetimeFixture(budget = 2, variantCount = 2, zoom = 0.5, responsiveDisabled = false) {
   window.localStorage.setItem('_histoire-ui-canvas', JSON.stringify({ zoom }))
   const resize = resizeObserverFixture()
   const dimensions = { width: 1800, height: 1000 }
@@ -38,6 +38,7 @@ async function lifetimeFixture(budget = 2, variantCount = 2, zoom = 0.5) {
     return { x: 0, y: 0, top: 0, left: 0, right: width, bottom: height, width, height, toJSON: () => ({}) }
   })
   const source = sourceFixture()
+  source.descriptor.catalog.stories[0].variants[0].responsiveDisabled = responsiveDisabled
   if (variantCount > 2) {
     source.descriptor.catalog.stories[0].variants = Array.from({ length: variantCount }, (_, index) => ({
       id: index === 0 ? 'c' : `variant-${index}`,
@@ -58,12 +59,13 @@ async function lifetimeFixture(budget = 2, variantCount = 2, zoom = 0.5) {
   const matrix = createMatrixStore()
   const menu = createContextMenu()
   const arrange = ref<'single' | 'grid' | 'list' | 'matrix'>('grid')
+  const uiHidden = ref(false)
   const Host = defineComponent({
     setup() {
       provideStoryCanvasViews(createStoryCanvasViews())
       provideMatrix(matrix)
       provideContextMenu(menu)
-      return () => h(CanvasViewport, { arrange: arrange.value, previewBase: 'https://book.example/', frameBudget: budget })
+      return () => h(CanvasViewport, { arrange: arrange.value, previewBase: 'https://book.example/', frameBudget: budget, uiHidden: uiHidden.value })
     },
   })
   const wrapper = mount(HistoireProvider, { props: { session: canonical }, attachTo: document.body, slots: { default: () => h(Host) } })
@@ -77,7 +79,7 @@ async function lifetimeFixture(budget = 2, variantCount = 2, zoom = 0.5) {
     await canonical.dispose()
   }
   await flushPromises()
-  return { wrapper, viewport, resize, dimensions, canvas, canonical, source, children, matrix, arrange, prepareChild }
+  return { wrapper, viewport, resize, dimensions, canvas, canonical, source, children, matrix, arrange, prepareChild, uiHidden }
 }
 
 describe('canvas frame runtime lifetime', () => {
@@ -140,6 +142,55 @@ describe('canvas frame runtime lifetime', () => {
     const wheel = new WheelEvent('wheel', { deltaY: 100, cancelable: true, bubbles: true })
     test.viewport.element.dispatchEvent(wheel)
     expect(wheel.defaultPrevented).toBe(false)
+  })
+
+  it('directly resizes Single dimensions, persists once, and retains its runtime document', async () => {
+    const test = await lifetimeFixture()
+    test.arrange.value = 'single'
+    await flushPromises()
+    const frame = test.wrapper.getComponent(CanvasFrame)
+    const iframe = frame.get('iframe').element
+    const owner = test.children.at(-1)!
+    const update = vi.spyOn(test.canonical.settings, 'update')
+    const width = test.wrapper.get('[aria-label="Resize viewport width"]')
+
+    await width.trigger('keydown', { key: 'ArrowRight' })
+    await flushPromises()
+
+    expect(test.canvas.singleViewport.mode).toBe('fixed')
+    expect(test.canvas.zoom).toBe(1)
+    expect(test.canvas.singleViewportDraft).toBeNull()
+    expect(test.wrapper.getComponent(CanvasFrame).props()).toMatchObject({ width: 1776, height: 968 })
+    expect(test.wrapper.getComponent(CanvasFrame).get('iframe').element).toBe(iframe)
+    expect(test.canonical.getSnapshot().settings).toMatchObject({ responsiveWidth: 1776, responsiveHeight: 968, rotate: false })
+    expect(owner.session.getSnapshot().settings).toMatchObject({ responsiveWidth: 1776, responsiveHeight: 968, rotate: false })
+    expect(update).toHaveBeenCalledOnce()
+  })
+
+  it('preserves logical rotation and hides direct resize chrome when unavailable', async () => {
+    const test = await lifetimeFixture()
+    test.arrange.value = 'single'
+    test.canvas.setSingleViewportMode('fixed')
+    await test.canonical.settings.update({ responsiveWidth: 844, responsiveHeight: 390, rotate: true })
+    await flushPromises()
+
+    expect(test.wrapper.getComponent(CanvasFrame).props()).toMatchObject({ width: 390, height: 844 })
+    await test.wrapper.get('[aria-label="Resize viewport width"]').trigger('keydown', { key: 'ArrowRight' })
+    await flushPromises()
+    expect(test.canonical.getSnapshot().settings).toMatchObject({ responsiveWidth: 844, responsiveHeight: 398, rotate: true })
+
+    test.uiHidden.value = true
+    await flushPromises()
+    expect(test.wrapper.find('[aria-label="Resize viewport width"]').exists()).toBe(false)
+    expect(test.wrapper.find('[aria-label="Resize viewport height"]').exists()).toBe(false)
+  })
+
+  it('does not expose direct resize chrome for responsive-disabled variants', async () => {
+    const test = await lifetimeFixture(2, 2, 0.5, true)
+    test.arrange.value = 'single'
+    await flushPromises()
+    expect(test.wrapper.find('[aria-label="Resize viewport width"]').exists()).toBe(false)
+    expect(test.wrapper.find('[aria-label="Resize viewport height"]').exists()).toBe(false)
   })
 
   it('keeps predecessor and destination documents across canvas and canonical selection', async () => {

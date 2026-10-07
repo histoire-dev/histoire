@@ -27,14 +27,15 @@ function createStorage(initial?: Record<string, unknown>): CanvasStorage & { val
 }
 
 describe('canvas zoom preferences', () => {
-  it('enables selection action only for a registered frame and exposes its active mode', async () => {
+  it('merges automatic zoom actions in Single and preserves selection zoom elsewhere', async () => {
     const canvas = createCanvasStore()
     const frames = createCanvasFrames(canvas)
     const rect = { x: 0, y: 0, width: 720, height: 640 }
-    canvas.setArrangement('list')
+    canvas.setArrangement('single')
     canvas.setGeometry({ width: 1200, height: 900 }, rect)
     canvas.selectedFrame = 'frame'
     canvas.setZoom(0.5)
+    const remove = frames.registerFrame({ id: 'frame', storyId: 'story', variantId: 'variant', rect })
     const Host = defineComponent({
       setup() {
         provideCanvas(canvas, frames)
@@ -43,10 +44,11 @@ describe('canvas zoom preferences', () => {
     })
     const wrapper = mount(Host, { global: { stubs: { ToolbarPopover: { template: '<div><slot name="trigger" /><slot /></div>' } } } })
     try {
-      const button = wrapper.findAll('button').find(button => button.text().startsWith('Zoom to selection'))!
-      expect(button.attributes('disabled')).toBeDefined()
-      const remove = frames.registerFrame({ id: 'frame', storyId: 'story', variantId: 'variant', rect })
+      expect(wrapper.findAll('button').some(button => button.text().startsWith('Fit to canvas'))).toBe(true)
+      expect(wrapper.findAll('button').some(button => button.text().startsWith('Zoom to selection'))).toBe(false)
+      canvas.setArrangement('list')
       await nextTick()
+      const button = wrapper.findAll('button').find(button => button.text().startsWith('Zoom to selection'))!
       expect(button.attributes('disabled')).toBeUndefined()
       await button.trigger('click')
       expect(canvas.zoom).toBe('selection')
@@ -166,7 +168,7 @@ describe('canvas zoom preferences', () => {
     const storage = createStorage({
       '_histoire-ui-canvas': {
         zoom: 0.5,
-        zoomByArrange: { single: 'fit', grid: -3, list: 'invalid', matrix: 9 },
+        zoomByArrange: { grid: -3, list: 'invalid', matrix: 9 },
         tool: 'pan',
         frameBackground: '#abcdef',
       },
@@ -179,7 +181,7 @@ describe('canvas zoom preferences', () => {
   })
 
   it('switches CanvasViewport through saved Grid, List, and Matrix zoom slots', async () => {
-    window.localStorage.setItem('_histoire-ui-canvas', JSON.stringify({ zoomByArrange: { single: 'fit', grid: 0.5, list: 0.75, matrix: 1 } }))
+    window.localStorage.setItem('_histoire-ui-canvas', JSON.stringify({ zoomByArrange: { grid: 0.5, list: 0.75, matrix: 1 } }))
     resizeObserverFixture()
     const fixture = sourceFixture()
     const session = createHistoireSessionWithAdapters({ url: 'https://book.example/' }, fixture.adapters)

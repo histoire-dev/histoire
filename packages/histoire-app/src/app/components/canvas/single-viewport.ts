@@ -1,4 +1,4 @@
-import type { HistoireSettings } from '@histoire/protocol'
+import type { HistoireSettings, HistoireSettingsPatch } from '@histoire/protocol'
 import type { HistoireCatalogStory } from '@histoire/sdk'
 import type { CanvasContentInsets } from '../../stores/canvas.js'
 import type { CanvasFrameLayout } from './frame-layout.js'
@@ -25,6 +25,13 @@ export function resolveSingleViewport(area: CanvasSize, settings: Pick<HistoireS
     width: settings.rotate && settings.responsiveHeight ? settings.responsiveHeight : settings.responsiveWidth,
     height: settings.rotate ? settings.responsiveWidth : settings.responsiveHeight ?? area.height,
   }
+}
+
+/** Convert physical frame dimensions back to rotation-aware persisted settings. */
+export function singleViewportSettings(size: CanvasSize, rotate: boolean): HistoireSettingsPatch {
+  return rotate
+    ? { responsiveWidth: size.height, responsiveHeight: size.width, rotate: true }
+    : { responsiveWidth: size.width, responsiveHeight: size.height, rotate: false }
 }
 
 /** One exact selected target participates in registry/inspector ownership. */

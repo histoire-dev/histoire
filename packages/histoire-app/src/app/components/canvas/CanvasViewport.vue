@@ -26,10 +26,10 @@ import { watchCanvasListDefaultSelection, watchCanvasSelectedSession } from './f
 import { createCanvasFrameState } from './frame-state.js'
 import FrameGrid from './FrameGrid.vue'
 import FrameList from './FrameList.vue'
-import { clientToCanvas } from './pan/usePanZoom.js'
+import { type CanvasSize, clientToCanvas } from './pan/usePanZoom.js'
 import { usePointerPan } from './pan/usePointerPan.js'
 import { useSpacePan } from './pan/useSpacePan.js'
-import { selectedSingleFrame } from './single-viewport.js'
+import { selectedSingleFrame, singleViewportSettings } from './single-viewport.js'
 import { bindStoryCanvasView } from './story-view-binding.js'
 import { useCanvasGeometry } from './useCanvasGeometry.js'
 import { useCanvasHeaderOcclusion } from './useCanvasHeaderOcclusion.js'
@@ -116,7 +116,10 @@ const canvasViewport = computed(() => {
   const origin = clientToCanvas({ x: 0, y: 0 }, canvas.effectiveZoom, canvas.panOffset)
   return { ...origin, width: Math.max(0, canvas.viewport.width - props.inspectorWidth) / canvas.effectiveZoom, height: canvas.viewport.height / canvas.effectiveZoom }
 })
+const variantsById = computed(() => new Map(story.value?.variants.map(variant => [variant.id, variant]) ?? []))
 const selectedFrame = computed(() => frames.value.find(frame => frame.variantId === (snapshot.value.selection?.variantId ?? (diagnostics.value.length ? cachedVariantId.value : null))))
+const selectedVariant = computed(() => selectedFrame.value ? variantsById.value.get(selectedFrame.value.variantId) : undefined)
+const singleResizable = computed(() => !props.uiHidden && !selectedVariant.value?.responsiveDisabled)
 /** Bound canvas DOM to visible frames while retaining selected inspector ownership. */
 const renderedFrames = computed(() => {
   const visible = visibleCanvasFrames(frames.value, canvasViewport.value)
@@ -124,7 +127,6 @@ const renderedFrames = computed(() => {
   if (!selected || visible.some(frame => frame.id === selected.id)) return visible
   return [...visible, selected].sort((first, second) => first.y - second.y || first.x - second.x)
 })
-const variantsById = computed(() => new Map(story.value?.variants.map(variant => [variant.id, variant]) ?? []))
 const viewportEvents = createCanvasViewportEvents({
   getViewport: () => viewport.value,
   frames: registry,
@@ -191,6 +193,11 @@ const stopSelectedSession = watchCanvasSelectedSession({
 function selectVariant(variantId: string): Promise<void> {
   if (!story.value) return Promise.resolve()
   return session.selection.select({ storyId: story.value.id, variantId }).catch(error => emit('error', error))
+}
+
+/** Persist one completed physical Single resize through canonical settings ownership. */
+function resizeSingleViewport(size: CanvasSize): void {
+  void session.settings.update(singleViewportSettings(size, snapshot.value.settings.rotate)).catch(error => emit('error', error))
 }
 
 watchCanvasListDefaultSelection({ snapshot: () => snapshot.value, arrangement: () => renderedArrange.value, zoom: () => canvas.zoom, unavailable: () => diagnostics.value.length > 0, select: selectVariant })
@@ -261,7 +268,7 @@ defineExpose({ canvas, registry })
         <CanvasHeader :story="story" :can-open-in-editor="canOpenInEditor" @open-in-editor="openInEditor" />
       </slot>
     </div>
-    <CanvasSingleVariant v-if="renderedArrange === 'single' && story" :area="singleArea" :frame="selectedFrame" :variant="selectedFrame ? variantsById.get(selectedFrame.variantId) : undefined" :preview-base="previewBase" :stale="diagnostics.length > 0" @contextmenu="(event, target) => emit('contextmenu', event, target)" />
+    <CanvasSingleVariant v-if="renderedArrange === 'single' && story" :area="singleArea" :frame="selectedFrame" :variant="selectedVariant" :preview-base="previewBase" :stale="diagnostics.length > 0" :resizable="singleResizable" @resize="resizeSingleViewport" @contextmenu="(event, target) => emit('contextmenu', event, target)" />
     <slot v-else-if="renderedArrange === 'matrix'" name="matrix" :canvas="canvas" :frames="registry" :size="size" :content-insets="contentInsets" :frame-budget="frameBudget" :preview-base="previewBase" />
     <component :is="renderedArrange === 'list' ? FrameList : FrameGrid" v-else :frames="renderedFrames">
       <template #default="{ frame }">

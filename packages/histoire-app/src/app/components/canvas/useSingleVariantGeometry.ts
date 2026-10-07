@@ -15,7 +15,7 @@ export function useSingleVariantGeometry(canvas: CanvasStore, options: {
 }) {
   const insets = shallowRef<CanvasContentInsets>({})
   const area = computed(() => singleVariantArea(canvas.viewport, insets.value, options.inspectorWidth(), options.hidden()))
-  const size = computed(() => resolveSingleViewport(area.value, options.settings(), canvas.singleViewport.mode))
+  const size = computed(() => canvas.singleViewportDraft ?? resolveSingleViewport(area.value, options.settings(), canvas.singleViewport.mode))
   watch([area, size], ([available, logical]) => {
     const measured = canvas.viewport.width > 0 && canvas.viewport.height > 0
     canvas.setSingleGeometry(measured ? available : { width: 0, height: 0 }, logical)
