@@ -4,14 +4,15 @@ import { clampZoom } from '../components/canvas/pan/usePanZoom.js'
 const CANVAS_ARRANGEMENTS: readonly CanvasArrangement[] = ['single', 'grid', 'list', 'matrix']
 
 /** Converts persisted input into a supported canvas zoom preference. */
-function readZoom(value: unknown): CanvasZoom | undefined {
+function readZoom(value: unknown, arrangement?: CanvasArrangement): CanvasZoom | undefined {
   if (value === 'fit') return value
+  if (value === 'selection' && arrangement === 'list') return value
   return typeof value === 'number' && Number.isFinite(value) ? clampZoom(value) : undefined
 }
 
 /** Creates independent default zoom preferences rather than sharing mutable state. */
 function defaultZoomByArrange(): CanvasZoomByArrange {
-  return { single: 'fit', grid: 'fit', list: 'fit', matrix: 'fit' }
+  return { single: 'fit', grid: 'fit', list: 'selection', matrix: 'fit' }
 }
 
 /** Storage getter itself may throw in sandboxed or private browsing contexts. */
@@ -35,8 +36,10 @@ export function readCanvasPreferences(storage?: CanvasStorage): CanvasPreference
     const savedZooms = saved.zoomByArrange && typeof saved.zoomByArrange === 'object' ? saved.zoomByArrange : {}
     const zoomByArrange = Object.fromEntries(CANVAS_ARRANGEMENTS.map((arrangement) => {
       // Single zoom was forced to 100% before version 3, so old values carry no user intent.
-      if (arrangement === 'single') return [arrangement, saved.version === 3 ? readZoom(savedZooms.single) ?? 'fit' : 'fit']
-      const zoom = readZoom(savedZooms[arrangement]) ?? legacyZoom ?? defaults.zoomByArrange[arrangement]
+      if (arrangement === 'single') return [arrangement, saved.version === 3 ? readZoom(savedZooms.single, arrangement) ?? 'fit' : 'fit']
+      let zoom = readZoom(savedZooms[arrangement], arrangement) ?? legacyZoom ?? defaults.zoomByArrange[arrangement]
+      // Old List Fit was the default; version 2 distinguishes a new explicit canvas Fit.
+      if (arrangement === 'list' && zoom === 'fit' && saved.version !== 2 && saved.version !== 3) zoom = 'selection'
       return [arrangement, zoom]
     })) as CanvasZoomByArrange
     return { zoomByArrange, tool, frameBackground: typeof saved.frameBackground === 'string' ? saved.frameBackground : defaults.frameBackground }

@@ -22,7 +22,7 @@ import { createCanvasArrangement } from './frame-arrangement.js'
 import { watchCanvasFrameFocus } from './frame-focus.js'
 import { bindCanvasFrameInteractions } from './frame-interactions.js'
 import { canvasFrameBounds, type CanvasFrameLayout, layoutCanvasFrames, visibleCanvasFrames } from './frame-layout.js'
-import { watchCanvasSelectedSession } from './frame-selection.js'
+import { watchCanvasListDefaultSelection, watchCanvasSelectedSession } from './frame-selection.js'
 import { createCanvasFrameState } from './frame-state.js'
 import FrameGrid from './FrameGrid.vue'
 import FrameList from './FrameList.vue'
@@ -160,7 +160,8 @@ const { insets: contentInsets, headerBounds, measure } = useCanvasGeometry({
       canvas.inspectorWidth = props.inspectorWidth
       return
     }
-    canvas.setGeometry(size, canvasFrameBounds(frames.value), props.inspectorWidth, insets)
+    const selected = selectedFrame.value
+    canvas.setGeometry(size, canvasFrameBounds(frames.value), props.inspectorWidth, insets, selected ? zoom => fitBoundsForFrame(selected, zoom) : undefined)
     // Selection can arrive before the host has measurable dimensions; reveal it once ready.
     if (initialFocusPending && selectedFrame.value && size.width > props.inspectorWidth && size.height > (insets.topInset ?? 0) + (insets.bottomInset ?? 0)) {
       viewBinding.focusInitialFrame(selectedFrame.value)
@@ -192,6 +193,8 @@ function selectVariant(variantId: string): Promise<void> {
   return session.selection.select({ storyId: story.value.id, variantId }).catch(error => emit('error', error))
 }
 
+watchCanvasListDefaultSelection({ snapshot: () => snapshot.value, arrangement: () => renderedArrange.value, zoom: () => canvas.zoom, unavailable: () => diagnostics.value.length > 0, select: selectVariant })
+
 /** Select another ready grid/list preview while leaving its original click untouched. */
 function activatePreview(iframe: HTMLIFrameElement) {
   if (renderedArrange.value === 'matrix' || snapshot.value.stale || diagnostics.value.length) return
@@ -222,7 +225,7 @@ watch(renderedArrange, (arrangement) => {
   }
   if (viewBinding.isActiveStory(story.value?.id)) canvas.setArrangement(arrangement)
 }, { flush: 'sync', immediate: true })
-watch([frames, () => props.inspectorWidth, () => props.uiHidden, renderedArrange, story, panning], measure, { flush: 'post' })
+watch([frames, () => selectedFrame.value?.id, () => props.inspectorWidth, () => props.uiHidden, renderedArrange, story, panning], measure, { flush: 'post' })
 watchCanvasFrameFocus({
   getFrame: () => selectedFrame.value,
   getArrange: () => renderedArrange.value,

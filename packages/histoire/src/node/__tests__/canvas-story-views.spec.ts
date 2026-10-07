@@ -65,6 +65,34 @@ describe('story canvas views', () => {
     state.binding.dispose()
   })
 
+  it('preserves List selection mode across story restore, remount, and shared views', async () => {
+    const state = createBinding('first', { baseArrangement: 'list' })
+    state.canvas.setArrangement('list')
+    state.canvas.resetZoom()
+    state.storyId.value = 'second'
+    await nextTick()
+    expect(state.canvas.zoom).toBe('selection')
+    state.canvas.setZoom(0.5)
+    state.storyId.value = 'first'
+    await nextTick()
+    expect(state.canvas.zoom).toBe('selection')
+    state.syncZoom.value = true
+    state.storyId.value = 'second'
+    await nextTick()
+    expect(state.canvas.zoom).toBe('selection')
+    state.syncZoom.value = false
+    expect(state.canvas.zoom).toBe(0.5)
+    state.storyId.value = 'first'
+    await nextTick()
+    state.binding.dispose()
+
+    const restored = createBinding('first', {}, state.views)
+    expect(restored.canvas.arrangement).toBe('list')
+    expect(restored.canvas.zoom).toBe('selection')
+    expect(typeof restored.canvas.effectiveZoom).toBe('number')
+    restored.binding.dispose()
+  })
+
   it('restores independent zoom and camera position when returning to a story', async () => {
     const state = createBinding()
     state.canvas.setZoom(2)

@@ -10,9 +10,10 @@ defineProps<{ open: string | null }>()
 const emit = defineEmits<{ 'update:open': [value: string | null] }>()
 const canvas = useCanvasStore()
 const frames = useCanvasFrames()
+const selectedFrame = computed(() => canvas.selectedFrame ? frames.getFrame(canvas.selectedFrame) : null)
 const settings = useUiSettingsStore()
 const shortcuts = useShortcutRegistry()
-const label = computed(() => canvas.zoom === 'fit' ? 'Fit' : `${Math.round(canvas.zoom * 100)}%`)
+const label = computed(() => canvas.zoom === 'selection' ? 'Selection' : canvas.zoom === 'fit' ? 'Fit' : `${Math.round(canvas.zoom * 100)}%`)
 
 /** Zoom ownership respects optional per-story synchronization preference. */
 function zoom(value: number | 'fit') {
@@ -22,8 +23,8 @@ function zoom(value: number | 'fit') {
 
 /** Selection zoom uses canvas geometry rather than preview document scaling. */
 function selection() {
-  const frame = canvas.selectedFrame ? frames.getFrame(canvas.selectedFrame) : null
-  if (frame) canvas.zoomToFrame(frame.fitBounds ?? frame.rect)
+  const frame = selectedFrame.value
+  if (frame) canvas.zoomToSelection(frame.fitBounds ?? frame.rect)
   emit('update:open', null)
 }
 </script>
@@ -36,7 +37,7 @@ function selection() {
     <HstButton color="flat" class="popover-row" :aria-pressed="canvas.zoom === 'fit'" @click="zoom('fit')">
       Fit to canvas<span class="popover-meta">{{ shortcuts?.hint('canvas.fit') || '⇧1' }}</span>
     </HstButton>
-    <HstButton color="flat" class="popover-row" :disabled="!canvas.selectedFrame" :aria-pressed="canvas.arrangement === 'single' && canvas.zoom === 'fit'" @click="selection">
+    <HstButton color="flat" class="popover-row" :disabled="!selectedFrame" :aria-pressed="canvas.zoom === 'selection' || (canvas.arrangement === 'single' && canvas.zoom === 'fit')" @click="selection">
       Zoom to selection<span class="popover-meta">{{ shortcuts?.hint('canvas.selection') || '⇧2' }}</span>
     </HstButton>
     <HstButton v-for="value in [.25, .5, 1, 2]" :key="value" color="flat" class="popover-row" :aria-pressed="canvas.zoom === value" @click="zoom(value)">

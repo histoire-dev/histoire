@@ -24,7 +24,7 @@ describe('workbench shortcut registry', () => {
     const remove = registerCanvasShortcuts(registry, canvas, frames)
     try {
       expect(registry.handle(keyboard('@', { code: 'Digit2', shiftKey: true }), ['canvas'], false)).toBe(true)
-      expect(canvas.zoom).toBe(arrangement === 'single' ? 'fit' : canvas.effectiveZoom)
+      expect(canvas.zoom).toBe(arrangement === 'list' ? 'selection' : arrangement === 'single' ? 'fit' : canvas.effectiveZoom)
       expect(registry.handle(keyboard('!', { code: 'Digit1', shiftKey: true }), ['canvas'], false)).toBe(true)
       expect(canvas.zoom).toBe('fit')
       expect(registry.handle(keyboard(')', { code: 'Digit0', shiftKey: true }), ['canvas'], false)).toBe(true)

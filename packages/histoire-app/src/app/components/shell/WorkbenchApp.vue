@@ -55,7 +55,7 @@ function fitVariant(target: HistoireTarget): void {
   if (arrange.value === 'matrix' || target.variantId === null) return
   const current = canvas.value
   const frame = current?.registry.getFrame(getHistoireTargetKey(target))
-  if (frame) current.canvas.zoomToFrame(frame.fitBounds ?? frame.rect)
+  if (frame) current.canvas.zoomToSelection(frame.fitBounds ?? frame.rect)
 }
 
 /** Bind inspector to exact selected ready frame for every navigation path. */

@@ -9,6 +9,60 @@ const bounds = { x: 0, y: 0, width: 720, height: 640 }
 const frame = { ...bounds, id: 'frame', storyId: 'story', variantId: 'variant' }
 
 describe('canvas geometry ownership', () => {
+  it('keeps selection mode pending until current target and viewport are measured', () => {
+    const canvas = createCanvasStore()
+    canvas.setArrangement('list')
+    canvas.zoomToSelection(frame)
+    expect(canvas.zoom).toBe('selection')
+    expect(canvas.effectiveZoom).toBe(1)
+    canvas.setGeometry({ width: 0, height: 0 }, bounds, 0, {}, frame)
+    expect(canvas.effectiveZoom).toBe(1)
+    canvas.setGeometry({ width: 1200, height: 900 }, bounds, 300, { topInset: 120, bottomInset: 60 }, frame)
+    expect(canvas.zoom).toBe('selection')
+    expect(typeof canvas.effectiveZoom).toBe('number')
+    const firstZoom = canvas.effectiveZoom
+    const firstOffset = canvas.panOffset
+    canvas.setGeometry(canvas.viewport, bounds, 300, canvas.contentInsets, frame)
+    expect(canvas.panOffset).toBe(firstOffset)
+    const smaller = { ...frame, x: 0, y: 3000, width: 300, height: 200 }
+    canvas.setGeometry(canvas.viewport, bounds, 300, canvas.contentInsets, smaller)
+    expect(canvas.effectiveZoom).toBeGreaterThan(firstZoom)
+    expect(canvasToClient(smaller, canvas.effectiveZoom, canvas.panOffset).y).toBeGreaterThanOrEqual(152)
+    const nextOffset = { ...canvas.panOffset }
+    const nextZoom = canvas.effectiveZoom
+    canvas.setGeometry({ width: 600, height: 400 }, bounds)
+    expect(canvas.effectiveZoom).toBe(nextZoom)
+    expect(canvas.panOffset).toEqual(nextOffset)
+    expect(canvas.zoom).toBe('selection')
+    canvas.setArrangement('matrix')
+    canvas.setGeometry({ width: 600, height: 400 }, bounds)
+    const matrixOffset = { ...canvas.panOffset }
+    const matrixZoom = canvas.effectiveZoom
+    canvas.setArrangement('list')
+    canvas.setGeometry(canvas.viewport, bounds)
+    expect(canvas.zoom).toBe('selection')
+    expect(canvas.effectiveZoom).toBe(matrixZoom)
+    expect(canvas.panOffset).toEqual(matrixOffset)
+  })
+
+  it.each(['panBy', 'setPanOffset', 'setZoom', 'fit'] as const)('manual %s exits selection mode and stays remembered', (action) => {
+    const canvas = createCanvasStore()
+    canvas.setArrangement('list')
+    canvas.setGeometry({ width: 1200, height: 900 }, bounds, 0, {}, frame)
+    if (action === 'panBy') canvas.panBy({ x: 24, y: 0 })
+    else if (action === 'setPanOffset') canvas.setPanOffset({ x: 25, y: 30 })
+    else if (action === 'setZoom') canvas.setZoom(0.5)
+    else canvas.fit()
+    const manualZoom = canvas.zoom
+    expect(manualZoom).not.toBe('selection')
+    canvas.setArrangement('grid')
+    expect(canvas.zoom).toBe('fit')
+    canvas.setArrangement('list')
+    expect(canvas.zoom).toBe(manualZoom)
+    canvas.resetZoom()
+    expect(canvas.zoom).toBe('selection')
+  })
+
   it('keeps Fit pending until measured viewport exists and refits after selection focus', () => {
     const canvas = createCanvasStore()
     canvas.setGeometry({ width: 0, height: 0 }, bounds, 300, { topInset: 184 })

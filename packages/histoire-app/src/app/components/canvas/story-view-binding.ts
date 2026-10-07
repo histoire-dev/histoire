@@ -103,7 +103,7 @@ export function bindStoryCanvasView(options: StoryCanvasViewBindingOptions) {
     else if (previousStoryId) {
       activeArrangement = fallbackArrangement()
       canvas.setArrangement(options.getRenderedArrangement())
-      canvas.fit()
+      canvas.resetZoom()
     }
   }, { flush: 'pre', immediate: true })
 
@@ -126,7 +126,7 @@ export function bindStoryCanvasView(options: StoryCanvasViewBindingOptions) {
     else {
       activeArrangement = fallbackArrangement()
       canvas.setArrangement(options.getRenderedArrangement())
-      canvas.fit()
+      canvas.resetZoom()
     }
   }, { flush: 'sync' })
 

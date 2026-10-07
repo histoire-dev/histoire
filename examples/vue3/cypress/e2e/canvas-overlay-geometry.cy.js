@@ -26,8 +26,8 @@ function zoomAction(label) {
 }
 
 /** Read persisted numeric or automatic canvas zoom without coupling assertions to menu labels. */
-function storedCanvasZoom(window) {
-  return JSON.parse(window.localStorage.getItem('_histoire-ui-canvas')).zoom
+function storedCanvasZoom(window, arrangement = 'grid') {
+  return JSON.parse(window.localStorage.getItem('_histoire-ui-canvas')).zoomByArrange[arrangement]
 }
 
 /** Header metadata stays inside inspector-safe canvas space across responsive reflows. */
@@ -75,7 +75,48 @@ function assertFrames(selector = '.histoire-canvas-frame', allEdges = true) {
   })
 }
 
+/** Selection must fill one usable dimension, not merely remain somewhere inside the canvas. */
+function assertSelectionFit() {
+  const selected = '[data-frame-id]:has(> button[aria-pressed="true"])'
+  assertFrames(selected)
+  cy.get(canvas).should(($canvas) => {
+    const root = $canvas[0]
+    const viewport = root.getBoundingClientRect()
+    const header = root.querySelector('.histoire-canvas-header').getBoundingClientRect()
+    const inspector = root.ownerDocument.querySelector('aside.histoire-inspector-frame')?.getBoundingClientRect()
+    const rect = root.querySelector(selected).getBoundingClientRect()
+    const widthRemaining = (inspector ? inspector.left - 12 : viewport.right) - viewport.left - 64 - rect.width
+    const heightRemaining = viewport.bottom - header.bottom - 64 - rect.height
+    expect(Math.min(Math.abs(widthRemaining), Math.abs(heightRemaining)), 'selection fills limiting content dimension').to.be.lessThan(2)
+  })
+}
+
 describe('canvas overlay geometry', () => {
+  for (const initialArrangement of ['grid', 'list']) {
+    it(`fits story-only List navigation from initial ${initialArrangement}`, () => {
+      visitCanvas(`/story/src-components-workbenchmatrix-story-vue?variantId&arrange=${initialArrangement}`)
+      if (initialArrangement === 'grid') {
+        cy.location('search').should('not.include', 'variantId=default')
+        cy.get('button[aria-label="List"]').click()
+      }
+      cy.location('search').should('include', 'variantId=default')
+      cy.get('button[aria-label="Zoom level"]').should('contain', 'Selection')
+      assertSelectionFit()
+      cy.get('[aria-label="Story tree"] .vue-recycle-scroller').scrollTo('bottom')
+      cy.contains('[data-test-id="story-list-variant"]', /^Alternate$/).click()
+      cy.location('search').should('include', 'variantId=alternate')
+      assertSelectionFit()
+    })
+  }
+
+  it('fits generated Tailwind story after switching story-only Grid to List', () => {
+    visitCanvas('/story/tailwind?variantId')
+    cy.get('button[aria-label="List"]').click()
+    cy.location('search').should('include', 'variantId=background-color')
+    cy.get('button[aria-label="Zoom level"]').should('contain', 'Selection')
+    assertSelectionFit()
+  })
+
   it('preserves saved 67% zoom and places initial Code gen frame below header', () => {
     visitCanvas(codegen, 0.67)
     cy.get('button[aria-label="Zoom level"]').should('contain', '67%')
@@ -109,19 +150,47 @@ describe('canvas overlay geometry', () => {
     })
   })
 
-  it('fits selected variant once when List opens and preserves zoom for later selection', () => {
-    let initialZoom
-    visitCanvas(`${matrix.replace('&arrange=matrix', '')}&arrange=list`)
+  it('defaults List to selection fit and follows later selection', () => {
+    visitCanvas(matrix.replace('&arrange=matrix', ''))
+    cy.get('button[aria-label="List"]').click()
+    cy.get('button[aria-label="Zoom level"]').should('contain', 'Selection')
     assertFrames('.histoire-canvas-frame.is-selected')
-    cy.window().then((window) => {
-      initialZoom = storedCanvasZoom(window)
-      expect(initialZoom, 'List entry stores selected-frame fit').to.be.a('number')
+    cy.window().should((window) => {
+      expect(storedCanvasZoom(window, 'list'), 'List stores selection-fit mode').to.equal('selection')
     })
-    cy.contains('.histoire-frame-label', /^Alternate$/).click({ force: true })
+    // Selection fit virtualizes the next canvas row; select through story navigation.
+    cy.get('[aria-label="Story tree"] .vue-recycle-scroller').scrollTo('bottom')
+    cy.contains('[data-test-id="story-list-variant"]', /^Alternate$/).click()
     cy.location('search').should('include', 'variantId=alternate')
     cy.window().should((window) => {
-      expect(storedCanvasZoom(window), 'later List selection preserves fitted zoom').to.equal(initialZoom)
+      expect(storedCanvasZoom(window, 'list'), 'later List selection retains mode').to.equal('selection')
     })
+    assertFrames('.histoire-canvas-frame.is-selected')
+    cy.viewport(1000, 760)
+    assertFrames('.histoire-canvas-frame.is-selected')
+  })
+
+  it('remembers explicit numeric and canvas Fit choices for List', () => {
+    visitCanvas(`${matrix.replace('&arrange=matrix', '')}&arrange=list`)
+    assertFrames('.histoire-canvas-frame.is-selected')
+    zoomAction('50%')
+    cy.get('button[aria-label="Grid"]').click()
+    cy.get('button[aria-label="List"]').click()
+    cy.window().should((window) => {
+      expect(storedCanvasZoom(window, 'list')).to.equal(0.5)
+    })
+    zoomAction('Fit to canvas')
+    cy.contains('.histoire-frame-label', /^Alternate$/).click({ force: true })
+    cy.location('search').should('include', 'variantId=alternate')
+    cy.get('button[aria-label="Grid"]').click()
+    cy.get('button[aria-label="List"]').click()
+    cy.window().should((window) => {
+      expect(storedCanvasZoom(window, 'list')).to.equal('fit')
+    })
+    cy.reload()
+    cy.get('button[aria-label="Zoom level"]').should('contain', 'Fit')
+    zoomAction('Zoom to selection')
+    cy.get('button[aria-label="Zoom level"]').should('contain', 'Selection')
     assertFrames('.histoire-canvas-frame.is-selected')
   })
 
@@ -146,7 +215,8 @@ describe('canvas overlay geometry', () => {
 
   it('fits Matrix between its fixed controls and footer', () => {
     visitCanvas(matrix)
-    cy.get('.histoire-matrix-cell').should('have.length', 4)
+    // Axes arrive after runtime readiness; iframe existence alone does not imply ready cells.
+    cy.get('.histoire-matrix-cell', { timeout: 20000 }).should('have.length', 4)
     assertFrames('.histoire-matrix-cell')
     cy.get('[aria-label="Close inspector"]').click()
     cy.viewport(1000, 760)

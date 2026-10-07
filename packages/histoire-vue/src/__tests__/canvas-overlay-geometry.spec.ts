@@ -5,9 +5,11 @@ import { flushPromises, mount } from '@vue/test-utils'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { defineComponent, h, nextTick, ref } from 'vue'
 import CanvasViewport from '../../../histoire-app/src/app/components/canvas/CanvasViewport.vue'
+import { layoutCanvasFrames } from '../../../histoire-app/src/app/components/canvas/frame-layout.js'
 import MatrixView from '../../../histoire-app/src/app/components/canvas/matrix/MatrixView.vue'
 import { canvasToClient } from '../../../histoire-app/src/app/components/canvas/pan/usePanZoom.js'
 import { createMatrixStore, provideMatrix } from '../../../histoire-app/src/app/stores/matrix.js'
+import { createStoryCanvasViews, provideStoryCanvasViews } from '../../../histoire-app/src/app/stores/story-canvas-views.js'
 import { sourceFixture } from '../../../histoire-sdk/src/__tests__/fixtures/session.js'
 import { resizeObserverFixture } from './fixtures/resize-observer.js'
 
@@ -22,7 +24,7 @@ afterEach(async () => {
 })
 
 /** Mount genuine canvas geometry; preview lifetimes do not participate in layout. */
-async function canvasFixture(zoom: number | 'fit' = 'fit', initialHeight = 900, customHeader = false) {
+async function canvasFixture(zoom: number | 'fit' = 'fit', initialHeight = 900, customHeader = false, initialArrangement: 'grid' | 'list' = 'grid', initialVariantId: string | null = 'c') {
   window.localStorage.setItem('_histoire-ui-canvas', JSON.stringify({ zoom }))
   const observers = resizeObserverFixture()
   const geometry = { height: initialHeight, headerHeight: 48, footerHeight: 14 }
@@ -42,13 +44,15 @@ async function canvasFixture(zoom: number | 'fit' = 'fit', initialHeight = 900, 
   const fixture = sourceFixture()
   const session = createHistoireSessionWithAdapters({ url: 'https://book.example/' }, fixture.adapters)
   await session.connect()
-  await session.selection.select({ storyId: 'a:b', variantId: 'c' })
+  await session.selection.select({ storyId: 'a:b', variantId: initialVariantId })
   const matrix = createMatrixStore()
-  const arrange = ref<'grid' | 'list' | 'matrix'>('grid')
+  const arrange = ref<'grid' | 'list' | 'matrix'>(initialArrangement)
+  const inspectorWidth = ref(300)
   const Host = defineComponent({
     setup() {
       provideMatrix(matrix)
-      return () => h(CanvasViewport, { arrange: arrange.value, previewBase: 'https://book.example/', frameBudget: 1, inspectorWidth: 300 }, {
+      provideStoryCanvasViews(createStoryCanvasViews())
+      return () => h(CanvasViewport, { arrange: arrange.value, previewBase: 'https://book.example/', frameBudget: 1, inspectorWidth: inspectorWidth.value }, {
         header: customHeader ? () => h('div', 'Custom header') : undefined,
         matrix: slot => h(MatrixView, { size: slot.size, contentInsets: slot.contentInsets, frameBudget: 1, previewBase: 'https://book.example/' }),
       })
@@ -74,10 +78,117 @@ async function canvasFixture(zoom: number | 'fit' = 'fit', initialHeight = 900, 
     observers.deliver()
     await flushPromises()
   }
-  return { wrapper, component, canvas, geometry, observers, fixture, session, matrix, arrange, resize }
+  return { wrapper, component, canvas, geometry, observers, fixture, session, matrix, arrange, inspectorWidth, resize }
+}
+
+/** Check selection against unobstructed viewport bounds, including fixed-size title. */
+function assertSelectionFits(test: Awaited<ReturnType<typeof canvasFixture>>) {
+  const snapshot = test.session.getSnapshot()
+  const story = snapshot.catalog.stories.find(story => story.id === snapshot.selection?.storyId)!
+  const frames = layoutCanvasFrames(story.id, story.variants.map(variant => variant.id), { width: snapshot.settings.responsiveWidth, height: snapshot.settings.responsiveHeight ?? 640 }, 'list', 3, test.canvas.effectiveZoom)
+  const frame = frames.find(frame => frame.variantId === snapshot.selection?.variantId)!
+  const start = canvasToClient(frame, test.canvas.effectiveZoom, test.canvas.panOffset)
+  const end = canvasToClient({ x: frame.x + frame.width, y: frame.y + frame.height }, test.canvas.effectiveZoom, test.canvas.panOffset)
+  expect(start.x).toBeGreaterThanOrEqual(31.99)
+  expect(start.y).toBeGreaterThanOrEqual((test.canvas.contentInsets.topInset ?? 0) + 31.99)
+  expect(end.x).toBeLessThanOrEqual(test.canvas.viewport.width - test.inspectorWidth.value - 31.99)
+  expect(end.y).toBeLessThanOrEqual(test.canvas.viewport.height - (test.canvas.contentInsets.bottomInset ?? 0) - 31.99)
+  const widthRemaining = test.canvas.viewport.width - test.inspectorWidth.value - 64 - frame.width * test.canvas.effectiveZoom
+  const heightRemaining = test.canvas.viewport.height - (test.canvas.contentInsets.topInset ?? 0) - (test.canvas.contentInsets.bottomInset ?? 0) - 64 - frame.height * test.canvas.effectiveZoom
+  expect(Math.min(Math.abs(widthRemaining), Math.abs(heightRemaining)), 'selection fills limiting content dimension').toBeLessThan(0.01)
 }
 
 describe('canvas overlay geometry', () => {
+  it.each(['grid', 'list'] as const)('gives story-only navigation a canonical List fit target from initial %s', async (initialArrangement) => {
+    const test = await canvasFixture('fit', 900, false, initialArrangement, null)
+    if (initialArrangement === 'grid') {
+      expect(test.session.getSnapshot().selection?.variantId).toBeNull()
+      test.arrange.value = 'list'
+      await flushPromises()
+    }
+    expect(test.session.getSnapshot().selection).toEqual({ storyId: 'a:b', variantId: 'c' })
+    expect(test.canvas.zoom).toBe('selection')
+    assertSelectionFits(test)
+    await test.session.selection.select({ storyId: 'a:b', variantId: 'other' })
+    await flushPromises()
+    expect(test.session.getSnapshot().selection?.variantId).toBe('other')
+    assertSelectionFits(test)
+  })
+
+  it.each([0.5, 'fit'] as const)('preserves story-only chooser with explicit List zoom %s', async (zoom) => {
+    const test = await canvasFixture('fit', 900, false, 'grid', null)
+    test.canvas.setArrangement('list')
+    if (zoom === 'fit') test.canvas.fit()
+    else test.canvas.setZoom(zoom)
+    test.arrange.value = 'list'
+    await flushPromises()
+    expect(test.session.getSnapshot().selection?.variantId).toBeNull()
+    expect(test.canvas.zoom).toBe(zoom)
+  })
+
+  it('keeps documentation-only targets unselected in List selection mode', async () => {
+    const test = await canvasFixture('fit', 900, false, 'list')
+    // Legacy docs catalogs can still contain a synthetic variant.
+    test.fixture.descriptor.catalog.stories.find(story => story.id === 'docs')!.variants.push({ id: '_default', title: 'Default' })
+    test.fixture.emitCatalog()
+    await test.session.selection.select({ storyId: 'docs', variantId: null })
+    await flushPromises()
+    expect(test.session.getSnapshot().selection).toEqual({ storyId: 'docs', variantId: null })
+    expect(test.canvas.zoom).toBe('selection')
+  })
+
+  it('defers initial List selection fit until viewport is measurable', async () => {
+    const test = await canvasFixture('fit', 0, false, 'list')
+    expect(test.canvas.zoom).toBe('selection')
+    expect(test.canvas.effectiveZoom).toBe(1)
+    test.geometry.height = 900
+    await test.resize()
+    assertSelectionFits(test)
+  })
+
+  it.each(['grid', 'list'] as const)('fits List selection from initial %s and follows later selection and resize', async (initialArrangement) => {
+    const test = await canvasFixture('fit', 900, false, initialArrangement)
+    test.arrange.value = 'list'
+    await flushPromises()
+    expect(test.canvas.zoom).toBe('selection')
+    assertSelectionFits(test)
+    const firstOffset = { ...test.canvas.panOffset }
+    await test.session.selection.select({ storyId: 'a:b', variantId: 'other' })
+    await flushPromises()
+    expect(test.canvas.zoom).toBe('selection')
+    expect(test.canvas.panOffset).not.toEqual(firstOffset)
+    assertSelectionFits(test)
+    const firstZoom = test.canvas.effectiveZoom
+    test.geometry.height = 600
+    test.geometry.headerHeight = 100
+    test.inspectorWidth.value = 600
+    await test.resize()
+    expect(test.canvas.effectiveZoom).toBeLessThan(firstZoom)
+    assertSelectionFits(test)
+    await test.session.settings.update({ responsiveWidth: 300, responsiveHeight: 300 })
+    await flushPromises()
+    expect(test.canvas.effectiveZoom).toBeGreaterThan(firstZoom)
+    assertSelectionFits(test)
+  })
+
+  it('keeps custom List zoom choices and re-enables selection following explicitly', async () => {
+    const test = await canvasFixture('fit', 900, false, 'list')
+    test.canvas.setZoom(0.5)
+    test.arrange.value = 'grid'
+    await flushPromises()
+    test.arrange.value = 'list'
+    await flushPromises()
+    expect(test.canvas.zoom).toBe(0.5)
+    test.canvas.fit()
+    await test.session.selection.select({ storyId: 'a:b', variantId: 'other' })
+    await flushPromises()
+    expect(test.canvas.zoom).toBe('fit')
+    test.canvas.resetZoom()
+    await test.resize()
+    expect(test.canvas.zoom).toBe('selection')
+    assertSelectionFits(test)
+  })
+
   it('measures header metadata and Pan hint in viewport pixels and observes subsequent sizes', async () => {
     const test = await canvasFixture()
     expect(test.component.get('.histoire-canvas-header .histoire-canvas-status').exists()).toBe(true)
