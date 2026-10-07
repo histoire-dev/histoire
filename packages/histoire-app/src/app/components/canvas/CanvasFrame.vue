@@ -183,7 +183,7 @@ function openMenu(event: MouseEvent | KeyboardEvent) {
 .is-highlighted .histoire-frame-label { color: var(--histoire-accent); } .is-highlighted .histoire-frame-body { border-color: var(--histoire-accent); }
 .histoire-frame-content { transform-origin: top left; }
 .histoire-frame-select { position: absolute; inset: 0; cursor: pointer; }
-.histoire-frame-placeholder, .histoire-frame-error { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 16px; color: var(--histoire-muted); background: var(--histoire-field); font-size: 12px; text-align: center; }
+.histoire-frame-placeholder, .histoire-frame-error { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 16px; color: var(--histoire-muted); background: var(--histoire-input); font-size: 12px; text-align: center; }
 .histoire-frame-error { z-index: 2; color: var(--histoire-danger); background: var(--histoire-danger-soft); }
 .histoire-frame-error button { padding: 4px 10px; color: inherit; }
 .is-stale .histoire-frame-content { opacity: .4; pointer-events: none; }
