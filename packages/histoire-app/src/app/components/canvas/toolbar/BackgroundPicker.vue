@@ -43,7 +43,7 @@ function apply(color: string, custom = false) {
 </script>
 
 <template>
-  <ToolbarPopover id="background" :open="open" label="Background" icon="color-palette" :width="280" data-test-id="toolbar-background" @update:open="emit('update:open', $event)">
+  <ToolbarPopover id="background" :open="open" label="Background" icon="color-palette" icon-only :width="280" data-test-id="toolbar-background" @update:open="emit('update:open', $event)">
     <template #trigger>
       <span class="toolbar-menu-only background-trigger-swatch" :style="getBackgroundPresetStyle({ color: activePreset, label: '' })" />
     </template>

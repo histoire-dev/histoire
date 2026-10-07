@@ -5,4 +5,5 @@ import { describeWorkbenchContract } from '../../../cypress/workbench-contract.j
 describeWorkbenchContract({
   path: '/story/src-meow-story-svelte?variantId=src-meow-story-svelte-0',
   previewText: '😺',
+  externalStoryIcons: ['carbon:car'],
 })

@@ -1,5 +1,7 @@
 /* Defaults reset at each provider; nested embeds do not inherit compact chrome. */
 .histoire-provider {
+  /* Pane edges stay aligned across tabs and both density modes. */
+  --histoire-pane-gutter: 16px;
   --histoire-settings-row-padding: 20px;
   --histoire-viewport-row-padding: 13px;
   --histoire-list-row-padding: 10px;

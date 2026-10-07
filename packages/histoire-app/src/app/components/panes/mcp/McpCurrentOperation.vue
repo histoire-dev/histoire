@@ -18,7 +18,7 @@ const cancelling = computed(() => operation.value && store.cancelling.includes(o
       <BuiltinIcon icon="time" :size="16" />
       <code>{{ operation.tool }}</code>
       <span :title="mcpTargetLabel(operation.target, snapshot.catalog)">{{ mcpTargetLabel(operation.target, snapshot.catalog) }}</span>
-      <HstButton v-if="isMcpOperationCancellable(operation)" color="flat" type="button" :disabled="cancelling" :aria-label="cancelling ? 'Cancelling operation' : 'Cancel operation'" @click="store.cancel(operation.id)">
+      <HstButton v-if="isMcpOperationCancellable(operation)" icon-only color="flat" type="button" :disabled="cancelling" :aria-label="cancelling ? 'Cancelling operation' : 'Cancel operation'" @click="store.cancel(operation.id)">
         <BuiltinIcon icon="stop-filled" :size="14" />
       </HstButton>
     </div>
@@ -37,7 +37,7 @@ const cancelling = computed(() => operation.value && store.cancelling.includes(o
 .histoire-mcp-operation-heading { display: flex; align-items: center; gap: 7px; color: var(--histoire-agent-text); }
 code { font-size: 11px; overflow-wrap: anywhere; }
 .histoire-mcp-operation-heading > span { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; color: var(--histoire-muted); }
-button { display: grid; place-items: center; flex: none; width: 26px; height: 26px; color: var(--histoire-danger-text); }
+button { --histoire-icon-button-size: 26px; color: var(--histoire-danger-text); }
 button:hover { background: var(--histoire-danger-soft); }
 button:disabled { opacity: .5; cursor: wait; }
 progress { appearance: none; display: block; width: 100%; height: 4px; margin: 10px 0; border: 0; border-radius: 999px; background: var(--histoire-surface); overflow: hidden; }

@@ -25,6 +25,7 @@ defineProps<{
 
 <template>
   <HstButton
+    icon-only
     color="flat"
     type="button"
     class="histoire-rail-button"
@@ -43,13 +44,8 @@ defineProps<{
 
 <style scoped>
 .histoire-rail-button {
-  display: grid;
-  place-items: center;
+  --histoire-icon-button-size: var(--histoire-rail-button-size, 40px);
   position: relative;
-  width: 40px;
-  height: 40px;
-  flex: 0 0 40px;
-  padding: 0;
   color: var(--histoire-muted);
 }
 .histoire-rail-button:hover { color: var(--histoire-text); background: var(--histoire-chip); }
@@ -67,7 +63,4 @@ defineProps<{
 }
 .histoire-rail-badge[data-tone="agent"] { background: var(--histoire-agent); }
 .histoire-rail-badge[data-tone="mcp"] { background: rgb(var(--histoire-agent-rgb) / .6); }
-@container (max-width: 640px) {
-  .histoire-rail-button { width: auto; min-width: 0; flex: 1 1 0; }
-}
 </style>

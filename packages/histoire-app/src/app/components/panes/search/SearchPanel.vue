@@ -12,8 +12,10 @@ import { useContextMenu } from '../../../composables/context-menu.js'
 import CommandPrompts from '../../command/CommandPrompts.vue'
 import WorkbenchVirtualList from '../../lists/WorkbenchVirtualList.vue'
 import WorkbenchEmptyState from '../../shell/WorkbenchEmptyState.vue'
+import WorkbenchLoadingState from '../../shell/WorkbenchLoadingState.vue'
 
 import { getSearchCommandDomId, SEARCH_ACTIVE_RESULT_ID, SEARCH_RESULTS_ID } from './accessibility.js'
+import { createWorkbenchCommandExecutor } from './command-execution.js'
 import { createWorkbenchSearchController } from './controller.js'
 import { getSearchActivationResult, getSearchFrameMatches } from './query.js'
 import SearchResultList from './SearchResultList.vue'
@@ -172,12 +174,10 @@ async function activate(result: WorkbenchSearchResult, isolated = false) {
   catch (error) { if (ownsFeedback()) emit('error', error) }
 }
 
-/** Prompts retain existing plugin contracts; this component owns no command transport. */
-function execute(command: ClientCommand, params: Record<string, any>) {
-  void props.commands.execute(command, params).catch((error) => {
-    if (active) emit('error', error)
-  })
-}
+/** Prompt submission retains transport contract and captured feedback ownership. */
+const commandExecutor = createWorkbenchCommandExecutor(context.session, () => props.commands, () => activationGeneration, error => emit('error', error))
+useHistoireResource(commandExecutor.close)
+const execute = commandExecutor.execute
 
 /** Selecting a prompt command only opens its form. */
 function activateCommand(command: ClientCommand) {
@@ -248,6 +248,7 @@ function keydown(event: KeyboardEvent) {
     <p v-if="state.error" class="notice" role="status">
       Search index unavailable. Loaded props remain searchable.
     </p>
+    <WorkbenchLoadingState v-if="query.trim() && state.loading && !ordered.length && !commands.length" title="Searching…" />
     <WorkbenchEmptyState v-if="query.trim() && !state.loading && !ordered.length && !commands.length" icon="search" title="No matches">
       Nothing for <q class="search-empty-query">{{ query.trim() }}</q><template v-if="scope !== 'all'">
         in {{ scope }}
@@ -261,7 +262,7 @@ function keydown(event: KeyboardEvent) {
     <p v-if="activeCursor" :id="SEARCH_ACTIVE_RESULT_ID" class="search-active-result" role="status" aria-live="polite" data-search-active-result>
       {{ activeCursor.label }}
     </p>
-    <div :id="SEARCH_RESULTS_ID">
+    <div :id="SEARCH_RESULTS_ID" class="search-results">
       <SearchResultList :results="ordered" :query="query" :active-id="activeId" :selection="snapshot.selection" @activate="activate" @focus="focusResult" />
       <section v-if="commands.length" class="command-results" aria-label="Commands">
         <h3>Commands</h3>
@@ -279,20 +280,22 @@ function keydown(event: KeyboardEvent) {
 </template>
 
 <style scoped>
-.workbench-search { flex: 1; padding: 14px 10px; overflow: auto; min-width: 0; min-height: 0; background: var(--histoire-surface); color: var(--histoire-text); }
-.search-input { display: flex; align-items: center; gap: 12px; box-sizing: border-box; width: 100%; min-width: 0; height: 40px; padding: 0 12px; margin: 0 0 6px; border: 1px solid var(--histoire-border); border-radius: 12px; background: var(--histoire-input); color: var(--histoire-text); }
+.workbench-search { flex: 1; padding: 16px var(--histoire-pane-gutter, 16px); overflow: auto; min-width: 0; min-height: 0; background: var(--histoire-surface); color: var(--histoire-text); }
+.search-input { display: flex; align-items: center; gap: 12px; box-sizing: border-box; width: 100%; min-width: 0; height: 40px; padding: 0 12px; margin: 0 0 8px; border: 1px solid var(--histoire-border); border-radius: 12px; background: var(--histoire-input); color: var(--histoire-text); }
 .search-input:focus-within { border-color: var(--histoire-accent); box-shadow: 0 0 0 1px var(--histoire-accent); }
 .search-input svg { color: var(--histoire-muted); width: 18px; height: 18px; flex: none; }
 .search-query { flex: 1; min-width: 0; height: 100%; padding: 0; border: 0; outline: 0; background: transparent; color: inherit; font: inherit; appearance: none; -webkit-appearance: none; }
 .search-query::placeholder { color: var(--histoire-muted); opacity: 1; }
 .search-query::-webkit-search-cancel-button { display: none; -webkit-appearance: none; }
 kbd { flex: none; color: var(--histoire-muted); font: 11px var(--histoire-font-mono, monospace); }
-.notice { margin: 20px 10px; color: var(--histoire-muted); font-size: 12px; }
+.notice { margin: 20px 0; color: var(--histoire-muted); font-size: 12px; }
 .search-empty-query { color: var(--histoire-text); }
 .search-active-result { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.search-results { margin-inline: -8px; }
+.workbench-search :deep(.workbench-state) { margin-inline: 0; }
 .command-results { margin-top: 22px; }
-.command-results h3 { padding: 0 10px; color: var(--histoire-muted); font-size: 12px; }
-.command-results button { display: flex; gap: 10px; align-items: center; width: 100%; padding: 10px; color: inherit; text-align: left; }
+.command-results h3 { padding: 0 8px; color: var(--histoire-muted); font-size: 12px; }
+.command-results button { display: flex; gap: 10px; align-items: center; width: 100%; padding: 10px 8px; color: inherit; text-align: left; }
 .command-results button.active { background: var(--histoire-accent-soft); }
 .command-results button:focus-visible { outline: 2px solid var(--histoire-accent); outline-offset: -2px; }
 </style>

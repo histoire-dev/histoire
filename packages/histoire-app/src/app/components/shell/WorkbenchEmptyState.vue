@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { BuiltinIcon } from '@histoire/controls/vue'
+import './workbench-state.css'
 
 defineProps<{
   /** Offline Carbon glyph name shown in accent badge. */
@@ -16,8 +17,8 @@ defineSlots<{
 </script>
 
 <template>
-  <div class="workbench-empty-state" role="status">
-    <span class="workbench-empty-state-icon">
+  <div class="workbench-state workbench-empty-state" role="status">
+    <span class="workbench-state-visual workbench-empty-state-icon">
       <BuiltinIcon :icon="icon" :size="22" />
     </span>
     <strong>{{ title }}</strong>
@@ -31,10 +32,7 @@ defineSlots<{
 </template>
 
 <style scoped>
-.workbench-empty-state { display: flex; flex-direction: column; align-items: center; gap: 6px; margin: 48px 16px; text-align: center; color: var(--histoire-muted); font-size: 12px; }
-.workbench-empty-state-icon { display: grid; place-items: center; width: 48px; height: 48px; margin-bottom: 8px; border-radius: 50%; background: var(--histoire-accent-soft); color: var(--histoire-accent); }
-.workbench-empty-state strong { color: var(--histoire-text); font-size: 14px; font-weight: 600; }
-.workbench-empty-state p { max-width: 100%; margin: 0; overflow-wrap: anywhere; }
+.workbench-empty-state-icon { border-radius: 50%; background: var(--histoire-accent-soft); }
 .workbench-empty-state-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 8px; }
 .workbench-empty-state-actions :deep(.histoire-button[data-color="flat"]) { color: var(--histoire-accent); }
 </style>

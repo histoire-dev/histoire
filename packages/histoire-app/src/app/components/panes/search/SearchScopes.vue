@@ -15,10 +15,13 @@ const scopes: { value: SearchScope, label: string }[] = [{ value: 'all', label: 
 </script>
 
 <template>
-  <HstButtonGroup class="search-scopes" layout="inline" aria-label="Search scope" :model-value="modelValue" :options="scopes" @update:model-value="emit('update:modelValue', $event)" />
+  <div class="search-scopes">
+    <HstButtonGroup layout="inline" aria-label="Search scope" :model-value="modelValue" :options="scopes" @update:model-value="emit('update:modelValue', $event)" />
+  </div>
 </template>
 
 <style scoped>
-.search-scopes.histoire-wrapper[data-layout="inline"] { display: flex; width: 100%; max-width: 100%; margin: 0 0 4px; }
+.search-scopes { display: flex; margin-bottom: 12px; }
+.search-scopes :deep(.histoire-button-group) { width: 100%; max-width: 100%; }
 .search-scopes :deep(.histoire-control-content), .search-scopes :deep(.histoire-control-value), .search-scopes :deep(.histoire-button-group-options) { width: 100%; max-width: 100%; }
 </style>

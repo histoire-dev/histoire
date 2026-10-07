@@ -7,13 +7,13 @@ describe('offline workbench icons', () => {
     })
     vi.stubGlobal('fetch', fetch)
     try {
-      const { getWorkbenchIcon, workbenchIconNames } = await import('../../../../histoire-app/src/app/util/icons.js')
-      expect(workbenchIconNames.length).toBeGreaterThan(60)
-      for (const name of workbenchIconNames) {
-        expect(getWorkbenchIcon(name)?.body, name).toBeTruthy()
-        expect(getWorkbenchIcon(`carbon:${name}`)?.body, name).toBeTruthy()
+      const { getHistoireIcon, histoireIconNames } = await import('../../../../histoire-shared/src/icons/index.js')
+      expect(histoireIconNames.length).toBeGreaterThan(60)
+      for (const name of histoireIconNames) {
+        expect(getHistoireIcon(name)?.body, name).toBeTruthy()
+        expect(getHistoireIcon(`carbon:${name}`)?.body, name).toBeTruthy()
       }
-      expect(getWorkbenchIcon('not-a-glyph')).toBeUndefined()
+      expect(getHistoireIcon('not-a-glyph')).toBeUndefined()
       expect(fetch).not.toHaveBeenCalled()
     }
     finally {
@@ -22,17 +22,17 @@ describe('offline workbench icons', () => {
   })
 
   it('resolves legacy first-party icon aliases offline', async () => {
-    const { getWorkbenchIcon } = await import('../../../../histoire-app/src/app/util/icons.js')
-    expect(getWorkbenchIcon('ri:add-line')).toEqual(getWorkbenchIcon('add'))
-    expect(getWorkbenchIcon('mdi:drag-vertical-variant')).toEqual(getWorkbenchIcon('draggable'))
+    const { getHistoireIcon } = await import('../../../../histoire-shared/src/icons/index.js')
+    expect(getHistoireIcon('ri:add-line')).toEqual(getHistoireIcon('add'))
+    expect(getHistoireIcon('mdi:drag-vertical-variant')).toEqual(getHistoireIcon('draggable'))
   })
 
   it('resolves Tailwind logo offline without substituting a generic glyph', async () => {
-    const { getWorkbenchIcon } = await import('../../../../histoire-app/src/app/util/icons.js')
-    const logo = getWorkbenchIcon('mdi:tailwind')
+    const { getHistoireIcon } = await import('../../../../histoire-shared/src/icons/index.js')
+    const logo = getHistoireIcon('mdi:tailwind')
     expect(logo?.body).toContain('<path')
     expect(logo).toMatchObject({ width: 24, height: 24 })
-    expect(logo).not.toEqual(getWorkbenchIcon('cube'))
-    expect(logo).not.toEqual(getWorkbenchIcon('color-palette'))
+    expect(logo).not.toEqual(getHistoireIcon('cube'))
+    expect(logo).not.toEqual(getHistoireIcon('color-palette'))
   })
 })

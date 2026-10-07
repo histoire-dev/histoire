@@ -66,11 +66,13 @@ function sendDrafts() {
 <template>
   <section class="comments-panel" aria-label="Comments">
     <header class="comments-heading">
-      <h2>Comments</h2><HstButton color="flat" type="button" aria-label="Show resolved comment pins" :aria-pressed="model.showResolved.value" @click="model.toggleResolved">
+      <h2>Comments</h2><HstButton icon-only color="flat" type="button" aria-label="Show resolved comment pins" :aria-pressed="model.showResolved.value" @click="model.toggleResolved">
         <BuiltinIcon icon="filter" :size="16" />
       </HstButton>
     </header>
-    <HstButtonGroup v-model="filter" layout="inline" class="comments-filters" aria-label="Comment status" :options="filterOptions" />
+    <div class="comments-filters">
+      <HstButtonGroup v-model="filter" layout="inline" aria-label="Comment status" :options="filterOptions" />
+    </div>
     <p v-if="!model.connected.value" class="comments-notice" role="status">
       Comments disconnected
     </p>
@@ -101,10 +103,12 @@ function sendDrafts() {
 
 <style scoped>
 .comments-panel { display: flex; flex-direction: column; height: 100%; min-height: 0; color: var(--histoire-text); }
-.comments-heading { display: flex; align-items: center; justify-content: space-between; padding: 18px 16px; }.comments-heading h2 { font-size: 15px; font-weight: 800; margin: 0; }.comments-heading button { color: var(--histoire-muted); padding: 4px; }
-.comments-filters { display: flex; margin: 3px 14px 0; }
-.comments-scroll { flex: 1; min-height: 0; overflow: auto; padding: 0 8px 12px; }.comments-notice { margin: 18px 16px; color: var(--histoire-muted); font-size: 12px; }
-footer { display: flex; align-items: center; gap: 6px; padding: 11px 14px; border-top: 1px solid var(--histoire-border); }
+.comments-heading { display: flex; align-items: center; justify-content: space-between; padding: 16px var(--histoire-pane-gutter, 16px); }.comments-heading h2 { font-size: 15px; font-weight: 800; margin: 0; }.comments-heading button { color: var(--histoire-muted); padding: 4px; }
+.comments-filters { display: flex; flex: none; padding: 0 var(--histoire-pane-gutter, 16px) 12px; }
+.comments-filters :deep(.histoire-button-group) { width: 100%; }
+.comments-scroll { flex: 1; min-height: 0; overflow: auto; padding: 0 calc(var(--histoire-pane-gutter, 16px) - 8px) 16px; }.comments-notice { margin: 18px var(--histoire-pane-gutter, 16px); color: var(--histoire-muted); font-size: 12px; }
+.comments-scroll .comments-notice { margin-inline: 8px; }
+footer { display: flex; align-items: center; gap: 6px; padding: 11px var(--histoire-pane-gutter, 16px); border-top: 1px solid var(--histoire-border); }
 footer .histoire-select { width: 110px; min-width: 0; }
 footer button { flex: 1; min-height: 34px; font-weight: 700; }
 footer svg { color: var(--histoire-agent); }

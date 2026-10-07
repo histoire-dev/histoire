@@ -77,5 +77,5 @@ const rows = computed<(CommentHeading | CommentItem)[]>(() => {
 </template>
 
 <style scoped>
-h3 { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; margin: 0; padding: 20px 9px 6px; color: var(--histoire-muted); font-size: 11px; font-weight: 700; }h3 svg { width: 12px; height: 12px; }small { margin-left: auto; color: var(--histoire-warn); font-size: 10px; }
+h3 { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; margin: 0; padding: 20px 8px 6px; color: var(--histoire-muted); font-size: 11px; font-weight: 700; }h3 svg { width: 12px; height: 12px; }small { margin-left: auto; color: var(--histoire-warn); font-size: 10px; }
 </style>

@@ -21,6 +21,33 @@ async function setup() {
 }
 
 describe('workbench content ownership', () => {
+  it.each(['ready', 'error'] as const)('retires source loading when delayed read becomes %s', async (result) => {
+    const { session, preview } = await setup()
+    const pending = deferred<HistoireSourceContent>()
+    vi.spyOn(session.source, 'get').mockReturnValueOnce(pending.promise)
+    const wrapper = mount(HistoireProvider, { props: { session }, slots: { default: () => h(SourceDrawer) } })
+    try {
+      await wrapper.get('[aria-label="Expand source"]').trigger('click')
+      await vi.waitFor(() => expect(wrapper.get('[role="status"][aria-atomic="true"]').text()).toBe('Loading source…'))
+      expect(wrapper.find('[aria-label="Histoire source"]').exists()).toBe(true)
+      if (result === 'ready') {
+        pending.resolve({ storyId: 'a:b', variantId: 'c', epoch: 'epoch-1', revision: 'revision-1', mode: 'dynamic', origin: 'generated', body: 'Loaded source', language: 'text' })
+        await vi.waitFor(() => expect(wrapper.text()).toContain('Loaded source'))
+      }
+      else {
+        pending.reject(new Error('Source unavailable'))
+        await vi.waitFor(() => expect(wrapper.get('[role="alert"]').text()).toBe('Source unavailable'))
+        expect(wrapper.findAll('button').some(button => button.text() === 'Retry source')).toBe(true)
+      }
+      expect(wrapper.find('[role="status"][aria-atomic="true"]').exists()).toBe(false)
+    }
+    finally {
+      wrapper.unmount()
+      await preview.unmount()
+      await session.dispose()
+    }
+  })
+
   it.each(['generated', 'external'] as const)('hides editor actions but keeps source controls for %s stories', async (fileOrigin) => {
     const fixture = sourceFixture()
     fixture.descriptor.catalog.stories[0].fileOrigin = fileOrigin

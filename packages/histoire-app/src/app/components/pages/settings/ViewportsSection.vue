@@ -45,10 +45,10 @@ function save(): void {
       </header>
       <div v-for="(preset, index) in presets.responsivePresets.value" :key="presets.viewportKey(index)" class="histoire-settings-row histoire-viewport-row">
         <BuiltinIcon :icon="preset.width < 600 ? 'mobile' : preset.width < 1000 ? 'tablet' : preset.width < 1280 ? 'laptop' : 'screen'" :size="17" /><strong>{{ preset.label }}</strong><code>{{ preset.width }} × {{ preset.height ?? 'Auto' }}</code>
-        <HstButton color="default" class="histoire-settings-action" type="button" :aria-label="`Edit ${preset.label}`" @click="edit(index)">
+        <HstButton icon-only color="default" class="histoire-settings-action" type="button" :aria-label="`Edit ${preset.label}`" @click="edit(index)">
           <BuiltinIcon icon="edit" :size="15" />
         </HstButton>
-        <HstButton color="default" class="histoire-settings-action" type="button" :aria-label="`Remove ${preset.label}`" @click="presets.removeViewport(index)">
+        <HstButton icon-only color="default" class="histoire-settings-action" type="button" :aria-label="`Remove ${preset.label}`" @click="presets.removeViewport(index)">
           <BuiltinIcon icon="trash-can" :size="15" />
         </HstButton>
       </div>
@@ -76,6 +76,6 @@ function save(): void {
 <style scoped>
 .histoire-viewport-row { padding-block: var(--histoire-viewport-row-padding, 13px); }
 .histoire-viewport-row > strong { flex: 1; }
-.histoire-viewport-row > .histoire-settings-action { border: 0; background: transparent; color: var(--histoire-muted, #71717a); padding: 4px; }
+.histoire-viewport-row > .histoire-settings-action { border: 0; background: transparent; color: var(--histoire-muted, #71717a); }
 .histoire-viewport-row code { width: 125px; color: var(--histoire-muted, #71717a); font-size: 12px; }
 </style>

@@ -109,7 +109,7 @@ onBeforeUnmount(() => document.removeEventListener('pointerdown', outside, true)
       <template v-for="(entry, index) in actions" :key="`${entry.kind}:${entry.action.id}`">
         <div v-if="index && actions[index - 1].action.group !== entry.action.group" class="menu-divider" role="separator" />
         <SubMenu v-if="entry.kind === 'frame' && entry.action.children && frameTarget" :action="entry.action" :items="children(entry.action)" :target="frameTarget" @action="run({ kind: 'frame', action: $event })" />
-        <MenuItem v-else :label="entry.action.label" :icon="entry.action.icon" :disabled="entry.disabled" :shortcut="entry.kind === 'frame' && entry.action.shortcut ? shortcuts?.hint(entry.action.shortcut) : undefined" :ai="entry.action.group === 'ai'" @click="run(entry)" />
+        <MenuItem v-else :label="entry.action.label" :icon="entry.action.icon" :disabled="entry.disabled" :shortcut="entry.action.shortcut ? shortcuts?.hint(entry.action.shortcut) : undefined" :ai="entry.action.group === 'ai'" @click="run(entry)" />
       </template>
     </div>
     <div v-if="registry?.manualCopy.value !== null && registry?.manualCopy.value !== undefined" class="histoire-copy-recovery histoire-control-popover" role="alert">

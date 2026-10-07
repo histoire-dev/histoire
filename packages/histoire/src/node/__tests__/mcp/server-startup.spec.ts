@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { useCollectStories } from '../../collect/index.js'
 import { createMarkdownFilesWatcher } from '../../markdown.js'
+import { getContextRegistry } from '../../runtime/registry.js'
 import { createServer } from '../../server/index.js'
 import { registerAgentsChannel } from '../../server/ui-channel/agents.js'
 import { registerCommentsChannel } from '../../server/ui-channel/comments.js'
@@ -49,7 +50,10 @@ describe('dev startup ownership', () => {
     server = { close: serverClose, listen: vi.fn(async () => {}), config: { server: {} }, ws: { send: vi.fn() }, moduleGraph: { getModuleById: () => undefined } }
     vi.mocked(createViteServers).mockResolvedValue({ nodeServer: { close: nodeClose } as any, server, viteConfigFile: undefined })
     vi.mocked(watchStories).mockResolvedValue({ ready: Promise.resolve(), close: storyClose } as any)
-    vi.mocked(createMarkdownFilesWatcher).mockResolvedValue({ stop: markdownClose } as any)
+    vi.mocked(createMarkdownFilesWatcher).mockImplementation(async (ctx) => {
+      getContextRegistry(ctx).cleanup.add(markdownClose)
+      return { stop: markdownClose }
+    })
     vi.mocked(useCollectStories).mockReturnValue({ clearCache: vi.fn(), executeStoryFile: vi.fn(async () => {}), destroy } as any)
     vi.spyOn(console, 'log').mockImplementation(() => {})
   })

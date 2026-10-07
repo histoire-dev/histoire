@@ -32,7 +32,7 @@ async function copyValue(kind: 'endpoint' | 'http' | 'stdio') {
     <h3>{{ store.endpoint ? 'Endpoint' : 'Client config' }}</h3>
     <div v-if="store.endpoint">
       <code :title="store.endpoint">{{ store.endpoint }}</code>
-      <HstButton color="flat" type="button" :aria-label="copied && copyKind === 'endpoint' ? 'Endpoint copied' : 'Copy endpoint'" @click="copyValue('endpoint')">
+      <HstButton icon-only color="flat" type="button" :aria-label="copied && copyKind === 'endpoint' ? 'Endpoint copied' : 'Copy endpoint'" @click="copyValue('endpoint')">
         <BuiltinIcon :icon="copied && copyKind === 'endpoint' ? 'checkmark' : 'copy'" :size="16" />
       </HstButton>
     </div>
@@ -53,7 +53,7 @@ async function copyValue(kind: 'endpoint' | 'http' | 'stdio') {
 h3 { margin: 0 0 8px; color: var(--histoire-muted); font-size: 12px; font-weight: 600; }
 .histoire-mcp-endpoint > div { display: flex; align-items: center; gap: 10px; }
 code { flex: 1; min-width: 0; overflow-wrap: anywhere; font-size: 11px; line-height: 1.6; }
-button { flex: none; display: grid; place-items: center; width: 28px; height: 28px; padding: 0; color: var(--histoire-muted); }
+button { --histoire-icon-button-size: 28px; color: var(--histoire-muted); }
 button:hover { color: var(--histoire-text); }
 button.histoire-mcp-copy-config { display: inline-flex; width: auto; height: auto; margin-top: 8px; padding: 0; background: transparent; font-size: 11px; color: var(--histoire-accent-link); }
 nav { display: flex; flex-wrap: wrap; gap: 12px; }

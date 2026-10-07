@@ -1,4 +1,4 @@
-import { beginCommentDraft, selectControl } from '../../../cypress/workbench-actions.js'
+import { beginCommentDraft, getGeneratedSource, selectControl } from '../../../cypress/workbench-actions.js'
 /// <reference types="cypress" />
 
 import { describeWorkbenchContract } from '../../../cypress/workbench-contract.js'
@@ -6,6 +6,7 @@ import { describeWorkbenchContract } from '../../../cypress/workbench-contract.j
 describeWorkbenchContract({
   path: '/story/src-components-demo-story-vue?variantId=src-components-demo-story-vue-0',
   previewText: 'Hello world!',
+  externalStoryIcons: ['carbon:accessibility-alt', 'carbon:function-math', 'carbon:list', 'carbon:notebook', 'carbon:text-selection'],
 })
 
 if (Cypress.env('workbenchMode') === 'dev') {
@@ -174,10 +175,9 @@ describe('Vue workbench integration', () => {
     cy.contains('[aria-label="Histoire documentation"] h1', 'Title 1').should('be.visible')
     cy.reload()
     cy.contains('[aria-label="Inspector"] [role="tab"]', /^\s*Docs\s*$/).should('have.attr', 'aria-selected', 'true')
-    cy.get('[aria-label="Expand source"]').click()
-    cy.get('[data-test-id="story-source-code"] code').should('contain', 'Hello world!')
+    getGeneratedSource().should('contain', 'Hello world!')
     cy.contains('[aria-label="Source mode"] button', /^\s*Story file\s*$/).click()
-    cy.get('[data-test-id="story-source-code"] code').should('contain', '<Story').and('contain', '<docs')
+    cy.get('.histoire-source-content').should('contain', '<Story').and('contain', '<docs')
     cy.contains('[aria-label="Inspector"] [role="tab"]', /^\s*Props\s*$/).click()
     cy.location('search').should('not.include', 'tab=docs')
     cy.get('[data-test-id="story-controls"]').should('be.visible')
@@ -209,7 +209,7 @@ describe('Vue workbench integration', () => {
     })
     cy.get('[aria-label="Search stories, docs and props"]').should('be.focused').type('{esc}')
     cy.get('[data-test-id="search-modal"]').should('not.exist')
-    cy.get('[aria-label="Workbench"] [aria-label="Search"]').focus().trigger('keydown', { eventConstructor: 'KeyboardEvent', key: 'k', code: 'KeyK', ctrlKey: true })
+    cy.get('[aria-label="Workbench"] [aria-label="Search"]').focus().trigger('keydown', { eventConstructor: 'KeyboardEvent', key: 'k', code: 'KeyK', ctrlKey: true, bubbles: true, cancelable: true })
     cy.get('[aria-label="Search stories, docs and props"]').should('be.focused').type('Demo')
     cy.contains('[aria-label="Search scope"] button', /^Stories$/).click()
     cy.get('[data-test-id="search-item"]:is([data-search-kind="story"], [data-search-kind="variant"])').should('have.length.greaterThan', 1)

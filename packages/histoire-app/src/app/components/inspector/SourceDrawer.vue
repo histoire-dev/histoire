@@ -7,6 +7,7 @@ import { computed, nextTick, ref, shallowRef, useId, watch } from 'vue'
 import { isContextMenuShortcut } from '../../composables/context-menu.js'
 import { useSelection } from '../../composables/selection.js'
 import { usePageOwnership } from '../pages/home/ownership.js'
+import WorkbenchLoadingState from '../shell/WorkbenchLoadingState.vue'
 
 import { findChangedSourceLine } from './state.js'
 
@@ -136,13 +137,13 @@ function status(value: { status: 'idle' | 'loading' | 'ready' | 'error' }) {
       </HstButton>
       <HstButtonGroup v-if="expanded" v-model="mode" layout="inline" class="inspector-source-modes" aria-label="Source mode" :options="[{ value: 'dynamic', label: 'Variant' }, { value: 'raw', label: 'Story file' }]" />
       <span v-else class="inspector-source-file" :title="story?.relativePath">{{ fileLabel }}</span>
-      <HstButton v-if="expanded" color="flat" type="button" class="inspector-source-action" :disabled="!content" :aria-label="copied ? 'Source copied' : 'Copy source'" :title="copied ? 'Copied' : 'Copy source'" @click="copy">
+      <HstButton v-if="expanded" icon-only color="flat" type="button" class="inspector-source-action" :disabled="!content" :aria-label="copied ? 'Source copied' : 'Copy source'" :title="copied ? 'Copied' : 'Copy source'" @click="copy">
         <BuiltinIcon :icon="copied ? 'checkmark' : 'copy'" :size="16" />
       </HstButton>
-      <HstButton v-if="expanded && canEdit" color="flat" type="button" class="inspector-source-action" aria-label="Open source in editor" title="Open source in editor" @click="editor">
+      <HstButton v-if="expanded && canEdit" icon-only color="flat" type="button" class="inspector-source-action" aria-label="Open source in editor" title="Open source in editor" @click="editor">
         <BuiltinIcon icon="launch" :size="16" />
       </HstButton>
-      <HstButton color="flat" type="button" class="inspector-source-action" :aria-label="expanded ? 'Collapse source' : 'Expand source'" :aria-expanded="expanded" @click="expanded = !expanded">
+      <HstButton icon-only color="flat" type="button" class="inspector-source-action" :aria-label="expanded ? 'Collapse source' : 'Expand source'" :aria-expanded="expanded" @click="expanded = !expanded">
         <BuiltinIcon :icon="expanded ? 'chevron-down' : 'chevron-up'" :size="12" />
       </HstButton>
     </div>
@@ -152,9 +153,9 @@ function status(value: { status: 'idle' | 'loading' | 'ready' | 'error' }) {
       </p>
       <template v-else>
         <HistoireSource v-if="dynamicReady" ref="panel" :mode="mode" appearance="dark" data-test-id="story-source-code" @content="receive" @error="report" @status="status" />
-        <p v-if="loading || waitingForPreview" class="inspector-source-empty" role="status">
-          Loading source…
-        </p>
+        <div v-if="loading || waitingForPreview" class="inspector-source-loading">
+          <WorkbenchLoadingState title="Loading source…" />
+        </div>
         <p v-if="content?.body === ''" class="inspector-source-empty">
           Source is empty.
         </p>
@@ -169,16 +170,18 @@ function status(value: { status: 'idle' | 'loading' | 'ready' | 'error' }) {
 <style scoped>
 .inspector-source { flex: none; min-height: 0; border-top: 1px solid var(--histoire-border); }
 .inspector-source.is-expanded { display: flex; flex-direction: column; flex-basis: 42%; }
-.inspector-source-header { display: flex; align-items: center; gap: 7px; min-height: 46px; padding: 0 12px 0 var(--histoire-inspector-gutter, 16px); }
+.inspector-source-header { display: flex; align-items: center; gap: 7px; min-height: 46px; padding: 0 var(--histoire-inspector-gutter, 16px); }
 .inspector-source-toggle { display: flex; align-items: center; gap: 9px; padding: 0; }
 .inspector-source-toggle svg { color: var(--histoire-muted); }
 .inspector-source-toggle strong { font-size: 12px; font-weight: 800; }
 .inspector-source-file { flex: 1; overflow: hidden; text-align: right; text-overflow: ellipsis; white-space: nowrap; color: var(--histoire-muted); font: 10px var(--histoire-font-mono); }
 .inspector-source-modes { display: flex; flex: 1; min-width: 0; }
-.inspector-source-action { display: grid; place-items: center; width: 22px; height: 26px; padding: 0; color: var(--histoire-muted); }
-.inspector-source-body { position: relative; flex: 1; min-height: 0; margin: 0 12px 12px; overflow: auto; border-radius: 10px; background: var(--histoire-code); color: #e6e7ea; }
+.inspector-source-action { --histoire-icon-button-size: 26px; color: var(--histoire-muted); }
+.inspector-source-body { position: relative; flex: 1; min-height: 0; margin: 0 var(--histoire-inspector-gutter, 16px) 16px; overflow: auto; border-radius: 10px; background: var(--histoire-code); color: #e6e7ea; }
 .inspector-source-body :deep(.histoire-content-actions) { display: none; }
 .inspector-source-body :deep(.histoire-source) { height: 100%; }
+/* Native source stays mounted underneath; pending reads occupy visible drawer. */
+.inspector-source-loading { position: absolute; inset: 0; overflow: auto; background: var(--histoire-code); --histoire-text: #e6e7ea; --histoire-muted: #b4b8c0; }
 .inspector-source-body :deep(pre) { min-width: max-content; font: 11px/1.7 var(--histoire-font-mono); padding: 14px; background: transparent !important; }
 .inspector-source-body :deep(.line) { display: inline-block; min-width: 100%; }
 .inspector-source-body :deep(.line[data-source-changed]) { background: color-mix(in srgb, var(--histoire-accent) 15%, transparent); box-shadow: inset 2px 0 var(--histoire-accent); }

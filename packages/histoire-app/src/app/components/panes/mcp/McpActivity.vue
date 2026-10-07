@@ -31,7 +31,7 @@ const recent = computed(() => store.history.slice(0, 3))
           <strong :title="store.clientName(current.clientId)">{{ store.clientName(current.clientId) }}</strong>
           <code :title="current.tool">{{ current.tool }}</code>
           <span v-if="progress">{{ progress.done }} / {{ progress.total }}</span>
-          <HstButton v-if="cancellable" color="flat" type="button" :disabled="store.cancelling.includes(current.id)" aria-label="Cancel operation" @click="store.cancel(current.id)">
+          <HstButton v-if="cancellable" icon-only color="flat" type="button" :disabled="store.cancelling.includes(current.id)" aria-label="Cancel operation" @click="store.cancel(current.id)">
             <BuiltinIcon icon="stop-filled" :size="12" />
           </HstButton>
         </div>
@@ -66,7 +66,7 @@ h2 small { color: var(--histoire-muted); font-size: 10px; border-radius: 5px; pa
 .histoire-mcp-activity-current strong { flex-shrink: 0; max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--histoire-text); font-size: 11px; font-weight: 700; }
 .histoire-mcp-activity-current code { flex: 1; }
 .histoire-mcp-activity-current > div > span { flex: none; color: var(--histoire-muted); font: 10px var(--histoire-font-mono); }
-.histoire-mcp-activity-current button { flex: none; display: grid; place-items: center; width: 24px; height: 24px; color: var(--histoire-danger-text); }
+.histoire-mcp-activity-current button { --histoire-icon-button-size: 24px; color: var(--histoire-danger-text); }
 .histoire-mcp-activity-current button:disabled { opacity: .5; cursor: wait; }
 progress { appearance: none; display: block; width: 100%; height: 4px; margin-top: 8px; border: 0; border-radius: 999px; background: var(--histoire-surface); overflow: hidden; }
 progress::-webkit-progress-bar { background: var(--histoire-surface); border-radius: 999px; }

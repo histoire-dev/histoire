@@ -65,7 +65,7 @@ function onKeydown(event: KeyboardEvent): void {
 </template>
 
 <style scoped>
-.search-result { display: flex; align-items: flex-start; gap: 10px; width: 100%; padding: var(--histoire-list-row-padding, 10px) 10px; text-align: left; color: var(--histoire-text); }
+.search-result { display: flex; align-items: flex-start; gap: 10px; width: 100%; padding: var(--histoire-list-row-padding, 10px) 8px; text-align: left; color: var(--histoire-text); }
 .search-result:hover { background: var(--histoire-chip); }
 .search-result.active { background: var(--histoire-accent-soft); }
 .search-result:focus-visible { outline: 2px solid var(--histoire-accent); outline-offset: -2px; }

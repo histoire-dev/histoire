@@ -56,12 +56,24 @@ export function createWorkbenchComments(transport: CommentsTransport = {
   const streaming = shallowRef<Record<string, { agentId: string, text: string }>>({})
   const enabled = ref(false)
   const connected = ref(transport.available)
-  const error = ref('')
+  let active = true
+  let errorTimeout: ReturnType<typeof setTimeout> | undefined
+  const errorMessage = ref('')
+  const error = computed({
+    /** Canvas and pane share the same transient error. */
+    get: () => errorMessage.value,
+    /** Every failure gets five seconds, including repeated identical messages. */
+    set(message: string) {
+      if (!active) return
+      clearTimeout(errorTimeout)
+      errorMessage.value = message
+      if (message) errorTimeout = setTimeout(() => errorMessage.value = '', 5000)
+    },
+  })
   const activeId = ref<string | null>(null)
   const draft = shallowRef<UiCommentDraft | null>(null)
   const pending = ref(false)
   const showResolved = ref(false)
-  let active = true
   let pendingRequest: { id: string, draft: UiCommentDraft } | undefined
   let publication: { revision: string, total: number, parts: Map<number, UiComment[]> } | undefined
   /** Install complete snapshots atomically; interleaved older publications are retired. */
@@ -185,6 +197,8 @@ export function createWorkbenchComments(transport: CommentsTransport = {
     /** Component/provider teardown observes no further publications. */
     close() {
       active = false
+      clearTimeout(errorTimeout)
+      errorMessage.value = ''
       connected.value = false
       off()
       offStream()

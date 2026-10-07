@@ -22,8 +22,6 @@ import ZoomMenu from './ZoomMenu.vue'
 defineProps<{
   /** Active arrangement from standalone route/preferences. */
   arrange: 'single' | 'grid' | 'list' | 'matrix'
-  /** Collected runtime supports exact matrix cells. */
-  matrixAvailable?: boolean
   /** Matching current-story frame count. */
   matchCount?: number
   /** Independent reveal cursor position. */
@@ -94,7 +92,7 @@ onBeforeUnmount(() => disposers.forEach(dispose => dispose()))
       <ToolSwitch :class="{ 'histoire-tool-switch--leading': !matchCount }" />
     </BaseOverflowToolbarItem>
     <BaseOverflowToolbarItem id="arrange" separator-before>
-      <ArrangeSwitch :arrange="arrange" :matrix-available="matrixAvailable" @arrange="emit('arrange', $event)" /><slot name="matrix" v-bind="{ open, setOpen }" />
+      <ArrangeSwitch :arrange="arrange" @arrange="emit('arrange', $event)" /><slot name="matrix" v-bind="{ open, setOpen }" />
     </BaseOverflowToolbarItem>
     <BaseOverflowToolbarItem id="viewport" separator-before>
       <ViewportMenu v-model:open="open" @edit-presets="emit('editPresets')" />

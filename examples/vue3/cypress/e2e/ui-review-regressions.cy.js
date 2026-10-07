@@ -93,7 +93,8 @@ describe('UI review regressions', () => {
       expect(opacities.filter(value => value < 1)).to.have.length.at.least(1)
     })
     cy.get(primaryPreviewFrame).should(($frame) => {
-      const layer = $frame[0].closest('.histoire-canvas-primary')
+      const layer = $frame[0].closest('.histoire-frame-content')
+      expect(layer, 'selected document content layer').not.to.equal(null)
       expect(Number(layer.ownerDocument.defaultView.getComputedStyle(layer).opacity), 'nonmatching canonical document is dimmed').to.be.lessThan(1)
     })
     // Already visible matches correctly need no movement; pan all targets out first.

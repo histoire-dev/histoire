@@ -291,7 +291,7 @@ function icon(row: StoryTreeRow): string {
 </template>
 
 <style scoped>
-.stories-panel { display: flex; flex-direction: column; min-height: 0; height: 100%; padding: 18px 8px; color: var(--histoire-text); }
+.stories-panel { display: flex; flex-direction: column; min-height: 0; height: 100%; padding: 16px calc(var(--histoire-pane-gutter, 16px) - 8px); color: var(--histoire-text); }
 .stories-heading { display: flex; align-items: baseline; gap: 8px; padding: 0 8px; margin-bottom: 18px; }
 .stories-heading h2 { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 15px; font-weight: 800; margin: 0; }
 .stories-count, .stories-variants { font-family: var(--histoire-font-mono); font-size: 11px; color: var(--histoire-muted); white-space: nowrap; }

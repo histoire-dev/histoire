@@ -2,7 +2,7 @@ import type { InjectionKey } from 'vue'
 import { inject, provide, shallowReactive } from 'vue'
 
 /** Keyboard ownership stays local to workbench/provider scope. */
-export type ShortcutScope = 'global' | 'canvas' | 'frame'
+export type ShortcutScope = 'global' | 'canvas' | 'frame' | 'comment'
 
 /** One binding drives handlers, toolbar hints, menu hints and settings reference. */
 export interface ShortcutDefinition {
@@ -45,6 +45,7 @@ const builtins: readonly ShortcutReference[] = [
   { id: 'frame.tests', label: 'Run tests', keys: ['t'], scope: 'frame', devOnly: true },
   { id: 'frame.screenshot', label: 'Screenshot', keys: ['shift+s'], scope: 'frame', devOnly: true },
   { id: 'frame.comment', label: 'Comment for AI', keys: ['c'], scope: 'frame', devOnly: true },
+  { id: 'comment.screenshot', label: 'Attach screenshot to comment', keys: ['mod+shift+s'], scope: 'comment', devOnly: true },
 ]
 
 /** Normalize equivalent modifier spellings for duplicate detection. */

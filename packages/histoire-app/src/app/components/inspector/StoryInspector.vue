@@ -130,10 +130,10 @@ function openControlMenu(event: MouseEvent | KeyboardEvent): void {
 </template>
 
 <style scoped>
-.story-inspector { --histoire-inspector-gutter: 16px; display: flex; flex-direction: column; width: 100%; height: 100%; min-width: 0; min-height: 0; overflow: hidden; color: var(--histoire-text); background: var(--histoire-surface); }
+.story-inspector { --histoire-inspector-gutter: var(--histoire-pane-gutter, 16px); display: flex; flex-direction: column; width: 100%; height: 100%; min-width: 0; min-height: 0; overflow: hidden; color: var(--histoire-text); background: var(--histoire-surface); }
 .inspector-content { flex: 1; min-height: 0; overflow: auto; }
 .inspector-test-failure { margin: 0 var(--histoire-inspector-gutter) 14px; color: var(--histoire-danger-text); font-size: 12px; white-space: pre-wrap; overflow-wrap: anywhere; }
-.inspector-content :deep(.histoire-docs) { padding: 2px var(--histoire-inspector-gutter) 20px; color: var(--histoire-body); font-size: 12px; line-height: 1.7; }
+.inspector-content :deep(.histoire-docs) { padding: 2px var(--histoire-inspector-gutter) 16px; color: var(--histoire-body); font-size: 12px; line-height: 1.7; }
 .inspector-content :deep(.histoire-docs :is(h1,h2,h3,h4)) { color: var(--histoire-text); font-weight: 800; }
 .inspector-content :deep(.histoire-docs table) { width: 100%; font-size: 11px; border-collapse: collapse; }
 .inspector-content :deep(.histoire-docs :is(th,td)) { padding: 9px; text-align: left; border-bottom: 1px solid var(--histoire-border); }

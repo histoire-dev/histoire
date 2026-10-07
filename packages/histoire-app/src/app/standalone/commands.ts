@@ -17,16 +17,24 @@ export function createStandaloneCommands(session: HistoireSession, router: Route
   const metadata = shallowRef(files.map(file => mapFile(file)))
   const snapshot = shallowRef(session.getSnapshot())
   const active = shallowRef(true)
+  let executionGeneration = 0
   // Visibility depends on canonical state/capabilities, not only query changes.
   // This publication is shared by every reactive list/context consumer.
   const stopSnapshot = session.subscribe(value => snapshot.value = value)
   let actions = createStandaloneClientActions(session)
   const stopRuntime = runtime
     ? watch(runtime.current, (owner) => {
+        executionGeneration++
         actions.close()
         if (owner.getSnapshot().status !== 'disposed') actions = createStandaloneClientActions(owner)
       }, { immediate: true, flush: 'sync' })
     : () => {}
+  // Runtime state publications may change document ownership without replacing
+  // its session. State edits retain ownership; source/target/runtime changes do not.
+  const stopExecutionOwner = watch(() => {
+    const owner = runtime?.snapshot.value ?? snapshot.value
+    return JSON.stringify([owner.status, owner.stale, owner.source?.sourceId, owner.source?.epoch, owner.source?.revision, owner.selection, owner.runtime.status, owner.runtime.runtimeId])
+  }, () => executionGeneration++, { flush: 'sync' })
   // Virtual metadata subscriptions survive HMR, and are owned by this bootstrap.
   const off = onUpdate((files) => {
     if (active.value) metadata.value = files.map(file => mapFile(file))
@@ -67,12 +75,18 @@ export function createStandaloneCommands(session: HistoireSession, router: Route
     })
   }
   return { context, list, execute, activateSearch,
+    /** Capture actual command runtime lifetime, including same-target frame replacement. */
+    captureExecutionOwner() {
+      const generation = executionGeneration
+      return () => active.value && generation === executionGeneration
+    },
     /** Retire reactive publications and both callback/visibility subscriptions once. */
     close() {
       if (!active.value) return
       active.value = false
       stopSnapshot()
       stopRuntime()
+      stopExecutionOwner()
       actions.close()
       off?.()
     } }

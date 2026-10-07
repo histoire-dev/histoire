@@ -59,7 +59,7 @@ function responsive() {
       Viewport
     </p>
     <HstButton color="flat" class="popover-row" :aria-pressed="canvas.arrangement === 'single' && canvas.singleViewport.mode === 'responsive'" @click="responsive">
-      <BuiltinIcon icon="arrows-horizontal" :size="16" />Responsive<span class="popover-meta">fill</span>
+      <BuiltinIcon icon="arrows-horizontal" :size="16" />{{ canvas.arrangement === 'single' ? 'Fill viewport' : 'Responsive' }}<span class="popover-meta">fill</span>
     </HstButton>
     <HstButton v-for="(option, index) in presets" :key="index" color="flat" class="popover-row" :aria-pressed="(canvas.arrangement !== 'single' || canvas.singleViewport.mode === 'fixed') && snapshot.settings.responsiveWidth === option.width && snapshot.settings.responsiveHeight === (option.height ?? null)" @click="preset(option.width, option.height)">
       <BuiltinIcon :icon="option.width < 500 ? 'mobile' : option.width < 900 ? 'tablet' : 'screen'" :size="16" /><span>{{ option.label }}</span><span class="popover-meta">{{ option.width }}<template v-if="option.height"> × {{ option.height }}</template></span>

@@ -9,6 +9,8 @@ const props = withDefaults(defineProps<{
   label: string
   /** Optional Carbon glyph. */
   icon?: string
+  /** Explicit icon sizing when a slot only supplies menu content. */
+  iconOnly?: boolean
   /** Toggle or exclusive-choice selection state. */
   pressed?: boolean
   /** Native disabled state. */
@@ -19,7 +21,7 @@ const props = withDefaults(defineProps<{
   description?: string
   /** Exclusive choices opt into radio semantics in dropdown. */
   menuRole?: 'menuitem' | 'menuitemcheckbox' | 'menuitemradio'
-}>(), { pressed: undefined })
+}>(), { pressed: undefined, iconOnly: undefined })
 const attrs = useAttrs()
 const { toolbar, overflow } = useOverflowToolbar()
 const descriptionId = useId()
@@ -32,7 +34,7 @@ function click(): void {
 </script>
 
 <template>
-  <HstButton color="flat" type="button" class="histoire-toolbar-button" :role="role" :tabindex="overflow ? -1 : undefined" :aria-label="label" :title="description ?? (shortcut ? `${label} (${shortcut})` : label)" :aria-describedby="description ? descriptionId : undefined" :aria-pressed="role || pressed === undefined ? undefined : pressed" :aria-checked="role && role !== 'menuitem' ? pressed : undefined" :disabled="disabled" @click="click">
+  <HstButton :icon-only="!overflow && (iconOnly ?? (Boolean(icon) && !$slots.default))" color="flat" type="button" class="histoire-toolbar-button" :role="role" :tabindex="overflow ? -1 : undefined" :aria-label="label" :title="description ?? (shortcut ? `${label} (${shortcut})` : label)" :aria-describedby="description ? descriptionId : undefined" :aria-pressed="role || pressed === undefined ? undefined : pressed" :aria-checked="role && role !== 'menuitem' ? pressed : undefined" :disabled="disabled" @click="click">
     <BuiltinIcon v-if="icon" :icon="icon" :size="16" />
     <span class="toolbar-action-label">{{ label }}</span>
     <span v-if="$slots.default" class="toolbar-action-value"><slot /></span>
@@ -42,7 +44,8 @@ function click(): void {
 </template>
 
 <style scoped>
-.histoire-toolbar-button { display: inline-flex; align-items: center; justify-content: center; gap: 5px; min-width: 28px; height: 28px; padding: 0 5px; color: var(--histoire-muted); white-space: nowrap; }
+.histoire-toolbar-button { --histoire-icon-button-size: 28px; display: inline-flex; align-items: center; justify-content: center; gap: 5px; min-width: 28px; height: 28px; padding: 0 5px; color: var(--histoire-muted); white-space: nowrap; }
+.histoire-toolbar-button.histoire-icon-button { padding: 0; }
 .histoire-toolbar-button :deep(svg) { display: block; width: 16px; height: 16px; flex: none; }
 .toolbar-action-label, .toolbar-action-shortcut { display: none; }
 .toolbar-action-value { display: contents; }

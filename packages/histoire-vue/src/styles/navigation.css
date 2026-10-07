@@ -26,6 +26,7 @@
   color: var(--histoire-accent);
 }
 .histoire-provider .histoire-tree summary { padding: 6px 8px; cursor: pointer; }
+.histoire-provider .histoire-tree .histoire-story-variant-count { float: inline-end; opacity: .6; }
 .histoire-provider .histoire-search small { display: block; color: var(--histoire-muted); }
 .histoire-provider .histoire-search .histoire-text { width: 100%; margin-bottom: 6px; }
 .histoire-provider .histoire-toolbar {

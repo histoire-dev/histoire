@@ -48,7 +48,7 @@ function onKeydown(event: KeyboardEvent): void {
 </template>
 
 <style scoped>
-.comment-row { display: flex; align-items: flex-start; gap: 10px; width: 100%; padding: var(--histoire-comment-row-padding, 12px) 9px; color: var(--histoire-text); text-align: left; }
+.comment-row { display: flex; align-items: flex-start; gap: 10px; width: 100%; padding: var(--histoire-comment-row-padding, 12px) 8px; color: var(--histoire-text); text-align: left; }
 .comment-row:hover { background: var(--histoire-chip); }.comment-row.active { background: var(--histoire-agent-soft); }
 .row-pin { display: grid; place-items: center; flex: none; width: 23px; height: 25px; border-radius: 50% 50% 50% 4px; background: var(--histoire-agent); color: #fff; font-size: 10px; font-weight: 700; }
 .row-pin.draft { background: var(--histoire-muted); }

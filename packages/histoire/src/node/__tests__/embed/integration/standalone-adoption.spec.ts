@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { createEmbedBridgeFixture } from '../../utils/embed/bridge-fixture.js'
+import { STANDALONE_SELECTED_FRAME } from '../../utils/embed/browser.js'
 
 const story = `<script>if(typeof window!=='undefined')window.__HOST_STORY_IMPORTS__=true</script><script setup>function initial(){return{count:2}}</script><template><Story id="normal" title="Normal story"><Variant id="one" title="First" :init-state="initial"><template #default="{state}"><button @click="state.count++">Count:{{state.count}}</button></template></Variant><Variant id="two" title="Second" :init-state="initial"><template #default="{state}"><button @click="state.count++">Second:{{state.count}}</button></template></Variant></Story></template>`
 const files = {
@@ -31,9 +32,9 @@ describe('standalone adoption of reusable explorer', () => {
       if (String(message.payload).includes('full-reload')) diagnostics.push(String(message.payload))
     }))
     const route = (value: string) => `${fixture.bookUrl}${routerMode === 'hash' ? '#' : ''}${value}`
-    // Passive replicas reorder across navigation; target registered primary iframe.
-    const primary = () => page.frameLocator('iframe[data-test-id="preview-iframe"]')
-    const primaryCount = () => page.locator('iframe[data-test-id="preview-iframe"]').count()
+    // Canvas replicas reorder across navigation; target only selected ready actor.
+    const primary = () => page.frameLocator(STANDALONE_SELECTED_FRAME)
+    const primaryCount = () => page.locator(STANDALONE_SELECTED_FRAME).count()
     const preview = (storyId: string, variantId: string) => page.frames().find((frame) => {
       const url = new URL(frame.url())
       return url.pathname.endsWith('__sandbox.html') && !url.searchParams.has('controls') && url.searchParams.get('storyId') === storyId && url.searchParams.get('variantId') === variantId
@@ -117,7 +118,7 @@ describe('standalone adoption of reusable explorer', () => {
         await search.fill('>Prompt fixture')
         await searchPanel().getByRole('button', { name: 'Prompt fixture state', exact: true }).click()
         expect(await page.getByRole('textbox', { name: 'Amount', exact: true }).inputValue()).toBe('2')
-        await page.locator('form.histoire-command-prompts').locator('button[type="submit"]').click()
+        await page.getByRole('textbox', { name: 'Amount', exact: true }).press('Enter')
         await expect.poll(() => primary().getByRole('button', { name: 'Second:5', exact: true }).count(), { timeout: 15_000 }).toBe(1)
         expect(await page.evaluate('window.__PARAMS_COUNT__')).toBe(3)
         // Runtime state changes command availability while keyboard focus remains on an action.

@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { resolveStoryRouteId } from '@histoire/protocol'
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { createHistoireSessionWithAdapters } from '../../../../histoire-sdk/src/session/controller.js'
+import { createHistoireSessionWithAdapters, getAcceptedHistoireSessionDescriptor, getHistoireSessionDescriptor } from '../../../../histoire-sdk/dist/internal.js'
 import { sourceFixture } from '../../../../histoire-sdk/src/__tests__/fixtures/session.js'
 import { createStandaloneNavigation } from '../../../../histoire-app/src/app/standalone/navigation.js'
 import { createStandaloneSelection } from '../../../../histoire-app/src/app/standalone/selection.js'
@@ -14,6 +14,23 @@ afterEach(async () => {
 })
 
 describe('standalone navigation restoration', () => {
+  /** The navigation facade forwards the immutable internal view but keeps public reads detached. */
+  it('forwards accepted descriptor identity through standalone selection facade', async () => {
+    const fixture = sourceFixture()
+    const session = createHistoireSessionWithAdapters({ url: window.location.href }, fixture.adapters)
+    await session.connect()
+    const accepted = getAcceptedHistoireSessionDescriptor(session)
+    const selection = createStandaloneSelection(session)
+    resources.push(selection.close, () => session.dispose())
+
+    expect(getAcceptedHistoireSessionDescriptor(selection.session)).toBe(accepted)
+    const detached = getHistoireSessionDescriptor(selection.session)
+    expect(detached).not.toBe(accepted)
+    detached.catalog.stories = []
+    expect(getAcceptedHistoireSessionDescriptor(selection.session)).toBe(accepted)
+    expect(getHistoireSessionDescriptor(selection.session).catalog.stories).not.toHaveLength(0)
+  })
+
   it('restores the exact selected target from Settings without replaying selection', async () => {
     const fixture = sourceFixture()
     const session = createHistoireSessionWithAdapters({ url: window.location.href }, fixture.adapters)

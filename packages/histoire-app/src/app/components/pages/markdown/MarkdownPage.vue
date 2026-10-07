@@ -118,7 +118,7 @@ async function select(target: HistoireSelectionInput): Promise<void> {
       <HstButton v-if="canEdit" color="default" type="button" @click="edit">
         <BuiltinIcon icon="edit" :size="16" />Edit .md
       </HstButton>
-      <HstButton color="default" type="button" :aria-label="copied ? 'Link copied' : 'Copy link'" :title="copied ? 'Link copied' : 'Copy link'" @click="copyLink">
+      <HstButton icon-only color="default" type="button" :aria-label="copied ? 'Link copied' : 'Copy link'" :title="copied ? 'Link copied' : 'Copy link'" @click="copyLink">
         <BuiltinIcon :icon="copied ? 'checkmark-filled' : 'link'" :size="16" />
       </HstButton>
     </div>

@@ -33,6 +33,33 @@ function transport() {
 }
 
 describe('workbench comments', () => {
+  it('clears errors after five seconds and restarts lifetime for repeated failures', () => {
+    vi.useFakeTimers()
+    const channel = transport()
+    const model = createWorkbenchComments(channel.port)
+    try {
+      channel.snapshot({ error: 'Server execution is unavailable' })
+      vi.advanceTimersByTime(4999)
+      expect(model.error.value).toBe('Server execution is unavailable')
+      vi.advanceTimersByTime(1)
+      expect(model.error.value).toBe('')
+      model.error.value = 'Screenshot unavailable. Retry capture.'
+      vi.advanceTimersByTime(3000)
+      model.error.value = 'Screenshot unavailable. Retry capture.'
+      vi.advanceTimersByTime(4999)
+      expect(model.error.value).toBe('Screenshot unavailable. Retry capture.')
+      vi.advanceTimersByTime(1)
+      expect(model.error.value).toBe('')
+      model.error.value = 'Screenshot service disconnected.'
+      model.close()
+      expect(vi.getTimerCount()).toBe(0)
+    }
+    finally {
+      model.close()
+      vi.useRealTimers()
+    }
+  })
+
   it('installs bounded snapshots atomically and retires disconnected/closed authority', () => {
     const channel = transport()
     const model = createWorkbenchComments(channel.port)

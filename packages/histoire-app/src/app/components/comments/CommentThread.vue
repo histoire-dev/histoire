@@ -74,13 +74,13 @@ function submit() {
     </div>
     <form class="thread-actions" @submit.prevent="submit">
       <HstText v-model="reply" layout="inline" aria-label="Reply to comment" placeholder="Reply…" maxlength="8192" :disabled="disabled || busy" />
-      <HstButton v-if="reply.trim()" color="flat" type="submit" :disabled="disabled || busy" aria-label="Send reply">
+      <HstButton v-if="reply.trim()" icon-only color="flat" type="submit" :disabled="disabled || busy" aria-label="Send reply">
         <BuiltinIcon icon="send-alt-filled" :size="16" />
       </HstButton>
       <HstButton color="flat" type="button" class="resolve" :disabled="disabled" @click="emit('resolve', comment.status !== 'resolved')">
         <BuiltinIcon :icon="comment.status === 'resolved' ? 'renew' : 'checkmark'" :size="16" />{{ comment.status === 'resolved' ? 'Reopen' : 'Resolve' }}
       </HstButton>
-      <HstButton color="flat" type="button" class="delete" :disabled="disabled || busy" aria-label="Delete comment" @click="emit('remove')">
+      <HstButton icon-only color="flat" type="button" class="delete" :disabled="disabled || busy" aria-label="Delete comment" @click="emit('remove')">
         <BuiltinIcon icon="trash-can" :size="16" />
       </HstButton>
     </form>

@@ -5,6 +5,7 @@ import { ACP_PRESETS } from '@histoire/shared'
 import { computed, shallowRef } from 'vue'
 import { useAgentsStore } from '../../../stores/agents.js'
 import { histoireConfig } from '../../../util/config.js'
+import WorkbenchLoadingState from '../../shell/WorkbenchLoadingState.vue'
 
 import AgentPresetRow from './AgentPresetRow.vue'
 import SaveToProject from './SaveToProject.vue'
@@ -58,8 +59,9 @@ function saved(path: 'presets' | 'permissions'): void {
         </HstButton>
       </header>
       <AgentPresetRow v-for="preset in state.presets" :key="preset.id" :agent-id="preset.id" />
-      <p v-if="!state.presets.length" class="histoire-agent-empty">
-        {{ agents.connected.value ? 'No agents configured' : 'Connecting to dev server' }}
+      <WorkbenchLoadingState v-if="!state.presets.length && !agents.connected.value" title="Connecting to dev server" />
+      <p v-else-if="!state.presets.length" class="histoire-agent-empty">
+        No agents configured
       </p>
       <SaveToProject path="agents.presets" :value="state.presets" :project-value="projectPresets" :local="JSON.stringify(state.presets) !== JSON.stringify(projectPresets)" @reset="agents.resetProject(['agents.presets'])" @saved="saved('presets')" />
     </div>

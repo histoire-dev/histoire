@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import type { UiCommentAgent, UiCommentDraft } from '@histoire/shared'
 import { BuiltinIcon, getControlElement, HstButton, HstSelect, HstTextarea } from '@histoire/controls/vue'
-import { onMounted, ref, watch } from 'vue'
+import { onMounted, onUnmounted, ref, watch } from 'vue'
+import { createShortcutRegistry, useShortcutRegistry } from '../../util/shortcuts.js'
 import PulsatingDisc from '../base/PulsatingDisc.vue'
 
 import CommentContext from './CommentContext.vue'
@@ -31,12 +32,22 @@ const emit = defineEmits<{
 }>()
 const body = ref(props.draft.body)
 const input = ref<HTMLTextAreaElement>()
+const shortcuts = useShortcutRegistry() ?? createShortcutRegistry()
+onUnmounted(shortcuts.bind('comment.screenshot', attach, { allowInput: true, enabled: () => !props.capturing }))
 const { agentId, usable, choose, reset } = useCommentDestination(() => props.agents)
 watch(() => props.draft.id, () => {
   body.value = props.draft.body
   reset()
 })
 onMounted(() => input.value?.focus())
+/** Button and composer shortcut share the current capture gate. */
+function attach() {
+  if (!props.capturing) emit('attach')
+}
+/** Consume comment shortcuts only while focus stays inside this composer. */
+function keydown(event: KeyboardEvent) {
+  if (shortcuts.handle(event, ['comment'], true)) event.stopPropagation()
+}
 /** Composer dispatches current text together with immutable point context. */
 function send() {
   if (body.value.trim() && agentId.value && !props.capturing) emit('send', { ...props.draft, body: body.value }, agentId.value)
@@ -44,11 +55,18 @@ function send() {
 </script>
 
 <template>
-  <form class="comment-card comment-composer" aria-label="Comment for AI" @submit.prevent="send" @keydown.escape.stop.prevent="emit('close')">
-    <CommentContext :title="title" :comment="draft" />
-    <HstTextarea :ref="value => { input = getControlElement(value) as HTMLTextAreaElement }" v-model="body" layout="inline" maxlength="8192" aria-label="Comment message" placeholder="Describe what to change…" @keydown.meta.enter.prevent="send" @keydown.ctrl.enter.prevent="send" />
+  <form class="comment-card comment-composer" aria-label="Comment for AI" @submit.prevent="send" @keydown="keydown" @keydown.escape.stop.prevent="emit('close')">
+    <div class="comment-composer-header">
+      <CommentContext :title="title" :comment="draft" />
+      <HstButton icon-only color="flat" type="button" class="icon-button close-button" aria-label="Close comment" title="Close comment (Esc)" @click="emit('close')">
+        <BuiltinIcon icon="close" :size="16" />
+      </HstButton>
+    </div>
+    <div class="comment-composer-body">
+      <HstTextarea :ref="value => { input = getControlElement(value) as HTMLTextAreaElement }" v-model="body" layout="inline" maxlength="8192" aria-label="Comment message" placeholder="Describe what to change…" @keydown.meta.enter.prevent="send" @keydown.ctrl.enter.prevent="send" />
+    </div>
     <footer>
-      <HstButton color="flat" type="button" class="icon-button" :disabled="capturing" :aria-label="capturing ? 'Capturing screenshot' : 'Attach screenshot'" @click="emit('attach')">
+      <HstButton icon-only color="flat" type="button" class="icon-button" :disabled="capturing" :aria-label="capturing ? 'Capturing screenshot' : 'Attach screenshot'" :title="capturing ? 'Capturing screenshot' : `Attach screenshot (${shortcuts.hint('comment.screenshot')})`" aria-keyshortcuts="Control+Shift+S Meta+Shift+S" @click="attach">
         <PulsatingDisc v-if="capturing" />
         <BuiltinIcon v-else icon="camera" :size="16" />
       </HstButton>
@@ -70,6 +88,10 @@ function send() {
 
 <style scoped>
 .comment-card { width: 360px; max-width: calc(100vw - 24px); background: var(--histoire-surface); color: var(--histoire-text); border-radius: var(--histoire-radius-panel); box-shadow: var(--histoire-shadow-panel); overflow: hidden; }
+.comment-composer-header { display: flex; align-items: flex-start; border-bottom: 1px solid var(--histoire-border); }
+.comment-composer-header :deep(.comment-context) { flex: 1; min-width: 0; border-bottom: 0; }
+.close-button { flex: none; margin: 12px 12px 0 0; }
+.comment-composer-body { padding: 12px; }
 .histoire-textarea { display: flex; width: 100%; }
 .histoire-textarea :deep(textarea) { min-height: 130px; }
 .comment-composer { --histoire-control-accent: var(--histoire-agent); --histoire-control-on-accent: #fff; }

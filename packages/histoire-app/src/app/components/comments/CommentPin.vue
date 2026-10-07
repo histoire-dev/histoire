@@ -18,7 +18,7 @@ const emit = defineEmits<{
 </script>
 
 <template>
-  <HstButton color="flat" type="button" class="comment-pin" :class="{ active, draft }" :aria-label="temporary ? 'Current comment draft' : `Open comment ${number}`" :aria-pressed="active" @click.stop="emit('select')">
+  <HstButton icon-only color="flat" type="button" class="comment-pin" :class="{ active, draft }" :aria-label="temporary ? 'Current comment draft' : `Open comment ${number}`" :aria-pressed="active" @click.stop="emit('select')">
     <BuiltinIcon v-if="temporary" icon="add" :size="14" />
     <template v-else>
       {{ number }}
@@ -27,7 +27,7 @@ const emit = defineEmits<{
 </template>
 
 <style scoped>
-.comment-pin { display: grid; place-items: center; width: 27px; height: 29px; padding: 0; color: #fff; }
+.comment-pin { --histoire-icon-button-size: 28px; color: #fff; }
 .comment-pin.draft { background: var(--histoire-muted); }
 .comment-pin.active { outline: 3px solid rgb(var(--histoire-agent-rgb) / .25); outline-offset: 2px; }
 .comment-pin:focus-visible { outline: 2px solid var(--histoire-agent); outline-offset: 3px; }

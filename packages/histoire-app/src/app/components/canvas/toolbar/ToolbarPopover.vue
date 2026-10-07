@@ -7,7 +7,7 @@ import { useCanvasPopoverBounds } from './bounds.js'
 import ToolbarButton from './ToolbarButton.vue'
 
 /** Existing controlled identity keeps tool panels mutually exclusive. */
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   /** Stable panel identity shared by toolbar owner. */
   id: string
   /** Currently open tool panel. */
@@ -16,9 +16,11 @@ const props = defineProps<{
   label: string
   /** Optional Carbon trigger glyph. */
   icon?: string
+  /** Trigger slot supplies menu-only content while inline action stays square. */
+  iconOnly?: boolean
   /** Preferred width before canvas clamping. */
   width?: number
-}>()
+}>(), { iconOnly: undefined })
 const emit = defineEmits<{ 'update:open': [value: string | null] }>()
 const trigger = shallowRef<HTMLElement | null>(null)
 const { bounds, overlayTarget } = useCanvasPopoverBounds(() => trigger.value)
@@ -37,7 +39,9 @@ watch(() => props.open === props.id, (opened) => {
 
 <template>
   <span class="histoire-toolbar-anchor">
-    <ToolbarButton :ref="setTrigger" :label="label" :icon="icon" :pressed="open === id" menu-role="menuitem" aria-haspopup="dialog" :aria-expanded="open === id" @click="emit('update:open', open === id ? null : id)"><slot name="trigger" /></ToolbarButton>
+    <ToolbarButton :ref="setTrigger" :label="label" :icon="icon" :icon-only="iconOnly" :pressed="open === id" menu-role="menuitem" aria-haspopup="dialog" :aria-expanded="open === id" @click="emit('update:open', open === id ? null : id)">
+      <template v-if="$slots.trigger" #default><slot name="trigger" /></template>
+    </ToolbarButton>
     <BasePopover class="histoire-toolbar-popover" :open="open === id" :anchor="trigger" :label="label" :width="width" :overlay-target="overlayTarget" :bounds="bounds" @update:open="emit('update:open', null)">
       <template #default="slot"><slot :close="slot.close" /></template>
     </BasePopover>

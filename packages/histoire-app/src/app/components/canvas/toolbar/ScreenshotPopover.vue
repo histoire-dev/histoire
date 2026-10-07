@@ -172,7 +172,7 @@ onBeforeUnmount(() => {
           Recent
         </p>
         <div v-for="file in recentFiles" :key="file.path" class="recent-capture">
-          <img :src="imageUrl(file)" alt="" loading="lazy"><span :title="file.metadata"><strong>{{ file.label }}</strong><small><time v-if="file.capturedAt" :datetime="file.capturedAt">{{ file.time }}</time><code>{{ file.shortName }}</code></small></span><HstButton color="flat" type="button" :aria-label="`Copy path for ${file.label}`" :title="copied === file.path ? 'Copied' : 'Copy path'" @click="copyPath(file.path)">
+          <img :src="imageUrl(file)" alt="" loading="lazy"><span :title="file.metadata"><strong>{{ file.label }}</strong><small><time v-if="file.capturedAt" :datetime="file.capturedAt">{{ file.time }}</time><code>{{ file.shortName }}</code></small></span><HstButton icon-only color="flat" type="button" :aria-label="`Copy path for ${file.label}`" :title="copied === file.path ? 'Copied' : 'Copy path'" @click="copyPath(file.path)">
             <BuiltinIcon :icon="copied === file.path ? 'checkmark' : 'copy'" :size="16" />
           </HstButton>
         </div>

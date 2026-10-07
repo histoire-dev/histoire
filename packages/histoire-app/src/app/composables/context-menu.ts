@@ -20,6 +20,10 @@ export interface WorkbenchContextAction {
   icon: string
   /** Adjacent groups receive a separator. */
   group?: string
+  /** Append to every target's menu after its own actions. */
+  global?: boolean
+  /** Existing shortcut registry identity used for the menu hint. */
+  shortcut?: string
   /** Unsupported target/action pairs stay hidden. */
   available?: (target: WorkbenchContextTarget) => boolean
   /** Visible unavailable actions explain their readiness requirement. */
@@ -66,7 +70,10 @@ export function createContextMenu(options: ContextMenuOptions = {}) {
     },
     /** Filter registered actions through exact target capabilities. */
     list(target: WorkbenchContextTarget): WorkbenchContextAction[] {
-      return state.actionIds.map(id => entries.get(id)).filter((action): action is WorkbenchContextAction => Boolean(action && action.available?.(target) !== false))
+      // Global actions stay last even when a surface explicitly requests one.
+      const local = state.actionIds.filter(id => !entries.get(id)?.global)
+      const global = [...entries.values()].filter(action => action.global).map(action => action.id)
+      return [...new Set([...local, ...global])].map(id => entries.get(id)).filter((action): action is WorkbenchContextAction => Boolean(action && action.available?.(target) !== false))
     },
     /** Handle action failures at the owning workbench boundary. */
     async run(action: WorkbenchContextAction, target: WorkbenchContextTarget): Promise<void> {

@@ -24,10 +24,10 @@ function onKeydown(event: KeyboardEvent): void {
       <span v-if="variantTitle && variantTitle !== storyTitle" class="inspector-story-title"><span>{{ storyTitle }}</span><BuiltinIcon icon="chevron-right" :size="12" /></span>
       <h2>{{ variantTitle || storyTitle }}</h2>
     </div>
-    <a v-if="isolatedHref" :href="isolatedHref" target="_blank" rel="noopener noreferrer" class="inspector-icon-button" aria-label="Open in new tab" title="Open in new tab">
+    <a v-if="isolatedHref" :href="isolatedHref" target="_blank" rel="noopener noreferrer" class="inspector-icon-button histoire-icon-button" aria-label="Open in new tab" title="Open in new tab">
       <BuiltinIcon icon="launch" :size="16" />
     </a>
-    <HstButton color="flat" type="button" class="inspector-icon-button" aria-label="Close inspector" title="Close inspector" @click="$emit('close')">
+    <HstButton icon-only color="flat" type="button" class="inspector-icon-button" aria-label="Close inspector" title="Close inspector" @click="$emit('close')">
       <BuiltinIcon icon="close" :size="16" />
     </HstButton>
   </header>
@@ -40,6 +40,6 @@ function onKeydown(event: KeyboardEvent): void {
 .inspector-story-title > span { overflow: hidden; text-overflow: ellipsis; }
 .inspector-story-title > svg { flex: none; }
 .inspector-header h2 { margin: 0; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 15px; line-height: 1.3; font-weight: 800; }
-.inspector-icon-button { display: grid; place-items: center; flex: none; width: 28px; height: 28px; padding: 0; color: var(--histoire-muted); }
+.inspector-icon-button { --histoire-icon-button-size: 28px; color: var(--histoire-muted); }
 .inspector-icon-button:hover { background: var(--histoire-chip); color: var(--histoire-text); }
 </style>

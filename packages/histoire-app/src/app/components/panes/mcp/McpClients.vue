@@ -36,7 +36,7 @@ const rows = computed(() => {
 </template>
 
 <style scoped>
-.histoire-mcp-clients { margin: 0 4px 22px; }
+.histoire-mcp-clients { margin: 0 0 22px; }
 h3 { margin: 0 0 14px; color: var(--histoire-muted); font-size: 12px; font-weight: 600; }
 p { margin: 0; color: var(--histoire-muted); font-size: 12px; }
 .histoire-mcp-client-row { display: flex; align-items: center; gap: 10px; padding: var(--histoire-mcp-row-padding, 8px) 0; }

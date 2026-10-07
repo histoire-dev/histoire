@@ -104,18 +104,32 @@ onBeforeUnmount(() => {
     <div v-if="draftAnchor" class="canvas-comment-pin" :style="{ left: `${draftAnchor.x}px`, top: `${draftAnchor.y}px` }">
       <CommentPin active temporary />
     </div>
-    <div v-if="anchor && cardStyle" class="canvas-comment-card" :style="cardStyle">
-      <CommentComposer v-if="model.draft.value" :draft="model.draft.value" :title="title(model.draft.value)" :agents="agents" :capturing="Boolean(capture.requestId.value) || model.pending.value" @save="model.save" @send="model.sendDraft" @attach="capture.capture" @close="model.dismiss" @setup-agent="emit('setupAgent')" />
-      <CommentThread v-else-if="model.selected.value" :comment="model.selected.value" :title="title(model.selected.value)" :agents="agents" :disabled="!model.available.value" @reply="(id, body) => model.reply(id, body)" @resolve="model.resolve(model.selected.value!.id, $event)" @remove="model.remove(model.selected.value!.id)" @close="model.dismiss" />
-      <p v-if="model.error.value" class="comment-error" role="alert">
-        {{ model.error.value }}
-      </p>
+    <div v-if="anchor && cardStyle" class="canvas-comment-overlay" :style="cardStyle">
+      <div class="canvas-comment-card">
+        <CommentComposer v-if="model.draft.value" :draft="model.draft.value" :title="title(model.draft.value)" :agents="agents" :capturing="Boolean(capture.requestId.value) || model.pending.value" @save="model.save" @send="model.sendDraft" @attach="capture.capture" @close="model.dismiss" @setup-agent="emit('setupAgent')" />
+        <CommentThread v-else-if="model.selected.value" :comment="model.selected.value" :title="title(model.selected.value)" :agents="agents" :disabled="!model.available.value" @reply="(id, body) => model.reply(id, body)" @resolve="model.resolve(model.selected.value!.id, $event)" @remove="model.remove(model.selected.value!.id)" @close="model.dismiss" />
+      </div>
+      <Transition name="comment-error" appear>
+        <p v-if="model.error.value" class="comment-error" role="alert">
+          {{ model.error.value }}
+        </p>
+      </Transition>
     </div>
   </Teleport>
 </template>
 
 <style scoped>
 .canvas-comment-pin { position: fixed; z-index: 28; transform: translate(-50%, -50%); pointer-events: auto; }
-.canvas-comment-card { position: fixed; z-index: 32; pointer-events: auto; max-height: calc(100vh - 24px); overflow: auto; }
+.canvas-comment-overlay { position: fixed; z-index: 32; pointer-events: auto; }
+/* The scroll container owns the shadow so its overflow cannot clip it. */
+.canvas-comment-card { max-height: calc(100vh - 24px); overflow: auto; border-radius: var(--histoire-radius-panel); box-shadow: var(--histoire-shadow-panel); }
+.canvas-comment-card :deep(.comment-card), .canvas-comment-card :deep(.comment-thread) { box-shadow: none; }
 .comment-error { max-width: 340px; margin: 8px 0 0; padding: 9px 12px; border-radius: var(--histoire-radius-control); background: var(--histoire-danger-soft); color: var(--histoire-danger-text); font-size: 12px; }
+.comment-error-enter-active { transition: opacity 180ms ease-out, transform 180ms cubic-bezier(0.16, 1, 0.3, 1); }
+.comment-error-leave-active { transition: opacity 140ms ease-in, transform 140ms ease-in; pointer-events: none; }
+.comment-error-enter-from, .comment-error-leave-to { opacity: 0; transform: translateY(-6px); }
+@media (prefers-reduced-motion: reduce) {
+  .comment-error-enter-active, .comment-error-leave-active { transition: none; }
+  .comment-error-enter-from, .comment-error-leave-to { transform: none; }
+}
 </style>

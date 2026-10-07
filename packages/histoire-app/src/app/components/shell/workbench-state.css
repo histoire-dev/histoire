@@ -1,0 +1,5 @@
+/* Empty and loading states share spacing; each owns its visual treatment. */
+.workbench-state { display: flex; flex-direction: column; align-items: center; gap: 6px; margin: 48px var(--histoire-pane-gutter, 16px); text-align: center; color: var(--histoire-muted); font-size: 12px; }
+.workbench-state-visual { display: grid; place-items: center; flex: none; width: 48px; height: 48px; margin-bottom: 8px; color: var(--histoire-accent); }
+.workbench-state > strong { color: var(--histoire-text); font-size: 14px; font-weight: 600; }
+.workbench-state > p { max-width: 100%; margin: 0; overflow-wrap: anywhere; }

@@ -26,6 +26,7 @@ import { createShortcutRegistry, provideShortcutRegistry } from '../util/shortcu
 import { onUiEvent, sendUiEvent } from '../util/ui-channel.js'
 import { createWorkbenchArrangement } from './arrangement.js'
 import { createWorkbenchMarkdownTransition } from './markdown-transition.js'
+import { registerUiVisibilityAction } from './ui-visibility-menu.js'
 import { useWorkbenchDev } from './workbench-dev.js'
 import { activateWorkspacePane, type WorkspacePane } from './workbench-navigation.js'
 
@@ -90,6 +91,7 @@ export function useWorkbench(props: WorkbenchProps, error: (error: unknown) => v
       await revealVariant(target)
     },
     frameSession: target => canvas.value?.registry.getFrame(target.frameKey)?.session ?? null,
+    frameRegistration: target => canvas.value?.registry.getFrame(target.frameKey) ?? null,
     error,
   })
   provideFrameActions(actions)
@@ -169,6 +171,7 @@ export function useWorkbench(props: WorkbenchProps, error: (error: unknown) => v
     }
   }
   useHistoireResource(shortcuts.bind('global.toggle-ui', toggleUi, { allowInput: true, enabled: canToggleUi }))
+  useHistoireResource(registerUiVisibilityAction(menu, { hidden: () => shell.uiHidden.value, available: canToggleUi, toggle: toggleUi }))
   const arrangementState = createWorkbenchArrangement({
     query: () => route.value.query.arrange,
     storyId: () => story.value?.id,

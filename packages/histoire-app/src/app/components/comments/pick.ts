@@ -4,6 +4,7 @@ import { getControlStateKeys } from '@histoire/controls/vue'
 import { getHistoireTargetKey } from '@histoire/protocol'
 import { ELEMENT_PICK_REQUEST, ELEMENT_PICK_RESULT } from '@histoire/shared'
 import { onBeforeUnmount, onMounted } from 'vue'
+import { captureFrameRegistration } from '../canvas/frame-registration.js'
 
 /** Exact pointer identity emitted by CanvasViewport. */
 export interface CommentFramePoint {
@@ -19,7 +20,7 @@ export interface CommentFramePoint {
 
 /** Finite element pick is attributed to one iframe document and frame target. */
 export function useCommentPick(model: WorkbenchComments, frames: CanvasFrames, composed: () => void) {
-  let pending: { point: CommentFramePoint, documentId: string, requestId: string } | undefined
+  let pending: { point: CommentFramePoint, documentId: string, requestId: string, isCurrent: () => boolean } | undefined
   let timeout: ReturnType<typeof setTimeout> | undefined
   /** Retire old requests before another click or component teardown. */
   function clear() {
@@ -30,7 +31,7 @@ export function useCommentPick(model: WorkbenchComments, frames: CanvasFrames, c
   function finish(selector?: string) {
     const owner = pending
     const frame = owner && frames.getFrame(owner.point.frameKey)
-    if (!owner || !frame?.iframe || frame.documentId !== owner.documentId) return clear()
+    if (!owner || !owner.isCurrent() || !frame?.iframe || frame.documentId !== owner.documentId) return clear()
     const current = frame.session?.getSnapshot()
     const target = { storyId: owner.point.storyId, variantId: owner.point.variantId }
     if (current?.status !== 'ready' || current.stale || current.runtime.status !== 'ready') return clear()
@@ -68,7 +69,8 @@ export function useCommentPick(model: WorkbenchComments, frames: CanvasFrames, c
       if (!model.available.value) return
       const frame = frames.getFrame(point.frameKey)
       if (!frame?.documentId || !frame.iframe || frame.storyId !== point.storyId || frame.variantId !== point.variantId || !Number.isFinite(point.point.x) || !Number.isFinite(point.point.y) || point.point.x < 0 || point.point.y < 0 || point.point.x > frame.rect.width || point.point.y > frame.rect.height) return
-      pending = { point, documentId: frame.documentId, requestId: `comment-${crypto.randomUUID()}` }
+      const activation = captureFrameRegistration(() => frames.getFrame(point.frameKey))!
+      pending = { point, documentId: frame.documentId, requestId: `comment-${crypto.randomUUID()}`, isCurrent: activation.isCurrent }
       const sent = frames.postToFrame(point.frameKey, { type: ELEMENT_PICK_REQUEST, ...point.point, requestId: pending.requestId, storyId: point.storyId, variantId: point.variantId })
       if (!sent) finish()
       else timeout = setTimeout(() => finish(), 700)

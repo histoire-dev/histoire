@@ -70,7 +70,7 @@ useHistoireResource(() => {
 </script>
 
 <template>
-  <nav class="histoire-app-rail" aria-label="Workbench">
+  <nav class="histoire-app-rail" aria-label="Workbench" :style="{ '--histoire-rail-action-count': items.length + (hideTheme ? 2 : 3) }">
     <a class="histoire-rail-logo" :href="logoHref ?? homeHref" :target="logoHref ? '_blank' : undefined" :rel="logoHref ? 'noopener noreferrer' : undefined" aria-label="Histoire home" @click="activateLogo">
       <img :src="logo" alt="" width="28" height="28">
     </a>
@@ -104,9 +104,10 @@ useHistoireResource(() => {
 .histoire-rail-destinations, .histoire-rail-tools { display: flex; flex-direction: column; gap: 4px; }
 .histoire-rail-tools { margin-top: auto; }
 @container (max-width: 640px) {
-  .histoire-app-rail { flex-direction: row; gap: 2px; padding: 8px 4px; border-inline-end: 0; border-block-start: 1px solid var(--histoire-border); }
+  /* Fit every action within narrow shells while retaining square hit areas. */
+  .histoire-app-rail { --histoire-rail-button-size: min(40px, calc((100cqw - 8px) / var(--histoire-rail-action-count) - 2px)); flex-direction: row; justify-content: space-between; gap: 2px; padding: 8px 4px; border-inline-end: 0; border-block-start: 1px solid var(--histoire-border); }
   .histoire-rail-logo { display: none; }
-  /* Share available width across every action so Settings stays reachable. */
+  /* Place every square action in the same responsive row. */
   .histoire-rail-destinations, .histoire-rail-tools { display: contents; }
 }
 </style>

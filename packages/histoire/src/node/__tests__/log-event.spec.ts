@@ -1,6 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { EVENT_SEND } from '../../../../histoire-app/src/app/util/const.js'
-import { isTrustedPreviewFrameMessage } from '../../../../histoire-app/src/app/util/preview-message.js'
 import { FAKE_ORIGIN, installFakeWindow } from './utils/fake-window.js'
 
 /**
@@ -9,14 +8,13 @@ import { FAKE_ORIGIN, installFakeWindow } from './utils/fake-window.js'
  *
  * Inside the preview sandbox the entry has to cross the iframe boundary, and
  * the host drops any frame message that does not carry the `__histoire` marker
- * — so the shape of that message is the whole contract and is asserted here by
- * feeding it back through the very guard the host uses.
+ * — so fallback message shape is asserted here. Real runtime/SDK acceptance is
+ * exercised by `embed/runtime-frame-events.spec.ts` and SDK `mount-events.spec.ts`.
  */
 
 const SANDBOX_HREF = `${FAKE_ORIGIN}/__sandbox.html?storyId=story-a&variantId=variant-a`
 
 let fakeWindow: ReturnType<typeof installFakeWindow>
-const addEvent = vi.fn()
 
 /**
  * Loads `logEvent` with a fake sandbox/host document installed.
@@ -26,9 +24,6 @@ const addEvent = vi.fn()
 async function loadLogEvent(href: string) {
   vi.resetModules()
   fakeWindow = installFakeWindow({ href })
-  vi.doMock('../../../../histoire-app/src/app/stores/events.js', () => ({
-    useEventsStore: () => ({ addEvent }),
-  }))
 
   const { logEvent } = await import('../../../../histoire-app/src/app/util/events.js')
   return logEvent
@@ -37,8 +32,7 @@ async function loadLogEvent(href: string) {
 describe('logEvent', () => {
   beforeEach(() => {
     vi.spyOn(console, 'log').mockImplementation(() => {})
-    addEvent.mockClear()
-    // `stringifyEvent` tests values against these DOM constructors; they do not
+    // `cleanEventPayload` tests values against these DOM constructors; they do not
     // exist in the `node` environment this package runs in.
     ;(globalThis as any).Node = class Node {}
     ;(globalThis as any).Window = class Window {}
@@ -52,7 +46,7 @@ describe('logEvent', () => {
     delete (globalThis as any).Window
   })
 
-  it('posts an event the host will actually accept', async () => {
+  it('posts same-origin marked fallback event', async () => {
     const logEvent = await loadLogEvent(SANDBOX_HREF)
 
     await logEvent('my-event', { detail: 'payload' })
@@ -68,13 +62,6 @@ describe('logEvent', () => {
       },
     })
 
-    // The real host listener runs every inbound frame message through this
-    // guard: without the marker the event is silently discarded and never
-    // reaches the Events panel.
-    expect(isTrustedPreviewFrameMessage(
-      { source: 'preview-frame', origin: FAKE_ORIGIN, data: payload },
-      { contentWindow: 'preview-frame' },
-    )).toBe(true)
     // Never '*': the sandbox is same-origin with the host by construction, and
     // a wildcard would leak the event payload to any page embedding it.
     expect(targetOrigin).toBe(FAKE_ORIGIN)
@@ -109,12 +96,39 @@ describe('logEvent', () => {
   it('writes straight to the events store outside the sandbox', async () => {
     const logEvent = await loadLogEvent(`${FAKE_ORIGIN}/story/story-a`)
 
-    await logEvent('my-event', { detail: 'payload' })
+    const { createPinia, setActivePinia } = await import('pinia')
+    const { useEventsStore } = await import('../../../../histoire-app/src/app/stores/events.js')
+    const pinia = createPinia()
+    setActivePinia(pinia)
+
+    await logEvent('my-event', { detail: 'payload', callback: () => {} })
 
     expect(fakeWindow.parentMessages).toHaveLength(0)
-    expect(addEvent).toHaveBeenCalledWith({
+    expect(useEventsStore().events).toEqual([{
       name: 'my-event',
       argument: { detail: 'payload' },
-    })
+    }])
+    expect(useEventsStore().unseen).toBe(1)
+    setActivePinia(undefined)
+  })
+
+  it('keeps host histories independent across Pinia owners and resets explicitly', async () => {
+    const logEvent = await loadLogEvent(`${FAKE_ORIGIN}/story/story-a`)
+    const { createPinia, setActivePinia } = await import('pinia')
+    const { useEventsStore } = await import('../../../../histoire-app/src/app/stores/events.js')
+    const first = createPinia()
+    const second = createPinia()
+    setActivePinia(first)
+    await logEvent('first', 1)
+    setActivePinia(second)
+    await logEvent('second', 2)
+
+    expect(useEventsStore(first).events).toEqual([{ name: 'first', argument: 1 }])
+    expect(useEventsStore(second).events).toEqual([{ name: 'second', argument: 2 }])
+    useEventsStore(first).reset()
+    expect(useEventsStore(first).events).toEqual([])
+    expect(useEventsStore(first).unseen).toBe(0)
+    expect(useEventsStore(second).unseen).toBe(1)
+    setActivePinia(undefined)
   })
 })

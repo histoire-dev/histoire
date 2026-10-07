@@ -37,7 +37,7 @@ const rows = computed(() => store.history.map(operation => ({ key: operation.id,
 </template>
 
 <style scoped>
-.histoire-mcp-history { margin: 0 4px; }
+.histoire-mcp-history { margin: 0; }
 header { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 18px; }
 .history-follow { padding: 0; margin: 0; }
 h3 { margin: 0; color: var(--histoire-muted); font-size: 12px; font-weight: 600; }

@@ -1,5 +1,5 @@
 import type { HistoireSession, HistoireStoryLink, HistoireTarget } from '@histoire/sdk/internal'
-import { getHistoireSessionDescriptor, isHistoirePrimaryMountActive, registerHistoireSessionInternals, requestHistoireOpenInEditor, requestHistoireStatePreset, waitForHistoireSelection } from '@histoire/sdk/internal'
+import { getAcceptedHistoireSessionDescriptor, getHistoireSessionDescriptor, isHistoirePrimaryMountActive, registerHistoireSessionInternals, requestHistoireOpenInEditor, requestHistoireStatePreset, waitForHistoireSelection } from '@histoire/sdk/internal'
 import { resolveAutoSelectedVariantId } from '../util/variant-selection.js'
 
 /** Standalone preserves variant chooser while browser SDK retains story-only first/remembered behavior. */
@@ -58,7 +58,7 @@ export function createStandaloneSelection(session: HistoireSession) {
     finally { navigationIntents-- }
   }
   const facade: HistoireSession = { ...session, selection: { select } }
-  registerHistoireSessionInternals(facade, { descriptor: () => getHistoireSessionDescriptor(session), presets: action => requestHistoireStatePreset(session, action), openInEditor: target => requestHistoireOpenInEditor(session, target), docsPolicy: 'trusted-local', selectionSettled: () => waitForHistoireSelection(session), primaryMountActive: mount => isHistoirePrimaryMountActive(session, mount), storyLink: link => select(link.selection, link) })
+  registerHistoireSessionInternals(facade, { descriptor: () => getHistoireSessionDescriptor(session), acceptedDescriptor: () => getAcceptedHistoireSessionDescriptor(session), presets: action => requestHistoireStatePreset(session, action), openInEditor: target => requestHistoireOpenInEditor(session, target), docsPolicy: 'trusted-local', selectionSettled: () => waitForHistoireSelection(session), primaryMountActive: mount => isHistoirePrimaryMountActive(session, mount), storyLink: link => select(link.selection, link) })
   return { session: facade, resolve,
     /** Canonical observer ignores facade intents that already own URL push. */
     isNavigating: () => navigationIntents > 0,

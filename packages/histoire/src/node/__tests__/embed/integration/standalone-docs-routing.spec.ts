@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { createEmbedBridgeFixture } from '../../utils/embed/bridge-fixture.js'
+import { STANDALONE_SELECTED_FRAME } from '../../utils/embed/browser.js'
 
 const story = '<template><Story id="normal" title="Normal story"><Variant id="one"><button>First preview</button></Variant><Variant id="two"><button>Second preview</button></Variant></Story></template>'
 const documentation = `# Story documentation
@@ -21,9 +22,9 @@ describe('standalone documentation navigation intent', () => {
       const url = new URL(page.url())
       return routerMode === 'hash' ? new URL(url.hash.slice(1), url.origin) : url
     }
-    /** Canvas replicas are independent; inspect only selected canonical preview. */
+    /** Canvas replicas are independent; inspect only selected ready actor. */
     async function preview() {
-      const selected = page.locator('iframe[data-test-id="preview-iframe"]')
+      const selected = page.locator(STANDALONE_SELECTED_FRAME)
       if (!await selected.count()) return null
       const iframe = await selected.elementHandle()
       return iframe?.contentFrame()
@@ -35,7 +36,7 @@ describe('standalone documentation navigation intent', () => {
       await expect.poll(() => currentRoute().searchParams.get('variantId'), { timeout: 15_000 }).toBe('')
       expect(currentRoute().searchParams.get('tab')).toBe('docs')
       expect(currentRoute().hash).toBe('#part')
-      await expect.poll(() => page.locator('iframe[data-test-id="preview-iframe"]').count(), { timeout: 15_000 }).toBe(0)
+      await expect.poll(() => page.locator(STANDALONE_SELECTED_FRAME).count(), { timeout: 15_000 }).toBe(0)
       expect(await page.getByRole('tab', { name: 'Docs', exact: true }).getAttribute('aria-selected')).toBe('true')
 
       await page.getByRole('link', { name: 'Second documentation', exact: true }).click()
