@@ -14,6 +14,8 @@ export interface HistoireBrowserRunConfigOptions {
    * `HST_COLLECT` flag baked into the bundle.
    */
   collecting: boolean
+  /** Definition discovery keeps test runtime flags but uses bounded browser work. */
+  definitions?: boolean
   /** The generated specs, used as dependency optimizer entries. */
   entries: string[]
   /** Extra Vite plugins (the collection results channel). */
@@ -34,6 +36,14 @@ export async function getHistoireBrowserRunConfig(
     browserRuntime: true,
     collecting,
   })
+  // Generated specs are warmed directly before dispatch. Their fresh run paths
+  // must not invalidate persistent optimizer hashes on every collection.
+  // Stable remaining story roots still admit lazy CommonJS imports, alongside
+  // explicit user entries; proven-empty stories never enter this graph.
+  const userEntries = viteConfig.optimizeDeps?.entries ?? []
+  const optimizerEntries = options.definitions
+    ? [...new Set([...ctx.storyFiles.map(file => file.path), ...typeof userEntries === 'string' ? [userEntries] : userEntries])]
+    : entries
 
   if (options.plugins?.length) {
     viteConfig.plugins = [...((viteConfig.plugins as VitePlugin[] | undefined) ?? []), ...options.plugins]
@@ -45,7 +55,7 @@ export async function getHistoireBrowserRunConfig(
     viteConfig.optimizeDeps = {
       ...viteConfig.optimizeDeps,
       include: [],
-      entries,
+      entries: optimizerEntries,
       noDiscovery: true,
     }
   }
@@ -56,7 +66,8 @@ export async function getHistoireBrowserRunConfig(
   // run's own temp directory (emptied on every run) so it is actually
   // reusable; Vite re-optimizes on config/lockfile changes, so no `force` is
   // needed.
-  viteConfig.cacheDir = resolve(ctx.root, '.histoire', 'cache', collecting ? 'vitest-collect' : 'vitest-test')
+  viteConfig.cacheDir = resolve(ctx.root, '.histoire', 'cache', collecting ? 'vitest-collect' : options.definitions ? 'vitest-definitions' : 'vitest-test')
+  if (options.definitions) viteConfig.optimizeDeps = { ...viteConfig.optimizeDeps, holdUntilCrawlEnd: viteConfig.optimizeDeps?.holdUntilCrawlEnd ?? false }
 
   return createVitestBrowserRuntimeConfig(ctx, viteConfig, {
     define: {
@@ -64,8 +75,10 @@ export async function getHistoireBrowserRunConfig(
       '__HST_COLLECT__': String(collecting),
     },
     optimizeDeps: {
-      entries,
+      entries: optimizerEntries,
+      ...(options.definitions ? { noDiscovery: viteConfig.optimizeDeps?.noDiscovery ?? false } : {}),
     },
+    reachableDependencies: options.definitions,
     ...(collecting
       ? {
           test: {
@@ -78,7 +91,7 @@ export async function getHistoireBrowserRunConfig(
         }
       : {
           test: {
-            maxWorkers: getTestMaxWorkers(ctx),
+            maxWorkers: options.definitions ? Math.min(4, getTestMaxWorkers(ctx)) : getTestMaxWorkers(ctx),
           },
           resolveAlias: {
             [TEST_HARNESS_ID]: RESOLVED_TEST_HARNESS_ID,

@@ -1,9 +1,10 @@
 import type { TestContextFiles } from './context-transfer.js'
-import type { RunHistoireTestsOptions } from './types.js'
+import type { CollectHistoireTestsOptions } from './types.js'
 import { HistoireSdkError } from '@histoire/protocol'
 import { closeContext, createContext } from '../context.js'
 import { hasUnconfirmedCleanup } from '../runtime/cleanup.js'
 import { ExecutionError } from '../runtime/execution-types.js'
+import { debugVitestBrowser } from '../util/browser-debug.js'
 import { collectHistoireProjectTests } from './collect.js'
 import { restoreTestContextFiles } from './context-transfer.js'
 import { runHistoireTests } from './run.js'
@@ -12,14 +13,18 @@ const abort = new AbortController()
 let started = false
 
 /** Child owns runner's process effects; terminal result follows context and browser cleanup. */
-async function run(input: { operation?: 'run' | 'collect', root: string, configFile?: string, files?: TestContextFiles, options: RunHistoireTestsOptions }) {
+async function run(input: { operation?: 'run' | 'collect', root: string, configFile?: string, files?: TestContextFiles, options: CollectHistoireTestsOptions }) {
   let context: Awaited<ReturnType<typeof createContext>> | undefined
   let summary: unknown
   let failure: unknown
   try {
+    const started = performance.now()
     context = await createContext({ root: input.root, configFile: input.configFile, mode: 'dev' })
+    debugVitestBrowser('collection:context', performance.now() - started)
     if (input.files) restoreTestContextFiles(context, input.files)
-    summary = await (input.operation === 'collect' ? collectHistoireProjectTests : runHistoireTests)(context, { ...input.options, isolate: false, signal: abort.signal })
+    summary = await (input.operation === 'collect' ? collectHistoireProjectTests : runHistoireTests)(context, { ...input.options, isolate: false, signal: abort.signal, onProgress(collection) {
+      if (!abort.signal.aborted && process.connected) process.send?.({ type: 'progress', collection }, undefined, undefined, () => {})
+    } })
   }
   catch (error) { failure = error }
   finally {
@@ -47,3 +52,4 @@ process.on('message', (message: any) => {
     })
   }
 })
+process.on('disconnect', () => abort.abort())

@@ -29,6 +29,7 @@ defineEmits<{
 .histoire-markdown-pager { display: flex; gap: 12px; margin-top: 28px; }
 button { display: flex; flex: 1; align-items: center; gap: 12px; min-width: 0; padding: 18px 16px; color: var(--histoire-text); text-align: left; }
 button > div { flex: 1; min-width: 0; }
+button.next { text-align: right; }
 button.next:last-child { margin-left: auto; }
 small { display: block; margin-bottom: 6px; color: var(--histoire-muted); font-size: 11px; }
 strong { display: block; }

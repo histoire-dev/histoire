@@ -1,23 +1,9 @@
 import type { HistoireProjectTestCollectionResult } from '@histoire/protocol'
-import { createHistoireSessionWithAdapters } from '@histoire/sdk/internal'
 import { describe, expect, it, vi } from 'vitest'
 import { createWorkbenchTestsModel } from '../../../histoire-app/src/app/components/panes/tests/model.js'
-import { deferred, sourceFixture } from '../../../histoire-sdk/src/__tests__/fixtures/session.js'
+import { deferred } from '../../../histoire-sdk/src/__tests__/fixtures/session.js'
 import { createHistoireTestsModel } from '../tests/model.js'
-
-/** Real connected source with deterministic executable provenance. */
-async function setup() {
-  const fixture = sourceFixture()
-  for (const story of fixture.descriptor.catalog.stories) story.runtimeRevision = 'a'.repeat(64)
-  const session = createHistoireSessionWithAdapters({ url: 'https://book.example/' }, fixture.adapters)
-  await session.connect()
-  /** Full collection explicitly acknowledges every empty variant. */
-  function collection(tested = true, storyId?: string): HistoireProjectTestCollectionResult {
-    const source = session.getSnapshot().source!
-    return { execution: { runId: 'discovery', mode: 'server', sourceId: source.sourceId, epoch: source.epoch, revision: source.revision }, variants: fixture.descriptor.catalog.stories.filter(story => !story.docsOnly && (!storyId || story.id === storyId)).flatMap(story => story.variants.map(variant => ({ target: { storyId: story.id, variantId: variant.id }, collection: { definitions: tested && variant.id === 'c' ? [{ id: '0', name: 'test', fullName: 'test' }] : [] } }))) }
-  }
-  return { fixture, session, collection }
-}
+import { setupTestDiscovery as setup } from './fixtures/test-discovery.js'
 
 describe('project test discovery', () => {
   it('discovers once before first run without selecting or fabricating assertion results', async () => {
@@ -177,7 +163,7 @@ describe('project test discovery', () => {
       gate.resolve(empty)
       await operation
       await vi.waitFor(() => expect(model.visibleRows.value).toHaveLength(1))
-      expect(collectStory).toHaveBeenCalledExactlyOnceWith('a:b', expect.any(AbortSignal))
+      expect(collectStory).toHaveBeenCalledExactlyOnceWith('a:b', expect.any(AbortSignal), expect.any(Function))
     }
     finally {
       model.close()

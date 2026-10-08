@@ -1,3 +1,4 @@
+import type { Plugin } from 'vite'
 import type { Context } from '../context.js'
 import { getHistoireBrowserRunConfig } from '../vitest-browser-config/run-config.js'
 
@@ -6,9 +7,11 @@ import { getHistoireBrowserRunConfig } from '../vitest-browser-config/run-config
  * @param ctx The histoire context.
  * @param entries The generated specs, used as dependency optimizer entries.
  */
-export async function getTestVitestConfig(ctx: Context, entries: string[]) {
+export async function getTestVitestConfig(ctx: Context, entries: string[], mode: 'run' | 'definitions' = 'run', plugins: Plugin[] = []) {
   return getHistoireBrowserRunConfig(ctx, {
     collecting: false,
     entries,
+    definitions: mode === 'definitions',
+    plugins,
   })
 }

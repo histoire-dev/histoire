@@ -4,12 +4,27 @@ import pc from 'picocolors'
 import { ExecutionError } from '../runtime/execution-types.js'
 import { cleanupVitestBrowserRun } from '../vitest-browser-cleanup.js'
 import { assignVitestBrowserProjectOptions } from '../vitest-browser-config/index.js'
+import { debugVitestBrowser } from './browser-debug.js'
+import { prepareCollectionBrowser } from './collection-browser.js'
 import { loadProjectVitest } from './project-vitest.js'
 import { throwIfTestAborted, withTestAbort } from './test-abort.js'
 import { CLEANUP_TIMEOUT } from './test-timeouts.js'
 import { formatVitestError } from './vitest-errors.js'
 import { shouldRetryVitestBrowserRun } from './vitest-retry.js'
 import { runWithVitestStartTimeout } from './vitest-start-timeout.js'
+
+/** Cancellation notification must precede RPC teardown; a stuck user import cannot hold it forever. */
+async function cancelVitestBeforeCleanup(vitest: Vitest) {
+  let timer: ReturnType<typeof setTimeout> | undefined
+  const cancellation = Promise.resolve().then(() => vitest.cancelCurrentRun?.('keyboard-input'))
+  void cancellation.catch(() => {})
+  try {
+    await Promise.race([cancellation.catch(() => {}), new Promise<void>((resolve) => {
+      timer = setTimeout(resolve, 1000)
+    })])
+  }
+  finally { clearTimeout(timer) }
+}
 
 /**
  * Everything one attempt of a Vitest browser run needs.
@@ -71,6 +86,7 @@ export interface RunVitestAttemptsOptions<TContext, TResult> {
  * @param strict Require confirmed teardown for a long-lived shared execution lane.
  */
 async function cleanupRun(vitest: Vitest, label: string, originalError?: unknown, strict = false) {
+  const started = performance.now()
   try {
     const outcome = await cleanupVitestBrowserRun(vitest, { label, timeoutMs: CLEANUP_TIMEOUT })
     if (strict && outcome?.status === 'unconfirmed') {
@@ -86,6 +102,7 @@ async function cleanupRun(vitest: Vitest, label: string, originalError?: unknown
       originalError.cause = cleanupError
     }
   }
+  finally { debugVitestBrowser('collection:cleanup', { label, duration: performance.now() - started }) }
 }
 
 /**
@@ -113,13 +130,22 @@ export async function runVitestAttempts<TContext, TResult>(
 
     try {
       // Observe late creation even after abort: only the acquired handle can confirm teardown.
+      const acquired = performance.now()
       vitest = await api.createVitest('test', setup.vitestOptions as any, setup.viteConfig as any)
+      if (options.mode === 'collect') debugVitestBrowser('collection:startup', performance.now() - acquired)
       throwIfTestAborted(options.signal)
       if (setup.browserProjectOptions) {
         assignVitestBrowserProjectOptions(vitest, setup.browserProjectOptions)
       }
 
-      await runWithVitestStartTimeout(() => withTestAbort(() => options.mode === 'collect' ? vitest!.collect(setup.filter ?? [], { staticParse: false }) : vitest!.start(setup.filter ?? []), options.signal), {
+      await runWithVitestStartTimeout(() => withTestAbort(async () => {
+        if (options.mode === 'collect') {
+          await prepareCollectionBrowser(vitest!)
+          throwIfTestAborted(options.signal)
+          return vitest!.collect(setup.filter ?? [], { staticParse: false })
+        }
+        return vitest!.start(setup.filter ?? [])
+      }, options.signal), {
         timeoutMs: setup.timeoutMs,
         message: setup.timeoutMessage,
         onTimeout: () => setup.onTimeout?.(vitest!),
@@ -134,12 +160,12 @@ export async function runVitestAttempts<TContext, TResult>(
     }
     catch (error) {
       if (vitest && !cleanupStarted) {
-        if (options.signal?.aborted) {
+        if (options.signal?.aborted || options.mode === 'collect') {
           // Vitest must stop queued testers before browser teardown. Otherwise
           // closing its RPC page is classified as a fatal run, and late pool
           // work can exit the isolated worker without a cleanup acknowledgement.
           // Resource release still waits for cleanupRun, even if cancellation fails.
-          void vitest.cancelCurrentRun?.('keyboard-input').catch(() => {})
+          await cancelVitestBeforeCleanup(vitest)
         }
         await cleanupRun(vitest, options.label, error, options.strictCleanup)
       }

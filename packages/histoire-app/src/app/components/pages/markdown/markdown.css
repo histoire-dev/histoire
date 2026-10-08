@@ -12,7 +12,7 @@
 .histoire-markdown-page .histoire-docs a.header-anchor { margin-left: 6px; opacity: 0; text-decoration: none; }
 .histoire-markdown-page .histoire-docs :is(h1,h2,h3):hover a.header-anchor, .histoire-markdown-page .histoire-docs a.header-anchor:focus-visible { opacity: 1; }
 .histoire-markdown-page .histoire-docs :is(code,pre) { font-family: var(--histoire-font-mono, monospace); font-size: .9em; }
-.histoire-markdown-page .histoire-docs pre { overflow: auto; margin: 18px 0 26px; padding: 16px; border-radius: 10px; background: var(--histoire-code); color: #e6e7ea; }
+.histoire-markdown-page .histoire-docs pre { overflow: auto; margin: 18px 0 26px; padding: 12px 16px; border-radius: 10px; background: var(--histoire-code); color: #e6e7ea; }
 .histoire-markdown-page .histoire-docs :not(pre) > code { padding: 2px 4px; border-radius: 4px; background: var(--histoire-chip); }
 .histoire-markdown-page .histoire-docs blockquote { margin: 16px 0; padding: 10px 14px; border: 1px solid var(--histoire-border); border-radius: 8px; background: var(--histoire-accent-soft); }
 .histoire-markdown-page .histoire-docs blockquote > p { margin: 0; }

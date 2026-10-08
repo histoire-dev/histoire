@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { HistoireTarget } from '@histoire/protocol'
 import type { WorkbenchTestRow } from './types.js'
-import { BuiltinIcon, HstButton, HstSwitch } from '@histoire/controls/vue'
+import { BuiltinIcon, HstButton, HstPulsatingDisc, HstSwitch } from '@histoire/controls/vue'
 import { getHistoireTargetKey } from '@histoire/protocol'
 import { useHistoireSnapshot } from '@histoire/vue'
 import { useHistoireContext, useHistoireResource } from '@histoire/vue/internal'
@@ -25,7 +25,7 @@ useHistoireResource(() => {
 })
 const issue = computed(() => {
   const error = model?.error.value ?? model?.discoveryError.value
-  return error ? (error instanceof Error ? error.message : String(error)) : null
+  return error ? (error instanceof Error ? error.message : String(error)).split('\n')[0] : null
 })
 /** Selection is canonical; root translates successful activation into inspector Tests tab. */
 async function select(row: WorkbenchTestRow) {
@@ -54,13 +54,17 @@ async function select(row: WorkbenchTestRow) {
     <template v-if="model">
       <TestsSummary :summary="model.summary.value" :running="model.running.value" :completed="model.completed.value" :total="model.total.value" />
       <TestsFilter v-model="filter" />
+      <div v-if="['collecting', 'error'].includes(model.discoveryStatus.value) && model.discoveryProgress.value.completed" class="collection-progress" role="status">
+        <HstPulsatingDisc v-if="model.discoveryStatus.value === 'collecting'" :size="12" />
+        {{ model.discoveryStatus.value === 'collecting' ? 'Collecting tests…' : 'Collected targets' }} {{ model.discoveryProgress.value.completed }}/{{ model.discoveryProgress.value.total }}
+      </div>
       <p v-if="issue" class="test-issue" role="alert">
         {{ issue }}
       </p>
       <HstButton v-if="model.discoveryStatus.value === 'error'" color="flat" type="button" class="retry-collection" @click="model.retryCollection()">
         Retry collection
       </HstButton>
-      <WorkbenchLoadingState v-if="model.discoveryStatus.value === 'collecting' && !model.visibleRows.value.length" title="Collecting tests…" />
+      <WorkbenchLoadingState v-if="model.discoveryStatus.value === 'collecting' && !model.discoveryProgress.value.completed" title="Collecting tests…" />
       <TestsTree v-else-if="model.discoveryStatus.value !== 'error' || model.visibleRows.value.length" :rows="model.visibleRows.value" :filter="filter" :selected="snapshot.selection" @select="select" />
       <footer>
         <label :for="watchModeId" class="watch-mode-row" :class="{ disabled: !model.canRun.value }">
@@ -83,6 +87,7 @@ h2 { margin: 0; font-size: 14px; font-weight: 800; }
 .run-tests { display: inline-flex; align-items: center; gap: 6px; padding: 8px 10px; font-weight: 750; }
 .test-issue { margin: 10px var(--histoire-pane-gutter, 16px); color: var(--histoire-danger-text); font-size: 12px; overflow-wrap: anywhere; white-space: pre-line; }
 .retry-collection { margin: 10px var(--histoire-pane-gutter, 16px); align-self: flex-start; }
+.collection-progress { display: flex; align-items: center; gap: 8px; margin: 10px var(--histoire-pane-gutter, 16px); color: var(--histoire-muted); font-size: 12px; }
 footer { margin-top: auto; border-top: 1px solid var(--histoire-border); }
 .watch-mode-row { display: flex; align-items: center; gap: 9px; box-sizing: border-box; inline-size: 100%; min-inline-size: 0; padding: 14px var(--histoire-pane-gutter, 16px); cursor: pointer; }
 .watch-mode-row:hover { background: var(--histoire-chip); }

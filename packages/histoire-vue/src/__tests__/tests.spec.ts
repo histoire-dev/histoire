@@ -9,6 +9,7 @@ import { deferred, sourceFixture } from '../../../histoire-sdk/src/__tests__/fix
 import { HistoireTests } from '../components/tests/HistoireTests.js'
 import { HistoireProvider } from '../provider/HistoireProvider.js'
 import { createHistoireTestsController } from '../tests/controller.js'
+import { testRows } from './fixtures/tests-panel.js'
 
 /** Existing SDK fixture proves independent native panel uses only explicit provider session. */
 async function fixture() {
@@ -41,9 +42,9 @@ describe('independent tests panel', () => {
     expect(wrapper.text()).not.toContain('Collect')
     expect(wrapper.text()).not.toContain('preview')
     await chooseTestAction(wrapper, 'Run on server')
-    await vi.waitFor(() => expect(wrapper.get('output').text()).toBe('0 passed · 1 failed · 0 skipped'))
+    await vi.waitFor(() => expect(wrapper.get('output').text()).toBe('1 failed'))
     expect(run.mock.calls[0][0].mode).toBe('server')
-    expect(wrapper.get('summary').text()).toBe('expected true')
+    expect(wrapper.get('.histoire-test-error-message').text()).toBe('expected true')
     expect(wrapper.get('[aria-label="Assertion difference"]').text()).toBe('- false\n+ true')
     expect(wrapper.get('[aria-label="Error stack and source excerpt"]').text()).toContain('Button.story.vue:12')
     wrapper.unmount()
@@ -68,7 +69,7 @@ describe('independent tests panel', () => {
       await chooseTestAction(wrapper, 'Force refresh')
       await vi.waitFor(() => expect(collect).toHaveBeenCalledOnce())
       expect(run).toHaveBeenCalledOnce()
-      expect(wrapper.get('output').text()).toBe('1 collected')
+      expect(wrapper.get('output').text()).toBe('1 test')
     }
     finally {
       wrapper.unmount()
@@ -132,8 +133,8 @@ describe('independent tests panel', () => {
     const run = vi.spyOn(test.session.tests, 'run')
     const collect = vi.spyOn(test.session.tests, 'collect')
     const wrapper = mount(HistoireProvider, { props: { session: test.session }, slots: { default: () => h(HistoireTests, { summary }) } })
-    expect(wrapper.get('output').text()).toBe('0 passed · 1 failed · 0 skipped')
-    expect(wrapper.get('summary').text()).toBe('cached failure')
+    expect(wrapper.get('output').text()).toBe('1 failed')
+    expect(wrapper.get('.histoire-test-error-message').text()).toBe('cached failure')
     expect(run).not.toHaveBeenCalled()
     expect(collect).not.toHaveBeenCalled()
     wrapper.unmount()
@@ -152,7 +153,7 @@ describe('independent tests panel', () => {
     await result.promise
     await Promise.resolve()
     expect(panel.emitted('completed')).toBeUndefined()
-    expect(panel.get('output').text()).toBe('idle')
+    expect(panel.get('output').text()).toBe('Not run')
     wrapper.unmount()
     await test.session.dispose()
   })
@@ -169,14 +170,14 @@ describe('independent tests panel', () => {
       const collection = { definitions: [{ id: 'cached', name: 'Cached test', fullName: 'Suite > Cached test' }] }
       cached.value = { collection, running: true }
       await nextTick()
-      expect(panel.get('output').text()).toBe('running')
-      expect(panel.text()).toContain('Suite > Cached test — Not run')
+      expect(panel.get('output').text()).toBe('Running…')
+      expect(testRows(panel)).toEqual([['Suite › Cached test', 'Running']])
       expect(panel.find('[role="alert"]').exists()).toBe(false)
       expect(panel.findAll('button').every(button => button.attributes('disabled') !== undefined)).toBe(true)
       cached.value = { collection, running: false, summary: { ok: true, total: 1, passed: 1, failed: 0, skipped: 0, errors: [], tests: [{ id: 'cached', name: 'Cached test', fullName: 'Suite > Cached test', state: 'passed', errors: [] }] } }
       await nextTick()
-      expect(panel.get('output').text()).toBe('1 passed · 0 failed · 0 skipped')
-      expect(panel.text()).toContain('Suite > Cached test — passed')
+      expect(panel.get('output').text()).toBe('1 passed')
+      expect(testRows(panel)).toEqual([['Suite › Cached test', 'Passed']])
       expect(panel.find('[role="alert"]').exists()).toBe(false)
       expect(run).toHaveBeenCalledOnce()
       expect(collect).not.toHaveBeenCalled()
@@ -195,14 +196,14 @@ describe('independent tests panel', () => {
     const wrapper = mount(HistoireProvider, { props: { session: test.session }, slots: { default: () => h(HistoireTests, { summary: cached.value }) } })
     const panel = wrapper.findComponent(HistoireTests)
     try {
-      expect(panel.get('output').text()).toBe('0 passed · 0 failed · 0 skipped')
+      expect(panel.get('output').text()).toBe('No tests run')
       await chooseTestAction(wrapper, 'Run on server')
-      await vi.waitFor(() => expect(panel.get('output').text()).toBe('0 passed · 1 failed · 0 skipped'))
-      expect(panel.get('summary').text()).toBe('Fresh failure')
+      await vi.waitFor(() => expect(panel.get('output').text()).toBe('1 failed'))
+      expect(panel.get('.histoire-test-error-message').text()).toBe('Fresh failure')
       cached.value = { ok: true, total: 1, passed: 1, failed: 0, skipped: 0, errors: [], tests: [{ id: 'host', name: 'Host test', fullName: 'Host test', state: 'passed', errors: [] }] }
       await nextTick()
-      expect(panel.get('output').text()).toBe('1 passed · 0 failed · 0 skipped')
-      expect(panel.text()).toContain('Host test — passed')
+      expect(panel.get('output').text()).toBe('1 passed')
+      expect(testRows(panel)).toEqual([['Host test', 'Passed']])
     }
     finally {
       wrapper.unmount()

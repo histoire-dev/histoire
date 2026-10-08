@@ -82,6 +82,8 @@ export interface VitestInstanceStubOptions {
 export function createVitestInstanceStub(options: VitestInstanceStubOptions = {}) {
   return {
     options: options.options,
+    projects: [],
+    _initBrowserServers: vi.fn(async () => {}),
     start: vi.fn(options.start ?? (async () => {})),
     // The run must never wait on it: `start()` already resolves when the run
     // ended, and awaiting both would hang once Vitest resolves them in order.

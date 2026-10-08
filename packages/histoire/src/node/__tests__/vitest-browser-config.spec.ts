@@ -85,6 +85,22 @@ it('bakes the collection flag matching the kind of run', async () => {
   expect(test.viteConfig.test.maxWorkers).toBe(ctx.config.test?.maxWorkers)
 })
 
+it('keeps definition optimizer roots stable across runs and preserves explicit user policy', async () => {
+  const ctx = createContext()
+  ctx.storyFiles = [{ path: '/unknown.story.vue' }] as Context['storyFiles']
+  ctx.config.test!.maxWorkers = 8
+  ctx.config.vite = { optimizeDeps: { entries: ['/setup.ts'], include: ['change-case'], exclude: ['opaque-package'], noDiscovery: true, holdUntilCrawlEnd: true } }
+  const first = await getHistoireBrowserRunConfig(ctx, { collecting: false, definitions: true, entries: ['/run-first/spec.ts'] })
+  const second = await getHistoireBrowserRunConfig(ctx, { collecting: false, definitions: true, entries: ['/run-second/spec.ts'] })
+  expect(first.viteConfig.optimizeDeps).toMatchObject({ entries: ['/unknown.story.vue', '/setup.ts'], include: ['change-case'], exclude: ['opaque-package'], noDiscovery: true, holdUntilCrawlEnd: true })
+  expect(second.viteConfig.optimizeDeps).toEqual(first.viteConfig.optimizeDeps)
+  expect(first.viteConfig.cacheDir).toBe(`${ctx.root}/.histoire/cache/vitest-definitions`)
+  expect(first.viteConfig.test.maxWorkers).toBe(4)
+  expect(first.viteConfig.define?.__HST_COLLECT__).toBe('false')
+  const assertions = await getHistoireBrowserRunConfig(ctx, { collecting: false, entries: [] })
+  expect(assertions.viteConfig.test.maxWorkers).toBe(8)
+})
+
 it('uses the configured worker ceiling for browser test runs', async () => {
   const ctx = createContext()
   ctx.config.test!.maxWorkers = 2

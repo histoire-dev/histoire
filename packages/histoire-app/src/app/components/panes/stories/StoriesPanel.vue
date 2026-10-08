@@ -151,7 +151,7 @@ function openMenu(event: MouseEvent | KeyboardEvent, row: StoryTreeRow): void {
   }
   if (!row.target || row.kind === 'group') return
   const selection: HistoireSelectionInput = 'variantId' in row.target ? { ...row.target } : { storyId: row.target.storyId }
-  menu.open(event, { kind: 'story', key: row.key, label: row.title, selection }, ['stories.select', 'context.copy-link'])
+  menu.open(event, { kind: 'story', key: row.key, label: row.title, selection }, ['stories.select', 'context.copy-link', 'story.embed'])
 }
 
 /** Variant rows retain an exact frame target; stories and folders have no single frame. */

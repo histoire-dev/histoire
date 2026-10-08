@@ -1,3 +1,5 @@
+import type { HistoireProjectTestCollectionResult } from '@histoire/protocol'
+
 export interface RunHistoireTestsOptions {
   /** Isolates Vitest process handlers and exit state from library caller. */
   isolate?: boolean
@@ -31,4 +33,14 @@ export interface GeneratedSpecFile {
   path: string
   storyId: string
   variantId: string
+}
+
+/** Private collection inputs; no eligibility fields enter public story metadata. */
+export interface CollectHistoireTestsOptions extends RunHistoireTestsOptions {
+  /** Generation-owned proof transferred only over the owned worker channel. */
+  knownEmptyStoryIds?: string[]
+  /** Stable operation identity shared by early results and worker completion. */
+  collectionRunId?: string
+  /** Completed target subsets; terminal result still contains every target. */
+  onProgress?: (collection: HistoireProjectTestCollectionResult) => void
 }

@@ -25,7 +25,7 @@ const vitestCollectStubPath = resolveVitestCollectStubPath()
  * whenever Vitest adds a new internal public-export dependency.
  * @param importer Module requesting `vitest`.
  */
-function isVitestRuntimeImporter(importer?: string) {
+export function isVitestRuntimeImporter(importer?: string) {
   const normalized = importer?.replaceAll('\\', '/')
   return normalized?.includes('/node_modules/@vitest/')
     || normalized?.includes('/node_modules/vitest/')

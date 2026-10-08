@@ -34,7 +34,7 @@ onTest(({ variant }) => {
   beforeEach(() => fetch('${origin}/beforeEach'))
   afterEach(() => fetch('${origin}/afterEach'))
   afterAll(() => fetch('${origin}/afterAll'))
-  it('body', () => fetch('${origin}/body'))
+  it('body', () => fetch('${origin}/body'), 250)
   it.skip('skipped', () => { throw new Error('Skipped body executed') })
   it.todo('todo')
 })
@@ -49,6 +49,7 @@ onTest(({ variant }) => {
     expect(result.execution).toMatchObject({ mode: 'server', epoch: runtime.epoch })
     const tested = result.variants.find(entry => entry.target.variantId === 'tested')!
     expect(tested.collection.definitions.map(test => test.mode ?? 'run')).toEqual(['run', 'skip', 'todo'])
+    expect(tested.collection.definitions[0].timeout).toBe(250)
     expect(result.variants.find(entry => entry.target.variantId === 'empty')?.collection).toEqual({ definitions: [] })
     expect(result.variants.find(entry => entry.target.storyId === 'empty')?.collection).toEqual({ definitions: [] })
     expect(result.variants.find(entry => entry.target.variantId === 'broken')?.collection.error).toMatchObject({ message: 'Registration failed' })

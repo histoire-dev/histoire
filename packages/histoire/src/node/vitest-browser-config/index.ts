@@ -3,6 +3,7 @@ import type { Context } from '../context.js'
 import { mergeAlias } from 'vite'
 import { debugVitestBrowser } from '../util/browser-debug.js'
 import { getVitestBrowserProjectConfig } from './browser-project.js'
+import { createDefinitionOptimizerPolicy } from './definition-optimizer.js'
 import { getVitestBrowserDependencyNames, getVitestBrowserOptimizeDeps, VITEST_BROWSER_OPTIMIZER_EXCLUDES } from './dependencies.js'
 import { createVitestBrowserResolvePlugin } from './resolve-plugin.js'
 
@@ -26,6 +27,8 @@ export interface VitestBrowserRuntimeConfigResult {
 }
 
 export interface CreateVitestBrowserRuntimeConfigOptions {
+  /** Entry scanning discovers actual browser imports instead of every development tool. */
+  reachableDependencies?: boolean
   isServer?: boolean
   define?: Record<string, string>
   optimizeDeps?: {
@@ -52,8 +55,10 @@ export async function createVitestBrowserRuntimeConfig(
 ): Promise<VitestBrowserRuntimeConfigResult> {
   const plugins = [...((viteConfig.plugins as VitePlugin[] | undefined) ?? [])]
   plugins.push(createVitestBrowserResolvePlugin(ctx, options.isServer))
-  const defaultTest = await getVitestBrowserProjectConfig(ctx.root, plugins)
-  const browserDependencyNames = getVitestBrowserDependencyNames(ctx)
+  const definitionOptimizer = options.reachableDependencies ? { ...viteConfig.optimizeDeps, ...options.optimizeDeps } : undefined
+  if (definitionOptimizer) plugins.push(createDefinitionOptimizerPolicy(definitionOptimizer))
+  const defaultTest = await getVitestBrowserProjectConfig(ctx.root, plugins, definitionOptimizer)
+  const browserDependencyNames = options.reachableDependencies ? [] : getVitestBrowserDependencyNames(ctx)
 
   return {
     vitestOptions: {
@@ -81,7 +86,7 @@ export async function createVitestBrowserRuntimeConfig(
         ...options.optimizeDeps,
         include: [
           ...new Set([
-            ...getVitestBrowserOptimizeDeps(ctx),
+            ...(options.reachableDependencies ? viteConfig.optimizeDeps?.include ?? [] : getVitestBrowserOptimizeDeps(ctx)),
             ...((options.optimizeDeps?.include ?? [])),
           ]),
         ],

@@ -246,9 +246,11 @@ export function createWorkbenchTestsModel(session: HistoireSession, selected?: H
     if (!value) pending.clear()
   }
   discovery.refresh()
-  return { discoveryStatus: discovery.status, discoveryError: discovery.error, retryCollection: discovery.retry, session, rows, visibleRows, summary, entries, running, error, completed, total, watchTests, canRun, cancel, invalidate, setWatch,
+  return { discoveryStatus: discovery.status, discoveryError: discovery.error, discoveryProgress: discovery.progress, retryCollection: discovery.retry, session, rows, visibleRows, summary, entries, running, error, completed, total, watchTests, canRun, cancel, invalidate, setWatch,
     /** Pause only this provider's background definitions while an interactive capture owns work. */
     suspendDiscovery: discovery.suspend,
+    /** Explicit execution of one exact variant, sharing the project execution lane. */
+    run: (target: HistoireTarget) => execute([target]),
     /** Explicit project execution covers all collected non-document variants. */
     runAll: () => execute(rows.value.filter(row => row.target.variantId !== null && row.selectable).map(row => row.target), true),
     /** Close only project observers/requests; caller keeps canonical session ownership. */

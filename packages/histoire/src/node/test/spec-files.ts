@@ -4,6 +4,7 @@ import fs from 'fs-extra'
 import { join } from 'pathe'
 import { assertNoDuplicateTempPaths, toTempPathSegment } from '../util/temp-paths.js'
 import { TEST_HARNESS_ID } from '../virtual/index.js'
+import { TEST_COLLECTION_ENDPOINT } from './collection-channel.js'
 
 /**
  * Writes one Vitest spec file per collected variant.
@@ -11,7 +12,7 @@ import { TEST_HARNESS_ID } from '../virtual/index.js'
  * @param root Directory owned by the current run.
  * @param mode Collection stores definitions in inert task metadata; run executes assertions.
  */
-export async function generateSpecFiles(storyFiles: ServerStoryFile[], root: string, mode: 'run' | 'collect' = 'run'): Promise<GeneratedSpecFile[]> {
+export async function generateSpecFiles(storyFiles: ServerStoryFile[], root: string, mode: 'run' | 'collect' = 'run', collectionToken?: string): Promise<GeneratedSpecFile[]> {
   await fs.emptyDir(root)
   const results: GeneratedSpecFile[] = []
 
@@ -28,7 +29,7 @@ export async function generateSpecFiles(storyFiles: ServerStoryFile[], root: str
         `${toTempPathSegment(variant.id)}.histoire.spec.ts`,
       )
       await fs.ensureDir(join(specPath, '..'))
-      await fs.writeFile(specPath, mode === 'collect' ? generateCollectionSpecCode(storyFile.story.id, variant.id) : generateSpecCode(storyFile.story.id, variant.id, storyFile.story.title, variant.title), 'utf8')
+      await fs.writeFile(specPath, mode === 'collect' ? generateCollectionSpecCode(storyFile.story.id, variant.id, collectionToken) : generateSpecCode(storyFile.story.id, variant.id, storyFile.story.title, variant.title), 'utf8')
       results.push({
         path: specPath,
         storyId: storyFile.story.id,
@@ -48,11 +49,12 @@ export async function generateSpecFiles(storyFiles: ServerStoryFile[], root: str
 }
 
 /** Inert task metadata carries exact definitions through Vitest's collection reporting. */
-function generateCollectionSpecCode(storyId: string, variantId: string): string {
+function generateCollectionSpecCode(storyId: string, variantId: string, token?: string): string {
   return `import { test } from '@vitest/runner'
 import { serializeTestErrors } from '@histoire/shared'
 import { collectVariantTests } from ${JSON.stringify(TEST_HARNESS_ID)}
 
+const collectionStarted = performance.now()
 let collection
 try {
   collection = { definitions: await collectVariantTests(${JSON.stringify(storyId)}, ${JSON.stringify(variantId)}) }
@@ -60,6 +62,12 @@ try {
 catch (error) {
   collection = { definitions: [], error: serializeTestErrors([error])[0] }
 }
+${token
+  ? `await fetch(${JSON.stringify(TEST_COLLECTION_ENDPOINT)}, {
+  method: 'POST', headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ token: ${JSON.stringify(token)}, duration: performance.now() - collectionStarted, entry: { target: ${JSON.stringify({ storyId, variantId })}, collection } }),
+}).then(response => { if (!response.ok) throw new Error('Test collection publication failed') })`
+  : ''}
 // Runtime collection reads metadata; this callback never executes.
 test('Histoire test collection', { meta: { histoireCollection: collection } }, () => {})
 `

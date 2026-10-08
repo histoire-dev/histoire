@@ -27,6 +27,7 @@ function sourceKey(snapshot: ReturnType<HistoireSession['getSnapshot']>): string
 export function createWorkbenchTestDiscovery(options: WorkbenchTestsOptions, owner: DiscoveryOwner) {
   const status = shallowRef<'idle' | 'collecting' | 'completed' | 'error'>('idle')
   const error = shallowRef<unknown>(null)
+  const progress = shallowRef({ completed: 0, total: 0 })
   const pending = new Set<string>()
   let project = !!options.collectProject
   let active = true
@@ -70,6 +71,11 @@ export function createWorkbenchTestDiscovery(options: WorkbenchTestsOptions, own
     }
     else if (publication !== nextPublication) {
       cancel(true)
+      // Admission can reject while catalog updating, before its replacement
+      // publication arrives. That failure cannot block the newer source.
+      blocked = false
+      error.value = null
+      if (status.value === 'error') status.value = 'idle'
     }
     publication = nextPublication
     if (snapshot.status !== 'ready' || snapshot.stale) cancel(true)
@@ -78,6 +84,9 @@ export function createWorkbenchTestDiscovery(options: WorkbenchTestsOptions, own
   /** Changed hidden variants must be discovered even with Watch disabled. */
   function invalidate(storyId: string) {
     if (!active || (!options.collectProject && !options.collectStory)) return
+    // Dependency HMR can retire a graph without changing catalog revision.
+    // Revoke the request before its rejection can block newer queued work.
+    cancel(true)
     pending.add(storyId)
     blocked = false
     schedule()
@@ -88,7 +97,7 @@ export function createWorkbenchTestDiscovery(options: WorkbenchTestsOptions, own
     if (!active || suspended || request || blocked || owner.running() || snapshot.status !== 'ready' || snapshot.stale || snapshot.source?.mode !== 'dev') return
     if (!project && !pending.size) return
     const storyId = !project && options.collectStory ? pending.values().next().value : undefined
-    const collect = storyId ? (signal: AbortSignal) => options.collectStory!(storyId, signal) : options.collectProject
+    const collect = storyId ? (signal: AbortSignal, publish?: (result: HistoireProjectTestCollectionResult) => void) => options.collectStory!(storyId, signal, publish) : options.collectProject
     if (!collect) return
     if (storyId) {
       pending.delete(storyId)
@@ -105,13 +114,32 @@ export function createWorkbenchTestDiscovery(options: WorkbenchTestsOptions, own
     request = current
     status.value = 'collecting'
     error.value = null
-    try {
-      const result = await collect(current.abort.signal)
+    progress.value = { completed: 0, total: targets.length }
+    const admitted = new Set(targets.map(getHistoireTargetKey))
+    const completed = new Set<string>()
+    let runId: string | undefined
+    /** Partial publication advances our own evidence while preserving newer selected/execution facts. */
+    function publish(result: HistoireProjectTestCollectionResult, terminal = false) {
       if (!active || request !== current || sourceKey(owner.snapshot()) !== source) return
-      validateProjectTestCollection(result, targets)
+      validateProjectTestCollection(result, terminal ? targets : undefined)
       const execution = result.execution
       if (execution.sourceId !== snapshot.source?.sourceId || execution.epoch !== snapshot.source?.epoch || execution.revision !== snapshot.source?.revision) throw new HistoireSdkError('STALE_REVISION', 'Test discovery belongs to another source publication')
-      owner.apply(result.variants.filter(entry => evidence.get(getHistoireTargetKey(entry.target)) === owner.entries().get(getHistoireTargetKey(entry.target)) && epochs.get(entry.target.storyId) === owner.epoch(entry.target.storyId)))
+      if (runId && execution.runId !== runId) throw new HistoireSdkError('INVALID_ARGUMENT', 'Test discovery operation changed')
+      runId = execution.runId
+      for (const entry of result.variants) {
+        const key = getHistoireTargetKey(entry.target)
+        if (!admitted.has(key)) throw new HistoireSdkError('INVALID_ARGUMENT', 'Test discovery target inventory changed')
+        completed.add(key)
+      }
+      const valid = result.variants.filter(entry => evidence.get(getHistoireTargetKey(entry.target)) === owner.entries().get(getHistoireTargetKey(entry.target)) && epochs.get(entry.target.storyId) === owner.epoch(entry.target.storyId))
+      owner.apply(valid)
+      for (const entry of valid) evidence.set(getHistoireTargetKey(entry.target), owner.entries().get(getHistoireTargetKey(entry.target)))
+      progress.value = { completed: completed.size, total: targets.length }
+    }
+    try {
+      const result = await collect(current.abort.signal, publish)
+      if (!active || request !== current || sourceKey(owner.snapshot()) !== source) return
+      publish(result, true)
       status.value = 'completed'
     }
     catch (failure) {
@@ -130,7 +158,7 @@ export function createWorkbenchTestDiscovery(options: WorkbenchTestsOptions, own
       }
     }
   }
-  return { status, error, refresh, invalidate,
+  return { status, error, progress, refresh, invalidate,
     /** Capture owners pause background work; confirmed runner cleanup still owns lane release. */
     suspend() {
       suspended++

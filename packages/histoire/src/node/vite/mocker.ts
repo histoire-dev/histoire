@@ -13,7 +13,9 @@ export function shouldTransformHistoireDynamicImport(id: string): boolean {
   // Interceptor registration awaits MSW acquisition. Wrapping the mocker's own
   // loader in prepare() would wait on that same pending registration forever.
   if (/\/node_modules\/@vitest\/mocker\//.test(normalized)) return false
-  const roots = [resolve(APP_PATH, 'embed'), resolve(APP_PATH, '../../histoire-vue/src'), resolve(APP_PATH, '../../histoire-controls/src')]
+  // Source documents can consume published native UI entries too. Both src and
+  // dist remain UI-owned; their lazy content reads have no story mock runner.
+  const roots = [resolve(APP_PATH, 'embed'), resolve(APP_PATH, '../../histoire-vue'), resolve(APP_PATH, '../../histoire-controls')]
   return !roots.some(root => normalized.startsWith(`${root}/`))
 }
 

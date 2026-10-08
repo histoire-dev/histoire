@@ -8,6 +8,7 @@ import { ExplorerPanels } from '../components/explorer/ExplorerPanels.js'
 import { HistoireTests } from '../components/tests/HistoireTests.js'
 import { HistoireProvider } from '../provider/HistoireProvider.js'
 import { createHistoireTestsModel, provideHistoireTestsModel } from '../tests/model.js'
+import { testRows } from './fixtures/tests-panel.js'
 
 describe('standalone shared test collection', () => {
   it('collects only ready primary, shares badge/panel, isolates nested session and never runs automatically', async () => {
@@ -32,10 +33,9 @@ describe('standalone shared test collection', () => {
     const wrapper = mount(scope)
     expect(wrapper.get('[aria-label="Collected tests"]').text()).toBe('2')
     const panels = wrapper.findAllComponents(HistoireTests)
-    expect(panels[0].text()).toContain('2 collected')
-    expect(panels[0].text()).toContain('Run — Not run')
-    expect(panels[0].text()).toContain('Skipped — Skipped')
-    expect(panels[1].get('output').text()).toBe('idle')
+    expect(panels[0].get('output').text()).toBe('2 tests')
+    expect(testRows(panels[0])).toEqual([['Run', 'Not run'], ['Skipped', 'Skipped']])
+    expect(panels[1].get('output').text()).toBe('Not run')
     expect(otherCollect).not.toHaveBeenCalled()
     await sessions[0].state.patch({ count: 8 })
     expect(collect).toHaveBeenCalledOnce()
