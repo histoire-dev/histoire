@@ -1,6 +1,7 @@
 import type {
   HistoireCatalogStory,
   HistoireDocsContent,
+  HistoireEmbedPresentation,
   HistoireEvent,
   HistoireHostChannelMessage,
   HistoireJsonValue,
@@ -45,6 +46,11 @@ export interface HistoireMount {
   /** Idempotent complete resource teardown. */
   unmount: () => Promise<void>
 }
+
+/** Scoped presentation is supported only by explorer mounts. */
+export type HistoireMountOptions =
+  | { surface: 'explorer', presentation?: HistoireEmbedPresentation }
+  | { surface: Exclude<HistoireSurface, 'explorer'>, presentation?: never }
 
 /** Framework-neutral controller shared by iframe and native Vue consumers. */
 export interface HistoireSession {
@@ -97,7 +103,7 @@ export interface HistoireSession {
     run: (options: { mode: 'preview' | 'server', signal?: AbortSignal }) => Promise<HistoireTestRunSummary>
   }
   /** Reserve runtime synchronously when mounting primary surface. */
-  mount: (container: HTMLElement, options: { surface: HistoireSurface }) => HistoireMount
+  mount: (container: HTMLElement, options: HistoireMountOptions) => HistoireMount
   /** Explicit offscreen primary with real viewport dimensions. */
   createHiddenPreview: () => HistoireMount
   /** Terminal idempotent disposal, rejecting pending work immediately. */

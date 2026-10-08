@@ -11,8 +11,8 @@ describe('data-only UI import boundary', () => {
     expect(shouldTransformHistoireDynamicImport('/project/node_modules/story-library/client.js')).toBe(true)
   })
 
-  it('keeps source UI lazy imports native without excluding story/support/runtime mocking', () => {
-    for (const path of ['embed/adapters/tests-surface.js', 'embed/adapters/controls.js', '../../histoire-vue/src/components/controls/HistoireControls.ts', '../../histoire-controls/src/components/json/HstJson.vue']) {
+  it('keeps source and published UI lazy imports native without excluding story/support/runtime mocking', () => {
+    for (const path of ['embed/adapters/tests-surface.js', 'embed/adapters/controls.js', '../../histoire-vue/src/components/controls/HistoireControls.ts', '../../histoire-vue/dist/components/docs/sanitize.js', '../../histoire-controls/src/components/json/HstJson.vue', '../../histoire-controls/dist/index.js']) {
       expect(shouldTransformHistoireDynamicImport(`${resolve(APP_PATH, path)}?v=1`)).toBe(false)
     }
     for (const id of ['/project/Story.story.vue', '/project/helpers/dynamic.ts', 'virtual:$histoire-preview-runtime', resolve(APP_PATH, 'embed-other/story.js')]) expect(shouldTransformHistoireDynamicImport(id)).toBe(true)

@@ -72,6 +72,11 @@ export function registerDevEvents(ctx: Context, server: ViteDevServer, moduleLoa
     const handle = enqueueHistoireTestRun(lane, ctx, {
       storyId: payload?.storyId,
       variantId: payload?.variantId,
+      onProgress: operation === 'collect'
+        ? (progress) => {
+            if (isActive() && !retiredClients.has(client)) client.send('histoire:dev-event-progress', { event: 'collectStoryTests', requestId, progress })
+          }
+        : undefined,
     }, isActive, operation)
     const key = requestKey(requestId)
     if (!key) return handle
@@ -148,7 +153,7 @@ export function registerDevEvents(ctx: Context, server: ViteDevServer, moduleLoa
       client.send(`histoire:dev-event-result`, {
         event,
         requestId,
-        error: formatDevEventError(error),
+        error: event === 'collectStoryTests' && error instanceof Error ? error.message : formatDevEventError(error),
         ...(code ? { code } : {}),
       })
     }

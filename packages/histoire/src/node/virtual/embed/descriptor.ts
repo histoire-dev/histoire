@@ -4,6 +4,7 @@ import type { CatalogSnapshot } from '../../runtime/catalog/types.js'
 import { createEmbedSurfaceCapabilities } from '@histoire/app/dist/embed/capabilities.js'
 import { validateHistoireSourceDescriptor } from '@histoire/protocol'
 import { resolveEmbedConfig } from '../../config/embed.js'
+import { resolveMatrixNumericValues } from '../../config/matrix.js'
 import { hasProjectVitest } from '../../util/has-vitest.js'
 import { DEFAULT_RUN_TIMEOUT, DEFAULT_STORY_COLLECT_TIMEOUT, getTestMaxWorkers } from '../../util/test-timeouts.js'
 import { projectEmbedCatalog } from './catalog.js'
@@ -49,6 +50,8 @@ export function createEmbedDescriptor(ctx: Context, snapshot: CatalogSnapshot, m
     assets: projectEmbedAssets(snapshot, namespace),
     config: {
       title: theme?.title ?? 'Histoire',
+      routerMode: ctx.config.routerMode ?? 'history',
+      matrix: { numericValues: resolveMatrixNumericValues(ctx.config.ui?.matrix?.numericValues) },
       theme: {
         defaultColorScheme: theme?.defaultColorScheme ?? 'auto',
         darkClass: theme?.darkClass ?? 'dark',

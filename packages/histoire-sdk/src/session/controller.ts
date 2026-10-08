@@ -213,7 +213,7 @@ export function createHistoireSessionWithAdapters(options: HistoireSessionOption
     docs: { get: storyId => observeOperation(getDocs(context, storyId)) },
     source: { get: input => observeOperation(getSource(context, input)) },
     tests: { collect: () => observeOperation(collectTests(context)), run: options => observeOperation(runTests(context, options)) },
-    mount: (container, options) => mountSurface(context, container, options.surface),
+    mount: (container, options) => mountSurface(context, container, options.surface, false, options.presentation),
     createHiddenPreview: () => mountSurface(context, undefined, 'preview', true),
   }
   context.session = session

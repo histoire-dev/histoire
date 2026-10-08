@@ -1,3 +1,4 @@
+import type { HistoireTarget } from '@histoire/protocol'
 import type { HistoireSession } from '@histoire/sdk'
 import type { InjectionKey } from 'vue'
 import type { CanvasFrameRegistration } from '../composables/canvas-settings.js'
@@ -55,6 +56,8 @@ export interface FrameActionOptions {
   frameRegistration?: (target: FrameActionTarget) => CanvasFrameRegistration | null
   /** Clipboard abstraction used by behavior tests and native host. */
   copy?: (text: string) => Promise<void>
+  /** Workbench tests owner runs exact target so inspector and test panes observe its results. */
+  runTests?: (target: HistoireTarget) => Promise<void>
   /** Opening isolated preview stays native and explicit. */
   open?: (url: string) => void
   /** Surface failures through owning provider. */
@@ -142,8 +145,10 @@ export function createFrameActions(options: FrameActionOptions) {
       await copy(source.body)
     } },
     { id: 'copy-link', label: 'Copy link', icon: 'link', group: 'copy', run: target => copy(options.link(target)) },
-    { id: 'run-tests', label: 'Run tests', icon: 'chemistry', group: 'tests', shortcut: 'frame.tests', devOnly: true, available: () => options.session.getSnapshot().capabilities.serverTests.available, async run(target) {
-      await (await select(target)).tests.run({ mode: 'server' })
+    { id: 'run-tests', label: 'Run tests', icon: 'chemistry', group: 'tests', shortcut: 'frame.tests', devOnly: true, available: () => !!options.runTests && options.session.getSnapshot().capabilities.serverTests.available, async run(target) {
+      // Selecting first shows the run's progress and results in the inspector Tests tab.
+      await select(target)
+      await options.runTests?.({ storyId: target.storyId, variantId: target.variantId })
     } },
     { id: 'save-props', label: 'Save props as variant', icon: 'bookmark-add', group: 'tests', available: variantSource.available, disabled: variantSource.disabled, async run(target) {
       const result = await variantSource.generate(target)

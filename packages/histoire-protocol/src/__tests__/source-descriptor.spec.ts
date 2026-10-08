@@ -36,6 +36,10 @@ describe('portable source descriptor policy', () => {
       config: { title: 'Book', theme: { defaultColorScheme: 'auto', darkClass: 'dark' }, responsivePresets: [{ label: 'Phone', width: 320 }], backgroundPresets: [{ label: 'White', color: '#fff', contrastColor: '#000' }], autoApplyContrastColor: false },
     }
     expect(validateHistoireSourceDescriptor(descriptor)).toBe(descriptor)
+    expect(validateHistoireSourceDescriptor({ ...descriptor, config: { ...descriptor.config, matrix: { numericValues: [-1, 0, 0.5] } } }).config?.matrix?.numericValues).toEqual([-1, 0, 0.5])
+    for (const numericValues of [[], [1], [1, '2'], Array.from({ length: 65 }, (_, index) => index)]) {
+      expect(() => validateHistoireSourceDescriptor({ ...descriptor, config: { ...descriptor.config, matrix: { numericValues } } })).toThrow('Invalid matrix numeric values')
+    }
     for (const path of ['/private/source', '../secret', 'https://evil.test/source', '//evil.test/source', 'assets\\secret', 'assets/%2e%2e/secret', 'assets/secret?token=x', 'assets/%252e%252e/secret']) {
       expect(() => validateHistoireSourceDescriptor({ ...descriptor, assets: { ...descriptor.assets, search: path } })).toThrow()
     }

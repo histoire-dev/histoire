@@ -1,5 +1,6 @@
 import { bookBase, subscribeSource } from 'virtual:$histoire-embed-source'
 import { installEmbedHandshake } from './handshake.js'
+import { createEmbedDocumentLifecycle } from './lifecycle.js'
 import { createEmbedSourceConnection } from './source.js'
 import './adapters/preview.js'
 import './adapters/tests-surface.js'
@@ -16,6 +17,14 @@ export function bootstrapEmbedSource() {
 /** Explicit document bootstrap: data bridge plus exact-parent handshake, no story imports. */
 export function bootstrapEmbedDocument() {
   const sourceConnection = bootstrapEmbedSource()
+  if (new URL(window.location.href).searchParams.get('view') === 'embed') {
+    const lifecycle = createEmbedDocumentLifecycle(window)
+    void sourceConnection.then(source => lifecycle.add(() => source.close())).catch(() => {})
+    void import('./direct.js').then(({ bootstrapDirectEmbed }) => bootstrapDirectEmbed(sourceConnection, new URL(bookBase, window.location.origin).href, lifecycle)).catch(() => {
+      if (!lifecycle.signal.aborted) document.body.textContent = 'Embed failed to load'
+    })
+    return sourceConnection
+  }
   const lifecycle = installEmbedHandshake(sourceConnection)
   void sourceConnection.catch(() => lifecycle.close())
   return sourceConnection

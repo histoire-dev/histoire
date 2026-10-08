@@ -97,6 +97,11 @@ export function createHistoireDevPlugin(): VitePlugin {
     config() {
       // Examples context
       return {
+        optimizeDeps: {
+          // Native panels must share vendor Vue with the source app. Optimizing
+          // the scroller separately can bundle a second renderer into its slots.
+          exclude: ['vue-virtual-scroller'],
+        },
         resolve: {
           alias: [
             ...DEV_VENDOR_ALIASES.reduce((acc, [name, entry]) => {

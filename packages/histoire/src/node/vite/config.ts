@@ -5,6 +5,7 @@ import {
   mergeConfig as mergeViteConfig,
 } from 'vite'
 import { createMarkdownPlugins } from '../markdown.js'
+import { collectionEligibilityTransformPlugin } from '../test/eligibility/transforms.js'
 import { hasProjectVitest } from '../util/has-vitest.js'
 import { createVirtualFilesPlugin } from '../virtual/vite-plugin.js'
 import { createCollectionOptimizerPolicy } from './collection-optimizer.js'
@@ -112,6 +113,8 @@ export async function getViteConfigWithPlugins(
       await plugin.vitePlugins(plugins)
     }
   }
+
+  if (!isServer && !options.browserRuntime) plugins.push(collectionEligibilityTransformPlugin(ctx))
 
   // Append after framework hooks: middleware-mode collection must not start a
   // second optimized framework runtime beside vite-node's native imports.

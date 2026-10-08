@@ -21,6 +21,8 @@ export interface DevEventResult {
   error?: string
   /** Stable source-retirement category preserved across the dev channel. */
   code?: HistoireErrorCode
+  /** Completed subset, never a terminal reply. */
+  progress?: unknown
 }
 
 /** The dev-server channel `createDevEventApi` drives. */
@@ -29,6 +31,10 @@ export interface DevEventTransport {
   send: (payload: { event: string, payload?: any, requestId: string }) => void
   /** Subscribes to every `histoire:dev-event-result` message. */
   onResult: (listener: (result: DevEventResult) => void) => void | (() => void)
+  /** Optional additive stream for socket-owned collection requests. */
+  onProgress?: (listener: (result: DevEventResult) => void) => void | (() => void)
+  /** Disconnect retires pending streams while allowing later requests after reconnection. */
+  onDisconnect?: (listener: () => void) => void | (() => void)
 }
 
 /**
@@ -78,7 +84,7 @@ export function createDevEventApi(transport: DevEventTransport) {
   const clientId = createClientId()
   let requestCounter = 0
   let closed = false
-  const pending = new Set<() => void>()
+  const pending = new Set<(failure?: unknown) => void>()
 
   const offResult = transport.onResult((result) => {
     // Forward the whole result (including `error`) so `sendEvent` can reject on
@@ -86,6 +92,13 @@ export function createDevEventApi(transport: DevEventTransport) {
     for (const listener of listeners[result.event] ?? []) {
       listener(result)
     }
+  })
+  const offProgress = transport.onProgress?.((result) => {
+    if (closed || result.requestId === undefined) return
+    for (const listener of listeners[result.event] ?? []) listener(result)
+  })
+  const offDisconnect = transport.onDisconnect?.(() => {
+    for (const cancel of [...pending]) cancel(new Error('Histoire dev event connection closed.'))
   })
 
   /**
@@ -110,7 +123,7 @@ export function createDevEventApi(transport: DevEventTransport) {
    * @param payload Arbitrary JSON payload for that plugin.
    * @param signal Cancels exact server-side test work after request admission.
    */
-  function sendEvent(event: string, payload?: any, signal?: AbortSignal) {
+  function sendEvent(event: string, payload?: any, signal?: AbortSignal, onProgress?: (progress: any) => void) {
     const operation = new Promise<any>((resolve, reject) => {
       if (closed) {
         reject(new Error('Histoire dev event API closed.'))
@@ -121,9 +134,9 @@ export function createDevEventApi(transport: DevEventTransport) {
         return
       }
       const requestId = `${clientId}-${++requestCounter}`
-      transport.send({ event, payload, requestId })
 
       if (event.startsWith('on')) {
+        transport.send({ event, payload, requestId })
         resolve(undefined)
         return
       }
@@ -133,26 +146,42 @@ export function createDevEventApi(transport: DevEventTransport) {
       let off: () => void = () => {}
       let timeout: ReturnType<typeof setTimeout>
       let removeAbort = () => {}
-      const cancel = () => {
+      /** Revoke stream ownership before asking server to cancel; preserve validation failures. */
+      function cancelRequest(failure: unknown) {
         off()
         clearTimeout(timeout)
         removeAbort()
         pending.delete(cancel)
-        reject(new Error('Histoire dev event API closed.'))
+        try {
+          if (event === 'runStoryTests' || event === 'collectStoryTests') transport.send({ event: 'cancelStoryTests', payload: { requestId }, requestId })
+        }
+        catch { /* Server disconnect already cancels socket-owned work. */ }
+        reject(failure)
+      }
+      /** API closure and socket retirement share exact listener/timer ownership. */
+      function cancel(failure: unknown = new Error('Histoire dev event API closed.')) {
+        cancelRequest(failure)
       }
 
       timeout = setTimeout(() => {
-        off()
-        removeAbort()
-        pending.delete(cancel)
-        reject(new Error(`Histoire dev event "${event}" timed out after ${DEV_EVENT_TIMEOUT / 1000}s without a result.`))
+        cancelRequest(new Error(`Histoire dev event "${event}" timed out after ${DEV_EVENT_TIMEOUT / 1000}s without a result.`))
       }, DEV_EVENT_TIMEOUT)
 
-      off = addListener(event, ({ requestId: resultRequestId, result, error, code }) => {
+      off = addListener(event, ({ requestId: resultRequestId, result, error, code, progress }) => {
         // Results reach every client and every pending call of this event — only
         // settle with our own. Replies without a request id come from legacy
         // plugin handlers and still settle anyone waiting.
         if (resultRequestId !== undefined && String(resultRequestId) !== requestId) {
+          return
+        }
+        if (progress !== undefined) {
+          if (resultRequestId !== requestId) return
+          try {
+            onProgress?.(progress)
+          }
+          catch (failure) {
+            cancelRequest(failure)
+          }
           return
         }
 
@@ -168,19 +197,14 @@ export function createDevEventApi(transport: DevEventTransport) {
         }
       })
       pending.add(cancel)
-      const abort = () => {
-        // Only test runs own an execution-lane handle. Other plugin events may
-        // have side effects but have no server cancellation protocol.
-        if (event === 'runStoryTests' || event === 'collectStoryTests') {
-          transport.send({ event: 'cancelStoryTests', payload: { requestId }, requestId })
-        }
-        off()
-        clearTimeout(timeout)
-        pending.delete(cancel)
-        reject(new Error('Histoire dev event request cancelled.'))
-      }
+      const abort = () => cancelRequest(new Error('Histoire dev event request cancelled.'))
       signal?.addEventListener('abort', abort, { once: true })
       removeAbort = () => signal?.removeEventListener('abort', abort)
+      // Install listeners first: even synchronous adapters can report progress.
+      try {
+        transport.send({ event, payload, requestId })
+      }
+      catch (failure) { cancelRequest(failure) }
     })
     void operation.catch(() => {})
     return operation
@@ -192,6 +216,8 @@ export function createDevEventApi(transport: DevEventTransport) {
     closed = true
     try {
       if (typeof offResult === 'function') offResult()
+      if (typeof offProgress === 'function') offProgress()
+      if (typeof offDisconnect === 'function') offDisconnect()
     }
     finally {
       for (const cancel of [...pending]) cancel()

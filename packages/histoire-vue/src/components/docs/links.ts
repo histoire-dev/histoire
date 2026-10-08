@@ -65,3 +65,15 @@ export function resolveDocsStoryLink(href: string, base: string, stories: readon
   }
   catch { return null }
 }
+
+/** Canonical book link uses catalog-resolved IDs and source router mode, including dot-only IDs. */
+export function getDocsStoryHref(link: HistoireStoryLink, base: string, mode: 'history' | 'hash' = 'history'): string {
+  const query = new URLSearchParams()
+  const dot = /^\.+$/.test(link.selection.storyId)
+  if (dot) query.set('storyId', link.selection.storyId)
+  if (link.selection.variantId !== undefined && link.selection.variantId !== null) query.set('variantId', link.selection.variantId)
+  if (link.panel) query.set('tab', link.panel)
+  const values = [query.toString(), link.selection.variantId === null ? 'variantId' : ''].filter(Boolean).join('&')
+  const path = `story${dot ? '' : `/${encodeURIComponent(link.selection.storyId)}`}${values ? `?${values}` : ''}${link.anchor ?? ''}`
+  return mode === 'hash' ? `${base}#/${path}` : new URL(path, base).href
+}

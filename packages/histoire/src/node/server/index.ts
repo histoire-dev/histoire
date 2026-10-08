@@ -10,8 +10,10 @@ import { resolveDevServerPort } from '../runtime/port.js'
 import { getContextRegistry } from '../runtime/registry.js'
 import { waitForRuntimeWork } from '../runtime/wait.js'
 import { onStoryListChange, watchStories } from '../stories.js'
+import { attachTestCollectionEligibility } from '../test/eligibility/index.js'
 import * as VirtualFiles from '../virtual/index.js'
 import { closeDevPreviewHost } from '../vite/mcp-preview-html.js'
+import { prepareDevClient } from './client-ready.js'
 import { createStoryCollector } from './collect.js'
 import { registerDevEvents } from './dev-events.js'
 import { createModuleInvalidators } from './invalidate.js'
@@ -78,6 +80,7 @@ export async function createServer(ctx: Context, options: CreateServerOptions = 
         checkActive()
       }
     }
+    attachTestCollectionEligibility(ctx, server)
     registerDevEvents(ctx, server, moduleLoader, execution, isActive)
     const uiChannel = registerUiChannel(ctx, server, execution, isActive)
     registerConfigChannel(ctx, uiChannel, isActive)
@@ -115,7 +118,10 @@ export async function createServer(ctx: Context, options: CreateServerOptions = 
     cleanup.add(onMarkdownListChange(ctx, () => {
       if (isActive()) invalidateModule(VirtualFiles.RESOLVED_MARKDOWN_FILES)
     }))
-    const ready = collector.collect()
+    const ready = collector.collect().then(async () => {
+      await prepareDevClient(server)
+      checkActive()
+    })
     // Returned readiness still rejects for callers, but ordinary dev never leaks
     // an unhandled rejection while the controller attaches its observer.
     void ready.catch(() => {})

@@ -4,6 +4,13 @@ import type { HistoireSettings } from './settings.js'
 export interface HistoireSourceConfig {
   /** Source display title. */
   title: string
+  /** Full-book link routing; omitted older descriptors use history mode. */
+  routerMode?: 'history' | 'hash'
+  /** Portable props matrix defaults; absent on older sources. */
+  matrix?: {
+    /** Ordered samples for open numeric props. */
+    numericValues: readonly number[]
+  }
   /** Named appearance values used by first-party surfaces. */
   theme: {
     /** Source preference used before host settings arrive. */

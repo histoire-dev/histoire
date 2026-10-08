@@ -1,3 +1,4 @@
+import { getHistoireNumericMatrixValues } from '../helpers/matrix-numeric.js'
 import { validateEmbedOrigins } from '../url/embed-origins.js'
 import { invalid, validateSettingsPatch, wireId, wireRecord } from './validation.js'
 
@@ -37,7 +38,13 @@ export function validateSourceDescriptorFields(input: Record<string, unknown>): 
   }
   if (input.config !== undefined) {
     const config = wireRecord(input.config)
-    keys(config, ['title', 'theme', 'responsivePresets', 'backgroundPresets', 'autoApplyContrastColor', 'storyCollectTimeout', 'runTimeout', 'testMaxWorkers', 'globals', 'textDirection'])
+    keys(config, ['title', 'routerMode', 'matrix', 'theme', 'responsivePresets', 'backgroundPresets', 'autoApplyContrastColor', 'storyCollectTimeout', 'runTimeout', 'testMaxWorkers', 'globals', 'textDirection'])
+    if (config.routerMode !== undefined && !['history', 'hash'].includes(config.routerMode as string)) invalid('Invalid source router mode')
+    if (config.matrix !== undefined) {
+      const matrix = wireRecord(config.matrix)
+      keys(matrix, ['numericValues'])
+      if (!getHistoireNumericMatrixValues(matrix.numericValues)) invalid('Invalid matrix numeric values')
+    }
     if (config.globals !== undefined) validateSettingsPatch({ globals: config.globals })
     if (config.textDirection !== undefined) validateSettingsPatch({ textDirection: config.textDirection })
     if (typeof config.title !== 'string' || typeof config.autoApplyContrastColor !== 'boolean') invalid('Invalid source config')

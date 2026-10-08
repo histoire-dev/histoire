@@ -3,6 +3,7 @@ import { createServer } from 'node:http'
 import { dirname, join } from 'node:path'
 import { createHistoireProject } from 'histoire/node'
 import sirv from 'sirv'
+import { readBuiltEmbedPolicy } from '../../../config/embed-built.js'
 import { closeOwnedServer, listenOwnedServer } from '../../../runtime/hosting/listener.js'
 import { createMcpProjectFixture } from '../mcp/project.js'
 import { launchEmbedBrowser } from './browser.js'
@@ -33,6 +34,8 @@ export async function createEmbedBridgeFixture(options: {
   copiedOutput?: boolean
   /** Performance runs retain warm HTTP cache; ordinary gates stay uncached. */
   staticCache?: boolean
+  /** Real static hosting applies emitted framing policy when testing plain iframes. */
+  framingHeaders?: boolean
   /** Trusted fixture modules such as mocked story dependencies. */
   files?: Record<string, string>
 } = {}) {
@@ -74,7 +77,15 @@ export async function createEmbedBridgeFixture(options: {
         copied = await createMcpProjectFixture()
         await cp(built.outDir, copied.root, { recursive: true })
       }
-      const bookServer = createServer(hosts.application().use('/book/', sirv(copied?.root ?? built.outDir, options.staticCache ? { maxAge: 3600, etag: true } : { dev: true })))
+      const policy = options.framingHeaders ? await readBuiltEmbedPolicy(copied?.root ?? built.outDir, { target: 'static' }) : undefined
+      const app = hosts.application()
+      if (policy) {
+        app.use('/book/', (_request, response, next) => {
+          response.setHeader('Content-Security-Policy', policy.header)
+          next()
+        })
+      }
+      const bookServer = createServer(app.use('/book/', sirv(copied?.root ?? built.outDir, options.staticCache ? { maxAge: 3600, etag: true } : { dev: true })))
       servers.push(bookServer)
       bookUrl = `${await listenOwnedServer(bookServer, 0, '127.0.0.1')}/book/`
     }

@@ -1,4 +1,5 @@
 import type { Component } from '@histoire/vendors/vue'
+import { normalizeHistoireMatrixHint } from '@histoire/shared'
 import { nextTick } from '@histoire/vendors/vue'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import MountStory from '../client/mount.js'
@@ -21,6 +22,12 @@ async function mount(component: Component, props: Record<string, unknown>) {
 }
 
 describe('react story collection', () => {
+  it('collects numeric story ranges for portable catalog projection', async () => {
+    const payload = collectionPayload()
+    await collectStory(() => <Story matrix={{ axes: { count: { min: 0, max: 0.3, step: 0.1 } } }}><p>Count</p></Story>, payload)
+    expect(normalizeHistoireMatrixHint(payload.storyData[0].matrix)?.axes.count).toEqual([0, 0.1, 0.2, 0.3])
+  })
+
   it('collects metadata and generated ids without executing variant content', async () => {
     const content = vi.fn(() => <button type="button">Hidden</button>)
     const payload = collectionPayload()

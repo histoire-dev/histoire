@@ -10,16 +10,12 @@ import { useWorkbenchBuildInfo } from '../../standalone/build-info.js'
 import { useWorkbench } from '../../standalone/workbench.js'
 import { customLogos, histoireConfig } from '../../util/config.js'
 import CanvasViewport from '../canvas/CanvasViewport.vue'
-import MatrixInspector from '../canvas/matrix/MatrixInspector.vue'
-import MatrixView from '../canvas/matrix/MatrixView.vue'
 import MeasureOverlay from '../canvas/MeasureOverlay.vue'
 import CanvasToolbar from '../canvas/toolbar/CanvasToolbar.vue'
 import ToolbarButton from '../canvas/toolbar/ToolbarButton.vue'
-import StoryInspector from '../inspector/StoryInspector.vue'
+import EmbedMenu from '../embed/EmbedMenu.vue'
 import ContextMenu from '../menu/ContextMenu.vue'
 import HomePage from '../pages/home/HomePage.vue'
-import MarkdownPage from '../pages/markdown/MarkdownPage.vue'
-import SettingsPage from '../pages/settings/SettingsPage.vue'
 import SearchPanel from '../panes/search/SearchPanel.vue'
 import StoriesPanel from '../panes/stories/StoriesPanel.vue'
 import ShellLayout from './ShellLayout.vue'
@@ -34,6 +30,16 @@ function revealStoryVariant(target: FrameActionTarget): Promise<void> {
 const workbench = useWorkbench(props, error => emit('error', error), revealStoryVariant)
 const buildInfo = useWorkbenchBuildInfo()
 const { snapshot, route, shell, settings, mcp, dev, search, canvas, shortcuts, highlighted, searchQuery, searchActive, searchMatches, story, markdown, arrange, baseArrange, arrangementOverride, badges } = workbench
+/** Matrix props load only when corresponding inspector is displayed. */
+const MatrixInspector = defineAsyncComponent(() => import('../canvas/matrix/MatrixInspector.vue'))
+/** Matrix canvas stays outside initial project-test page imports. */
+const MatrixView = defineAsyncComponent(() => import('../canvas/matrix/MatrixView.vue'))
+/** Selected-story inspector loads only when its region is mounted. */
+const StoryInspector = defineAsyncComponent(() => import('../inspector/StoryInspector.vue'))
+/** Document route downloads its renderer when selected. */
+const MarkdownPage = defineAsyncComponent(() => import('../pages/markdown/MarkdownPage.vue'))
+/** Settings route does not delay first project-test discovery. */
+const SettingsPage = defineAsyncComponent(() => import('../pages/settings/SettingsPage.vue'))
 const TestsPanel = __HISTOIRE_DEV__ ? defineAsyncComponent(() => import('../panes/tests/TestsPanel.vue')) : undefined
 const McpPanel = __HISTOIRE_DEV__ ? defineAsyncComponent(() => import('../panes/mcp/McpPanel.vue')) : undefined
 const McpActivity = __HISTOIRE_DEV__ ? defineAsyncComponent(() => import('../panes/mcp/McpActivity.vue')) : undefined
@@ -42,6 +48,7 @@ const ScreenshotPopover = __HISTOIRE_DEV__ ? defineAsyncComponent(() => import('
 const CommentsPanel = __HISTOIRE_DEV__ ? defineAsyncComponent(() => import('../panes/comments/CommentsPanel.vue')) : undefined
 const CommentsCanvasOverlay = __HISTOIRE_DEV__ ? defineAsyncComponent(() => import('../comments/CommentsCanvasOverlay.vue')) : undefined
 const PermissionPrompt = __HISTOIRE_DEV__ ? defineAsyncComponent(() => import('../agents/PermissionPrompt.vue')) : undefined
+const EmbedDialog = defineAsyncComponent(() => import('../embed/EmbedDialog.vue'))
 const commentOverlay = dev?.commentOverlay ?? ref()
 const selectedSession = shallowRef<HistoireSession>()
 const inspector = computed(() => route.value.name === 'story' && !story.value?.docsOnly)
@@ -54,6 +61,12 @@ const cols = computed(() => typeof route.value.query.cols === 'string' ? route.v
 /** Report rejected route restoration through the existing workbench error boundary. */
 function activatePane(pane: 'stories' | 'search' | 'tests' | 'comments' | 'mcp'): void {
   void workbench.activatePane(pane).catch(error => emit('error', error))
+}
+
+/** Show inspector Props tab so the matrix new-axis form is visible. */
+function revealMatrixProps(): void {
+  if (!shell.inspectorOpen.value) shell.toggleInspector()
+  if (route.value.query.tab) workbench.panel('')
 }
 
 /** Fit the exact mounted frame; Matrix has multiple cells for one variant. */
@@ -103,13 +116,16 @@ function setSelectedSession(session: HistoireSession | undefined): void {
             <template #inspector>
               <ToolbarButton v-if="!shell.inspectorOpen.value" label="Show inspector" icon="side-panel-open" @click="shell.toggleInspector" />
             </template>
+            <template #embed="slot">
+              <EmbedMenu :controller="workbench.embed" :open="slot.open" @update:open="slot.setOpen" />
+            </template>
             <template #ui>
               <ToolbarButton label="Hide UI" icon="screen-off" :shortcut="shortcuts.hint('global.toggle-ui')" @click="workbench.toggleUi" />
             </template>
           </CanvasToolbar>
         </template>
         <template #matrix="slot">
-          <MatrixView :rows="rows" :cols="cols" :preview-base="previewBase" :frame-budget="histoireConfig.ui?.frameBudget ?? 6" :size="slot.size" :content-insets="slot.contentInsets" :ui-hidden="shell.uiHidden.value" :discovery-failed="slot.discoveryFailed" @axes="workbench.setAxes" @error="emit('error', $event)" />
+          <MatrixView :rows="rows" :cols="cols" :preview-base="previewBase" :frame-budget="histoireConfig.ui?.frameBudget ?? 6" :size="slot.size" :content-insets="slot.contentInsets" :ui-hidden="shell.uiHidden.value" :discovery-failed="slot.discoveryFailed" @axes="workbench.setAxes" @add-axis="revealMatrixProps" @error="emit('error', $event)" />
         </template>
         <template #overlays>
           <CommentsCanvasOverlay v-if="CommentsCanvasOverlay && dev" ref="commentOverlay" :model="dev.comments" :agents="dev.commentAgents.value" @composed="dev.commentMode.value = false" @setup-agent="dev.setupAgents" />
@@ -138,4 +154,5 @@ function setSelectedSession(session: HistoireSession | undefined): void {
   </ShellLayout>
   <!-- Menus remain reachable from the canvas while workbench chrome is hidden. -->
   <ContextMenu />
+  <EmbedDialog v-if="workbench.embed.target.value" :controller="workbench.embed" :book-url="previewBase" :enabled="histoireConfig.embed?.enabled ?? false" :allowed-origins="histoireConfig.embed?.allowedOrigins ?? []" />
 </template>

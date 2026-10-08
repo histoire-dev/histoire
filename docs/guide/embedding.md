@@ -22,6 +22,74 @@ The book's own origin is always allowed when embedding is enabled. Additional en
 
 Dev and static books expose `__embed.html` and versioned `histoire-embed.json` under their configured base. Keep the complete built output together. Existing `index.html`, `__sandbox.html`, and `histoire.json` remain available.
 
+## Embed selected variant or story
+
+Right-click a variant tree row or canvas frame and choose **Embed this variant**. Right-click a story row and choose **Embed this story**. Canvas toolbar's **Embed** menu offers both for the current selection. Opening a tree or frame action captures that exact target without selecting it. Matrix cells capture their underlying variant; cell overrides are excluded.
+
+The dialog offers **Iframe**, **JavaScript**, and **Vue** code, optional **Controls**, **Docs**, **Source**, and **Events** panels, **Copy**, and **Open embed**. Controls starts enabled. Docs and Source require available story content; Source shows raw source. Clear all checkboxes for canvas only. Width stays responsive at `100%`; height starts at `600px` and accepts positive numeric values. Each new target resets these choices.
+
+Variant scope renders only the captured variant. Story scope starts with the first authored variant and offers a dropdown limited to that story. Both use a single canvas even for stories authored with grid layout. New embeds start from authored state and project settings, excluding current state edits, matrix overrides, viewport presets, zoom, and pan. Docs-only stories cannot be embedded this way.
+
+When `embed.enabled` is false, the dialog shows configuration guidance instead of snippets. Configured allowed parents appear in the enabled dialog; deployment headers still require [static hosting setup](#origins-and-deployment-headers).
+
+### Direct iframe URL
+
+Direct documents start themselves without a parent SDK:
+
+```html
+<iframe
+  src="https://books.example.com/stories/__embed.html?view=embed&amp;storyId=buttons&amp;variantId=primary&amp;panels=controls"
+  title="Primary button"
+  loading="lazy"
+  style="width:100%;height:600px;border:0"
+></iframe>
+```
+
+`storyId` identifies the exact story. An absent `variantId` selects story scope; a present `variantId` must identify an exact nonempty variant. IDs are URL-encoded without splitting or inferring identity. `panels` lists `controls,docs,source,events` in canonical order. `panels=` enables none; omission defaults to Controls. Unsupported panel values, empty IDs, missing or ambiguous targets fail instead of opening another story. Generated URLs use the book base, excluding workbench route, query, and hash.
+
+Direct documents contain no credentials, serialized state, or runtime identity. Their framing policy comes from response headers, not query hints or referrer. Removing the iframe closes its app and owned session.
+
+### JavaScript SDK format
+
+Use a host module bundler or import map resolving `@histoire/sdk`. Give its container the selected dimensions:
+
+```html
+<div id="histoire-embed" style="width:100%;height:600px"></div>
+```
+
+```ts
+import { createHistoireSession } from '@histoire/sdk'
+
+const session = createHistoireSession({ url: 'https://books.example.com/stories/' })
+await session.connect()
+await session.selection.select({ storyId: 'buttons', variantId: 'primary' })
+const embed = session.mount(document.querySelector<HTMLElement>('#histoire-embed')!, {
+  surface: 'explorer',
+  presentation: { type: 'embed', scope: 'variant', panels: ['controls'] },
+})
+await embed.ready
+
+// When removing this view, including after a failed mount:
+try { await embed.unmount() }
+finally { await session.dispose() }
+```
+
+For story scope, omit `variantId` from selection and use `scope: 'story'`. Presentation is supported only on `explorer`; ordinary explorer mounts keep their existing behavior. SDK documents retain authenticated parent handshake. Presentation hints grant no extra commands or origin permissions.
+
+### Vue SDK format
+
+The dialog produces a complete SFC importing `createHistoireSession`, `HistoireProvider`, `HistoireEmbed`, and `@histoire/vue/style.css`. Connect and select during `onMounted`; render the provider and composition only after selection succeeds:
+
+```vue
+<HistoireProvider v-if="ready" :session="session" style="width:100%;height:600px">
+  <HistoireEmbed scope="story" :panels="['controls']" @error="reportError" />
+</HistoireProvider>
+```
+
+Keep an active-lifetime guard around asynchronous startup, show connection errors, and dispose the session in `onBeforeUnmount`, even if connection or selection is pending. Provider owns child mounts and observers; session disposal remains caller responsibility. Scoped composition measures its actual canvas area for runtime dimensions. Panels sit beside the canvas on desktop and below it under 760px, with independent scrolling.
+
+Known story links in embedded Docs open the full book in a new tab, leaving embedded selection unchanged. Local document anchors stay local. Scoped UI excludes full-book navigation, tests, editor actions, and grid/list/matrix controls.
+
 ## Mount an iframe explorer
 
 Install `@histoire/sdk` in the host. Supply an absolute book base URL; the SDK appends a missing trailing `/`:

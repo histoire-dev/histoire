@@ -1,5 +1,5 @@
-import type { HistoireBridgeAck, HistoireBridgeHello, HistoirePortRole } from '@histoire/protocol'
-import { HistoireSdkError, validateEmbedOrigin, validateHistoireAck } from '@histoire/protocol'
+import type { HistoireBridgeAck, HistoireBridgeHello, HistoireEmbedPresentation, HistoirePortRole } from '@histoire/protocol'
+import { HistoireSdkError, validateEmbedOrigin, validateHistoireAck, writeEmbedPresentation } from '@histoire/protocol'
 import { HISTOIRE_CONTROL_TIMEOUT } from './validation.js'
 /** One explicit browser attachment; constructing SDK never evaluates these fields. */
 export interface BridgeFrameOptions {
@@ -13,6 +13,8 @@ export interface BridgeFrameOptions {
   role: HistoirePortRole
   /** Explicit requested view, absent for metadata bridge. */
   surface?: string
+  /** Validated explorer-only presentation hints. */
+  presentation?: HistoireEmbedPresentation
   /** Owned attachment container. */
   container: HTMLElement
   /** Cancellation affects handshake immediately. */
@@ -31,12 +33,13 @@ export function createBridgeFrame(options: BridgeFrameOptions) {
   const parentOrigin = validateEmbedOrigin(parentWindow.location.origin)
   const base = new URL(options.url)
   const url = new URL('__embed.html', base)
+  if (options.presentation) writeEmbedPresentation(url.searchParams, options.presentation)
   const hello: HistoireBridgeHello = { kind: 'histoire:hello', protocolRange: { min: 1, max: 1 }, nonce: `${Date.now()}:${++nextNonce}:${Math.random()}`, sessionId: options.sessionId, mountId: options.mountId, parentOrigin, role: options.role }
   for (const [key, value] of Object.entries({ view: options.surface ? 'surface' : 'bridge', ...(options.surface ? { surface: options.surface } : {}), parentOrigin, sessionId: options.sessionId, mountId: options.mountId })) {
     url.searchParams.set(key, value)
   }
   const iframe = document.createElement('iframe')
-  iframe.title = options.surface ? `Histoire ${options.surface}` : 'Histoire source bridge'
+  iframe.title = options.presentation ? 'Histoire embed' : options.surface === 'preview' ? 'Histoire canvas' : options.surface ? `Histoire ${options.surface}` : 'Histoire source bridge'
   iframe.style.cssText = options.surface ? 'border:0;width:100%;height:100%;display:block' : 'position:absolute;width:1px;height:1px;border:0;opacity:0;pointer-events:none'
   const channel = new MessageChannel()
   let active = true

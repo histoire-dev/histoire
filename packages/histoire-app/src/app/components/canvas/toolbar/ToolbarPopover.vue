@@ -35,6 +35,9 @@ function setTrigger(element: Element | ComponentPublicInstance | null): void {
 watch(() => props.open === props.id, (opened) => {
   if (opened && overflow?.value) toolbar?.reveal()
 })
+
+/** Consumers opening a modal can restore focus to actual toolbar trigger. */
+defineExpose({ trigger })
 </script>
 
 <template>

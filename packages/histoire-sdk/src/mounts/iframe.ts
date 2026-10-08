@@ -46,7 +46,7 @@ export function mountRemoteSurface(context: HistoireMountContext): HistoireSurfa
   let synchronize = () => {}
   const source = context.session.getSnapshot().source!
   const id = `${context.mountId}:connection`
-  const frame = createBridgeFrame({ url: source.url, sessionId: context.sessionId, mountId: context.mountId, surface: context.surface, role, container, signal: abort.signal, disconnected: () => {
+  const frame = createBridgeFrame({ url: source.url, sessionId: context.sessionId, mountId: context.mountId, surface: context.surface, presentation: context.presentation, role, container, signal: abort.signal, disconnected: () => {
     bridge?.disconnect()
     close()
   } })

@@ -19,6 +19,14 @@ export function setupPluginApi(router: Router) {
       import.meta.hot.on('histoire:dev-event-result', listener)
       return () => import.meta.hot.off('histoire:dev-event-result', listener)
     },
+    onProgress: (listener) => {
+      import.meta.hot.on('histoire:dev-event-progress', listener)
+      return () => import.meta.hot.off('histoire:dev-event-progress', listener)
+    },
+    onDisconnect: (listener) => {
+      import.meta.hot.on('vite:ws:disconnect', listener)
+      return () => import.meta.hot.off('vite:ws:disconnect', listener)
+    },
   })
 
   const previous = window.__HST_PLUGIN_API__

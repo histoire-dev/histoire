@@ -8,18 +8,14 @@ import { useHistoireSnapshot } from '@histoire/vue'
 import { HISTOIRE_SEARCH_FOCUS, HISTOIRE_TOGGLE_UI, useHistoireContext, useHistoireResource } from '@histoire/vue/internal'
 import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import { getRegisteredFrameTarget } from '../components/canvas/frame-target.js'
+import { registerEmbedActions } from '../components/embed/actions.js'
+import { createEmbedController } from '../components/embed/controller.js'
 import { createSearchFrameNavigation } from '../components/panes/search/frame-navigation.js'
 import { createDevWorkbenchTestsOptions } from '../components/panes/tests/dev-runner.js'
 import { createWorkbenchTestsModel, provideWorkbenchTestsModel } from '../components/panes/tests/model.js'
 import { createContextMenu, provideContextMenu } from '../composables/context-menu.js'
-import { provideShell } from '../composables/shell.js'
-import { createMatrixStore, provideMatrix } from '../stores/matrix.js'
 import { createMcpStore, provideMcpStore } from '../stores/mcp.js'
-import { createPresetConfigStore, providePresetConfigStore } from '../stores/presets-config.js'
 import { createProjectConfigStore, provideProjectConfigStore } from '../stores/project-config.js'
-import { createUiSettingsStore, provideUiSettingsStore } from '../stores/settings.js'
-import { createShell } from '../stores/shell.js'
-import { createStoryCanvasViews, provideStoryCanvasViews } from '../stores/story-canvas-views.js'
 import { histoireConfig } from '../util/config.js'
 import { createFrameActions, provideFrameActions } from '../util/frame-actions.js'
 import { createShortcutRegistry, provideShortcutRegistry } from '../util/shortcuts.js'
@@ -29,33 +25,14 @@ import { createWorkbenchMarkdownTransition } from './markdown-transition.js'
 import { registerUiVisibilityAction } from './ui-visibility-menu.js'
 import { useWorkbenchDev } from './workbench-dev.js'
 import { activateWorkspacePane, type WorkspacePane } from './workbench-navigation.js'
+import { useWorkbenchStores } from './workbench-stores.js'
 
 /** Bind standalone adapters once, keeping every store owned by this provider. */
 export function useWorkbench(props: WorkbenchProps, error: (error: unknown) => void, revealVariant: (target: FrameActionTarget) => void | Promise<void>) {
   const context = useHistoireContext()
   const snapshot = useHistoireSnapshot()
   const route = props.navigation.router.currentRoute
-  let storage: Storage | undefined
-  try {
-    storage = props.hostWindow.localStorage
-  }
-  catch { /* Memory-only workbench remains usable when storage is blocked. */ }
-  const shell = createShell({ dev: __HISTOIRE_DEV__, storage })
-  provideShell(shell)
-  useHistoireResource(shell.close)
-  const settings = createUiSettingsStore({ storage, warn: console.warn })
-  provideUiSettingsStore(settings)
-  const storyCanvasViews = createStoryCanvasViews()
-  provideStoryCanvasViews(storyCanvasViews)
-  const presets = createPresetConfigStore({ storage, config: () => histoireConfig, warn: console.warn })
-  providePresetConfigStore(presets)
-  const matrix = createMatrixStore({ storage })
-  provideMatrix(matrix)
-  useHistoireResource(matrix.close)
-  watch(() => [snapshot.value.status, snapshot.value.stale, snapshot.value.runtime, snapshot.value.selection, snapshot.value.source, snapshot.value.catalog.stories, snapshot.value.state, route.value.query.rows, route.value.query.cols], () => matrix.synchronize(snapshot.value, {
-    rows: typeof route.value.query.rows === 'string' ? route.value.query.rows : undefined,
-    cols: typeof route.value.query.cols === 'string' ? route.value.query.cols : undefined,
-  }), { immediate: true })
+  const { shell, settings, storyCanvasViews, presets, matrix } = useWorkbenchStores(props.hostWindow, snapshot, route)
   const projectTests = createWorkbenchTestsModel(props.session, props.tests, {
     ...(__HISTOIRE_DEV__ ? createDevWorkbenchTestsOptions(props.hostWindow) : {}),
     settings,
@@ -92,9 +69,13 @@ export function useWorkbench(props: WorkbenchProps, error: (error: unknown) => v
     },
     frameSession: target => canvas.value?.registry.getFrame(target.frameKey)?.session ?? null,
     frameRegistration: target => canvas.value?.registry.getFrame(target.frameKey) ?? null,
+    runTests: target => projectTests.run(target),
     error,
   })
   provideFrameActions(actions)
+  const embed = createEmbedController(props.session)
+  useHistoireResource(embed.dispose)
+  useHistoireResource(registerEmbedActions(embed, menu, actions))
   menu.register({ id: 'control.copy-name', label: 'Copy control name', icon: 'copy', group: 'copy', available: target => target.kind === 'control', run: (target) => {
     if (target.kind === 'control') return actions.copyText(target.label)
   } })
@@ -320,5 +301,5 @@ export function useWorkbench(props: WorkbenchProps, error: (error: unknown) => v
     const action = actions.entries.get('open-isolated')
     if (action && target.variantId) void actions.run(action, { ...target, variantId: target.variantId, frameKey: getHistoireTargetKey(target) })
   }
-  return { snapshot, route, shell, settings, presets, matrix, projectTests, project, mcp, dev, menu, actions, canvas, shortcuts, search, searchQuery, searchActive, searchMatches, highlighted, story, markdown: markdownTransition.visible, arrange, baseArrange, arrangementOverride, badges, showPane, activatePane, openSearch, closeSearch, toggleUi, panel, setArrange, setAxes, navigate, searchSelected, testsSelected, nextMatch: searchMatches.next, previousMatch: searchMatches.previous, runAll, openIsolated }
+  return { snapshot, route, shell, settings, presets, matrix, projectTests, project, mcp, dev, menu, actions, embed, canvas, shortcuts, search, searchQuery, searchActive, searchMatches, highlighted, story, markdown: markdownTransition.visible, arrange, baseArrange, arrangementOverride, badges, showPane, activatePane, openSearch, closeSearch, toggleUi, panel, setArrange, setAxes, navigate, searchSelected, testsSelected, nextMatch: searchMatches.next, previousMatch: searchMatches.previous, runAll, openIsolated }
 }

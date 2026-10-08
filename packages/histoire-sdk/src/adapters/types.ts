@@ -1,4 +1,5 @@
 import type {
+  HistoireEmbedPresentation,
   HistoireEvent,
   HistoireHostChannelMessage,
   HistoireRuntimeSnapshot,
@@ -117,6 +118,8 @@ export interface HistoireMountContext {
   mountId: string
   /** Requested first-party view. */
   surface: HistoireSurface
+  /** Optional scoped explorer composition, never additional authority. */
+  presentation?: HistoireEmbedPresentation
   /** Explicit hidden primary request. */
   hidden: boolean
   /** Caller-owned container; absent for adapter-owned hidden container. */

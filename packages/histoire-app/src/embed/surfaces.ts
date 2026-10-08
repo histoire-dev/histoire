@@ -1,10 +1,12 @@
-import type { HistoireBridgeCommand, HistoireBridgePublication, HistoireRuntimeSnapshot, HistoireSourceDescriptor, HistoireSurface } from '@histoire/protocol'
+import type { HistoireBridgeCommand, HistoireBridgePublication, HistoireEmbedPresentation, HistoireRuntimeSnapshot, HistoireSourceDescriptor, HistoireSurface } from '@histoire/protocol'
 import type { HistoireBridgePort, HistoireRequestCapture, HistoireSession } from '@histoire/sdk/internal'
 import { HistoireSdkError } from '@histoire/protocol'
 /** Per-document first-party surface context; no global active frame or selection. */
 export interface EmbedSurfaceContext {
   /** Explicit first-party local mount; enables compatible runtime-owned preferences. */
   standalone?: boolean
+  /** Scoped explorer UI, independent of parent bridge authority. */
+  presentation?: HistoireEmbedPresentation
   /** Explicit source base for local standalone mounts whose route changes independently. */
   sourceBase?: string
   /** Native provider renders generic editors locally; independent iframe defaults to full panel. */

@@ -1,18 +1,23 @@
+import type { PropType } from 'vue'
 import type { HistoireContentState } from '../../content/controller.js'
 import type { HistoirePreparedDocs } from './content.js'
 import { HistoireSdkError, isStoryRouteHash } from '@histoire/protocol'
-import { getHistoireDocsPolicy, selectHistoireStoryLink } from '@histoire/sdk/internal'
+import { getAcceptedHistoireSessionDescriptor, getHistoireDocsPolicy, selectHistoireStoryLink } from '@histoire/sdk/internal'
 import { defineComponent, h, nextTick, onMounted, shallowRef, watch } from 'vue'
 import { createHistoireContentController } from '../../content/controller.js'
 import { useHistoireContext, useHistoireResource } from '../../provider/context.js'
 import { scrollDocsAnchor } from './anchors.js'
 import { prepareHistoireDocs } from './content.js'
-import { resolveDocsStoryLink } from './links.js'
+import { getDocsStoryHref, resolveDocsStoryLink } from './links.js'
 
 /** Independent data-only documentation; no host story import or host router dependency. */
 export const HistoireDocs = defineComponent({
   name: 'HistoireDocs',
-  props: { anchor: { type: String, default: '' } },
+  props: {
+    anchor: { type: String, default: '' },
+    /** Embedded docs open book links without changing the scoped session. */
+    storyLinkBehavior: { type: String as PropType<'select' | 'open'>, default: 'select' },
+  },
   emits: ['content', 'error', 'anchor'],
   setup(props, { emit, expose }) {
     const context = useHistoireContext()
@@ -75,6 +80,11 @@ export const HistoireDocs = defineComponent({
       event.preventDefault()
       if (!target) {
         emit('error', new HistoireSdkError('STORY_NOT_FOUND', 'Documentation story link unavailable'))
+        return
+      }
+      if (props.storyLinkBehavior === 'open') {
+        const mode = getAcceptedHistoireSessionDescriptor(session).config?.routerMode
+        root.value.ownerDocument.defaultView?.open(getDocsStoryHref(target, snapshot.source!.url, mode), '_blank', 'noopener,noreferrer')
         return
       }
       const current = ++navigation

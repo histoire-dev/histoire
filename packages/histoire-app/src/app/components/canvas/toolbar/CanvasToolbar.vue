@@ -112,6 +112,9 @@ onBeforeUnmount(() => disposers.forEach(dispose => dispose()))
     <BaseOverflowToolbarItem id="comment">
       <slot name="comment" v-bind="{ open, setOpen }" />
     </BaseOverflowToolbarItem>
+    <BaseOverflowToolbarItem id="embed">
+      <slot name="embed" v-bind="{ open, setOpen }" />
+    </BaseOverflowToolbarItem>
     <BaseOverflowToolbarItem id="inspector">
       <slot name="inspector" />
     </BaseOverflowToolbarItem>

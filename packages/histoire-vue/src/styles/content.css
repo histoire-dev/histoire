@@ -5,6 +5,13 @@
 .histoire-provider .histoire-docs :is(img, video) { max-width: 100%; height: auto; }
 .histoire-provider .histoire-docs :is(pre, code) { font-family: ui-monospace, monospace; }
 .histoire-provider .histoire-docs pre { padding: 12px; overflow: auto; background: var(--histoire-panel); }
+/* One shared container keeps document and story fences compact without utility CSS. */
+.histoire-provider .histoire-docs .__histoire-code { position: relative; margin: 18px 0 26px; border-radius: 10px; background: var(--histoire-code, #24292e); color: #e6e7ea; }
+.histoire-provider .histoire-docs .__histoire-code > pre { margin: 0; padding: 12px 16px; border-radius: inherit; background: transparent !important; }
+.histoire-provider .histoire-docs .__histoire-code > :is(.__histoire-code-language, div:first-child) { position: absolute; top: 8px; right: 12px; color: rgb(255 255 255 / .4); font: 10px/1.5 var(--histoire-font-mono, ui-monospace, monospace); pointer-events: none; user-select: none; }
+/* Cached and older remote docs can still include MarkdownIt's redundant outer pre. */
+.histoire-provider .histoire-docs pre:has(> code > .__histoire-code) { margin: 0; padding: 0; overflow: visible; white-space: normal; background: transparent; }
+.histoire-provider .histoire-docs pre > code:has(> .__histoire-code) { display: block; font: inherit; }
 .histoire-provider .histoire-source { display: flex; flex-direction: column; }
 .histoire-provider .histoire-content-actions { display: flex; gap: 4px; padding: 8px; border-bottom: 1px solid var(--histoire-border); }
 .histoire-provider .histoire-content-actions button {    padding: 4px 10px;  }

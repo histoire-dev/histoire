@@ -141,6 +141,22 @@ describe('workbench frame actions', () => {
     finally { await session.dispose() }
   })
 
+  it('runs tests through workbench tests owner for selected frame target', async () => {
+    const fixture = sourceFixture()
+    const session = createHistoireSessionWithAdapters({ url: 'https://book.example/' }, fixture.adapters)
+    await session.connect()
+    await session.selection.select({ storyId: 'a:b', variantId: 'c' })
+    const direct = vi.spyOn(session.tests, 'run')
+    const runTests = vi.fn(async () => {})
+    const actions = createFrameActions({ session, link: () => '', reveal: vi.fn(), runTests })
+    try {
+      await actions.run(actions.entries.get('run-tests')!, { storyId: 'a:b', variantId: 'c', frameKey: 'frame' })
+      expect(runTests).toHaveBeenCalledWith({ storyId: 'a:b', variantId: 'c' })
+      expect(direct).not.toHaveBeenCalled()
+    }
+    finally { await session.dispose() }
+  })
+
   it('hides dev/capability actions and preserves copy text when clipboard fails', async () => {
     const fixture = sourceFixture()
     fixture.descriptor.mode = 'static'

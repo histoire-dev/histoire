@@ -133,8 +133,9 @@ describe('getViteConfigWithPlugins', () => {
     })
 
     expect(await storyShimPlugin!.resolveId?.('vitest', lateStoryPath)).toBeTruthy()
-    // Non-story importers keep resolving the real vitest entry.
-    expect(await storyShimPlugin!.resolveId?.('vitest', `${ctx.root}/src/components/Example.vue`)).toBeFalsy()
+    // Child components and user setup/helpers register into the same collector.
+    expect(await storyShimPlugin!.resolveId?.('vitest', `${ctx.root}/src/components/Example.vue`)).toBeTruthy()
+    expect(await storyShimPlugin!.resolveId?.('vitest', `${ctx.root}/node_modules/@vitest/browser/dist/index.js`)).toBeFalsy()
   })
 
   it('resolves the browser collection vitest stub to the source file', async () => {

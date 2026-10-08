@@ -99,7 +99,7 @@ function openControlMenu(event: MouseEvent | KeyboardEvent): void {
 </script>
 
 <template>
-  <section class="story-inspector" data-test-id="story-side-panel" aria-label="Story inspector">
+  <section class="story-inspector" :data-active-tab="active || 'props'" data-test-id="story-side-panel" aria-label="Story inspector">
     <InspectorHeader :story-title="story?.title || 'Story'" :variant-title="variantTitle || variant?.title" :isolated-href="isolatedHref" @close="emit('close')" @contextmenu="openSelectionMenu" />
     <InspectorTabs :id-prefix="id" :active-tab="active" :tests-enabled="testsEnabled" :event-count="unseen" :test-count="testCount" :test-status="testStatus" @select="select" />
     <div :id="`${id}-panel-${active || 'props'}`" class="inspector-content" data-histoire-docs-scroll role="tabpanel" :aria-labelledby="`${id}-tab-${active || 'props'}`" @contextmenu="openControlMenu" @keydown="openControlMenu">
@@ -122,7 +122,11 @@ function openControlMenu(event: MouseEvent | KeyboardEvent): void {
         <p v-if="cachedFailure" class="inspector-test-failure" role="alert">
           {{ cachedFailure }}
         </p>
-        <HistoireTests :summary="cachedSummary" :collection="cachedCollection" :running="testEntry?.running" @error="emit('error', $event)" />
+        <HistoireTests :summary="cachedSummary" :collection="cachedCollection" :running="testEntry?.running" @error="emit('error', $event)">
+          <template #empty="{ collected }">
+            <WorkbenchEmptyState icon="chemistry" :title="collected ? 'No tests' : 'Tests not collected'" />
+          </template>
+        </HistoireTests>
       </template>
     </div>
     <SourceDrawer @error="emit('error', $event)" @contextmenu="openSelectionMenu" />
@@ -130,9 +134,10 @@ function openControlMenu(event: MouseEvent | KeyboardEvent): void {
 </template>
 
 <style scoped>
-.story-inspector { --histoire-inspector-gutter: var(--histoire-pane-gutter, 16px); display: flex; flex-direction: column; width: 100%; height: 100%; min-width: 0; min-height: 0; overflow: hidden; color: var(--histoire-text); background: var(--histoire-surface); }
+.story-inspector { --histoire-inspector-gutter: var(--histoire-pane-gutter, 16px); display: flex; flex-direction: column; width: 100%; height: 100%; min-width: 0; min-height: 0; overflow: hidden; border: 1px solid transparent; border-radius: var(--histoire-radius-panel, 16px); color: var(--histoire-text); background: var(--histoire-surface); }
+.story-inspector[data-active-tab="docs"] { border-color: var(--histoire-border); background: var(--histoire-canvas); }
 .inspector-content { flex: 1; min-height: 0; overflow: auto; }
-.inspector-test-failure { margin: 0 var(--histoire-inspector-gutter) 14px; color: var(--histoire-danger-text); font-size: 12px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.inspector-test-failure { margin: 0 var(--histoire-inspector-gutter) 10px; padding: 8px 10px; border-radius: 8px; background: var(--histoire-danger-soft); color: var(--histoire-danger-text); font-size: 12px; white-space: pre-wrap; overflow-wrap: anywhere; }
 .inspector-content :deep(.histoire-docs) { padding: 2px var(--histoire-inspector-gutter) 16px; color: var(--histoire-body); font-size: 12px; line-height: 1.7; }
 .inspector-content :deep(.histoire-docs :is(h1,h2,h3,h4)) { color: var(--histoire-text); font-weight: 800; }
 .inspector-content :deep(.histoire-docs table) { width: 100%; font-size: 11px; border-collapse: collapse; }
@@ -146,7 +151,5 @@ function openControlMenu(event: MouseEvent | KeyboardEvent): void {
 .inspector-content :deep(.histoire-events time) { margin-left: auto; color: var(--histoire-muted); font-size: 10px; }
 .inspector-content :deep(.histoire-event-argument) { margin: 8px 0 0; max-height: 120px; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere; color: var(--histoire-muted); font: 10px/1.6 var(--histoire-font-mono); }
 .inspector-content :deep(.histoire-tests) { padding: 2px var(--histoire-inspector-gutter) 16px; font-size: 12px; }
-.inspector-content :deep(.histoire-tests-actions button) { border-color: var(--histoire-border); background: var(--histoire-chip); border-radius: 7px; font-size: 11px; }
-.inspector-content :deep(.histoire-test-row) { padding: 10px 0; border-bottom: 1px solid var(--histoire-border); }
-.inspector-content :deep(.histoire-tests :is(pre,summary)) { white-space: pre-wrap; overflow-wrap: anywhere; font: 11px/1.6 var(--histoire-font-mono); }
+.inspector-content :deep(.histoire-tests .workbench-empty-state) { flex: 1; }
 </style>

@@ -18,11 +18,20 @@ export async function createMarkdownRenderer(ctx: Context) {
   const highlighter = getMarkdownHighlighter(ctx)
 
   const md = new MarkdownIt({
-    highlight: (code, lang) => `<div class="htw-relative htw-not-prose __histoire-code"><div class="htw-absolute htw-top-0 htw-right-0 htw-text-xs htw-text-white/40">${lang}</div>${highlighter.highlight(code, lang)}</div>`,
+    highlight: (code, lang) => highlighter.highlight(code, lang),
     linkify: true,
     html: true,
     breaks: false,
   })
+
+  // MarkdownIt recognizes Shiki's leading <pre> and skips its own <pre><code>.
+  // Wrap the completed fence so the label stays outside selectable code content.
+  const renderFence = md.renderer.rules.fence!
+  md.renderer.rules.fence = (tokens, index, options, env, self) => {
+    const language = md.utils.unescapeAll(tokens[index].info).trim().split(/\s+/)[0]
+    const label = language ? `<span class="__histoire-code-language">${md.utils.escapeHtml(language)}</span>` : ''
+    return `<div class="__histoire-code">${label}${renderFence(tokens, index, options, env, self)}</div>\n`
+  }
 
   md.use(anchor, {
     slugify,

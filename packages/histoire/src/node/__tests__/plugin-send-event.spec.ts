@@ -14,6 +14,7 @@ import { createDevEventApi, DEV_EVENT_TIMEOUT } from '../../../../histoire-app/s
 function createChannel() {
   const requests: { event: string, payload?: any, requestId: string }[] = []
   let emit: (result: any) => void = () => {}
+  let emitProgress: (result: any) => void = () => {}
 
   return {
     requests,
@@ -24,15 +25,90 @@ function createChannel() {
       onResult: (listener: (result: any) => void) => {
         emit = listener
       },
+      onProgress: (listener: (result: any) => void) => {
+        emitProgress = listener
+        return () => {
+          emitProgress = () => {}
+        }
+      },
     },
     /** Delivers a `histoire:dev-event-result` message. */
     reply(result: Record<string, any>) {
       emit(result)
     },
+    /** Delivers additive completion without settling terminal promise. */
+    progress(result: Record<string, any>) {
+      emitProgress(result)
+    },
   }
 }
 
 describe('createDevEventApi', () => {
+  it('cleans pending progress and timers when socket send fails during admission', async () => {
+    const channel = createChannel()
+    const api = createDevEventApi({ ...channel.transport, send() {
+      throw new Error('Socket closed')
+    } })
+    await expect(api.sendEvent('collectStoryTests')).rejects.toThrow('Socket closed')
+    expect(vi.getTimerCount()).toBe(0)
+    api.close()
+  })
+  it('retires pending progress on disconnect and admits new requests after reconnection', async () => {
+    const channel = createChannel()
+    let disconnect = () => {}
+    const published: unknown[] = []
+    const api = createDevEventApi({ ...channel.transport, onDisconnect(listener) {
+      disconnect = listener
+    } })
+    const operation = api.sendEvent('collectStoryTests', {}, undefined, result => published.push(result))
+    const requestId = channel.requests[0].requestId
+    disconnect()
+    await expect(operation).rejects.toThrow('connection closed')
+    channel.progress({ event: 'collectStoryTests', requestId, progress: 'late' })
+    expect(published).toEqual([])
+    expect(vi.getTimerCount()).toBe(0)
+    const retry = api.sendEvent('collectStoryTests')
+    channel.reply({ event: 'collectStoryTests', requestId: channel.requests.at(-1)!.requestId, result: 'complete' })
+    await expect(retry).resolves.toBe('complete')
+    api.close()
+  })
+  it('streams only correlated progress, preserves terminal promise, and drops late delivery', async () => {
+    const channel = createChannel()
+    const api = createDevEventApi(channel.transport)
+    const published: unknown[] = []
+    const operation = api.sendEvent('collectStoryTests', {}, undefined, result => published.push(result))
+    const requestId = channel.requests[0].requestId
+    channel.progress({ event: 'collectStoryTests', requestId: 'other-client', progress: 'wrong' })
+    channel.progress({ event: 'other-event', requestId, progress: 'wrong' })
+    channel.progress({ event: 'collectStoryTests', progress: 'uncorrelated' })
+    channel.progress({ event: 'collectStoryTests', requestId, progress: 'partial' })
+    expect(published).toEqual(['partial'])
+    expect(vi.getTimerCount()).toBe(1)
+    channel.reply({ event: 'collectStoryTests', requestId, result: 'complete' })
+    await expect(operation).resolves.toBe('complete')
+    channel.progress({ event: 'collectStoryTests', requestId, progress: 'late' })
+    api.close()
+    expect(published).toEqual(['partial'])
+    expect(vi.getTimerCount()).toBe(0)
+  })
+
+  it('cancels correlated collection after invalid progress or transport timeout', async () => {
+    const channel = createChannel()
+    const api = createDevEventApi(channel.transport)
+    const operation = api.sendEvent('collectStoryTests', {}, undefined, () => {
+      throw new Error('Invalid progress')
+    })
+    const requestId = channel.requests[0].requestId
+    channel.progress({ event: 'collectStoryTests', requestId, progress: 'invalid' })
+    await expect(operation).rejects.toThrow('Invalid progress')
+    expect(channel.requests[1]).toMatchObject({ event: 'cancelStoryTests', payload: { requestId } })
+    const pending = api.sendEvent('collectStoryTests')
+    const timedOut = expect(pending).rejects.toThrow('timed out')
+    await vi.advanceTimersByTimeAsync(DEV_EVENT_TIMEOUT)
+    await timedOut
+    expect(channel.requests[3]).toMatchObject({ event: 'cancelStoryTests', payload: { requestId: channel.requests[2].requestId } })
+    api.close()
+  })
   it('closes result subscription and rejects pending calls without leaving timers or sending again', async () => {
     const channel = createChannel()
     const off = vi.fn()

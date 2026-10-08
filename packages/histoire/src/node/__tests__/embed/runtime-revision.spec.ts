@@ -50,6 +50,15 @@ describe('canonical runtime digest projection', () => {
     expect(fixture.catalog.current.catalog.stories.find(story => story.id === fixture.story.story.id)!.runtimeRevision).not.toBe(firstDigest)
   })
 
+  it.each(['dev', 'static'] as const)('projects matrix ranges and project defaults in %s descriptors', async (mode) => {
+    fixture.context.config.ui = { matrix: { numericValues: [3, 6, 9] } }
+    fixture.story.story.matrix = { axes: { count: { min: 0, max: 0.3, step: 0.1 } } }
+    await fixture.catalog.publish(fixture.context)
+    const descriptor = createEmbedDescriptor(fixture.context, fixture.catalog.current, mode, mode === 'static' ? 'build-1' : undefined)
+    expect(descriptor.config?.matrix?.numericValues).toEqual([3, 6, 9])
+    expect(descriptor.catalog.stories[0].matrix?.axes.count).toEqual([0, 0.1, 0.2, 0.3])
+  })
+
   it('omits runtime digest when canonical source bytes are unavailable', async () => {
     const unavailable = createMcpStory(fixture.root, 'unavailable', 'unavailable.story.js')
     delete unavailable.moduleCode

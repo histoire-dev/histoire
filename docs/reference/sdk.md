@@ -38,7 +38,7 @@ await session.connect()
 | `source.get({ storyId, variantId?, mode })` | `mode: 'raw'` is data-only; `'dynamic'` requires matching ready runtime |
 | `tests.collect()` | Selected ready-preview definitions; no test execution |
 | `tests.run({ mode, signal? })` | Explicit `'preview'` or `'server'` completed run summary |
-| `mount(container, { surface })` | Owned handle with `id`, `ready`, `unmount()` |
+| `mount(container, { surface, presentation? })` | Owned handle with `id`, `ready`, `unmount()`; scoped presentation for explorer only |
 | `createHiddenPreview()` | Same primary lifecycle with real viewport dimensions |
 | `dispose()` | Terminal idempotent `Promise<void>` rejecting pending work and closing owned resources |
 
@@ -106,6 +106,26 @@ type HistoireSurface =
 
 One session permits one primary preview/grid, including explorer preview and hidden preview. Competing mounts reject with `RUNTIME_IN_USE`. Await full unmount before replacement. Multiple independent data-only surfaces and multiple sessions are supported. A failed mount still belongs to caller and must be unmounted.
 
+### Scoped embed presentation
+
+```ts
+type HistoireEmbedPanel = 'controls' | 'docs' | 'source' | 'events'
+
+interface HistoireEmbedPresentation {
+  type: 'embed'
+  scope: 'story' | 'variant'
+  panels?: readonly HistoireEmbedPanel[]
+}
+
+type HistoireMountOptions =
+  | { surface: 'explorer', presentation?: HistoireEmbedPresentation }
+  | { surface: Exclude<HistoireSurface, 'explorer'>, presentation?: never }
+```
+
+Connect and select a variant before mounting scoped presentation. It captures the current source and target. Story scope allows switching only within that story; variant scope offers no switcher. Both render one primary irrespective of authored grid layout. Panels default to Controls, normalize to Controls/Docs/Source/Events order, and accept `[]` for canvas only. Unavailable Docs/Source are hidden; Source uses raw mode. Unsupported scope/panels and presentation on other surfaces reject with `INVALID_ARGUMENT`, including untyped callers. Existing explorer mounting without presentation remains unchanged.
+
+URL presentation hints are validated cosmetic transport hints; selection/settings remain parent session authority. No new surface, descriptor requirement, or bridge command is added. See [copied formats and direct document URLs](../guide/embedding.md#embed-selected-variant-or-story).
+
 Runtime-dependent capabilities reflect readiness. Data-only surfaces never import story modules automatically. Custom controls execute in a source-origin replica frame and edit canonical preview state. Generic native controls patch session state.
 
 ## Vue exports
@@ -116,13 +136,14 @@ Import `@histoire/vue/style.css` once. Host Vue is a peer dependency; imports re
 | --- | --- |
 | `HistoireProvider` | Required explicit `session`; local theme, size, overlay and child ownership |
 | `HistoireExplorer` | Shared composition with navigation/toolbar/preview/panels slots |
+| `HistoireEmbed` | Captured story/variant composition; required `scope`, optional `panels`, `ready`/`error` events |
 | `HistoirePreview` | Isolated single primary runtime |
 | `HistoireVariantGrid` | Isolated grid primary runtime |
 | `HistoireStoryTree` | Catalog navigation |
 | `HistoireSearch` | Metadata/docs target search |
 | `HistoireToolbar` | Session settings and capability-gated dev actions |
 | `HistoireControls` | Native generic controls plus isolated custom controls |
-| `HistoireDocs` | Data-only sanitized docs; optional `anchor` |
+| `HistoireDocs` | Data-only sanitized docs; optional `anchor` and `storyLinkBehavior: 'select' \| 'open'` |
 | `HistoireSource` | Explicit `mode: 'raw' | 'dynamic'`, default raw |
 | `HistoireEvents` | Session event history |
 | `HistoireTests` | Explicit collection, preview/server run and cancellation actions |
@@ -130,6 +151,10 @@ Import `@histoire/vue/style.css` once. Host Vue is a peer dependency; imports re
 | `useHistoireSnapshot()` | Read-only shallow ref of coherent snapshots |
 
 Explorer visibility props `showNavigation`, `showSearch`, `showToolbar`, and `showPanels` default to true. A custom preview slot owns its chosen primary component. Provider unmount closes child resources and observers, retaining caller session. Provider does not install host router, Pinia, global FloatingVue configuration, or app plugins.
+
+`HistoireEmbed` requires a connected provider session with an exact selected variant at mount. It captures source and target identity, uses the existing primary/panel components, measures positive canvas dimensions, and releases listeners, observers, and child mounts with provider ownership. The caller retains session disposal responsibility. Panels occupy 320px beside the canvas, or a bounded scrolling area below it under 760px. Invalid or removed captured targets produce an error instead of adopting another story.
+
+`HistoireDocs.storyLinkBehavior` defaults to `select`, preserving session navigation. `open` resolves known story links through the catalog and opens the full book in a new tab without changing session selection. Local anchors retain their existing behavior. `HistoireEmbed` uses `open`. Optional `source.config.routerMode` (`history` or `hash`, default `history`) supplies full-book link format without requiring a host router.
 
 Standalone automatically collects definitions once per ready source/selection/document and shares that controller with its badge and tests panel. It never automatically executes tests or retries failed collection. Independent embedded/native panels retain explicit collection; a nested provider with another session cannot inherit standalone test state.
 

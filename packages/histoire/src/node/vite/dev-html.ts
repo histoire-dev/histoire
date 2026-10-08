@@ -3,6 +3,7 @@ import type { Connect, ViteDevServer } from 'vite'
 import type { Context } from '../context.js'
 import { lookup as lookupMime } from 'mrmime'
 import { APP_PATH } from '../alias.js'
+import { getDevClientPreloads } from '../server/client-ready.js'
 import { renderVitestRunnerBootstrap } from '../virtual/vitest-runner-bootstrap.js'
 
 /** Early Histoire routes inherit Vite headers without replacing caller-owned response policy. */
@@ -52,9 +53,11 @@ ${renderVitestRunnerBootstrap('  ')}
 /**
  * Renders the HTML document of the Histoire app shell.
  * @param ctx The histoire context, used for the configured favicon.
- * @param base The dev server base path the favicon is served from.
+ * @param server Exact dev server owning base path and ready module preload hints.
  */
-function renderAppHtml(ctx: Context, base: string) {
+function renderAppHtml(ctx: Context, server: ViteDevServer) {
+  const base = server.config.base
+  const preloads = getDevClientPreloads(server).map(url => `<link rel="modulepreload" crossorigin href="${url.replaceAll('&', '&amp;').replaceAll('"', '&quot;').replaceAll('<', '&lt;')}">`).join('\n')
   return `
 <!DOCTYPE html>
 <html>
@@ -64,6 +67,7 @@ function renderAppHtml(ctx: Context, base: string) {
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="description" content="">
+    ${preloads}
     ${ctx.config.theme?.favicon ? `<link rel="icon" type="${lookupMime(ctx.config.theme.favicon)}" href="${base}${ctx.config.theme.favicon}"/>` : ''}
   </head>
   <body>
@@ -110,7 +114,7 @@ export function createSandboxHtmlMiddleware(server: ViteDevServer): Connect.Next
 export function createAppHtmlMiddleware(server: ViteDevServer, ctx: Context): Connect.NextHandleFunction {
   return async (req, res, next) => {
     if (req.url!.endsWith('.html')) {
-      await sendHtml(server, req, res, renderAppHtml(ctx, server.config.base))
+      await sendHtml(server, req, res, renderAppHtml(ctx, server))
       return
     }
     next()

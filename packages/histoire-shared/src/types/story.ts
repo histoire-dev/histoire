@@ -1,4 +1,4 @@
-import type { HistoireMatrixHint, HistoireMatrixValue, HistoireStoryFileOrigin } from '@histoire/protocol'
+import type { HistoireMatrixDeclaration, HistoireMatrixValue, HistoireStoryFileOrigin } from '@histoire/protocol'
 
 export interface StoryFile {
   id: string
@@ -49,7 +49,7 @@ export interface StoryProps extends CommonProps, InheritedProps {
   layout?: StoryLayout
   docsOnly?: boolean
   /** Explicit finite values for props matrix axes. */
-  matrix?: HistoireMatrixHint
+  matrix?: HistoireMatrixDeclaration
 }
 
 export interface CommonMeta {}
@@ -63,7 +63,7 @@ export interface Story {
   variants: Variant[]
   layout?: StoryLayout
   /** Explicit finite values for props matrix axes. */
-  matrix?: HistoireMatrixHint
+  matrix?: HistoireMatrixDeclaration
   icon?: string
   iconColor?: string
   docsOnly?: boolean
@@ -182,7 +182,7 @@ export interface ServerStory {
   /** Story or defaultStoryProps declared layout before collection fallback. */
   layoutExplicit?: boolean
   /** Explicit finite values for props matrix axes. */
-  matrix?: HistoireMatrixHint
+  matrix?: HistoireMatrixDeclaration
   icon?: string
   iconColor?: string
   docsOnly?: boolean
