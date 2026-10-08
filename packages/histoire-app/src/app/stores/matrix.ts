@@ -1,40 +1,33 @@
 import type { HistoireReadonly, HistoireSnapshot } from '@histoire/protocol'
 import type { InjectionKey } from 'vue'
 import type { MatrixAxis, MatrixProp, MatrixValue } from '../util/matrix.js'
+import type { MatrixPreferences, MatrixStorage } from './matrix-preferences.js'
+import { getHistoireNumericMatrixValues } from '@histoire/protocol'
 import { computed, inject, provide, shallowRef } from 'vue'
-import { discoverMatrixAxes, discoverMatrixProps, expandMatrixCells, filterMatrixValues, isMatrixPropName, resolveMatrixAxisPair } from '../util/matrix.js'
+import { normalizeMatrixCustomValues } from '../util/matrix-values.js'
+import { discoverMatrixAxes, discoverMatrixProps, expandMatrixCells, filterMatrixValues, isMatrixPropName } from '../util/matrix.js'
+import { createMatrixAxisEditor } from './matrix-axis-editor.js'
+import { composeMatrixAxes, matrixAxisPreferences, resolveMatrixSelection, validateMatrixDomainEdit } from './matrix-domains.js'
+import { isNumericMatrixAxis, restoreMatrixPreferences } from './matrix-preferences.js'
 import { createMatrixRuntime } from './matrix-runtime.js'
 
-/** Saved per-story choices exclude transient selected cell and runtime owners. */
-export interface MatrixPreferences {
-  /** Row axis prop name. */
-  rows: string
-  /** Column axis prop name. */
-  cols: string
-  /** Optional row subset; empty means intentionally no cells. */
-  rowValues?: readonly MatrixValue[]
-  /** Optional column subset. */
-  colValues?: readonly MatrixValue[]
-  /** Explicit user overrides; preset defaults stay outside persisted state. */
-  base: Record<string, unknown>
-}
-
-/** Optional storage port follows same caller ownership as shell. */
-interface MatrixStorage {
-  /** Read preference JSON. */
-  getItem: (key: string) => string | null
-  /** Persist preference JSON. */
-  setItem: (key: string, value: string) => void
-}
+export type { MatrixPreferences } from './matrix-preferences.js'
 
 /** Independent backing shared by matrix canvas and inspector in one workbench. */
-export function createMatrixStore(options: { storage?: MatrixStorage } = {}) {
+export function createMatrixStore(options: {
+  /** Optional caller-owned local preference storage. */
+  storage?: MatrixStorage
+  /** Current descriptor samples; absent on disconnected or older sources. */
+  numericValues?: () => readonly number[] | undefined
+} = {}) {
   const storyId = shallowRef('')
-  const axes = shallowRef<readonly MatrixAxis[]>([])
+  const defaultAxes = shallowRef<readonly MatrixAxis[]>([])
   const props = shallowRef<readonly MatrixProp[]>([])
   /** A ready projection can contain zero axes; availability is a separate question. */
   const metadataReady = shallowRef(false)
   const state = shallowRef<MatrixPreferences>({ rows: '', cols: '', base: {} })
+  let hintedNames: readonly string[] = []
+  const axes = computed(() => composeMatrixAxes(defaultAxes.value, props.value, state.value, hintedNames))
   const provisional = shallowRef<Pick<MatrixPreferences, 'rows' | 'cols' | 'rowValues' | 'colValues'>>()
   const effective = computed(() => ({ ...state.value, ...provisional.value }))
   const seed = shallowRef<Record<string, unknown>>({})
@@ -42,12 +35,14 @@ export function createMatrixStore(options: { storage?: MatrixStorage } = {}) {
   const records = new Map<string, MatrixPreferences>()
   const sources = new Map<string, () => Promise<string>>()
   const sourceRevision = shallowRef(0)
+  /** Explicit domain edits publish axis-name changes independently of passive discovery. */
+  const axisRevision = shallowRef(0)
   let storage = options.storage
   let closed = false
-  let hintedNames: readonly string[] = []
   let currentSnapshot: HistoireReadonly<HistoireSnapshot> | undefined
   let currentQuery: { rows?: string, cols?: string } = {}
   const runtime = createMatrixRuntime(refresh)
+  const axisEditor = createMatrixAxisEditor(storyId)
   const usableAxes = computed(() => axes.value.filter(axis => axis.values.length >= 2))
   const rowAxis = computed(() => usableAxes.value.find(axis => axis.name === effective.value.rows))
   const colAxis = computed(() => usableAxes.value.find(axis => axis.name === effective.value.cols))
@@ -76,38 +71,26 @@ export function createMatrixStore(options: { storage?: MatrixStorage } = {}) {
     if (!cells.value.some(cell => cell.key === selectedKey.value)) selectedKey.value = undefined
     save()
   }
-  /** Value filters follow exact axis names across provisional fallback and explicit swaps. */
-  function axisPreferences(rows: string, cols: string, previous: MatrixPreferences) {
-    const filters = new Map([[previous.rows, previous.rowValues], [previous.cols, previous.colValues]])
-    const rowValues = filters.get(rows)
-    const colValues = filters.get(cols)
-    return {
-      rows,
-      cols,
-      rowValues: rowValues === undefined ? undefined : filterMatrixValues(axes.value.find(axis => axis.name === rows)!, rowValues),
-      colValues: colValues === undefined ? undefined : filterMatrixValues(axes.value.find(axis => axis.name === cols)!, colValues),
-    }
-  }
   /** Axis names resolve independently so a valid column survives invalid rows. */
   function selectAxes(rows?: string, cols?: string): void {
-    const pair = resolveMatrixAxisPair(axes.value, { rows, cols }, effective.value, hintedNames)
-    if (!pair) return
+    if (usableAxes.value.length < 2) return
+    const pair = resolveMatrixSelection(axes.value, { rows, cols }, effective.value, hintedNames)
     const { rows: row, cols: col } = pair
     const base = Object.fromEntries(Object.entries(state.value.base).filter(([name]) => name !== row && name !== col))
-    update({ ...axisPreferences(row, col, effective.value), base })
+    update({ ...matrixAxisPreferences(axes.value, row, col, effective.value), base })
   }
   /** Source publications update candidates, retaining saved edits per exact story. */
   function activate(id: string, candidates: readonly MatrixAxis[], base: Record<string, unknown>, query: { rows?: string, cols?: string } = {}, hints: readonly string[] = [], fields?: readonly MatrixProp[], ready = true): void {
     if (closed) return
     const changed = storyId.value !== id
     storyId.value = id
-    axes.value = candidates
+    hintedNames = hints
+    defaultAxes.value = candidates
     props.value = fields ?? discoverMatrixProps(base)
     metadataReady.value = ready
-    hintedNames = hints
     // Preset/runtime values seed untouched props. Only explicit edits survive
     // a preset switch, and defaults are never mistaken for persisted overrides.
-    seed.value = Object.fromEntries(Object.entries(base).filter(([name]) => isMatrixPropName(name)))
+    seed.value = Object.fromEntries(Object.entries(base).filter(([name, value]) => isMatrixPropName(name) && value !== undefined))
     if (changed) {
       selectedKey.value = undefined
       let saved = records.get(id)
@@ -118,7 +101,7 @@ export function createMatrixStore(options: { storage?: MatrixStorage } = {}) {
         }
         catch { /* Unknown or malformed preferences use current source defaults. */ }
       }
-      state.value = { rows: typeof saved?.rows === 'string' ? saved.rows : '', cols: typeof saved?.cols === 'string' ? saved.cols : '', rowValues: Array.isArray(saved?.rowValues) ? saved.rowValues : undefined, colValues: Array.isArray(saved?.colValues) ? saved.colValues : undefined, base: Object.fromEntries(Object.entries(saved?.base ?? {}).filter(([name]) => isMatrixPropName(name))) }
+      state.value = restoreMatrixPreferences(saved)
     }
     provisional.value = undefined
     if (ready) {
@@ -127,8 +110,8 @@ export function createMatrixStore(options: { storage?: MatrixStorage } = {}) {
     else {
       // Hints can render immediately, but cannot replace preferences belonging
       // to automatic domains that have not arrived from their runtime yet.
-      const pair = resolveMatrixAxisPair(axes.value, query, state.value, hintedNames)
-      if (pair) provisional.value = axisPreferences(pair.rows, pair.cols, state.value)
+      const pair = resolveMatrixSelection(axes.value, query, state.value, hintedNames)
+      if (pair.rows && pair.cols) provisional.value = matrixAxisPreferences(axes.value, pair.rows, pair.cols, state.value)
     }
     if (!cells.value.some(cell => cell.key === selectedKey.value)) selectedKey.value = undefined
   }
@@ -139,7 +122,9 @@ export function createMatrixStore(options: { storage?: MatrixStorage } = {}) {
     const story = snapshot.catalog.stories.find(item => item.id === snapshot.selection?.storyId)
     if (!story) {
       storyId.value = ''
-      axes.value = []
+      state.value = { rows: '', cols: '', base: {} }
+      seed.value = {}
+      defaultAxes.value = []
       props.value = []
       metadataReady.value = false
       selectedKey.value = undefined
@@ -147,9 +132,9 @@ export function createMatrixStore(options: { storage?: MatrixStorage } = {}) {
       return
     }
     const projection = runtime.getProjection()
-    const definitions = [{ props: projection?.axes.map(axis => ({ name: axis.name, values: axis.values })) ?? [] }]
+    const definitions = [{ props: projection?.props.map(prop => ({ name: prop.name, types: prop.numeric ? ['number'] : [], values: projection.axes.find(axis => axis.name === prop.name)?.values })) ?? [] }]
     const hints = snapshot.status === 'ready' && !snapshot.stale && snapshot.source ? story.matrix : undefined
-    activate(story.id, discoverMatrixAxes(definitions, hints), projection?.base ?? {}, currentQuery, Object.keys(hints?.axes ?? {}), projection?.props ?? [], Boolean(projection))
+    activate(story.id, discoverMatrixAxes(definitions, hints, undefined, { numericValues: options.numericValues?.() }), projection?.base ?? {}, currentQuery, Object.keys(hints?.axes ?? {}), projection?.props ?? [], Boolean(projection))
   }
   /** All arrangements discover candidates using exact source, runtime and target ownership. */
   function synchronize(snapshot: HistoireReadonly<HistoireSnapshot>, query: { rows?: string, cols?: string } = {}): void {
@@ -163,7 +148,51 @@ export function createMatrixStore(options: { storage?: MatrixStorage } = {}) {
   function setFilter(dimension: 'rows' | 'cols', values: readonly MatrixValue[]): void {
     const axis = dimension === 'rows' ? rowAxis.value : colAxis.value
     if (!axis) return
-    update({ ...axisPreferences(effective.value.rows, effective.value.cols, effective.value), ...(dimension === 'rows' ? { rowValues: filterMatrixValues(axis, values) } : { colValues: filterMatrixValues(axis, values) }) })
+    update({ ...matrixAxisPreferences(axes.value, effective.value.rows, effective.value.cols, effective.value), ...(dimension === 'rows' ? { rowValues: filterMatrixValues(axis, values) } : { colValues: filterMatrixValues(axis, values) }) })
+  }
+  /** Validate complete candidate/cell projection before publishing a domain edit. */
+  function publishDomain(name: string, patch: Partial<MatrixPreferences>): void {
+    const next = { ...state.value, ...effective.value, ...patch, ...(effective.value.rows === name ? { rowValues: undefined } : {}), ...(effective.value.cols === name ? { colValues: undefined } : {}) }
+    const candidates = composeMatrixAxes(defaultAxes.value, props.value, next, hintedNames)
+    const pair = resolveMatrixSelection(candidates, {}, next, hintedNames)
+    const value = { ...next, ...matrixAxisPreferences(candidates, pair.rows, pair.cols, next) }
+    validateMatrixDomainEdit(storyId.value, candidates, value, { ...seed.value, ...value.base })
+    const changed = pair.rows !== effective.value.rows || pair.cols !== effective.value.cols
+    update(value)
+    if (changed) axisRevision.value++
+  }
+  /** User-authored domains can introduce literal props absent from runtime metadata. */
+  function setCustomAxis(input: string, values: readonly MatrixValue[]): void {
+    if (closed || !storyId.value) return
+    const name = input.trim()
+    if (!isMatrixPropName(name)) throw new Error('Enter a valid prop name')
+    const customAxes = { ...state.value.customAxes, [name]: normalizeMatrixCustomValues(values) }
+    if (!Object.hasOwn(state.value.customAxes ?? {}, name) && new Set([...hintedNames, ...Object.keys(customAxes)]).size > 32) throw new Error('Matrix supports at most 32 axes')
+    const numericValues = { ...state.value.numericValues }
+    delete numericValues[name]
+    publishDomain(name, { customAxes, numericValues })
+  }
+  /** Removing a local domain restores latest source defaults, or removes its axis. */
+  function removeCustomAxis(name: string): void {
+    if (closed) return
+    const customAxes = { ...state.value.customAxes }
+    const numericValues = { ...state.value.numericValues }
+    delete customAxes[name]
+    delete numericValues[name]
+    publishDomain(name, { customAxes, numericValues })
+  }
+  /** Numeric editing shares custom entries when user explicitly introduced this axis. */
+  function setNumericValues(name: string, input: readonly number[]): void {
+    const values = getHistoireNumericMatrixValues(input)
+    if (!values) throw new Error('Values must contain 2–64 distinct finite numbers')
+    if (state.value.customAxes?.[name]) return setCustomAxis(name, values)
+    const axis = defaultAxes.value.find(axis => axis.name === name)
+    if (closed || !axis || !isNumericMatrixAxis(axis, props.value)) return
+    publishDomain(name, { numericValues: { ...state.value.numericValues, [name]: values } })
+  }
+  /** Reset removes local domain edits and restores current source values. */
+  function resetNumericValues(name: string): void {
+    removeCustomAxis(name)
   }
   /** Base props never shadow selected axes or internal control definitions. */
   function setBase(name: string, value: unknown): void {
@@ -172,7 +201,7 @@ export function createMatrixStore(options: { storage?: MatrixStorage } = {}) {
   }
   /** Reset only shared overrides; canonical runtime state remains unchanged. */
   function resetBase(base: Record<string, unknown>): void {
-    seed.value = Object.fromEntries(Object.entries(base).filter(([name]) => isMatrixPropName(name)))
+    seed.value = Object.fromEntries(Object.entries(base).filter(([name, value]) => isMatrixPropName(name) && value !== undefined))
     update({ base: {} })
   }
   /** Swap also transfers each axis filter rather than positional subsets. */
@@ -218,7 +247,7 @@ export function createMatrixStore(options: { storage?: MatrixStorage } = {}) {
     records.clear()
     storage = undefined
   }
-  return { storyId: computed(() => storyId.value), axes: computed(() => axes.value), props: computed(() => props.value), metadataReady: computed(() => metadataReady.value), usableAxes, rowAxis, colAxis, cells, selectedCell, canCopy, rows: computed(() => effective.value.rows), cols: computed(() => effective.value.cols), rowValues: computed(() => effective.value.rowValues), colValues: computed(() => effective.value.colValues), base: baseProps, available: computed(() => usableAxes.value.length >= 2), activate, synchronize, selectAxes, setFilter, setBase, resetBase, swapAxes, selectCell, registerSource, sourceForSelected, registerRuntimeObserver: runtime.registerRuntimeObserver, restore, close }
+  return { storyId: computed(() => storyId.value), axes, axisRevision: computed(() => axisRevision.value), customAxes: computed(() => Object.freeze({ ...state.value.customAxes })), props: computed(() => props.value), metadataReady: computed(() => metadataReady.value), usableAxes, rowAxis, colAxis, cells, selectedCell, canCopy, rows: computed(() => effective.value.rows), cols: computed(() => effective.value.cols), rowValues: computed(() => effective.value.rowValues), colValues: computed(() => effective.value.colValues), base: baseProps, available: computed(() => usableAxes.value.length >= 2), activate, synchronize, selectAxes, setFilter, setCustomAxis, removeCustomAxis, setNumericValues, resetNumericValues, setBase, resetBase, swapAxes, selectCell, registerSource, sourceForSelected, registerRuntimeObserver: runtime.registerRuntimeObserver, restore, close, axisEditor }
 }
 
 /** Injectable state belongs to one workbench, independent of canonical selection. */

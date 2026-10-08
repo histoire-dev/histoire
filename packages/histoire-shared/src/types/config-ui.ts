@@ -24,6 +24,11 @@ export interface HistoireUiConfig {
     defaultArrange?: 'single' | 'grid' | 'list'
     /** Maximum simultaneously live preview frames. Defaults to 6. */
     frameBudget?: number
+    /** Defaults for props matrix sampling. */
+    matrix?: {
+      /** Ordered samples for open numeric props; 2–64 distinct finite values. */
+      numericValues?: readonly number[]
+    }
   }
   /** ACP remains disabled until explicitly enabled. */
   agents?: {

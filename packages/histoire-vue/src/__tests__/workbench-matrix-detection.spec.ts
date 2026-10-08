@@ -3,7 +3,7 @@ import { createMatrixStore } from '../../../histoire-app/src/app/stores/matrix.j
 import { discoverMatrixAxes, resolveMatrixAxisPair } from '../../../histoire-app/src/app/util/matrix.js'
 
 describe('automatic matrix domains', () => {
-  it('detects pure Boolean declarations and own root state without guessing open domains', () => {
+  it('detects Boolean domains and numeric samples without guessing free text', () => {
     const definitions = [{ props: [
       { name: 'enabled', types: ['boolean'] },
       { name: 'mixed', types: ['boolean', 'string'] },
@@ -12,6 +12,7 @@ describe('automatic matrix domains', () => {
     ] }]
     expect(discoverMatrixAxes(definitions, undefined, { emphasized: true, mixed: false, count: 1, nested: { active: true }, _hPrivate: false })).toEqual([
       { name: 'enabled', values: [false, true] },
+      { name: 'count', values: [0, 1, 2, 5, 10] },
       { name: 'emphasized', values: [false, true] },
     ])
     expect(discoverMatrixAxes(undefined, undefined, [false, true])).toEqual([])

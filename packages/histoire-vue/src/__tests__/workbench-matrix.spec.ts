@@ -11,10 +11,11 @@ import { MEASURE_REQUEST } from '../../../histoire-shared/src/types/preview-mess
 describe('props matrix behavior', () => {
   const definitions = [{ index: 0, name: 'Button', props: [{ name: 'size', types: ['string'], values: ['sm', 'md'] }, { name: 'disabled', types: ['boolean'] }, { name: 'label', types: ['string'] }, { name: 'count', types: ['number'] }] }]
 
-  it('discovers finite definitions and explicit hints without guessing free text or numbers', () => {
+  it('discovers finite definitions, numeric samples and explicit hints without guessing free text', () => {
     expect(discoverMatrixAxes(definitions, { axes: { variant: ['primary', 'danger'], size: ['sm', 'md', 'lg'] } })).toEqual([
       { name: 'size', values: ['sm', 'md', 'lg'] },
       { name: 'disabled', values: [false, true] },
+      { name: 'count', values: [0, 1, 2, 5, 10] },
       { name: 'variant', values: ['primary', 'danger'] },
     ])
   })

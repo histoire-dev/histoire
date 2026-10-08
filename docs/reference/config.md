@@ -626,6 +626,13 @@ export default defineConfig({
 })
 ```
 
+## `ui.matrix.numericValues`
+
+- Type: `number[]`
+- Default: `[0, 1, 2, 5, 10]`
+
+Ordered samples used by props matrix for numeric props without a complete runtime domain or explicit story values. Require 2–64 distinct finite numbers; duplicates are removed while preserving order. Invalid lists fail config resolution. Saved app overrides take precedence over story `matrix.axes` arrays or ranges, which override complete runtime domains and project samples. Resetting an axis restores its current source values. Same defaults apply to dev, static, and embedded books. See [props matrix](../guide/ui-matrix.md#numeric-values).
+
 ## `ui.frameBudget`
 
 `number` - Default: `6`

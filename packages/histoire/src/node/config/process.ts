@@ -2,8 +2,9 @@ import type { Context } from '../context.js'
 import fs from 'node:fs'
 import path from 'pathe'
 import pc from 'picocolors'
-import { resolveEmbedConfig } from './embed.js'
 import { getTestMaxWorkers } from '../util/test-timeouts.js'
+import { resolveEmbedConfig } from './embed.js'
+import { resolveMatrixNumericValues } from './matrix.js'
 
 /**
  * Resolves the file paths held by the config against the project root and
@@ -15,6 +16,7 @@ import { getTestMaxWorkers } from '../util/test-timeouts.js'
 export async function processConfig(ctx: Context) {
   const { config, root } = ctx
   config.embed = resolveEmbedConfig(config.embed)
+  config.ui = { ...config.ui, matrix: { ...config.ui?.matrix, numericValues: resolveMatrixNumericValues(config.ui?.matrix?.numericValues) } }
   getTestMaxWorkers(ctx)
 
   // Resolve files paths

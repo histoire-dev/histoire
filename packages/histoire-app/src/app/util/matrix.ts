@@ -1,8 +1,9 @@
-import type { HistoireMatrixValue } from '@histoire/protocol'
-import { getHistoireFiniteMatrixValues, getHistoireMatrixValues, isHistoireMatrixPropName } from '@histoire/protocol'
+import type { HistoireJsonValue } from '@histoire/protocol'
+import { getHistoireFiniteMatrixValues, HISTOIRE_MATRIX_NUMERIC_VALUES, isHistoireMatrixPropName, normalizeHistoireMatrixHint } from '@histoire/protocol'
+import { equalMatrixValue, matrixValueKey } from './matrix-values.js'
 
 /** Finite scalar values have stable identity across URL/storage/runtime boundaries. */
-export type MatrixValue = HistoireMatrixValue
+export type MatrixValue = HistoireJsonValue
 
 /** A discoverable prop with an explicit finite domain. */
 export interface MatrixAxis {
@@ -32,6 +33,8 @@ export interface MatrixProp {
   value: unknown
   /** Runtime type for editor selection. */
   type: string
+  /** Exclusive numeric declaration or finite unowned root numeric state. */
+  numeric?: boolean
 }
 
 /** User-provided property names cannot select internal/prototype state. */
@@ -57,8 +60,15 @@ function components(definitions: unknown): { index?: number, props: { name: stri
   }))
 }
 
-/** Boolean definitions, enum values and explicit story hints define axes. */
-export function discoverMatrixAxes(definitions: unknown, hint?: { axes?: Record<string, unknown> }, state?: unknown): MatrixAxis[] {
+/** Numeric sampling can be disabled when capturing source-owned finite metadata. */
+interface MatrixDiscoveryOptions {
+  /** Project samples; false retains only complete finite runtime domains. */
+  numericValues?: readonly number[] | false
+}
+
+/** Finite definitions, numeric samples and explicit story hints define axes. */
+export function discoverMatrixAxes(definitions: unknown, hint?: { axes?: Record<string, unknown> }, state?: unknown, options: MatrixDiscoveryOptions = {}): MatrixAxis[] {
+  const numericValues = options.numericValues === false ? undefined : options.numericValues ?? HISTOIRE_MATRIX_NUMERIC_VALUES
   const axes = new Map<string, MatrixAxis>()
   const owners = new Set<string>()
   const hintedNames = new Set<string>()
@@ -66,15 +76,20 @@ export function discoverMatrixAxes(definitions: unknown, hint?: { axes?: Record<
     for (const prop of component.props) {
       if (!isMatrixPropName(prop.name) || owners.has(prop.name)) continue
       owners.add(prop.name)
-      const values = getHistoireFiniteMatrixValues(prop.values) ?? (prop.types?.length && prop.types.every(type => type === 'boolean') ? [false, true] : undefined)
+      let values: readonly MatrixValue[] | undefined = getHistoireFiniteMatrixValues(prop.values)
+      if (!values && prop.types?.length) {
+        if (prop.types.every(type => type === 'boolean')) values = [false, true]
+        else if (prop.types.every(type => type === 'number')) values = numericValues
+      }
       if (values?.length) axes.set(prop.name, { name: prop.name, values })
     }
   }
   for (const [name, descriptor] of Object.entries(Object.getOwnPropertyDescriptors(getMatrixState(state)))) {
-    if (descriptor.enumerable && isMatrixPropName(name) && !owners.has(name) && typeof descriptor.value === 'boolean') axes.set(name, { name, values: [false, true] })
+    if (!descriptor.enumerable || !isMatrixPropName(name) || owners.has(name)) continue
+    if (typeof descriptor.value === 'boolean') axes.set(name, { name, values: [false, true] })
+    else if (typeof descriptor.value === 'number' && Number.isFinite(descriptor.value) && numericValues) axes.set(name, { name, values: numericValues })
   }
-  for (const [name, input] of Object.entries(hint?.axes ?? {})) {
-    const values = getHistoireMatrixValues(input)
+  for (const [name, values] of Object.entries(normalizeHistoireMatrixHint(hint)?.axes ?? {})) {
     if (isMatrixPropName(name) && values?.length) {
       axes.set(name, { name, values })
       hintedNames.add(name)
@@ -112,24 +127,30 @@ export function discoverMatrixProps(input: unknown = {}): MatrixProp[] {
     for (const prop of component.props) {
       if (!isMatrixPropName(prop.name) || props.has(prop.name)) continue
       const owner = overrides?.[String(component.index ?? 0)]
-      const value = owner && Object.hasOwn(owner, prop.name) ? owner[prop.name] : Object.hasOwn(prop, 'value') ? prop.value : Object.hasOwn(state, prop.name) ? state[prop.name] : prop.default
-      props.set(prop.name, { name: prop.name, value, type: prop.types?.[0] ?? typeof value })
+      // Frameworks serialize factories as source text. That text is metadata,
+      // never an actual Object/Array default or something discovery may execute.
+      const structured = prop.types?.length && prop.types.every(type => type === 'object' || type === 'array')
+      const fallback = structured && prop.default !== null && typeof prop.default !== 'object' ? undefined : prop.default
+      const value = owner && Object.hasOwn(owner, prop.name) ? owner[prop.name] : Object.hasOwn(prop, 'value') ? prop.value : Object.hasOwn(state, prop.name) ? state[prop.name] : fallback
+      props.set(prop.name, { name: prop.name, value, type: prop.types?.[0] ?? typeof value, ...(prop.types?.length && prop.types.every(type => type === 'number') ? { numeric: true } : {}) })
     }
   }
-  for (const [name, value] of Object.entries(state)) {
-    if (isMatrixPropName(name) && !props.has(name)) props.set(name, { name, value, type: typeof value })
+  for (const [name, descriptor] of Object.entries(Object.getOwnPropertyDescriptors(state))) {
+    if (!descriptor.enumerable || !Object.hasOwn(descriptor, 'value')) continue
+    const value = descriptor.value
+    if (isMatrixPropName(name) && !props.has(name)) props.set(name, { name, value, type: typeof value, ...(typeof value === 'number' && Number.isFinite(value) ? { numeric: true } : {}) })
   }
   return [...props.values()]
 }
 
 /** Typed JSON key avoids collisions such as number 1 and string "1". */
 export function matrixCellKey(storyId: string, rows: string, row: MatrixValue, cols: string, col: MatrixValue): string {
-  return JSON.stringify([storyId, rows, row, cols, col])
+  return `[${JSON.stringify(storyId)},${JSON.stringify(rows)},${matrixValueKey(row)},${JSON.stringify(cols)},${matrixValueKey(col)}]`
 }
 
 /** Missing filter means all values; empty filter intentionally means no cells. */
 export function filterMatrixValues(axis: MatrixAxis, filter?: readonly MatrixValue[]): readonly MatrixValue[] {
-  return filter === undefined ? axis.values : axis.values.filter(value => filter.some(item => Object.is(item, value)))
+  return filter === undefined ? axis.values : axis.values.filter(value => filter.some(item => equalMatrixValue(item, value)))
 }
 
 /** Axis props override shared base props, without mutating either input. */
@@ -138,7 +159,7 @@ export function expandMatrixCells(storyId: string, rows: MatrixAxis, cols: Matri
     key: matrixCellKey(storyId, rows.name, row, cols.name, col),
     row,
     col,
-    props: { ...base, [rows.name]: row, [cols.name]: col },
+    props: { ...structuredClone(base), [rows.name]: structuredClone(row), [cols.name]: structuredClone(col) },
   })))
 }
 

@@ -2,6 +2,7 @@
 import type { MatrixProp, MatrixValue } from '../../../util/matrix.js'
 import { HstNumber, HstSelect, HstSwitch, HstText, HstTextarea } from '@histoire/controls/vue'
 import { computed, ref } from 'vue'
+import { equalMatrixValue, formatMatrixValue } from '../../../util/matrix-values.js'
 
 const props = defineProps<{
   /** Discovered editor label and runtime type. */
@@ -15,6 +16,13 @@ const props = defineProps<{
 }>()
 const emit = defineEmits<{ update: [value: unknown] }>()
 const error = ref('')
+/** Select must use current domain instance after persisted object values are cloned. */
+const selected = computed(() => props.values?.find((value) => {
+  try {
+    return equalMatrixValue(value, props.value as MatrixValue)
+  }
+  catch { return false }
+}) ?? props.value)
 const text = computed(() => {
   if (typeof props.value === 'string') return props.value
   try {
@@ -41,7 +49,7 @@ function number(value: number): void {
 <template>
   <div class="histoire-matrix-base-prop" :data-edited="edited">
     <span class="histoire-matrix-prop-label"><code>{{ prop.name }}<small v-if="edited"> · edited</small></code><span>{{ prop.type }}</span></span>
-    <HstSelect v-if="values?.length" layout="inline" :aria-label="prop.name" :model-value="value" :options="values.map(option => ({ value: option, label: String(option) }))" @update:model-value="emit('update', $event)" />
+    <HstSelect v-if="values?.length" layout="inline" :aria-label="prop.name" :model-value="selected" :options="values.map(option => ({ value: option, label: formatMatrixValue(option) }))" @update:model-value="emit('update', $event)" />
     <HstSwitch v-else-if="prop.type === 'boolean' || typeof value === 'boolean'" layout="inline" :aria-label="prop.name" :model-value="Boolean(value)" @update:model-value="emit('update', $event)" />
     <HstNumber v-else-if="prop.type === 'number' || typeof value === 'number'" layout="inline" :aria-label="prop.name" :model-value="value as number" @update:model-value="number" />
     <HstText v-else-if="prop.type === 'string' || typeof value === 'string' || value === undefined" layout="inline" :aria-label="prop.name" type="text" :model-value="String(value ?? '')" @update:model-value="emit('update', $event)" />

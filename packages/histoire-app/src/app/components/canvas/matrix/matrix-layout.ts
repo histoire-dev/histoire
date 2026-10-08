@@ -1,6 +1,7 @@
 import type { MatrixCellData, MatrixValue } from '../../../util/matrix.js'
 import type { CanvasFrameLayout } from '../frame-layout.js'
 import type { CanvasRect, CanvasSize } from '../pan/usePanZoom.js'
+import { equalMatrixValue } from '../../../util/matrix-values.js'
 import { canvasFrameBounds } from '../frame-layout.js'
 import { clampZoom } from '../pan/usePanZoom.js'
 
@@ -36,8 +37,8 @@ export function layoutMatrixFrames(cells: readonly MatrixCellData[], options: Ma
     id: cell.key,
     storyId: options.storyId,
     variantId: options.variantId,
-    x: MATRIX_ROW_GUTTER / scale + options.cols.findIndex(value => Object.is(value, cell.col)) * (options.size.width + MATRIX_GAP / scale),
-    y: MATRIX_COLUMN_HEADER / scale + options.rows.findIndex(value => Object.is(value, cell.row)) * (options.size.height + MATRIX_GAP / scale),
+    x: MATRIX_ROW_GUTTER / scale + options.cols.findIndex(value => equalMatrixValue(value, cell.col)) * (options.size.width + MATRIX_GAP / scale),
+    y: MATRIX_COLUMN_HEADER / scale + options.rows.findIndex(value => equalMatrixValue(value, cell.row)) * (options.size.height + MATRIX_GAP / scale),
     width: options.size.width,
     height: options.size.height,
   }))

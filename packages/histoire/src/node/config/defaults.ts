@@ -1,4 +1,5 @@
 import type { HistoireConfig } from '@histoire/shared'
+import { HISTOIRE_MATRIX_NUMERIC_VALUES } from '@histoire/protocol'
 import { DEFAULT_THEME_FONTS } from '@histoire/shared'
 import { tailwindTokens } from '../builtin-plugins/tailwind-tokens.js'
 import { vanillaSupport } from '../builtin-plugins/vanilla-support/plugin.js'
@@ -44,7 +45,7 @@ export function getDefaultConfig(): HistoireConfig {
       storeColorScheme: true,
       darkClass: 'dark',
     },
-    ui: { defaultArrange: 'grid', frameBudget: 6 },
+    ui: { defaultArrange: 'grid', frameBudget: 6, matrix: { numericValues: [...HISTOIRE_MATRIX_NUMERIC_VALUES] } },
     agents: { enabled: false, presets: [], permissions: { fileEdits: 'ask', terminal: 'ask' } },
     comments: { enabled: true, file: '.histoire/comments.json' },
     responsivePresets: [

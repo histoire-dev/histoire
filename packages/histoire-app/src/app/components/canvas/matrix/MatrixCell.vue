@@ -8,6 +8,7 @@ import { useCanvasFrameBackground, useCanvasFrames, useCanvasStore } from '../..
 import { useContextMenu } from '../../../composables/context-menu.js'
 import { useMatrixStore } from '../../../stores/matrix.js'
 import { getBackgroundStyle } from '../../../util/background.js'
+import { formatMatrixValue } from '../../../util/matrix-values.js'
 import CanvasLoadingIndicator from '../CanvasLoadingIndicator.vue'
 import CanvasReplicaPreview from '../CanvasReplicaPreview.vue'
 import { isFrameMenuShortcut, openFrameMenu } from '../frame-menu.js'
@@ -83,7 +84,7 @@ onBeforeUnmount(() => {
     <div class="histoire-matrix-cell-content" :style="style">
       <CanvasReplicaPreview v-if="live" :key="variantId" ref="preview" :frame-id="frame.id" :story-id="frame.storyId" :variant-id="variantId" :preview-base="previewBase" :props-override="cell.props" @status="updateStatus" />
     </div>
-    <button class="histoire-matrix-cell-select" type="button" :aria-label="`Select matrix cell ${cell.row} · ${cell.col}`" :aria-pressed="matrix.selectedCell.value?.key === cell.key" @click="matrix.selectCell(cell.key)" @keydown="onKeyDown" />
+    <button class="histoire-matrix-cell-select" type="button" :aria-label="`Select matrix cell ${formatMatrixValue(cell.row)} · ${formatMatrixValue(cell.col)}`" :aria-pressed="matrix.selectedCell.value?.key === cell.key" @click="matrix.selectCell(cell.key)" @keydown="onKeyDown" />
     <span v-if="!live" class="histoire-matrix-cell-placeholder">Not rendered</span>
     <div v-else-if="status === 'loading'" class="histoire-matrix-cell-loading" role="status" aria-label="Loading variant">
       <CanvasLoadingIndicator />

@@ -32,9 +32,11 @@ const props = defineProps<{
   /** Current hidden discovery runtime failed before usable axes arrived. */
   discoveryFailed?: boolean
 }>()
-const emit = defineEmits<{ axes: [value: { rows: string, cols: string }], error: [error: unknown] }>()
+const emit = defineEmits<{ axes: [value: { rows: string, cols: string }], error: [error: unknown], addAxis: [] }>()
 const canvas = useCanvasStore()
 const matrix = useMatrixStore()
+// Only explicit domain edits publish URL intent; source discovery remains passive.
+watch(matrix.axisRevision, () => emit('axes', { rows: matrix.rows.value, cols: matrix.cols.value }), { flush: 'post' })
 onBeforeUnmount(watchMatrixFrameSelection(matrix, canvas))
 const context = useHistoireContext()
 const { story, variant } = useSelection()
@@ -95,7 +97,7 @@ onMounted(() => {
       <MatrixAxisBar @axes="emit('axes', $event)" />
     </div>
     <div v-if="!uiHidden && (!matrix.available.value || !matrix.cells.value.length)" class="histoire-matrix-empty">
-      <MatrixAvailabilityState :failed="discoveryFailed" />
+      <MatrixAvailabilityState :failed="discoveryFailed" @add-axis="emit('addAxis')" />
     </div>
     <div v-else class="histoire-matrix-board" :style="{ top: `${topInset}px` }">
       <!-- Keep world coordinates unchanged while clipping beneath fixed chrome. -->
@@ -119,4 +121,6 @@ onMounted(() => {
 .histoire-matrix-col-label { text-align: center; }
 .histoire-matrix-empty { position: absolute; inset: 184px calc(var(--histoire-canvas-inspector-reserve) + var(--histoire-canvas-info-inset)) 24px var(--histoire-canvas-info-inset); display: grid; place-items: center; overflow: auto; }
 .histoire-matrix-empty :deep(.workbench-state) { max-width: 52ch; margin: 24px 0; }
+/* Guidance overlays the pannable canvas; only its actions take pointer input. */
+.histoire-matrix-empty :deep(.workbench-empty-state-actions) { pointer-events: auto; }
 </style>

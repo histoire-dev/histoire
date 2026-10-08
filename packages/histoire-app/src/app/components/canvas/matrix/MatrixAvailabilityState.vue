@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { BuiltinIcon, HstButton } from '@histoire/controls/vue'
 import { useMatrixStore } from '../../../stores/matrix.js'
 import WorkbenchEmptyState from '../../shell/WorkbenchEmptyState.vue'
 import WorkbenchLoadingState from '../../shell/WorkbenchLoadingState.vue'
@@ -7,7 +8,17 @@ defineProps<{
   /** Current discovery runtime failed before finite metadata was available. */
   failed?: boolean
 }>()
+const emit = defineEmits<{
+  /** New-axis form opened; host reveals the inspector Props tab containing it. */
+  addAxis: []
+}>()
 const matrix = useMatrixStore()
+
+/** Open the custom axis form shared with the inspector. */
+function addAxis(): void {
+  matrix.axisEditor.add()
+  emit('addAxis')
+}
 </script>
 
 <template>
@@ -18,13 +29,17 @@ const matrix = useMatrixStore()
     <WorkbenchLoadingState v-else-if="!matrix.metadataReady.value" title="Reading prop axes" />
     <WorkbenchEmptyState v-else icon="data-table" title="Matrix needs two prop axes">
       <template v-if="matrix.usableAxes.value.length">
-        Found 1 usable axis: <code>{{ matrix.usableAxes.value[0].name }}</code>.
-        Each axis needs at least two known values.
-        Declare finite values in <code>Story matrix.axes</code> for another prop.
+        Only <code>{{ matrix.usableAxes.value[0].name }}</code> has at least two known values.
       </template>
       <template v-else>
-        No usable prop axes found. Each axis needs at least two known values.
-        Boolean props are detected automatically; declare other finite values in <code>Story matrix.axes</code>.
+        No prop has at least two known values. Boolean and numeric props are detected automatically.
+      </template>
+      Add a custom axis with your own values, or declare them in <code>Story matrix.axes</code>.
+      <template #actions>
+        <HstButton color="flat" type="button" @pointerdown.stop @click="addAxis">
+          <BuiltinIcon icon="add" :size="16" />
+          Add custom axis
+        </HstButton>
       </template>
     </WorkbenchEmptyState>
   </template>

@@ -51,7 +51,7 @@ export function createMatrixRuntime(onCapture: () => void) {
       target: { ...state.target },
       generation,
       canonical,
-      axes: discoverMatrixAxes(value._hPropDefs, undefined, value),
+      axes: discoverMatrixAxes(value._hPropDefs, undefined, value, { numericValues: false }),
       base: Object.fromEntries(props.map(prop => [prop.name, prop.value])),
       props,
     })

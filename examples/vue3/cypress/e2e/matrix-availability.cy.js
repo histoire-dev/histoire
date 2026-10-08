@@ -8,7 +8,7 @@ describe('Props matrix availability', () => {
     cy.visit(`/story/src-components-basebutton-story-vue?variantId=${variantId}`)
     cy.get('[aria-label="Props matrix"]').should('not.be.disabled').click()
     cy.location('search').should('include', 'arrange=matrix').and('include', `variantId=${variantId}`)
-    cy.contains('[role="status"]', 'Matrix needs two prop axes', { timeout: 20000 }).should('be.visible').and('contain', 'Found 1 usable axis: disabled').and('contain', 'Each axis needs at least two known values').and('contain', 'Story matrix.axes')
+    cy.contains('[role="status"]', 'Matrix needs two prop axes', { timeout: 20000 }).should('be.visible').and('contain', 'Only disabled has at least two known values').and('contain', 'Add a custom axis').and('contain', 'Story matrix.axes')
     cy.get('[aria-label^="Select matrix cell "]').should('not.exist')
     cy.get('[data-frame-id]').should('not.exist')
     cy.get('[aria-label="Swap matrix axes"]').should('not.exist')
@@ -19,9 +19,13 @@ describe('Props matrix availability', () => {
 
   it('explains zero axes after runtime discovery completes', () => {
     cy.visit('/story/src-components-demo-story-vue?arrange=matrix&variantId=src-components-demo-story-vue-0')
-    cy.contains('[role="status"]', 'Matrix needs two prop axes', { timeout: 20000 }).should('be.visible').and('contain', 'No usable prop axes found').and('contain', 'Boolean props are detected automatically').and('contain', 'Story matrix.axes')
+    cy.contains('[role="status"]', 'Matrix needs two prop axes', { timeout: 20000 }).should('be.visible').and('contain', 'No prop has at least two known values').and('contain', 'Boolean and numeric props are detected automatically').and('contain', 'Story matrix.axes')
     cy.contains('[role="status"]', 'Reading prop axes').should('not.exist')
     cy.get('[data-frame-id]').should('not.exist')
+    // Guidance action reveals the inspector's new-axis form, even when closed.
+    cy.get('[aria-label="Close inspector"]').click()
+    cy.contains('button', 'Add custom axis').click()
+    cy.get('form[aria-label="Add matrix axis"]').should('be.visible').find('input[aria-label="Prop name"]').should('have.focus')
   })
 
   it('keeps matrix loading visible until its discovery document responds', () => {
@@ -68,7 +72,7 @@ describe('Props matrix availability', () => {
     cy.visit('/story/src-components-basebutton-story-vue?arrange=matrix&variantId')
     cy.contains('[role="status"]', 'Matrix needs two prop axes', { timeout: 20000 })
       .should('be.visible')
-      .and('contain', 'Found 1 usable axis: disabled')
+      .and('contain', 'Only disabled has at least two known values')
     cy.location('search').should('include', 'arrange=matrix').and('not.include', 'variantId=src-components')
     cy.get('[data-frame-id]').should('not.exist')
     cy.reload()

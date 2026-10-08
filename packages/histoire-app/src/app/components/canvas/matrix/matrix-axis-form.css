@@ -1,0 +1,38 @@
+/* Shared inline editor card for matrix axis values (custom, numeric, new axis). */
+.histoire-matrix-axis-form {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  padding: 10px;
+  border: 1px solid var(--histoire-border);
+  border-radius: var(--histoire-radius-panel);
+}
+
+.histoire-matrix-axis-form .histoire-wrapper {
+  min-width: 0;
+  --histoire-control-margin: 0px;
+  --histoire-control-wrapper-padding: 0px;
+  --histoire-control-gap: 6px;
+}
+
+/* Beats the workbench `font-family: inherit` reset on form fields. */
+.histoire-matrix-axis-form .histoire-textarea textarea.histoire-control-field {
+  font-family: var(--histoire-font-mono);
+  font-size: 12px;
+}
+
+.histoire-matrix-axis-form [role="alert"] {
+  color: var(--histoire-danger);
+  font-size: 12px;
+}
+
+.histoire-matrix-axis-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 8px;
+}
+
+.histoire-matrix-axis-form-secondary {
+  margin-inline-end: auto;
+}
