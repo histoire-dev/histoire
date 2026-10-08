@@ -1,9 +1,8 @@
 <script setup lang="ts">
 import type { UiComment, UiCommentAgent } from '@histoire/shared'
-import { BuiltinIcon, HstButton, HstText } from '@histoire/controls/vue'
+import { BuiltinIcon, HstButton, HstPulsatingDisc, HstText } from '@histoire/controls/vue'
 import { computed, ref } from 'vue'
 import { useWorkbenchComments } from '../../stores/comments.js'
-import PulsatingDisc from '../base/PulsatingDisc.vue'
 
 import CommentContext from './CommentContext.vue'
 import { commentAge } from './presentation.js'
@@ -69,7 +68,7 @@ function submit() {
         <span class="avatar"><BuiltinIcon icon="bot" :size="16" /></span><div><header><strong>{{ agentName(comment.agentId) }}</strong></header><p>{{ streamed }}</p></div>
       </article>
       <p v-if="busy" class="agent-working" role="status">
-        <PulsatingDisc />{{ agentName(comment.agentId) }} is working…
+        <HstPulsatingDisc />{{ agentName(comment.agentId) }} is working…
       </p>
     </div>
     <form class="thread-actions" @submit.prevent="submit">

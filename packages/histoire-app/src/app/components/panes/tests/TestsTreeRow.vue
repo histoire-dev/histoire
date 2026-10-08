@@ -1,10 +1,9 @@
 <script setup lang="ts">
 import type { WorkbenchTestRow } from './types.js'
-import { BuiltinIcon, HstButton } from '@histoire/controls/vue'
+import { BuiltinIcon, HstButton, HstPulsatingDisc } from '@histoire/controls/vue'
 import { getHistoireTargetKey } from '@histoire/protocol'
 import { computed } from 'vue'
 import { isContextMenuShortcut, useContextMenu } from '../../../composables/context-menu.js'
-import PulsatingDisc from '../../base/PulsatingDisc.vue'
 
 /** One actual collected variant or diagnostic; unknown diagnostics stay visible. */
 const props = defineProps<{ row: WorkbenchTestRow, selected: boolean }>()
@@ -36,7 +35,7 @@ function onKeydown(event: KeyboardEvent): void {
 
 <template>
   <HstButton color="flat" type="button" class="test-row" :class="{ failed: row.failed, warning: row.notCollected, passed: !row.failed && row.summary?.passed }" :aria-current="selected ? 'true' : undefined" :aria-label="`${row.storyTitle} / ${row.variantTitle ?? status}, ${status}`" :disabled="!row.selectable" :title="row.error ? String(row.error) : undefined" @click="emit('select', row)" @contextmenu="openMenu" @keydown="onKeydown">
-    <PulsatingDisc v-if="running" />
+    <HstPulsatingDisc v-if="running" />
     <BuiltinIcon v-else :icon="icon" :size="16" />
     <span class="test-row-title">{{ row.variantTitle ?? row.storyTitle }}</span>
     <span v-if="row.notCollected" class="test-row-detail">not collected</span>

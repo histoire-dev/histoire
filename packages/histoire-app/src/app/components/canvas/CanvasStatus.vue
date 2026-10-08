@@ -29,7 +29,8 @@ const size = computed(() => {
 </template>
 
 <style scoped>
-.histoire-canvas-info { position: absolute; inset-inline: var(--histoire-canvas-info-inset) calc(var(--histoire-canvas-inspector-reserve) + var(--histoire-canvas-info-inset)); bottom: 20px; display: flex; align-items: center; min-width: 0; container-type: inline-size; pointer-events: none; }
+/* Keep the pan hint above positioned frame chrome, including the selected frame ring. */
+.histoire-canvas-info { position: absolute; inset-inline: var(--histoire-canvas-info-inset) calc(var(--histoire-canvas-inspector-reserve) + var(--histoire-canvas-info-inset)); bottom: 20px; display: flex; align-items: center; min-width: 0; container-type: inline-size; pointer-events: none; z-index: 4; }
 .histoire-canvas-status { display: flex; inline-size: 100%; align-items: center; justify-content: flex-end; gap: 8px; min-width: 0; font: 11px var(--histoire-font-mono, "JetBrains Mono", monospace); color: var(--histoire-muted); }
 .histoire-canvas-status svg { flex: none; }
 .histoire-canvas-status span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

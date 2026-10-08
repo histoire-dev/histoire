@@ -1,4 +1,5 @@
 <script setup lang="ts">
+/** Standard Histoire loading indicator: a disc that pulses into a ring. */
 import { computed } from 'vue'
 
 const props = withDefaults(defineProps<{
@@ -13,7 +14,7 @@ const resolvedSize = computed(() => typeof props.size === 'number' ? `${props.si
 <template>
   <div
     aria-hidden="true"
-    class="histoire-pulsating-disc htw-flex htw-items-center htw-justify-center"
+    class="histoire-pulsating-disc"
     :style="{
       width: resolvedSize,
       height: resolvedSize,
@@ -35,7 +36,7 @@ const resolvedSize = computed(() => typeof props.size === 'number' ? `${props.si
 </template>
 
 <style scoped>
-.histoire-pulsating-disc { box-sizing: border-box; aspect-ratio: 1; }
+.histoire-pulsating-disc { display: flex; align-items: center; justify-content: center; box-sizing: border-box; aspect-ratio: 1; }
 .histoire-pulsating-disc-dot {
   position: relative;
   width: 100%;

@@ -1,12 +1,11 @@
 <script setup lang="ts">
 import type { HistoireCatalogVariant } from '@histoire/sdk'
 import type { CanvasRect } from './pan/usePanZoom.js'
-import { BuiltinIcon, HstButton } from '@histoire/controls/vue'
+import { BuiltinIcon, HstButton, HstPulsatingDisc } from '@histoire/controls/vue'
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useCanvasFrameBackground, useCanvasFrames, useCanvasStore } from '../../composables/canvas-settings.js'
 import { useContextMenu } from '../../composables/context-menu.js'
 import { getBackgroundStyle } from '../../util/background.js'
-import PulsatingDisc from '../base/PulsatingDisc.vue'
 import { useWorkbenchTestsModel } from '../panes/tests/model.js'
 
 import CanvasLoadingIndicator from './CanvasLoadingIndicator.vue'
@@ -126,7 +125,7 @@ function openMenu(event: MouseEvent | KeyboardEvent) {
 <template>
   <section class="histoire-canvas-frame" :class="{ 'is-single': single, 'is-selected': selected, 'is-stale': stale, 'is-highlighted': highlighted, 'is-dimmed': dimmed }" :style="position" :data-frame-id="frame.id" @contextmenu="openMenu">
     <button v-if="!single" type="button" class="histoire-frame-label" data-canvas-overlay-occluder :aria-pressed="selected" :disabled="!canSelect" @click="select" @keydown="onKeyDown">
-      <span class="histoire-frame-title" :title="variant.title">{{ variant.title }}</span><BuiltinIcon v-if="status === 'error'" icon="error-filled" :size="12" class="is-error" /><PulsatingDisc v-else-if="test?.running" :size="12" /><BuiltinIcon v-else-if="testIcon" :icon="testIcon" :size="12" :class="{ 'is-error': test?.failed || test?.error }" />
+      <span class="histoire-frame-title" :title="variant.title">{{ variant.title }}</span><BuiltinIcon v-if="status === 'error'" icon="error-filled" :size="16" class="is-error" /><HstPulsatingDisc v-else-if="test?.running" :size="14" /><BuiltinIcon v-else-if="testIcon" :icon="testIcon" :size="16" :class="{ 'is-error': test?.failed || test?.error }" />
     </button>
     <div class="histoire-frame-body" data-test-id="responsive-preview-bg" :style="{ height: `${height * scale}px`, ...getBackgroundStyle(background) }" @click="select">
       <div class="histoire-frame-content" :style="previewStyle" :aria-busy="status !== 'ready'" :inert="status !== 'ready' || stale ? true : undefined">
@@ -182,7 +181,9 @@ function openMenu(event: MouseEvent | KeyboardEvent) {
 .histoire-frame-label:focus-visible { outline: 2px solid var(--histoire-accent); outline-offset: 2px; }
 .histoire-frame-label:disabled { opacity: .45; cursor: default; }
 .is-selected .histoire-frame-label { color: var(--histoire-accent); font-weight: 700; }
-.histoire-frame-label :is(svg, .histoire-pulsating-disc) { color: var(--histoire-accent); } .histoire-frame-label svg.is-error { color: var(--histoire-danger); }
+.histoire-frame-label :is(svg, .histoire-pulsating-disc) { flex: none; color: var(--histoire-accent); }
+/* Same 16px slot as status icons, matching tests panel row glyphs. */
+.histoire-frame-label .histoire-pulsating-disc { margin-inline: 1px; } .histoire-frame-label svg.is-error { color: var(--histoire-danger); }
 .histoire-frame-body { position: relative; width: 100%; overflow: hidden; border: 1px solid var(--histoire-border); border-radius: 7px; background: white; }
 /* Unscaled chrome owns selection so every runtime state keeps a two-pixel ring. */
 .is-selected .histoire-frame-body { border-color: var(--histoire-accent); }

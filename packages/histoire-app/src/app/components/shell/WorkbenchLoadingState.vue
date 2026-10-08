@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import PulsatingDisc from '../base/PulsatingDisc.vue'
+import { HstPulsatingDisc } from '@histoire/controls/vue'
 import './workbench-state.css'
 
 defineProps<{
@@ -15,7 +15,7 @@ defineSlots<{
 <template>
   <div class="workbench-state workbench-loading-state" role="status" aria-atomic="true">
     <div class="workbench-state-visual" aria-hidden="true">
-      <PulsatingDisc :size="32" />
+      <HstPulsatingDisc :size="32" />
     </div>
     <strong>{{ title }}</strong>
     <p v-if="$slots.default">

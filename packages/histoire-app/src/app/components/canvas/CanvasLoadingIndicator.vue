@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import PulsatingDisc from '../base/PulsatingDisc.vue'
+import { HstPulsatingDisc } from '@histoire/controls/vue'
 </script>
 
 <template>
   <span class="histoire-canvas-loading-indicator" aria-hidden="true">
-    <PulsatingDisc :size="16" />
+    <HstPulsatingDisc :size="16" />
   </span>
 </template>
 

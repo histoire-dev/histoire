@@ -83,8 +83,9 @@ wrappers reset their own margins and padding.
 fonts in their existing order. `document.pcss` owns the standalone document
 reset; reusable native surfaces do not import it. `sandbox.css` owns the story
 runtime document baseline and retains controls/runtime Tailwind utilities.
-Generated Markdown still uses `__histoire-code` and `htw-` utilities, so code
-and prose compatibility rules remain in `main.pcss`.
+Generated Markdown code blocks use shared native docs styles in
+`histoire-vue/src/styles/content.css`; prose compatibility rules remain in
+`main.pcss`.
 
 Native `HistoireStoryTree` variant counts belong to
 `packages/histoire-vue/src/styles/navigation.css`, scoped to the provider's

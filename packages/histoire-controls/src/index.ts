@@ -8,6 +8,7 @@ import HstColorShadesVue from './components/design-tokens/HstColorShades.vue'
 import HstTokenGridVue from './components/design-tokens/HstTokenGrid.vue'
 import HstTokenListVue from './components/design-tokens/HstTokenList.vue'
 import HstCopyIconVue from './components/HstCopyIcon.vue'
+import HstPulsatingDiscVue from './components/HstPulsatingDisc.vue'
 import HstJsonVue from './components/json/HstJson.vue'
 import HstNumberVue from './components/number/HstNumber.vue'
 import HstRadioVue from './components/radio/HstRadio.vue'
@@ -36,6 +37,7 @@ export const HstCopyIcon = HstCopyIconVue
 export const HstRadio = HstRadioVue
 export const HstJson = HstJsonVue
 export const HstColorSelect = HstColorSelectVue
+export const HstPulsatingDisc = HstPulsatingDiscVue
 
 export const components = {
   HstButton,

@@ -1,9 +1,8 @@
 <script setup lang="ts">
 import type { UiCommentAgent, UiCommentDraft } from '@histoire/shared'
-import { BuiltinIcon, getControlElement, HstButton, HstSelect, HstTextarea } from '@histoire/controls/vue'
+import { BuiltinIcon, getControlElement, HstButton, HstPulsatingDisc, HstSelect, HstTextarea } from '@histoire/controls/vue'
 import { onMounted, onUnmounted, ref, watch } from 'vue'
 import { createShortcutRegistry, useShortcutRegistry } from '../../util/shortcuts.js'
-import PulsatingDisc from '../base/PulsatingDisc.vue'
 
 import CommentContext from './CommentContext.vue'
 import { useCommentDestination } from './destination.js'
@@ -67,7 +66,7 @@ function send() {
     </div>
     <footer>
       <HstButton icon-only color="flat" type="button" class="icon-button" :disabled="capturing" :aria-label="capturing ? 'Capturing screenshot' : 'Attach screenshot'" :title="capturing ? 'Capturing screenshot' : `Attach screenshot (${shortcuts.hint('comment.screenshot')})`" aria-keyshortcuts="Control+Shift+S Meta+Shift+S" @click="attach">
-        <PulsatingDisc v-if="capturing" />
+        <HstPulsatingDisc v-if="capturing" />
         <BuiltinIcon v-else icon="camera" :size="16" />
       </HstButton>
       <HstButton color="flat" type="button" class="save-draft" :disabled="!body.trim() || capturing" @click="emit('save', { ...draft, body })">
