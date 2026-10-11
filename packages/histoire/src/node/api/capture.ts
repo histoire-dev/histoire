@@ -6,6 +6,7 @@ import { HistoireSdkError, validateSettingsPatch } from '@histoire/protocol'
 import { CAPTURE_LIMITS } from '../runtime/browser/limits.js'
 import { createScreenshotTask } from '../runtime/browser/screenshot.js'
 import { lookupTarget, validId } from '../runtime/catalog/lookup.js'
+import { getContextScreenshotSetup } from '../runtime/registry.js'
 import { getDevPreviewHost } from '../vite/mcp-preview-html.js'
 import { awaitSdkExecution, toSdkExecutionError } from './execution.js'
 
@@ -41,7 +42,7 @@ export async function captureProjectScreenshot(services: ProjectServices, option
       defaults = source.snapshot.defaults
       execution = source.execution
       isActive = source.isActive
-      session = { root: services.root, host: source.registry, target: { origin: source.origin, epoch: source.epoch, storyId: options.storyId, variantId: options.variantId, ...dimensions, textDirection: defaults.textDirection, backgroundColor: defaults.backgroundColor, isActive } }
+      session = { root: services.root, host: source.registry, setupOwner: source.setupOwner, target: { origin: source.origin, epoch: source.epoch, storyId: options.storyId, variantId: options.variantId, ...dimensions, textDirection: defaults.textDirection, backgroundColor: defaults.backgroundColor, isActive } }
     }
     else {
       const dev = services.dev
@@ -54,7 +55,7 @@ export async function captureProjectScreenshot(services: ProjectServices, option
       execution = dev.execution
       // Retained metadata is readable while collection runs, never executable.
       isActive = () => source.isActive() && dev.catalog?.current === snapshot && !dev.catalog.updating
-      session = { root: services.root, host: getDevPreviewHost(source.server), target: { origin: new URL(dev.handle.url).origin, epoch: source.epoch, storyId: options.storyId, variantId: options.variantId, ...dimensions, textDirection: defaults.textDirection, backgroundColor: defaults.backgroundColor, isActive } }
+      session = { root: services.root, host: getDevPreviewHost(source.server), setupOwner: getContextScreenshotSetup(source.context, source.isActive), target: { origin: new URL(dev.handle.url).origin, epoch: source.epoch, storyId: options.storyId, variantId: options.variantId, ...dimensions, textDirection: defaults.textDirection, backgroundColor: defaults.backgroundColor, isActive } }
     }
     const colorScheme = options.colorScheme ?? defaults.colorScheme
     session.target = { ...session.target, textDirection: options.textDirection ?? defaults.textDirection, colorScheme: colorScheme === 'auto' ? undefined : colorScheme, globals: { ...(options.globals ?? defaults.globals) }, backgroundColor: defaults.backgroundColor }

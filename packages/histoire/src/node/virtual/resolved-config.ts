@@ -1,7 +1,8 @@
 import type { Context } from '../context.js'
 
 export function resolvedConfig(ctx: Context) {
-  const { agents, comments, ...publicConfig } = ctx.config
+  // Trusted launch policy can contain an absolute executable path; keep it server-side.
+  const { agents, browser: _browser, comments, ...publicConfig } = ctx.config
   // Agent environment belongs to user-level process settings. It must never
   // enter a browser module, including development's public virtual config.
   const config = ctx.mode === 'dev'

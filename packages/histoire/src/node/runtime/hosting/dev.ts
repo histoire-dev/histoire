@@ -23,6 +23,10 @@ export interface DevHosting {
 
 /** Creates one stable delegate over generation replacement and explicit readiness. */
 export function createDevHosting(options: {
+  /** Optional MCP adapter policy. */
+  mcp?: boolean
+  /** Optional agent service policy. */
+  agents?: boolean
   /** Explicit project root. */
   root: string
   /** Root-resolved configuration file. */
@@ -56,6 +60,8 @@ export function createDevHosting(options: {
   let configuredCsp: string | string[] | number | undefined
   const session = createDevSession({
     root: options.root,
+    mcp: options.mcp,
+    agents: options.agents,
     projectId: options.projectId,
     config: options.configFile,
     middleware: options.middleware,

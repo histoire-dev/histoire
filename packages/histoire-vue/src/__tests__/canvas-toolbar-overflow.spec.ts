@@ -13,13 +13,38 @@ import { sourceFixture } from '../../../histoire-sdk/src/__tests__/fixtures/sess
 import { toolbarGeometry } from './fixtures/toolbar-geometry.js'
 
 vi.mock('virtual:$histoire-config', () => ({ config: { responsivePresets: [], backgroundPresets: [], theme: {} }, logos: {} }))
-const send = vi.hoisted(() => vi.fn((_event: string, _payload: unknown) => true))
-vi.mock('../../../histoire-app/src/app/util/ui-channel.js', () => ({ sendUiEvent: send, onUiEvent: () => () => {}, onUiDisconnect: () => () => {} }))
+const uiChannel = vi.hoisted(() => ({
+  listeners: new Map<string, Set<(value: unknown) => void>>(),
+  disconnect: new Set<() => void>(),
+  send: vi.fn((_event: string, _payload: unknown) => true),
+}))
+vi.mock('../../../histoire-app/src/app/util/ui-channel.js', () => ({
+  sendUiEvent: (event: string, payload: Record<string, unknown>) => {
+    uiChannel.send(event, payload)
+    if (event === 'histoire:ui:screenshot-setup' && payload.action === 'read') {
+      const result = { requestId: payload.requestId, setup: { revision: 1, state: 'ready', source: 'chrome', attempts: [], repairs: [] } }
+      for (const listener of [...(uiChannel.listeners.get('histoire:ui:screenshot-setup-result') ?? [])]) listener(result)
+    }
+    return true
+  },
+  onUiEvent: (event: string, listener: (value: unknown) => void) => {
+    const listeners = uiChannel.listeners.get(event) ?? new Set()
+    listeners.add(listener)
+    uiChannel.listeners.set(event, listeners)
+    return () => listeners.delete(listener)
+  },
+  onUiDisconnect: (listener: () => void) => {
+    uiChannel.disconnect.add(listener)
+    return () => uiChannel.disconnect.delete(listener)
+  },
+}))
 
 afterEach(() => {
   vi.restoreAllMocks()
   vi.unstubAllGlobals()
-  send.mockClear()
+  uiChannel.send.mockClear()
+  uiChannel.listeners.clear()
+  uiChannel.disconnect.clear()
   document.body.replaceChildren()
 })
 
@@ -72,7 +97,7 @@ describe('canvas toolbar overflow integration', () => {
       const capture = [...document.querySelectorAll<HTMLButtonElement>('button')].find(value => value.textContent?.trim() === 'Capture 1 frame')!
       capture.click()
       await test.geometry.flush()
-      expect(send).toHaveBeenCalledWith('histoire:ui:screenshot', expect.objectContaining({ targets: [{ storyId: 'a:b', variantId: 'c' }], viewport: { width: 848, height: 748 }, scale: 1, background: '$checkerboard' }))
+      expect(uiChannel.send).toHaveBeenCalledWith('histoire:ui:screenshot', expect.objectContaining({ targets: [{ storyId: 'a:b', variantId: 'c' }], viewport: { width: 848, height: 748 }, scale: 1, background: '$checkerboard' }))
       button('Rotate viewport').click()
       await test.geometry.flush()
       expect(test.canvas.singleViewport.mode).toBe('fixed')
@@ -216,13 +241,13 @@ describe('canvas toolbar overflow integration', () => {
       const capture = [...document.querySelectorAll<HTMLButtonElement>('button')].find(value => value.textContent?.trim() === 'Capture 1 frame')!
       capture.click()
       await test.geometry.flush()
-      expect(send.mock.calls.filter(([event]) => event === 'histoire:ui:screenshot')).toHaveLength(1)
+      expect(uiChannel.send.mock.calls.filter(([event]) => event === 'histoire:ui:screenshot')).toHaveLength(1)
       test.geometry.resize(1000)
       await test.geometry.flush()
       button('Screenshot').click()
       await test.geometry.flush()
       expect([...document.querySelectorAll('button')].some(value => value.textContent?.trim() === 'Cancel capture')).toBe(true)
-      expect(send.mock.calls.filter(([event]) => event === 'histoire:ui:screenshot-cancel')).toHaveLength(0)
+      expect(uiChannel.send.mock.calls.filter(([event]) => event === 'histoire:ui:screenshot-cancel')).toHaveLength(0)
       button('Viewport').click()
       await test.geometry.flush()
       expect(document.querySelector<HTMLInputElement>('input[aria-label="Custom width"]')?.value).toBe('432')

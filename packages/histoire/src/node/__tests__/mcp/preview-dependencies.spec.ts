@@ -22,7 +22,7 @@ describe('optional preview browser dependency', () => {
     const load = vi.spyOn(imports, 'importResolvedModule').mockResolvedValue({ chromium: { launch } })
     const resolved = await resolvePreviewBrowser('/target/project')
     expect(launch).not.toHaveBeenCalled()
-    await expect(resolved({ headless: true })).rejects.toMatchObject({ code: 'BROWSER_UNAVAILABLE', message: 'Chromium could not launch. Install browser with: pnpm exec playwright install chromium' })
+    await expect(resolved({ headless: true })).rejects.toMatchObject({ code: 'BROWSER_UNAVAILABLE', message: 'Chromium could not launch. Install browser with: pnpm exec playwright install chromium --only-shell' })
     expect(load).toHaveBeenCalledWith('/target/project/playwright/index.mjs')
   })
 

@@ -89,15 +89,34 @@ SIGINT/SIGTERM stop admission, mark readiness unavailable, cancel owned jobs, an
 
 ## Optional browser execution
 
-Metadata, docs, source, and preview URLs work with Node alone. To enable screenshots or compiled preview tests, install the artifact's optional Playwright dependency and Chromium in the deployment environment:
+Metadata, docs, source, and preview URLs work with Node alone. Node artifacts do not include the development screenshot setup panel. Screenshots, rendered inspection, and compiled tests use the existing SDK and MCP routes and discover browsers on the deployment machine.
+
+The default source is `auto`. With Playwright 1.49 or newer it tries matching Chromium headless shell, matching cached full Chromium, stable Google Chrome, then stable Microsoft Edge. Older supported drivers try their default Chromium headless executable before Chrome and Edge; they do not provide separate shell/full-channel choices. A copied artifact never treats the build machine's browser path or probe result as target setup. The generated `package.json` records at most one optional driver (`playwright` or `playwright-core`) selected during the build. Install that dependency in the deployment directory:
 
 ```sh
 cd .histoire/dist
 npm install --omit=dev
-npx playwright install chromium
 ```
 
-The generated package records the Playwright version available during the build. When no version was available, install a compatible Playwright release explicitly before installing Chromium. Missing Playwright reports an actionable unavailable capability rather than loading dependencies from the original project.
+An installed stable Chrome or Edge can be used without downloading another browser once a compatible driver is present. If the target has no supported browser and the selected driver is Playwright 1.49 or newer, install the matching driver's headless shell. Use its CLI name, `playwright` or `playwright-core`:
+
+```sh
+npx playwright-core install chromium --only-shell
+```
+
+This installs only Chromium's headless shell and leaves already installed browser binaries in place. When the generated package has no optional driver, install a compatible `playwright` or `playwright-core` release explicitly before using that driver's install command. Missing drivers leave read tools available and report screenshots as unavailable; the artifact never loads dependencies from the original project.
+
+Older supported drivers do not offer a separate headless shell. Install their default Chromium with `npx playwright install chromium` or `npx playwright-core install chromium`, or upgrade the selected driver before choosing `headless-shell` or full-channel `chromium` explicitly.
+
+Set target policy in the deployment environment. For example, choose stable Chrome explicitly or select full Chromium after a confirmed shell-specific issue:
+
+```sh
+HISTOIRE_BROWSER_SOURCE=chrome node server.mjs
+```
+
+`HISTOIRE_BROWSER_SOURCE` accepts `auto`, `headless-shell`, `chromium`, `chrome`, `msedge`, or `executable`. For `executable`, also set `HISTOIRE_BROWSER_EXECUTABLE_PATH` to an absolute path or a path relative to the artifact directory. Incompatible source/path combinations fail instead of falling back. Project `browser` config and build-machine executable paths are not copied into deployment policy.
+
+On supported Linux systems with a classified missing-library failure, install OS dependencies with `npx playwright install-deps chromium` or `npx playwright-core install-deps chromium`, matching the installed driver. Full Chromium is a targeted option for a pinned full renderer: set `HISTOIRE_BROWSER_SOURCE=chromium` and, with Playwright 1.49 or newer, run `npx playwright install chromium --no-shell` or `npx playwright-core install chromium --no-shell`, matching the installed driver. Older drivers install their default Chromium with the same command without `--no-shell`. Installing full Chromium alone does not make the default headless-shell source use it.
 
 Tests use engine `built-preview`. They run the compiled embedded test session in isolated Chromium contexts and preserve aggregate outcomes, skips, hooks, and explicit test/hook deadlines. They need neither project Vitest nor `@vitest/browser-playwright` on the server. Build with the embedded browser test runtime to enable them; artifacts lacking it report `CAPABILITY_UNAVAILABLE`. They do not provide project-wide Vitest execution or runtime source discovery.
 

@@ -111,7 +111,42 @@ describe('ui screenshot lane', () => {
     value.browser.launch.mockImplementation(async () => {
       throw new PreviewError('DEPENDENCY_MISSING', 'private dependency resolver failure')
     })
-    expect(await value.service.capture(request(), {})).toMatchObject({ error: { code: 'unavailable', message: expect.stringContaining('pnpm exec playwright install chromium') } })
+    expect(await value.service.capture(request(), {})).toMatchObject({ error: { code: 'unavailable', message: expect.stringContaining('pnpm exec playwright install chromium --only-shell') } })
+    await value.service.close()
+    await value.execution.close()
+  })
+
+  it('attaches one executable-specific repair without repeating it in target errors', async () => {
+    const value = await fixture()
+    const setup = {
+      revision: 2,
+      state: 'needs-action' as const,
+      reason: 'permission' as const,
+      attempts: [{ source: 'executable' as const, reason: 'permission' as const }],
+      repairs: [{ id: 'check-setup' as const, label: 'Check screenshot setup' }],
+    }
+    const latestSetup = { revision: 3, state: 'ready' as const, source: 'chrome' as const, attempts: [], repairs: [] }
+    const getSnapshot = vi.fn(() => latestSetup)
+    value.resolve
+      .mockImplementationOnce(() => value.browser.session)
+      .mockImplementationOnce(() => ({
+        ...value.browser.session,
+        setupOwner: { getSnapshot } as NonNullable<typeof value.browser.session.setupOwner>,
+        launch: async () => { throw new PreviewError('BROWSER_UNAVAILABLE', 'private executable failure', true, setup) },
+      }))
+
+    const output = await value.service.capture(request(), {})
+
+    expect(output).toMatchObject({
+      requestId: 'capture',
+      files: [{ variantId: 'variant' }],
+      errors: [{ variantId: 'second', error: { code: 'unavailable', message: 'Screenshot browser setup needs attention' } }],
+      setup,
+    })
+    if (!('files' in output)) throw new Error('Capture did not retain successful file')
+    expect(output.errors?.[0].error).not.toHaveProperty('setup')
+    expect(getSnapshot).not.toHaveBeenCalled()
+    expect(JSON.stringify(output)).not.toContain('pnpm exec playwright install chromium')
     await value.service.close()
     await value.execution.close()
   })

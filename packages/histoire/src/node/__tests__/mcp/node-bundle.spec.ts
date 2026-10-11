@@ -44,9 +44,11 @@ describe('standalone server bundle', () => {
     const entry = join(fixture.root, 'entry.mjs')
     const policy = fileURLToPath(new URL('../../config/embed-built.ts', import.meta.url))
     const cleanup = fileURLToPath(new URL('../../runtime/cleanup.ts', import.meta.url))
-    await writeFile(entry, `export {readBuiltEmbedPolicy} from ${JSON.stringify(policy)};export {hasUnconfirmedCleanup} from ${JSON.stringify(cleanup)}`)
+    const browserPolicy = fileURLToPath(new URL('../../runtime/browser/setup/policy.ts', import.meta.url))
+    await writeFile(entry, `export {readBuiltEmbedPolicy} from ${JSON.stringify(policy)};export {hasUnconfirmedCleanup} from ${JSON.stringify(cleanup)};export {createBrowserSetupPolicy} from ${JSON.stringify(browserPolicy)}`)
     const output = join(fixture.root, 'server.mjs')
-    await expect(bundleNodeRuntime(entry, output)).resolves.toBeDefined()
+    const bundle = await bundleNodeRuntime(entry, output)
+    expect(bundle.inputs.some(path => path.endsWith('/node/config/browser.ts'))).toBe(true)
     await validateNodeBundleImport(output)
     for (const path of ['../../config/load.ts', '../../runtime/controller.ts']) {
       const forbidden = fileURLToPath(new URL(path, import.meta.url))
@@ -65,5 +67,9 @@ describe('standalone server bundle', () => {
   it('generates minimal ESM deployment package with optional browser peer only', () => {
     expect(createNodePackage('1.2.3')).toEqual({ private: true, type: 'module', version: '1.2.3', engines: { node: '>=22' }, scripts: { start: 'node server.mjs' } })
     expect(createNodePackage('1.2.3', '1.59.1').optionalDependencies).toEqual({ playwright: '1.59.1' })
+    expect(createNodePackage('1.2.3', '')).not.toHaveProperty('optionalDependencies')
+    expect(createNodePackage('1.2.3', { packageName: 'playwright', version: '1.59.1' }).optionalDependencies).toEqual({ playwright: '1.59.1' })
+    expect(createNodePackage('1.2.3', { packageName: 'playwright-core', version: '1.59.1' }).optionalDependencies).toEqual({ 'playwright-core': '1.59.1' })
+    expect(Object.keys(createNodePackage('1.2.3', { packageName: 'playwright-core', version: '1.59.1' }).optionalDependencies ?? {})).toEqual(['playwright-core'])
   })
 })

@@ -69,6 +69,7 @@ describe('immutable Node preview hosting', () => {
       expect((await fetch(handle.url)).status).toBe(200)
       const old = getProjectServices(project).preview.current
       expect(old.snapshot.getTarget('a:b', 'c:d').variant.id).toBe('c:d')
+      const closeSetupOwner = vi.spyOn(old.setupOwner, 'close')
       const lease = old.registry.open({ origin: old.origin, storyId: 'a:b', variantId: 'c:d', epoch: old.epoch, width: 720, height: 560, backgroundColor: 'transparent', textDirection: 'ltr', isActive: old.isActive })
       expect(await (await fetch(lease.url)).text()).toContain('mcpNonce')
       lease.close()
@@ -84,11 +85,15 @@ describe('immutable Node preview hosting', () => {
       const restarting = handle.restart()
       expect(old.isActive()).toBe(false)
       await flushMicrotasks()
+      expect(closeSetupOwner).not.toHaveBeenCalled()
       expect((await fetch(handle.url)).status).toBe(503)
       cleanup.resolve()
       await restarting
       await expect(capture.result).rejects.toMatchObject({ code: 'CANCELLED' })
-      expect(getProjectServices(project).preview.current.epoch).not.toBe(old.epoch)
+      const current = getProjectServices(project).preview.current
+      expect(current.epoch).not.toBe(old.epoch)
+      expect(current.setupOwner).not.toBe(old.setupOwner)
+      expect(closeSetupOwner).toHaveBeenCalledOnce()
       const previous = await readFile(join(copied.root, 'output', 'index.html'), 'utf8')
       await expect(project.build()).rejects.toThrow('active preview')
       expect(await readFile(join(copied.root, 'output', 'index.html'), 'utf8')).toBe(previous)

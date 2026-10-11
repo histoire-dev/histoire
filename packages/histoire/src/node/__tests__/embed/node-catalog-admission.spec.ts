@@ -5,15 +5,20 @@ import { runProjectTests } from '../../api/tests.js'
 import { createRuntimeCatalog } from '../../runtime/catalog/publication.js'
 import { createExecutionOwner } from '../../runtime/execution-owner.js'
 import { createExecutionService } from '../../runtime/execution-service.js'
+import { getContextScreenshotSetup } from '../../runtime/registry.js'
 import { closeDevPreviewHost, createMcpPreviewHtmlMiddleware } from '../../vite/mcp-preview-html.js'
 import { flushMicrotasks } from '../utils/flush.js'
 import { deferred } from '../utils/mcp/deferred.js'
 import { createMcpContext, createMcpProjectFixture, createMcpStory, MCP_PROJECT_OPTIONS } from '../utils/mcp/project.js'
 
 const tests = vi.hoisted(() => vi.fn(async () => ({ ok: true, total: 0 })))
-const capture = vi.hoisted(() => vi.fn(async () => ({ artifact: new Uint8Array([1]), result: { width: 480, height: 320, sha256: 'hash' } })))
+const { capture, createScreenshotTask } = vi.hoisted(() => {
+  const capture = vi.fn(async () => ({ artifact: new Uint8Array([1]), result: { width: 480, height: 320, sha256: 'hash' } }))
+  const createScreenshotTask = vi.fn(() => ({ run: capture }))
+  return { capture, createScreenshotTask }
+})
 vi.mock('../../test/execution-service.js', () => ({ createHistoireTestTask: () => ({ run: tests }) }))
-vi.mock('../../runtime/browser/screenshot.js', () => ({ createScreenshotTask: () => ({ run: capture }) }))
+vi.mock('../../runtime/browser/screenshot.js', () => ({ createScreenshotTask }))
 
 describe('completed Node dev execution admission', () => {
   let fixture: Awaited<ReturnType<typeof createMcpProjectFixture>>
@@ -25,9 +30,10 @@ describe('completed Node dev execution admission', () => {
   beforeEach(async () => {
     tests.mockClear()
     capture.mockClear()
+    createScreenshotTask.mockClear()
     fixture = await createMcpProjectFixture()
     const context = createMcpContext(fixture.root, [createMcpStory(fixture.root)])
-    context.config = { theme: { defaultColorScheme: 'light' } } as any
+    context.config = { browser: { source: 'executable', executablePath: './binaries/chrome' }, theme: { defaultColorScheme: 'light' } } as any
     catalog = createRuntimeCatalog({ root: fixture.root, ...MCP_PROJECT_OPTIONS })
     await catalog.publish(context)
     execution = createExecutionService()
@@ -82,6 +88,9 @@ describe('completed Node dev execution admission', () => {
     const completed = catalog.current
     await expect(run('capture')).resolves.toMatchObject({ png: new Uint8Array([1]), sha256: 'hash' })
     expect(capture).toHaveBeenCalledOnce()
+    const setupOwner = createScreenshotTask.mock.lastCall?.[0].setupOwner
+    expect(setupOwner).toBe(getContextScreenshotSetup(services.dev!.controller.current!.context))
+    expect(setupOwner?.getSnapshot()).toEqual({ revision: 0, state: 'unverified', attempts: [], repairs: [] })
     expect(catalog.current).toBe(completed)
     expect(Object.isFrozen(completed.catalog)).toBe(true)
     await expect(run('tests')).resolves.toMatchObject({ ok: true })

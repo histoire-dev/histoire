@@ -1,3 +1,4 @@
+import type { ScreenshotSetupOwner } from '../../runtime/browser/setup/types.js'
 import { describe, expect, it, vi } from 'vitest'
 import { createScreenshotTask, readPngDimensions } from '../../mcp/browser/screenshot.js'
 import { createPreviewSession } from '../../mcp/browser/session.js'
@@ -122,6 +123,60 @@ describe('isolated screenshot execution', () => {
     await expect(job.result).rejects.toMatchObject({ code: 'PREVIEW_NOT_READY', message: 'Preview page failed' })
     expect(fixture.close).toHaveBeenCalledOnce()
     await execution.close()
+  })
+
+  it('refresh during story readiness keeps leased browser and never retries acquisition', async () => {
+    const fixture = createPreviewBrowserFixture()
+    const browser = { newContext: fixture.newContext, close: fixture.close }
+    const release = vi.fn(fixture.close)
+    const setupOwner = {
+      acquire: vi.fn(async () => ({ browser: browser as any, source: 'headless-shell' as const, release, discard: release })),
+      invalidate: vi.fn(),
+    } as unknown as ScreenshotSetupOwner
+    fixture.page.waitForFunction.mockImplementation(async () => {
+      setupOwner.invalidate()
+      throw new Error('story variant failed during readiness')
+    })
+    const session = createPreviewSession({ ...fixture.session, launch: undefined, setupOwner })
+
+    await expect(session.open(new AbortController().signal)).rejects.toMatchObject({ code: 'PREVIEW_NOT_READY' })
+    await session.close()
+
+    expect(fixture.page.goto).toHaveBeenCalledOnce()
+    expect(setupOwner.acquire).toHaveBeenCalledOnce()
+    expect(setupOwner.invalidate).toHaveBeenCalledOnce()
+    expect(fixture.contextClose).toHaveBeenCalledOnce()
+    expect(release).toHaveBeenCalledOnce()
+  })
+
+  it('bounds held context cleanup, discards exact browser and quarantines the lane', async () => {
+    const ready = deferred<void>()
+    const contextClosed = deferred<void>()
+    const fixture = createPreviewBrowserFixture({ wait: () => ready.promise, close: async () => ready.reject(new Error('Browser discarded')) })
+    fixture.contextClose.mockReturnValue(contextClosed.promise)
+    const discard = vi.fn(async () => {
+      await fixture.close()
+    })
+    const release = vi.fn(async () => {})
+    const setupOwner = {
+      acquire: vi.fn(async () => ({ browser: { newContext: fixture.newContext, close: fixture.close } as any, source: 'headless-shell' as const, release, discard })),
+    } as unknown as ScreenshotSetupOwner
+    const execution = createExecutionService()
+    const task = createScreenshotTask({ ...fixture.session, launch: undefined, setupOwner })
+    const job = execution.enqueue(task)
+    await vi.waitFor(() => expect(fixture.page.waitForFunction).toHaveBeenCalledOnce())
+    job.cancel()
+    await vi.waitFor(() => expect(fixture.contextClose).toHaveBeenCalledOnce())
+
+    expect(discard).not.toHaveBeenCalled()
+    await expect(job.result).rejects.toMatchObject({ code: 'CLEANUP_UNCONFIRMED' })
+
+    expect(discard).toHaveBeenCalledOnce()
+    expect(release).not.toHaveBeenCalled()
+    expect(fixture.close).toHaveBeenCalledOnce()
+    expect(execution.available).toBe(false)
+    expect(() => execution.enqueue({ run: vi.fn(async () => 'next') })).toThrow('Server execution is unavailable')
+    await execution.close().catch(() => {})
   })
 
   it('whole-preview deadline aborts pending readiness and confirms cleanup', async () => {

@@ -2,12 +2,16 @@
 export const CAPTURE_LIMITS = Object.freeze({
   /** Whole capture budget, including acquisition and ready document settling. */
   previewTimeoutMs: 30_000,
+  /** One candidate's launch and neutral probe share this bounded budget. */
+  browserCandidateTimeoutMs: 3_000,
+  /** Explicit setup checks share this total acquisition deadline. */
+  setupCheckTimeoutMs: 15_000,
   /** PNG byte limit remains independent of device pixel dimensions. */
   artifactBytes: 4 * 1024 * 1024,
-  /** Minimum CSS viewport width. */
-  minWidth: 320,
-  /** Minimum CSS viewport height. */
-  minHeight: 240,
+  /** Minimum positive CSS viewport width. */
+  minWidth: 1,
+  /** Minimum positive CSS viewport height. */
+  minHeight: 1,
   /** Maximum CSS viewport width. */
   width: 3840,
   /** Maximum CSS viewport height. */

@@ -20,6 +20,7 @@ export function getDefaultConfig(): HistoireConfig {
     ],
     outDir: '.histoire/dist',
     mcp: true,
+    browser: { source: 'auto' },
     embed: { enabled: false, allowedOrigins: [], channels: [], allowOpenInEditor: false, allowServerTests: false },
     storyMatch: [
       '**/*.story.vue',

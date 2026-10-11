@@ -1,3 +1,5 @@
+import type { ScreenshotSetupSnapshot } from './screenshot-setup.js'
+
 /** Safe dev-only client identity; credentials remain server-owned. */
 export interface UiMcpClientInfo {
   /** Opaque session identity. */
@@ -86,6 +88,8 @@ export interface UiChannelError {
   code: 'invalid' | 'unavailable' | 'cancelled' | 'timeout' | 'failed'
   /** Deliberate public explanation. */
   message: string
+  /** One scrubbed setup diagnostic for a complete request failure. */
+  setup?: ScreenshotSetupSnapshot
 }
 
 /** Successful file written beneath project screenshots directory. */
@@ -108,6 +112,8 @@ export type UiScreenshotResult = {
   files: UiScreenshotFile[]
   /** Per-target failures from a partially successful request. */
   errors?: { storyId: string, variantId: string, frameKey?: string, error: UiChannelError }[]
+  /** One shared setup diagnostic; never repeated in per-target error rows. */
+  setup?: ScreenshotSetupSnapshot
 } | {
   /** Request correlation. */
   requestId: string
@@ -127,6 +133,10 @@ export interface UiClientEvents {
   'histoire:ui:screenshot-list': { requestId: string }
   /** Cancel an existing MCP operation through its owner. */
   'histoire:ui:mcp-cancel': { operationId: string }
+  /** Read setup metadata or explicitly check available browser installations. */
+  'histoire:ui:screenshot-setup': { requestId: string, action: 'read' | 'check' | 'refresh' }
+  /** Cancel this browser's explicit setup check only. */
+  'histoire:ui:screenshot-setup-cancel': { requestId: string }
 }
 
 /** Safe server notifications. */
@@ -140,3 +150,5 @@ export interface UiServerEvents {
   /** Recent file inventory. */
   'histoire:ui:screenshot-list-result': { requestId: string, files: UiScreenshotFile[] }
 }
+  /** Correlated scrubbed setup observation or owned check error. */
+  'histoire:ui:screenshot-setup-result': { requestId: string, setup: ScreenshotSetupSnapshot } | { requestId: string, error: UiChannelError }

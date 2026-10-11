@@ -99,6 +99,55 @@ export default defineConfig({
 
 Vue/Nuxt stories read `useHistoireGlobals()` from `histoire/client`; Svelte/vanilla use `useHistoireGlobalsStore()`. Initial appearance still comes from `theme.defaultColorScheme`. Grid variants share session globals. See [SDK settings](./sdk.md#snapshots-and-settings).
 
+## `browser`
+
+`({ source?: 'auto' | 'headless-shell' | 'chromium' | 'chrome' | 'msedge' } | { source: 'executable', executablePath: string }) & { reuse?: boolean, idleTimeoutMs?: number }` - Default: `{ source: 'auto' }`; reuse is disabled.
+
+Choose the browser used by Histoire-owned isolated screenshots and rendered inspection in development, and by screenshots, rendered inspection, and compiled tests in Node artifacts. This setting does not configure the project's Vitest browser runner. Node deployments use target-machine environment variables instead; static books do not run server-side screenshots.
+
+Browser-process reuse is opt-in and applies to development captures. Each capture still gets a fresh browser context. Set `idleTimeoutMs` only with `reuse: true`; it must be an integer from 1000 to 300000 milliseconds and defaults to 30000. A configuration refresh retires idle processes; an active capture keeps its process until cleanup completes. Node artifacts keep fresh-process behavior.
+
+```ts
+export default defineConfig({
+  browser: { source: 'chrome', reuse: true, idleTimeoutMs: 30_000 },
+})
+```
+
+With Playwright 1.49 or newer, `auto` checks, in order, for the matching headless shell, matching cached full Chromium, stable Google Chrome, then stable Microsoft Edge. Older supported drivers use their default matching Chromium headless executable before checking Chrome and Edge; those versions do not have separate headless-shell or full-Chromium channel support. It launches each candidate headlessly in a fresh browser context. Bundled Chromium keeps the renderer version aligned with the selected driver. Branded Chrome and Edge can render differently, so pin `source` when reproducible browser selection matters.
+
+Explicit sources never fall back. `headless-shell` and full-channel `chromium` require Playwright 1.49 or newer. Installing full Chromium does not change the default shell choice; use `source: 'chromium'` to select it. On older drivers, let `auto` use the default bundled Chromium or upgrade before selecting a separate renderer. A custom executable path is trusted local configuration and resolves relative to the project root:
+
+```ts
+export default defineConfig({
+  browser: { source: 'chrome' },
+})
+```
+
+```ts
+export default defineConfig({
+  browser: { source: 'executable', executablePath: './tools/chromium' },
+})
+```
+
+The browser driver remains optional. Histoire resolves project `playwright` first, then project `playwright-core`, before its own dependency fallback. `playwright-core` can use existing browsers without installing the full Playwright package, but it still needs a browser automation driver and a compatible installed browser. Use the selected driver's CLI when installing a shell:
+
+```sh
+pnpm add -D playwright-core
+pnpm exec playwright-core install chromium --only-shell
+```
+
+The shell-only install flag requires Playwright 1.49 or newer. Older supported drivers install their default Chromium with `pnpm exec playwright install chromium` or `pnpm exec playwright-core install chromium`; those drivers do not provide a separate headless-shell install.
+
+For Playwright 1.49 or newer, install full Chromium without its headless shell when explicitly selecting `source: 'chromium'`:
+
+```sh
+pnpm exec playwright install chromium --no-shell
+```
+
+Use `pnpm exec playwright-core install chromium --no-shell` for a core-only driver. Older drivers install their default Chromium without the `--no-shell` option.
+
+See [screenshot setup](../guide/ui-screenshots-mcp.md) for setup checks and targeted repairs. Development tests still require the separate Vitest dependencies described in the [browser testing guide](../guide/testing.md).
+
 ## `build.target`
 
 `'static' | 'node'` - Default: `'static'`

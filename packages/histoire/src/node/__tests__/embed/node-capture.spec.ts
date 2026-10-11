@@ -1,4 +1,5 @@
 import type { ProjectServices } from '../../api/internal.js'
+import type { ScreenshotSetupOwner } from '../../runtime/browser/setup/types.js'
 import { describe, expect, it, vi } from 'vitest'
 import { captureProjectScreenshot } from '../../api/capture.js'
 import { createExecutionOwner } from '../../runtime/execution-owner.js'
@@ -11,7 +12,8 @@ vi.mock('../../runtime/browser/screenshot.js', () => ({ createScreenshotTask: sc
 function fixture() {
   const execution = createExecutionService()
   let active = true
-  const source = { epoch: 'preview', origin: 'http://book.test', base: '/nested/', execution: createExecutionOwner(execution), registry: {}, isActive: () => active, snapshot: { capture: { available: true }, defaults: { colorScheme: 'dark', textDirection: 'rtl', globals: { theme: 'default' } }, getTarget: vi.fn() } }
+  const setupOwner = {} as ScreenshotSetupOwner
+  const source = { epoch: 'preview', origin: 'http://book.test', base: '/nested/', execution: createExecutionOwner(execution), registry: {}, setupOwner, isActive: () => active, snapshot: { capture: { available: true }, defaults: { colorScheme: 'dark', textDirection: 'rtl', globals: { theme: 'default' } }, getTarget: vi.fn() } }
   const services = { root: '/project', execution, preview: { handle: { status: 'ready' }, current: source } } as unknown as ProjectServices
   return { services, source, close: () => {
     active = false
@@ -26,6 +28,7 @@ describe('node capture admission', () => {
     globals.theme = 'mutated'
     await expect(result).resolves.toMatchObject({ png: new Uint8Array([1]), width: 480, height: 320 })
     expect(screenshot.mock.lastCall?.[0]).toMatchObject({ host: test.source.registry, target: { epoch: 'preview', globals: { theme: 'chosen' }, textDirection: 'rtl', deviceScaleFactor: 1 } })
+    expect(screenshot.mock.lastCall?.[0].setupOwner).toBe(test.source.setupOwner)
     expect(test.source.snapshot.getTarget).toHaveBeenCalledWith('story', 'variant')
     await test.execution.close()
   })

@@ -78,14 +78,43 @@ The six read tools require no browser. Docs prefer sibling Markdown, then standa
 
 ## Screenshots and tests
 
-Install browser execution dependencies in the project:
+Check the existing browser setup before installing anything:
 
 ```sh
-pnpm add -D playwright vitest @vitest/browser-playwright
-pnpm exec playwright install chromium
+pnpm exec histoire screenshot-setup
+pnpm exec histoire screenshot-setup --check
+pnpm exec histoire screenshot-setup --json
 ```
 
-Screenshots and rendered inspection need Playwright/Chromium. Development tests additionally need Vitest 4 and `@vitest/browser-playwright`. Missing peers leave read tools available; project capabilities explain unavailable execution. Browser installation happens explicitly, never during an MCP call.
+The command accepts `--root <directory>` or `-c, --config <file>` to inspect another project. The first command reads setup metadata without launching a browser. `--check` performs a bounded neutral launch and closes it; neither action installs dependencies. `--json` writes one setup snapshot, or one bounded `{ error }` object, to stdout. Metadata reads exit `0` when unverified or ready and `1` when setup needs action. Explicit checks exit `0` only when ready and otherwise `1`; invalid arguments, project roots, or config exit `2`. After installing a driver or browser, rerun the command to refresh discovery. Setup can also be checked from the canvas screenshot toolbar during development.
+
+With Playwright 1.49 or newer, automatic selection tries a matching Chromium headless shell, matching cached full Chromium, stable Google Chrome, then stable Microsoft Edge. Older supported drivers try their default Chromium headless executable before Chrome and Edge; they do not have separate shell/full-channel choices. Pin a supported explicit [`browser.source`](../reference/config.md#browser) to keep renderer choice stable. Explicit choices never fall back. Existing Chrome or Edge needs a driver but no browser download; install only `playwright` or opt into `playwright-core` for screenshot and rendered-inspection execution:
+
+```sh
+pnpm add -D playwright-core
+pnpm exec histoire screenshot-setup --check
+```
+
+If the check reports no supported browser and the selected driver is Playwright 1.49 or newer, install its Chromium headless shell:
+
+```sh
+pnpm add -D playwright
+pnpm exec playwright install chromium --only-shell
+```
+
+If the project uses only `playwright-core`, run `pnpm exec playwright-core install chromium --only-shell` instead. With an older driver, install its default Chromium using `pnpm exec playwright install chromium` or `pnpm exec playwright-core install chromium`.
+
+The shell install leaves other installed browsers in place. For Playwright 1.49 or newer, a confirmed shell-specific incompatibility or explicitly pinned full renderer uses `browser: { source: 'chromium' }` with `pnpm exec playwright install chromium --no-shell` or `pnpm exec playwright-core install chromium --no-shell`. Older drivers install their default Chromium with the same command without `--no-shell`. Installing full Chromium alone does not change the default shell choice. On supported Linux systems with a classified missing-library failure, install OS dependencies with `pnpm exec playwright install-deps chromium` or `pnpm exec playwright-core install-deps chromium`.
+
+Older supported drivers do not provide a separate shell/full-channel choice. Install their default Chromium with `pnpm exec playwright install chromium` or `pnpm exec playwright-core install chromium`, or upgrade the driver before explicitly selecting `headless-shell` or full-channel `chromium`.
+
+Development tests still require Vitest 4 and `@vitest/browser-playwright`:
+
+```sh
+pnpm add -D vitest @vitest/browser-playwright
+```
+
+The `playwright-core` opt-in does not satisfy those test-runner dependencies. Headed Vitest work may also need full Chromium. Missing peers leave read tools available; project capabilities explain unavailable execution. Browser installation happens explicitly, never during an MCP call.
 
 Start a job with a fresh caller-generated UUID `requestKey`:
 

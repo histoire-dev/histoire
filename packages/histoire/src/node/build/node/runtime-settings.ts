@@ -1,6 +1,6 @@
 import type { RollupOutput } from 'rollup'
-import { readFileSync } from 'node:fs'
-import { tryResolveDependency } from '../../util/resolve-package.js'
+import type { NodeArtifactBrowserDriver } from './package.js'
+import { resolveBrowserSetupDriverIdentity } from '../../runtime/browser/setup/driver.js'
 
 /** Requires emitted variant session and actual preview Vitest modules, not package declarations. */
 export function includesEmbeddedTestRuntime(output: RollupOutput): boolean {
@@ -8,13 +8,24 @@ export function includesEmbeddedTestRuntime(output: RollupOutput): boolean {
   return modules.some(id => id.includes('/variant-test-session/')) && modules.some(id => id.includes('/@vitest/spy/')) && modules.some(id => id.includes('/@vitest/mocker/'))
 }
 
-/** Pins optional deployed browser dependency to the package exercised by this build. */
-export function resolveBuildPlaywrightVersion(root: string): string | undefined {
-  const path = tryResolveDependency(root, 'playwright/package.json')
-  if (!path) return
-  try {
-    const metadata = JSON.parse(readFileSync(path, 'utf8'))
-    return typeof metadata.version === 'string' && /^\d+\.\d+\.\d+(?:-[\w.-]+)?$/.test(metadata.version) ? metadata.version : undefined
+/**
+ * Pins the exact browser package selected by shared, launch-free driver discovery.
+ * @param root Project root used by shared browser-driver resolution.
+ */
+export async function resolveBuildBrowserDriver(root: string): Promise<NodeArtifactBrowserDriver | undefined> {
+  const result = await resolveBrowserSetupDriverIdentity(root)
+  if (result.status === 'missing') return
+  if (result.status === 'invalid') {
+    throw new Error(`Selected browser driver package metadata is invalid: ${result.packageName}`)
   }
-  catch { return undefined }
+  return { packageName: result.identity.packageName, version: result.identity.version }
+}
+
+/**
+ * Compatibility projection for callers that only need the legacy Playwright version.
+ * @param root Project root used by shared browser-driver resolution.
+ */
+export async function resolveBuildPlaywrightVersion(root: string): Promise<string | undefined> {
+  const browserDriver = await resolveBuildBrowserDriver(root)
+  return browserDriver?.packageName === 'playwright' ? browserDriver.version : undefined
 }

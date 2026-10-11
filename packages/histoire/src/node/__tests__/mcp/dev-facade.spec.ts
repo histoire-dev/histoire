@@ -1,7 +1,12 @@
+import type { ScreenshotSetupSnapshot } from '@histoire/shared'
 import type { ProjectRuntimeHandle, ProjectRuntimeStatus } from '../../runtime/types.js'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { createDevMcpProject } from '../../mcp/project/dev-facade.js'
 import { mcpProjectSchema } from '../../mcp/protocol/project-schema.js'
+import { getContextScreenshotSetup } from '../../runtime/registry.js'
+import * as preflight from '../../test/preflight.js'
+import * as projectVitest from '../../util/has-vitest.js'
+import * as packages from '../../util/resolve-package.js'
 import { deferred } from '../utils/mcp/deferred.js'
 import { createReadProjectFixture } from '../utils/mcp/read-project.js'
 
@@ -9,6 +14,7 @@ describe('generation-owned dev MCP facade', () => {
   const close: (() => unknown | Promise<unknown>)[] = []
   afterEach(async () => {
     await Promise.all(close.splice(0).reverse().map(fn => fn()))
+    vi.restoreAllMocks()
   })
   /** Control lifecycle without sockets, collection workers, or optional module loading. */
   async function fixture() {
@@ -117,5 +123,26 @@ describe('generation-owned dev MCP facade', () => {
     await ready('failed')
     expect(project.getProject()).toMatchObject({ status: 'failed', diagnostics: [{ code: 'COLLECTION_FAILED', message: 'Project catalog initialization failed' }] })
     expect(() => project.getStory({ storyId: 'story' })).toThrow(/failed/)
+  })
+
+  it('refreshes package potential and live setup health without changing test prerequisites', async () => {
+    const resolvePackage = vi.spyOn(packages, 'tryResolveDependency').mockReturnValue(null)
+    vi.spyOn(projectVitest, 'hasProjectVitest').mockReturnValue(true)
+    vi.spyOn(preflight, 'missingBrowserTestDependencies').mockReturnValue(['playwright'])
+    const { project, ready, handle } = await fixture()
+    let setup: ScreenshotSetupSnapshot = { revision: 0, state: 'unverified', attempts: [], repairs: [] }
+    const owner = getContextScreenshotSetup(handle.context, handle.isActive)
+    vi.spyOn(owner, 'getSnapshot').mockImplementation(() => setup)
+
+    await ready()
+    expect(project.getProject().capabilities).toMatchObject({ screenshots: { available: false }, inspection: { available: false }, tests: { available: false, engine: 'unavailable' } })
+
+    resolvePackage.mockImplementation((_root, name) => name === 'playwright-core' ? '/project/node_modules/playwright-core/index.js' : null)
+    expect(project.getProject().capabilities).toMatchObject({ screenshots: { available: true }, inspection: { available: true }, tests: { available: false, engine: 'unavailable' } })
+
+    setup = { revision: 1, state: 'needs-action', reason: 'browser-missing', attempts: [], repairs: [] }
+    expect(project.getProject().capabilities).toMatchObject({ screenshots: { available: false }, inspection: { available: false }, tests: { available: false, engine: 'unavailable' } })
+    setup = { revision: 2, state: 'ready', source: 'chromium', attempts: [], repairs: [] }
+    expect(project.getProject().capabilities).toMatchObject({ screenshots: { available: true }, inspection: { available: true }, tests: { available: false, engine: 'unavailable' } })
   })
 })

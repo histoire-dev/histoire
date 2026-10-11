@@ -25,6 +25,8 @@ import { createViteServers } from './vite-servers.js'
 
 /** Dev generation startup and publication ownership. */
 export interface CreateServerOptions extends ViteServerOptions {
+  /** Headless consumers can omit agent/comment service acquisition. */
+  agents?: boolean
   /** Cancels startup when its owning controller closes or restarts. */
   signal?: AbortSignal
   /** Suppresses publication from a superseded runtime generation. */
@@ -84,8 +86,10 @@ export async function createServer(ctx: Context, options: CreateServerOptions = 
     registerDevEvents(ctx, server, moduleLoader, execution, isActive)
     const uiChannel = registerUiChannel(ctx, server, execution, isActive)
     registerConfigChannel(ctx, uiChannel, isActive)
-    const agents = registerAgentsChannel(ctx, uiChannel, server)
-    registerCommentsChannel(ctx, uiChannel, agents, isActive)
+    if (options.agents !== false) {
+      const agents = registerAgentsChannel(ctx, uiChannel, server)
+      registerCommentsChannel(ctx, uiChannel, agents, isActive)
+    }
     cleanup.add(() => uiChannel.close())
     // Vite pre-bundling completes during listen; initial collection follows it.
     if (!options.middleware) {

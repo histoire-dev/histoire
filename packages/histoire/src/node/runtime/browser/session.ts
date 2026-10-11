@@ -1,10 +1,14 @@
 import type { Browser, BrowserContext, Frame, Page } from 'playwright'
 import type { LaunchPreviewBrowser } from './dependencies.js'
 import type { PreviewHostRegistry, PreviewHostTarget } from './preview-host.js'
+import type { CaptureBrowserLease, ScreenshotSetupOwner } from './setup/types.js'
+import { withCleanupDeadline } from '../cleanup.js'
+import { ExecutionError } from '../execution-types.js'
 import { closePreviewBrowser } from './cleanup.js'
-import { resolvePreviewBrowser } from './dependencies.js'
 import { PreviewError } from './errors.js'
 import { CAPTURE_LIMITS } from './limits.js'
+import { createScreenshotSetupOwner } from './setup/owner.js'
+import { createBrowserSetupPolicy } from './setup/policy.js'
 
 /** Browser session options shared by dev screenshots and deployed preview tests. */
 export interface PreviewSessionOptions {
@@ -16,17 +20,31 @@ export interface PreviewSessionOptions {
   target: PreviewHostTarget
   /** Injectable acquisition used by focused lifecycle tests. */
   launch?: LaunchPreviewBrowser
+  /** Runtime-owned progressive browser acquisition; explicit launch stays authoritative. */
+  setupOwner?: ScreenshotSetupOwner
   /** Whole preview deadline, including browser startup. */
   timeoutMs?: number
   /** Screenshot/inspection fixed style policy; test execution preserves story styles. */
   deterministicCapture?: boolean
+  /** Visual testing requires consecutive decoded captures to stabilize. */
+  stableCapture?: boolean
   /** Fixed internal observer attaches before navigation; never supplied by MCP callers. */
   observePage?: (page: Page) => void
 }
 
+/** Distinguishes a setup lease from legacy injected browser launch results. */
+function isCaptureBrowserLease(value: unknown): value is CaptureBrowserLease {
+  return typeof value === 'object' && value !== null && 'browser' in value && 'release' in value
+}
+
 /** Fresh owned browser/context/page; creation itself never launches resources. */
 export function createPreviewSession(options: PreviewSessionOptions) {
+  const ownsSetupOwner = !options.launch && !options.setupOwner
+  const setupOwner = options.launch
+    ? undefined
+    : options.setupOwner ?? createScreenshotSetupOwner({ root: options.root, policy: createBrowserSetupPolicy(undefined, options.root), isActive: options.target.isActive })
   let browser: Browser | undefined
+  let browserLease: CaptureBrowserLease | undefined
   let context: BrowserContext | undefined
   let page: Page | undefined
   let frame: Frame | undefined
@@ -36,7 +54,8 @@ export function createPreviewSession(options: PreviewSessionOptions) {
   let removeAbort: (() => void) | undefined
   let removePageError: (() => void) | undefined
   let closing: Promise<void> | undefined
-  let acquiring: Promise<Browser> | undefined
+  let acquiring: Promise<Browser | CaptureBrowserLease> | undefined
+  let pendingBrowserApi = 0
   let closed = false
   let opened = false
   let timedOut = false
@@ -46,16 +65,54 @@ export function createPreviewSession(options: PreviewSessionOptions) {
   function close() {
     closed = true
     lease?.close()
+    const discardPendingApi = pendingBrowserApi > 0
     removeAbort?.()
     removePageError?.()
     clearTimeout(timer)
     return closing ??= (async () => {
-      const owned = browser ?? await acquiring?.catch(() => undefined)
-      if (owned) await closePreviewBrowser(owned)
+      const acquired = await acquiring?.catch(() => undefined)
+      const lateLease = isCaptureBrowserLease(acquired) ? acquired : undefined
+      const leaseToRelease = browserLease ?? lateLease
+      const owned = browser ?? leaseToRelease?.browser ?? (acquired && !lateLease ? acquired : undefined)
+      if (leaseToRelease) {
+        let contextFailure: unknown
+        try {
+          if (context) await withCleanupDeadline(Promise.resolve().then(() => context!.close()), 2_500)
+        }
+        catch (error) {
+          contextFailure = error
+        }
+        if (contextFailure || discardPendingApi) {
+          try {
+            await (leaseToRelease.discard ?? leaseToRelease.release)()
+          }
+          catch (error) {
+            throw new ExecutionError(
+              'CLEANUP_UNCONFIRMED',
+              'Screenshot browser lease cleanup could not be confirmed',
+              new AggregateError([contextFailure, error], 'Context and browser cleanup failed'),
+            )
+          }
+          if (contextFailure) {
+            throw new ExecutionError('CLEANUP_UNCONFIRMED', 'Screenshot browser context cleanup could not be confirmed', contextFailure)
+          }
+          if (!leaseToRelease.discard) {
+            throw new ExecutionError('CLEANUP_UNCONFIRMED', 'Pending browser API cleanup could not be confirmed after release')
+          }
+        }
+        else {
+          await leaseToRelease.release()
+        }
+      }
+      else if (owned) {
+        await closePreviewBrowser(owned)
+      }
+      browserLease = undefined
       browser = undefined
       context = undefined
       page = undefined
       frame = undefined
+      if (ownsSetupOwner) await setupOwner?.close()
     })()
   }
   /** Remaining budget for every browser API; no independent readiness sleeps. */
@@ -64,6 +121,35 @@ export function createPreviewSession(options: PreviewSessionOptions) {
     signal?.throwIfAborted()
     if (closed) throw new PreviewError('CANCELLED', 'Preview session is closed')
     return Math.max(1, until - Date.now())
+  }
+  /** Races context APIs against cancellation and closes resources returned late. */
+  async function awaitSessionApi<T>(work: Promise<T>, closeLate?: (value: T) => Promise<unknown>): Promise<T> {
+    const operation = Promise.resolve(work)
+    pendingBrowserApi++
+    void operation.catch(() => {})
+    let rejectStop: ((error: unknown) => void) | undefined
+    const stopped = new Promise<never>((_resolve, reject) => {
+      rejectStop = reject
+    })
+    const onAbort = () => rejectStop?.(new PreviewError('CANCELLED', 'Preview operation cancelled'))
+    signal?.addEventListener('abort', onAbort, { once: true })
+    if (signal?.aborted) onAbort()
+    try {
+      const value = await Promise.race([operation, stopped])
+      if (signal?.aborted) throw new PreviewError('CANCELLED', 'Preview operation cancelled')
+      return value
+    }
+    catch (error) {
+      if (signal?.aborted) {
+        void close().catch(() => {})
+        if (closeLate) void operation.then(value => closeLate(value)).catch(() => {})
+      }
+      throw error
+    }
+    finally {
+      pendingBrowserApi--
+      signal?.removeEventListener('abort', onAbort)
+    }
   }
   /** Check live iframe document, whose WindowProxy survives a reload. */
   async function isDocumentReady(documentId: string): Promise<boolean> {
@@ -132,9 +218,17 @@ export function createPreviewSession(options: PreviewSessionOptions) {
         deadline.abort()
       }, remaining())
       try {
-        const launch = options.launch ?? await resolvePreviewBrowser(options.root)
-        acquiring = launch({ headless: true, timeout: remaining() })
-        browser = await acquiring
+        if (options.launch) {
+          const launchAcquisition = options.launch({ headless: true, timeout: remaining() })
+          acquiring = launchAcquisition
+          browser = await launchAcquisition
+        }
+        else {
+          const setupAcquisition = setupOwner!.acquire(signal, until)
+          acquiring = setupAcquisition
+          browserLease = await setupAcquisition
+          browser = browserLease.browser
+        }
         /** Abort browser APIs promptly; the lane still awaits confirmed cleanup. */
         const onAbort = () => {
           void close().catch(() => {})
@@ -143,9 +237,9 @@ export function createPreviewSession(options: PreviewSessionOptions) {
         removeAbort = () => signal?.removeEventListener('abort', onAbort)
         if (signal.aborted) onAbort()
         remaining()
-        context = await browser.newContext({ viewport: { width: options.target.width, height: options.target.height }, colorScheme: options.target.colorScheme, deviceScaleFactor: options.target.deviceScaleFactor ?? 1, reducedMotion: 'reduce', ...(options.deterministicCapture ? { timezoneId: 'UTC', locale: 'en-US' } : {}) })
+        context = await awaitSessionApi(browser.newContext({ viewport: { width: options.target.width, height: options.target.height }, colorScheme: options.target.colorScheme, deviceScaleFactor: options.target.deviceScaleFactor ?? 1, reducedMotion: 'reduce', ...(options.deterministicCapture ? { timezoneId: 'UTC', locale: 'en-US' } : {}) }), value => value.close())
         remaining()
-        page = await context.newPage()
+        page = await awaitSessionApi(context!.newPage())
         options.observePage?.(page)
         /** Uncaught preview errors fail the owned job without exposing raw stacks. */
         const onPageError = () => {

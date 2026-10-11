@@ -6,12 +6,13 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { createExecutionService } from '../runtime/execution-service.js'
-import { listScreenshotFiles, saveScreenshotFile } from '../server/ui-channel/files.js'
+import { listScreenshotFiles, saveScreenshotFile, screenshotFilePathForBudget } from '../server/ui-channel/files.js'
 import { installUiHttpRouter } from '../server/ui-channel/http.js'
 import { registerScreenshotChannel } from '../server/ui-channel/screenshot.js'
 import { UI_CHANNEL_BYTES } from '../server/ui-channel/validation.js'
 import { createMcpPreviewHtmlMiddleware } from '../vite/mcp-preview-html.js'
 import { PREVIEW_PNG } from './utils/mcp/preview-browser.js'
+import { createPreviewPng } from './utils/mcp/preview-png.js'
 import { uiChannelFixture } from './utils/ui-channel.js'
 
 const roots: string[] = []
@@ -31,7 +32,7 @@ function fixture(context: Context) {
   createMcpPreviewHtmlMiddleware(value.server)
   ;(value.server as { resolvedUrls?: { local: string[] } }).resolvedUrls = { local: ['http://localhost:6006/'] }
   const execution = createExecutionService()
-  registerScreenshotChannel(context, value.server, value.channel, execution, () => true)
+  registerScreenshotChannel(context, value.server, value.channel, execution, () => true, { launch: preview.session.launch })
   return { ...value, execution }
 }
 
@@ -59,9 +60,58 @@ function context(root: string, input: UiScreenshotRequest): Context {
 
 afterEach(async () => {
   await Promise.all(roots.splice(0).map(root => rm(root, { recursive: true, force: true })))
+  preview.screenshot.mockReset().mockImplementation(async () => PREVIEW_PNG)
 })
 
 describe('bounded screenshot channel replies', () => {
+  it('captures exact small positive viewport dimensions without clamping', async () => {
+    const root = await mkdtemp(join(tmpdir(), 'histoire-ui-screenshot-small-'))
+    roots.push(root)
+    const input: UiScreenshotRequest = {
+      requestId: 'small-capture',
+      targets: [{ storyId: 'story', variantId: 'variant' }],
+      viewport: { width: 128, height: 96 },
+      scale: 1,
+      format: 'png',
+      background: 'transparent',
+    }
+    const value = fixture(context(root, input))
+    preview.newContext.mockClear()
+    preview.screenshot.mockResolvedValueOnce(createPreviewPng(128, 96))
+
+    await value.request('histoire:ui:screenshot', input)
+
+    expect(preview.newContext).toHaveBeenCalledWith(expect.objectContaining({ viewport: { width: 128, height: 96 } }))
+    expect(value.client.send.mock.calls[0][1]).toMatchObject({ files: [{ storyId: 'story', variantId: 'variant' }] })
+    await value.channel.close()
+    await value.execution.close()
+  })
+
+  it.each([
+    [{ width: 0, height: 96 }, 'Screenshot viewport width must be an integer between 1 and 3840'],
+    [{ width: 128, height: 1.5 }, 'Screenshot viewport height must be an integer between 1 and 2160'],
+  ])('returns a fixed field-specific error for invalid viewport %j', async (viewport, message) => {
+    const root = await mkdtemp(join(tmpdir(), 'histoire-ui-screenshot-invalid-size-'))
+    roots.push(root)
+    const input = {
+      requestId: 'invalid-size',
+      targets: [{ storyId: 'story', variantId: 'variant' }],
+      viewport,
+      scale: 1,
+      format: 'png',
+      background: 'transparent',
+    }
+    const value = fixture(context(root, input as UiScreenshotRequest))
+    const enqueue = vi.spyOn(value.execution, 'enqueue')
+
+    await value.request('histoire:ui:screenshot', input)
+
+    expect(enqueue).not.toHaveBeenCalled()
+    expect(value.client.send.mock.calls[0][1]).toMatchObject({ requestId: 'invalid-size', error: { code: 'invalid', message } })
+    await value.channel.close()
+    await value.execution.close()
+  })
+
   it('rejects a valid 64-target capture before writing receipts that cannot fit one correlated event', async () => {
     const root = await mkdtemp(join(tmpdir(), 'histoire-ui-screenshot-channel-'))
     roots.push(root)
@@ -97,6 +147,31 @@ describe('bounded screenshot channel replies', () => {
     expect(result).toEqual({ requestId: input.requestId, files: expect.any(Array) })
     expect(result.files.map((file: { storyId: string, variantId: string }) => [file.storyId, file.variantId])).toEqual(input.targets.map(target => [target.storyId, target.variantId]))
     expect(Buffer.byteLength(JSON.stringify({ type: 'custom', event, data: result }))).toBeLessThanOrEqual(UI_CHANNEL_BYTES)
+    expect(Buffer.byteLength(JSON.stringify({ type: 'custom', event, data: result })) + 8 * 1024).toBeLessThanOrEqual(UI_CHANNEL_BYTES)
+    await value.channel.close()
+    await value.execution.close()
+  })
+
+  it('reserves setup diagnostic bytes once before admitting a near-limit 64-target result', async () => {
+    const root = await mkdtemp(join(tmpdir(), 'histoire-ui-screenshot-reserve-'))
+    roots.push(root)
+    const input = {
+      ...oversizedCapture(),
+      requestId: 'reserved-result',
+      targets: Array.from({ length: 64 }, (_, index) => ({ storyId: `story-${index}-${'s'.repeat(330)}`, variantId: `variant-${index}-${'v'.repeat(330)}` })),
+    }
+    const files = input.targets.map(target => ({ path: screenshotFilePathForBudget(target, input.format), storyId: target.storyId, variantId: target.variantId }))
+    const frame = { type: 'custom', event: 'histoire:ui:screenshot-result', data: { requestId: input.requestId, files } }
+    expect(Buffer.byteLength(JSON.stringify(input))).toBeLessThanOrEqual(UI_CHANNEL_BYTES)
+    expect(Buffer.byteLength(JSON.stringify(frame))).toBeLessThanOrEqual(UI_CHANNEL_BYTES)
+    expect(Buffer.byteLength(JSON.stringify(frame)) + 8 * 1024).toBeGreaterThan(UI_CHANNEL_BYTES)
+
+    const value = fixture(context(root, input))
+    const enqueue = vi.spyOn(value.execution, 'enqueue')
+    await value.request('histoire:ui:screenshot', input)
+
+    expect(enqueue).not.toHaveBeenCalled()
+    expect(value.client.send).toHaveBeenCalledWith('histoire:ui:screenshot-result', { requestId: input.requestId, error: { code: 'invalid', message: 'Capture result exceeds the 64 KB channel limit' } })
     await value.channel.close()
     await value.execution.close()
   })

@@ -1,5 +1,6 @@
 import type { ArtifactManifest } from '../../deploy/artifact-schema.js'
 import type { NodeBuildLayout } from './layout.js'
+import type { NodeArtifactBrowserDriver } from './package.js'
 import type { NodeBuildSnapshot } from './snapshot.js'
 import { writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
@@ -20,8 +21,10 @@ export interface WriteNodeArtifactOptions {
   entryFile: string
   /** Actual preview test runtime was emitted by browser build. */
   testRuntimeIncluded: boolean
-  /** Optional supported browser version, resolved at build time. */
+  /** @deprecated Legacy Playwright-only version; use browserDriver to preserve package kind. */
   playwrightVersion?: string
+  /** Exact project-first browser driver selected without importing or launching it. */
+  browserDriver?: NodeArtifactBrowserDriver
   /** Installed package metadata version, injectable for focused writer tests. */
   histoireVersion?: string
 }
@@ -32,7 +35,7 @@ export async function writeNodeArtifact(options: WriteNodeArtifactOptions): Prom
   const manifest = createArtifactManifest(options.snapshot, await inventoryPublicAssets(options.layout.publicDir), options.testRuntimeIncluded, version)
   await writeNodeContent(options.layout.privateDir, options.snapshot.blobs)
   await writeFile(join(options.layout.privateDir, 'manifest.json'), JSON.stringify(manifest), 'utf8')
-  await writeFile(join(options.layout.stagingDir, 'package.json'), `${JSON.stringify(createNodePackage(version, options.playwrightVersion), null, 2)}\n`, 'utf8')
+  await writeFile(join(options.layout.stagingDir, 'package.json'), `${JSON.stringify(createNodePackage(version, options.browserDriver ?? options.playwrightVersion), null, 2)}\n`, 'utf8')
   const bundlePath = join(options.layout.stagingDir, 'server.mjs')
   await bundleNodeRuntime(options.entryFile, bundlePath)
   await validateNodeBundleImport(bundlePath)

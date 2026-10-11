@@ -9,12 +9,13 @@ import { registerDevTestExecutor } from '../operations/tests.js'
 import { createDevMcpProject } from '../project/dev-facade.js'
 
 /** Own project, facade and execution services even when dev HTTP is disabled. */
-export function createWorkerRuntime(options: { config?: string, projectId: string }) {
+export function createWorkerRuntime(options: { root: string, config?: string, projectId: string }) {
   const execution = createExecutionService()
   const activity = createDevMcpActivity()
   activity.setEnabled(true)
   let operations: ReturnType<typeof createDevMcpOperations>
   const controller = createProjectRuntimeController({
+    root: options.root,
     config: options.config,
     host: '127.0.0.1',
     port: 0,

@@ -20,7 +20,7 @@ export async function resolvePreviewBrowser(root: string): Promise<LaunchPreview
       return await chromium.launch(options)
     }
     catch {
-      throw new PreviewError('BROWSER_UNAVAILABLE', 'Chromium could not launch. Install browser with: pnpm exec playwright install chromium', true)
+      throw new PreviewError('BROWSER_UNAVAILABLE', 'Chromium could not launch. Install browser with: pnpm exec playwright install chromium --only-shell', true)
     }
   }
 }

@@ -21,9 +21,9 @@ function forbiddenImport(id: string): boolean {
 /** Checks relative or resolved paths that could bypass a package-name import guard. */
 function forbiddenInput(id: string): boolean {
   const normalized = resolve(id).replace(/\\/g, '/')
-  // These exact audited modules contain only policy validation and SDK-free
-  // cleanup ownership. Their transitive inputs remain subject to every guard.
-  if (/\/histoire\/(?:src|dist)\/node\/(?:config\/embed-built|runtime\/cleanup)\.[cm]?[jt]s$/.test(normalized)) return false
+  // These exact modules contain built-policy validation, browser path
+  // normalization, or SDK-free cleanup. Transitive inputs remain guarded.
+  if (/\/histoire\/(?:src|dist)\/node\/(?:config\/(?:embed-built|browser)|runtime\/cleanup)\.[cm]?[jt]s$/.test(normalized)) return false
   return /\/node_modules\/(?:vite|vite-node|vitest|@vue\/compiler[^/]*|@vitest\/(?:runner|browser|browser-playwright))\//.test(normalized)
     || /\/histoire-(?:sdk|vue|app|controls|vendors)\/(?:src|dist)\//.test(normalized)
     || /\/histoire\/(?:src|dist)\/node\/(?:context|dev|index|load|stories|preview)\.[cm]?[jt]s$/.test(normalized)

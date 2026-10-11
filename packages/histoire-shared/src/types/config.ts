@@ -3,6 +3,7 @@ import type {
   UserConfig as ViteConfig,
   ConfigEnv as ViteConfigEnv,
 } from 'vite'
+import type { HistoireBrowserConfig } from './config-browser.js'
 import type { HistoireThemeConfig } from './config-theme.js'
 import type { HistoireUiConfig } from './config-ui.js'
 import type { HistoireEmbedConfig, HistoirePreviewConfig } from './embed-config.js'
@@ -42,6 +43,8 @@ export * from './config-ui.js'
 
 export interface HistoireConfig extends HistoireUiConfig {
   /** Initial host-owned globals; embedded sessions keep separate runtime values. */
+  /** Browser selection for Histoire-owned isolated screenshots and inspections. */
+  browser?: HistoireBrowserConfig
   preview?: HistoirePreviewConfig
   plugins: Plugin[]
   /** Opt-in data bridge and reusable browser surface documents. */

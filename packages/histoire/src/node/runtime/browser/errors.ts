@@ -1,4 +1,5 @@
 import type { HistoireErrorCode } from '@histoire/protocol'
+import type { ScreenshotSetupSnapshot } from '@histoire/shared'
 
 /** Browser service exposes existing portable codes, without transport schemas. */
 export type PreviewErrorCode = Extract<HistoireErrorCode, 'DEPENDENCY_MISSING' | 'BROWSER_UNAVAILABLE' | 'PREVIEW_NOT_READY' | 'RESULT_TOO_LARGE' | 'CANCELLED' | 'TIMEOUT' | 'INTERNAL_ERROR'>
@@ -9,12 +10,15 @@ export class PreviewError extends Error {
   readonly code: PreviewErrorCode
   /** Whether changed external state may allow a later caller attempt. */
   readonly retryable: boolean
+  /** Portable setup diagnosis attached only to classified setup failures. */
+  readonly setup?: ScreenshotSetupSnapshot
 
   /** Retains deliberate public message without exposing browser causes. */
-  constructor(code: PreviewErrorCode, message: string, retryable = false) {
-    super(message)
+  constructor(code: PreviewErrorCode, message: string, retryable = false, setup?: ScreenshotSetupSnapshot, cause?: unknown) {
+    super(message, cause === undefined ? undefined : { cause })
     this.name = 'PreviewError'
     this.code = code
     this.retryable = retryable
+    this.setup = setup
   }
 }

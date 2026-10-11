@@ -12,6 +12,8 @@ pnpm add -D vitest@latest @vitest/browser-playwright@latest playwright
 
 Keep `vitest` and `@vitest/browser-playwright` on same version. Histoire uses project installation instead of bundling separate Vitest copy.
 
+This remains required for development story tests even when the screenshot setup uses an already installed Chrome/Edge or the optional `playwright-core` driver. Screenshot browser discovery does not configure or replace the project Vitest browser runner; see [screenshot setup](./ui-screenshots-mcp.md) for that separate path.
+
 ## Register story tests
 
 Use `onTest` inside story and import test APIs from `vitest`:

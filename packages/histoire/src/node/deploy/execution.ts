@@ -4,6 +4,7 @@ import type { McpOperations } from '../mcp/operations/store.js'
 import type { McpExecutionCapture } from '../mcp/operations/types.js'
 import type { McpToolInput } from '../mcp/protocol/tool-schema.js'
 import type { PreviewSessionOptions } from '../runtime/browser/session.js'
+import type { ScreenshotSetupOwner } from '../runtime/browser/setup/types.js'
 import type { NodeArtifact } from './artifact-reader.js'
 import type { NodeCatalog } from './catalog.js'
 import { createScreenshotTask } from '../mcp/browser/screenshot.js'
@@ -19,6 +20,8 @@ export interface NodeExecutionValue {
   host: PreviewHostRegistry
   /** Actual loopback listener origin for internal automation. */
   readonly origin: string
+  /** Deployment-generation setup owner; injected launch fixtures bypass it. */
+  setupOwner?: ScreenshotSetupOwner
 }
 
 /** Immutable Node preview authority is shared by screenshots and inspection. */
@@ -26,7 +29,8 @@ export function resolveNodePreviewOptions(target: McpToolInput<'histoire_capture
   const { artifact, catalog, host, origin } = capture.value
   catalog.getTarget(target.storyId, target.variantId, capture.revision)
   const manifest = artifact.manifest
-  return { root: artifact.root, host, launch, target: { origin, storyId: target.storyId, variantId: target.variantId, epoch: capture.epoch, width: target.width, height: target.height, deviceScaleFactor: target.deviceScaleFactor, globals: target.globals ?? manifest.globals ?? {}, colorScheme: target.colorScheme ?? (manifest.defaultColorScheme === 'auto' ? undefined : manifest.defaultColorScheme), textDirection: target.textDirection, backgroundColor: manifest.backgroundColor, isActive: capture.isActive } }
+  const setupOwner = launch ? undefined : capture.value.setupOwner
+  return { root: artifact.root, host, launch, ...(setupOwner ? { setupOwner } : {}), target: { origin, storyId: target.storyId, variantId: target.variantId, epoch: capture.epoch, width: target.width, height: target.height, deviceScaleFactor: target.deviceScaleFactor, globals: target.globals ?? manifest.globals ?? {}, colorScheme: target.colorScheme ?? (manifest.defaultColorScheme === 'auto' ? undefined : manifest.defaultColorScheme), textDirection: target.textDirection, backgroundColor: manifest.backgroundColor, isActive: capture.isActive } }
 }
 
 /** Install production screenshot executor without runtime source or Vite imports. */

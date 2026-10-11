@@ -34,7 +34,7 @@ import { generateEntryHtml, generateScriptLinks } from './html.js'
 import { writeNodeArtifact } from './node/artifact.js'
 import { assertNodeOutputSafe, createNodeBuildLayout } from './node/layout.js'
 import { publishNodeArtifact } from './node/publish.js'
-import { includesEmbeddedTestRuntime, resolveBuildPlaywrightVersion } from './node/runtime-settings.js'
+import { includesEmbeddedTestRuntime, resolveBuildBrowserDriver } from './node/runtime-settings.js'
 import { captureNodeBuildInputs, createNodeBuildSnapshot } from './node/snapshot.js'
 import { resolveBuildTarget } from './node/target.js'
 import { writeFile, writeMswWorker } from './output.js'
@@ -191,7 +191,7 @@ export async function build(ctx: Context, options: BuildOptions = {}) {
     await writeLocalSourceDescriptor(ctx, localSource, outputRoot, capture.buildId)
     if (layout) {
       const snapshot = await createNodeBuildSnapshot(ctx, inputs)
-      await writeNodeArtifact({ layout, snapshot, entryFile: options.nodeEntryFile, testRuntimeIncluded: includesEmbeddedTestRuntime(result), playwrightVersion: resolveBuildPlaywrightVersion(ctx.root) })
+      await writeNodeArtifact({ layout, snapshot, entryFile: options.nodeEntryFile, testRuntimeIncluded: includesEmbeddedTestRuntime(result), browserDriver: await resolveBuildBrowserDriver(ctx.root) })
       await publishNodeArtifact(layout)
     }
   }

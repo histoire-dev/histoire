@@ -40,6 +40,20 @@ describe('portable Node server', () => {
     expect((await fetch(`${runtime.origin}/book/__histoire/mcp`)).status).toBe(404)
   })
 
+  it('keeps injected browser launch authoritative over deployment environment', async () => {
+    runtime = await createNodeServer({
+      artifactDirectory: fixture.root,
+      environment: { HOST: '127.0.0.1', PORT: '0', HISTOIRE_BROWSER_SOURCE: 'future-source' },
+      arguments: ['--no-mcp'],
+      launch: async () => {
+        throw new Error('injected browser should not run during catalog reads')
+      },
+    })
+    const project = await runtime.project.getProject()
+    expect(project.capabilities.screenshots.available).toBe(true)
+    expect((await fetch(`${runtime.origin}/book/`)).status).toBe(200)
+  })
+
   it('drains owned work and releases port after close', async () => {
     const running = deferred()
     const cleaned = deferred()

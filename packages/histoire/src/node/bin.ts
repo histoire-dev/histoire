@@ -2,6 +2,7 @@ import fs from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, resolve } from 'pathe'
 import sade from 'sade'
+import { reportInvalidScreenshotSetupArguments, validateScreenshotSetupArguments } from './commands/screenshot-setup-args.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
@@ -65,4 +66,26 @@ program.command('test')
     return testCommand(options, rawVitestArgs)
   })
 
-program.parse(process.argv)
+program.command('screenshot-setup')
+  .describe('inspect or explicitly check screenshot browser setup')
+  .option('--root <directory>', 'Existing project directory (default current directory)')
+  .option('-c, --config <file>', 'Histoire config file relative to project root')
+  .option('--check', 'Launch and release one finite screenshot setup probe')
+  .option('--json', 'Print one JSON snapshot or error object')
+  .action(async (options) => {
+    const { screenshotSetupCommand } = await import('./commands/screenshot-setup.js')
+    return screenshotSetupCommand(options)
+  })
+
+// Sade exits with status 1 for malformed arguments, so preserve the command's
+// documented status 2 for invalid screenshot setup input.
+const screenshotSetupInvalid = process.argv[2] === 'screenshot-setup'
+  ? validateScreenshotSetupArguments(process.argv.slice(3))
+  : undefined
+if (screenshotSetupInvalid) {
+  reportInvalidScreenshotSetupArguments(process.argv.slice(3).includes('--json'))
+  process.exitCode = 2
+}
+else {
+  program.parse(process.argv)
+}

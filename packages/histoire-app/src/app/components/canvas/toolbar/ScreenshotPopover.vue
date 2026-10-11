@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { UiChannelError, UiScreenshotFile, UiScreenshotRequest } from '@histoire/shared'
+import type { ScreenshotSetupSnapshot, UiChannelError, UiScreenshotFile, UiScreenshotRequest } from '@histoire/shared'
 import { BuiltinIcon, HstButton, HstButtonGroup } from '@histoire/controls/vue'
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { useCanvasFrames, useCanvasStore } from '../../../composables/canvas-settings.js'
@@ -10,8 +10,10 @@ import { snapshotScreenshotTargets } from '../../../util/screenshot-targets.js'
 import { onUiDisconnect, onUiEvent, sendUiEvent } from '../../../util/ui-channel.js'
 import { useCaptureDiscoveryPause } from '../../panes/tests/capture.js'
 
+import ScreenshotSetup from './ScreenshotSetup.vue'
 import { useCanvasPreviewSettings } from './session-settings.js'
 import ToolbarPopover from './ToolbarPopover.vue'
+import { useScreenshotSetup } from './use-screenshot-setup.js'
 
 /** Canvas selection supplies exact story identity without route/global coupling. */
 const props = defineProps<{
@@ -41,6 +43,10 @@ const requestId = ref<string | null>(null)
 useCaptureDiscoveryPause(requestId)
 const recent = ref<UiScreenshotFile[]>([])
 const error = ref<UiChannelError | null>(null)
+const capturedSetup = ref<ScreenshotSetupSnapshot | null>(null)
+const screenshotSetup = useScreenshotSetup()
+/** Capture controls exist only after the owned setup snapshot is ready. */
+const setupReady = computed(() => screenshotSetup.snapshot.value?.state === 'ready')
 const message = ref('')
 const copied = ref('')
 const listRequest = ref('')
@@ -73,6 +79,7 @@ function capture() {
   const viewport = props.viewport ?? { width: frame?.rect.width ?? settings.responsiveWidth ?? 1024, height: frame?.rect.height ?? settings.responsiveHeight ?? 640 }
   const background = frame && canvas.frameBackgrounds[frame.id] ? canvas.frameBackgrounds[frame.id] : settings
   error.value = null
+  capturedSetup.value = null
   message.value = ''
   if (targets.value.length > 64) {
     error.value = { code: 'invalid', message: 'Capture up to 64 frames at once' }
@@ -116,8 +123,10 @@ const disposers = [
     requestId.value = null
     if ('error' in result) {
       error.value = result.error
+      capturedSetup.value = result.error.setup ?? null
       return
     }
+    capturedSetup.value = result.setup ?? null
     recent.value = [...result.files.slice().reverse(), ...recent.value].slice(0, 20)
     message.value = result.errors?.length ? `${result.files.length} captured, ${result.errors.length} failed` : `${result.files.length} frame${result.files.length === 1 ? '' : 's'} captured`
     error.value = result.errors?.[0]?.error ?? null
@@ -128,11 +137,13 @@ const disposers = [
     error.value = { code: 'unavailable', message: 'Screenshot service unavailable' }
   }),
 ]
+watch(capturedSetup, value => screenshotSetup.acceptCaptureSetup(value))
 watch(() => open.value === 'screenshot', (opened) => {
   if (!opened) return
+  screenshotSetup.read()
   listRequest.value = identity()
   sendUiEvent('histoire:ui:screenshot-list', { requestId: listRequest.value })
-})
+}, { immediate: true })
 watch(() => props.trigger, () => {
   scope.value = 'selected'
   setOpen('screenshot')
@@ -146,37 +157,40 @@ onBeforeUnmount(() => {
 <template>
   <ToolbarPopover id="screenshot" :open="open" label="Screenshot" icon="camera" :width="330" @update:open="setOpen">
     <div class="screenshot-content">
-      <p class="popover-title">
-        Screenshot
-      </p>
-      <HstButtonGroup v-model="scope" title="Frames" aria-label="Capture frames" layout="horizontal" :options="[{ value: 'selected', label: 'Selected' }, { value: 'all', label: `All ${allTargets.length}` }]" />
-      <HstButtonGroup v-model="scale" title="Scale" aria-label="Screenshot scale" layout="horizontal" :options="[1, 2, 3].map(value => ({ value, label: `${value}×` }))" />
-      <HstButtonGroup v-model="format" title="Format" aria-label="Screenshot format" layout="horizontal" :options="[{ value: 'png', label: 'PNG' }, { value: 'webp', label: 'WebP' }]" />
-      <div class="screenshot-option">
-        <span>Save to</span><code>.histoire/screenshots/</code>
-      </div>
-      <HstButton v-if="!requestId" color="primary" type="button" class="screenshot-capture" :disabled="!targets.length" @click="capture">
-        <BuiltinIcon icon="camera" :size="16" />Capture {{ targets.length }} frame{{ targets.length === 1 ? '' : 's' }}
-      </HstButton>
-      <HstButton v-else color="primary" type="button" class="screenshot-capture" @click="cancel">
-        Cancel capture
-      </HstButton>
-      <p v-if="message" class="capture-message" role="status">
-        {{ message }}
-      </p>
-      <p v-if="error" class="popover-error" role="alert">
-        {{ error.message }}
-      </p>
-      <template v-if="recent.length">
-        <div class="popover-divider" /><p class="popover-title">
-          Recent
+      <template v-if="setupReady">
+        <p class="popover-title">
+          Screenshot
         </p>
-        <div v-for="file in recentFiles" :key="file.path" class="recent-capture">
-          <img :src="imageUrl(file)" alt="" loading="lazy"><span :title="file.metadata"><strong>{{ file.label }}</strong><small><time v-if="file.capturedAt" :datetime="file.capturedAt">{{ file.time }}</time><code>{{ file.shortName }}</code></small></span><HstButton icon-only color="flat" type="button" :aria-label="`Copy path for ${file.label}`" :title="copied === file.path ? 'Copied' : 'Copy path'" @click="copyPath(file.path)">
-            <BuiltinIcon :icon="copied === file.path ? 'checkmark' : 'copy'" :size="16" />
-          </HstButton>
+        <HstButtonGroup v-model="scope" title="Frames" aria-label="Capture frames" layout="horizontal" :options="[{ value: 'selected', label: 'Selected' }, { value: 'all', label: `All ${allTargets.length}` }]" />
+        <HstButtonGroup v-model="scale" title="Scale" aria-label="Screenshot scale" layout="horizontal" :options="[1, 2, 3].map(value => ({ value, label: `${value}×` }))" />
+        <HstButtonGroup v-model="format" title="Format" aria-label="Screenshot format" layout="horizontal" :options="[{ value: 'png', label: 'PNG' }, { value: 'webp', label: 'WebP' }]" />
+        <div class="screenshot-option">
+          <span>Save to</span><code>.histoire/screenshots/</code>
         </div>
+        <HstButton v-if="!requestId" color="primary" type="button" class="screenshot-capture" :disabled="!targets.length" @click="capture">
+          <BuiltinIcon icon="camera" :size="16" />Capture {{ targets.length }} frame{{ targets.length === 1 ? '' : 's' }}
+        </HstButton>
+        <HstButton v-else color="primary" type="button" class="screenshot-capture" @click="cancel">
+          Cancel capture
+        </HstButton>
+        <p v-if="message" class="capture-message" role="status">
+          {{ message }}
+        </p>
+        <p v-if="error" class="popover-error" role="alert">
+          {{ error.message }}
+        </p>
+        <template v-if="recent.length">
+          <div class="popover-divider" /><p class="popover-title">
+            Recent
+          </p>
+          <div v-for="file in recentFiles" :key="file.path" class="recent-capture">
+            <img :src="imageUrl(file)" alt="" loading="lazy"><span :title="file.metadata"><strong>{{ file.label }}</strong><small><time v-if="file.capturedAt" :datetime="file.capturedAt">{{ file.time }}</time><code>{{ file.shortName }}</code></small></span><HstButton icon-only color="flat" type="button" :aria-label="`Copy path for ${file.label}`" :title="copied === file.path ? 'Copied' : 'Copy path'" @click="copyPath(file.path)">
+              <BuiltinIcon :icon="copied === file.path ? 'checkmark' : 'copy'" :size="16" />
+            </HstButton>
+          </div>
+        </template>
       </template>
+      <ScreenshotSetup v-else :controller="screenshotSetup" />
     </div>
   </ToolbarPopover>
 </template>

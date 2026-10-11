@@ -106,7 +106,7 @@ describe('copied Node artifact without original project', () => {
       const job = await callMcp(client, 'histoire_capture_screenshot', { storyId: '..', variantId: 'a:/雪', requestKey: 'missing-chromium' })
       const result = await waitMcp(() => callMcp(client!, 'histoire_get_operation', { operationId: job.data.operationId }), value => ['failed', 'completed', 'cancelled'].includes(value.data?.state))
       expect(result.data).toMatchObject({ state: 'failed', error: { code: 'BROWSER_UNAVAILABLE' } })
-      expect(result.data.error.message).toContain('playwright install chromium')
+      expect(result.data.error.message).toContain('playwright install chromium --only-shell')
     }
     finally {
       await client?.close()

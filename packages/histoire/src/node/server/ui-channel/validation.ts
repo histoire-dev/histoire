@@ -13,10 +13,10 @@ export function assertUiPayload(value: unknown): void {
 }
 
 /** Check Vite's complete custom-event frame before a feature admits bounded work. */
-export function isUiChannelEventWithinBudget(event: string, data: unknown): boolean {
+export function isUiChannelEventWithinBudget(event: string, data: unknown, reservedBytes = 0): boolean {
   try {
     const json = JSON.stringify({ type: 'custom', event, data })
-    return json !== undefined && Buffer.byteLength(json) <= UI_CHANNEL_BYTES
+    return json !== undefined && reservedBytes >= 0 && Buffer.byteLength(json) + reservedBytes <= UI_CHANNEL_BYTES
   }
   catch {
     return false

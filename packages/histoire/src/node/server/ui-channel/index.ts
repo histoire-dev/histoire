@@ -5,6 +5,7 @@ import type { UiChannelServer } from './types.js'
 import { getContextRegistry } from '../../runtime/registry.js'
 import { createUiChannel } from './channel.js'
 import { registerMcpChannel } from './mcp.js'
+import { registerScreenshotSetupChannel } from './screenshot-setup.js'
 import { registerScreenshotChannel } from './screenshot.js'
 
 /** Generation-scoped integration point for config, comments, and ACP features. */
@@ -22,6 +23,8 @@ export function registerUiChannel(ctx: Context, server: ViteDevServer, execution
   })
   registerScreenshotChannel(ctx, server, channel, execution, isActive)
   registerMcpChannel(ctx, channel)
+  registerVisualChannel(ctx, server, channel, execution, isActive)
+  registerScreenshotSetupChannel(ctx, channel, execution, isActive)
   return channel
 }
 

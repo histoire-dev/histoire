@@ -1,5 +1,10 @@
+import type { HistoireBrowserConfig, HistoireBrowserSource } from '@histoire/shared'
+import type { BrowserSetupPolicy } from '../runtime/browser/setup/types.js'
 import { isIP } from 'node:net'
 import { captureMcpToken, validateMcpToken } from '../mcp/transport/http-auth.js'
+import { createBrowserSetupPolicy } from '../runtime/browser/setup/policy.js'
+
+const browserSources = new Set<HistoireBrowserSource>(['auto', 'headless-shell', 'chromium', 'chrome', 'msedge', 'executable'])
 
 /** Validated immutable listener settings; no project config or proxy input. */
 export interface NodeServerOptions {
@@ -13,6 +18,35 @@ export interface NodeServerOptions {
   mcpEnabled: boolean
   /** Private captured credential, never projected into project data. */
   token?: string
+}
+
+/**
+ * Converts target-owned deployment environment into one project-root policy.
+ * @param environment Target process environment.
+ * @param artifactRoot Real copied-artifact root for relative executable paths.
+ */
+export function resolveNodeBrowserPolicy(environment: NodeJS.ProcessEnv, artifactRoot: string): BrowserSetupPolicy {
+  const source = environment.HISTOIRE_BROWSER_SOURCE ?? 'auto'
+  const executablePath = environment.HISTOIRE_BROWSER_EXECUTABLE_PATH
+  if (!browserSources.has(source as HistoireBrowserSource)) {
+    throw new Error('HISTOIRE_BROWSER_SOURCE must be auto, headless-shell, chromium, chrome, msedge, or executable')
+  }
+  if (executablePath !== undefined && source !== 'executable') {
+    throw new Error('HISTOIRE_BROWSER_EXECUTABLE_PATH requires HISTOIRE_BROWSER_SOURCE=executable')
+  }
+  if (source === 'executable' && (!executablePath || executablePath.trim().length === 0)) {
+    throw new Error('HISTOIRE_BROWSER_EXECUTABLE_PATH is required when HISTOIRE_BROWSER_SOURCE=executable')
+  }
+
+  const config: HistoireBrowserConfig = source === 'executable'
+    ? { source, executablePath: executablePath! }
+    : { source: source as Exclude<HistoireBrowserSource, 'executable'> }
+  try {
+    return createBrowserSetupPolicy(config, artifactRoot)
+  }
+  catch {
+    throw new Error('HISTOIRE_BROWSER_EXECUTABLE_PATH must be a local filesystem path')
+  }
 }
 
 /** Derive only documented production env/flags, removing credential immediately. */

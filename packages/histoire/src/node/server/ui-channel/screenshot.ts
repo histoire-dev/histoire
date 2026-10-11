@@ -1,19 +1,34 @@
 import type { UiChannelError, UiScreenshotRequest, UiScreenshotResult } from '@histoire/shared'
 import type { ViteDevServer } from 'vite'
 import type { Context } from '../../context.js'
+import type { PreviewSessionOptions } from '../../runtime/browser/session.js'
 import type { ExecutionService } from '../../runtime/execution-service.js'
-import type { UiChannelServer } from './types.js'
+import type { UiClientConnection } from './client-connection.js'
+import type { UiChannelClient, UiChannelServer } from './types.js'
 import { Buffer } from 'node:buffer'
 import { randomUUID } from 'node:crypto'
+import { getContextScreenshotSetup } from '../../runtime/registry.js'
 import { getDevPreviewHost } from '../../vite/mcp-preview-html.js'
+import { observeUiClientConnection } from './client-connection.js'
 import { listScreenshotFiles, readScreenshotFile, screenshotFilePathForBudget } from './files.js'
 import { registerUiHttpRoute, uiHttpPath } from './http.js'
 import { createUiScreenshotService } from './screenshot-service.js'
 import { isUiChannelEventWithinBudget, uiRequestIdSchema, uiScreenshotSchema } from './validation.js'
 
 const screenshotResultEvent = 'histoire:ui:screenshot-result'
+const screenshotSetupReserveBytes = 8 * 1024
 const screenshotResultLimitError: UiChannelError = { code: 'invalid', message: 'Capture result exceeds the 64 KB channel limit' }
-const largestScreenshotError: UiChannelError = { code: 'unavailable', message: 'Install Playwright in this project: pnpm add -D playwright && pnpm exec playwright install chromium' }
+const largestScreenshotError: UiChannelError = { code: 'unavailable', message: 'Install Playwright in this project: pnpm add -D playwright && pnpm exec playwright install chromium --only-shell' }
+
+/** Projects schema paths to fixed messages without echoing invalid request values. */
+function screenshotOptionsError(issues: readonly { path: readonly PropertyKey[] }[]): UiChannelError {
+  const width = issues.some(issue => issue.path[0] === 'viewport' && issue.path[1] === 'width')
+  const height = issues.some(issue => issue.path[0] === 'viewport' && issue.path[1] === 'height')
+  if (width && height) return { code: 'invalid', message: 'Screenshot viewport width and height must be integers within allowed limits' }
+  if (width) return { code: 'invalid', message: 'Screenshot viewport width must be an integer between 1 and 3840' }
+  if (height) return { code: 'invalid', message: 'Screenshot viewport height must be an integer between 1 and 2160' }
+  return { code: 'invalid', message: 'Invalid screenshot options' }
+}
 
 /** Admit only captures whose full exact receipts or target errors fit one event. */
 function canSendScreenshotResult(request: UiScreenshotRequest): boolean {
@@ -27,11 +42,12 @@ function canSendScreenshotResult(request: UiScreenshotRequest): boolean {
     if (Buffer.byteLength(JSON.stringify(file)) >= Buffer.byteLength(JSON.stringify(error))) files.push(file)
     else errors.push(error)
   }
-  return isUiChannelEventWithinBudget(screenshotResultEvent, { requestId: request.requestId, files, ...(errors.length ? { errors } : {}) })
+  return isUiChannelEventWithinBudget(screenshotResultEvent, { requestId: request.requestId, files, ...(errors.length ? { errors } : {}) }, screenshotSetupReserveBytes)
 }
 
 /** Publish a compact correlated error if an unexpected result exceeds its frame. */
-function sendScreenshotResult(channel: UiChannelServer, result: UiScreenshotResult, client: Parameters<UiChannelServer['send']>[2]): void {
+function sendScreenshotResult(channel: UiChannelServer, result: UiScreenshotResult, client: UiChannelClient): void {
+  if (client.socket.readyState !== 1) return
   if (!isUiChannelEventWithinBudget(screenshotResultEvent, result)) result = { requestId: result.requestId, error: screenshotResultLimitError }
   channel.send(screenshotResultEvent, result, client)
 }
@@ -48,6 +64,7 @@ export function resolveUiScreenshotTarget(ctx: Context, server: ViteDevServer, i
   return {
     root: ctx.root,
     host: getDevPreviewHost(server),
+    setupOwner: getContextScreenshotSetup(ctx, isActive),
     target: {
       origin: new URL(address).origin,
       ...target,
@@ -65,10 +82,15 @@ export function resolveUiScreenshotTarget(ctx: Context, server: ViteDevServer, i
 }
 
 /** Register correlated capture/list/cancel requests on this dev generation only. */
-export function registerScreenshotChannel(ctx: Context, server: ViteDevServer, channel: UiChannelServer, execution: ExecutionService, isActive: () => boolean) {
+export function registerScreenshotChannel(ctx: Context, server: ViteDevServer, channel: UiChannelServer, execution: ExecutionService, isActive: () => boolean, options: { launch?: PreviewSessionOptions['launch'] } = {}) {
   const epoch = randomUUID()
-  const service = createUiScreenshotService({ root: ctx.root, execution, resolve: (request, target) => resolveUiScreenshotTarget(ctx, server, isActive, epoch, request, target) })
+  const service = createUiScreenshotService({ root: ctx.root, execution, resolve: (request, target) => ({ ...resolveUiScreenshotTarget(ctx, server, isActive, epoch, request, target), ...(options.launch ? { launch: options.launch } : {}) }) })
+  const connections = new Set<UiClientConnection>()
   channel.addCleanup(service.close)
+  channel.addCleanup(() => {
+    for (const connection of connections) connection.dispose()
+    connections.clear()
+  })
   const imagePrefix = uiHttpPath(server, '/__histoire/screenshots/')
   channel.addCleanup(registerUiHttpRoute(server, imagePrefix, (request, response) => {
     const name = request.url.slice(imagePrefix.length)
@@ -88,7 +110,7 @@ export function registerScreenshotChannel(ctx: Context, server: ViteDevServer, c
     const parsed = uiScreenshotSchema.safeParse(value)
     if (!parsed.success) {
       const identity = uiRequestIdSchema.safeParse(value && typeof value === 'object' ? { requestId: (value as { requestId?: unknown }).requestId } : undefined)
-      if (identity.success) sendScreenshotResult(channel, { requestId: identity.data.requestId, error: { code: 'invalid', message: 'Invalid screenshot options' } }, client)
+      if (identity.success) sendScreenshotResult(channel, { requestId: identity.data.requestId, error: screenshotOptionsError(parsed.error.issues) }, client)
       return
     }
     const request = parsed.data as UiScreenshotRequest
@@ -96,11 +118,22 @@ export function registerScreenshotChannel(ctx: Context, server: ViteDevServer, c
       sendScreenshotResult(channel, { requestId: request.requestId, error: screenshotResultLimitError }, client)
       return
     }
+    const connection = observeUiClientConnection(client, () => service.cancel(request.requestId, client))
+    if (!connection.isOpen()) {
+      connection.dispose()
+      return
+    }
+    connections.add(connection)
     try {
-      sendScreenshotResult(channel, await service.capture(request, client), client)
+      const result = await service.capture(request, client)
+      if (connection.isOpen()) sendScreenshotResult(channel, result, client)
     }
     catch {
-      sendScreenshotResult(channel, { requestId: request.requestId, error: { code: 'failed', message: 'Screenshot could not be captured' } }, client)
+      if (connection.isOpen()) sendScreenshotResult(channel, { requestId: request.requestId, error: { code: 'failed', message: 'Screenshot could not be captured' } }, client)
+    }
+    finally {
+      connections.delete(connection)
+      connection.dispose()
     }
   })
   channel.on('histoire:ui:screenshot-cancel', value => uiRequestIdSchema.parse(value), (value, client) => service.cancel(value.requestId, client))

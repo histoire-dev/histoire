@@ -9,9 +9,9 @@ import { ExecutionError } from '../../runtime/execution-types.js'
 import { saveScreenshotFile } from './files.js'
 
 /** Keep host failures deliberate and avoid leaking filesystem paths or credentials. */
-export function screenshotError(error: unknown): UiChannelError {
+export function screenshotError(error: unknown, setup?: UiChannelError['setup']): UiChannelError {
   if (error instanceof PreviewError) {
-    if (['DEPENDENCY_MISSING', 'BROWSER_UNAVAILABLE'].includes(error.code)) return { code: 'unavailable', message: 'Install Playwright in this project: pnpm add -D playwright && pnpm exec playwright install chromium' }
+    if (['DEPENDENCY_MISSING', 'BROWSER_UNAVAILABLE'].includes(error.code)) return { code: 'unavailable', message: setup ? 'Screenshot browser setup needs attention' : 'Install Playwright in this project: pnpm add -D playwright && pnpm exec playwright install chromium --only-shell' }
     if (error.code === 'TIMEOUT') return { code: 'timeout', message: 'Screenshot timed out' }
     if (error.code === 'CANCELLED') return { code: 'cancelled', message: 'Capture cancelled' }
   }
@@ -20,6 +20,13 @@ export function screenshotError(error: unknown): UiChannelError {
     if (error.code === 'UNAVAILABLE' || error.code === 'QUEUE_FULL') return { code: 'unavailable', message: error.message }
   }
   return { code: 'failed', message: 'Screenshot could not be captured' }
+}
+
+/** Setup state is shared once per request and only surfaced after a classified setup failure. */
+function failedSetup(session: PreviewSessionOptions, error: unknown) {
+  if (!(error instanceof PreviewError) || !['DEPENDENCY_MISSING', 'BROWSER_UNAVAILABLE'].includes(error.code)) return undefined
+  const setup = error.setup ?? session.setupOwner?.getSnapshot()
+  return setup?.state === 'needs-action' ? setup : undefined
 }
 
 /** Browser identity scopes request cancellation; handles never cross request owners. */
@@ -55,11 +62,13 @@ export function createUiScreenshotService(options: {
       requests.add(request)
       const files: Extract<UiScreenshotResult, { files: unknown }>['files'] = []
       const errors: NonNullable<Extract<UiScreenshotResult, { files: unknown }>['errors']> = []
+      let setup: UiChannelError['setup']
       try {
         for (const target of input.targets) {
           if (request.cancelled) break
+          let session: PreviewSessionOptions | undefined
           try {
-            const session = options.resolve(input, target)
+            session = options.resolve(input, target)
             const task = createScreenshotTask(session, { format: input.format })
             const handle = options.execution.enqueue(task)
             request.handle = handle
@@ -68,11 +77,15 @@ export function createUiScreenshotService(options: {
             if (!session.target.isActive()) throw new ExecutionError('CANCELLED', 'Capture generation retired')
             files.push(await saveScreenshotFile(options.root, target, input.format, output.artifact))
           }
-          catch (error) { errors.push({ storyId: target.storyId, variantId: target.variantId, ...(target.frameKey ? { frameKey: target.frameKey } : {}), error: screenshotError(error) }) }
+          catch (error) {
+            const targetSetup = session && failedSetup(session, error)
+            setup ??= targetSetup
+            errors.push({ storyId: target.storyId, variantId: target.variantId, ...(target.frameKey ? { frameKey: target.frameKey } : {}), error: screenshotError(error, targetSetup) })
+          }
           finally { request.handle = undefined }
         }
         if (request.cancelled) return files.length ? { requestId: input.requestId, files, errors: [...errors, ...input.targets.slice(files.length + errors.length).map(target => ({ storyId: target.storyId, variantId: target.variantId, ...(target.frameKey ? { frameKey: target.frameKey } : {}), error: { code: 'cancelled' as const, message: 'Capture cancelled' } }))] } : { requestId: input.requestId, error: { code: 'cancelled', message: 'Capture cancelled' } }
-        return files.length ? { requestId: input.requestId, files, ...(errors.length ? { errors } : {}) } : { requestId: input.requestId, error: errors[0]?.error ?? { code: 'failed', message: 'Screenshot could not be captured' } }
+        return files.length ? { requestId: input.requestId, files, ...(errors.length ? { errors } : {}), ...(setup ? { setup } : {}) } : { requestId: input.requestId, error: { ...(errors[0]?.error ?? { code: 'failed', message: 'Screenshot could not be captured' }), ...(setup ? { setup } : {}) } }
       }
       finally { requests.delete(request) }
     },

@@ -12,6 +12,10 @@ export interface HistoireProjectOptions {
 
 /** Explicit managed HTTP binding; zero requests an actual ephemeral port. */
 export interface HistoireDevOptions {
+  /** Disable optional MCP HTTP adapter for headless runs. */
+  mcp?: boolean
+  /** Disable agent/comment services for headless runs. */
+  agents?: boolean
   /** Binding hostname; true permits external interfaces. */
   host?: string | boolean
   /** Requested TCP port. */
@@ -89,9 +93,9 @@ export interface HistoireCaptureOptions {
   storyId: string
   /** Exact variant within story. */
   variantId: string
-  /** CSS width, 320–3840; default 480. */
+  /** CSS width, 1–3840; default 480. */
   width?: number
-  /** CSS height, 240–2160; default 320. */
+  /** CSS height, 1–2160; default 320. */
   height?: number
   /** Integer device scale, 1–3; default 1. */
   deviceScaleFactor?: number

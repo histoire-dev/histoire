@@ -2,9 +2,10 @@ import type { createProjectRuntimeController } from '../../runtime/controller.js
 import type { ProjectRuntimeHandle } from '../../runtime/types.js'
 import type { McpProject } from '../protocol/project-schema.js'
 import type { HistoireMcpProject } from './facade.js'
+import { getContextScreenshotSetup } from '../../runtime/registry.js'
 import { McpDomainError } from '../protocol/errors.js'
 import { createMcpEpoch } from '../protocol/ids.js'
-import { detectDevMcpCapabilities } from './capabilities.js'
+import { detectDevMcpCapabilities, refreshDevMcpScreenshotCapabilities } from './capabilities.js'
 import { createProjectContent } from './content.js'
 import { withExecutionAvailability } from './execution-capabilities.js'
 import { createPreviewUrls } from './preview-urls.js'
@@ -23,6 +24,8 @@ interface DevReadGeneration {
   content: ReturnType<typeof createProjectContent>
   /** Package availability cached for this generation. */
   capabilities: McpProject['capabilities']
+  /** Shared generation owner; facade reads its latest safe health snapshot. */
+  setupOwner: ReturnType<typeof getContextScreenshotSetup>
   /** Catalog initialization failed independently of listener readiness. */
   failed: boolean
 }
@@ -42,7 +45,8 @@ export function createDevMcpProject(options: { controller: McpRuntimeController,
     if (handle?.isActive()) {
       const attached = attachProjectCatalog(handle, options)
       display = { title: handle.context.config.theme?.title ?? 'Histoire', base: handle.server.config.base ?? '/', routerMode: handle.context.config.routerMode ?? 'history' }
-      const value: DevReadGeneration = { handle, attached, content: createProjectContent({ root: handle.context.root, catalog: attached.catalog }), capabilities: detectDevMcpCapabilities(handle.context.root), failed: false }
+      const setupOwner = getContextScreenshotSetup(handle.context, handle.isActive)
+      const value: DevReadGeneration = { handle, attached, content: createProjectContent({ root: handle.context.root, catalog: attached.catalog }), capabilities: detectDevMcpCapabilities(handle.context.root), setupOwner, failed: false }
       generation = value
       void attached.ready.catch(() => {
         if (generation === value && handle.isActive()) value.failed = true
@@ -83,7 +87,7 @@ export function createDevMcpProject(options: { controller: McpRuntimeController,
         ...display,
         storyCount: snapshot?.stories.length ?? 0,
         variantCount: snapshot?.stories.reduce((total, story) => total + story.variants.length, 0) ?? 0,
-        capabilities: withExecutionAvailability(value?.capabilities ?? { catalog: false, content: false, previews: false, screenshots: { available: false, reason: 'Project is not ready' }, tests: { available: false, engine: 'unavailable', reason: 'Project is not ready' } }, options.executionAvailable?.() ?? true),
+        capabilities: withExecutionAvailability(value ? refreshDevMcpScreenshotCapabilities(value.handle.context.root, value.capabilities, value.setupOwner.getSnapshot()) : { catalog: false, content: false, previews: false, screenshots: { available: false, reason: 'Project is not ready' }, tests: { available: false, engine: 'unavailable', reason: 'Project is not ready' } }, options.executionAvailable?.() ?? true),
         diagnostics: snapshot ? [...snapshot.diagnostics] : value?.failed ? [{ code: 'COLLECTION_FAILED', message: 'Project catalog initialization failed' }] : [],
         diagnosticsTruncated: snapshot?.diagnosticsTruncated ?? false,
       }

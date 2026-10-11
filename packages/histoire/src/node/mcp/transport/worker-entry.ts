@@ -14,9 +14,9 @@ process.env.HISTOIRE = 'true'
 /** Boot owned project worker after environment isolation. */
 async function main() {
   const bootstrap = z.tuple([z.string().refine(isAbsolute), z.string(), mcpProjectIdSchema, z.string().regex(/^stdio:[0-9a-f-]{36}$/)]).parse(process.argv.slice(2))
-  const [, config, projectId, principal] = bootstrap
+  const [root, config, projectId, principal] = bootstrap
   const { createWorkerRuntime } = await import('./worker-runtime.js')
-  const runtime = createWorkerRuntime({ projectId, config: config || undefined })
+  const runtime = createWorkerRuntime({ root, projectId, config: config || undefined })
   const requests = new Map<string, AbortController>()
   let closing: Promise<void> | undefined
   let writes = 0

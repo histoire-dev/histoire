@@ -2,6 +2,7 @@ import type { Connect } from 'vite'
 import type { HistoirePreviewHandle } from '../../api/types.js'
 import type { Context } from '../../context.js'
 import type { PreviewHostRegistry } from '../browser/preview-host.js'
+import type { ScreenshotSetupOwner } from '../browser/setup/types.js'
 import type { BuiltPreviewSnapshot } from '../catalog/built.js'
 import type { ExecutionService } from '../execution-service.js'
 import { randomUUID } from 'node:crypto'
@@ -17,6 +18,7 @@ import { createPreviewHostRegistry } from '../browser/preview-host.js'
 import { getBuiltNodeArtifact, readBuiltPreviewSnapshot } from '../catalog/built.js'
 import { hasUnconfirmedCleanup } from '../cleanup.js'
 import { createExecutionOwner } from '../execution-owner.js'
+import { createContextScreenshotSetup } from '../registry.js'
 import { closeOwnedServer, listenOwnedServer } from './listener.js'
 import { createEmbedOriginsRoute, createPreviewRoute, matchesHostingBase, unavailableMiddleware } from './routes.js'
 
@@ -34,6 +36,8 @@ export interface PreviewGeneration {
   registry: PreviewHostRegistry
   /** Scoped view of the canonical project lane. */
   execution: ExecutionService
+  /** Browser setup policy owned by this preview's captured Context. */
+  setupOwner: ScreenshotSetupOwner
   /** False immediately after restart/close begins. */
   isActive: () => boolean
 }
@@ -111,7 +115,23 @@ export async function createPreviewHosting(options: {
     delegate = unavailableMiddleware
     old?.registry.close()
     if (old) {
-      retirement = old.execution.close().catch((error) => {
+      retirement = (async () => {
+        let laneError: unknown
+        try {
+          await old.execution.close()
+        }
+        catch (error) {
+          laneError = error
+        }
+        try {
+          await old.setupOwner.close()
+        }
+        catch (error) {
+          if (laneError) throw new AggregateError([laneError, error], String(laneError))
+          throw error
+        }
+        if (laneError) throw laneError
+      })().catch((error) => {
         // A failed restart must not forget unknown resources when close joins
         // after current has been cleared, even if the runner settles later.
         retainCleanupFailure(error)
@@ -129,7 +149,9 @@ export async function createPreviewHosting(options: {
     if (!server.listening) origin = await listenOwnedServer(server, options.port ?? 6006, options.host, options.strictPort)
     if (handleClosed()) throw new HistoireSdkError('DISPOSED', 'Histoire preview closed')
     const registry = createPreviewHostRegistry({ base })
-    const captured: PreviewGeneration = { epoch: randomUUID(), origin, base, snapshot, registry, execution: createExecutionOwner(options.execution), isActive: () => status !== 'closed' && current === captured }
+    let captured: PreviewGeneration
+    const setupOwner = createContextScreenshotSetup(options.context, () => status !== 'closed' && current === captured && status === 'ready')
+    captured = { epoch: randomUUID(), origin, base, snapshot, registry, execution: createExecutionOwner(options.execution), setupOwner, isActive: () => status !== 'closed' && current === captured && status === 'ready' }
     const app = connect()
     allowedOrigins = embed?.allowedOrigins
     if (embed && snapshot.mode === 'node') app.use(createEmbedOriginsRoute(base, embed.allowedOrigins))

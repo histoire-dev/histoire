@@ -1,8 +1,11 @@
 import type { PluginConfigContext } from '@histoire/shared'
 import type { Context } from '../context.js'
+import type { ScreenshotSetupOwner } from './browser/setup/types.js'
 import type { ExecutionService } from './execution-service.js'
 import { rm } from 'node:fs/promises'
 import { getRunTempDir } from '../util/temp-paths.js'
+import { createScreenshotSetupOwner } from './browser/setup/owner.js'
+import { createBrowserSetupPolicy } from './browser/setup/policy.js'
 import { createCleanupStack } from './cleanup.js'
 import { createProjectEvents } from './events.js'
 
@@ -38,6 +41,8 @@ function createRegistry(ctx: Context) {
     storyWatcher: undefined as object | undefined,
     /** Dev owner captured before Vite plugins configure finite execution routes. */
     execution: undefined as { service: ExecutionService, isActive: () => boolean } | undefined,
+    /** One browser setup owner for this exact captured context/configuration. */
+    screenshotSetup: undefined as ScreenshotSetupOwner | undefined,
   }
 }
 
@@ -46,6 +51,28 @@ export function getContextRegistry(ctx: Context) {
   let registry = registries.get(ctx)
   if (!registry) registries.set(ctx, registry = createRegistry(ctx))
   return registry
+}
+
+/** Returns the lazily acquired browser setup owner scoped to this Context. */
+export function getContextScreenshotSetup(ctx: Context, isActive?: () => boolean): ScreenshotSetupOwner {
+  const registry = getContextRegistry(ctx)
+  if (registry.screenshotSetup) return registry.screenshotSetup
+  const owner = createContextScreenshotSetup(ctx, isActive)
+  registry.screenshotSetup = owner
+  return owner
+}
+
+/** Creates a Context-configured owner whose caller controls its narrower lifetime. */
+export function createContextScreenshotSetup(ctx: Context, isActive?: () => boolean): ScreenshotSetupOwner {
+  const registry = getContextRegistry(ctx)
+  if (registry.cleanup.isClosing) throw new Error('Cannot acquire screenshot setup after context cleanup started')
+  const owner = createScreenshotSetupOwner({
+    root: ctx.root,
+    policy: createBrowserSetupPolicy(ctx.config.browser, ctx.root),
+    isActive: isActive ?? (() => registry.execution?.isActive() ?? true),
+  })
+  registry.cleanup.add(() => owner.close())
+  return owner
 }
 
 /** Releases captured context resources once, including partially resolved plugins. */

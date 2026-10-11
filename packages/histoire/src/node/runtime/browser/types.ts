@@ -12,6 +12,8 @@ export interface ScreenshotResult {
   mimeType: 'image/png'
   /** Full PNG byte count. */
   bytes: number
+  /** Actual browser version, recorded only by opt-in stable visual capture. */
+  browserVersion?: string
   /** Full PNG digest. */
   sha256: string
 }

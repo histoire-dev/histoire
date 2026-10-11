@@ -43,7 +43,8 @@ export function createCompiledPreviewTestTask(input: McpToolInput<'histoire_run_
           signal.throwIfAborted()
           if (!capture.isActive()) throw new McpDomainError('PROJECT_CLOSED', 'Deployed project is closing')
           catalog.getTarget(input.storyId, variant.id, capture.revision)
-          session = createPreviewSession({ root: artifact.root, host, launch, timeoutMs: Math.max(1, until - Date.now()), target: {
+          const setupOwner = launch ? undefined : capture.value.setupOwner
+          session = createPreviewSession({ root: artifact.root, host, launch, ...(setupOwner ? { setupOwner } : {}), timeoutMs: Math.max(1, until - Date.now()), target: {
             origin,
             storyId: input.storyId,
             variantId: variant.id,

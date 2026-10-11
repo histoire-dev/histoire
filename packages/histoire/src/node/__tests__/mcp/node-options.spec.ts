@@ -1,6 +1,7 @@
+import { resolve } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { normalizeNodeBase } from '../../deploy/base.js'
-import { resolveNodeOptions } from '../../deploy/options.js'
+import { resolveNodeBrowserPolicy, resolveNodeOptions } from '../../deploy/options.js'
 
 describe('deployed options', () => {
   it('rejects noncanonical bases while supporting encoded spaces and Unicode', () => {
@@ -24,5 +25,28 @@ describe('deployed options', () => {
 
   it.each(['https://book.example/path', 'https://book.example/?token=x', 'https://user:secret@book.example', 'file:///tmp/book', 'https://book.example#x'])('rejects non-origin PUBLIC_ORIGIN %s', (origin) => {
     expect(() => resolveNodeOptions(false, { PUBLIC_ORIGIN: origin }, [])).toThrow('PUBLIC_ORIGIN')
+  })
+
+  it('defaults target browser policy to automatic and keeps explicit choices exclusive', () => {
+    expect(resolveNodeBrowserPolicy({}, '/srv/histoire')).toEqual({ source: 'auto' })
+    expect(resolveNodeBrowserPolicy({ HISTOIRE_BROWSER_SOURCE: 'chrome' }, '/srv/histoire')).toEqual({ source: 'chrome' })
+    expect(() => resolveNodeBrowserPolicy({ HISTOIRE_BROWSER_SOURCE: 'chrome', HISTOIRE_BROWSER_EXECUTABLE_PATH: '/opt/chrome' }, '/srv/histoire')).toThrow('HISTOIRE_BROWSER_EXECUTABLE_PATH')
+    expect(() => resolveNodeBrowserPolicy({ HISTOIRE_BROWSER_SOURCE: 'executable' }, '/srv/histoire')).toThrow('HISTOIRE_BROWSER_EXECUTABLE_PATH')
+  })
+
+  it.each(['auto', 'headless-shell', 'chromium', 'chrome', 'msedge'] as const)('accepts deployment browser source %s', (source) => {
+    expect(resolveNodeBrowserPolicy({ HISTOIRE_BROWSER_SOURCE: source }, '/srv/histoire')).toEqual({ source })
+  })
+
+  it('resolves an explicit target executable relative to the copied artifact root', () => {
+    expect(resolveNodeBrowserPolicy({ HISTOIRE_BROWSER_SOURCE: 'executable', HISTOIRE_BROWSER_EXECUTABLE_PATH: 'bin/chrome for tests' }, '/srv/copied book')).toEqual({ source: 'executable', executablePath: resolve('/srv/copied book/bin/chrome for tests') })
+  })
+
+  it.each(['', 'https://chrome.example', 'chrome --headless'])('rejects invalid explicit target executable path %s', (path) => {
+    expect(() => resolveNodeBrowserPolicy({ HISTOIRE_BROWSER_SOURCE: 'executable', HISTOIRE_BROWSER_EXECUTABLE_PATH: path }, '/srv/histoire')).toThrow()
+  })
+
+  it('rejects unsupported target sources without falling back to auto', () => {
+    expect(() => resolveNodeBrowserPolicy({ HISTOIRE_BROWSER_SOURCE: 'chromium-beta' }, '/srv/histoire')).toThrow('HISTOIRE_BROWSER_SOURCE')
   })
 })
