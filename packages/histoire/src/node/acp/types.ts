@@ -1,4 +1,5 @@
 import type { HistoireUiConfig, UiAgentPermission, UiAgentReply, UiAgentSettings, UiAgentsSnapshot } from '@histoire/shared'
+import type { createAgentRegistry } from './registry.js'
 
 /** Information attached to one comment prompt; paths stay project relative. */
 export interface AcpPromptContext {
@@ -59,6 +60,8 @@ export type AcpUpdate =
 export interface AcpManagerOptions {
   /** Absolute project root. */
   root: string
+  /** Registry cache and remote boundary overrides, primarily for tests. */
+  registry?: Parameters<typeof createAgentRegistry>[0]
   /** Project policy; env fields are ignored in favor of user-level storage. */
   config?: HistoireUiConfig['agents']
   /** Optional test/user data file override. */

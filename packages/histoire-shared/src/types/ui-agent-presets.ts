@@ -1,13 +1,16 @@
 import type { UiAgentSettings } from './ui-agents.js'
 
-/** Official installed executable names; presets require explicit local opt-in. */
+/** Stable legacy IDs and fallback commands; fresh presets use managed registry launch. */
 export const ACP_PRESETS: UiAgentSettings['presets'] = [
-  { id: 'claude', name: 'Claude Code', command: 'claude-agent-acp', default: true },
-  { id: 'gemini', name: 'Gemini CLI', command: 'gemini', args: ['--acp'] },
-  { id: 'codex', name: 'Codex', command: 'codex-acp' },
+  { id: 'claude', registryId: 'claude-acp', name: 'Claude Code', command: 'claude-agent-acp', default: true },
+  { id: 'gemini', registryId: 'gemini', name: 'Gemini CLI', command: 'gemini', args: ['--acp'] },
+  { id: 'codex', registryId: 'codex-acp', name: 'Codex', command: 'codex-acp' },
 ]
 
-/** Install suggestions are informational; Histoire never installs adapters. */
+/** Legacy preset IDs keep credential/comment ownership without catalog duplicates. */
+export const ACP_REGISTRY_ALIASES: Record<string, string> = { claude: 'claude-acp', codex: 'codex-acp' }
+
+/** Informational installation hints for legacy/custom command overrides. */
 export const ACP_INSTALL_HINTS: Record<string, string> = {
   claude: 'npm install -g @agentclientprotocol/claude-agent-acp',
   gemini: 'npm install -g @google/gemini-cli',

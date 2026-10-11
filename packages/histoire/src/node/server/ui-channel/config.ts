@@ -95,13 +95,14 @@ function validateSetting(patch: ConfigPatch): void {
   else if (patch.path.startsWith('agents.presets')) {
     /** One complete preset has only project-safe launch data. */
     function preset(item: unknown): item is { id: string, name: string, command: string } {
-      if (!item || typeof item !== 'object' || Array.isArray(item) || !Object.keys(item).every(key => ['id', 'name', 'command', 'args', 'cwd', 'default'].includes(key))) return false
+      if (!item || typeof item !== 'object' || Array.isArray(item) || !Object.keys(item).every(key => ['id', 'name', 'command', 'args', 'cwd', 'default', 'registryId', 'model', 'effort'].includes(key))) return false
       const agent = item as Record<string, unknown>
       return text(agent.id) && text(agent.name) && text(agent.command)
         && (agent.args === undefined || (Array.isArray(agent.args) && agent.args.every(arg => typeof arg === 'string')))
+        && ['registryId', 'model', 'effort'].every(key => agent[key] === undefined || text(agent[key]))
         && (agent.cwd === undefined || typeof agent.cwd === 'string') && (agent.default === undefined || typeof agent.default === 'boolean')
     }
-    const field = /\]\.(id|name|command|args|cwd|default)$/.exec(patch.path)?.[1]
+    const field = /\]\.(id|name|command|args|cwd|default|registryId|model|effort)$/.exec(patch.path)?.[1]
     if (field === 'default') {
       requireValid(typeof value === 'boolean')
     }

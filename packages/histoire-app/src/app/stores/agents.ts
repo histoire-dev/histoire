@@ -1,10 +1,15 @@
-import type { UiAgentPermission, UiAgentSettings, UiAgentsSnapshot } from '@histoire/shared'
+import type { UiAgentConfigOptions, UiAgentPermission, UiAgentRegistry, UiAgentSettings, UiAgentsSnapshot } from '@histoire/shared'
 import type { InjectionKey } from 'vue'
 import { inject, provide, ref, shallowRef } from 'vue'
+import { createAgentsCatalogStore } from './agents-catalog.js'
 
 /** Transport separates write-only credential POSTs from safe HMR settings events. */
 export interface AgentsTransport {
   /** Safe commands containing no env values. */
+  /** Full remote catalog is never sent over HMR. */
+  registry?: (force: boolean) => Promise<UiAgentRegistry>
+  /** Bounded temporary session discovery. */
+  configOptions?: (agentId: string, force: boolean) => Promise<UiAgentConfigOptions>
   send: (event: string, value: unknown) => boolean
   /** Current server settings and process state. */
   snapshot: (callback: (value: UiAgentsSnapshot) => void) => () => void
@@ -25,6 +30,7 @@ export function createAgentsStore(transport?: AgentsTransport) {
   const pending = ref(false)
   const connected = ref(false)
   const error = ref('')
+  const catalog = createAgentsCatalogStore(transport, () => state.value, () => connected.value)
   let active = true
   const cleanup = [
     transport?.snapshot((value) => {
@@ -40,12 +46,14 @@ export function createAgentsStore(transport?: AgentsTransport) {
     transport?.disconnect(() => {
       if (active) {
         connected.value = false
+        catalog.disconnect()
         pending.value = false
         permissions.value = []
       }
     }),
   ]
   return {
+    ...catalog,
     state,
     permissions,
     pending,
@@ -89,6 +97,7 @@ export function createAgentsStore(transport?: AgentsTransport) {
       if (!active || !transport) return false
       try {
         await transport.environment(agentId, env)
+        if (active) catalog.invalidate()
         return active
       }
       catch {
@@ -99,6 +108,7 @@ export function createAgentsStore(transport?: AgentsTransport) {
     /** Detaches all callbacks and clears every pending card on workbench teardown. */
     close(): void {
       active = false
+      catalog.close()
       for (const off of cleanup) off?.()
       permissions.value = []
       pending.value = false

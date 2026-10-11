@@ -114,4 +114,20 @@ describe('aCP field-level project overrides', () => {
     expect(manager.snapshot()).toMatchObject({ presets: [{ id: 'project' }], permissions: settings.permissions, context: settings.context })
     expect(JSON.parse(await readFile(file, 'utf8')).env.custom.TOKEN).toBe('legacy-private')
   })
+  it('round-trips registry/model/effort defaults through project save and reset without moving credentials', async () => {
+    const { root, manager } = await fakeManager('normal', false)
+    await manager.ready
+    await manager.setEnvironment('fake', { TOKEN: 'preserved-secret' })
+    const preset = { ...manager.snapshot().presets[0], registryId: 'fake-registry', model: 'large', effort: 'deep' }
+    await manager.configure({ ...manager.snapshot(), presets: [preset] })
+    await manager.retireProjectOverrides(['agents.presets'], { presets: [preset] })
+    expect(manager.snapshot().presets).toEqual([preset])
+    const file = join(root, 'user/agents.json')
+    expect(JSON.parse(await readFile(file, 'utf8')).projects[root].presets).toBeUndefined()
+    await manager.configure({ ...manager.snapshot(), presets: [{ ...preset, model: 'small', effort: 'quick' }] })
+    await manager.resetProjectOverrides(['agents.presets'])
+    expect(manager.snapshot().presets).toEqual([preset])
+    expect(JSON.parse(await readFile(file, 'utf8')).env.fake).toEqual({ TOKEN: 'preserved-secret' })
+    expect(JSON.stringify(manager.snapshot())).not.toContain('preserved-secret')
+  })
 })

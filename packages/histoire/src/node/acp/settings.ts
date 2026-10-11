@@ -1,4 +1,4 @@
-import type { UiAgentSettings } from '@histoire/shared'
+import type { AgentPreset, UiAgentSettings } from '@histoire/shared'
 import type { AcpManagerOptions, AcpSettingsOverrides } from './types.js'
 import { isDeepStrictEqual } from 'node:util'
 import { ACP_PRESETS } from './presets.js'
@@ -6,8 +6,8 @@ import { validateAgentSettings } from './validation.js'
 
 /** Fresh project defaults never inherit unrelated local snapshot fields. */
 export function defaultAgentSettings(config?: AcpManagerOptions['config']): UiAgentSettings {
-  const presets = config?.presets?.length ? config.presets : ACP_PRESETS
-  return validateAgentSettings({ enabled: config?.enabled === true, enabledIds: config?.enabled ? presets.map(item => item.id) : [], presets: presets.map(({ id, name, command, args, cwd, default: isDefault }) => ({ id, name, command, ...(args === undefined ? {} : { args }), ...(cwd === undefined ? {} : { cwd }), ...(isDefault === undefined ? {} : { default: isDefault }) })), permissions: { fileEdits: 'ask', terminal: 'ask', ...config?.permissions }, context: { exposeMcp: true, attachScreenshot: true, includeSource: true, askEachTime: false } })
+  const presets: AgentPreset[] = config?.presets?.length ? config.presets : ACP_PRESETS
+  return validateAgentSettings({ enabled: config?.enabled === true, enabledIds: config?.enabled ? presets.map(item => item.id) : [], presets: presets.map(({ env: _env, ...preset }) => preset), permissions: { fileEdits: 'ask', terminal: 'ask', ...config?.permissions }, context: { exposeMcp: true, attachScreenshot: true, includeSource: true, askEachTime: false } })
 }
 
 /** Merge only deliberate fields; removed presets cannot retain stale enabled identities. */

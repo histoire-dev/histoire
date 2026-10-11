@@ -11,6 +11,9 @@ const presetSchema = z.object({
   args: z.array(z.string().max(2048)).max(64).optional(),
   cwd: z.string().max(2048).optional(),
   default: z.boolean().optional(),
+  registryId: z.string().regex(/^[\w-]{1,80}$/).optional(),
+  model: z.string().min(1).max(2048).transform(value => value === 'default' ? undefined : value).optional(),
+  effort: z.string().min(1).max(2048).optional(),
 }).strict()
 
 /** Runtime settings validator strips snapshot-only fields while rejecting env. */

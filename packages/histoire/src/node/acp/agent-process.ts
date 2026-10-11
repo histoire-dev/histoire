@@ -1,6 +1,7 @@
 import type { UiAgentSettings } from '@histoire/shared'
 import { spawn } from 'node:child_process'
 import { win32 } from 'node:path'
+import crossSpawn from 'cross-spawn'
 import path from 'pathe'
 
 /** Waits for lifecycle evidence without allowing inherited pipes to hold shutdown forever. */
@@ -15,7 +16,7 @@ async function settles(operation: Promise<void>, timeout: number): Promise<boole
 /** Launch one executable in its own POSIX process group, never through a shell. */
 export function launchAgentProcess(preset: UiAgentSettings['presets'][number], root: string, environment: Record<string, string>) {
   const posix = process.platform !== 'win32'
-  const child = spawn(preset.command, preset.args ?? [], {
+  const child = crossSpawn(preset.command, preset.args ?? [], {
     cwd: path.resolve(root, preset.cwd ?? '.'),
     env: { ...process.env, ...environment },
     stdio: ['pipe', 'pipe', 'pipe'],

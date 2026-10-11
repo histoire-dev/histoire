@@ -1,3 +1,4 @@
+import type { NewSessionResponse } from '@agentclientprotocol/sdk'
 import type { UiAgentStatus } from '@histoire/shared'
 import type { createAgentRuntime } from './agent-runtime.js'
 import type { createAgentFileChanges } from './file-changes.js'
@@ -16,8 +17,8 @@ export interface AgentRecord {
   start?: Promise<void>
   /** Coalesced teardown retains this record until its owned process tree exits. */
   stop?: Promise<void>
-  /** Stable ACP sessions keyed by comment id. */
-  sessions: Map<string, string>
+  /** Complete ACP sessions keyed by comment id, retaining idle configuration updates. */
+  sessions: Map<string, NewSessionResponse>
   /** One live prompt per agent to avoid adapter-global interleaving. */
   active?: {
     /** User request and per-prompt observer. */

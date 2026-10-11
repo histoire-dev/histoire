@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import type { UiAgentSettings } from '@histoire/shared'
-import { BuiltinIcon, HstButton, HstButtonGroup, HstSwitch } from '@histoire/controls/vue'
+import { BuiltinIcon, HstButton, HstButtonGroup, HstPulsatingDisc, HstSwitch, HstText } from '@histoire/controls/vue'
 import { ACP_PRESETS } from '@histoire/shared'
-import { computed, shallowRef } from 'vue'
+import { computed, nextTick, onMounted, ref, shallowRef, watch } from 'vue'
 import { useAgentsStore } from '../../../stores/agents.js'
+import { agentCatalogRows } from '../../../util/agent-catalog-rows.js'
 import { histoireConfig } from '../../../util/config.js'
+import WorkbenchEmptyState from '../../shell/WorkbenchEmptyState.vue'
 import WorkbenchLoadingState from '../../shell/WorkbenchLoadingState.vue'
 
 import AgentPresetRow from './AgentPresetRow.vue'
@@ -15,6 +17,18 @@ import './agents-settings.css'
 const agents = useAgentsStore()
 /** Snapshot remains authoritative until server confirms each command. */
 const state = computed(() => agents?.state.value)
+/** Registry search does not change configured preset ownership. */
+const query = ref('')
+/** Scoped DOM owner prevents a late confirmation from scrolling another settings visit. */
+const section = ref<HTMLElement>()
+/** Only an explicit Add agent command grants one reveal after server confirmation. */
+const pendingRevealId = ref<string>()
+/** Entire catalog merges with local overrides independently of 32-preset cap. */
+const rows = computed(() => state.value ? agentCatalogRows(state.value, agents?.catalog.value.entries ?? [], query.value) : [])
+watch([() => state.value?.presets, () => agents?.pending.value, () => agents?.connected.value, pendingRevealId], revealAddedAgent)
+onMounted(() => {
+  void agents?.loadRegistry()
+})
 /** Project save/reset baseline explicitly excludes private env values. */
 const projectPresets = shallowRef<UiAgentSettings['presets']>(histoireConfig.agents?.presets?.length ? histoireConfig.agents.presets.map(({ env: _env, ...preset }) => preset) : ACP_PRESETS)
 /** Shared project defaults are distinct from local user policy. */
@@ -32,9 +46,33 @@ const contextOptions = [
 
 /** Adds one disabled manual command; launch still requires explicit opt-in. */
 function addAgent(): void {
-  if (!state.value) return
+  if (!agents || !state.value || agents.pending.value || !agents.connected.value) return
   const id = `agent-${Date.now().toString(36)}`
-  agents?.configure({ presets: [...state.value.presets, { id, name: 'New agent', command: 'agent-acp' }] })
+  pendingRevealId.value = id
+  agents.configure({ presets: [...state.value.presets, { id, name: 'New agent', command: 'agent-acp' }] })
+}
+/** Expands and centers the confirmed identity after clearing any filter that would hide its row. */
+async function revealAddedAgent(): Promise<void> {
+  const id = pendingRevealId.value
+  if (!id) return
+  if (!agents?.connected.value) {
+    pendingRevealId.value = undefined
+    return
+  }
+  if (!state.value?.presets.some(preset => preset.id === id)) {
+    if (!agents.pending.value) pendingRevealId.value = undefined
+    return
+  }
+  // Clearing search schedules another DOM update; wait before locating the sorted row.
+  query.value = ''
+  await nextTick()
+  if (!section.value || pendingRevealId.value !== id) return
+  pendingRevealId.value = undefined
+  const row = section.value.querySelector<HTMLElement>(`[data-agent-id="${id}"]`)
+  const details = row?.querySelector<HTMLDetailsElement>('details')
+  // Expand the native disclosure first so scrolling uses the full settings height.
+  if (details) details.open = true
+  row?.scrollIntoView?.({ block: 'center', inline: 'nearest', behavior: 'instant' })
 }
 /** A verified receipt updates display baseline after server retires matching overrides. */
 function saved(path: 'presets' | 'permissions'): void {
@@ -45,7 +83,7 @@ function saved(path: 'presets' | 'permissions'): void {
 </script>
 
 <template>
-  <section v-if="agents && state">
+  <section v-if="agents && state" ref="section">
     <h1>AI agents</h1>
     <div class="histoire-settings-card">
       <div class="histoire-settings-row">
@@ -58,11 +96,19 @@ function saved(path: 'presets' | 'permissions'): void {
           <BuiltinIcon icon="add" :size="14" />Add agent
         </HstButton>
       </header>
-      <AgentPresetRow v-for="preset in state.presets" :key="preset.id" :agent-id="preset.id" />
-      <WorkbenchLoadingState v-if="!state.presets.length && !agents.connected.value" title="Connecting to dev server" />
-      <p v-else-if="!state.presets.length" class="histoire-agent-empty">
-        No agents configured
+      <div class="histoire-agent-catalog-tools">
+        <HstText v-model="query" layout="inline" aria-label="Search agents" placeholder="Search agents" />
+        <HstButton type="button" color="default" class="histoire-settings-action" aria-label="Refresh agent registry" :disabled="agents.catalogLoading.value || !agents.connected.value" @click="agents.loadRegistry(true)">
+          <HstPulsatingDisc v-if="agents.catalogLoading.value" :size="14" /><BuiltinIcon v-else icon="renew" :size="14" />Refresh
+        </HstButton>
+      </div>
+      <p v-if="agents.catalogLoaded.value && agents.catalog.value.status.state !== 'fresh'" class="histoire-agent-warning" role="status">
+        {{ agents.catalog.value.status.state === 'stale' ? 'Using cached agent registry' : 'Agent registry unavailable' }}
       </p>
+      <AgentPresetRow v-for="row in rows" :key="row.id" :agent-id="row.id" :registry-entry="row.registryEntry" />
+      <WorkbenchLoadingState v-if="!rows.length && !agents.connected.value" title="Connecting to dev server" />
+      <WorkbenchLoadingState v-else-if="!rows.length && agents.catalogLoading.value" title="Loading agents" />
+      <WorkbenchEmptyState v-else-if="!rows.length" icon="search" :title="query.trim() ? 'No matches' : 'No agents configured'" />
       <SaveToProject path="agents.presets" :value="state.presets" :project-value="projectPresets" :local="JSON.stringify(state.presets) !== JSON.stringify(projectPresets)" @reset="agents.resetProject(['agents.presets'])" @saved="saved('presets')" />
     </div>
     <div class="histoire-settings-card">
@@ -87,6 +133,6 @@ function saved(path: 'presets' | 'permissions'): void {
     </p>
   </section>
   <section v-else>
-    <h1>AI agents</h1><p>Agent settings unavailable</p>
+    <h1>AI agents</h1><WorkbenchEmptyState icon="bot" title="Agent settings unavailable" />
   </section>
 </template>

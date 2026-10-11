@@ -21,8 +21,8 @@ export function isAgentEnvironmentOrigin(request: IncomingMessage): boolean {
   catch { return false }
 }
 
-/** Reads at most 64 KB without logging or echoing the private payload. */
-async function readEnvironmentBody(request: IncomingMessage): Promise<unknown> {
+/** Reads ACP JSON input within existing 64 KB limit without logging private payloads. */
+export async function readAgentJsonBody(request: IncomingMessage): Promise<unknown> {
   const chunks: Buffer[] = []
   let bytes = 0
   for await (const chunk of request) {
@@ -48,7 +48,7 @@ export function registerAgentEnvironment(ctx: Context, server: ViteDevServer, ma
         return
       }
       try {
-        const { agentId, env } = validateAgentEnvironment(await readEnvironmentBody(request))
+        const { agentId, env } = validateAgentEnvironment(await readAgentJsonBody(request))
         if (!isActive()) throw new Error('Agent runtime closed')
         await manager.setEnvironment(agentId, env)
         response.statusCode = 204

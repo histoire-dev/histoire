@@ -13,7 +13,7 @@ export const CONFIG_EDITABLE_PATHS = [
 /** Parses only documented paths; arbitrary properties and prototype keys fail. */
 export function parseConfigPath(path: string): PathToken[] {
   if ((CONFIG_EDITABLE_PATHS as readonly string[]).includes(path)) return path.split('.')
-  const agent = /^agents\.presets\[([\w-]+)\](?:\.(id|name|command|args|cwd|default))?$/.exec(path)
+  const agent = /^agents\.presets\[([\w-]+)\](?:\.(id|name|command|args|cwd|default|registryId|model|effort))?$/.exec(path)
   if (agent) return ['agents', 'presets', { id: agent[1] }, ...agent[2] ? [agent[2]] : []]
   throw new Error(`Config path "${path}" is not editable`)
 }

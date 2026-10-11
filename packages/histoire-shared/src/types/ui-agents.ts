@@ -10,6 +10,8 @@ export interface UiAgentStatus {
   state: 'disabled' | 'starting' | 'connected' | 'idle' | 'error' | 'not-installed'
   /** Redacted actionable failure. */
   error?: string
+  /** Accepted defaults replaced a rejected saved configuration. */
+  warning?: string
   /** Explicit per-agent opt-in. */
   enabled: boolean
   /** Redacted last stderr lines. */

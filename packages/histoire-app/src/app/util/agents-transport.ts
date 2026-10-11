@@ -1,9 +1,11 @@
 import { createAgentsStore } from '../stores/agents.js'
+import { createAgentHttpTransport } from './agents-http.js'
 import { onUiDisconnect, onUiEvent, sendUiEvent } from './ui-channel.js'
 
 /** Creates the dev-only transport; static workbenches never import this module. */
 export function createDevAgentsStore() {
   const store = createAgentsStore({
+    ...createAgentHttpTransport(),
     send: (event, value) => sendUiEvent(event as `histoire:ui:${string}`, value),
     snapshot: callback => onUiEvent('histoire:ui:agents-snapshot', callback),
     permission: callback => onUiEvent('histoire:ui:agent-permission', callback),

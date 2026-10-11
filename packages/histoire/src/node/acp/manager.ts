@@ -4,12 +4,13 @@ import type { AgentRecord } from './record.js'
 import type { AcpManagerOptions, AcpPromptRequest, AcpPromptResult, AcpUpdate, AcpUserData } from './types.js'
 import { Buffer } from 'node:buffer'
 import { methods } from '@agentclientprotocol/sdk'
-import { createAgentRuntime } from './agent-runtime.js'
 import { createAgentControlLane } from './control-lane.js'
 import { createPermissionBroker } from './permissions.js'
 import { projectAgentStatuses } from './projection.js'
 import { promptAgent } from './prompt.js'
+import { createAgentServices } from './services.js'
 import { defaultAgentSettings, mergeAgentSettings, retireAgentOverrides, updateAgentOverrides } from './settings.js'
+import { startAgentRecord } from './start-record.js'
 import { agentUserDataFile, createAgentRedactor, readAgentUserData, updateAgentUserData } from './user-data.js'
 import { validateAgentEnvironment, validateAgentSettings } from './validation.js'
 
@@ -58,6 +59,7 @@ export function createAcpManager(options: AcpManagerOptions) {
   function changed(): void {
     emit({ type: 'snapshot', value: snapshot() })
   }
+  const services = createAgentServices(options, sanitize)
   const permissions = createPermissionBroker({ root: options.root, policy: () => settings.permissions, sanitize, emit: value => emit({ type: 'permission', value }), resolved: requestId => emit({ type: 'permission-resolved', value: { requestId } }) })
   const ready = readAgentUserData(dataFile).then((value) => {
     if (closed) return
@@ -71,7 +73,7 @@ export function createAcpManager(options: AcpManagerOptions) {
     if (record.stop) return record.stop
     clearTimeout(record.timer)
     if (records.get(id) === record) permissions.cancel(id)
-    record.stop = Promise.resolve().then(() => record.runtime?.stop()).then(() => {
+    record.stop = Promise.resolve().then(() => record.start?.catch(() => {})).then(() => record.runtime?.stop()).then(() => {
       if (records.get(id) === record) records.delete(id)
     })
     return record.stop
@@ -83,6 +85,7 @@ export function createAcpManager(options: AcpManagerOptions) {
   /** Retire existing prompt/start authority synchronously before queuing configuration. */
   function retire(): void {
     generation++
+    services.retire()
     permissions.cancel()
   }
   /** Starts one configured process on first explicit prompt; concurrent starts share it. */
@@ -109,41 +112,17 @@ export function createAcpManager(options: AcpManagerOptions) {
     const captured = record
     const owner = generation
     const owned = () => !closed && generation === owner && records.get(id) === captured
-    captured.runtime = createAgentRuntime(preset, {
+    captured.start = startAgentRecord(captured, preset, {
       root: options.root,
-      environment: captured.environment,
-      sanitize,
       timeout: options.handshakeTimeoutMs ?? 10_000,
-      log(lines) {
-        if (owned()) {
-          captured.status.logs = lines
-          changed()
-        }
-      },
-      failed(error, missing) {
-        if (owned()) {
-          captured.status.state = missing ? 'not-installed' : 'error'
-          captured.status.error = error
-          permissions.cancel(id)
-          changed()
-        }
-      },
-      permission(request) { return owned() && captured.active?.sessionId === request.sessionId ? permissions.request(id, request) : Promise.resolve({ outcome: { outcome: 'cancelled' } }) },
-      update(notification) { if (owned()) reply(id, captured, notification) },
+      prepare: () => services.prepare(preset, captured.environment),
+      owned,
+      sanitize,
+      changed,
+      permissions,
+      update: notification => reply(id, captured, notification),
     })
     changed()
-    captured.start = captured.runtime.ready.then(() => {
-      if (!owned()) throw new Error('Agent runtime closed')
-      captured.status.state = 'connected'
-      changed()
-    }).catch(async (error) => {
-      const message = await captured.runtime.failureMessage() ?? sanitize(error instanceof Error ? error.message : String(error))
-      captured.status.state = captured.status.state === 'not-installed' ? 'not-installed' : 'error'
-      captured.status.error = message
-      await captured.runtime.stop()
-      if (owned()) changed()
-      throw new Error(message)
-    })
     await captured.start
     return captured
   }
@@ -166,6 +145,11 @@ export function createAcpManager(options: AcpManagerOptions) {
   }
   /** Accepts only text reply chunks belonging to this exact active prompt/session. */
   function reply(agentId: string, record: AgentRecord, notification: SessionNotification): void {
+    if (notification.update.sessionUpdate === 'config_option_update') {
+      const session = [...record.sessions.values()].find(session => session.sessionId === notification.sessionId)
+      if (session) session.configOptions = notification.update.configOptions
+      return
+    }
     const active = record.active
     if (!active || notification.sessionId !== active.sessionId) return
     const update = notification.update
@@ -193,6 +177,16 @@ export function createAcpManager(options: AcpManagerOptions) {
   return {
     ready,
     snapshot,
+    /** Catalog reads never change configured presets or launch agents. */
+    registry: services.registry,
+    /** Discovery has separate capacity and process ownership from comments. */
+    async configOptions(agentId: string, force = false) {
+      await ready
+      controls.assertAdmission()
+      const preset = settings.presets.find(item => item.id === agentId)
+      if (!preset || !settings.enabled || !settings.enabledIds.includes(agentId)) throw new Error('Agent is disabled; enable it in AI agent settings')
+      return services.discover(preset, { ...data.env[agentId] }, force)
+    },
     /** Subscribes to this runtime's safe process/reply/permission updates. */
     onUpdate(listener: (event: AcpUpdate) => void): () => void {
       listeners.add(listener)
@@ -224,6 +218,7 @@ export function createAcpManager(options: AcpManagerOptions) {
         await ready
         if (closed) throw new Error('Agent manager is closed')
         if (!settings.presets.some(preset => preset.id === agentId)) throw new Error('Unknown agent')
+        services.retire()
         data = await updateAgentUserData(dataFile, options.root, undefined, { id: agentId, value: checked.env })
         const record = records.get(agentId)
         if (record) await stopRecord(agentId, record)
@@ -259,7 +254,7 @@ export function createAcpManager(options: AcpManagerOptions) {
     /** Cancels only the requested comment conversation and its permission cards. */
     async cancel(threadId: string): Promise<void> {
       for (const [id, record] of records) {
-        const sessionId = record.sessions.get(threadId)
+        const sessionId = record.sessions.get(threadId)?.sessionId
         if (sessionId && record.active?.request.threadId === threadId) {
           permissions.cancel(id, sessionId)
           await record.runtime.connection.agent.notify(methods.agent.session.cancel, { sessionId })
@@ -287,8 +282,9 @@ export function createAcpManager(options: AcpManagerOptions) {
       if (closing) return closing
       closed = true
       generation++
+      services.retire()
       permissions.close()
-      closing = Promise.all([stopAll(), controls.settled()]).then(() => {}).finally(() => listeners.clear())
+      closing = Promise.all([stopAll(), services.close(), controls.settled()]).then(() => {}).finally(() => listeners.clear())
       return closing
     },
   }

@@ -30,3 +30,26 @@ Preset arrays retire when current value matches submitted project value. Permiss
 fields retire independently; newer local edits keep ownership. Explicit reset
 clears named local fields using current server project defaults, without writing
 project config or deleting credentials/context/unrelated overrides.
+
+Full registry and model catalogs use dev-only HTTP routes, separate from 64 KB HMR
+preference snapshots. Catalog refresh cannot change opt-ins or commands. Managed
+presets retain stable local IDs and refer to server-resolved registry IDs; archive
+URLs, distribution environment and resolved cache paths never enter user settings.
+Validated registry cache lasts 24 hours; failed fetches retain last valid catalog.
+
+Managed launch preparation captures an abort signal before fetching/installing.
+Configuration retirement aborts preparation before awaiting writes. Binary installs
+use content-addressed directories and temporary extraction; executable publication
+is atomic and older versions remain intact. ZIP and TAR paths/links must stay inside
+extraction root. Advertised archive SHA-256 is verified before extraction.
+
+Discovery uses separate temporary runtimes, at most two concurrently. It sends no
+prompt, advertises no MCP servers, denies permission requests and stops owned
+process tree in finally. Cache keys include configuration/environment and discovery
+generation; retired requests cannot publish choices for replacement runtime.
+
+Session creation keeps configOptions. Saved model applies before effort, using
+returned configuration after each request. Rejected preferences continue with
+accepted configuration and public warning. Literal model `default` is never sent
+as override. Idle config_option_update notifications update retained session state
+before prompt-specific reply filtering.

@@ -21,6 +21,7 @@ export function projectAgentStatuses(settings: UiAgentSettings, statuses: Map<st
       state: enabled ? status?.state ?? 'idle' : 'disabled',
       enabled,
       error: status?.error ? text(status.error) : undefined,
+      warning: status?.warning ? text(status.warning) : undefined,
       logs: (status?.logs ?? []).slice(-30).map(line => text(line)).filter(Boolean),
       envKeys: Object.keys(environment[preset.id] ?? {}).map(key => text(key, 120)).filter(Boolean),
     }

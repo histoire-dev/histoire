@@ -6,6 +6,12 @@ export interface AgentPreset {
   name: string
   /** Executable command. */
   command: string
+  /** Canonical ACP registry identity for managed launch. */
+  registryId?: string
+  /** Saved model override; omission uses agent default. */
+  model?: string
+  /** Saved reasoning override; omission uses agent default. */
+  effort?: string
   /** Command arguments. */
   args?: string[]
   /** User-level environment overrides, excluded from serialized config. */

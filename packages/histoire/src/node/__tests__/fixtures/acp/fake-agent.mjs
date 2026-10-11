@@ -16,6 +16,19 @@ if (scenario === 'rotation-secret') {
     setTimeout(() => process.exit(0), 10)
   })
 }
+/** Configuration scenarios record real wire order for discovery/prompt assertions. */
+const configurationScenario = ['config-options', 'delayed-config', 'config-secrets'].includes(scenario)
+if (configurationScenario) appendFileSync('launches.txt', `${process.pid}\n`)
+/** Each independent session has its own accepted model and effort. */
+const configurations = new Map()
+/** Advertise effort choices dependent on accepted model. */
+function configOptions(state) {
+  return [
+    { id: 'model-selector', name: 'Model', category: 'model', type: 'select', currentValue: state.model, options: [{ group: 'models', name: 'Models', options: [{ value: 'small', name: scenario === 'config-secrets' ? `Small ${process.env.AGENT_TOKEN}` : 'Small' }, { value: 'large', name: 'Large' }] }] },
+    { id: 'reasoning-selector', name: 'Effort', category: 'thought_level', type: 'select', currentValue: state.effort, options: state.model === 'large' ? [{ value: 'quick', name: 'Quick' }, { value: 'deep', name: 'Deep' }] : [{ value: 'quick', name: 'Quick' }] },
+  ]
+}
+
 /** Session counter proves comment-thread session reuse. */
 let sessions = 0
 /** Prompt currently waiting for a permission reply or cancellation. */
@@ -38,13 +51,39 @@ function update(sessionId, text) {
 
 lines.on('line', (line) => {
   const message = JSON.parse(line)
+  if (configurationScenario && message.method) appendFileSync('protocol.txt', `${message.method}\n`)
   if (message.method === 'initialize') {
     result(message.id, { protocolVersion: scenario === 'mismatch' ? 999 : message.params.protocolVersion, agentCapabilities: { mcpCapabilities: { http: true } }, authMethods: [], agentInfo: { name: 'fixture', version: '1.0.0' } })
   }
   else if (message.method === 'session/new') {
-    result(message.id, { sessionId: `session-${++sessions}` })
+    const sessionId = `session-${++sessions}`
+    const state = { model: 'small', effort: 'quick' }
+    configurations.set(sessionId, state)
+    const response = { sessionId, ...(configurationScenario ? { configOptions: configOptions(state) } : {}) }
+    if (scenario === 'delayed-config') setTimeout(() => result(message.id, response), 300)
+    else result(message.id, response)
+  }
+  else if (message.method === 'session/set_config_option') {
+    const state = configurations.get(message.params.sessionId)
+    if (message.params.configId === 'model-selector' && ['small', 'large'].includes(message.params.value)) {
+      state.model = message.params.value
+    }
+    else if (message.params.configId === 'reasoning-selector' && (message.params.value === 'quick' || (state.model === 'large' && message.params.value === 'deep'))) {
+      state.effort = message.params.value
+    }
+    else {
+      send({ id: message.id, error: { code: -32602, message: 'Invalid configuration' } })
+      return
+    }
+    result(message.id, { configOptions: configOptions(state) })
   }
   else if (message.method === 'session/prompt') {
+    if (configurationScenario) {
+      const state = configurations.get(message.params.sessionId)
+      update(message.params.sessionId, `model=${state.model} effort=${state.effort}`)
+      result(message.id, { stopReason: 'end_turn' })
+      return
+    }
     if (scenario === 'crash') {
       process.stderr.write(`fixture crash ${process.env.AGENT_TOKEN ?? ''}\n`)
       process.exit(2)

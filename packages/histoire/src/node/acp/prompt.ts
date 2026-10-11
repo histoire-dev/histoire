@@ -1,3 +1,4 @@
+import type { NewSessionResponse } from '@agentclientprotocol/sdk'
 import type { UiAgentSettings } from '@histoire/shared'
 import type { AgentRecord } from './record.js'
 import type { AcpPromptRequest, AcpPromptResult } from './types.js'
@@ -6,6 +7,7 @@ import path from 'pathe'
 import { withAgentTimeout } from './agent-runtime.js'
 import { createAgentFileChanges } from './file-changes.js'
 import { buildPromptContext, safeMcpEndpoint } from './prompt-context.js'
+import { applyAgentSessionDefaults } from './session-config.js'
 import { createAgentOutputFilter } from './user-data.js'
 
 /** Dependencies captured by the project manager for one explicit prompt. */
@@ -42,7 +44,7 @@ export async function promptAgent(record: AgentRecord, request: AcpPromptRequest
   if (record.busy) throw new Error('Agent is busy; wait for its current reply')
   record.busy = true
   const runtime = record.runtime
-  let sessionId = record.sessions.get(request.threadId)
+  let sessionId = record.sessions.get(request.threadId)?.sessionId
   try {
     if (!sessionId) {
       const preset = options.settings.presets.find(item => item.id === record.status.id)
@@ -50,10 +52,13 @@ export async function promptAgent(record: AgentRecord, request: AcpPromptRequest
       const initialized = await runtime.ready
       const mcpServers = endpoint && initialized.agentCapabilities?.mcpCapabilities?.http ? [{ type: 'http' as const, name: 'histoire', url: endpoint, headers: [] }] : []
       try {
-        const session = await withAgentTimeout<{ sessionId: string }>(runtime.connection.agent.request(methods.agent.session.new, { cwd: path.resolve(options.root, preset.cwd ?? '.'), mcpServers }), options.handshakeTimeout, 'ACP session handshake timed out')
+        const session = await withAgentTimeout(runtime.connection.agent.request<NewSessionResponse>(methods.agent.session.new, { cwd: path.resolve(options.root, preset.cwd ?? '.'), mcpServers }), options.handshakeTimeout, 'ACP session handshake timed out')
         if (!options.isOwned()) throw new Error('Agent runtime closed')
         sessionId = session.sessionId
-        record.sessions.set(request.threadId, sessionId)
+        const configured = await applyAgentSessionDefaults(runtime, sessionId, preset, session.configOptions ?? [], options.handshakeTimeout, options.isOwned)
+        if (!options.isOwned()) throw new Error('Agent runtime closed')
+        record.status.warning = configured.warning
+        record.sessions.set(request.threadId, { ...session, configOptions: configured.options })
       }
       catch (error) {
         record.status.state = 'error'

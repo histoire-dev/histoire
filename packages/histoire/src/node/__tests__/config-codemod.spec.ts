@@ -180,4 +180,13 @@ describe('config codemod', () => {
     const { root, file } = await configTestProject('export default {}')
     await expect(editConfig(file, [{ path: 'responsivePresets', value: value as never }], { root })).rejects.toThrow('JSON')
   })
+  it('edits safe registry and model defaults while retaining other preset fields', async () => {
+    const { root, file } = await configTestProject('export default { agents: { presets: [{ id: "helper", name: "Helper", command: "custom", registryId: "registry-helper", model: "small", effort: "quick" }] } }')
+    const result = await editConfig(file, [{ path: 'agents.presets[helper].model', value: 'large' }, { path: 'agents.presets[helper].effort', value: 'deep' }], { root })
+    expect(result.code).toContain('registryId: "registry-helper"')
+    expect(result.code).toContain('command: "custom"')
+    expect(result.code).toContain('model: "large"')
+    expect(result.code).toContain('effort: "deep"')
+    await expect(editConfig(file, [{ path: 'agents.presets[helper].env', value: { TOKEN: 'secret' } }], { root })).rejects.toThrow()
+  })
 })

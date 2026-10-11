@@ -1,16 +1,30 @@
 # AI agents
 
-Histoire can connect local coding agents to canvas comments through the [Agent Client Protocol](https://agentclientprotocol.com/). Agents run in development mode. Open **Settings → AI agents**, enable local agents, then enable an installed agent. Processes start on the first comment sent to that agent.
+Histoire connects local coding agents to canvas comments through [Agent Client Protocol](https://agentclientprotocol.com/). Agents run in development mode. Open **Settings → AI agents**, search registry, enable local agents, then enable selected agent.
 
-Built-in presets remain editable and disabled until enabled locally:
+Settings lists full [ACP registry](https://cdn.agentclientprotocol.com/registry/v1/latest/registry.json), alongside existing custom commands. Configured default appears first, then enabled agents, then remaining catalog. Agents without compatible platform distribution remain visible but cannot be enabled.
 
-| Agent | Command | Optional installation |
-| --- | --- | --- |
-| Claude Code | `claude-agent-acp` | `npm install -g @agentclientprotocol/claude-agent-acp` |
-| Gemini CLI | `gemini --acp` | `npm install -g @google/gemini-cli` |
-| Codex | `codex-acp` | `npm install -g @agentclientprotocol/codex-acp` |
+Registry agents display their published logos in both themes. Missing or unavailable images use the bundled agent icon; logos stay separate from saved command preferences.
 
-These commands come from the official [Claude adapter](https://github.com/agentclientprotocol/claude-agent-acp), [Codex adapter](https://github.com/agentclientprotocol/codex-acp), and [Gemini ACP documentation](https://github.com/google-gemini/gemini-cli/blob/main/docs/cli/acp-mode.md). Histoire does not install adapters or launch them merely by opening settings. Complete each agent's own authentication setup before sending a comment.
+## Models and advanced settings
+
+Enabled agents expose **Model** and **Effort** defaults. **Agent default** leaves selection to adapter. Choices come from temporary ACP sessions using [session configuration options](https://agentclientprotocol.com/protocol/v1/session-config-options); changing model clears saved effort and loads compatible choices. Unsupported selectors stay disabled. Discovery sends no prompt and exposes no Histoire MCP tools. Complete agent's own authentication setup before discovery or sending comments.
+
+Saved defaults apply to later comment sessions. If adapter rejects saved model or effort, comment still sends with accepted configuration and warning. Configuration changes retire existing processes before applying new preferences.
+
+**Advanced settings** starts collapsed. It contains name, command, arguments, working directory, environment, logs and maintenance actions. Closing it preserves unsaved drafts. **Add agent** creates custom command. Renaming registry agent or changing working directory retains managed launch; changing command or arguments and selecting **Save command** converts it to custom override.
+
+Removing configured registry agent leaves its catalog entry available. Removing custom agent removes its configuration. Neither deletes saved credentials.
+
+## Registry and installation
+
+Catalog uses validated 24-hour user cache. **Refresh** fetches current catalog. Offline refresh retains cached catalog and marks it stale; unavailable registry never erases local configuration.
+
+Managed launches prefer `npx`, then `uvx`, then current-platform binary archive. Packages run with exact registry version and arguments; binaries download into Histoire user cache and verify registry checksums when provided. Opening catalog never downloads or launches adapters. Enabling agent while local agents are on allows model discovery to prepare and launch temporary adapter.
+
+Install Node/npm or `uv` separately when required. Histoire does not install package managers. Existing custom commands and legacy presets keep their executable paths, credentials and IDs.
+
+Caches live in `$XDG_CACHE_HOME/histoire` or `~/.cache/histoire` on Linux, `~/Library/Caches/histoire` on macOS, and `%LOCALAPPDATA%/histoire` on Windows. Binary versions cache separately so refreshing catalog does not delete executable used by active process.
 
 Use **Add agent** for another ACP executable. Arguments accept a JSON array of strings. Commands execute directly without a shell; set command and arguments separately. Working directories resolve from the project root. **Set default** chooses the destination for comments; **Ask each time** requires an explicit choice.
 
@@ -55,12 +69,12 @@ Preferences store deliberate field overrides. Changing one permission or context
 
 Older full preference snapshots have no record of which fields were deliberately edited. Migration preserves them as explicit local overrides. Reset a section, or save it successfully to the project, to restore project inheritance for that section.
 
-**Save to project** shares safe command presets or permission defaults through the config editor. It never writes environment values. Per-user opt-ins and context preferences remain local. See [configuration editing](../reference/config-codemod.md) for supported config shapes and conflict handling.
+**Save to project** shares safe command presets, registry identities, model/effort defaults or permission defaults through the config editor. It never writes environment values. Per-user opt-ins and context preferences remain local. See [configuration editing](../reference/config-codemod.md) for supported config shapes and conflict handling.
 
 After verified save completion, only matching submitted presets or permission fields lose their local override. Later edits, private environment values, opt-ins, and context choices remain. Reconnecting checks completion of the existing save rather than submitting another write.
 
 ## Troubleshooting
 
-**Not installed** means the executable could not be found. Install the adapter separately or choose its absolute executable path. Logs show bounded, redacted stderr output. Initialization timeout, ACP protocol mismatch, and process exit have separate messages. **Restart** retires a running or failed process and reacquires it; agents that have never run remain lazy.
+**Not installed** means executable or package runner could not be found. Install required package manager, or set custom executable path in **Advanced settings**. Logs show bounded, redacted stderr output. Initialization timeout, ACP protocol mismatch, and process exit have separate messages. **Restart** retires a running or failed process and reacquires it; agents that have never run remain lazy.
 
-Automated coverage uses a test-only ACP process for initialization, thread sessions, streaming, permission choices, crashes, secret redaction, diff summaries, and teardown. Real-agent authentication and interactive edit approval remain manual validation steps.
+Automated coverage uses test-only ACP process for initialization, grouped model/effort discovery, configuration fallback, thread sessions, streaming, permission choices, crashes, secret redaction, diff summaries and teardown. Archive fixtures check managed installation and path/link containment. Real-agent authentication and interactive edit approval remain manual validation steps.

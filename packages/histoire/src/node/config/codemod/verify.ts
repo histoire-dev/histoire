@@ -51,7 +51,7 @@ function snapshotEditableValues(parsed: ParsedConfig): TrackedValue[] {
   if (!Array.isArray(presets)) return values
   for (const preset of presets) {
     if (!preset || Array.isArray(preset) || typeof preset !== 'object' || typeof preset.id !== 'string') continue
-    for (const field of ['id', 'name', 'command', 'args', 'cwd', 'default']) {
+    for (const field of ['id', 'name', 'command', 'args', 'cwd', 'default', 'registryId', 'model', 'effort']) {
       addValue(parsed, config.object, ['agents', 'presets', { id: preset.id }, field], values)
     }
   }

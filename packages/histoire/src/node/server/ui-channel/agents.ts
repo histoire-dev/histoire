@@ -4,6 +4,7 @@ import type { UiChannelClient, UiChannelServer } from './types.js'
 import { z } from 'zod'
 import { getAcpManager } from '../../acp/index.js'
 import { validateAgentSettings } from '../../acp/validation.js'
+import { registerAgentsCatalog } from './agents-catalog.js'
 import { registerAgentEnvironment } from './agents-env.js'
 import { onVerifiedConfigSave } from './config-receipts.js'
 
@@ -46,7 +47,10 @@ export function registerAgentsChannel(ctx: Context, channel: UiChannelServer, se
     catch { snapshot(client, 'Cannot restart agent; check command and logs') }
   })
   channel.on('histoire:ui:agent-permission-reply', value => z.object({ requestId: z.string().uuid(), allow: z.boolean(), remember: z.boolean().optional() }).strict().parse(value), ({ requestId, allow, remember }) => manager.replyPermission(requestId, allow, remember === true))
-  if (server) channel.addCleanup(registerAgentEnvironment(ctx, server, manager, () => active))
+  if (server) {
+    channel.addCleanup(registerAgentEnvironment(ctx, server, manager, () => active))
+    channel.addCleanup(registerAgentsCatalog(ctx, server, manager, () => active))
+  }
   channel.addCleanup(async () => {
     active = false
     await manager.close()
