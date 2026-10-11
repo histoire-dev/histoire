@@ -9,6 +9,7 @@ import { computed, ref, useId } from 'vue'
 import WorkbenchEmptyState from '../../shell/WorkbenchEmptyState.vue'
 import WorkbenchErrorState from '../../shell/WorkbenchErrorState.vue'
 import WorkbenchLoadingState from '../../shell/WorkbenchLoadingState.vue'
+import WorkbenchPanelAction from '../../shell/WorkbenchPanelAction.vue'
 
 import { useWorkbenchTestsModel } from './model.js'
 import TestsFilter from './TestsFilter.vue'
@@ -51,12 +52,8 @@ async function select(row: WorkbenchTestRow) {
       <HstButton color="flat" type="button" class="refresh-tests" aria-label="Refresh tests" title="Refresh tests" :disabled="!model?.canRefresh.value" @click="model?.retryCollection()">
         <BuiltinIcon icon="renew" :size="16" />
       </HstButton>
-      <HstButton v-if="model?.running.value" color="primary" type="button" class="run-tests" @click="model.cancel()">
-        <BuiltinIcon icon="stop-filled-alt" :size="16" />Stop
-      </HstButton>
-      <HstButton v-else color="primary" type="button" class="run-tests" :disabled="!model?.canRun.value" @click="model?.runAll()">
-        <BuiltinIcon icon="play-filled-alt" :size="16" />Run all
-      </HstButton>
+      <WorkbenchPanelAction v-if="model?.running.value" icon="stop-filled-alt" label="Stop" @click="model.cancel()" />
+      <WorkbenchPanelAction v-else icon="play-filled-alt" label="Run all" :disabled="!model?.canRun.value" @click="model?.runAll()" />
     </header>
     <template v-if="model">
       <TestsSummary :summary="model.summary.value" :running="model.running.value" :completed="model.completed.value" :total="model.total.value" />
@@ -98,7 +95,6 @@ async function select(row: WorkbenchTestRow) {
 header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px var(--histoire-pane-gutter, 16px); }
 h2 { margin: 0; font-size: 14px; font-weight: 800; }
 .refresh-tests { display: inline-flex; align-items: center; justify-content: center; padding: 8px; margin-left: auto; }
-.run-tests { display: inline-flex; align-items: center; gap: 6px; padding: 8px 10px; font-weight: 750; }
 .test-issue { margin: 10px var(--histoire-pane-gutter, 16px); color: var(--histoire-danger-text); font-size: 12px; overflow-wrap: anywhere; white-space: pre-line; }
 .retry-collection { margin: 10px var(--histoire-pane-gutter, 16px); align-self: flex-start; }
 .collection-progress { display: flex; align-items: center; gap: 8px; margin: 10px var(--histoire-pane-gutter, 16px); color: var(--histoire-muted); font-size: 12px; }

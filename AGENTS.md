@@ -22,6 +22,11 @@
   - Announces failure with `role="alert"`; uses shared state layout and subtle danger badge background.
   - Keep field validation, inline action feedback, and compact canvas error overlays in their specialized forms. Preserve usable content after partial failures.
 
+- Primary call-to-action in panel/tab headers (Run, Stop, ...) must use `WorkbenchPanelAction` from `packages/histoire-app/src/app/components/shell/WorkbenchPanelAction.vue` so every tab CTA shares same size (follows `--histoire-control-height`).
+  - `icon`: offline Carbon glyph name. `label`: short visible label. `disabled`: disables action and options trigger.
+  - Optional `menu` slot (scoped `{ close }`) adds split chevron with options popover; `menuLabel` overrides its accessible name.
+  - Example: `<WorkbenchPanelAction icon="play-filled-alt" label="Run" @click="run"><template #menu="{ close }"><MenuItem label="Run all" @click="close()" /></template></WorkbenchPanelAction>`.
+
 - Every spinner, busy dot, or "running"/"working" indicator must use `HstPulsatingDisc` from `@histoire/controls/vue` (source: `packages/histoire-controls/src/components/HstPulsatingDisc.vue`). Applies to app (`histoire-app`) and native components (`histoire-vue`).
   - `size`: number (px) or CSS length; default `16`. Color follows `currentColor`.
   - Never add custom spin/rotate keyframes or animate status icons (e.g. `in-progress`) for loading.
