@@ -4,8 +4,8 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "dev:hst": "nodemon --watch ../../packages/histoire/dist --watch ../../packages/histoire-plugin-vue/dist --exec \"rm -rf ./node_modules/.hst* && HISTOIRE_DEV=true histoire dev\"",
-    "story:dev": "histoire dev",
+    "dev:hst": "node ../../scripts/dev-histoire.mjs --source",
+    "story:dev": "node ../../scripts/dev-histoire.mjs",
     "story:build": "histoire build",
     "story:preview": "histoire preview --port 4567",
     "ci": "start-server-and-test story:preview http://localhost:4567/ test",
@@ -30,7 +30,6 @@
     "globby": "^14.0.2",
     "histoire": "workspace:*",
     "minimatch": "^10.0.1",
-    "nodemon": "^3.1.7",
     "playwright": "^1.59.1",
     "sass": "^1.82.0",
     "start-server-and-test": "^2.0.8",

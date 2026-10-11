@@ -38,6 +38,7 @@
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.26",
     "floating-vue": "5.2.2",
+    "nodemon": "^3.1.7",
     "postcss": "catalog:",
     "rimraf": "^6.0.1",
     "tailwindcss": "catalog:",

@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "build": "histoire build",
-    "story:dev": "histoire dev",
+    "story:dev": "node ../../scripts/dev-histoire.mjs",
     "story:build": "histoire build",
     "story:preview": "histoire preview --port 4567",
     "story:build:node": "histoire build --config histoire.node.config.ts",

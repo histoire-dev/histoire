@@ -63,7 +63,11 @@ cd examples/vue3
 pnpm run story:dev
 ```
 
-> For the `vue3` example, you can use the `pnpm run dev:hst` command to start the app with a special configuration enabling HMR for the Histoire UI. Especially useful when working on the UI!
+Example `story:dev` scripts watch built outputs across repository packages. After output changes settle for 1.5 seconds, Histoire restarts automatically with fresh runtime code and the browser reconnects. Story and component edits still use Vite HMR without restarting the process.
+
+Keep `pnpm run watch` running separately when editing Histoire packages. The example launcher does not build packages; if a rebuild temporarily removes outputs or startup fails, it waits for later output changes and starts again. Optimizer caches are preserved. A rebuild can interrupt active tests; run them again after Histoire finishes restarting.
+
+`story:dev` uses the built Histoire UI. In `vue3`, `pnpm run dev:hst` uses the same automatic restart launcher with `HISTOIRE_DEV=true`, enabling HMR for Histoire UI sources. Both commands forward CLI arguments, for example `pnpm run story:dev -- --port 6006 --config "custom config.ts"`.
 
 4. After you have tested your changes in development mode, build the story apps and test them using the `story:build` and `story:preview` scripts:
 

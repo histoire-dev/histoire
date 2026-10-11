@@ -4,7 +4,7 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "story:dev": "histoire dev",
+    "story:dev": "node ../../scripts/dev-histoire.mjs",
     "story:build": "histoire build",
     "story:preview": "histoire preview"
   },

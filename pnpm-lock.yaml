@@ -65,6 +65,9 @@ importers:
       floating-vue:
         specifier: 5.2.2
         version: 5.2.2(@nuxt/kit@3.20.2(magicast@0.5.1))(vue@3.5.26(typescript@5.6.3))
+      nodemon:
+        specifier: ^3.1.7
+        version: 3.1.11
       postcss:
         specifier: 'catalog:'
         version: 8.5.6
@@ -357,9 +360,6 @@ importers:
       minimatch:
         specifier: ^10.0.1
         version: 10.1.1
-      nodemon:
-        specifier: ^3.1.7
-        version: 3.1.11
       playwright:
         specifier: ^1.59.1
         version: 1.59.1
