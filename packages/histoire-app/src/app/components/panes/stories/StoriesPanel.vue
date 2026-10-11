@@ -9,6 +9,7 @@ import { computed, nextTick, onBeforeUnmount, onMounted, ref, shallowRef, watch 
 import { isContextMenuShortcut, useContextMenu } from '../../../composables/context-menu.js'
 import { histoireConfig } from '../../../util/config.js'
 import WorkbenchVirtualList from '../../lists/WorkbenchVirtualList.vue'
+import WorkbenchErrorState from '../../shell/WorkbenchErrorState.vue'
 
 import { useWorkbenchTestsModel } from '../tests/model.js'
 import { createStoryTreeRows, nextTreeFocus } from './tree.js'
@@ -243,9 +244,7 @@ function icon(row: StoryTreeRow): string {
       <h2>{{ title }}</h2>
       <span class="stories-count">{{ snapshot.catalog.stories.length }} stories</span>
     </header>
-    <p v-if="snapshot.status === 'failed' || (snapshot.source && !snapshot.capabilities.catalog.available)" class="stories-empty" role="alert">
-      Catalog unavailable
-    </p>
+    <WorkbenchErrorState v-if="snapshot.status === 'failed' || (snapshot.source && !snapshot.capabilities.catalog.available)" title="Catalog unavailable" />
     <div ref="tree" class="stories-tree" role="tree" aria-label="Story tree" :tabindex="treeTabStop ? 0 : -1" @focus="onTreeFocus" @keydown="onTreeKeydown" @scroll.capture="scheduleTreeTabStop">
       <WorkbenchVirtualList ref="virtualList" :items="rows" :item-size="32">
         <template #default="{ item: row }">

@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import type { HistoireTarget } from '@histoire/protocol'
 import type { WorkbenchTestRow } from './types.js'
-import { BuiltinIcon, HstButton } from '@histoire/controls/vue'
+import { BuiltinIcon, HstButton, HstPulsatingDisc } from '@histoire/controls/vue'
 import { useHistoireResource } from '@histoire/vue/internal'
 import { computed, ref } from 'vue'
 import { isContextMenuShortcut, useContextMenu } from '../../../composables/context-menu.js'
 import WorkbenchVirtualList from '../../lists/WorkbenchVirtualList.vue'
+import WorkbenchEmptyState from '../../shell/WorkbenchEmptyState.vue'
 
 import TestsTreeRow from './TestsTreeRow.vue'
 
@@ -15,8 +16,18 @@ const emit = defineEmits<{ select: [row: WorkbenchTestRow] }>()
 const menu = useContextMenu()
 /** One fixed-height row in the flattened virtual project explorer. */
 type TestTreeEntry =
-  | { key: string, kind: 'heading', id: string, title: string, failed: boolean, stale: boolean, passed: boolean, count: number, total: number }
+  | { key: string, kind: 'heading', id: string, title: string, status: TestGroupStatus, count: number, total: number }
   | { key: string, kind: 'test', row: WorkbenchTestRow }
+/** Aggregate story state; running wins so active work is never hidden behind an older result. */
+type TestGroupStatus = 'running' | 'failed' | 'stale' | 'passed' | 'idle'
+/** Glyph and accessible label per aggregate state; running uses the standard loader. */
+const GROUP_STATUS: Record<TestGroupStatus, { icon?: string, label: string }> = {
+  running: { label: 'Tests running' },
+  failed: { icon: 'error-filled', label: 'Tests failing' },
+  stale: { icon: 'renew', label: 'Tests outdated' },
+  passed: { icon: 'checkmark-filled', label: 'Tests passed' },
+  idle: { icon: 'subtract', label: 'Tests not run' },
+}
 const closed = ref(new Set<string>())
 const menuDisposers = [
   menu?.register({ id: 'tests.expand-group', label: 'Expand story tests', icon: 'chevron-down', available: target => target.kind === 'test-group' && !target.expanded, run: (target) => {
@@ -45,9 +56,13 @@ const visible = computed<TestTreeEntry[]>(() => {
         kind: 'heading',
         id,
         title: all[0].storyTitle,
-        failed: all.some(row => row.failed),
-        stale: all.some(row => row.stale),
-        passed: all.every(row => row.summary?.ok && !row.stale) && all.some(row => row.summary?.passed),
+        status: all.some(row => row.running && !row.notCollected)
+          ? 'running'
+          : all.some(row => row.failed)
+            ? 'failed'
+            : all.some(row => row.stale)
+              ? 'stale'
+              : all.every(row => row.summary?.ok && !row.stale) && all.some(row => row.summary?.passed) ? 'passed' : 'idle',
         count: all.reduce((sum, row) => sum + (row.summary?.passed ?? 0), 0),
         total: all.reduce((sum, row) => sum + (row.collection?.definitions.length ?? row.summary?.total ?? 0), 0),
       })
@@ -57,6 +72,12 @@ const visible = computed<TestTreeEntry[]>(() => {
   }
   return entries
 })
+/** Empty message names the active filter once project tests exist. */
+const empty = computed(() => !props.rows.length || props.filter === 'all'
+  ? { icon: 'chemistry', title: 'No tests' }
+  : props.filter === 'failing'
+    ? { icon: 'checkmark-filled', title: 'No failing tests' }
+    : { icon: 'renew', title: 'No outdated results' })
 /** Folder disclosure changes only local project explorer presentation. */
 function toggle(storyId: string) {
   const next = new Set(closed.value)
@@ -77,14 +98,15 @@ function onGroupKeydown(event: KeyboardEvent, item: Extract<TestTreeEntry, { kin
 
 <template>
   <div class="tests-tree" aria-label="Project tests">
-    <p v-if="!visible.length" class="tests-empty">
-      {{ !rows.length ? 'No tests' : filter === 'failing' ? 'No failing tests' : filter === 'changed' ? 'No outdated results' : 'No tests' }}
-    </p>
+    <WorkbenchEmptyState v-if="!visible.length" :icon="empty.icon" :title="empty.title" />
     <WorkbenchVirtualList v-else :items="visible" :item-size="40" list-tag="ul" item-tag="li">
       <template #default="{ item }">
         <HstButton v-if="item.kind === 'heading'" color="flat" type="button" class="test-story-heading" :aria-expanded="!closed.has(item.id)" @click="toggle(item.id)" @contextmenu="openGroupMenu($event, item)" @keydown="onGroupKeydown($event, item)">
           <BuiltinIcon :icon="closed.has(item.id) ? 'chevron-right' : 'chevron-down'" :size="16" />
-          <BuiltinIcon :icon="item.failed ? 'error-filled' : item.stale ? 'renew' : item.passed ? 'checkmark-filled' : 'subtract'" :class="{ failed: item.failed, passed: item.passed }" :size="16" />
+          <span class="test-story-status" :data-status="item.status" role="img" :aria-label="GROUP_STATUS[item.status].label" :title="GROUP_STATUS[item.status].label">
+            <BuiltinIcon v-if="GROUP_STATUS[item.status].icon" :icon="GROUP_STATUS[item.status].icon!" :size="16" />
+            <HstPulsatingDisc v-else :size="14" />
+          </span>
           <strong>{{ item.title }}</strong>
           <span>{{ item.count }} / {{ item.total }}</span>
         </HstButton>
@@ -96,12 +118,12 @@ function onGroupKeydown(event: KeyboardEvent, item: Extract<TestTreeEntry, { kin
 
 <style scoped>
 .tests-tree { flex: 1; min-height: 0; overflow: hidden; padding: 0 calc(var(--histoire-pane-gutter, 16px) - 8px) 16px; }
-.tests-empty { padding: 20px 8px; color: var(--histoire-muted); }
 .test-story-heading { display: flex; align-items: center; gap: 8px; width: 100%; height: var(--histoire-virtual-row-height, 39px); padding: var(--histoire-test-heading-padding, 10px) 8px; color: var(--histoire-text); line-height: 18px; text-align: left; }
 .test-story-heading strong { flex: 1; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-weight: 750; }
 .test-story-heading span { font-size: 11px; font-family: var(--histoire-font-mono); color: var(--histoire-muted); }
 .test-story-heading:hover { background: var(--histoire-chip); }
 .test-story-heading:focus-visible { outline: 2px solid var(--histoire-accent); outline-offset: -2px; }
-.failed { color: var(--histoire-danger); }
-.passed { color: var(--histoire-accent); }
+.test-story-status { display: inline-flex; flex: none; align-items: center; justify-content: center; width: 16px; height: 16px; color: var(--histoire-muted); }
+.test-story-status[data-status="failed"] { color: var(--histoire-danger); }
+.test-story-status[data-status="passed"] { color: var(--histoire-accent); }
 </style>

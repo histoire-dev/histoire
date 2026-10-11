@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useMcpStore } from '../../../stores/mcp.js'
+import WorkbenchErrorState from '../../shell/WorkbenchErrorState.vue'
 import McpClients from './McpClients.vue'
 import McpCurrentOperation from './McpCurrentOperation.vue'
 import McpEndpoint from './McpEndpoint.vue'
@@ -22,10 +23,15 @@ const store = useMcpStore()
       <McpClients />
       <McpCurrentOperation v-if="store.current" />
     </template>
+    <WorkbenchErrorState v-else-if="store.status === 'unavailable'" title="MCP unavailable">
+      <template v-if="store.error" #default>
+        {{ store.error }}
+      </template>
+    </WorkbenchErrorState>
     <p v-else class="histoire-mcp-empty" role="status">
-      {{ store.status === 'disabled' ? 'MCP disabled in project config.' : 'MCP status unavailable.' }}
+      MCP disabled in project config.
     </p>
-    <p v-if="store.error" class="histoire-mcp-error" role="alert">
+    <p v-if="store.error && store.status !== 'unavailable'" class="histoire-mcp-error" role="alert">
       {{ store.error }}
     </p>
     <p v-if="store.omitted?.reads" class="histoire-mcp-empty" role="status">

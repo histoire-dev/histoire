@@ -41,4 +41,16 @@ describe('production TestsTree collection diagnostics', () => {
     }
     finally { await owner.close() }
   })
+
+  it('marks story heading running while any of its variants runs', async () => {
+    virtualViewport()
+    const passed = rows()
+    const owner = await mountTestsTree({ rows: passed, filter: 'all', selected: null })
+    try {
+      expect(owner.wrapper.get('.test-story-heading [role="img"]').attributes('aria-label')).toBe('Tests passed')
+      await owner.wrapper.setProps({ rows: passed.map((row, index) => index ? row : { ...row, running: true }) })
+      expect(owner.wrapper.get('.test-story-heading [role="img"]').attributes('aria-label')).toBe('Tests running')
+    }
+    finally { await owner.close() }
+  })
 })

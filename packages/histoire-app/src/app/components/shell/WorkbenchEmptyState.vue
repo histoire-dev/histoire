@@ -25,7 +25,7 @@ defineSlots<{
     <p v-if="$slots.default">
       <slot />
     </p>
-    <div v-if="$slots.actions" class="workbench-empty-state-actions">
+    <div v-if="$slots.actions" class="workbench-state-actions workbench-empty-state-actions">
       <slot name="actions" />
     </div>
   </div>
@@ -33,6 +33,5 @@ defineSlots<{
 
 <style scoped>
 .workbench-empty-state-icon { border-radius: 50%; background: var(--histoire-accent-soft); }
-.workbench-empty-state-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 8px; }
-.workbench-empty-state-actions :deep(.histoire-button[data-color="flat"]) { color: var(--histoire-accent); }
+.workbench-state-actions :deep(.histoire-button[data-color="flat"]) { color: var(--histoire-accent); }
 </style>

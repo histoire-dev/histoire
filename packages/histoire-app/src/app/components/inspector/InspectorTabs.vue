@@ -54,6 +54,7 @@ function navigate(event: KeyboardEvent) {
 .inspector-tabs button { display: flex; align-items: center; justify-content: center; gap: 5px; flex: 1; min-width: 0; min-height: 32px; color: var(--histoire-muted); font-weight: 700; }
 .inspector-tabs button:hover { color: var(--histoire-text); }
 .inspector-event-count { color: var(--histoire-agent-text); font-size: 13px; font-variant-numeric: tabular-nums; }
+.inspector-test-running { color: var(--histoire-muted); }
 .inspector-test-passed { color: var(--histoire-accent); }
 .inspector-test-failed { color: var(--histoire-danger); }
 .inspector-test-count { color: var(--histoire-muted); font-size: 13px; }

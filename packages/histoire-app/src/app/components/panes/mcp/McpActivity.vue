@@ -57,8 +57,9 @@ const recent = computed(() => store.history.slice(0, 3))
 
 <style scoped>
 h2 { display: flex; align-items: center; gap: 8px; margin: 0 0 14px; font-size: 15px; font-weight: 800; }
-h2 button { padding: 0; color: inherit; }
-h2 button:hover { color: var(--histoire-accent-link); }
+/* Outrank global `.histoire-provider .histoire-button` chrome so the heading reads as text. */
+h2 .histoire-button.histoire-button { padding: 0; border: 0; background: none; color: inherit; font: inherit; }
+h2 .histoire-button.histoire-button:hover { color: var(--histoire-accent-link); }
 h2 small { color: var(--histoire-muted); font-size: 10px; border-radius: 5px; padding: 2px 5px; background: var(--histoire-chip); }
 .histoire-mcp-activity-card { padding: 12px; border: 1px solid var(--histoire-border); border-radius: 14px; background: var(--histoire-surface); }
 .histoire-mcp-activity-current { padding: 10px; margin-bottom: 8px; border-radius: 10px; background: var(--histoire-agent-soft); }

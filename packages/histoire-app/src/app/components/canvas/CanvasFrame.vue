@@ -183,7 +183,7 @@ function openMenu(event: MouseEvent | KeyboardEvent) {
 .is-selected .histoire-frame-label { color: var(--histoire-accent); font-weight: 700; }
 .histoire-frame-label :is(svg, .histoire-pulsating-disc) { flex: none; color: var(--histoire-accent); }
 /* Same 16px slot as status icons, matching tests panel row glyphs. */
-.histoire-frame-label .histoire-pulsating-disc { margin-inline: 1px; } .histoire-frame-label svg.is-error { color: var(--histoire-danger); }
+.histoire-frame-label .histoire-pulsating-disc { margin-inline: 1px; color: var(--histoire-muted); } .histoire-frame-label svg.is-error { color: var(--histoire-danger); }
 .histoire-frame-body { position: relative; width: 100%; overflow: hidden; border: 1px solid var(--histoire-border); border-radius: 7px; background: white; }
 /* Unscaled chrome owns selection so every runtime state keeps a two-pixel ring. */
 .is-selected .histoire-frame-body { border-color: var(--histoire-accent); }

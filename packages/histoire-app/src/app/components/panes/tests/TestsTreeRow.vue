@@ -54,4 +54,6 @@ function onKeydown(event: KeyboardEvent): void {
 .failed :deep(svg) { color: var(--histoire-danger); }
 .warning :deep(svg) { color: var(--histoire-warn); }
 .passed :deep(svg) { color: var(--histoire-accent); }
+/* Running indicator stays neutral whatever the previous result tint. */
+.test-row :deep(:is(.histoire-pulsating-disc, .histoire-pulsating-disc svg)) { color: var(--histoire-muted); }
 </style>

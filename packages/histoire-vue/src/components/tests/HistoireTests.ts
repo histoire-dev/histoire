@@ -35,6 +35,8 @@ export const HistoireTests = defineComponent({
   slots: Object as SlotsType<{
     /** Replaces default empty message; `collected` tells whether definitions were discovered. */
     empty?: (props: { collected: boolean }) => VNodeChild
+    /** Shown while collecting or running before any test is known; status line covers it by default. */
+    loading?: (props: { collecting: boolean }) => VNodeChild
   }>,
   setup(props, { emit, expose, slots }) {
     const { session } = useHistoireContext()
@@ -102,7 +104,7 @@ export const HistoireTests = defineComponent({
           ? h(HistoireVirtualList, { class: 'histoire-tests-list', items: rows, minItemSize: 36, listTag: 'ul', itemTag: 'li' }, {
               default: ({ index }: HistoireVirtualSlot) => renderTestRow(rows[index]),
             })
-          : busy ? null : slots.empty?.({ collected: !!collection }) ?? h('p', { class: 'histoire-tests-empty' }, collection ? 'No tests' : 'Tests not collected'),
+          : busy ? slots.loading?.({ collecting: state.value.status === 'collecting' }) : slots.empty?.({ collected: !!collection }) ?? h('p', { class: 'histoire-tests-empty' }, collection ? 'No tests' : 'Tests not collected'),
       ])
     }
   },

@@ -16,6 +16,12 @@
   - Matches empty-state layout with `HstPulsatingDisc` (see below) and no icon badge background.
   - Keep controls skeletons, canvas loaders, inline button/tab/row indicators, and startup progress screen in their specialized forms.
 
+- Panel failures must use `WorkbenchErrorState` from `packages/histoire-app/src/app/components/shell/WorkbenchErrorState.vue`.
+  - `title`: short headline naming failed operation, no trailing period. `icon`: optional offline Carbon glyph; defaults to `error-filled`.
+  - Default slot: optional error detail. `actions` slot: optional recovery buttons.
+  - Announces failure with `role="alert"`; uses shared state layout and subtle danger badge background.
+  - Keep field validation, inline action feedback, and compact canvas error overlays in their specialized forms. Preserve usable content after partial failures.
+
 - Every spinner, busy dot, or "running"/"working" indicator must use `HstPulsatingDisc` from `@histoire/controls/vue` (source: `packages/histoire-controls/src/components/HstPulsatingDisc.vue`). Applies to app (`histoire-app`) and native components (`histoire-vue`).
   - `size`: number (px) or CSS length; default `16`. Color follows `currentColor`.
   - Never add custom spin/rotate keyframes or animate status icons (e.g. `in-progress`) for loading.

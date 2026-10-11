@@ -9,6 +9,8 @@ import { isContextMenuShortcut, useContextMenu } from '../../composables/context
 import { useSelection } from '../../composables/selection.js'
 import { useWorkbenchTestsModel } from '../panes/tests/model.js'
 import WorkbenchEmptyState from '../shell/WorkbenchEmptyState.vue'
+import WorkbenchErrorState from '../shell/WorkbenchErrorState.vue'
+import WorkbenchLoadingState from '../shell/WorkbenchLoadingState.vue'
 import InspectorHeader from './InspectorHeader.vue'
 import InspectorTabs from './InspectorTabs.vue'
 import PropsTab from './PropsTab.vue'
@@ -119,12 +121,15 @@ function openControlMenu(event: MouseEvent | KeyboardEvent): void {
         <WorkbenchEmptyState v-else icon="flash" title="No events yet" />
       </template>
       <template v-else-if="testsEnabled && active === 'tests'">
-        <p v-if="cachedFailure" class="inspector-test-failure" role="alert">
+        <WorkbenchErrorState v-if="cachedFailure" title="Tests unavailable">
           {{ cachedFailure }}
-        </p>
-        <HistoireTests :summary="cachedSummary" :collection="cachedCollection" :running="testEntry?.running" @error="emit('error', $event)">
+        </WorkbenchErrorState>
+        <HistoireTests v-if="!cachedFailure || cachedCollection" :summary="cachedSummary" :collection="cachedCollection" :running="testEntry?.running" @error="emit('error', $event)">
           <template #empty="{ collected }">
             <WorkbenchEmptyState icon="chemistry" :title="collected ? 'No tests' : 'Tests not collected'" />
+          </template>
+          <template #loading="{ collecting }">
+            <WorkbenchLoadingState :title="collecting ? 'Collecting tests…' : 'Running tests…'" />
           </template>
         </HistoireTests>
       </template>
@@ -137,7 +142,6 @@ function openControlMenu(event: MouseEvent | KeyboardEvent): void {
 .story-inspector { --histoire-inspector-gutter: var(--histoire-pane-gutter, 16px); display: flex; flex-direction: column; width: 100%; height: 100%; min-width: 0; min-height: 0; overflow: hidden; border: 1px solid transparent; border-radius: var(--histoire-radius-panel, 16px); color: var(--histoire-text); background: var(--histoire-surface); }
 .story-inspector[data-active-tab="docs"] { border-color: var(--histoire-border); background: var(--histoire-canvas); }
 .inspector-content { flex: 1; min-height: 0; overflow: auto; }
-.inspector-test-failure { margin: 0 var(--histoire-inspector-gutter) 10px; padding: 8px 10px; border-radius: 8px; background: var(--histoire-danger-soft); color: var(--histoire-danger-text); font-size: 12px; white-space: pre-wrap; overflow-wrap: anywhere; }
 .inspector-content :deep(.histoire-docs) { padding: 2px var(--histoire-inspector-gutter) 16px; color: var(--histoire-body); font-size: 12px; line-height: 1.7; }
 .inspector-content :deep(.histoire-docs :is(h1,h2,h3,h4)) { color: var(--histoire-text); font-weight: 800; }
 .inspector-content :deep(.histoire-docs table) { width: 100%; font-size: 11px; border-collapse: collapse; }
@@ -151,5 +155,5 @@ function openControlMenu(event: MouseEvent | KeyboardEvent): void {
 .inspector-content :deep(.histoire-events time) { margin-left: auto; color: var(--histoire-muted); font-size: 10px; }
 .inspector-content :deep(.histoire-event-argument) { margin: 8px 0 0; max-height: 120px; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere; color: var(--histoire-muted); font: 10px/1.6 var(--histoire-font-mono); }
 .inspector-content :deep(.histoire-tests) { padding: 2px var(--histoire-inspector-gutter) 16px; font-size: 12px; }
-.inspector-content :deep(.histoire-tests .workbench-empty-state) { flex: 1; }
+.inspector-content :deep(.histoire-tests .workbench-state) { flex: 1; }
 </style>
