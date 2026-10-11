@@ -1,17 +1,18 @@
 import type { HistoireProjectTestCollectionResult, HistoireTestRunSummary } from '@histoire/protocol'
 import type { WorkbenchTestsOptions } from './types.js'
 import { HistoireSdkError } from '@histoire/protocol'
+import { DEFAULT_COLLECT_TIMEOUT, TEST_COLLECTION_REPLY_GRACE } from '@histoire/shared'
 import { STORY_CHANGED_EVENT } from '../../../util/hot.js'
 
 /** Adapt existing correlated plugin channel; server retains shared execution-lane ownership. */
-export function createDevWorkbenchTestsOptions(window: Window): WorkbenchTestsOptions {
+export function createDevWorkbenchTestsOptions(window: Window, collectTimeout = DEFAULT_COLLECT_TIMEOUT): WorkbenchTestsOptions {
   let storage: Storage | undefined
   try {
     storage = window.localStorage
   }
   catch { /* Blocked preferences cannot prevent explicit server execution. */ }
   /** One request owns one runner; aborting retires publication until server teardown. */
-  function request<T>(event: 'runStoryTests' | 'collectStoryTests', target: { storyId?: string, variantId?: string | null }, signal: AbortSignal, onProgress?: (collection: HistoireProjectTestCollectionResult) => void) {
+  function request<T>(event: 'runStoryTests' | 'collectStoryTests', target: { storyId?: string, variantId?: string | null, force?: boolean }, signal: AbortSignal, onProgress?: (collection: HistoireProjectTestCollectionResult) => void) {
     const api = window.__HST_PLUGIN_API__
     if (!api) return Promise.reject(new HistoireSdkError('CAPABILITY_UNAVAILABLE', 'Server test execution is unavailable'))
     signal.throwIfAborted()
@@ -20,7 +21,9 @@ export function createDevWorkbenchTestsOptions(window: Window): WorkbenchTestsOp
       signal.addEventListener('abort', cancel, { once: true })
       // A project request collects once, then Vitest owns test-file parallelism.
       // Server requests still share the same UI/MCP execution/teardown lane.
-      const operation = onProgress ? api.sendEvent(event, target, signal, onProgress) : api.sendEvent(event, target, signal)
+      const operation = event === 'collectStoryTests'
+        ? api.sendEvent(event, target, signal, onProgress, { timeoutMs: collectTimeout + TEST_COLLECTION_REPLY_GRACE })
+        : onProgress ? api.sendEvent(event, target, signal, onProgress) : api.sendEvent(event, target, signal)
       void operation.then((summary: T) => {
         if (!signal.aborted) resolve(summary)
       }, reject).finally(() => signal.removeEventListener('abort', cancel))
@@ -28,7 +31,7 @@ export function createDevWorkbenchTestsOptions(window: Window): WorkbenchTestsOp
   }
   /** Assertion results stay distinct from definition-only discovery. */
   const run = (target: { storyId?: string, variantId?: string | null }, signal: AbortSignal) => request<HistoireTestRunSummary>('runStoryTests', target, signal)
-  return { storage, run, collectProject: (signal, progress) => request<HistoireProjectTestCollectionResult>('collectStoryTests', {}, signal, progress), collectStory: (storyId, signal, progress) => request<HistoireProjectTestCollectionResult>('collectStoryTests', { storyId }, signal, progress),
+  return { storage, run, collectProject: (signal, progress, options) => request<HistoireProjectTestCollectionResult>('collectStoryTests', options?.force ? { force: true } : {}, signal, progress), collectStory: (storyId, signal, progress, options) => request<HistoireProjectTestCollectionResult>('collectStoryTests', { storyId, ...(options?.force ? { force: true } : {}) }, signal, progress),
     /** Project execution avoids starting an isolated Vitest worker per variant. */
     runProject: signal => run({}, signal),
     /** Watch executes all variants in one changed story with one worker. */

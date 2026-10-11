@@ -3,15 +3,10 @@ import { resolve } from 'node:path'
 import { createHistoireProject } from 'histoire/node'
 import { expect, it } from 'vitest'
 import { getProjectServices } from '../../../../../dist/node/api/internal.js'
+import { createHistoireTestCollectionTask } from '../../../../../dist/node/test/execution-service.js'
 import { launchEmbedBrowser } from '../../utils/embed/browser.js'
+import { TEST_DISCOVERY_FACTS as publishedFacts } from '../../utils/mcp/test-discovery-observer.js'
 import { createVue3DiscoveryProject } from '../../utils/mcp/vue3-discovery-project.js'
-
-/** Observe actual published model, not spinner removal or receipt of a terminal frame. */
-const publishedFacts = `() => {
-  const model = document.querySelector('.tests-panel')?.__vueParentComponent?.setupState.model
-  return model && {status:model.discoveryStatus.value,error:String(model.discoveryError.value),progress:model.discoveryProgress.value,
-    variants:model.rows.value.map(row=>({target:row.target,collection:model.entries.value.get(JSON.stringify([row.target.storyId,row.target.variantId]))?.collection,summary:row.summary}))}
-}`
 
 it('publishes complete real Vue3 inventory within 5s on three cold source pages, refresh and HMR', async () => {
   for (let sample = 1; sample <= 3; sample++) {
@@ -25,8 +20,8 @@ it('publishes complete real Vue3 inventory within 5s on three cold source pages,
       const services = getProjectServices(project)
       const stories = services.dev!.controller.current!.context.storyFiles.filter(file => file.story && !file.story.docsOnly)
       const targets = services.dev!.catalog!.current!.catalog.stories.filter(story => !story.docsOnly).flatMap(story => story.variants.map(variant => ({ storyId: story.id, variantId: variant.id })))
-      expect(stories).toHaveLength(40)
-      expect(targets).toHaveLength(1093)
+      expect(stories).toHaveLength(41)
+      expect(targets).toHaveLength(1095)
       expect(stories.find(file => file.story!.title === 'HugeGrid')!.story!.variants).toHaveLength(1000)
       browser = await launchEmbedBrowser()
       const page = await browser.newPage()
@@ -70,13 +65,24 @@ it('publishes complete real Vue3 inventory within 5s on three cold source pages,
         expect(published.reduce((total: number, entry: any) => total + entry.collection.definitions.length, 0)).toBe(definitions)
         expect(errors).toEqual([])
         process.stderr.write(`${JSON.stringify({ sample, phase, navigationToPublication: duration, collectionRequest: terminal.duration, targets: inventory.length })}\n`)
-        expect(terminal.duration).toBeLessThan(5000)
-        expect(duration).toBeLessThan(5000)
+        // Full example reload includes opaque Lottie code, which must remain
+        // mounted. Measure a complete cache hit separately below.
+        expect(terminal.duration).toBeLessThan(phase === 'refresh' ? 2000 : 5000)
+        expect(duration).toBeLessThan(phase === 'refresh' ? 2000 : 5000)
       }
       const started = performance.now()
       await page.goto(dev.url, { waitUntil: 'domcontentloaded' })
       await verify(started)
       if (sample === 3) {
+        const mocking = stories.find(file => file.story!.title === 'Vitest Mocking')!
+        const cachedStarted = performance.now()
+        const cached = await services.execution.enqueue(createHistoireTestCollectionTask(services.dev!.controller.current!.context, { storyId: mocking.story!.id })).result
+        expect(cached.execution.runId).not.toBe(terminal.result.execution.runId)
+        expect(cached.variants.map(entry => entry.target)).toEqual(targets.filter(target => target.storyId === mocking.story!.id))
+        expect(cached.variants.every(entry => !entry.collection.error)).toBe(true)
+        expect(cached.variants.flatMap(entry => entry.collection.definitions)).toHaveLength(6)
+        process.stderr.write(`${JSON.stringify({ sample, phase: 'cache hit', collectionRequest: performance.now() - cachedStarted })}\n`)
+        expect(performance.now() - cachedStarted).toBeLessThan(1000)
         terminal = undefined
         const refresh = performance.now()
         await page.reload({ waitUntil: 'domcontentloaded' })

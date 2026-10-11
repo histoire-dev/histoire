@@ -32,4 +32,16 @@ describe('collection registration reachability', () => {
   it('does not confuse user copy with registration code', () => {
     expect(analyzeCollectionModule(`const text = 'onTest'; const title = 'HugeGrid';`)).toEqual({ imports: [], safe: true })
   })
+
+  it.each(['vi.importActual(moduleName)', 'vi.importMock(moduleName)'])('cannot cache graphs loaded through opaque Vitest APIs: %s', (code) => {
+    expect(analyzeCollectionModule(code)).toMatchObject({ safe: false, opaque: true })
+  })
+
+  it.each(['import * as client from \'histoire/client\'', 'const client=await import(\'histoire/client\')', 'const client=await runner.wrapDynamicImport(()=>import(\'histoire/client\'))'])('recognizes Vitest-hoisted client reads while retaining registration capability: %s', (load) => {
+    expect(analyzeCollectionModule(`${load};client.onTest(()=>{});client.isTesting()`)).toEqual({ imports: ['histoire/client'], safe: false, runtimeImports: ['histoire/client'] })
+  })
+
+  it.each(['client[key]()', 'consume(client)', 'client[\'on\'+\'Test\']()'])('inspects the complete client runtime when namespace escapes: %s', (use) => {
+    expect(analyzeCollectionModule(`import * as client from 'histoire/client';${use}`).runtimeImports).toBeUndefined()
+  })
 })

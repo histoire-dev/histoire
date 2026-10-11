@@ -45,6 +45,12 @@ export interface DevEventTransport {
  */
 export const DEV_EVENT_TIMEOUT = 360_000
 
+/** Local request backstop; these options never enter a server request payload. */
+export interface DevEventRequestOptions {
+  /** Milliseconds before cancelling a request whose terminal reply was lost. */
+  timeoutMs?: number
+}
+
 /**
  * Builds a per-browser-client id used to prefix request ids.
  *
@@ -122,9 +128,16 @@ export function createDevEventApi(transport: DevEventTransport) {
    * @param event Event name handled by a Histoire plugin on the node side.
    * @param payload Arbitrary JSON payload for that plugin.
    * @param signal Cancels exact server-side test work after request admission.
+   * @param onProgress Observes correlated completed collection subsets.
+   * @param options Local timeout override; other events retain the default backstop.
    */
-  function sendEvent(event: string, payload?: any, signal?: AbortSignal, onProgress?: (progress: any) => void) {
+  function sendEvent(event: string, payload?: any, signal?: AbortSignal, onProgress?: (progress: any) => void, options: DevEventRequestOptions = {}) {
     const operation = new Promise<any>((resolve, reject) => {
+      const timeoutMs = options.timeoutMs ?? DEV_EVENT_TIMEOUT
+      if (!Number.isFinite(timeoutMs) || timeoutMs <= 0) {
+        reject(new HistoireSdkError('INVALID_ARGUMENT', 'Dev event timeout must be positive'))
+        return
+      }
       if (closed) {
         reject(new Error('Histoire dev event API closed.'))
         return
@@ -164,8 +177,8 @@ export function createDevEventApi(transport: DevEventTransport) {
       }
 
       timeout = setTimeout(() => {
-        cancelRequest(new Error(`Histoire dev event "${event}" timed out after ${DEV_EVENT_TIMEOUT / 1000}s without a result.`))
-      }, DEV_EVENT_TIMEOUT)
+        cancelRequest(new HistoireSdkError('TIMEOUT', `Histoire dev event "${event}" timed out after ${timeoutMs / 1000}s without a result.`))
+      }, timeoutMs)
 
       off = addListener(event, ({ requestId: resultRequestId, result, error, code, progress }) => {
         // Results reach every client and every pending call of this event — only

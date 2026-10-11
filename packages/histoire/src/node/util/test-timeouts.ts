@@ -1,8 +1,8 @@
 import type { Context } from '../context.js'
 import { availableParallelism } from 'node:os'
+import { DEFAULT_COLLECT_TIMEOUT } from '@histoire/shared'
 
-/** Default maximum time (ms) to wait for the browser story collection run. */
-export const DEFAULT_COLLECT_TIMEOUT = 120_000
+export { DEFAULT_COLLECT_TIMEOUT } from '@histoire/shared'
 
 /** Default maximum time (ms) a single story may take to load and mount while collecting. */
 export const DEFAULT_STORY_COLLECT_TIMEOUT = 30_000

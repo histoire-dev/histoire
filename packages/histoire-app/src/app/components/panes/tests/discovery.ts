@@ -1,6 +1,6 @@
 import type { HistoireProjectTestCollectionResult } from '@histoire/protocol'
 import type { HistoireSession } from '@histoire/sdk'
-import type { WorkbenchTestEntry, WorkbenchTestsOptions } from './types.js'
+import type { WorkbenchTestCollectionOptions, WorkbenchTestEntry, WorkbenchTestsOptions } from './types.js'
 import { getHistoireTargetKey, HistoireSdkError, validateProjectTestCollection } from '@histoire/protocol'
 import { shallowRef } from 'vue'
 
@@ -30,12 +30,13 @@ export function createWorkbenchTestDiscovery(options: WorkbenchTestsOptions, own
   const progress = shallowRef({ completed: 0, total: 0 })
   const pending = new Set<string>()
   let project = !!options.collectProject
+  let force = false
   let active = true
   let suspended = 0
   let blocked = false
   let identity: string | undefined
   let publication: string | undefined
-  let request: { abort: AbortController, storyId?: string } | undefined
+  let request: { abort: AbortController, storyId?: string, force: boolean } | undefined
 
   /** Microtask admission coalesces HMR and lets explicit execution win first. */
   function schedule() {
@@ -49,6 +50,7 @@ export function createWorkbenchTestDiscovery(options: WorkbenchTestsOptions, own
     request = undefined
     previous?.abort.abort()
     if (preserve && previous) {
+      force ||= previous.force
       if (previous.storyId) pending.add(previous.storyId)
       else project = !!options.collectProject
     }
@@ -64,6 +66,7 @@ export function createWorkbenchTestDiscovery(options: WorkbenchTestsOptions, own
       cancel()
       pending.clear()
       project = !!options.collectProject
+      force = false
       blocked = false
       error.value = null
       status.value = 'idle'
@@ -97,7 +100,7 @@ export function createWorkbenchTestDiscovery(options: WorkbenchTestsOptions, own
     if (!active || suspended || request || blocked || owner.running() || snapshot.status !== 'ready' || snapshot.stale || snapshot.source?.mode !== 'dev') return
     if (!project && !pending.size) return
     const storyId = !project && options.collectStory ? pending.values().next().value : undefined
-    const collect = storyId ? (signal: AbortSignal, publish?: (result: HistoireProjectTestCollectionResult) => void) => options.collectStory!(storyId, signal, publish) : options.collectProject
+    const collect = storyId ? (signal: AbortSignal, publish?: (result: HistoireProjectTestCollectionResult) => void, collectionOptions?: WorkbenchTestCollectionOptions) => options.collectStory!(storyId, signal, publish, collectionOptions) : options.collectProject
     if (!collect) return
     if (storyId) {
       pending.delete(storyId)
@@ -110,7 +113,8 @@ export function createWorkbenchTestDiscovery(options: WorkbenchTestsOptions, own
     const evidence = new Map(targets.map(target => [getHistoireTargetKey(target), owner.entries().get(getHistoireTargetKey(target))]))
     const epochs = new Map(targets.map(target => [target.storyId, owner.epoch(target.storyId)]))
     const source = sourceKey(snapshot)
-    const current = { abort: new AbortController(), storyId }
+    const current = { abort: new AbortController(), storyId, force }
+    force = false
     request = current
     status.value = 'collecting'
     error.value = null
@@ -137,7 +141,7 @@ export function createWorkbenchTestDiscovery(options: WorkbenchTestsOptions, own
       progress.value = { completed: completed.size, total: targets.length }
     }
     try {
-      const result = await collect(current.abort.signal, publish)
+      const result = await collect(current.abort.signal, publish, current.force ? { force: true } : undefined)
       if (!active || request !== current || sourceKey(owner.snapshot()) !== source) return
       publish(result, true)
       status.value = 'completed'
@@ -176,13 +180,16 @@ export function createWorkbenchTestDiscovery(options: WorkbenchTestsOptions, own
       cancel()
       pending.clear()
       project = false
+      force = false
       blocked = false
       error.value = null
     },
     /** Retry is explicit after dependency, transport, or collection failure. */
     retry() {
+      cancel(true)
       blocked = false
       project = !!options.collectProject
+      force = true
       schedule()
     },
     /** No late collection may publish after model teardown. */

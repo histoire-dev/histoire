@@ -25,7 +25,7 @@ export function createTestCollectionChannel(execution: HistoireProjectTestCollec
           const key = getHistoireTargetKey(input.entry.target)
           if (!admitted.has(key) || results.has(key)) throw new Error('Invalid collection target')
           results.set(key, input.entry)
-          debugVitestBrowser('collection:target', { target: input.entry.target, duration: input.duration, completed: results.size, total: admitted.size })
+          debugVitestBrowser('collection:target', { runId: execution.runId, target: input.entry.target, duration: input.duration, completed: results.size, total: admitted.size })
           onProgress?.(result)
           response.statusCode = 204
         }

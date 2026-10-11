@@ -54,12 +54,18 @@ export interface WorkbenchTestsSummary {
   duration: number
 }
 
+/** Private definition discovery policy; deadlines remain server-owned. */
+export interface WorkbenchTestCollectionOptions {
+  /** Explicit Retry and Refresh discard cached definitions for requested stories. */
+  force?: boolean
+}
+
 /** First-party execution adapter uses existing shared server lane. */
 export interface WorkbenchTestsOptions {
   /** Discover every project variant without running assertion bodies. */
-  collectProject?: (signal: AbortSignal, onProgress?: (collection: HistoireProjectTestCollectionResult) => void) => Promise<HistoireProjectTestCollectionResult>
+  collectProject?: (signal: AbortSignal, onProgress?: (collection: HistoireProjectTestCollectionResult) => void, options?: WorkbenchTestCollectionOptions) => Promise<HistoireProjectTestCollectionResult>
   /** Refresh all variants of one executable story after HMR. */
-  collectStory?: (storyId: string, signal: AbortSignal, onProgress?: (collection: HistoireProjectTestCollectionResult) => void) => Promise<HistoireProjectTestCollectionResult>
+  collectStory?: (storyId: string, signal: AbortSignal, onProgress?: (collection: HistoireProjectTestCollectionResult) => void, options?: WorkbenchTestCollectionOptions) => Promise<HistoireProjectTestCollectionResult>
   /** One project-wide server worker; returned cases retain exact target attribution. */
   runProject?: (signal: AbortSignal) => Promise<HistoireTestRunSummary>
   /** One changed story worker, including all currently collected variants. */

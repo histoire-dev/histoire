@@ -14,12 +14,25 @@ import { getCollectTimeout } from '../util/test-timeouts.js'
 import { assertVitestRunHasNoUnhandledErrors } from '../util/vitest-errors.js'
 import { runVitestAttempts } from '../util/vitest-run.js'
 import { createTestCollectionChannel } from './collection-channel.js'
+import { createCollectionDeadline } from './collection-deadline.js'
 import { ensureBrowserTestDepsInstalled, ensureProjectVitest } from './preflight.js'
 import { generateSpecFiles } from './spec-files.js'
 import { getTestVitestConfig } from './vitest-config.js'
 
 /** Collect mounted variant definitions from captured dev metadata, without executing tests. */
 export async function collectHistoireProjectTests(ctx: Context, options: CollectHistoireTestsOptions = {}): Promise<HistoireProjectTestCollectionResult> {
+  const deadline = createCollectionDeadline(getCollectTimeout(ctx), options.signal, options.collectionDeadline)
+  try {
+    const result = await collectProjectTests(ctx, { ...options, signal: deadline.signal, collectionDeadline: deadline.until })
+    deadline.assertCurrent()
+    return result
+  }
+  catch (error) { throw deadline.failure(error) }
+  finally { deadline.close() }
+}
+
+/** Runner work consumes one inherited budget; terminal completion follows owned cleanup. */
+async function collectProjectTests(ctx: Context, options: CollectHistoireTestsOptions): Promise<HistoireProjectTestCollectionResult> {
   const started = performance.now()
   throwIfTestAborted(options.signal)
   if (options.storyId !== undefined && !validId(options.storyId)) throw new HistoireSdkError('INVALID_ARGUMENT', 'Test target IDs must be non-empty strings')
@@ -48,12 +61,14 @@ export async function collectHistoireProjectTests(ctx: Context, options: Collect
     throwIfTestAborted(options.signal)
     const generationStarted = performance.now()
     const specs = await generateSpecFiles(remaining, root, 'collect', execution.runId)
-    debugVitestBrowser('collection:specs', { duration: performance.now() - generationStarted, variants: specs.length })
+    debugVitestBrowser('collection:specs', { runId: execution.runId, duration: performance.now() - generationStarted, variants: specs.length })
     const include = specs.map(spec => spec.path)
     const channel = createTestCollectionChannel(execution, specs.map(spec => ({ storyId: spec.storyId, variantId: spec.variantId })), options.onProgress)
     const result = await runVitestAttempts<undefined, HistoireProjectTestCollectionResult>({
       root: ctx.root,
       mode: 'collect',
+      deadline: options.collectionDeadline,
+      runId: execution.runId,
       signal: options.signal,
       strictCleanup: options.strictCleanup,
       maxRetries: options.maxRetries,
@@ -62,12 +77,12 @@ export async function collectHistoireProjectTests(ctx: Context, options: Collect
       async setup() {
         // Harness loaders are optimizer entry edges: proven-empty stories must
         // not pull their entire dependency graph back into mounted discovery.
-        const config = await getTestVitestConfig({ ...ctx, storyFiles: remaining }, include, 'definitions', [channel.plugin])
+        const config = await getTestVitestConfig({ ...ctx, storyFiles: remaining }, include, 'definitions', [channel.plugin], options.collectionOptimizerEntries)
         return {
           vitestOptions: { ...config.vitestOptions, config: false, run: true, watch: false, passWithNoTests: true, include },
           viteConfig: config.viteConfig,
           browserProjectOptions: config.vitestOptions,
-          timeoutMs: getCollectTimeout(ctx),
+          timeoutMs: Math.max(1, options.collectionDeadline! - Date.now()),
           timeoutMessage: 'Histoire test collection timed out.',
           context: undefined,
         }
@@ -93,6 +108,6 @@ export async function collectHistoireProjectTests(ctx: Context, options: Collect
   }
   finally {
     await fs.remove(root)
-    debugVitestBrowser('collection:complete', { duration: performance.now() - started })
+    debugVitestBrowser('collection:complete', { runId: execution.runId, duration: performance.now() - started })
   }
 }

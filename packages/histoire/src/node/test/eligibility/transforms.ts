@@ -50,7 +50,7 @@ export function collectionEligibilityTransformPlugin(ctx: Context): Plugin {
 }
 
 /** Run the same client transforms, stopping at captured user output rather than optimizer transport. */
-export async function transformCollectionEligibility(ctx: Context, id: string, transform: () => Promise<unknown>): Promise<CollectionModuleAnalysis | undefined> {
+export async function transformCollectionEligibility(ctx: Context, id: string, transform: () => Promise<unknown>, signal?: AbortSignal): Promise<CollectionModuleAnalysis | undefined> {
   const state = current(ctx)
   const cached = state.modules.get(id)
   if (cached) return cached
@@ -60,5 +60,5 @@ export async function transformCollectionEligibility(ctx: Context, id: string, t
     await proofTransform.run(proof, transform)
   }
   catch (error) { if (error !== complete) throw error }
-  return proof.code === undefined ? undefined : remember(ctx, id, proof.code, state)
+  return signal?.aborted || proof.code === undefined ? undefined : remember(ctx, id, proof.code, state)
 }

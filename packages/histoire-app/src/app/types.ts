@@ -1,4 +1,5 @@
 import type { RouteLocationRaw } from 'vue-router'
+import type { DevEventRequestOptions } from './util/dev-event-api.js'
 
 export type {
   Story,
@@ -58,7 +59,7 @@ declare global {
 
   interface Window {
     __HST_PLUGIN_API__: {
-      sendEvent: (event: string, payload: any, signal?: AbortSignal, onProgress?: (progress: any) => void) => Promise<any>
+      sendEvent: (event: string, payload: any, signal?: AbortSignal, onProgress?: (progress: any) => void, options?: DevEventRequestOptions) => Promise<any>
       openStory: (storyId: string) => void
     }
   }

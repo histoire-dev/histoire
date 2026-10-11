@@ -4,7 +4,7 @@ import { debugVitestBrowser } from './browser-debug.js'
 import { finishClientOptimization, warmClientModules } from './client-optimizer.js'
 
 /** Finish entry scanning and initial prebundling before isolated tester documents open. */
-export async function prepareCollectionBrowser(vitest: Vitest): Promise<void> {
+export async function prepareCollectionBrowser(vitest: Vitest, runId?: string): Promise<void> {
   const started = performance.now()
   // COMPAT: browser server initialization matches existing provider adapter's
   // internal Vitest API. Real browser integration covers supported Vitest 4.1.
@@ -19,10 +19,11 @@ export async function prepareCollectionBrowser(vitest: Vitest): Promise<void> {
       await prepareVitestCollectionProvider(project.browser?.provider)
     })(), (async () => {
       const { testFiles } = await project.globTestFiles()
-      const entries = project.browser?.vite.config.optimizeDeps.entries ?? []
-      await warmClientModules(client, [...new Set([...testFiles, ...project.config.setupFiles, ...typeof entries === 'string' ? [entries] : entries])].map(file => `/@fs/${file}`))
+      // Scan roots retain stable optimizer metadata, but only admitted specs
+      // need transforms now. Cached stories never enter mounted discovery.
+      await warmClientModules(client, [...testFiles, ...project.config.setupFiles].map(file => `/@fs/${file}`), project.browser?.vite.config.root)
       await finishClientOptimization(client)
     })()])
   }))
-  debugVitestBrowser('collection:optimizer', { duration: performance.now() - started })
+  debugVitestBrowser('collection:optimizer', { runId, duration: performance.now() - started })
 }

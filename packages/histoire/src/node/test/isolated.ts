@@ -34,20 +34,25 @@ async function isolatedTestOperation(ctx: Context, options: CollectHistoireTests
   let result: HistoireTestRunSummary | HistoireProjectTestCollectionResult | undefined
   let failure: unknown
   let failed = false
+  let rejectOperation: ((error: unknown) => void) | undefined
   const targets = ctx.storyFiles.filter(file => file.story && !file.story.docsOnly && (!options.storyId || file.story.id === options.storyId)).flatMap(file => file.story!.variants.map(variant => ({ storyId: file.story!.id, variantId: variant.id })))
   const admitted = new Set(targets.map(getHistoireTargetKey))
   const seen = new Set<string>()
   /** Only finite cancellation travels to existing runner; never release lane here. */
   const abort = () => {
     if (child.connected) child.send({ type: 'cancel' }, () => {})
+    // Collection abort starts bounded cleanup immediately, even if worker is
+    // stuck before acquiring a cancellable Vitest handle. Lane stays owned.
+    if (operation === 'collect') rejectOperation?.(new ExecutionError('CANCELLED', 'Histoire test run cancelled'))
   }
   options.signal?.addEventListener('abort', abort, { once: true })
   try {
     result = await new Promise<HistoireTestRunSummary | HistoireProjectTestCollectionResult>((resolve, reject) => {
+      rejectOperation = reject
       timer = setTimeout(() => {
-        abort()
         reject(new HistoireSdkError('TIMEOUT', 'Histoire test worker timed out'))
-      }, (operation === 'collect' ? getCollectTimeout(ctx) : getRunTimeout(ctx)) + 60_000)
+        abort()
+      }, operation === 'collect' ? Math.max(0, (options.collectionDeadline ?? Date.now() + getCollectTimeout(ctx)) - Date.now()) : getRunTimeout(ctx) + 60_000)
       child.once('error', reject)
       child.once('exit', () => {
         if (!received) reject(new HistoireSdkError('INTERNAL_ERROR', 'Test worker exited without confirmed result'))
@@ -94,7 +99,7 @@ async function isolatedTestOperation(ctx: Context, options: CollectHistoireTests
       // Metadata capture prevents queued target contamination. Plugin functions
       // reload in owned child; no live server/config object crosses IPC.
       const files = options.skipStoryScan ? captureTestContextFiles(ctx) : undefined
-      child.send({ type: 'run', operation, root: ctx.root, configFile: ctx.configFile, files, options: { storyId: options.storyId, variantId: options.variantId, knownEmptyStoryIds: options.knownEmptyStoryIds, collectionRunId: options.collectionRunId, skipStoryScan: options.skipStoryScan, maxRetries: 0, strictCleanup: true, strictTarget: true } }, (error) => {
+      child.send({ type: 'run', operation, root: ctx.root, configFile: ctx.configFile, files, options: { storyId: options.storyId, variantId: options.variantId, knownEmptyStoryIds: options.knownEmptyStoryIds, collectionRunId: options.collectionRunId, collectionDeadline: options.collectionDeadline, collectionOptimizerEntries: options.collectionOptimizerEntries, skipStoryScan: options.skipStoryScan, maxRetries: 0, strictCleanup: true, strictTarget: true } }, (error) => {
         if (error) reject(error)
       })
       if (options.signal?.aborted) abort()

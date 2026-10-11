@@ -34,7 +34,7 @@ export function useWorkbench(props: WorkbenchProps, error: (error: unknown) => v
   const route = props.navigation.router.currentRoute
   const { shell, settings, storyCanvasViews, presets, matrix } = useWorkbenchStores(props.hostWindow, snapshot, route)
   const projectTests = createWorkbenchTestsModel(props.session, props.tests, {
-    ...(__HISTOIRE_DEV__ ? createDevWorkbenchTestsOptions(props.hostWindow) : {}),
+    ...(__HISTOIRE_DEV__ ? createDevWorkbenchTestsOptions(props.hostWindow, histoireConfig.test?.collectTimeout) : {}),
     settings,
   })
   provideWorkbenchTestsModel(projectTests)

@@ -37,6 +37,12 @@ export interface GeneratedSpecFile {
 
 /** Private collection inputs; no eligibility fields enter public story metadata. */
 export interface CollectHistoireTestsOptions extends RunHistoireTestsOptions {
+  /** Explicit refresh evicts requested generation-owned definition evidence. */
+  force?: boolean
+  /** Trusted absolute collection deadline shared with the isolated worker. */
+  collectionDeadline?: number
+  /** Stable captured catalog roots keep optimizer hashes independent of cache misses. */
+  collectionOptimizerEntries?: string[]
   /** Generation-owned proof transferred only over the owned worker channel. */
   knownEmptyStoryIds?: string[]
   /** Stable operation identity shared by early results and worker completion. */

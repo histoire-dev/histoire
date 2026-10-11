@@ -53,6 +53,10 @@ export interface VitestAttemptSetup<TContext> {
 }
 
 export interface RunVitestAttemptsOptions<TContext, TResult> {
+  /** Absolute collection budget inherited from eligibility and isolated process startup. */
+  deadline?: number
+  /** Correlates opt-in runner phase timings with streamed collection results. */
+  runId?: string
   /** Collection executes modules without executing assertion bodies or lifecycle hooks. */
   mode?: 'run' | 'collect'
   /** Project install used for Node and browser Vitest APIs. */
@@ -85,7 +89,7 @@ export interface RunVitestAttemptsOptions<TContext, TResult> {
  * @param originalError The error currently being handled, if any.
  * @param strict Require confirmed teardown for a long-lived shared execution lane.
  */
-async function cleanupRun(vitest: Vitest, label: string, originalError?: unknown, strict = false) {
+async function cleanupRun(vitest: Vitest, label: string, originalError?: unknown, strict = false, runId?: string) {
   const started = performance.now()
   try {
     const outcome = await cleanupVitestBrowserRun(vitest, { label, timeoutMs: CLEANUP_TIMEOUT })
@@ -102,7 +106,7 @@ async function cleanupRun(vitest: Vitest, label: string, originalError?: unknown
       originalError.cause = cleanupError
     }
   }
-  finally { debugVitestBrowser('collection:cleanup', { label, duration: performance.now() - started }) }
+  finally { debugVitestBrowser('collection:cleanup', { runId, label, duration: performance.now() - started }) }
 }
 
 /**
@@ -121,7 +125,9 @@ export async function runVitestAttempts<TContext, TResult>(
 
   while (true) {
     throwIfTestAborted(options.signal)
-    const setup = await options.setup()
+    const setupStarted = performance.now()
+    const setup = options.mode === 'collect' ? await withTestAbort(options.setup, options.signal) : await options.setup()
+    if (options.mode === 'collect') debugVitestBrowser('collection:config', { runId: options.runId, duration: performance.now() - setupStarted })
     throwIfTestAborted(options.signal)
     const api = await loadProjectVitest(options.root)
     throwIfTestAborted(options.signal)
@@ -132,7 +138,7 @@ export async function runVitestAttempts<TContext, TResult>(
       // Observe late creation even after abort: only the acquired handle can confirm teardown.
       const acquired = performance.now()
       vitest = await api.createVitest('test', setup.vitestOptions as any, setup.viteConfig as any)
-      if (options.mode === 'collect') debugVitestBrowser('collection:startup', performance.now() - acquired)
+      if (options.mode === 'collect') debugVitestBrowser('collection:startup', { runId: options.runId, duration: performance.now() - acquired })
       throwIfTestAborted(options.signal)
       if (setup.browserProjectOptions) {
         assignVitestBrowserProjectOptions(vitest, setup.browserProjectOptions)
@@ -140,13 +146,13 @@ export async function runVitestAttempts<TContext, TResult>(
 
       await runWithVitestStartTimeout(() => withTestAbort(async () => {
         if (options.mode === 'collect') {
-          await prepareCollectionBrowser(vitest!)
+          await prepareCollectionBrowser(vitest!, options.runId)
           throwIfTestAborted(options.signal)
           return vitest!.collect(setup.filter ?? [], { staticParse: false })
         }
         return vitest!.start(setup.filter ?? [])
       }, options.signal), {
-        timeoutMs: setup.timeoutMs,
+        timeoutMs: options.deadline === undefined ? setup.timeoutMs : Math.max(1, options.deadline - Date.now()),
         message: setup.timeoutMessage,
         onTimeout: () => setup.onTimeout?.(vitest!),
       })
@@ -155,7 +161,7 @@ export async function runVitestAttempts<TContext, TResult>(
       const result = await options.read(vitest, setup.context)
       throwIfTestAborted(options.signal)
       cleanupStarted = true
-      await cleanupRun(vitest, options.label, undefined, options.strictCleanup)
+      await cleanupRun(vitest, options.label, undefined, options.strictCleanup, options.runId)
       return result
     }
     catch (error) {
@@ -167,7 +173,7 @@ export async function runVitestAttempts<TContext, TResult>(
           // Resource release still waits for cleanupRun, even if cancellation fails.
           await cancelVitestBeforeCleanup(vitest)
         }
-        await cleanupRun(vitest, options.label, error, options.strictCleanup)
+        await cleanupRun(vitest, options.label, error, options.strictCleanup, options.runId)
       }
 
       throwIfTestAborted(options.signal)

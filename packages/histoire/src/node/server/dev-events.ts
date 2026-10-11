@@ -72,6 +72,7 @@ export function registerDevEvents(ctx: Context, server: ViteDevServer, moduleLoa
     const handle = enqueueHistoireTestRun(lane, ctx, {
       storyId: payload?.storyId,
       variantId: payload?.variantId,
+      force: operation === 'collect' ? payload?.force : undefined,
       onProgress: operation === 'collect'
         ? (progress) => {
             if (isActive() && !retiredClients.has(client)) client.send('histoire:dev-event-progress', { event: 'collectStoryTests', requestId, progress })

@@ -3,8 +3,8 @@ import { parseAst } from 'rollup/dist/parseAst.js'
 import { analyzeCollectionModule } from '../test/eligibility/analysis.js'
 import { debugVitestBrowser } from './browser-debug.js'
 
-/** Warm static runtime imports; entry scanning owns literal dynamic dependencies without loading unused UI. */
-export async function warmClientModules(client: DevEnvironment, entries: string[]): Promise<ReadonlyMap<string, readonly string[]>> {
+/** Warm runtime imports; collection may also prepare user-owned literal imports before browser dispatch. */
+export async function warmClientModules(client: DevEnvironment, entries: string[], dynamicRoot?: string): Promise<ReadonlyMap<string, readonly string[]>> {
   const visited = new Set<string>()
   const graph = new Map<string, readonly string[]>()
   /** Root stories are admitted separately because generated harness loaders use dynamic imports. */
@@ -18,7 +18,14 @@ export async function warmClientModules(client: DevEnvironment, entries: string[
       // setup files. Other lazy UI remains cold until a mounted target needs it.
       const staticImports = parseAst(module.code).body.flatMap(node => ('source' in node && node.source?.type === 'Literal' && typeof node.source.value === 'string') ? [node.source.value] : [])
       graph.set(url, staticImports)
-      const imports = url.includes('virtual:$histoire-') ? analyzeCollectionModule(module.code).imports : staticImports
+      // A scan can miss interop discovered when a story's onMounted import
+      // loads. Prepare those literal edges before opening tester documents;
+      // framework/app lazy UI stays outside this user-root traversal.
+      const file = url.startsWith('/@fs/') ? decodeURI(url.slice('/@fs/'.length)) : undefined
+      // Optimizer output lives beneath the user's root, but its lazy framework
+      // branches are not user-authored import edges and must stay cold.
+      const userModule = dynamicRoot && !url.includes('/node_modules/') && !url.includes('/.histoire/cache/') && (file ? [file, `/${file}`].some(path => path.startsWith(`${dynamicRoot}/`)) : !url.startsWith('/@'))
+      const imports = url.includes('virtual:$histoire-') || userModule ? analyzeCollectionModule(module.code).imports : staticImports
       await Promise.all(imports.map(warm))
     }
     catch (error) { debugVitestBrowser('collection:client-warmup', error instanceof Error ? error.message : error) }
@@ -47,6 +54,9 @@ export async function finishClientOptimization(client: DevEnvironment): Promise<
   if (!optimizer) return
   await optimizer.init()
   await optimizer.scanProcessing
-  optimizer.run()
-  await Promise.all(Object.values(optimizer.metadata.discovered).map(dependency => dependency.processing))
+  const pending = Object.values(optimizer.metadata.discovered).map(dependency => dependency.processing).filter(Boolean)
+  // Vite starts pending batches when scanning/crawling ends. Scheduling an
+  // extra run can enqueue a second rebuild behind that batch; its promises
+  // are already settled when the rebuild races tester startup.
+  await Promise.all(pending)
 }

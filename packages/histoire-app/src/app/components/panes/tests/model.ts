@@ -246,7 +246,9 @@ export function createWorkbenchTestsModel(session: HistoireSession, selected?: H
     if (!value) pending.clear()
   }
   discovery.refresh()
-  return { discoveryStatus: discovery.status, discoveryError: discovery.error, discoveryProgress: discovery.progress, retryCollection: discovery.retry, session, rows, visibleRows, summary, entries, running, error, completed, total, watchTests, canRun, cancel, invalidate, setWatch,
+  return { discoveryStatus: discovery.status, discoveryError: discovery.error, discoveryProgress: discovery.progress, retryCollection: discovery.retry,
+    /** Explicit refresh is available only while an idle ready dev publication owns discovery. */
+    canRefresh: computed(() => !!options.collectProject && snapshot.value.source?.mode === 'dev' && snapshot.value.status === 'ready' && !snapshot.value.stale && !running.value && discovery.status.value !== 'collecting'), session, rows, visibleRows, summary, entries, running, error, completed, total, watchTests, canRun, cancel, invalidate, setWatch,
     /** Pause only this provider's background definitions while an interactive capture owns work. */
     suspendDiscovery: discovery.suspend,
     /** Explicit execution of one exact variant, sharing the project execution lane. */

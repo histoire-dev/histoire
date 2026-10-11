@@ -20,6 +20,8 @@ export interface HistoireBrowserRunConfigOptions {
   entries: string[]
   /** Extra Vite plugins (the collection results channel). */
   plugins?: VitePlugin[]
+  /** Private stable catalog roots do not expand mounted story or spec admission. */
+  collectionOptimizerEntries?: string[]
 }
 
 /**
@@ -38,11 +40,12 @@ export async function getHistoireBrowserRunConfig(
   })
   // Generated specs are warmed directly before dispatch. Their fresh run paths
   // must not invalidate persistent optimizer hashes on every collection.
-  // Stable remaining story roots still admit lazy CommonJS imports, alongside
-  // explicit user entries; proven-empty stories never enter this graph.
+  // Controller-owned catalog roots keep the hash stable when cache misses
+  // shrink. These are transform/scan inputs; only filtered specs mount stories.
+  // Other callers retain their existing remaining-story entry policy.
   const userEntries = viteConfig.optimizeDeps?.entries ?? []
   const optimizerEntries = options.definitions
-    ? [...new Set([...ctx.storyFiles.map(file => file.path), ...typeof userEntries === 'string' ? [userEntries] : userEntries])]
+    ? [...new Set([...options.collectionOptimizerEntries ?? ctx.storyFiles.map(file => file.path), ...typeof userEntries === 'string' ? [userEntries] : userEntries])]
     : entries
 
   if (options.plugins?.length) {

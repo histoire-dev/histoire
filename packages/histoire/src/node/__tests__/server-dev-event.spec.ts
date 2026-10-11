@@ -2,6 +2,7 @@ import { HistoireSdkError } from '@histoire/protocol'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { createExecutionService } from '../runtime/execution-service.js'
 import { createHistoireTestTask } from '../test/execution-service.js'
+import { createRunTestsStoryFile } from './utils/run-tests-harness.js'
 
 /**
  * Behaviour of the dev-server `histoire:dev-event` handler, driven through a
@@ -192,13 +193,16 @@ describe('dev-event handler', () => {
 
   it.each(['runStoryTests', 'collectStoryTests'])('cancels only socket-owned %s and keeps lane until cleanup', async (event) => {
     const execution = createExecutionService()
-    const server = register(createContext(), execution)
+    const context = createContext()
+    context.root = '/virtual-root'
+    context.storyFiles = ['active', 'cancelled', 'other', 'reused'].map(id => createRunTestsStoryFile({ id, variantId: 'main', source: '' }))
+    const server = register(context, execution)
     const first = createClient()
     const other = createClient()
     const started: string[] = []
     let release!: () => void
     let activeSignal!: AbortSignal
-    runHistoireTests.mockImplementation(async (_context, options) => {
+    runHistoireTests.mockImplementation(async (context, options) => {
       started.push(options.storyId)
       if (options.storyId === 'active') {
         activeSignal = options.signal
@@ -206,7 +210,9 @@ describe('dev-event handler', () => {
           release = done
         })
       }
-      return { ok: true, storyId: options.storyId }
+      return options.collectionRunId
+        ? { execution: { runId: options.collectionRunId, mode: 'server' }, variants: context.storyFiles.map(file => ({ target: { storyId: file.story.id, variantId: 'main' }, collection: { definitions: [] } })) }
+        : { ok: true, storyId: options.storyId }
     })
 
     const active = server.emit({ event, payload: { storyId: 'active' }, requestId: 'active' }, first)

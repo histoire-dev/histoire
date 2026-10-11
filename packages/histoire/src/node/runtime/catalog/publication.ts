@@ -19,6 +19,8 @@ export function createRuntimeCatalog(options: SnapshotOptions & { root: string, 
     get current() { return current },
     /** A new collection/content batch blocks execution admission. */
     get updating() { return updating },
+    /** Monotonic execution admission fence, including unchanged catalog publications. */
+    get executionRevision() { return batch },
     /** Retains last completed reads while blocking execution. */
     markUpdating() {
       updating = true

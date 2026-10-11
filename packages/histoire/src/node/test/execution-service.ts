@@ -7,8 +7,8 @@ import type { CollectHistoireTestsOptions, RunHistoireTestsOptions } from './typ
 import { HistoireSdkError } from '@histoire/protocol'
 import { getRuntimeCatalogForContext } from '../runtime/catalog/attachment.js'
 import { getEmbedSourceId } from '../virtual/embed/identity.js'
+import { collectGenerationTests } from './collection-task.js'
 import { createTestContextSnapshot } from './context-snapshot.js'
-import { captureTestCollectionEligibility } from './eligibility/index.js'
 
 /** Capture detached metadata before queueing; acquire runner only at lane head. */
 export function createHistoireTestTask(ctx: Context, options: Pick<RunHistoireTestsOptions, 'storyId' | 'variantId'>): ExecutionTask<HistoireTestRunSummary> {
@@ -16,13 +16,12 @@ export function createHistoireTestTask(ctx: Context, options: Pick<RunHistoireTe
 }
 
 /** Definition collection shares captured source identity and server execution lane. */
-export function createHistoireTestCollectionTask(ctx: Context, options: Pick<CollectHistoireTestsOptions, 'storyId' | 'onProgress'>): ExecutionTask<HistoireProjectTestCollectionResult> {
+export function createHistoireTestCollectionTask(ctx: Context, options: Pick<CollectHistoireTestsOptions, 'storyId' | 'onProgress' | 'force'>): ExecutionTask<HistoireProjectTestCollectionResult> {
   return createTestOperationTask(ctx, options, 'collect') as ExecutionTask<HistoireProjectTestCollectionResult>
 }
 
 /** Both operation kinds validate source ownership before acquisition and completion. */
-function createTestOperationTask(ctx: Context, options: Pick<CollectHistoireTestsOptions, 'storyId' | 'variantId' | 'onProgress'>, operation: 'run' | 'collect'): ExecutionTask<HistoireTestRunSummary | HistoireProjectTestCollectionResult> {
-  const { onProgress: publishProgress, ...targetOptions } = options
+function createTestOperationTask(ctx: Context, options: Pick<CollectHistoireTestsOptions, 'storyId' | 'variantId' | 'onProgress' | 'force'>, operation: 'run' | 'collect'): ExecutionTask<HistoireTestRunSummary | HistoireProjectTestCollectionResult> {
   const snapshot = createTestContextSnapshot(ctx)
   const catalog = getRuntimeCatalogForContext(ctx)?.catalog
   const source = catalog?.current
@@ -40,22 +39,10 @@ function createTestOperationTask(ctx: Context, options: Pick<CollectHistoireTest
     validate: assertSourceOwner,
     async run(signal) {
       assertSourceOwner()
-      const eligibility = operation === 'collect' ? await captureTestCollectionEligibility(ctx, options.storyId, signal) : undefined
-      const knownEmptyStoryIds = eligibility?.knownEmptyStoryIds
+      if (operation === 'collect') return collectGenerationTests(ctx, snapshot, source, options, assertSourceOwner, signal)
+      const { runHistoireTests } = await import('./index.js')
+      const result = await runHistoireTests(snapshot, { storyId: options.storyId, variantId: options.variantId, skipStoryScan: true, signal, strictCleanup: true, isolate: true, maxRetries: 0 })
       assertSourceOwner()
-      eligibility?.assertCurrent()
-      /** Progress has the same captured publication authority as final completion. */
-      function onProgress(result: HistoireProjectTestCollectionResult) {
-        if (signal.aborted) return
-        assertSourceOwner()
-        eligibility?.assertCurrent()
-        publishProgress?.(source ? { ...result, execution: { ...result.execution, sourceId: getEmbedSourceId(snapshot.root), epoch: source.epoch, revision: source.revision } } : result)
-      }
-      const runner = operation === 'collect' ? (await import('./collect.js')).collectHistoireProjectTests : (await import('./index.js')).runHistoireTests
-      const collectionOptions = operation === 'collect' ? { knownEmptyStoryIds, onProgress } : {}
-      const result = await runner(snapshot, { ...targetOptions, ...collectionOptions, skipStoryScan: true, signal, strictCleanup: true, isolate: true, maxRetries: 0 })
-      assertSourceOwner()
-      eligibility?.assertCurrent()
       // UI/SDK consumers admit work under the portable book identity, not the
       // private runtime-controller project ID. Revision remains admission-owned.
       return source && result.execution ? { ...result, execution: { ...result.execution, sourceId: getEmbedSourceId(snapshot.root), epoch: source.epoch, revision: source.revision } } : result
@@ -64,7 +51,7 @@ function createTestOperationTask(ctx: Context, options: Pick<CollectHistoireTest
 }
 
 /** Common UI/MCP submission adapter; queue retains runner ownership through confirmed teardown. */
-export function enqueueHistoireTestRun(execution: ExecutionService, ctx: Context, options: Pick<CollectHistoireTestsOptions, 'storyId' | 'variantId' | 'onProgress'>, isActive = () => true, operation: 'run' | 'collect' = 'run') {
+export function enqueueHistoireTestRun(execution: ExecutionService, ctx: Context, options: Pick<CollectHistoireTestsOptions, 'storyId' | 'variantId' | 'onProgress' | 'force'>, isActive = () => true, operation: 'run' | 'collect' = 'run') {
   const task = operation === 'collect' ? createHistoireTestCollectionTask(ctx, options) : createHistoireTestTask(ctx, options)
   return execution.enqueue<HistoireTestRunSummary | HistoireProjectTestCollectionResult>({ ...task, validate() {
     task.validate?.()

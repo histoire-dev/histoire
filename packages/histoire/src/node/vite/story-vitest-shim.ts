@@ -4,7 +4,8 @@ import type { BrowserRuntimePaths } from './resolve-paths.js'
 import { generateStoryVitestShim } from './story-vitest-shim/index.js'
 import { isVitestRuntimeImporter } from './vitest-collect-stub.js'
 
-const STORY_VITEST_SHIM_ID = '\0virtual:$histoire-story-vitest'
+/** Owned shim identity is also trusted by non-executing dependency analysis. */
+export const STORY_VITEST_SHIM_ID = '\0virtual:$histoire-story-vitest'
 
 /**
  * Serves the browser-compatible `vitest` shim to story files.
