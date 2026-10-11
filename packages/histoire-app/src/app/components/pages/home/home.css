@@ -1,0 +1,23 @@
+/*
+ * Shared home page chrome: section headings, bordered cards and list rows.
+ * Selectors are prefixed with `.histoire-home-page` so they outrank the global
+ * `.histoire-provider .histoire-button[data-color]` rules that otherwise strip
+ * borders and backgrounds from buttons used as cards or rows.
+ */
+.histoire-home-page h2 { display: flex; align-items: center; gap: 8px; margin: 0 0 14px; font-size: 15px; font-weight: 800; }
+.histoire-home-page h2 > span, .histoire-home-page h2 > small { color: var(--histoire-muted); font-size: 10px; }
+.histoire-home-page h2 > small { padding: 2px 5px; border-radius: 5px; background: var(--histoire-chip); }
+
+.histoire-home-page .histoire-home-card { overflow: hidden; border: 1px solid var(--histoire-border); border-radius: 14px; background: var(--histoire-surface); }
+
+/* Clickable card (browse sections, search). */
+.histoire-home-page .histoire-button.histoire-home-card { border-color: var(--histoire-border); background: var(--histoire-surface); text-align: left; }
+.histoire-home-page .histoire-button.histoire-home-card:not(:disabled):hover { border-color: var(--histoire-accent); background: var(--histoire-surface); }
+.histoire-home-page .histoire-button.histoire-home-card:focus-visible { outline-offset: 3px; }
+
+/* Full-width list row inside a card; consecutive rows get a divider. */
+.histoire-home-page .histoire-home-row { display: flex; align-items: center; gap: 10px; width: 100%; padding: 11px 14px; border: 0; border-radius: 0; color: var(--histoire-text); text-align: left; }
+.histoire-home-page .histoire-home-row + .histoire-home-row { border-top: 1px solid var(--histoire-border); }
+.histoire-home-page .histoire-home-row:focus-visible { outline-offset: -2px; }
+.histoire-home-page .histoire-home-row > svg { flex: none; }
+.histoire-home-page .histoire-home-row > span { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

@@ -14,6 +14,7 @@ import HomeHeader from './HomeHeader.vue'
 import HomeSearch from './HomeSearch.vue'
 import { usePageOwnership } from './ownership.js'
 import UpdatesList from './UpdatesList.vue'
+import './home.css'
 
 defineProps<{
   /** Source-owned release/build information; omitted during unavailable Git metadata. */

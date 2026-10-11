@@ -15,18 +15,18 @@ defineEmits<{
 <template>
   <section v-if="guides.length" class="histoire-guides">
     <h2>Guides</h2>
-    <HstButton v-for="guide in guides" :key="guide.id" color="flat" type="button" @click="$emit('select', { storyId: guide.id, variantId: null })">
-      <BuiltinIcon icon="document" :size="16" />
-      <span>{{ guide.title }}</span>
-      <BuiltinIcon icon="chevron-right" :size="16" />
-    </HstButton>
+    <div class="histoire-home-card">
+      <HstButton v-for="guide in guides" :key="guide.id" color="flat" type="button" class="histoire-home-row" @click="$emit('select', { storyId: guide.id, variantId: null })">
+        <BuiltinIcon icon="document" :size="16" />
+        <span>{{ guide.title }}</span>
+        <BuiltinIcon icon="chevron-right" :size="16" />
+      </HstButton>
+    </div>
   </section>
 </template>
 
 <style scoped>
-h2 { margin: 0 0 14px; font-size: 15px; font-weight: 800; }
-.histoire-guides button { display: flex; align-items: center; gap: 10px; width: 100%; margin-bottom: 7px; padding: 12px 14px; color: var(--histoire-text); text-align: left; font-weight: 700; }
-.histoire-guides span { flex: 1; }
-.histoire-guides button > svg:first-child { color: var(--histoire-accent); }
-.histoire-guides button:hover { color: var(--histoire-accent); }
+.histoire-home-row { font-weight: 700; }
+.histoire-home-row > svg:first-child { color: var(--histoire-accent); }
+.histoire-home-row > svg:last-child { color: var(--histoire-muted); }
 </style>

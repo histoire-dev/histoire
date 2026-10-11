@@ -26,7 +26,7 @@ const issues = computed(() => {
 <template>
   <section v-if="issues.length" class="histoire-needs-attention">
     <h2>Needs attention <span>{{ issues.length }}</span><small>DEV</small></h2>
-    <div class="histoire-attention-card">
+    <div class="histoire-home-card">
       <div v-for="issue in issues" :key="issue.id" class="histoire-attention-row">
         <BuiltinIcon :icon="issue.warning ? 'warning-alt-filled' : 'error-filled'" :class="issue.warning ? 'warning' : 'danger'" :size="16" />
         <div><strong>{{ issue.title }}</strong><p>{{ issue.message }}</p></div>
@@ -39,10 +39,6 @@ const issues = computed(() => {
 </template>
 
 <style scoped>
-h2 { display: flex; align-items: center; gap: 8px; margin: 0 0 14px; font-size: 15px; font-weight: 800; }
-h2 span, h2 small { color: var(--histoire-muted); font-size: 10px; }
-h2 small { border-radius: 5px; padding: 2px 5px; background: var(--histoire-chip); }
-.histoire-attention-card { overflow: hidden; border: 1px solid var(--histoire-border); border-radius: 14px; background: var(--histoire-surface); }
 .histoire-attention-row { display: flex; align-items: center; gap: 12px; padding: 14px 16px; }
 .histoire-attention-row + .histoire-attention-row { border-top: 1px solid var(--histoire-border); }
 .histoire-attention-row > div { flex: 1; min-width: 0; }

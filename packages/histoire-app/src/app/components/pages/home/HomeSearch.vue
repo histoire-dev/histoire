@@ -14,7 +14,7 @@ defineEmits<{
 </script>
 
 <template>
-  <HstButton color="flat" type="button" class="histoire-home-search" @click="$emit('search')">
+  <HstButton type="button" class="histoire-home-search histoire-home-card" @click="$emit('search')">
     <BuiltinIcon icon="search" :size="16" />
     <span>Search {{ stories }} stories and {{ guides }} docs pages</span>
     <kbd>Ctrl K</kbd>
@@ -22,9 +22,8 @@ defineEmits<{
 </template>
 
 <style scoped>
-.histoire-home-search { display: flex; align-items: center; gap: 12px; width: 100%; padding: 16px 18px; color: var(--histoire-muted); text-align: left; }
+.histoire-home-search { display: flex; align-items: center; justify-content: flex-start; gap: 12px; width: 100%; padding: 14px 16px; color: var(--histoire-muted); }
 .histoire-home-search span { flex: 1; }
 .histoire-home-search kbd { border: 1px solid var(--histoire-border); border-radius: 5px; padding: 2px 5px; font-family: var(--histoire-font-mono, monospace); font-size: 10px; }
-.histoire-home-search:hover { border-color: var(--histoire-accent); }
-.histoire-home-search:focus-visible { outline: 2px solid var(--histoire-accent); outline-offset: 3px; }
+.histoire-home-search:hover { color: var(--histoire-text); }
 </style>
