@@ -10,6 +10,8 @@ import { notifyStoryChange } from '../stories.js'
 import { resolveHistoireAppBundledDir } from '../util/resolve-histoire-app.js'
 import { createOptimizerCacheIgnore } from '../util/story-ignore.js'
 import { createEmbedMiddleware } from '../virtual/embed/middleware.js'
+import { resolveVisualConfig } from '../visual/config.js'
+import { retireVisualSource } from '../visual/source.js'
 import { createAppHtmlMiddleware, createSandboxHtmlMiddleware } from './dev-html.js'
 import { createMcpPreviewHtmlMiddleware } from './mcp-preview-html.js'
 import { histoireSharedPath, resolveSupportPluginAllowPaths, tryResolveDependency, withPackageDirs } from './resolve-paths.js'
@@ -36,6 +38,7 @@ export function createHistoireVitePlugin(ctx: Context, options: HistoireVitePlug
   // Peer CSS retains font URLs after package publishing, so Vite must serve its assets.
   const controlsAllowPaths = controlsEntry ? [dirname(controlsEntry)] : []
   const { tempDir } = getContextRegistry(ctx)
+  const visual = resolveVisualConfig(ctx.config.visual)
 
   return {
     name: 'histoire-vite-plugin',
@@ -130,7 +133,10 @@ export function createHistoireVitePlugin(ctx: Context, options: HistoireVitePlug
           watch: {
             // Every run owns its optimizer cache, but older caches can remain
             // beside it. Watch plugin sources while pruning all cache folders.
-            ignored: [`!**/node_modules/.histoire/**`, '**/vite.config.*', createOptimizerCacheIgnore(ctx)],
+            ignored: [`!**/node_modules/.histoire/**`, '**/vite.config.*', createOptimizerCacheIgnore(ctx),
+              // Offline reports must never reload the reviewing browser. Baseline
+              // approvals and saved cells refresh through their owned UI channel.
+              `${ctx.root}/.histoire/visual/**`, ...visual ? [`${ctx.root}/${visual.baselineDir}/**`] : []],
           },
           hmr: command === 'build' ? false : !isServer,
         },
@@ -160,6 +166,7 @@ export function createHistoireVitePlugin(ctx: Context, options: HistoireVitePlug
     },
 
     handleHotUpdate(updateContext) {
+      if (visual && !isServer && !browserRuntime) retireVisualSource(updateContext.server)
       const story = ctx.storyFiles.find(file => file.path === updateContext.file)
       if (story) {
         notifyStoryChange(ctx, story)

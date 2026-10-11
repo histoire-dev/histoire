@@ -7,6 +7,7 @@ import { createUiChannel } from './channel.js'
 import { registerMcpChannel } from './mcp.js'
 import { registerScreenshotSetupChannel } from './screenshot-setup.js'
 import { registerScreenshotChannel } from './screenshot.js'
+import { registerVisualChannel } from './visual.js'
 
 /** Generation-scoped integration point for config, comments, and ACP features. */
 const channels = new WeakMap<Context, UiChannelServer>()
@@ -22,9 +23,9 @@ export function registerUiChannel(ctx: Context, server: ViteDevServer, execution
     await channel.close()
   })
   registerScreenshotChannel(ctx, server, channel, execution, isActive)
-  registerMcpChannel(ctx, channel)
   registerVisualChannel(ctx, server, channel, execution, isActive)
   registerScreenshotSetupChannel(ctx, channel, execution, isActive)
+  registerMcpChannel(ctx, channel)
   return channel
 }
 

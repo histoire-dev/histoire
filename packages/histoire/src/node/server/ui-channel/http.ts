@@ -23,7 +23,7 @@ export function installUiHttpRouter(server: ViteDevServer): void {
   if (routers.has(server.middlewares)) return
   const routes = new Set<UiHttpRoute>()
   routers.set(server.middlewares, routes)
-  const namespaces = ['screenshots', 'agents'].map(name => uiHttpPath(server, `/__histoire/${name}`))
+  const namespaces = ['screenshots', 'agents', 'visual'].map(name => uiHttpPath(server, `/__histoire/${name}`))
   server.httpServer?.once('close', () => routes.clear())
   server.middlewares.use((request, response, next) => {
     const path = request.url?.split('?')[0]
@@ -54,7 +54,7 @@ export function installUiHttpRouter(server: ViteDevServer): void {
 export function registerUiHttpRoute(server: ViteDevServer, prefix: string, handler: Connect.NextHandleFunction, isActive: () => boolean): () => void {
   const routes = routers.get(server.middlewares)
   if (!routes) throw new Error('UI HTTP router must be installed during configureServer')
-  const owned = ['screenshots', 'agents'].some(name => prefix.startsWith(uiHttpPath(server, `/__histoire/${name}/`)))
+  const owned = ['screenshots', 'agents', 'visual'].some(name => prefix.startsWith(uiHttpPath(server, `/__histoire/${name}/`)))
   if (!owned) throw new Error('Invalid UI HTTP route prefix')
   if ([...routes].some(route => route.prefix === prefix)) throw new Error('UI HTTP route already registered')
   const route = { prefix, handler, isActive }

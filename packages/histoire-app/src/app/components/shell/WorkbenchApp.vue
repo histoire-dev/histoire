@@ -29,7 +29,7 @@ function revealStoryVariant(target: FrameActionTarget): Promise<void> {
 }
 const workbench = useWorkbench(props, error => emit('error', error), revealStoryVariant)
 const buildInfo = useWorkbenchBuildInfo()
-const { snapshot, route, shell, settings, mcp, dev, search, canvas, shortcuts, highlighted, searchQuery, searchActive, searchMatches, story, markdown, arrange, baseArrange, arrangementOverride, badges } = workbench
+const { visual, snapshot, route, shell, settings, mcp, dev, search, canvas, shortcuts, highlighted, searchQuery, searchActive, searchMatches, story, markdown, arrange, baseArrange, arrangementOverride, badges } = workbench
 /** Matrix props load only when corresponding inspector is displayed. */
 const MatrixInspector = defineAsyncComponent(() => import('../canvas/matrix/MatrixInspector.vue'))
 /** Matrix canvas stays outside initial project-test page imports. */
@@ -40,6 +40,7 @@ const StoryInspector = defineAsyncComponent(() => import('../inspector/StoryInsp
 const MarkdownPage = defineAsyncComponent(() => import('../pages/markdown/MarkdownPage.vue'))
 /** Settings route does not delay first project-test discovery. */
 const SettingsPage = defineAsyncComponent(() => import('../pages/settings/SettingsPage.vue'))
+const VisualViewer = __HISTOIRE_DEV__ ? defineAsyncComponent(() => import('../panes/visual/VisualViewer.vue')) : undefined
 const TestsPanel = __HISTOIRE_DEV__ ? defineAsyncComponent(() => import('../panes/tests/TestsPanel.vue')) : undefined
 const McpPanel = __HISTOIRE_DEV__ ? defineAsyncComponent(() => import('../panes/mcp/McpPanel.vue')) : undefined
 const McpActivity = __HISTOIRE_DEV__ ? defineAsyncComponent(() => import('../panes/mcp/McpActivity.vue')) : undefined
@@ -150,6 +151,7 @@ function setSelectedSession(session: HistoireSession | undefined): void {
     </template>
     <template #overlays>
       <PermissionPrompt v-if="PermissionPrompt" />
+      <VisualViewer v-if="VisualViewer && visual?.viewerOpen.value" />
     </template>
   </ShellLayout>
   <!-- Menus remain reachable from the canvas while workbench chrome is hidden. -->

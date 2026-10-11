@@ -77,6 +77,22 @@ program.command('screenshot-setup')
     return screenshotSetupCommand(options)
   })
 
+program.command('visual')
+  .describe('compare story images and review visual regressions')
+  .option('-c, --config <file>', 'Use specified Histoire config file')
+  .option('--story <id>', 'Exact story ID')
+  .option('--variant <id>', 'Exact variant ID, requires --story')
+  .option('--case <id>', 'Exact saved or canonical case ID')
+  .option('--profile <id>', 'Exact capture profile ID')
+  .option('--baseline-ref <ref>', 'Read baselines from this Git ref')
+  .option('--incremental', 'Capture only comparisons without valid retained evidence')
+  .option('--update', 'Approve successful selected captures')
+  .option('--all', 'Explicitly allow whole-project baseline update')
+  .action(async (options) => {
+    const { visualCommand } = await import('./commands/visual.js')
+    return visualCommand(options)
+  })
+
 // Sade exits with status 1 for malformed arguments, so preserve the command's
 // documented status 2 for invalid screenshot setup input.
 const screenshotSetupInvalid = process.argv[2] === 'screenshot-setup'

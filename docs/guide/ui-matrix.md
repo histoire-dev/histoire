@@ -89,3 +89,5 @@ Rows and columns restore from `arrange=matrix&rows=variant&cols=size`. Valid URL
 ## Runtime prop metadata
 
 Vue declarations whose type is exclusively Boolean supply `[false, true]`. A mixed Boolean/String declaration has no proven finite domain. Runtime prop definitions may explicitly expose complete `values` or `enum` arrays; Histoire preserves their finite scalar values in `_hPropDefs`. The first component declaring a prop owns that name, matching matrix override routing. A `String` constructor alone does not expose a TypeScript union, so use a story hint when runtime enum metadata is absent.
+
+See [Visual testing](./visual-testing.md) for tracked baselines, Matrix cases, image review, and CI comparisons.

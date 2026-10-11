@@ -26,6 +26,7 @@ import { registerUiVisibilityAction } from './ui-visibility-menu.js'
 import { useWorkbenchDev } from './workbench-dev.js'
 import { activateWorkspacePane, type WorkspacePane } from './workbench-navigation.js'
 import { useWorkbenchStores } from './workbench-stores.js'
+import { useWorkbenchVisualActions } from './workbench-visual.js'
 
 /** Bind standalone adapters once, keeping every store owned by this provider. */
 export function useWorkbench(props: WorkbenchProps, error: (error: unknown) => void, revealVariant: (target: FrameActionTarget) => void | Promise<void>) {
@@ -73,6 +74,7 @@ export function useWorkbench(props: WorkbenchProps, error: (error: unknown) => v
     error,
   })
   provideFrameActions(actions)
+  const visual = useWorkbenchVisualActions(props, canvas, actions, () => showPane('tests'), matrix.metadataReady)
   const embed = createEmbedController(props.session)
   useHistoireResource(embed.dispose)
   useHistoireResource(registerEmbedActions(embed, menu, actions))
@@ -301,5 +303,5 @@ export function useWorkbench(props: WorkbenchProps, error: (error: unknown) => v
     const action = actions.entries.get('open-isolated')
     if (action && target.variantId) void actions.run(action, { ...target, variantId: target.variantId, frameKey: getHistoireTargetKey(target) })
   }
-  return { snapshot, route, shell, settings, presets, matrix, projectTests, project, mcp, dev, menu, actions, embed, canvas, shortcuts, search, searchQuery, searchActive, searchMatches, highlighted, story, markdown: markdownTransition.visible, arrange, baseArrange, arrangementOverride, badges, showPane, activatePane, openSearch, closeSearch, toggleUi, panel, setArrange, setAxes, navigate, searchSelected, testsSelected, nextMatch: searchMatches.next, previousMatch: searchMatches.previous, runAll, openIsolated }
+  return { visual, snapshot, route, shell, settings, presets, matrix, projectTests, project, mcp, dev, menu, actions, embed, canvas, shortcuts, search, searchQuery, searchActive, searchMatches, highlighted, story, markdown: markdownTransition.visible, arrange, baseArrange, arrangementOverride, badges, showPane, activatePane, openSearch, closeSearch, toggleUi, panel, setArrange, setAxes, navigate, searchSelected, testsSelected, nextMatch: searchMatches.next, previousMatch: searchMatches.previous, runAll, openIsolated }
 }

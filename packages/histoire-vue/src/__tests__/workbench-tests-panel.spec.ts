@@ -132,14 +132,27 @@ describe('workbench Tests pane loading', () => {
 
   it('retires loading on discovery failure and keeps retry actionable', async () => {
     const gate = deferred<HistoireProjectTestCollectionResult>()
-    const test = await mountPanel(true, { collectProject: () => gate.promise })
+    const again = deferred<HistoireProjectTestCollectionResult>()
+    const pending = [gate.promise, again.promise]
+    const test = await mountPanel(true, { collectProject: () => pending.shift()! })
     try {
       await vi.waitFor(() => expect(test.wrapper.find('[role="status"][aria-atomic="true"]').exists()).toBe(true))
       gate.reject(new Error('Collection unavailable'))
-      await vi.waitFor(() => expect(test.wrapper.get('[role="alert"]').text()).toBe('Collection unavailable'))
+      await vi.waitFor(() => expect(test.wrapper.get('[role="alert"] p').text()).toBe('Collection unavailable'))
+      expect(test.wrapper.get('[role="alert"] strong').text()).toBe('Test collection failed')
       expect(test.wrapper.find('[role="status"][aria-atomic="true"]').exists()).toBe(false)
-      expect(test.wrapper.findAll('button').some(button => button.text() === 'Retry collection')).toBe(true)
+      const retry = test.wrapper.get('[role="alert"] button')
+      expect(retry.text()).toBe('Retry collection')
+      await retry.trigger('click')
+      await vi.waitFor(() => expect(test.wrapper.find('[role="status"][aria-atomic="true"]').exists()).toBe(true))
+      expect(test.wrapper.find('[role="alert"]').exists()).toBe(false)
+      again.resolve(test.collection(true))
+      await vi.waitFor(() => expect(test.wrapper.find('[aria-label="Project tests"]').exists()).toBe(true))
+      expect(test.wrapper.find('[role="status"][aria-atomic="true"]').exists()).toBe(false)
     }
-    finally { await test.close() }
+    finally {
+      again.resolve(test.collection(true))
+      await test.close()
+    }
   })
 })

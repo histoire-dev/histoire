@@ -9,6 +9,7 @@ import type { HistoireUiConfig } from './config-ui.js'
 import type { HistoireEmbedConfig, HistoirePreviewConfig } from './embed-config.js'
 import type { Plugin } from './plugin.js'
 import type { ServerTreeFile, StoryProps } from './story.js'
+import type { HistoireVisualConfig } from './visual.js'
 
 export interface SupportMatchPattern {
   id: string
@@ -42,9 +43,11 @@ export * from './config-theme.js'
 export * from './config-ui.js'
 
 export interface HistoireConfig extends HistoireUiConfig {
-  /** Initial host-owned globals; embedded sessions keep separate runtime values. */
+  /** Opt-in story visual regression testing. */
+  visual?: HistoireVisualConfig
   /** Browser selection for Histoire-owned isolated screenshots and inspections. */
   browser?: HistoireBrowserConfig
+  /** Initial host-owned globals; embedded sessions keep separate runtime values. */
   preview?: HistoirePreviewConfig
   plugins: Plugin[]
   /** Opt-in data bridge and reusable browser surface documents. */

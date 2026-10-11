@@ -34,6 +34,12 @@ export function onUiDisconnect(callback: () => void): () => void {
   return () => import.meta.hot?.off('vite:ws:disconnect', callback)
 }
 
+/** Refresh provider inventory after restoring development connection. */
+export function onUiReconnect(callback: () => void): () => void {
+  import.meta.hot?.on('vite:ws:connect', callback)
+  return () => import.meta.hot?.off('vite:ws:connect', callback)
+}
+
 if (import.meta.hot) {
   /** Resend snapshots after Vite restores this exact browser transport. */
   const ready = () => sendUiEvent('histoire:ui:ready', {})

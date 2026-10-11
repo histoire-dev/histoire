@@ -69,3 +69,5 @@ Remove `iframe: false` from story layouts. Option is deprecated and ignored:
 Code that accessed host document or host app globals must use story iframe document instead. In a test, use provided `canvas`; in story code, use runtime-local `window` and `document`.
 
 Increase [`test.storyCollectTimeout`](../reference/config.md#test-storycollecttimeout) for legitimately slow imports or mounts. Same budget protects bootstrap and render readiness.
+
+See [Visual testing](./visual-testing.md) for tracked baselines, Matrix cases, image review, and CI comparisons.

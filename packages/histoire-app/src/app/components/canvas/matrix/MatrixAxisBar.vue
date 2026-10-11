@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { BuiltinIcon, HstButton, HstSelect } from '@histoire/controls/vue'
 import { useMatrixStore } from '../../../stores/matrix.js'
+import MatrixVisualActions from './MatrixVisualActions.vue'
 
 const emit = defineEmits<{ axes: [value: { rows: string, cols: string }] }>()
 const matrix = useMatrixStore()
@@ -25,6 +26,7 @@ function swap(): void {
       <BuiltinIcon icon="arrows-horizontal" :size="16" />
     </HstButton>
     <HstSelect title="Columns" layout="horizontal" :model-value="matrix.cols.value" :options="matrix.usableAxes.value.map(axis => ({ value: axis.name, label: axis.name, disabled: axis.name === matrix.rows.value }))" @update:model-value="select('cols', $event)" />
+    <MatrixVisualActions scope="all" />
     <span class="histoire-matrix-base-summary">Base props <code v-for="(value, name) in matrix.base.value" :key="name">{{ name }}={{ JSON.stringify(value) }}</code></span>
   </div>
 </template>

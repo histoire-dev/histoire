@@ -3,6 +3,7 @@ import fs from 'node:fs'
 import path from 'pathe'
 import pc from 'picocolors'
 import { getTestMaxWorkers } from '../util/test-timeouts.js'
+import { resolveVisualConfig } from '../visual/config.js'
 import { normalizeBrowserConfig } from './browser.js'
 import { resolveEmbedConfig } from './embed.js'
 import { resolveMatrixNumericValues } from './matrix.js'
@@ -16,6 +17,7 @@ import { resolveMatrixNumericValues } from './matrix.js'
  */
 export async function processConfig(ctx: Context) {
   const { config, root } = ctx
+  resolveVisualConfig(config.visual)
   config.browser = normalizeBrowserConfig(config.browser, root)
   config.embed = resolveEmbedConfig(config.embed)
   config.ui = { ...config.ui, matrix: { ...config.ui?.matrix, numericValues: resolveMatrixNumericValues(config.ui?.matrix?.numericValues) } }

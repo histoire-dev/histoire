@@ -55,3 +55,5 @@ Activity retains at most 50 completed calls, subject to the byte limit, while ke
 Development features communicate through Vite custom events named `histoire:ui:*`. JSON payloads are bounded to 64 KB; MCP notifications project tool names, scoped targets, lifecycle, and opaque client identities. Credentials, source text, arguments, and artifact bytes stay server-owned. Listener cleanup follows the captured runtime generation, preventing stale completions after restart.
 
 Static builds hide screenshots and MCP activity and provide no UI channel HTTP fallback.
+
+See [Visual testing](./visual-testing.md) for tracked baselines, Matrix cases, image review, and CI comparisons.

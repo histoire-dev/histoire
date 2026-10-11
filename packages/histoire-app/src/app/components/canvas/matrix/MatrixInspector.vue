@@ -10,6 +10,7 @@ import WorkbenchEmptyState from '../../shell/WorkbenchEmptyState.vue'
 import MatrixAxisEntry from './MatrixAxisEntry.vue'
 import MatrixBaseProp from './MatrixBaseProp.vue'
 import MatrixCustomAxes from './MatrixCustomAxes.vue'
+import MatrixVisualActions from './MatrixVisualActions.vue'
 
 const emit = defineEmits<{ error: [error: unknown] }>()
 const matrix = useMatrixStore()
@@ -93,6 +94,7 @@ async function copyVariant(): Promise<void> {
         {{ copied ? 'Copied' : copying ? 'Copying…' : 'Save as variant' }}
       </HstButton>
     </div>
+    <MatrixVisualActions scope="selected" />
     <section aria-label="Matrix axes">
       <h3>Axes</h3>
       <MatrixAxisEntry v-for="dimension in dimensions" :key="dimension.id" :name="dimension.axis!.name" :dimension="dimension.id" />

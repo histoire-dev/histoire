@@ -2,6 +2,7 @@ import { HstVue } from '@histoire/plugin-vue'
 import { defineConfig, getDefaultConfig } from 'histoire'
 
 export default defineConfig({
+  visual: {},
   ui: { frameBudget: 12 },
   // outDir: 'hdist',
   plugins: [

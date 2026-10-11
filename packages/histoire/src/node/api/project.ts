@@ -13,6 +13,7 @@ import { captureProjectScreenshot } from './capture.js'
 import { registerProjectServices } from './internal.js'
 import { previewProject } from './preview.js'
 import { runProjectTests } from './tests.js'
+import { createProjectVisual } from './visual.js'
 
 /** Constructs idle ownership from explicit paths; configuration evaluates on first operation. */
 export async function createHistoireProject(options: HistoireProjectOptions): Promise<HistoireProject> {
@@ -84,7 +85,9 @@ export async function createHistoireProject(options: HistoireProjectOptions): Pr
       publish()
     } }
   }
+  const visual = createProjectVisual(services, track, assertOpen)
   const project: HistoireProject = {
+    visual: visual.api,
     async startDev(options = {}) {
       const common = claimDev()
       try {
@@ -184,6 +187,7 @@ export async function createHistoireProject(options: HistoireProjectOptions): Pr
         void (async () => {
           const devClose = services.dev?.handle.close()
           const previewClose = services.preview?.handle.close()
+          const visualClose = visual.close()
           const executionClose = services.execution.close()
           publish()
           // A cancelled operation still joins its final cleanup. Ordinary operation
@@ -191,7 +195,7 @@ export async function createHistoireProject(options: HistoireProjectOptions): Pr
           const joined = [...operations].map(operation => operation.catch((error) => {
             if (hasUnconfirmedCleanup(error)) throw error
           }))
-          const results = await Promise.allSettled([devClose, previewClose, executionClose, ...joined])
+          const results = await Promise.allSettled([devClose, previewClose, visualClose, executionClose, ...joined])
           if (unsafeCleanupError) throw unsafeCleanupError
           const failure = results.find((result): result is PromiseRejectedResult => result.status === 'rejected')
           if (failure) throw failure.reason

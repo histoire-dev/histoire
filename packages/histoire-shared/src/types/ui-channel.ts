@@ -1,4 +1,5 @@
 import type { ScreenshotSetupSnapshot } from './screenshot-setup.js'
+import type { UiVisualReply, UiVisualRequest } from './ui-visual.js'
 
 /** Safe dev-only client identity; credentials remain server-owned. */
 export interface UiMcpClientInfo {
@@ -123,6 +124,8 @@ export type UiScreenshotResult = {
 
 /** Event maps remain open to feature-owned declaration merging. */
 export interface UiClientEvents {
+  /** Correlated visual inventory, capture, and review actions. */
+  'histoire:ui:visual': UiVisualRequest
   /** Request current feature snapshots after reconnect. */
   'histoire:ui:ready': Record<string, never>
   /** Capture selected frames. */
@@ -131,16 +134,18 @@ export interface UiClientEvents {
   'histoire:ui:screenshot-cancel': { requestId: string }
   /** List recent captures from disk. */
   'histoire:ui:screenshot-list': { requestId: string }
-  /** Cancel an existing MCP operation through its owner. */
-  'histoire:ui:mcp-cancel': { operationId: string }
   /** Read setup metadata or explicitly check available browser installations. */
   'histoire:ui:screenshot-setup': { requestId: string, action: 'read' | 'check' | 'refresh' }
   /** Cancel this browser's explicit setup check only. */
   'histoire:ui:screenshot-setup-cancel': { requestId: string }
+  /** Cancel an existing MCP operation through its owner. */
+  'histoire:ui:mcp-cancel': { operationId: string }
 }
 
 /** Safe server notifications. */
 export interface UiServerEvents {
+  /** Private visual metadata and progress reply. */
+  'histoire:ui:visual-result': UiVisualReply
   /** Current MCP runtime state. */
   'histoire:ui:mcp-snapshot': UiMcpSnapshot
   /** Operation lifecycle upsert. */
@@ -149,6 +154,6 @@ export interface UiServerEvents {
   'histoire:ui:screenshot-result': UiScreenshotResult
   /** Recent file inventory. */
   'histoire:ui:screenshot-list-result': { requestId: string, files: UiScreenshotFile[] }
-}
   /** Correlated scrubbed setup observation or owned check error. */
   'histoire:ui:screenshot-setup-result': { requestId: string, setup: ScreenshotSetupSnapshot } | { requestId: string, error: UiChannelError }
+}

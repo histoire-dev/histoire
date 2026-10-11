@@ -1,5 +1,5 @@
 import type { HistoireCapability, HistoireCatalog, HistoireReadonly } from '@histoire/protocol'
-import type { HistoireTestRunSummary } from '@histoire/shared'
+import type { HistoireProjectVisual, HistoireTestRunSummary } from '@histoire/shared'
 import type { Connect, HttpServer } from 'vite'
 
 /** Explicit project location; relative configuration paths resolve against root. */
@@ -147,6 +147,8 @@ export interface HistoireProjectSnapshot {
 
 /** Public Node SDK; construction acquires no browser, listener or watcher. */
 export interface HistoireProject {
+  /** Opt-in capture, comparison, and retained-image approval. */
+  visual: HistoireProjectVisual
   /** Acquires one project-owned development listener. */
   startDev: (options?: HistoireDevOptions) => Promise<HistoireServerHandle>
   /** Acquires a stable delegate without listening on the caller's server. */

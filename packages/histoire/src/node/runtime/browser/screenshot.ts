@@ -23,6 +23,7 @@ export function createScreenshotTask(options: PreviewSessionOptions, encoding: {
     async run(signal) {
       try {
         let ready = await session.open(signal)
+        let previous: Uint8Array | undefined
         for (;;) {
           let artifact: Uint8Array
           try {
@@ -30,12 +31,14 @@ export function createScreenshotTask(options: PreviewSessionOptions, encoding: {
           }
           catch (error) {
             if (await session.isDocumentReady(ready.documentId)) throw error
+            previous = undefined
             ready = await session.waitForReady()
             continue
           }
           // A cold Vite optimizer may reload the iframe during capture. Never
           // retain pixels from a document whose readiness authority was lost.
           if (!await session.isDocumentReady(ready.documentId)) {
+            previous = undefined
             ready = await session.waitForReady()
             continue
           }
@@ -43,8 +46,19 @@ export function createScreenshotTask(options: PreviewSessionOptions, encoding: {
           const dimensions = readPngDimensions(artifact)
           const scale = options.target.deviceScaleFactor ?? 1
           if (dimensions.width !== options.target.width * scale || dimensions.height !== options.target.height * scale) throw new PreviewError('INTERNAL_ERROR', 'Screenshot dimensions do not match viewport and device scale')
+          if (options.stableCapture) {
+            const { decodeVisualPng } = await import('../../visual/compare.js')
+            const decoded = (await decodeVisualPng(artifact)).data
+            const stable = previous && previous.length === decoded.length && previous.every((byte, index) => byte === decoded[index])
+            previous = decoded
+            if (!stable) {
+              await ready.frame.evaluate(() => new Promise<void>(resolve => requestAnimationFrame(() => requestAnimationFrame(() => resolve()))))
+              session.remaining()
+              continue
+            }
+          }
           if (encoding.format === 'webp') artifact = await encodeScreenshotWebp(ready.page, artifact)
-          return { artifact, result: { storyId: options.target.storyId, variantId: options.target.variantId, ...dimensions, mimeType: encoding.format === 'webp' ? 'image/webp' : 'image/png', bytes: artifact.byteLength, sha256: createHash('sha256').update(artifact).digest('hex') } }
+          return { artifact, result: { storyId: options.target.storyId, variantId: options.target.variantId, ...dimensions, ...(options.stableCapture ? { browserVersion: ready.page.context().browser()!.version() } : {}), mimeType: encoding.format === 'webp' ? 'image/webp' : 'image/png', bytes: artifact.byteLength, sha256: createHash('sha256').update(artifact).digest('hex') } }
         }
       }
       catch (error) {

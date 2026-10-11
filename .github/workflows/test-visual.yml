@@ -1,0 +1,43 @@
+name: Visual regression
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  visual:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      BROWSER: none
+      CI: true
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - uses: pnpm/action-setup@v4.0.0
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run build
+      # Frozen lockfile pins Playwright 1.59.1 and its Chromium revision.
+      - run: pnpm --filter histoire exec playwright install --with-deps chromium
+      - name: Isolated behavior and failure coverage
+        run: |
+          pnpm --filter histoire exec vitest run visual-comparison visual-storage visual-stability
+          pnpm --filter histoire test:visual:integration
+      - name: Compare tracked example baselines
+        working-directory: examples/vue3
+        run: pnpm exec histoire visual --config histoire.visual.config.ts
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: visual-results-linux-x64
+          path: examples/vue3/.histoire/visual/runs/
+          if-no-files-found: warn
