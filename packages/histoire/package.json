@@ -61,11 +61,13 @@
     "test:embed:consumers": "vitest run --config vitest.consumers.config.ts",
     "test:mcp:integration": "vitest run --config vitest.mcp.config.ts",
     "test:mcp:package": "vitest run --config vitest.package.config.ts",
-    "test:dev": "vitest"
+    "test:dev": "vitest",
+    "test:visual:integration": "vitest run --config vitest.visual.config.ts"
   },
   "peerDependencies": {
     "@vitest/browser-playwright": "^4.0.0",
     "playwright": "^1.0.0",
+    "playwright-core": "^1.0.0",
     "vite": "^7.0.0 || ^8.0.0",
     "vitest": "^4.0.0"
   },
@@ -74,6 +76,9 @@
       "optional": true
     },
     "playwright": {
+      "optional": true
+    },
+    "playwright-core": {
       "optional": true
     },
     "vitest": {
@@ -95,6 +100,7 @@
     "change-case": "^5.4.4",
     "chokidar": "^4.0.1",
     "connect": "^3.7.0",
+    "cross-spawn": "7.0.6",
     "defu": "^6.1.4",
     "diacritics": "^1.3.0",
     "esbuild": "^0.27.2",
@@ -113,19 +119,24 @@
     "msw": "^2.14.6",
     "pathe": "^1.1.2",
     "picocolors": "^1.1.1",
+    "pixelmatch": "^7.2.0",
+    "pngjs": "^7.0.0",
     "postcss": "catalog:",
     "postcss-selector-parser": "^6.1.2",
     "rollup": "^4.28.0",
     "sade": "^1.8.1",
     "shiki": "^3.0.0",
     "sirv": "^3.0.0",
+    "tar": "7.5.22",
     "vite-node": "3.2.4",
+    "yauzl": "^3.4.0",
     "zod": "4.6.5"
   },
   "devDependencies": {
     "@modelcontextprotocol/client": "2.2.0",
     "@types/fs-extra": "^11.0.4",
     "@types/node": "^22.10.1",
+    "@types/pngjs": "^6.0.5",
     "@vitest/browser-playwright": "4.1.10",
     "typescript": "catalog:",
     "vite": "catalog:",
