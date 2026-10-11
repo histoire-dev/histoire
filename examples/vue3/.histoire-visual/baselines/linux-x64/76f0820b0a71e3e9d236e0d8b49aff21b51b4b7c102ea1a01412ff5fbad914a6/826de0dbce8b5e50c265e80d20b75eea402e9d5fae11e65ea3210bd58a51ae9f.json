@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "caseId": "741cfab8867492ad30dfbb5c953f841ae81fa340b46d0dad4e94e48f426df995",
+  "case": {
+    "id": "741cfab8867492ad30dfbb5c953f841ae81fa340b46d0dad4e94e48f426df995",
+    "kind": "canonical",
+    "label": "Code gen › slots props (default slot)",
+    "schemaVersion": 1,
+    "storyId": "src-components-codegen-story-vue",
+    "variantId": "slot-with-props"
+  },
+  "profileId": "desktop-light",
+  "spec": {
+    "backgroundColor": "#ffffff",
+    "colorScheme": "light",
+    "deviceScaleFactor": 1,
+    "globals": {},
+    "height": 640,
+    "id": "desktop-light",
+    "textDirection": "ltr",
+    "width": 1024
+  },
+  "platform": "linux-x64",
+  "imageHash": "db91bae9d89d72368255880d4f29eeef2814960c8bbc6a19f004c2c1efef47b9",
+  "dimensions": {
+    "width": 1024,
+    "height": 640
+  },
+  "browserVersion": "147.0.7727.15"
+}

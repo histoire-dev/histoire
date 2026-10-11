@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "caseId": "4446f7e30e63a65ae7a77be15746f9a97e5f20b4ef71d0942331379ee95d5380",
+  "case": {
+    "id": "4446f7e30e63a65ae7a77be15746f9a97e5f20b4ef71d0942331379ee95d5380",
+    "kind": "canonical",
+    "label": "Tailwind › Drop Shadow",
+    "schemaVersion": 1,
+    "storyId": "tailwind",
+    "variantId": "drop-shadow"
+  },
+  "profileId": "desktop-light",
+  "spec": {
+    "backgroundColor": "#ffffff",
+    "colorScheme": "light",
+    "deviceScaleFactor": 1,
+    "globals": {},
+    "height": 640,
+    "id": "desktop-light",
+    "textDirection": "ltr",
+    "width": 1024
+  },
+  "platform": "linux-x64",
+  "imageHash": "a57d4027349b87bf23d0971a8bd1475971c490a4e62154c12dec2d00f802c7ed",
+  "dimensions": {
+    "width": 1024,
+    "height": 640
+  },
+  "browserVersion": "147.0.7727.15"
+}

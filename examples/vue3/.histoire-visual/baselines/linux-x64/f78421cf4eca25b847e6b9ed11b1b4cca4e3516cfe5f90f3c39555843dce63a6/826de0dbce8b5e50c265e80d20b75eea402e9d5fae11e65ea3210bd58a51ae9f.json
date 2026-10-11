@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "caseId": "020d0c627dc70c9c8404f6a8802ecce86cc684c1b42c4a9290e2011b5ab456c8",
+  "case": {
+    "id": "020d0c627dc70c9c8404f6a8802ecce86cc684c1b42c4a9290e2011b5ab456c8",
+    "kind": "canonical",
+    "label": "Auto State & Props › Naked",
+    "schemaVersion": 1,
+    "storyId": "src-components-autostateprops-story-vue",
+    "variantId": "src-components-autostateprops-story-vue-0"
+  },
+  "profileId": "desktop-light",
+  "spec": {
+    "backgroundColor": "#ffffff",
+    "colorScheme": "light",
+    "deviceScaleFactor": 1,
+    "globals": {},
+    "height": 640,
+    "id": "desktop-light",
+    "textDirection": "ltr",
+    "width": 1024
+  },
+  "platform": "linux-x64",
+  "imageHash": "fca901970b43ff9beb6b0e5e8833dd36a02c93aa0d73a214c33ed1c65e80f245",
+  "dimensions": {
+    "width": 1024,
+    "height": 640
+  },
+  "browserVersion": "147.0.7727.15"
+}

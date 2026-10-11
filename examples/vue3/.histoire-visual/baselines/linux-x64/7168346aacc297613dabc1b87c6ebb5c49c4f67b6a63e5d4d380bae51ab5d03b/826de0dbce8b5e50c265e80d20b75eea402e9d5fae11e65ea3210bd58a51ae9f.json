@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "caseId": "a73fd9ac1790f2371069f48ccce71b8ebbed928c01f07ab217e3ae3cb5152441",
+  "case": {
+    "id": "a73fd9ac1790f2371069f48ccce71b8ebbed928c01f07ab217e3ae3cb5152441",
+    "kind": "canonical",
+    "label": "ContrastColor › default",
+    "schemaVersion": 1,
+    "storyId": "src-components-contrastcolor-story-vue",
+    "variantId": "_default"
+  },
+  "profileId": "desktop-light",
+  "spec": {
+    "backgroundColor": "#ffffff",
+    "colorScheme": "light",
+    "deviceScaleFactor": 1,
+    "globals": {},
+    "height": 640,
+    "id": "desktop-light",
+    "textDirection": "ltr",
+    "width": 1024
+  },
+  "platform": "linux-x64",
+  "imageHash": "87a7567cbd81325c2bc3056c7c8f1d67cf3d9d87ad24764e845028fb207c7656",
+  "dimensions": {
+    "width": 1024,
+    "height": 640
+  },
+  "browserVersion": "147.0.7727.15"
+}

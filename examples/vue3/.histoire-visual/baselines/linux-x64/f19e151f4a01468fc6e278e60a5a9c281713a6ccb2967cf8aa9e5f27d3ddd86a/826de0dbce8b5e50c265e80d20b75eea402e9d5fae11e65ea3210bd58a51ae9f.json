@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "caseId": "53228026dfcc1d7aee3f12ce46837ee4b43e9bd975223e5720422c27316fa656",
+  "case": {
+    "id": "53228026dfcc1d7aee3f12ce46837ee4b43e9bd975223e5720422c27316fa656",
+    "kind": "canonical",
+    "label": "Tailwind › Margin",
+    "schemaVersion": 1,
+    "storyId": "tailwind",
+    "variantId": "margin"
+  },
+  "profileId": "desktop-light",
+  "spec": {
+    "backgroundColor": "#ffffff",
+    "colorScheme": "light",
+    "deviceScaleFactor": 1,
+    "globals": {},
+    "height": 640,
+    "id": "desktop-light",
+    "textDirection": "ltr",
+    "width": 1024
+  },
+  "platform": "linux-x64",
+  "imageHash": "764ed445fc2eeb4a371cef487ef920ed4ab191fbbe4b3a26cc749c5110d3b9df",
+  "dimensions": {
+    "width": 1024,
+    "height": 640
+  },
+  "browserVersion": "147.0.7727.15"
+}

@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "caseId": "168d8255606263189b8aa7f1fc2729fa32e51813b8b785cc0fbcba45d964b9d3",
+  "case": {
+    "id": "168d8255606263189b8aa7f1fc2729fa32e51813b8b785cc0fbcba45d964b9d3",
+    "kind": "canonical",
+    "label": "Story setup › Local setup",
+    "schemaVersion": 1,
+    "storyId": "src-components-storysetup-story-vue",
+    "variantId": "local"
+  },
+  "profileId": "desktop-light",
+  "spec": {
+    "backgroundColor": "#ffffff",
+    "colorScheme": "light",
+    "deviceScaleFactor": 1,
+    "globals": {},
+    "height": 640,
+    "id": "desktop-light",
+    "textDirection": "ltr",
+    "width": 1024
+  },
+  "platform": "linux-x64",
+  "imageHash": "770b472fb99b88d07e5246d36346b76df9e01e9b58d1b4f5145b70ff6ee0736e",
+  "dimensions": {
+    "width": 1024,
+    "height": 640
+  },
+  "browserVersion": "147.0.7727.15"
+}

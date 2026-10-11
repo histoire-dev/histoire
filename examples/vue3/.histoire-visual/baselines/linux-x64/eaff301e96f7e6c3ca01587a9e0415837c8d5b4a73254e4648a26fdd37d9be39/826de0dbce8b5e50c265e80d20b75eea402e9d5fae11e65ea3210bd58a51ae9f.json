@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "caseId": "c7678a7a9bf8febb323309e80912580d858fded604f12e328c1f86707bff5f5d",
+  "case": {
+    "id": "c7678a7a9bf8febb323309e80912580d858fded604f12e328c1f86707bff5f5d",
+    "kind": "canonical",
+    "label": "Tailwind › Font Family",
+    "schemaVersion": 1,
+    "storyId": "tailwind",
+    "variantId": "font-family"
+  },
+  "profileId": "desktop-light",
+  "spec": {
+    "backgroundColor": "#ffffff",
+    "colorScheme": "light",
+    "deviceScaleFactor": 1,
+    "globals": {},
+    "height": 640,
+    "id": "desktop-light",
+    "textDirection": "ltr",
+    "width": 1024
+  },
+  "platform": "linux-x64",
+  "imageHash": "33ab3701c0acb4978a3d32d369e6c96d92939aa7671c107be8b6fe68776542bf",
+  "dimensions": {
+    "width": 1024,
+    "height": 640
+  },
+  "browserVersion": "147.0.7727.15"
+}

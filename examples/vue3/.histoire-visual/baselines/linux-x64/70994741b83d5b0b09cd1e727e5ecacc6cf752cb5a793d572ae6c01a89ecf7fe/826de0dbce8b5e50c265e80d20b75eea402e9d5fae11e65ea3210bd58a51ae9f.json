@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "caseId": "a11b41b79c5b94794638ff6d6334c50326acca69960895c5ac7cc3332678c130",
+  "case": {
+    "id": "a11b41b79c5b94794638ff6d6334c50326acca69960895c5ac7cc3332678c130",
+    "kind": "canonical",
+    "label": "HugeGrid › Variant 362",
+    "schemaVersion": 1,
+    "storyId": "src-components-hugegrid-story-vue",
+    "variantId": "src-components-hugegrid-story-vue-361"
+  },
+  "profileId": "desktop-light",
+  "spec": {
+    "backgroundColor": "#ffffff",
+    "colorScheme": "light",
+    "deviceScaleFactor": 1,
+    "globals": {},
+    "height": 640,
+    "id": "desktop-light",
+    "textDirection": "ltr",
+    "width": 1024
+  },
+  "platform": "linux-x64",
+  "imageHash": "b3d4a520b5dd85e0d72e77f6850210e3af0f06a435709aa41830ff8c59ad8d53",
+  "dimensions": {
+    "width": 1024,
+    "height": 640
+  },
+  "browserVersion": "147.0.7727.15"
+}

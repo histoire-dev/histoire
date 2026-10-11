@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "caseId": "353626a9fefcdf0258855fc573cc8b7ea1ecdbfcf0f70b51c68101fa387f1028",
+  "case": {
+    "schemaVersion": 1,
+    "id": "353626a9fefcdf0258855fc573cc8b7ea1ecdbfcf0f70b51c68101fa387f1028",
+    "kind": "canonical",
+    "storyId": "visual-card",
+    "variantId": "emphasized",
+    "label": "Visual card › Emphasized"
+  },
+  "profileId": "light",
+  "spec": {
+    "backgroundColor": "#ffffff",
+    "colorScheme": "light",
+    "deviceScaleFactor": 1,
+    "globals": {},
+    "height": 240,
+    "id": "light",
+    "textDirection": "ltr",
+    "width": 320
+  },
+  "platform": "linux-x64",
+  "imageHash": "3c345bb5afad64a9fe52f5b9c741e42582d254f82e564a23a1cbbb12e099b53d",
+  "dimensions": {
+    "width": 320,
+    "height": 240
+  },
+  "browserVersion": "147.0.7727.15"
+}

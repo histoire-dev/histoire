@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "caseId": "23b6d96991808dfff0a0ad8de862fc6bed1633eac3a412fd70994a86ebff93b2",
+  "case": {
+    "id": "23b6d96991808dfff0a0ad8de862fc6bed1633eac3a412fd70994a86ebff93b2",
+    "kind": "canonical",
+    "label": "Tailwind › Letter Spacing",
+    "schemaVersion": 1,
+    "storyId": "tailwind",
+    "variantId": "letter-spacing"
+  },
+  "profileId": "desktop-light",
+  "spec": {
+    "backgroundColor": "#ffffff",
+    "colorScheme": "light",
+    "deviceScaleFactor": 1,
+    "globals": {},
+    "height": 640,
+    "id": "desktop-light",
+    "textDirection": "ltr",
+    "width": 1024
+  },
+  "platform": "linux-x64",
+  "imageHash": "54298dff5c9bd037f0d660d9542bd925bc7aa5ba3c772a3c2391aab350681706",
+  "dimensions": {
+    "width": 1024,
+    "height": 640
+  },
+  "browserVersion": "147.0.7727.15"
+}

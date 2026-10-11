@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "caseId": "cbd728395b88cfcae74d5e813596e791d589c1eba0803630b783f1e73c0b5dd9",
+  "case": {
+    "id": "cbd728395b88cfcae74d5e813596e791d589c1eba0803630b783f1e73c0b5dd9",
+    "kind": "canonical",
+    "label": "Vitest Mocking › mocked with controls",
+    "schemaVersion": 1,
+    "storyId": "src-components-vitestmocking-story-vue",
+    "variantId": "src-components-vitestmocking-story-vue-1"
+  },
+  "profileId": "desktop-light",
+  "spec": {
+    "backgroundColor": "#ffffff",
+    "colorScheme": "light",
+    "deviceScaleFactor": 1,
+    "globals": {},
+    "height": 640,
+    "id": "desktop-light",
+    "textDirection": "ltr",
+    "width": 1024
+  },
+  "platform": "linux-x64",
+  "imageHash": "872a168c76b22a32876ca9ef72e552c60b5ee8bf7a2430f3444da9507bc4f592",
+  "dimensions": {
+    "width": 1024,
+    "height": 640
+  },
+  "browserVersion": "147.0.7727.15"
+}

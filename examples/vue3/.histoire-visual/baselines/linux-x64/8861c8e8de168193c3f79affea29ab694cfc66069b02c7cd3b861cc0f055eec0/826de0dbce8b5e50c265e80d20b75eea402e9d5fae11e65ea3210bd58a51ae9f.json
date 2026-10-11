@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "caseId": "06af209b3d492503640f24824b187bca990ffe09005ae2601c0623dfa78e3e4d",
+  "case": {
+    "id": "06af209b3d492503640f24824b187bca990ffe09005ae2601c0623dfa78e3e4d",
+    "kind": "canonical",
+    "label": "Tailwind › Box Shadow",
+    "schemaVersion": 1,
+    "storyId": "tailwind",
+    "variantId": "box-shadow"
+  },
+  "profileId": "desktop-light",
+  "spec": {
+    "backgroundColor": "#ffffff",
+    "colorScheme": "light",
+    "deviceScaleFactor": 1,
+    "globals": {},
+    "height": 640,
+    "id": "desktop-light",
+    "textDirection": "ltr",
+    "width": 1024
+  },
+  "platform": "linux-x64",
+  "imageHash": "d17a2b887af476b2e79711a8ac03b3dc51b065bef3db5f977838a139ec53f344",
+  "dimensions": {
+    "width": 1024,
+    "height": 640
+  },
+  "browserVersion": "147.0.7727.15"
+}

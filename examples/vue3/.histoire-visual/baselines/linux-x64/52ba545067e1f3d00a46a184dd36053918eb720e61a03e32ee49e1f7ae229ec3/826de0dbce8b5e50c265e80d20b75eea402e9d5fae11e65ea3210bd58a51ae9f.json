@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "caseId": "a279c22efc05f320971343599c7bbb90d74e3dd7e43c1a43e0f6f2175ef20126",
+  "case": {
+    "id": "a279c22efc05f320971343599c7bbb90d74e3dd7e43c1a43e0f6f2175ef20126",
+    "kind": "canonical",
+    "label": "Detected State Pane › two fields",
+    "schemaVersion": 1,
+    "storyId": "src-components-detectedstatepane-story-vue",
+    "variantId": "src-components-detectedstatepane-story-vue-1"
+  },
+  "profileId": "desktop-light",
+  "spec": {
+    "backgroundColor": "#ffffff",
+    "colorScheme": "light",
+    "deviceScaleFactor": 1,
+    "globals": {},
+    "height": 640,
+    "id": "desktop-light",
+    "textDirection": "ltr",
+    "width": 1024
+  },
+  "platform": "linux-x64",
+  "imageHash": "53fd7d7f799e3de272924f3fea8fe51b63ee5314a89bcabdfa6f170f48b47e22",
+  "dimensions": {
+    "width": 1024,
+    "height": 640
+  },
+  "browserVersion": "147.0.7727.15"
+}

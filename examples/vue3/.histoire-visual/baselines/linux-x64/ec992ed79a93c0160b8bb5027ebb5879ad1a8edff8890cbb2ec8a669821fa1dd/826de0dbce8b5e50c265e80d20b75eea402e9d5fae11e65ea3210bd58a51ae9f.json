@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "caseId": "b657a07ebdf25b36425a5c06ad4bce2bf3c4f6c1fd04aed12fa8d8084563142a",
+  "case": {
+    "id": "b657a07ebdf25b36425a5c06ad4bce2bf3c4f6c1fd04aed12fa8d8084563142a",
+    "kind": "canonical",
+    "label": "Serialize › object",
+    "schemaVersion": 1,
+    "storyId": "src-components-serialize-story-vue",
+    "variantId": "src-components-serialize-story-vue-1"
+  },
+  "profileId": "desktop-light",
+  "spec": {
+    "backgroundColor": "#ffffff",
+    "colorScheme": "light",
+    "deviceScaleFactor": 1,
+    "globals": {},
+    "height": 640,
+    "id": "desktop-light",
+    "textDirection": "ltr",
+    "width": 1024
+  },
+  "platform": "linux-x64",
+  "imageHash": "4f3e6f8f7ce478fdafdd72bd43b5ee14b4b35fc98c8eaf653ed8c9d737b29132",
+  "dimensions": {
+    "width": 1024,
+    "height": 640
+  },
+  "browserVersion": "147.0.7727.15"
+}

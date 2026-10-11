@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "caseId": "96347a775a5b80728fb96f5c4714c1ea0a3f8cb8b55e01af0f850a2750de80bb",
+  "case": {
+    "id": "96347a775a5b80728fb96f5c4714c1ea0a3f8cb8b55e01af0f850a2750de80bb",
+    "kind": "canonical",
+    "label": "🐱 Meow › default",
+    "schemaVersion": 1,
+    "storyId": "src-components-meow-story-vue",
+    "variantId": "src-components-meow-story-vue-0"
+  },
+  "profileId": "desktop-light",
+  "spec": {
+    "backgroundColor": "#ffffff",
+    "colorScheme": "light",
+    "deviceScaleFactor": 1,
+    "globals": {},
+    "height": 640,
+    "id": "desktop-light",
+    "textDirection": "ltr",
+    "width": 1024
+  },
+  "platform": "linux-x64",
+  "imageHash": "2c8322a45874452368eba388d306414de99318e2a51b431149c7847c5898f444",
+  "dimensions": {
+    "width": 1024,
+    "height": 640
+  },
+  "browserVersion": "147.0.7727.15"
+}

@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "caseId": "fdd74fe3ff026d3360728fe9c47075b8a5ecd026c5ed725fc5d4ef3fe6ba4e32",
+  "case": {
+    "id": "fdd74fe3ff026d3360728fe9c47075b8a5ecd026c5ed725fc5d4ef3fe6ba4e32",
+    "kind": "canonical",
+    "label": "Tailwind › Text Color",
+    "schemaVersion": 1,
+    "storyId": "tailwind",
+    "variantId": "text-color"
+  },
+  "profileId": "desktop-light",
+  "spec": {
+    "backgroundColor": "#ffffff",
+    "colorScheme": "light",
+    "deviceScaleFactor": 1,
+    "globals": {},
+    "height": 640,
+    "id": "desktop-light",
+    "textDirection": "ltr",
+    "width": 1024
+  },
+  "platform": "linux-x64",
+  "imageHash": "e24a6669c1a31af462fee30df2ec0bb3602b43e90c0c66ecf14212d71b4b9511",
+  "dimensions": {
+    "width": 1024,
+    "height": 640
+  },
+  "browserVersion": "147.0.7727.15"
+}

@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "caseId": "2199daa0ef8c5364356c1835fcc5f149c81639e2b05f3eec81034bd63d27acc6",
+  "case": {
+    "id": "2199daa0ef8c5364356c1835fcc5f149c81639e2b05f3eec81034bd63d27acc6",
+    "kind": "canonical",
+    "label": "Tailwind › Border Radius",
+    "schemaVersion": 1,
+    "storyId": "tailwind",
+    "variantId": "border-radius"
+  },
+  "profileId": "desktop-light",
+  "spec": {
+    "backgroundColor": "#ffffff",
+    "colorScheme": "light",
+    "deviceScaleFactor": 1,
+    "globals": {},
+    "height": 640,
+    "id": "desktop-light",
+    "textDirection": "ltr",
+    "width": 1024
+  },
+  "platform": "linux-x64",
+  "imageHash": "55feb46097233052eb9e0d48e522393b0ca45b865d8ac6d70ad52147a3b91483",
+  "dimensions": {
+    "width": 1024,
+    "height": 640
+  },
+  "browserVersion": "147.0.7727.15"
+}

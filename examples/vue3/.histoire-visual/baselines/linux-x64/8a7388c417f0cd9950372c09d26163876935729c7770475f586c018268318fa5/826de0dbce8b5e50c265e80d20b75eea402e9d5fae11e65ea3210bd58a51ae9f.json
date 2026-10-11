@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "caseId": "1d407f60f144a24d5ad980bfea59de11df74ddda03a895502d2dba39a8b5c267",
+  "case": {
+    "id": "1d407f60f144a24d5ad980bfea59de11df74ddda03a895502d2dba39a8b5c267",
+    "kind": "canonical",
+    "label": "Tailwind › Opacity",
+    "schemaVersion": 1,
+    "storyId": "tailwind",
+    "variantId": "opacity"
+  },
+  "profileId": "desktop-light",
+  "spec": {
+    "backgroundColor": "#ffffff",
+    "colorScheme": "light",
+    "deviceScaleFactor": 1,
+    "globals": {},
+    "height": 640,
+    "id": "desktop-light",
+    "textDirection": "ltr",
+    "width": 1024
+  },
+  "platform": "linux-x64",
+  "imageHash": "6a16566e8fafa633caa3aacf5aebe33f553f0539837723b1f2e62d4248ebc576",
+  "dimensions": {
+    "width": 1024,
+    "height": 640
+  },
+  "browserVersion": "147.0.7727.15"
+}

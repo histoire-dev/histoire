@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "caseId": "6ea8ebcab60ad330e00bcfa8f5a4e6c61cc5c5101916fd8d4dd980db1968a1c0",
+  "case": {
+    "id": "6ea8ebcab60ad330e00bcfa8f5a4e6c61cc5c5101916fd8d4dd980db1968a1c0",
+    "kind": "canonical",
+    "label": "Tailwind › Background Color",
+    "schemaVersion": 1,
+    "storyId": "tailwind",
+    "variantId": "background-color"
+  },
+  "profileId": "desktop-light",
+  "spec": {
+    "backgroundColor": "#ffffff",
+    "colorScheme": "light",
+    "deviceScaleFactor": 1,
+    "globals": {},
+    "height": 640,
+    "id": "desktop-light",
+    "textDirection": "ltr",
+    "width": 1024
+  },
+  "platform": "linux-x64",
+  "imageHash": "89538179d8af1a7052e69f58ca345a5c00ff7084b480bf5a3d939dd520adaeca",
+  "dimensions": {
+    "width": 1024,
+    "height": 640
+  },
+  "browserVersion": "147.0.7727.15"
+}

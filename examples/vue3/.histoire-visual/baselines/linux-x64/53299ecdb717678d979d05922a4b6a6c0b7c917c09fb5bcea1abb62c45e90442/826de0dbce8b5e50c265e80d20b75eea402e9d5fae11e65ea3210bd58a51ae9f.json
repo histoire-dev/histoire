@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "caseId": "3fb34350e6c43a9f200fdc34e358ae1869448b9e6a91ec707af2dd31ac33fc76",
+  "case": {
+    "id": "3fb34350e6c43a9f200fdc34e358ae1869448b9e6a91ec707af2dd31ac33fc76",
+    "kind": "canonical",
+    "label": "Workbench matrix › Alternate",
+    "schemaVersion": 1,
+    "storyId": "src-components-workbenchmatrix-story-vue",
+    "variantId": "alternate"
+  },
+  "profileId": "desktop-light",
+  "spec": {
+    "backgroundColor": "#ffffff",
+    "colorScheme": "light",
+    "deviceScaleFactor": 1,
+    "globals": {},
+    "height": 640,
+    "id": "desktop-light",
+    "textDirection": "ltr",
+    "width": 1024
+  },
+  "platform": "linux-x64",
+  "imageHash": "ada50035d07d69f64ddcc4fa7325aaa1b6ced3eaada5cdbc99a846ed156a8add",
+  "dimensions": {
+    "width": 1024,
+    "height": 640
+  },
+  "browserVersion": "147.0.7727.15"
+}

@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "caseId": "784653edc34136f7246e261af3bb30f9d3ac006f23559d10bb1fe076d94e3b78",
+  "case": {
+    "schemaVersion": 1,
+    "id": "784653edc34136f7246e261af3bb30f9d3ac006f23559d10bb1fe076d94e3b78",
+    "kind": "canonical",
+    "storyId": "visual-card",
+    "variantId": "default",
+    "label": "Visual card › Default"
+  },
+  "profileId": "light",
+  "spec": {
+    "backgroundColor": "#ffffff",
+    "colorScheme": "light",
+    "deviceScaleFactor": 1,
+    "globals": {},
+    "height": 240,
+    "id": "light",
+    "textDirection": "ltr",
+    "width": 320
+  },
+  "platform": "linux-x64",
+  "imageHash": "6ace62fbe2b67661ed968ff4cf6cd9d727dbff44ea61f8deb005e3d9528dc816",
+  "dimensions": {
+    "width": 320,
+    "height": 240
+  },
+  "browserVersion": "147.0.7727.15"
+}

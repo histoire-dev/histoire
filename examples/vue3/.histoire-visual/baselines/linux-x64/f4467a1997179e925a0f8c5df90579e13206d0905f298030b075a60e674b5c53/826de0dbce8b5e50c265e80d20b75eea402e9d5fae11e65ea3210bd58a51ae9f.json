@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "caseId": "6ca9e0b38639d28cc53e4088b7dbea32730663f341c89b8c6a83b64dd560c66d",
+  "case": {
+    "id": "6ca9e0b38639d28cc53e4088b7dbea32730663f341c89b8c6a83b64dd560c66d",
+    "kind": "canonical",
+    "label": "Hand-written source › Source template",
+    "schemaVersion": 1,
+    "storyId": "src-components-handwrittensource-story-vue",
+    "variantId": "src-components-handwrittensource-story-vue-1"
+  },
+  "profileId": "desktop-light",
+  "spec": {
+    "backgroundColor": "#ffffff",
+    "colorScheme": "light",
+    "deviceScaleFactor": 1,
+    "globals": {},
+    "height": 640,
+    "id": "desktop-light",
+    "textDirection": "ltr",
+    "width": 1024
+  },
+  "platform": "linux-x64",
+  "imageHash": "8314c7377bcb460726dfb17cf36302c23d6347d23fa7a3e0ddbaa244e214b955",
+  "dimensions": {
+    "width": 1024,
+    "height": 640
+  },
+  "browserVersion": "147.0.7727.15"
+}

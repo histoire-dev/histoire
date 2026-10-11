@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "caseId": "1c2b78443fd7abd02b41f34311637d72d2824ad69487aefa0d93bd8040f1b06c",
+  "case": {
+    "id": "1c2b78443fd7abd02b41f34311637d72d2824ad69487aefa0d93bd8040f1b06c",
+    "kind": "canonical",
+    "label": "Code gen › click event",
+    "schemaVersion": 1,
+    "storyId": "src-components-codegen-story-vue",
+    "variantId": "click-events"
+  },
+  "profileId": "desktop-light",
+  "spec": {
+    "backgroundColor": "#ffffff",
+    "colorScheme": "light",
+    "deviceScaleFactor": 1,
+    "globals": {},
+    "height": 640,
+    "id": "desktop-light",
+    "textDirection": "ltr",
+    "width": 1024
+  },
+  "platform": "linux-x64",
+  "imageHash": "68731b0c4256964a0e8cb6bf22dfa5cf8c63cc257ab3369155e680adad03e973",
+  "dimensions": {
+    "width": 1024,
+    "height": 640
+  },
+  "browserVersion": "147.0.7727.15"
+}

@@ -1,0 +1,16 @@
+{
+  "axes": {
+    "emphasized": false,
+    "wide": true
+  },
+  "label": "Wide card",
+  "propsOverride": {
+    "emphasized": false,
+    "wide": true
+  },
+  "storyId": "visual-card",
+  "variantId": "default",
+  "schemaVersion": 1,
+  "kind": "matrix",
+  "id": "cf5f18c7af2893ec86e3cbabbef5d41a6d131fffc8c819a204dda358f90cc546"
+}

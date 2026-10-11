@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "caseId": "ed1dbd171ab5c786b50a54b0d5da67fc13c0fd7aafbaa4df5cce7b70ae845d50",
+  "case": {
+    "id": "ed1dbd171ab5c786b50a54b0d5da67fc13c0fd7aafbaa4df5cce7b70ae845d50",
+    "kind": "canonical",
+    "label": "NestedButton › default",
+    "schemaVersion": 1,
+    "storyId": "src-components-nestedstories-nestedbutton-story-vue",
+    "variantId": "src-components-nestedstories-nestedbutton-story-vue-0"
+  },
+  "profileId": "desktop-light",
+  "spec": {
+    "backgroundColor": "#ffffff",
+    "colorScheme": "light",
+    "deviceScaleFactor": 1,
+    "globals": {},
+    "height": 640,
+    "id": "desktop-light",
+    "textDirection": "ltr",
+    "width": 1024
+  },
+  "platform": "linux-x64",
+  "imageHash": "027beacc8d901e3ef0d8eba65647cc1827b2a08985aa760937a7f609395fcd74",
+  "dimensions": {
+    "width": 1024,
+    "height": 640
+  },
+  "browserVersion": "147.0.7727.15"
+}

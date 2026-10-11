@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "caseId": "1fde63055783796912c116896440aea630635686f9e61bb086db1f15652c9d59",
+  "case": {
+    "id": "1fde63055783796912c116896440aea630635686f9e61bb086db1f15652c9d59",
+    "kind": "canonical",
+    "label": "Vitest Mocking › mocked module in story setup",
+    "schemaVersion": 1,
+    "storyId": "src-components-vitestmocking-story-vue",
+    "variantId": "src-components-vitestmocking-story-vue-0"
+  },
+  "profileId": "desktop-light",
+  "spec": {
+    "backgroundColor": "#ffffff",
+    "colorScheme": "light",
+    "deviceScaleFactor": 1,
+    "globals": {},
+    "height": 640,
+    "id": "desktop-light",
+    "textDirection": "ltr",
+    "width": 1024
+  },
+  "platform": "linux-x64",
+  "imageHash": "2f30bcf453d750a2bae02edc5939e7718c7b472e910ac3a7762c89a83bac5033",
+  "dimensions": {
+    "width": 1024,
+    "height": 640
+  },
+  "browserVersion": "147.0.7727.15"
+}

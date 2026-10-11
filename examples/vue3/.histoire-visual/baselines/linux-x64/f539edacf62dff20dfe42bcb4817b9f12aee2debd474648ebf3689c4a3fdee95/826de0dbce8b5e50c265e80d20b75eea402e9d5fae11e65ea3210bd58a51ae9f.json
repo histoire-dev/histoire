@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "caseId": "9fede5020e4e8fdcfc03cdc322bef85e893436852ea7dca1b482baea6a05c917",
+  "case": {
+    "id": "9fede5020e4e8fdcfc03cdc322bef85e893436852ea7dca1b482baea6a05c917",
+    "kind": "canonical",
+    "label": "Color Button › playground",
+    "schemaVersion": 1,
+    "storyId": "src-components-colorbutton-story-vue",
+    "variantId": "src-components-colorbutton-story-vue-0"
+  },
+  "profileId": "desktop-light",
+  "spec": {
+    "backgroundColor": "#ffffff",
+    "colorScheme": "light",
+    "deviceScaleFactor": 1,
+    "globals": {},
+    "height": 640,
+    "id": "desktop-light",
+    "textDirection": "ltr",
+    "width": 1024
+  },
+  "platform": "linux-x64",
+  "imageHash": "c4b3fb396e7e209e040640cd6fde12a2d6e034e7e73941be428c34ea15db4779",
+  "dimensions": {
+    "width": 1024,
+    "height": 640
+  },
+  "browserVersion": "147.0.7727.15"
+}

@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "caseId": "f2442231c852560fa72fdb69671dd7584bf761dd0cb8f740208d75ce981f7401",
+  "case": {
+    "id": "f2442231c852560fa72fdb69671dd7584bf761dd0cb8f740208d75ce981f7401",
+    "kind": "canonical",
+    "label": "Story setup › Global component",
+    "schemaVersion": 1,
+    "storyId": "src-components-storysetup-story-vue",
+    "variantId": "global-component"
+  },
+  "profileId": "desktop-light",
+  "spec": {
+    "backgroundColor": "#ffffff",
+    "colorScheme": "light",
+    "deviceScaleFactor": 1,
+    "globals": {},
+    "height": 640,
+    "id": "desktop-light",
+    "textDirection": "ltr",
+    "width": 1024
+  },
+  "platform": "linux-x64",
+  "imageHash": "bca37107705946b74f08caf53ca0de0b523090be1012a3d6ad49f5274fe7c422",
+  "dimensions": {
+    "width": 1024,
+    "height": 640
+  },
+  "browserVersion": "147.0.7727.15"
+}

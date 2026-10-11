@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "caseId": "98cbe3951fb63d8b4ea228230a3c53338f8c146bb0723009a1f488f8b87ce0e7",
+  "case": {
+    "id": "98cbe3951fb63d8b4ea228230a3c53338f8c146bb0723009a1f488f8b87ce0e7",
+    "kind": "canonical",
+    "label": "Variant-scoped Controls › variant 1",
+    "schemaVersion": 1,
+    "storyId": "src-components-sharedcontrols-story-vue",
+    "variantId": "src-components-sharedcontrols-story-vue-0"
+  },
+  "profileId": "desktop-light",
+  "spec": {
+    "backgroundColor": "#ffffff",
+    "colorScheme": "light",
+    "deviceScaleFactor": 1,
+    "globals": {},
+    "height": 640,
+    "id": "desktop-light",
+    "textDirection": "ltr",
+    "width": 1024
+  },
+  "platform": "linux-x64",
+  "imageHash": "a9c8cf6320163bbfae336c5c95f052c37451e9f6cdec5f40b6546b68c282b46f",
+  "dimensions": {
+    "width": 1024,
+    "height": 640
+  },
+  "browserVersion": "147.0.7727.15"
+}

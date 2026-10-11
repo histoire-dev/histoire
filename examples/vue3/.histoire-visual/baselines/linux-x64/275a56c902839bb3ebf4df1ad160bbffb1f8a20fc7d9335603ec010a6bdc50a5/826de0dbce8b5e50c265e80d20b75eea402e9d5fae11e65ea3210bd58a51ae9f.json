@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "caseId": "059a5a0a46502a21cdc2378f8c95681549328dafdbca3fe4c97bbd436984cbef",
+  "case": {
+    "id": "059a5a0a46502a21cdc2378f8c95681549328dafdbca3fe4c97bbd436984cbef",
+    "kind": "canonical",
+    "label": "Code gen › boolean props",
+    "schemaVersion": 1,
+    "storyId": "src-components-codegen-story-vue",
+    "variantId": "boolean props"
+  },
+  "profileId": "desktop-light",
+  "spec": {
+    "backgroundColor": "#ffffff",
+    "colorScheme": "light",
+    "deviceScaleFactor": 1,
+    "globals": {},
+    "height": 640,
+    "id": "desktop-light",
+    "textDirection": "ltr",
+    "width": 1024
+  },
+  "platform": "linux-x64",
+  "imageHash": "5d439ade4cb6761122a9b5604f635bf6438a8294022debd51f7bad4213cd23c8",
+  "dimensions": {
+    "width": 1024,
+    "height": 640
+  },
+  "browserVersion": "147.0.7727.15"
+}

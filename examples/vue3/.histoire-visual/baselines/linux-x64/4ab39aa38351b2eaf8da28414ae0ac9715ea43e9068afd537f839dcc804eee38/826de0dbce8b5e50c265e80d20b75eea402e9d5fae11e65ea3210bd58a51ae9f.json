@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "caseId": "323022b4d05878e66e22c7dfb89cc98af99c87093839b40472f2d1bf37efdad8",
+  "case": {
+    "id": "323022b4d05878e66e22c7dfb89cc98af99c87093839b40472f2d1bf37efdad8",
+    "kind": "canonical",
+    "label": "Tailwind › Padding",
+    "schemaVersion": 1,
+    "storyId": "tailwind",
+    "variantId": "padding"
+  },
+  "profileId": "desktop-light",
+  "spec": {
+    "backgroundColor": "#ffffff",
+    "colorScheme": "light",
+    "deviceScaleFactor": 1,
+    "globals": {},
+    "height": 640,
+    "id": "desktop-light",
+    "textDirection": "ltr",
+    "width": 1024
+  },
+  "platform": "linux-x64",
+  "imageHash": "baf284a243e48af3cb329a3fe909d9c63b651677645110bb5d540e43a87116d7",
+  "dimensions": {
+    "width": 1024,
+    "height": 640
+  },
+  "browserVersion": "147.0.7727.15"
+}

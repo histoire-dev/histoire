@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "caseId": "7ffc7534f3b6b2e6fa1367e36a59edf1463bc28ca1a152d38037e4594278b246",
+  "case": {
+    "id": "7ffc7534f3b6b2e6fa1367e36a59edf1463bc28ca1a152d38037e4594278b246",
+    "kind": "canonical",
+    "label": "Tailwind › Font Weight",
+    "schemaVersion": 1,
+    "storyId": "tailwind",
+    "variantId": "font-weight"
+  },
+  "profileId": "desktop-light",
+  "spec": {
+    "backgroundColor": "#ffffff",
+    "colorScheme": "light",
+    "deviceScaleFactor": 1,
+    "globals": {},
+    "height": 640,
+    "id": "desktop-light",
+    "textDirection": "ltr",
+    "width": 1024
+  },
+  "platform": "linux-x64",
+  "imageHash": "f826099d92cc7c25057720a8d1e21ba6d425c242c3e285c47ed109f540e3b981",
+  "dimensions": {
+    "width": 1024,
+    "height": 640
+  },
+  "browserVersion": "147.0.7727.15"
+}

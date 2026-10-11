@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "caseId": "0d5f36328f1f98ce199d32f1211ed10c8234c03557bb24b5c0272162d5a17eba",
+  "case": {
+    "id": "0d5f36328f1f98ce199d32f1211ed10c8234c03557bb24b5c0272162d5a17eba",
+    "kind": "canonical",
+    "label": "Vitest Lifecycle › untitled",
+    "schemaVersion": 1,
+    "storyId": "src-components-vitestlifecycle-story-vue",
+    "variantId": "src-components-vitestlifecycle-story-vue-0"
+  },
+  "profileId": "desktop-light",
+  "spec": {
+    "backgroundColor": "#ffffff",
+    "colorScheme": "light",
+    "deviceScaleFactor": 1,
+    "globals": {},
+    "height": 640,
+    "id": "desktop-light",
+    "textDirection": "ltr",
+    "width": 1024
+  },
+  "platform": "linux-x64",
+  "imageHash": "f46a42aaa3b1b8765aefc4d00a9004aa4a5283a148d3ef666e79d627cea15182",
+  "dimensions": {
+    "width": 1024,
+    "height": 640
+  },
+  "browserVersion": "147.0.7727.15"
+}

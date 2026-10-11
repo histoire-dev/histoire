@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "caseId": "c9285f585f27c490bc3a3cb223859273242a45b12d3545267ae266c87d985095",
+  "case": {
+    "id": "c9285f585f27c490bc3a3cb223859273242a45b12d3545267ae266c87d985095",
+    "kind": "canonical",
+    "label": "EventButtonGrid › Variant 3",
+    "schemaVersion": 1,
+    "storyId": "src-components-eventbuttongrid-story-vue",
+    "variantId": "src-components-eventbuttongrid-story-vue-2"
+  },
+  "profileId": "desktop-light",
+  "spec": {
+    "backgroundColor": "#ffffff",
+    "colorScheme": "light",
+    "deviceScaleFactor": 1,
+    "globals": {},
+    "height": 640,
+    "id": "desktop-light",
+    "textDirection": "ltr",
+    "width": 1024
+  },
+  "platform": "linux-x64",
+  "imageHash": "a328018aa3585b9f23508c814d14e130665ffa52c66886ce6d1e1d49384141df",
+  "dimensions": {
+    "width": 1024,
+    "height": 640
+  },
+  "browserVersion": "147.0.7727.15"
+}

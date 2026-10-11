@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "caseId": "4264fb89f3bc49d3ae76262c509519c84455debdece34e2fb64dec586c5393b0",
+  "case": {
+    "id": "4264fb89f3bc49d3ae76262c509519c84455debdece34e2fb64dec586c5393b0",
+    "kind": "canonical",
+    "label": "Controls overlays › untitled",
+    "schemaVersion": 1,
+    "storyId": "src-components-controlsoverlays-story-vue",
+    "variantId": "src-components-controlsoverlays-story-vue-0"
+  },
+  "profileId": "desktop-light",
+  "spec": {
+    "backgroundColor": "#ffffff",
+    "colorScheme": "light",
+    "deviceScaleFactor": 1,
+    "globals": {},
+    "height": 640,
+    "id": "desktop-light",
+    "textDirection": "ltr",
+    "width": 1024
+  },
+  "platform": "linux-x64",
+  "imageHash": "2d99d1f0e5c388a5c415b1a5a60b0e2e260b3539513cc1a4594d20963c2ee300",
+  "dimensions": {
+    "width": 1024,
+    "height": 640
+  },
+  "browserVersion": "147.0.7727.15"
+}

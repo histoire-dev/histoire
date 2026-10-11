@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "caseId": "6d775b18764efc72c73e6afc3cf1f40d51ca0860096a482e8adf14623e8bfc47",
+  "case": {
+    "id": "6d775b18764efc72c73e6afc3cf1f40d51ca0860096a482e8adf14623e8bfc47",
+    "kind": "canonical",
+    "label": "Code gen › v-model input",
+    "schemaVersion": 1,
+    "storyId": "src-components-codegen-story-vue",
+    "variantId": "v-model"
+  },
+  "profileId": "desktop-light",
+  "spec": {
+    "backgroundColor": "#ffffff",
+    "colorScheme": "light",
+    "deviceScaleFactor": 1,
+    "globals": {},
+    "height": 640,
+    "id": "desktop-light",
+    "textDirection": "ltr",
+    "width": 1024
+  },
+  "platform": "linux-x64",
+  "imageHash": "9a4284d5ddb91db4ed44286603aea5636ac695de7186e2888c0d20f93877f575",
+  "dimensions": {
+    "width": 1024,
+    "height": 640
+  },
+  "browserVersion": "147.0.7727.15"
+}

@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "caseId": "adfd4b6cd49c170e9a821f9e53541ba9e013c6f66a1cfddcd22b9c79b5015afc",
+  "case": {
+    "id": "adfd4b6cd49c170e9a821f9e53541ba9e013c6f66a1cfddcd22b9c79b5015afc",
+    "kind": "canonical",
+    "label": "BaseButton › playground",
+    "schemaVersion": 1,
+    "storyId": "src-components-basebutton-story-vue",
+    "variantId": "src-components-basebutton-story-vue-0"
+  },
+  "profileId": "desktop-light",
+  "spec": {
+    "backgroundColor": "#ffffff",
+    "colorScheme": "light",
+    "deviceScaleFactor": 1,
+    "globals": {},
+    "height": 640,
+    "id": "desktop-light",
+    "textDirection": "ltr",
+    "width": 1024
+  },
+  "platform": "linux-x64",
+  "imageHash": "c8983f4d1a63e1dbfe16f049465dc5ac5e50411438dda792e4724f34646c1492",
+  "dimensions": {
+    "width": 1024,
+    "height": 640
+  },
+  "browserVersion": "147.0.7727.15"
+}

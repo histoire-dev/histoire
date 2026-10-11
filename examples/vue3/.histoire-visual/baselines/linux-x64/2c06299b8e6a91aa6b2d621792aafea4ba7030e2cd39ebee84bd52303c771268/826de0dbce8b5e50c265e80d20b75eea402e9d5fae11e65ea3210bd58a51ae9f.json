@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "caseId": "cf5f18c7af2893ec86e3cbabbef5d41a6d131fffc8c819a204dda358f90cc546",
+  "case": {
+    "axes": {
+      "emphasized": false,
+      "wide": true
+    },
+    "id": "cf5f18c7af2893ec86e3cbabbef5d41a6d131fffc8c819a204dda358f90cc546",
+    "kind": "matrix",
+    "label": "Wide card",
+    "propsOverride": {
+      "emphasized": false,
+      "wide": true
+    },
+    "schemaVersion": 1,
+    "storyId": "visual-card",
+    "variantId": "default"
+  },
+  "profileId": "desktop-light",
+  "spec": {
+    "backgroundColor": "#ffffff",
+    "colorScheme": "light",
+    "deviceScaleFactor": 1,
+    "globals": {},
+    "height": 640,
+    "id": "desktop-light",
+    "propsOverride": {
+      "emphasized": false,
+      "wide": true
+    },
+    "textDirection": "ltr",
+    "width": 1024
+  },
+  "platform": "linux-x64",
+  "imageHash": "91cc0c391c906c232d77181767824960c85753d903edd53d2a33707545db18ba",
+  "dimensions": {
+    "width": 1024,
+    "height": 640
+  },
+  "browserVersion": "147.0.7727.15"
+}

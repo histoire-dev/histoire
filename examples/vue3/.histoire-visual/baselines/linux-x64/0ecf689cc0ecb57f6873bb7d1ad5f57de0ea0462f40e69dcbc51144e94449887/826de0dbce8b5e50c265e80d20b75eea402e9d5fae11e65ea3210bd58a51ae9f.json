@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "caseId": "74758861d47c76911867c02c5469b5b02e3fdd6a247abda93d028e06f6b62222",
+  "case": {
+    "id": "74758861d47c76911867c02c5469b5b02e3fdd6a247abda93d028e06f6b62222",
+    "kind": "canonical",
+    "label": "PiniaStory › default",
+    "schemaVersion": 1,
+    "storyId": "src-components-piniastore-story-vue",
+    "variantId": "_default"
+  },
+  "profileId": "desktop-light",
+  "spec": {
+    "backgroundColor": "#ffffff",
+    "colorScheme": "light",
+    "deviceScaleFactor": 1,
+    "globals": {},
+    "height": 640,
+    "id": "desktop-light",
+    "textDirection": "ltr",
+    "width": 1024
+  },
+  "platform": "linux-x64",
+  "imageHash": "daa1c03ff9cc9f1d084a2e28f7d1f97af66c1741a64257f435784bcefff69993",
+  "dimensions": {
+    "width": 1024,
+    "height": 640
+  },
+  "browserVersion": "147.0.7727.15"
+}

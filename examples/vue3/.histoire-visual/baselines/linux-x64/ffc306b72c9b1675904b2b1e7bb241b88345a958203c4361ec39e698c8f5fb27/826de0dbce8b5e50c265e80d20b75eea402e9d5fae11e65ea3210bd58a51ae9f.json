@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "caseId": "cdcefe3a00fc91d7b576d0f8cde0c27628518aeb8be93c0d9563c121d2d100f3",
+  "case": {
+    "id": "cdcefe3a00fc91d7b576d0f8cde0c27628518aeb8be93c0d9563c121d2d100f3",
+    "kind": "canonical",
+    "label": "Tailwind › Breakpoints",
+    "schemaVersion": 1,
+    "storyId": "tailwind",
+    "variantId": "breakpoints"
+  },
+  "profileId": "desktop-light",
+  "spec": {
+    "backgroundColor": "#ffffff",
+    "colorScheme": "light",
+    "deviceScaleFactor": 1,
+    "globals": {},
+    "height": 640,
+    "id": "desktop-light",
+    "textDirection": "ltr",
+    "width": 1024
+  },
+  "platform": "linux-x64",
+  "imageHash": "f48fe55c766463d6cff1ff7e391fc5edf089924e6737113bf04b34d18386ff03",
+  "dimensions": {
+    "width": 1024,
+    "height": 640
+  },
+  "browserVersion": "147.0.7727.15"
+}

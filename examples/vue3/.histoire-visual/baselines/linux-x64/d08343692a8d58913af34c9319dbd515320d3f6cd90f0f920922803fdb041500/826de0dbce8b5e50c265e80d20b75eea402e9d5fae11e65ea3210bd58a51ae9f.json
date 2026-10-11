@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "caseId": "ea6b24ccecb0923ac2d994f7c972cb78d4a59be2b3ca5eeed5adaf6f4789d72b",
+  "case": {
+    "id": "ea6b24ccecb0923ac2d994f7c972cb78d4a59be2b3ca5eeed5adaf6f4789d72b",
+    "kind": "canonical",
+    "label": "Tailwind › Height",
+    "schemaVersion": 1,
+    "storyId": "tailwind",
+    "variantId": "height"
+  },
+  "profileId": "desktop-light",
+  "spec": {
+    "backgroundColor": "#ffffff",
+    "colorScheme": "light",
+    "deviceScaleFactor": 1,
+    "globals": {},
+    "height": 640,
+    "id": "desktop-light",
+    "textDirection": "ltr",
+    "width": 1024
+  },
+  "platform": "linux-x64",
+  "imageHash": "1a32db6d8073de61e06d70ff4a7e3c6a0de75b9236a912e35e20ab7e88acb783",
+  "dimensions": {
+    "width": 1024,
+    "height": 640
+  },
+  "browserVersion": "147.0.7727.15"
+}

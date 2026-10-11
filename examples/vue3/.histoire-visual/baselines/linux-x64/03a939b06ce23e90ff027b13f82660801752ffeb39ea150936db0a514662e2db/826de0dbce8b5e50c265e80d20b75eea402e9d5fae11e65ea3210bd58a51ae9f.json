@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "caseId": "794bd754a4188ca06ba95938d4ccc74c8fe3f166a24afd1fc740cbc94c384132",
+  "case": {
+    "id": "794bd754a4188ca06ba95938d4ccc74c8fe3f166a24afd1fc740cbc94c384132",
+    "kind": "canonical",
+    "label": "Tailwind › Border Color",
+    "schemaVersion": 1,
+    "storyId": "tailwind",
+    "variantId": "border-color"
+  },
+  "profileId": "desktop-light",
+  "spec": {
+    "backgroundColor": "#ffffff",
+    "colorScheme": "light",
+    "deviceScaleFactor": 1,
+    "globals": {},
+    "height": 640,
+    "id": "desktop-light",
+    "textDirection": "ltr",
+    "width": 1024
+  },
+  "platform": "linux-x64",
+  "imageHash": "a3774dbcf4522f023163976043f76a8bed05e1f09403b6f392c7a6156b7334e6",
+  "dimensions": {
+    "width": 1024,
+    "height": 640
+  },
+  "browserVersion": "147.0.7727.15"
+}

@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "caseId": "246d6e0f44d8afa3a29431a17ad7ddad0296cb5282391e9af8d948cfcac8edb3",
+  "case": {
+    "id": "246d6e0f44d8afa3a29431a17ad7ddad0296cb5282391e9af8d948cfcac8edb3",
+    "kind": "canonical",
+    "label": "Story Scoped CSS › default",
+    "schemaVersion": 1,
+    "storyId": "src-components-storyscopedcss-story-vue",
+    "variantId": "src-components-storyscopedcss-story-vue-0"
+  },
+  "profileId": "desktop-light",
+  "spec": {
+    "backgroundColor": "#ffffff",
+    "colorScheme": "light",
+    "deviceScaleFactor": 1,
+    "globals": {},
+    "height": 640,
+    "id": "desktop-light",
+    "textDirection": "ltr",
+    "width": 1024
+  },
+  "platform": "linux-x64",
+  "imageHash": "cc29d91604729f677fa681756f34d71303f24ace16b8932d962952a591dbf037",
+  "dimensions": {
+    "width": 1024,
+    "height": 640
+  },
+  "browserVersion": "147.0.7727.15"
+}
