@@ -39,7 +39,7 @@ export async function select(context: SessionContext, target: HistoireTarget): P
     if (target.variantId === null || !primary) return
     if (!primary.active && context.snapshot.runtime.status === 'absent') return
     if (context.snapshot.runtime.status === 'ready' && context.snapshot.runtime.runtimeId) return
-      if (!primary.active || context.snapshot.runtime.status !== 'mounting') throw new HistoireSdkError('PREVIEW_NOT_READY', 'Variant is unavailable; remount it to continue.')
+    if (!primary.active || context.snapshot.runtime.status !== 'mounting') throw new HistoireSdkError('PREVIEW_NOT_READY', 'Variant is unavailable; remount it to continue.')
     await waitSelectionRuntime(context, primary)
     return
   }

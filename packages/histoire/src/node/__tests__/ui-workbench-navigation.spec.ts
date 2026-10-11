@@ -8,8 +8,12 @@ type WorkspacePane = Exclude<ShellPane, 'home'>
 /** Creates route and pane spies for one rail activation. */
 function fixture(route: string, selection: HistoireTarget | null) {
   let currentRoute = route
-  const restore = vi.fn(async () => { currentRoute = 'story' })
-  const home = vi.fn(async () => { currentRoute = 'home' })
+  const restore = vi.fn(async () => {
+    currentRoute = 'story'
+  })
+  const home = vi.fn(async () => {
+    currentRoute = 'home'
+  })
   const showPane = vi.fn()
   return {
     currentRoute: () => currentRoute,

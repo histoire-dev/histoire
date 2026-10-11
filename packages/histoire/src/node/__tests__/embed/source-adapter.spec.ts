@@ -108,7 +108,8 @@ describe('first-party data-only source adapter', () => {
       const accepted = getAcceptedHistoireSessionDescriptor(session)
       expect(accepted.embed).toBeUndefined()
       await expect(createEmbedSourceConnection({ url: 'https://book.test/nested/book/', descriptor: accepted }))
-        .rejects.toThrow('Source descriptor lacks required portable fields')
+        .rejects
+        .toThrow('Source descriptor lacks required portable fields')
     }
     finally {
       await session.dispose()

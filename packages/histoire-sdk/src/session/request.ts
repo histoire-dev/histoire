@@ -70,7 +70,7 @@ export function waitForRuntime(context: SessionContext, signal: AbortSignal): Pr
       }
       else if (['failed', 'stale', 'absent'].includes(context.snapshot.runtime.status)) {
         cleanup()
-      reject(new HistoireSdkError('PREVIEW_NOT_READY', 'Variant became unavailable before loading completed.'))
+        reject(new HistoireSdkError('PREVIEW_NOT_READY', 'Variant became unavailable before loading completed.'))
       }
     }
     if (signal.aborted) {

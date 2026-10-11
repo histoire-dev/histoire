@@ -87,7 +87,7 @@ export function createSessionChannels(context: SessionContext) {
       return {
         post: (type: string, data: HistoireJsonValue) => observeOperation((async () => {
           allowed(name)
-  if (!context.snapshot.selection?.variantId) throw new HistoireSdkError('PREVIEW_NOT_READY', 'Host channel requires a selected variant.')
+          if (!context.snapshot.selection?.variantId) throw new HistoireSdkError('PREVIEW_NOT_READY', 'Host channel requires a selected variant.')
           const primary = primaryRuntime(context)
           captureOwner()
           const payload = validateHostChannelPayload({ name, type, data })

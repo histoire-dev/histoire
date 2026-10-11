@@ -70,7 +70,8 @@ Declare per-prop samples as arrays or increasing ranges:
 <Story :matrix="{ axes: {
   count: { min: 0, max: 20, step: 5 },
   opacity: [0, 0.25, 0.5, 1],
-} }">
+} }"
+>
 ```
 
 Ranges include `min` and stop at `max`; an off-step endpoint is not appended. `{ min: 0, max: 10, step: 3 }` produces `[0, 3, 6, 9]`. Negative values, decimals, and scientific notation work. Require finite bounds, `min <= max`, a positive step, and at most 64 generated values. Invalid ranges contribute no hint for that prop. Svelte and React use the same range object; published catalogs contain expanded arrays.

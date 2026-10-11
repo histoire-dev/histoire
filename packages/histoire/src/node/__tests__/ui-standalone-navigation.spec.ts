@@ -1,10 +1,10 @@
 // @vitest-environment jsdom
 import { resolveStoryRouteId } from '@histoire/protocol'
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { createHistoireSessionWithAdapters, getAcceptedHistoireSessionDescriptor, getHistoireSessionDescriptor } from '../../../../histoire-sdk/dist/internal.js'
-import { sourceFixture } from '../../../../histoire-sdk/src/__tests__/fixtures/session.js'
 import { createStandaloneNavigation } from '../../../../histoire-app/src/app/standalone/navigation.js'
 import { createStandaloneSelection } from '../../../../histoire-app/src/app/standalone/selection.js'
+import { createHistoireSessionWithAdapters, getAcceptedHistoireSessionDescriptor, getHistoireSessionDescriptor } from '../../../../histoire-sdk/dist/internal.js'
+import { sourceFixture } from '../../../../histoire-sdk/src/__tests__/fixtures/session.js'
 
 const resources: (() => Promise<void> | void)[] = []
 

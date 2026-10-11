@@ -1,7 +1,7 @@
 export { HistoireControls } from './components/controls/HistoireControls.js'
 export { HistoireDocs } from './components/docs/HistoireDocs.js'
-export { HistoireEvents } from './components/events/HistoireEvents.js'
 export { HistoireEmbed } from './components/embed/HistoireEmbed.js'
+export { HistoireEvents } from './components/events/HistoireEvents.js'
 export { HistoireExplorer } from './components/explorer/HistoireExplorer.js'
 export { HistoirePreview } from './components/preview/HistoirePreview.js'
 export { HistoireVariantGrid } from './components/preview/HistoireVariantGrid.js'

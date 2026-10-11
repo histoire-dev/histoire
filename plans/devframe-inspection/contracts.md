@@ -18,7 +18,7 @@ Keep protocol/descriptor version 1 only if old-reader/new-descriptor tests prove
 
 ## Browser SDK
 
-```ts
+```text
 // Signatures abbreviated here; implementation adds JSDoc to every member.
 type InspectionOptions = {
   target?: { storyId: string; variantId: string }
@@ -88,7 +88,7 @@ import { attachHistoireDevframe } from '@histoire/devframe/client'
 const attachment = await attachHistoireDevframe({
   session,
   connection, // already connected, caller-owned Devframe RPC client
-  grant,      // one-use pairing grant delivered by host bootstrap
+  grant, // one-use pairing grant delivered by host bootstrap
   expose: ['inspection', 'events'],
   webmcp: false,
 })

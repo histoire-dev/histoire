@@ -233,7 +233,16 @@ describe('native controls state ownership', () => {
       const surface = originalMount(context)
       if (context.surface !== 'controls') return surface
       mountId = context.mountId
-      return { ...surface, channel: { subscribe(listener) { publish = listener; return () => {} }, post() {} } }
+      return {
+        ...surface,
+        channel: {
+          subscribe(listener) {
+            publish = listener
+            return () => {}
+          },
+          post() {},
+        },
+      }
     }
     const session = createHistoireSessionWithAdapters({ url: 'https://book.example/' }, fixture.adapters)
     await session.connect()

@@ -70,8 +70,12 @@ const embed = session.mount(document.querySelector<HTMLElement>('#histoire-embed
 await embed.ready
 
 // When removing this view, including after a failed mount:
-try { await embed.unmount() }
-finally { await session.dispose() }
+try {
+  await embed.unmount()
+}
+finally {
+  await session.dispose()
+}
 ```
 
 For story scope, omit `variantId` from selection and use `scope: 'story'`. Presentation is supported only on `explorer`; ordinary explorer mounts keep their existing behavior. SDK documents retain authenticated parent handshake. Presentation hints grant no extra commands or origin permissions.
