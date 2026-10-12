@@ -27,4 +27,3 @@ Review also considered cached candidate probe reuse. Slice 03 explicitly permits
 ## Evidence limits
 
 Adjacent `config-save-recovery.spec.ts` still fails its JavaScript-destination case. Its unchanged fixture symlinks `node_modules/histoire` to `/home/akryum/Projects/histoire/packages`, rather than `/home/akryum/Projects/histoire/packages/histoire`, and the generated config import fails verification. This test does not use screenshot/setup handlers; no unrelated test/config changes were made. Original platform limits and unrelated Vue typecheck baseline remain recorded in the combined receipt.
-
