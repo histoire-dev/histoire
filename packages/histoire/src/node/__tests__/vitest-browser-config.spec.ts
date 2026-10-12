@@ -1,6 +1,8 @@
 import type { Context } from '../context.js'
 import fs from 'node:fs'
-import { readFile } from 'node:fs/promises'
+import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises'
+import { tmpdir } from 'node:os'
+import { dirname, join } from 'node:path'
 import { expect, it, vi } from 'vitest'
 import { getDefaultConfig } from '../config/index.js'
 import { resolveVitestModule } from '../util/resolve-vitest-package.js'
@@ -32,6 +34,25 @@ it('keeps Node Playwright providers and declaration packages out of browser opti
     expect(getVitestBrowserDependencyNames({ root: '/consumer', supportPlugins: [] } as Context)).toEqual(['vue', 'client-library'])
   }
   finally { read.mockRestore() }
+})
+
+it('keeps installed Vite plugins out of browser optimization', async () => {
+  // Bundling a Vite plugin for the page pulls Vite and its native watcher addon
+  // (fsevents on macOS), which esbuild cannot load.
+  const root = await mkdtemp(join(tmpdir(), 'histoire-browser-deps-'))
+  try {
+    const manifests = {
+      'package.json': { devDependencies: { '@vitejs/plugin-vue': '5', 'client-library': '1' } },
+      'node_modules/@vitejs/plugin-vue/package.json': { peerDependencies: { vite: '6', vue: '3' } },
+      'node_modules/client-library/package.json': { peerDependencies: { vue: '3' } },
+    }
+    for (const [path, manifest] of Object.entries(manifests)) {
+      await mkdir(dirname(join(root, path)), { recursive: true })
+      await writeFile(join(root, path), JSON.stringify(manifest))
+    }
+    expect(getVitestBrowserDependencyNames({ root, supportPlugins: [] } as unknown as Context)).toEqual(['client-library'])
+  }
+  finally { await rm(root, { recursive: true, force: true }) }
 })
 
 it('includes framework runtime entry points without depending on package declarations', () => {

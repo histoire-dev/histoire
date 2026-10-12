@@ -1,10 +1,29 @@
 import type { Context } from '../context.js'
 import fs from 'node:fs'
-import { resolve } from 'pathe'
-import { withPackageDirs } from '../util/resolve-package.js'
+import { join, resolve } from 'pathe'
+import { findProjectPackageDirectories, withPackageDirs } from '../util/resolve-package.js'
 
 /** Node browser providers are executed by Vitest, never by its browser page. */
 const NODE_BROWSER_PROVIDERS = new Set(['playwright', 'playwright-core', '@playwright/test'])
+
+/**
+ * Tells whether an installed package extends Vite (it depends or peer-depends
+ * on `vite`). Such plugins only run in Node: prebundling one for the page pulls
+ * Vite and its native watcher addon (`fsevents` on macOS) that esbuild cannot load.
+ * @param root The project root the package is installed from.
+ * @param name The package name.
+ */
+function isVitePlugin(root: string, name: string) {
+  const directory = findProjectPackageDirectories(root, name)[0]
+  if (!directory) return false
+  try {
+    const manifest = JSON.parse(fs.readFileSync(join(directory, 'package.json'), 'utf8')) as Record<string, Record<string, string> | undefined>
+    return [manifest.dependencies, manifest.peerDependencies].some(dependencies => dependencies?.vite !== undefined)
+  }
+  catch {
+    return false
+  }
+}
 
 /**
  * Packages that must NEVER be prebundled for the browser run: Vitest and its
@@ -39,8 +58,9 @@ export function getVitestBrowserOptimizeDeps(ctx: Context) {
  * run disables Vite's dep discovery, so a story importing a package that was not
  * pre-bundled triggers a mid-run optimizer reload that kills the browser
  * connection — the failure `shouldRetryBrowserRun` in `test.ts` has to retry.
- * Node browser providers stay excluded: scanning their server graph can fail on
- * optional platform modules such as Playwright's Chromium BiDi implementation.
+ * Node browser providers and Vite plugins stay excluded: scanning their server
+ * graph can fail on optional platform modules such as Playwright's Chromium
+ * BiDi implementation or Vite's `fsevents` watcher.
  * @param ctx The histoire context, used for the project root and support plugins.
  */
 export function getVitestBrowserDependencyNames(ctx: Context) {
@@ -80,6 +100,7 @@ export function getVitestBrowserDependencyNames(ctx: Context) {
         && !dep.startsWith('@vitest/')
         && !dep.startsWith('@types/')
         && !dep.startsWith('@vue/')
+        && !isVitePlugin(ctx.root, dep)
       ) {
         deps.add(dep)
       }

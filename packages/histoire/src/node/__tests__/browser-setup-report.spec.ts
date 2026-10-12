@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { classifyBrowserSetupFailure, getBrowserSetupRepairs, serializeScreenshotSetupCommand } from '../runtime/browser/setup/report.js'
+import { classifyBrowserSetupFailure, createBrowserSetupPreviewError, getBrowserSetupRepairs, serializeScreenshotSetupCommand } from '../runtime/browser/setup/report.js'
 
 describe('safe setup diagnosis and repairs', () => {
   it.each([
@@ -25,6 +25,13 @@ describe('safe setup diagnosis and repairs', () => {
     expect(serializeScreenshotSetupCommand(repair.command!)).toBe('pnpm add -D playwright-core@latest')
     expect(repair.command?.args).not.toContain('--only-shell')
     expect(repair.command?.args).not.toContain('--no-shell')
+  })
+
+  it('surfaces the repair command in setup failure messages', () => {
+    const repairs = getBrowserSetupRepairs('browser-missing', { source: 'auto' }, 'playwright', 'linux', '1.50.0')
+    const error = createBrowserSetupPreviewError('browser-missing', { revision: 1, state: 'needs-action', reason: 'browser-missing', attempts: [], repairs })
+    expect(error).toMatchObject({ code: 'BROWSER_UNAVAILABLE', setup: { repairs } })
+    expect(error.message).toContain('pnpm exec playwright install chromium --only-shell')
   })
 
   it('asks for restart when package metadata changed behind a loaded driver', () => {

@@ -26,6 +26,29 @@ async function cancelVitestBeforeCleanup(vitest: Vitest) {
   finally { clearTimeout(timer) }
 }
 
+/** Upper bound for interrupted startup to acquire what cleanup must release. */
+const INTERRUPTED_STARTUP_SETTLE_TIMEOUT = 5000
+
+/**
+ * Waits, bounded, for browser startup an abort or timeout race stopped observing.
+ *
+ * `withTestAbort` rejects immediately, but browser server and provider startup
+ * keep running: a Playwright browser launched after cleanup captured providers
+ * would outlive the run and keep the isolated worker process alive. Startup
+ * never executes user code, unlike collection/start, which may hang forever.
+ * @param work Interrupted browser startup, if it began.
+ */
+async function settleInterruptedStartup(work: Promise<unknown> | undefined) {
+  if (!work) return
+  let timer: ReturnType<typeof setTimeout> | undefined
+  try {
+    await Promise.race([work.catch(() => {}), new Promise<void>((resolve) => {
+      timer = setTimeout(resolve, INTERRUPTED_STARTUP_SETTLE_TIMEOUT)
+    })])
+  }
+  finally { clearTimeout(timer) }
+}
+
 /**
  * Everything one attempt of a Vitest browser run needs.
  *
@@ -133,6 +156,7 @@ export async function runVitestAttempts<TContext, TResult>(
     throwIfTestAborted(options.signal)
     let vitest: Vitest | undefined
     let cleanupStarted = false
+    let startup: Promise<void> | undefined
 
     try {
       // Observe late creation even after abort: only the acquired handle can confirm teardown.
@@ -146,7 +170,7 @@ export async function runVitestAttempts<TContext, TResult>(
 
       await runWithVitestStartTimeout(() => withTestAbort(async () => {
         if (options.mode === 'collect') {
-          await prepareCollectionBrowser(vitest!, options.runId)
+          await (startup = prepareCollectionBrowser(vitest!, options.runId))
           throwIfTestAborted(options.signal)
           return vitest!.collect(setup.filter ?? [], { staticParse: false })
         }
@@ -172,6 +196,7 @@ export async function runVitestAttempts<TContext, TResult>(
           // work can exit the isolated worker without a cleanup acknowledgement.
           // Resource release still waits for cleanupRun, even if cancellation fails.
           await cancelVitestBeforeCleanup(vitest)
+          await settleInterruptedStartup(startup)
         }
         await cleanupRun(vitest, options.label, error, options.strictCleanup, options.runId)
       }

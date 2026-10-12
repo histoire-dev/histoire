@@ -53,10 +53,7 @@ export function createHistoireVitePlugin(ctx: Context, options: HistoireVitePlug
       const optimizeInclude = browserRuntime
         ? []
         : withPackageDirs([
-            'flexsearch',
             'shiki',
-            'vscode-oniguruma',
-            'vscode-textmate',
           ])
 
       return {
@@ -157,6 +154,18 @@ export function createHistoireVitePlugin(ctx: Context, options: HistoireVitePlug
           ? (isServer ? 'browser-server' : 'browser-client')
           : (isServer ? 'server' : 'client')),
       }
+    },
+
+    /**
+     * Vitest runs once and creates its servers with `server.watch: null`, but
+     * the dev watch options returned above re-enable chokidar. A run cancelled
+     * while warmup transforms are in flight then re-adds files to the closed
+     * watcher (chokidar reopens on `add`), and those live `fs.watch` handles
+     * keep the isolated test worker from exiting after teardown.
+     * @param config The resolved Vite config, mutated before servers read it.
+     */
+    configResolved(config) {
+      if (browserRuntime) (config.server as { watch: unknown }).watch = null
     },
 
     options() {

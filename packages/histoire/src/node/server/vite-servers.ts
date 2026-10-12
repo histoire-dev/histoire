@@ -32,7 +32,9 @@ export async function createViteServers(ctx: Context, options: CreateServerOptio
       const base = options.middleware.base ?? viteConfig.base ?? '/'
       viteConfig.base = base
       if (collecting) {
-        viteConfig.server = { ...viteConfig.server, middlewareMode: true, hmr: false }
+        // Middleware-mode Vite still opens standalone WebSocket server on shared default port 24678 when `hmr` is
+        // disabled. Node-only collection has no browser clients, so disable it to avoid cross-process port conflicts.
+        viteConfig.server = { ...viteConfig.server, middlewareMode: true, hmr: false, ws: false }
       }
       else {
         proxyEvents = createHostingProxyEvents(options.middleware.httpServer, base, viteConfig.server.proxy)

@@ -9,7 +9,7 @@ import type {
   ScreenshotSetupStage,
 } from '@histoire/shared'
 import type { BrowserSetupDriver, BrowserSetupPackage, BrowserSetupPolicy } from './types.js'
-import { getScreenshotSetupCommand } from '@histoire/shared'
+import { getScreenshotSetupCommand, serializeScreenshotSetupCommand } from '@histoire/shared'
 import { hasUnconfirmedCleanup } from '../../cleanup.js'
 import { PreviewError } from '../errors.js'
 import { supportsSeparatedHeadlessShell } from './candidates.js'
@@ -98,10 +98,20 @@ export function browserSetupFailureMessage(reason: ScreenshotSetupReason): strin
 /** Creates a public setup failure while retaining the existing transport code. */
 export function createBrowserSetupPreviewError(
   reason: ScreenshotSetupReason,
-  snapshot: import('@histoire/shared').ScreenshotSetupSnapshot,
+  snapshot: ScreenshotSetupSnapshot,
 ): PreviewError {
   const dependency = reason === 'driver-missing' || reason === 'driver-invalid'
-  return new PreviewError(dependency ? 'DEPENDENCY_MISSING' : 'BROWSER_UNAVAILABLE', browserSetupFailureMessage(reason), true, snapshot)
+  const message = withRepairHint(browserSetupFailureMessage(reason), snapshot.repairs)
+  return new PreviewError(dependency ? 'DEPENDENCY_MISSING' : 'BROWSER_UNAVAILABLE', message, true, snapshot)
+}
+
+/**
+ * Appends the first fixed repair command so transports without the setup snapshot
+ * (MCP operations, CLI output) still surface an actionable step.
+ */
+function withRepairHint(message: string, repairs: readonly ScreenshotSetupRepair[]): string {
+  const repair = repairs.find(candidate => candidate.command)
+  return repair?.command ? `${message}. ${repair.label}: ${serializeScreenshotSetupCommand(repair.command)}` : message
 }
 
 /** Creates a generic failure when refreshed metadata invalidated diagnosis. */
