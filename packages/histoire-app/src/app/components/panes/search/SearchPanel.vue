@@ -2,7 +2,7 @@
 import type { HistoireSearchResult, HistoireTarget } from '@histoire/protocol'
 import type { ClientCommand } from '@histoire/shared'
 import type { createStandaloneCommands } from '../../../standalone/commands.js'
-import type { WorkbenchSearchState } from './controller.js'
+import type { WorkbenchSearchRuntime, WorkbenchSearchState } from './controller.js'
 import type { SearchScope, WorkbenchSearchResult } from './query.js'
 import { BuiltinIcon, HstButton } from '@histoire/controls/vue'
 import { getHistoireTargetKey } from '@histoire/protocol'
@@ -24,6 +24,8 @@ import SearchScopes from './SearchScopes.vue'
 const props = defineProps<{
   /** Existing standalone plugin actions and prompt context. */
   commands: ReturnType<typeof createStandaloneCommands>
+  /** Selected runtime owner; canvas frames hold prop metadata, not the canonical session. */
+  runtime?: WorkbenchSearchRuntime
 }>()
 const emit = defineEmits<{
   /** Completed canonical activation, retaining original docs anchor. */
@@ -49,7 +51,7 @@ const input = ref<HTMLInputElement | null>(null)
 const query = ref('')
 const scope = ref<SearchScope>('all')
 const state = shallowRef<WorkbenchSearchState>({ query: '', loading: false, results: [], error: null })
-const search = createWorkbenchSearchController(context.session, value => state.value = value)
+const search = createWorkbenchSearchController(context.session, value => state.value = value, props.runtime)
 useHistoireResource(search.close)
 let active = true
 let activationGeneration = 0

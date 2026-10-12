@@ -72,8 +72,10 @@ export function createStandaloneNavigation(selection: ReturnType<typeof createSt
     }
     finally { routeSelections-- }
   }
-  const off = router.afterEach(() => {
-    void synchronize()
+  const off = router.afterEach((_to, _from, failure) => {
+    // Failed or cancelled navigations leave the route unchanged. Replaying it
+    // would revert a selection whose own URL push was superseded.
+    if (!failure) void synchronize()
   })
   return { router, synchronize,
     /** Restore an already-selected target without invoking the SDK selection adapter. */

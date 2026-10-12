@@ -1,6 +1,8 @@
 import type { HistoireSession } from '@histoire/sdk/internal'
+import type { Ref } from 'vue'
 import type { LoadedProps, WorkbenchSearchResult } from './query.js'
 import { getHistoireTargetKey } from '@histoire/protocol'
+import { watch } from 'vue'
 import { rankSearchMatches } from '../../../../embed/search-match.js'
 import { matchLoadedProps, projectSearchResults, readPropNames } from './query.js'
 
@@ -16,8 +18,19 @@ export interface WorkbenchSearchState {
   error: unknown
 }
 
-/** Merge shared relevance while retaining generation guards in one request owner. */
-export function createWorkbenchSearchController(session: HistoireSession, publish: (state: WorkbenchSearchState) => void) {
+/** Snapshot of the session currently owning the selected runtime document. */
+export interface WorkbenchSearchRuntime {
+  /** Canonical snapshot, or the admitted canvas frame snapshot once bound. */
+  snapshot: Readonly<Ref<ReturnType<HistoireSession['getSnapshot']>>>
+}
+
+/**
+ * Merge shared relevance while retaining generation guards in one request owner.
+ * @param session Canonical session owning source search and catalog.
+ * @param publish Receives every published search state.
+ * @param runtime Optional runtime binding; canvas frames own selected runtime state, not the canonical session.
+ */
+export function createWorkbenchSearchController(session: HistoireSession, publish: (state: WorkbenchSearchState) => void, runtime?: WorkbenchSearchRuntime) {
   let active = true
   let generation = 0
   let timer: ReturnType<typeof setTimeout> | undefined
@@ -38,7 +51,13 @@ export function createWorkbenchSearchController(session: HistoireSession, publis
     // fallback, and removing those definitions must reveal it without refetching.
     if (active) publish({ query, loading, error, results: rankSearchMatches([...ranked, ...matchLoadedProps([...loaded.values()], session.getSnapshot().catalog.stories, query)]) })
   }
-  /** Only ready canonical state may add runtime-owned prop metadata. */
+  /** Only ready runtime-owned state may add prop metadata. */
+  function collect(snapshot: ReturnType<HistoireSession['getSnapshot']>) {
+    if (sourceKey(snapshot) === source && snapshot.status === 'ready' && !snapshot.stale && snapshot.runtime.status === 'ready' && snapshot.state && snapshot.state.runtimeId === snapshot.runtime.runtimeId) {
+      loaded.set(getHistoireTargetKey(snapshot.state.target), { target: snapshot.state.target, names: readPropNames(snapshot.state.value) })
+    }
+  }
+  /** Canonical publications own source invalidation; standalone canonical has no runtime once frames own it. */
   function observe(snapshot: ReturnType<HistoireSession['getSnapshot']>) {
     const key = sourceKey(snapshot)
     if (key !== source) {
@@ -49,9 +68,7 @@ export function createWorkbenchSearchController(session: HistoireSession, publis
       ranked = []
       schedule()
     }
-    if (snapshot.status === 'ready' && !snapshot.stale && snapshot.runtime.status === 'ready' && snapshot.state && snapshot.state.runtimeId === snapshot.runtime.runtimeId) {
-      loaded.set(getHistoireTargetKey(snapshot.state.target), { target: snapshot.state.target, names: readPropNames(snapshot.state.value) })
-    }
+    collect(snapshot)
     update()
   }
   /** Superseded requests remain observed but cannot publish or restore old targets. */
@@ -101,6 +118,13 @@ export function createWorkbenchSearchController(session: HistoireSession, publis
   }
   const off = session.subscribe(observe)
   observe(session.getSnapshot())
+  // Bound frame sessions publish selected runtime state the canonical session never receives.
+  const stopRuntime = runtime
+    ? watch(runtime.snapshot, (snapshot) => {
+        collect(snapshot)
+        update()
+      }, { immediate: true, flush: 'sync' })
+    : () => {}
   return {
     /** Set raw query; source search receives the same text as the existing modal. */
     search(value: string) {
@@ -113,6 +137,7 @@ export function createWorkbenchSearchController(session: HistoireSession, publis
       generation++
       clearTimeout(timer)
       off()
+      stopRuntime()
       loaded.clear()
       cache.clear()
     },

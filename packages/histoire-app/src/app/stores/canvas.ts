@@ -62,6 +62,7 @@ export function createCanvasStore(options: { storage?: CanvasStorage, singleView
   const preferences = readCanvasPreferences(options.storage)
   const state = reactive({ ...preferences, singleViewport: options.singleViewport ?? { mode: 'responsive' as const }, singleViewportSize: { width: 1, height: 1 }, singleViewportDraft: null as CanvasSize | null, arrangement: 'grid' as CanvasArrangement, zoom: preferences.zoomByArrange.grid, effectiveZoom: typeof preferences.zoomByArrange.grid === 'number' ? preferences.zoomByArrange.grid : 1, panOffset: { x: 32, y: 32 }, selectedFrame: null as string | null, viewport: { width: 0, height: 0 }, bounds: { x: 0, y: 0, width: 0, height: 0 }, inspectorWidth: 0, contentInsets: { topInset: 0, bottomInset: 0 }, frameBackgrounds: {} as Record<string, CanvasBackground>, panning: false })
   let selectionBounds: CanvasFitTarget | undefined
+  let fitBounds: CanvasFitTarget = state.bounds
   let singleArea: CanvasSize = { width: 0, height: 0 }
   const singleZoomListeners = new Set<SingleZoomListener>()
   /** Notify native scroll ownership before replacing the rendered scale. */
@@ -105,10 +106,11 @@ export function createCanvasStore(options: { storage?: CanvasStorage, singleView
       return save()
     }
     // Setup runs before ResizeObserver measures; fitting an empty viewport would lock at 10%.
-    const content = contentRect()
-    if (!content.width || !content.height) return save()
-    const transform = fitCanvas(state.bounds, state.viewport, { padding: 32, inspectorWidth: state.inspectorWidth, ...state.contentInsets })
-    applyTransform(transform, 0.0001)
+    const transform = frameTransform(fitBounds)
+    if (!transform) return save()
+    // Static bounds converge through reactive relayout, so a dead band stops it early. Zoom-dependent
+    // bounds are already solved at a fixed point; applying them exactly keeps screen-space chrome in view.
+    applyTransform(transform, typeof fitBounds === 'function' ? undefined : 0.0001)
     save()
   }
   /** Switch zoom around current visible point rather than jumping canvas origin. */
@@ -133,15 +135,16 @@ export function createCanvasStore(options: { storage?: CanvasStorage, singleView
     state.singleViewportSize = size
     if (state.arrangement === 'single' && state.zoom === 'fit') fit()
   }
-  /** Geometry comes from canvas adapter, never transformed DOM dimensions. */
-  function setGeometry(viewport: CanvasSize, bounds: CanvasRect, inspectorWidth = 0, insets: CanvasContentInsets = {}, selectedBounds?: CanvasFitTarget) {
+  /** Geometry comes from canvas adapter, never transformed DOM dimensions; bounds may depend on zoom. */
+  function setGeometry(viewport: CanvasSize, bounds: CanvasFitTarget, inspectorWidth = 0, insets: CanvasContentInsets = {}, selectedBounds?: CanvasFitTarget) {
     // Every measurement replaces ownership; an absent selection retires old frame bounds.
     selectionBounds = selectedBounds
     const nextInsets = { topInset: Math.max(0, insets.topInset ?? 0), bottomInset: Math.max(0, insets.bottomInset ?? 0) }
     // Moving between arrangements moves their content origin while keeping explicit zoom and pan.
     if (state.arrangement !== 'single' && typeof state.zoom === 'number' && nextInsets.topInset !== state.contentInsets.topInset) state.panOffset = { x: state.panOffset.x, y: state.panOffset.y + nextInsets.topInset - state.contentInsets.topInset }
     state.viewport = viewport
-    state.bounds = bounds
+    fitBounds = bounds
+    state.bounds = typeof bounds === 'function' ? bounds(state.effectiveZoom) : bounds
     state.inspectorWidth = inspectorWidth
     state.contentInsets = nextInsets
     if (state.zoom === 'fit') fit()

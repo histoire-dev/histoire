@@ -22,8 +22,10 @@ export interface WorkspacePaneActivation {
   selection: () => HistoireTarget | null
   /** Standalone navigation adapter owned by the current workbench. */
   navigation: WorkspacePaneNavigation
-  /** Reveals the requested local pane only after page routing succeeds. */
+  /** Reveals the requested local pane only after leaving Settings succeeds. */
   showPane: (pane: WorkspacePane) => void
+  /** Workspace rail toggle: an already open pane collapses, another pane opens. */
+  togglePane: (pane: WorkspacePane) => void
 }
 
 /**
@@ -37,7 +39,10 @@ export async function activateWorkspacePane(options: WorkspacePaneActivation): P
     if (options.currentRoute() !== (target ? 'story' : 'home')) {
       throw new Error('Could not leave Settings before opening workspace pane.')
     }
+    // Settings hides every pane, so leaving it must always reveal the requested one.
+    options.showPane(options.pane)
+    return true
   }
-  options.showPane(options.pane)
+  options.togglePane(options.pane)
   return true
 }

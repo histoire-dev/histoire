@@ -162,7 +162,8 @@ const { insets: contentInsets, headerBounds, measure } = useCanvasGeometry({
       return
     }
     const selected = selectedFrame.value
-    canvas.setGeometry(size, canvasFrameBounds(frames.value), props.inspectorWidth, insets, selected ? zoom => fitBoundsForFrame(selected, zoom) : undefined)
+    // Fixed-pixel labels and gaps make extent zoom-dependent; Fit solves it without relayout feedback.
+    canvas.setGeometry(size, zoom => canvasFrameBounds(layoutFrames(zoom)), props.inspectorWidth, insets, selected ? zoom => fitBoundsForFrame(selected, zoom) : undefined)
     // Selection can arrive before the host has measurable dimensions; reveal it once ready.
     if (initialFocusPending && selectedFrame.value && size.width > props.inspectorWidth && size.height > (insets.topInset ?? 0) + (insets.bottomInset ?? 0)) {
       viewBinding.focusInitialFrame(selectedFrame.value)
@@ -250,7 +251,8 @@ onBeforeUnmount(() => {
   stopInteractions()
   frameState.dispose()
 })
-defineExpose({ canvas, registry })
+// Layout covers virtualized offscreen frames that registry (mounted frames only) cannot resolve.
+defineExpose({ canvas, registry, getFrameLayout: (id: string) => frames.value.find(frame => frame.id === id) })
 </script>
 
 <template>

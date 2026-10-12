@@ -1,5 +1,6 @@
 import type { HistoireSession } from '@histoire/sdk/internal'
 import type { HistoireTestsModel } from '@histoire/vue/internal'
+import type { CanvasFrameLayout } from '../components/canvas/frame-layout.js'
 import type { CanvasFrames } from '../composables/canvas-settings.js'
 import type { CanvasStore } from '../stores/canvas.js'
 import type { createStandaloneCommands } from './commands.js'
@@ -13,6 +14,8 @@ export interface WorkbenchCanvas {
   canvas: CanvasStore
   /** Mounted preview records retain exact frame-specific SDK sessions. */
   registry: CanvasFrames
+  /** Resolve current arrangement layout for any frame, including virtualized offscreen ones. */
+  getFrameLayout: (id: string) => CanvasFrameLayout | undefined
 }
 
 /** Explicit standalone ownership passed into the native workbench. */

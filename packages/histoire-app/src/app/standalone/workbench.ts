@@ -175,9 +175,10 @@ export function useWorkbench(props: WorkbenchProps, error: (error: unknown) => v
     getOwner: () => JSON.stringify([searchQuery.value, snapshot.value.source?.sourceId, snapshot.value.source?.epoch, snapshot.value.source?.revision, story.value?.id, arrange.value]),
     getSelected: () => snapshot.value.selection ? getHistoireTargetKey(snapshot.value.selection) : undefined,
     reveal: (key) => {
-      const entry = canvas.value?.registry.getFrame(key)
-      if (!entry || entry.storyId !== story.value?.id || key !== getHistoireTargetKey(entry)) return false
-      canvas.value!.canvas.revealFrame({ id: key, storyId: entry.storyId, variantId: entry.variantId, ...entry.rect })
+      // Offscreen matches are virtualized out of registry; reveal from layout so stepping can bring them back.
+      const frame = canvas.value?.getFrameLayout(key)
+      if (!frame || frame.storyId !== story.value?.id || key !== getHistoireTargetKey(frame)) return false
+      canvas.value!.canvas.revealFrame(frame)
       return true
     },
   })
@@ -253,6 +254,7 @@ export function useWorkbench(props: WorkbenchProps, error: (error: unknown) => v
       selection: () => snapshot.value.selection,
       navigation: props.navigation,
       showPane,
+      togglePane: shell.selectPane,
     })
   }
   /** Search rail and keyboard entry share one input and one source index. */

@@ -89,6 +89,40 @@ describe('standalone URL adapter', () => {
     }
   })
 
+  it.each(['history', 'hash'] as const)('keeps accepted selection when its URL push is cancelled by a newer navigation in %s mode', async (mode) => {
+    const fixture = sourceFixture()
+    window.history.replaceState({}, '', '/book/')
+    const core = createHistoireSessionWithAdapters({ url: 'https://book.example/book/' }, fixture.adapters)
+    await core.connect()
+    const selection = createStandaloneSelection(core)
+    const errors = vi.fn()
+    const navigation = createStandaloneNavigation(selection, { base: '/book/', mode, error: errors })
+    try {
+      await navigation.router.push('/story/a:b?variantId')
+      await navigation.synchronize()
+      expect(core.getSnapshot().selection).toEqual({ storyId: 'a:b', variantId: null })
+      const variants: (string | null | undefined)[] = []
+      const stop = core.subscribe(snapshot => variants.push(snapshot.selection?.variantId))
+      // Canvas List default selection can repeat before its first URL push settles;
+      // the second push cancels the first one.
+      const selecting = selection.session.selection.select({ storyId: 'a:b', variantId: 'other' })
+      const superseding = selection.session.selection.select({ storyId: 'a:b', variantId: 'other' })
+      await Promise.all([selecting, superseding])
+      await navigation.synchronize()
+      stop()
+      // Cancelled navigation never changed the route, so it must not replay the stale null target.
+      expect(variants.slice(variants.indexOf('other'))).not.toContain(null)
+      expect(core.getSnapshot().selection).toEqual({ storyId: 'a:b', variantId: 'other' })
+      expect(errors).not.toHaveBeenCalled()
+    }
+    finally {
+      navigation.close()
+      selection.close()
+      await core.dispose()
+      window.history.replaceState({}, '', '/')
+    }
+  })
+
   it.each(['history', 'hash'] as const)('opens docs-only tree target with legacy synthetic variant from active preview in %s mode', async (mode) => {
     const fixture = sourceFixture()
     const docs = fixture.descriptor.catalog.stories.find(story => story.id === 'docs')!

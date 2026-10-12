@@ -15,12 +15,14 @@ function fixture(route: string, selection: HistoireTarget | null) {
     currentRoute = 'home'
   })
   const showPane = vi.fn()
+  const togglePane = vi.fn()
   return {
     currentRoute: () => currentRoute,
     restore,
     home,
     showPane,
-    activate: (pane: WorkspacePane) => activateWorkspacePane({ pane, currentRoute: () => currentRoute, selection: () => selection, navigation: { restore, home }, showPane }),
+    togglePane,
+    activate: (pane: WorkspacePane) => activateWorkspacePane({ pane, currentRoute: () => currentRoute, selection: () => selection, navigation: { restore, home }, showPane, togglePane }),
   }
 }
 
@@ -36,15 +38,18 @@ describe('workbench workspace-pane navigation', () => {
     expect(subject.restore).toHaveBeenCalledWith(target)
     expect(subject.home).not.toHaveBeenCalled()
     expect(subject.showPane).toHaveBeenCalledWith(pane)
+    expect(subject.togglePane).not.toHaveBeenCalled()
   })
 
-  it('leaves normal Story and Home pane activations route-free', async () => {
+  it('toggles normal Story and Home pane activations without routing', async () => {
     for (const route of ['story', 'home']) {
       const subject = fixture(route, target)
       await expect(subject.activate('search')).resolves.toBe(true)
       expect(subject.restore).not.toHaveBeenCalled()
       expect(subject.home).not.toHaveBeenCalled()
-      expect(subject.showPane).toHaveBeenCalledWith('search')
+      // Workspace rail buttons collapse their own already-open pane.
+      expect(subject.togglePane).toHaveBeenCalledWith('search')
+      expect(subject.showPane).not.toHaveBeenCalled()
     }
   })
 
@@ -65,5 +70,6 @@ describe('workbench workspace-pane navigation', () => {
     await expect(subject.activate('comments')).rejects.toThrow('Could not leave Settings before opening workspace pane.')
 
     expect(subject.showPane).not.toHaveBeenCalled()
+    expect(subject.togglePane).not.toHaveBeenCalled()
   })
 })

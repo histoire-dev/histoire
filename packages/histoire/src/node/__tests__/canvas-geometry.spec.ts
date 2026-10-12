@@ -127,12 +127,11 @@ describe('canvas geometry ownership', () => {
 
   it.each(['grid', 'list'] as const)('converges %s Fit with screen-space labels below header and above footer', (arrange) => {
     const canvas = createCanvasStore()
-    let frames = layoutCanvasFrames('story', ['a', 'b', 'c', 'd'], bounds, arrange)
-    for (let index = 0; index < 40; index++) {
-      canvas.setGeometry({ width: 1200, height: 900 }, canvasFrameBounds(frames), 300, { topInset: 120, bottomInset: 60 })
-      frames = layoutCanvasFrames('story', ['a', 'b', 'c', 'd'], bounds, arrange, 3, canvas.effectiveZoom)
-    }
-    const extent = canvasFrameBounds(frames)
+    /** Whole-canvas extent with fixed-pixel labels and gaps resolved at a candidate zoom. */
+    const extentAt = (zoom: number) => canvasFrameBounds(layoutCanvasFrames('story', ['a', 'b', 'c', 'd'], bounds, arrange, 3, zoom))
+    // One measurement must converge without relying on reactive relayout feedback.
+    canvas.setGeometry({ width: 1200, height: 900 }, extentAt, 300, { topInset: 120, bottomInset: 60 })
+    const extent = extentAt(canvas.effectiveZoom)
     const start = canvasToClient(extent, canvas.effectiveZoom, canvas.panOffset)
     const end = canvasToClient({ x: extent.width, y: extent.height }, canvas.effectiveZoom, canvas.panOffset)
     expect(start.x).toBeGreaterThanOrEqual(31.9)

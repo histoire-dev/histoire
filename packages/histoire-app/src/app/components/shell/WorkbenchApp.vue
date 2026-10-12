@@ -91,7 +91,7 @@ function setSelectedSession(session: HistoireSession | undefined): void {
       <StoriesPanel ref="storiesPanel" :folders="folders" @select="shell.closePanelAfterSelection" @fit="fitVariant" @error="emit('error', $event)" />
     </template>
     <template #search>
-      <SearchPanel ref="search" :commands="commands" @select="workbench.searchSelected" @isolated="workbench.openIsolated" @highlight="highlighted = $event" @query="searchQuery = $event" @next-match="workbench.nextMatch" @close="workbench.closeSearch" @error="emit('error', $event)" />
+      <SearchPanel ref="search" :commands="commands" :runtime="runtime" @select="workbench.searchSelected" @isolated="workbench.openIsolated" @highlight="highlighted = $event" @query="searchQuery = $event" @next-match="workbench.nextMatch" @close="workbench.closeSearch" @error="emit('error', $event)" />
     </template>
     <template #tests>
       <TestsPanel v-if="TestsPanel" @select="workbench.testsSelected" @error="emit('error', $event)" />
