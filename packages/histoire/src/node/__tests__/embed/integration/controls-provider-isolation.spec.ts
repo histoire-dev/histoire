@@ -23,7 +23,7 @@ describe('controls provider lifecycle isolation', () => {
         window.unavailableSession=createHistoireSession({url:${JSON.stringify(fixture.bookUrl)}});await unavailableSession.connect();await unavailableSession.selection.select({storyId:'controls',variantId:'generic'});
         window.unavailableApp=createApp({render:()=>h(HistoireProvider,{session:unavailableSession},{default:()=>h(HistoireControls)})});unavailableApp.mount(element);
       })()`)
-      expect(await page.locator('#unavailable').textContent()).toContain('Preview unavailable')
+      expect(await page.locator('#unavailable').textContent()).toContain('Variant unavailable')
       expect(page.frames().filter(frame => frame.url().includes('__sandbox.html'))).toHaveLength(frameCount)
       const documentId = new URL(embedCustomControlsFrame(page).url()).searchParams.get('documentId')!
       const customMountId = await page.evaluate('controlsMounts[0].id') as string

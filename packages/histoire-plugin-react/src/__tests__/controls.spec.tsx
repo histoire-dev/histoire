@@ -101,11 +101,13 @@ it('keeps React context, events, and ownership for every repeated Vue slot', asy
   function Preview() {
     const text = useContext(Context)
     useEffect(() => cleanup, [])
-    return <button type="button" onClick={onClick}>{text}</button>
+    return <button type="button" data-react-slot onClick={onClick}>{text}</button>
   }
   const preview = <><Preview /></>
   const target = document.createElement('div')
   const root = createRoot(target)
+  /** Only React slot buttons; token details also render copy buttons. */
+  const slotButtons = () => Array.from(target.querySelectorAll<HTMLButtonElement>('button[data-react-slot]'))
   /** Wait for both frameworks before inspecting repeated portals. */
   async function render(tokens: Record<string, number>, text: string) {
     flushSync(() => root.render(
@@ -114,20 +116,20 @@ it('keeps React context, events, and ownership for every repeated Vue slot', asy
       </Context.Provider>,
     ))
     await nextTick()
-    await vi.waitFor(() => expect(target.querySelectorAll('button')).toHaveLength(Object.keys(tokens).length))
+    await vi.waitFor(() => expect(slotButtons()).toHaveLength(Object.keys(tokens).length))
   }
   try {
     await render({ a: 1, b: 2 }, 'sample')
-    const initialButtons = Array.from(target.querySelectorAll('button'))
+    const initialButtons = slotButtons()
     expect(initialButtons.map(button => button.textContent)).toEqual(['sample', 'sample'])
     initialButtons.forEach(button => button.click())
     expect(onClick).toHaveBeenCalledTimes(2)
     await render({ b: 2, a: 1 }, 'updated')
-    expect(Array.from(target.querySelectorAll('button'))).toEqual([initialButtons[1], initialButtons[0]])
-    expect(Array.from(target.querySelectorAll('button')).map(button => button.textContent)).toEqual(['updated', 'updated'])
+    expect(slotButtons()).toEqual([initialButtons[1], initialButtons[0]])
+    expect(slotButtons().map(button => button.textContent)).toEqual(['updated', 'updated'])
     expect(cleanup).not.toHaveBeenCalled()
     await render({ b: 2 }, 'remaining')
-    expect(target.querySelector('button')).toBe(initialButtons[1])
+    expect(slotButtons()).toEqual([initialButtons[1]])
     expect(target.contains(initialButtons[0])).toBe(false)
     await vi.waitFor(() => expect(cleanup).toHaveBeenCalledOnce())
   }

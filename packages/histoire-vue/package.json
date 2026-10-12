@@ -46,6 +46,7 @@
     "vue-virtual-scroller": "^3.0.5"
   },
   "devDependencies": {
+    "@histoire/shared": "workspace:^",
     "@vue/test-utils": "^2.4.6",
     "concurrently": "^9.1.0",
     "jsdom": "^27.4.0",

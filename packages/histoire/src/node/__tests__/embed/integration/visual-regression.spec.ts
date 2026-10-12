@@ -11,6 +11,7 @@ import { createVisualService } from '../../../../../dist/node/visual/service.js'
 import { resolveVisualSource } from '../../../../../dist/node/visual/source.js'
 import { createEmbedBridgeFixture } from '../../utils/embed/bridge-fixture.js'
 import { createEmbedVueProject } from '../../utils/embed/vue-project.js'
+import { openVisualTestsPane } from '../../utils/embed/workbench.js'
 import { createMcpFrameworkProject } from '../../utils/mcp/framework-project.js'
 import { startMcpProcess } from '../../utils/mcp/process.js'
 
@@ -43,7 +44,8 @@ describe('visual consumer acceptance', () => {
     })
     try {
       await page.goto(`${fixture.bookUrl}#/story/card?variantId=one&arrange=matrix`, { waitUntil: 'domcontentloaded' })
-      await expect.poll(() => page.getByRole('button', { name: /^Select matrix cell / }).count()).toBe(4)
+      // Cold dev server optimizes dependencies before the first app render.
+      await expect.poll(() => page.getByRole('button', { name: /^Select matrix cell / }).count(), { timeout: 30_000 }).toBe(4)
       await page.getByRole('button', { name: /^Select matrix cell / }).first().click({ button: 'right' })
       expect(await page.getByRole('menuitem', { name: 'Compare to main', exact: true }).count()).toBe(0)
       release()
@@ -67,8 +69,7 @@ describe('visual consumer acceptance', () => {
       await page.getByRole('button', { name: 'Add visual cases', exact: true }).click()
       await expect.poll(() => page.getByRole('button', { name: 'Add visual cases', exact: true }).isEnabled()).toBe(true)
       expect((await definitions()).length).toBe(2)
-      await page.getByRole('navigation', { name: 'Workbench' }).getByRole('button', { name: /^Tests/ }).click()
-      await page.getByRole('group', { name: 'Test type', exact: true }).getByRole('button', { name: 'Visual', exact: true }).click()
+      await openVisualTestsPane(page)
       const panel = page.getByRole('region', { name: 'Visual tests' })
       await panel.getByRole('button', { name: 'Run', exact: true }).click()
       await expect.poll(() => panel.getByRole('button', { name: /^Review / }).count(), { timeout: 60_000 }).toBe(4)
@@ -235,15 +236,8 @@ describe('visual consumer acceptance', () => {
     try {
       await page.goto(`${fixture.bookUrl}story/card?variantId=one`)
       await page.locator('iframe[title="Histoire variant"]').first().contentFrame().locator('[data-test-id="sandbox-render"] svg').waitFor()
-      await page.getByRole('navigation', { name: 'Workbench' }).getByRole('button', { name: /^Tests/ }).click()
-      await page.getByRole('group', { name: 'Test type', exact: true }).getByRole('button', { name: 'Visual', exact: true }).click()
+      await openVisualTestsPane(page)
       const panel = page.getByRole('region', { name: 'Visual tests' })
-      await page.waitForTimeout(1500)
-      await panel.locator('xpath=..').screenshot({ path: '/tmp/claude-1000/-home-akryum-Projects-histoire/f3aec729-b416-4244-9d3f-9839c434b242/scratchpad/pane.png' })
-      await page.getByRole('group', { name: 'Test type', exact: true }).getByRole('button', { name: 'Functional', exact: true }).click()
-      await page.waitForTimeout(500)
-      await page.getByRole('group', { name: 'Test type', exact: true }).locator('xpath=..').screenshot({ path: '/tmp/claude-1000/-home-akryum-Projects-histoire/f3aec729-b416-4244-9d3f-9839c434b242/scratchpad/pane-functional.png' })
-      await page.getByRole('group', { name: 'Test type', exact: true }).getByRole('button', { name: 'Visual', exact: true }).click()
       await panel.getByRole('button', { name: 'Run', exact: true }).click()
       await expect.poll(async () => ({ rows: await panel.getByRole('button', { name: /^Review / }).count(), issue: await panel.getByRole('alert').allTextContents(), text: await panel.textContent() }), { timeout: 30_000 }).toMatchObject({ rows: 2, issue: [] })
       await page.getByRole('button', { name: /^Review Card › One small,/ }).click()

@@ -11,7 +11,7 @@ onTest(({canvas})=>{
 </script><template><Story id="tests"><Variant id="pass"><button>pass</button></Variant><Variant id="fail"><button>fail</button></Variant><Variant id="slow"><button>slow pass</button></Variant></Story></template>`
 
 describe('explicit embedded test execution', () => {
-  it('collects and runs static preview once, rejects server mode, retires cancelled document', async () => {
+  it('collects and runs static preview once, rejects server mode, removes cancelled test workers', async () => {
     const fixture = await createEmbedBridgeFixture({ story })
     const page = await fixture.browser.newPage()
     try {
@@ -28,12 +28,16 @@ describe('explicit embedded test execution', () => {
       const fail = await page.evaluate('session.tests.run({mode:"preview"})')
       expect(fail).toMatchObject({ ok: false, failed: 1, total: 2 })
       await page.evaluate('session.selection.select({storyId:"tests",variantId:"slow"})')
+      const slowRuntimeId = await page.evaluate('session.getSnapshot().runtime.runtimeId')
       await page.evaluate('window.abort=new AbortController(); void(window.pending=session.tests.run({mode:"preview",signal:abort.signal}).then(()=>"unexpected",error=>error.code))')
       await page.waitForTimeout(250)
       await page.evaluate('abort.abort()')
       expect(await page.evaluate('pending')).toBe('CANCELLED')
-      await expect.poll(() => page.evaluate('session.getSnapshot().runtime.status')).toBe('stale')
-      expect(page.frames().some(frame => frame.url().includes('__sandbox.html'))).toBe(false)
+      // Cases run in isolated hidden worker documents: cancellation removes them and keeps primary runtime usable.
+      await expect.poll(() => page.frames().some(frame => frame.url().includes('testWorker=true'))).toBe(false)
+      expect(await page.evaluate('session.getSnapshot().runtime')).toMatchObject({ status: 'ready', runtimeId: slowRuntimeId })
+      await page.evaluate('session.selection.select({storyId:"tests",variantId:"pass"})')
+      expect(await page.evaluate('session.tests.run({mode:"preview"})')).toMatchObject({ ok: true, total: 2, passed: 2 })
       await page.evaluate('primary.unmount(); session.dispose()')
     }
     finally {

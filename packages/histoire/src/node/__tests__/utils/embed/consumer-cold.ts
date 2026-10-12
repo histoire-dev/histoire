@@ -1,3 +1,4 @@
+import { stripVTControlCharacters } from 'node:util'
 import { expect } from 'vitest'
 import { launchEmbedBrowser } from './browser.js'
 import { attemptEmbedPrimary } from './primary-session.js'
@@ -11,7 +12,8 @@ export async function proveConsumerColdSource(hostOrigin: string, sourceUrl: str
     const interrupted = await attemptEmbedPrimary(page, sourceUrl, { storyId: 'deterministic', variantId: 'normal' }, 'explorer')
     if (interrupted) {
       expect(interrupted).toEqual({ code: 'NOT_CONNECTED', status: 'disconnected', stale: true })
-      expect(sourceLog()).toMatch(/new dependencies optimized: vue[\s\S]*optimized dependencies changed\. reloading/)
+      // Vite colors dependency names, so compare plain log text.
+      expect(stripVTControlCharacters(sourceLog())).toMatch(/new dependencies optimized: vue[\s\S]*optimized dependencies changed\. reloading/)
     }
     else {
       // Already warm/default readiness improvements remain valid; no replay is needed.

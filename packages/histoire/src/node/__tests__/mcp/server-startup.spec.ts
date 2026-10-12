@@ -19,6 +19,8 @@ vi.mock('../../collect/index.js', () => ({ useCollectStories: vi.fn() }))
 vi.mock('../../load.js', () => ({ useModuleLoader: () => ({}) }))
 vi.mock('../../plugin.js', () => ({ DevPluginApi: class {} }))
 vi.mock('../../server/dev-events.js', () => ({ registerDevEvents: vi.fn() }))
+// Client warmup drives real Vite environments; startup ordering only needs its completion.
+vi.mock('../../server/client-ready.js', () => ({ prepareDevClient: vi.fn(async () => {}) }))
 // Startup tests own acquisition plumbing. Feature registration is a boundary:
 // real ACP/config/comment initialization must not inspect user settings here.
 vi.mock('../../server/ui-channel/index.js', () => ({ registerUiChannel: vi.fn() }))
@@ -47,7 +49,7 @@ describe('dev startup ownership', () => {
     channel = { close: channelClose }
     vi.mocked(registerUiChannel).mockReturnValue(channel)
     vi.mocked(registerAgentsChannel).mockReturnValue({} as any)
-    server = { close: serverClose, listen: vi.fn(async () => {}), config: { server: {} }, ws: { send: vi.fn() }, moduleGraph: { getModuleById: () => undefined } }
+    server = { close: serverClose, listen: vi.fn(async () => {}), config: { server: {} }, ws: { send: vi.fn() }, watcher: { on: vi.fn(), off: vi.fn(), add: vi.fn() }, moduleGraph: { getModuleById: () => undefined } }
     vi.mocked(createViteServers).mockResolvedValue({ nodeServer: { close: nodeClose } as any, server, viteConfigFile: undefined })
     vi.mocked(watchStories).mockResolvedValue({ ready: Promise.resolve(), close: storyClose } as any)
     vi.mocked(createMarkdownFilesWatcher).mockImplementation(async (ctx) => {

@@ -1,6 +1,6 @@
 /// <reference types="cypress" />
 
-import { selectCanvasVariant, visitStories } from '../../../cypress/workbench-actions.js'
+import { getTreeStory, selectCanvasVariant, visitStories } from '../../../cypress/workbench-actions.js'
 
 describe('Vitest story runtime', () => {
   it('reopens the story without losing the manual Vitest mock state', () => {
@@ -10,7 +10,7 @@ describe('Vitest story runtime', () => {
 
     cy.assertMockedGreeting()
 
-    cy.get('[data-test-id="story-list-item"]').contains('BaseButton').click()
+    getTreeStory('BaseButton').click()
     cy.location('pathname').should('include', '/story/src-components-basebutton-story-vue')
 
     cy.openVitestStory()
@@ -20,7 +20,7 @@ describe('Vitest story runtime', () => {
   it('renders custom controls of a mocked story through the controls sandbox', () => {
     cy.viewport(1600, 1000)
     visitStories()
-    cy.get('[data-test-id="story-list-item"]').contains('Vitest Mocking').click()
+    getTreeStory('Vitest Mocking').click()
     selectCanvasVariant('mocked with controls', 'src-components-vitestmocking-story-vue-1')
 
     // The host cannot render the #controls slot of a mocked story itself —

@@ -26,6 +26,9 @@ describe('numeric matrix browser acceptance', () => {
         return value && [value.getAttribute('data-count'), value.getAttribute('data-amount'), value.getAttribute('data-count-type'), value.getAttribute('data-amount-type')].join('/')
       }).sort()), { timeout: 30_000 }).toEqual(['0/3/number/number', '0/6/number/number', '0.1/3/number/number', '0.1/6/number/number', '0.2/3/number/number', '0.2/6/number/number', '0.3/3/number/number', '0.3/6/number/number'].sort())
       const editor = page.getByRole('group', { name: 'count numeric values', exact: true })
+      // Numeric editor stays collapsed until the axis edit action opens it.
+      const edit = page.getByRole('button', { name: 'Edit count values', exact: true })
+      await edit.click()
       await editor.getByRole('button', { name: 'Range', exact: true }).click()
       await editor.getByRole('textbox', { name: 'count min', exact: true }).fill('-1')
       await editor.getByRole('textbox', { name: 'count max', exact: true }).fill('0')
@@ -33,8 +36,11 @@ describe('numeric matrix browser acceptance', () => {
       await editor.getByRole('button', { name: 'Apply', exact: true }).click()
       await expect.poll(() => page.getByRole('button', { name: /^Select matrix cell / }).count()).toBe(6)
       await page.reload()
+      await edit.click()
       await expect.poll(() => page.getByRole('textbox', { name: 'count values', exact: true }).inputValue()).toBe('-1, -0.5, 0')
       await editor.getByRole('button', { name: 'Reset values', exact: true }).click()
+      // Reset closes the editor; reopen it to check restored source defaults.
+      await edit.click()
       await expect.poll(() => page.getByRole('textbox', { name: 'count values', exact: true }).inputValue()).toBe('0, 0.1, 0.2, 0.3')
       await expect.poll(() => page.getByRole('button', { name: /^Select matrix cell / }).count()).toBe(8)
       expect(errors).toEqual([])

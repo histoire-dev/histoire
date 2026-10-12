@@ -22,6 +22,8 @@ describe('Numeric props matrix', () => {
       }
     })
 
+    // Numeric editor stays collapsed until the axis edit action opens it.
+    cy.get('button[aria-label="Edit amount values"]').click()
     cy.get('[aria-label="amount numeric values"]').within(() => {
       cy.contains('button', /^Range$/).click()
       cy.get('input[aria-label="amount min"]').type('0')
@@ -37,9 +39,12 @@ describe('Numeric props matrix', () => {
     })
     cy.reload()
     cy.get('[aria-label^="Select matrix cell "]', { timeout: 20000 }).should('have.length', 8)
+    cy.get('button[aria-label="Edit amount values"]').click()
     cy.get('input[aria-label="amount values"]').should('have.value', '0, 0.1, 0.2, 0.3')
     cy.get('[aria-label="amount numeric values"]').contains('button', /^\s*Reset values\s*$/).click()
     cy.get('[aria-label^="Select matrix cell "]').should('have.length', 10)
+    // Reset closes the editor; reopen it to check restored source defaults.
+    cy.get('button[aria-label="Edit amount values"]').click()
     cy.get('input[aria-label="amount values"]').should('have.value', '0, 1, 2, 5, 10')
   })
 })

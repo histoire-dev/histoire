@@ -21,6 +21,42 @@ export function selectCanvasVariant(title, variantId) {
 }
 
 /**
+ * Scrolls the virtualized story tree until one story or folder row is mounted.
+ * @param {string} title Exact visible row title.
+ * @param {'story-list-item' | 'story-list-folder'} [testId] Row kind; stories by default.
+ * @returns {Cypress.Chainable<JQuery<HTMLElement>>} Mounted tree row.
+ */
+export function getTreeStory(title, testId = 'story-list-item') {
+  const scroller = '[aria-label="Story tree"] .vue-recycle-scroller'
+  /** @param {JQuery<HTMLElement>} $root Tree scroller or its subtree. */
+  const find = $root => $root.find(`[data-test-id="${testId}"]`).filter((_, row) => row.querySelector('.stories-label')?.textContent === title)
+  /**
+   * Recycled views render asynchronously after a scroll; wait until a mounted
+   * row covers the scroller's top edge so lookups never inspect a stale range.
+   * @param {JQuery<HTMLElement>} $scroller Tree scroller.
+   */
+  const rendered = ($scroller) => {
+    const bounds = $scroller[0].getBoundingClientRect()
+    const rows = $scroller.find('.stories-row, .stories-group').toArray().map(row => row.getBoundingClientRect())
+    expect(rows.some(row => row.top <= bounds.top + 1 && row.bottom > bounds.top), 'tree rendered at scroll position').to.equal(true)
+  }
+  cy.get(scroller).scrollTo('top', { ensureScrollable: false })
+  /** Half-viewport steps keep every row mounted across at least two checks. */
+  function step() {
+    cy.get(scroller).should(rendered).then(($scroller) => {
+      const element = $scroller[0]
+      const max = element.scrollHeight - element.clientHeight
+      if (find($scroller).length || element.scrollTop >= max) return
+      cy.wrap($scroller).scrollTo(0, Math.min(max, element.scrollTop + element.clientHeight / 2), { ensureScrollable: false })
+      step()
+    })
+  }
+  step()
+  // Final lookup retries while the last scroll position renders.
+  return cy.get(scroller).should($scroller => expect(find($scroller), `story row "${title}"`).to.have.length(1)).then(find)
+}
+
+/**
  * Returns selected retained document or admitted passive frame document.
  * @param {string} storyId Exact collected story identity.
  * @param {string} variantId Exact collected variant identity.

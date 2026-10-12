@@ -9,7 +9,7 @@ describe('Detected state pane in grid stories', () => {
    * Asserts visible detected state item count for selected variant.
    */
   function expectDetectedStateCount(count) {
-    cy.get('[aria-label="Controls"] .histoire-generic-controls > label').should('have.length', count)
+    cy.get('[aria-label="Controls"] .histoire-generic-controls > .histoire-state-control').should('have.length', count)
   }
 
   beforeEach(() => {

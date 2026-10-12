@@ -9,10 +9,13 @@ const selectedFrame = '[data-frame-id].is-selected iframe, [data-frame-id][data-
 /** Matrix provides finite axes and editable props in every arrangement. */
 const story = '/story/src-components-workbenchmatrix-story-vue?variantId=default'
 
+/** Horizontal offset clearing side panel resize handle, which straddles canvas edge by 4px. */
+const backgroundX = 12
+
 /** Open from canvas background through the real event handlers. */
 function openCanvasMenu(keyboard = false) {
   if (keyboard) cy.get(canvas).focus().trigger('keydown', { eventConstructor: 'KeyboardEvent', key: 'F10', shiftKey: true, force: true })
-  else cy.get(canvas).rightclick(2, 2)
+  else cy.get(canvas).rightclick(backgroundX, 2)
   cy.get(menu).should('be.visible')
 }
 

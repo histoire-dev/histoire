@@ -7,6 +7,7 @@ import { createVisualService } from '../../../../../dist/node/visual/service.js'
 import { resolveVisualSource } from '../../../../../dist/node/visual/source.js'
 import { launchEmbedBrowser } from '../../utils/embed/browser.js'
 import { createEmbedVueProject } from '../../utils/embed/vue-project.js'
+import { openVisualTestsPane } from '../../utils/embed/workbench.js'
 import { startMcpProcess } from '../../utils/mcp/process.js'
 
 /** Reuse real project-owned runtime and lane; recovery never replaces capture logic. */
@@ -103,8 +104,7 @@ describe('durable visual recovery consumer', () => {
       await server.ready
       await page.goto(`${server.url}#/story/one?variantId=main`)
       await page.locator('iframe[title="Histoire variant"]').first().contentFrame().locator('[data-test-id="sandbox-render"] svg').waitFor()
-      await page.getByRole('navigation', { name: 'Workbench' }).getByRole('button', { name: /^Tests/ }).click()
-      await page.getByRole('group', { name: 'Test type', exact: true }).getByRole('button', { name: 'Visual', exact: true }).click()
+      await openVisualTestsPane(page)
       return project
     }
     try {
@@ -129,9 +129,9 @@ describe('durable visual recovery consumer', () => {
       for (const client of devSource.server.ws.clients) client.socket.close()
       expect(await disconnected).toBe('')
       await connection
-      // Vite reloads document after restoring its socket; reopen same visual pane.
-      await page.getByRole('navigation', { name: 'Workbench' }).getByRole('button', { name: /^Tests/ }).click()
-      await page.getByRole('group', { name: 'Test type', exact: true }).getByRole('button', { name: 'Visual', exact: true }).click()
+      // Vite reloads document after restoring its socket: wait for replacement document before reading restored pane.
+      await expect.poll(() => page.evaluate(() => 'visualDisconnectState' in window).catch(() => true), { timeout: 30_000 }).toBe(false)
+      await openVisualTestsPane(page)
       await expect.poll(() => panel.getByRole('button', { name: /^\s*Run\s*$/ }).isEnabled(), { timeout: 30_000 }).toBe(true)
       expect(await panel.getByRole('alert').allTextContents()).toEqual([])
       expect(await panel.getByRole('button', { name: /^Review / }).count()).toBe(2)

@@ -16,7 +16,7 @@ describe('BaseButton grid detection', () => {
   }
 
   function expectNoDetectedState() {
-    cy.get('[aria-label="Controls"] .histoire-generic-controls > label').should('not.exist')
+    cy.get('[aria-label="Controls"] .histoire-generic-controls > .histoire-state-control').should('not.exist')
   }
 
   beforeEach(() => {

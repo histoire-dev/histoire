@@ -163,7 +163,7 @@ describe('project test discovery', () => {
       gate.resolve(empty)
       await operation
       await vi.waitFor(() => expect(model.visibleRows.value).toHaveLength(1))
-      expect(collectStory).toHaveBeenCalledExactlyOnceWith('a:b', expect.any(AbortSignal), expect.any(Function))
+      expect(collectStory).toHaveBeenCalledExactlyOnceWith('a:b', expect.any(AbortSignal), expect.any(Function), undefined)
     }
     finally {
       model.close()

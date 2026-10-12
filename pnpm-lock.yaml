@@ -1205,6 +1205,9 @@ importers:
         specifier: ^3.0.5
         version: 3.0.5(vue@3.5.26(typescript@5.6.3))
     devDependencies:
+      '@histoire/shared':
+        specifier: workspace:^
+        version: link:../histoire-shared
       '@vue/test-utils':
         specifier: ^2.4.6
         version: 2.4.6

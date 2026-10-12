@@ -1,3 +1,4 @@
+import type { Context } from '../context.js'
 import { mergeHistoireTestSummaries } from '@histoire/shared'
 import { afterEach, expect, it, vi } from 'vitest'
 import * as attachment from '../runtime/catalog/attachment.js'
@@ -15,7 +16,11 @@ it.each([createHistoireTestTask, createHistoireTestCollectionTask])('attributes 
     vi.spyOn(attachment, 'getRuntimeCatalogForContext').mockReturnValue({ catalog: fixture.catalog, ready: Promise.resolve(), close: () => {} })
     const summary = { ...mergeHistoireTestSummaries([]), execution: { runId: 'owned-run', mode: 'server' as const } }
     vi.doMock('../test/index.js', () => ({ runHistoireTests: vi.fn(async () => summary) }))
-    vi.doMock('../test/collect.js', () => ({ collectHistoireProjectTests: vi.fn(async () => ({ execution: summary.execution, variants: [] })) }))
+    // Collection must cover every admitted variant target, otherwise inventory validation rejects it.
+    vi.doMock('../test/collect.js', () => ({ collectHistoireProjectTests: vi.fn(async (ctx: Context) => ({
+      execution: summary.execution,
+      variants: ctx.storyFiles.flatMap(file => file.story!.variants.map(variant => ({ target: { storyId: file.story!.id, variantId: variant.id }, collection: { definitions: [] } }))),
+    })) }))
     const descriptor = createEmbedSource(fixture.context, fixture.catalog, 'local').getDescriptor()
     expect(descriptor.sourceId).not.toBe(fixture.catalog.current.projectId)
     const task = createTask(fixture.context, {})

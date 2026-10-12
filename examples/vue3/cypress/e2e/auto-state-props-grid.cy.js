@@ -14,12 +14,12 @@ describe('Auto State & Props grid story', () => {
 
   it('shows detected state for non-first variants that define init state', () => {
     // "Naked" declares no init state, so only its detected props show up.
-    cy.get('[aria-label="Controls"] .histoire-generic-controls > label').should('not.exist')
+    cy.get('[aria-label="Controls"] .histoire-generic-controls > .histoire-state-control').should('not.exist')
     cy.get('[aria-label="Controls"] fieldset').should('be.visible')
 
     selectCanvasVariant('State', 'src-components-autostateprops-story-vue-1')
 
-    cy.get('[aria-label="Controls"] .histoire-generic-controls > label').should('be.visible')
-    cy.get('[aria-label="Controls"] .histoire-generic-controls > label').contains('name').should('be.visible')
+    cy.get('[aria-label="Controls"] .histoire-generic-controls > .histoire-state-control').should('be.visible')
+    cy.get('[aria-label="Controls"] .histoire-generic-controls > .histoire-state-control').contains('name').should('be.visible')
   })
 })

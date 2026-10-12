@@ -2,6 +2,9 @@
 
 import { beginCommentDraft } from '../../../cypress/workbench-actions.js'
 
+/** Agents settings and AI comments exist only in development workbench. */
+const dev = Cypress.env('workbenchMode') === 'dev'
+
 /** Captures C1 acceptance states while exercising real native and sandbox controls. */
 describe('C1 shared controls acceptance', () => {
   beforeEach(() => cy.clearLocalStorage())
@@ -19,10 +22,13 @@ describe('C1 shared controls acceptance', () => {
         cy.contains('[aria-label="Density"] button', new RegExp(`^${density}$`)).click()
         cy.get('.histoire-settings-content').scrollTo('top', { ensureScrollable: false })
         cy.screenshot(`${name}-settings`)
-        cy.visit('/settings/agents')
-        cy.get('[role="switch"][aria-label="Enable local agents"]').should('match', 'input')
-        cy.get('[aria-label="File edit policy"] button').should('have.length', 3)
-        cy.screenshot(`${name}-agent-settings`)
+        // Agents settings need dev server; built workbench intentionally omits that section.
+        if (dev) {
+          cy.visit('/settings/agents')
+          cy.get('[role="switch"][aria-label="Enable local agents"]').should('match', 'input')
+          cy.get('[aria-label="File edit policy"] button').should('have.length', 3)
+          cy.screenshot(`${name}-agent-settings`)
+        }
         cy.visit('/story/src-components-workbenchmatrix-story-vue?variantId=default')
         cy.getPreviewIframeBody({ timeout: 20000 }).contains('Matrix message')
         cy.get('[aria-label="Controls"] [role="switch"]').should('exist')
@@ -58,8 +64,11 @@ describe('C1 shared controls acceptance', () => {
         cy.get('[aria-label="Custom width"]').should('be.visible')
         cy.screenshot(`${name}-toolbar`)
         cy.get('button[aria-label="Viewport"]').click()
-        beginCommentDraft()
-        cy.screenshot(`${name}-comments`)
+        // Comments for AI need dev server; built workbench omits their toolbar entry.
+        if (dev) {
+          beginCommentDraft()
+          cy.screenshot(`${name}-comments`)
+        }
       })
     }
   }

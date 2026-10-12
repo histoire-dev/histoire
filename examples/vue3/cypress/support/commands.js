@@ -4,7 +4,7 @@
 // More info: https://on.cypress.io/custom-commands
 // ***********************************************
 
-import { selectCanvasVariant } from '../../../cypress/workbench-actions.js'
+import { getTreeStory, selectCanvasVariant } from '../../../cypress/workbench-actions.js'
 import '../../../cypress/frame-commands.js'
 
 /**
@@ -14,7 +14,7 @@ import '../../../cypress/frame-commands.js'
  * preview. Explicit frame chrome also works when a prior variant was remembered.
  */
 Cypress.Commands.add('openVitestStory', () => {
-  cy.get('[data-test-id="story-list-item"]').contains('Vitest Mocking').click()
+  getTreeStory('Vitest Mocking').click()
   cy.location('pathname').should('include', '/story/src-components-vitestmocking-story-vue')
   selectCanvasVariant('mocked module in story setup', 'src-components-vitestmocking-story-vue-0')
   cy.location('search').should('include', 'variantId=src-components-vitestmocking-story-vue-0')

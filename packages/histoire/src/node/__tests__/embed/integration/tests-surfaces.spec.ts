@@ -1,9 +1,19 @@
+import type { Frame, Locator, Page } from 'playwright'
 import { describe, expect, it } from 'vitest'
 import { createEmbedBridgeFixture } from '../../utils/embed/bridge-fixture.js'
 import { createEmbedVueHostAssets } from '../../utils/embed/vue-host.js'
 
 const story = `<script>import{onTest}from'histoire/client';import{it,expect}from'vitest';onTest(({canvas})=>it('owned assertion',async()=>{if(canvas.textContent.includes('slow'))await new Promise(resolve=>setTimeout(resolve,5000));expect(canvas.textContent).toContain('pass')}))</script><template><Story id="tests"><Variant id="pass"><button>pass</button></Variant><Variant id="fail"><button>fail</button></Variant><Variant id="slow"><button>slow pass</button></Variant></Story></template>`
 const hostHtml = '<!doctype html><head><link rel="stylesheet" href="/native.css"></head><body><div id="mount" style="width:600px;height:400px"></div><div id="native"></div></body>'
+
+/**
+ * Starts server run from split Run menu. Menu popover may be teleported to provider overlay, so menu item is
+ * looked up from owning document rather than panel root.
+ */
+async function runOnServer(root: Locator | Frame, document: Page | Frame): Promise<void> {
+  await root.getByRole('button', { name: 'More test actions', exact: true }).click()
+  await document.getByRole('menuitem', { name: 'Run on server', exact: true }).click()
+}
 
 describe('independent test surfaces', () => {
   it('keeps cross-origin server tests denied by default before engine admission', async () => {
@@ -44,16 +54,16 @@ describe('independent test surfaces', () => {
       await expect.poll(() => iframe.getByLabel('Histoire tests').getByRole('status').textContent()).toBe('Not run')
       expect(await page.evaluate('session.getSnapshot().runtime.status')).toBe('absent')
       expect(page.frames().some(frame => frame.url().includes('__sandbox.html'))).toBe(false)
-      expect(await iframe.getByRole('button', { name: 'Run preview', exact: true }).isEnabled()).toBe(false)
-      await iframe.getByRole('button', { name: 'Run server', exact: true }).click()
+      expect(await iframe.getByRole('button', { name: 'Run tests', exact: true }).isEnabled()).toBe(false)
+      await runOnServer(iframe, iframe)
       await expect.poll(() => iframe.getByRole('status').textContent(), { timeout: 60_000 }).toContain('1 failed')
       expect(await page.locator('#native').getByRole('status').textContent()).toBe('Not run')
       await page.evaluate('session.selection.select({storyId:"tests",variantId:"pass"})')
-      await page.locator('#native').getByRole('button', { name: 'Run server', exact: true }).click()
+      await runOnServer(page.locator('#native'), page)
       await expect.poll(() => page.locator('#native').getByRole('status').textContent(), { timeout: 60_000 }).toContain('1 passed')
       expect(await page.evaluate('session.getSnapshot().runtime.status')).toBe('absent')
       await page.evaluate('session.selection.select({storyId:"tests",variantId:"slow"})')
-      await iframe.getByRole('button', { name: 'Run server', exact: true }).click()
+      await runOnServer(iframe, iframe)
       await page.waitForTimeout(250)
       await iframe.getByRole('button', { name: 'Cancel', exact: true }).click()
       await expect.poll(() => iframe.getByRole('status').textContent()).toBe('Cancelled')
