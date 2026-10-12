@@ -1,4 +1,5 @@
 import type { Browser, Page } from 'playwright'
+import { warmEmbedSandbox } from './warm-source.js'
 
 /** Real mocked story retains object option values and callbacks inside source runtime. */
 export const embedControlsStory = `<script lang="ts">
@@ -22,12 +23,7 @@ export const embedControlsHostHtml = `<!doctype html><html><head><style>body{mar
 
 /** Test-owned warm runtime completes cold dev optimization before consumer connection. */
 export async function warmEmbedControlsSource(browser: Browser, bookUrl: string): Promise<void> {
-  const page = await browser.newPage()
-  try {
-    await page.goto(new URL('__sandbox.html?storyId=controls&variantId=custom&embed=true', bookUrl).href)
-    await page.getByRole('button', { name: 'mocked-controls:2:Initial:Choice 0:0', exact: true }).waitFor({ timeout: 60_000 })
-  }
-  finally { await page.close() }
+  await warmEmbedSandbox(browser, bookUrl, { storyId: 'controls', variantId: 'custom' }, 'mocked-controls:2:Initial:Choice 0:0')
 }
 
 /** Same actual host Vue package build shared by native controls browser scenarios. */

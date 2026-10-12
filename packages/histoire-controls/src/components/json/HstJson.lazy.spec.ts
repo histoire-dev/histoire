@@ -21,7 +21,9 @@ function createDeferred<T>() {
   }
 }
 
-describe('json lazy editor boundary', () => {
+// Each test re-imports the whole controls entry after `vi.resetModules()`;
+// cold transforms exceed the default 5s under parallel CI package runs.
+describe('json lazy editor boundary', { timeout: 30_000 }, () => {
   it('keeps package imports light, forwards latest props and focus, and retires pending mounts', async () => {
     vi.resetModules()
     const editorModule = createDeferred<{ default: Component }>()

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { createEmbedBridgeFixture } from '../../utils/embed/bridge-fixture.js'
 import { attemptEmbedPrimary } from '../../utils/embed/primary-session.js'
+import { warmEmbedSandbox } from '../../utils/embed/warm-source.js'
 
 /** Existing built-in vanilla support uses DOM callbacks, not a host framework adapter. */
 const vanilla = `
@@ -17,6 +18,9 @@ export default{id:'vanilla',title:'Vanilla runtime',layout:{type:'grid',width:25
 describe('built-in vanilla runtime embeddability', () => {
   it.each(['dev', 'static'] as const)('keeps data lazy and canonical grid callbacks isolated in %s', async (mode) => {
     const fixture = await createEmbedBridgeFixture({ mode, copiedOutput: mode === 'static', config: 'storyMatch:[\'*.story.js\'],', files: { 'Native.story.js': vanilla } })
+    // Slow runners can finish cold dev optimization after mount readiness and
+    // retire the session mid-test; a separate page settles it first.
+    if (mode === 'dev') await warmEmbedSandbox(fixture.browser, fixture.bookUrl, { storyId: 'vanilla', variantId: 'one' }, 'one:3')
     const page = await fixture.browser.newPage({ viewport: { width: 1000, height: 750 } })
     const errors: string[] = []
     page.on('pageerror', error => errors.push(error.message))
