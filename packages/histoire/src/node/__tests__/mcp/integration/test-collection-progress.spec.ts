@@ -60,8 +60,10 @@ async function setup(){await fetch('${origin}/setup')}
     await vi.waitFor(() => expect(completed.get('healthy')).toBe(1), { timeout: 5000 })
     expect(performance.now() - started).toBeLessThan(5000)
     expect(completed.get('empty')).toBe(0)
+    // Healthy and Slow specs collect concurrently: healthy progress can publish
+    // before Slow's held setup request reaches the marker server.
+    await vi.waitFor(() => expect(pending.size).toBe(1), { timeout: 5000 })
     expect(completed.has('slow')).toBe(false)
-    expect(pending.size).toBe(1)
     expect(settled).toBe(false)
     const queued = services.execution.enqueue(createHistoireTestCollectionTask(context(), {}))
     expect(queued.state).toBe('queued')
@@ -121,7 +123,8 @@ async function setup(){await fetch('${origin}/setup')}
       await page.getByRole('button', { name: 'Refresh tests', exact: true }).click()
       await page.waitForFunction(`document.querySelector('.collection-progress')?.textContent.includes('2/3')`, undefined, { timeout: 5000 })
       expect(performance.now() - started).toBeLessThan(5000)
-      expect(pending.size).toBe(1)
+      // Same concurrent-spec ordering as above: 2/3 may precede the held request.
+      await vi.waitFor(() => expect(pending.size).toBe(1), { timeout: 5000 })
       await page.getByRole('button', { name: 'All', exact: true }).click()
       const healthy = page.getByRole('button', { name: /^Healthy \// })
       await healthy.waitFor({ timeout: 1000 })

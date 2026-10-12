@@ -97,7 +97,9 @@ describe('copied Node artifact without original project', () => {
     await fixture.addPlaywright()
     const browsers = resolve(fixture.root, 'empty browser cache')
     await mkdir(browsers)
-    const runtime = startMcpProcess([], fixture.unrelated, { HOST: '127.0.0.1', PORT: '0', HISTOIRE_MCP_TOKEN: token, PLAYWRIGHT_BROWSERS_PATH: browsers }, resolve(fixture.artifact, 'server.mjs'))
+    // Pin the default Playwright binary: `auto` would fall back to a system Chrome
+    // (preinstalled on CI runners at /opt/google/chrome), hiding the missing shell.
+    const runtime = startMcpProcess([], fixture.unrelated, { HOST: '127.0.0.1', PORT: '0', HISTOIRE_MCP_TOKEN: token, PLAYWRIGHT_BROWSERS_PATH: browsers, HISTOIRE_BROWSER_SOURCE: 'headless-shell' }, resolve(fixture.artifact, 'server.mjs'))
     let client: Awaited<ReturnType<typeof connectMcpHttp>> | undefined
     try {
       const endpoint = (await runtime.waitFor(/Histoire MCP: (http:\/\/\S+)/))[1]
