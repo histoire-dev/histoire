@@ -4,6 +4,7 @@ import type { ChildProcess } from 'node:child_process'
 import { spawn } from 'node:child_process'
 import { once } from 'node:events'
 import { createServer } from 'node:net'
+import { stripVTControlCharacters } from 'node:util'
 import { Client, StreamableHTTPClientTransport } from '@modelcontextprotocol/client'
 import { createPackageProcessEnvironment } from '../process-environment.js'
 import { MCP_BUILT_CLI } from './cli-project.js'
@@ -36,7 +37,8 @@ export function startMcpProcess(args: string[], cwd: string, environment: NodeJS
   let output = ''
   const listeners = new Set<() => void>()
   const append = (bytes: Buffer) => {
-    output = (output + bytes.toString()).slice(-32000)
+    // CI enables colors (e.g. Vite URLs); strip the whole buffer so codes split across chunks are removed too.
+    output = stripVTControlCharacters(output + bytes.toString()).slice(-32000)
     listeners.forEach(listener => listener())
   }
   child.stdout.on('data', append)

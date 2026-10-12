@@ -25,11 +25,11 @@ export async function createDevLauncherProject(createProject: () => Promise<{ ro
     }
     // Unbundled source UI dependency imports Vue through Histoire's vendor aliases.
     // Keep its importer private too, so aliases resolve one renderer rather than shared workspace Vue.
-    const scroller = await realpath(resolve(MCP_REPOSITORY_ROOT, 'packages/histoire-app/node_modules/vue-virtual-scroller'))
+    const scroller = await realpath(resolve(MCP_REPOSITORY_ROOT, 'packages/histoire-vue/node_modules/vue-virtual-scroller'))
     const privateScroller = resolve(repository, 'external/vue-virtual-scroller')
     await cp(scroller, privateScroller, { recursive: true })
     packages.set('vue-virtual-scroller', privateScroller)
-    await linkPrivateDependencies(resolve(MCP_REPOSITORY_ROOT, 'packages/histoire-app'), privateScroller, packages)
+    await linkPrivateDependencies(resolve(MCP_REPOSITORY_ROOT, 'packages/histoire-vue'), privateScroller, packages)
     for (const entry of entries) await linkPrivateDependencies(resolve(MCP_REPOSITORY_ROOT, 'packages', entry), resolve(repository, 'packages', entry), packages)
     await linkPrivateDependencies(MCP_REPOSITORY_ROOT, repository, packages)
     await cp(resolve(MCP_REPOSITORY_ROOT, 'tailwind.config.cjs'), resolve(repository, 'tailwind.config.cjs'))
