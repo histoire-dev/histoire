@@ -47,7 +47,17 @@ async function createPrimary(closing?: Promise<void>, standalone = false) {
   await session.connect()
   await session.selection.select({ storyId: 'a:b', variantId: 'c' })
   const wrapper = mount(HistoireProvider, { props: { session, onError: error => errors.push(error) }, slots: { default: () => h(HistoirePreview, { ref: preview, onReady }) }, attachTo: document.body })
-  await vi.waitFor(() => expect(wrapper.find('iframe').exists()).toBe(true))
+  // Observe attachment before queued MessagePort notifications are delivered.
+  // A fast story can acknowledge readiness within this same microtask turn.
+  await new Promise<void>((resolve) => {
+    if (wrapper.find('iframe').exists()) return resolve()
+    const observer = new MutationObserver(() => {
+      if (!wrapper.find('iframe').exists()) return
+      observer.disconnect()
+      resolve()
+    })
+    observer.observe(wrapper.element, { childList: true, subtree: true })
+  })
   /** Current frame messages carry exact document identity and selected target. */
   function publish(type = '__histoire:variant-ready', documentId?: string, error?: { message: string }) {
     const frame = wrapper.get('iframe').element as HTMLIFrameElement

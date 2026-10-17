@@ -56,7 +56,15 @@ export function mountLocalHistoireSurface(context: HistoireMountContext, sourceB
     instance = mountEmbedSurface(context.surface, { container: root, session: context.session, bridge: child, descriptor, signal: abort.signal, sourceBase, controlsCustomOnly: customOnly, standalone, presentation: context.presentation })
     return instance
   })
-  const ready = acquired.then(view => view.ready)
+  const ready = acquired.then(async (view) => {
+    const runtime = await view.ready
+    if (runtime) {
+      // Readiness can resolve before the port delivers earlier mounting events.
+      // A round trip drains those ordered publications before SDK adopts ready.
+      await parent.request('view.sync', context.session.getSnapshot(), { ...parent.getOwner(), signal: abort.signal })
+    }
+    return runtime
+  })
   void ready.catch(() => {})
   let off = () => {}
   try {
