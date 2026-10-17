@@ -1,4 +1,4 @@
-# Getting started with React
+# Getting started with React <Badge type="tip" text="1.0-beta.2+" />
 
 React 18 and 19 stories use `.story.tsx` or `.story.jsx` files with a default component export.
 

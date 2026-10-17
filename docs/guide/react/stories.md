@@ -1,4 +1,4 @@
-# React stories
+# React stories <Badge type="tip" text="1.0-beta.2+" />
 
 Each story file exports a default React component containing `Story`. Import `Story` and `Variant` from `@histoire/plugin-react`.
 

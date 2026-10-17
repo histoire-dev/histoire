@@ -13,13 +13,19 @@ export const setupVue3 = defineSetupVue3(({ addWrapper }) => {
 })
 ```
 
-The rendering will recursively occur in all the wrappers `default` slot. Wrappers also surround custom controls by default. Pass `{ controls: false }` for visual wrappers that should not add layout around inspector controls:
+The rendering will recursively occur in all the wrappers `default` slot.
+
+## Controls wrappers <Badge type="tip" text="1.0-beta.2+" />
+
+Wrappers also surround custom controls by default. Pass `{ controls: false }` for visual wrappers that should not add layout around inspector controls:
 
 ```ts
 addWrapper(WrapperGlobal, { controls: false })
 ```
 
 This keeps provider wrappers enabled for controls unless they opt out.
+
+## Wrapper example
 
 Here is an example for a wrapper component:
 

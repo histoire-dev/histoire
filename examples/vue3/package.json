@@ -7,6 +7,7 @@
     "dev:hst": "node ../../scripts/dev-histoire.mjs --source",
     "story:dev": "node ../../scripts/dev-histoire.mjs",
     "story:build": "histoire build",
+    "story:build:docs": "histoire build --config histoire.docs.config.ts",
     "story:preview": "histoire preview --port 4567",
     "ci": "start-server-and-test story:preview http://localhost:4567/ test",
     "test": "node ./cypress-parallel.mjs",

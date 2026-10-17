@@ -20,8 +20,11 @@
     "test:examples": "pnpm run -r --workspace-concurrency 1 --filter \"./examples/vue**\"  test:examples",
     "test:examples:all": "pnpm run -r --workspace-concurrency 1 --filter \"./examples/**\" test:examples",
     "release": "pnpm run lint && pnpm run test && pnpm run build && sheep release -b main --force",
-    "docs:dev": "vitepress dev docs",
-    "docs:build": "vitepress build docs",
+    "docs:demo": "pnpm --filter histoire-example-vue3 story:build:docs",
+    "docs:dev": "pnpm docs:demo && vitepress dev docs",
+    "docs:build": "pnpm docs:demo && vitepress build docs",
+    "docs:check": "node scripts/check-docs-demo.mjs",
+    "docs:screenshots": "node scripts/check-docs-demo.mjs --screenshots",
     "docs:serve": "vitepress serve docs",
     "update": "pnpm --recursive update --latest"
   },

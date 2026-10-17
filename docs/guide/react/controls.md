@@ -1,4 +1,4 @@
-# State and controls
+# State and controls <Badge type="tip" text="1.0-beta.2+" />
 
 Initialize state on `Story` or `Variant`. Render callbacks receive the variant's Vue reactive `state`. Mutating it updates both React preview and Histoire controls.
 

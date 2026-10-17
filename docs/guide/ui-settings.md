@@ -1,4 +1,4 @@
-# Workbench settings
+# Workbench settings <Badge type="tip" text="1.0-beta.2+" />
 
 Open Settings from the rail. General, Appearance, Viewports, Keyboard shortcuts, and About are available in development and static books. Tests, AI agents, and MCP server are development-only. Invalid or unavailable section URLs recover to Appearance.
 

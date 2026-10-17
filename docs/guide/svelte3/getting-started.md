@@ -34,6 +34,14 @@ Histoire is an Open-Source project supported by our sponsors - thank you!
   </a>
 </div>
 
+## Svelte 5 support <Badge type="tip" text="1.0-beta.2+" />
+
+Svelte 5 is supported alongside Svelte 4. Both use `@histoire/plugin-svelte` and the same story format.
+
+## SvelteKit 3 support <Badge type="tip" text="1.0-beta.2+" />
+
+SvelteKit 2 and 3 projects use `@histoire/plugin-svelte` alongside their existing SvelteKit Vite setup. Register `HstSvelte()` as shown below.
+
 ## Installation
 
 Install the `histoire` and `@histoire/plugin-svelte` packages into your project:

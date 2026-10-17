@@ -1,4 +1,4 @@
-# Comments for AI
+# Comments for AI <Badge type="tip" text="1.0-beta.2+" />
 
 In development, choose the Comment tool, press `C`, or choose **Comment for AI** from a frame menu. Click a preview point to open its composer. Histoire attaches the exact story and variant, the picked element selector when available, and JSON-safe state and prop overrides. **Attach screenshot** uses the existing screenshot executor and records its generated project-relative image path.
 

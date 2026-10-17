@@ -1,43 +1,38 @@
+<script setup>
+import { withBase } from 'vitepress'
+</script>
+
 <template>
-  <div class="!xl:hidden -mx-32 bg-gray-200 dark:bg-gray-900 p-2 rounded-lg h-[550px] flex flex-col relative">
-    <div class="flex-none h-4 flex gap-1 justify-end">
-      <div
-        v-for="n in 3"
-        :key="n"
-        class="w-2 h-2 rounded-full bg-gray-400"
-      />
-    </div>
-
-    <iframe
-      src="https://vue3.examples.histoire.dev/"
-      class="w-full h-full border border-none rounded bg-gray-200 dark:bg-gray-900"
-    />
-
-    <div class="absolute bottom-4 left-0 w-full flex justify-center pointer-events-none">
-      <a
-        v-tooltip="'Open demo in a new tab'"
-        href="https://vue3.examples.histoire.dev/"
-        target="_blank"
-        class="pointer-events-auto flex items-center justify-center w-16 h-16 rounded bg-primary-500 hover:bg-primary-400 text-white"
+  <div class="workbench-demo">
+    <a :href="withBase('/demo/')" target="_self" aria-label="Open demo">
+      <img
+        :src="withBase('/screenshots/workbench-light.png')"
+        alt="Histoire workbench with story variants, canvas tools and editable props"
+        class="light-only"
+        width="1600"
+        height="1000"
+        loading="lazy"
       >
-        <Icon
-          icon="oi:fullscreen-enter"
-          class="w-6 h-6"
-        />
-      </a>
-    </div>
+      <img
+        :src="withBase('/screenshots/workbench-dark.png')"
+        alt="Histoire workbench with story variants, canvas tools and editable props"
+        class="dark-only"
+        width="1600"
+        height="1000"
+        loading="lazy"
+      >
+    </a>
+    <a :href="withBase('/demo/')" target="_self" class="btn demo-action">
+      Open demo
+    </a>
   </div>
-
-  <a
-    href="https://vue3.examples.histoire.dev/"
-    target="_blank"
-    class="xl:hidden btn flex items-center gap-4 p-4 hover:no-underline"
-  >
-    <img
-      src="/logo.svg"
-      alt="Logo"
-      class="w-8 h-8"
-    >
-    Online demo
-  </a>
 </template>
+
+<style scoped>
+.workbench-demo { margin: 32px auto; max-width: 1280px; padding: 0 24px; text-align: center; }
+img { display: block; width: 100%; height: auto; border-radius: 12px; box-shadow: 0 12px 40px rgb(0 0 0 / .1); }
+.demo-action { display: inline-flex; margin-top: 20px; padding: 10px 20px; }
+.dark-only { display: none; }
+:global(.dark) .light-only { display: none; }
+:global(.dark) .dark-only { display: block; }
+</style>

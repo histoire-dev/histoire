@@ -1,4 +1,8 @@
-# Workbench navigation
+# Workbench layout <Badge type="tip" text="1.0-beta.2+" />
+
+<DemoPreview />
+
+Browse stories on the left, compare variants on the canvas, and edit the selected variant in the inspector. Use **Open demo** above to try the static book. Development adds tests, comments, screenshots and MCP activity.
 
 Use Stories, Search, Tests, Comments, or MCP activity in the left rail to change the side panel. Selecting its active button again collapses the panel. The collapse button near Settings also opens or closes the panel. Home and Settings keep their existing route navigation.
 
@@ -21,6 +25,10 @@ Static builds include Home, Stories, Search, appearance controls, panel collapse
 Press **Ctrl/⌘ Shift D** to switch light/dark appearance. **Ctrl/⌘ K** retains the story and command palette. The existing `theme.hideColorSchemeSwitch` option controls the appearance switch.
 
 Panel and inspector preferences use `_histoire-ui-shell`. Story URLs and their `variantId` and `tab` query parameters remain independent of these local preferences.
+
+## Hide and restore UI
+
+Choose **Hide UI** in the canvas toolbar or press **Ctrl/⌘ Shift H** to focus on the canvas. Right-click the canvas and choose **Show UI**, or use the same shortcut, to restore workbench controls. Context menus remain available while UI is hidden.
 
 ## Internal shell contracts
 

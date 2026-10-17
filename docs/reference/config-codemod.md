@@ -1,4 +1,4 @@
-# Config codemod
+# Config codemod <Badge type="tip" text="1.0-beta.2+" />
 
 Project settings use a Node-only codemod for explicit **Save to project** actions. It reads the existing `histoire.config.ts`, `histoire.config.js`, `.histoire.ts`, or `.histoire.js`. Config loading and merge precedence remain unchanged.
 

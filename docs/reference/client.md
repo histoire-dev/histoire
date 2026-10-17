@@ -48,7 +48,7 @@ import { toggleDark } from 'histoire/client'
 toggleDark(true)
 ```
 
-## `onTest`
+## `onTest` <Badge type="tip" text="1.0-beta.2+" />
 
 Registers story-scoped Vitest cases for the current variant.
 

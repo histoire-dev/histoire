@@ -2,7 +2,7 @@
 
 Histoire automatically adds your project's Tailwind design tokens under **Design System**. Tailwind CSS v3 and v4 are supported. No Tailwind installation means no generated stories.
 
-## Automatic design-system stories
+## Automatic design-system stories <Badge type="tip" text="1.0-beta.2+" />
 
 For **v3**, Histoire finds `tailwind.config.{js,cjs,mjs,ts}` in your project or its parents and resolves it using your project's Tailwind installation. The story keeps ID `tailwind`.
 
@@ -14,7 +14,7 @@ Use **Filter tokens** to search names and values literally. Typography variants 
 
 v4 styles preserve theme variables, contextual rules, and required utility declarations inside each source's scope. Application selectors and Tailwind preflight are excluded. v4 Full Config shows resolved CSS theme variables and source metadata rather than a synthesized v3 JavaScript config.
 
-## Select sources or disable generation
+## Select sources or disable generation <Badge type="tip" text="1.0-beta.2+" />
 
 Configure the built-in plugin through `tailwindTokens`, exported from `histoire`. A plugin with this name replaces the default instance.
 
@@ -34,7 +34,7 @@ To disable automatic stories:
 plugins: [tailwindTokens({ enabled: false })]
 ```
 
-## Changes and errors
+## Changes and errors <Badge type="tip" text="1.0-beta.2+" />
 
 Initial generation finishes before story collection starts. In development, changes to CSS, configuration, imported styles, and compatibility plugins refresh the generated story. A failed source reports its path and retains its last valid output until repaired. Removing an entry removes its generated story. Production generation errors fail the build.
 

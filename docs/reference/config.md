@@ -43,7 +43,7 @@ export default defineConfig({
 })
 ```
 
-## `mcp`
+## `mcp` <Badge type="tip" text="1.0-beta.2+" />
 
 `boolean | { enabled?: boolean, port?: number }` - Default: `true`
 
@@ -59,7 +59,7 @@ export default defineConfig({
 
 Node builds record the enabled policy, with runtime `--mcp`/`--no-mcp` overrides. Node ignores this dev-only port and uses the book listener. Deployed MCP requires a strong `HISTOIRE_MCP_TOKEN`.
 
-## `embed`
+## `embed` <Badge type="tip" text="1.0-beta.2+" />
 
 `{ enabled?: boolean, allowedOrigins?: string[], channels?: string[], allowOpenInEditor?: boolean, allowServerTests?: boolean }` - Default: disabled, no additional origins or channels, both command opt-ins false.
 
@@ -82,7 +82,7 @@ When enabled, book origin is allowed automatically. Additional origins must exac
 
 Built books can replace additional origins at deployment without rebuilding. Static output reads optional same-base `histoire-embed-origins.json` with `{ "version": 1, "allowedOrigins": [...] }`; Node deployment reads comma-separated `HISTOIRE_EMBED_ORIGINS`. Invalid present override permits book origin only. See [deployment headers](../guide/embedding.md#origins-and-deployment-headers) for matching `frame-ancestors`/host `frame-src` policies.
 
-## `preview`
+## `preview` <Badge type="tip" text="1.0-beta.2+" />
 
 `{ globals?: Record<string, string | number | boolean | null>, textDirection?: 'ltr' | 'rtl' }` - Default: empty globals, `'ltr'`.
 
@@ -99,7 +99,7 @@ export default defineConfig({
 
 Vue/Nuxt stories read `useHistoireGlobals()` from `histoire/client`; Svelte/vanilla use `useHistoireGlobalsStore()`. Initial appearance still comes from `theme.defaultColorScheme`. Grid variants share session globals. See [SDK settings](./sdk.md#snapshots-and-settings).
 
-## `browser`
+## `browser` <Badge type="tip" text="1.0-beta.2+" />
 
 `({ source?: 'auto' | 'headless-shell' | 'chromium' | 'chrome' | 'msedge' } | { source: 'executable', executablePath: string }) & { reuse?: boolean, idleTimeoutMs?: number }` - Default: `{ source: 'auto' }`; reuse is disabled.
 
@@ -148,7 +148,7 @@ Use `pnpm exec playwright-core install chromium --no-shell` for a core-only driv
 
 See [screenshot setup](../guide/ui-screenshots-mcp.md) for setup checks and targeted repairs. Development tests still require the separate Vitest dependencies described in the [browser testing guide](../guide/testing.md).
 
-## `build.target`
+## `build.target` <Badge type="tip" text="1.0-beta.2+" />
 
 `'static' | 'node'` - Default: `'static'`
 
@@ -160,7 +160,7 @@ export default defineConfig({
 })
 ```
 
-## `build.node.includeSource`
+## `build.node.includeSource` <Badge type="tip" text="1.0-beta.2+" />
 
 `boolean` - Default: `true`
 
@@ -396,8 +396,6 @@ Each object in the array is a preset with the following properties:
 - `color: string`: CSS color, `transparent`, `$checkerboard` (light checkerboard), or `$checkerboard-dark` (dark checkerboard).
 - `contrastColor?: string`: Contrast color of preset
 
-Toolbar always includes both checkerboard choices after configured colors. Configured checkerboard presets can override their labels and text contrast colors. Their palettes remain fixed, and image exports retain transparency.
-
 Default values are shown in the example below:
 
 ```ts
@@ -439,6 +437,10 @@ You can use current contrast color via the css variable `--histoire-contrast-col
   color: var(--histoire-contrast-color);
 }
 ```
+
+### Checkerboard backgrounds <Badge type="tip" text="1.0-beta.2+" />
+
+Toolbar always includes both checkerboard choices after configured colors. Configured checkerboard presets can override their labels and text contrast colors. Their palettes remain fixed, and image exports retain transparency.
 
 ## `autoApplyContrastColor`
 
@@ -574,7 +576,28 @@ export default defineConfig({
 })
 ```
 
-## `test.collectTimeout`
+## `visual` <Badge type="tip" text="1.0-beta.2+" />
+
+Enable built-in visual testing with `visual: {}`. Omit it to leave visual testing disabled.
+
+```ts
+export default defineConfig({
+  visual: {
+    baselineDir: '.histoire-visual',
+    baselineRef: 'main',
+    profiles: [
+      { id: 'desktop-light', width: 1024, height: 640, colorScheme: 'light' },
+    ],
+    threshold: 0.1,
+    maxDiffPixelRatio: 0,
+    includeAA: false,
+  },
+})
+```
+
+`exclude` filters story paths with glob patterns. Profiles can also set `deviceScaleFactor`, `backgroundColor`, `textDirection`, and scalar `globals`. See [visual testing](../guide/visual-testing.md) for capture requirements, baseline review, Matrix cases, and CLI/CI workflows.
+
+## `test.collectTimeout` <Badge type="tip" text="1.0-beta.2+" />
 
 `number` - Default: `120000`
 
@@ -588,7 +611,7 @@ export default defineConfig({
 })
 ```
 
-## `test.storyCollectTimeout`
+## `test.storyCollectTimeout` <Badge type="tip" text="1.0-beta.2+" />
 
 `number` - Default: `30000`
 
@@ -602,7 +625,7 @@ export default defineConfig({
 })
 ```
 
-## `test.runTimeout`
+## `test.runTimeout` <Badge type="tip" text="1.0-beta.2+" />
 
 `number` - Default: `300000`
 
@@ -616,7 +639,7 @@ export default defineConfig({
 })
 ```
 
-## `test.maxWorkers`
+## `test.maxWorkers` <Badge type="tip" text="1.0-beta.2+" />
 
 `number` - Default: available CPU parallelism
 
@@ -632,7 +655,7 @@ export default defineConfig({
 })
 ```
 
-## `theme.description`
+## `theme.description` <Badge type="tip" text="1.0-beta.2+" />
 
 `string` - Default: unset
 
@@ -644,7 +667,7 @@ export default defineConfig({
 })
 ```
 
-## `theme.fonts`
+## `theme.fonts` <Badge type="tip" text="1.0-beta.2+" />
 
 `{ sans?: string, mono?: string }`
 
@@ -663,7 +686,7 @@ export default defineConfig({
 })
 ```
 
-## `ui.defaultArrange`
+## `ui.defaultArrange` <Badge type="tip" text="1.0-beta.2+" />
 
 `'single' | 'grid' | 'list'` - Default: `'grid'`
 
@@ -675,14 +698,14 @@ export default defineConfig({
 })
 ```
 
-## `ui.matrix.numericValues`
+## `ui.matrix.numericValues` <Badge type="tip" text="1.0-beta.2+" />
 
 - Type: `number[]`
 - Default: `[0, 1, 2, 5, 10]`
 
 Ordered samples used by props matrix for numeric props without a complete runtime domain or explicit story values. Require 2–64 distinct finite numbers; duplicates are removed while preserving order. Invalid lists fail config resolution. Saved app overrides take precedence over story `matrix.axes` arrays or ranges, which override complete runtime domains and project samples. Resetting an axis restores its current source values. Same defaults apply to dev, static, and embedded books. See [props matrix](../guide/ui-matrix.md#numeric-values).
 
-## `ui.frameBudget`
+## `ui.frameBudget` <Badge type="tip" text="1.0-beta.2+" />
 
 `number` - Default: `6`
 
@@ -696,7 +719,7 @@ export default defineConfig({
 })
 ```
 
-## `agents.enabled`
+## `agents.enabled` <Badge type="tip" text="1.0-beta.2+" />
 
 `boolean` - Default: `false`
 
@@ -708,7 +731,7 @@ export default defineConfig({
 })
 ```
 
-## `agents.presets`
+## `agents.presets` <Badge type="tip" text="1.0-beta.2+" />
 
 `Array<{ id: string, name: string, command: string, args?: string[], env?: Record<string, string>, cwd?: string, default?: boolean }>` - Default: `[]`
 
@@ -726,7 +749,7 @@ export default defineConfig({
 })
 ```
 
-## `agents.permissions`
+## `agents.permissions` <Badge type="tip" text="1.0-beta.2+" />
 
 `{ fileEdits?: 'ask' | 'allow-src' | 'never', terminal?: 'ask' | 'allow' | 'never' }`
 
@@ -742,7 +765,7 @@ export default defineConfig({
 })
 ```
 
-## `comments.enabled`
+## `comments.enabled` <Badge type="tip" text="1.0-beta.2+" />
 
 `boolean` - Default: `true`
 
@@ -754,7 +777,7 @@ export default defineConfig({
 })
 ```
 
-## `comments.file`
+## `comments.file` <Badge type="tip" text="1.0-beta.2+" />
 
 `string` - Default: `'.histoire/comments.json'`
 
@@ -766,7 +789,7 @@ export default defineConfig({
 })
 ```
 
-## `build.changedSince`
+## `build.changedSince` <Badge type="tip" text="1.0-beta.2+" />
 
 `string` - Default: unset
 

@@ -1,4 +1,4 @@
-# Visual testing
+# Visual testing <Badge type="tip" text="1.0-beta.2+" />
 
 Histoire can capture story variants, compare approved PNGs, and review changes locally or in CI. Enable it in your project config:
 

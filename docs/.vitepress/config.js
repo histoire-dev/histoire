@@ -46,7 +46,7 @@ module.exports = {
                 link: '/guide/react/getting-started',
               },
               {
-                text: 'Svelte 3',
+                text: 'Svelte',
                 link: '/guide/svelte3/getting-started',
               },
             ],
@@ -236,7 +236,7 @@ module.exports = {
       ],
       '/guide/svelte3/': [
         {
-          text: 'Guide - Svelte 3',
+          text: 'Guide - Svelte',
           collapsible: true,
           items: [
             {
@@ -314,7 +314,7 @@ module.exports = {
         {
           text: 'Workbench',
           items: [
-            { text: 'Shell and navigation', link: '/guide/ui-shell' },
+            { text: 'Workbench layout', link: '/guide/ui-shell' },
             { text: 'Stories, search, tests and home', link: '/guide/ui-navigation' },
             { text: 'Inspector', link: '/guide/ui-inspector' },
             { text: 'Props matrix', link: '/guide/ui-matrix' },

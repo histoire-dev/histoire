@@ -23,7 +23,9 @@
 📝 Generate source code examples automatically
 🎨 Beautiful and customizable interface
 
-![screenshot](./screenshot.png)
+[![Histoire workbench with story variants, canvas tools and editable props](./screenshot.png)](https://histoire.dev/demo/)
+
+Try the [online demo](https://histoire.dev/demo/). Requires Node.js 22+ and Vite 7 or 8; supports Vue 3, React 18/19, Svelte 4/5, Nuxt 3/4 and SvelteKit 2/3.
 
 `histoire dev` exposes [MCP tools](./docs/guide/mcp.md) by default. Use `histoire build --target node` for a [standalone Node book and MCP server](./docs/guide/deploy-node.md).
 

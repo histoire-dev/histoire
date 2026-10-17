@@ -1,4 +1,4 @@
-# Props matrix
+# Props matrix <Badge type="tip" text="1.0-beta.2+" />
 
 Choose **Props matrix** to display every combination of two prop axes. This arrangement is always accessible. While Histoire reads prop values, the canvas shows a loading state. If fewer than two usable axes exist, it explains the requirement, names any detected axis, and suggests a custom axis or values declared in `Story matrix.axes`. **Add custom axis** opens the new-axis form in Props, showing the inspector if needed. Each axis needs at least two distinct values. Histoire detects Boolean component props, complete finite `values`/`enum` runtime metadata, and top-level Boolean variant state automatically. Numeric props receive configurable samples. Free text, nested state, and nonnumeric default values do not become axes automatically.
 

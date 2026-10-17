@@ -1,4 +1,4 @@
-# Canvas screenshots and MCP activity
+# Canvas screenshots and MCP activity <Badge type="tip" text="1.0-beta.2+" />
 
 Development mode exposes screenshots from the canvas toolbar. Choose selected frames or all story frames, PNG or WebP, and 1×, 2×, or 3× output. Files remain under `.histoire/screenshots/`; recent captures offer **Copy path**. A per-image JSON sidecar records its story and variant for the recent list after restart.
 

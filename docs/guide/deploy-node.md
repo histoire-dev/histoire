@@ -1,4 +1,4 @@
-# Deploy to Node.js
+# Deploy to Node.js <Badge type="tip" text="1.0-beta.2+" />
 
 Node deployment bundles a standalone production server with the compiled book and MCP. Runtime needs Node.js 22 or later. The original project, config, Vite, framework compiler, and project `node_modules` are not required.
 

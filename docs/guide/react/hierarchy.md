@@ -1,4 +1,4 @@
-# Story hierarchy
+# Story hierarchy <Badge type="tip" text="1.0-beta.2+" />
 
 Use `title` paths to group React stories in navigation:
 

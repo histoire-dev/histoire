@@ -1,4 +1,4 @@
-# Story inspector
+# Story inspector <Badge type="tip" text="1.0-beta.2+" />
 
 The floating inspector follows the selected variant. Its Props, Docs, Events and Tests tabs preserve the existing story URL values: an empty `tab` value for Props, then `docs`, `events` and `tests`.
 

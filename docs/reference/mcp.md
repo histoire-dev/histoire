@@ -1,4 +1,4 @@
-# MCP reference
+# MCP reference <Badge type="tip" text="1.0-beta.2+" />
 
 See [setup](../guide/mcp.md) and [Node deployment](../guide/deploy-node.md) for launch commands.
 

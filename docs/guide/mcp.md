@@ -1,4 +1,4 @@
-# MCP server
+# MCP server <Badge type="tip" text="1.0-beta.2+" />
 
 Histoire exposes stories, docs, source, preview URLs, screenshots, rendered inspection, and story tests through Model Context Protocol (MCP).
 

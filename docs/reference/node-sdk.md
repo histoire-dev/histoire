@@ -1,4 +1,4 @@
-# Node SDK reference
+# Node SDK reference <Badge type="tip" text="1.0-beta.2+" />
 
 `histoire/node` manages a Histoire project without CLI process ownership. See [embedding](../guide/embedding.md) and [production Node deployment](../guide/deploy-node.md) for browser/deployment configuration.
 

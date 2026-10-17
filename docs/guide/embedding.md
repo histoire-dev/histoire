@@ -1,4 +1,4 @@
-# Embed Histoire
+# Embed Histoire <Badge type="tip" text="1.0-beta.2+" />
 
 Use `@histoire/sdk` to mount a complete explorer or independent iframe surfaces. Vue hosts can use `@histoire/vue` to compose native panels around isolated story runtimes. Both connect to a running Histoire dev server or a deployed static book.
 

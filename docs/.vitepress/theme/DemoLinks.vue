@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { withBase } from 'vitepress'
 import { computed } from 'vue'
 
 const props = defineProps<{
@@ -7,7 +8,7 @@ const props = defineProps<{
 
 const allLinks = {
   vue3: {
-    demo: 'https://vue3.examples.histoire.dev/',
+    demo: '/demo/',
     stackblitz: 'https://stackblitz.com/edit/histoire-vue3-starter',
   },
   nuxt3: {
@@ -27,7 +28,7 @@ const links = computed(() => allLinks[props.framework])
   <div class="demo-links space-y-2">
     <a
       v-if="links.demo"
-      :href="links.demo"
+      :href="withBase(links.demo)"
       target="_blank"
       class="btn flex items-center gap-4 p-4 hover:no-underline"
     >

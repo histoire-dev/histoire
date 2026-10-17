@@ -24,10 +24,11 @@ This mono-repo contains the following packages:
 | [histoire](./packages/histoire) | Main package |
 | [@histoire/app](./packages/histoire-app) | Pre-bundled UI |
 | [@histoire/controls](./packages/histoire-controls) | Builtin controls components |
-| [@histoire/controls-stories](./packages/histoire-controls) | Stories for builtin controls |
+| [@histoire/controls-stories](./packages/histoire-controls-stories) | Stories for builtin controls |
 | [@histoire/plugin-vue](./packages/histoire-plugin-vue) | Vue 3 integration |
-| [@histoire/plugin-vue2](./packages/histoire-plugin-vue) | Vue 2 integration |
-| [@histoire/plugin-nuxt](./packages/histoire-plugin-nuxt) | Nuxt 3 integration |
+| [@histoire/plugin-react](./packages/histoire-plugin-react) | React 18/19 integration |
+| [@histoire/plugin-svelte](./packages/histoire-plugin-svelte) | Svelte 4/5 and SvelteKit 2/3 integration |
+| [@histoire/plugin-nuxt](./packages/histoire-plugin-nuxt) | Nuxt 3/4 integration |
 | [@histoire/plugin-percy](./packages/histoire-plugin-percy) | Visual regression testing with Percy |
 | [@histoire/plugin-screenshot](./packages/histoire-plugin-screenshot) | Visual regression testing with simple screenshots |
 | [@histoire/shared](./packages/histoire-shared) | Shared utilities |
@@ -38,7 +39,7 @@ This mono-repo contains the following packages:
 1. Install dependencies with [pnpm](https://pnpm.io/):
 
 ```sh
-node corepack enable
+corepack enable
 pnpm i
 ```
 
@@ -77,6 +78,37 @@ pnpm run story:preview
 ```
 
 ## Running tests
+
+### Documentation and demo
+
+Use Node.js 22+ and the repository's pinned pnpm version. Build workspace packages before building docs:
+
+```sh
+corepack enable
+pnpm install --frozen-lockfile
+pnpm build
+pnpm docs:build
+pnpm --filter histoire-example-vue3 exec playwright install chromium
+pnpm docs:check
+pnpm docs:serve
+```
+
+`docs:build` builds a static Vue book into ignored `docs/public/demo/` before VitePress copies it into `docs/.vitepress/dist/demo/`. Publish the whole `docs/.vitepress/dist/` directory. The `/demo/` asset base and hash routing keep direct story links usable without host rewrite rules. Demo links perform a full navigation so VitePress does not treat the book as a Markdown page.
+
+`docs:dev` also builds this book before starting VitePress. After changing a demo story, run `pnpm docs:demo` to refresh it. `examples/vue3/histoire.docs.config.ts` selects existing interactive examples and omits stress and failure fixtures; the regular Vue test book remains unchanged.
+
+`docs:check` serves the production output using a plain static server and checks the actual browser: demo navigation, prop edits reaching the canvas, generated source, docs links surviving reload, narrow-screen rendering, and development actions staying hidden. It needs the Vue example's Playwright dependency and Chromium. It uses an ephemeral loopback port and closes both server and browser on failure.
+
+Refresh screenshots after workbench changes:
+
+```sh
+pnpm docs:build
+pnpm docs:screenshots
+pnpm docs:build
+pnpm docs:check
+```
+
+`docs:screenshots` runs the same browser checks, captures light/dark workbench images under `docs/public/screenshots/`, and updates the README's `screenshot.png`. Review both images before committing. Rebuild afterward so the published docs contain the new images.
 
 ### Linting
 

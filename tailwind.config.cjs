@@ -62,6 +62,9 @@ module.exports = {
   content: [
     './docs/**/*.{vue,js,ts,jsx,tsx,md}',
     './docs/.vitepress/**/*.{vue,js,ts,jsx,tsx,md}',
+    '!./docs/node_modules/**',
+    '!./docs/public/**',
+    '!./docs/.vitepress/{cache,dist}/**',
   ],
   darkMode: 'class', // or 'media' or 'class'
   corePlugins: {

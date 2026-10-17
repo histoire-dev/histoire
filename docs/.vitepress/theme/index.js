@@ -11,7 +11,10 @@ import './style/index.pcss'
 
 export default {
   ...DefaultTheme,
-  enhanceApp({ app }) {
+  /** Preserve built-in components before registering Histoire's docs components. */
+  enhanceApp(context) {
+    DefaultTheme.enhanceApp?.(context)
+    const { app } = context
     app.use(FloatingVue, {
       themes: {
         dropdown: {

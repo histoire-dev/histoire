@@ -1,4 +1,4 @@
-# Browser and Vue SDK reference
+# Browser and Vue SDK reference <Badge type="tip" text="1.0-beta.2+" />
 
 See [embedding guide](../guide/embedding.md) for source configuration and deployment. Public browser imports come from `@histoire/sdk`; Vue components/composables come from `@histoire/vue`. `@histoire/protocol` owns portable DTOs and typed errors. `/internal` adapter entries are unsupported for external source/story loaders.
 

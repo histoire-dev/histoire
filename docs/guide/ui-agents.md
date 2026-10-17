@@ -1,4 +1,4 @@
-# AI agents
+# AI agents <Badge type="tip" text="1.0-beta.2+" />
 
 Histoire connects local coding agents to canvas comments through [Agent Client Protocol](https://agentclientprotocol.com/). Agents run in development mode. Open **Settings → AI agents**, search registry, enable local agents, then enable selected agent.
 

@@ -1,4 +1,4 @@
-# Browser tests and runtime migration
+# Browser tests and runtime migration <Badge type="tip" text="1.0-beta.2+" />
 
 Histoire renders every story inside browser iframe runtime. Same runtime collects and runs story tests, supports Vitest mocks, and owns live variant state.
 

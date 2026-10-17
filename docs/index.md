@@ -13,6 +13,10 @@ hero:
       text: Get Started
       link: /guide/getting-started
     - theme: alt
+      text: Open demo
+      link: /demo/
+      target: _self
+    - theme: alt
       text: Why Histoire?
       link: /guide/
     - theme: alt
@@ -34,6 +38,8 @@ features:
     details: Enjoy a more pleasing experience during night.
 ---
 
+<DemoPreview />
+
 <!-- Frameworks -->
 
 <h2 class="text-center !text-lg mt-12 mb-6">
@@ -41,6 +47,12 @@ features:
 </h2>
 
 <div class="flex items-center justify-center gap-4 flex-wrap">
+  <a
+    href="./guide/react/getting-started.html"
+    class="p-10 rounded bg-gray-100 dark:bg-gray-900 transition-colors hover:bg-blue-100 text-2xl"
+  >
+    React
+  </a>
   <a
     href="./guide/vue3/getting-started.html"
     class="p-10 rounded bg-gray-100 dark:bg-gray-900 transition-colors hover:bg-green-100"

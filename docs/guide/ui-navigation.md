@@ -1,4 +1,4 @@
-# Workbench navigation
+# Workbench navigation <Badge type="tip" text="1.0-beta.2+" />
 
 Histoire keeps story selection in the URL. Existing `/story/:storyId`, `variantId`, and `tab` links continue to work. Rail panes and panel visibility are local preferences.
 

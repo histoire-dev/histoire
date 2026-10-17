@@ -2,9 +2,11 @@
 
 Controls give you the ability to interact with your components arguments.
 
+## Controls sandbox <Badge type="tip" text="1.0-beta.2+" />
+
 Custom `#controls` slots run in a dedicated sandbox. Their background, typography and color scheme follow the Histoire panel. Built-in dropdowns and tooltips render in the host window, so they can extend beyond the controls form.
 
-## Shared component contracts
+## Shared component contracts <Badge type="tip" text="1.0-beta.2+" />
 
 Builtin `Hst*` controls use C1 styling with bundled Manrope and JetBrains Mono fonts. No font requests leave the book. Provider appearance and density stay local; standalone controls receive C1 defaults.
 
@@ -16,7 +18,7 @@ Wrapped fields accept `layout="stacked"`, `layout="horizontal"`, or `layout="inl
 
 Both controls entrypoints keep existing exports. Native Vue hosts import `@histoire/controls/vue` and its provider-scoped stylesheet; JavaScript import alone does not install global styles or theme state. Preview components retain their own styling.
 
-## Custom overlays
+## Custom overlays <Badge type="tip" text="1.0-beta.2+" />
 
 Use `getControlsHost()` inside a custom controls component to display a text tooltip or a dropdown in the host. The adapter is available only in the controls sandbox. Keep option values in your component and pass string IDs and labels to the host.
 
