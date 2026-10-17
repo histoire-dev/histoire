@@ -7,3 +7,6 @@ histoire-dist/
 **/cypress/videos/
 .DS_Store
 .eslintcache
+docs/public/demo/
+docs/.vitepress/cache/
+.vitest-attachments/
