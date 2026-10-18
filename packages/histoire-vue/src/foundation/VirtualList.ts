@@ -134,7 +134,8 @@ export const HistoireVirtualList = defineComponent({
           default: (value: HistoireVirtualSlot) => {
             // Retired pool slots cannot read a replacement publication by old index.
             if (!value.active || props.items[value.index]?.key !== value.item.key) return null
-            const row = () => h('div', { 'key': value.item.key, 'data-virtual-key': value.item.key, 'style': { paddingBottom: '1px' } }, [slots.default?.(value)])
+            // Keep configurable spacing inside the measured row so recycled positions include it.
+            const row = () => h('div', { 'key': value.item.key, 'data-virtual-key': value.item.key, 'style': { paddingBottom: 'var(--histoire-virtual-item-gap, 1px)' } }, [slots.default?.(value)])
             return dynamic ? h(DynamicScrollerItem, { item: value.item, active: value.active, index: value.index }, { default: row }) : row()
           },
         }),

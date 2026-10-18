@@ -146,7 +146,7 @@ function openControlMenu(event: MouseEvent | KeyboardEvent): void {
 .inspector-content :deep(.histoire-docs :is(h1,h2,h3,h4)) { color: var(--histoire-text); font-weight: 800; }
 .inspector-content :deep(.histoire-docs table) { width: 100%; font-size: 11px; border-collapse: collapse; }
 .inspector-content :deep(.histoire-docs :is(th,td)) { padding: 9px; text-align: left; border-bottom: 1px solid var(--histoire-border); }
-.inspector-content :deep(.histoire-events) { position: relative; padding: 2px var(--histoire-inspector-gutter) 16px; }
+.inspector-content :deep(.histoire-events) { --histoire-virtual-item-gap: 8px; position: relative; padding: 2px var(--histoire-inspector-gutter) 16px; }
 .inspector-content :deep(.histoire-events-count) { position: absolute; top: 9px; inset-inline-start: var(--histoire-inspector-gutter); color: var(--histoire-muted); font-size: 10px; }
 .inspector-content :deep(.histoire-events > button) { display: block; margin-left: auto; border: 0; border-radius: 7px; background: var(--histoire-chip); padding: 7px 10px; font-size: 11px; font-weight: 700; cursor: pointer; }
 .inspector-content :deep(.histoire-events ol) { padding: 0; list-style: none; }
