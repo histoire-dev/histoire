@@ -10,7 +10,7 @@ import { useHistoireContext } from '../../provider/context.js'
 export const HistoireEvents = defineComponent({
   name: 'HistoireEvents',
   props: {
-    /** First-party inspector shows cleaned payload under each event trigger. */
+    /** First-party inspector shows cleaned payload directly in each event card. */
     inlineDetails: { type: Boolean, default: false },
   },
   setup(props) {
@@ -32,11 +32,16 @@ export const HistoireEvents = defineComponent({
           const payload = event.payload as { name?: string, argument?: unknown } | null
           const name = typeof payload?.name === 'string' ? payload.name : 'Event'
           const argument = payload && Object.hasOwn(payload, 'argument') ? payload.argument : event.payload
+          const heading = [name, h('time', { datetime: new Date(event.timestamp).toISOString() }, props.inlineDetails ? new Date(event.timestamp).toLocaleTimeString(undefined, { hour12: false }) : new Date(event.timestamp).toISOString())]
+          // Inline cards already expose their payload, so they need no floating trigger.
+          if (props.inlineDetails) {
+            return h('div', { 'class': 'histoire-event-row', 'data-test-id': 'event-item' }, [
+              h('div', { class: 'histoire-event-heading' }, heading),
+              h('pre', { class: 'histoire-event-argument' }, JSON.stringify(argument, null, 2)),
+            ])
+          }
           return h('div', { class: 'histoire-event-row' }, h(HistoireDropdown, { 'placement': 'right', 'data-test-id': 'event-item' }, {
-            default: () => [
-              h(HstButton, { color: 'flat', type: 'button' }, { default: () => [name, h('time', { datetime: new Date(event.timestamp).toISOString() }, props.inlineDetails ? new Date(event.timestamp).toLocaleTimeString(undefined, { hour12: false }) : new Date(event.timestamp).toISOString())] }),
-              props.inlineDetails ? h('pre', { class: 'histoire-event-argument' }, JSON.stringify(argument, null, 2)) : null,
-            ],
+            default: () => h(HstButton, { color: 'flat', type: 'button' }, { default: () => heading }),
             popper: () => h('pre', JSON.stringify(argument, null, 2)),
           }))
         } }),

@@ -151,7 +151,7 @@ function openControlMenu(event: MouseEvent | KeyboardEvent): void {
 .inspector-content :deep(.histoire-events > button) { display: block; margin-left: auto; border: 0; border-radius: 7px; background: var(--histoire-chip); padding: 7px 10px; font-size: 11px; font-weight: 700; cursor: pointer; }
 .inspector-content :deep(.histoire-events ol) { padding: 0; list-style: none; }
 .inspector-content :deep(.histoire-event-row) { padding: 10px; border-radius: 8px; background: var(--histoire-chip); font: 11px var(--histoire-font-mono); }
-.inspector-content :deep(.histoire-events li button) { display: flex; gap: 8px; width: 100%; border: 0; padding: 0; text-align: left; background: transparent; cursor: pointer; }
+.inspector-content :deep(.histoire-event-heading) { display: flex; gap: 8px; width: 100%; text-align: left; }
 .inspector-content :deep(.histoire-events time) { margin-left: auto; color: var(--histoire-muted); font-size: 10px; }
 .inspector-content :deep(.histoire-event-argument) { margin: 8px 0 0; max-height: 120px; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere; color: var(--histoire-muted); font: 10px/1.6 var(--histoire-font-mono); }
 .inspector-content :deep(.histoire-tests) { padding: 2px var(--histoire-inspector-gutter) 16px; font-size: 12px; }
