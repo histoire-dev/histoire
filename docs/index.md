@@ -49,9 +49,9 @@ features:
 <div class="flex items-center justify-center gap-4 flex-wrap">
   <a
     href="./guide/react/getting-started.html"
-    class="p-10 rounded bg-gray-100 dark:bg-gray-900 transition-colors hover:bg-blue-100 text-2xl"
+    class="p-10 rounded bg-gray-100 dark:bg-gray-900 transition-colors hover:bg-blue-100"
   >
-    React
+    <img src="/react.svg" alt="React logo" class="w-16 h-16" />
   </a>
   <a
     href="./guide/vue3/getting-started.html"
