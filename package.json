@@ -22,7 +22,7 @@
     "release": "pnpm run lint && pnpm run test && pnpm run build && sheep release -b main --force",
     "docs:demo": "pnpm --filter histoire-example-vue3 story:build:docs",
     "docs:dev": "pnpm docs:demo && vitepress dev docs",
-    "docs:build": "pnpm docs:demo && vitepress build docs",
+    "docs:build": "pnpm --recursive --filter \"histoire-example-vue3^...\" run build && pnpm docs:demo && vitepress build docs",
     "docs:check": "node scripts/check-docs-demo.mjs",
     "docs:screenshots": "node scripts/check-docs-demo.mjs --screenshots",
     "docs:serve": "vitepress serve docs",

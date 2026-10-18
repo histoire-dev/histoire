@@ -81,21 +81,20 @@ pnpm run story:preview
 
 ### Documentation and demo
 
-Use Node.js 22+ and the repository's pinned pnpm version. Build workspace packages before building docs:
+Use Node.js 22+ and the repository's pinned pnpm version:
 
 ```sh
 corepack enable
 pnpm install --frozen-lockfile
-pnpm build
 pnpm docs:build
 pnpm --filter histoire-example-vue3 exec playwright install chromium
 pnpm docs:check
 pnpm docs:serve
 ```
 
-`docs:build` builds a static Vue book into ignored `docs/public/demo/` before VitePress copies it into `docs/.vitepress/dist/demo/`. Publish the whole `docs/.vitepress/dist/` directory. The `/demo/` asset base and hash routing keep direct story links usable without host rewrite rules. Demo links perform a full navigation so VitePress does not treat the book as a Markdown page.
+`docs:build` first compiles the Vue demo's workspace dependencies in dependency order, so it works from a fresh checkout without a separate `pnpm build`. It then builds a static Vue book into ignored `docs/public/demo/` before VitePress copies it into `docs/.vitepress/dist/demo/`. Publish the whole `docs/.vitepress/dist/` directory. The `/demo/` asset base and hash routing keep direct story links usable without host rewrite rules. Demo links perform a full navigation so VitePress does not treat the book as a Markdown page.
 
-`docs:dev` also builds this book before starting VitePress. After changing a demo story, run `pnpm docs:demo` to refresh it. `examples/vue3/histoire.docs.config.ts` selects existing interactive examples and omits stress and failure fixtures; the regular Vue test book remains unchanged.
+`docs:dev` also builds this book before starting VitePress; compile workspace packages first with `pnpm build` or `pnpm docs:build`. After changing a demo story, run `pnpm docs:demo` to refresh it. `examples/vue3/histoire.docs.config.ts` selects existing interactive examples and omits stress and failure fixtures; the regular Vue test book remains unchanged.
 
 `docs:check` serves the production output using a plain static server and checks the actual browser: demo navigation, prop edits reaching the canvas, generated source, docs links surviving reload, narrow-screen rendering, and development actions staying hidden. It needs the Vue example's Playwright dependency and Chromium. It uses an ephemeral loopback port and closes both server and browser on failure.
 
