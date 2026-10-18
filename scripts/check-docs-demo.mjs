@@ -4,6 +4,7 @@ import { createServer } from 'node:http'
 import { createRequire } from 'node:module'
 import { fileURLToPath } from 'node:url'
 import { checkReleaseBadges } from './check-docs-release-badges.mjs'
+import { checkSourcePane, expandSource } from './check-docs-source.mjs'
 
 const requireExample = createRequire(new URL('../examples/vue3/package.json', import.meta.url))
 const requireHistoire = createRequire(new URL('../packages/histoire/package.json', import.meta.url))
@@ -12,12 +13,6 @@ const expect = requireExample('playwright/test').expect.configure({ timeout: 150
 const sirv = requireHistoire('sirv')
 const output = fileURLToPath(new URL('../docs/.vitepress/dist/', import.meta.url))
 const screenshots = process.argv.includes('--screenshots')
-
-/** Source expansion persists across story changes; keep existing readable source open. */
-async function expandSource(page) {
-  const button = page.getByRole('button', { name: 'Expand source', exact: true })
-  if (await button.count()) await button.click()
-}
 
 /** Captures shipped UI after real canvas and authored controls finish mounting. */
 async function captureWorkbench(page, origin) {
@@ -115,6 +110,8 @@ try {
 
   if (screenshots) await captureWorkbench(page, origin)
 
+  await checkSourcePane(browser, origin, expect)
+
   await page.goto(`${origin}/guide/ui-shell.html`)
   await expect(page.getByRole('heading', { name: /^Workbench layout/ })).toBeVisible()
   if (!screenshots) {
@@ -124,7 +121,7 @@ try {
     await expect.poll(() => image.evaluate(element => element.naturalWidth)).toBe(1600)
   }
   assert.deepEqual(errors, [], 'Docs and demo must load without browser errors or missing local assets')
-  process.stdout.write('Docs/demo passed: release badges, navigation, prop editing, source, docs deep link, reload, mobile canvas, static capabilities.\n')
+  process.stdout.write('Docs/demo passed: release badges, navigation, prop editing, source persistence and highlighting, docs deep link, reload, mobile canvas, static capabilities.\n')
 }
 finally {
   await browser?.close()

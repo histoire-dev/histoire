@@ -12,6 +12,8 @@ export interface ShellState {
   panelOpen: boolean
   /** Whether story inspector is visible. */
   inspectorOpen: boolean
+  /** Source drawer expansion shared across story selections. */
+  sourceExpanded: boolean
   /** Preferred side pane width, retained through responsive changes. */
   panelWidth: number
   /** Preferred inspector width, independent of pane visibility. */
@@ -36,7 +38,7 @@ export function createShell(options: {
   /** Optional explicit persistence service, usually caller document storage. */
   storage?: ShellStorage
 }) {
-  const state = shallowRef<ShellState>({ pane: 'stories', panelOpen: true, inspectorOpen: true, panelWidth: PANEL_WIDTH_DEFAULT, inspectorWidth: INSPECTOR_WIDTH_DEFAULT })
+  const state = shallowRef<ShellState>({ pane: 'stories', panelOpen: true, inspectorOpen: true, sourceExpanded: false, panelWidth: PANEL_WIDTH_DEFAULT, inspectorWidth: INSPECTOR_WIDTH_DEFAULT })
   const uiHidden = shallowRef(false)
   const narrow = shallowRef(false)
   const containerWidth = shallowRef(0)
@@ -71,6 +73,7 @@ export function createShell(options: {
       pane,
       panelOpen: pane !== 'home' && (typeof saved.panelOpen === 'boolean' ? saved.panelOpen : true),
       inspectorOpen: typeof saved.inspectorOpen === 'boolean' ? saved.inspectorOpen : true,
+      sourceExpanded: typeof saved.sourceExpanded === 'boolean' ? saved.sourceExpanded : false,
       panelWidth: clampPanelWidth(saved.panelWidth, PANEL_WIDTH_LIMITS, PANEL_WIDTH_DEFAULT),
       inspectorWidth: clampPanelWidth(saved.inspectorWidth, INSPECTOR_WIDTH_LIMITS, INSPECTOR_WIDTH_DEFAULT),
     })
@@ -87,6 +90,10 @@ export function createShell(options: {
   /** Closing inspector keeps its content selection intact. */
   function toggleInspector(): void {
     update({ inspectorOpen: !state.value.inspectorOpen })
+  }
+  /** Keep source visibility independent of inspector and selection lifetimes. */
+  function toggleSource(): void {
+    update({ sourceExpanded: !state.value.sourceExpanded })
   }
   /** Hide workbench chrome for this page session without persisting the choice. */
   function toggleUi(): void {
@@ -130,6 +137,8 @@ export function createShell(options: {
     panelOpen: computed(() => state.value.panelOpen),
     /** Current inspector visibility preference. */
     inspectorOpen: computed(() => state.value.inspectorOpen),
+    /** Saved source drawer expansion preference. */
+    sourceExpanded: computed(() => state.value.sourceExpanded),
     /** Whether workbench chrome is temporarily hidden. */
     uiHidden: computed(() => uiHidden.value),
     /** Current container responsive state. */
@@ -147,6 +156,7 @@ export function createShell(options: {
     selectPane,
     togglePanel,
     toggleInspector,
+    toggleSource,
     toggleUi,
     setNarrow,
     setInspectorAvailable,

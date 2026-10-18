@@ -4,9 +4,9 @@ import { HistoireProvider } from '@histoire/vue'
 import { mount } from '@vue/test-utils'
 import { describe, expect, it, vi } from 'vitest'
 import { h, nextTick } from 'vue'
-import SourceDrawer from '../../../histoire-app/src/app/components/inspector/SourceDrawer.vue'
 import MarkdownPage from '../../../histoire-app/src/app/components/pages/markdown/MarkdownPage.vue'
 import { deferred, sourceFixture } from '../../../histoire-sdk/src/__tests__/fixtures/session.js'
+import { mountSourceDrawer } from './fixtures/source-drawer.js'
 
 /** Real session fixture owns source notifications; components keep their actual provider. */
 async function setup() {
@@ -25,7 +25,7 @@ describe('workbench content ownership', () => {
     const { session, preview } = await setup()
     const pending = deferred<HistoireSourceContent>()
     vi.spyOn(session.source, 'get').mockReturnValueOnce(pending.promise)
-    const wrapper = mount(HistoireProvider, { props: { session }, slots: { default: () => h(SourceDrawer) } })
+    const wrapper = mountSourceDrawer(session)
     try {
       await wrapper.get('[aria-label="Expand source"]').trigger('click')
       await vi.waitFor(() => expect(wrapper.get('[role="status"][aria-atomic="true"]').text()).toBe('Loading source…'))
@@ -57,7 +57,7 @@ describe('workbench content ownership', () => {
     await session.selection.select({ storyId: 'a:b', variantId: 'c' })
     const preview = session.mount(document.createElement('div'), { surface: 'preview' })
     await preview.ready
-    const source = mount(HistoireProvider, { props: { session }, slots: { default: () => h(SourceDrawer) } })
+    const source = mountSourceDrawer(session)
     try {
       await source.get('[aria-label="Expand source"]').trigger('click')
       expect(source.find('[aria-label="Open source in editor"]').exists()).toBe(false)
@@ -78,7 +78,7 @@ describe('workbench content ownership', () => {
   it('preserves current generated source and copy after unrelated SDK publications', async () => {
     const { fixture, session, preview } = await setup()
     const read = vi.spyOn(session.source, 'get').mockImplementation(async options => ({ ...options, epoch: 'epoch-1', revision: 'revision-1', origin: options.mode === 'raw' ? 'file' : 'dynamic', body: options.mode === 'raw' ? 'story source' : `count=${session.getSnapshot().state?.value.count}`, language: 'text' }))
-    const wrapper = mount(HistoireProvider, { props: { session }, slots: { default: () => h(SourceDrawer) } })
+    const wrapper = mountSourceDrawer(session)
     try {
       await wrapper.get('[aria-label="Expand source"]').trigger('click')
       await vi.waitFor(() => expect(wrapper.get('.histoire-source-content').text()).toContain('count=5'))
@@ -107,7 +107,7 @@ describe('workbench content ownership', () => {
     const { session, preview } = await setup()
     const delayed = deferred<HistoireSourceContent>()
     vi.spyOn(session.source, 'get').mockReturnValueOnce(delayed.promise).mockResolvedValue({ storyId: 'a', variantId: 'b:c', epoch: 'epoch-1', revision: 'revision-1', mode: 'dynamic', origin: 'dynamic', body: 'replacement', language: 'text' })
-    const wrapper = mount(HistoireProvider, { props: { session }, slots: { default: () => h(SourceDrawer) } })
+    const wrapper = mountSourceDrawer(session)
     try {
       await wrapper.get('[aria-label="Expand source"]').trigger('click')
       await session.selection.select({ storyId: 'a', variantId: 'b:c' })
@@ -161,7 +161,7 @@ describe('workbench content ownership', () => {
       : dispatch(command, payload))
     vi.spyOn(session.source, 'get').mockImplementation(async value => ({ ...value, epoch: 'epoch-1', revision: 'revision-1', origin: 'dynamic', body: `source:${value.variantId}`, language: 'text' }))
     const errors = vi.fn()
-    const wrapper = mount(HistoireProvider, { props: { session }, slots: { default: () => h(SourceDrawer, { onError: errors }) } })
+    const wrapper = mountSourceDrawer(session, { onError: errors })
     try {
       await wrapper.get('[aria-label="Expand source"]').trigger('click')
       await vi.waitFor(() => expect(wrapper.text()).toContain('source:c'))
@@ -204,7 +204,7 @@ describe('workbench content ownership', () => {
     const dispatch = fixture.request.getMockImplementation()!
     fixture.request.mockImplementation((command, payload) => command === 'openInEditor' ? editor.shift()!.promise : dispatch(command, payload))
     const errors = vi.fn()
-    const wrapper = mount(HistoireProvider, { props: { session }, slots: { default: () => h(SourceDrawer, { onError: errors }) } })
+    const wrapper = mountSourceDrawer(session, { onError: errors })
     try {
       await wrapper.get('[aria-label="Expand source"]').trigger('click')
       await vi.waitFor(() => expect(wrapper.find('[aria-label="Copy source"]').attributes('disabled')).toBeUndefined())

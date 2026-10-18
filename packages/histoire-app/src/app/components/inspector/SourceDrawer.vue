@@ -6,6 +6,7 @@ import { HistoireSource } from '@histoire/vue'
 import { computed, nextTick, ref, shallowRef, useId, watch } from 'vue'
 import { isContextMenuShortcut } from '../../composables/context-menu.js'
 import { useSelection } from '../../composables/selection.js'
+import { useShell } from '../../composables/shell.js'
 import { usePageOwnership } from '../pages/home/ownership.js'
 import WorkbenchLoadingState from '../shell/WorkbenchLoadingState.vue'
 
@@ -21,7 +22,7 @@ function onHeaderKeydown(event: KeyboardEvent): void {
 const { session, snapshot, story, variant } = useSelection()
 const ownership = usePageOwnership(session)
 const drawerId = `${useId()}-source-content`
-const expanded = ref(false)
+const { sourceExpanded: expanded, toggleSource } = useShell()
 const mode = ref<'raw' | 'dynamic'>('dynamic')
 const content = shallowRef<HistoireSourceContent>()
 const failure = ref<unknown>()
@@ -131,7 +132,7 @@ function status(value: { status: 'idle' | 'loading' | 'ready' | 'error' }) {
 <template>
   <section ref="root" class="inspector-source" :class="{ 'is-expanded': expanded }" aria-label="Source">
     <div class="inspector-source-header" @contextmenu="emit('contextmenu', $event)" @keydown="onHeaderKeydown">
-      <HstButton color="flat" type="button" class="inspector-source-toggle" :aria-expanded="expanded" :aria-controls="drawerId" @click="expanded = !expanded">
+      <HstButton color="flat" type="button" class="inspector-source-toggle" :aria-expanded="expanded" :aria-controls="drawerId" @click="toggleSource">
         <BuiltinIcon icon="code" :size="16" />
         <strong>Source</strong>
       </HstButton>
@@ -143,7 +144,7 @@ function status(value: { status: 'idle' | 'loading' | 'ready' | 'error' }) {
       <HstButton v-if="expanded && canEdit" icon-only color="flat" type="button" class="inspector-source-action" aria-label="Open source in editor" title="Open source in editor" @click="editor">
         <BuiltinIcon icon="launch" :size="16" />
       </HstButton>
-      <HstButton icon-only color="flat" type="button" class="inspector-source-action" :aria-label="expanded ? 'Collapse source' : 'Expand source'" :aria-expanded="expanded" @click="expanded = !expanded">
+      <HstButton icon-only color="flat" type="button" class="inspector-source-action" :aria-label="expanded ? 'Collapse source' : 'Expand source'" :aria-expanded="expanded" @click="toggleSource">
         <BuiltinIcon :icon="expanded ? 'chevron-down' : 'chevron-up'" :size="12" />
       </HstButton>
     </div>
