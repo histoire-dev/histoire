@@ -1,4 +1,5 @@
-.example-stage :is(button, a).example-button {
+.example-stage :is(button, a).example-button,
+.example-stage.example-native > button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -19,7 +20,8 @@
 }
 
 .example-stage .example-button:hover:enabled,
-.example-stage a.example-button:hover {
+.example-stage a.example-button:hover,
+.example-stage.example-native > button:hover:enabled {
   background: var(--example-primary-hover);
 }
 
@@ -53,12 +55,14 @@
   font-size: 16px;
 }
 
-.example-stage .example-button:disabled {
+.example-stage .example-button:disabled,
+.example-stage.example-native > button:disabled {
   opacity: 0.45;
   cursor: default;
 }
 
-.example-stage .example-input {
+.example-stage .example-input,
+.example-native > input {
   box-sizing: border-box;
   width: 100%;
   min-width: 0;
@@ -71,7 +75,8 @@
   font: inherit;
 }
 
-.example-stage :is(.example-button, .example-input, .example-checkbox, .example-link):focus-visible {
+.example-stage :is(.example-button, .example-input, .example-checkbox, .example-link):focus-visible,
+.example-native > :is(button, input):focus-visible {
   outline: 2px solid var(--example-text);
   outline-offset: 3px;
 }

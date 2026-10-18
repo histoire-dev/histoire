@@ -4,12 +4,15 @@ import BaseButton from './BaseButton.vue'
 import ModalWithSlots from './ModalWithSlots.vue'
 import SlotWithProps from './SlotWithProps.vue'
 
+/** Minimal directive fixture keeps generated directive syntax observable. */
 const vTooltip = {
+  /** Exposes tooltip content on native element. */
   mounted: (el, { value }) => {
     el.setAttribute('title', value)
   },
 }
 
+/** Creates independent editable values for each variant. */
 function initState() {
   return {
     count: 0,
@@ -17,6 +20,7 @@ function initState() {
   }
 }
 
+/** Logs native events without altering generated handler expressions. */
 function onClick(event) {
   console.log(event)
 }
@@ -27,6 +31,7 @@ const value = ref('Foo')
 <template>
   <Story
     title="Code gen"
+    :meta="{ exampleStage: true }"
     icon="carbon:code"
     icon-color="#8B5CF6"
   >

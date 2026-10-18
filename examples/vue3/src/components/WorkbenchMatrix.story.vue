@@ -3,7 +3,7 @@ import WorkbenchMatrix from './WorkbenchMatrix.vue'
 </script>
 
 <template>
-  <Story title="Workbench matrix">
+  <Story :meta="{ exampleStage: true }" title="Workbench matrix">
     <Variant id="default" title="Default">
       <WorkbenchMatrix />
     </Variant>

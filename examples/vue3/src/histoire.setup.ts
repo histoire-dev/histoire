@@ -11,6 +11,8 @@ declare module 'histoire' {
      * Set to `false` to disable the `WrapperGlobal` component styling.
      */
     wrapper?: boolean
+    /** Apply shared example layout to native code-generation fixtures. */
+    exampleStage?: boolean
   }
 }
 

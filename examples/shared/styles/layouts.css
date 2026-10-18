@@ -33,7 +33,8 @@
   max-width: 320px;
 }
 
-.example-stage .example-heading {
+.example-stage .example-heading,
+.example-native h1 {
   margin: 0;
   font: 600 16px/1.4 ui-sans-serif, system-ui, sans-serif;
 }
@@ -46,7 +47,8 @@
   overflow-wrap: anywhere;
 }
 
-.example-stage .example-output {
+.example-stage .example-output,
+.example-native pre {
   box-sizing: border-box;
   min-width: 0;
   width: 100%;
@@ -83,6 +85,26 @@
   border-radius: 6px;
   background: var(--example-surface);
   font-variant-numeric: tabular-nums;
+}
+
+/* Wrapper styles keep code-generation fixture templates and source output intact. */
+.example-native {
+  overflow-wrap: anywhere;
+}
+
+.example-native :is(p, ul) {
+  margin: 0;
+}
+
+.example-native hr {
+  width: 100%;
+  margin: 0;
+  border: 0;
+  border-top: 1px solid var(--example-border);
+}
+
+.example-native > input {
+  max-width: 320px;
 }
 
 @media (max-width: 768px) {
