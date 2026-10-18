@@ -9,12 +9,18 @@
   iconColor="gray"
 >
   <Hst.Variant title="default">
-    🚗
+    <div class="example-stage">
+      <span class="example-specimen">🚗</span>
+    </div>
   </Hst.Variant>
   <Hst.Variant title="Fast">
-    🏎️
+    <div class="example-stage">
+      <span class="example-specimen">🏎️</span>
+    </div>
   </Hst.Variant>
   <Hst.Variant title="Slow">
-    🚜
+    <div class="example-stage">
+      <span class="example-specimen">🚜</span>
+    </div>
   </Hst.Variant>
 </Hst.Story>

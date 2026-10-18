@@ -1,5 +1,6 @@
 <template>
   <Story
+    :meta="{ wrapper: false }"
     title="Sub Folder/Sub Story 2"
     :layout="{
       type: 'grid',
@@ -7,7 +8,9 @@
     }"
   >
     <Variant title="default">
-      <p>This is a sub story</p>
+      <div class="example-stage example-stack">
+        <p>This is a sub story</p>
+      </div>
     </Variant>
   </Story>
 </template>

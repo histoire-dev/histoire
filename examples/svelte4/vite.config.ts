@@ -9,6 +9,7 @@ export default defineConfig({
     svelte(),
   ],
   histoire: {
+    setupFile: './src/histoire.setup.ts',
     plugins: [
       HstSvelte(),
     ],

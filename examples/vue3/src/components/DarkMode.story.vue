@@ -1,11 +1,13 @@
 <template>
-  <Story title="Dark mode">
+  <Story :meta="{ wrapper: false }" title="Dark mode">
     <Variant
       title="default"
     >
-      <div class="meow">
-        <span class="only-dark">Dark</span>
-        Meow
+      <div class="example-stage example-stack">
+        <div class="meow">
+          <span class="only-dark">Dark</span>
+          Meow
+        </div>
       </div>
     </Variant>
   </Story>

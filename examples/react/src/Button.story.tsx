@@ -15,9 +15,9 @@ export default function ButtonStory() {
         )}
         source="<Button>Hi</Button>"
       >
-        {({ state }) => <Button disabled={state.disabled}>{state.label}</Button>}
+        {({ state }) => <div className="example-stage"><Button disabled={state.disabled}>{state.label}</Button></div>}
       </Variant>
-      <Variant title="Disabled"><Button disabled>Disabled</Button></Variant>
+      <Variant title="Disabled"><div className="example-stage"><Button disabled>Disabled</Button></div></Variant>
     </Story>
   )
 }

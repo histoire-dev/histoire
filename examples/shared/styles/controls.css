@@ -1,0 +1,89 @@
+.example-stage :is(button, a).example-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-sizing: border-box;
+  min-height: 36px;
+  max-width: 100%;
+  padding: 7px 14px;
+  border: 0;
+  border-radius: 6px;
+  background: var(--example-primary);
+  color: var(--example-on-primary);
+  font: 500 14px/1.4 ui-sans-serif, system-ui, sans-serif;
+  text-align: center;
+  text-decoration: none;
+  overflow-wrap: anywhere;
+  cursor: pointer;
+}
+
+.example-stage .example-button:hover:enabled,
+.example-stage a.example-button:hover {
+  background: var(--example-primary-hover);
+}
+
+.example-stage .example-button:is(.btn-color-green) {
+  background: var(--example-success);
+  color: var(--example-on-success);
+}
+
+.example-stage .example-button.btn-color-green:hover:enabled {
+  background: var(--example-success-hover);
+}
+
+.example-stage .example-button.btn-color-red {
+  background: var(--example-danger);
+  color: var(--example-on-danger);
+}
+
+.example-stage .example-button.btn-color-red:hover:enabled {
+  background: var(--example-danger-hover);
+}
+
+.example-stage .example-button:is(.btn-size-small, .small) {
+  min-height: 28px;
+  padding: 4px 10px;
+  font-size: 12px;
+}
+
+.example-stage .example-button:is(.btn-size-big, .large) {
+  min-height: 44px;
+  padding: 10px 18px;
+  font-size: 16px;
+}
+
+.example-stage .example-button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.example-stage .example-input {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  min-height: 36px;
+  padding: 7px 10px;
+  border: 1px solid var(--example-border);
+  border-radius: 6px;
+  background: var(--example-field);
+  color: var(--example-text);
+  font: inherit;
+}
+
+.example-stage :is(.example-button, .example-input, .example-checkbox, .example-link):focus-visible {
+  outline: 2px solid var(--example-text);
+  outline-offset: 3px;
+}
+
+.example-stage .example-checkbox {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  accent-color: var(--example-primary);
+}
+
+.example-stage .example-link {
+  color: inherit;
+  text-underline-offset: 3px;
+}

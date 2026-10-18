@@ -3,12 +3,14 @@ import InjectDemo from './InjectDemo.vue'
 </script>
 
 <template>
-  <Story title="Story setup">
+  <Story :meta="{ wrapper: false }" title="Story setup">
     <Variant
       id="global"
       title="Global setup"
     >
-      <InjectDemo />
+      <div class="example-stage">
+        <InjectDemo />
+      </div>
     </Variant>
 
     <Variant
@@ -18,14 +20,18 @@ import InjectDemo from './InjectDemo.vue'
         app.provide('demo', 'meow')
       }"
     >
-      <InjectDemo />
+      <div class="example-stage">
+        <InjectDemo />
+      </div>
     </Variant>
 
     <Variant
       id="global-component"
       title="Global component"
     >
-      <GlobalComp />
+      <div class="example-stage">
+        <GlobalComp />
+      </div>
     </Variant>
   </Story>
 </template>

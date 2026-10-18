@@ -11,7 +11,7 @@ defineProps<{
 </template>
 
 <style scoped>
-.hello {
+.hello:not(.example-message) {
   font-size: 24px;
   color: #00bebe;
 }

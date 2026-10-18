@@ -1,18 +1,19 @@
 <script setup>
-console.log('useNuxtApp', useNuxtApp())
-console.log('useNuxtApp().$config', useNuxtApp().$config)
 const config = useRuntimeConfig()
-console.log('useRuntimeConfig', config)
 </script>
 
 <template>
   <Story>
-    <Meow />
+    <div class="example-stage example-stack">
+      <Meow />
 
-    <h3>Nuxt runtime config</h3>
-    <pre>{{ config }}</pre>
-    <p data-testid="config">
-      {{ config.public.configFromNuxt }}
-    </p>
+      <h3 class="example-heading">
+        Nuxt runtime config
+      </h3>
+      <pre class="example-output">{{ config }}</pre>
+      <p data-testid="config">
+        {{ config.public.configFromNuxt }}
+      </p>
+    </div>
   </Story>
 </template>

@@ -5,5 +5,5 @@
 </script>
 
 <Hst.Story id="kit-environment" title="Kit environment">
-  <p>{browser ? 'Browser' : 'Server'} environment ({dev ? 'development' : 'production'})</p>
+  <div class="example-stage">{browser ? 'Browser' : 'Server'} environment ({dev ? 'development' : 'production'})</div>
 </Hst.Story>

@@ -6,6 +6,7 @@ const props = defineProps<{
 
 const computedClasses = computed(() => ({
   'btn-base': true,
+  'example-button': true,
   'btn-primary': props.variant === 'primary',
 }))
 </script>

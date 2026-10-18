@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import BaseButton from './BaseButton.vue'
 
+/** Creates independent editable values for each variant. */
 function initState() {
   return {
     disabled: false,
@@ -12,6 +13,7 @@ function initState() {
 
 <template>
   <Story
+    :meta="{ wrapper: false }"
     title="BaseButton"
     :layout="{
       type: 'grid',
@@ -23,13 +25,16 @@ function initState() {
       :init-state="initState"
     >
       <template #default="{ state }">
-        <BaseButton
-          :disabled="state.disabled"
-          :color="state.color"
-          :size="state.size"
-        >
-          Click me
-        </BaseButton>
+        <div class="example-stage">
+          <BaseButton
+            class="example-button"
+            :disabled="state.disabled"
+            :color="state.color"
+            :size="state.size"
+          >
+            Click me
+          </BaseButton>
+        </div>
       </template>
 
       <template #controls="{ state }">
@@ -62,34 +67,30 @@ function initState() {
       title="big green button"
       icon="el:resize-full"
     >
-      <BaseButton
-        color="green"
-        size="big"
-      >
-        Click me
-      </BaseButton>
+      <div class="example-stage">
+        <BaseButton
+          class="example-button"
+          color="green"
+          size="big"
+        >
+          Click me
+        </BaseButton>
+      </div>
     </Variant>
 
     <Variant
       title="small red button"
       icon-color="#F43F5E"
     >
-      <BaseButton
-        color="red"
-        size="small"
-      >
-        Click me!
-      </BaseButton>
-    </Variant>
-    <!-- <Variant
-      title="button inside div"
-      icon-color="#F43F5E"
-    >
-      <div>
-        <BaseButton>
+      <div class="example-stage">
+        <BaseButton
+          class="example-button"
+          color="red"
+          size="small"
+        >
           Click me!
         </BaseButton>
       </div>
-    </Variant> -->
+    </Variant>
   </Story>
 </template>

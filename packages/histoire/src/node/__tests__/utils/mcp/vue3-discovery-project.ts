@@ -1,11 +1,12 @@
-import { cp, mkdtemp, rm, symlink, writeFile } from 'node:fs/promises'
-import { tmpdir } from 'node:os'
+import { cp, symlink, writeFile } from 'node:fs/promises'
 import { resolve } from 'node:path'
 import { linkMcpFixtureDependencies, MCP_REPOSITORY_ROOT } from './cli-project.js'
+import { createExampleDirectory } from './example-directory.js'
 
 /** Copy actual example definitions while owning every optimizer cache and generated run. */
 export async function createVue3DiscoveryProject() {
-  const root = await mkdtemp(resolve(tmpdir(), 'histoire-discovery-cold-'))
+  const directory = await createExampleDirectory('histoire-discovery-cold-')
+  const { root } = directory
   const source = resolve(MCP_REPOSITORY_ROOT, 'examples/vue3')
   for (const name of ['src', 'public', 'package.json', 'vite.config.ts', 'histoire.config.ts', 'tailwind.config.cjs']) {
     await cp(resolve(source, name), resolve(root, name), { recursive: true })
@@ -23,5 +24,5 @@ module.exports = { plugins: [require('postcss-import'), require('tailwindcss/nes
 `)
   return { root,
     /** Release only this owned fixture after its runtime stops. */
-    async close() { await rm(root, { recursive: true, force: true }) } }
+    close: directory.close }
 }

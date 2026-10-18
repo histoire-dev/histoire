@@ -1,23 +1,28 @@
 <template>
   <Story
+    :meta="{ wrapper: false }"
     title="Serialize"
   >
     <Variant
       title="array"
     >
-      <div
-        :list="['a', 2, { foo: 'bar' }]"
-      >
-        Array
+      <div class="example-stage">
+        <div
+          :list="['a', 2, { foo: 'bar' }]"
+        >
+          Array
+        </div>
       </div>
     </Variant>
     <Variant
       title="object"
     >
-      <div
-        :obj="{ a: 2, nested: { foo: 'bar' } }"
-      >
-        Object
+      <div class="example-stage">
+        <div
+          :obj="{ a: 2, nested: { foo: 'bar' } }"
+        >
+          Object
+        </div>
       </div>
     </Variant>
   </Story>

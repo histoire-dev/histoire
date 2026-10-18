@@ -3,13 +3,15 @@ import NestedButton from './NestedButton.vue'
 </script>
 
 <template>
-  <Story title="NestedButton">
+  <Story :meta="{ wrapper: false }" title="NestedButton">
     <Variant title="default">
-      <NestedButton>
-        <template #default>
-          Click me
-        </template>
-      </NestedButton>
+      <div class="example-stage">
+        <NestedButton class="example-button">
+          <template #default>
+            Click me
+          </template>
+        </NestedButton>
+      </div>
     </Variant>
   </Story>
 </template>

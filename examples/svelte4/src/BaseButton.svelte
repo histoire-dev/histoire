@@ -1,34 +1,10 @@
 <script lang="ts">
+  /** Whether native action is unavailable. */
   export let disabled: boolean = false
+  /** Component size controlled by story. */
   export let size: 'small' | 'medium' | 'large' = 'medium'
 </script>
 
-<button class:disabled class={size} on:click>
+<button type="button" {disabled} class:disabled class="example-button {size}" on:click>
   <slot />
 </button>
-
-<style>
-button {
-  background: #ff3e00;
-  color: white;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: opacity .15s;
-}
-
-button.small {
-  padding: 6px;
-}
-
-button.medium {
-  padding: 12px;
-}
-
-button.large {
-  padding: 24px;
-}
-
-button.disabled {
-  opacity: 0.5;
-}
-</style>

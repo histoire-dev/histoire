@@ -9,9 +9,11 @@
 
 <Hst.Story>
   <Hst.Variant title="Variant 1">
-    <BaseButton {disabled}>
-      {content} 1
-    </BaseButton>
+    <div class="example-stage">
+      <BaseButton {disabled}>
+        {content} 1
+      </BaseButton>
+    </div>
 
     <svelte:fragment slot="controls">
       <Hst.Text bind:value={content} title="Content 1" />
@@ -20,9 +22,11 @@
   </Hst.Variant>
 
   <Hst.Variant title="Variant 2">
-    <BaseButton {disabled}>
-      {content} 2
-    </BaseButton>
+    <div class="example-stage">
+      <BaseButton {disabled}>
+        {content} 2
+      </BaseButton>
+    </div>
 
     <svelte:fragment slot="controls">
       <Hst.Text bind:value={content} title="Content 2" />

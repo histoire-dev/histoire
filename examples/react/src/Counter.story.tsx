@@ -17,9 +17,11 @@ export default function CounterStory() {
   return (
     <Story title="Counter" initState={() => ({ count: 0 })} controls={({ state }) => <HstNumber title="Count" value={state.count} onChange={value => state.count = value} />}>
       {({ state }) => (
-        <button type="button" onClick={() => state.count++}>
-          {`Count ${state.count}`}
-        </button>
+        <div className="example-stage">
+          <button className="example-button" type="button" onClick={() => state.count++}>
+            {`Count ${state.count}`}
+          </button>
+        </div>
       )}
     </Story>
   )

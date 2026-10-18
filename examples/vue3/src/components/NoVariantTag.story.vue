@@ -1,5 +1,6 @@
 <template>
   <Story
+    :meta="{ wrapper: false }"
     title="No variant tag"
     :init-state="() => ({
       meow: {
@@ -8,7 +9,12 @@
     })"
   >
     <template #default="{ state }">
-      <input v-model="state.meow.foo">
+      <div class="example-stage">
+        <label class="example-field">
+          <span>meow.foo</span>
+          <input v-model="state.meow.foo" class="example-input" aria-label="meow.foo">
+        </label>
+      </div>
     </template>
 
     <template #controls="{ state }">

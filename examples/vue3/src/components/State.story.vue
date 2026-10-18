@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+/** Creates independent editable values for each variant. */
 function initState() {
   return {
     count: 0,
@@ -6,6 +7,7 @@ function initState() {
   }
 }
 
+/** Creates nested state used by dedicated variant. */
 function initState2() {
   return {
     meow: {
@@ -17,6 +19,7 @@ function initState2() {
 
 <template>
   <Story
+    :meta="{ wrapper: false }"
     title="State"
   >
     <Variant
@@ -24,16 +27,30 @@ function initState2() {
       :init-state="initState"
     >
       <template #default="{ state }">
-        <h1>State</h1>
-        <div>
-          <pre>{{ state }}</pre>
-          <input
-            v-model.number="state.count"
-            type="number"
-          >
-          <input
-            v-model="state.text"
-          >
+        <div class="example-stage example-stack">
+          <h1 class="example-heading">
+            State
+          </h1>
+          <div class="example-stack">
+            <pre class="example-output">{{ state }}</pre>
+            <label class="example-field">
+              <span>Count</span>
+              <input
+                v-model.number="state.count"
+                class="example-input"
+                aria-label="Count"
+                type="number"
+              >
+            </label>
+            <label class="example-field">
+              <span>Text</span>
+              <input
+                v-model="state.text"
+                class="example-input"
+                aria-label="Text"
+              >
+            </label>
+          </div>
         </div>
       </template>
 
@@ -60,7 +77,15 @@ function initState2() {
       :init-state="initState2"
     >
       <template #default="{ state }">
-        <input v-model="state.meow.foo">
+        <div class="example-stage example-stack">
+          <label class="example-field">
+            <span>meow.foo</span>
+            <input
+              v-model="state.meow.foo" class="example-input"
+              aria-label="meow.foo"
+            >
+          </label>
+        </div>
       </template>
 
       <template #controls="{ state }">

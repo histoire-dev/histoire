@@ -1,0 +1,39 @@
+/* Opt-in tokens keep diagnostic stories and authored controls untouched. */
+.example-stage {
+  --example-text: #202124;
+  --example-muted: #62656d;
+  --example-surface: #f3f4f5;
+  --example-field: #fff;
+  --example-border: #d9dce1;
+  --example-primary: #24262b;
+  --example-on-primary: #fff;
+  --example-primary-hover: #41444b;
+  --example-success: #e3f1e8;
+  --example-on-success: #235c3c;
+  --example-success-hover: #d1e8d9;
+  --example-danger: #f8e7e6;
+  --example-on-danger: #8c322e;
+  --example-danger-hover: #f0d4d2;
+  color: var(--example-text);
+  font: 400 14px/1.5 ui-sans-serif, system-ui, sans-serif;
+  color-scheme: light;
+}
+
+/* Histoire owns these classes in both canvas and isolated story documents. */
+:is(.dark, .htw-dark, .my-dark) .example-stage {
+  --example-text: #ececef;
+  --example-muted: #a8abb3;
+  --example-surface: #25272c;
+  --example-field: #1d1f23;
+  --example-border: #454952;
+  --example-primary: #e8eaed;
+  --example-on-primary: #202124;
+  --example-primary-hover: #cdd0d7;
+  --example-success: #20382a;
+  --example-on-success: #a7d8b8;
+  --example-success-hover: #2a4736;
+  --example-danger: #402725;
+  --example-on-danger: #edb0ab;
+  --example-danger-hover: #51332f;
+  color-scheme: dark;
+}

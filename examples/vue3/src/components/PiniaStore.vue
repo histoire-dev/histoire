@@ -5,10 +5,12 @@ const myStore = useMyStore()
 </script>
 
 <template>
-  <button @click="myStore.myValue++">
-    +1
-  </button>
-  <span>
-    {{ myStore.myValue }}
-  </span>
+  <div class="example-row">
+    <button type="button" class="example-button" @click="myStore.myValue++">
+      +1
+    </button>
+    <span class="example-value">
+      {{ myStore.myValue }}
+    </span>
+  </div>
 </template>

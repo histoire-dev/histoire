@@ -12,14 +12,14 @@ function notify() {
 
 <template>
   <UApp>
-    <section class="rounded-lg border border-default bg-default p-6 text-default">
-      <h2 class="text-xl font-semibold">
+    <section class="p-6 text-default">
+      <h2 class="m-0 text-base font-semibold">
         {{ config.fixture.title }}
       </h2>
       <p v-if="loading" role="status">
         Loading
       </p>
-      <ul v-else aria-label="Fixture items" class="my-4 space-y-2">
+      <ul v-else aria-label="Fixture items" class="my-5 space-y-3 text-sm">
         <li v-for="item in items" :key="item.id">
           {{ item.label }}
         </li>

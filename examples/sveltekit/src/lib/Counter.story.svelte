@@ -5,5 +5,5 @@
 </script>
 
 <Hst.Story>
-  <Counter />
+  <div class="example-stage"><Counter /></div>
 </Hst.Story>

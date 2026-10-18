@@ -19,24 +19,43 @@ export default {
 </script>
 
 <template>
-  <Story>
+  <Story :meta="{ wrapper: false }">
     <Variant
       title="default"
     >
-      <h1>State</h1>
-      <div>
-        <pre>{{ state }}</pre>
-        <div>{{ { synced } }}</div>
-        <input
-          v-model.number="state.count"
-          type="number"
-        >
-        <input
-          v-model="state.text"
-        >
-        <input
-          v-model="synced"
-        >
+      <div class="example-stage example-stack">
+        <h1 class="example-heading">
+          State
+        </h1>
+        <div class="example-stack">
+          <pre class="example-output">{{ state }}</pre>
+          <div>{{ { synced } }}</div>
+          <label class="example-field">
+            <span>Count</span>
+            <input
+              v-model.number="state.count"
+              class="example-input"
+              aria-label="Count"
+              type="number"
+            >
+          </label>
+          <label class="example-field">
+            <span>Text</span>
+            <input
+              v-model="state.text"
+              class="example-input"
+              aria-label="Text"
+            >
+          </label>
+          <label class="example-field">
+            <span>Synced</span>
+            <input
+              v-model="synced"
+              class="example-input"
+              aria-label="Synced"
+            >
+          </label>
+        </div>
       </div>
 
       <template #controls>

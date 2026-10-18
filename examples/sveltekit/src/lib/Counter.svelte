@@ -1,20 +1,33 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import { spring } from 'svelte/motion';
 
 	let count = 0;
 
-	const displayed_count = spring();
-	$: displayed_count.set(count);
+	let reduceMotion = false;
+	const displayed_count = spring(0);
+
+	// Read live browser preference only after mount; SSR remains deterministic.
+	onMount(() => {
+		const media = window.matchMedia('(prefers-reduced-motion: reduce)');
+		/** Updates spring policy when operating system preference changes. */
+		const updateMotion = () => { reduceMotion = media.matches; };
+		updateMotion();
+		media.addEventListener('change', updateMotion);
+		return () => media.removeEventListener('change', updateMotion);
+	});
+	$: displayed_count.set(count, { hard: reduceMotion });
 	$: offset = modulo($displayed_count, 1);
 
+	/** Keeps digit offset positive while decrementing through zero. */
 	function modulo(n: number, m: number) {
 		// handle negative numbers
 		return ((n % m) + m) % m;
 	}
 </script>
 
-<div class="counter">
-	<button on:click={() => (count -= 1)} aria-label="Decrease the counter by one">
+<div class="counter" role="group" aria-label="Counter">
+	<button class="example-button" type="button" on:click={() => (count -= 1)} aria-label="Decrease the counter by one">
 		<svg aria-hidden="true" viewBox="0 0 1 1">
 			<path d="M0,0.5 L1,0.5" />
 		</svg>
@@ -27,7 +40,7 @@
 		</div>
 	</div>
 
-	<button on:click={() => (count += 1)} aria-label="Increase the counter by one">
+	<button class="example-button" type="button" on:click={() => (count += 1)} aria-label="Increase the counter by one">
 		<svg aria-hidden="true" viewBox="0 0 1 1">
 			<path d="M0,0.5 L1,0.5 M0.5,0 L0.5,1" />
 		</svg>
@@ -35,69 +48,43 @@
 </div>
 
 <style>
-	.counter {
-		display: flex;
-		border-top: 1px solid rgba(0, 0, 0, 0.1);
-		border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-		margin: 1rem 0;
-	}
+  .counter {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    max-width: 100%;
+  }
 
-	.counter button {
-		width: 2em;
-		padding: 0;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		border: 0;
-		background-color: transparent;
-		touch-action: manipulation;
-		color: var(--text-color);
-		font-size: 2rem;
-	}
+  .counter button {
+    width: 36px;
+    flex-shrink: 0;
+    padding: 0;
+    touch-action: manipulation;
+  }
 
-	.counter button:hover {
-		background-color: var(--secondary-color);
-	}
+  svg { width: 12px; height: 12px; }
+  path { vector-effect: non-scaling-stroke; stroke-width: 2px; stroke: currentColor; }
 
-	svg {
-		width: 25%;
-		height: 25%;
-	}
+  .counter-viewport {
+    width: 3ch;
+    height: 48px;
+    overflow: hidden;
+    text-align: center;
+    position: relative;
+    font-size: 28px;
+    font-variant-numeric: tabular-nums;
+  }
 
-	path {
-		vector-effect: non-scaling-stroke;
-		stroke-width: 2px;
-		stroke: var(--text-color);
-	}
+  .counter-viewport strong {
+    position: absolute;
+    display: flex;
+    width: 100%;
+    height: 100%;
+    font-weight: 600;
+    align-items: center;
+    justify-content: center;
+  }
 
-	.counter-viewport {
-		width: 8em;
-		height: 4em;
-		overflow: hidden;
-		text-align: center;
-		position: relative;
-	}
-
-	.counter-viewport strong {
-		position: absolute;
-		display: flex;
-		width: 100%;
-		height: 100%;
-		font-weight: 400;
-		color: var(--accent-color);
-		font-size: 4rem;
-		align-items: center;
-		justify-content: center;
-	}
-
-	.counter-digits {
-		position: absolute;
-		width: 100%;
-		height: 100%;
-	}
-
-	.hidden {
-		top: -100%;
-		user-select: none;
-	}
+  .counter-digits { position: absolute; width: 100%; height: 100%; }
+  .hidden { top: -100%; user-select: none; }
 </style>

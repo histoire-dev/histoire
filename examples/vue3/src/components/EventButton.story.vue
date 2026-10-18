@@ -5,11 +5,14 @@ import EventButton from './EventButton.vue'
 
 <template>
   <Story
+    :meta="{ wrapper: false }"
     title="events/EventButton"
   >
-    <EventButton @my-event="logEvent('My event', $event)" /><br>
-    <button @click="logEvent('Click', $event)">
-      Click
-    </button>
+    <div class="example-stage example-stack">
+      <EventButton @my-event="logEvent('My event', $event)" />
+      <button class="example-button" @click="logEvent('Click', $event)">
+        Click
+      </button>
+    </div>
   </Story>
 </template>

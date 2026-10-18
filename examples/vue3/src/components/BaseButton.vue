@@ -73,7 +73,7 @@ defineProps({
   padding: 2px 4px;
 }
 
-.my-dark .btn {
+.my-dark .btn:not(.example-button) {
   color: black;
 }
 </style>

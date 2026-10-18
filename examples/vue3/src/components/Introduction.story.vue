@@ -1,17 +1,15 @@
 <template>
-  <Story
-    group="top"
-    docs-only
-    icon="carbon:bookmark"
-  />
+  <Story group="top" docs-only icon="carbon:bookmark" />
 </template>
 
 <docs lang="md">
-# Welcome
+# Vue 3 examples
 
-This is a demo book using Vue 3.
+Explore components, edit props, and inspect emitted events.
 
----
+- **BaseButton:** sizes, colors, and disabled state.
+- **Controls:** editable state and custom controls.
+- **Responsive:** layout changes with canvas width.
 
-Learn more about Histoire [here](https://histoire.dev/).
+[Histoire documentation](https://histoire.dev/)
 </docs>

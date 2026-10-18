@@ -14,14 +14,18 @@
   </svelte:fragment>
 
   <Hst.Variant title="Variant 1">
-    <BaseButton {disabled}>
-      {content}
-    </BaseButton>
+    <div class="example-stage">
+      <BaseButton {disabled}>
+        {content}
+      </BaseButton>
+    </div>
   </Hst.Variant>
 
   <Hst.Variant title="Variant 2">
-    <BaseButton {disabled}>
-      {content}
-    </BaseButton>
+    <div class="example-stage">
+      <BaseButton {disabled}>
+        {content}
+      </BaseButton>
+    </div>
   </Hst.Variant>
 </Hst.Story>

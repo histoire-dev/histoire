@@ -6,12 +6,15 @@
     }"
   >
     <Variant>
-      <BaseButtonLink
-        variant="primary"
-        to="#"
-      >
-        Hello world
-      </BaseButtonLink>
+      <div class="example-stage">
+        <BaseButtonLink
+          class="example-button"
+          variant="primary"
+          to="#"
+        >
+          Hello world
+        </BaseButtonLink>
+      </div>
     </Variant>
   </Story>
 </template>

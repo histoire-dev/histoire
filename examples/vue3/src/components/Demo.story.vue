@@ -4,10 +4,13 @@ import Demo from './Demo.vue'
 
 <template>
   <Story
+    :meta="{ wrapper: false }"
     title="Demo"
   >
     <Variant>
-      <Demo message="Hello world!" />
+      <div class="example-stage">
+        <Demo class="example-message" message="Hello world!" />
+      </div>
     </Variant>
 
     <Variant
@@ -16,15 +19,21 @@ import Demo from './Demo.vue'
       icon-color="#00bebe"
       auto-props-disabled
     >
-      <Demo message="Meow!" />
+      <div class="example-stage">
+        <Demo class="example-message" message="Meow!" />
+      </div>
     </Variant>
   </story>
 </template>
 
 <docs lang="md">
-# Title 1
+# Message
 
-## Title 2
+Edit `message` in Props to update selected variant.
 
-[Link](https://example.com)
+## Variants
+
+Each variant supplies its own message.
+
+[Histoire documentation](https://histoire.dev/)
 </docs>

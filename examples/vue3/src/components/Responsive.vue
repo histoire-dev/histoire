@@ -1,25 +1,7 @@
 <template>
-  <div class="target">
-    <p
-      v-for="n in 100"
-      :key="n"
-    >
-      Responsive
-    </p>
+  <div class="example-responsive">
+    <div v-for="n in 6" :key="n" class="example-region">
+      {{ String(n).padStart(2, '0') }}
+    </div>
   </div>
 </template>
-
-<style scoped>
-.target p {
-  margin: 2px;
-  padding: 12px;
-  background-color: rgb(188, 130, 255);
-  color: black;
-}
-
-@media (max-width: 768px) {
-  .target p {
-    background-color: rgb(115, 255, 173);
-  }
-}
-</style>

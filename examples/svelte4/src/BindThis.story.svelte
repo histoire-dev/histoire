@@ -6,21 +6,24 @@
 </script>
   
 <Hst.Story title="BindThisVsControls">
-  <button bind:this={button} {disabled}>
-    Hello Histoire
-  </button>
+  <div class="example-stage example-stack">
+    <button type="button" class="example-button" bind:this={button} {disabled}>
+      Hello Histoire
+    </button>
 
-  <section>
-    button={button}
-  </section>
+    <section class="example-output">
+      button={button}
+    </section>
 
-  <label>
-    <input
-      type="checkbox"
-      bind:checked={disabled}
-    />
-    Disabled
-  </label>
+    <label class="example-row">
+      <input
+        class="example-checkbox"
+        type="checkbox"
+        bind:checked={disabled}
+      />
+      Disabled
+    </label>
+  </div>
 
   <svelte:fragment slot="controls">
     <Hst.Checkbox

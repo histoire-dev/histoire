@@ -24,6 +24,7 @@ defineExpose({
 
 <template>
   <Story
+    :meta="{ wrapper: false }"
     title="Variant-scoped Controls"
     :layout="{ type: 'grid', width: 280 }"
   >
@@ -58,22 +59,34 @@ defineExpose({
     <Variant
       title="variant 1"
     >
-      <h1>Variant 1</h1>
-      <pre data-test-id="shared-controls-state">{{ state }}</pre>
+      <div class="example-stage example-stack">
+        <h1 class="example-heading">
+          Variant 1
+        </h1>
+        <pre class="example-output" data-test-id="shared-controls-state">{{ state }}</pre>
+      </div>
     </Variant>
 
     <Variant
       title="variant 2"
     >
-      <h1>Variant 2</h1>
-      <pre data-test-id="shared-controls-state">{{ state }}</pre>
+      <div class="example-stage example-stack">
+        <h1 class="example-heading">
+          Variant 2
+        </h1>
+        <pre class="example-output" data-test-id="shared-controls-state">{{ state }}</pre>
+      </div>
     </Variant>
 
     <Variant
       title="variant 3"
     >
-      <h1>Variant 3</h1>
-      <pre data-test-id="shared-controls-state">{{ state }}</pre>
+      <div class="example-stage example-stack">
+        <h1 class="example-heading">
+          Variant 3
+        </h1>
+        <pre class="example-output" data-test-id="shared-controls-state">{{ state }}</pre>
+      </div>
     </Variant>
   </Story>
 </template>

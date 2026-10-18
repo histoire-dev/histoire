@@ -11,6 +11,7 @@ const radioOptions = {
   'elden-ring': 'Elden Ring',
 }
 
+/** Creates independent editable values for each variant. */
 function initState() {
   return {
     text: 'Hello',
@@ -26,14 +27,18 @@ function initState() {
 </script>
 
 <template>
-  <Story title="Controls">
+  <Story :meta="{ wrapper: false }" title="Controls">
     <Variant
       title="default"
       :init-state="initState"
     >
       <template #default="{ state }">
-        <h1>State</h1>
-        <pre class="state-output">{{ state }}</pre>
+        <div class="example-stage example-stack">
+          <h1 class="example-heading">
+            State
+          </h1>
+          <pre class="state-output example-output">{{ state }}</pre>
+        </div>
       </template>
 
       <template #controls="{ state }">

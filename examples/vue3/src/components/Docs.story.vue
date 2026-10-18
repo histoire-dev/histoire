@@ -1,48 +1,33 @@
 <template>
-  <Story
-    title="Docs"
-    icon="carbon:notebook"
-  >
-    <Variant
-      title="default"
-    >
-      I have docs!
+  <Story :meta="{ wrapper: false }" title="Docs" icon="carbon:notebook">
+    <Variant title="default">
+      <div class="example-stage">
+        I have docs!
+      </div>
     </Variant>
   </Story>
 </template>
 
 <docs lang="md">
-# Title
+# Component documentation
 
-## Subtitle
+Stories can include usage notes and code beside rendered component.
 
-> Hello
-
-Deserunt nihil nam qui. :cat2: Accusamus ea a voluptatem. Vel veniam non temporibus pariatur cumque aperiam tempora tempora. Assumenda aspernatur qui cum aut tempora rerum. Quisquam quibusdam dignissimos magni et.
-
-[Learn more](https://histoire.dev)
+## Usage
 
 ```vue
-<script lang="ts" setup>
+<script setup lang="ts">
 defineProps<{
-  foo: string
+  message: string
 }>()
 </script>
 
 <template>
-  <div>Hello {{ world }}</div>
+  <p>{{ message }}</p>
 </template>
 ```
 
-Ratione vero beatae corrupti quia. Tenetur temporibus ipsa qui qui tempora. Quae harum velit odit quo animi maxime officiis. Dolores ea iusto et.
+Use **Props** to edit values and **Source** to inspect selected variant.
 
-- Meow
-- Waf
-- Purr
-
-1. Meow
-2. Waf
-3. Purr
-
-[Go home](/)
+[Histoire documentation](https://histoire.dev/)
 </docs>

@@ -8,21 +8,24 @@ const emit = defineEmits<{
 const value1 = ref('Hello')
 const value2 = ref('World')
 
+/** Sends current field values through story event contract. */
 function sendEvent() {
   emit('myEvent', { a: value1.value, b: value2.value })
 }
 </script>
 
 <template>
-  <input
-    v-model="value1"
-    type="text"
-  >
-  <input
-    v-model="value2"
-    type="text"
-  >
-  <button @click="sendEvent">
-    Send
-  </button>
+  <div class="example-stack">
+    <label class="example-field">
+      First value
+      <input v-model="value1" class="example-input" type="text">
+    </label>
+    <label class="example-field">
+      Second value
+      <input v-model="value2" class="example-input" type="text">
+    </label>
+    <button type="button" class="example-button" @click="sendEvent">
+      Send
+    </button>
+  </div>
 </template>

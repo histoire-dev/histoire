@@ -1,14 +1,15 @@
-import { cp, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises'
+import { cp, readFile, writeFile } from 'node:fs/promises'
 import { createRequire } from 'node:module'
-import { tmpdir } from 'node:os'
 import { basename, resolve } from 'node:path'
 import { linkMcpFixtureDependencies, linkMcpFixturePlaywright, MCP_REPOSITORY_ROOT } from './cli-project.js'
+import { createExampleDirectory } from './example-directory.js'
 import { startMcpProcess } from './process.js'
 
 /** Copy unchanged example sources, reusing explicitly installed example dependencies. */
 export async function createMcpFrameworkProject(name: 'react' | 'svelte4' | 'svelte5' | 'sveltekit' | 'nuxt4' | 'nuxt-ui') {
   const example = resolve(MCP_REPOSITORY_ROOT, 'examples', name === 'svelte5' ? 'sveltekit' : name)
-  const root = await mkdtemp(resolve(tmpdir(), `histoire MCP ${name} `))
+  const directory = await createExampleDirectory(`histoire MCP ${name} `)
+  const { root } = directory
   await cp(example, root, {
     recursive: true,
     filter: path => !['node_modules', '.histoire', '.nuxt', '.output', '.svelte-kit'].includes(basename(path)),
@@ -37,6 +38,6 @@ export async function createMcpFrameworkProject(name: 'react' | 'svelte4' | 'sve
   return {
     root,
     /** Remove copied sources only after owned runtime closes. */
-    async close() { await rm(root, { recursive: true, force: true }) },
+    close: directory.close,
   }
 }

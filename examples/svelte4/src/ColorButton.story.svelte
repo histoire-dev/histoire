@@ -21,14 +21,16 @@
 </script>
   
 <Hst.Story title="ColorButton" {source}>
-  <ColorButton {disabled} {colorselect} on:click={event => logEvent('click', event)}>
-    Click me!
-  </ColorButton>
-  <div style="margin-top: 6px;">
-    <label>
-      <input type="checkbox" bind:checked={disabled} >
-      Disabled
-    </label>
+  <div class="example-stage example-stack">
+    <ColorButton {disabled} {colorselect} on:click={event => logEvent('click', event)}>
+      Click me!
+    </ColorButton>
+    <div>
+      <label class="example-row">
+        <input class="example-checkbox" type="checkbox" bind:checked={disabled} >
+        Disabled
+      </label>
+    </div>
   </div>
 
   <svelte:fragment slot="controls">
@@ -48,13 +50,3 @@
     <pre>{JSON.stringify({ disabled, size }, null, 2)}</pre>
   </svelte:fragment>
 </Hst.Story>
-
-<style>
-  pre {
-    padding: 8px;
-    background: rgba(0, 0, 0, .1);
-    border-radius: 4px;
-    margin: 8px;
-    font-size: 0.8rem;
-  }
-</style>
