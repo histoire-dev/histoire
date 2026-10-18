@@ -1,3 +1,4 @@
+import { writeFileSync } from 'node:fs'
 import { unlink } from 'node:fs/promises'
 import { join } from 'node:path'
 import { describe, expect, it, vi } from 'vitest'
@@ -20,15 +21,17 @@ describe('markdown watcher ownership', () => {
         expect(file.html).toContain(file.content)
         completed.push(file.content!)
       })
-      await project.write('[Missing](./Missing.story.md)', 'Guide.story.md')
+      // Keep each edit complete before watcher callbacks can run. Async writes
+      // yield after truncation, allowing a valid empty document to be published.
+      writeFileSync(file.absolutePath, '[Missing](./Missing.story.md)')
       await vi.waitFor(() => expect(errors).toHaveBeenCalled())
       expect(String(errors.mock.calls[0][0])).toContain('[md] Cannot find story file')
       expect(file.content).toBe('Original')
       expect(completed).toEqual([])
       // Native change events within Chokidar's throttle window can coalesce.
       // Retry the real edit until admitted; a poisoned queue still cannot pass.
-      await vi.waitFor(async () => {
-        if (!completed.length) await project.write('Corrected', 'Guide.story.md')
+      await vi.waitFor(() => {
+        if (!completed.length) writeFileSync(file.absolutePath, 'Corrected')
         expect(completed).toEqual(['Corrected'])
       }, { interval: 100 })
       expect(file.html).toContain('Corrected')
