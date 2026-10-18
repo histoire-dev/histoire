@@ -95,7 +95,8 @@ textarea.histoire-control-field { resize: vertical; }
 .histoire-switch-input:disabled { opacity: .45; cursor: default; }
 .histoire-checkbox { cursor: pointer; }
 .histoire-checkbox:focus-visible { outline: 2px solid var(--histoire-control-resolved-accent); outline-offset: -2px; border-radius: 7px; }
-.histoire-simple-checkbox { display: inline-grid; place-items: center; width: 16px; height: 16px; border: 1px solid var(--histoire-control-resolved-border); border-radius: 4px; background: var(--histoire-control-resolved-input); }
+/* Keep the line box stable when the checkmark changes the inline grid's baseline. */
+.histoire-simple-checkbox { display: inline-grid; vertical-align: middle; place-items: center; width: 16px; height: 16px; border: 1px solid var(--histoire-control-resolved-border); border-radius: 4px; background: var(--histoire-control-resolved-input); }
 .histoire-simple-checkbox[data-checked="true"] { background: var(--histoire-control-resolved-accent); border-color: var(--histoire-control-resolved-accent); color: #fff; }
 .histoire-choice-list { display: flex; flex-direction: column; gap: 6px; }
 .histoire-choice-list label { position: relative; display: flex; align-items: center; gap: 8px; cursor: pointer; }
