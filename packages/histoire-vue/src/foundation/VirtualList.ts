@@ -24,12 +24,18 @@ export interface HistoireVirtualSlot {
 interface VirtualScrollerHandle {
   /** Both installed scrollers reveal current array positions with nearest alignment. */
   scrollToItem: (index: number, options?: { align: 'nearest' }) => void
+  /** Both installed scrollers support immediate pixel-based navigation. */
+  scrollToPosition: (position: number) => void
   /** Only RecycleScroller exposes direct refresh; DynamicScroller acknowledges update events. */
   updateVisibleItems?: (itemsChanged: boolean, checkPositionDiff?: boolean) => unknown
 }
 
 /** List actions reveal keyboard targets before querying recycled row elements. */
 export interface HistoireVirtualListHandle {
+  /** Read vertical offset of list's own scrolling viewport. */
+  getScrollTop: () => number | undefined
+  /** Immediately show beginning without moving keyboard focus. */
+  scrollToTop: () => void
   /** Reveal exact current row; removed rows cannot acquire another row's focus. */
   reveal: (key: string) => Promise<HTMLElement | undefined>
   /** Focus exact row's first native interactive control. */
@@ -110,7 +116,15 @@ export const HistoireVirtualList = defineComponent({
       const row = await resolveRow(key, request)
       if (active && request === action) row?.querySelector<HTMLElement>('button:not(:disabled), [tabindex], a[href]')?.focus({ preventScroll: true })
     }
-    expose({ reveal, focus } satisfies HistoireVirtualListHandle)
+    /** Page-mode lists have no owned viewport; both native scrollers use their root. */
+    function getScrollTop(): number | undefined {
+      return props.pageMode ? undefined : (root.value?.firstElementChild as HTMLElement | undefined)?.scrollTop
+    }
+    /** Keep navigation inside library so measured and fixed lists share behavior. */
+    function scrollToTop(): void {
+      scroller.value?.scrollToPosition(0)
+    }
+    expose({ reveal, focus, getScrollTop, scrollToTop } satisfies HistoireVirtualListHandle)
     return () => {
       const dynamic = props.itemSize === undefined
       return h('div', { ...attrs, ref: root, class: ['histoire-virtual-list', attrs.class, { 'histoire-virtual-list-page': props.pageMode }] }, [
