@@ -17,7 +17,7 @@ export type { HistoireVirtualItem, HistoireVirtualListHandle, HistoireVirtualSlo
 // First-party panel foundation. External loaders/extensions are unsupported.
 export { useHistoireContext, useHistoireResource } from './provider/context.js'
 export type { HistoireContainerSize, HistoireVueContext } from './provider/context.js'
-export { focusHistoireSearch, HISTOIRE_SEARCH_FOCUS, HISTOIRE_TOGGLE_UI, requestHistoireUiToggle } from './provider/shortcuts.js'
+export { focusHistoireSearch, HISTOIRE_SEARCH_FOCUS, HISTOIRE_SHOW_UI, HISTOIRE_TOGGLE_UI, requestHistoireUiShow, requestHistoireUiToggle } from './provider/shortcuts.js'
 export { createHistoireSearchNavigation, provideHistoireSearchNavigation } from './search/navigation.js'
 export { createHistoireTestsCollector } from './tests/collector.js'
 export { createHistoireTestsModel, provideHistoireTestsModel, useProvidedHistoireTestsModel } from './tests/model.js'

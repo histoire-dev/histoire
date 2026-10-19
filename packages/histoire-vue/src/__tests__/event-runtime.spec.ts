@@ -4,6 +4,34 @@ import { cleanEventPayload } from '../../../histoire-app/src/app/util/event-payl
 import { installRuntimeEventScope, publishRuntimeEvent, resolveRuntimeEventTarget } from '../../../histoire-app/src/app/util/runtime-events.js'
 
 describe('runtime event payload and actor', () => {
+  it('relays unhandled Escape as a restore intent without consuming native Escape', () => {
+    const actions: unknown[] = []
+    const close = installRuntimeEventScope(() => 'story', (focused, action) => actions.push({ focused, action }))
+    const input = document.body.appendChild(document.createElement('input'))
+    try {
+      const escape = new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true })
+      input.dispatchEvent(escape)
+      expect(actions).toEqual([{ focused: true, action: 'show-ui' }])
+      expect(escape.defaultPrevented).toBe(false)
+
+      for (const modifiers of [{ ctrlKey: true }, { metaKey: true }, { altKey: true }, { shiftKey: true }, { repeat: true }]) {
+        input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, ...modifiers }))
+      }
+      input.addEventListener('keydown', event => event.preventDefault(), { once: true })
+      input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true }))
+      input.addEventListener('keydown', event => event.stopPropagation(), { once: true })
+      input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }))
+      expect(actions).toHaveLength(1)
+      close()
+      input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }))
+      expect(actions).toHaveLength(1)
+    }
+    finally {
+      close()
+      input.remove()
+    }
+  })
+
   it('cleans DOM events, nested nodes, cycles and primitive payloads once into JSON-safe data', () => {
     const button = document.createElement('button')
     let click: MouseEvent | undefined

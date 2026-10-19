@@ -2,7 +2,7 @@
 import type { HistoireSession } from '@histoire/sdk'
 import { subscribeHistoireMountEvents } from '@histoire/sdk/internal'
 import { useHistoireSession, useHistoireSnapshot } from '@histoire/vue'
-import { focusHistoireSearch, requestHistoireUiToggle, useHistoireContext } from '@histoire/vue/internal'
+import { focusHistoireSearch, requestHistoireUiShow, requestHistoireUiToggle, useHistoireContext } from '@histoire/vue/internal'
 import { useEventListener } from '@vueuse/core'
 import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useCanvasFrames, useCanvasFrameState, useCanvasStore } from '../../composables/canvas-settings.js'
@@ -194,6 +194,7 @@ async function startOwned(version: number, signal: AbortSignal): Promise<void> {
       const action = (event.payload as { action?: string }).action
       if (action === 'search') focusHistoireSearch(context.root.value)
       else if (action === 'toggle-ui') requestHistoireUiToggle(context.root.value)
+      else if (action === 'show-ui') requestHistoireUiShow(context.root.value)
     })
     const intent = targetSelector.currentIntent()
     const mounted = mount.ready.catch((error) => {

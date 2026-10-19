@@ -6,12 +6,24 @@ import { useHistoireContext, useHistoireResource } from './context.js'
 export const HISTOIRE_SEARCH_FOCUS = 'histoire:search-focus'
 /** Owned source-frame intent toggles chrome in its exact standalone provider. */
 export const HISTOIRE_TOGGLE_UI = 'histoire:toggle-ui'
+/** Owned source-frame Escape restores chrome without toggling visible UI off. */
+export const HISTOIRE_SHOW_UI = 'histoire:show-ui'
+
+/** Dispatch a finite visibility intent without bubbling into neighboring providers. */
+function requestUiVisibility(root: HTMLElement | null, type: typeof HISTOIRE_SHOW_UI | typeof HISTOIRE_TOGGLE_UI): void {
+  if (!root) return
+  const Event = root.ownerDocument.defaultView?.Event
+  if (Event) root.dispatchEvent(new Event(type, { cancelable: true }))
+}
+
+/** Dispatch the finite restore intent on its owning provider root. */
+export function requestHistoireUiShow(root: HTMLElement | null): void {
+  requestUiVisibility(root, HISTOIRE_SHOW_UI)
+}
 
 /** Dispatch the finite UI-toggle intent on its owning provider root. */
 export function requestHistoireUiToggle(root: HTMLElement | null): void {
-  if (!root) return
-  const Event = root.ownerDocument.defaultView?.Event
-  if (Event) root.dispatchEvent(new Event(HISTOIRE_TOGGLE_UI, { cancelable: true }))
+  requestUiVisibility(root, HISTOIRE_TOGGLE_UI)
 }
 
 /** Owned source-frame intent focuses only this provider's first independent search part. */

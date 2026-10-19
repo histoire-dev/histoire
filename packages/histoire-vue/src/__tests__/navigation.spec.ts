@@ -8,7 +8,7 @@ import { HistoireSearch } from '../components/search/HistoireSearch.js'
 import { HistoireToolbar } from '../components/toolbar/HistoireToolbar.js'
 import { HistoireStoryTree } from '../components/tree/HistoireStoryTree.js'
 import { HistoireProvider } from '../provider/HistoireProvider.js'
-import { focusHistoireSearch, HISTOIRE_SEARCH_FOCUS } from '../provider/shortcuts.js'
+import { focusHistoireSearch, HISTOIRE_SEARCH_FOCUS, HISTOIRE_SHOW_UI, HISTOIRE_TOGGLE_UI } from '../provider/shortcuts.js'
 import { selectControl, selectLabels } from './fixtures/select.js'
 
 describe('independent session navigation', () => {
@@ -153,7 +153,11 @@ describe('independent session navigation', () => {
     await session.dispose()
   })
 
-  it('reveals absent owning search from current source document and rejects stale focus', async () => {
+  it.each([
+    ['search', HISTOIRE_SEARCH_FOCUS],
+    ['toggle-ui', HISTOIRE_TOGGLE_UI],
+    ['show-ui', HISTOIRE_SHOW_UI],
+  ])('relays %s from current source document to owning UI and rejects stale focus', async (action, intent) => {
     const fixture = sourceFixture()
     let receive = (_event: any) => {}
     const original = fixture.adapters.mount!
@@ -176,10 +180,10 @@ describe('independent session navigation', () => {
       await nextTick()
       wrapper.findAll('input')[1].element.focus()
     })
-    wrapper.element.addEventListener(HISTOIRE_SEARCH_FOCUS, request)
+    wrapper.element.addEventListener(intent, request)
     await vi.waitFor(() => expect(session.getSnapshot().runtime.status).toBe('ready'))
     const snapshot = session.getSnapshot()
-    const event = { protocolVersion: 1, sessionId: 'session', connectionId: 'source-port', mountId: snapshot.runtime.mountId!, sourceId: snapshot.source!.sourceId, epoch: snapshot.source!.epoch, revision: snapshot.source!.revision, runtimeId: snapshot.runtime.runtimeId!, target: snapshot.selection!, kind: 'event' as const, event: 'focus.changed' as const, sequence: 1, payload: { focused: true, action: 'search' } }
+    const event = { protocolVersion: 1, sessionId: 'session', connectionId: 'source-port', mountId: snapshot.runtime.mountId!, sourceId: snapshot.source!.sourceId, epoch: snapshot.source!.epoch, revision: snapshot.source!.revision, runtimeId: snapshot.runtime.runtimeId!, target: snapshot.selection!, kind: 'event' as const, event: 'focus.changed' as const, sequence: 1, payload: { focused: true, action } }
     receive({ ...event, runtimeId: 'retired' })
     expect(revealed.value).toBe(false)
     expect(request).not.toHaveBeenCalled()
@@ -188,7 +192,7 @@ describe('independent session navigation', () => {
     expect(request).toHaveBeenCalledOnce()
     const ownInput = wrapper.findAll('input')[1].element
     expect(document.activeElement).toBe(ownInput)
-    wrapper.element.removeEventListener(HISTOIRE_SEARCH_FOCUS, request)
+    wrapper.element.removeEventListener(intent, request)
     wrapper.unmount()
     receive(event)
     expect(document.activeElement).not.toBe(wrapper.element)

@@ -61,6 +61,9 @@ describe('UI visibility context menus', () => {
           cy.get(menu).should('not.exist')
           cy.get(canvas).should('be.focused')
           cy.get('[aria-label="Workbench"]').should('not.exist')
+          cy.get(canvas).trigger('keydown', { eventConstructor: 'KeyboardEvent', key: 'Escape' })
+          cy.get('[aria-label="Workbench"]').should('be.visible')
+          cy.get('[aria-label="Hide UI"]').click()
           // Single fills its canvas with native story content while chrome is hidden.
           openCanvasMenu(arrange === 'single')
           cy.contains(`${menu} [role="menuitem"]`, 'Show UI').click()
@@ -68,6 +71,39 @@ describe('UI visibility context menus', () => {
           cy.get('[aria-label="Workbench"]').should('be.visible')
           cy.get('[aria-label="Hide UI"]').should('be.visible')
           cy.get(input).should('have.value', message)
+          cy.location('href').should('equal', href)
+          cy.get(selectedFrame).should(($retained) => {
+            expect($retained[0].contentDocument).to.equal(document)
+          })
+        })
+      })
+    })
+  }
+
+  for (const arrange of ['single', 'grid', 'list', 'matrix']) {
+    it(`restores ${arrange} UI from canvas and story input, yielding to story Escape`, () => {
+      visitCanvas(arrange)
+      cy.get(selectedFrame).then(($frames) => {
+        const document = $frames[0].contentDocument
+        const input = document.createElement('input')
+        input.setAttribute('aria-label', 'Escape test input')
+        document.body.append(input)
+        cy.location('href').then((href) => {
+          cy.get('[aria-label="Hide UI"]').click()
+          cy.get(canvas).focus().type('{esc}')
+          cy.get('[aria-label="Workbench"]').should('be.visible')
+          cy.get(canvas).type('{esc}')
+          cy.get('[aria-label="Workbench"]').should('be.visible')
+          cy.get('[aria-label="Hide UI"]').click()
+          cy.wrap(input).type(`Retained ${arrange} input`)
+          cy.then(() => input.addEventListener('keydown', event => event.preventDefault(), { once: true }))
+          cy.wrap(input).type('{esc}')
+          cy.get('[aria-label="Workbench"]').should('not.exist')
+          cy.wrap(input).type('{esc}')
+          cy.get('[aria-label="Workbench"]').should('be.visible')
+          cy.wrap(input).should('have.value', `Retained ${arrange} input`).should('be.focused')
+          cy.wrap(input).type('{esc}')
+          cy.get('[aria-label="Workbench"]').should('be.visible')
           cy.location('href').should('equal', href)
           cy.get(selectedFrame).should(($retained) => {
             expect($retained[0].contentDocument).to.equal(document)

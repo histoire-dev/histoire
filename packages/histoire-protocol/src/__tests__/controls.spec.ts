@@ -8,6 +8,15 @@ import { validateBridgeResult } from '../bridge/results.js'
 const owner = { protocolVersion: 1, sessionId: 'session', connectionId: 'connection', mountId: 'mount', sourceId: 'source', epoch: 'epoch', revision: 'revision', runtimeId: 'runtime', target: { storyId: 'story', variantId: 'variant' } }
 
 describe('controls bridge authority', () => {
+  it('admits restore UI only from current owned primary document', () => {
+    const focus = { ...owner, kind: 'event', sequence: 1, event: 'focus.changed', payload: { focused: true, action: 'show-ui' } }
+    expect(() => validateBridgeEnvelope(focus, owner, 'primary', undefined, 'child-to-parent')).not.toThrow()
+    expect(() => validateBridgeEnvelope({ ...focus, runtimeId: 'retired' }, owner, 'primary', undefined, 'child-to-parent')).toThrow()
+    expect(() => validateBridgeEnvelope({ ...focus, payload: { ...focus.payload, direction: 'next' } }, owner, 'primary', undefined, 'child-to-parent')).toThrow()
+    expect(() => validateBridgeEnvelope({ ...focus, payload: { focused: true, action: 'unknown' } }, owner, 'primary', undefined, 'child-to-parent')).toThrow()
+    expect(() => validateBridgeEnvelope(focus, owner, 'primary')).toThrow()
+  })
+
   it('allows only current child primary focus/search and bounded event reset publications', () => {
     const focus = { ...owner, kind: 'event', sequence: 1, event: 'focus.changed', payload: { focused: true, action: 'search' } }
     expect(() => validateBridgeEnvelope(focus, owner, 'primary', undefined, 'child-to-parent')).not.toThrow()

@@ -154,7 +154,7 @@ export interface HistoireRuntimeFocusMessage extends HistoireStoryScopedMessage 
   /** Whether owned story document currently has focus. */
   focused: boolean
   /** Explicit host UI action; other keys stay inside story. */
-  action?: 'search' | 'toggle-ui'
+  action?: 'search' | 'toggle-ui' | 'show-ui'
 }
 
 /** Host request: collect the tests a variant registers. */

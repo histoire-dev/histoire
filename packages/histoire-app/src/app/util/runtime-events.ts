@@ -1,4 +1,4 @@
-import type { HistoireEventSendMessage, HistoireTarget } from '@histoire/protocol'
+import type { HistoireEventSendMessage, HistoireRuntimeFocusMessage, HistoireTarget } from '@histoire/protocol'
 
 /** Attributed event payload before document/version metadata is added by runtime. */
 type RuntimeEventMessage = HistoireEventSendMessage & Partial<HistoireTarget>
@@ -53,7 +53,7 @@ export function publishRuntimeEvent(message: RuntimeEventMessage): boolean {
 }
 
 /** Capture actor before framework handlers; no Promise/timer monkey patches or async ambient ownership. */
-export function installRuntimeEventScope(storyId: () => string | undefined, publishFocus?: (focused: boolean, action?: 'search' | 'toggle-ui') => void, publishEvent?: (message: RuntimeEventMessage) => void): () => void {
+export function installRuntimeEventScope(storyId: () => string | undefined, publishFocus?: (focused: boolean, action?: HistoireRuntimeFocusMessage['action']) => void, publishEvent?: (message: RuntimeEventMessage) => void): () => void {
   const scope: RuntimeEventScope = { storyId, publishEvent }
   globals()[key] = scope
   const types = ['click', 'dblclick', 'input', 'change', 'submit', 'keydown', 'keyup', 'pointerdown', 'pointerup', 'focusin', 'focusout']
@@ -67,9 +67,15 @@ export function installRuntimeEventScope(storyId: () => string | undefined, publ
     scope.actor = actor
     scope.event = event
   }
-  /** Only finite search and chrome-toggle shortcuts leave owned iframe. */
+  /** Finite host intents yield to story handlers before leaving the owned iframe. */
   function keydown(event: KeyboardEvent) {
-    if (!publishFocus || event.defaultPrevented || event.altKey || !(event.ctrlKey || event.metaKey)) return
+    if (!publishFocus || event.defaultPrevented || event.altKey) return
+    if (event.key === 'Escape' && !event.ctrlKey && !event.metaKey && !event.shiftKey && !event.repeat) {
+      // Only the host knows whether chrome is hidden; leave native Escape unconsumed.
+      publishFocus(true, 'show-ui')
+      return
+    }
+    if (!(event.ctrlKey || event.metaKey)) return
     const key = event.key.toLowerCase()
     const action = event.shiftKey && key === 'h' ? 'toggle-ui' : key === 'k' ? 'search' : undefined
     if (!action) return

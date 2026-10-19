@@ -259,7 +259,7 @@ export function createEmbedRuntimeFrame(context: EmbedSurfaceContext, layout: 's
       }
       catch { context.bridge.post('events.appended', { items: [], droppedCount: 1 }, { runtimeId: owner.id!, target: selected! }) }
     }
-    else if (message.type === RUNTIME_FOCUS && typeof message.focused === 'boolean' && (message.action === undefined || message.action === 'search' || message.action === 'toggle-ui')) {
+    else if (message.type === RUNTIME_FOCUS && typeof message.focused === 'boolean' && (message.action === undefined || message.action === 'search' || message.action === 'toggle-ui' || message.action === 'show-ui')) {
       context.bridge.post('focus.changed', { focused: message.focused, ...(message.action ? { action: message.action } : {}) }, { runtimeId: owner.id!, target: selected! })
     }
     else if (message.type === SELECT_VARIANT && owner.acceptsSelection(message) && readyIds.has(message.variantId) && context.session.getSnapshot().catalog.stories.some(story => story.id === message.storyId && story.variants.filter(variant => variant.id === message.variantId).length === 1)) {
