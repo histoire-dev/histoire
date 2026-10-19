@@ -152,7 +152,8 @@ function openMenu(event: MouseEvent | KeyboardEvent) {
 .histoire-canvas-frame { position: absolute; min-width: 0; }
 .histoire-canvas-frame.is-single { position: relative; overflow: hidden; border-radius: 7px; }
 .is-single .histoire-frame-body { border: 0; }
-.is-single .histoire-frame-body::after { display: none; }
+/* Draw inside the rounded viewport without changing its physical dimensions. */
+.histoire-canvas-frame.is-single .histoire-frame-body::after { box-shadow: inset 0 0 0 1px var(--histoire-border); }
 .is-dimmed:not(.is-selected) { opacity: .35; }
 .is-dimmed.is-selected .histoire-frame-content { opacity: .35; }
 /* Frame labels keep selection semantics without shared button pressed surfaces. */
