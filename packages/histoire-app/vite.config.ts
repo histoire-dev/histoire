@@ -3,6 +3,10 @@ import vue from '@vitejs/plugin-vue'
 import fs from 'fs-extra'
 import { globbySync } from 'globby'
 import { defineConfig } from 'vite'
+import { moduleFileName } from './scripts/module-file-name.mjs'
+
+/** Read package dependencies once, including when Vite uses its ESM config runner. */
+const dependencies = Object.keys(fs.readJsonSync(fileURLToPath(new URL('./package.json', import.meta.url))).dependencies)
 
 export default defineConfig({
   plugins: [
@@ -56,13 +60,11 @@ export default defineConfig({
       entry: '',
       formats: ['es'],
     },
-    rollupOptions: {
+    rolldownOptions: {
       // Native UI source must pass through existing vendor aliases so this
       // document never mixes a host Vue copy with Histoire's vendor Vue.
       external(id) {
         if (id === '@histoire/vue' || id === '@histoire/vue/internal' || id === '@histoire/controls/vue') return false
-        // eslint-disable-next-line ts/no-require-imports
-        const dependencies = Object.keys(require('./package.json').dependencies)
         return /\$histoire|@histoire/.test(id) || dependencies.some(name => id === name || id.startsWith(`${name}/`))
       },
 
@@ -78,6 +80,22 @@ export default defineConfig({
         // direct imports even when reusable standalone UI never imports them.
         'src/app/components/story/GenericMountStory.vue',
         'src/app/components/story/GenericRenderStory.vue',
+        // Generated runtimes import these paths outside this build's graph.
+        // Explicit entries retain every exported protocol/helper under Rolldown.
+        'src/app/components/story/StoryVariantGridSandbox.vue',
+        'src/app/components/shell/WorkbenchEmptyState.vue',
+        'src/app/plugin.ts',
+        'src/app/stores/preview-settings.ts',
+        'src/app/util/const.ts',
+        'src/app/util/config.ts',
+        'src/app/util/dark.ts',
+        'src/app/util/preview-settings.ts',
+        'src/app/util/runtime-events.ts',
+        'src/app/util/host-channel.ts',
+        'src/app/util/state.ts',
+        'src/app/util/docs.ts',
+        'src/app/util/mapping.ts',
+        'src/app/util/vitest-mocker-shim.ts',
       ],
 
       output: {
@@ -86,8 +104,8 @@ export default defineConfig({
         //     return 'vendor'
         //   }
         // },
-        entryFileNames: '[name].js',
-        chunkFileNames: '[name].js',
+        entryFileNames: moduleFileName,
+        chunkFileNames: moduleFileName,
         assetFileNames: '[name][extname]',
         // hoistTransitiveImports: false,
         preserveModules: true,

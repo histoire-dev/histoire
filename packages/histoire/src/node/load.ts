@@ -16,7 +16,7 @@ let _load: ModuleLoader['loadModule']
 export function useModuleLoader(options: UseModuleLoaderOptions): ModuleLoader {
   const { server } = options
 
-  const node = new ViteNodeServer(server as any)
+  const node = new ViteNodeServer(server)
   const cssResolver = server.config.createResolver({ extensions: ['.css', '.pcss', '.postcss'], mainFields: ['style'], conditions: ['style'] })
 
   const runner = new ViteNodeRunner({

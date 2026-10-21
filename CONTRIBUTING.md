@@ -79,9 +79,32 @@ pnpm run story:preview
 
 ## Running tests
 
+### TypeScript compilers
+
+`pnpm exec tsc` runs native TypeScript 7 for builds and type checks. Workspaces
+that use TypeScript declare `@typescript/native` from the shared catalog.
+The `typescript` catalog entry aliases `@typescript/typescript6`, keeping the
+TypeScript 6 JavaScript API available to Vue tooling, ESLint, vendor builds,
+Svelte tooling, and tests that parse TypeScript. Declare both catalog entries
+in each workspace so pnpm resolves framework peers to the compatibility API.
+`pnpm exec tsc6` runs the compatibility compiler explicitly. Keep both catalog
+entries when updating TypeScript; replacing `typescript` with stock TypeScript 7
+breaks those tools.
+
+### Vite and bundlers
+
+Workspace builds use Vite 8 with Rolldown and Oxc. Keep Vite versions on the
+shared catalog and use `build.rolldownOptions` in workspace Vite configs.
+Histoire still supports Vite 7 consumers through its Rollup config path.
+The Svelte 4 example and VitePress retain their separate Vite 5 dependencies.
+
+`@histoire/vendors` still builds with Rollup and the TypeScript 6 API. Histoire
+also uses Rollup's parser and esbuild for deployed Node bundles; these direct
+dependencies are independent of Vite's bundler.
+
 ### Documentation and demo
 
-Use Node.js 22+ and the repository's pinned pnpm version:
+Use Node.js 22.12+ and the repository's pinned pnpm version:
 
 ```sh
 corepack enable

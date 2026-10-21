@@ -5,7 +5,7 @@ import pkg from './package.json'
 export default defineConfig({
   build: {
     minify: false,
-    rollupOptions: {
+    rolldownOptions: {
       input: ['src/index.ts', 'src/index.node.ts', 'src/client/index.ts', 'src/collect/index.ts'],
       external: [
         ...Object.keys({ ...pkg.dependencies, ...pkg.peerDependencies }).map(dep => new RegExp(`^${dep}(/|$)`)),

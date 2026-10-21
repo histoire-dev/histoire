@@ -7,6 +7,7 @@
     "module": "ESNext",
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
+    "types": ["node", "react", "react-dom"],
     "strict": true,
     "declaration": true,
     "outDir": "dist",

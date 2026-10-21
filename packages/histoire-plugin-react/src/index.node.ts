@@ -18,9 +18,10 @@ export function HstReact(): Plugin {
       supportMatch: [{ id: 'react', patterns: ['**/*.story.tsx', '**/*.story.jsx'], pluginIds: ['react'] }],
       viteNodeTransformMode: { web: [/\.[jt]sx$/] },
       vite: {
-        // A project JSX plugin can configure OXC through Vite 8 while Histoire's
-        // workspace runtime uses Vite 7; retain automatic JSX in that collector.
-        esbuild: { jsx: 'automatic', jsxImportSource: 'react' },
+        // Collection needs automatic JSX even before the project transform runs.
+        ...usesLegacyVite()
+          ? { esbuild: { jsx: 'automatic', jsxImportSource: 'react' } }
+          : { oxc: { jsx: { runtime: 'automatic', importSource: 'react' } } },
         resolve: { dedupe: ['react', 'react-dom', 'react/jsx-runtime', 'react/jsx-dev-runtime'] },
         plugins: [{
           name: JSX_CHECK_PLUGIN_NAME,

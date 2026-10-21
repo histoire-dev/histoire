@@ -55,6 +55,8 @@ export function createDomEnv() {
   window.IntersectionObserver = window.IntersectionObserver || class IntersectionObserver {
     root: Element
     rootMargin: string
+    /** Collection has no layout; retain the browser's default scroll margin. */
+    scrollMargin = '0px 0px 0px 0px'
     thresholds: number[]
     disconnect(): void { /* noop */ }
     observe = (_target: Element) => void { /* noop */ }

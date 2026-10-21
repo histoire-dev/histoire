@@ -46,7 +46,7 @@ Histoire is an Open-Source project supported by our sponsors - thank you!
 
 Titles marked <Badge type="tip" text="1.0-beta.2+" /> describe unreleased features for the next beta. Use [continuous releases](https://nightly.akryum.dev/histoire-dev/histoire) to try them before publication.
 
-Use Node.js **22 or later** and [Vite](https://vitejs.dev) **7 or 8**. Framework tooling can impose a higher Node.js requirement.
+Use Node.js **22.12 or later** and [Vite](https://vitejs.dev) **7 or 8**. Framework tooling can impose a higher Node.js requirement.
 
 ---
 

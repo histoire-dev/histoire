@@ -12,6 +12,7 @@
     "@histoire/sdk": "workspace:^"
   },
   "devDependencies": {
+    "@typescript/native": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:"
   }

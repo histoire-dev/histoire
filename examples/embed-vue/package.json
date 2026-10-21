@@ -15,6 +15,7 @@
     "vue": "^3.5.26"
   },
   "devDependencies": {
+    "@typescript/native": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:"
   }

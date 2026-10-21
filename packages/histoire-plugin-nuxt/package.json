@@ -41,6 +41,7 @@
   "devDependencies": {
     "@nuxt/schema": "^3.14.1592",
     "@types/node": "^22.10.1",
+    "@typescript/native": "catalog:",
     "histoire": "workspace:*",
     "typescript": "catalog:",
     "vite": "catalog:"

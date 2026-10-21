@@ -7,14 +7,15 @@
       "ESNext",
       "DOM"
     ],
-    "baseUrl": ".",
     "rootDir": "src",
     "module": "ESNext",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "types": [
       "node"
     ],
+    // Preserve existing checks while upgrading the compiler.
+    "strict": false,
     "strictBindCallApply": true,
     "strictFunctionTypes": true,
     "alwaysStrict": true,

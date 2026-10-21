@@ -16,10 +16,12 @@
     "@histoire/plugin-nuxt": "workspace:*",
     "@histoire/plugin-vue": "workspace:*",
     "@nuxtjs/tailwindcss": "^6.12.2",
+    "@typescript/native": "catalog:",
     "cypress": "^13.16.1",
     "histoire": "workspace:*",
     "nuxt": "^4.2.2",
     "start-server-and-test": "^2.0.8",
+    "typescript": "catalog:",
     "vue": "^3.5.26"
   }
 }

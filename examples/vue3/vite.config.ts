@@ -8,12 +8,12 @@ export default defineConfig({
   // Example build config for a component library
   build: {
     lib: {
-      entry: path.resolve(__dirname, './src/main.ts'),
+      entry: path.resolve(import.meta.dirname, './src/main.ts'),
       name: 'histoire-kit',
       fileName: format => `histoire-kit.${format}.js`,
     },
 
-    rollupOptions: {
+    rolldownOptions: {
       // make sure to externalize deps that shouldn't be bundled
       // into your library
       external: ['vue'],

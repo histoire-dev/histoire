@@ -5,6 +5,7 @@
     "lib": ["ESNext", "DOM"],
     "module": "ESNext",
     "moduleResolution": "bundler",
+    "types": ["vite/client", "react", "react-dom"],
     "strict": true,
     "noEmit": true,
     "skipLibCheck": true

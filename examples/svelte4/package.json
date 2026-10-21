@@ -18,10 +18,11 @@
   "devDependencies": {
     "@histoire/plugin-svelte": "workspace:*",
     "@sveltejs/vite-plugin-svelte": "^3.0.2",
+    "@typescript/native": "catalog:",
     "cypress": "^13.16.1",
     "histoire": "workspace:*",
     "start-server-and-test": "^2.0.8",
-    "svelte-preprocess": "^5.1.0",
+    "typescript": "catalog:",
     "vite": "^5.0.11"
   }
 }

@@ -3,6 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "devDependencies": {
+    "@typescript/native": "catalog:",
+    "typescript": "catalog:",
     "vue": "^3.5.26"
   }
 }

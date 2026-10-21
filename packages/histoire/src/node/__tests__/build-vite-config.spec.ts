@@ -1,30 +1,11 @@
-import type { ViteDevServer } from 'vite'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { createBuildViteConfig } from '../build/vite-config.js'
-import { getViteConfigWithPlugins } from '../vite/index.js'
-
-vi.mock('../vite/index.js', () => ({ getViteConfigWithPlugins: vi.fn() }))
-
-/** Retrieves Histoire's final static-bundle chunk classifier. */
-async function createManualChunks() {
-  const viteConfig = await createBuildViteConfig({
-    config: { embed: { enabled: false }, outDir: '/tmp/histoire-static-build' },
-  } as any, {
-    config: { server: {} },
-  } as ViteDevServer)
-  const plugin = viteConfig.plugins.find(candidate => (candidate as any)?.name === 'histoire-build-config-override') as any
-  const config = { build: { rollupOptions: {} }, define: {} }
-  plugin.config(config)
-  return config.build.rollupOptions.output.manualChunks as (id: string, graph: { getModuleInfo: (id: string) => { importedIds: string[] } | null }) => string | undefined
-}
+import type { Context } from '../context.js'
+import { describe, expect, it } from 'vitest'
+import { createBuildChunkOutput } from '../build/chunks.js'
 
 describe('static build Vite config', () => {
-  beforeEach(() => {
-    vi.mocked(getViteConfigWithPlugins).mockResolvedValue({ viteConfig: { plugins: [] } } as any)
-  })
-
-  it('classifies Rolldown modules without requiring whole-graph enumeration', async () => {
-    const manualChunks = await createManualChunks()
+  it('classifies Rolldown modules without requiring whole-graph enumeration', () => {
+    const output = createBuildChunkOutput({ config: { embed: { enabled: false } } } as Context)
+    const classify = output.codeSplitting?.groups[0].name ?? output.manualChunks!
     const imports = {
       '/node_modules/vue/index.js': [],
       '/node_modules/ui/index.js': ['/node_modules/vue/index.js', '/virtual/theme.js'],
@@ -37,7 +18,7 @@ describe('static build Vite config', () => {
       },
     }
 
-    expect(manualChunks('/node_modules/vue/index.js', graph)).toBe('vendor')
-    expect(manualChunks('/node_modules/ui/index.js', graph)).toBeUndefined()
+    expect(classify('/node_modules/vue/index.js', graph)).toBe('vendor')
+    expect(classify('/node_modules/ui/index.js', graph)).toBeFalsy()
   })
 })

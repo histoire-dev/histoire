@@ -62,6 +62,7 @@
   },
   "devDependencies": {
     "@types/node": "^22.10.1",
+    "@typescript/native": "catalog:",
     "concurrently": "^9.1.0",
     "histoire": "workspace:*",
     "typescript": "catalog:",

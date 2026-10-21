@@ -1,6 +1,7 @@
 import { fileURLToPath } from 'node:url'
 import vue from '@vitejs/plugin-vue'
 import { defineConfig } from 'vite'
+import { moduleFileName } from './scripts/module-file-name.mjs'
 
 /** Source UI uses Histoire's vendor Vue independently of the story framework. */
 const reusableUi = new Set(['@histoire/vue', '@histoire/vue/internal', '@histoire/controls/vue'])
@@ -38,13 +39,13 @@ export default defineConfig({
       },
       formats: ['es'],
     },
-    rollupOptions: {
+    rolldownOptions: {
       external(id) {
         if (reusableUi.has(id)) return false
         return /^virtual:|^@histoire\/|^@vue\//.test(id) || id === 'fuse.js'
       },
       preserveEntrySignatures: 'strict',
-      output: { format: 'es', preserveModules: true, preserveModulesRoot: 'src/embed', entryFileNames: '[name].js', chunkFileNames: '[name].js' },
+      output: { format: 'es', preserveModules: true, preserveModulesRoot: 'src/embed', entryFileNames: moduleFileName, chunkFileNames: moduleFileName },
     },
   },
 })

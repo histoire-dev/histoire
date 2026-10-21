@@ -9,8 +9,7 @@ import { mergeConfig as mergeViteConfig, version as viteVersion } from 'vite'
 import { APP_PATH } from '../alias.js'
 import { resolveEmbedConfig } from '../config/embed.js'
 import { getViteConfigWithPlugins } from '../vite/index.js'
-import { isLazyBrowserDependency } from './lazy-dependencies.js'
-import { hasVendorDependencyClosure } from './vendor-graph.js'
+import { createBuildChunkOutput } from './chunks.js'
 
 /**
  * Builds the Vite config of the final bundle: the histoire app entries plus the
@@ -24,20 +23,31 @@ import { hasVendorDependencyClosure } from './vendor-graph.js'
 export async function createBuildViteConfig(ctx: Context, collectServer: ViteDevServer, outputRoot = ctx.config.outDir) {
   const { viteConfig: buildViteConfigRaw } = await getViteConfigWithPlugins(false, ctx)
   const embedEnabled = resolveEmbedConfig(ctx.config.embed).enabled
+  const bundlerKey = Number.parseInt(viteVersion, 10) >= 8 ? 'rolldownOptions' : 'rollupOptions'
+  // Rolldown's non-recursive chunk groups need extendable entries. Existing
+  // exports remain public while shared chunks may expose additional bindings.
+  const preserveEntrySignatures = bundlerKey === 'rolldownOptions' ? 'allow-extension' : 'strict'
+  const input = [
+    join(APP_PATH, 'bundle-main.js'),
+    join(APP_PATH, 'bundle-sandbox.js'),
+    ...embedEnabled ? [join(APP_PATH, 'bundle-embed.js')] : [],
+  ]
+  // Vite 8 favors native options over the legacy alias. Merge both before adding
+  // owned settings so legacy user plugins/policies do not silently disappear.
+  if (bundlerKey === 'rolldownOptions' && buildViteConfigRaw.build?.rollupOptions) {
+    buildViteConfigRaw.build.rolldownOptions = mergeViteConfig(buildViteConfigRaw.build.rollupOptions, buildViteConfigRaw.build.rolldownOptions ?? {})
+    delete buildViteConfigRaw.build.rollupOptions
+  }
   const buildViteConfig: ViteInlineConfig = mergeViteConfig(buildViteConfigRaw, {
     mode: 'development',
     build: {
       lib: false,
-      rollupOptions: {
-        preserveEntrySignatures: 'strict',
-        input: [
-          join(APP_PATH, 'bundle-main.js'),
-          join(APP_PATH, 'bundle-sandbox.js'),
-          ...embedEnabled ? [join(APP_PATH, 'bundle-embed.js')] : [],
-        ],
+      [bundlerKey]: {
+        preserveEntrySignatures,
+        input,
         plugins: [
           {
-            name: 'histoire-build-rollup-options-override',
+            name: 'histoire-build-bundler-options-override',
             enforce: 'post',
             options(options) {
               // Don't externalize
@@ -82,32 +92,12 @@ export async function createBuildViteConfig(ctx: Context, collectServer: ViteDev
     name: 'histoire-build-config-override',
     enforce: 'post',
     config(config) {
-      // Don't externalize
-      config.build.rollupOptions.external = []
-
-      /** Portable data stays outside UI/vendor even for installed SDK packages. */
-      const isEmbedData = (id: string) => embedEnabled && (id.includes('@histoire/protocol') || id.includes('/histoire-protocol/') || id.includes('/fuse.js/'))
-      /** Optional engines and project-dependent packages retain natural boundaries. */
-      const isVendorCandidate = (id: string) => !isLazyBrowserDependency(id) && !isEmbedData(id)
-        && !id.includes('@histoire/app') && id.includes('node_modules')
-        && !(ctx.config.build?.excludeFromVendorsChunk ?? []).some(test => typeof test === 'string' ? id.includes(test) : test.test(id))
-      // Force only dependency-closed packages into vendor. Generated Nuxt UI
-      // themes can import story code, so grouping them with Vue creates a cycle.
-      config.build.rollupOptions.output = {
-        // Shared vendor imports must not absorb Vite's preload helper used by
-        // data entry's lazy surface imports and thereby force Vue to execute.
-        ...(Number.parseInt(viteVersion, 10) < 8 ? { onlyExplicitManualChunks: true } : {}),
-        manualChunks(id, graph) {
-          // MSW storage effects and heavy content engines belong to explicit
-          // runtime/panel imports, never the shared Vue/vendor entry. Let
-          // Rollup preserve their actual dynamic dependency boundaries.
-          if (isLazyBrowserDependency(id)) return
-          // Data entry must not inherit Vue/router/runtime side effects from
-          // standalone's shared vendor chunk, even when both entries are built.
-          if (isEmbedData(id)) return 'embed-data'
-          if (hasVendorDependencyClosure(id, moduleId => graph.getModuleInfo(moduleId), isVendorCandidate)) return 'vendor'
-        },
-      }
+      const bundler = config.build[bundlerKey] ??= {}
+      // Final assignment also removes project library entries concatenated by mergeConfig.
+      bundler.input = input
+      bundler.external = []
+      bundler.preserveEntrySignatures = preserveEntrySignatures
+      bundler.output = createBuildChunkOutput(ctx)
 
       // Force vite build options
       Object.assign(config.build, {

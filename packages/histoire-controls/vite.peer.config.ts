@@ -13,6 +13,6 @@ export default defineConfig({
     emptyOutDir: false,
     outDir: 'dist/peer',
     lib: { entry: 'src/index.ts', formats: ['es'], fileName: 'index' },
-    rollupOptions: { external: [/^vue(?:\/|$)/, /^@vue\//, /^@vueuse\//, /^floating-vue(?:\/|$)/, /^@iconify\//, /^@histoire\//] },
+    rolldownOptions: { external: [/^vue(?:\/|$)/, /^@vue\//, /^@vueuse\//, /^floating-vue(?:\/|$)/, /^@iconify\//, /^@histoire\//] },
   },
 })

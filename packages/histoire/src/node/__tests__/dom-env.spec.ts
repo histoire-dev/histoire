@@ -2,6 +2,17 @@
 import { expect, it, vi } from 'vitest'
 import { createDomEnv } from '../dom/env.js'
 
+it('exposes the default scroll margin on collection IntersectionObservers', () => {
+  const env = createDomEnv()
+  try {
+    const observer = new window.IntersectionObserver(() => {})
+    expect(observer.scrollMargin).toBe('0px 0px 0px 0px')
+  }
+  finally {
+    env.destroy()
+  }
+})
+
 it('releases window timers and document before restoring globals, once', async () => {
   const nativeDelay = globalThis.setTimeout
   const env = createDomEnv()

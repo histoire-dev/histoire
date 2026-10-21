@@ -41,13 +41,14 @@
     "@types/node": "^22.10.1",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
+    "@typescript/native": "catalog:",
     "@vitejs/plugin-vue-jsx": "^5.1.3",
     "histoire": "workspace:*",
     "jsdom": "^27.4.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "typescript": "catalog:",
-    "vite": "^8.0.12",
+    "vite": "catalog:",
     "vitest": "4.1.10"
   }
 }

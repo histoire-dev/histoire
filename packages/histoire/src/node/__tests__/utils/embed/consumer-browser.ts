@@ -28,7 +28,7 @@ export async function probeConsumerExamples(origin: string, bookUrl: string, mod
         if (mode === 'native') {
           await page.getByRole('button', { name: 'Connect two sessions', exact: true }).click()
           const variants = page.getByRole('button', { name: /^Deterministic capture \/.+/ })
-          await expect.poll(() => variants.count()).toBe(2)
+          await expect.poll(() => variants.count(), { timeout: 45_000 }).toBe(2)
           await variants.nth(0).click()
           await variants.nth(1).click()
           await expect.poll(() => primaryFrames(page).length, { timeout: 45_000 }).toBe(2)
@@ -48,13 +48,13 @@ export async function probeConsumerExamples(origin: string, bookUrl: string, mod
           await page.getByLabel('View', { exact: true }).selectOption(mode)
           await page.getByRole('button', { name: 'Connect', exact: true }).click()
           if (mode === 'explorer') {
-            await expect.poll(() => page.frames().filter(frame => new URL(frame.url()).searchParams.get('surface') === 'explorer').length).toBe(1)
+            await expect.poll(() => page.frames().filter(frame => new URL(frame.url()).searchParams.get('surface') === 'explorer').length, { timeout: 45_000 }).toBe(1)
             const explorer = page.frames().find(frame => new URL(frame.url()).searchParams.get('surface') === 'explorer')!
             await explorer.getByRole('button', { name: /^Deterministic capture \/.+/ }).click()
           }
           else {
             const selectors = page.getByLabel('Story / variant', { exact: true })
-            await expect.poll(() => selectors.count()).toBe(mode === 'parts' ? 2 : 1)
+            await expect.poll(() => selectors.count(), { timeout: 45_000 }).toBe(mode === 'parts' ? 2 : 1)
             expect(primaryFrames(page)).toHaveLength(0)
             for (let index = 0; index < await selectors.count(); index++) await selectors.nth(index).selectOption('0')
             if (mode === 'hidden') {

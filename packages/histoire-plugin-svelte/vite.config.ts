@@ -69,7 +69,7 @@ export default defineConfig({
     emptyOutDir: false,
     outDir: 'dist',
     cssCodeSplit: false,
-    rollupOptions: {
+    rolldownOptions: {
       external: [
         ...Object.keys(pkg.dependencies).map(dep => new RegExp(`^${dep}(\\/?)`)),
         ...Object.keys(pkg.peerDependencies).map(dep => new RegExp(`^${dep}(\\/?)`)),

@@ -47,6 +47,7 @@
     "picocolors": "^1.1.1"
   },
   "devDependencies": {
+    "@typescript/native": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:"
   }

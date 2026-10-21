@@ -12,8 +12,8 @@ export async function proveConsumerColdSource(hostOrigin: string, sourceUrl: str
     const interrupted = await attemptEmbedPrimary(page, sourceUrl, { storyId: 'deterministic', variantId: 'normal' }, 'explorer')
     if (interrupted) {
       expect(interrupted).toEqual({ code: 'NOT_CONNECTED', status: 'disconnected', stale: true })
-      // Vite colors dependency names, so compare plain log text.
-      expect(stripVTControlCharacters(sourceLog())).toMatch(/new dependencies optimized: vue[\s\S]*optimized dependencies changed\. reloading/)
+      // Package layout determines which dependency triggers the reload; require the real event.
+      expect(stripVTControlCharacters(sourceLog())).toMatch(/new dependencies optimized: \S[\s\S]*optimized dependencies changed\. reloading/)
     }
     else {
       // Already warm/default readiness improvements remain valid; no replay is needed.
@@ -22,8 +22,22 @@ export async function proveConsumerColdSource(hostOrigin: string, sourceUrl: str
     await page.evaluate('session.dispose()')
     expect(await page.evaluate('session.getSnapshot().status')).toBe('disposed')
     expect(page.frames()).toHaveLength(1)
+    // Raw support-plugin imports can trigger another optimization wave after
+    // the control bridge connected. Finish that real runtime before testing a
+    // fresh Connect in the example, as source-development HMR fixtures do.
+    const warm = await browser.newPage()
+    try {
+      await warm.goto(new URL('__sandbox.html?storyId=deterministic&variantId=normal&embed=true', sourceUrl).href)
+      await warm.locator('[data-capture-label]').waitFor({ timeout: 60_000 })
+    }
+    finally {
+      await warm.close()
+    }
     // Actual example creates its own new controller through explicit Connect after this teardown.
     return interrupted
+  }
+  catch (error) {
+    throw new Error(`Installed cold source log: ${sourceLog().slice(-8000)}`, { cause: error })
   }
   finally {
     await page.close()

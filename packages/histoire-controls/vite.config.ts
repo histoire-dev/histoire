@@ -34,7 +34,7 @@ export default defineConfig({
       fileName: 'index.es',
     },
 
-    rollupOptions: {
+    rolldownOptions: {
       external: [
         /@histoire/,
       ],

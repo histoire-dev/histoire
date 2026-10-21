@@ -26,6 +26,7 @@
     "watch": "tsc -w --sourceMap"
   },
   "devDependencies": {
+    "@typescript/native": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",
     "vitest": "4.1.10"

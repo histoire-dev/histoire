@@ -23,7 +23,12 @@ describe('clean SDK package consumers', () => {
   beforeAll(async () => {
     fixture = await createMcpProjectFixture()
     cleanup.push(() => fixture.close())
-    const dependencies = Object.fromEntries(await Promise.all(['vue', 'vite', 'typescript', '@types/node', '@vitejs/plugin-vue', 'ws', '@types/ws'].map(async name => [name, await fixturePackageVersion(name, ['typescript', '@types/node', 'ws', '@types/ws'].includes(name) ? 'embed-node' : 'vue3')])))
+    const dependencies = Object.fromEntries(await Promise.all(['vue', 'vite', 'typescript', '@types/node', '@vitejs/plugin-vue', 'ws', '@types/ws'].map(async (name) => {
+      const example = ['typescript', '@types/node', 'ws', '@types/ws'].includes(name) ? 'embed-node' : 'vue3'
+      // Installed consumers use stock TS7; the workspace's typescript alias supplies the TS6 API.
+      const installedName = name === 'typescript' ? '@typescript/native' : name
+      return [name, await fixturePackageVersion(installedName, example)]
+    })))
     consumer = await createPackedPackageConsumer(fixture.root, { packages: ['@histoire/sdk', '@histoire/vue', 'histoire', '@histoire/plugin-vue'], dependencies })
     hosts = await createEmbedHosts({ sdkEntry: join(consumer.root, 'node_modules/@histoire/sdk/dist/index.js') })
     cleanup.push(() => hosts.close())

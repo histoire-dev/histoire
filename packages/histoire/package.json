@@ -50,7 +50,7 @@
     "plugin.js"
   ],
   "engines": {
-    "node": ">=22"
+    "node": ">=22.12.0"
   },
   "scripts": {
     "build": "rimraf dist && tsc",
@@ -128,7 +128,7 @@
     "shiki": "^3.0.0",
     "sirv": "^3.0.0",
     "tar": "7.5.22",
-    "vite-node": "3.2.4",
+    "vite-node": "^6.0.0",
     "yauzl": "^3.4.0",
     "zod": "4.6.5"
   },
@@ -137,6 +137,7 @@
     "@types/fs-extra": "^11.0.4",
     "@types/node": "^22.10.1",
     "@types/pngjs": "^6.0.5",
+    "@typescript/native": "catalog:",
     "@vitest/browser-playwright": "4.1.10",
     "typescript": "catalog:",
     "vite": "catalog:",

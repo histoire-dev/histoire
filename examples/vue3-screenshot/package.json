@@ -14,8 +14,10 @@
   "devDependencies": {
     "@histoire/plugin-screenshot": "workspace:*",
     "@histoire/plugin-vue": "workspace:*",
-    "@vitejs/plugin-vue": "^5.2.1",
+    "@typescript/native": "catalog:",
+    "@vitejs/plugin-vue": "^6.0.10",
     "histoire": "workspace:*",
+    "typescript": "catalog:",
     "vite": "catalog:"
   }
 }

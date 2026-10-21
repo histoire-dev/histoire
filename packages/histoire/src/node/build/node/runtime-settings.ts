@@ -1,9 +1,9 @@
-import type { RollupOutput } from 'rollup'
+import type { Rolldown } from 'vite'
 import type { NodeArtifactBrowserDriver } from './package.js'
 import { resolveBrowserSetupDriverIdentity } from '../../runtime/browser/setup/driver.js'
 
 /** Requires emitted variant session and actual preview Vitest modules, not package declarations. */
-export function includesEmbeddedTestRuntime(output: RollupOutput): boolean {
+export function includesEmbeddedTestRuntime(output: Rolldown.RolldownOutput): boolean {
   const modules = output.output.flatMap(item => item.type === 'chunk' ? Object.entries(item.modules).filter(([, metadata]) => metadata.renderedLength > 0).map(([id]) => id.replace(/\\/g, '/')) : [])
   return modules.some(id => id.includes('/variant-test-session/')) && modules.some(id => id.includes('/@vitest/spy/')) && modules.some(id => id.includes('/@vitest/mocker/'))
 }

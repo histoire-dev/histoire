@@ -3,7 +3,7 @@ import type {
   ChangeViteConfigCallback,
   PreviewStoryCallback,
 } from '@histoire/shared'
-import type { RollupOutput } from 'rollup'
+import type { Rolldown } from 'vite'
 import type { Context } from '../context.js'
 import type { NodeBuildLayout } from './node/layout.js'
 import type { BuildTarget } from './node/target.js'
@@ -136,7 +136,7 @@ export async function build(ctx: Context, options: BuildOptions = {}) {
     const results = await viteBuild(buildViteConfig)
     server = undefined
     await closeCollectionServer()
-    const result = Array.isArray(results) ? results[0] : results as RollupOutput
+    const result = (Array.isArray(results) ? results[0] : results) as Rolldown.RolldownOutput
 
     const styleOutput = result.output.find(o => o.name === 'style.css' && o.type === 'asset')
 

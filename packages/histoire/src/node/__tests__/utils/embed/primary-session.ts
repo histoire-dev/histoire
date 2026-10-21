@@ -7,10 +7,13 @@ export async function attemptEmbedPrimary(page: any, url: string, target: Histoi
 } = {}) {
   return page.evaluate(`(async()=>{
     const {createHistoireSession}=await import('/sdk.js');
-    ${options.reuseSession ? '' : `window.session=createHistoireSession({url:${JSON.stringify(url)}});await session.connect();`}
-    await session.selection.select(${JSON.stringify(target)});
-    window.primary=session.mount(document.querySelector('#mount'),{surface:${JSON.stringify(surface)}});
-    try{await primary.ready;return null}
+    // Cold dependency optimization may retire the source during Connect or mount.
+    try{
+      ${options.reuseSession ? '' : `window.session=createHistoireSession({url:${JSON.stringify(url)}});await session.connect();`}
+      await session.selection.select(${JSON.stringify(target)});
+      window.primary=session.mount(document.querySelector('#mount'),{surface:${JSON.stringify(surface)}});
+      await primary.ready;return null
+    }
     catch(error){return {code:error.code,status:session.getSnapshot().status,stale:session.getSnapshot().stale}}
   })()`)
 }
