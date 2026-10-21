@@ -16,7 +16,7 @@ describe('comment thread drafts', () => {
       await wrapper.setProps({ comment: { ...second, updatedAt: '2026-10-04T12:00:00.000Z' } })
       expect((wrapper.get('input').element as HTMLInputElement).value).toBe('Instruction for second comment')
       await wrapper.get('form').trigger('submit')
-      expect(wrapper.emitted('reply')).toEqual([[second.id, 'Instruction for second comment']])
+      expect(wrapper.emitted('reply')).toEqual([[second.id, 'Instruction for second comment', undefined]])
     }
     finally { wrapper.unmount() }
   })

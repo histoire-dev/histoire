@@ -111,8 +111,8 @@ function setSelectedSession(session: HistoireSession | undefined): void {
             <template #screenshot="slot">
               <ScreenshotPopover v-if="ScreenshotPopover && snapshot.selection?.variantId" :story-id="snapshot.selection.storyId" :variant-id="snapshot.selection.variantId" :open="slot.open" :trigger="dev?.screenshotTrigger.value" @update:open="slot.setOpen" />
             </template>
-            <template #comment>
-              <ToolbarButton v-if="dev" label="Comment for AI" icon="add-comment" :disabled="!dev.comments.available.value" :pressed="dev.commentMode.value" @click="dev.startComment()" />
+            <template #tool>
+              <ToolbarButton v-if="dev" menu-role="menuitemradio" label="Comment" icon="add-comment" :disabled="!dev.comments.available.value" :pressed="dev.commentMode.value" @click="dev.commentMode.value = true" />
             </template>
             <template #inspector>
               <ToolbarButton v-if="!shell.inspectorOpen.value" label="Show inspector" icon="side-panel-open" @click="shell.toggleInspector" />
@@ -129,7 +129,7 @@ function setSelectedSession(session: HistoireSession | undefined): void {
           <MatrixView :rows="rows" :cols="cols" :preview-base="previewBase" :frame-budget="histoireConfig.ui?.frameBudget ?? 6" :size="slot.size" :content-insets="slot.contentInsets" :ui-hidden="shell.uiHidden.value" :discovery-failed="slot.discoveryFailed" @axes="workbench.setAxes" @add-axis="revealMatrixProps" @error="emit('error', $event)" />
         </template>
         <template #overlays>
-          <CommentsCanvasOverlay v-if="CommentsCanvasOverlay && dev" ref="commentOverlay" :model="dev.comments" :agents="dev.commentAgents.value" @composed="dev.commentMode.value = false" @setup-agent="dev.setupAgents" />
+          <CommentsCanvasOverlay v-if="CommentsCanvasOverlay && dev" ref="commentOverlay" :model="dev.comments" :agents="dev.commentAgents.value" :active="dev.commentMode.value" @setup-agent="dev.setupAgents" />
           <MeasureOverlay /><AgentCursor v-if="AgentCursor && mcp" />
         </template>
       </CanvasViewport>

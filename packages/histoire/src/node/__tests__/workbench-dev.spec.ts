@@ -81,6 +81,8 @@ describe('standalone dev feature ownership', () => {
       await context.controls.selectComment(comment)
       expect(context.session.getSnapshot().selection).toEqual({ storyId: 'a:b', variantId: 'other' })
       expect(context.comments.activeId.value).toBe(comment.id)
+      // Pins and threads only exist in comment mode, so opening one enters it.
+      expect(context.canvas.tool).toBe('comment')
       expect(context.showComments).toHaveBeenCalledOnce()
       expect(context.controls.commentAgents.value).toEqual([{ id: 'agent', name: 'Agent', state: 'idle', default: true, askEachTime: true }])
       context.agents.state.value = { ...context.agents.state.value, context: { ...context.agents.state.value.context, askEachTime: false }, enabled: false, presets: [] }
@@ -111,10 +113,8 @@ describe('standalone dev feature ownership', () => {
     const pending = deferred<void>()
     const context = await controlsFixture(() => pending.promise)
     const comment = commentFixture({ storyId: 'a:b', variantId: 'other' })
-    context.canvas.setTool('measure')
     context.controls.startComment()
-    expect(context.controls.commentMode.value).toBe(true)
-    expect(context.canvas.tool).toBe('select')
+    expect(context.canvas.tool).toBe('comment')
     const work = context.controls.selectComment(comment)
     context.controls.close()
     await context.session.selection.select(comment)
@@ -123,28 +123,30 @@ describe('standalone dev feature ownership', () => {
     try {
       expect(context.comments.activeId.value).toBeNull()
       expect(context.showComments).not.toHaveBeenCalled()
-      expect(context.controls.commentMode.value).toBe(false)
+      expect(context.canvas.tool).toBe('select')
       expect(context.actions.entries.has('comment')).toBe(false)
       expect(context.actions.entries.has('screenshot')).toBe(false)
     }
     finally { await context.close() }
   })
 
-  it('retires comment placement when another pointer tool takes ownership and disposes watcher', async () => {
+  it('toggles the comment tool and closes the open thread when another tool takes over', async () => {
     const context = await controlsFixture()
+    const comment = commentFixture()
+    context.comments.comments.value = [comment]
     try {
+      context.controls.startComment()
+      expect(context.canvas.tool).toBe('comment')
+      expect(context.controls.commentMode.value).toBe(true)
+      context.controls.startComment()
+      expect(context.canvas.tool).toBe('select')
       for (const tool of ['measure', 'pan'] as const) {
         context.controls.startComment()
-        expect(context.controls.commentMode.value).toBe(true)
+        context.comments.open(comment.id)
         context.canvas.setTool(tool)
         expect(context.controls.commentMode.value).toBe(false)
+        expect(context.comments.activeId.value).toBeNull()
       }
-      context.controls.close()
-      // A retained ref detects leaked subscriptions without invoking closed controls.
-      context.controls.commentMode.value = true
-      context.canvas.setTool('measure')
-      expect(context.controls.commentMode.value).toBe(true)
-      context.controls.commentMode.value = false
     }
     finally { await context.close() }
   })

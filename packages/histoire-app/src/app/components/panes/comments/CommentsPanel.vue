@@ -87,7 +87,7 @@ function sendDrafts() {
         No {{ filter === 'all' ? '' : `${filter} ` }}comments
       </p>
     </div>
-    <CommentThread v-if="orphan && model.selected.value" :comment="model.selected.value" :title="`${model.selected.value.storyId} › ${model.selected.value.variantId}`" :agents="agents" :disabled="!model.available.value" @reply="(id, body) => model.reply(id, body)" @resolve="model.resolve(model.selected.value!.id, $event)" @remove="model.remove(model.selected.value!.id)" @close="model.dismiss" />
+    <CommentThread v-if="orphan && model.selected.value" :comment="model.selected.value" :title="`${model.selected.value.storyId} › ${model.selected.value.variantId}`" :agents="agents" :disabled="!model.available.value" @reply="(id, body, agentId) => model.reply(id, body, agentId)" @resolve="model.resolve(model.selected.value!.id, $event)" @remove="model.remove(model.selected.value!.id)" @close="model.dismiss" />
     <footer>
       <template v-if="agents.length">
         <HstSelect layout="inline" :model-value="agentId" aria-label="Bulk comment agent" placeholder="Choose agent" :options="agents.map(agent => ({ value: agent.id, label: agent.name }))" @update:model-value="choose" /><HstButton color="flat" type="button" :disabled="!drafts.length || !agentId || !model.available.value" @click="sendDrafts">

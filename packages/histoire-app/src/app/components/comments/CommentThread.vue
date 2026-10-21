@@ -5,7 +5,9 @@ import { computed, ref } from 'vue'
 import { useWorkbenchComments } from '../../stores/comments.js'
 
 import CommentContext from './CommentContext.vue'
+import { commentDestination } from './destination.js'
 import AgentLiveTail from './thread/AgentLiveTail.vue'
+import { useStickToBottom } from './thread/stick-to-bottom.js'
 import ThreadMessage from './thread/ThreadMessage.vue'
 
 const props = defineProps<{
@@ -19,8 +21,8 @@ const props = defineProps<{
   disabled?: boolean
 }>()
 const emit = defineEmits<{
-  /** Persist reply and continue configured ACP conversation. */
-  reply: [id: string, body: string]
+  /** Persist reply and continue its ACP conversation; `agentId` is used when the comment was never sent. */
+  reply: [id: string, body: string, agentId?: string]
   /** Toggle persisted resolved status. */
   resolve: [resolved: boolean]
   /** Remove persisted comment. */
@@ -37,6 +39,10 @@ const reply = computed({
 const model = useWorkbenchComments()
 /** Live output of the working agent, if any. */
 const live = computed(() => model?.streaming.value[props.comment.id])
+const scroller = ref<HTMLElement>()
+const log = ref<HTMLElement>()
+// Re-pin when another thread opens or a message is added (own reply, final agent answer).
+useStickToBottom(scroller, log, () => `${props.comment.id}:${props.comment.thread.length}`)
 const busy = computed(() => ['sent', 'working'].includes(props.comment.status))
 /** Configured display metadata for an agent id, without inventing provider labels. */
 function agent(id?: string): { name: string, icon?: string } {
@@ -47,7 +53,7 @@ function agent(id?: string): { name: string, icon?: string } {
 function submit() {
   const body = reply.value
   if (!body.trim() || busy.value || props.disabled) return
-  emit('reply', props.comment.id, body)
+  emit('reply', props.comment.id, body, props.comment.agentId ? undefined : commentDestination(props.agents) || undefined)
   reply.value = ''
 }
 </script>
@@ -55,23 +61,25 @@ function submit() {
 <template>
   <section class="comment-thread" aria-label="Comment conversation" @keydown.escape.stop.prevent="emit('close')">
     <CommentContext :title="title" :comment="comment" minimizable @minimize="emit('close')" />
-    <div class="thread-messages">
-      <ThreadMessage author="user" name="You" :at="comment.createdAt" :body="comment.body" />
-      <ThreadMessage
-        v-for="(message, index) in comment.thread"
-        :key="index"
-        :author="message.author"
-        :name="message.author === 'agent' ? agent(message.agentId).name : 'You'"
-        :icon="message.author === 'agent' ? agent(message.agentId).icon : undefined"
-        :at="message.at"
-        :body="message.body"
-        :steps="message.steps"
-        :changes="message.changes"
-        :failed="message.failed"
-      />
-      <ThreadMessage v-if="busy" author="agent" :name="agent(comment.agentId).name" :icon="agent(comment.agentId).icon" :body="live?.text ?? ''" :steps="live?.steps" streaming aria-live="polite">
-        <AgentLiveTail :steps="live?.steps ?? []" :text="live?.text ?? ''" :started-at="live?.startedAt" :queued="comment.status === 'sent'" />
-      </ThreadMessage>
+    <div ref="scroller" class="thread-messages">
+      <div ref="log">
+        <ThreadMessage author="user" name="You" :at="comment.createdAt" :body="comment.body" />
+        <ThreadMessage
+          v-for="(message, index) in comment.thread"
+          :key="index"
+          :author="message.author"
+          :name="message.author === 'agent' ? agent(message.agentId).name : 'You'"
+          :icon="message.author === 'agent' ? agent(message.agentId).icon : undefined"
+          :at="message.at"
+          :body="message.body"
+          :steps="message.steps"
+          :changes="message.changes"
+          :failed="message.failed"
+        />
+        <ThreadMessage v-if="busy" author="agent" :name="agent(comment.agentId).name" :icon="agent(comment.agentId).icon" :body="live?.text ?? ''" :steps="live?.steps" streaming aria-live="polite">
+          <AgentLiveTail :steps="live?.steps ?? []" :text="live?.text ?? ''" :started-at="live?.startedAt" :queued="comment.status === 'sent'" />
+        </ThreadMessage>
+      </div>
     </div>
     <form class="thread-actions" @submit.prevent="submit">
       <HstText v-model="reply" layout="inline" aria-label="Reply to comment" placeholder="Reply…" maxlength="8192" :disabled="disabled || busy" />

@@ -98,7 +98,7 @@ declare module './ui-channel.js' {
     /** Resolve or reopen an existing comment. */
     'histoire:ui:comment-resolve': { id: string, resolved: boolean }
     /** Add a user reply to a thread. */
-    'histoire:ui:comment-reply': { id: string, body: string }
+    'histoire:ui:comment-reply': { id: string, body: string, agentId?: string }
     /** Send ordered draft/replied comments to one configured agent. */
     'histoire:ui:comment-send': { ids: string[], agentId: string, draft?: UiCommentDraft } & UiCommentRequest
   }

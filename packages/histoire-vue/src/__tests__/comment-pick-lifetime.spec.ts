@@ -28,7 +28,7 @@ describe('comment pick activation ownership', () => {
     const post = vi.spyOn(frames, 'postToFrame').mockReturnValue(true)
     let picker!: ReturnType<typeof useCommentPick>
     const wrapper = mount(defineComponent({ setup() {
-      picker = useCommentPick(model, frames, vi.fn())
+      picker = useCommentPick(model, frames)
       return () => h('div')
     } }))
     try {

@@ -38,7 +38,7 @@ watch(() => props.text, async (text) => {
 .agent-markdown :deep(> :last-child) { margin-bottom: 0; }
 .agent-markdown :deep(:is(ul, ol)) { padding-left: 18px; }
 .agent-markdown :deep(code) { padding: 1px 4px; border-radius: 4px; background: var(--histoire-chip); font-size: 11px; }
-.agent-markdown :deep(pre) { padding: 8px; border-radius: 6px; background: var(--histoire-chip); overflow: auto; }
+.agent-markdown :deep(pre) { padding: 8px; border-radius: 6px; background: var(--histoire-chip); white-space: pre-wrap; overflow-wrap: anywhere; }
 .agent-markdown :deep(pre code) { padding: 0; background: none; }
 .agent-markdown :deep(a) { color: var(--histoire-accent-link); }
 .agent-markdown :deep(:is(h1, h2, h3, h4)) { margin: 8px 0 4px; font-size: 12px; }

@@ -42,7 +42,6 @@ export interface WorkbenchDevOptions {
 
 /** Independent feature controls make async navigation and target ownership directly testable. */
 export function createWorkbenchDevControls(options: WorkbenchDevOptions, comments: WorkbenchComments, agents: ReturnType<typeof createAgentsStore>) {
-  const commentMode = ref(false)
   const commentOverlay = shallowRef<WorkbenchCommentOverlay>()
   const screenshotTarget = shallowRef<FrameActionTarget>()
   const screenshotTrigger = ref(0)
@@ -63,11 +62,18 @@ export function createWorkbenchDevControls(options: WorkbenchDevOptions, comment
       }
     })
   })
-  const stopCanvas = watch(options.canvas, (value) => {
-    if (!value) commentMode.value = false
+  /** Comment mode is the canvas `comment` tool; leaving it falls back to select. */
+  const commentMode = computed({
+    get: () => options.canvas.value?.canvas.tool === 'comment',
+    set(value: boolean) {
+      const canvas = options.canvas.value?.canvas
+      if (!canvas || value === (canvas.tool === 'comment')) return
+      canvas.setTool(value ? 'comment' : 'select')
+    },
   })
-  const stopTool = watch(() => options.canvas.value?.canvas.tool, (tool) => {
-    if (tool !== 'select') commentMode.value = false
+  // Pins and threads only live in comment mode (like Figma); leaving it closes the open card.
+  const stopTool = watch(commentMode, (value) => {
+    if (!value) comments.dismiss()
   }, { flush: 'sync' })
   const stopSource = options.session.subscribe((snapshot) => {
     const next = JSON.stringify(snapshot.source)
@@ -93,14 +99,11 @@ export function createWorkbenchDevControls(options: WorkbenchDevOptions, comment
     if (!active || !comments.available.value) return
     if (!target) {
       commentMode.value = !commentMode.value
-      if (commentMode.value) {
-        options.canvas.value?.canvas.setTool('select')
-      }
       return
     }
     const frame = readyFrame(target)
     if (!frame || !commentOverlay.value) return
-    commentMode.value = false
+    commentMode.value = true
     commentOverlay.value.pick({ ...target, point: { x: frame.rect.width / 2, y: frame.rect.height / 2 } })
   }
 
@@ -120,6 +123,7 @@ export function createWorkbenchDevControls(options: WorkbenchDevOptions, comment
       if (exists) await options.navigate(target)
       if (!active || token !== generation || source !== JSON.stringify(options.session.getSnapshot().source)) return
       if (exists && getHistoireTargetKey(options.session.getSnapshot().selection ?? { storyId: '', variantId: null }) !== getHistoireTargetKey(target)) return
+      commentMode.value = true
       comments.open(comment.id)
       options.showComments()
     }
@@ -163,7 +167,6 @@ export function createWorkbenchDevControls(options: WorkbenchDevOptions, comment
       commentMode.value = false
       commentOverlay.value = undefined
       screenshotTarget.value = undefined
-      stopCanvas()
       stopTool()
       stopSource()
       dispose.forEach(off => off())

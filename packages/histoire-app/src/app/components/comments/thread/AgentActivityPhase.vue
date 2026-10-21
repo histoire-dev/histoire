@@ -45,7 +45,7 @@ const expandable = computed(() => props.phase.steps.some(step => step.kind !== '
 </template>
 
 <style scoped>
-.activity-phase { font-size: 11px; color: var(--histoire-muted); }
+.activity-phase { min-width: 0; font-size: 11px; color: var(--histoire-muted); }
 .phase-row { display: flex; align-items: center; gap: 6px; width: 100%; min-width: 0; padding: 3px 0; border: 0; background: none; color: inherit; font: inherit; text-align: left; cursor: pointer; }
 .phase-row:disabled { cursor: default; }
 .phase-row strong { color: var(--histoire-body); font-weight: 600; }
@@ -55,7 +55,7 @@ const expandable = computed(() => props.phase.steps.some(step => step.kind !== '
 .counts { flex: none; }
 .added { color: var(--histoire-accent-link); }
 .removed, .failed { color: var(--histoire-danger-text); }
-.phase-steps { display: grid; gap: 2px; margin: 2px 0 4px; padding: 0 0 0 18px; list-style: none; }
+.phase-steps { display: grid; grid-template-columns: minmax(0, 1fr); gap: 2px; margin: 2px 0 4px; padding: 0 0 0 18px; list-style: none; }
 .phase-steps li { display: flex; align-items: center; gap: 6px; min-width: 0; }
 .step-title { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .phase-steps code { flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 10px; }

@@ -10,6 +10,8 @@ defineProps<{
   draft?: boolean
   /** Unsaved picked point uses the active compose-board plus cue. */
   temporary?: boolean
+  /** Resolved annotations show a check instead of their ordinal. */
+  resolved?: boolean
 }>()
 const emit = defineEmits<{
   /** Reveal this annotation's thread. */
@@ -18,8 +20,9 @@ const emit = defineEmits<{
 </script>
 
 <template>
-  <HstButton icon-only color="flat" type="button" class="comment-pin" :class="{ active, draft }" :aria-label="temporary ? 'Current comment draft' : `Open comment ${number}`" :aria-pressed="active" @click.stop="emit('select')">
+  <HstButton icon-only color="flat" type="button" class="comment-pin" :class="{ active, draft, resolved }" :aria-label="temporary ? 'Current comment draft' : `Open ${resolved ? 'resolved ' : ''}comment ${number}`" :aria-pressed="active" @click.stop="emit('select')">
     <BuiltinIcon v-if="temporary" icon="add" :size="14" />
+    <BuiltinIcon v-else-if="resolved" icon="checkmark" :size="14" />
     <template v-else>
       {{ number }}
     </template>
@@ -27,8 +30,10 @@ const emit = defineEmits<{
 </template>
 
 <style scoped>
-.comment-pin { --histoire-icon-button-size: 28px; color: #fff; }
-.comment-pin.draft { background: var(--histoire-muted); }
+/* `.histoire-button` doubles specificity over the flat button reset (transparent background). */
+.histoire-button.comment-pin { --histoire-icon-button-size: 28px; height: 30px; border-radius: 50% 50% 50% 4px; font-size: 11px; font-weight: 700; color: #fff; background: rgb(var(--histoire-agent-rgb) / .85); box-shadow: 0 1px 4px rgb(0 0 0 / .35); }
+.histoire-button.comment-pin:hover, .histoire-button.comment-pin.active { background: var(--histoire-agent); }
+.histoire-button.comment-pin.draft, .histoire-button.comment-pin.resolved { background: var(--histoire-muted); }
 .comment-pin.active { outline: 3px solid rgb(var(--histoire-agent-rgb) / .25); outline-offset: 2px; }
 .comment-pin:focus-visible { outline: 2px solid var(--histoire-agent); outline-offset: 3px; }
 </style>

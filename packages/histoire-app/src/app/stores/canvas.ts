@@ -12,7 +12,8 @@ import { readCanvasPreferences, saveCanvasPreferences } from './canvas-preferenc
 export { getCanvasStorage } from './canvas-preferences.js'
 
 /** Persistent canvas pointer mode. */
-export type CanvasTool = 'select' | 'pan' | 'measure'
+/** `comment` exists only in dev with comments available and is never persisted. */
+export type CanvasTool = 'select' | 'pan' | 'measure' | 'comment'
 /** Canvas arrangements retain local zoom preferences; Matrix resets to Fit on entry. */
 export type CanvasArrangement = 'single' | 'grid' | 'list' | 'matrix'
 /** Logical scale, whole-canvas fit, or List selection fitting. */

@@ -50,7 +50,7 @@ export function readCanvasPreferences(storage?: CanvasStorage): CanvasPreference
 /** Persist only user intent; measured geometry remains workbench-local. */
 export function saveCanvasPreferences(storage: CanvasStorage | undefined, state: CanvasPreferences): void {
   try {
-    storage?.setItem('_histoire-ui-canvas', JSON.stringify({ version: 3, zoomByArrange: state.zoomByArrange, tool: state.tool, frameBackground: state.frameBackground, autoFitContent: state.autoFitContent }))
+    storage?.setItem('_histoire-ui-canvas', JSON.stringify({ version: 3, zoomByArrange: state.zoomByArrange, tool: state.tool === 'comment' ? 'select' : state.tool, frameBackground: state.frameBackground, autoFitContent: state.autoFitContent }))
   }
   catch { /* Private browsing storage can be unavailable. */ }
 }

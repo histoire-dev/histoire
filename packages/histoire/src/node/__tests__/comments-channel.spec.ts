@@ -50,4 +50,25 @@ describe('comments agent bridge', () => {
       await project.close()
     }
   })
+
+  it('reopens resolved threads on reply and sends unsent ones to the chosen agent', async () => {
+    const root = await mkdtemp(join(tmpdir(), 'histoire-comments-channel-'))
+    const fixture = uiChannelFixture()
+    const resolved = commentFixture({ status: 'resolved', agentId: 'first', thread: [{ author: 'agent', agentId: 'first', body: 'Done', at: '2026-10-03T10:00:00.000Z' }] })
+    const unsent = commentFixture()
+    const prompt = vi.fn<CommentsAgentBridge['prompt']>(async () => ({ text: 'Again' }))
+    const ctx = { mode: 'dev', root, config: { comments: { enabled: true }, agents: { presets: [] } }, storyFiles: [{ relativePath: 'src/Button.story.vue', story: commentStory }] } as unknown as Context
+    await writeCommentsFile(root, '.histoire/comments.json', [resolved, unsent])
+    const store = registerCommentsChannel(ctx, fixture.channel, { prompt, cancel: vi.fn() })
+    try {
+      await fixture.request('histoire:ui:comment-reply', { id: resolved.id, body: 'One more', agentId: 'ignored' })
+      await fixture.request('histoire:ui:comment-reply', { id: unsent.id, body: 'Please', agentId: 'second' })
+      expect(prompt.mock.calls.map(([request]) => [request.threadId, request.agentId])).toEqual([[resolved.id, 'first'], [unsent.id, 'second']])
+      expect((await store.list()).map(comment => [comment.id, comment.status, comment.agentId])).toEqual(expect.arrayContaining([[resolved.id, 'replied', 'first'], [unsent.id, 'replied', 'second']]))
+    }
+    finally {
+      await fixture.channel.close()
+      await rm(root, { recursive: true, force: true })
+    }
+  })
 })

@@ -18,10 +18,10 @@ const props = defineProps<{
   model: WorkbenchComments
   /** Safe ACP display state. */
   agents: readonly UiCommentAgent[]
+  /** Comment tool is active; pins only show in this mode. */
+  active?: boolean
 }>()
 const emit = defineEmits<{
-  /** Exit pointer comment mode after its composer is placed. */
-  composed: []
   /** Open AI settings from unavailable-agent composer. */
   setupAgent: []
 }>()
@@ -34,25 +34,43 @@ const tick = ref(0)
 const viewport = ref({ width: 1024, height: 768 })
 const draftOwner = shallowRef<{ id: string, documentId: string } | null>(null)
 const capture = useCommentScreenshot(props.model, frames, canvas)
-const picker = useCommentPick(props.model, frames, () => emit('composed'))
+const picker = useCommentPick(props.model, frames)
 defineExpose({ pick: picker.pick })
 
-/** Pins follow mounted iframe geometry after canvas DOM transforms are applied. */
+/** Last projected point per frame and anchor, reused while that frame's document reloads. */
+const lastPoints = new Map<string, { point: { x: number, y: number }, camera: string }>()
+/**
+ * Pins follow mounted iframe geometry after canvas DOM transforms are applied.
+ * Geometry only needs the iframe box, so a story reload (agent edits, HMR) keeps
+ * pins and the open card in place instead of unmounting them until the new document is ready.
+ */
 function position(comment: Pick<UiComment, 'storyId' | 'variantId' | 'anchor'>) {
   void tick.value
   const id = getHistoireTargetKey(comment)
   const frame = frames.getFrame(id)
-  if (!frame?.iframe || !frame.documentId || frame.storyId !== comment.storyId || frame.variantId !== comment.variantId) return null
+  if (!frame || frame.storyId !== comment.storyId || frame.variantId !== comment.variantId) return null
+  const key = `${id}:${comment.anchor.x}:${comment.anchor.y}`
+  // Cached points are only valid for the camera they were projected with.
+  const camera = `${canvas.panOffset.x}:${canvas.panOffset.y}:${canvas.effectiveZoom}`
+  if (!frame.iframe) {
+    const last = lastPoints.get(key)
+    return last?.camera === camera ? last.point : null
+  }
   const point = frames.frameToClient(id, comment.anchor)
   const bounds = frame.iframe.closest('.histoire-canvas-viewport')?.getBoundingClientRect()
   if (!point || !bounds || point.x < bounds.left || point.x > bounds.right || point.y < bounds.top || point.y > bounds.bottom) return null
+  lastPoints.set(key, { point, camera })
   return point
 }
-const pins = computed(() => props.model.comments.value.flatMap((comment, index) => {
-  if (comment.status === 'resolved' && !props.model.showResolved.value) return []
-  const point = position(comment)
-  return point ? [{ comment, number: index + 1, point }] : []
-}))
+const pins = computed(() => {
+  if (!props.active) return []
+  return props.model.comments.value.flatMap((comment, index) => {
+    // Resolved pins stay hidden unless shown by the pane toggle or their thread is open.
+    if (comment.status === 'resolved' && !props.model.showResolved.value && props.model.activeId.value !== comment.id) return []
+    const point = position(comment)
+    return point ? [{ comment, number: index + 1, point }] : []
+  })
+})
 const active = computed(() => props.model.draft.value ?? props.model.selected.value)
 /** Unsaved anchors stay owned by the picked document, never its replacement. */
 const draftAnchor = computed(() => {
@@ -105,7 +123,7 @@ onBeforeUnmount(() => {
 <template>
   <Teleport :to="context.overlay.value ?? context.root.value ?? 'body'">
     <div v-for="pin in pins" :key="pin.comment.id" class="canvas-comment-pin" :style="{ left: `${pin.point.x}px`, top: `${pin.point.y}px` }">
-      <CommentPin :number="pin.number" :active="model.activeId.value === pin.comment.id" :draft="pin.comment.status === 'draft'" @select="model.toggle(pin.comment.id)" />
+      <CommentPin :number="pin.number" :active="model.activeId.value === pin.comment.id" :draft="pin.comment.status === 'draft'" :resolved="pin.comment.status === 'resolved'" @select="model.toggle(pin.comment.id)" />
     </div>
     <div v-if="draftAnchor" class="canvas-comment-pin" :style="{ left: `${draftAnchor.x}px`, top: `${draftAnchor.y}px` }">
       <CommentPin active temporary />
@@ -113,7 +131,7 @@ onBeforeUnmount(() => {
     <div v-if="anchor && cardStyle" class="canvas-comment-overlay" :style="cardStyle">
       <div class="canvas-comment-card">
         <CommentComposer v-if="model.draft.value" :draft="model.draft.value" :title="title(model.draft.value)" :agents="agents" :capturing="Boolean(capture.requestId.value) || model.pending.value" @save="model.save" @send="model.sendDraft" @attach="capture.capture" @close="model.dismiss" @setup-agent="emit('setupAgent')" />
-        <CommentThread v-else-if="model.selected.value" :comment="model.selected.value" :title="title(model.selected.value)" :agents="agents" :disabled="!model.available.value" @reply="(id, body) => model.reply(id, body)" @resolve="model.resolve(model.selected.value!.id, $event)" @remove="model.remove(model.selected.value!.id)" @close="model.dismiss" />
+        <CommentThread v-else-if="model.selected.value" :comment="model.selected.value" :title="title(model.selected.value)" :agents="agents" :disabled="!model.available.value" @reply="(id, body, agentId) => model.reply(id, body, agentId)" @resolve="model.resolve(model.selected.value!.id, $event)" @remove="model.remove(model.selected.value!.id)" @close="model.dismiss" />
       </div>
       <Transition name="comment-error" appear>
         <p v-if="model.error.value" class="comment-error" role="alert">
@@ -125,7 +143,8 @@ onBeforeUnmount(() => {
 </template>
 
 <style scoped>
-.canvas-comment-pin { position: fixed; z-index: 28; transform: translate(-50%, -50%); pointer-events: auto; }
+/* Bubble tail (bottom-left corner) points at the anchor, matching the comments pane badge. */
+.canvas-comment-pin { position: fixed; z-index: 28; transform: translateY(-100%); pointer-events: auto; }
 .canvas-comment-overlay { position: fixed; z-index: 32; pointer-events: auto; }
 /* The scroll container owns the shadow so its overflow cannot clip it. */
 .canvas-comment-card { max-height: calc(100vh - 24px); overflow: auto; border-radius: var(--histoire-radius-panel); box-shadow: var(--histoire-shadow-panel); }

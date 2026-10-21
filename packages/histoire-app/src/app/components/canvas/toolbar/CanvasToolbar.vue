@@ -98,7 +98,9 @@ onBeforeUnmount(() => disposers.forEach(dispose => dispose()))
       <SearchMatchStepper :count="matchCount" :position="matchPosition ?? 0" @previous="emit('previousMatch')" @next="emit('nextMatch')" />
     </BaseOverflowToolbarItem>
     <BaseOverflowToolbarItem id="tools" :separator-before="Boolean(matchCount)">
-      <ToolSwitch :class="{ 'histoire-tool-switch--leading': !matchCount }" />
+      <ToolSwitch :class="{ 'histoire-tool-switch--leading': !matchCount }">
+        <slot name="tool" />
+      </ToolSwitch>
     </BaseOverflowToolbarItem>
     <BaseOverflowToolbarItem id="arrange" separator-before>
       <ArrangeSwitch :arrange="arrange" @arrange="emit('arrange', $event)" /><slot name="matrix" v-bind="{ open, setOpen }" />
@@ -117,9 +119,6 @@ onBeforeUnmount(() => disposers.forEach(dispose => dispose()))
     </BaseOverflowToolbarItem>
     <BaseOverflowToolbarItem id="screenshot">
       <slot name="screenshot" v-bind="{ open, setOpen }" />
-    </BaseOverflowToolbarItem>
-    <BaseOverflowToolbarItem id="comment">
-      <slot name="comment" v-bind="{ open, setOpen }" />
     </BaseOverflowToolbarItem>
     <BaseOverflowToolbarItem id="embed">
       <slot name="embed" v-bind="{ open, setOpen }" />

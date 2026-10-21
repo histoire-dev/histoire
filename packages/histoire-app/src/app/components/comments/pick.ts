@@ -19,7 +19,7 @@ export interface CommentFramePoint {
 }
 
 /** Finite element pick is attributed to one iframe document and frame target. */
-export function useCommentPick(model: WorkbenchComments, frames: CanvasFrames, composed: () => void) {
+export function useCommentPick(model: WorkbenchComments, frames: CanvasFrames) {
   let pending: { point: CommentFramePoint, documentId: string, requestId: string, isCurrent: () => boolean } | undefined
   let timeout: ReturnType<typeof setTimeout> | undefined
   /** Retire old requests before another click or component teardown. */
@@ -45,7 +45,7 @@ export function useCommentPick(model: WorkbenchComments, frames: CanvasFrames, c
       }
       catch { /* Cyclic/opaque state leaves a usable coordinate comment. */ }
     }
-    if (model.compose({ target, anchor: { ...owner.point.point, selector }, props })) composed()
+    model.compose({ target, anchor: { ...owner.point.point, selector }, props })
     clear()
   }
   /** Reply cannot claim a replacement runtime, another frame, or previous click. */

@@ -107,7 +107,9 @@ export function registerCommentsChannel(ctx: Context, channel: UiChannelServer, 
     const id = commentId(value?.id)
     await store.reply(id, value?.body)
     const comment = (await store.list()).find(comment => comment.id === id)
-    if (comment?.agentId) await dispatch([id], comment.agentId)
+    // Threads keep their agent; never-sent comments go to the agent chosen by the client.
+    const agentId = comment?.agentId ?? (typeof value?.agentId === 'string' && value.agentId ? value.agentId : undefined)
+    if (agentId) await dispatch([id], agentId)
   })
   handle('histoire:ui:comment-send', async (value) => {
     if (!Array.isArray(value?.ids)) throw new Error('Invalid comment send')

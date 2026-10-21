@@ -140,12 +140,12 @@ export function createCommentsStore(options: {
     resolve(id: string, resolved: boolean): Promise<void> {
       return change(id, comment => ({ ...comment, status: resolved ? 'resolved' : idleStatus(comment) }))
     },
-    /** Replies enter the same independent comment conversation on its next send. */
+    /** Replies reopen resolved threads and enter the same independent conversation on its next send. */
     reply(id: string, body: string): Promise<void> {
       const message = validateCommentMessage({ author: 'user', body, at: new Date().toISOString() })
       return change(id, (comment, fileKey) => {
         if (isPending(id, fileKey) || ['sent', 'working'].includes(comment.status)) throw new Error('Cannot reply while agent is working')
-        return { ...comment, thread: [...comment.thread, message], status: comment.status === 'resolved' ? 'resolved' : 'draft' }
+        return { ...comment, thread: [...comment.thread, message], status: 'draft' }
       })
     },
     /** Ordered bulk delivery shares no agent session or positional identity between comments. */

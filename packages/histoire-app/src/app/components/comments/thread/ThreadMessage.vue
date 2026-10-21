@@ -64,7 +64,7 @@ const phases = computed(() => groupActivityPhases(props.steps ?? []))
 header { display: flex; flex-wrap: wrap; align-items: baseline; gap: 7px; margin-bottom: 4px; }
 strong { font-size: 12px; }
 time { color: var(--histoire-muted); font-size: 11px; }
-.phases { display: grid; gap: 1px; margin-bottom: 6px; }
+.phases { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1px; margin-bottom: 6px; }
 p { margin: 0; font-size: 12px; line-height: 1.6; color: var(--histoire-body); white-space: pre-wrap; overflow-wrap: anywhere; }
 .failed { display: flex; align-items: center; gap: 6px; color: var(--histoire-danger-text); }
 .file-change { display: flex; align-items: center; flex-wrap: wrap; gap: 5px; width: fit-content; margin-top: 6px; padding: 5px 7px; border-radius: 6px; background: var(--histoire-chip); font-size: 10px; overflow-wrap: anywhere; }

@@ -211,8 +211,8 @@ export function createWorkbenchComments(transport: CommentsTransport = {
       if (accepted && resolved && activeId.value === id) activeId.value = null
       return accepted
     },
-    /** User reply is stored before continuing its configured conversation. */
-    reply(id: string, body: string): boolean { return send('histoire:ui:comment-reply', { id, body }) },
+    /** User reply reopens the thread and is stored before continuing its conversation (or starting one with `agentId`). */
+    reply(id: string, body: string, agentId?: string): boolean { return send('histoire:ui:comment-reply', { id, body, ...(agentId ? { agentId } : {}) }) },
     /** Delete only the requested thread. */
     remove(id: string): boolean { return send('histoire:ui:comment-delete', { id }) },
     /** Reveal an existing exact thread and dismiss local composer. */
