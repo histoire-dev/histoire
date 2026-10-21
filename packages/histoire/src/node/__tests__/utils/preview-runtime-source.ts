@@ -1,6 +1,7 @@
 import type { ServerStory } from '@histoire/shared'
 import type { PreviewRuntimeStoryFile } from '../../virtual/preview-runtime/preamble.js'
 import { buildPreviewRuntimeSource, buildStoryModuleLoaders } from '../../virtual/preview-runtime/index.js'
+import { buildStoryEntryLoaders } from '../../virtual/preview-runtime/story-entries.js'
 
 /**
  * Story id packed with every character that could break out of the string,
@@ -66,8 +67,11 @@ export const previewRuntimeStubStoryFiles: PreviewRuntimeStoryFile[] = [
  *
  * @param hasVitestPreview Selects the branch to generate: `true` emits the
  * Vitest mocker imports and environment bootstrap, `false` the plain runtime.
+ * @param options Generation options.
+ * @param options.lazyStoryEntries Emits the dev form importing per-story entries
+ * instead of baking the story metadata.
  */
-export function generatePreviewRuntimeSource(hasVitestPreview = true) {
+export function generatePreviewRuntimeSource(hasVitestPreview = true, { lazyStoryEntries = false } = {}) {
   return buildPreviewRuntimeSource({
     hasVitestPreview,
     vitestSpyId: '/stub/node_modules/@vitest/spy/dist/index.js',
@@ -83,6 +87,7 @@ export function generatePreviewRuntimeSource(hasVitestPreview = true) {
     },
     files: previewRuntimeStubStoryFiles,
     loaders: buildStoryModuleLoaders(previewRuntimeStubStoryFiles),
+    storyEntryLoaders: lazyStoryEntries ? buildStoryEntryLoaders(previewRuntimeStubStoryFiles, true) : undefined,
     mountTimeoutMs: 30_000,
   })
 }

@@ -84,6 +84,9 @@ export function createVirtualFilesPlugin(ctx: Context, isServer: boolean) {
       if (id.startsWith(VirtualFiles.PREVIEW_RUNTIME_ID)) {
         return VirtualFiles.RESOLVED_PREVIEW_RUNTIME_ID
       }
+      if (id.startsWith(VirtualFiles.PREVIEW_STORY_ENTRY_ID_PREFIX)) {
+        return `\0${id}`
+      }
       if (id.startsWith(VirtualFiles.VITEST_BROWSER_RUNTIME_ID)) {
         return VirtualFiles.RESOLVED_VITEST_BROWSER_RUNTIME_ID
       }
@@ -161,7 +164,13 @@ export function createVirtualFilesPlugin(ctx: Context, isServer: boolean) {
         return VirtualFiles.testHarness(ctx)
       }
       if (id === VirtualFiles.RESOLVED_PREVIEW_RUNTIME_ID) {
-        return VirtualFiles.previewRuntime(ctx)
+        // Generated code has no original source to map to. An empty map stops
+        // Vite from inlining a sourcemap (several times the module's size,
+        // sourcesContent included) into every sandbox document.
+        return { code: VirtualFiles.previewRuntime(ctx), map: { mappings: '' } }
+      }
+      if (id.startsWith(VirtualFiles.RESOLVED_PREVIEW_STORY_ENTRY_ID_PREFIX)) {
+        return { code: VirtualFiles.previewStoryEntry(ctx, id), map: { mappings: '' } }
       }
       if (id === VirtualFiles.RESOLVED_VITEST_BROWSER_RUNTIME_ID) {
         return VirtualFiles.vitestBrowserRuntime(ctx)

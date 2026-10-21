@@ -2,7 +2,7 @@ import type { Plugin as VitePlugin } from 'vite'
 import type { Context } from '../context.js'
 import type { BrowserRuntimePaths } from './resolve-paths.js'
 import { dirname, join } from 'pathe'
-import { APP_PATH } from '../alias.js'
+import { APP_PATH, getHistoireStyleFiles } from '../alias.js'
 import { tailwindRuntimeDirectory } from '../builtin-plugins/tailwind/template.js'
 import { getContextRegistry } from '../runtime/registry.js'
 import { installUiHttpRouter } from '../server/ui-channel/http.js'
@@ -64,12 +64,11 @@ export function createHistoireVitePlugin(ctx: Context, options: HistoireVitePlug
           alias: [
             {
               find: 'histoire-style',
-              replacement: join(APP_PATH, process.env.HISTOIRE_DEV ? 'app/style/main.pcss' : 'style.css'),
+              replacement: getHistoireStyleFiles().style,
             },
             {
               find: 'histoire-bundled-style',
-              // The preview uses bundled components even when the host app runs from source.
-              replacement: join(resolveHistoireAppBundledDir(), 'app.css'),
+              replacement: getHistoireStyleFiles().bundledStyle,
             },
             {
               find: /^@histoire\/shared$/,

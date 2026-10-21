@@ -2,9 +2,11 @@ import type { ServerResponse } from 'node:http'
 import type { Connect, ViteDevServer } from 'vite'
 import type { Context } from '../context.js'
 import { lookup as lookupMime } from 'mrmime'
-import { APP_PATH } from '../alias.js'
+import { APP_PATH, getHistoireStyleFiles } from '../alias.js'
 import { getDevClientPreloads } from '../server/client-ready.js'
+import { RESOLVED_PREVIEW_RUNTIME_ID } from '../virtual/index.js'
 import { renderVitestRunnerBootstrap } from '../virtual/vitest-runner-bootstrap.js'
+import { versionModuleFile } from './module-version.js'
 
 /** Early Histoire routes inherit Vite headers without replacing caller-owned response policy. */
 export function applyDevResponseHeaders(server: ViteDevServer, res: ServerResponse): void {
@@ -21,9 +23,36 @@ function getBundleSuffix() {
 }
 
 /**
- * Renders the HTML document of the story sandbox iframe.
+ * Head and entry script of the sandbox document.
+ *
+ * Built Histoire styles load as `<link>` stylesheets: with versioned URLs the
+ * browser caches and reuses them across sandbox documents, instead of every
+ * iframe evaluating ~270KB of CSS wrapped in JS modules and injecting it
+ * through the HMR client. The entry script is then the preview runtime itself.
+ * Local Histoire development keeps the CSS imports of its `-dev` bundle, whose
+ * source styles hot-update.
+ * @param version Maps an absolute file path to its versioned module path.
  */
-function renderSandboxHtml() {
+export function renderSandboxEntry(version: (file: string) => string) {
+  if (process.env.HISTOIRE_DEV) {
+    return {
+      head: '',
+      script: `<script type="module" src="/@fs/${APP_PATH}/bundle-sandbox${getBundleSuffix()}.js"></script>`,
+    }
+  }
+  const { style, bundledStyle } = getHistoireStyleFiles()
+  return {
+    head: [style, bundledStyle].map(file => `<link rel="stylesheet" href="/@fs/${version(file)}">`).join('\n  '),
+    script: `<script type="module" src="${RESOLVED_PREVIEW_RUNTIME_ID}"></script>`,
+  }
+}
+
+/**
+ * Renders the HTML document of the story sandbox iframe.
+ * @param server Dev server versioning the document's stylesheet URLs.
+ */
+function renderSandboxHtml(server: ViteDevServer) {
+  const entry = renderSandboxEntry(file => versionModuleFile(server, file))
   return `
 <!DOCTYPE html>
 <html>
@@ -32,6 +61,7 @@ function renderSandboxHtml() {
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="">
+  ${entry.head}
 </head>
 <body>
   <div id="app"></div>
@@ -45,7 +75,7 @@ ${renderVitestRunnerBootstrap('  ')}
     }
   }
   </script>
-  <script type="module" src="/@fs/${APP_PATH}/bundle-sandbox${getBundleSuffix()}.js"></script>
+  ${entry.script}
 </body>
 </html>`
 }
@@ -97,7 +127,7 @@ async function sendHtml(server: ViteDevServer, req: Connect.IncomingMessage, res
 export function createSandboxHtmlMiddleware(server: ViteDevServer): Connect.NextHandleFunction {
   return async (req, res, next) => {
     if (req.url!.startsWith(`${server.config.base}__sandbox`)) {
-      await sendHtml(server, req, res, renderSandboxHtml())
+      await sendHtml(server, req, res, renderSandboxHtml(server))
       return
     }
     next()

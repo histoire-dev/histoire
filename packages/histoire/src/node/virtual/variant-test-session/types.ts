@@ -58,6 +58,14 @@ export interface VariantTestSessionOptions {
    * a hot update; loaders emitted for a built app ignore it.
    */
   moduleLoaders: Record<string, (version?: number) => Promise<StoryModuleExports>>
+  /**
+   * Fetches a story's metadata and module loader into `files` and
+   * `moduleLoaders` before they are read. The dev preview runtime delivers
+   * only the selected story this way instead of baking every story's metadata
+   * into each sandbox document. Resolves without adding anything for an
+   * unknown story.
+   */
+  loadStoryEntry?: (storyId: string) => Promise<void>
   runWithDynamicImport: (loader: () => Promise<StoryModuleExports>) => Promise<StoryModuleExports>
   ensureEnvironment?: () => Promise<void> | void
   /**

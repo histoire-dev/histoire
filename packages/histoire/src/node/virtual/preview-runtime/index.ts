@@ -1,5 +1,6 @@
 import type { Context } from '../../context.js'
 import type { PreviewRuntimePreambleOptions, PreviewRuntimeStoryFile } from './preamble.js'
+import { randomUUID } from 'node:crypto'
 import { createRequire } from 'node:module'
 import { hasProjectVitest } from '../../util/has-vitest.js'
 import { resolveHistoireAppBundledDir } from '../../util/resolve-histoire-app.js'
@@ -14,11 +15,18 @@ import { previewErrorOverlay } from './error-overlay.js'
 import { previewHostMessaging } from './host-messaging.js'
 import { previewMount } from './mount.js'
 import { previewRuntimePreamble } from './preamble.js'
+import { buildStoryEntryLoaders, buildStoryEntryModule, parseStoryEntryId } from './story-entries.js'
 import { previewStoryLoading } from './story-loading.js'
+import { buildStoryModuleLoader } from './story-module-loader.js'
 import { previewVariantBridge } from './variant-bridge.js'
 import { previewVitestEnvironment } from './vitest-environment.js'
 
+export { PREVIEW_STORY_ENTRY_ID_PREFIX, RESOLVED_PREVIEW_STORY_ENTRY_ID_PREFIX } from './story-entries.js'
+
 const require = createRequire(import.meta.url)
+
+/** Per-context salt of story entry versions (see `getStoryEntrySpecifier`). */
+const storyEntrySalts = new WeakMap<Context, string>()
 
 /**
  * Options of {@link buildPreviewRuntimeSource}: everything the emitted runtime
@@ -53,47 +61,22 @@ export interface PreviewRuntimeSourceOptions {
   mountTimeoutMs: number
   /** Emitted `"<story id>": () => import("<module id>")` loader entries. */
   loaders: string[]
-}
-
-/**
- * Whether a module id can carry the cache-busting query of a hot update.
- *
- * Only real file modules do: a virtual id is resolved by the plugin that owns
- * it, and appending a query to it can make that resolution fail.
- */
-function supportsModuleUrlVersion(moduleId: string) {
-  return !moduleId.startsWith('virtual:') && !moduleId.startsWith('\0')
+  /** Emitted per-story entry loaders; switches the runtime to lazy story metadata. */
+  storyEntryLoaders?: string[]
 }
 
 /**
  * Builds the emitted module loader entries, one
- * `"<story id>": version => import("<module id>")` per story file.
- *
- * Loaders take an optional version: re-importing the same URL is served from the
- * browser's native module cache, so after a hot update the story's top-level
- * code — where module-scope `onTest(...)` definitions live — would never run
- * again and its tests would come back empty until a full reload.
- *
- * Both the object key and the import specifier go through `JSON.stringify` so a
- * story id or module id containing a quote, a backslash or a backtick cannot
- * break out of the literal it is baked into.
+ * `"<story id>": version => import("<module id>")` per story file (see
+ * {@link buildStoryModuleLoader}). The object key goes through
+ * `JSON.stringify` so a story id containing a quote, a backslash or a backtick
+ * cannot break out of the literal it is baked into.
  * @param files Story files to emit a loader for.
  * @param options Loader options.
- * @param options.hmr Enables the cache-busting form (dev server only: a built
- * app has no hot updates, and the busted URL is not analyzable by the bundler).
+ * @param options.hmr Enables the cache-busting form.
  */
 export function buildStoryModuleLoaders(files: PreviewRuntimeStoryFile[], { hmr = false } = {}) {
-  return files.map((file) => {
-    const key = JSON.stringify(file.id)
-    const moduleId = JSON.stringify(file.moduleId)
-
-    if (!hmr || !supportsModuleUrlVersion(file.moduleId)) {
-      return `${key}: () => import(${moduleId})`
-    }
-
-    const versionQuery = JSON.stringify(`${file.moduleId.includes('?') ? '&' : '?'}hst-v=`)
-    return `${key}: version => version ? import(/* @vite-ignore */ ${moduleId} + ${versionQuery} + version) : import(${moduleId})`
-  })
+  return files.map(file => `${JSON.stringify(file.id)}: ${buildStoryModuleLoader(file, { hmr })}`)
 }
 
 /**
@@ -119,7 +102,7 @@ ${previewHostMessaging()}
 
 ${previewErrorOverlay()}
 
-${previewStoryLoading(options.mountTimeoutMs)}
+${previewStoryLoading(options.mountTimeoutMs, !!options.storyEntryLoaders)}
 
 ${previewVariantBridge()}
 
@@ -169,7 +152,13 @@ export function previewRuntime(ctx: Context) {
   const vitestMockerBrowserId = tryResolveVitestModule(ctx.root, '@vitest/mocker/browser')
   const hasVitestPreview = Boolean(hasVitest && vitestSpyId && vitestMockerBrowserId)
   const files = getRuntimeStoryFiles(ctx)
-  const loaders = buildStoryModuleLoaders(files, { hmr: ctx.mode === 'dev' })
+  const hmr = ctx.mode === 'dev'
+  const salt = storyEntrySalts.get(ctx) ?? randomUUID()
+  storyEntrySalts.set(ctx, salt)
+  // Dev documents fetch only their own story's metadata (see story-entries).
+  // A build keeps it baked: one hashed bundle is cached by the browser anyway.
+  const storyEntryLoaders = hmr ? buildStoryEntryLoaders(files, hmr, salt) : undefined
+  const loaders = storyEntryLoaders ? [] : buildStoryModuleLoaders(files, { hmr })
 
   return buildPreviewRuntimeSource({
     hasVitestPreview,
@@ -188,6 +177,19 @@ export function previewRuntime(ctx: Context) {
     },
     files,
     loaders,
+    storyEntryLoaders,
     mountTimeoutMs: getStoryCollectTimeout(ctx),
   })
+}
+
+/**
+ * Generates a `virtual:$histoire-preview-story:<id>` entry module from the
+ * current collection (see `story-entries.ts`).
+ * @param ctx Histoire context holding the collected story files.
+ * @param id Resolved entry module id.
+ */
+export function previewStoryEntry(ctx: Context, id: string) {
+  const storyId = parseStoryEntryId(id)
+  const file = getRuntimeStoryFiles(ctx).find(item => item.id === storyId)
+  return buildStoryEntryModule(file, { hmr: ctx.mode === 'dev' })
 }

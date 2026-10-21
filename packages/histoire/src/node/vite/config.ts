@@ -18,6 +18,7 @@ import {
 } from './extra-plugins.js'
 import { mergeHistoireViteConfig } from './merge-config.js'
 import { createMockerPlugins } from './mocker.js'
+import { createModuleVersionPlugin } from './module-version.js'
 import { resolveBrowserRuntimePaths } from './resolve-paths.js'
 import { createStoryVitestShimPlugin } from './story-vitest-shim.js'
 import { createBrowserCollectVitestStubPlugin, createNodeCollectVitestStubPlugin } from './vitest-collect-stub.js'
@@ -61,6 +62,11 @@ export async function getViteConfigWithPlugins(
   }))
 
   plugins.push(createVirtualFilesPlugin(ctx, isServer))
+
+  // Sandbox documents share Histoire's built modules: serve them cacheable.
+  if (ctx.mode === 'dev' && !isServer && !options.browserRuntime) {
+    plugins.push(createModuleVersionPlugin())
+  }
 
   if (!isServer && options.browserRuntime && options.collecting) {
     plugins.push(createBrowserCollectVitestStubPlugin())

@@ -1,6 +1,7 @@
 import type { DevEnvironment } from 'vite'
 import { parseAst } from 'rollup/dist/parseAst.js'
 import { analyzeCollectionModule } from '../test/eligibility/analysis.js'
+import { isHistoireModuleVersionUrl } from '../vite/module-version.js'
 import { debugVitestBrowser } from './browser-debug.js'
 
 /** Warm runtime imports; collection may also prepare user-owned literal imports before browser dispatch. */
@@ -35,12 +36,16 @@ export async function warmClientModules(client: DevEnvironment, entries: string[
   return graph
 }
 
-/** Preload static app modules only; lazy story imports and optimizer-version URLs stay excluded. */
+/**
+ * Preload static app modules only; lazy story imports and optimizer-version URLs
+ * stay excluded. Histoire's own versioned module URLs are stable for the server
+ * lifetime, so they are kept.
+ */
 export function getStaticClientPreloads(graph: ReadonlyMap<string, readonly string[]>, entries: string[]): string[] {
   const urls = new Set<string>()
   /** Cycles and shared imports yield one hint without admitting lazy story modules. */
   function visit(url: string) {
-    if (urls.has(url) || !graph.has(url) || /[?&]v=/.test(url)) return
+    if (urls.has(url) || !graph.has(url) || (/[?&]v=/.test(url) && !isHistoireModuleVersionUrl(url))) return
     urls.add(url)
     for (const dependency of graph.get(url)!) visit(dependency)
   }

@@ -1,6 +1,7 @@
 import type { SerializedStoryFile } from '../variant-test-session/types.js'
 import { STORY_CHANGED_EVENT, TEST_DEFINITIONS_KEY } from '@histoire/shared'
 import { MOCK_RPC_SNIPPET } from '../mock-rpc-snippet.js'
+import { previewStoryEntries } from './story-entries.js'
 
 /**
  * Story metadata baked into the generated preview runtime, one entry per
@@ -48,6 +49,12 @@ export interface PreviewRuntimePreambleOptions {
   files: PreviewRuntimeStoryFile[]
   /** Emitted `"<story id>": () => import("<module id>")` loader entries. */
   loaders: string[]
+  /**
+   * Emitted per-story entry loaders (see `buildStoryEntryLoaders`). When set,
+   * `files` and `loaders` start empty and each story's metadata and module
+   * loader are imported on first use instead of being baked in.
+   */
+  storyEntryLoaders?: string[]
 }
 
 /**
@@ -67,6 +74,7 @@ export function previewRuntimePreamble({
   histoireVendorIds,
   files,
   loaders,
+  storyEntryLoaders,
 }: PreviewRuntimePreambleOptions) {
   /** Quotes an absolute specifier for a module of the bundled app build. */
   const app = (subpath: string) => JSON.stringify(`${histoireAppBundledDir}/${subpath}`)
@@ -123,10 +131,11 @@ async function ensureGridComponent() {
 
 const TEST_DEFINITIONS_KEY = ${JSON.stringify(TEST_DEFINITIONS_KEY)}
 const STORY_CHANGED_EVENT = ${JSON.stringify(STORY_CHANGED_EVENT)}
-const files = ${JSON.stringify(files)}
+const files = ${JSON.stringify(storyEntryLoaders ? [] : files)}
 const moduleLoaders = {
-  ${loaders.join(',\n  ')}
+  ${storyEntryLoaders ? '' : loaders.join(',\n  ')}
 }
+${storyEntryLoaders ? previewStoryEntries(storyEntryLoaders) : ''}
 const storyFileCache = new Map()
 const initialSelection = {
   storyId: new URLSearchParams(window.location.search).get('storyId'),

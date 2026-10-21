@@ -6,7 +6,7 @@ import { withRegistry } from './registry.js'
 /** The subset of the session options the story module cache needs. */
 type StoryModuleCacheOptions = Pick<
   VariantTestSessionOptions,
-  'files' | 'moduleLoaders' | 'runWithDynamicImport' | 'ensureEnvironment'
+  'files' | 'moduleLoaders' | 'loadStoryEntry' | 'runWithDynamicImport' | 'ensureEnvironment'
 >
 
 /**
@@ -87,6 +87,7 @@ export function createStoryModuleCache(options: StoryModuleCacheOptions) {
       return importedStoryCache.get(storyId)!
     }
 
+    await options.loadStoryEntry?.(storyId)
     const file = getSerializedFile(options.files, storyId)
     const loadModule = options.moduleLoaders[storyId]
     if (!loadModule) {

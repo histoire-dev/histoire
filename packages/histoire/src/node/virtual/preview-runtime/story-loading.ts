@@ -9,8 +9,11 @@ import { VITEST_DYNAMIC_IMPORT_SNIPPET } from '../vitest-runner-bootstrap.js'
  *   latest collection,
  * - the collected test-definition globals, cleared together with the caches
  *   when a story is invalidated by HMR.
+ * @param mountTimeoutMs Maximum time allowed for one variant mount.
+ * @param lazyStoryEntries Whether the session fetches story entries on demand
+ * through `loadStoryEntry` (declared by the preamble in that mode).
  */
-export function previewStoryLoading(mountTimeoutMs: number) {
+export function previewStoryLoading(mountTimeoutMs: number, lazyStoryEntries = false) {
   return `${VITEST_DYNAMIC_IMPORT_SNIPPET}
 
 ${generatedKnownEmptySetupProbe()}
@@ -18,7 +21,7 @@ ${generatedKnownEmptySetupProbe()}
 const variantTestSession = createVariantTestSession({
   files,
   mountTimeoutMs: ${mountTimeoutMs},
-  moduleLoaders,
+  moduleLoaders,${lazyStoryEntries ? '\n  loadStoryEntry,' : ''}
   runWithDynamicImport: runWithVitestDynamicImport,
   ensureEnvironment: ensureVitestPreviewEnvironment,
   offscreenRenderMount: true,

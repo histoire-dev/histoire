@@ -12,6 +12,7 @@ import { createCanvasReplicaSession } from './frame-replica.js'
 import { createCanvasPropsRequestId } from './frame-requests.js'
 import { type CanvasStartupRequest, useCanvasStartupCoordinator } from './frame-startup-coordinator.js'
 import { createCanvasReplicaTargetSelector, createCanvasStartupReadiness, observeCanvasStartupRuntime, waitForCanvasStartup } from './frame-startup-lifecycle.js'
+import { matrixSandboxBootGate } from './sandbox-boot-gate.js'
 import { useCanvasContentSizing } from './useCanvasContentSizing.js'
 
 const props = defineProps<{
@@ -118,7 +119,15 @@ async function start(): Promise<void> {
     const pending = (async () => {
       if (previousDirect) await previousDirect
       if (closing || version !== generation) return
-      await startOwned(version, controller.signal)
+      // Matrix cells start together: stage them so one fills the module cache.
+      const release = props.propsOverride ? await matrixSandboxBootGate.enter(controller.signal) : undefined
+      try {
+        if (closing || version !== generation) return
+        await startOwned(version, controller.signal)
+      }
+      finally {
+        release?.()
+      }
     })()
     const owned = pending.catch(() => {})
     directStartup = owned
