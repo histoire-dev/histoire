@@ -141,6 +141,8 @@ function openControlMenu(event: MouseEvent | KeyboardEvent): void {
 <style scoped>
 .story-inspector { --histoire-inspector-gutter: var(--histoire-pane-gutter, 16px); display: flex; flex-direction: column; width: 100%; height: 100%; min-width: 0; min-height: 0; overflow: hidden; border: 1px solid transparent; border-radius: var(--histoire-radius-panel, 16px); color: var(--histoire-text); background: var(--histoire-surface); }
 .story-inspector[data-active-tab="docs"] { border-color: var(--histoire-border); background: var(--histoire-canvas); }
+/* Docs canvas background only applies to the docs area: source drawer keeps the regular surface. */
+.story-inspector[data-active-tab="docs"] :deep(.inspector-source) { background: var(--histoire-surface); }
 .inspector-content { flex: 1; min-height: 0; overflow: auto; }
 .inspector-content :deep(.histoire-docs) { padding: 2px var(--histoire-inspector-gutter) 16px; color: var(--histoire-body); font-size: 12px; line-height: 1.7; }
 .inspector-content :deep(.histoire-docs :is(h1,h2,h3,h4)) { color: var(--histoire-text); font-weight: 800; }
