@@ -36,3 +36,35 @@ export function toolbarAvailableWidth(root: HTMLElement): number {
   const width = measured ? measured - (style.boxSizing === 'border-box' ? parentChrome : 0) : parent.getBoundingClientRect().width - parentChrome
   return Math.max(0, width - pixels(chrome.paddingLeft) - pixels(chrome.paddingRight) - pixels(chrome.borderLeftWidth) - pixels(chrome.borderRightWidth))
 }
+
+/** Attributes the overflow layout itself writes on item wrappers; they never change natural width. */
+const PRESENTATION_ATTRIBUTES = new Set(['data-toolbar-presentation', 'data-separator', 'hidden'])
+
+/** True when a mutation only reflects the layout's own presentation output on an item wrapper. */
+export function isPresentationMutation(record: MutationRecord): boolean {
+  return record.type === 'attributes' && PRESENTATION_ATTRIBUTES.has(record.attributeName ?? '') && (record.target as Element).classList?.contains('overflow-toolbar-item')
+}
+
+/**
+ * Natural-width cache keyed by item content. Clone measurement forces layout, so items
+ * whose markup did not change reuse their last width until `clear()` (resize, fonts).
+ */
+export function createItemWidthCache() {
+  let cache = new WeakMap<HTMLElement, { signature: string, width: number }>()
+  return {
+    /** Cached width when content is unchanged, otherwise a fresh clone measurement. */
+    measure(element: HTMLElement, host: HTMLElement): number {
+      // Wrapper presentation attributes are normalized by the clone, so only content and own styling count.
+      const signature = `${element.className}\u0000${element.getAttribute('style') ?? ''}\u0000${element.innerHTML}`
+      const cached = cache.get(element)
+      if (cached?.signature === signature) return cached.width
+      const width = measureInlineItem(element, host)
+      cache.set(element, { signature, width })
+      return width
+    },
+    /** Drop every width after changes that can affect styling without touching markup. */
+    clear(): void {
+      cache = new WeakMap()
+    },
+  }
+}

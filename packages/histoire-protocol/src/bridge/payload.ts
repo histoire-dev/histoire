@@ -4,8 +4,13 @@ import { validateHistoireSnapshot } from './snapshot.js'
 import { HISTOIRE_BRIDGE_EVENTS } from './types.js'
 import { invalid, validateHistoireTarget, validateSettingsPatch, wireId, wireRecord } from './validation.js'
 
-/** Validates finite command arguments; transport signals never cross wire. */
-export function validateBridgePayload(command: HistoireBridgeCommand, value: unknown): void {
+/**
+ * Validates finite command arguments; transport signals never cross wire.
+ * @param command Request command.
+ * @param value Untrusted arguments.
+ * @param measured Caller already ran `validateWireValue(value, { kind: 'request', name: command })`.
+ */
+export function validateBridgePayload(command: HistoireBridgeCommand, value: unknown, measured = false): void {
   const input = wireRecord(value)
   const fields: Partial<Record<HistoireBridgeCommand, readonly string[]>> = {
     'catalog.list': [],
@@ -47,7 +52,7 @@ export function validateBridgePayload(command: HistoireBridgeCommand, value: unk
     if (command === 'subscriptions.add' && (!Array.isArray(input.streams) || input.streams.some(stream => !HISTOIRE_BRIDGE_EVENTS.includes(stream)))) invalid('Invalid subscription stream')
   }
   if (command === 'channel.post') validateHostChannelPayload(input)
-  if (command === 'view.sync') validateHistoireSnapshot(value)
+  if (command === 'view.sync') validateHistoireSnapshot(value, measured)
   if (command === 'controls.configure' && typeof input.customOnly !== 'boolean') invalid('Controls presentation must be boolean')
   if (command === 'controls.preset') {
     if (!['list', 'save', 'apply', 'delete', 'rename'].includes(input.action as string)) invalid('Invalid preset action')

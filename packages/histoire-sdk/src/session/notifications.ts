@@ -2,6 +2,7 @@ import type { HistoireSourceDescriptor } from '@histoire/protocol'
 import type { HistoireSessionNotification } from '../adapters/types.js'
 import type { SessionContext } from './context.js'
 import { validateHistoireEvent, validateHistoireStateSnapshot, validateHistoireViewports, validateWireValue } from '@histoire/protocol'
+import { isValidatedNotification } from '../transport/validated.js'
 import { appendEvent } from './events.js'
 import { acceptHistoireSourceDescriptor, isAcceptedHistoireSourceDescriptor } from './internal.js'
 import { publishRuntime } from './runtime.js'
@@ -78,14 +79,19 @@ export function receiveNotification(context: SessionContext, notification: Histo
     return
   }
   if (notification.runtimeId !== context.snapshot.runtime.runtimeId || context.snapshot.runtime.status !== 'ready') return
+  // Bridge ports already sized and schema-checked these exact payload objects (the
+  // per-event and viewport checks below are subsets of the envelope checks).
+  const validated = isValidatedNotification(notification)
   if (notification.type === 'layout') {
-    try {
-      validateWireValue({ viewports: notification.viewports }, { kind: 'event', name: 'layout.changed' })
-      validateHistoireViewports(notification.viewports)
-    }
-    catch {
-      context.publish({ stale: true })
-      return
+    if (!validated) {
+      try {
+        validateWireValue({ viewports: notification.viewports }, { kind: 'event', name: 'layout.changed' })
+        validateHistoireViewports(notification.viewports)
+      }
+      catch {
+        context.publish({ stale: true })
+        return
+      }
     }
     const viewports = mount?.hidden ? [] : context.copy(notification.viewports)
     const viewport = viewports.find(viewport => viewport.target.storyId === context.snapshot.selection?.storyId && viewport.target.variantId === context.snapshot.selection.variantId) ?? null
@@ -94,23 +100,27 @@ export function receiveNotification(context: SessionContext, notification: Histo
   else if (notification.type === 'state') {
     const state = notification.state
     if (state.runtimeId !== notification.runtimeId || state.target.storyId !== context.snapshot.selection?.storyId || state.target.variantId !== context.snapshot.selection.variantId) return
-    try {
-      validateHistoireStateSnapshot(state)
-    }
-    catch {
-      context.publish({ stale: true })
-      return
+    if (!validated) {
+      try {
+        validateHistoireStateSnapshot(state)
+      }
+      catch {
+        context.publish({ stale: true })
+        return
+      }
     }
     context.publish({ state: context.copy(state) })
   }
   else if (notification.type === 'event') {
-    try {
-      validateWireValue(notification.event, { kind: 'event', name: 'events.appended' })
-      validateHistoireEvent(notification.event)
-    }
-    catch {
-      context.publish({ events: { ...context.snapshot.events, droppedCount: context.snapshot.events.droppedCount + 1 } })
-      return
+    if (!validated) {
+      try {
+        validateWireValue(notification.event, { kind: 'event', name: 'events.appended' })
+        validateHistoireEvent(notification.event)
+      }
+      catch {
+        context.publish({ events: { ...context.snapshot.events, droppedCount: context.snapshot.events.droppedCount + 1 } })
+        return
+      }
     }
     appendEvent(context, notification.event)
   }

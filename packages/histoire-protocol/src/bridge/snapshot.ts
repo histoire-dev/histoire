@@ -33,27 +33,42 @@ export function validateHistoireRuntimeSnapshot(value: unknown): HistoireRuntime
   return input as unknown as HistoireRuntimeSnapshot
 }
 
-/** Cyclic cleaned state root remains structured-clone data and never runtime callbacks. */
-export function validateHistoireStateSnapshot(value: unknown): HistoireStateSnapshot {
-  validateWireValue(value, { kind: 'event', name: 'state.changed' })
+/**
+ * Cyclic cleaned state root remains structured-clone data and never runtime callbacks.
+ * @param value Untrusted value.
+ * @param measured Caller already measured `value` with the `state.changed` event policy
+ * (identical to the `view.sync` state sub-budget).
+ */
+export function validateHistoireStateSnapshot(value: unknown, measured = false): HistoireStateSnapshot {
+  if (!measured) validateWireValue(value, { kind: 'event', name: 'state.changed' })
   const input = wireRecord(value)
   validateHistoireTarget(input.target)
   if (!wireId(input.runtimeId) || !input.value || typeof input.value !== 'object') invalid('Invalid state snapshot')
   return input as unknown as HistoireStateSnapshot
 }
 
-/** Every event retains exact target/document ownership and finite chronology. */
-export function validateHistoireEvent(value: unknown): HistoireEvent {
+/**
+ * Every event retains exact target/document ownership and finite chronology.
+ * @param value Untrusted value.
+ * @param measured Caller already measured an enclosing JSON value under a budget no larger
+ * than the default request budget (e.g. the `events.appended` batch), which covers this payload.
+ */
+export function validateHistoireEvent(value: unknown, measured = false): HistoireEvent {
   const input = wireRecord(value)
   validateHistoireTarget(input.target)
   if (!wireId(input.runtimeId) || !Number.isSafeInteger(input.sequence) || (input.sequence as number) < 0 || typeof input.timestamp !== 'number' || !Number.isFinite(input.timestamp) || !Object.hasOwn(input, 'payload')) invalid('Invalid story event')
-  measureWireValue(input.payload)
+  if (!measured) measureWireValue(input.payload)
   return input as unknown as HistoireEvent
 }
 
-/** Complete projected view snapshot; event history arrives in separate bounded batches. */
-export function validateHistoireSnapshot(value: unknown): HistoireSnapshot {
-  validateWireValue(value, { kind: 'request', name: 'view.sync' })
+/**
+ * Complete projected view snapshot; event history arrives in separate bounded batches.
+ * @param value Untrusted value.
+ * @param measured Caller already ran `validateWireValue(value, { kind: 'request', name: 'view.sync' })`,
+ * which also measures the `catalog` and `state` sub-budgets.
+ */
+export function validateHistoireSnapshot(value: unknown, measured = false): HistoireSnapshot {
+  if (!measured) validateWireValue(value, { kind: 'request', name: 'view.sync' })
   const input = wireRecord(value)
   if (!['idle', 'connecting', 'ready', 'restarting', 'disconnected', 'failed', 'disposed'].includes(input.status as string) || typeof input.stale !== 'boolean') invalid('Invalid session lifecycle')
   if (input.source !== null) {
@@ -74,7 +89,7 @@ export function validateHistoireSnapshot(value: unknown): HistoireSnapshot {
   if (!Array.isArray(input.diagnostics) || input.diagnostics.length !== (diagnostics as unknown[]).length) invalid('Invalid snapshot diagnostics')
   if (input.selection !== null) validateHistoireTarget(input.selection)
   validateHistoireRuntimeSnapshot(input.runtime)
-  if (input.state !== null) validateHistoireStateSnapshot(input.state)
+  if (input.state !== null) validateHistoireStateSnapshot(input.state, measured)
   const settings = validateSettingsPatch(input.settings)
   for (const key of ['responsiveWidth', 'responsiveHeight', 'rotate', 'backgroundColor', 'checkerboard', 'textDirection', 'colorScheme', 'globals']) {
     if (!Object.hasOwn(settings, key)) invalid('Incomplete session settings')

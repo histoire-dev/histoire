@@ -5,6 +5,11 @@ import { useCanvasHeaderOcclusion } from '../../../histoire-app/src/app/componen
 import { createCanvasFrames } from '../../../histoire-app/src/app/composables/canvas-settings.js'
 import { type CanvasArrangement, createCanvasStore } from '../../../histoire-app/src/app/stores/canvas.js'
 
+/** Header occlusion measures once per animation frame. */
+function animationFrame(): Promise<void> {
+  return new Promise(resolve => requestAnimationFrame(() => resolve()))
+}
+
 describe('canvas overlay occlusion', () => {
   const header = { left: 100, top: 80, right: 500, bottom: 130 }
 
@@ -55,15 +60,42 @@ describe('canvas overlay occlusion', () => {
       expect(obscured.value).toBe(false)
       arrangement.value = 'list'
       await nextTick()
+      await animationFrame()
       expect(obscured.value).toBe(true)
       label.remove()
       canvas.panOffset.y += 100
       await nextTick()
+      await animationFrame()
       expect(obscured.value).toBe(false)
     }
     finally {
       scope.stop()
       viewport.remove()
+      vi.restoreAllMocks()
+    }
+  })
+
+  it('coalesces camera changes into one geometry read per animation frame', async () => {
+    const canvas = createCanvasStore()
+    const registry = createCanvasFrames(canvas)
+    const heading = document.createElement('header')
+    document.body.append(heading)
+    const read = vi.spyOn(heading, 'getBoundingClientRect').mockReturnValue(new DOMRect(100, 80, 400, 50))
+    const scope = effectScope()
+    try {
+      scope.run(() => useCanvasHeaderOcclusion({ header: () => heading, viewport: () => undefined, canvas, registry, bounds: () => null }))
+      read.mockClear()
+      for (let step = 0; step < 5; step++) {
+        canvas.panOffset.x += 10
+        await nextTick()
+      }
+      expect(read).not.toHaveBeenCalled()
+      await animationFrame()
+      expect(read).toHaveBeenCalledOnce()
+    }
+    finally {
+      scope.stop()
+      heading.remove()
       vi.restoreAllMocks()
     }
   })

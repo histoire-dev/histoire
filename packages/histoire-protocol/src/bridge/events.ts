@@ -42,8 +42,13 @@ function validateOverlay(input: Record<string, unknown>, closing: boolean): void
   }
 }
 
-/** Validates every finite publication before parent observers/framework rendering. */
-export function validateBridgeEventPayload(event: HistoireBridgeEvent, value: unknown): void {
+/**
+ * Validates every finite publication before parent observers/framework rendering.
+ * @param event Publication discriminator.
+ * @param value Untrusted payload.
+ * @param measured Caller already ran `validateWireValue(value, { kind: 'event', name: event })`.
+ */
+export function validateBridgeEventPayload(event: HistoireBridgeEvent, value: unknown, measured = false): void {
   const input = wireRecord(value)
   if (event === 'catalog.changed') {
     validateHistoireSourceDescriptor(input.descriptor)
@@ -58,14 +63,14 @@ export function validateBridgeEventPayload(event: HistoireBridgeEvent, value: un
     validateSettingsPatch(input)
   }
   else if (event === 'state.changed') {
-    validateHistoireStateSnapshot(input)
+    validateHistoireStateSnapshot(input, measured)
   }
   else if (event === 'layout.changed') {
     validateHistoireViewports(input.viewports)
   }
   else if (event === 'events.appended') {
     if (!Array.isArray(input.items) || input.items.length > 1000 || (input.reset !== undefined && typeof input.reset !== 'boolean') || (input.droppedCount !== undefined && (!Number.isSafeInteger(input.droppedCount) || (input.droppedCount as number) < 0))) invalid('Invalid event batch')
-    for (const entry of input.items) validateHistoireEvent(entry)
+    for (const entry of input.items) validateHistoireEvent(entry, measured)
   }
   else if (event === 'readiness.changed') {
     validateHistoireRuntimeSnapshot(input.runtime)

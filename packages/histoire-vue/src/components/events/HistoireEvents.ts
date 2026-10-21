@@ -1,3 +1,4 @@
+import type { HistoireEvent } from '@histoire/protocol'
 import type { HistoireVirtualListHandle, HistoireVirtualSlot } from '../../foundation/VirtualList.js'
 import { HstButton } from '@histoire/controls/vue'
 import { computed, defineComponent, h, nextTick, onUpdated, ref, watch } from 'vue'
@@ -17,10 +18,18 @@ export const HistoireEvents = defineComponent({
     const { session } = useHistoireContext()
     const snapshot = useHistoireSnapshot()
     const list = ref<HistoireVirtualListHandle>()
-    const owner = computed(() => JSON.stringify([snapshot.value.runtime.runtimeId, snapshot.value.selection?.storyId, snapshot.value.selection?.variantId]))
-    const items = computed(() => {
-      const value = snapshot.value
-      return value.events.items.filter(event => event.runtimeId === value.runtime.runtimeId && event.target.storyId === value.selection?.storyId && event.target.variantId === value.selection?.variantId)
+    // Field computeds keep identity across unrelated publications (settings, layout, ...),
+    // so the list and its virtual scroller only update when events or their owner change.
+    const runtimeId = computed(() => snapshot.value.runtime.runtimeId)
+    const storyId = computed(() => snapshot.value.selection?.storyId)
+    const variantId = computed(() => snapshot.value.selection?.variantId)
+    const history = computed(() => snapshot.value.events.items)
+    const droppedCount = computed(() => snapshot.value.events.droppedCount)
+    const owner = computed(() => JSON.stringify([runtimeId.value, storyId.value, variantId.value]))
+    const items = computed<readonly HistoireEvent[]>((previous) => {
+      const next = history.value.filter(event => event.runtimeId === runtimeId.value && event.target.storyId === storyId.value && event.target.variantId === variantId.value)
+      // Events of other variants/runtimes replace history without changing this panel's rows.
+      return previous && previous.length === next.length && previous.every((event, index) => event === next[index]) ? previous : next
     })
     const displayed = computed(() => (props.inlineDetails ? [...items.value].reverse() : items.value).map(event => ({ key: JSON.stringify([event.runtimeId, event.sequence]), event })))
     let afterRender: (() => void) | undefined
@@ -47,11 +56,10 @@ export const HistoireEvents = defineComponent({
       afterRender = undefined
     })
     return () => {
-      const value = snapshot.value
       return h('section', { 'class': 'histoire-events', 'aria-label': 'Histoire events' }, [
         props.inlineDetails ? h('span', { class: 'histoire-events-count' }, `${items.value.length} events · newest first`) : null,
         h(HstButton, { color: 'flat', type: 'button', onClick: () => session.events.clear() }, { default: () => props.inlineDetails ? 'Clear' : 'Clear events' }),
-        value.events.droppedCount ? h('output', `${value.events.droppedCount} dropped`) : null,
+        droppedCount.value ? h('output', `${droppedCount.value} dropped`) : null,
         h(HistoireVirtualList, { ref: list, items: displayed.value, minItemSize: 72, listTag: 'ol', itemTag: 'li' }, { default: ({ index }: HistoireVirtualSlot) => {
           const event = displayed.value[index].event
           const payload = event.payload as { name?: string, argument?: unknown } | null

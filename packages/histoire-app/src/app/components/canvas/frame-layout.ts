@@ -23,6 +23,21 @@ export interface CanvasFrameLayout extends CanvasRect {
   variantId: string
 }
 
+/**
+ * Return `previous` when `next` describes identical geometry, otherwise `next`.
+ * Keeping array identity stops downstream watchers (visibility, measurement) from
+ * rerunning when a recomputation produced the same layout.
+ */
+export function keepFrameLayouts(previous: CanvasFrameLayout[] | undefined, next: CanvasFrameLayout[]): CanvasFrameLayout[] {
+  if (!previous || previous.length !== next.length) return next
+  for (let index = 0; index < next.length; index++) {
+    const a = previous[index]
+    const b = next[index]
+    if (a.id !== b.id || a.x !== b.x || a.y !== b.y || a.width !== b.width || a.height !== b.height || a.rowBottom !== b.rowBottom || a.storyId !== b.storyId || a.variantId !== b.variantId) return next
+  }
+  return previous
+}
+
 /** Lay out frames independently of their preview runtime and visibility. */
 export function layoutCanvasFrames(storyId: string, variantIds: readonly string[], size: CanvasSize | ((variantId: string) => CanvasSize), arrange: 'grid' | 'list', columns = 3, chromeScale = 1): CanvasFrameLayout[] {
   const list = arrange === 'list'

@@ -12,6 +12,7 @@ import WorkbenchVirtualList from '../../lists/WorkbenchVirtualList.vue'
 import WorkbenchErrorState from '../../shell/WorkbenchErrorState.vue'
 
 import { useWorkbenchTestsModel } from '../tests/model.js'
+import { useStoryRowStatus } from './row-status.js'
 import { createStoryTreeRows, nextTreeFocus } from './tree.js'
 
 const props = defineProps<{
@@ -43,7 +44,12 @@ let treeObserver: MutationObserver | undefined
 useHistoireResource(() => {
   active = false
 })
-const rows = computed(() => createStoryTreeRows(snapshot.value.catalog, snapshot.value.selection, props.folders.expandedPaths.value, collapsedStory.value !== snapshot.value.selection?.storyId))
+// Field computeds keep identity across unrelated publications, so rows (and the
+// virtual scroller watching them) only rebuild when tree inputs actually change.
+const catalog = computed(() => snapshot.value.catalog)
+const selection = computed<HistoireTarget | null>(previous => sameTarget(previous, snapshot.value.selection) ? previous! : snapshot.value.selection)
+const { hasDiagnostic, testsFailing } = useStoryRowStatus(catalog, tests)
+const rows = computed(() => createStoryTreeRows(catalog.value, selection.value, props.folders.expandedPaths.value, collapsedStory.value !== selection.value?.storyId))
 const items = computed(() => rows.value.filter(row => row.kind !== 'group'))
 const title = computed(() => histoireConfig.theme.title ?? 'Stories')
 const menuDisposers = [
@@ -219,15 +225,9 @@ function onTreeKeydown(event: KeyboardEvent): void {
   if (row) void onKeydown(event, row)
 }
 
-/** Catalog warnings stay visible and selectable, including failed collection sources. */
-function hasDiagnostic(row: StoryTreeRow): boolean {
-  return row.kind === 'story' && snapshot.value.catalog.diagnostics.some(value => value.storyId === row.story?.id || (value.relativePath && value.relativePath === row.story?.relativePath))
-}
-
-/** Exact result attribution avoids variant-key parsing and unrelated run failures. */
-function testsFailing(row: StoryTreeRow): boolean {
-  if (!row.target) return false
-  return tests?.rows.value.some(test => test.failed && !test.stale && test.target.storyId === row.target?.storyId && (row.kind !== 'variant' || test.target.variantId === (row.target as HistoireTarget).variantId)) ?? false
+/** Exact canonical target equality; publications may reallocate an unchanged selection. */
+function sameTarget(a: HistoireTarget | null | undefined, b: HistoireTarget | null): boolean {
+  return a === b || (!!a && !!b && a.storyId === b.storyId && a.variantId === b.variantId)
 }
 
 /** Preserve custom story icons; docs and stories receive distinct defaults. */
@@ -257,7 +257,7 @@ function icon(row: StoryTreeRow): string {
             type="button"
             role="treeitem"
             class="stories-row"
-            :class="{ 'stories-current': row.kind === 'story' && snapshot.selection?.storyId === row.story?.id }"
+            :class="{ 'stories-current': row.kind === 'story' && selection?.storyId === row.story?.id }"
             :style="{ paddingInlineStart: `${8 + row.depth * 16}px` }"
             :data-tree-key="row.key"
             :data-test-id="row.kind === 'story' ? 'story-list-item' : row.kind === 'folder' ? 'story-list-folder' : 'story-list-variant'"

@@ -3,7 +3,7 @@ import type { PopoverScope } from '../popover/scope.js'
 import type { OverflowToolbarItem } from './context.js'
 import { nextTick, onBeforeUnmount, onMounted, ref, shallowRef } from 'vue'
 import { fitOverflowItems } from './fit.js'
-import { measureInlineItem, toolbarAvailableWidth } from './measurement.js'
+import { createItemWidthCache, isPresentationMutation, measureInlineItem, toolbarAvailableWidth } from './measurement.js'
 
 /** Per-toolbar measurements preserve control identities and focused ownership. */
 export function useOverflowLayout(root: ShallowRef<HTMLElement | null>, trigger: ShallowRef<HTMLElement | null>, scope: PopoverScope, opened: () => boolean, close: () => void) {
@@ -15,6 +15,7 @@ export function useOverflowLayout(root: ShallowRef<HTMLElement | null>, trigger:
   let mutation: MutationObserver | undefined
   let fonts: FontFaceSet | undefined
   let removedFocus: { element: Element, index: number } | undefined
+  const widthCache = createItemWidthCache()
 
   /** Resolve template order from markers rather than registration timing. */
   function ordered(): OverflowToolbarItem[] {
@@ -57,7 +58,7 @@ export function useOverflowLayout(root: ShallowRef<HTMLElement | null>, trigger:
     let widths: { width: number, separatorBefore: boolean }[]
     let triggerWidth = 28
     try {
-      widths = list.map(item => ({ width: item.element.value ? measureInlineItem(item.element.value, host) : 0, separatorBefore: item.separatorBefore() }))
+      widths = list.map(item => ({ width: item.element.value ? widthCache.measure(item.element.value, host) : 0, separatorBefore: item.separatorBefore() }))
       // Hidden trigger still needs its natural width on the first overflow.
       if (trigger.value) triggerWidth = measureInlineItem(trigger.value, host) || triggerWidth
     }
@@ -115,6 +116,17 @@ export function useOverflowLayout(root: ShallowRef<HTMLElement | null>, trigger:
     }
   }
 
+  /** Geometry/font changes can restyle items without markup changes, so drop cached widths. */
+  function remeasureAll(): void {
+    widthCache.clear()
+    measure()
+  }
+
+  /** Ignore the layout's own presentation writes; other content changes re-measure (cached per item). */
+  function onMutation(records: MutationRecord[]): void {
+    if (!records.every(isPresentationMutation)) measure()
+  }
+
   /** Persistent item wrappers stay observed after their content teleports. */
   function observe(): void {
     mutation?.disconnect()
@@ -141,14 +153,14 @@ export function useOverflowLayout(root: ShallowRef<HTMLElement | null>, trigger:
   }
 
   onMounted(() => {
-    resize = new ResizeObserver(measure)
-    mutation = new MutationObserver(measure)
+    resize = new ResizeObserver(remeasureAll)
+    mutation = new MutationObserver(onMutation)
     if (root.value?.parentElement) resize.observe(root.value.parentElement)
     if (root.value) resize.observe(root.value)
     observe()
     fonts = root.value?.ownerDocument.fonts
-    fonts?.addEventListener('loadingdone', measure)
-    void fonts?.ready.then(measure)
+    fonts?.addEventListener('loadingdone', remeasureAll)
+    void fonts?.ready.then(remeasureAll)
     measure()
   })
   onBeforeUnmount(() => {
@@ -156,7 +168,7 @@ export function useOverflowLayout(root: ShallowRef<HTMLElement | null>, trigger:
     cancelAnimationFrame(scheduled)
     resize?.disconnect()
     mutation?.disconnect()
-    fonts?.removeEventListener('loadingdone', measure)
+    fonts?.removeEventListener('loadingdone', remeasureAll)
   })
   return { items, overflowing, register, measure }
 }

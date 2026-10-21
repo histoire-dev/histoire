@@ -6,11 +6,14 @@ import { validateWireValue } from './size.js'
 import { HISTOIRE_BRIDGE_COMMANDS, HISTOIRE_BRIDGE_EVENTS } from './types.js'
 import { invalid, validateHistoireTarget, wireId, wireRecord } from './validation.js'
 
+/** Bridge message direction relative to parent document. */
+type BridgeDirection = 'parent-to-child' | 'child-to-parent'
+
 /** Runtime-only request groups; data bridge must never execute stories implicitly. */
 const runtimeCommands = ['state.get', 'state.patch', 'state.reset', 'tests.collect', 'controls.preset', 'channel.post']
 
 /** Gates role authority before dispatch, independently of advertised capability checks. */
-function validateRole(role: HistoirePortRole, command: HistoireBridgeCommand, payload: Record<string, unknown>, direction: 'parent-to-child' | 'child-to-parent'): void {
+function validateRole(role: HistoirePortRole, command: HistoireBridgeCommand, payload: Record<string, unknown>, direction: BridgeDirection): void {
   if (command === 'controls.configure') {
     if (role !== 'controls' || direction !== 'parent-to-child') invalid('Controls presentation requires parent controls port')
     return
@@ -33,8 +36,21 @@ function validateRole(role: HistoirePortRole, command: HistoireBridgeCommand, pa
   if (role === 'controls' && !['state.patch', 'subscriptions.add', 'subscriptions.remove', 'view.sync'].includes(command)) invalid('Controls port command unavailable')
 }
 
-/** Validates envelope before use; expected response command comes from pending request. */
-export function validateBridgeEnvelope(value: unknown, owner: HistoireBridgeIdentity, role: HistoirePortRole, responseCommand?: HistoireBridgeCommand, direction: 'parent-to-child' | 'child-to-parent' = 'parent-to-child', metadataOnly = false): HistoireBridgeEnvelope {
+/**
+ * Validates envelope before use; expected response command comes from pending request.
+ * Metadata and body are each traversed once; `metadataOnly` stops after owner/identity checks
+ * so callers can gate (rate, correlation) before running {@link validateBridgeEnvelopeBody}.
+ */
+export function validateBridgeEnvelope(value: unknown, owner: HistoireBridgeIdentity, role: HistoirePortRole, responseCommand?: HistoireBridgeCommand, direction: BridgeDirection = 'parent-to-child', metadataOnly = false): HistoireBridgeEnvelope {
+  const input = validateBridgeEnvelopeMetadata(value, owner, direction)
+  return metadataOnly ? input as unknown as HistoireBridgeEnvelope : validateBridgeEnvelopeBody(input, role, responseCommand, direction)
+}
+
+/**
+ * Validates owner identity, kind discriminators and bounded metadata size.
+ * @returns Envelope record; payload/result remain unchecked.
+ */
+function validateBridgeEnvelopeMetadata(value: unknown, owner: HistoireBridgeIdentity, direction: BridgeDirection): Record<string, unknown> {
   const input = wireRecord(value)
   const keys = ['protocolVersion', 'sessionId', 'connectionId', 'mountId', 'sourceId', 'epoch', 'revision'] as const
   const allowed = [...keys, 'runtimeId', 'target', 'selectionVersion', 'kind', ...(input.kind === 'request' ? ['requestId', 'command', 'payload', 'selectionRequestId'] : input.kind === 'response' ? ['requestId', 'ok', 'result', 'error'] : ['event', 'sequence', 'payload'])]
@@ -76,25 +92,46 @@ export function validateBridgeEnvelope(value: unknown, owner: HistoireBridgeIden
   metadata.kind = input.kind
   if (input.kind === 'request') {
     if (!wireId(input.requestId) || !HISTOIRE_BRIDGE_COMMANDS.includes(input.command as HistoireBridgeCommand)) invalid('Invalid bridge request')
-    const command = input.command as HistoireBridgeCommand
     metadata.requestId = input.requestId
-    metadata.command = command
+    metadata.command = input.command
     if (input.selectionRequestId !== undefined) {
-      if (!wireId(input.selectionRequestId) || command !== 'view.sync' || direction !== 'parent-to-child') invalid('Selection acknowledgment requires parent view sync')
+      if (!wireId(input.selectionRequestId) || input.command !== 'view.sync' || direction !== 'parent-to-child') invalid('Selection acknowledgment requires parent view sync')
       metadata.selectionRequestId = input.selectionRequestId
     }
-    validateWireValue(metadata, { kind: 'metadata', name: '' })
-    if (metadataOnly) return input as unknown as HistoireBridgeEnvelope
-    validateWireValue(input.payload, { kind: 'request', name: command })
-    validateBridgePayload(command, input.payload)
-    validateRole(role, command, wireRecord(input.payload), direction)
   }
   else if (input.kind === 'response') {
     if (!wireId(input.requestId) || typeof input.ok !== 'boolean') invalid('Invalid bridge response')
     metadata.requestId = input.requestId
     metadata.ok = input.ok
-    validateWireValue(metadata, { kind: 'metadata', name: '' })
-    if (metadataOnly) return input as unknown as HistoireBridgeEnvelope
+  }
+  else if (input.kind === 'event') {
+    if (!HISTOIRE_BRIDGE_EVENTS.includes(input.event as HistoireBridgeEvent) || !Number.isSafeInteger(input.sequence) || (input.sequence as number) < 0) invalid('Invalid bridge event')
+    metadata.event = input.event
+    metadata.sequence = input.sequence
+  }
+  else {
+    invalid('Unknown bridge envelope kind')
+  }
+  // Single bounded traversal of the copied identity fields; payload is excluded.
+  validateWireValue(metadata, { kind: 'metadata', name: '' })
+  return input
+}
+
+/**
+ * Validates payload/result/error and role authority of an envelope whose metadata
+ * already passed `validateBridgeEnvelope(..., metadataOnly = true)` for the same object.
+ * Each payload is measured once here; nested validators receive `measured` so they skip
+ * re-measuring the same subtree under an identical or looser budget.
+ */
+export function validateBridgeEnvelopeBody(value: unknown, role: HistoirePortRole, responseCommand?: HistoireBridgeCommand, direction: BridgeDirection = 'parent-to-child'): HistoireBridgeEnvelope {
+  const input = wireRecord(value)
+  if (input.kind === 'request') {
+    const command = input.command as HistoireBridgeCommand
+    validateWireValue(input.payload, { kind: 'request', name: command })
+    validateBridgePayload(command, input.payload, true)
+    validateRole(role, command, wireRecord(input.payload), direction)
+  }
+  else if (input.kind === 'response') {
     if (input.ok) {
       if (!responseCommand) invalid('Successful response requires captured command')
       validateBridgeResult(responseCommand, input.result)
@@ -103,40 +140,36 @@ export function validateBridgeEnvelope(value: unknown, owner: HistoireBridgeIden
       validateHistoireErrorData(input.error)
     }
   }
-  else if (input.kind === 'event') {
-    if (!HISTOIRE_BRIDGE_EVENTS.includes(input.event as HistoireBridgeEvent) || !Number.isSafeInteger(input.sequence) || (input.sequence as number) < 0) invalid('Invalid bridge event')
-    const event = input.event as HistoireBridgeEvent
-    metadata.event = event
-    metadata.sequence = input.sequence
-    validateWireValue(metadata, { kind: 'metadata', name: '' })
-    if (metadataOnly) return input as unknown as HistoireBridgeEnvelope
-    validateWireValue(input.payload, { kind: 'event', name: event })
-    validateBridgeEventPayload(event, input.payload)
-    if (event === 'channel.message') {
-      const payload = wireRecord(input.payload)
-      const target = wireRecord(payload.target)
-      if (role !== 'primary' || direction !== 'child-to-parent' || !wireId(input.runtimeId) || payload.runtimeId !== input.runtimeId
-        || !input.target || target.storyId !== wireRecord(input.target).storyId) {
-        invalid('Host channel event requires exact primary document and story')
-      }
-    }
-    if (event === 'focus.changed' && role === 'primary') {
-      if (direction !== 'child-to-parent' || wireRecord(input.payload).direction !== undefined) invalid('Primary focus must come from owned document')
-    }
-    else if (event.startsWith('overlay.') || event === 'controls.height' || event === 'focus.changed') {
-      if (role !== 'controls') invalid('Controls event requires controls port')
-      if ((event === 'overlay.result') !== (direction === 'parent-to-child')) invalid('Controls event direction unavailable')
-    }
-    if (event === 'catalog.changed') {
-      const descriptor = wireRecord(wireRecord(input.payload).descriptor)
-      for (const key of ['sourceId', 'epoch', 'revision']) {
-        if (descriptor[key] !== input[key]) invalid('Catalog publication identity mismatch')
-      }
-    }
-  }
   else {
-    invalid('Unknown bridge envelope kind')
+    validateBridgeEventBody(input, role, direction)
   }
-  validateWireValue(metadata, { kind: 'metadata', name: '' })
   return input as unknown as HistoireBridgeEnvelope
+}
+
+/** Event payload schema plus role/direction authority for one publication. */
+function validateBridgeEventBody(input: Record<string, unknown>, role: HistoirePortRole, direction: BridgeDirection): void {
+  const event = input.event as HistoireBridgeEvent
+  validateWireValue(input.payload, { kind: 'event', name: event })
+  validateBridgeEventPayload(event, input.payload, true)
+  if (event === 'channel.message') {
+    const payload = wireRecord(input.payload)
+    const target = wireRecord(payload.target)
+    if (role !== 'primary' || direction !== 'child-to-parent' || !wireId(input.runtimeId) || payload.runtimeId !== input.runtimeId
+      || !input.target || target.storyId !== wireRecord(input.target).storyId) {
+      invalid('Host channel event requires exact primary document and story')
+    }
+  }
+  if (event === 'focus.changed' && role === 'primary') {
+    if (direction !== 'child-to-parent' || wireRecord(input.payload).direction !== undefined) invalid('Primary focus must come from owned document')
+  }
+  else if (event.startsWith('overlay.') || event === 'controls.height' || event === 'focus.changed') {
+    if (role !== 'controls') invalid('Controls event requires controls port')
+    if ((event === 'overlay.result') !== (direction === 'parent-to-child')) invalid('Controls event direction unavailable')
+  }
+  if (event === 'catalog.changed') {
+    const descriptor = wireRecord(wireRecord(input.payload).descriptor)
+    for (const key of ['sourceId', 'epoch', 'revision']) {
+      if (descriptor[key] !== input[key]) invalid('Catalog publication identity mismatch')
+    }
+  }
 }
