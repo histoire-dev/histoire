@@ -134,6 +134,11 @@ export function useWorkbench(props: WorkbenchProps, error: (error: unknown) => v
   const shortcuts = createShortcutRegistry()
   provideShortcutRegistry(shortcuts)
   useHistoireResource(shortcuts.bind('global.search', () => openSearch(), { allowInput: true }))
+  if (dev) {
+    useHistoireResource(shortcuts.bind('canvas.comment', () => {
+      dev.commentMode.value = true
+    }, { enabled: () => dev.comments.available.value }))
+  }
   const story = computed(() => snapshot.value.catalog.stories.find(item => item.id === snapshot.value.selection?.storyId))
   const markdownTransition = createWorkbenchMarkdownTransition(props.session)
   useHistoireResource(markdownTransition.close)

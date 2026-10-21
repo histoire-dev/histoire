@@ -112,7 +112,7 @@ function setSelectedSession(session: HistoireSession | undefined): void {
               <ScreenshotPopover v-if="ScreenshotPopover && snapshot.selection?.variantId" :story-id="snapshot.selection.storyId" :variant-id="snapshot.selection.variantId" :open="slot.open" :trigger="dev?.screenshotTrigger.value" @update:open="slot.setOpen" />
             </template>
             <template #tool>
-              <ToolbarButton v-if="dev" menu-role="menuitemradio" label="Comment" icon="add-comment" :disabled="!dev.comments.available.value" :pressed="dev.commentMode.value" @click="dev.commentMode.value = true" />
+              <ToolbarButton v-if="dev" menu-role="menuitemradio" label="Comment" icon="add-comment" :shortcut="shortcuts.hint('canvas.comment')" :disabled="!dev.comments.available.value" :pressed="dev.commentMode.value" @click="dev.commentMode.value = true" />
             </template>
             <template #inspector>
               <ToolbarButton v-if="!shell.inspectorOpen.value" label="Show inspector" icon="side-panel-open" @click="shell.toggleInspector" />

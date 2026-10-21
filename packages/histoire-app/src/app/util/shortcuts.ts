@@ -36,6 +36,7 @@ const builtins: readonly ShortcutReference[] = [
   { id: 'canvas.select', label: 'Select tool', keys: ['v'], scope: 'canvas' },
   { id: 'canvas.pan', label: 'Pan tool', keys: ['h'], scope: 'canvas' },
   { id: 'canvas.measure', label: 'Measure tool', keys: ['m'], scope: 'canvas' },
+  { id: 'canvas.comment', label: 'Comment tool', keys: ['c'], scope: 'canvas', devOnly: true },
   { id: 'canvas.pan-hold', label: 'Hold to pan', keys: ['space'], scope: 'canvas' },
   { id: 'canvas.fit', label: 'Fit to canvas', keys: ['shift+1'], scope: 'canvas' },
   { id: 'canvas.selection', label: 'Zoom to selection', keys: ['shift+2'], scope: 'canvas' },
@@ -45,7 +46,7 @@ const builtins: readonly ShortcutReference[] = [
   { id: 'frame.source', label: 'Copy source', keys: ['mod+shift+c'], scope: 'frame' },
   { id: 'frame.tests', label: 'Run tests', keys: ['t'], scope: 'frame', devOnly: true },
   { id: 'frame.screenshot', label: 'Screenshot', keys: ['shift+s'], scope: 'frame', devOnly: true },
-  { id: 'frame.comment', label: 'Comment for AI', keys: ['c'], scope: 'frame', devOnly: true },
+  { id: 'frame.comment', label: 'Comment for AI', keys: ['shift+c'], scope: 'frame', devOnly: true },
   { id: 'comment.screenshot', label: 'Attach screenshot to comment', keys: ['mod+shift+s'], scope: 'comment', devOnly: true },
 ]
 
