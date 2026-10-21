@@ -5,6 +5,7 @@ import { COLLECT_TESTS, EVENT_SEND, HistoireSdkError, HOST_CHANNEL_MESSAGE, PREV
 import { createEmbedHostChannels } from './channels.js'
 import { createRuntimeDocumentId, createRuntimeDocumentOwner } from './document.js'
 import { mapRuntimeViewport } from './geometry.js'
+import { createRuntimeLayoutScheduler } from './runtime-layout.js'
 import { createRuntimeLoadRecovery } from './runtime-loading.js'
 import { createRuntimeReadiness } from './runtime-readiness.js'
 import { createRuntimeRequests } from './runtime-requests.js'
@@ -31,7 +32,10 @@ export function createEmbedRuntimeFrame(context: EmbedSurfaceContext, layout: 's
   let states = new Map<string, Record<string, any>>()
   let viewports: HistoireViewport[] = []
   let sandboxViewports: HistoireViewport[] = []
-  let scheduledLayout = 0
+  let appliedSettings: { settings: unknown, document: string | null } | undefined
+  /** Wrapper scrolling/resize changes offsets even when child content stays fixed. */
+  const layoutScheduler = createRuntimeLayoutScheduler(iframe, { active: () => active && !!owner.id, measure: measureLayout })
+  const refreshLayout = layoutScheduler.refresh
   const readiness = createRuntimeReadiness(context.descriptor.config.storyCollectTimeout ?? 30_000, fail)
   const requests = createRuntimeRequests(post, Math.max(context.descriptor.config.runTimeout ?? 300_000, context.descriptor.config.storyCollectTimeout ?? 30_000))
   const testWorkers = createEmbedTestWorkers({
@@ -83,6 +87,7 @@ export function createEmbedRuntimeFrame(context: EmbedSurfaceContext, layout: 's
   /** Runtime identity transitions reach parent before state/layout of replacement. */
   function publish(status: HistoireRuntimeSnapshot['status']) {
     const runtime = snapshot(status)
+    layoutScheduler.reset()
     context.bridge.post('readiness.changed', { runtime }, { runtimeId: owner.id ?? undefined, target: selected ?? undefined })
     return runtime
   }
@@ -99,20 +104,22 @@ export function createEmbedRuntimeFrame(context: EmbedSurfaceContext, layout: 's
     const state: HistoireStateSnapshot = { target: selected, runtimeId: owner.id, value }
     context.bridge.post('state.changed', state, { runtimeId: owner.id, target: selected })
   }
-  /** Wrapper scrolling/resize changes offsets even when child content stays fixed. */
-  function refreshLayout() {
-    if (!active || !owner.id || scheduledLayout) return
-    scheduledLayout = requestAnimationFrame(() => {
-      scheduledLayout = 0
-      if (!active || !owner.id) return
-      const rect = iframe.getBoundingClientRect()
-      viewports = iframe.clientWidth && iframe.clientHeight ? sandboxViewports.filter(viewport => readyIds.has(viewport.target.variantId!)).map(viewport => mapRuntimeViewport(viewport, rect, { width: iframe.clientWidth, height: iframe.clientHeight }, { x: 0, y: 0, width: window.innerWidth, height: window.innerHeight })).filter(Boolean) : []
-      context.bridge.post('layout.changed', { viewports }, { runtimeId: owner.id, target: selected! })
-    })
+  /** Map sandbox viewports into host coordinates; unchanged results are not republished. */
+  function measureLayout() {
+    if (!owner.id) return
+    const runtimeId = owner.id
+    const target = selected!
+    const rect = iframe.getBoundingClientRect()
+    viewports = iframe.clientWidth && iframe.clientHeight ? sandboxViewports.filter(viewport => readyIds.has(viewport.target.variantId!)).map(viewport => mapRuntimeViewport(viewport, rect, { width: iframe.clientWidth, height: iframe.clientHeight }, { x: 0, y: 0, width: window.innerWidth, height: window.innerHeight })).filter(Boolean) : []
+    const published = viewports
+    return { key: JSON.stringify([runtimeId, target, published]), post: () => context.bridge.post('layout.changed', { viewports: published }, { runtimeId, target }) }
   }
-  /** Logical responsive dimensions belong to actual sandbox, including hidden preview. */
-  function settings() {
+  /** Logical responsive dimensions belong to actual sandbox; `force` resends unchanged settings. */
+  function settings(force = true) {
     const value = context.session.getSnapshot().settings
+    // Snapshot settings keep identity until they change, so unrelated publications skip the post.
+    if (!force && appliedSettings?.settings === value && appliedSettings.document === owner.id) return
+    appliedSettings = { settings: value, document: owner.id }
     const width = value.rotate && value.responsiveHeight ? value.responsiveHeight : value.responsiveWidth
     const height = value.rotate ? value.responsiveWidth : value.responsiveHeight
     iframe.style.width = layout === 'grid' ? '100%' : `${width}px`
@@ -202,7 +209,7 @@ export function createEmbedRuntimeFrame(context: EmbedSurfaceContext, layout: 's
         publishState()
       }
     }
-    settings()
+    settings(false)
   }
   /** Both origin/frame and parent-minted document checked before every reply/event. */
   function receive(event: MessageEvent) {
@@ -271,8 +278,6 @@ export function createEmbedRuntimeFrame(context: EmbedSurfaceContext, layout: 's
   const resize = new ResizeObserver(refreshLayout)
   resize.observe(iframe)
   resize.observe(context.container)
-  window.addEventListener('resize', refreshLayout)
-  document.addEventListener('scroll', refreshLayout, true)
   const unsubscribe = context.session.subscribe(synchronize)
   synchronize()
   return {
@@ -311,10 +316,8 @@ export function createEmbedRuntimeFrame(context: EmbedSurfaceContext, layout: 's
       retireRuntime('absent', false, false)
       testWorkers.close()
       window.removeEventListener('message', receive)
-      window.removeEventListener('resize', refreshLayout)
-      document.removeEventListener('scroll', refreshLayout, true)
+      layoutScheduler.close()
       resize.disconnect()
-      cancelAnimationFrame(scheduledLayout)
       iframe.removeEventListener('load', loading.loaded)
       iframe.remove()
     },

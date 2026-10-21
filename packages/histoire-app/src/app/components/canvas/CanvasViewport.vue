@@ -19,7 +19,7 @@ import CollectErrorCard from './CollectErrorCard.vue'
 import { useCanvasFrameAdmission } from './frame-admission.js'
 import { watchCanvasFrameFocus } from './frame-focus.js'
 import { bindCanvasFrameInteractions } from './frame-interactions.js'
-import { canvasFrameBounds, type CanvasFrameLayout, layoutCanvasFrames, rankCanvasStartupFrames, visibleCanvasFrames } from './frame-layout.js'
+import { canvasFrameBounds, type CanvasFrameLayout, keepFrameLayouts, layoutCanvasFrames, rankCanvasStartupFrames, visibleCanvasFrames } from './frame-layout.js'
 import { watchCanvasListDefaultSelection, watchCanvasSelectedSession } from './frame-selection.js'
 import { provideCanvasStartupCoordinator } from './frame-startup-coordinator.js'
 import { createCanvasFrameState } from './frame-state.js'
@@ -68,8 +68,11 @@ const panHint = ref<InstanceType<typeof CanvasStatus>>()
 const singleVariant = ref<InstanceType<typeof CanvasSingleVariant>>()
 const cachedStory = shallowRef<HistoireCatalogStory>()
 const cachedVariantId = ref<string | null>(null)
-const currentStory = computed(() => snapshot.value.catalog.stories.find(story => story.id === snapshot.value.selection?.storyId))
-const diagnostics = computed(() => snapshot.value.catalog.diagnostics.filter(error => error.code === 'COLLECTION_FAILED' && (error.storyId === (currentStory.value?.id ?? cachedStory.value?.id) || error.relativePath === (currentStory.value?.relativePath ?? cachedStory.value?.relativePath))))
+// Field computeds stay stable across unrelated publications, sparing frame layout/measure.
+const catalog = computed(() => snapshot.value.catalog)
+const selectedVariantId = computed(() => snapshot.value.selection?.variantId)
+const currentStory = computed(() => catalog.value.stories.find(story => story.id === snapshot.value.selection?.storyId))
+const diagnostics = computed(() => catalog.value.diagnostics.filter(error => error.code === 'COLLECTION_FAILED' && (error.storyId === (currentStory.value?.id ?? cachedStory.value?.id) || error.relativePath === (currentStory.value?.relativePath ?? cachedStory.value?.relativePath))))
 const story = computed(() => currentStory.value ?? (diagnostics.value.length ? cachedStory.value : undefined))
 const settings = useUiSettingsStore()
 const canvas = createCanvasStore({ singleViewport: settings?.singleViewport, storage: getCanvasStorage(typeof window === 'undefined' ? undefined : window) })
@@ -90,11 +93,11 @@ const viewBinding = bindStoryCanvasView({
   views: useStoryCanvasViews(),
 })
 const { size, frameContentSize } = useCanvasVariantSize(canvas)
-const { area: singleArea, size: singleSize, measure: measureSingle } = useSingleVariantGeometry(canvas, { settings: () => snapshot.value.settings, inspectorWidth: () => props.inspectorWidth, hidden: () => props.uiHidden, contentSize: () => canvas.autoFitContent ? frameContentSize(snapshot.value.selection?.variantId) : undefined })
+const { area: singleArea, size: singleSize, measure: measureSingle } = useSingleVariantGeometry(canvas, { settings: () => snapshot.value.settings, inspectorWidth: () => props.inspectorWidth, hidden: () => props.uiHidden, contentSize: () => canvas.autoFitContent ? frameContentSize(selectedVariantId.value) : undefined })
 /** Reuse arrangement geometry for rendering and target-zoom selection fitting. */
 function layoutFrames(zoom = canvas.effectiveZoom) {
   if (renderedArrange.value === 'single') {
-    const variantId = snapshot.value.selection?.variantId ?? (diagnostics.value.length ? cachedVariantId.value : null)
+    const variantId = selectedVariantId.value ?? (diagnostics.value.length ? cachedVariantId.value : null)
     return selectedSingleFrame(story.value, variantId, singleSize.value)
   }
   return story.value ? layoutCanvasFrames(story.value.id, story.value.variants.map(variant => variant.id), canvas.autoFitContent ? frameContentSize : size.value, renderedArrange.value === 'list' ? 'list' : 'grid', 3, zoom) : []
@@ -104,13 +107,13 @@ function fitBoundsForFrame(frame: CanvasFrameLayout, zoom: number): CanvasFrameL
   return layoutFrames(zoom).find(candidate => candidate.id === frame.id) ?? frame
 }
 
-const frames = computed(() => layoutFrames())
+const frames = computed<CanvasFrameLayout[]>(previous => keepFrameLayouts(previous, layoutFrames()))
 const canvasViewport = computed(() => {
   const origin = clientToCanvas({ x: 0, y: 0 }, canvas.effectiveZoom, canvas.panOffset)
   return { ...origin, width: Math.max(0, canvas.viewport.width - props.inspectorWidth) / canvas.effectiveZoom, height: canvas.viewport.height / canvas.effectiveZoom }
 })
 const variantsById = computed(() => new Map(story.value?.variants.map(variant => [variant.id, variant]) ?? []))
-const selectedFrame = computed(() => frames.value.find(frame => frame.variantId === (snapshot.value.selection?.variantId ?? (diagnostics.value.length ? cachedVariantId.value : null))))
+const selectedFrame = computed(() => frames.value.find(frame => frame.variantId === (selectedVariantId.value ?? (diagnostics.value.length ? cachedVariantId.value : null))))
 const selectedVariant = computed(() => selectedFrame.value ? variantsById.value.get(selectedFrame.value.variantId) : undefined)
 const singleResizable = computed(() => !props.uiHidden && !selectedVariant.value?.responsiveDisabled)
 const { space, pointer, panning } = useCanvasPan({ canvas, viewport: () => viewport.value, arrangement: () => renderedArrange.value, frameId: () => selectedFrame.value?.id, single: () => singleVariant.value })

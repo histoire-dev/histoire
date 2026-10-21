@@ -1,10 +1,11 @@
 import type { HistoireBridgeCommand, HistoireBridgeIdentity, HistoireBridgePublication, HistoireBridgeRequest, HistoirePortRole, HistoireSourceDescriptor, HistoireTarget } from '@histoire/protocol'
 import type { HistoireRequestCapture, HistoireSessionNotification } from '../adapters/types.js'
-import { HistoireSdkError, validateBridgeEnvelope, wireRecord } from '@histoire/protocol'
+import { HistoireSdkError, validateBridgeEnvelope, validateBridgeEnvelopeBody, wireRecord } from '@histoire/protocol'
 import { acceptBridgeViewSelection, advanceBridgeSelection, advanceBridgeSourceRevision, createBridgeRuntimeAuthority, createBridgeSelectionEcho, getBridgeIncomingOwner, isBridgeSourcePublication, isBridgeSourceRequest, synchronizeBridgeSelection, validateLocalBridgeSelection } from './authority.js'
 import { createInboundBridgeDispatch } from './inbound.js'
 import { createBridgeReplies } from './reply.js'
 import { createBridgeRequests } from './requests.js'
+import { markValidatedNotification } from './validated.js'
 import { getBridgeRequestTimeout } from './validation.js'
 /** Dedicated port options captured once during handshake. */
 export interface BridgePortOptions {
@@ -41,8 +42,10 @@ export function createBridgePort(options: BridgePortOptions) {
   const lifetime = new AbortController()
   const direction = options.child ? 'parent-to-child' : 'child-to-parent'
   const outward = options.child ? 'child-to-parent' : 'parent-to-child'
+  /** Emitted notifications derive from fully validated envelopes or local state. */
   const emit = (value: HistoireSessionNotification) => {
     if (active) {
+      markValidatedNotification(value)
       for (const listener of [...listeners]) {
         try {
           listener(value)
@@ -124,8 +127,11 @@ export function createBridgePort(options: BridgePortOptions) {
     // New work/publications from that predecessor never regain authority.
     if (!pending && !replacement && !sourceCancellation && runtimes.isRetired(raw.runtimeId) && !(raw.kind === 'event' && isBridgeSourcePublication(raw.event)) && !(raw.kind === 'request' && isBridgeSourceRequest(raw.command, raw.payload))) return
     const expected = getBridgeIncomingOwner(owner, raw, Boolean(options.child), pending, sourceCancellation)
+    // Metadata validated once before rate gating; body and failure paths reuse the result.
+    let identified = false
     try {
       validateBridgeEnvelope(raw, expected, options.role, pending?.command, direction, true)
+      identified = true
       if (raw.kind === 'event') {
         if (Date.now() - rateStart >= 1000) {
           rateStart = Date.now()
@@ -136,7 +142,7 @@ export function createBridgePort(options: BridgePortOptions) {
           return
         }
       }
-      const envelope = validateBridgeEnvelope(raw, expected, options.role, pending?.command, direction)
+      const envelope = validateBridgeEnvelopeBody(raw, options.role, pending?.command, direction)
       if (envelope.kind === 'response') {
         requests.receive(envelope)
       }
@@ -171,9 +177,8 @@ export function createBridgePort(options: BridgePortOptions) {
         catch {
         }
       }
-      else if (raw.kind === 'event') {
+      else if (raw.kind === 'event' && identified) {
         try {
-          validateBridgeEnvelope(raw, expected, options.role, undefined, direction, true)
           dropped(['catalog.changed', 'state.changed', 'layout.changed', 'readiness.changed'].includes(raw.event))
         }
         catch {

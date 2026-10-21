@@ -80,4 +80,17 @@ describe('bounded wire accounting', () => {
     expect(() => validateWireValue({ text: 'x'.repeat(70_000) }, { kind: 'event', name: 'events.appended' })).toThrow()
     expect(() => validateWireValue({ message: 'x'.repeat(16_384) }, { kind: 'error', name: 'docs.get' })).toThrow()
   })
+
+  it('charges enumerable extra array fields in state mode and rejects them, holes and symbols in JSON', () => {
+    const slots: any = [1, 'a']
+    slots.extra = true
+    Object.defineProperty(slots, 'hidden', { value: 1 })
+    // Container 16, two slots + extra edge 24, numbers 8, 'a' 1, key 'extra' 5, boolean 1.
+    expect(measureWireValue(slots, { mode: 'state' })).toBe(16 + 24 + 8 + 1 + 5 + 1)
+    expect(() => measureWireValue(slots)).toThrow(expect.objectContaining({ code: 'INVALID_ARGUMENT' }))
+    expect(measureWireValue(Object.defineProperty([1], 'hidden', { value: 1 }))).toBe(3)
+    expect(() => measureWireValue(createEmbedSparseArray(2))).toThrow(expect.objectContaining({ code: 'INVALID_ARGUMENT' }))
+    expect(() => measureWireValue({ [Symbol('key')]: 1 }, { mode: 'state' })).toThrow(expect.objectContaining({ code: 'INVALID_ARGUMENT' }))
+    expect(() => measureWireValue(Object.defineProperty([], '0', { get: () => 1, enumerable: true }))).toThrow(expect.objectContaining({ code: 'INVALID_ARGUMENT' }))
+  })
 })

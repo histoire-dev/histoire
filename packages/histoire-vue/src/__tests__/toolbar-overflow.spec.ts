@@ -127,6 +127,25 @@ describe('single-instance overflow toolbar', () => {
     finally { test.wrapper.unmount() }
   })
 
+  it('re-measures only toolbar items whose content changed', async () => {
+    const test = fixture()
+    try {
+      await test.geometry.flush()
+      const clone = vi.spyOn(Node.prototype, 'cloneNode')
+      /** Item wrappers cloned for natural-width measurement. */
+      const measuredItems = () => clone.mock.contexts.filter(node => (node as Element).classList?.contains('overflow-toolbar-item')).length
+      test.width.value = 60
+      await test.geometry.flush()
+      expect(measuredItems()).toBe(1)
+      clone.mockClear()
+      // Resize can change every natural width (density, fonts), so it measures all items again.
+      test.geometry.resize(299)
+      await test.geometry.flush()
+      expect(measuredItems()).toBe(3)
+    }
+    finally { test.wrapper.unmount() }
+  })
+
   it('keeps parent open for child panels and unwinds Escape from deepest panel', async () => {
     const test = fixture({ available: 100, nested: true })
     try {

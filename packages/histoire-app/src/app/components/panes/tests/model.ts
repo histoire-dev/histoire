@@ -15,6 +15,11 @@ function executableStoryProvenance(catalog: HistoireCatalog): Map<string, string
   return new Map(catalog.stories.filter(story => !story.docsOnly).map(story => [story.id, story.runtimeRevision]))
 }
 
+/** Exact keys of every catalog variant; recomputed only when the catalog is replaced. */
+function catalogTargetKeys(catalog: HistoireCatalog): Set<string> {
+  return new Set(catalog.stories.flatMap(story => story.variants.map(variant => getHistoireTargetKey({ storyId: story.id, variantId: variant.id }))))
+}
+
 /** Aggregate project facts share actual SDK preview results and existing server execution. */
 export function createWorkbenchTestsModel(session: HistoireSession, selected?: HistoireTestsModel, options: WorkbenchTestsOptions = {}) {
   const snapshot = shallowRef(session.getSnapshot())
@@ -34,6 +39,7 @@ export function createWorkbenchTestsModel(session: HistoireSession, selected?: H
   let source = JSON.stringify([snapshot.value.source?.sourceId, snapshot.value.source?.epoch])
   let publication = snapshot.value.source?.revision
   let executableStories = executableStoryProvenance(snapshot.value.catalog)
+  let catalogTargets = catalogTargetKeys(snapshot.value.catalog)
   let settings: Record<string, unknown> = {}
   try {
     settings = JSON.parse(options.storage?.getItem('_histoire-ui-settings') ?? '{}')
@@ -47,7 +53,9 @@ export function createWorkbenchTestsModel(session: HistoireSession, selected?: H
         if (!value) pending.clear()
       }, { flush: 'sync' })
     : () => {}
-  const rows = computed(() => projectTestRows(snapshot.value.catalog, entries.value))
+  // Catalog keeps identity across unrelated publications, so rows rebuild only on real changes.
+  const catalog = computed(() => snapshot.value.catalog)
+  const rows = computed(() => projectTestRows(catalog.value, entries.value))
   const visibleRows = computed(() => rows.value.filter(isVisibleTestRow))
   const summary = computed(() => ({ ...summarizeTestRows(visibleRows.value), ...(executionDuration.value === null ? {} : { duration: executionDuration.value }) }))
   const canRun = computed(() => !!(options.run || options.runProject || options.runStory) && snapshot.value.source?.mode === 'dev' && snapshot.value.status === 'ready' && !snapshot.value.stale && (snapshot.value.capabilities.serverTests.available || snapshot.value.capabilities.serverTests.reason === 'SELECTION_REQUIRED'))
@@ -118,8 +126,11 @@ export function createWorkbenchTestsModel(session: HistoireSession, selected?: H
       executionDuration.value = null
       epochs.clear()
     }
-    if (catalogChanged) invalidateChangedExecutableStories(value.catalog)
-    const targets = new Set(value.catalog.stories.flatMap(story => story.variants.map(variant => getHistoireTargetKey({ storyId: story.id, variantId: variant.id }))))
+    if (catalogChanged) {
+      invalidateChangedExecutableStories(value.catalog)
+      catalogTargets = catalogTargetKeys(value.catalog)
+    }
+    const targets = catalogTargets
     if ([...entries.value.keys()].some(key => !targets.has(key))) entries.value = new Map([...entries.value].filter(([key]) => targets.has(key)))
     discovery.refresh()
     if (value.status === 'ready' && !value.stale) void drain()

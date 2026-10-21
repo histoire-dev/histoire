@@ -17,45 +17,69 @@ export interface HistoireWireSizeOptions {
   maxEdges?: number
 }
 
-/** Iterative frame; exit removes JSON ancestry without losing repeated alias accounting. */
-interface Frame {
-  /** Current scalar/container without serialization. */
-  value: unknown
-  /** Captured path depth. */
-  depth: number
-  /** Releases JSON ancestor after all child frames. */
-  exit?: boolean
-}
+/** Depth marker for a frame that releases its JSON ancestor after all children. */
+const EXIT = -1
 
 /** Throws a typed failure without including untrusted oversized data. */
 function fail(code: 'INVALID_ARGUMENT' | 'RESULT_TOO_LARGE', message: string): never {
   throw new HistoireSdkError(code, message)
 }
 
+/** Keys that could mutate prototypes when a receiver assigns them. */
+function isPrototypeKey(key: string): boolean {
+  return key === '__proto__' || key === 'prototype' || key === 'constructor'
+}
+
 /** Reads an own data field without ever evaluating accessors or toJSON. */
 function readField(value: object, key: string): unknown {
-  if (['__proto__', 'prototype', 'constructor'].includes(key)) fail('INVALID_ARGUMENT', 'Prototype-mutating keys are forbidden')
+  if (isPrototypeKey(key)) fail('INVALID_ARGUMENT', 'Prototype-mutating keys are forbidden')
   const descriptor = Object.getOwnPropertyDescriptor(value, key)
   if (!descriptor || !('value' in descriptor)) fail('INVALID_ARGUMENT', 'Accessors are forbidden in wire values')
   return descriptor.value
 }
 
-/** Counts and validates one bounded wire value, stopping before expensive allocation. */
+/** Exact `JSON.stringify(value).length` for a finite number, without allocating for safe integers. */
+function jsonNumberLength(value: number): number {
+  if (!Number.isSafeInteger(value)) return String(value).length
+  // -0 is not < 0 and serializes as "0".
+  let length = value < 0 ? 2 : 1
+  for (let rest = Math.abs(value); rest >= 10; rest = Math.floor(rest / 10)) length++
+  return length
+}
+
+/** Rejects a negative or non-integer budget. */
+function checkBound(bound: number): void {
+  if (!Number.isSafeInteger(bound) || bound < 0) fail('INVALID_ARGUMENT', 'Invalid wire budget')
+}
+
+/**
+ * Counts and validates one bounded wire value, stopping before expensive allocation.
+ * Traversal is iterative over two parallel stacks (value, depth) to avoid per-node frame
+ * objects; an `EXIT` depth marks where a JSON container leaves the ancestry.
+ */
 export function measureWireValue(value: unknown, options: HistoireWireSizeOptions = {}): number {
   const json = options.mode !== 'state'
   const maxBytes = options.maxBytes ?? HISTOIRE_WIRE_LIMITS.request
   const maxDepth = options.maxDepth ?? HISTOIRE_WIRE_LIMITS.depth
   const maxContainers = options.maxContainers ?? HISTOIRE_WIRE_LIMITS.containers
   const maxEdges = options.maxEdges ?? HISTOIRE_WIRE_LIMITS.edges
-  for (const bound of [maxBytes, maxDepth, maxContainers, maxEdges]) {
-    if (!Number.isSafeInteger(bound) || bound < 0) fail('INVALID_ARGUMENT', 'Invalid wire budget')
-  }
+  checkBound(maxBytes)
+  checkBound(maxDepth)
+  checkBound(maxContainers)
+  checkBound(maxEdges)
   let bytes = 0
   let containers = 0
   let edges = 0
-  const visited = new WeakSet<object>()
-  const ancestry = new WeakSet<object>()
-  const stack: Frame[] = [{ value, depth: 0 }]
+  // JSON mode tracks only the current ancestry (cycles); state mode tracks every visited
+  // container (aliases counted once). One call-local Set serves either purpose.
+  const seen = new Set<object>()
+  const values: unknown[] = [value]
+  const depths: number[] = [0]
+  // Per-container scratch, overwritten (never truncated) for each container: field
+  // values/enumerability captured by the single descriptor read so children are pushed
+  // without a second descriptor lookup. Only indices below the container's key count are read.
+  const fieldValues: unknown[] = []
+  const fieldEnumerable: boolean[] = []
   /** Every increment checks budget before next traversal/allocation. */
   const charge = (amount: number) => {
     bytes += amount
@@ -67,16 +91,20 @@ export function measureWireValue(value: unknown, options: HistoireWireSizeOption
     if (edges > maxEdges) fail('RESULT_TOO_LARGE', 'Wire edge limit exceeded')
     if (!json) charge(amount * 8)
   }
-  while (stack.length) {
-    const frame = stack.pop()!
-    const current = frame.value
-    if (frame.exit) {
-      ancestry.delete(current as object)
+  /** Charges one string; counting stops once it cannot fit the remaining budget. */
+  const chargeString = (text: string, quoted: boolean) => {
+    charge(countWireString(text, quoted, maxBytes - bytes))
+  }
+  while (values.length) {
+    const current = values.pop()
+    const depth = depths.pop()!
+    if (depth === EXIT) {
+      seen.delete(current as object)
       continue
     }
-    if (frame.depth > maxDepth) fail('RESULT_TOO_LARGE', 'Wire depth limit exceeded')
+    if (depth > maxDepth) fail('RESULT_TOO_LARGE', 'Wire depth limit exceeded')
     if (typeof current === 'string') {
-      countWireString(current, json, charge)
+      chargeString(current, json)
       continue
     }
     if (current === null) {
@@ -89,7 +117,7 @@ export function measureWireValue(value: unknown, options: HistoireWireSizeOption
     }
     if (typeof current === 'number') {
       if (!Number.isFinite(current)) fail('INVALID_ARGUMENT', 'Non-finite wire number')
-      charge(json ? JSON.stringify(current).length : 8)
+      charge(json ? jsonNumberLength(current) : 8)
       continue
     }
     if (current === undefined && !json) {
@@ -111,58 +139,70 @@ export function measureWireValue(value: unknown, options: HistoireWireSizeOption
     const array = Array.isArray(current)
     const prototype = Object.getPrototypeOf(current)
     if (array ? prototype !== Array.prototype : prototype !== Object.prototype && prototype !== null) fail('INVALID_ARGUMENT', 'Wire values must be plain containers')
-    if (json && ancestry.has(current)) fail('INVALID_ARGUMENT', 'Cycles are forbidden in JSON DTOs')
-    if (!json && visited.has(current)) continue
+    if (seen.has(current)) {
+      if (json) fail('INVALID_ARGUMENT', 'Cycles are forbidden in JSON DTOs')
+      continue
+    }
     if (++containers > maxContainers) fail('RESULT_TOO_LARGE', 'Wire container limit exceeded')
-    visited.add(current)
+    seen.add(current)
     if (array && current.length > maxEdges - edges) fail('RESULT_TOO_LARGE', 'Wire edge limit exceeded')
-    const names = Object.getOwnPropertyNames(current)
-    if (names.length - (array ? 1 : 0) > maxEdges - edges) fail('RESULT_TOO_LARGE', 'Wire edge limit exceeded')
-    for (const key of names) {
+    // `getOwnPropertyNames` is much faster than `Reflect.ownKeys` in V8; symbols are
+    // checked separately after this container, as before.
+    const keys = Object.getOwnPropertyNames(current)
+    const names = keys.length
+    if (names - (array ? 1 : 0) > maxEdges - edges) fail('RESULT_TOO_LARGE', 'Wire edge limit exceeded')
+    // Arrays list present indices ascending before `length` (created first among string keys).
+    let indexCount = 0
+    for (let position = 0; position < names; position++) {
+      const key = keys[position]
       const descriptor = Object.getOwnPropertyDescriptor(current, key)!
       if (!('value' in descriptor)) fail('INVALID_ARGUMENT', 'Accessors are forbidden in wire values')
-      if (['__proto__', 'prototype', 'constructor'].includes(key) || (key === 'toJSON' && typeof descriptor.value === 'function')) fail('INVALID_ARGUMENT', 'Forbidden wire serialization key')
+      if (isPrototypeKey(key) || (key === 'toJSON' && typeof descriptor.value === 'function')) fail('INVALID_ARGUMENT', 'Forbidden wire serialization key')
+      if (array && key === 'length') indexCount = position
+      fieldValues[position] = descriptor.value
+      fieldEnumerable[position] = descriptor.enumerable!
     }
     if (json) {
-      ancestry.add(current)
-      stack.push({ ...frame, exit: true })
+      values.push(current)
+      depths.push(EXIT)
       charge(2)
     }
     else {
       charge(16)
     }
+    const childDepth = depth + 1
     if (array) {
       chargeEdges(current.length)
       if (json && current.length) charge(current.length - 1)
-      for (let index = current.length - 1; index >= 0; index--) {
-        const key = String(index)
-        if (!Object.hasOwn(current, key)) {
-          if (json) fail('INVALID_ARGUMENT', 'Sparse arrays are forbidden in JSON DTOs')
-          continue
-        }
-        stack.push({ value: readField(current, key), depth: frame.depth + 1 })
+      if (json && indexCount < current.length) fail('INVALID_ARGUMENT', 'Sparse arrays are forbidden in JSON DTOs')
+      // Push descending so indices pop in ascending order.
+      for (let position = indexCount - 1; position >= 0; position--) {
+        values.push(fieldValues[position])
+        depths.push(childDepth)
       }
       // Structured-clone arrays support data properties as well as slots;
       // JSON ignores extra properties, so reject them rather than hide data.
-      for (const key in current) {
-        if (!Object.hasOwn(current, key) || (/^(?:0|[1-9]\d*)$/.test(key) && Number(key) < current.length)) continue
+      for (let position = indexCount + 1; position < names; position++) {
+        if (!fieldEnumerable[position]) continue
         if (json) fail('INVALID_ARGUMENT', 'Extra array fields are forbidden in JSON DTOs')
         chargeEdges(1)
-        countWireString(key, false, charge)
-        stack.push({ value: readField(current, key), depth: frame.depth + 1 })
+        chargeString(keys[position], false)
+        values.push(fieldValues[position])
+        depths.push(childDepth)
       }
     }
     else {
       let first = true
-      for (const key in current) {
-        if (!Object.hasOwn(current, key)) continue
+      for (let position = 0; position < names; position++) {
+        if (!fieldEnumerable[position]) continue
         chargeEdges(1)
         if (json) {
           charge(first ? 1 : 2)
           first = false
         }
-        countWireString(key, json, charge)
-        stack.push({ value: readField(current, key), depth: frame.depth + 1 })
+        chargeString(keys[position], json)
+        values.push(fieldValues[position])
+        depths.push(childDepth)
       }
     }
     if (Object.getOwnPropertySymbols(current).length) fail('INVALID_ARGUMENT', 'Symbol keys are forbidden in wire values')

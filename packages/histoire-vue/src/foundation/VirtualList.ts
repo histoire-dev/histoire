@@ -1,5 +1,5 @@
 import type { PropType, SlotsType, VNodeChild } from 'vue'
-import { computed, defineComponent, h, nextTick, onBeforeUnmount, ref, watch } from 'vue'
+import { defineComponent, h, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 import { DynamicScroller, DynamicScrollerItem, RecycleScroller } from 'vue-virtual-scroller'
 
 /** Stable row identity stays separate from recycled DOM view identity. */
@@ -62,8 +62,6 @@ export const HistoireVirtualList = defineComponent({
   },
   slots: Object as SlotsType<{ default: (value: HistoireVirtualSlot) => VNodeChild }>,
   setup(props, { attrs, slots, expose }) {
-    // The library accepts mutable arrays; caller-owned readonly publications stay intact.
-    const items = computed(() => Array.from(props.items))
     const root = ref<HTMLElement>()
     const scroller = ref<VirtualScrollerHandle>()
     let active = true
@@ -130,7 +128,9 @@ export const HistoireVirtualList = defineComponent({
       return h('div', { ...attrs, ref: root, class: ['histoire-virtual-list', attrs.class, { 'histoire-virtual-list-page': props.pageMode }] }, [
         h(dynamic ? DynamicScroller : RecycleScroller, {
           ref: scroller,
-          items: items.value,
+          // Pass caller array as-is (the library never mutates it): a copy would give the
+          // scroller a new identity on every render and trigger its items watcher (sync layout).
+          items: props.items as HistoireVirtualItem[],
           keyField: 'key',
           typeField: 'kind',
           itemSize: props.itemSize,

@@ -18,7 +18,8 @@ const bounds = computed(() => {
   const rect = layer.value?.getBoundingClientRect()
   return rect ? { x: rect.left, y: rect.top, width: rect.width, height: rect.height } : null
 })
-const position = computed(() => bounds.value ? getMcpCursor({ activity: mcp, snapshot: snapshot.value, canvas, frames, bounds: bounds.value }) : null)
+// Check activity first: layer bounds force layout and are only needed while an agent operation runs.
+const position = computed(() => mcp.current && bounds.value ? getMcpCursor({ activity: mcp, snapshot: snapshot.value, canvas, frames, bounds: bounds.value }) : null)
 let resize: ResizeObserver | undefined
 let host: Window | null = null
 
@@ -57,7 +58,7 @@ onBeforeUnmount(() => {
 
 <template>
   <div ref="layer" class="histoire-agent-cursor-layer" :style="{ right: `${canvas.inspectorWidth}px` }" aria-hidden="true">
-    <div v-if="position && mcp.current" class="histoire-agent-cursor" :style="{ left: `${position.x}px`, top: `${position.y}px` }">
+    <div v-if="mcp.current && position" class="histoire-agent-cursor" :style="{ left: `${position.x}px`, top: `${position.y}px` }">
       <BuiltinIcon icon="cursor-1" :size="20" />
       <span>{{ mcp.clientName(mcp.current.clientId) }} · {{ mcp.current.tool }}</span>
     </div>
