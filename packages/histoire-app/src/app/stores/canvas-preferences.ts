@@ -25,7 +25,7 @@ export function getCanvasStorage(window?: Pick<Window, 'localStorage'>): CanvasS
 
 /** Validate saved values without trusting obsolete or corrupt local preferences. */
 export function readCanvasPreferences(storage?: CanvasStorage): CanvasPreferences {
-  const defaults: CanvasPreferences = { zoomByArrange: defaultZoomByArrange(), tool: 'select', frameBackground: 'transparent' }
+  const defaults: CanvasPreferences = { zoomByArrange: defaultZoomByArrange(), tool: 'select', frameBackground: 'transparent', autoFitContent: false }
   try {
     const saved = JSON.parse(storage?.getItem('_histoire-ui-canvas') ?? 'null')
     if (!saved || typeof saved !== 'object') return defaults
@@ -42,7 +42,15 @@ export function readCanvasPreferences(storage?: CanvasStorage): CanvasPreference
       if (arrangement === 'list' && zoom === 'fit' && saved.version !== 2 && saved.version !== 3) zoom = 'selection'
       return [arrangement, zoom]
     })) as CanvasZoomByArrange
-    return { zoomByArrange, tool, frameBackground: typeof saved.frameBackground === 'string' ? saved.frameBackground : defaults.frameBackground }
+    return { zoomByArrange, tool, frameBackground: typeof saved.frameBackground === 'string' ? saved.frameBackground : defaults.frameBackground, autoFitContent: saved.autoFitContent === true }
   }
   catch { return defaults }
+}
+
+/** Persist only user intent; measured geometry remains workbench-local. */
+export function saveCanvasPreferences(storage: CanvasStorage | undefined, state: CanvasPreferences): void {
+  try {
+    storage?.setItem('_histoire-ui-canvas', JSON.stringify({ version: 3, zoomByArrange: state.zoomByArrange, tool: state.tool, frameBackground: state.frameBackground, autoFitContent: state.autoFitContent }))
+  }
+  catch { /* Private browsing storage can be unavailable. */ }
 }

@@ -15,6 +15,7 @@ import { useCanvasPreviewSettings } from './session-settings.js'
 import { registerCanvasShortcuts } from './shortcuts.js'
 import ToolbarButton from './ToolbarButton.vue'
 import ToolSwitch from './ToolSwitch.vue'
+import { useCanvasViewportDimensions } from './viewport-size.js'
 import ViewportMenu from './ViewportMenu.vue'
 import ZoomMenu from './ZoomMenu.vue'
 
@@ -31,6 +32,7 @@ const emit = defineEmits<{ arrange: [value: 'single' | 'grid' | 'list' | 'matrix
 const canvas = useCanvasStore()
 const frames = useCanvasFrames()
 const { snapshot, update } = useCanvasPreviewSettings()
+const viewportDimensions = useCanvasViewportDimensions()
 const shortcuts = useShortcutRegistry()
 const actions = useFrameActions()
 const menu = useContextMenu()
@@ -46,6 +48,13 @@ function setOpen(value: string | null) {
 
 /** Rotation fixes responsive Single dimensions before swapping orientation. */
 function rotateViewport(): void {
+  if (canvas.autoFitContent) {
+    const size = viewportDimensions.value
+    canvas.setSingleViewportMode('fixed')
+    canvas.setAutoFitContent(false)
+    update({ responsiveWidth: size.width, responsiveHeight: size.height ?? 640, rotate: true })
+    return
+  }
   if (canvas.arrangement === 'single' && canvas.singleViewport.mode === 'responsive') {
     const size = canvas.singleViewportSize
     canvas.setSingleViewportMode('fixed')
@@ -96,7 +105,7 @@ onBeforeUnmount(() => disposers.forEach(dispose => dispose()))
     </BaseOverflowToolbarItem>
     <BaseOverflowToolbarItem id="viewport" separator-before>
       <ViewportMenu v-model:open="open" @edit-presets="emit('editPresets')" />
-      <ToolbarButton label="Rotate viewport" icon="rotate" :pressed="snapshot.settings.rotate" @click="rotateViewport" />
+      <ToolbarButton label="Rotate viewport" icon="rotate" :pressed="!canvas.autoFitContent && snapshot.settings.rotate" @click="rotateViewport" />
     </BaseOverflowToolbarItem>
     <BaseOverflowToolbarItem id="zoom" separator-before>
       <ToolbarButton label="Zoom out" icon="zoom-out" @click="canvas.setZoom(canvas.effectiveZoom / 1.25)" />

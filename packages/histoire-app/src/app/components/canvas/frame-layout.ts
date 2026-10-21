@@ -13,6 +13,8 @@ const LIST_FRAME_GAP = GRID_FRAME_GAP + 64
 
 /** Canvas identity stays stable when mounted frames change. */
 export interface CanvasFrameLayout extends CanvasRect {
+  /** Shared row extent keeps visibility binary search valid for unequal sibling heights. */
+  rowBottom?: number
   /** Stable key scoped to story and variant. */
   id: string
   /** Collected story identity. */
@@ -22,22 +24,42 @@ export interface CanvasFrameLayout extends CanvasRect {
 }
 
 /** Lay out frames independently of their preview runtime and visibility. */
-export function layoutCanvasFrames(storyId: string, variantIds: readonly string[], size: CanvasSize, arrange: 'grid' | 'list', columns = 3, chromeScale = 1): CanvasFrameLayout[] {
+export function layoutCanvasFrames(storyId: string, variantIds: readonly string[], size: CanvasSize | ((variantId: string) => CanvasSize), arrange: 'grid' | 'list', columns = 3, chromeScale = 1): CanvasFrameLayout[] {
   const list = arrange === 'list'
   const count = list ? 1 : Math.max(1, columns)
   const scale = Math.max(0.1, chromeScale)
   // Frame chrome stays readable at every zoom while previews retain logical dimensions.
   const labelHeight = (list ? CANVAS_FRAME_LABEL_HEIGHT : GRID_FRAME_LABEL_RESERVE) / scale
   const gap = (list ? LIST_FRAME_GAP : GRID_FRAME_GAP) / scale
+  const sizes = variantIds.map(id => typeof size === 'function' ? size(id) : size)
+  const widths = Array.from({ length: count }, () => 0)
+  const heights = Array.from({ length: Math.ceil(variantIds.length / count) }, () => 0)
+  sizes.forEach((size, index) => {
+    widths[index % count] = Math.max(widths[index % count], size.width)
+    heights[Math.floor(index / count)] = Math.max(heights[Math.floor(index / count)], size.height + labelHeight)
+  })
+  const xs = canvasTrackOffsets(widths, GRID_FRAME_GAP / scale)
+  const ys = canvasTrackOffsets(heights, gap)
   return variantIds.map((variantId, index) => ({
     id: getHistoireTargetKey({ storyId, variantId }),
     storyId,
     variantId,
-    x: (index % count) * (size.width + GRID_FRAME_GAP / scale),
-    y: Math.floor(index / count) * (size.height + labelHeight + gap),
-    width: size.width,
-    height: size.height + labelHeight,
+    x: xs[index % count],
+    y: ys[Math.floor(index / count)],
+    width: sizes[index].width,
+    height: sizes[index].height + labelHeight,
+    ...(typeof size === 'function' ? { rowBottom: ys[Math.floor(index / count)] + heights[Math.floor(index / count)] } : {}),
   }))
+}
+
+/** Accumulate unequal tracks once rather than summing preceding sizes for every cell. */
+export function canvasTrackOffsets(sizes: readonly number[], gap: number, start = 0): number[] {
+  let offset = start
+  return sizes.map((size) => {
+    const value = offset
+    offset += size + gap
+    return value
+  })
 }
 
 /** Find complete canvas extent without measuring transformed DOM. */
@@ -59,7 +81,7 @@ export function visibleCanvasFrames(frames: readonly CanvasFrameLayout[], viewpo
   let high = frames.length
   while (low < high) {
     const middle = Math.floor((low + high) / 2)
-    if (frames[middle].y + frames[middle].height <= viewport.y) low = middle + 1
+    if ((frames[middle].rowBottom ?? frames[middle].y + frames[middle].height) <= viewport.y) low = middle + 1
     else high = middle
   }
   const start = low
@@ -72,7 +94,7 @@ export function visibleCanvasFrames(frames: readonly CanvasFrameLayout[], viewpo
   }
 
   const viewportRight = viewport.x + viewport.width
-  return frames.slice(start, low).filter(frame => frame.x < viewportRight && frame.x + frame.width > viewport.x)
+  return frames.slice(start, low).filter(frame => frame.y + frame.height > viewport.y && frame.x < viewportRight && frame.x + frame.width > viewport.x)
 }
 
 /** Calculate a frame's rendered area inside the actual viewport. */

@@ -4,19 +4,17 @@ import type { SingleViewportState } from '../components/canvas/single-viewport.j
 import type { SingleZoomListener } from '../components/canvas/single-zoom.js'
 import type { CanvasBackground } from '../util/background.js'
 import { reactive } from 'vue'
+import { createCanvasContentSizes } from '../components/canvas/content-sizes.js'
 import { canvasContentRect, clampZoom, fitCanvas, zoomAroundPoint } from '../components/canvas/pan/usePanZoom.js'
 import { fitSingleViewport } from '../components/canvas/single-zoom.js'
-
-import { readCanvasPreferences } from './canvas-preferences.js'
+import { readCanvasPreferences, saveCanvasPreferences } from './canvas-preferences.js'
 
 export { getCanvasStorage } from './canvas-preferences.js'
 
 /** Persistent canvas pointer mode. */
 export type CanvasTool = 'select' | 'pan' | 'measure'
-
 /** Canvas arrangements retain local zoom preferences; Matrix resets to Fit on entry. */
 export type CanvasArrangement = 'single' | 'grid' | 'list' | 'matrix'
-
 /** Logical scale, whole-canvas fit, or List selection fitting. */
 export type CanvasZoom = number | 'fit' | 'selection'
 
@@ -38,6 +36,8 @@ export interface CanvasViewSnapshot {
 
 /** Persistent canvas preferences; per-story transforms use workbench memory. */
 export interface CanvasPreferences {
+  /** Fit each runtime's intrinsic content rather than a shared viewport. */
+  autoFitContent: boolean
   /** Independent zoom preference for each arrangement. */
   zoomByArrange: CanvasZoomByArrange
   /** Persistent pointer mode. */
@@ -75,12 +75,7 @@ export function createCanvasStore(options: { storage?: CanvasStorage, singleView
     return canvasContentRect(state.viewport, { inspectorWidth: state.inspectorWidth, ...state.contentInsets })
   }
   /** Persist only contract preferences; failures leave usable current-session state. */
-  function save() {
-    try {
-      options.storage?.setItem('_histoire-ui-canvas', JSON.stringify({ version: 3, zoomByArrange: state.zoomByArrange, tool: state.tool, frameBackground: state.frameBackground }))
-    }
-    catch { /* Private browsing storage can be unavailable. */ }
-  }
+  const save = () => saveCanvasPreferences(options.storage, state)
   /** Updates active arrangement preference without mutating another view's scale. */
   function setActiveZoom(zoom: CanvasZoom) {
     state.zoom = zoom
@@ -265,7 +260,12 @@ export function createCanvasStore(options: { storage?: CanvasStorage, singleView
     setActiveZoom(state.arrangement === 'matrix' ? 'fit' : 'selection')
     save()
   }
-  return Object.assign(state, { setZoom, setArrangement, fit, resetZoom, setGeometry, setSingleGeometry, panBy, setPanOffset, snapshotView, restoreView, revealFrame, selectFrame, focusFrame, zoomToFrame, zoomToSelection,
+  return Object.assign(state, { setZoom, setArrangement, fit, resetZoom, setGeometry, setSingleGeometry, panBy, setPanOffset, snapshotView, restoreView, revealFrame, selectFrame, focusFrame, zoomToFrame, zoomToSelection, contentSizes: createCanvasContentSizes(),
+    /** Select sizing without modifying manual dimensions or camera intent. */
+    setAutoFitContent(value: boolean) {
+      state.autoFitContent = value
+      save()
+    },
     /** Switch Single sizing intent and retire any transient direct-resize draft. */
     setSingleViewportMode(mode: SingleViewportState['mode']) {
       state.singleViewport.mode = mode

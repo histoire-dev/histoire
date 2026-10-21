@@ -1,11 +1,14 @@
 <script setup lang="ts">
 import type { CanvasContentInsets } from '../../../stores/canvas.js'
+import type { MatrixCellData } from '../../../util/matrix.js'
+import { useHistoireSnapshot } from '@histoire/vue'
 import { useHistoireContext } from '@histoire/vue/internal'
 import { computed, onBeforeUnmount, onMounted, watch } from 'vue'
 import { useCanvasStore } from '../../../composables/canvas-settings.js'
 import { useSelection } from '../../../composables/selection.js'
 import { useMatrixStore } from '../../../stores/matrix.js'
 import { filterMatrixValues } from '../../../util/matrix.js'
+import { canvasContentKey } from '../content-sizes.js'
 import { useCanvasFrameAdmission } from '../frame-admission.js'
 import { canvasContentRect, clientToCanvas } from '../pan/usePanZoom.js'
 import { layoutMatrixFrames, MATRIX_COLUMN_HEADER, MATRIX_ROW_GUTTER, MATRIX_TOP_INSET, matrixLayoutBounds } from './matrix-layout.js'
@@ -39,13 +42,19 @@ const matrix = useMatrixStore()
 watch(matrix.axisRevision, () => emit('axes', { rows: matrix.rows.value, cols: matrix.cols.value }), { flush: 'post' })
 onBeforeUnmount(watchMatrixFrameSelection(matrix, canvas))
 const context = useHistoireContext()
+const snapshot = useHistoireSnapshot()
 const { story, variant } = useSelection()
 const baseVariant = computed(() => variant.value?.id ?? story.value?.variants[0]?.id)
 const rowValues = computed(() => matrix.rowAxis.value ? filterMatrixValues(matrix.rowAxis.value, matrix.rowValues.value) : [])
 const colValues = computed(() => matrix.colAxis.value ? filterMatrixValues(matrix.colAxis.value, matrix.colValues.value) : [])
+/** Matrix projections share a variant, but never share intrinsic dimensions. */
+function cellSize(cell: MatrixCellData) {
+  const target = { storyId: story.value?.id ?? '', variantId: baseVariant.value ?? '' }
+  return canvas.contentSizes.get(cell.key, canvasContentKey(snapshot.value, target, cell.props)) ?? props.size
+}
 /** Rendering and selection share fixed-pixel matrix gutter/gap calculations. */
 function layoutFrames(zoom = canvas.effectiveZoom) {
-  return layoutMatrixFrames(matrix.cells.value, { storyId: story.value?.id ?? '', variantId: baseVariant.value ?? '', rows: rowValues.value, cols: colValues.value, size: props.size, zoom })
+  return layoutMatrixFrames(matrix.cells.value, { storyId: story.value?.id ?? '', variantId: baseVariant.value ?? '', rows: rowValues.value, cols: colValues.value, size: canvas.autoFitContent ? cellSize : props.size, zoom })
 }
 const frames = computed(() => layoutFrames())
 const topInset = computed(() => Math.max(props.uiHidden ? MATRIX_COLUMN_HEADER : MATRIX_TOP_INSET, props.contentInsets?.topInset ?? 0))
@@ -66,14 +75,16 @@ const rowPosition = computed(() => {
   if (!frames.value.length) return []
   return rowValues.value.map((value, index) => {
     const frame = frames.value[index * colValues.value.length]
-    return { value, style: { top: `${(frame.y + frame.height / 2) * canvas.effectiveZoom + canvas.panOffset.y}px`, left: `${canvas.panOffset.x}px`, width: `${MATRIX_ROW_GUTTER}px` } }
+    const height = Math.max(...frames.value.slice(index * colValues.value.length, (index + 1) * colValues.value.length).map(frame => frame.height))
+    return { value, style: { top: `${(frame.y + height / 2) * canvas.effectiveZoom + canvas.panOffset.y}px`, left: `${canvas.panOffset.x}px`, width: `${MATRIX_ROW_GUTTER}px` } }
   })
 })
 const colPosition = computed(() => {
   if (!frames.value.length) return []
   return colValues.value.map((value, index) => {
     const frame = frames.value[index]
-    return { value, style: { top: `${frame.y * canvas.effectiveZoom + canvas.panOffset.y - MATRIX_COLUMN_HEADER}px`, left: `${frame.x * canvas.effectiveZoom + canvas.panOffset.x}px`, width: `${frame.width * canvas.effectiveZoom}px` } }
+    const width = Math.max(...frames.value.filter((_, cellIndex) => cellIndex % colValues.value.length === index).map(frame => frame.width))
+    return { value, style: { top: `${frame.y * canvas.effectiveZoom + canvas.panOffset.y - MATRIX_COLUMN_HEADER}px`, left: `${frame.x * canvas.effectiveZoom + canvas.panOffset.x}px`, width: `${width * canvas.effectiveZoom}px` } }
   })
 })
 

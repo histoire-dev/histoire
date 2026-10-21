@@ -2,7 +2,7 @@ import type { MatrixCellData, MatrixValue } from '../../../util/matrix.js'
 import type { CanvasFrameLayout } from '../frame-layout.js'
 import type { CanvasRect, CanvasSize } from '../pan/usePanZoom.js'
 import { equalMatrixValue } from '../../../util/matrix-values.js'
-import { canvasFrameBounds } from '../frame-layout.js'
+import { canvasFrameBounds, canvasTrackOffsets } from '../frame-layout.js'
 import { clampZoom } from '../pan/usePanZoom.js'
 
 /** Fixed toolbar, story heading and axis controls above the matrix board. */
@@ -25,7 +25,7 @@ interface MatrixLayoutOptions {
   /** Visible column values in source order. */
   cols: readonly MatrixValue[]
   /** Logical preview dimensions from existing viewport settings. */
-  size: CanvasSize
+  size: CanvasSize | ((cell: MatrixCellData) => CanvasSize)
   /** Current numeric zoom; chrome converts screen pixels into world units. */
   zoom: number
 }
@@ -33,14 +33,26 @@ interface MatrixLayoutOptions {
 /** Place previews in world coordinates without scaling labels or gaps. */
 export function layoutMatrixFrames(cells: readonly MatrixCellData[], options: MatrixLayoutOptions): CanvasFrameLayout[] {
   const scale = clampZoom(options.zoom)
-  return cells.map(cell => ({
+  const sizes = cells.map(cell => typeof options.size === 'function' ? options.size(cell) : options.size)
+  const rows = cells.map(cell => options.rows.findIndex(value => equalMatrixValue(value, cell.row)))
+  const cols = cells.map(cell => options.cols.findIndex(value => equalMatrixValue(value, cell.col)))
+  const widths = options.cols.map(() => 0)
+  const heights = options.rows.map(() => 0)
+  sizes.forEach((size, index) => {
+    widths[cols[index]] = Math.max(widths[cols[index]], size.width)
+    heights[rows[index]] = Math.max(heights[rows[index]], size.height)
+  })
+  const xs = canvasTrackOffsets(widths, MATRIX_GAP / scale, MATRIX_ROW_GUTTER / scale)
+  const ys = canvasTrackOffsets(heights, MATRIX_GAP / scale, MATRIX_COLUMN_HEADER / scale)
+  return cells.map((cell, index) => ({
     id: cell.key,
     storyId: options.storyId,
     variantId: options.variantId,
-    x: MATRIX_ROW_GUTTER / scale + options.cols.findIndex(value => equalMatrixValue(value, cell.col)) * (options.size.width + MATRIX_GAP / scale),
-    y: MATRIX_COLUMN_HEADER / scale + options.rows.findIndex(value => equalMatrixValue(value, cell.row)) * (options.size.height + MATRIX_GAP / scale),
-    width: options.size.width,
-    height: options.size.height,
+    x: xs[cols[index]],
+    y: ys[rows[index]],
+    width: sizes[index].width,
+    height: sizes[index].height,
+    ...(typeof options.size === 'function' ? { rowBottom: ys[rows[index]] + heights[rows[index]] } : {}),
   }))
 }
 

@@ -56,7 +56,7 @@ describe('canvas preference ownership', () => {
     store.selectedFrame = 'frame'
     store.panBy({ x: 50, y: 20 })
     store.setTool('select')
-    expect(JSON.parse(setItem.mock.calls.at(-1)![1])).toEqual({ version: 3, zoomByArrange: { single: 'fit', grid: 4, list: 4, matrix: 4 }, tool: 'select', frameBackground: 'white' })
+    expect(JSON.parse(setItem.mock.calls.at(-1)![1])).toEqual({ version: 3, zoomByArrange: { single: 'fit', grid: 4, list: 4, matrix: 4 }, tool: 'select', frameBackground: 'white', autoFitContent: false })
     expect(createCanvasStore().selectedFrame).toBe(null)
   })
 
@@ -66,7 +66,7 @@ describe('canvas preference ownership', () => {
     const canvas = createCanvasStore({ storage })
     canvas.setTool(tool)
     expect(createCanvasStore({ storage }).tool).toBe(tool)
-    expect(JSON.parse(saved!)).toEqual({ version: 3, zoomByArrange: { single: 'fit', grid: 'fit', list: 'selection', matrix: 'fit' }, tool, frameBackground: 'transparent' })
+    expect(JSON.parse(saved!)).toEqual({ version: 3, zoomByArrange: { single: 'fit', grid: 'fit', list: 'selection', matrix: 'fit' }, tool, frameBackground: 'transparent', autoFitContent: false })
   })
 
   it.each([

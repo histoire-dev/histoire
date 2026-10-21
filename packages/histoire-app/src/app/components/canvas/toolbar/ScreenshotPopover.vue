@@ -9,6 +9,7 @@ import { screenshotFileDetails } from '../../../util/screenshot-file.js'
 import { snapshotScreenshotTargets } from '../../../util/screenshot-targets.js'
 import { onUiDisconnect, onUiEvent, sendUiEvent } from '../../../util/ui-channel.js'
 import { useCaptureDiscoveryPause } from '../../panes/tests/capture.js'
+import { getSelectedCanvasFrame } from '../frame-target.js'
 
 import ScreenshotSetup from './ScreenshotSetup.vue'
 import { useCanvasPreviewSettings } from './session-settings.js'
@@ -51,7 +52,7 @@ const message = ref('')
 const copied = ref('')
 const listRequest = ref('')
 const allTargets = computed(() => props.targets ?? [...registry.frames.values()].filter(frame => frame.storyId === props.storyId).map(frame => ({ storyId: frame.storyId, variantId: frame.variantId, ...(frame.propsOverride ? { frameKey: frame.id, propsOverride: frame.propsOverride } : {}) })))
-const selectedFrame = computed(() => canvas.selectedFrame ? registry.getFrame(canvas.selectedFrame) : null)
+const selectedFrame = computed(() => getSelectedCanvasFrame(registry, canvas, snapshot.value.selection))
 const targets = computed(() => scope.value === 'all' ? allTargets.value : selectedFrame.value ? allTargets.value.filter(target => target.frameKey ? target.frameKey === selectedFrame.value?.id : target.variantId === selectedFrame.value?.variantId).slice(0, 1) : [{ storyId: props.storyId, variantId: props.variantId ?? '' }].filter(target => target.variantId))
 const recentFiles = computed(() => recent.value.slice(0, 5).map((file) => {
   const details = screenshotFileDetails(file.path)

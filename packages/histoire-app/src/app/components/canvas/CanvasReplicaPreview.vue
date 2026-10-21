@@ -12,6 +12,7 @@ import { createCanvasReplicaSession } from './frame-replica.js'
 import { createCanvasPropsRequestId } from './frame-requests.js'
 import { type CanvasStartupRequest, useCanvasStartupCoordinator } from './frame-startup-coordinator.js'
 import { createCanvasReplicaTargetSelector, createCanvasStartupReadiness, observeCanvasStartupRuntime, waitForCanvasStartup } from './frame-startup-lifecycle.js'
+import { useCanvasContentSizing } from './useCanvasContentSizing.js'
 
 const props = defineProps<{
   /** Stable canvas frame identifier. */
@@ -67,12 +68,14 @@ const propsOverride = createCanvasPropsOverrideController({
   nextRequestId: createCanvasPropsRequestId(),
   fail,
 })
+const contentSizing = useCanvasContentSizing({ canvas: store, canonical, snapshot, container, ready, target: () => props, wait: propsOverride.wait })
 
 /** Apply canonical settings and frame-local presentation overrides. */
 function settings() {
   const value = snapshot.value.settings
   const background = store.frameBackgrounds[props.frameId]
-  return { ...value, ...(background ?? {}), ...(props.viewport ? { responsiveWidth: props.viewport.width, responsiveHeight: props.viewport.height, rotate: false } : {}) }
+  const viewport = contentSizing.size.value ?? props.viewport
+  return { ...value, ...(background ?? {}), ...(viewport ? { responsiveWidth: viewport.width, responsiveHeight: viewport.height, rotate: false } : {}) }
 }
 
 /** Publish iframe identity for finite measure and comment requests. */
@@ -183,6 +186,7 @@ async function startOwned(version: number, signal: AbortSignal): Promise<void> {
           propsOverride.update()
         }
         ready.value = true
+        contentSizing.refresh()
         emit('status', 'ready')
         readiness.ready()
       },

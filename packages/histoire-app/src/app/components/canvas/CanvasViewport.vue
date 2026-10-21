@@ -31,6 +31,7 @@ import { bindStoryCanvasView } from './story-view-binding.js'
 import { useCanvasGeometry } from './useCanvasGeometry.js'
 import { useCanvasHeaderOcclusion } from './useCanvasHeaderOcclusion.js'
 import { useCanvasPan } from './useCanvasPan.js'
+import { useCanvasVariantSize } from './useCanvasVariantSize.js'
 import { useSingleVariantGeometry } from './useSingleVariantGeometry.js'
 import { createCanvasViewportEvents } from './viewport-events.js'
 
@@ -88,18 +89,15 @@ const viewBinding = bindStoryCanvasView({
   canvas,
   views: useStoryCanvasViews(),
 })
-const size = computed(() => {
-  const settings = snapshot.value.settings
-  return { width: settings.rotate && settings.responsiveHeight ? settings.responsiveHeight : settings.responsiveWidth, height: settings.rotate ? settings.responsiveWidth : settings.responsiveHeight ?? 640 }
-})
-const { area: singleArea, size: singleSize, measure: measureSingle } = useSingleVariantGeometry(canvas, { settings: () => snapshot.value.settings, inspectorWidth: () => props.inspectorWidth, hidden: () => props.uiHidden })
+const { size, frameContentSize } = useCanvasVariantSize(canvas)
+const { area: singleArea, size: singleSize, measure: measureSingle } = useSingleVariantGeometry(canvas, { settings: () => snapshot.value.settings, inspectorWidth: () => props.inspectorWidth, hidden: () => props.uiHidden, contentSize: () => canvas.autoFitContent ? frameContentSize(snapshot.value.selection?.variantId) : undefined })
 /** Reuse arrangement geometry for rendering and target-zoom selection fitting. */
 function layoutFrames(zoom = canvas.effectiveZoom) {
   if (renderedArrange.value === 'single') {
     const variantId = snapshot.value.selection?.variantId ?? (diagnostics.value.length ? cachedVariantId.value : null)
     return selectedSingleFrame(story.value, variantId, singleSize.value)
   }
-  return story.value ? layoutCanvasFrames(story.value.id, story.value.variants.map(variant => variant.id), size.value, renderedArrange.value === 'list' ? 'list' : 'grid', 3, zoom) : []
+  return story.value ? layoutCanvasFrames(story.value.id, story.value.variants.map(variant => variant.id), canvas.autoFitContent ? frameContentSize : size.value, renderedArrange.value === 'list' ? 'list' : 'grid', 3, zoom) : []
 }
 /** Resolve selection-fit geometry by stable target after visible-frame filtering. */
 function fitBoundsForFrame(frame: CanvasFrameLayout, zoom: number): CanvasFrameLayout {
@@ -269,7 +267,7 @@ defineExpose({ canvas, registry, getFrameLayout: (id: string) => frames.value.fi
     <slot v-else-if="renderedArrange === 'matrix'" name="matrix" :canvas="canvas" :frames="registry" :size="size" :content-insets="contentInsets" :frame-budget="frameBudget" :preview-base="previewBase" :discovery-failed="matrixDiscoveryFailed" />
     <component :is="renderedArrange === 'list' ? FrameList : FrameGrid" v-else :frames="renderedFrames">
       <template #default="{ frame }">
-        <CanvasFrame :frame="frame" :fit-bounds="zoom => fitBoundsForFrame(frame, zoom)" :variant="variantsById.get(frame.variantId)!" :selected="frame.id === selectedFrame?.id" :live="live.has(frame.id)" :preview-base="previewBase" :width="size.width" :height="size.height" :stale="diagnostics.length > 0" v-bind="getSearchFrameState(frame.id, !!searchActive, highlightedTargets)" @select="selectVariant" @contextmenu="(event, target) => emit('contextmenu', event, target)" />
+        <CanvasFrame :frame="frame" :fit-bounds="zoom => fitBoundsForFrame(frame, zoom)" :variant="variantsById.get(frame.variantId)!" :selected="frame.id === selectedFrame?.id" :live="live.has(frame.id)" :preview-base="previewBase" :width="frame.width" :height="frameContentSize(frame.variantId).height" :stale="diagnostics.length > 0" v-bind="getSearchFrameState(frame.id, !!searchActive, highlightedTargets)" @select="selectVariant" @contextmenu="(event, target) => emit('contextmenu', event, target)" />
       </template>
     </component>
     <CanvasMatrixPrimary :active="renderedArrange === 'matrix'" :preview-base="previewBase" :width="size.width" :height="size.height" @status="matrixDiscoveryFailed = $event === 'error'" @error="emit('error', $event)" />

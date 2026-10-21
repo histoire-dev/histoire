@@ -36,7 +36,10 @@ defineExpose(pan)
 /** Freeze Responsive and Fit only after one effective direct-resize change. */
 function startResize(): void {
   if (canvas.zoom === 'fit') canvas.setZoom(canvas.effectiveZoom)
+  const size = props.frame && { width: props.frame.width, height: props.frame.height }
   canvas.setSingleViewportMode('fixed')
+  if (canvas.autoFitContent && size) canvas.setSingleViewportDraft(size)
+  canvas.setAutoFitContent(false)
 }
 
 /** Publish physical dimensions without touching canonical settings per pointer move. */

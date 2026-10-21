@@ -133,6 +133,7 @@ describe('canvas zoom preferences', () => {
       zoomByArrange: { single: 'fit', grid: 0.5, list: 'fit', matrix: 'fit' },
       tool: 'select',
       frameBackground: 'transparent',
+      autoFitContent: false,
     }
     expect(storage.value('_histoire-ui-canvas')).toEqual(saved)
 
@@ -186,6 +187,7 @@ describe('canvas zoom preferences', () => {
       zoomByArrange: { single: 'fit', grid: 0.67, list: 0.67, matrix: 'fit' },
       tool: 'measure',
       frameBackground: '#123456',
+      autoFitContent: false,
     })
   })
 

@@ -3,6 +3,7 @@ import { BuiltinIcon } from '@histoire/controls/vue'
 import { useHistoireSnapshot } from '@histoire/vue'
 import { computed } from 'vue'
 import { useCanvasStore } from '../../composables/canvas-settings.js'
+import { useCanvasViewportDimensions } from './toolbar/viewport-size.js'
 
 defineProps<{
   /** Temporary pan mode includes Space without persisting tool change. */
@@ -10,11 +11,8 @@ defineProps<{
 }>()
 const snapshot = useHistoireSnapshot()
 const canvas = useCanvasStore()
-const size = computed(() => {
-  if (canvas.arrangement === 'single') return `${canvas.singleViewportSize.width} × ${canvas.singleViewportSize.height}`
-  const value = snapshot.value.settings
-  return value.rotate ? `${value.responsiveHeight ?? 'Auto'} × ${value.responsiveWidth}` : `${value.responsiveWidth} × ${value.responsiveHeight ?? 'Auto'}`
-})
+const dimensions = useCanvasViewportDimensions()
+const size = computed(() => `${dimensions.value.width} × ${dimensions.value.height ?? 'Auto'}`)
 </script>
 
 <template>
