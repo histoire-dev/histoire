@@ -1,6 +1,6 @@
-import type { UiComment, UiCommentDraft, UiCommentMessage } from '@histoire/shared'
+import type { UiAgentStep, UiComment, UiCommentDraft, UiCommentMessage } from '@histoire/shared'
 import { Buffer } from 'node:buffer'
-import { COMMENT_BYTE_LIMIT, COMMENT_MESSAGE_LIMIT } from './limits.js'
+import { COMMENT_BYTE_LIMIT, COMMENT_MESSAGE_LIMIT, COMMENT_STEP_LIMIT } from './limits.js'
 
 /** User fields stay bounded before file IO or agent prompt construction. */
 function text(value: unknown, maximum: number, label: string): string {
@@ -37,6 +37,31 @@ export function validateCommentDraft(value: unknown): UiCommentDraft {
   return { id: commentId(input.id), storyId: text(input.storyId, 2048, 'story'), variantId: text(input.variantId, 2048, 'variant'), anchor: { x: anchor.x, y: anchor.y, ...(anchor.selector === undefined ? {} : { selector: text(anchor.selector, 4096, 'selector') }) }, body: text(input.body, 8192, 'body'), props, screenshot: screenshot(input.screenshot) }
 }
 
+/** Persisted agent step kinds and statuses mirror ACP tool calls. */
+const STEP_KINDS = ['read', 'edit', 'delete', 'move', 'search', 'execute', 'think', 'fetch', 'other']
+const STEP_STATUSES = ['pending', 'in_progress', 'completed', 'failed']
+
+/** Optional non-negative line count. */
+function lineCount(value: unknown): number | undefined {
+  if (value === undefined) return undefined
+  if (!Number.isSafeInteger(value) || (value as number) < 0) throw new Error('Invalid comment step')
+  return value as number
+}
+
+/** Agent steps keep only display fields; arguments and outputs are never persisted. */
+function validateCommentSteps(value: unknown): UiAgentStep[] | undefined {
+  if (value === undefined) return undefined
+  if (!Array.isArray(value) || value.length > COMMENT_STEP_LIMIT) throw new Error('Invalid comment steps')
+  return value.map((step: any) => {
+    if (!step || !STEP_KINDS.includes(step.kind) || !STEP_STATUSES.includes(step.status)) throw new Error('Invalid comment step')
+    const target = step.target === undefined ? undefined : text(step.target, 512, 'step target')
+    if (target && (target.startsWith('/') || target.split('/').includes('..'))) throw new Error('Invalid comment step')
+    const added = lineCount(step.added)
+    const removed = lineCount(step.removed)
+    return { id: text(step.id, 200, 'step'), kind: step.kind, title: text(step.title, 300, 'step title'), status: step.status, ...(target ? { target } : {}), ...(added === undefined ? {} : { added }), ...(removed === undefined ? {} : { removed }) }
+  })
+}
+
 /** Preserve only project-relative agent-reported edits with finite line counts. */
 export function validateCommentMessage(value: unknown): UiCommentMessage {
   if (!value || typeof value !== 'object') throw new Error('Invalid comment reply')
@@ -50,7 +75,7 @@ export function validateCommentMessage(value: unknown): UiCommentMessage {
           return { file: change.file, added: change.added, removed: change.removed }
         })
       : (() => { throw new Error('Invalid comment changes') })()
-  return { author: input.author, body: text(input.body, 8192, 'reply'), at: input.at, agentId: input.agentId === undefined ? undefined : text(input.agentId, 128, 'agent'), changes }
+  return { author: input.author, body: text(input.body, 8192, 'reply'), at: input.at, agentId: input.agentId === undefined ? undefined : text(input.agentId, 128, 'agent'), changes, ...(input.failed === true && input.author === 'agent' ? { failed: true } : {}), ...(input.author === 'agent' && input.steps !== undefined ? { steps: validateCommentSteps(input.steps) } : {}) }
 }
 
 /** Corrupt persisted data is reported without overwriting the original bytes. */

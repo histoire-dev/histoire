@@ -1,6 +1,7 @@
 export { GenericControls } from './components/controls/GenericControls.js'
 export { StatePresets } from './components/controls/StatePresets.js'
 export { HistoireDocs } from './components/docs/HistoireDocs.js'
+export { sanitizeDocsHtml } from './components/docs/sanitize.js'
 export { HistoireEvents } from './components/events/HistoireEvents.js'
 export { ExplorerNavigation } from './components/explorer/ExplorerNavigation.js'
 export { ExplorerPanels } from './components/explorer/ExplorerPanels.js'

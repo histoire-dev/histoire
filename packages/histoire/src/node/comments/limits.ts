@@ -6,3 +6,5 @@ export const COMMENT_BYTE_LIMIT = 48 * 1024
 export const COMMENT_FILE_BYTE_LIMIT = 2 * 1024 * 1024
 /** Admission reserves this encoded-byte budget for one visibly bounded final reply. */
 export const COMMENT_AGENT_REPLY_BYTES = 24 * 1024
+/** Maximum persisted agent steps per message. */
+export const COMMENT_STEP_LIMIT = 64

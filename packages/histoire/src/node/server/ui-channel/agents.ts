@@ -19,7 +19,7 @@ export function registerAgentsChannel(ctx: Context, channel: UiChannelServer, se
   }
   channel.addCleanup(manager.onUpdate((event) => {
     if (!active) return
-    const events = { 'snapshot': 'agents-snapshot', 'permission': 'agent-permission', 'permission-resolved': 'agent-permission-resolved', 'reply': 'agent-reply' }
+    const events = { 'snapshot': 'agents-snapshot', 'permission': 'agent-permission', 'permission-resolved': 'agent-permission-resolved', 'reply': 'agent-reply', 'activity': 'agent-activity' }
     channel.send(`histoire:ui:${events[event.type]}`, event.value)
   }))
   channel.onReady((client) => {

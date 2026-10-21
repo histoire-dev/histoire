@@ -93,6 +93,11 @@ export function createAgentRegistry(options: {
       if (!launch) throw new Error('Unavailable on this platform')
       return launch
     },
+    /** Validated HTTPS logo URL of a registry entry, if any. */
+    async iconUrl(id: string): Promise<string | undefined> {
+      await load()
+      return entries.find(entry => entry.id === id)?.icon
+    },
     cacheDir,
   }
 }

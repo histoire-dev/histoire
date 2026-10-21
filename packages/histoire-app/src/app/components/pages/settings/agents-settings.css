@@ -2,8 +2,6 @@
 .histoire-provider .histoire-agent-row:last-of-type { border-bottom: 0; }
 .histoire-provider .histoire-agent-heading { display: flex; align-items: center; gap: 13px; padding: 17px 20px; }
 .histoire-provider .histoire-agent-icon { width: 32px; height: 32px; flex-shrink: 0; display: grid; place-items: center; color: var(--histoire-muted, #71717a); background: var(--histoire-chip, #f4f4f5); border-radius: 10px; }
-.histoire-provider .histoire-agent-icon img { object-fit: contain; filter: grayscale(1) brightness(0); }
-.histoire-provider[data-histoire-appearance="dark"] .histoire-agent-icon img { filter: grayscale(1) brightness(0) invert(.9); }
 .histoire-provider .histoire-agent-identity { min-width: 0; flex: 1; display: flex; align-items: center; flex-wrap: wrap; gap: 7px; }
 .histoire-provider .histoire-agent-identity code { flex: 1 0 100%; min-width: 0; color: var(--histoire-muted, #71717a); font: 11px var(--histoire-font-mono, monospace); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .histoire-provider .histoire-agent-default { padding: 2px 6px; border-radius: 6px; background: var(--histoire-subtle, #f4f4f5); color: var(--histoire-muted, #71717a); font-size: 10px; font-weight: 600; text-transform: uppercase; }

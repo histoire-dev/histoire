@@ -1,0 +1,46 @@
+<script setup lang="ts">
+import type { UiAgentStep } from '@histoire/shared'
+import { HstPulsatingDisc } from '@histoire/controls/vue'
+import { computed, onBeforeUnmount, ref } from 'vue'
+import { isStepRunning } from './activity-phases.js'
+
+const props = defineProps<{
+  /** Live steps of the working reply. */
+  steps: readonly UiAgentStep[]
+  /** Partial reply text received so far. */
+  text: string
+  /** Client time the live output started. */
+  startedAt?: number
+  /** Agent request is queued behind another one. */
+  queued?: boolean
+}>()
+/** Ticks every second while mounted for the elapsed label. */
+const now = ref(Date.now())
+const timer = setInterval(() => now.value = Date.now(), 1000)
+onBeforeUnmount(() => clearInterval(timer))
+/** What the agent is doing right now. */
+const label = computed(() => {
+  if (props.queued) return 'Queued'
+  const running = props.steps.findLast(isStepRunning)
+  if (running) return running.kind === 'think' ? 'Thinking' : running.title
+  return props.text ? 'Writing response' : 'Thinking'
+})
+/** "12s" / "1m 05s" elapsed since the live output started. */
+const elapsed = computed(() => {
+  if (!props.startedAt) return ''
+  const seconds = Math.max(0, Math.floor((now.value - props.startedAt) / 1000))
+  return seconds < 60 ? `${seconds}s` : `${Math.floor(seconds / 60)}m ${String(seconds % 60).padStart(2, '0')}s`
+})
+</script>
+
+<template>
+  <p class="agent-live-tail" role="status">
+    <HstPulsatingDisc :size="12" /><span class="label">{{ label }}</span><time v-if="elapsed">{{ elapsed }}</time>
+  </p>
+</template>
+
+<style scoped>
+.agent-live-tail { display: flex; align-items: center; gap: 6px; min-width: 0; margin: 4px 0 0; color: var(--histoire-agent-text); font-size: 11px; }
+.label { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+time { flex: none; color: var(--histoire-muted); }
+</style>

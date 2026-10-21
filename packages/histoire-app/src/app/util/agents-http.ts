@@ -1,5 +1,13 @@
 import type { UiAgentConfigOptions, UiAgentRegistry } from '@histoire/shared'
 
+/**
+ * Same-origin URL of a registry agent's logo, proxied by the dev server.
+ * @param registryId ACP registry identity.
+ */
+export function agentIconUrl(registryId: string): string {
+  return `${import.meta.env.BASE_URL.replace(/\/$/, '')}/__histoire/agents/icon/${encodeURIComponent(registryId)}`
+}
+
 /** Safe catalog requests use HTTP so full registry never consumes socket budget. */
 export function createAgentHttpTransport() {
   const prefix = `${import.meta.env.BASE_URL.replace(/\/$/, '')}/__histoire/agents/`

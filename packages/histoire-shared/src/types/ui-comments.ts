@@ -1,3 +1,5 @@
+import type { UiAgentStep } from './ui-agents.js'
+
 /** One user-created canvas annotation persisted only in development. */
 export interface UiComment {
   /** Opaque UUID; never a file path. */
@@ -38,6 +40,10 @@ export interface UiCommentMessage {
   at: string
   /** Project-relative changes reported by the agent. */
   changes?: { file: string, added: number, removed: number }[]
+  /** Server-written notice that the agent request failed; thread stays unsent. */
+  failed?: boolean
+  /** Agent tool calls and thinking spans performed for this reply, in order. */
+  steps?: UiAgentStep[]
 }
 
 /** Writable draft fields; server owns lifecycle, timestamps and agent replies. */
@@ -79,6 +85,8 @@ export interface UiCommentAgent {
   default?: boolean
   /** Require an explicit destination for each new send. */
   askEachTime?: boolean
+  /** Same-origin monochrome registry logo URL, when the preset comes from the ACP registry. */
+  icon?: string
 }
 
 declare module './ui-channel.js' {

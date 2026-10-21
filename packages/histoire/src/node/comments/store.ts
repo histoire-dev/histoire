@@ -1,4 +1,4 @@
-import type { UiComment, UiCommentDraft } from '@histoire/shared'
+import type { UiAgentStep, UiComment, UiCommentDraft } from '@histoire/shared'
 import { boundedCommentAgentReply, CommentCapacityError, CommentReplyStorageError, reserveCommentFileReplyCapacity } from './capacity.js'
 import { commentsFileBytes, commentsFileIdentity, readCommentsFile, withCommentsFileLock, writeCommentsFile } from './file.js'
 import { COMMENT_FILE_BYTE_LIMIT } from './limits.js'
@@ -10,10 +10,22 @@ export interface CommentAgentReply {
   text: string
   /** Agent-reported project edits. */
   changes?: { file: string, added: number, removed: number }[]
+  /** Agent tool calls and thinking spans, settled. */
+  steps?: UiAgentStep[]
 }
 
 /** Comment dispatcher starts one independent agent session for each comment. */
 export type CommentAgentRunner = (comment: UiComment, working: () => Promise<void>) => Promise<CommentAgentReply>
+
+/**
+ * Status of a comment no agent is working on: `replied` when the latest message is a
+ * successful agent answer, otherwise `draft` (unsent user reply, failure, or no reply yet).
+ * @param comment Persisted comment.
+ */
+export function idleStatus(comment: UiComment): 'draft' | 'replied' {
+  const last = comment.thread.at(-1)
+  return last?.author === 'agent' && !last.failed ? 'replied' : 'draft'
+}
 
 /** Stores for the same project file share pending ownership, including resolved conversations. */
 const deliveries = new Map<string, Set<string>>()
@@ -96,8 +108,10 @@ export function createCommentsStore(options: {
       await withCommentsFileLock(options.root, options.file, async (fileKey) => {
         const comments = await list()
         if (closed) return
-        if (!comments.some(comment => comment.status === 'sent' || comment.status === 'working')) return
-        const recovered = comments.map(comment => ['sent', 'working'].includes(comment.status) ? { ...comment, status: 'draft' as const, updatedAt: new Date().toISOString() } : comment)
+        // Interrupted work and older reopened threads (saved as `draft` after an agent reply) get their idle status.
+        const stale = (comment: UiComment) => ['sent', 'working'].includes(comment.status) || (comment.status === 'draft' && idleStatus(comment) === 'replied')
+        if (!comments.some(stale)) return
+        const recovered = comments.map(comment => stale(comment) ? { ...comment, status: idleStatus(comment), updatedAt: new Date().toISOString() } : comment)
         assertReservedFileCapacity(recovered, fileKey)
         await writeCommentsFile(options.root, options.file, recovered)
         if (!closed) options.changed?.(recovered)
@@ -124,7 +138,7 @@ export function createCommentsStore(options: {
     },
     /** Resolve/reopen preserves history and never restarts agent work. */
     resolve(id: string, resolved: boolean): Promise<void> {
-      return change(id, comment => ({ ...comment, status: resolved ? 'resolved' : 'draft' }))
+      return change(id, comment => ({ ...comment, status: resolved ? 'resolved' : idleStatus(comment) }))
     },
     /** Replies enter the same independent comment conversation on its next send. */
     reply(id: string, body: string): Promise<void> {
@@ -167,7 +181,7 @@ export function createCommentsStore(options: {
           }
           catch {
             try {
-              await change(id, value => ({ ...value, status: value.status === 'resolved' ? 'resolved' : 'draft', thread: [...value.thread, { author: 'agent', agentId, body: 'Agent request failed. Retry after checking the agent.', at: new Date().toISOString() }] }), { replacing: id, committed: currentFileKey => releaseReplyReservation(currentFileKey, id) })
+              await change(id, value => ({ ...value, status: value.status === 'resolved' ? 'resolved' : 'draft', thread: [...value.thread, { author: 'agent', agentId, body: 'Agent request failed. Retry after checking the agent.', at: new Date().toISOString(), failed: true }] }), { replacing: id, committed: currentFileKey => releaseReplyReservation(currentFileKey, id) })
             }
             catch {
               // Lifecycle recovery never requires a second available message slot.

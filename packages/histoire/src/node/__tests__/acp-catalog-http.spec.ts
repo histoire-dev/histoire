@@ -58,4 +58,46 @@ describe('dev catalog HTTP boundary', () => {
       await vite.close()
     }
   })
+
+  it('serves cached registry SVG logos same-origin and refuses unusable ones', async () => {
+    const fetched: string[] = []
+    const { root: cacheRoot } = await configTestProject()
+    const svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path d="M0 0h16v16z"/></svg>'
+    const { root, manager } = await fakeManager('icons', true, undefined, { registry: { cacheDir: join(cacheRoot, 'registry'), fetch: async (input) => {
+      const url = String(input)
+      fetched.push(url)
+      if (url.endsWith('registry.json')) {
+        return new Response(JSON.stringify({ agents: [
+          { id: 'good', name: 'Good', icon: 'https://cdn.test/good.svg' },
+          { id: 'html', name: 'Html', icon: 'https://cdn.test/html.svg' },
+          { id: 'none', name: 'None' },
+        ].map(entry => ({ ...entry, distribution: { npx: { package: 'agent@1' } } })) }))
+      }
+      return new Response(url.endsWith('good.svg') ? svg : '<html><script>alert(1)</script></html>')
+    } } })
+    const vite = await createServer({ root, configFile: false, server: { middlewareMode: true }, logLevel: 'silent', plugins: [{ name: 'icon-http', configureServer: installUiHttpRouter }] })
+    const http = createHttpServer(vite.middlewares)
+    const cleanup = registerAgentsCatalog({ mode: 'dev' } as Context, vite, manager, () => true)
+    try {
+      await new Promise<void>((resolve) => {
+        http.listen(0, '127.0.0.1', resolve)
+      })
+      const origin = `http://127.0.0.1:${(http.address() as { port: number }).port}`
+      const good = await fetch(`${origin}/__histoire/agents/icon/good`)
+      expect(good.headers.get('content-type')).toBe('image/svg+xml')
+      expect(good.headers.get('content-security-policy')).toContain('default-src \'none\'')
+      expect(await good.text()).toBe(svg)
+      await fetch(`${origin}/__histoire/agents/icon/good`)
+      expect(fetched.filter(url => url.endsWith('good.svg'))).toHaveLength(1)
+      for (const id of ['html', 'none', 'unknown', '..%2Fx', '%E0%A4%A']) expect((await fetch(`${origin}/__histoire/agents/icon/${id}`)).status).toBe(404)
+    }
+    finally {
+      cleanup()
+      await new Promise<void>((resolve) => {
+        http.close(() => resolve())
+        http.closeAllConnections()
+      })
+      await vite.close()
+    }
+  })
 })

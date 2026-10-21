@@ -195,9 +195,8 @@ describe('simplified agent settings', () => {
       await wrapper.get('[aria-label="Search agents"]').setValue('Other')
       expect(wrapper.findAll('article').map(row => row.attributes('aria-label'))).toEqual(['Other Agent'])
       const row = wrapper.get('article[aria-label="Other Agent"]')
-      expect(row.get('img').attributes('src')).toBe('https://cdn.agentclientprotocol.com/registry/v1/latest/other.svg')
-      await row.get('img').trigger('error')
-      expect(row.find('img').exists()).toBe(false)
+      // Registry logos are proxied same-origin; the browser never loads the CDN URL.
+      expect(row.html()).not.toContain('cdn.agentclientprotocol.com')
       const toggle = wrapper.get('[aria-label="Enable Other Agent"]')
       await toggle.setValue(true)
       await expect.poll(() => agents.state.value.enabledIds).toEqual(['fake', 'other'])

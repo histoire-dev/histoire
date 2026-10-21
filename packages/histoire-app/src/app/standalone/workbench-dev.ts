@@ -12,6 +12,7 @@ import { useHistoireResource } from '@histoire/vue/internal'
 import { computed, nextTick, ref, shallowRef, watch } from 'vue'
 import { provideAgentsStore } from '../stores/agents.js'
 import { createWorkbenchComments, provideWorkbenchComments } from '../stores/comments.js'
+import { agentIconUrl } from '../util/agents-http.js'
 import { createDevAgentsStore } from '../util/agents-transport.js'
 import { isUiChannelAvailable } from '../util/ui-channel.js'
 
@@ -50,13 +51,17 @@ export function createWorkbenchDevControls(options: WorkbenchDevOptions, comment
   let sourceOwner = JSON.stringify(options.session.getSnapshot().source)
   const commentAgents = computed<UiCommentAgent[]>(() => {
     const snapshot = agents.state.value
-    return snapshot.agents.map(agent => ({
-      id: agent.id,
-      name: agent.name,
-      state: snapshot.enabled && agent.enabled ? agent.state : 'disabled',
-      default: Boolean(snapshot.presets.find(preset => preset.id === agent.id)?.default),
-      askEachTime: snapshot.context.askEachTime,
-    }))
+    return snapshot.agents.map((agent) => {
+      const preset = snapshot.presets.find(preset => preset.id === agent.id)
+      return {
+        id: agent.id,
+        name: agent.name,
+        state: snapshot.enabled && agent.enabled ? agent.state : 'disabled',
+        default: Boolean(preset?.default),
+        askEachTime: snapshot.context.askEachTime,
+        ...(preset?.registryId ? { icon: agentIconUrl(preset.registryId) } : {}),
+      }
+    })
   })
   const stopCanvas = watch(options.canvas, (value) => {
     if (!value) commentMode.value = false

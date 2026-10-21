@@ -4,6 +4,7 @@ import type { AgentRecord } from './record.js'
 import type { AcpPromptRequest, AcpPromptResult } from './types.js'
 import { methods } from '@agentclientprotocol/sdk'
 import path from 'pathe'
+import { createAgentActivity } from './activity.js'
 import { withAgentTimeout } from './agent-runtime.js'
 import { createAgentFileChanges } from './file-changes.js'
 import { buildPromptContext, safeMcpEndpoint } from './prompt-context.js'
@@ -69,7 +70,7 @@ export async function promptAgent(record: AgentRecord, request: AcpPromptRequest
       }
     }
     if (!options.isOwned()) throw new Error('Agent runtime closed')
-    record.active = { request, sessionId, text: '', output: createAgentOutputFilter(options.environment), changes: createAgentFileChanges(options.root, options.sanitize) }
+    record.active = { request, sessionId, text: '', output: createAgentOutputFilter(options.environment), changes: createAgentFileChanges(options.root, options.sanitize), activity: createAgentActivity(options.root, options.sanitize) }
     record.status.state = 'connected'
     options.changed()
     try {
@@ -81,7 +82,8 @@ export async function promptAgent(record: AgentRecord, request: AcpPromptRequest
       record.active.text += tail
       if (tail) options.reply(tail)
       const changes = record.active.changes.snapshot()
-      return { text: record.active.text, ...changes.length ? { changes } : {} }
+      const steps = record.active.activity.finish()
+      return { text: record.active.text, ...changes.length ? { changes } : {}, ...steps.length ? { steps } : {} }
     }
     catch (error) { throw new Error(await runtime.failureMessage() ?? options.sanitize(error instanceof Error ? error.message : String(error))) }
     finally {

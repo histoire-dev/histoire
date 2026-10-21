@@ -47,11 +47,11 @@ function onKeydown(event: KeyboardEvent): void {
 </template>
 
 <style scoped>
-.comment-row { display: flex; align-items: flex-start; gap: 10px; width: 100%; padding: var(--histoire-comment-row-padding, 12px) 8px; color: var(--histoire-text); text-align: left; }
+.comment-row { display: flex; align-items: flex-start; justify-content: flex-start; gap: 10px; width: 100%; padding: var(--histoire-comment-row-padding, 12px); color: var(--histoire-text); text-align: left; }
 .comment-row:hover { background: var(--histoire-chip); }.comment-row.active { background: var(--histoire-agent-soft); }
 .row-pin { display: grid; place-items: center; flex: none; width: 23px; height: 25px; border-radius: 50% 50% 50% 4px; background: var(--histoire-agent); color: #fff; font-size: 10px; font-weight: 700; }
 .row-pin.draft { background: var(--histoire-muted); }
-.row-content { display: grid; gap: 5px; min-width: 0; }
+.row-content { display: grid; flex: 1; gap: 5px; min-width: 0; }
 .row-title { display: flex; flex-wrap: wrap; gap: 7px; align-items: baseline; font-size: 12px; }time { color: var(--histoire-muted); font-size: 11px; }
 .row-body { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; color: var(--histoire-body); font-size: 12px; line-height: 1.55; overflow-wrap: anywhere; }
 .row-status { display: flex; align-items: center; gap: 5px; color: var(--histoire-agent-text); font-size: 11px; font-weight: 700; }.row-status.neutral { color: var(--histoire-muted); }.row-status svg { width: 13px; height: 13px; }

@@ -4,6 +4,7 @@ import { BuiltinIcon, getControlElement, HstButton, HstPulsatingDisc, HstSelect,
 import { onMounted, onUnmounted, ref, watch } from 'vue'
 import { createShortcutRegistry, useShortcutRegistry } from '../../util/shortcuts.js'
 
+import AgentLogo from '../agents/AgentLogo.vue'
 import CommentContext from './CommentContext.vue'
 import { useCommentDestination } from './destination.js'
 
@@ -73,7 +74,7 @@ function send() {
         Save draft
       </HstButton>
       <template v-if="usable.length">
-        <label class="agent-picker"><BuiltinIcon icon="bot" :size="16" /><HstSelect layout="inline" :model-value="agentId" aria-label="Comment agent" placeholder="Choose agent" :options="usable.map(agent => ({ value: agent.id, label: agent.name }))" @update:model-value="choose" /></label>
+        <label class="agent-picker"><AgentLogo :icon="usable.find(agent => agent.id === agentId)?.icon" :size="16" /><HstSelect layout="inline" :model-value="agentId" aria-label="Comment agent" placeholder="Choose agent" :options="usable.map(agent => ({ value: agent.id, label: agent.name }))" @update:model-value="choose" /></label>
         <HstButton color="primary" type="submit" class="send-button" :disabled="!body.trim() || !agentId || capturing">
           <BuiltinIcon icon="send-alt-filled" :size="16" />Send
         </HstButton>
@@ -99,7 +100,7 @@ button { display: inline-flex; align-items: center; justify-content: center; gap
 .icon-button { color: var(--histoire-muted); }
 .save-draft { margin-right: auto; color: var(--histoire-muted); }
 .agent-picker { display: flex; align-items: center; gap: 6px;  }
-.agent-picker svg { color: var(--histoire-agent); }
+.agent-picker > :first-child { color: var(--histoire-agent); }
 .histoire-select { max-width: 150px; }
 .send-button { --histoire-control-accent: var(--histoire-agent); padding: 8px 10px; font-weight: 700; }
 </style>

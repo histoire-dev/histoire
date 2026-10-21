@@ -1,4 +1,4 @@
-import type { HistoireUiConfig, UiAgentPermission, UiAgentReply, UiAgentSettings, UiAgentsSnapshot } from '@histoire/shared'
+import type { HistoireUiConfig, UiAgentActivity, UiAgentPermission, UiAgentReply, UiAgentSettings, UiAgentsSnapshot, UiAgentStep } from '@histoire/shared'
 import type { createAgentRegistry } from './registry.js'
 
 /** Information attached to one comment prompt; paths stay project relative. */
@@ -47,6 +47,8 @@ export interface AcpPromptResult {
   text: string
   /** Agent-reported file diffs, when supplied. */
   changes?: AcpFileChange[]
+  /** Settled tool calls and thinking spans, when any. */
+  steps?: UiAgentStep[]
 }
 
 /** Manager notifications, restricted to safe public DTOs. */
@@ -55,6 +57,7 @@ export type AcpUpdate =
   | { type: 'permission', value: UiAgentPermission }
   | { type: 'permission-resolved', value: { requestId: string } }
   | { type: 'reply', value: UiAgentReply }
+  | { type: 'activity', value: UiAgentActivity }
 
 /** Construction dependencies owned by one active Histoire context. */
 export interface AcpManagerOptions {

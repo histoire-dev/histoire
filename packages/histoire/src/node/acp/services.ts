@@ -2,12 +2,14 @@ import type { UiAgentSettings } from '@histoire/shared'
 import type { AcpManagerOptions } from './types.js'
 import { createAgentBinaryCache } from './binary-cache.js'
 import { createAgentDiscovery } from './discovery.js'
+import { createAgentRegistryIcons } from './registry-icons.js'
 import { createAgentRegistry } from './registry.js'
 
 /** Manager-scoped registry preparation and discovery retain independent process ownership. */
 export function createAgentServices(options: AcpManagerOptions, sanitize: (text: string) => string) {
   const registry = createAgentRegistry(options.registry)
   const binaries = createAgentBinaryCache(registry.cacheDir)
+  const icons = createAgentRegistryIcons({ cacheDir: registry.cacheDir, fetch: options.registry?.fetch, iconUrl: registry.iconUrl })
   const discovery = createAgentDiscovery({ root: options.root, timeout: options.handshakeTimeoutMs ?? 10_000, sanitize })
   let controller = new AbortController()
   /** Resolve managed distribution without exposing archive URLs to browser. */
@@ -28,6 +30,8 @@ export function createAgentServices(options: AcpManagerOptions, sanitize: (text:
       return result
     },
     prepare,
+    /** Same-origin SVG logo of a registry agent. */
+    icon: icons.get,
     /** Coalesced probes use exact configured command/environment/model identity. */
     discover: (preset: UiAgentSettings['presets'][number], environment: Record<string, string>, force = false) => discovery.discover(preset, environment, () => prepare(preset, environment), force),
     /** Abort preparing launches synchronously before preferences enter control lane. */

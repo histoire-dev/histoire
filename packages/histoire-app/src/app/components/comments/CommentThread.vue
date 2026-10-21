@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import type { UiComment, UiCommentAgent } from '@histoire/shared'
-import { BuiltinIcon, HstButton, HstPulsatingDisc, HstText } from '@histoire/controls/vue'
+import { BuiltinIcon, HstButton, HstText } from '@histoire/controls/vue'
 import { computed, ref } from 'vue'
 import { useWorkbenchComments } from '../../stores/comments.js'
 
 import CommentContext from './CommentContext.vue'
-import { commentAge } from './presentation.js'
+import AgentLiveTail from './thread/AgentLiveTail.vue'
+import ThreadMessage from './thread/ThreadMessage.vue'
 
 const props = defineProps<{
   /** Persisted conversation with server-owned statuses. */
@@ -34,11 +35,13 @@ const reply = computed({
   set: (body: string) => { replies.value = { ...replies.value, [props.comment.id]: body } },
 })
 const model = useWorkbenchComments()
-const streamed = computed(() => model?.streaming.value[props.comment.id]?.text ?? '')
+/** Live output of the working agent, if any. */
+const live = computed(() => model?.streaming.value[props.comment.id])
 const busy = computed(() => ['sent', 'working'].includes(props.comment.status))
-/** Actual agent IDs map to configured display names without inventing provider labels. */
-function agentName(id?: string): string {
-  return props.agents.find(agent => agent.id === id)?.name ?? id ?? 'Agent'
+/** Configured display metadata for an agent id, without inventing provider labels. */
+function agent(id?: string): { name: string, icon?: string } {
+  const found = props.agents.find(agent => agent.id === id)
+  return { name: found?.name ?? id ?? 'Agent', icon: found?.icon }
 }
 /** Each message belongs to exact saved thread; form submission cannot duplicate work. */
 function submit() {
@@ -51,25 +54,24 @@ function submit() {
 
 <template>
   <section class="comment-thread" aria-label="Comment conversation" @keydown.escape.stop.prevent="emit('close')">
-    <CommentContext :title="title" :comment="comment" />
+    <CommentContext :title="title" :comment="comment" minimizable @minimize="emit('close')" />
     <div class="thread-messages">
-      <article class="thread-message">
-        <span class="avatar"><BuiltinIcon icon="user-avatar" :size="16" /></span>
-        <div><header><strong>You</strong><time :datetime="comment.createdAt" :title="comment.createdAt">{{ commentAge(comment.createdAt) }}</time></header><p>{{ comment.body }}</p></div>
-      </article>
-      <article v-for="(message, index) in comment.thread" :key="index" class="thread-message" :class="{ 'agent-message': message.author === 'agent' }">
-        <span class="avatar"><BuiltinIcon :icon="message.author === 'agent' ? 'bot' : 'user-avatar'" :size="16" /></span>
-        <div>
-          <header><strong>{{ message.author === 'agent' ? agentName(message.agentId) : 'You' }}</strong><time :datetime="message.at" :title="message.at">{{ commentAge(message.at) }}</time></header><p>{{ message.body }}</p>
-          <code v-for="change in message.changes" :key="change.file" class="file-change"><BuiltinIcon icon="code" :size="16" />{{ change.file }} <span class="added">+{{ change.added }}</span><span class="removed">-{{ change.removed }}</span></code>
-        </div>
-      </article>
-      <article v-if="busy && streamed" class="thread-message agent-message" aria-live="polite">
-        <span class="avatar"><BuiltinIcon icon="bot" :size="16" /></span><div><header><strong>{{ agentName(comment.agentId) }}</strong></header><p>{{ streamed }}</p></div>
-      </article>
-      <p v-if="busy" class="agent-working" role="status">
-        <HstPulsatingDisc />{{ agentName(comment.agentId) }} is working…
-      </p>
+      <ThreadMessage author="user" name="You" :at="comment.createdAt" :body="comment.body" />
+      <ThreadMessage
+        v-for="(message, index) in comment.thread"
+        :key="index"
+        :author="message.author"
+        :name="message.author === 'agent' ? agent(message.agentId).name : 'You'"
+        :icon="message.author === 'agent' ? agent(message.agentId).icon : undefined"
+        :at="message.at"
+        :body="message.body"
+        :steps="message.steps"
+        :changes="message.changes"
+        :failed="message.failed"
+      />
+      <ThreadMessage v-if="busy" author="agent" :name="agent(comment.agentId).name" :icon="agent(comment.agentId).icon" :body="live?.text ?? ''" :steps="live?.steps" streaming aria-live="polite">
+        <AgentLiveTail :steps="live?.steps ?? []" :text="live?.text ?? ''" :started-at="live?.startedAt" :queued="comment.status === 'sent'" />
+      </ThreadMessage>
     </div>
     <form class="thread-actions" @submit.prevent="submit">
       <HstText v-model="reply" layout="inline" aria-label="Reply to comment" placeholder="Reply…" maxlength="8192" :disabled="disabled || busy" />
@@ -89,18 +91,6 @@ function submit() {
 <style scoped>
 .comment-thread { width: 360px; max-width: calc(100vw - 24px); border-radius: var(--histoire-radius-panel); background: var(--histoire-surface); color: var(--histoire-text); box-shadow: var(--histoire-shadow-panel); overflow: hidden; }
 .thread-messages { max-height: min(50vh, 400px); overflow: auto; padding: 16px 14px; }
-.thread-message { display: flex; gap: 10px; margin: 0 0 18px; }
-.thread-message:last-child { margin-bottom: 0; }
-.thread-message > div { min-width: 0; flex: 1; }
-.avatar { display: grid; place-items: center; flex: none; width: 28px; height: 28px; border-radius: 50%; background: var(--histoire-chip); color: var(--histoire-muted); }
-.agent-message .avatar { background: var(--histoire-agent-soft); color: var(--histoire-agent-text); }
-.thread-message header { display: flex; flex-wrap: wrap; align-items: baseline; gap: 7px; margin-bottom: 4px; }
-.thread-message strong { font-size: 12px; }
-time { color: var(--histoire-muted); font-size: 11px; }
-p { margin: 0; font-size: 12px; line-height: 1.6; color: var(--histoire-body); white-space: pre-wrap; overflow-wrap: anywhere; }
-.file-change { display: flex; align-items: center; flex-wrap: wrap; gap: 5px; width: fit-content; margin-top: 6px; padding: 5px 7px; border-radius: 6px; background: var(--histoire-chip); font-size: 10px; overflow-wrap: anywhere; }
-.added { color: var(--histoire-accent-link); }.removed { color: var(--histoire-danger-text); }
-.agent-working { display: flex; gap: 6px; align-items: center; color: var(--histoire-agent-text); }
 .thread-actions { display: flex; gap: 5px; padding: 10px; border-top: 1px solid var(--histoire-border); }
 .histoire-text { flex: 1; min-width: 0; }
 button { display: inline-flex; align-items: center; justify-content: center; gap: 5px; padding: 7px; color: inherit; }

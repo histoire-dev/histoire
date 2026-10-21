@@ -1,5 +1,6 @@
 import type { NewSessionResponse } from '@agentclientprotocol/sdk'
 import type { UiAgentStatus } from '@histoire/shared'
+import type { createAgentActivity } from './activity.js'
 import type { createAgentRuntime } from './agent-runtime.js'
 import type { createAgentFileChanges } from './file-changes.js'
 import type { AcpPromptRequest } from './types.js'
@@ -31,6 +32,8 @@ export interface AgentRecord {
     output: ReturnType<typeof createAgentOutputFilter>
     /** Tracks completed tool diff summaries. */
     changes: ReturnType<typeof createAgentFileChanges>
+    /** Projects tool calls and thinking spans for the UI. */
+    activity: ReturnType<typeof createAgentActivity>
   }
   /** Reserves adapter ownership before asynchronous session creation. */
   busy?: boolean

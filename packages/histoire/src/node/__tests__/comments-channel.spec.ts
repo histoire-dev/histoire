@@ -34,7 +34,7 @@ describe('comments agent bridge', () => {
   it('reports explicit capacity before dispatch without erasing a full conversation', async () => {
     const project = await createMcpProjectFixture()
     const fixture = uiChannelFixture()
-    const comment = commentFixture({ thread: commentMessages(64, 'Completed', 'agent') })
+    const comment = commentFixture({ status: 'replied', thread: commentMessages(64, 'Completed', 'agent') })
     const prompt = vi.fn<CommentsAgentBridge['prompt']>(async () => ({ text: 'Completed' }))
     const ctx = { mode: 'dev', root: project.root, config: { comments: { enabled: true }, agents: { presets: [] } }, storyFiles: [{ relativePath: 'src/Button.story.vue', story: commentStory }] } as unknown as Context
     await writeCommentsFile(project.root, '.histoire/comments.json', [comment])

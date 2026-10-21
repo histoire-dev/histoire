@@ -2,7 +2,7 @@ import type { UiComment, UiCommentMessage } from '@histoire/shared'
 import type { CommentAgentReply } from './store.js'
 import { Buffer } from 'node:buffer'
 import { commentsFileBytes } from './file.js'
-import { COMMENT_AGENT_REPLY_BYTES, COMMENT_BYTE_LIMIT, COMMENT_FILE_BYTE_LIMIT, COMMENT_MESSAGE_LIMIT } from './limits.js'
+import { COMMENT_AGENT_REPLY_BYTES, COMMENT_BYTE_LIMIT, COMMENT_FILE_BYTE_LIMIT, COMMENT_MESSAGE_LIMIT, COMMENT_STEP_LIMIT } from './limits.js'
 import { validateCommentMessage } from './validate.js'
 
 /** Safe user-facing admission failure; no agent is dispatched for this error. */
@@ -75,6 +75,8 @@ export function boundedCommentAgentReply(result: CommentAgentReply, agentId: str
     }
     catch { omitted++ }
   }
+  // Steps are display-only; keep the most recent ones and shorten titles for persistence.
+  const steps = (result.steps ?? []).slice(-COMMENT_STEP_LIMIT).map(step => ({ ...step, title: step.title.slice(0, 120) }))
   /** JSON escaping and Unicode bytes count toward capacity, not source character count. */
   function message(length: number): UiCommentMessage {
     const prefix = text.slice(0, length).replace(/[\uD800-\uDBFF]$/, '')
@@ -83,7 +85,7 @@ export function boundedCommentAgentReply(result: CommentAgentReply, agentId: str
       ...(omitted ? [`[Omitted ${omitted} reported file changes.]`] : []),
       ...(raw !== text ? ['[Removed unsupported text characters.]'] : []),
     ]
-    return { author: 'agent', agentId, at, body: [prefix, ...notes].join('\n\n'), ...(changes.length ? { changes } : {}) }
+    return { author: 'agent', agentId, at, body: [prefix, ...notes].join('\n\n'), ...(changes.length ? { changes } : {}), ...(steps.length ? { steps } : {}) }
   }
   /** Largest visible text prefix under both validated character and encoded-byte limits. */
   function fit(): UiCommentMessage {
@@ -99,7 +101,8 @@ export function boundedCommentAgentReply(result: CommentAgentReply, agentId: str
     }
     return message(lower)
   }
-  // Prefer complete outcome text over a long list of agent-reported paths.
+  // Prefer complete outcome text over activity history, then over agent-reported paths.
+  while (steps.length && Buffer.byteLength(JSON.stringify(message(Math.min(text.length, 8192)))) > COMMENT_AGENT_REPLY_BYTES) steps.shift()
   while (changes.length && Buffer.byteLength(JSON.stringify(message(Math.min(text.length, 8192)))) > COMMENT_AGENT_REPLY_BYTES) {
     changes.pop()
     omitted++

@@ -1,6 +1,7 @@
 import { symlink } from 'node:fs/promises'
 import { join } from 'node:path'
 import { describe, expect, it, vi } from 'vitest'
+import { boundedCommentAgentReply } from '../comments/capacity.js'
 import { commentsFileBytes, writeCommentsFile } from '../comments/file.js'
 import { COMMENT_AGENT_REPLY_BYTES, COMMENT_FILE_BYTE_LIMIT } from '../comments/limits.js'
 import { createCommentsStore } from '../comments/store.js'
@@ -207,5 +208,16 @@ describe('comment delivery capacity', () => {
       expect(await store.list()).toMatchObject([{ status: 'draft', thread: [...comment.thread, { body: 'External edit' }] }])
     }
     finally { await fixture.close() }
+  })
+
+  it('persists display-only agent steps and drops oldest ones before truncating reply text', () => {
+    const step = (index: number) => ({ id: `t${index}`, kind: 'read' as const, title: `Read file ${index} ${'x'.repeat(200)}`, status: 'completed' as const, target: `src/${index}.ts` })
+    const short = boundedCommentAgentReply({ text: 'Done', steps: [step(0)] }, 'agent')
+    expect(short.steps).toEqual([{ ...step(0), title: step(0).title.slice(0, 120) }])
+    // Multi-byte text leaves room for only part of the steps within the reply byte budget.
+    const long = boundedCommentAgentReply({ text: '€'.repeat(6000), steps: Array.from({ length: 300 }, (_, index) => step(index)) }, 'agent')
+    expect(long.body).toBe('€'.repeat(6000))
+    expect(long.steps!.length).toBeLessThan(64)
+    expect(long.steps!.at(-1)?.id).toBe('t299')
   })
 })

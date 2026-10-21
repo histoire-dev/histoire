@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import type { UiAgentRegistryEntry } from '@histoire/shared'
 import { BuiltinIcon, HstPulsatingDisc, HstSwitch } from '@histoire/controls/vue'
-import { computed, ref, watch } from 'vue'
+import { computed, ref } from 'vue'
 import { useAgentsStore } from '../../../stores/agents.js'
 import { formatAgentCommand } from '../../../util/agent-command.js'
+import { agentIconUrl } from '../../../util/agents-http.js'
+import AgentLogo from '../../agents/AgentLogo.vue'
 import AgentAdvancedSettings from './AgentAdvancedSettings.vue'
 import AgentModelSettings from './AgentModelSettings.vue'
 
@@ -27,11 +29,6 @@ const commandLine = computed(() => preset.value && !preset.value.registryId ? fo
 const showStatus = computed(() => unavailable.value || (status.value && status.value.state !== 'disabled'))
 /** Advanced form errors remain readable after disclosure closes. */
 const advancedError = ref('')
-/** Broken or missing remote logos retain bundled fallback without affecting enablement. */
-const iconFailed = ref(false)
-watch(() => props.registryEntry?.icon, () => {
-  iconFailed.value = false
-})
 /** Human-readable process states. */
 const labels = { 'disabled': 'Disabled', 'starting': 'Starting', 'connected': 'Connected', 'idle': 'Idle', 'error': 'Error', 'not-installed': 'Not installed' }
 
@@ -51,8 +48,7 @@ function toggle(value: boolean): void {
   <article class="histoire-agent-row" :aria-label="name" :data-agent-id="agentId">
     <div class="histoire-agent-heading">
       <span class="histoire-agent-icon">
-        <img v-if="registryEntry?.icon && !iconFailed" :src="registryEntry.icon" alt="" width="20" height="20" loading="lazy" decoding="async" referrerpolicy="no-referrer" @error="iconFailed = true">
-        <BuiltinIcon v-else icon="bot" :size="20" />
+        <AgentLogo :icon="registryEntry?.icon ? agentIconUrl(registryEntry.id) : undefined" :size="20" />
       </span>
       <span class="histoire-agent-identity"><strong>{{ name }}</strong><span v-if="preset?.default" class="histoire-agent-default">Default</span><code v-if="commandLine" :title="commandLine">{{ commandLine }}</code></span>
       <span v-if="showStatus" class="histoire-agent-status" :data-state="status?.state ?? 'disabled'">

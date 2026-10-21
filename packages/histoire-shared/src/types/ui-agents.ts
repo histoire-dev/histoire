@@ -75,3 +75,31 @@ export interface UiAgentReply {
   /** Redacted text delta. */
   text: string
 }
+
+/** One agent tool call or thinking span, projected without arguments or output. */
+export interface UiAgentStep {
+  /** ACP tool call identity (or synthetic id for thinking spans). */
+  id: string
+  /** ACP tool category. */
+  kind: 'read' | 'edit' | 'delete' | 'move' | 'search' | 'execute' | 'think' | 'fetch' | 'other'
+  /** Bounded redacted human-readable title reported by the agent. */
+  title: string
+  /** ACP tool call lifecycle. */
+  status: 'pending' | 'in_progress' | 'completed' | 'failed'
+  /** First project-relative file location, when reported. */
+  target?: string
+  /** Lines added by this step's diffs. */
+  added?: number
+  /** Lines removed by this step's diffs. */
+  removed?: number
+}
+
+/** Streamed agent step upsert, scoped to its own agent thread. */
+export interface UiAgentActivity {
+  /** Agent performing the step. */
+  agentId: string
+  /** Comment/thread identity. */
+  threadId: string
+  /** Full current step state, replacing any previous one with the same id. */
+  step: UiAgentStep
+}

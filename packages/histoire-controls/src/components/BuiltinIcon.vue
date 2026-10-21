@@ -79,5 +79,7 @@ const iconifyName = computed(() => props.icon.includes(':') ? props.icon : `carb
 </template>
 
 <style scoped>
+/* Sized glyphs keep their box inside flex rows with long neighbouring text. */
+svg, img { flex-shrink: 0; }
 img.colorize-black { filter: grayscale(100) brightness(0); }
 </style>

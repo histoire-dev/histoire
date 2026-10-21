@@ -2,9 +2,10 @@ import { mkdtemp, readFile, rm, stat, symlink } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
+import { writeCommentsFile } from '../comments/file.js'
 import { commentAgentContext, commentPrompt } from '../comments/prompt.js'
 import { createCommentsStore } from '../comments/store.js'
-import { commentDraft as draft } from './utils/comments.js'
+import { commentFixture, commentDraft as draft } from './utils/comments.js'
 import { deferred } from './utils/mcp/deferred.js'
 
 describe('persisted canvas comments', () => {
@@ -120,6 +121,29 @@ describe('persisted canvas comments', () => {
       await Promise.all([first, second])
       expect(calls).toBe(1)
       expect(await store.list()).toMatchObject([{ status: 'resolved', thread: [{ body: 'Done' }] }])
+      // Reopening keeps the agent's answer as current status instead of "not sent".
+      await store.resolve(value.id, false)
+      expect(await store.list()).toMatchObject([{ status: 'replied' }])
+      await store.reply(value.id, 'Follow up')
+      await store.resolve(value.id, true)
+      await store.resolve(value.id, false)
+      expect(await store.list()).toMatchObject([{ status: 'draft' }])
+    }
+    finally { await rm(root, { recursive: true, force: true }) }
+  })
+
+  it('recovers interrupted work and stale reopened drafts to their idle status', async () => {
+    const root = await mkdtemp(join(tmpdir(), 'histoire-comments-'))
+    const store = createCommentsStore({ root, file: '.histoire/comments.json', enabled: true })
+    const reply = { author: 'agent' as const, agentId: 'agent', body: 'Done', at: '2026-10-03T10:00:00.000Z' }
+    try {
+      await writeCommentsFile(root, '.histoire/comments.json', [
+        commentFixture({ status: 'working', thread: [reply] }),
+        commentFixture({ status: 'draft', thread: [reply] }),
+        commentFixture({ status: 'draft', thread: [{ ...reply, failed: true }] }),
+      ])
+      await store.recover()
+      expect((await store.list()).map(comment => comment.status).sort()).toEqual(['draft', 'replied', 'replied'])
     }
     finally { await rm(root, { recursive: true, force: true }) }
   })

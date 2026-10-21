@@ -4,6 +4,7 @@ import type { AcpManager } from '../../acp/manager.js'
 import type { Context } from '../../context.js'
 import { z } from 'zod'
 import { isAgentEnvironmentOrigin, readAgentJsonBody } from './agents-env.js'
+import { registerAgentIcons } from './agents-icons.js'
 import { registerUiHttpRoute, uiHttpPath } from './http.js'
 
 /** Catalog HTTP avoids putting unbounded registry/model lists on HMR snapshots. */
@@ -54,6 +55,7 @@ export function registerAgentsCatalog(ctx: Context, server: ViteDevServer, manag
       })
     }, isActive)
   })
+  cleanups.push(registerAgentIcons(ctx, server, manager, isActive))
   return () => {
     for (const cleanup of cleanups) cleanup()
   }

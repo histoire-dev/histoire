@@ -34,6 +34,16 @@ export function countChangedLines(before: string, after: string): { added: numbe
   return { added: newLines.length - common, removed: oldLines.length - common }
 }
 
+/**
+ * Projects an agent-reported path relative to the project root.
+ * @returns `undefined` for the root itself, paths escaping it, or overly long paths.
+ */
+export function projectRelativePath(root: string, file: string): string | undefined {
+  const relative = path.relative(root, path.resolve(root, file))
+  if (!relative || relative.length > 240 || relative === '..' || relative.startsWith('../') || path.isAbsolute(relative)) return undefined
+  return relative
+}
+
 /** Collects completed agent-reported diffs; Histoire does not mutate source files. */
 export function createAgentFileChanges(root: string, sanitize: (text: string) => string) {
   const tools = new Map<string, { status?: string, diffs: Map<string, AcpFileChange> }>()
@@ -47,8 +57,8 @@ export function createAgentFileChanges(root: string, sanitize: (text: string) =>
       if (update.status) tool.status = update.status
       for (const content of update.content ?? []) {
         if (content.type !== 'diff' || content.newText.length > 1_000_000 || (content.oldText?.length ?? 0) > 1_000_000) continue
-        const file = path.relative(root, path.resolve(root, content.path))
-        if (!file || file.length > 240 || file === '..' || file.startsWith('../') || path.isAbsolute(file)) continue
+        const file = projectRelativePath(root, content.path)
+        if (!file) continue
         if (!tool.diffs.has(file) && tool.diffs.size >= 64) continue
         const counts = countChangedLines(content.oldText ?? '', content.newText)
         tool.diffs.set(file, { file: sanitize(file).slice(0, 240), ...counts })

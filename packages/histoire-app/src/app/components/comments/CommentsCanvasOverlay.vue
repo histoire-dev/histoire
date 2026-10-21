@@ -9,6 +9,8 @@ import { useCommentScreenshot } from './capture.js'
 import CommentComposer from './CommentComposer.vue'
 import CommentPin from './CommentPin.vue'
 import CommentThread from './CommentThread.vue'
+import { useDismissOnOutsideClick } from './dismiss-outside.js'
+import { useFrameGeometryTick } from './frame-geometry.js'
 import { useCommentPick } from './pick.js'
 
 const props = defineProps<{
@@ -77,7 +79,11 @@ function resize() {
   viewport.value = { width: window.innerWidth, height: window.innerHeight }
   tick.value++
 }
-watch(() => [canvas.panOffset.x, canvas.panOffset.y, canvas.effectiveZoom, ...[...frames.frames.values()].flatMap(frame => [frame.iframe, frame.documentId])], () => tick.value++, { flush: 'post' })
+useFrameGeometryTick(canvas, frames, tick)
+// Outside clicks minimize threads only; unsaved composer text is never discarded.
+useDismissOnOutsideClick(() => {
+  if (!props.model.draft.value && props.model.activeId.value) props.model.dismiss()
+})
 // Capture once per composer. Screenshot/context updates retain this owner;
 // dismissal and save acknowledgment remove the temporary anchor automatically.
 watch(() => props.model.draft.value?.id, () => {
@@ -99,7 +105,7 @@ onBeforeUnmount(() => {
 <template>
   <Teleport :to="context.overlay.value ?? context.root.value ?? 'body'">
     <div v-for="pin in pins" :key="pin.comment.id" class="canvas-comment-pin" :style="{ left: `${pin.point.x}px`, top: `${pin.point.y}px` }">
-      <CommentPin :number="pin.number" :active="model.activeId.value === pin.comment.id" :draft="pin.comment.status === 'draft'" @select="model.open(pin.comment.id)" />
+      <CommentPin :number="pin.number" :active="model.activeId.value === pin.comment.id" :draft="pin.comment.status === 'draft'" @select="model.toggle(pin.comment.id)" />
     </div>
     <div v-if="draftAnchor" class="canvas-comment-pin" :style="{ left: `${draftAnchor.x}px`, top: `${draftAnchor.y}px` }">
       <CommentPin active temporary />

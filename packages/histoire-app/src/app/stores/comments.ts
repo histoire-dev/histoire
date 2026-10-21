@@ -1,5 +1,5 @@
 import type { HistoireTarget } from '@histoire/protocol'
-import type { UiAgentReply, UiComment, UiCommentDraft, UiCommentsSnapshot } from '@histoire/shared'
+import type { UiAgentActivity, UiAgentReply, UiAgentStep, UiComment, UiCommentDraft, UiCommentsSnapshot } from '@histoire/shared'
 import type { InjectionKey } from 'vue'
 import { computed, inject, provide, ref, shallowRef } from 'vue'
 import { isUiChannelAvailable, onUiDisconnect, onUiEvent, sendUiEvent } from '../util/ui-channel.js'
@@ -14,6 +14,8 @@ export interface CommentsTransport {
   subscribe: (callback: (snapshot: UiCommentsSnapshot) => void) => () => void
   /** Optional streamed deltas; persisted snapshots remain final authority. */
   stream?: (callback: (reply: UiAgentReply) => void) => () => void
+  /** Optional streamed tool call/thinking step upserts. */
+  activity?: (callback: (activity: UiAgentActivity) => void) => () => void
   /** Retire editing authority after disconnect. */
   disconnect: (callback: () => void) => () => void
 }
@@ -28,6 +30,18 @@ export interface CommentComposeContext {
   props?: Record<string, unknown>
   /** Existing generated screenshot path. */
   screenshot?: string
+}
+
+/** Live agent output for a working thread, replaced by the persisted reply. */
+export interface CommentStreaming {
+  /** Agent producing the output. */
+  agentId: string
+  /** Partial reply text. */
+  text: string
+  /** Steps in arrival order, upserted by id. */
+  steps: UiAgentStep[]
+  /** Client time the first live output arrived, for elapsed display. */
+  startedAt: number
 }
 
 /** Extract client-writable fields from a persisted comment for exact save acknowledgment. */
@@ -50,10 +64,11 @@ export function createWorkbenchComments(transport: CommentsTransport = {
   send: sendUiEvent,
   subscribe: callback => onUiEvent('histoire:ui:comments-snapshot', callback),
   stream: callback => onUiEvent('histoire:ui:agent-reply', callback),
+  activity: callback => onUiEvent('histoire:ui:agent-activity', callback),
   disconnect: onUiDisconnect,
 }) {
   const comments = shallowRef<UiComment[]>([])
-  const streaming = shallowRef<Record<string, { agentId: string, text: string }>>({})
+  const streaming = shallowRef<Record<string, CommentStreaming>>({})
   const enabled = ref(false)
   const connected = ref(transport.available)
   let active = true
@@ -106,15 +121,31 @@ export function createWorkbenchComments(transport: CommentsTransport = {
     }
     publication = undefined
   }
+  /** Live entry of a known working thread, from its persisted destination. */
+  function live(threadId: string, agentId: string): CommentStreaming | undefined {
+    if (!active || !connected.value) return undefined
+    const comment = comments.value.find(comment => comment.id === threadId && comment.agentId === agentId && ['sent', 'working'].includes(comment.status))
+    if (!comment) return undefined
+    return streaming.value[comment.id] ?? { agentId, text: '', steps: [], startedAt: Date.now() }
+  }
   /** Stream only a known working thread, from its persisted destination. */
   function receiveReply(reply: UiAgentReply) {
-    if (!active || !connected.value || typeof reply.text !== 'string') return
-    const comment = comments.value.find(comment => comment.id === reply.threadId && comment.agentId === reply.agentId && ['sent', 'working'].includes(comment.status))
-    if (!comment) return
-    streaming.value = { ...streaming.value, [comment.id]: { agentId: reply.agentId, text: `${streaming.value[comment.id]?.text ?? ''}${reply.text}`.slice(0, 8192) } }
+    if (typeof reply.text !== 'string') return
+    const entry = live(reply.threadId, reply.agentId)
+    if (entry) streaming.value = { ...streaming.value, [reply.threadId]: { ...entry, text: `${entry.text}${reply.text}`.slice(0, 8192) } }
+  }
+  /** Upsert one step of a known working thread. */
+  function receiveActivity(activity: UiAgentActivity) {
+    if (typeof activity.step?.id !== 'string') return
+    const entry = live(activity.threadId, activity.agentId)
+    if (!entry) return
+    const index = entry.steps.findIndex(step => step.id === activity.step.id)
+    const steps = index === -1 ? [...entry.steps, activity.step].slice(-200) : entry.steps.map((step, position) => position === index ? activity.step : step)
+    streaming.value = { ...streaming.value, [activity.threadId]: { ...entry, steps } }
   }
   const off = transport.available ? transport.subscribe(receive) : () => {}
   const offStream = transport.available ? transport.stream?.(receiveReply) ?? (() => {}) : () => {}
+  const offActivity = transport.available ? transport.activity?.(receiveActivity) ?? (() => {}) : () => {}
   const disconnect = transport.available
     ? transport.disconnect(() => {
         connected.value = false
@@ -174,8 +205,12 @@ export function createWorkbenchComments(transport: CommentsTransport = {
     },
     /** Ordered server dispatcher preserves separate comment conversations. */
     send(ids: string[], agentId: string): boolean { return send('histoire:ui:comment-send', { ids, agentId }) },
-    /** Resolve hides pin while retaining full persisted conversation. */
-    resolve(id: string, resolved: boolean): boolean { return send('histoire:ui:comment-resolve', { id, resolved }) },
+    /** Resolve hides pin and closes its card while retaining full persisted conversation. */
+    resolve(id: string, resolved: boolean): boolean {
+      const accepted = send('histoire:ui:comment-resolve', { id, resolved })
+      if (accepted && resolved && activeId.value === id) activeId.value = null
+      return accepted
+    },
     /** User reply is stored before continuing its configured conversation. */
     reply(id: string, body: string): boolean { return send('histoire:ui:comment-reply', { id, body }) },
     /** Delete only the requested thread. */
@@ -184,6 +219,11 @@ export function createWorkbenchComments(transport: CommentsTransport = {
     open(id: string): void {
       draft.value = null
       activeId.value = id
+    },
+    /** Pin click opens its thread, or minimizes it back to the pin when already open. */
+    toggle(id: string): void {
+      draft.value = null
+      activeId.value = activeId.value === id ? null : id
     },
     /** Dismiss floating UI without changing persisted annotations or accepted work. */
     dismiss(): void {
@@ -202,6 +242,7 @@ export function createWorkbenchComments(transport: CommentsTransport = {
       connected.value = false
       off()
       offStream()
+      offActivity()
       disconnect()
       publication = undefined
       streaming.value = {}

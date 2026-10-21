@@ -1,4 +1,4 @@
-import type { UiAgentReply, UiCommentsSnapshot } from '@histoire/shared'
+import type { UiAgentActivity, UiAgentReply, UiCommentsSnapshot } from '@histoire/shared'
 import { describe, expect, it, vi } from 'vitest'
 import { effectScope, nextTick, shallowRef } from 'vue'
 import { useCommentDestination } from '../../../../histoire-app/src/app/components/comments/destination.js'
@@ -13,12 +13,16 @@ function transport() {
   let receive: (snapshot: UiCommentsSnapshot) => void = () => {}
   let disconnect: () => void = () => {}
   let reply: (value: UiAgentReply) => void = () => {}
+  let activity: (value: UiAgentActivity) => void = () => {}
   const send = vi.fn(() => true)
   return { send, port: { available: true, send, subscribe(callback: typeof receive) {
     receive = callback
     return () => {}
   }, stream(callback: typeof reply) {
     reply = callback
+    return () => {}
+  }, activity(callback: typeof activity) {
+    activity = callback
     return () => {}
   }, disconnect(callback: typeof disconnect) {
     disconnect = callback
@@ -27,6 +31,8 @@ function transport() {
     receive({ enabled: true, revision: 'current', part: 0, total: 1, comments: [], ...value })
   }, delta(value: UiAgentReply) {
     reply(value)
+  }, step(value: UiAgentActivity) {
+    activity(value)
   }, disconnected() {
     disconnect()
   } }
@@ -140,6 +146,41 @@ describe('workbench comments', () => {
     channel.delta({ agentId: 'active-agent', threadId: comment.id, text: 'Late chunk' })
     expect(model.streaming.value).toEqual({})
     expect(model.comments.value[0].thread).toHaveLength(1)
+    model.close()
+  })
+
+  it('upserts live steps of working threads only and drops them with the final reply', () => {
+    const channel = transport()
+    const model = createWorkbenchComments(channel.port)
+    const comment = commentFixture({ status: 'working', agentId: 'agent' })
+    channel.snapshot({ comments: [comment] })
+    channel.step({ agentId: 'other', threadId: comment.id, step: { id: 'a', kind: 'read', title: 'Read', status: 'pending' } })
+    expect(model.streaming.value).toEqual({})
+    channel.step({ agentId: 'agent', threadId: comment.id, step: { id: 'a', kind: 'read', title: 'Read', status: 'pending' } })
+    channel.step({ agentId: 'agent', threadId: comment.id, step: { id: 'b', kind: 'edit', title: 'Edit', status: 'in_progress' } })
+    channel.step({ agentId: 'agent', threadId: comment.id, step: { id: 'a', kind: 'read', title: 'Read', status: 'completed' } })
+    channel.delta({ agentId: 'agent', threadId: comment.id, text: 'Done' })
+    expect(model.streaming.value[comment.id]).toMatchObject({ text: 'Done', steps: [{ id: 'a', status: 'completed' }, { id: 'b', status: 'in_progress' }] })
+    channel.snapshot({ comments: [{ ...comment, status: 'replied' }] })
+    expect(model.streaming.value).toEqual({})
+    model.close()
+  })
+
+  it('toggles an open thread back to its pin and closes it once resolved', () => {
+    const channel = transport()
+    const model = createWorkbenchComments(channel.port)
+    const comment = commentFixture({ status: 'replied' })
+    channel.snapshot({ comments: [comment] })
+    model.toggle(comment.id)
+    expect(model.activeId.value).toBe(comment.id)
+    model.toggle(comment.id)
+    expect(model.activeId.value).toBeNull()
+    model.open(comment.id)
+    expect(model.resolve(comment.id, true)).toBe(true)
+    expect(model.activeId.value).toBeNull()
+    model.open(comment.id)
+    model.resolve(comment.id, false)
+    expect(model.activeId.value).toBe(comment.id)
     model.close()
   })
 

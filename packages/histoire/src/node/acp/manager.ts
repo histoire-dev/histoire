@@ -154,6 +154,7 @@ export function createAcpManager(options: AcpManagerOptions) {
     if (!active || notification.sessionId !== active.sessionId) return
     const update = notification.update
     active.changes.update(notification)
+    for (const step of active.activity.update(notification)) emit({ type: 'activity', value: { agentId, threadId: active.request.threadId, step } })
     if (update.sessionUpdate === 'agent_message_chunk' && update.content.type === 'text') {
       const text = active.output.push(update.content.text)
       if (!text) return
@@ -179,6 +180,8 @@ export function createAcpManager(options: AcpManagerOptions) {
     snapshot,
     /** Catalog reads never change configured presets or launch agents. */
     registry: services.registry,
+    /** Registry logos never launch agents or reveal registry URLs. */
+    icon: services.icon,
     /** Discovery has separate capacity and process ownership from comments. */
     async configOptions(agentId: string, force = false) {
       await ready
