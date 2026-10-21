@@ -2,7 +2,7 @@ import type { UiAgentActivity, UiAgentReply, UiCommentsSnapshot } from '@histoir
 import { describe, expect, it, vi } from 'vitest'
 import { effectScope, nextTick, shallowRef } from 'vue'
 import { useCommentDestination } from '../../../../histoire-app/src/app/components/comments/destination.js'
-import { filterComments, groupComments } from '../../../../histoire-app/src/app/components/comments/presentation.js'
+import { compactSelectorPath, filterComments, groupComments, propsSummary, selectorParts } from '../../../../histoire-app/src/app/components/comments/presentation.js'
 import { createWorkbenchComments } from '../../../../histoire-app/src/app/stores/comments.js'
 import { commentsSnapshotParts } from '../server/ui-channel/comments.js'
 import { assertUiPayload } from '../server/ui-channel/validation.js'
@@ -119,6 +119,21 @@ describe('workbench comments', () => {
     expect(filterComments(comments, 'resolved')).toEqual([resolved])
     expect(groupComments(comments, [commentStory])).toMatchObject([{ orphaned: false, comments: [known, resolved] }, { orphaned: true, comments: [orphan] }])
     expect(comments).toHaveLength(3)
+  })
+
+  it('separates story render root from anchor selector path', () => {
+    expect(selectorParts('[data-test-id="sandbox-render"] > div > span')).toEqual({ storyRoot: true, path: 'div > span' })
+    expect(selectorParts('[data-test-id="sandbox-render"]')).toEqual({ storyRoot: true, path: '' })
+    expect(selectorParts('#app > div')).toEqual({ storyRoot: false, path: '#app > div' })
+    expect(compactSelectorPath('div > ul > li:nth-of-type(2) > span')).toBe('… > li:nth-of-type(2) > span')
+    expect(compactSelectorPath('div > span')).toBe('div > span')
+  })
+
+  it('summarizes captured props with collapsed nested values', () => {
+    expect(propsSummary({ label: 'Meow', size: 2, disabled: false, items: [1, 2], style: { a: 1 }, empty: null }))
+      .toEqual(['label: "Meow"', 'size: 2', 'disabled: false', 'items: [2]', 'style: {…}', 'empty: null'])
+    expect(propsSummary({ count: 1, componentProps: { 0: { size: 'lg' }, 2: { label: 'Hi' } } })).toEqual(['count: 1', 'size: "lg"', 'label: "Hi"'])
+    expect(propsSummary({ componentProps: {} })).toEqual([])
   })
 
   it('splits large file snapshots within transport limit without losing comments', () => {
