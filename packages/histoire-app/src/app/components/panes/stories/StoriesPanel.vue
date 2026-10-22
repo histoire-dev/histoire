@@ -10,6 +10,7 @@ import { isContextMenuShortcut, useContextMenu } from '../../../composables/cont
 import { histoireConfig } from '../../../util/config.js'
 import WorkbenchVirtualList from '../../lists/WorkbenchVirtualList.vue'
 import WorkbenchErrorState from '../../shell/WorkbenchErrorState.vue'
+import WorkbenchPaneHeader from '../../shell/WorkbenchPaneHeader.vue'
 
 import { useWorkbenchTestsModel } from '../tests/model.js'
 import { useStoryRowStatus } from './row-status.js'
@@ -240,10 +241,9 @@ function icon(row: StoryTreeRow): string {
 
 <template>
   <section class="stories-panel" aria-label="Stories">
-    <header class="stories-heading">
-      <h2>{{ title }}</h2>
+    <WorkbenchPaneHeader :title="title">
       <span class="stories-count">{{ snapshot.catalog.stories.length }} stories</span>
-    </header>
+    </WorkbenchPaneHeader>
     <WorkbenchErrorState v-if="snapshot.status === 'failed' || (snapshot.source && !snapshot.capabilities.catalog.available)" title="Catalog unavailable" />
     <div ref="tree" class="stories-tree" role="tree" aria-label="Story tree" :tabindex="treeTabStop ? 0 : -1" @focus="onTreeFocus" @keydown="onTreeKeydown" @scroll.capture="scheduleTreeTabStop">
       <WorkbenchVirtualList ref="virtualList" :items="rows" :item-size="32">
@@ -290,13 +290,11 @@ function icon(row: StoryTreeRow): string {
 </template>
 
 <style scoped>
-.stories-panel { display: flex; flex-direction: column; min-height: 0; height: 100%; padding: 16px calc(var(--histoire-pane-gutter, 16px) - 8px); color: var(--histoire-text); }
-.stories-heading { display: flex; align-items: baseline; gap: 8px; padding: 0 8px; margin-bottom: 18px; }
-.stories-heading h2 { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 15px; font-weight: 800; margin: 0; }
+.stories-panel { display: flex; flex-direction: column; min-height: 0; height: 100%; color: var(--histoire-text); }
 .stories-count, .stories-variants { font-family: var(--histoire-font-mono); font-size: 11px; color: var(--histoire-muted); white-space: nowrap; }
-.stories-tree { flex: 1; min-height: 0; overflow: hidden; list-style: none; margin: 0; padding: 0; }
-.stories-group { height: var(--histoire-virtual-row-height, 31px); display: flex; align-items: flex-end; padding: 0 8px var(--histoire-story-row-padding, 6px); margin: 0; font-size: 11px; color: var(--histoire-muted); font-weight: 700; }
-.stories-row { display: flex; align-items: center; gap: 7px; width: 100%; height: var(--histoire-virtual-row-height, 31px); padding: var(--histoire-story-row-padding, 6px) 8px; color: inherit; line-height: 18px; text-align: start; }
+.stories-tree { flex: 1; min-height: 0; overflow: hidden; list-style: none; margin: 0; padding: 0 var(--histoire-pane-gutter) var(--histoire-pane-gutter); }
+.stories-group { height: var(--histoire-virtual-row-height, 31px); display: flex; align-items: flex-end; padding: 0 var(--histoire-pane-row-inset) var(--histoire-story-row-padding, 6px); margin: 0; font-size: 11px; color: var(--histoire-muted); font-weight: 700; }
+.stories-row { display: flex; align-items: center; gap: 7px; width: 100%; height: var(--histoire-virtual-row-height, 31px); padding: var(--histoire-story-row-padding, 6px) var(--histoire-pane-row-inset); color: inherit; line-height: 18px; text-align: start; }
 .stories-row:hover, .stories-current { background: var(--histoire-chip); }
 .stories-current { font-weight: 700; }
 .stories-row[aria-selected="true"] { background: var(--histoire-accent-soft); color: var(--histoire-accent-text); font-weight: 700; }

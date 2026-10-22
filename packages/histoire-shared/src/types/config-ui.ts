@@ -50,11 +50,15 @@ export interface HistoireUiConfig {
       terminal?: 'ask' | 'allow' | 'never'
     }
   }
-  /** Development comments are stored locally in the project. */
+  /** Canvas comments, stored as pinned AI threads in `.histoire/threads.json`. */
   comments?: {
-    /** Enable comments in dev. Defaults to true. */
+    /** Enable pinned threads (canvas comments) in dev; other AI threads are unaffected. Defaults to true. */
     enabled?: boolean
-    /** Project-relative comment file. Defaults to '.histoire/comments.json'. */
+    /**
+     * Legacy project-relative comments file, only read once to import its comments as pinned
+     * threads; it is then renamed to `comments.migrated.json`. Defaults to '.histoire/comments.json'.
+     * @deprecated Comments now live in `.histoire/threads.json`; this is only the migration source.
+     */
     file?: string
   }
 }

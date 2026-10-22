@@ -1,3 +1,5 @@
+import { uiHttpUrl } from './http-json.js'
+
 /** Saved screenshot name projection; exact path remains clipboard/thumbnail identity. */
 interface ScreenshotFileDetails {
   /** Complete stored basename for metadata. */
@@ -19,4 +21,12 @@ export function screenshotFileDetails(path: string): ScreenshotFileDetails {
     shortName: capture ? `…${capture[2].slice(-12)}.${capture[3]}` : name.length > 28 ? `${name.slice(0, 10)}…${name.slice(-17)}` : name,
     capturedAt: Number.isSafeInteger(timestamp) && Number.isFinite(date.getTime()) ? date.toISOString() : undefined,
   }
+}
+
+/**
+ * Same-origin dev-only image URL of a saved screenshot.
+ * @param path Project-relative stored screenshot path.
+ */
+export function screenshotUrl(path: string): string {
+  return uiHttpUrl(`screenshots/${encodeURIComponent(path.split('/').pop()!)}`)
 }

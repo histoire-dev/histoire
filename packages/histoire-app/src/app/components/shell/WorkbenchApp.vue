@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { HistoireTarget } from '@histoire/protocol'
 import type { HistoireSession } from '@histoire/sdk'
+import type { WorkspacePane } from '../../standalone/workbench-navigation.js'
 import type { WorkbenchProps } from '../../standalone/workbench-types.js'
 import type { FrameActionTarget } from '../../util/frame-actions.js'
 import { getHistoireTargetKey, getSandboxRelativeUrl } from '@histoire/protocol'
@@ -42,11 +43,10 @@ const MarkdownPage = defineAsyncComponent(() => import('../pages/markdown/Markdo
 const SettingsPage = defineAsyncComponent(() => import('../pages/settings/SettingsPage.vue'))
 const VisualViewer = __HISTOIRE_DEV__ ? defineAsyncComponent(() => import('../panes/visual/VisualViewer.vue')) : undefined
 const TestsPanel = __HISTOIRE_DEV__ ? defineAsyncComponent(() => import('../panes/tests/TestsPanel.vue')) : undefined
-const McpPanel = __HISTOIRE_DEV__ ? defineAsyncComponent(() => import('../panes/mcp/McpPanel.vue')) : undefined
+const AiPanel = __HISTOIRE_DEV__ ? defineAsyncComponent(() => import('../panes/ai/AiPanel.vue')) : undefined
 const McpActivity = __HISTOIRE_DEV__ ? defineAsyncComponent(() => import('../panes/mcp/McpActivity.vue')) : undefined
 const AgentCursor = __HISTOIRE_DEV__ ? defineAsyncComponent(() => import('../canvas/AgentCursor.vue')) : undefined
 const ScreenshotPopover = __HISTOIRE_DEV__ ? defineAsyncComponent(() => import('../canvas/toolbar/ScreenshotPopover.vue')) : undefined
-const CommentsPanel = __HISTOIRE_DEV__ ? defineAsyncComponent(() => import('../panes/comments/CommentsPanel.vue')) : undefined
 const CommentsCanvasOverlay = __HISTOIRE_DEV__ ? defineAsyncComponent(() => import('../comments/CommentsCanvasOverlay.vue')) : undefined
 const PermissionPrompt = __HISTOIRE_DEV__ ? defineAsyncComponent(() => import('../agents/PermissionPrompt.vue')) : undefined
 const EmbedDialog = defineAsyncComponent(() => import('../embed/EmbedDialog.vue'))
@@ -60,8 +60,19 @@ const isolated = computed(() => {
 const rows = computed(() => typeof route.value.query.rows === 'string' ? route.value.query.rows : undefined)
 const cols = computed(() => typeof route.value.query.cols === 'string' ? route.value.query.cols : undefined)
 /** Report rejected route restoration through the existing workbench error boundary. */
-function activatePane(pane: 'stories' | 'search' | 'tests' | 'comments' | 'mcp'): void {
+function activatePane(pane: WorkspacePane): void {
   void workbench.activatePane(pane).catch(error => emit('error', error))
+}
+
+/** AI thread story links select the story like the catalog does. */
+function selectStory(target: HistoireTarget): void {
+  void props.session.selection.select(target).catch(error => emit('error', error))
+}
+
+/** Home activity card reveals the AI pane on its MCP section. */
+function openMcp(): void {
+  shell.setAiSection('mcp')
+  workbench.showPane('ai')
 }
 
 /** Show inspector Props tab so the matrix new-axis form is visible. */
@@ -96,11 +107,8 @@ function setSelectedSession(session: HistoireSession | undefined): void {
     <template #tests>
       <TestsPanel v-if="TestsPanel" @select="workbench.testsSelected" @error="emit('error', $event)" />
     </template>
-    <template #comments>
-      <CommentsPanel v-if="CommentsPanel && dev" :model="dev.comments" :agents="dev.commentAgents.value" @select="dev.selectComment" @setup-agent="dev.setupAgents" />
-    </template>
-    <template #mcp>
-      <McpPanel v-if="McpPanel" />
+    <template #ai>
+      <AiPanel v-if="AiPanel && dev" :agents="dev.commentAgents.value" :capture="snapshot.selection?.variantId ? dev.captureSelected : undefined" @select="selectStory" @select-comment="dev.selectComment" @setup-agent="dev.setupAgents" />
     </template>
     <template #main>
       <SettingsPage v-if="route.name === 'settings'" :section="typeof route.params.section === 'string' ? route.params.section : undefined" :build-info="buildInfo" @section="workbench.navigate('settings', $event)" />
@@ -112,7 +120,7 @@ function setSelectedSession(session: HistoireSession | undefined): void {
               <ScreenshotPopover v-if="ScreenshotPopover && snapshot.selection?.variantId" :story-id="snapshot.selection.storyId" :variant-id="snapshot.selection.variantId" :open="slot.open" :trigger="dev?.screenshotTrigger.value" @update:open="slot.setOpen" />
             </template>
             <template #tool>
-              <ToolbarButton v-if="dev" menu-role="menuitemradio" label="Comment" icon="add-comment" :shortcut="shortcuts.hint('canvas.comment')" :disabled="!dev.comments.available.value" :pressed="dev.commentMode.value" @click="dev.commentMode.value = true" />
+              <ToolbarButton v-if="dev?.threads.pinsEnabled.value" menu-role="menuitemradio" label="Comment" icon="add-comment" :shortcut="shortcuts.hint('canvas.comment')" :disabled="!dev.threads.pinsAvailable.value" :pressed="dev.commentMode.value" @click="dev.commentMode.value = true" />
             </template>
             <template #inspector>
               <ToolbarButton v-if="!shell.inspectorOpen.value" label="Show inspector" icon="side-panel-open" @click="shell.toggleInspector" />
@@ -129,13 +137,13 @@ function setSelectedSession(session: HistoireSession | undefined): void {
           <MatrixView :rows="rows" :cols="cols" :preview-base="previewBase" :frame-budget="histoireConfig.ui?.frameBudget ?? 6" :size="slot.size" :content-insets="slot.contentInsets" :ui-hidden="shell.uiHidden.value" :discovery-failed="slot.discoveryFailed" @axes="workbench.setAxes" @add-axis="revealMatrixProps" @error="emit('error', $event)" />
         </template>
         <template #overlays>
-          <CommentsCanvasOverlay v-if="CommentsCanvasOverlay && dev" ref="commentOverlay" :model="dev.comments" :agents="dev.commentAgents.value" :active="dev.commentMode.value" @setup-agent="dev.setupAgents" />
+          <CommentsCanvasOverlay v-if="CommentsCanvasOverlay && dev" ref="commentOverlay" :model="dev.threads" :agents="dev.commentAgents.value" :active="dev.commentMode.value" @setup-agent="dev.setupAgents" />
           <MeasureOverlay /><AgentCursor v-if="AgentCursor && mcp" />
         </template>
       </CanvasViewport>
       <HomePage v-else :build-info="buildInfo" @search="workbench.openSearch" @select="shell.closePanelAfterSelection" @run-tests="workbench.runAll" @error="emit('error', $event)">
         <template #activity>
-          <McpActivity v-if="McpActivity" @open="workbench.showPane('mcp')" />
+          <McpActivity v-if="McpActivity" @open="openMcp" />
         </template>
       </HomePage>
     </template>

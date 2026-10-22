@@ -18,7 +18,7 @@ import { createStoryCollector } from './collect.js'
 import { registerDevEvents } from './dev-events.js'
 import { createModuleInvalidators } from './invalidate.js'
 import { registerAgentsChannel } from './ui-channel/agents.js'
-import { registerCommentsChannel } from './ui-channel/comments.js'
+import { registerAiThreadsChannel } from './ui-channel/ai-threads.js'
 import { registerConfigChannel } from './ui-channel/config.js'
 import { registerUiChannel } from './ui-channel/index.js'
 import { createViteServers } from './vite-servers.js'
@@ -88,7 +88,7 @@ export async function createServer(ctx: Context, options: CreateServerOptions = 
     registerConfigChannel(ctx, uiChannel, isActive)
     if (options.agents !== false) {
       const agents = registerAgentsChannel(ctx, uiChannel, server)
-      registerCommentsChannel(ctx, uiChannel, agents, isActive)
+      registerAiThreadsChannel(ctx, uiChannel, agents, isActive, server)
     }
     cleanup.add(() => uiChannel.close())
     // Vite pre-bundling completes during listen; initial collection follows it.

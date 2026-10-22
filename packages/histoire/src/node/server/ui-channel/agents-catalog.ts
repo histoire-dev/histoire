@@ -3,8 +3,8 @@ import type { ViteDevServer } from 'vite'
 import type { AcpManager } from '../../acp/manager.js'
 import type { Context } from '../../context.js'
 import { z } from 'zod'
-import { isAgentEnvironmentOrigin, readAgentJsonBody } from './agents-env.js'
 import { registerAgentIcons } from './agents-icons.js'
+import { isSameOriginPost, readJsonBody, sendJson } from './http-body.js'
 import { registerUiHttpRoute, uiHttpPath } from './http.js'
 
 /** Catalog HTTP avoids putting unbounded registry/model lists on HMR snapshots. */
@@ -16,19 +16,16 @@ export function registerAgentsCatalog(ctx: Context, server: ViteDevServer, manag
     return registerUiHttpRoute(server, endpoint, (request: IncomingMessage, response: ServerResponse, next) => {
       if (request.url?.split('?')[0] !== endpoint) return next()
       response.setHeader('Cache-Control', 'no-store')
-      response.setHeader('Content-Type', 'application/json')
       response.setHeader('X-Content-Type-Options', 'nosniff')
       /** Responses carry only controlled errors and generation-owned public results. */
       async function run(): Promise<void> {
         const read = suffix === 'registry'
-        if (ctx.mode !== 'dev' || !isActive() || (read ? request.method !== 'GET' : !isAgentEnvironmentOrigin(request))) {
-          response.statusCode = 403
-          response.end(JSON.stringify({ error: 'Agent request refused' }))
-          return
+        if (ctx.mode !== 'dev' || !isActive() || (read ? request.method !== 'GET' : !isSameOriginPost(request))) {
+          return sendJson(response, 403, { error: 'Agent request refused' })
         }
         let validatedDiscovery = false
         try {
-          const input = read ? undefined : await readAgentJsonBody(request)
+          const input = read ? undefined : await readJsonBody(request)
           if (!isActive()) throw new Error('Agent runtime closed')
           let result: unknown
           if (suffix === 'config-options') {
@@ -41,13 +38,12 @@ export function registerAgentsCatalog(ctx: Context, server: ViteDevServer, manag
             result = await manager.registry(!read)
           }
           if (!isActive()) throw new Error('Agent runtime closed')
-          response.end(JSON.stringify(result))
+          sendJson(response, 200, result)
         }
         catch (error) {
-          response.statusCode = 400
           // Discovery sanitizes captured launch environment and SDK failures.
           // Validation failures never echo untrusted input or Zod diagnostics.
-          response.end(JSON.stringify({ error: validatedDiscovery && error instanceof Error ? error.message.slice(0, 2000) : suffix === 'config-options' ? 'Cannot load agent models; check command, authentication and logs' : 'Cannot load agent registry' }))
+          sendJson(response, 400, { error: validatedDiscovery && error instanceof Error ? error.message.slice(0, 2000) : suffix === 'config-options' ? 'Cannot load agent models; check command, authentication and logs' : 'Cannot load agent registry' })
         }
       }
       void run().catch(() => {

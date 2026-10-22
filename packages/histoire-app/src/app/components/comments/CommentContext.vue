@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { UiComment, UiCommentDraft } from '@histoire/shared'
+import type { UiAiThread, UiAiThreadDraft } from '@histoire/shared'
 import { BuiltinIcon, HstButton } from '@histoire/controls/vue'
 import { computed } from 'vue'
 import { compactSelectorPath, propsSummary, selectorParts } from './presentation'
@@ -7,8 +7,8 @@ import { compactSelectorPath, propsSummary, selectorParts } from './presentation
 const props = defineProps<{
   /** Human-readable story and variant. */
   title: string
-  /** Persisted or composer context. */
-  comment: UiComment | UiCommentDraft
+  /** Persisted pinned thread or canvas draft. */
+  thread: UiAiThread | UiAiThreadDraft
   /** Show a control collapsing the card back to its pin. */
   minimizable?: boolean
   /** Screenshot is shown as an attachment elsewhere (composer). */
@@ -21,7 +21,7 @@ const emit = defineEmits<{
 
 /** Picked element split into story root label, its deepest path segments, and readable full path for tooltip. */
 const element = computed(() => {
-  const selector = props.comment.anchor.selector
+  const selector = props.thread.anchor?.selector
   if (!selector) return null
   const parts = selectorParts(selector)
   const label = parts.storyRoot ? 'Story root' : 'Element'
@@ -29,7 +29,7 @@ const element = computed(() => {
 })
 
 /** Captured prop values shown inline; tooltip lists one per line. */
-const propLines = computed(() => propsSummary(props.comment.props))
+const propLines = computed(() => propsSummary(props.thread.props))
 </script>
 
 <template>
@@ -44,7 +44,7 @@ const propLines = computed(() => propsSummary(props.comment.props))
         </HstButton>
       </div>
     </div>
-    <div v-if="element || propLines.length || (comment.screenshot && !hideScreenshot)" class="context-chips">
+    <div v-if="element || propLines.length || (thread.screenshot && !hideScreenshot)" class="context-chips">
       <span v-if="element" class="chip" :title="element.full">
         <BuiltinIcon icon="code" :size="16" />
         <span class="chip-text">{{ element.label }}<code v-if="element.path">{{ element.path }}</code></span>
@@ -53,7 +53,7 @@ const propLines = computed(() => propsSummary(props.comment.props))
         <BuiltinIcon icon="settings-adjust" :size="16" />
         <span class="chip-text">Props<code>{{ propLines.join(', ') }}</code></span>
       </span>
-      <span v-if="comment.screenshot && !hideScreenshot" class="chip" :title="comment.screenshot">
+      <span v-if="thread.screenshot && !hideScreenshot" class="chip" :title="thread.screenshot">
         <BuiltinIcon icon="camera" :size="16" />
         <span class="chip-text">Screenshot</span>
       </span>

@@ -1,5 +1,5 @@
 import type { CanvasFrames } from '../../composables/canvas-settings.js'
-import type { WorkbenchComments } from '../../stores/comments.js'
+import type { AiThreads } from '../../stores/ai-threads.js'
 import { getControlStateKeys } from '@histoire/controls/vue'
 import { getHistoireTargetKey } from '@histoire/protocol'
 import { ELEMENT_PICK_REQUEST, ELEMENT_PICK_RESULT } from '@histoire/shared'
@@ -18,8 +18,12 @@ export interface CommentFramePoint {
   point: { x: number, y: number }
 }
 
-/** Finite element pick is attributed to one iframe document and frame target. */
-export function useCommentPick(model: WorkbenchComments, frames: CanvasFrames) {
+/**
+ * Finite element pick is attributed to one iframe document and frame target; it starts a pinned draft.
+ * @param model Threads store (only availability and `composePin` are used).
+ * @param frames Registered canvas frames.
+ */
+export function useCommentPick(model: Pick<AiThreads, 'pinsAvailable' | 'composePin'>, frames: CanvasFrames) {
   let pending: { point: CommentFramePoint, documentId: string, requestId: string, isCurrent: () => boolean } | undefined
   let timeout: ReturnType<typeof setTimeout> | undefined
   /** Retire old requests before another click or component teardown. */
@@ -45,7 +49,7 @@ export function useCommentPick(model: WorkbenchComments, frames: CanvasFrames) {
       }
       catch { /* Cyclic/opaque state leaves a usable coordinate comment. */ }
     }
-    model.compose({ target, anchor: { ...owner.point.point, selector }, props })
+    model.composePin({ target, anchor: { ...owner.point.point, ...(selector ? { selector } : {}) }, props })
     clear()
   }
   /** Reply cannot claim a replacement runtime, another frame, or previous click. */
@@ -66,7 +70,7 @@ export function useCommentPick(model: WorkbenchComments, frames: CanvasFrames) {
     /** One click produces one composer; older runtimes fall back to coordinates. */
     pick(point: CommentFramePoint) {
       clear()
-      if (!model.available.value) return
+      if (!model.pinsAvailable.value) return
       const frame = frames.getFrame(point.frameKey)
       if (!frame?.documentId || !frame.iframe || frame.storyId !== point.storyId || frame.variantId !== point.variantId || !Number.isFinite(point.point.x) || !Number.isFinite(point.point.y) || point.point.x < 0 || point.point.y < 0 || point.point.x > frame.rect.width || point.point.y > frame.rect.height) return
       const activation = captureFrameRegistration(() => frames.getFrame(point.frameKey))!

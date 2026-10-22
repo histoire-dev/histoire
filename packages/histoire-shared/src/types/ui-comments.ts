@@ -1,32 +1,4 @@
-import type { UiAgentStep } from './ui-agents.js'
-
-/** One user-created canvas annotation persisted only in development. */
-export interface UiComment {
-  /** Opaque UUID; never a file path. */
-  id: string
-  /** Exact collected story identity. */
-  storyId: string
-  /** Exact collected variant identity. */
-  variantId: string
-  /** Logical frame coordinates and optional picked element selector. */
-  anchor: { selector?: string, x: number, y: number }
-  /** Optional JSON-safe prop context captured when composed. */
-  props?: Record<string, unknown>
-  /** Optional project-relative generated screenshot. */
-  screenshot?: string
-  /** Original user message. */
-  body: string
-  /** Server-owned delivery lifecycle. */
-  status: 'draft' | 'sent' | 'working' | 'replied' | 'resolved'
-  /** Agent preset handling this thread. */
-  agentId?: string
-  /** Chronological user and agent replies. */
-  thread: UiCommentMessage[]
-  /** UTC creation date. */
-  createdAt: string
-  /** UTC last mutation date. */
-  updatedAt: string
-}
+import type { UiAgentCommand, UiAgentStep } from './ui-agents.js'
 
 /** One plain-text comment message and optional agent-reported file edits. */
 export interface UiCommentMessage {
@@ -44,32 +16,48 @@ export interface UiCommentMessage {
   failed?: boolean
   /** Agent tool calls and thinking spans performed for this reply, in order. */
   steps?: UiAgentStep[]
+  /** Files attached to a user reply. */
+  attachments?: UiCommentAttachment[]
 }
 
-/** Writable draft fields; server owns lifecycle, timestamps and agent replies. */
-export type UiCommentDraft = Pick<UiComment, 'id' | 'storyId' | 'variantId' | 'anchor' | 'body' | 'props' | 'screenshot'>
+/** Most files attached to one comment message, enforced by client and server. */
+export const COMMENT_ATTACHMENT_LIMIT = 8
+
+/** One stored file attached to a comment message. */
+export interface UiCommentAttachment {
+  /** Project-relative stored file beneath `.histoire/attachments`. */
+  path: string
+  /** Original display filename. */
+  name: string
+  /** Verified media type. */
+  mimeType: string
+  /** Byte size. */
+  size: number
+}
+
+/** Agent session configuration value IDs, keyed by selector category. */
+export interface UiCommentSessionOptions {
+  /** Model choice value. */
+  model?: string
+  /** Thought-level choice value. */
+  effort?: string
+  /** Session mode choice value. */
+  mode?: string
+}
+
+/** Project file suggested for an `@` mention. */
+export interface UiProjectFile {
+  /** Project-relative POSIX path. */
+  path: string
+  /** File name. */
+  basename: string
+  /** Parent directory, empty at root. */
+  dirname: string
+}
 
 /** Browser-owned ID lets a failed save retire only its originating composer request. */
 export interface UiCommentRequest {
   /** Opaque browser request identity. */
-  requestId?: string
-}
-
-/** Snapshots are split into bounded parts and installed atomically by the client. */
-export interface UiCommentsSnapshot {
-  /** Whether this dev generation enables annotations. */
-  enabled: boolean
-  /** Snapshot publication identity. */
-  revision: string
-  /** Zero-based part number. */
-  part: number
-  /** Total parts in this publication. */
-  total: number
-  /** Comments within this bounded part. */
-  comments: UiComment[]
-  /** Deliberate recoverable server/storage failure. */
-  error?: string
-  /** Request owning this private failure publication, when applicable. */
   requestId?: string
 }
 
@@ -87,23 +75,6 @@ export interface UiCommentAgent {
   askEachTime?: boolean
   /** Same-origin monochrome registry logo URL, when the preset comes from the ACP registry. */
   icon?: string
-}
-
-declare module './ui-channel.js' {
-  interface UiClientEvents {
-    /** Save user-writable draft content. */
-    'histoire:ui:comment-upsert': UiCommentDraft & UiCommentRequest
-    /** Remove an existing comment. */
-    'histoire:ui:comment-delete': { id: string }
-    /** Resolve or reopen an existing comment. */
-    'histoire:ui:comment-resolve': { id: string, resolved: boolean }
-    /** Add a user reply to a thread. */
-    'histoire:ui:comment-reply': { id: string, body: string, agentId?: string }
-    /** Send ordered draft/replied comments to one configured agent. */
-    'histoire:ui:comment-send': { ids: string[], agentId: string, draft?: UiCommentDraft } & UiCommentRequest
-  }
-  interface UiServerEvents {
-    /** Bounded complete persisted-comment snapshot publication. */
-    'histoire:ui:comments-snapshot': UiCommentsSnapshot
-  }
+  /** Slash commands last advertised by this agent. */
+  commands?: UiAgentCommand[]
 }

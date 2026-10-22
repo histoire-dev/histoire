@@ -769,7 +769,7 @@ export default defineConfig({
 
 `boolean` - Default: `true`
 
-Enable local comments in development. Disabled comments perform no comment-file I/O. Static builds never read or expose the comment store. See [comments for AI](../guide/ui-comments.md).
+Enable canvas comments (threads pinned on the canvas) in development. When disabled, the Comment tool is hidden and new pinned threads are refused; free-form AI threads stay available. Static builds never read or expose threads. See [AI threads and canvas comments](../guide/ui-comments.md).
 
 ```ts
 export default defineConfig({
@@ -777,17 +777,11 @@ export default defineConfig({
 })
 ```
 
-## `comments.file` <Badge type="tip" text="1.0-beta.2+" />
+## `comments.file` <Badge type="tip" text="1.0-beta.2+" /> <Badge type="warning" text="deprecated" />
 
 `string` - Default: `'.histoire/comments.json'`
 
-Project-relative path for local comment threads. The path must stay inside the project; symlink escapes are rejected. Updates use an atomic local write. Choose whether to commit this file or ignore it. See [comment storage](../guide/ui-comments.md).
-
-```ts
-export default defineConfig({
-  comments: { file: '.histoire/review-comments.json' },
-})
-```
+Earlier comment storage. Threads are now stored in `.histoire/threads.json`; on the next development start, comments found at this path are imported as pinned threads and the file is renamed to `comments.migrated.json`. The path must stay inside the project; symlink escapes are rejected. See [local storage](../guide/ui-comments.md#local-storage).
 
 ## `build.changedSince` <Badge type="tip" text="1.0-beta.2+" />
 

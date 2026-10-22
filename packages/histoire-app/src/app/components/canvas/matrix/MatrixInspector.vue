@@ -111,7 +111,7 @@ async function copyVariant(): Promise<void> {
 </template>
 
 <style scoped>
-.histoire-matrix-inspector { padding: 0 var(--histoire-inspector-gutter, 16px) 16px; }
+.histoire-matrix-inspector { padding: 0 var(--histoire-inspector-gutter) 16px; }
 .histoire-matrix-preset {
   display: flex;
   align-items: center;

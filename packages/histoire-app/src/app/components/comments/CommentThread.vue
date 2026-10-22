@@ -1,18 +1,22 @@
 <script setup lang="ts">
-import type { UiComment, UiCommentAgent } from '@histoire/shared'
-import { BuiltinIcon, HstButton, HstText } from '@histoire/controls/vue'
-import { computed, ref } from 'vue'
-import { useWorkbenchComments } from '../../stores/comments.js'
+import type { UiAiThread, UiCommentAgent } from '@histoire/shared'
+import type { AiThreadReplyExtra } from '../../stores/ai-threads.js'
+import { BuiltinIcon, HstButton } from '@histoire/controls/vue'
+import { computed, ref, watch } from 'vue'
+import { isThreadBusy } from '../../stores/agent-threads.js'
+import { useAiThreads } from '../../stores/ai-threads.js'
 
 import CommentContext from './CommentContext.vue'
-import { commentDestination } from './destination.js'
+import { agentDisplay, useCommentDestination } from './destination.js'
+import AgentPrompt from './prompt/AgentPrompt.vue'
+import { useReplyDrafts } from './reply-draft.js'
 import AgentLiveTail from './thread/AgentLiveTail.vue'
 import { useStickToBottom } from './thread/stick-to-bottom.js'
 import ThreadMessage from './thread/ThreadMessage.vue'
 
 const props = defineProps<{
-  /** Persisted conversation with server-owned statuses. */
-  comment: UiComment
+  /** Persisted pinned thread with server-owned statuses. */
+  thread: UiAiThread
   /** Collected story and variant display label. */
   title: string
   /** Current safe agent display states. */
@@ -22,7 +26,7 @@ const props = defineProps<{
 }>()
 const emit = defineEmits<{
   /** Persist reply and continue its ACP conversation; `agentId` is used when the comment was never sent. */
-  reply: [id: string, body: string, agentId?: string]
+  reply: [id: string, body: string, extra: AiThreadReplyExtra]
   /** Toggle persisted resolved status. */
   resolve: [resolved: boolean]
   /** Remove persisted comment. */
@@ -30,42 +34,50 @@ const emit = defineEmits<{
   /** Dismiss floating thread. */
   close: []
 }>()
-/** Shared thread shells retain drafts by exact comment identity during live updates. */
-const replies = ref<Record<string, string>>({})
-const reply = computed({
-  get: () => replies.value[props.comment.id] ?? '',
-  set: (body: string) => { replies.value = { ...replies.value, [props.comment.id]: body } },
-})
-const model = useWorkbenchComments()
+const model = useAiThreads()
 /** Live output of the working agent, if any. */
-const live = computed(() => model?.streaming.value[props.comment.id])
+const live = computed(() => model?.streaming.value[props.thread.id])
 const scroller = ref<HTMLElement>()
 const log = ref<HTMLElement>()
 // Re-pin when another thread opens or a message is added (own reply, final agent answer).
-useStickToBottom(scroller, log, () => `${props.comment.id}:${props.comment.thread.length}`)
-const busy = computed(() => ['sent', 'working'].includes(props.comment.status))
-/** Configured display metadata for an agent id, without inventing provider labels. */
+useStickToBottom(scroller, log, () => `${props.thread.id}:${props.thread.thread.length}`)
+const busy = computed(() => isThreadBusy(props.thread))
+/** Destination for a comment that never reached an agent; bound conversations keep theirs. */
+const { agentId, usable, choose, reset } = useCommentDestination(() => props.agents)
+watch(() => props.thread.id, reset)
+/** Reply drafts per comment; session choices stay with the agent they were made for. */
+const { draft, edit, options, choose: chooseOptions, sent } = useReplyDrafts(() => props.thread.id, () => props.thread.agentId ?? agentId.value)
+/** Configured display metadata for an agent id. */
 function agent(id?: string): { name: string, icon?: string } {
-  const found = props.agents.find(agent => agent.id === id)
-  return { name: found?.name ?? id ?? 'Agent', icon: found?.icon }
+  return agentDisplay(props.agents, id)
 }
 /** Each message belongs to exact saved thread; form submission cannot duplicate work. */
 function submit() {
-  const body = reply.value
+  const { body, attachments } = draft.value
   if (!body.trim() || busy.value || props.disabled) return
-  emit('reply', props.comment.id, body, props.comment.agentId ? undefined : commentDestination(props.agents) || undefined)
-  reply.value = ''
+  const destination = props.thread.agentId ? undefined : agentId.value || undefined
+  emit('reply', props.thread.id, body, { ...destination ? { agentId: destination } : {}, ...attachments.length ? { attachments } : {}, ...options.value ? { options: options.value } : {} })
+  sent()
 }
 </script>
 
 <template>
   <section class="comment-thread" aria-label="Comment conversation" @keydown.escape.stop.prevent="emit('close')">
-    <CommentContext :title="title" :comment="comment" minimizable @minimize="emit('close')" />
+    <CommentContext :title="title" :thread="thread" minimizable @minimize="emit('close')">
+      <template #actions>
+        <HstButton icon-only color="flat" type="button" :disabled="disabled" :aria-label="thread.status === 'resolved' ? 'Reopen comment' : 'Resolve comment'" :title="thread.status === 'resolved' ? 'Reopen' : 'Resolve'" @click="emit('resolve', thread.status !== 'resolved')">
+          <BuiltinIcon :icon="thread.status === 'resolved' ? 'renew' : 'checkmark'" :size="16" />
+        </HstButton>
+        <HstButton icon-only color="flat" type="button" :disabled="disabled || busy" aria-label="Delete comment" title="Delete" @click="emit('remove')">
+          <BuiltinIcon icon="trash-can" :size="16" />
+        </HstButton>
+      </template>
+    </CommentContext>
     <div ref="scroller" class="thread-messages">
       <div ref="log">
-        <ThreadMessage author="user" name="You" :at="comment.createdAt" :body="comment.body" />
+        <ThreadMessage author="user" name="You" :at="thread.createdAt" :body="thread.body" :attachments="thread.attachments" />
         <ThreadMessage
-          v-for="(message, index) in comment.thread"
+          v-for="(message, index) in thread.thread"
           :key="index"
           :author="message.author"
           :name="message.author === 'agent' ? agent(message.agentId).name : 'You'"
@@ -75,23 +87,16 @@ function submit() {
           :steps="message.steps"
           :changes="message.changes"
           :failed="message.failed"
+          :attachments="message.attachments"
         />
-        <ThreadMessage v-if="busy" author="agent" :name="agent(comment.agentId).name" :icon="agent(comment.agentId).icon" :body="live?.text ?? ''" :steps="live?.steps" streaming aria-live="polite">
-          <AgentLiveTail :steps="live?.steps ?? []" :text="live?.text ?? ''" :started-at="live?.startedAt" :queued="comment.status === 'sent'" />
+        <ThreadMessage v-if="busy" author="agent" :name="agent(thread.agentId).name" :icon="agent(thread.agentId).icon" :body="live?.text ?? ''" :steps="live?.steps" streaming aria-live="polite">
+          <AgentLiveTail :steps="live?.steps ?? []" :text="live?.text ?? ''" :started-at="live?.startedAt" :queued="thread.status === 'sent'" />
         </ThreadMessage>
       </div>
     </div>
-    <form class="thread-actions" @submit.prevent="submit">
-      <HstText v-model="reply" layout="inline" aria-label="Reply to comment" placeholder="Reply…" maxlength="8192" :disabled="disabled || busy" />
-      <HstButton v-if="reply.trim()" icon-only color="flat" type="submit" :disabled="disabled || busy" aria-label="Send reply">
-        <BuiltinIcon icon="send-alt-filled" :size="16" />
-      </HstButton>
-      <HstButton color="flat" type="button" class="resolve" :disabled="disabled" @click="emit('resolve', comment.status !== 'resolved')">
-        <BuiltinIcon :icon="comment.status === 'resolved' ? 'renew' : 'checkmark'" :size="16" />{{ comment.status === 'resolved' ? 'Reopen' : 'Resolve' }}
-      </HstButton>
-      <HstButton icon-only color="flat" type="button" class="delete" :disabled="disabled || busy" aria-label="Delete comment" @click="emit('remove')">
-        <BuiltinIcon icon="trash-can" :size="16" />
-      </HstButton>
+    <form class="thread-reply" @submit.prevent="submit">
+      <!-- Keyed by thread so a late upload of the previous thread cannot land in this draft. -->
+      <AgentPrompt :key="thread.id" :model-value="draft.body" :attachments="draft.attachments" :options="options ?? thread.options" compact label="Reply to comment" :placeholder="busy ? 'Agent is working…' : 'Reply…'" :agents="thread.agentId ? agents : usable" :agent-id="thread.agentId ?? agentId" :agent-locked="Boolean(thread.agentId)" :busy="busy" :disabled="disabled" @update:model-value="edit({ body: $event })" @update:attachments="edit({ attachments: $event })" @update:options="chooseOptions" @choose="choose" @send="submit" />
     </form>
   </section>
 </template>
@@ -99,8 +104,5 @@ function submit() {
 <style scoped>
 .comment-thread { width: 360px; max-width: calc(100vw - 24px); border-radius: var(--histoire-radius-panel); background: var(--histoire-surface); color: var(--histoire-text); box-shadow: var(--histoire-shadow-panel); overflow: hidden; }
 .thread-messages { max-height: min(50vh, 400px); overflow: auto; padding: 16px 14px; }
-.thread-actions { display: flex; gap: 5px; padding: 10px; border-top: 1px solid var(--histoire-border); }
-.histoire-text { flex: 1; min-width: 0; }
-button { display: inline-flex; align-items: center; justify-content: center; gap: 5px; padding: 7px; color: inherit; }
-.resolve { color: var(--histoire-accent-link); font-weight: 700; }.delete { color: var(--histoire-muted); }
+.thread-reply { padding: 10px; border-top: 1px solid var(--histoire-border); }
 </style>

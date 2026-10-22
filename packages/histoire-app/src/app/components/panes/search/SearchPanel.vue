@@ -282,7 +282,7 @@ function keydown(event: KeyboardEvent) {
 </template>
 
 <style scoped>
-.workbench-search { flex: 1; padding: 16px var(--histoire-pane-gutter, 16px); overflow: auto; min-width: 0; min-height: 0; background: var(--histoire-surface); color: var(--histoire-text); }
+.workbench-search { flex: 1; padding: 16px var(--histoire-pane-gutter); overflow: auto; min-width: 0; min-height: 0; background: var(--histoire-surface); color: var(--histoire-text); }
 .search-input { display: flex; align-items: center; gap: 12px; box-sizing: border-box; width: 100%; min-width: 0; height: 40px; padding: 0 12px; margin: 0 0 8px; border: 1px solid var(--histoire-border); border-radius: 12px; background: var(--histoire-input); color: var(--histoire-text); }
 .search-input:focus-within { border-color: var(--histoire-accent); box-shadow: 0 0 0 1px var(--histoire-accent); }
 .search-input svg { color: var(--histoire-muted); width: 18px; height: 18px; flex: none; }
@@ -293,7 +293,6 @@ kbd { flex: none; color: var(--histoire-muted); font: 11px var(--histoire-font-m
 .notice { margin: 20px 0; color: var(--histoire-muted); font-size: 12px; }
 .search-empty-query { color: var(--histoire-text); }
 .search-active-result { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-.search-results { margin-inline: -8px; }
 .workbench-search :deep(.workbench-state) { margin-inline: 0; }
 .command-results { margin-top: 22px; }
 .command-results h3 { padding: 0 8px; color: var(--histoire-muted); font-size: 12px; }

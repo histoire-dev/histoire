@@ -20,5 +20,5 @@ const visual = useWorkbenchVisual()
 <style scoped>
 .tests-modes { display: flex; flex-direction: column; height: 100%; min-height: 0; }
 /* Beats inline wrapper display and zero margin from controls stylesheet. */
-.tests-modes > .mode-switch { display: flex; margin: 12px var(--histoire-pane-gutter, 16px) 0; }.tests-modes > section { flex: 1; min-height: 0; }
+.tests-modes > .mode-switch { display: flex; margin: 12px var(--histoire-pane-gutter) 0; }.tests-modes > section { flex: 1; min-height: 0; }
 </style>

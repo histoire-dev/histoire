@@ -1,10 +1,14 @@
-import type { NewSessionResponse } from '@agentclientprotocol/sdk'
-import type { UiAgentConfigOptions, UiAgentSettings } from '@histoire/shared'
+import type { AvailableCommand, NewSessionResponse } from '@agentclientprotocol/sdk'
+import type { UiAgentCommand, UiAgentConfigOptions, UiAgentSettings } from '@histoire/shared'
 import { methods } from '@agentclientprotocol/sdk'
 import path from 'pathe'
 import { createAgentRuntime, withAgentTimeout } from './agent-runtime.js'
+import { projectAgentCommands } from './projection.js'
 import { applyAgentSessionDefaults, projectAgentConfig } from './session-config.js'
 import { createAgentRedactor } from './user-data.js'
+
+/** Default longest wait for slash commands announced after the probe session starts. */
+const COMMANDS_WAIT = 1500
 
 /** Temporary sessions never borrow a comment runtime or send prompts. */
 export function createAgentDiscovery(options: {
@@ -14,6 +18,10 @@ export function createAgentDiscovery(options: {
   timeout: number
   /** Secret redaction shared with manager. */
   sanitize: (text: string) => string
+  /** Longest wait for commands announced after the probe session starts; defaults to 1500ms. */
+  commandsWait?: number
+  /** Receives commands announced by a fresh probe (never for results served from the cache). */
+  announced?: (agentId: string, commands: UiAgentCommand[]) => void
 }) {
   let generation = 0
   const cache = new Map<string, UiAgentConfigOptions>()
@@ -21,6 +29,8 @@ export function createAgentDiscovery(options: {
   const runtimes = new Set<ReturnType<typeof createAgentRuntime>>()
   let running = 0
   const waiters = new Set<() => void>()
+  /** Pending command waits, ended early when probes retire. */
+  const commandWaits = new Set<() => void>()
   /** Queue capacity is separate from comment admission and wakes on retirement. */
   async function acquire(owner: number): Promise<void> {
     // Capacity changes when another asynchronous probe releases its slot.
@@ -46,6 +56,8 @@ export function createAgentDiscovery(options: {
         await acquire(owner)
         let runtime: ReturnType<typeof createAgentRuntime> | undefined
         let sanitize = options.sanitize
+        let commands: AvailableCommand[] | undefined
+        let announced: () => void = () => {}
         try {
           const prepared = await prepare()
           if (!owned()) throw new Error('Agent runtime closed')
@@ -60,7 +72,12 @@ export function createAgentDiscovery(options: {
             timeout: options.timeout,
             log: () => {},
             failed: () => {},
-            update: () => {},
+            // Agents announce slash commands right after creating a session.
+            update: (notification) => {
+              if (notification.update.sessionUpdate !== 'available_commands_update') return
+              commands = notification.update.availableCommands
+              announced()
+            },
             permission: async () => ({ outcome: { outcome: 'cancelled' } }),
           })
           runtimes.add(runtime)
@@ -70,14 +87,31 @@ export function createAgentDiscovery(options: {
           if (!owned()) throw new Error('Agent runtime closed')
           const configured = await applyAgentSessionDefaults(runtime, session.sessionId, preset, session.configOptions ?? [], options.timeout, owned)
           if (!owned()) throw new Error('Agent runtime closed')
-          const result = projectAgentConfig(preset.id, configured.options, configured.warning)
+          // Commands arrive asynchronously; wait briefly instead of stopping the probe first.
+          if (!commands) {
+            await new Promise<void>((resolve) => {
+              let timer: ReturnType<typeof setTimeout> | undefined
+              /** Ends the wait on announcement, timeout or retirement. */
+              const done = () => {
+                clearTimeout(timer)
+                commandWaits.delete(done)
+                resolve()
+              }
+              timer = setTimeout(done, options.commandsWait ?? COMMANDS_WAIT)
+              announced = done
+              commandWaits.add(done)
+            })
+          }
+          if (!owned()) throw new Error('Agent runtime closed')
+          const result = { ...projectAgentConfig(preset.id, configured.options, configured.warning), ...commands?.length ? { commands: projectAgentCommands(commands, sanitize) } : {} }
           // Labels and values are arbitrary remote text; redact before browser projection.
           const safe = { ...result }
-          for (const field of ['model', 'effort'] as const) {
+          for (const field of ['model', 'effort', 'mode'] as const) {
             const selector = safe[field]
             if (selector) safe[field] = { configId: sanitize(selector.configId), currentValue: sanitize(selector.currentValue), options: selector.options.map(choice => ({ value: sanitize(choice.value), label: sanitize(choice.label), ...(choice.group ? { group: sanitize(choice.group) } : {}) })) }
           }
           cache.set(key, safe)
+          if (safe.commands) options.announced?.(preset.id, safe.commands)
           return structuredClone(safe)
         }
         catch (error) {
@@ -102,6 +136,7 @@ export function createAgentDiscovery(options: {
       generation++
       cache.clear()
       wake()
+      for (const done of commandWaits) done()
       for (const runtime of runtimes) void runtime.stop().catch(() => {})
     },
     /** Drain probes as part of manager shutdown, including downloads and queued work. */

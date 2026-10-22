@@ -18,6 +18,18 @@ export interface UiAgentStatus {
   logs: string[]
   /** Names of user-level variables; their values are never returned. */
   envKeys: string[]
+  /** Redacted slash commands last advertised by any session of this agent. */
+  commands?: UiAgentCommand[]
+}
+
+/** One agent-advertised slash command. */
+export interface UiAgentCommand {
+  /** Command name without leading slash. */
+  name: string
+  /** Human-readable description. */
+  description: string
+  /** Optional input hint shown after the name. */
+  hint?: string
 }
 
 /** Optional prompt context controlled by the local user's agent settings. */

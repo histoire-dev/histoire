@@ -34,7 +34,7 @@ function onKeydown(event: KeyboardEvent): void {
 </template>
 
 <style scoped>
-.inspector-header { display: flex; align-items: center; gap: 8px; padding: 16px var(--histoire-inspector-gutter, 16px) 14px; }
+.inspector-header { display: flex; flex: none; align-items: center; gap: 8px; box-sizing: border-box; height: var(--histoire-pane-header-height); padding: 0 var(--histoire-inspector-gutter); }
 .inspector-header-titles { display: flex; align-items: center; gap: 6px; flex: 1; min-width: 0; }
 .inspector-story-title { display: flex; align-items: center; gap: 4px; min-width: 0; max-width: 50%; color: var(--histoire-muted); font-size: 13px; white-space: nowrap; }
 .inspector-story-title > span { overflow: hidden; text-overflow: ellipsis; }

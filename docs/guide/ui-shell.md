@@ -4,7 +4,7 @@
 
 Browse stories on the left, compare variants on the canvas, and edit the selected variant in the inspector. Use **Open demo** above to try the static book. Development adds tests, comments, screenshots and MCP activity.
 
-Use Stories, Search, Tests, Comments, or MCP activity in the left rail to change the side panel. Selecting its active button again collapses the panel. The collapse button near Settings also opens or closes the panel. Home and Settings keep their existing route navigation.
+Use Stories, Search, Tests, or AI (threads, canvas comments and MCP activity) in the left rail to change the side panel. Selecting its active button again collapses the panel. The collapse button near Settings also opens or closes the panel. Home and Settings keep their existing route navigation.
 
 The rail is 56px wide; expanded panels default to 280px. Drag the panel's outer edge or inspector's inner edge to resize. Focus either separator and use Left/Right arrows, Shift for larger steps, or Home/End for width limits. Widths persist locally and stay bounded to available workspace. The floating inspector defaults to 344px, can be resized or closed, and cannot be moved or pinned.
 

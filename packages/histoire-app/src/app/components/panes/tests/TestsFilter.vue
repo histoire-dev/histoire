@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { HstButtonGroup } from '@histoire/controls/vue'
+import WorkbenchPaneToolbar from '../../shell/WorkbenchPaneToolbar.vue'
 /** Current project-result scope; emitted value remains caller-owned. */
 defineProps<{ modelValue: 'failing' | 'all' | 'changed' }>()
 const emit = defineEmits<{ 'update:modelValue': [value: 'failing' | 'all' | 'changed'] }>()
@@ -8,12 +9,7 @@ const filters = [{ value: 'failing', label: 'Failing' }, { value: 'all', label: 
 </script>
 
 <template>
-  <div class="test-filters">
+  <WorkbenchPaneToolbar>
     <HstButtonGroup layout="inline" aria-label="Filter tests" :model-value="modelValue" :options="filters" @update:model-value="emit('update:modelValue', $event)" />
-  </div>
+  </WorkbenchPaneToolbar>
 </template>
-
-<style scoped>
-.test-filters { display: flex; flex: none; padding: 12px var(--histoire-pane-gutter, 16px); }
-.test-filters :deep(.histoire-button-group) { width: 100%; }
-</style>

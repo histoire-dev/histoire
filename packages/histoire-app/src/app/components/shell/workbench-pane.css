@@ -1,0 +1,8 @@
+/* Shared side-pane layout. Every block edge (headers, toolbars, inputs, row backgrounds) sits on the pane gutter; list rows pad their content by the row inset. */
+.workbench-pane-header { display: flex; flex: none; align-items: center; gap: 8px; box-sizing: border-box; height: var(--histoire-pane-header-height); padding: 0 var(--histoire-pane-gutter); }
+.workbench-pane-header > h2 { flex: 1; min-width: 0; margin: 0; overflow: hidden; color: var(--histoire-text); font-size: 15px; font-weight: 800; text-overflow: ellipsis; white-space: nowrap; }
+.workbench-pane-toolbar { display: flex; flex: none; gap: 8px; padding: var(--histoire-pane-gutter) var(--histoire-pane-gutter); }
+/* Under a header or another toolbar, the spacing above already separates them. */
+:is(.workbench-pane-header, .workbench-pane-toolbar) + .workbench-pane-toolbar { padding-top: 0; }
+.workbench-pane-toolbar > .histoire-button-group { flex: 1; min-width: 0; }
+.workbench-pane-list { flex: 1; min-height: 0; overflow: auto; padding: 0 var(--histoire-pane-gutter) var(--histoire-pane-gutter); }

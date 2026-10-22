@@ -1,28 +1,13 @@
 import type { UiScreenshotFile } from '@histoire/shared'
 import { randomUUID } from 'node:crypto'
-import { lstat, mkdir, readdir, readFile, realpath, writeFile } from 'node:fs/promises'
+import { lstat, readdir, readFile, writeFile } from 'node:fs/promises'
 import { basename, join } from 'pathe'
+import { projectDirectory } from '../../util/project-directory.js'
 import { isUiChannelEventWithinBudget, UI_CHANNEL_BYTES } from './validation.js'
 
-/** Ensure each generated directory remains inside the real project root. */
-async function screenshotsDirectory(root: string, create: boolean) {
-  let directory = await realpath(root)
-  for (const segment of ['.histoire', 'screenshots']) {
-    directory = join(directory, segment)
-    let entry = await lstat(directory).catch((error: NodeJS.ErrnoException) => {
-      if (error.code === 'ENOENT') return undefined
-      throw error
-    })
-    if (!entry && create) {
-      await mkdir(directory).catch((error: NodeJS.ErrnoException) => {
-        if (error.code !== 'EEXIST') throw error
-      })
-      entry = await lstat(directory)
-    }
-    if (!entry) return undefined
-    if (entry.isSymbolicLink() || !entry.isDirectory()) throw new Error('Screenshots directory cannot be a symlink or file')
-  }
-  return directory
+/** Generated screenshots stay inside the real project root. */
+function screenshotsDirectory(root: string, create: boolean) {
+  return projectDirectory(root, ['.histoire', 'screenshots'], create)
 }
 
 /** IDs are labels only; filenames never preserve separators or dot traversal. */

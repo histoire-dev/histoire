@@ -1,4 +1,3 @@
-import type { WorkbenchComments } from '../../../histoire-app/src/app/stores/comments.js'
 import { ELEMENT_PICK_RESULT } from '@histoire/shared'
 import { mount } from '@vue/test-utils'
 import { afterEach, describe, expect, it, vi } from 'vitest'
@@ -23,8 +22,8 @@ describe('comment pick activation ownership', () => {
     const frames = createCanvasFrames(createCanvasStore())
     const registration = { id: 'frame', storyId: 'a:b', variantId: 'c', rect: { x: 0, y: 0, width: 100, height: 100 }, iframe, documentId: 'document-1', session: fixture.session }
     frames.registerFrame(registration)
-    const compose = vi.fn(() => true)
-    const model = { available: ref(true), compose } as unknown as WorkbenchComments
+    const composePin = vi.fn(() => true)
+    const model = { pinsAvailable: ref(true), composePin }
     const post = vi.spyOn(frames, 'postToFrame').mockReturnValue(true)
     let picker!: ReturnType<typeof useCommentPick>
     const wrapper = mount(defineComponent({ setup() {
@@ -47,7 +46,7 @@ describe('comment pick activation ownership', () => {
           data: { __histoire: true, type: ELEMENT_PICK_RESULT, documentId: 'document-1', storyId: 'a:b', variantId: 'c', requestId: post.mock.calls[0][1].requestId, result: { selector: 'button' } },
         }))
       }
-      expect(compose).toHaveBeenCalledTimes(completion === 'current' ? 1 : 0)
+      expect(composePin).toHaveBeenCalledTimes(completion === 'current' ? 1 : 0)
     }
     finally {
       wrapper.unmount()

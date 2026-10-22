@@ -9,6 +9,7 @@ import { computed, ref, useId } from 'vue'
 import WorkbenchEmptyState from '../../shell/WorkbenchEmptyState.vue'
 import WorkbenchErrorState from '../../shell/WorkbenchErrorState.vue'
 import WorkbenchLoadingState from '../../shell/WorkbenchLoadingState.vue'
+import WorkbenchPaneHeader from '../../shell/WorkbenchPaneHeader.vue'
 import WorkbenchPanelAction from '../../shell/WorkbenchPanelAction.vue'
 
 import { useWorkbenchTestsModel } from './model.js'
@@ -47,14 +48,13 @@ async function select(row: WorkbenchTestRow) {
 
 <template>
   <section class="tests-panel" aria-label="Tests">
-    <header>
-      <h2>Tests</h2>
+    <WorkbenchPaneHeader title="Tests">
       <HstButton color="flat" type="button" class="refresh-tests" aria-label="Refresh tests" title="Refresh tests" :disabled="!model?.canRefresh.value" @click="model?.retryCollection()">
         <BuiltinIcon icon="renew" :size="16" />
       </HstButton>
       <WorkbenchPanelAction v-if="model?.running.value" icon="stop-filled-alt" label="Stop" @click="model.cancel()" />
       <WorkbenchPanelAction v-else icon="play-filled-alt" label="Run all" :disabled="!model?.canRun.value" @click="model?.runAll()" />
-    </header>
+    </WorkbenchPaneHeader>
     <template v-if="model">
       <TestsSummary :summary="model.summary.value" :running="model.running.value" :completed="model.completed.value" :total="model.total.value" />
       <TestsFilter v-model="filter" />
@@ -92,14 +92,12 @@ async function select(row: WorkbenchTestRow) {
 
 <style scoped>
 .tests-panel { display: flex; flex-direction: column; height: 100%; min-height: 0; background: var(--histoire-surface); color: var(--histoire-text); }
-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px var(--histoire-pane-gutter, 16px); }
-h2 { margin: 0; font-size: 14px; font-weight: 800; }
-.refresh-tests { display: inline-flex; align-items: center; justify-content: center; padding: 8px; margin-left: auto; }
-.test-issue { margin: 10px var(--histoire-pane-gutter, 16px); color: var(--histoire-danger-text); font-size: 12px; overflow-wrap: anywhere; white-space: pre-line; }
-.retry-collection { margin: 10px var(--histoire-pane-gutter, 16px); align-self: flex-start; }
-.collection-progress { display: flex; align-items: center; gap: 8px; margin: 10px var(--histoire-pane-gutter, 16px); color: var(--histoire-muted); font-size: 12px; }
+.refresh-tests { display: inline-flex; align-items: center; justify-content: center; padding: 8px; }
+.test-issue { margin: 10px var(--histoire-pane-gutter); color: var(--histoire-danger-text); font-size: 12px; overflow-wrap: anywhere; white-space: pre-line; }
+.retry-collection { margin: 10px var(--histoire-pane-gutter); align-self: flex-start; }
+.collection-progress { display: flex; align-items: center; gap: 8px; margin: 10px var(--histoire-pane-gutter); color: var(--histoire-muted); font-size: 12px; }
 footer { margin-top: auto; border-top: 1px solid var(--histoire-border); }
-.watch-mode-row { display: flex; align-items: center; gap: 9px; box-sizing: border-box; inline-size: 100%; min-inline-size: 0; padding: 14px var(--histoire-pane-gutter, 16px); cursor: pointer; }
+.watch-mode-row { display: flex; align-items: center; gap: 9px; box-sizing: border-box; inline-size: 100%; min-inline-size: 0; padding: 14px var(--histoire-pane-gutter); cursor: pointer; }
 .watch-mode-row:hover { background: var(--histoire-chip); }
 .watch-mode-row.disabled { cursor: default; }
 .watch-mode-row.disabled:hover { background: transparent; }

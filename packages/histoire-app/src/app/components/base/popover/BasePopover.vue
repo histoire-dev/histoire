@@ -27,6 +27,10 @@ const props = withDefaults(defineProps<{
   scope?: PopoverScope
   /** Menu opening can start at last enabled row. */
   focusLast?: boolean
+  /** Horizontal alignment to the anchor. */
+  align?: 'center' | 'start'
+  /** Preferred side of the anchor. */
+  side?: 'bottom' | 'top'
 }>(), { role: 'dialog', width: 280 })
 const emit = defineEmits<{ 'update:open': [value: boolean] }>()
 const injected = inject(popoverScopeKey, undefined)
@@ -61,7 +65,8 @@ function place(): void {
   const view = props.anchor.ownerDocument.defaultView
   if (!view) return
   const bounds = typeof props.bounds === 'function' ? props.bounds() : props.bounds
-  position.value = positionPopover(props.anchor.getBoundingClientRect(), bounds ?? { left: 0, top: 0, right: view.innerWidth, bottom: view.innerHeight }, { width: view.innerWidth, height: view.innerHeight }, props.width)
+  // Natural content height (independent of the current max-height) decides whether the panel opens above.
+  position.value = positionPopover(props.anchor.getBoundingClientRect(), bounds ?? { left: 0, top: 0, right: view.innerWidth, bottom: view.innerHeight }, { width: view.innerWidth, height: view.innerHeight }, props.width, { height: panel.value?.scrollHeight, align: props.align, side: props.side })
 }
 
 /** Descendant portal clicks remain inside this logical overlay chain. */
@@ -91,6 +96,13 @@ watch(() => props.open, async (value) => {
   ;(controls[props.focusLast ? controls.length - 1 : 0] ?? panel.value)?.focus({ preventScroll: true })
 }, { immediate: true })
 watch([() => typeof props.bounds === 'function' ? props.bounds() : props.bounds, () => props.anchor], place, { deep: true, flush: 'post' })
+// Content that arrives after opening (e.g. a loaded list) can change the best side. The panel's
+// own box is capped by max-height, so watch its content rather than its size.
+const content = typeof MutationObserver === 'undefined' ? undefined : new MutationObserver(place)
+watch(panel, (element) => {
+  content?.disconnect()
+  if (element) content?.observe(element, { childList: true, subtree: true })
+}, { flush: 'post' })
 watch(() => props.anchor, (anchor, previous) => {
   if (previous) observer?.unobserve(previous)
   if (anchor) observer?.observe(anchor)
@@ -116,6 +128,7 @@ onBeforeUnmount(() => {
   documentOwner?.removeEventListener('scroll', place, true)
   documentOwner?.defaultView?.removeEventListener('resize', place)
   observer?.disconnect()
+  content?.disconnect()
 })
 defineExpose({ panel, close, place })
 </script>

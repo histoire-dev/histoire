@@ -1,6 +1,6 @@
 # AI agents <Badge type="tip" text="1.0-beta.2+" />
 
-Histoire connects local coding agents to canvas comments through [Agent Client Protocol](https://agentclientprotocol.com/). Agents run in development mode. Open **Settings → AI agents**, search registry, enable local agents, then enable selected agent.
+Histoire connects local coding agents to AI threads and canvas comments through [Agent Client Protocol](https://agentclientprotocol.com/). Agents run in development mode. Open **Settings → AI agents**, search registry, enable local agents, then enable selected agent.
 
 Settings lists full [ACP registry](https://cdn.agentclientprotocol.com/registry/v1/latest/registry.json), alongside existing custom commands. Configured default appears first, then enabled agents, then remaining catalog. Agents without compatible platform distribution remain visible but cannot be enabled.
 
@@ -8,7 +8,7 @@ Registry agents display their published logos in both themes. Missing or unavail
 
 ## Models and advanced settings
 
-Enabled agents expose **Model** and **Effort** defaults. **Agent default** leaves selection to adapter. Choices come from temporary ACP sessions using [session configuration options](https://agentclientprotocol.com/protocol/v1/session-config-options); changing model clears saved effort and loads compatible choices. Unsupported selectors stay disabled. Discovery sends no prompt and exposes no Histoire MCP tools. Complete agent's own authentication setup before discovery or sending comments.
+Enabled agents expose **Model** and **Effort** defaults. **Agent default** leaves selection to adapter. Choices come from temporary ACP sessions using [session configuration options](https://agentclientprotocol.com/protocol/v1/session-config-options); changing model clears saved effort and loads compatible choices. Unsupported selectors stay disabled. Discovery sends no prompt and exposes no Histoire MCP tools. Complete agent's own authentication setup before discovery or sending messages.
 
 Saved defaults apply to later comment sessions. If adapter rejects saved model or effort, comment still sends with accepted configuration and warning. Configuration changes retire existing processes before applying new preferences.
 
@@ -26,21 +26,21 @@ Install Node/npm or `uv` separately when required. Histoire does not install pac
 
 Caches live in `$XDG_CACHE_HOME/histoire` or `~/.cache/histoire` on Linux, `~/Library/Caches/histoire` on macOS, and `%LOCALAPPDATA%/histoire` on Windows. Binary versions cache separately so refreshing catalog does not delete executable used by active process.
 
-Use **Add agent** for another ACP executable. Arguments accept a JSON array of strings. Commands execute directly without a shell; set command and arguments separately. Working directories resolve from the project root. **Set default** chooses the destination for comments; **Ask each time** requires an explicit choice.
+Use **Add agent** for another ACP executable. Arguments accept a JSON array of strings. Commands execute directly without a shell; set command and arguments separately. Working directories resolve from the project root. **Set default** chooses the destination for new threads and comments; **Ask each time** requires an explicit choice.
 
-## Comments and context
+## Threads and context
 
-Each comment thread keeps its own ACP session. Follow-ups reuse that session. Replies stream into the comment thread, and completed ACP tool diffs produce changed-file summaries when the adapter supplies them. Pending or failed tool edits do not count as completed changes. Summaries describe agent-reported diffs, rather than independently verifying filesystem contents; large diffs use the changed span for bounded line counting.
+Each thread, including canvas comments, keeps its own ACP session. Follow-ups reuse that session. Replies stream into the thread, and completed ACP tool diffs produce changed-file summaries when the adapter supplies them. Pending or failed tool edits do not count as completed changes. Summaries describe agent-reported diffs, rather than independently verifying filesystem contents; large diffs use the changed span for bounded line counting.
 
 Context switches control what Histoire attaches:
 
 - **Expose Histoire MCP tools** supplies the active MCP endpoint when the adapter supports HTTP MCP servers. Enable Histoire's MCP server separately to make an endpoint available.
-- **Attach screenshot to comments** includes the stored screenshot path when available.
+- **Attach screenshot to comments** sends a canvas comment's captured screenshot.
 - **Include story source and props** includes the story's source-file reference and captured props.
 
-Story and variant IDs, selected-element selector, and the user-authored comment remain available. Screenshot attachments are paths, rather than inline image bytes; an agent can inspect them through its own tools or Histoire MCP.
+Story and variant IDs, selected-element selector, and the user-authored message remain available. Screenshots and image attachments are sent as images when the adapter accepts them, and as file links otherwise; mentioned files are sent as file links. See [AI threads and canvas comments](./ui-comments.md).
 
-One prompt runs per agent process at a time. Other agents can work independently. Cancelled comments, process exits, and dev-server shutdown retire pending permission cards. Idle processes stop after five minutes; later comments acquire a fresh process/session. Configuration changes retire current processes before applying new preferences.
+One prompt runs per agent process at a time. Other agents can work independently. Cancelled threads, process exits, and dev-server shutdown retire pending permission cards. Idle processes stop after five minutes; later threads acquire a fresh process/session. Configuration changes retire current processes before applying new preferences.
 
 ## Permissions
 

@@ -26,7 +26,7 @@ const snapshot = useHistoireSnapshot()
 <style scoped>
 .inspector-props { min-width: 0; }
 /* Row padding contributes to the content gutter; hover backgrounds extend around it. */
-.inspector-props :deep(.histoire-controls) { padding: 0 calc(var(--histoire-inspector-gutter, 16px) - var(--histoire-control-wrapper-padding, 8px)) 16px; }
+.inspector-props :deep(.histoire-controls) { padding: 0 calc(var(--histoire-inspector-gutter) - var(--histoire-control-wrapper-padding, 8px)) 16px; }
 .inspector-props :deep(.histoire-state-presets) { margin: 2px var(--histoire-control-wrapper-padding, 8px) 20px; }
 .inspector-props :deep(.histoire-preset-trigger) { width: var(--histoire-control-height, 34px); height: var(--histoire-control-height, 34px); padding: 0; }
 .inspector-props :deep(.histoire-controls-reset) { align-self: start; margin: 2px var(--histoire-control-wrapper-padding, 8px) 0; height: var(--histoire-control-height, 34px); }

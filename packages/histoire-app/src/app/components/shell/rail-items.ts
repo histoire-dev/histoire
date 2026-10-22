@@ -11,7 +11,7 @@ export interface RailItem {
   /** Capability absent from static books. */
   devOnly?: boolean
   /** Status color semantics from tests or connected agent services. */
-  badgeTone?: 'danger' | 'agent' | 'mcp'
+  badgeTone?: 'danger' | 'agent'
 }
 
 /** Home navigation remains standalone-owned; other entries change local panels. */
@@ -20,6 +20,5 @@ export const railItems: readonly RailItem[] = [
   { id: 'stories', label: 'Stories', icon: 'catalog' },
   { id: 'search', label: 'Search', icon: 'search' },
   { id: 'tests', label: 'Tests', icon: 'chemistry', devOnly: true, badgeTone: 'danger' },
-  { id: 'comments', label: 'Comments', icon: 'chat', devOnly: true, badgeTone: 'agent' },
-  { id: 'mcp', label: 'MCP activity', icon: 'bot', devOnly: true, badgeTone: 'mcp' },
+  { id: 'ai', label: 'AI', icon: 'bot', devOnly: true, badgeTone: 'agent' },
 ]

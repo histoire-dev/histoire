@@ -1,41 +1,42 @@
 import type { HistoireCatalogStory } from '@histoire/protocol'
-import type { UiComment } from '@histoire/shared'
+import type { UiAiThread } from '@histoire/shared'
+import { isPinnedThread } from '@histoire/shared'
 
-/** Local rail filters never delete resolved or orphan annotations. */
-export type CommentsFilter = 'open' | 'resolved' | 'all'
+/**
+ * Pin numbers: ordinals among pinned threads in persisted order, shared by canvas pins and list rows.
+ * @param threads Persisted threads in file order.
+ */
+export function pinNumbers(threads: readonly UiAiThread[]): Map<string, number> {
+  return new Map(threads.filter(isPinnedThread).map((thread, index) => [thread.id, index + 1]))
+}
 
-/** One story's annotation group, including removed catalog targets. */
-export interface CommentsGroup {
-  /** Exact story identity. */
-  storyId: string
-  /** Folder path/title or orphan identity. */
+/**
+ * Whether a pinned thread's variant still exists, so it can open on the canvas.
+ * Orphans (story or variant removed) open in the pane instead.
+ * @param thread Thread to check.
+ * @param stories Collected catalog stories.
+ */
+export function isOnCanvas(thread: UiAiThread, stories: readonly HistoireCatalogStory[]): boolean {
+  return isPinnedThread(thread) && stories.some(story => story.id === thread.context.storyId && story.variants.some(variant => variant.id === thread.context.variantId))
+}
+
+/** Thread list section. */
+export interface ThreadGroup {
+  /** Section heading. */
   title: string
-  /** Removed target remains reviewable and deletable. */
-  orphaned: boolean
-  /** Original file ordering within this story. */
-  comments: UiComment[]
+  /** Threads in list order. */
+  threads: UiAiThread[]
 }
 
-/** Filter only lifecycle; a removed story does not remove its saved thread. */
-export function filterComments(comments: readonly UiComment[], filter: CommentsFilter): UiComment[] {
-  return comments.filter(comment => filter === 'all' || (filter === 'resolved' ? comment.status === 'resolved' : comment.status !== 'resolved'))
-}
-
-/** Group known and orphan targets while preserving persisted chronological ordering. */
-export function groupComments(comments: readonly UiComment[], stories: readonly HistoireCatalogStory[]): CommentsGroup[] {
-  const groups = new Map<string, CommentsGroup>()
-  for (const comment of comments) {
-    const story = stories.find(story => story.id === comment.storyId)
-    const orphaned = !story || !story.variants.some(variant => variant.id === comment.variantId)
-    const key = JSON.stringify([comment.storyId, orphaned])
-    let group = groups.get(key)
-    if (!group) {
-      group = { storyId: comment.storyId, title: story ? story.path.join(' / ') || story.title : comment.storyId, orphaned, comments: [] }
-      groups.set(key, group)
-    }
-    group.comments.push(comment)
-  }
-  return [...groups.values()]
+/**
+ * Threads of the selected story first, then the rest of the project; empty groups are dropped.
+ * @param threads Visible threads in list order.
+ * @param storyId Selected story, if any.
+ */
+export function groupThreads(threads: readonly UiAiThread[], storyId: string | undefined): ThreadGroup[] {
+  const story = threads.filter(thread => storyId !== undefined && thread.context?.storyId === storyId)
+  const project = threads.filter(thread => !story.includes(thread))
+  return [{ title: 'This story', threads: story }, { title: 'Project', threads: project }].filter(group => group.threads.length)
 }
 
 /** Compact timestamps keep actual time accessible through native title text. */

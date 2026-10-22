@@ -4,7 +4,7 @@ import { createMarkdownFilesWatcher } from '../../markdown.js'
 import { getContextRegistry } from '../../runtime/registry.js'
 import { createServer } from '../../server/index.js'
 import { registerAgentsChannel } from '../../server/ui-channel/agents.js'
-import { registerCommentsChannel } from '../../server/ui-channel/comments.js'
+import { registerAiThreadsChannel } from '../../server/ui-channel/ai-threads.js'
 import { registerConfigChannel } from '../../server/ui-channel/config.js'
 import { registerUiChannel } from '../../server/ui-channel/index.js'
 import { createViteServers } from '../../server/vite-servers.js'
@@ -22,11 +22,11 @@ vi.mock('../../server/dev-events.js', () => ({ registerDevEvents: vi.fn() }))
 // Client warmup drives real Vite environments; startup ordering only needs its completion.
 vi.mock('../../server/client-ready.js', () => ({ prepareDevClient: vi.fn(async () => {}) }))
 // Startup tests own acquisition plumbing. Feature registration is a boundary:
-// real ACP/config/comment initialization must not inspect user settings here.
+// real ACP/config/thread initialization must not inspect user settings here.
 vi.mock('../../server/ui-channel/index.js', () => ({ registerUiChannel: vi.fn() }))
 vi.mock('../../server/ui-channel/config.js', () => ({ registerConfigChannel: vi.fn() }))
 vi.mock('../../server/ui-channel/agents.js', () => ({ registerAgentsChannel: vi.fn() }))
-vi.mock('../../server/ui-channel/comments.js', () => ({ registerCommentsChannel: vi.fn() }))
+vi.mock('../../server/ui-channel/ai-threads.js', () => ({ registerAiThreadsChannel: vi.fn() }))
 
 describe('dev startup ownership', () => {
   let nodeClose: ReturnType<typeof vi.fn>
@@ -90,7 +90,7 @@ describe('dev startup ownership', () => {
     expect(registerUiChannel).toHaveBeenCalledWith(ctx, server, expect.any(Object), expect.any(Function))
     expect(registerConfigChannel).toHaveBeenCalledWith(ctx, channel, active)
     expect(registerAgentsChannel).toHaveBeenCalledWith(ctx, channel, server)
-    expect(registerCommentsChannel).toHaveBeenCalledWith(ctx, channel, expect.any(Object), active)
+    expect(registerAiThreadsChannel).toHaveBeenCalledWith(ctx, channel, expect.any(Object), active, server)
     expect(active()).toBe(true)
     expect(ready).toBe(false)
     collected.resolve()

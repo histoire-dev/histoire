@@ -13,7 +13,7 @@ const shell = useShell()
 </script>
 
 <template>
-  <aside :id="id" class="histoire-side-panel-host" :aria-label="`${pane === 'mcp' ? 'MCP activity' : pane} panel`">
+  <aside :id="id" class="histoire-side-panel-host" :aria-label="`${pane === 'ai' ? 'AI' : pane} panel`">
     <div class="histoire-side-panel-content">
       <slot />
     </div>

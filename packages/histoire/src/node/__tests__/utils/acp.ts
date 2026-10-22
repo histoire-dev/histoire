@@ -19,7 +19,8 @@ export function testAgentManager(options: AcpManagerOptions) {
 /** Creates an enabled lazy peer with isolated user settings and configurable lifecycle. */
 export async function fakeManager(scenario = 'normal', enabled = true, idleTimeoutMs?: number, extra: Partial<AcpManagerOptions> = {}) {
   const { root } = await configTestProject()
-  const manager = testAgentManager({ root, idleTimeoutMs, dataFile: join(root, 'user/agents.json'), config: { enabled, presets: [{ id: 'fake', name: 'Fake', command: process.execPath, args: [fakeAgentFile, scenario], default: true }] }, ...extra })
+  // Short command wait keeps discovery probes of agents without commands fast.
+  const manager = testAgentManager({ root, idleTimeoutMs, commandsWaitMs: 50, dataFile: join(root, 'user/agents.json'), config: { enabled, presets: [{ id: 'fake', name: 'Fake', command: process.execPath, args: [fakeAgentFile, scenario], default: true }] }, ...extra })
   return { root, manager }
 }
 

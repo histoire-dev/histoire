@@ -7,7 +7,7 @@ import { inject, provide, shallowReactive } from 'vue'
 export type WorkbenchContextTarget =
   | { kind: 'frame' | 'story' | 'search-result' | 'test' | 'inspector' | 'toolbar', label: string, frame?: FrameActionTarget, selection?: HistoireSelectionInput | HistoireTarget, key?: string }
   | { kind: 'folder' | 'test-group', label: string, key: string, path?: string[], storyId?: string, expanded: boolean }
-  | { kind: 'comment', label: string, key: string, selection: HistoireTarget, status: string, frame?: FrameActionTarget }
+  | { kind: 'comment', label: string, key: string, selection?: HistoireTarget, status: string, frame?: FrameActionTarget }
   | { kind: 'control', label: string, key: string, controlKind: 'prop' | 'state', element: HTMLElement, resetElement?: HTMLButtonElement }
 
 /** Shared capability-gated action shape for non-frame workbench targets. */
@@ -120,7 +120,7 @@ function cloneTarget(target: WorkbenchContextTarget): WorkbenchContextTarget {
     case 'test-group':
       return { ...target, path: target.path ? [...target.path] : undefined }
     case 'comment':
-      return { ...target, selection: { ...target.selection }, frame: target.frame ? { ...target.frame } : undefined }
+      return { ...target, ...(target.selection ? { selection: { ...target.selection } } : {}), frame: target.frame ? { ...target.frame } : undefined }
     case 'control':
       return { ...target }
     default:

@@ -1,7 +1,8 @@
-import type { UiComment, UiCommentMessage } from '@histoire/shared'
+import type { UiAgentThreadBase, UiAiThread, UiCommentMessage } from '@histoire/shared'
+import type { ThreadFileCodec } from './file.js'
 import type { CommentAgentReply } from './store.js'
 import { Buffer } from 'node:buffer'
-import { commentsFileBytes } from './file.js'
+import { commentsFileBytes, defaultCodec } from './file.js'
 import { COMMENT_AGENT_REPLY_BYTES, COMMENT_BYTE_LIMIT, COMMENT_FILE_BYTE_LIMIT, COMMENT_MESSAGE_LIMIT, COMMENT_STEP_LIMIT } from './limits.js'
 import { validateCommentMessage } from './validate.js'
 
@@ -9,7 +10,7 @@ import { validateCommentMessage } from './validate.js'
 export class CommentCapacityError extends Error {
   /** Preserve exact history and tell callers how to continue. */
   constructor() {
-    super('Comment reply capacity reached. Start a new comment to continue; existing history is preserved.')
+    super('Comment reply capacity reached. Start a new thread to continue; existing history is preserved.')
     this.name = 'CommentCapacityError'
   }
 }
@@ -24,7 +25,7 @@ export class CommentReplyStorageError extends Error {
 }
 
 /** Reserve one complete bounded reply without dropping any existing messages. */
-export function assertCommentReplyCapacity(comment: UiComment, agentId: string): void {
+export function assertCommentReplyCapacity(comment: UiAgentThreadBase, agentId: string): void {
   // Resolution can change during execution; reserve the longest terminal label.
   const pending = { ...comment, status: 'resolved', agentId, updatedAt: new Date().toISOString() }
   if (comment.thread.length >= COMMENT_MESSAGE_LIMIT || Buffer.byteLength(JSON.stringify(pending)) + COMMENT_AGENT_REPLY_BYTES + 1 > COMMENT_BYTE_LIMIT) throw new CommentCapacityError()
@@ -46,7 +47,7 @@ function reservedCommentAgentReply(agentId: string): UiCommentMessage {
 }
 
 /** Reserve encoded document capacity for this reply plus every other pending physical-file reply. */
-export function reserveCommentFileReplyCapacity(comments: readonly UiComment[], comment: UiComment, agentId: string, reservations: ReadonlyMap<string, UiCommentMessage>): UiCommentMessage {
+export function reserveCommentFileReplyCapacity<T extends UiAgentThreadBase = UiAiThread>(comments: readonly T[], comment: T, agentId: string, reservations: ReadonlyMap<string, UiCommentMessage>, codec: ThreadFileCodec<T> = defaultCodec<T>()): UiCommentMessage {
   assertCommentReplyCapacity(comment, agentId)
   const reply = reservedCommentAgentReply(agentId)
   const projected = comments.map((value) => {
@@ -55,7 +56,7 @@ export function reserveCommentFileReplyCapacity(comments: readonly UiComment[], 
       ? { ...value, ...(value.id === comment.id ? { status: 'sent' as const, agentId } : {}), thread: [...value.thread, reserved] }
       : value
   })
-  if (commentsFileBytes(projected) > COMMENT_FILE_BYTE_LIMIT) throw new CommentCapacityError()
+  if (commentsFileBytes(projected, codec) > COMMENT_FILE_BYTE_LIMIT) throw new CommentCapacityError()
   return reply
 }
 

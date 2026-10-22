@@ -7,6 +7,8 @@ import { useWorkbenchVisual } from '../../../stores/visual.js'
 import WorkbenchEmptyState from '../../shell/WorkbenchEmptyState.vue'
 import WorkbenchErrorState from '../../shell/WorkbenchErrorState.vue'
 import WorkbenchLoadingState from '../../shell/WorkbenchLoadingState.vue'
+import WorkbenchPaneHeader from '../../shell/WorkbenchPaneHeader.vue'
+import WorkbenchPaneToolbar from '../../shell/WorkbenchPaneToolbar.vue'
 import { countVisualResults, matchesVisualFilter } from './projection.js'
 import VisualResultsList from './VisualResultsList.vue'
 import VisualRunButton from './VisualRunButton.vue'
@@ -47,10 +49,9 @@ onMounted(() => {
 
 <template>
   <section class="visual-panel" aria-label="Visual tests">
-    <header>
-      <h2>Visual tests</h2>
+    <WorkbenchPaneHeader title="Visual tests">
       <VisualRunButton />
-    </header>
+    </WorkbenchPaneHeader>
     <div class="options">
       <template v-if="model.profiles.value.length > 1">
         <label :for="`${id}-profile`">Profile</label>
@@ -60,9 +61,9 @@ onMounted(() => {
       <HstSelect :id="`${id}-baseline`" v-model="model.baselineSource.value" title="Baseline" layout="inline" :disabled="running" :options="baselineOptions" />
     </div>
     <VisualTestsSummary v-if="model.results.value.length || running" :counts="counts" :running="running" :completed="model.completed.value" :total="running ? model.run.value?.total ?? 0 : model.results.value.length" :stale="model.results.value.some(result => !!result.staleReason)" />
-    <div v-if="model.results.value.length" class="filter">
+    <WorkbenchPaneToolbar v-if="model.results.value.length">
       <HstButtonGroup v-model="filter" layout="inline" aria-label="Visual results filter" :options="[{ value: 'changes', label: 'Changes' }, { value: 'errors', label: 'Errors' }, { value: 'all', label: 'All' }]" />
-    </div>
+    </WorkbenchPaneToolbar>
     <p v-if="model.issue.value && !panelFailed" class="issue" role="alert">
       {{ model.issue.value }}
     </p>
@@ -107,17 +108,13 @@ onMounted(() => {
 
 <style scoped>
 .visual-panel { display: flex; flex-direction: column; min-height: 0; height: 100%; }
-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px var(--histoire-pane-gutter, 16px); }
-h2 { margin: 0; font-size: 14px; font-weight: 800; }
 /* Label column sizes to longest label so selects line up. */
-.options { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 8px 12px; padding: 0 var(--histoire-pane-gutter, 16px) 16px; }
+.options { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 8px 12px; padding: 0 var(--histoire-pane-gutter) 16px; }
 .options label { color: var(--histoire-muted); font-size: 12px; }
 .options :deep(.histoire-select) { --histoire-control-margin: 0px; min-width: 0; }
-.filter { display: flex; flex: none; padding: 12px var(--histoire-pane-gutter, 16px); }
-.filter :deep(.histoire-button-group) { width: 100%; }
-.issue { margin: 10px var(--histoire-pane-gutter, 16px); color: var(--histoire-danger-text); white-space: pre-line; font-size: 12px; overflow-wrap: anywhere; }
-.approval-loading { flex: none; margin: 16px var(--histoire-pane-gutter, 16px); }
-footer { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: auto; padding: 10px var(--histoire-pane-gutter, 16px); border-top: 1px solid var(--histoire-border); }
+.issue { margin: 10px var(--histoire-pane-gutter); color: var(--histoire-danger-text); white-space: pre-line; font-size: 12px; overflow-wrap: anywhere; }
+.approval-loading { flex: none; margin: 16px var(--histoire-pane-gutter); }
+footer { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: auto; padding: 10px var(--histoire-pane-gutter); border-top: 1px solid var(--histoire-border); }
 .select-all { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 700; cursor: pointer; }
 .select-all input { margin: 0; accent-color: var(--histoire-accent); }
 .approve { display: inline-flex; align-items: center; gap: 6px; }

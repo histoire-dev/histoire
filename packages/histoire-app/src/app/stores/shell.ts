@@ -2,7 +2,10 @@ import { computed, shallowRef, watch } from 'vue'
 import { clampPanelWidth, INSPECTOR_WIDTH_DEFAULT, INSPECTOR_WIDTH_LIMITS, PANEL_WIDTH_DEFAULT, PANEL_WIDTH_LIMITS, resolveShellWidths } from './shell-widths.js'
 
 /** Local panel identities; home keeps the full workspace available. */
-export type ShellPane = 'home' | 'stories' | 'search' | 'tests' | 'comments' | 'mcp'
+export type ShellPane = 'home' | 'stories' | 'search' | 'tests' | 'ai'
+
+/** AI pane sections: agent threads or MCP server activity. */
+export type AiSection = 'threads' | 'mcp'
 
 /** Persisted shell preference stays independent of session selection and URLs. */
 export interface ShellState {
@@ -18,6 +21,8 @@ export interface ShellState {
   panelWidth: number
   /** Preferred inspector width, independent of pane visibility. */
   inspectorWidth: number
+  /** Visible section of the AI pane. */
+  aiSection: AiSection
 }
 
 /** Standalone persistence key; obsolete split-pane keys are never read. */
@@ -28,17 +33,17 @@ export type ShellStorage = Pick<Storage, 'getItem' | 'setItem'>
 
 /** Modes filter unavailable persisted and user-requested destinations alike. */
 export function isShellPane(value: unknown, dev: boolean): value is ShellPane {
-  return typeof value === 'string' && (['home', 'stories', 'search'].includes(value) || (dev && ['tests', 'comments', 'mcp'].includes(value)))
+  return typeof value === 'string' && (['home', 'stories', 'search'].includes(value) || (dev && ['tests', 'ai'].includes(value)))
 }
 
 /** Each mounted workbench owns one small store; no active Pinia/session globals. */
 export function createShell(options: {
-  /** Dev builds expose tests, comments, and MCP. */
+  /** Dev builds expose tests and AI. */
   dev: boolean
   /** Optional explicit persistence service, usually caller document storage. */
   storage?: ShellStorage
 }) {
-  const state = shallowRef<ShellState>({ pane: 'stories', panelOpen: true, inspectorOpen: true, sourceExpanded: false, panelWidth: PANEL_WIDTH_DEFAULT, inspectorWidth: INSPECTOR_WIDTH_DEFAULT })
+  const state = shallowRef<ShellState>({ pane: 'stories', panelOpen: true, inspectorOpen: true, sourceExpanded: false, panelWidth: PANEL_WIDTH_DEFAULT, inspectorWidth: INSPECTOR_WIDTH_DEFAULT, aiSection: 'threads' })
   const uiHidden = shallowRef(false)
   const narrow = shallowRef(false)
   const containerWidth = shallowRef(0)
@@ -68,7 +73,9 @@ export function createShell(options: {
     }
     catch { /* Malformed preferences are replaced by current defaults. */ }
     storage = value
-    const pane = isShellPane(saved.pane, options.dev) ? saved.pane : 'stories'
+    // Comments merged into the AI pane; older saved preferences still name it.
+    const savedPane: unknown = saved.pane === ('comments' as unknown) ? 'ai' : saved.pane
+    const pane = isShellPane(savedPane, options.dev) ? savedPane : 'stories'
     update({
       pane,
       panelOpen: pane !== 'home' && (typeof saved.panelOpen === 'boolean' ? saved.panelOpen : true),
@@ -76,6 +83,7 @@ export function createShell(options: {
       sourceExpanded: typeof saved.sourceExpanded === 'boolean' ? saved.sourceExpanded : false,
       panelWidth: clampPanelWidth(saved.panelWidth, PANEL_WIDTH_LIMITS, PANEL_WIDTH_DEFAULT),
       inspectorWidth: clampPanelWidth(saved.inspectorWidth, INSPECTOR_WIDTH_LIMITS, INSPECTOR_WIDTH_DEFAULT),
+      aiSection: saved.aiSection === 'mcp' ? 'mcp' : 'threads',
     })
   }
   /** Active panel buttons collapse; changing panels always reveals the new one. */
@@ -98,6 +106,10 @@ export function createShell(options: {
   /** Hide workbench chrome for this page session without persisting the choice. */
   function toggleUi(): void {
     if (!closed) uiHidden.value = !uiHidden.value
+  }
+  /** Switch the AI pane between agent threads and MCP activity. */
+  function setAiSection(section: AiSection): void {
+    update({ aiSection: section })
   }
   /** Container width, rather than global window, defines narrow fallback. */
   function setNarrow(width: number): void {
@@ -139,6 +151,8 @@ export function createShell(options: {
     inspectorOpen: computed(() => state.value.inspectorOpen),
     /** Saved source drawer expansion preference. */
     sourceExpanded: computed(() => state.value.sourceExpanded),
+    /** Visible AI pane section. */
+    aiSection: computed(() => state.value.aiSection),
     /** Whether workbench chrome is temporarily hidden. */
     uiHidden: computed(() => uiHidden.value),
     /** Current container responsive state. */
@@ -158,6 +172,7 @@ export function createShell(options: {
     toggleInspector,
     toggleSource,
     toggleUi,
+    setAiSection,
     setNarrow,
     setInspectorAvailable,
     setPanelWidth,

@@ -18,4 +18,23 @@ describe('toolbar surface placement', () => {
     expect(rightPanel.left + rightPanel.width).toBeLessThanOrEqual(rtl.right - 8)
     expect(surface).toEqual({ left: 56, top: 0, right: 700, bottom: 680 })
   })
+
+  it('opens above a trigger near the bottom edge and can align to its start', () => {
+    const bounds = { left: 0, top: 0, right: 700, bottom: 680 }
+    const viewport = { width: 700, height: 680 }
+    const anchor = { left: 60, width: 28, top: 620, bottom: 648 } as DOMRect
+    const above = positionPopover(anchor, bounds, viewport, 220, { height: 200, align: 'start' })
+    expect(above).toEqual({ left: 60, top: 414, width: 220, maxHeight: 606 })
+    // Room below keeps the default placement.
+    expect(positionPopover({ ...anchor, top: 40, bottom: 68 } as DOMRect, bounds, viewport, 220, { height: 200 }).top).toBe(74)
+  })
+
+  it('prefers opening above when asked and the panel fits there', () => {
+    const bounds = { left: 0, top: 0, right: 700, bottom: 680 }
+    const viewport = { width: 700, height: 680 }
+    const anchor = { left: 60, width: 28, top: 400, bottom: 428 } as DOMRect
+    expect(positionPopover(anchor, bounds, viewport, 220, { height: 200, side: 'top' }).top).toBe(194)
+    // Not enough room above for the panel, more room below: stays below.
+    expect(positionPopover({ ...anchor, top: 100, bottom: 128 } as DOMRect, bounds, viewport, 220, { height: 200, side: 'top' }).top).toBe(134)
+  })
 })

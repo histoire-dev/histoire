@@ -26,10 +26,20 @@ export function useCommentDestination(source: () => readonly UiCommentAgent[]) {
       explicitId = id
       agentId.value = commentDestination(usable.value, explicitId)
     },
-    /** Each new draft or accepted bulk send observes current destination policy. */
+    /** Each new draft observes current destination policy. */
     reset(): void {
       explicitId = undefined
       agentId.value = commentDestination(usable.value)
     },
   }
+}
+
+/**
+ * Configured display metadata for an agent id, without inventing provider labels.
+ * @param agents Current safe agent display states.
+ * @param id Agent that wrote or will write a message.
+ */
+export function agentDisplay(agents: readonly UiCommentAgent[], id?: string): { name: string, icon?: string } {
+  const found = agents.find(agent => agent.id === id)
+  return { name: found?.name ?? id ?? 'Agent', icon: found?.icon }
 }

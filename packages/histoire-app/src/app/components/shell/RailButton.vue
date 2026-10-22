@@ -15,7 +15,7 @@ defineProps<{
   /** Count supplies accessible status and small visual badge. */
   badge?: number
   /** Badge status semantics shared with its rail destination. */
-  badgeTone?: 'danger' | 'agent' | 'mcp'
+  badgeTone?: 'danger' | 'agent'
   /** Existing integration selector. */
   testId?: string
   /** Capability unavailable while route is unregistered. */
@@ -62,5 +62,4 @@ defineProps<{
   background: var(--histoire-danger);
 }
 .histoire-rail-badge[data-tone="agent"] { background: var(--histoire-agent); }
-.histoire-rail-badge[data-tone="mcp"] { background: rgb(var(--histoire-agent-rgb) / .6); }
 </style>

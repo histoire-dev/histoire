@@ -5,7 +5,7 @@ import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { useCanvasFrames, useCanvasStore } from '../../../composables/canvas-settings.js'
 import { getBackgroundCapture } from '../../../util/background.js'
 import { catalogTargetLabel } from '../../../util/catalog-target.js'
-import { screenshotFileDetails } from '../../../util/screenshot-file.js'
+import { screenshotFileDetails, screenshotUrl } from '../../../util/screenshot-file.js'
 import { snapshotScreenshotTargets } from '../../../util/screenshot-targets.js'
 import { onUiDisconnect, onUiEvent, sendUiEvent } from '../../../util/ui-channel.js'
 import { useCaptureDiscoveryPause } from '../../panes/tests/capture.js'
@@ -113,11 +113,6 @@ async function copyPath(path: string) {
   catch { message.value = 'Copy unavailable' }
 }
 
-/** File inventory uses project-relative names; image delivery stays same-origin dev-only. */
-function imageUrl(file: UiScreenshotFile) {
-  return `${import.meta.env.BASE_URL}__histoire/screenshots/${encodeURIComponent(file.path.split('/').pop()!)}`
-}
-
 const disposers = [
   onUiEvent('histoire:ui:screenshot-result', (result) => {
     if (result.requestId !== requestId.value) return
@@ -185,7 +180,7 @@ onBeforeUnmount(() => {
             Recent
           </p>
           <div v-for="file in recentFiles" :key="file.path" class="recent-capture">
-            <img :src="imageUrl(file)" alt="" loading="lazy"><span :title="file.metadata"><strong>{{ file.label }}</strong><small><time v-if="file.capturedAt" :datetime="file.capturedAt">{{ file.time }}</time><code>{{ file.shortName }}</code></small></span><HstButton icon-only color="flat" type="button" :aria-label="`Copy path for ${file.label}`" :title="copied === file.path ? 'Copied' : 'Copy path'" @click="copyPath(file.path)">
+            <img :src="screenshotUrl(file.path)" alt="" loading="lazy"><span :title="file.metadata"><strong>{{ file.label }}</strong><small><time v-if="file.capturedAt" :datetime="file.capturedAt">{{ file.time }}</time><code>{{ file.shortName }}</code></small></span><HstButton icon-only color="flat" type="button" :aria-label="`Copy path for ${file.label}`" :title="copied === file.path ? 'Copied' : 'Copy path'" @click="copyPath(file.path)">
               <BuiltinIcon :icon="copied === file.path ? 'checkmark' : 'copy'" :size="16" />
             </HstButton>
           </div>

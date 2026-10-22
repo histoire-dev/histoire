@@ -47,7 +47,8 @@ const builtins: readonly ShortcutReference[] = [
   { id: 'frame.tests', label: 'Run tests', keys: ['t'], scope: 'frame', devOnly: true },
   { id: 'frame.screenshot', label: 'Screenshot', keys: ['shift+s'], scope: 'frame', devOnly: true },
   { id: 'frame.comment', label: 'Comment for AI', keys: ['shift+c'], scope: 'frame', devOnly: true },
-  { id: 'comment.screenshot', label: 'Attach screenshot to comment', keys: ['mod+shift+s'], scope: 'comment', devOnly: true },
+  { id: 'comment.screenshot', label: 'Capture screenshot for AI message', keys: ['mod+shift+s'], scope: 'comment', devOnly: true },
+  { id: 'comment.attach', label: 'Attach files to AI message', keys: ['mod+u'], scope: 'comment', devOnly: true },
 ]
 
 /** Normalize equivalent modifier spellings for duplicate detection. */

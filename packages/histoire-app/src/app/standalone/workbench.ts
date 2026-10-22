@@ -26,6 +26,7 @@ import { useWorkbenchUiVisibility } from './ui-visibility.js'
 import { useWorkbenchDev } from './workbench-dev.js'
 import { activateWorkspacePane, type WorkspacePane } from './workbench-navigation.js'
 import { useWorkbenchStores } from './workbench-stores.js'
+import { registerThreadActions } from './workbench-thread-actions.js'
 import { useWorkbenchVisualActions } from './workbench-visual.js'
 
 /** Bind standalone adapters once, keeping every store owned by this provider. */
@@ -105,29 +106,12 @@ export function useWorkbench(props: WorkbenchProps, error: (error: unknown) => v
         canvas,
         actions,
         navigate: target => props.session.selection.select(target),
-        showComments: () => showPane('comments'),
+        showThreads: () => showPane('ai'),
         setupAgents: () => navigate('settings', 'agents'),
         error,
       })
     : undefined
-  if (dev) {
-    menu.register({ id: 'comment.open', label: 'Open comment', icon: 'chat', group: 'open', available: target => target.kind === 'comment' && dev.comments.comments.value.some(comment => comment.id === target.key), run: async (target) => {
-      if (target.kind !== 'comment') return
-      const comment = dev.comments.comments.value.find(item => item.id === target.key)
-      if (comment) await dev.selectComment(comment)
-    } })
-    menu.register({ id: 'comment.resolve', label: 'Resolve comment', icon: 'checkmark', group: 'comment', available: target => target.kind === 'comment' && dev.comments.comments.value.some(comment => comment.id === target.key && comment.status !== 'resolved'), run: (target) => {
-      if (target.kind === 'comment') dev.comments.resolve(target.key, true)
-    } })
-    menu.register({ id: 'comment.reopen', label: 'Reopen comment', icon: 'renew', group: 'comment', available: target => target.kind === 'comment' && dev.comments.comments.value.some(comment => comment.id === target.key && comment.status === 'resolved'), run: (target) => {
-      if (target.kind === 'comment') dev.comments.resolve(target.key, false)
-    } })
-    menu.register({ id: 'comment.copy-text', label: 'Copy comment text', icon: 'copy', group: 'copy', available: target => target.kind === 'comment' && dev.comments.comments.value.some(comment => comment.id === target.key), run: (target) => {
-      if (target.kind !== 'comment') return
-      const comment = dev.comments.comments.value.find(item => item.id === target.key)
-      if (comment) return actions.copyText(comment.body)
-    } })
-  }
+  if (dev) useHistoireResource(registerThreadActions({ menu, threads: dev.threads, select: dev.selectComment, copyText: text => actions.copyText(text) }))
   const search = ref<{ focus: () => void | Promise<void>, search: (query: string) => void }>()
   const highlighted = ref<string[]>([])
   const searchQuery = ref('')
@@ -137,7 +121,7 @@ export function useWorkbench(props: WorkbenchProps, error: (error: unknown) => v
   if (dev) {
     useHistoireResource(shortcuts.bind('canvas.comment', () => {
       dev.commentMode.value = true
-    }, { enabled: () => dev.comments.available.value }))
+    }, { enabled: () => dev.threads.pinsAvailable.value }))
   }
   const story = computed(() => snapshot.value.catalog.stories.find(item => item.id === snapshot.value.selection?.storyId))
   const markdownTransition = createWorkbenchMarkdownTransition(props.session)
@@ -178,7 +162,7 @@ export function useWorkbench(props: WorkbenchProps, error: (error: unknown) => v
     },
   })
   useHistoireResource(searchMatches.close)
-  const badges = computed(() => ({ tests: projectTests.summary.value.failed, mcp: mcp?.running.length ?? 0, comments: dev?.comments.count.value ?? 0 }))
+  const badges = computed(() => ({ tests: projectTests.summary.value.failed, ai: (mcp?.running.length ?? 0) + (dev?.threads.attention.value ?? 0) }))
   watch(() => route.value.name, (name, previousName) => {
     if (name === 'settings') {
       shell.selectPane('home')
@@ -230,7 +214,7 @@ export function useWorkbench(props: WorkbenchProps, error: (error: unknown) => v
     root?.removeEventListener(HISTOIRE_SEARCH_FOCUS, requestSearch)
   })
   /** Open without toggling an already visible pane closed. */
-  function showPane(pane: 'stories' | 'search' | 'tests' | 'comments' | 'mcp') {
+  function showPane(pane: WorkspacePane) {
     if (shell.pane.value !== pane || !shell.panelOpen.value) shell.selectPane(pane)
   }
   /** Rail destinations leave Settings before exposing workspace content. */

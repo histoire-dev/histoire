@@ -139,7 +139,7 @@ function openControlMenu(event: MouseEvent | KeyboardEvent): void {
 </template>
 
 <style scoped>
-.story-inspector { --histoire-inspector-gutter: var(--histoire-pane-gutter, 16px); display: flex; flex-direction: column; width: 100%; height: 100%; min-width: 0; min-height: 0; overflow: hidden; border: 1px solid transparent; border-radius: var(--histoire-radius-panel, 16px); color: var(--histoire-text); background: var(--histoire-surface); }
+.story-inspector { display: flex; flex-direction: column; width: 100%; height: 100%; min-width: 0; min-height: 0; overflow: hidden; border: 1px solid transparent; border-radius: var(--histoire-radius-panel, 16px); color: var(--histoire-text); background: var(--histoire-surface); }
 .story-inspector[data-active-tab="docs"] { border-color: var(--histoire-border); background: var(--histoire-canvas); }
 /* Docs canvas background only applies to the docs area: source drawer keeps the regular surface. */
 .story-inspector[data-active-tab="docs"] :deep(.inspector-source) { background: var(--histoire-surface); }

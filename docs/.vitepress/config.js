@@ -321,7 +321,7 @@ module.exports = {
             { text: 'Settings and project saves', link: '/guide/ui-settings' },
             { text: 'Screenshots and MCP activity', link: '/guide/ui-screenshots-mcp' },
             { text: 'ACP agents', link: '/guide/ui-agents' },
-            { text: 'Comments for AI', link: '/guide/ui-comments' },
+            { text: 'AI threads and comments', link: '/guide/ui-comments' },
           ],
         },
         {

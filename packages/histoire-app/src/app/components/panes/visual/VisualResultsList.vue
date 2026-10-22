@@ -43,7 +43,7 @@ function toggle(storyId: string): void {
 </template>
 
 <style scoped>
-.visual-results { flex: 1; min-height: 0; overflow: hidden; padding: 0 calc(var(--histoire-pane-gutter, 16px) - 8px) 8px; }
+.visual-results { flex: 1; min-height: 0; overflow: hidden; padding: 0 var(--histoire-pane-gutter) 8px; }
 .visual-story { display: flex; align-items: center; gap: 8px; width: 100%; height: var(--histoire-virtual-row-height, 39px); padding: 10px 8px; color: var(--histoire-text); line-height: 18px; text-align: left; }
 .visual-story:hover { background: var(--histoire-chip); }
 .visual-story:focus-visible { outline: 2px solid var(--histoire-accent); outline-offset: -2px; }

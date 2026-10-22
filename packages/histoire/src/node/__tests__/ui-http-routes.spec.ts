@@ -5,12 +5,15 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { createServer } from 'vite'
 import { describe, expect, it, vi } from 'vitest'
+import { createProjectFileIndex } from '../comments/files-search.js'
 import { createExecutionService } from '../runtime/execution-service.js'
 import { registerAgentEnvironment } from '../server/ui-channel/agents-env.js'
 import { createUiChannel } from '../server/ui-channel/channel.js'
+import { registerCommentsHttp } from '../server/ui-channel/comments-http.js'
 import { saveScreenshotFile } from '../server/ui-channel/files.js'
 import { installUiHttpRouter, uiHttpPath } from '../server/ui-channel/http.js'
 import { registerScreenshotChannel } from '../server/ui-channel/screenshot.js'
+import { configTestProject, disposeConfigProjects } from './utils/config-codemod.js'
 import { PREVIEW_PNG } from './utils/mcp/preview-browser.js'
 
 describe('early dev UI HTTP route ownership', () => {
@@ -70,5 +73,41 @@ describe('early dev UI HTTP route ownership', () => {
       expect((await fetch(`${origin}${path}`, { method: 'POST' })).status).toBe(404)
     }
     finally { await server.close() }
+  })
+
+  it('guards comment uploads and downloads', async () => {
+    const { root } = await configTestProject()
+    const server = await createServer({ root, configFile: false, logLevel: 'silent', optimizeDeps: { noDiscovery: true }, server: { port: 0, host: '127.0.0.1', hmr: false }, plugins: [{ name: 'ui-http-boundary', configureServer: installUiHttpRouter }] })
+    registerCommentsHttp({ root, mode: 'dev' } as Context, server, createProjectFileIndex(root), () => true)
+    try {
+      await server.listen()
+      const origin = new URL(server.resolvedUrls!.local[0]).origin
+      const upload = `${origin}/__histoire/comments/attachments?name=notes.txt&type=text%2Fplain`
+      const octet = { 'content-type': 'application/octet-stream' }
+      expect((await fetch(upload, { method: 'POST', headers: { ...octet, origin: 'http://evil.example' }, body: 'x' })).status).toBe(403)
+      expect((await fetch(upload, { method: 'POST', headers: { 'origin': origin, 'content-type': 'text/plain' }, body: 'x' })).status).toBe(403)
+      const large = await fetch(upload, { method: 'POST', headers: { ...octet, origin }, body: new Uint8Array(10 * 1024 * 1024 + 1) })
+      expect(large.status).toBe(400)
+      expect(await large.json()).toEqual({ error: 'Attachment exceeds 10 MB' })
+      const saved = await (await fetch(upload, { method: 'POST', headers: { ...octet, origin }, body: 'hello' })).json()
+      const download = await fetch(`${origin}/__histoire/comments/attachments/${saved.path.split('/').pop()}`)
+      expect(download.status).toBe(200)
+      expect(download.headers.get('content-disposition')).toBe('attachment')
+      expect(await download.text()).toBe('hello')
+      expect((await fetch(`${origin}/__histoire/comments/attachments/..%2Fcomments.json`)).status).toBe(404)
+      // Stored screenshots become attachments without a browser round trip.
+      const screenshot = await saveScreenshotFile(root, { storyId: 'story', variantId: 'variant' }, 'png', PREVIEW_PNG)
+      const copy = `${origin}/__histoire/comments/attachments/from-screenshot`
+      const json = { 'content-type': 'application/json' }
+      expect((await fetch(copy, { method: 'POST', headers: { ...json, origin: 'http://evil.example' }, body: JSON.stringify({ path: screenshot.path }) })).status).toBe(403)
+      expect((await fetch(copy, { method: 'POST', headers: { ...json, origin }, body: JSON.stringify({ path: '.histoire/screenshots/missing.png' }) })).status).toBe(400)
+      const attached = await (await fetch(copy, { method: 'POST', headers: { ...json, origin }, body: JSON.stringify({ path: screenshot.path }) })).json()
+      expect(attached).toMatchObject({ name: screenshot.path.split('/').pop(), mimeType: 'image/png', size: PREVIEW_PNG.byteLength })
+      expect(attached.path).toMatch(/^\.histoire\/attachments\//)
+    }
+    finally {
+      await server.close()
+      await disposeConfigProjects()
+    }
   })
 })

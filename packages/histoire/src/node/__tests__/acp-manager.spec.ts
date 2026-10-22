@@ -178,6 +178,17 @@ describe('aCP agent manager', () => {
     expect(result.text).not.toContain('omitted-')
   })
 
+  it('sends files of earlier messages only to a new thread session', async () => {
+    const { root, manager } = await fakeManager('blocks')
+    await writeFile(join(root, 'old.ts'), 'old')
+    await writeFile(join(root, 'new.ts'), 'new')
+    const files = [{ path: 'old.ts', earlier: true }, { path: 'new.ts' }]
+    expect((await manager.prompt({ threadId: 'one', text: 'First', files })).text).toBe('old.ts,new.ts')
+    expect((await manager.prompt({ threadId: 'one', text: 'Again', files })).text).toBe('new.ts')
+    await manager.restart('fake')
+    expect((await manager.prompt({ threadId: 'one', text: 'Restarted', files })).text).toBe('old.ts,new.ts')
+  })
+
   it.each([['mismatch', 'protocol version'], ['crash', 'fixture crash']])('reports %s distinctly and cleans up its process', async (scenario, message) => {
     const { manager } = await fakeManager(scenario)
     await expect(manager.prompt({ threadId: 'one', text: 'Hello' })).rejects.toThrow(message)

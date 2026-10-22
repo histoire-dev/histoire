@@ -36,7 +36,7 @@ const done = computed(() => props.counts.passed + issues.value.reduce((sum, stat
 </template>
 
 <style scoped>
-.visual-summary { padding: 0 var(--histoire-pane-gutter, 16px) 4px; }
+.visual-summary { padding: 0 var(--histoire-pane-gutter) 4px; }
 .visual-summary-bar { display: flex; gap: 2px; height: 6px; overflow: hidden; border-radius: 4px; background: var(--histoire-chip); }
 .visual-summary-bar span { min-width: 0; }
 .visual-summary-bar .progress { background: var(--histoire-accent); transition: width .2s; }

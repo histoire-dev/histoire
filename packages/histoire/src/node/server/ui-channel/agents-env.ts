@@ -1,38 +1,13 @@
 import type { IncomingMessage, ServerResponse } from 'node:http'
-import type { TLSSocket } from 'node:tls'
 import type { ViteDevServer } from 'vite'
 import type { AcpManager } from '../../acp/manager.js'
 import type { Context } from '../../context.js'
-import { Buffer } from 'node:buffer'
 import { validateAgentEnvironment } from '../../acp/validation.js'
+import { isSameOriginPost, readJsonBody } from './http-body.js'
 import { registerUiHttpRoute, uiHttpPath } from './http.js'
 
 /** Credential write endpoint stays outside the HMR channel and has no read route. */
 export const AGENT_ENVIRONMENT_PATH = '/__histoire/agents/environment'
-
-/** Rejects cross-origin browser credential writes before reading the secret body. */
-export function isAgentEnvironmentOrigin(request: IncomingMessage): boolean {
-  if (request.method !== 'POST' || !request.headers.origin || !request.headers.host || request.headers['content-type']?.split(';')[0] !== 'application/json') return false
-  try {
-    const origin = new URL(request.headers.origin)
-    const protocol = (request.socket as TLSSocket)?.encrypted ? 'https:' : 'http:'
-    return origin.protocol === protocol && origin.origin === request.headers.origin && !origin.username && !origin.password && origin.host === request.headers.host
-  }
-  catch { return false }
-}
-
-/** Reads ACP JSON input within existing 64 KB limit without logging private payloads. */
-export async function readAgentJsonBody(request: IncomingMessage): Promise<unknown> {
-  const chunks: Buffer[] = []
-  let bytes = 0
-  for await (const chunk of request) {
-    const buffer = Buffer.from(chunk)
-    bytes += buffer.length
-    if (bytes > 64 * 1024) throw new Error('Credential request is too large')
-    chunks.push(buffer)
-  }
-  return JSON.parse(Buffer.concat(chunks).toString('utf8'))
-}
 
 /** Mounts write-only local credentials for an exact active development context. */
 export function registerAgentEnvironment(ctx: Context, server: ViteDevServer, manager: AcpManager, isActive: () => boolean): () => void {
@@ -42,13 +17,13 @@ export function registerAgentEnvironment(ctx: Context, server: ViteDevServer, ma
     response.setHeader('Cache-Control', 'no-store')
     /** Responds deliberately without echoing request/exception details. */
     async function save(): Promise<void> {
-      if (ctx.mode !== 'dev' || !isActive() || !isAgentEnvironmentOrigin(request)) {
+      if (ctx.mode !== 'dev' || !isActive() || !isSameOriginPost(request)) {
         response.statusCode = 403
         response.end('Credential write refused')
         return
       }
       try {
-        const { agentId, env } = validateAgentEnvironment(await readAgentJsonBody(request))
+        const { agentId, env } = validateAgentEnvironment(await readJsonBody(request))
         if (!isActive()) throw new Error('Agent runtime closed')
         await manager.setEnvironment(agentId, env)
         response.statusCode = 204

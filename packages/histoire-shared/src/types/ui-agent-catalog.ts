@@ -1,3 +1,5 @@
+import type { UiAgentCommand } from './ui-agents.js'
+
 /** Secret-free catalog entry; launch distributions remain server-owned. */
 export interface UiAgentRegistryEntry {
   /** Canonical registry identity. */
@@ -52,6 +54,10 @@ export interface UiAgentConfigOptions {
   model?: UiAgentConfigSelector
   /** Absent when adapter exposes no thought-level selector. */
   effort?: UiAgentConfigSelector
+  /** Absent when adapter exposes no session mode selector. */
+  mode?: UiAgentConfigSelector
+  /** Slash commands the probe session advertised. */
+  commands?: UiAgentCommand[]
   /** Saved override was refused or unsupported. */
   warning?: string
 }

@@ -1,16 +1,21 @@
-import type { UiAgentSettings } from '@histoire/shared'
+import type { UiAgentCommand, UiAgentSettings } from '@histoire/shared'
 import type { AcpManagerOptions } from './types.js'
 import { createAgentBinaryCache } from './binary-cache.js'
 import { createAgentDiscovery } from './discovery.js'
 import { createAgentRegistryIcons } from './registry-icons.js'
 import { createAgentRegistry } from './registry.js'
 
-/** Manager-scoped registry preparation and discovery retain independent process ownership. */
-export function createAgentServices(options: AcpManagerOptions, sanitize: (text: string) => string) {
+/**
+ * Manager-scoped registry preparation and discovery retain independent process ownership.
+ * @param options Manager options.
+ * @param sanitize Secret redaction.
+ * @param announced Receives commands from fresh discovery probes.
+ */
+export function createAgentServices(options: AcpManagerOptions, sanitize: (text: string) => string, announced?: (agentId: string, commands: UiAgentCommand[]) => void) {
   const registry = createAgentRegistry(options.registry)
   const binaries = createAgentBinaryCache(registry.cacheDir)
   const icons = createAgentRegistryIcons({ cacheDir: registry.cacheDir, fetch: options.registry?.fetch, iconUrl: registry.iconUrl })
-  const discovery = createAgentDiscovery({ root: options.root, timeout: options.handshakeTimeoutMs ?? 10_000, sanitize })
+  const discovery = createAgentDiscovery({ root: options.root, timeout: options.handshakeTimeoutMs ?? 10_000, sanitize, commandsWait: options.commandsWaitMs, announced })
   let controller = new AbortController()
   /** Resolve managed distribution without exposing archive URLs to browser. */
   async function prepare(preset: UiAgentSettings['presets'][number], environment: Record<string, string>) {

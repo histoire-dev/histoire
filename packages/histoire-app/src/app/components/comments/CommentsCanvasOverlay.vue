@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import type { UiComment, UiCommentAgent } from '@histoire/shared'
-import type { WorkbenchComments } from '../../stores/comments.js'
+import type { UiAiThreadAnchor, UiCommentAgent } from '@histoire/shared'
+import type { AiThreads } from '../../stores/ai-threads.js'
 import { getHistoireTargetKey } from '@histoire/protocol'
+import { isPinnedThread } from '@histoire/shared'
 import { useHistoireContext, useHistoireResource } from '@histoire/vue/internal'
 import { computed, onBeforeUnmount, onMounted, ref, shallowRef, watch } from 'vue'
 import { useCanvasFrames, useCanvasStore } from '../../composables/canvas-settings.js'
@@ -12,10 +13,19 @@ import CommentThread from './CommentThread.vue'
 import { useDismissOnOutsideClick } from './dismiss-outside.js'
 import { useFrameGeometryTick } from './frame-geometry.js'
 import { useCommentPick } from './pick.js'
+import { pinNumbers } from './presentation.js'
+
+/** Canvas placement of a pinned thread or draft. */
+interface PinTarget {
+  /** Exact variant owning the pin. */
+  context?: { storyId: string, variantId?: string }
+  /** Logical frame point. */
+  anchor?: UiAiThreadAnchor
+}
 
 const props = defineProps<{
-  /** Shell-owned persisted annotation model. */
-  model: WorkbenchComments
+  /** Shell-owned threads model. */
+  model: AiThreads
   /** Safe ACP display state. */
   agents: readonly UiCommentAgent[]
   /** Comment tool is active; pins only show in this mode. */
@@ -44,39 +54,49 @@ const lastPoints = new Map<string, { point: { x: number, y: number }, camera: st
  * Geometry only needs the iframe box, so a story reload (agent edits, HMR) keeps
  * pins and the open card in place instead of unmounting them until the new document is ready.
  */
-function position(comment: Pick<UiComment, 'storyId' | 'variantId' | 'anchor'>) {
+function position(pin: PinTarget) {
   void tick.value
-  const id = getHistoireTargetKey(comment)
+  if (!isPinnedThread(pin)) return null
+  const { context, anchor } = pin
+  const id = getHistoireTargetKey(context)
   const frame = frames.getFrame(id)
-  if (!frame || frame.storyId !== comment.storyId || frame.variantId !== comment.variantId) return null
-  const key = `${id}:${comment.anchor.x}:${comment.anchor.y}`
+  if (!frame || frame.storyId !== context.storyId || frame.variantId !== context.variantId) return null
+  const key = `${id}:${anchor.x}:${anchor.y}`
   // Cached points are only valid for the camera they were projected with.
   const camera = `${canvas.panOffset.x}:${canvas.panOffset.y}:${canvas.effectiveZoom}`
   if (!frame.iframe) {
     const last = lastPoints.get(key)
     return last?.camera === camera ? last.point : null
   }
-  const point = frames.frameToClient(id, comment.anchor)
+  const point = frames.frameToClient(id, anchor)
   const bounds = frame.iframe.closest('.histoire-canvas-viewport')?.getBoundingClientRect()
   if (!point || !bounds || point.x < bounds.left || point.x > bounds.right || point.y < bounds.top || point.y > bounds.bottom) return null
   lastPoints.set(key, { point, camera })
   return point
 }
+/** Pins of pinned threads whose variant frame is mounted, numbered like the pane list. */
 const pins = computed(() => {
   if (!props.active) return []
-  return props.model.comments.value.flatMap((comment, index) => {
-    // Resolved pins stay hidden unless shown by the pane toggle or their thread is open.
-    if (comment.status === 'resolved' && !props.model.showResolved.value && props.model.activeId.value !== comment.id) return []
-    const point = position(comment)
-    return point ? [{ comment, number: index + 1, point }] : []
+  const numbers = pinNumbers(props.model.threads.value)
+  return props.model.pinned.value.flatMap((thread) => {
+    // Archived pins stay hidden unless shown by the pane toggle or their thread is open.
+    // Pins follow the list: active threads, or only archived ones while the archive is shown.
+    if ((thread.status === 'resolved') !== props.model.showArchived.value && props.model.activeId.value !== thread.id) return []
+    const point = position(thread)
+    return point ? [{ thread, number: numbers.get(thread.id) ?? 0, point }] : []
   })
 })
-const active = computed(() => props.model.draft.value ?? props.model.selected.value)
+/** Open pinned thread; free-form threads never show a canvas card. */
+const selected = computed(() => {
+  const thread = props.model.selectedThread.value
+  return thread && isPinnedThread(thread) ? thread : undefined
+})
+const active = computed(() => props.model.draft.value ?? selected.value)
 /** Unsaved anchors stay owned by the picked document, never its replacement. */
 const draftAnchor = computed(() => {
   const draft = props.model.draft.value
-  if (!draft || draftOwner.value?.id !== draft.id) return null
-  const frame = frames.getFrame(getHistoireTargetKey(draft))
+  if (!draft || !isPinnedThread(draft) || draftOwner.value?.id !== draft.id) return null
+  const frame = frames.getFrame(getHistoireTargetKey(draft.context))
   return frame?.documentId === draftOwner.value.documentId ? position(draft) : null
 })
 const anchor = computed(() => props.model.draft.value ? draftAnchor.value : active.value ? position(active.value) : null)
@@ -88,9 +108,11 @@ const cardStyle = computed(() => anchor.value
   : undefined)
 
 /** Collected labels are presentation only; identities stay exact tuples. */
-function title(comment: Pick<UiComment, 'storyId' | 'variantId'>): string {
-  const story = snapshot.value.catalog.stories.find(story => story.id === comment.storyId)
-  return `${story?.title ?? comment.storyId} › ${story?.variants.find(variant => variant.id === comment.variantId)?.title ?? comment.variantId}`
+function title(pin: PinTarget): string {
+  const context = pin.context
+  if (!context) return ''
+  const story = snapshot.value.catalog.stories.find(story => story.id === context.storyId)
+  return `${story?.title ?? context.storyId} › ${story?.variants.find(variant => variant.id === context.variantId)?.title ?? context.variantId}`
 }
 /** Browser resize changes overlay projection, never saved logical coordinates. */
 function resize() {
@@ -100,13 +122,13 @@ function resize() {
 useFrameGeometryTick(canvas, frames, tick)
 // Outside clicks minimize threads only; unsaved composer text is never discarded.
 useDismissOnOutsideClick(() => {
-  if (!props.model.draft.value && props.model.activeId.value) props.model.dismiss()
+  if (!props.model.draft.value && selected.value) props.model.dismiss()
 })
 // Capture once per composer. Screenshot/context updates retain this owner;
 // dismissal and save acknowledgment remove the temporary anchor automatically.
 watch(() => props.model.draft.value?.id, () => {
   const draft = props.model.draft.value
-  const frame = draft && frames.getFrame(getHistoireTargetKey(draft))
+  const frame = draft && isPinnedThread(draft) && frames.getFrame(getHistoireTargetKey(draft.context))
   draftOwner.value = draft && frame?.documentId ? { id: draft.id, documentId: frame.documentId } : null
 }, { immediate: true, flush: 'sync' })
 onMounted(() => {
@@ -122,16 +144,16 @@ onBeforeUnmount(() => {
 
 <template>
   <Teleport :to="context.overlay.value ?? context.root.value ?? 'body'">
-    <div v-for="pin in pins" :key="pin.comment.id" class="canvas-comment-pin" :style="{ left: `${pin.point.x}px`, top: `${pin.point.y}px` }">
-      <CommentPin :number="pin.number" :active="model.activeId.value === pin.comment.id" :draft="pin.comment.status === 'draft'" :resolved="pin.comment.status === 'resolved'" @select="model.toggle(pin.comment.id)" />
+    <div v-for="pin in pins" :key="pin.thread.id" class="canvas-comment-pin" :style="{ left: `${pin.point.x}px`, top: `${pin.point.y}px` }">
+      <CommentPin :number="pin.number" :active="model.activeId.value === pin.thread.id" :draft="pin.thread.status === 'draft'" :resolved="pin.thread.status === 'resolved'" @select="model.toggle(pin.thread.id)" />
     </div>
     <div v-if="draftAnchor" class="canvas-comment-pin" :style="{ left: `${draftAnchor.x}px`, top: `${draftAnchor.y}px` }">
       <CommentPin active temporary />
     </div>
     <div v-if="anchor && cardStyle" class="canvas-comment-overlay" :style="cardStyle">
       <div class="canvas-comment-card">
-        <CommentComposer v-if="model.draft.value" :draft="model.draft.value" :title="title(model.draft.value)" :agents="agents" :capturing="Boolean(capture.requestId.value) || model.pending.value" @save="model.save" @send="model.sendDraft" @attach="capture.capture" @close="model.dismiss" @setup-agent="emit('setupAgent')" />
-        <CommentThread v-else-if="model.selected.value" :comment="model.selected.value" :title="title(model.selected.value)" :agents="agents" :disabled="!model.available.value" @reply="(id, body, agentId) => model.reply(id, body, agentId)" @resolve="model.resolve(model.selected.value!.id, $event)" @remove="model.remove(model.selected.value!.id)" @close="model.dismiss" />
+        <CommentComposer v-if="model.draft.value" :draft="model.draft.value" :title="title(model.draft.value)" :agents="agents" :capturing="Boolean(capture.requestId.value) || model.pending.value" @send="model.sendDraft" @attach="capture.capture" @close="model.dismiss" @setup-agent="emit('setupAgent')" @remove-screenshot="capture.remove" />
+        <CommentThread v-else-if="selected" :thread="selected" :title="title(selected)" :agents="agents" :disabled="!model.available.value" @reply="model.reply" @resolve="model.archive(selected!.id, $event)" @remove="model.remove(selected!.id)" @close="model.dismiss" />
       </div>
       <Transition name="comment-error" appear>
         <p v-if="model.error.value" class="comment-error" role="alert">

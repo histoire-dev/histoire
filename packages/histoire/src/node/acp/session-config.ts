@@ -21,15 +21,21 @@ function projectSelector(option?: SessionConfigSelect & { id: string }): UiAgent
 
 /** Public choices omit raw SDK metadata and unrelated configuration categories. */
 export function projectAgentConfig(agentId: string, options: SessionConfigOption[], warning?: string): UiAgentConfigOptions {
-  return { agentId, model: projectSelector(select(options, 'model')), effort: projectSelector(select(options, 'thought_level')), warning }
+  return { agentId, model: projectSelector(select(options, 'model')), effort: projectSelector(select(options, 'thought_level')), mode: projectSelector(select(options, 'mode')), warning }
 }
 
-/** Apply model first so dependent effort choices come from accepted model response. */
-export async function applyAgentSessionDefaults(runtime: ReturnType<typeof createAgentRuntime>, sessionId: string, preset: UiAgentSettings['presets'][number], initial: SessionConfigOption[], timeout: number, isOwned: () => boolean) {
+/** Session option fields and the ACP categories they map to, applied in order. */
+const FIELDS = [['model', 'model'], ['effort', 'thought_level'], ['mode', 'mode']] as const
+
+/** Values chosen for one session, keyed by option field. */
+export type SessionConfigValues = Partial<Record<typeof FIELDS[number][0], string>>
+
+/** Apply model first so dependent effort choices come from accepted model response; unchanged values send nothing. */
+export async function applySessionConfig(runtime: ReturnType<typeof createAgentRuntime>, sessionId: string, values: SessionConfigValues, initial: SessionConfigOption[], timeout: number, isOwned: () => boolean) {
   let options = initial
   const warnings: string[] = []
-  for (const [field, category] of [['model', 'model'], ['effort', 'thought_level']] as const) {
-    const value = preset[field]
+  for (const [field, category] of FIELDS) {
+    const value = values[field]
     if (!value || (field === 'model' && value === 'default')) continue
     const option = select(options, category)
     if (!option) {
@@ -48,4 +54,9 @@ export async function applyAgentSessionDefaults(runtime: ReturnType<typeof creat
     }
   }
   return { options, warning: warnings.length ? warnings.join('. ') : undefined }
+}
+
+/** New sessions take per-comment choices first, then preset defaults. */
+export function applyAgentSessionDefaults(runtime: ReturnType<typeof createAgentRuntime>, sessionId: string, preset: UiAgentSettings['presets'][number], initial: SessionConfigOption[], timeout: number, isOwned: () => boolean, overrides: SessionConfigValues = {}) {
+  return applySessionConfig(runtime, sessionId, { model: overrides.model ?? preset.model, effort: overrides.effort ?? preset.effort, mode: overrides.mode }, initial, timeout, isOwned)
 }

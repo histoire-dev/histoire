@@ -1,6 +1,7 @@
 import { symlink } from 'node:fs/promises'
 import { join } from 'node:path'
 import { describe, expect, it, vi } from 'vitest'
+import { aiThreadsCodec } from '../ai-threads/validate.js'
 import { boundedCommentAgentReply } from '../comments/capacity.js'
 import { commentsFileBytes, writeCommentsFile } from '../comments/file.js'
 import { COMMENT_AGENT_REPLY_BYTES, COMMENT_FILE_BYTE_LIMIT } from '../comments/limits.js'
@@ -26,16 +27,17 @@ describe('comment delivery capacity', () => {
       if (commentsFileBytes([...comments, { ...filler, body: 'x'.repeat(middle) }]) <= COMMENT_FILE_BYTE_LIMIT - headroom) lower = middle
       else upper = middle - 1
     }
-    return [...comments, { ...filler, body: 'x'.repeat(lower) }]
+    // Persisted shape: the codec derives each (shortened) title from the body.
+    return [...comments, { ...filler, body: 'x'.repeat(lower) }].map(aiThreadsCodec.validate)
   }
 
   it('rejects aggregate file overflow before starting an otherwise valid agent reply', async () => {
     const fixture = await createMcpProjectFixture()
     const comments = commentsNearFileLimit(1024)
-    const store = createCommentsStore({ root: fixture.root, file: '.histoire/comments.json', enabled: true })
+    const store = createCommentsStore({ root: fixture.root, file: '.histoire/threads.json', enabled: true })
     const runner = vi.fn(async () => ({ text: 'Completed outcome' }))
     try {
-      await writeCommentsFile(fixture.root, '.histoire/comments.json', comments)
+      await writeCommentsFile(fixture.root, '.histoire/threads.json', comments)
       await expect(store.send([comments[0].id], 'agent', runner)).rejects.toThrow('Comment reply capacity reached')
       expect(runner).not.toHaveBeenCalled()
       expect(await store.list()).toEqual(comments)
@@ -46,9 +48,9 @@ describe('comment delivery capacity', () => {
   it('persists a bounded completed reply after aggregate file admission', async () => {
     const fixture = await createMcpProjectFixture()
     const comments = commentsNearFileLimit(COMMENT_AGENT_REPLY_BYTES + 8 * 1024)
-    const store = createCommentsStore({ root: fixture.root, file: '.histoire/comments.json', enabled: true })
+    const store = createCommentsStore({ root: fixture.root, file: '.histoire/threads.json', enabled: true })
     try {
-      await writeCommentsFile(fixture.root, '.histoire/comments.json', comments)
+      await writeCommentsFile(fixture.root, '.histoire/threads.json', comments)
       await store.send([comments[0].id], 'agent', async (_comment, working) => {
         await working()
         return { text: '\u0001'.repeat(8192), changes: Array.from({ length: 32 }, () => ({ file: '\u0001'.repeat(512), added: Number.MAX_SAFE_INTEGER, removed: Number.MAX_SAFE_INTEGER })) }
@@ -63,15 +65,15 @@ describe('comment delivery capacity', () => {
   it.each(['physical', 'alias'])('keeps pending aggregate capacity reserved across $0 writers', async (mode) => {
     const fixture = await createMcpProjectFixture()
     const comments = commentsNearFileLimit(COMMENT_AGENT_REPLY_BYTES + 8 * 1024)
-    const store = createCommentsStore({ root: fixture.root, file: '.histoire/comments.json', enabled: true })
+    const store = createCommentsStore({ root: fixture.root, file: '.histoire/threads.json', enabled: true })
     const alias = join(fixture.root, 'alias')
     if (mode === 'alias') await symlink(fixture.root, alias, 'dir')
-    const other = createCommentsStore({ root: mode === 'alias' ? alias : fixture.root, file: '.histoire/comments.json', enabled: true })
+    const other = createCommentsStore({ root: mode === 'alias' ? alias : fixture.root, file: '.histoire/threads.json', enabled: true })
     const started = deferred<void>()
     const finished = deferred<{ text: string }>()
     let sending: Promise<void> | undefined
     try {
-      await writeCommentsFile(fixture.root, '.histoire/comments.json', comments)
+      await writeCommentsFile(fixture.root, '.histoire/threads.json', comments)
       sending = store.send([comments[0].id], 'agent', async (_comment, working) => {
         await working()
         started.resolve()
@@ -94,13 +96,13 @@ describe('comment delivery capacity', () => {
   it('rejects before dispatch at the message limit without losing history or working forever', async () => {
     const fixture = await createMcpProjectFixture()
     const comment = commentFixture({ thread: commentMessages(63) })
-    const store = createCommentsStore({ root: fixture.root, file: '.histoire/comments.json', enabled: true })
+    const store = createCommentsStore({ root: fixture.root, file: '.histoire/threads.json', enabled: true })
     const runner = vi.fn(async (_comment, working) => {
       await working()
       return { text: 'Completed' }
     })
     try {
-      await writeCommentsFile(fixture.root, '.histoire/comments.json', [comment])
+      await writeCommentsFile(fixture.root, '.histoire/threads.json', [comment])
       await store.send([comment.id], 'agent', runner)
       await expect(store.send([comment.id], 'agent', runner)).rejects.toThrow('Comment reply capacity reached')
       expect(runner).toHaveBeenCalledTimes(1)
@@ -115,7 +117,7 @@ describe('comment delivery capacity', () => {
   ])('retains every completed $label reply and rejects capacity before the next dispatch', async ({ text, attempts }) => {
     const fixture = await createMcpProjectFixture()
     const comment = commentFixture()
-    const store = createCommentsStore({ root: fixture.root, file: '.histoire/comments.json', enabled: true })
+    const store = createCommentsStore({ root: fixture.root, file: '.histoire/threads.json', enabled: true })
     const runner = vi.fn(async (_comment, working) => {
       await working()
       return { text }
@@ -145,7 +147,7 @@ describe('comment delivery capacity', () => {
   it('bounds successful escaped output with an explicit note instead of calling it agent failure', async () => {
     const fixture = await createMcpProjectFixture()
     const comment = commentFixture()
-    const store = createCommentsStore({ root: fixture.root, file: '.histoire/comments.json', enabled: true })
+    const store = createCommentsStore({ root: fixture.root, file: '.histoire/threads.json', enabled: true })
     try {
       await store.upsert(comment)
       await store.send([comment.id], 'agent', async (_comment, working) => {
@@ -164,14 +166,14 @@ describe('comment delivery capacity', () => {
   it.each(['physical', 'alias'])('preserves reserved capacity across $0 root when resolved and reopened during a pending reply', async (mode) => {
     const fixture = await createMcpProjectFixture()
     const comment = commentFixture({ thread: commentMessages(63) })
-    const store = createCommentsStore({ root: fixture.root, file: '.histoire/comments.json', enabled: true })
+    const store = createCommentsStore({ root: fixture.root, file: '.histoire/threads.json', enabled: true })
     const alias = join(fixture.root, 'alias')
     if (mode === 'alias') await symlink(fixture.root, alias, 'dir')
-    const other = createCommentsStore({ root: mode === 'alias' ? alias : fixture.root, file: '.histoire/comments.json', enabled: true })
+    const other = createCommentsStore({ root: mode === 'alias' ? alias : fixture.root, file: '.histoire/threads.json', enabled: true })
     const started = deferred<void>()
     const finished = deferred<{ text: string }>()
     try {
-      await writeCommentsFile(fixture.root, '.histoire/comments.json', [comment])
+      await writeCommentsFile(fixture.root, '.histoire/threads.json', [comment])
       const sending = store.send([comment.id], 'agent', async (_comment, working) => {
         await working()
         started.resolve()
@@ -196,13 +198,13 @@ describe('comment delivery capacity', () => {
   it('settles failed delivery without requiring another message slot after an external history change', async () => {
     const fixture = await createMcpProjectFixture()
     const comment = commentFixture({ thread: commentMessages(63) })
-    const store = createCommentsStore({ root: fixture.root, file: '.histoire/comments.json', enabled: true })
+    const store = createCommentsStore({ root: fixture.root, file: '.histoire/threads.json', enabled: true })
     try {
-      await writeCommentsFile(fixture.root, '.histoire/comments.json', [comment])
+      await writeCommentsFile(fixture.root, '.histoire/threads.json', [comment])
       await store.send([comment.id], 'agent', async (_comment, working) => {
         await working()
         const [current] = await store.list()
-        await writeCommentsFile(fixture.root, '.histoire/comments.json', [{ ...current, thread: [...current.thread, { author: 'user', body: 'External edit', at: '2026-10-04T10:00:00.000Z' }] }])
+        await writeCommentsFile(fixture.root, '.histoire/threads.json', [{ ...current, thread: [...current.thread, { author: 'user', body: 'External edit', at: '2026-10-04T10:00:00.000Z' }] }])
         throw new Error('Runner unavailable')
       })
       expect(await store.list()).toMatchObject([{ status: 'draft', thread: [...comment.thread, { body: 'External edit' }] }])

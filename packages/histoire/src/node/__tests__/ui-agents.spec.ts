@@ -7,7 +7,8 @@ import { describe, expect, it, vi } from 'vitest'
 import { createAgentsStore } from '../../../../histoire-app/src/app/stores/agents.js'
 import { projectAgentStatuses } from '../acp/projection.js'
 import { validateAgentSettings } from '../acp/validation.js'
-import { AGENT_ENVIRONMENT_PATH, isAgentEnvironmentOrigin, registerAgentEnvironment } from '../server/ui-channel/agents-env.js'
+import { AGENT_ENVIRONMENT_PATH, registerAgentEnvironment } from '../server/ui-channel/agents-env.js'
+import { isSameOriginPost } from '../server/ui-channel/http-body.js'
 import { installUiHttpRouter } from '../server/ui-channel/http.js'
 
 /** Exact safe server state avoids browser/platform globals in store checks. */
@@ -108,12 +109,12 @@ describe('write-only credential endpoint', () => {
   }
 
   it('rejects wrong origin and read requests before touching private setters', () => {
-    expect(isAgentEnvironmentOrigin(request())).toBe(true)
-    expect(isAgentEnvironmentOrigin(request('http://evil.example'))).toBe(false)
-    expect(isAgentEnvironmentOrigin(request('https://localhost:6006'))).toBe(false)
-    expect(isAgentEnvironmentOrigin(request('http://localhost:6006/path'))).toBe(false)
-    expect(isAgentEnvironmentOrigin(Object.assign(request(), { method: 'GET' }))).toBe(false)
-    expect(isAgentEnvironmentOrigin(request('http://user:password@localhost:6006'))).toBe(false)
+    expect(isSameOriginPost(request())).toBe(true)
+    expect(isSameOriginPost(request('http://evil.example'))).toBe(false)
+    expect(isSameOriginPost(request('https://localhost:6006'))).toBe(false)
+    expect(isSameOriginPost(request('http://localhost:6006/path'))).toBe(false)
+    expect(isSameOriginPost(Object.assign(request(), { method: 'GET' }))).toBe(false)
+    expect(isSameOriginPost(request('http://user:password@localhost:6006'))).toBe(false)
   })
 
   it('writes only accepted active same-origin POSTs and never echoes credentials/errors', async () => {

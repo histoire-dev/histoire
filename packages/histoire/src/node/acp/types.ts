@@ -1,5 +1,7 @@
 import type { HistoireUiConfig, UiAgentActivity, UiAgentPermission, UiAgentReply, UiAgentSettings, UiAgentsSnapshot, UiAgentStep } from '@histoire/shared'
+import type { PromptFile } from './prompt-blocks.js'
 import type { createAgentRegistry } from './registry.js'
+import type { SessionConfigValues } from './session-config.js'
 
 /** Information attached to one comment prompt; paths stay project relative. */
 export interface AcpPromptContext {
@@ -27,6 +29,12 @@ export interface AcpPromptRequest {
   text: string
   /** Scoped comment context. */
   context?: AcpPromptContext
+  /** Text is a slash command sent ahead of the context. */
+  command?: boolean
+  /** Attached and mentioned project files. */
+  files?: PromptFile[]
+  /** Session choices for this conversation (model, effort, mode). */
+  options?: SessionConfigValues
   /** Optional consumer scoped to this prompt's reply chunks. */
   onUpdate?: (text: string) => void
 }
@@ -75,6 +83,8 @@ export interface AcpManagerOptions {
   idleTimeoutMs?: number
   /** Bound initialization and session creation. */
   handshakeTimeoutMs?: number
+  /** Longest wait for commands announced by a discovery probe; defaults to 1500ms. */
+  commandsWaitMs?: number
 }
 
 /** Explicit local settings fields overlay current project defaults. */

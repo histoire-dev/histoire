@@ -27,6 +27,13 @@
   - Optional `menu` slot (scoped `{ close }`) adds split chevron with options popover; `menuLabel` overrides its accessible name.
   - Example: `<WorkbenchPanelAction icon="play-filled-alt" label="Run" @click="run"><template #menu="{ close }"><MenuItem label="Run all" @click="close()" /></template></WorkbenchPanelAction>`.
 
+- Side panes share one layout so edges line up across tabs and densities (tokens in `packages/histoire-app/src/app/style/density.css`).
+  - `WorkbenchPaneHeader` (`title`, default slot for trailing actions): fixed `--histoire-pane-header-height`, so hiding an action never shifts the pane.
+  - `WorkbenchPaneToolbar`: filter or section switch row; a button group fills it. Spacing adapts to whether it starts the pane, follows a header, or follows other content.
+  - `WorkbenchPaneList`: scrolling list body inset by `--histoire-pane-gutter`, like every other block, so row backgrounds line up with inputs and toolbars.
+  - List rows pad their content horizontally by `--histoire-pane-row-inset` and vertically by their density token (e.g. `--histoire-comment-row-padding`); never apply a density token to all four sides, and never pull rows outside the gutter.
+  - Never hard-code the gutter (16px) or the row inset (8px).
+
 - Every spinner, busy dot, or "running"/"working" indicator must use `HstPulsatingDisc` from `@histoire/controls/vue` (source: `packages/histoire-controls/src/components/HstPulsatingDisc.vue`). Applies to app (`histoire-app`) and native components (`histoire-vue`).
   - `size`: number (px) or CSS length; default `16`. Color follows `currentColor`.
   - Never add custom spin/rotate keyframes or animate status icons (e.g. `in-progress`) for loading.

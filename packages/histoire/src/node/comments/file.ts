@@ -1,19 +1,34 @@
-import type { UiComment } from '@histoire/shared'
+import type { UiAgentThreadBase, UiAiThread } from '@histoire/shared'
 import { Buffer } from 'node:buffer'
 import { randomUUID } from 'node:crypto'
 import { lstat, mkdir, readFile, realpath, rename, rm, writeFile } from 'node:fs/promises'
 import path from 'pathe'
+import { aiThreadsCodec } from '../ai-threads/validate.js'
 import { COMMENT_FILE_BYTE_LIMIT } from './limits.js'
-import { validateComment } from './validate.js'
+
+/** Serialization of one kind of persisted agent conversation (comments, AI threads). */
+export interface ThreadFileCodec<T extends UiAgentThreadBase> {
+  /** Array property in the versioned JSON document. */
+  key: string
+  /** Capitalized label used in error messages. */
+  label: string
+  /** Validate one persisted record, throwing on corrupt data. */
+  validate: (value: unknown) => T
+}
+
+/** AI threads codec as the default of generic helpers, which thread callers omit. */
+export function defaultCodec<T extends UiAgentThreadBase>(): ThreadFileCodec<T> {
+  return aiThreadsCodec as unknown as ThreadFileCodec<T>
+}
 
 /** All stores for the same real project path share one mutation lane. */
 const queues = new Map<string, Promise<unknown>>()
 
 /** Resolve each parent without traversing a symlink or escaping the real project. */
-async function checkedFile(root: string, file: string, create: boolean): Promise<string | undefined> {
+async function checkedFile(root: string, file: string, create: boolean, label: string): Promise<string | undefined> {
   const realRoot = await realpath(root)
   const relative = path.relative(path.resolve(root), path.resolve(root, file))
-  if (!relative || relative.startsWith('../') || path.isAbsolute(relative)) throw new Error('Comments file must stay inside project')
+  if (!relative || relative.startsWith('../') || path.isAbsolute(relative)) throw new Error(`${label} file must stay inside project`)
   const segments = relative.split('/')
   let current = realRoot
   for (let index = 0; index < segments.length; index++) {
@@ -30,36 +45,36 @@ async function checkedFile(root: string, file: string, create: boolean): Promise
       entry = await lstat(current)
     }
     if (!entry && !create) return undefined
-    if (entry && (entry.isSymbolicLink() || (final ? !entry.isFile() : !entry.isDirectory()))) throw new Error('Comments path cannot contain symlinks or non-regular files')
+    if (entry && (entry.isSymbolicLink() || (final ? !entry.isFile() : !entry.isDirectory()))) throw new Error(`${label} path cannot contain symlinks or non-regular files`)
   }
   return current
 }
 
 /** Read only bounded versioned JSON; missing directories remain uncreated. */
-export async function readCommentsFile(root: string, file: string): Promise<UiComment[]> {
-  const checked = await checkedFile(root, file, false)
+export async function readCommentsFile<T extends UiAgentThreadBase = UiAiThread>(root: string, file: string, codec = defaultCodec<T>()): Promise<T[]> {
+  const checked = await checkedFile(root, file, false, codec.label)
   if (!checked) return []
-  if ((await lstat(checked)).size > COMMENT_FILE_BYTE_LIMIT) throw new Error('Comments file exceeds 2 MB')
+  if ((await lstat(checked)).size > COMMENT_FILE_BYTE_LIMIT) throw new Error(`${codec.label} file exceeds 2 MB`)
   const data = JSON.parse(await readFile(checked, 'utf8'))
-  if (data?.version !== 1 || !Array.isArray(data.comments)) throw new Error('Invalid comments file; original file preserved')
-  return data.comments.map(validateComment)
+  if (data?.version !== 1 || !Array.isArray(data[codec.key])) throw new Error(`Invalid ${codec.label.toLowerCase()} file; original file preserved`)
+  return data[codec.key].map(codec.validate)
 }
 
 /** Use one serializer for persisted writes and admission calculations. */
-function commentsFileContent(comments: readonly UiComment[]): string {
-  return `${JSON.stringify({ version: 1, comments: comments.map(validateComment) }, null, 2)}\n`
+function commentsFileContent<T extends UiAgentThreadBase>(comments: readonly T[], codec: ThreadFileCodec<T>): string {
+  return `${JSON.stringify({ version: 1, [codec.key]: comments.map(codec.validate) }, null, 2)}\n`
 }
 
 /** Report exact on-disk UTF-8 bytes, including pretty-printing and final newline. */
-export function commentsFileBytes(comments: readonly UiComment[]): number {
-  return Buffer.byteLength(commentsFileContent(comments))
+export function commentsFileBytes<T extends UiAgentThreadBase = UiAiThread>(comments: readonly T[], codec = defaultCodec<T>()): number {
+  return Buffer.byteLength(commentsFileContent(comments, codec))
 }
 
 /** Rename a private sibling after successful serialization, preserving original on failure. */
-export async function writeCommentsFile(root: string, file: string, comments: readonly UiComment[]): Promise<void> {
-  const content = commentsFileContent(comments)
-  if (Buffer.byteLength(content) > COMMENT_FILE_BYTE_LIMIT) throw new Error('Comments file exceeds 2 MB')
-  const checked = (await checkedFile(root, file, true))!
+export async function writeCommentsFile<T extends UiAgentThreadBase = UiAiThread>(root: string, file: string, comments: readonly T[], codec = defaultCodec<T>()): Promise<void> {
+  const content = commentsFileContent(comments, codec)
+  if (Buffer.byteLength(content) > COMMENT_FILE_BYTE_LIMIT) throw new Error(`${codec.label} file exceeds 2 MB`)
+  const checked = (await checkedFile(root, file, true, codec.label))!
   const temporary = `${checked}.${randomUUID()}.tmp`
   try {
     await writeFile(temporary, content, { flag: 'wx', mode: 0o600 })

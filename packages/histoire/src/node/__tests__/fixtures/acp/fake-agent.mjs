@@ -62,6 +62,7 @@ lines.on('line', (line) => {
     const response = { sessionId, ...(configurationScenario ? { configOptions: configOptions(state) } : {}) }
     if (scenario === 'delayed-config') setTimeout(() => result(message.id, response), 300)
     else result(message.id, response)
+    if (scenario === 'config-options') send({ method: 'session/update', params: { sessionId, update: { sessionUpdate: 'available_commands_update', availableCommands: [{ name: 'review', description: 'Review changes', input: { hint: 'files' } }] } } })
   }
   else if (message.method === 'session/set_config_option') {
     const state = configurations.get(message.params.sessionId)
@@ -114,6 +115,10 @@ lines.on('line', (line) => {
       }
       else if (scenario === 'context') {
         update(message.params.sessionId, message.params.prompt[0].text)
+      }
+      else if (scenario === 'blocks') {
+        // Names of the file blocks the client sent with this prompt.
+        update(message.params.sessionId, message.params.prompt.slice(1).map(block => block.name).join(','))
       }
       else {
         update(message.params.sessionId, 'Hello ')

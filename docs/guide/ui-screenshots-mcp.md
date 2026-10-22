@@ -46,7 +46,7 @@ Older supported drivers do not offer separate shell/full-channel choices. Use th
 
 Project Vitest tests still need `vitest`, `@vitest/browser-playwright`, and their browser setup as described in the [browser testing guide](./testing.md). Screenshot setup does not replace those development test dependencies. The setup panel exists in development; static books do not expose screenshot controls. Node artifacts discover browsers on the deployment machine and use the existing [SDK and MCP capture routes](./deploy-node.md#optional-browser-execution).
 
-The MCP pane shows the actual bound HTTP endpoint, connected exchanges, current operation, and recent tool activity. Copy client configuration from that endpoint or use Histoire's existing stdio CLI. **Cancel** appears only for queued or running work with an owned cancellable execution handle. Cancellation rejection clears the pending state and shows the server's feedback; accepted cancellation waits for the operation's terminal status.
+The **MCP** section of the AI tab shows the actual bound HTTP endpoint, connected exchanges, current operation, and recent tool activity. Copy client configuration from that endpoint or use Histoire's existing stdio CLI. **Cancel** appears only for queued or running work with an owned cancellable execution handle. Cancellation rejection clears the pending state and shows the server's feedback; accepted cancellation waits for the operation's terminal status.
 
 **Follow** navigates to a running operation's story and variant. Its cursor appears only on that exact ready, visible preview document. It stays hidden for a stale or unrelated frame and for ambiguous Matrix cells. Turning Follow off keeps activity history without navigating.
 

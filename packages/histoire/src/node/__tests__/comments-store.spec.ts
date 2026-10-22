@@ -1,18 +1,23 @@
+import type { UiPinnedAiThread } from '@histoire/shared'
 import { mkdtemp, readFile, rm, stat, symlink } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it } from 'vitest'
+import { commentAgentContext, commentPrompt } from '../ai-threads/prompt.js'
+import { attachmentExists, saveAttachment } from '../comments/attachments.js'
 import { writeCommentsFile } from '../comments/file.js'
-import { commentAgentContext, commentPrompt } from '../comments/prompt.js'
 import { createCommentsStore } from '../comments/store.js'
-import { commentFixture, commentDraft as draft } from './utils/comments.js'
+import { commentFixture, commentDraft as draft, PNG_BYTES } from './utils/comments.js'
+import { configTestProject, disposeConfigProjects } from './utils/config-codemod.js'
 import { deferred } from './utils/mcp/deferred.js'
 
-describe('persisted canvas comments', () => {
+afterEach(disposeConfigProjects)
+
+describe('persisted threads', () => {
   it('creates files lazily and serializes concurrent stores without losing drafts', async () => {
     const root = await mkdtemp(join(tmpdir(), 'histoire-comments-'))
-    const first = createCommentsStore({ root, file: '.histoire/comments.json', enabled: true })
-    const second = createCommentsStore({ root, file: '.histoire/comments.json', enabled: true })
+    const first = createCommentsStore({ root, file: '.histoire/threads.json', enabled: true })
+    const second = createCommentsStore({ root, file: '.histoire/threads.json', enabled: true })
     try {
       expect(await first.list()).toEqual([])
       await expect(stat(join(root, '.histoire'))).rejects.toMatchObject({ code: 'ENOENT' })
@@ -22,9 +27,9 @@ describe('persisted canvas comments', () => {
       const saved = await first.list()
       expect(saved).toHaveLength(drafts.length)
       expect(saved.map(({ id, body, status, thread }) => ({ id, body, status, thread })).sort((left, right) => left.id.localeCompare(right.id))).toEqual(expected)
-      const persisted = JSON.parse(await readFile(join(root, '.histoire/comments.json'), 'utf8'))
+      const persisted = JSON.parse(await readFile(join(root, '.histoire/threads.json'), 'utf8'))
       expect(persisted.version).toBe(1)
-      expect(persisted.comments.map(({ id, body, status, thread }: typeof saved[number]) => ({ id, body, status, thread })).sort((left: typeof expected[number], right: typeof expected[number]) => left.id.localeCompare(right.id))).toEqual(expected)
+      expect(persisted.threads.map(({ id, body, status, thread }: typeof saved[number]) => ({ id, body, status, thread })).sort((left: typeof expected[number], right: typeof expected[number]) => left.id.localeCompare(right.id))).toEqual(expected)
       await first.resolve(drafts[0].id, true)
       await second.resolve(drafts[0].id, false)
       expect((await first.list()).find(comment => comment.id === drafts[0].id)?.status).toBe('draft')
@@ -35,20 +40,20 @@ describe('persisted canvas comments', () => {
   })
 
   it('never reads or writes disabled storage and rejects path escapes', async () => {
-    const disabled = createCommentsStore({ root: '/missing-project', file: '.histoire/comments.json', enabled: false })
+    const disabled = createCommentsStore({ root: '/missing-project', file: '.histoire/threads.json', enabled: false })
     expect(await disabled.list()).toEqual([])
     await expect(disabled.upsert(draft())).rejects.toThrow('Comments are disabled')
     await expect(disabled.send([draft().id], 'agent', async () => ({ text: 'Completed' }))).rejects.toThrow('Comments are disabled')
     const root = await mkdtemp(join(tmpdir(), 'histoire-comments-'))
     try {
-      await expect(createCommentsStore({ root, file: '../outside.json', enabled: true }).list()).rejects.toThrow('Comments file must stay inside project')
+      await expect(createCommentsStore({ root, file: '../outside.json', enabled: true }).list()).rejects.toThrow('AI threads file must stay inside project')
     }
     finally { await rm(root, { recursive: true, force: true }) }
   })
 
   it('sends drafts in order, preserves orphan targets, and appends replies and changes', async () => {
     const root = await mkdtemp(join(tmpdir(), 'histoire-comments-'))
-    const store = createCommentsStore({ root, file: '.histoire/comments.json', enabled: true })
+    const store = createCommentsStore({ root, file: '.histoire/threads.json', enabled: true })
     const first = draft('First')
     const second = draft('Second')
     const seen: string[] = []
@@ -62,17 +67,17 @@ describe('persisted canvas comments', () => {
         return { text: 'Fixed width', changes: [{ file: 'src/Button.vue', added: 2, removed: 1 }] }
       })
       expect(seen).toEqual(['First', 'Second'])
-      expect(await store.list()).toMatchObject([{ status: 'replied', storyId: first.storyId, thread: [{ author: 'agent', body: 'Fixed width', changes: [{ file: 'src/Button.vue' }] }] }, { status: 'replied' }])
-      expect(commentAgentContext((await store.list())[0], 'src/Button.story.vue')).toMatchObject({ source: 'src/Button.story.vue', props: { size: 'sm' } })
-      expect(commentPrompt((await store.list())[0])).not.toContain('src/Button.story.vue')
-      expect(commentPrompt((await store.list())[0])).toContain('First')
+      expect(await store.list()).toMatchObject([{ status: 'replied', context: first.context, thread: [{ author: 'agent', body: 'Fixed width', changes: [{ file: 'src/Button.vue' }] }] }, { status: 'replied' }])
+      expect(commentAgentContext((await store.list())[0] as UiPinnedAiThread, 'src/Button.story.vue')).toMatchObject({ source: 'src/Button.story.vue', props: { size: 'sm' } })
+      expect(commentPrompt((await store.list())[0] as UiPinnedAiThread, [])).not.toContain('src/Button.story.vue')
+      expect(commentPrompt((await store.list())[0] as UiPinnedAiThread, [])).toContain('First')
     }
     finally { await rm(root, { recursive: true, force: true }) }
   })
 
   it('returns failed agent requests to draft and records recoverable error in thread', async () => {
     const root = await mkdtemp(join(tmpdir(), 'histoire-comments-'))
-    const store = createCommentsStore({ root, file: '.histoire/comments.json', enabled: true })
+    const store = createCommentsStore({ root, file: '.histoire/threads.json', enabled: true })
     const value = draft()
     try {
       await store.upsert(value)
@@ -89,9 +94,9 @@ describe('persisted canvas comments', () => {
     const outside = await mkdtemp(join(tmpdir(), 'histoire-comments-outside-'))
     try {
       await symlink(outside, join(root, '.histoire'), 'dir')
-      const store = createCommentsStore({ root, file: '.histoire/comments.json', enabled: true })
-      await expect(store.upsert(draft())).rejects.toThrow('Comments path cannot contain symlinks')
-      await expect(stat(join(outside, 'comments.json'))).rejects.toMatchObject({ code: 'ENOENT' })
+      const store = createCommentsStore({ root, file: '.histoire/threads.json', enabled: true })
+      await expect(store.upsert(draft())).rejects.toThrow('AI threads path cannot contain symlinks')
+      await expect(stat(join(outside, 'threads.json'))).rejects.toMatchObject({ code: 'ENOENT' })
     }
     finally {
       await rm(root, { recursive: true, force: true })
@@ -101,7 +106,7 @@ describe('persisted canvas comments', () => {
 
   it('deduplicates in-flight sends and preserves resolution while agent replies', async () => {
     const root = await mkdtemp(join(tmpdir(), 'histoire-comments-'))
-    const store = createCommentsStore({ root, file: '.histoire/comments.json', enabled: true })
+    const store = createCommentsStore({ root, file: '.histoire/threads.json', enabled: true })
     const value = draft()
     const started = deferred<void>()
     const finish = deferred<{ text: string }>()
@@ -134,10 +139,10 @@ describe('persisted canvas comments', () => {
 
   it('recovers interrupted work and stale reopened drafts to their idle status', async () => {
     const root = await mkdtemp(join(tmpdir(), 'histoire-comments-'))
-    const store = createCommentsStore({ root, file: '.histoire/comments.json', enabled: true })
+    const store = createCommentsStore({ root, file: '.histoire/threads.json', enabled: true })
     const reply = { author: 'agent' as const, agentId: 'agent', body: 'Done', at: '2026-10-03T10:00:00.000Z' }
     try {
-      await writeCommentsFile(root, '.histoire/comments.json', [
+      await writeCommentsFile(root, '.histoire/threads.json', [
         commentFixture({ status: 'working', thread: [reply] }),
         commentFixture({ status: 'draft', thread: [reply] }),
         commentFixture({ status: 'draft', thread: [{ ...reply, failed: true }] }),
@@ -146,5 +151,30 @@ describe('persisted canvas comments', () => {
       expect((await store.list()).map(comment => comment.status).sort()).toEqual(['draft', 'replied', 'replied'])
     }
     finally { await rm(root, { recursive: true, force: true }) }
+  })
+
+  it('deletes attachment files of a removed comment and its replies', async () => {
+    const { root } = await configTestProject()
+    const store = createCommentsStore({ root, file: '.histoire/threads.json', enabled: true })
+    const [first, reply] = await Promise.all(['a.png', 'b.png'].map(name => saveAttachment(root, name, 'image/png', PNG_BYTES)))
+    const value = { ...draft(), attachments: [first] }
+    await store.upsert(value)
+    await store.reply(value.id, 'More', [reply])
+    await store.remove(value.id)
+    expect(await Promise.all([first, reply].map(file => attachmentExists(root, file)))).toEqual([false, false])
+  })
+
+  it('deletes a detached upload but keeps one another message still references', async () => {
+    const { root } = await configTestProject()
+    const store = createCommentsStore({ root, file: '.histoire/threads.json', enabled: true })
+    const [shared, own] = await Promise.all(['shared.png', 'own.png'].map(name => saveAttachment(root, name, 'image/png', PNG_BYTES)))
+    const value = { ...draft(), attachments: [shared, own] }
+    const other = draft()
+    await store.upsert(value)
+    await store.upsert(other)
+    await store.reply(other.id, 'Same file', [shared])
+    await store.upsert({ ...value, attachments: [] })
+    expect(await attachmentExists(root, own)).toBe(false)
+    expect(await attachmentExists(root, shared)).toBe(true)
   })
 })

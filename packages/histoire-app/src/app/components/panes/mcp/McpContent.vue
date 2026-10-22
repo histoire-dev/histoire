@@ -12,7 +12,6 @@ const store = useMcpStore()
 <template>
   <section class="histoire-mcp-panel" aria-label="MCP activity">
     <header>
-      <h2>MCP</h2>
       <span class="histoire-mcp-status" :data-status="store.status">
         <span aria-hidden="true" />
         {{ store.status === 'enabled' ? 'Running' : store.status === 'disabled' ? 'Disabled' : 'Unavailable' }}
@@ -45,9 +44,8 @@ const store = useMcpStore()
 </template>
 
 <style scoped>
-.histoire-mcp-panel { flex: 1; box-sizing: border-box; padding: 16px var(--histoire-pane-gutter, 16px); overflow: auto; min-height: 0; color: var(--histoire-text); }
-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 0 0 18px; }
-h2 { margin: 0; font-size: 15px; font-weight: 700; }
+.histoire-mcp-panel { flex: 1; box-sizing: border-box; padding: 4px var(--histoire-pane-gutter) 16px; overflow: auto; min-height: 0; color: var(--histoire-text); }
+header { display: flex; margin: 0 0 18px; }
 .histoire-mcp-status { display: flex; align-items: center; gap: 5px; padding: 4px 8px; border-radius: 999px; color: var(--histoire-muted); background: var(--histoire-chip); font-size: 11px; font-weight: 700; }
 .histoire-mcp-status[data-status="enabled"] { color: var(--histoire-accent-link); background: var(--histoire-accent-soft); }
 .histoire-mcp-status > span { width: 6px; height: 6px; background: currentColor; border-radius: 50%; }

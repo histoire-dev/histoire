@@ -6,8 +6,8 @@ import { describe, expect, it, vi } from 'vitest'
 import { defineComponent, h } from 'vue'
 import { useCommentScreenshot } from '../../../histoire-app/src/app/components/comments/capture.js'
 import { createCanvasFrames } from '../../../histoire-app/src/app/composables/canvas-settings.js'
+import { createAiThreads } from '../../../histoire-app/src/app/stores/ai-threads.js'
 import { createCanvasStore } from '../../../histoire-app/src/app/stores/canvas.js'
-import { createWorkbenchComments } from '../../../histoire-app/src/app/stores/comments.js'
 import { sourceFixture } from '../../../histoire-sdk/src/__tests__/fixtures/session.js'
 
 const send = vi.hoisted(() => vi.fn(() => true))
@@ -24,9 +24,10 @@ describe('checkerboard comment exports', () => {
     const id = getHistoireTargetKey(target)
     frames.registerFrame({ id, ...target, iframe: document.createElement('iframe'), session, rect: { x: 0, y: 0, width: 480, height: 320 } })
     canvas.setFrameBackground(id, 'transparent', true, theme)
-    const model = createWorkbenchComments({ available: true, send: () => true, subscribe: () => () => {}, disconnect: () => () => {} })
+    const model = createAiThreads({ available: true, send: () => true, subscribe: () => () => {}, disconnect: () => () => {} })
     model.enabled.value = true
-    model.compose({ target, anchor: { x: 20, y: 30 } })
+    model.pinsEnabled.value = true
+    model.composePin({ target, anchor: { x: 20, y: 30 } })
     const Host = defineComponent({
       setup() {
         const capture = useCommentScreenshot(model, frames, canvas)

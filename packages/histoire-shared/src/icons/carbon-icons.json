@@ -6,6 +6,7 @@
     "add": {"body":"<path fill=\"currentColor\" d=\"M17 15V8h-2v7H8v2h7v7h2v-7h7v-2z\"/>"},
     "add-alt": {"body":"<path fill=\"currentColor\" d=\"M16 4c6.6 0 12 5.4 12 12s-5.4 12-12 12S4 22.6 4 16S9.4 4 16 4m0-2C8.3 2 2 8.3 2 16s6.3 14 14 14s14-6.3 14-14S23.7 2 16 2\"/><path fill=\"currentColor\" d=\"M24 15h-7V8h-2v7H8v2h7v7h2v-7h7z\"/>"},
     "add-comment": {"body":"<path fill=\"currentColor\" d=\"M17.74 30L16 29l4-7h6a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h9v2H6a4 4 0 0 1-4-4V8a4 4 0 0 1 4-4h20a4 4 0 0 1 4 4v12a4 4 0 0 1-4 4h-4.84Z\"/><path fill=\"currentColor\" d=\"M17 9h-2v4h-4v2h4v4h2v-4h4v-2h-4z\"/>"},
+    "archive": {"body":"<path fill=\"currentColor\" d=\"M14 19h4v2h-4z\"/><path fill=\"currentColor\" d=\"M6 2v26a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V2Zm18 26H8V16h16Zm0-14H8v-4h16ZM8 8V4h16v4Z\"/>"},
     "arrow-down": {"body":"<path fill=\"currentColor\" d=\"M24.59 16.59L17 24.17V4h-2v20.17l-7.59-7.58L6 18l10 10l10-10z\"/>"},
     "arrow-up": {"body":"<path fill=\"currentColor\" d=\"M16 4L6 14l1.41 1.41L15 7.83V28h2V7.83l7.59 7.58L26 14z\"/>"},
     "arrows-horizontal": {"body":"<path fill=\"currentColor\" d=\"M11.41 26.59L7.83 23H28v-2H7.83l3.58-3.59L10 16l-6 6l6 6zM28 10l-6-6l-1.41 1.41L24.17 9H4v2h20.17l-3.58 3.59L22 16z\"/>"},

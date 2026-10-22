@@ -2,7 +2,7 @@ import { readFile } from 'node:fs/promises'
 import { join } from 'pathe'
 import { afterEach, describe, expect, it } from 'vitest'
 import { createAgentDiscovery } from '../acp/discovery.js'
-import { disposeAgentManagers, fakeAgentFile, fakeManager } from './utils/acp.js'
+import { disposeAgentManagers, fakeAgentFile, fakeManager, testAgentManager } from './utils/acp.js'
 import { configTestProject, disposeConfigProjects } from './utils/config-codemod.js'
 
 afterEach(async () => {
@@ -14,7 +14,7 @@ describe('agent model and effort defaults', () => {
   it('redacts discovery environment captured by temporary processes, including registry defaults', async () => {
     const { root } = await configTestProject()
     const preset = { id: 'fake', name: 'Fake', command: process.execPath, args: [fakeAgentFile, 'config-secrets'] }
-    const discovery = createAgentDiscovery({ root, timeout: 1000, sanitize: text => text })
+    const discovery = createAgentDiscovery({ root, timeout: 1000, sanitize: text => text, commandsWait: 50 })
     try {
       const result = await discovery.discover(preset, {}, async () => ({ preset, environment: { AGENT_TOKEN: 'distribution-secret' } }))
       expect(result.model?.options[0].label).toBe('Small [redacted]')
@@ -32,10 +32,27 @@ describe('agent model and effort defaults', () => {
     const choices = await manager.configOptions('fake')
     expect(choices.model?.options).toEqual([{ value: 'small', label: 'Small', group: 'Models' }, { value: 'large', label: 'Large', group: 'Models' }])
     expect(choices.effort?.options.map(option => option.value)).toEqual(['quick', 'deep'])
+    expect(choices.commands).toEqual([{ name: 'review', description: 'Review changes', hint: 'files' }])
     expect(await readFile(join(root, 'protocol.txt'), 'utf8')).not.toContain('session/prompt')
     const result = await manager.prompt({ threadId: 'one', text: 'Hello' })
     expect(result.text).toBe('model=large effort=deep')
     expect((await manager.prompt({ threadId: 'one', text: 'Again' })).text).toBe(result.text)
+  })
+
+  it('applies per-comment session choices and publishes advertised commands', async () => {
+    const { root, manager } = await fakeManager('config-options')
+    await manager.ready
+    expect((await manager.prompt({ threadId: 'one', text: 'Hello', options: { model: 'large', effort: 'deep' } })).text).toBe('model=large effort=deep')
+    expect((await manager.prompt({ threadId: 'one', text: 'Again', options: { model: 'large', effort: 'quick' } })).text).toBe('model=large effort=quick')
+    expect(manager.snapshot().agents[0].commands).toEqual([{ name: 'review', description: 'Review changes', hint: 'files' }])
+    expect(manager.commandNames('fake')).toEqual(['review'])
+    expect(manager.commandNames('unknown')).toEqual([])
+    // Closing drains the cache write; a later dev server remembers commands before its agent runs again.
+    await manager.close()
+    const next = testAgentManager({ root, dataFile: join(root, 'user/agents.json'), config: { enabled: true, presets: [{ id: 'fake', name: 'Fake', command: process.execPath, args: [fakeAgentFile, 'config-options'], default: true }] } })
+    await next.ready
+    expect(next.snapshot().agents[0].commands).toEqual([{ name: 'review', description: 'Review changes', hint: 'files' }])
+    expect(next.commandNames('fake')).toEqual(['review'])
   })
 
   it('keeps default configuration untouched and continues rejected overrides with visible warning', async () => {
@@ -48,6 +65,26 @@ describe('agent model and effort defaults', () => {
     await manager.configure({ ...manager.snapshot(), presets: manager.snapshot().presets.map(preset => ({ ...preset, model: 'missing' })) })
     expect((await manager.prompt({ threadId: 'two', text: 'Continue' })).text).toBe('model=small effort=quick')
     expect(manager.snapshot().agents[0].warning).toContain('model')
+  })
+
+  it('reports choices rejected in the middle of a thread', async () => {
+    const { manager } = await fakeManager('config-options')
+    await manager.prompt({ threadId: 'one', text: 'Hello' })
+    expect(manager.snapshot().agents[0].warning).toBeUndefined()
+    expect((await manager.prompt({ threadId: 'one', text: 'Again', options: { effort: 'deep' } })).text).toBe('model=small effort=quick')
+    expect(manager.snapshot().agents[0].warning).toContain('effort')
+  })
+
+  it('ends the command wait as soon as discovery retires', async () => {
+    const { root } = await configTestProject()
+    const preset = { id: 'fake', name: 'Fake', command: process.execPath, args: [fakeAgentFile, 'config-secrets'] }
+    const discovery = createAgentDiscovery({ root, timeout: 1000, sanitize: text => text, commandsWait: 30_000 })
+    const probe = discovery.discover(preset, {}, async () => ({ preset, environment: {} })).catch(error => error)
+    await expect.poll(async () => readFile(join(root, 'protocol.txt'), 'utf8').catch(() => '')).toContain('session/new')
+    const started = Date.now()
+    await discovery.close()
+    expect(await probe).toBeInstanceOf(Error)
+    expect(Date.now() - started).toBeLessThan(5000)
   })
 
   it('refuses discovery without both opt-ins and suppresses retired probe completion', async () => {

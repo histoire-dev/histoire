@@ -4,6 +4,7 @@ import { BuiltinIcon } from '@histoire/controls/vue'
 import { computed } from 'vue'
 import AgentLogo from '../../agents/AgentLogo.vue'
 import { commentAge } from '../presentation.js'
+import AttachmentStrip from '../prompt/AttachmentStrip.vue'
 import { groupActivityPhases } from './activity-phases.js'
 import AgentActivityPhase from './AgentActivityPhase.vue'
 import AgentMarkdown from './AgentMarkdown.vue'
@@ -27,6 +28,8 @@ const props = defineProps<{
   failed?: boolean
   /** Reply is still being produced. */
   streaming?: boolean
+  /** Files attached to a user message. */
+  attachments?: UiCommentMessage['attachments']
 }>()
 const phases = computed(() => groupActivityPhases(props.steps ?? []))
 </script>
@@ -49,6 +52,7 @@ const phases = computed(() => groupActivityPhases(props.steps ?? []))
       <p v-else-if="body" class="plain">
         {{ body }}
       </p>
+      <AttachmentStrip v-if="attachments?.length" class="attachments" :attachments="attachments" linked />
       <code v-for="change in changes" :key="change.file" class="file-change"><BuiltinIcon icon="code" :size="16" />{{ change.file }} <span class="added">+{{ change.added }}</span><span class="removed">-{{ change.removed }}</span></code>
       <slot />
     </div>
@@ -56,6 +60,7 @@ const phases = computed(() => groupActivityPhases(props.steps ?? []))
 </template>
 
 <style scoped>
+.attachments { margin-top: 6px; }
 .thread-message { display: flex; gap: 10px; margin: 0 0 18px; }
 .thread-message:last-child { margin-bottom: 0; }
 .thread-message > div { min-width: 0; flex: 1; }

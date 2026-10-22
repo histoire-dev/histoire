@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import type { UiAgentConfigSelector } from '@histoire/shared'
 import { HstButton, HstPulsatingDisc, HstSelect } from '@histoire/controls/vue'
-import { computed, watch } from 'vue'
+import { computed } from 'vue'
+import { useAgentDiscovery } from '../../../composables/agent-discovery.js'
 import { useAgentsStore } from '../../../stores/agents.js'
 
 /** Model defaults belong to configured preset, not a temporary discovery session. */
@@ -10,16 +11,7 @@ const props = defineProps<{ agentId: string }>()
 const agents = useAgentsStore()!
 /** Server-confirmed defaults. */
 const preset = computed(() => agents.state.value.presets.find(item => item.id === props.agentId)!)
-/** Only choices for current command/model/environment identity are usable. */
-const discovery = computed(() => {
-  const state = agents.discoveries.value[props.agentId]
-  return state?.key === agents.discoveryKey(props.agentId) ? state : undefined
-})
-/** Disabled global policy never causes a process launch. */
-const allowed = computed(() => agents.connected.value && agents.state.value.enabled && agents.state.value.enabledIds.includes(props.agentId))
-watch(() => [allowed.value, agents.discoveryKey(props.agentId)], () => {
-  if (allowed.value) void agents.discoverAgent(props.agentId)
-}, { immediate: true })
+const { allowed, discovery } = useAgentDiscovery(agents, () => props.agentId)
 
 /** Preserve unavailable saved selection visibly instead of displaying misleading default. */
 function choices(selector: UiAgentConfigSelector | undefined, current?: string) {

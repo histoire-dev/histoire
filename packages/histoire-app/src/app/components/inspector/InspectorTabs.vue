@@ -50,7 +50,7 @@ function navigate(event: KeyboardEvent) {
 </template>
 
 <style scoped>
-.inspector-tabs { margin: 0 var(--histoire-inspector-gutter, 16px) 14px; }
+.inspector-tabs { margin: 0 var(--histoire-inspector-gutter) var(--histoire-pane-gutter); }
 .inspector-tabs button { display: flex; align-items: center; justify-content: center; gap: 5px; flex: 1; min-width: 0; min-height: 32px; color: var(--histoire-muted); font-weight: 700; }
 .inspector-tabs button:hover { color: var(--histoire-text); }
 .inspector-event-count { color: var(--histoire-agent-text); font-size: 13px; font-variant-numeric: tabular-nums; }

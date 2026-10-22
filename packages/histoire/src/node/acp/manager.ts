@@ -1,13 +1,15 @@
-import type { SessionNotification } from '@agentclientprotocol/sdk'
 import type { UiAgentSettings, UiAgentsSnapshot } from '@histoire/shared'
 import type { AgentRecord } from './record.js'
 import type { AcpManagerOptions, AcpPromptRequest, AcpPromptResult, AcpUpdate, AcpUserData } from './types.js'
 import { Buffer } from 'node:buffer'
 import { methods } from '@agentclientprotocol/sdk'
+import { createAgentCommands } from './commands-cache.js'
 import { createAgentControlLane } from './control-lane.js'
+import { routeAgentNotification } from './notifications.js'
 import { createPermissionBroker } from './permissions.js'
 import { projectAgentStatuses } from './projection.js'
 import { promptAgent } from './prompt.js'
+import { emitReplyChunks } from './reply-chunks.js'
 import { createAgentServices } from './services.js'
 import { defaultAgentSettings, mergeAgentSettings, retireAgentOverrides, updateAgentOverrides } from './settings.js'
 import { startAgentRecord } from './start-record.js'
@@ -21,6 +23,8 @@ export function createAcpManager(options: AcpManagerOptions) {
   let settings = defaults
   let data: AcpUserData = { version: 2, projects: {}, env: {} }
   const records = new Map<string, AgentRecord>()
+  /** Latest slash commands per agent, kept across process and dev server restarts. */
+  const commands = createAgentCommands(dataFile, options.root, () => changed())
   const listeners = new Set<(event: AcpUpdate) => void>()
   let closed = false
   let closing: Promise<void> | undefined
@@ -52,16 +56,16 @@ export function createAcpManager(options: AcpManagerOptions) {
       presets: settings.presets.map(preset => ({ ...preset, args: preset.args ? [...preset.args] : undefined })),
       permissions: { ...settings.permissions },
       context: { ...settings.context },
-      agents: projectAgentStatuses(settings, new Map([...records].map(([id, record]) => [id, record.status])), data.env, sanitize),
+      agents: projectAgentStatuses(settings, new Map([...records].map(([id, record]) => [id, record.status])), data.env, sanitize, commands.map),
     }
   }
   /** Publishes the safe state after every meaningful process/preference change. */
   function changed(): void {
     emit({ type: 'snapshot', value: snapshot() })
   }
-  const services = createAgentServices(options, sanitize)
+  const services = createAgentServices(options, sanitize, commands.remember)
   const permissions = createPermissionBroker({ root: options.root, policy: () => settings.permissions, sanitize, emit: value => emit({ type: 'permission', value }), resolved: requestId => emit({ type: 'permission-resolved', value: { requestId } }) })
-  const ready = readAgentUserData(dataFile).then((value) => {
+  const ready = Promise.all([readAgentUserData(dataFile), commands.load()]).then(([value]) => {
     if (closed) return
     data = value
     settings = mergeAgentSettings(defaults, data.projects[options.root])
@@ -120,7 +124,7 @@ export function createAcpManager(options: AcpManagerOptions) {
       sanitize,
       changed,
       permissions,
-      update: notification => reply(id, captured, notification),
+      update: notification => routeAgentNotification(id, captured, notification, { remember: commands.remember, sanitize, emit }),
     })
     changed()
     await captured.start
@@ -143,38 +147,6 @@ export function createAcpManager(options: AcpManagerOptions) {
       changed()
     })
   }
-  /** Accepts only text reply chunks belonging to this exact active prompt/session. */
-  function reply(agentId: string, record: AgentRecord, notification: SessionNotification): void {
-    if (notification.update.sessionUpdate === 'config_option_update') {
-      const session = [...record.sessions.values()].find(session => session.sessionId === notification.sessionId)
-      if (session) session.configOptions = notification.update.configOptions
-      return
-    }
-    const active = record.active
-    if (!active || notification.sessionId !== active.sessionId) return
-    const update = notification.update
-    active.changes.update(notification)
-    for (const step of active.activity.update(notification)) emit({ type: 'activity', value: { agentId, threadId: active.request.threadId, step } })
-    if (update.sessionUpdate === 'agent_message_chunk' && update.content.type === 'text') {
-      const text = active.output.push(update.content.text)
-      if (!text) return
-      active.text = `${active.text}${text}`.slice(-256_000)
-      replyChunk(agentId, active.request, text)
-    }
-  }
-  /** Safe consumers cannot break ACP notification dispatch. */
-  function replyChunk(agentId: string, request: AcpPromptRequest, text: string): void {
-    // Worst-case JSON escaping takes six bytes per character; small chunks stay
-    // within the UI channel's 64 KB limit without changing secret filtering.
-    for (let index = 0; index < text.length; index += 8000) {
-      const chunk = text.slice(index, index + 8000)
-      try {
-        request.onUpdate?.(chunk)
-      }
-      catch { /* UI/comment observers do not own the agent transport. */ }
-      emit({ type: 'reply', value: { agentId, threadId: request.threadId, text: chunk } })
-    }
-  }
   return {
     ready,
     snapshot,
@@ -190,6 +162,8 @@ export function createAcpManager(options: AcpManagerOptions) {
       if (!preset || !settings.enabled || !settings.enabledIds.includes(agentId)) throw new Error('Agent is disabled; enable it in AI agent settings')
       return services.discover(preset, { ...data.env[agentId] }, force)
     },
+    /** Names of the agent's last announced or cached slash commands. */
+    commandNames: (agentId: string): string[] => commands.names(agentId),
     /** Subscribes to this runtime's safe process/reply/permission updates. */
     onUpdate(listener: (event: AcpUpdate) => void): () => void {
       listeners.add(listener)
@@ -251,7 +225,7 @@ export function createAcpManager(options: AcpManagerOptions) {
         sanitize,
         settle: (sessionId) => { if (records.get(id) === record) permissions.settle(id, sessionId) },
         stop: () => stopRecord(id, record),
-        reply: text => replyChunk(id, request, text),
+        reply: text => emitReplyChunks(id, request, text, emit),
       })
     },
     /** Cancels only the requested comment conversation and its permission cards. */
@@ -287,7 +261,7 @@ export function createAcpManager(options: AcpManagerOptions) {
       generation++
       services.retire()
       permissions.close()
-      closing = Promise.all([stopAll(), services.close(), controls.settled()]).then(() => {}).finally(() => listeners.clear())
+      closing = Promise.all([stopAll(), services.close(), controls.settled()]).then(() => commands.flush()).finally(() => listeners.clear())
       return closing
     },
   }

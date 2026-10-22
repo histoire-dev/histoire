@@ -11,7 +11,7 @@ describe('standalone shell ownership', () => {
       expect(shell.panelOpen.value).toBe(false)
       shell.selectPane('search')
       expect(shell.panelOpen.value).toBe(true)
-      expect(JSON.parse(window.localStorage.getItem(SHELL_STORAGE_KEY)!)).toEqual({ pane: 'search', panelOpen: true, inspectorOpen: true, sourceExpanded: false, panelWidth: 280, inspectorWidth: 344 })
+      expect(JSON.parse(window.localStorage.getItem(SHELL_STORAGE_KEY)!)).toEqual({ pane: 'search', panelOpen: true, inspectorOpen: true, sourceExpanded: false, panelWidth: 280, inspectorWidth: 344, aiSection: 'threads' })
       shell.selectPane('search')
       expect(shell.panelOpen.value).toBe(false)
       shell.selectPane('home')
@@ -27,7 +27,7 @@ describe('standalone shell ownership', () => {
     }
   })
 
-  it.each(['tests', 'comments', 'mcp', 'unknown'])('recovers persisted hidden or unknown pane %s in static mode', (pane) => {
+  it.each(['tests', 'comments', 'ai', 'unknown'])('recovers persisted hidden or unknown pane %s in static mode', (pane) => {
     window.localStorage.setItem(SHELL_STORAGE_KEY, JSON.stringify({ pane, panelOpen: true, inspectorOpen: false }))
     const shell = createShell({ dev: false, storage: window.localStorage })
     try {
@@ -36,6 +36,19 @@ describe('standalone shell ownership', () => {
       expect(shell.inspectorOpen.value).toBe(false)
       shell.selectPane('tests')
       expect(shell.pane.value).toBe('stories')
+    }
+    finally {
+      shell.close()
+      window.localStorage.removeItem(SHELL_STORAGE_KEY)
+    }
+  })
+
+  it('restores a saved comments pane as the AI pane', () => {
+    window.localStorage.setItem(SHELL_STORAGE_KEY, JSON.stringify({ pane: 'comments', panelOpen: true }))
+    const shell = createShell({ dev: true, storage: window.localStorage })
+    try {
+      expect(shell.pane.value).toBe('ai')
+      expect(shell.panelOpen.value).toBe(true)
     }
     finally {
       shell.close()
@@ -85,7 +98,7 @@ describe('standalone shell ownership', () => {
       expect(shell.inspectorWidth.value).toBe(380)
       shell.setPanelWidth(420)
       shell.setInspectorWidth(460)
-      expect(JSON.parse(window.localStorage.getItem(SHELL_STORAGE_KEY)!)).toEqual({ pane: 'search', panelOpen: true, inspectorOpen: false, sourceExpanded: false, panelWidth: 420, inspectorWidth: 460 })
+      expect(JSON.parse(window.localStorage.getItem(SHELL_STORAGE_KEY)!)).toEqual({ pane: 'search', panelOpen: true, inspectorOpen: false, sourceExpanded: false, panelWidth: 420, inspectorWidth: 460, aiSection: 'threads' })
       shell.close()
       shell.setPanelWidth(260)
       expect(shell.panelWidth.value).toBe(420)
