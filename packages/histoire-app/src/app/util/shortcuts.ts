@@ -75,7 +75,7 @@ export function matchesShortcut(binding: string, event: KeyboardEvent): boolean 
 }
 
 /** Detect editable native controls without requiring a global DOM realm. */
-function isEditing(target: EventTarget | null): boolean {
+export function isEditing(target: EventTarget | null): boolean {
   const element = target as HTMLElement | null
   return Boolean(element?.closest?.('input, textarea, select, [contenteditable="true"], [role="textbox"]'))
 }

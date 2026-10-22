@@ -1,6 +1,5 @@
 import type { HistoireMeasureResult } from '@histoire/shared'
-import type { MeasureOwner } from '../../../../histoire-app/src/app/components/canvas/measure-controller.js'
-import type { CanvasPoint } from '../../../../histoire-app/src/app/components/canvas/pan/usePanZoom.js'
+import type { MeasureOwner, MeasureQuery } from '../../../../histoire-app/src/app/components/canvas/measure-controller.js'
 import { MEASURE_RESULT } from '@histoire/shared'
 import { describe, expect, it, vi } from 'vitest'
 import { createMeasureController } from '../../../../histoire-app/src/app/components/canvas/measure-controller.js'
@@ -9,7 +8,7 @@ import { measureResult as result } from './utils/measurement.js'
 /** One changing owner drives real controller, keeping reply provenance explicit. */
 function fixture() {
   let owner: MeasureOwner | null = { frameId: 'frame', storyId: 'story', variantId: 'variant', documentId: 'document', source: {} as Window, origin: 'https://book.test', generation: 'revision-1' }
-  const post = vi.fn((_owner: MeasureOwner, _requestId: string, _point: CanvasPoint) => true)
+  const post = vi.fn((_owner: MeasureOwner, _requestId: string, _query: MeasureQuery) => true)
   const controller = createMeasureController({ getOwner: () => owner, post })
   return { controller, post,
     /** Publish predecessor retirement or another exact runtime owner. */
@@ -132,5 +131,91 @@ describe('canvas measurement lock', () => {
     reply()
     expect(controller.locked.value).toBe(false)
     expect(controller.result.value).toBeNull()
+  })
+
+  it('inspects target only while locked and keeps it apart from locked measurement', () => {
+    const { controller, post, reply } = fixture()
+    controller.inspectTarget({ x: 1, y: 1 })
+    expect(post).not.toHaveBeenCalled()
+    controller.hover({ x: 10, y: 20 })
+    reply()
+    controller.toggle()
+    controller.inspectTarget({ x: 70, y: 80 })
+    reply(result(70))
+    expect(controller.result.value?.rect.x).toBe(10)
+    expect(controller.target.value?.rect.x).toBe(70)
+    controller.clearTarget()
+    expect(controller.target.value).toBeNull()
+    controller.toggle()
+    expect(controller.target.value).toBeNull()
+  })
+
+  it('drops pending target reply after clear and clears target with owner change', () => {
+    const { controller, post, reply, setOwner, owner } = fixture()
+    controller.hover({ x: 10, y: 20 })
+    reply()
+    controller.toggle()
+    controller.inspectTarget({ x: 70, y: 80 })
+    const pending = post.mock.calls.at(-1)![1]
+    controller.clearTarget()
+    reply(result(70), {}, pending)
+    expect(controller.target.value).toBeNull()
+    controller.inspectTarget({ x: 70, y: 80 })
+    reply(result(70))
+    setOwner({ ...owner(), generation: 'revision-2' })
+    expect(controller.target.value).toBeNull()
+  })
+
+  it('navigates locked measurement by selector and keeps lock when nothing is related', () => {
+    const { controller, post, reply } = fixture()
+    controller.navigate('parent')
+    expect(post).not.toHaveBeenCalled()
+    controller.hover({ x: 10, y: 20 })
+    reply()
+    controller.toggle()
+    controller.inspectTarget({ x: 70, y: 80 })
+    reply(result(70))
+    controller.navigate('parent')
+    expect(post.mock.calls.at(-1)![2]).toEqual({ token: 'token', relation: 'parent' })
+    reply(result(0))
+    expect(controller.result.value?.rect.x).toBe(0)
+    expect(controller.target.value).toBeNull()
+    controller.navigate('child')
+    controller.navigate('parent')
+    expect(post.mock.calls.at(-1)![2]).toEqual({ token: 'token', relation: 'child' })
+    reply(null)
+    expect(controller.locked.value).toBe(true)
+    expect(controller.result.value?.rect.x).toBe(0)
+  })
+
+  it('clears locked measurement when its node vanished before navigation', () => {
+    const { controller, reply } = fixture()
+    controller.hover({ x: 10, y: 20 })
+    reply()
+    controller.toggle()
+    controller.navigate('next')
+    reply(null, { reason: 'unresolved' })
+    expect(controller.locked.value).toBe(false)
+    expect(controller.result.value).toBeNull()
+  })
+
+  it('climbs several ancestors at once for breadcrumb navigation', () => {
+    const { controller, post, reply } = fixture()
+    controller.hover({ x: 10, y: 20 })
+    reply()
+    controller.toggle()
+    controller.navigate('parent', 3)
+    expect(post.mock.calls.at(-1)![2]).toEqual({ token: 'token', relation: 'parent', depth: 3 })
+  })
+
+  it('rejects malformed sibling geometry and path labels', () => {
+    const { controller, reply } = fixture()
+    controller.hover({ x: 10, y: 20 })
+    reply({ ...result(), siblings: [{ ...result().rect, top: Number.NaN }], index: 0 })
+    reply({ ...result(), siblings: [result().rect], index: 3 })
+    reply({ ...result(), path: ['x'.repeat(65)] })
+    expect(controller.result.value).toBeNull()
+    reply({ ...result(), siblings: [result().rect], index: 0 })
+    expect(controller.result.value?.siblings).toHaveLength(1)
   })
 })
