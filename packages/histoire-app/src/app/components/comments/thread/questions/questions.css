@@ -1,0 +1,28 @@
+/* Shared look of agent questions shown inside a thread or the floating card. */
+.agent-question { display: grid; gap: 10px; margin: 8px 0 4px; padding: 10px; border: 1px solid var(--histoire-agent-soft, var(--histoire-border)); border-radius: 10px; background: var(--histoire-surface); font-size: 12px; color: var(--histoire-text); }
+.agent-question > header { display: flex; align-items: center; gap: 6px; color: var(--histoire-agent-text); }
+.agent-question > header strong { color: var(--histoire-text); font-weight: 600; }
+.agent-question .question-message { margin: 0; line-height: 1.5; white-space: pre-wrap; overflow-wrap: anywhere; }
+.agent-question .plan-text { max-height: 260px; overflow: auto; padding: 8px 10px; border-radius: 8px; background: var(--histoire-chip); }
+.agent-question .question-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 6px; }
+.agent-question .question-status { display: flex; align-items: center; gap: 6px; margin: 0; color: var(--histoire-agent-text); }
+.agent-question .question-link { display: flex; align-items: center; justify-content: space-between; gap: 6px; min-width: 0; margin: 0; }
+.agent-question .question-host { font: 11px var(--histoire-font-mono, monospace); color: var(--histoire-muted); overflow-wrap: anywhere; }
+.agent-question .field-hint { margin: 2px 0 0; color: var(--histoire-muted); font-size: 11px; }
+.agent-question .field-error { margin: 2px 0 0; color: var(--histoire-danger-text); font-size: 11px; }
+.agent-question > header .question-expiry { margin-left: auto; color: var(--histoire-muted); font-size: 11px; font-variant-numeric: tabular-nums; }
+.agent-question > header .question-dismiss { margin: -4px -6px -4px auto; color: var(--histoire-muted); }
+.agent-question > header .question-expiry + .question-dismiss { margin-left: 0; }
+.agent-question .question-field-label { display: block; margin: 0 0 6px; padding: 0; font-family: inherit; font-size: 12px; font-weight: 500; color: var(--histoire-text); }
+.agent-question .question-required { margin-left: 2px; color: var(--histoire-muted); }
+.agent-question .question-options { display: grid; gap: 2px; min-width: 0; margin: 0; padding: 0; border: 0; }
+/* Rows bleed to 1px inside the card edges so the hover tint uses the full width while radios align with the legend. */
+.agent-question .question-option { display: flex; align-items: flex-start; gap: 6px; margin: 0 -9px; padding: 5px 9px; border-radius: 7px; cursor: pointer; }
+.agent-question .question-option:hover { background: var(--histoire-chip); }
+.agent-question .question-option input { flex: none; width: 14px; height: 14px; margin: 1px 0 0; accent-color: var(--histoire-accent); cursor: pointer; }
+.agent-question .question-option input:focus-visible { outline: 2px solid var(--histoire-accent); outline-offset: 2px; }
+.agent-question .question-option-text { display: grid; flex: 1; gap: 2px; min-width: 0; }
+.agent-question .question-option-label { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; font-weight: 500; line-height: 1.4; overflow-wrap: anywhere; }
+.agent-question .question-option-description { color: var(--histoire-muted); line-height: 1.45; overflow-wrap: anywhere; }
+.agent-question .question-badge { padding: 0 6px; border: 1px solid var(--histoire-border); border-radius: 999px; background: var(--histoire-chip); font-size: 10px; font-weight: 500; line-height: 16px; color: var(--histoire-muted); }
+.agent-question .question-other { margin: 2px 0 0 20px; }

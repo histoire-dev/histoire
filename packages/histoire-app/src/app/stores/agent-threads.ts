@@ -1,4 +1,4 @@
-import type { UiAgentActivity, UiAgentReply, UiAgentStep, UiAgentThreadBase } from '@histoire/shared'
+import type { UiAgentActivity, UiAgentPlan, UiAgentPlanEntry, UiAgentReply, UiAgentStep, UiAgentThreadBase } from '@histoire/shared'
 import { computed, ref, shallowRef } from 'vue'
 
 /** Bounded snapshot part shared by every persisted conversation feature. */
@@ -34,6 +34,8 @@ export interface ThreadsTransport<T, S extends ThreadsSnapshotPart<T> = ThreadsS
   stream?: (callback: (reply: UiAgentReply) => void) => () => void
   /** Optional streamed tool call/thinking step upserts. */
   activity?: (callback: (activity: UiAgentActivity) => void) => () => void
+  /** Optional streamed plan replacements. */
+  plan?: (callback: (plan: UiAgentPlan) => void) => () => void
   /** Retire editing authority after disconnect. */
   disconnect: (callback: () => void) => () => void
 }
@@ -48,6 +50,8 @@ export interface ThreadStreaming {
   steps: UiAgentStep[]
   /** Client time the first live output arrived, for elapsed display. */
   startedAt: number
+  /** Last plan the agent reported. */
+  plan?: UiAgentPlanEntry[]
 }
 
 /** Statuses during which an agent owns the thread. */
@@ -121,11 +125,18 @@ export function createThreadsModel<T extends UiAgentThreadBase, S extends Thread
     const steps = index === -1 ? [...entry.steps, activity.step].slice(-200) : entry.steps.map((step, position) => position === index ? activity.step : step)
     streaming.value = { ...streaming.value, [activity.threadId]: { ...entry, steps } }
   }
+  /** Replace the plan of a known working thread. */
+  function receivePlan(plan: UiAgentPlan) {
+    if (!Array.isArray(plan.entries)) return
+    const entry = live(plan.threadId, plan.agentId)
+    if (entry) streaming.value = { ...streaming.value, [plan.threadId]: { ...entry, plan: plan.entries.slice(0, 50) } }
+  }
   const offs = transport.available
     ? [
         transport.subscribe(receive),
         transport.stream?.(receiveReply) ?? (() => {}),
         transport.activity?.(receiveActivity) ?? (() => {}),
+        transport.plan?.(receivePlan) ?? (() => {}),
         transport.disconnect(() => {
           connected.value = false
           publication = undefined

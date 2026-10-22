@@ -1,4 +1,4 @@
-import type { UiAgentActivity, UiAgentReply } from '@histoire/shared'
+import type { UiAgentActivity, UiAgentPlan, UiAgentReply } from '@histoire/shared'
 import type { AiThreadsSnapshotPart } from '../../../histoire-app/src/app/stores/ai-threads.js'
 import { describe, expect, it, vi } from 'vitest'
 import { effectScope, nextTick, shallowRef } from 'vue'
@@ -12,6 +12,7 @@ function transport() {
   let disconnect: () => void = () => {}
   let reply: (value: UiAgentReply) => void = () => {}
   let activity: (value: UiAgentActivity) => void = () => {}
+  let plan: (value: UiAgentPlan) => void = () => {}
   const send = vi.fn(() => true)
   const port = {
     available: true,
@@ -29,6 +30,11 @@ function transport() {
     /** Capture the step listener. */
     activity(callback: typeof activity) {
       activity = callback
+      return () => {}
+    },
+    /** Capture the plan listener. */
+    plan(callback: typeof plan) {
+      plan = callback
       return () => {}
     },
     /** Capture the disconnect listener. */
@@ -49,6 +55,10 @@ function transport() {
     /** Deliver one streamed step. */
     step(value: UiAgentActivity) {
       activity(value)
+    },
+    /** Deliver one streamed plan. */
+    planned(value: UiAgentPlan) {
+      plan(value)
     },
     /** Simulate channel loss. */
     disconnected() {
@@ -149,6 +159,18 @@ describe('aI threads snapshots', () => {
     expect(model.streaming.value[thread.id]).toMatchObject({ text: 'Done', steps: [{ id: 'a', status: 'completed' }, { id: 'b', status: 'in_progress' }] })
     channel.snapshot({ items: [{ ...thread, status: 'replied' }] })
     expect(model.streaming.value).toEqual({})
+    model.close()
+  })
+
+  it('replaces the live plan of working threads only', () => {
+    const { channel, model } = setup()
+    const thread = commentFixture({ status: 'working', agentId: 'agent' })
+    channel.snapshot({ items: [thread] })
+    channel.planned({ agentId: 'other', threadId: thread.id, entries: [{ content: 'Nope', status: 'pending' }] })
+    expect(model.streaming.value).toEqual({})
+    channel.planned({ agentId: 'agent', threadId: thread.id, entries: [{ content: 'Read', status: 'in_progress' }, { content: 'Edit', status: 'pending' }] })
+    channel.planned({ agentId: 'agent', threadId: thread.id, entries: [{ content: 'Read', status: 'completed' }] })
+    expect(model.streaming.value[thread.id]?.plan).toEqual([{ content: 'Read', status: 'completed' }])
     model.close()
   })
 

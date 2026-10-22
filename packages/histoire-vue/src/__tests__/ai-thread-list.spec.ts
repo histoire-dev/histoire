@@ -1,11 +1,13 @@
 import type { UiAiThread } from '@histoire/shared'
+import type { createAgentsStore } from '../../../histoire-app/src/app/stores/agents.js'
 import type { AiThreads } from '../../../histoire-app/src/app/stores/ai-threads.js'
 import { createHistoireSessionWithAdapters } from '@histoire/sdk/internal'
 import { HistoireProvider } from '@histoire/vue'
 import { flushPromises, mount } from '@vue/test-utils'
 import { describe, expect, it, vi } from 'vitest'
-import { h, ref } from 'vue'
+import { defineComponent, h, ref } from 'vue'
 import AiThreadList from '../../../histoire-app/src/app/components/panes/ai/AiThreadList.vue'
+import { provideAgentsStore } from '../../../histoire-app/src/app/stores/agents.js'
 import { sourceFixture } from '../../../histoire-sdk/src/__tests__/fixtures/session.js'
 import { commentFixture } from '../../../histoire/src/node/__tests__/utils/comments.js'
 
@@ -20,15 +22,18 @@ const otherPinned = commentFixture({ title: 'Pinned elsewhere', context: { story
 /** Pinned thread whose story was removed. */
 const orphan = commentFixture({ title: 'Orphan', context: { storyId: 'gone', variantId: 'x' } })
 
-/** Mount the list inside a session whose selection is story `a:b`. */
-async function mountList(threads: UiAiThread[], showArchived = false) {
+/** Mount the list inside a session whose selection is story `a:b`, optionally beneath an agents store. */
+async function mountList(threads: UiAiThread[], showArchived = false, agents?: ReturnType<typeof createAgentsStore>) {
   const session = createHistoireSessionWithAdapters({ url: 'https://book.example/' }, sourceFixture().adapters)
   await session.connect()
   await session.selection.select({ storyId: 'a:b', variantId: 'c' })
   const open = vi.fn()
   const selectPin = vi.fn()
   const model = { visible: ref(threads), threads: ref(threads), showArchived: ref(showArchived), available: ref(true), activeId: ref(null), open, compose: vi.fn() } as unknown as AiThreads
-  const wrapper = mount(HistoireProvider, { props: { session }, slots: { default: () => h(AiThreadList, { model, agents: [], onSelectPin: selectPin }) }, global: { stubs: { BuiltinIcon: true, AgentLogo: true } } })
+  const wrapper = mount(HistoireProvider, { props: { session }, slots: { default: () => h(defineComponent({ setup() {
+    if (agents) provideAgentsStore(agents)
+    return () => h(AiThreadList, { model, agents: [], onSelectPin: selectPin })
+  } })) }, global: { stubs: { BuiltinIcon: true, AgentLogo: true } } })
   await flushPromises()
   return { wrapper, open, selectPin,
     /** Rows of one group, by heading. */
@@ -68,6 +73,17 @@ describe('aI thread list', () => {
       await list.group('Project')[0].trigger('click')
       expect(list.open).toHaveBeenLastCalledWith(orphan.id)
       expect(list.selectPin).toHaveBeenCalledOnce()
+    }
+    finally { await list.close() }
+  })
+
+  it('marks threads waiting for an answer', async () => {
+    const agents = { needsInput: ref([storyThread.id]) } as unknown as ReturnType<typeof createAgentsStore>
+    const list = await mountList([pinned, storyThread], false, agents)
+    try {
+      const [pinnedRow, waitingRow] = list.group('This story')
+      expect(waitingRow.find('[aria-label="Needs your input"]').exists()).toBe(true)
+      expect(pinnedRow.find('[aria-label="Needs your input"]').exists()).toBe(false)
     }
     finally { await list.close() }
   })

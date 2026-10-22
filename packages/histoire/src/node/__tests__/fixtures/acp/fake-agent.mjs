@@ -33,6 +33,8 @@ function configOptions(state) {
 let sessions = 0
 /** Prompt currently waiting for a permission reply or cancellation. */
 let pending
+/** Capabilities the client advertised during initialize. */
+let clientCapabilities = {}
 
 /** Writes one ACP JSON-RPC envelope to the SDK transport. */
 function send(value) {
@@ -53,6 +55,7 @@ lines.on('line', (line) => {
   const message = JSON.parse(line)
   if (configurationScenario && message.method) appendFileSync('protocol.txt', `${message.method}\n`)
   if (message.method === 'initialize') {
+    clientCapabilities = message.params.clientCapabilities ?? {}
     result(message.id, { protocolVersion: scenario === 'mismatch' ? 999 : message.params.protocolVersion, agentCapabilities: { mcpCapabilities: { http: true } }, authMethods: [], agentInfo: { name: 'fixture', version: '1.0.0' } })
   }
   else if (message.method === 'session/new') {
@@ -88,6 +91,41 @@ lines.on('line', (line) => {
     if (scenario === 'crash') {
       process.stderr.write(`fixture crash ${process.env.AGENT_TOKEN ?? ''}\n`)
       process.exit(2)
+    }
+    if (scenario === 'plan') {
+      const sessionId = message.params.sessionId
+      const plan = entries => send({ method: 'session/update', params: { sessionId, update: { sessionUpdate: 'plan', entries } } })
+      plan([{ content: 'Read story', priority: 'high', status: 'in_progress' }, { content: 'Add prop', priority: 'medium', status: 'pending' }])
+      plan([{ content: 'Read story', priority: 'high', status: 'completed' }, { content: 'Add prop', priority: 'medium', status: 'in_progress' }])
+      update(sessionId, 'planned')
+      result(message.id, { stopReason: 'end_turn' })
+      return
+    }
+    if (scenario.startsWith('elicit-')) {
+      pending = message
+      const sessionId = message.params.sessionId
+      if (!clientCapabilities.elicitation?.form || !clientCapabilities.elicitation?.url) {
+        update(sessionId, 'no-capability')
+        result(message.id, { stopReason: 'end_turn' })
+        pending = undefined
+        return
+      }
+      const params = scenario === 'elicit-url'
+        ? { sessionId, mode: 'url', message: 'Sign in', url: 'https://auth.example.com/login?state=1', elicitationId: 'oauth-1' }
+        : { sessionId, mode: 'form', message: `Pick a color ${process.env.AGENT_TOKEN ?? ''}`, requestedSchema: { type: 'object', properties: { color: { type: 'string', title: 'Color', oneOf: [{ const: 'red', title: 'Red' }, { const: 'blue', title: 'Blue' }] }, note: { type: 'string', title: 'Other' } }, required: ['color'] } }
+      send({ id: 'elicitation', method: 'elicitation/create', params })
+      if (scenario === 'elicit-url') setTimeout(() => send({ method: 'elicitation/complete', params: { elicitationId: 'oauth-1' } }), 50)
+      if (scenario === 'elicit-cancel') setTimeout(() => send({ method: '$/cancel_request', params: { requestId: 'elicitation' } }), 50)
+      return
+    }
+    if (scenario === 'exit-plan') {
+      pending = message
+      send({ id: 'permission', method: 'session/request_permission', params: {
+        sessionId: message.params.sessionId,
+        toolCall: { toolCallId: 'exit', title: 'Ready to code?', kind: 'switch_mode', content: [{ type: 'content', content: { type: 'text', text: '# Plan\n\n1. Add prop' } }] },
+        options: [{ optionId: 'exit-plan-auto', name: 'Yes, and use auto mode', kind: 'allow_always' }, { optionId: 'exit-plan-accept-edits', name: 'Yes, auto-accept edits', kind: 'allow_always' }, { optionId: 'exit-plan-default', name: 'Yes, manually approve edits', kind: 'allow_once' }, { optionId: 'reject', name: 'No, keep planning', kind: 'reject_once' }],
+      } })
+      return
     }
     if (scenario === 'permission' || scenario === 'public-secrets') {
       pending = message
@@ -130,11 +168,17 @@ lines.on('line', (line) => {
   else if (message.id === 'permission' && pending) {
     const token = scenario === 'public-secrets' ? process.env.AGENT_TOKEN ?? '' : ''
     update(pending.params.sessionId, token || (message.result.outcome.outcome === 'selected' ? message.result.outcome.optionId : 'cancelled'))
-    result(pending.id, { stopReason: 'end_turn' })
+    // Like Claude Code, rejecting a plan exit interrupts the turn.
+    result(pending.id, { stopReason: scenario === 'exit-plan' && message.result.outcome.optionId === 'reject' ? 'cancelled' : 'end_turn' })
     if (scenario === 'public-secrets') {
       process.stderr.write(`fixture failure ${token}\n`)
       setTimeout(() => process.exit(2), 10)
     }
+    pending = undefined
+  }
+  else if (message.id === 'elicitation' && pending) {
+    update(pending.params.sessionId, JSON.stringify(message.result ?? { error: message.error?.code }))
+    result(pending.id, { stopReason: 'end_turn' })
     pending = undefined
   }
   else if (message.method === 'session/cancel' && pending) {

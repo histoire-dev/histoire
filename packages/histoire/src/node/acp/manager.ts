@@ -3,10 +3,10 @@ import type { AgentRecord } from './record.js'
 import type { AcpManagerOptions, AcpPromptRequest, AcpPromptResult, AcpUpdate, AcpUserData } from './types.js'
 import { Buffer } from 'node:buffer'
 import { methods } from '@agentclientprotocol/sdk'
+import { createAgentBrokers } from './brokers.js'
 import { createAgentCommands } from './commands-cache.js'
 import { createAgentControlLane } from './control-lane.js'
 import { routeAgentNotification } from './notifications.js'
-import { createPermissionBroker } from './permissions.js'
 import { projectAgentStatuses } from './projection.js'
 import { promptAgent } from './prompt.js'
 import { emitReplyChunks } from './reply-chunks.js'
@@ -64,7 +64,10 @@ export function createAcpManager(options: AcpManagerOptions) {
     emit({ type: 'snapshot', value: snapshot() })
   }
   const services = createAgentServices(options, sanitize, commands.remember)
-  const permissions = createPermissionBroker({ root: options.root, policy: () => settings.permissions, sanitize, emit: value => emit({ type: 'permission', value }), resolved: requestId => emit({ type: 'permission-resolved', value: { requestId } }) })
+  const brokers = createAgentBrokers({ root: options.root, policy: () => settings.permissions, sanitize, emit, active: (agentId, sessionId) => {
+    const active = records.get(agentId)?.active
+    return active?.sessionId === sessionId ? active : undefined
+  } })
   const ready = Promise.all([readAgentUserData(dataFile), commands.load()]).then(([value]) => {
     if (closed) return
     data = value
@@ -76,7 +79,7 @@ export function createAcpManager(options: AcpManagerOptions) {
   async function stopRecord(id: string, record: AgentRecord): Promise<void> {
     if (record.stop) return record.stop
     clearTimeout(record.timer)
-    if (records.get(id) === record) permissions.cancel(id)
+    if (records.get(id) === record) brokers.cancel(id)
     record.stop = Promise.resolve().then(() => record.start?.catch(() => {})).then(() => record.runtime?.stop()).then(() => {
       if (records.get(id) === record) records.delete(id)
     })
@@ -90,7 +93,7 @@ export function createAcpManager(options: AcpManagerOptions) {
   function retire(): void {
     generation++
     services.retire()
-    permissions.cancel()
+    brokers.cancel()
   }
   /** Starts one configured process on first explicit prompt; concurrent starts share it. */
   async function start(id: string, internal = false): Promise<AgentRecord> {
@@ -123,7 +126,7 @@ export function createAcpManager(options: AcpManagerOptions) {
       owned,
       sanitize,
       changed,
-      permissions,
+      brokers,
       update: notification => routeAgentNotification(id, captured, notification, { remember: commands.remember, sanitize, emit }),
     })
     changed()
@@ -223,7 +226,7 @@ export function createAcpManager(options: AcpManagerOptions) {
         isOwned: () => !closed && generation === captured && records.get(id) === record,
         changed,
         sanitize,
-        settle: (sessionId) => { if (records.get(id) === record) permissions.settle(id, sessionId) },
+        settle: (sessionId) => { if (records.get(id) === record) brokers.settle(id, sessionId) },
         stop: () => stopRecord(id, record),
         reply: text => emitReplyChunks(id, request, text, emit),
       })
@@ -233,12 +236,14 @@ export function createAcpManager(options: AcpManagerOptions) {
       for (const [id, record] of records) {
         const sessionId = record.sessions.get(threadId)?.sessionId
         if (sessionId && record.active?.request.threadId === threadId) {
-          permissions.cancel(id, sessionId)
+          record.active.cancelled = true
+          brokers.cancel(id, sessionId)
           await record.runtime.connection.agent.notify(methods.agent.session.cancel, { sessionId })
         }
       }
     },
-    replyPermission: permissions.reply,
+    replyPermission: brokers.permissions.reply,
+    replyElicitation: brokers.elicitations.reply,
     /** Restarts share configuration admission; a queued retirement cannot resurrect its predecessor. */
     restart(agentId: string): Promise<void> {
       const captured = generation
@@ -260,7 +265,7 @@ export function createAcpManager(options: AcpManagerOptions) {
       closed = true
       generation++
       services.retire()
-      permissions.close()
+      brokers.close()
       closing = Promise.all([stopAll(), services.close(), controls.settled()]).then(() => commands.flush()).finally(() => listeners.clear())
       return closing
     },

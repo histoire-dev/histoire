@@ -1,3 +1,4 @@
+export * from './agent-elicitation.js'
 export * from './codegen/index.js'
 export * from './controls-overlay.js'
 export * from './events.js'

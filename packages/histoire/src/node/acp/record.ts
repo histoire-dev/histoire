@@ -1,5 +1,5 @@
 import type { NewSessionResponse } from '@agentclientprotocol/sdk'
-import type { UiAgentStatus } from '@histoire/shared'
+import type { UiAgentPlanDecision, UiAgentPlanEntry, UiAgentStatus } from '@histoire/shared'
 import type { createAgentActivity } from './activity.js'
 import type { createAgentRuntime } from './agent-runtime.js'
 import type { createAgentFileChanges } from './file-changes.js'
@@ -34,6 +34,12 @@ export interface AgentRecord {
     changes: ReturnType<typeof createAgentFileChanges>
     /** Projects tool calls and thinking spans for the UI. */
     activity: ReturnType<typeof createAgentActivity>
+    /** Last plan the agent reported during this prompt. */
+    plan?: UiAgentPlanEntry[]
+    /** Plan approval answers given during this prompt. */
+    decisions?: UiAgentPlanDecision[]
+    /** Histoire asked the agent to cancel this prompt. */
+    cancelled?: boolean
   }
   /** Reserves adapter ownership before asynchronous session creation. */
   busy?: boolean

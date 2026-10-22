@@ -72,10 +72,54 @@ export interface UiAgentPermission {
   requestId: string
   /** Agent asking for authorization. */
   agentId: string
-  /** Tool category affecting policy. */
-  kind: 'file-edit' | 'terminal' | 'other'
+  /** Tool category affecting policy; `plan` asks to leave plan mode. */
+  kind: 'file-edit' | 'terminal' | 'plan' | 'other'
   /** Bounded redacted title and paths. */
   detail: string
+  /** Thread whose active prompt asked, when known. */
+  threadId?: string
+  /** Redacted markdown plan the user approves, for `plan` requests. */
+  plan?: string
+  /** Explicit choices replacing the default allow/deny buttons, for `plan` requests. */
+  choices?: UiAgentPermissionChoice[]
+}
+
+/** One broker-owned answer to a permission card. */
+export interface UiAgentPermissionChoice {
+  /** Broker-local identity sent back with the reply; never an agent option id. */
+  id: string
+  /** Short visible button label. */
+  label: string
+  /** Whether choosing it lets the tool run. */
+  intent: 'approve' | 'reject'
+}
+
+/** One agent plan entry, as reported by ACP `plan` session updates. */
+export interface UiAgentPlanEntry {
+  /** Bounded redacted task description. */
+  content: string
+  /** Entry progress. */
+  status: 'pending' | 'in_progress' | 'completed'
+  /** Agent-reported importance. */
+  priority?: 'high' | 'medium' | 'low'
+}
+
+/** User answer to a plan approval card, kept with the reply it belongs to. */
+export interface UiAgentPlanDecision {
+  /** Bounded redacted plan markdown the user answered; may be empty. */
+  plan: string
+  /** Chosen outcome. */
+  outcome: 'approved' | 'kept-planning'
+}
+
+/** Streamed complete plan, replacing any previous plan of the same thread. */
+export interface UiAgentPlan {
+  /** Agent reporting the plan. */
+  agentId: string
+  /** Comment/thread identity. */
+  threadId: string
+  /** Current entries in agent order. */
+  entries: UiAgentPlanEntry[]
 }
 
 /** Streamed comment reply chunk, scoped to its own agent thread. */

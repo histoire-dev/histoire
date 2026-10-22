@@ -31,6 +31,7 @@ function defaultTransport(): ThreadsTransport<UiAiThread, AiThreadsSnapshotPart>
     subscribe: callback => onUiEvent('histoire:ui:ai-threads-snapshot', ({ threads, ...snapshot }) => callback({ ...snapshot, items: threads })),
     stream: callback => onUiEvent('histoire:ui:agent-reply', callback),
     activity: callback => onUiEvent('histoire:ui:agent-activity', callback),
+    plan: callback => onUiEvent('histoire:ui:agent-plan', callback),
     disconnect: onUiDisconnect,
   }
 }
@@ -60,6 +61,8 @@ export function createAiThreads(transport: ThreadsTransport<UiAiThread, AiThread
   const drafts = createThreadDrafts({ send: model.send, items: model.items, activeId, composing, pinsAvailable })
   hooks.snapshot = drafts.receive
   hooks.disconnect = drafts.release
+  /** Workbench handler opening a thread where it lives (canvas card or pane). */
+  let revealer: ((id: string) => void | Promise<void>) | undefined
   const selectedThread = computed(() => model.items.value.find(thread => thread.id === activeId.value))
   /** Newest first, archived hidden unless requested. */
   /** Newest first: active threads, or only archived ones while the archive is shown. */
@@ -92,6 +95,24 @@ export function createAiThreads(transport: ThreadsTransport<UiAiThread, AiThread
       drafts.draft.value = null
       composing.value = false
       activeId.value = id
+    },
+    /**
+     * Open a thread where it lives, through the handler bound by the workbench.
+     * @param id Thread identity.
+     */
+    async reveal(id: string): Promise<void> {
+      await revealer?.(id)
+    },
+    /**
+     * Bind the workbench handler used by `reveal`.
+     * @param handler Opens a thread on the canvas or in the pane.
+     * @returns Unbind callback.
+     */
+    bindReveal(handler: (id: string) => void | Promise<void>): () => void {
+      revealer = handler
+      return () => {
+        if (revealer === handler) revealer = undefined
+      }
     },
     /** Open the new thread view. */
     compose(): void {

@@ -1,4 +1,4 @@
-import type { UiAgentPermission, UiAgentsSnapshot } from '@histoire/shared'
+import type { UiAgentElicitation, UiAgentPermission, UiAgentsSnapshot } from '@histoire/shared'
 import type { IncomingMessage } from 'node:http'
 import type { AgentsTransport } from '../../../../histoire-app/src/app/stores/agents.js'
 import { Buffer } from 'node:buffer'
@@ -29,7 +29,7 @@ function transport() {
       return off
     }
   }
-  const value: AgentsTransport = { send, environment, snapshot: subscribe('snapshot'), permission: subscribe('permission'), resolved: subscribe('resolved'), disconnect: subscribe('disconnect') }
+  const value: AgentsTransport = { send, environment, snapshot: subscribe('snapshot'), permission: subscribe('permission'), resolved: subscribe('resolved'), elicitation: subscribe('elicitation'), elicitationResolved: subscribe('elicitationResolved'), disconnect: subscribe('disconnect') }
   return { callbacks, send, environment, off, value }
 }
 
@@ -51,7 +51,7 @@ describe('safe agent UI ownership', () => {
     store.close()
     peer.callbacks.snapshot(snapshot())
     expect(store.state.value.enabledIds).toEqual([])
-    expect(peer.off).toHaveBeenCalledTimes(4)
+    expect(peer.off).toHaveBeenCalledTimes(6)
   })
 
   it('resets only named overrides without sending browser project defaults', () => {
@@ -90,6 +90,31 @@ describe('safe agent UI ownership', () => {
     store.close()
     peer.callbacks.permission(request)
     expect(store.permissions.value).toEqual([])
+  })
+
+  it('groups in-thread questions per thread and sends plan choices and form answers', () => {
+    const peer = transport()
+    const store = createAgentsStore(peer.value)
+    const plan: UiAgentPermission = { requestId: 'plan', agentId: 'fake', kind: 'plan', detail: 'Ready to code?', threadId: 'one', plan: '# Plan', choices: [{ id: 'approve', label: 'Approve', intent: 'approve' }] }
+    const tool: UiAgentPermission = { requestId: 'tool', agentId: 'fake', kind: 'terminal', detail: 'ls', threadId: 'one' }
+    const form: UiAgentElicitation = { requestId: 'form', agentId: 'fake', threadId: 'one', message: 'Pick', expiresAt: '2026-10-22T12:00:00.000Z', mode: 'form', fields: [{ key: 'color', type: 'text', required: true }] }
+    peer.callbacks.permission(plan)
+    peer.callbacks.permission(tool)
+    peer.callbacks.elicitation(form)
+    peer.callbacks.elicitation(form)
+    expect(store.pendingFor('one')).toEqual({ plans: [plan], elicitations: [form] })
+    expect(store.pendingFor('two')).toEqual({ plans: [], elicitations: [] })
+    store.reply(plan.requestId, true, false, 'approve')
+    expect(peer.send).toHaveBeenLastCalledWith('histoire:ui:agent-permission-reply', { requestId: 'plan', allow: true, remember: false, choice: 'approve' })
+    store.replyElicitation(form.requestId, 'accept', { color: 'red' })
+    expect(peer.send).toHaveBeenLastCalledWith('histoire:ui:agent-elicitation-reply', { requestId: 'form', action: 'accept', content: { color: 'red' } })
+    expect(store.pendingFor('one')).toEqual({ plans: [], elicitations: [form] })
+    peer.callbacks.elicitationResolved({ requestId: 'form', reason: 'answered' })
+    expect(store.elicitations.value).toEqual([])
+    peer.callbacks.elicitation({ ...form, requestId: 'other' })
+    peer.callbacks.disconnect()
+    expect(store.elicitations.value).toEqual([])
+    store.close()
   })
 
   it('caps serialized snapshots and rejects secret-bearing or oversized presets', () => {

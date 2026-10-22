@@ -2,3 +2,8 @@
 .histoire-provider .histoire-agent-permission h2 { display: flex; align-items: center; gap: 8px; margin: 0 0 12px; font-size: 14px; font-weight: 600; }
 .histoire-provider .histoire-agent-permission pre { max-height: 180px; overflow: auto; padding: 12px; margin: 0 0 14px; border-radius: 8px; background: var(--histoire-input, #f4f4f5); font: 12px/1.5 var(--histoire-font-mono, monospace); white-space: pre-wrap; overflow-wrap: anywhere; }
 .histoire-provider .histoire-agent-permission-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
+/* Question heading keeps the open-thread action on its line. */
+.histoire-provider .histoire-agent-question-header { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 0 0 12px; }
+.histoire-provider .histoire-agent-question-header h2 { margin: 0; }
+/* Thread questions answered from the floating card drop their own frame. */
+.histoire-provider .histoire-agent-permission .agent-question { margin: 0; padding: 0; border: 0; background: none; }

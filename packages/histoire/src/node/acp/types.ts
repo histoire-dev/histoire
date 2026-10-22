@@ -1,4 +1,4 @@
-import type { HistoireUiConfig, UiAgentActivity, UiAgentPermission, UiAgentReply, UiAgentSettings, UiAgentsSnapshot, UiAgentStep } from '@histoire/shared'
+import type { HistoireUiConfig, UiAgentActivity, UiAgentElicitation, UiAgentElicitationResolved, UiAgentPermission, UiAgentPlan, UiAgentPlanDecision, UiAgentPlanEntry, UiAgentReply, UiAgentSettings, UiAgentsSnapshot, UiAgentStep } from '@histoire/shared'
 import type { PromptFile } from './prompt-blocks.js'
 import type { createAgentRegistry } from './registry.js'
 import type { SessionConfigValues } from './session-config.js'
@@ -57,6 +57,10 @@ export interface AcpPromptResult {
   changes?: AcpFileChange[]
   /** Settled tool calls and thinking spans, when any. */
   steps?: UiAgentStep[]
+  /** Last plan the agent reported, when any. */
+  plan?: UiAgentPlanEntry[]
+  /** Plan approval answers given during the prompt, when any. */
+  decisions?: UiAgentPlanDecision[]
 }
 
 /** Manager notifications, restricted to safe public DTOs. */
@@ -66,6 +70,9 @@ export type AcpUpdate =
   | { type: 'permission-resolved', value: { requestId: string } }
   | { type: 'reply', value: UiAgentReply }
   | { type: 'activity', value: UiAgentActivity }
+  | { type: 'plan', value: UiAgentPlan }
+  | { type: 'elicitation', value: UiAgentElicitation }
+  | { type: 'elicitation-resolved', value: UiAgentElicitationResolved }
 
 /** Construction dependencies owned by one active Histoire context. */
 export interface AcpManagerOptions {

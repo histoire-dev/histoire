@@ -7,8 +7,10 @@ import { computed, ref, watch } from 'vue'
 import { isThreadBusy } from '../../../stores/agent-threads.js'
 import { agentDisplay, useCommentDestination } from '../../comments/destination.js'
 import AgentPrompt from '../../comments/prompt/AgentPrompt.vue'
+import { PLAN_FOLLOW_UP_PLACEHOLDER, usePlanFollowUp } from '../../comments/prompt/plan-follow-up.js'
 import { useReplyDrafts } from '../../comments/reply-draft.js'
 import AgentLiveTail from '../../comments/thread/AgentLiveTail.vue'
+import AgentPendingInput from '../../comments/thread/questions/AgentPendingInput.vue'
 import { useStickToBottom } from '../../comments/thread/stick-to-bottom.js'
 import ThreadMessage from '../../comments/thread/ThreadMessage.vue'
 import AiCreatedStories from './AiCreatedStories.vue'
@@ -41,6 +43,9 @@ watch(() => props.thread.id, reset)
 const { draft, edit, options, choose: chooseOptions, sent } = useReplyDrafts(() => props.thread.id, () => props.thread.agentId ?? agentId.value)
 /** Files changed by every agent reply in the thread. */
 const changes = computed(() => props.thread.thread.flatMap(message => message.changes ?? []))
+const prompt = ref<InstanceType<typeof AgentPrompt>>()
+/** Latest reply kept planning: ask what should change. */
+const keptPlanning = usePlanFollowUp(() => props.thread, prompt)
 /** Configured display metadata for an agent id. */
 function agent(id?: string): { name: string, icon?: string } {
   return agentDisplay(props.agents, id)
@@ -76,18 +81,22 @@ function submit() {
           :at="message.at"
           :body="message.body"
           :steps="message.steps"
+          :plan="message.plan"
+          :decisions="message.decisions"
           :changes="message.changes"
           :failed="message.failed"
           :attachments="message.attachments"
         />
-        <ThreadMessage v-if="busy" author="agent" :name="agent(thread.agentId).name" :icon="agent(thread.agentId).icon" :body="live?.text ?? ''" :steps="live?.steps" streaming aria-live="polite">
-          <AgentLiveTail :steps="live?.steps ?? []" :text="live?.text ?? ''" :started-at="live?.startedAt" :queued="thread.status === 'sent'" />
+        <ThreadMessage v-if="busy" author="agent" :name="agent(thread.agentId).name" :icon="agent(thread.agentId).icon" :body="live?.text ?? ''" :steps="live?.steps" :plan="live?.plan" streaming aria-live="polite">
+          <AgentLiveTail :thread-id="thread.id" :steps="live?.steps ?? []" :text="live?.text ?? ''" :started-at="live?.startedAt" :queued="thread.status === 'sent'" />
         </ThreadMessage>
+        <!-- Questions span the whole thread width, below the working reply. -->
+        <AgentPendingInput v-if="busy" :thread-id="thread.id" />
         <AiCreatedStories :changes="changes" @select="emit('select', $event)" />
       </div>
     </div>
     <form class="ai-thread-reply" @submit.prevent="submit">
-      <AgentPrompt :key="thread.id" :capture="capture" :model-value="draft.body" :attachments="draft.attachments" :options="options ?? thread.options" compact label="Reply to thread" :placeholder="busy ? 'Agent is working…' : 'Reply…'" :agents="thread.agentId ? agents : usable" :agent-id="thread.agentId ?? agentId" :agent-locked="Boolean(thread.agentId)" :busy="busy" :disabled="disabled" @update:model-value="edit({ body: $event })" @update:attachments="edit({ attachments: $event })" @update:options="chooseOptions" @choose="choose" @send="submit" />
+      <AgentPrompt :key="thread.id" ref="prompt" :capture="capture" :model-value="draft.body" :attachments="draft.attachments" :options="options ?? thread.options" compact label="Reply to thread" :placeholder="busy ? 'Agent is working…' : keptPlanning ? PLAN_FOLLOW_UP_PLACEHOLDER : 'Reply…'" :agents="thread.agentId ? agents : usable" :agent-id="thread.agentId ?? agentId" :agent-locked="Boolean(thread.agentId)" :busy="busy" :disabled="disabled" @update:model-value="edit({ body: $event })" @update:attachments="edit({ attachments: $event })" @update:options="chooseOptions" @choose="choose" @send="submit" />
     </form>
   </section>
 </template>

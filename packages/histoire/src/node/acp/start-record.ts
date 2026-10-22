@@ -1,6 +1,6 @@
 import type { SessionNotification } from '@agentclientprotocol/sdk'
 import type { UiAgentSettings } from '@histoire/shared'
-import type { createPermissionBroker } from './permissions.js'
+import type { AgentBrokers } from './brokers.js'
 import type { AgentRecord } from './record.js'
 import { createAgentRuntime } from './agent-runtime.js'
 
@@ -18,11 +18,13 @@ export async function startAgentRecord(record: AgentRecord, preset: UiAgentSetti
   sanitize: (value: string) => string
   /** Safe state broadcaster. */
   changed: () => void
-  /** Existing comment permission authority. */
-  permissions: ReturnType<typeof createPermissionBroker>
+  /** Permission and elicitation authority shared by every agent. */
+  brokers: AgentBrokers
   /** Existing notification observer. */
   update: (notification: SessionNotification) => void
 }): Promise<void> {
+  /** Only the record's live prompt may ask the user anything. */
+  const active = (sessionId?: string) => options.owned() && Boolean(sessionId) && record.active?.sessionId === sessionId
   try {
     const prepared = await options.prepare()
     if (!options.owned()) throw new Error('Agent runtime closed')
@@ -42,11 +44,13 @@ export async function startAgentRecord(record: AgentRecord, preset: UiAgentSetti
         if (options.owned()) {
           record.status.state = missing ? 'not-installed' : 'error'
           record.status.error = error
-          options.permissions.cancel(preset.id)
+          options.brokers.cancel(preset.id)
           options.changed()
         }
       },
-      permission: request => options.owned() && record.active?.sessionId === request.sessionId ? options.permissions.request(preset.id, request) : Promise.resolve({ outcome: { outcome: 'cancelled' } }),
+      permission: (request, signal) => active(request.sessionId) ? options.brokers.permissions.request(preset.id, request, signal) : Promise.resolve({ outcome: { outcome: 'cancelled' } }),
+      elicitation: (request, signal) => active('sessionId' in request ? request.sessionId as string : undefined) ? options.brokers.elicitations.request(preset.id, request, signal) : Promise.resolve({ action: 'cancel' }),
+      elicitationComplete: (params) => { if (options.owned()) options.brokers.elicitations.complete(preset.id, params.elicitationId) },
       update: (notification) => { if (options.owned()) options.update(notification) },
     })
     await record.runtime.ready

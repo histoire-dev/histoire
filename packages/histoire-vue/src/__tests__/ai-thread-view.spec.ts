@@ -12,7 +12,7 @@ import { pasteEvent, pngFile, readyAgents } from './utils/comment-prompt.js'
 function mountView(thread: UiAiThread) {
   const reply = vi.fn(() => true)
   const model = { streaming: ref({}), available: ref(true), reply, back: vi.fn(), archive: vi.fn(), remove: vi.fn() } as unknown as AiThreads
-  const wrapper = mount(AiThreadView, { props: { thread, model, agents: readyAgents }, global: { stubs: { BuiltinIcon: true, ThreadMessage: true, AiCreatedStories: true } } })
+  const wrapper = mount(AiThreadView, { attachTo: document.body, props: { thread, model, agents: readyAgents }, global: { stubs: { BuiltinIcon: true, ThreadMessage: true, AiCreatedStories: true } } })
   return { wrapper, reply }
 }
 
@@ -48,6 +48,18 @@ describe('aI thread reply', () => {
       await wrapper.get('textarea').setValue('Go')
       await wrapper.get('form').trigger('submit')
       expect(reply).toHaveBeenCalledWith(expect.any(String), 'Go', { agentId: 'claude' })
+    }
+    finally { wrapper.unmount() }
+  })
+
+  it('asks for plan changes and focuses the composer when the agent kept planning', async () => {
+    const working = commentFixture({ status: 'working', agentId: 'claude' })
+    const { wrapper } = mountView(working)
+    try {
+      await wrapper.setProps({ thread: { ...working, status: 'replied', thread: [{ author: 'agent', agentId: 'claude', at: '2026-10-03T10:01:00.000Z', body: 'Kept planning.', decisions: [{ plan: '# Plan', outcome: 'kept-planning' }] }] } })
+      await flushPromises()
+      expect(wrapper.get('textarea').attributes('placeholder')).toBe('What should change in the plan?')
+      expect(document.activeElement).toBe(wrapper.get('textarea').element)
     }
     finally { wrapper.unmount() }
   })

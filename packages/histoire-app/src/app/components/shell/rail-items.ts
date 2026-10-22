@@ -1,5 +1,8 @@
 import type { ShellPane } from '../../stores/shell.js'
 
+/** Badge color semantics: failures, agent activity, or an agent waiting for the user. */
+export type RailBadgeTone = 'danger' | 'agent' | 'attention'
+
 /** One finite descriptor drives rail labeling, iconography, and mode filtering. */
 export interface RailItem {
   /** Persisted local pane identity. */
@@ -11,7 +14,7 @@ export interface RailItem {
   /** Capability absent from static books. */
   devOnly?: boolean
   /** Status color semantics from tests or connected agent services. */
-  badgeTone?: 'danger' | 'agent'
+  badgeTone?: RailBadgeTone
 }
 
 /** Home navigation remains standalone-owned; other entries change local panels. */

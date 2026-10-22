@@ -9,8 +9,10 @@ import { useAiThreads } from '../../stores/ai-threads.js'
 import CommentContext from './CommentContext.vue'
 import { agentDisplay, useCommentDestination } from './destination.js'
 import AgentPrompt from './prompt/AgentPrompt.vue'
+import { PLAN_FOLLOW_UP_PLACEHOLDER, usePlanFollowUp } from './prompt/plan-follow-up.js'
 import { useReplyDrafts } from './reply-draft.js'
 import AgentLiveTail from './thread/AgentLiveTail.vue'
+import AgentPendingInput from './thread/questions/AgentPendingInput.vue'
 import { useStickToBottom } from './thread/stick-to-bottom.js'
 import ThreadMessage from './thread/ThreadMessage.vue'
 
@@ -47,6 +49,9 @@ const { agentId, usable, choose, reset } = useCommentDestination(() => props.age
 watch(() => props.thread.id, reset)
 /** Reply drafts per comment; session choices stay with the agent they were made for. */
 const { draft, edit, options, choose: chooseOptions, sent } = useReplyDrafts(() => props.thread.id, () => props.thread.agentId ?? agentId.value)
+const prompt = ref<InstanceType<typeof AgentPrompt>>()
+/** Latest reply kept planning: ask what should change. */
+const keptPlanning = usePlanFollowUp(() => props.thread, prompt)
 /** Configured display metadata for an agent id. */
 function agent(id?: string): { name: string, icon?: string } {
   return agentDisplay(props.agents, id)
@@ -85,18 +90,22 @@ function submit() {
           :at="message.at"
           :body="message.body"
           :steps="message.steps"
+          :plan="message.plan"
+          :decisions="message.decisions"
           :changes="message.changes"
           :failed="message.failed"
           :attachments="message.attachments"
         />
-        <ThreadMessage v-if="busy" author="agent" :name="agent(thread.agentId).name" :icon="agent(thread.agentId).icon" :body="live?.text ?? ''" :steps="live?.steps" streaming aria-live="polite">
-          <AgentLiveTail :steps="live?.steps ?? []" :text="live?.text ?? ''" :started-at="live?.startedAt" :queued="thread.status === 'sent'" />
+        <ThreadMessage v-if="busy" author="agent" :name="agent(thread.agentId).name" :icon="agent(thread.agentId).icon" :body="live?.text ?? ''" :steps="live?.steps" :plan="live?.plan" streaming aria-live="polite">
+          <AgentLiveTail :thread-id="thread.id" :steps="live?.steps ?? []" :text="live?.text ?? ''" :started-at="live?.startedAt" :queued="thread.status === 'sent'" />
         </ThreadMessage>
+        <!-- Questions span the whole thread width, below the working reply. -->
+        <AgentPendingInput v-if="busy" :thread-id="thread.id" />
       </div>
     </div>
     <form class="thread-reply" @submit.prevent="submit">
       <!-- Keyed by thread so a late upload of the previous thread cannot land in this draft. -->
-      <AgentPrompt :key="thread.id" :model-value="draft.body" :attachments="draft.attachments" :options="options ?? thread.options" compact label="Reply to comment" :placeholder="busy ? 'Agent is working…' : 'Reply…'" :agents="thread.agentId ? agents : usable" :agent-id="thread.agentId ?? agentId" :agent-locked="Boolean(thread.agentId)" :busy="busy" :disabled="disabled" @update:model-value="edit({ body: $event })" @update:attachments="edit({ attachments: $event })" @update:options="chooseOptions" @choose="choose" @send="submit" />
+      <AgentPrompt :key="thread.id" ref="prompt" :model-value="draft.body" :attachments="draft.attachments" :options="options ?? thread.options" compact label="Reply to comment" :placeholder="busy ? 'Agent is working…' : keptPlanning ? PLAN_FOLLOW_UP_PLACEHOLDER : 'Reply…'" :agents="thread.agentId ? agents : usable" :agent-id="thread.agentId ?? agentId" :agent-locked="Boolean(thread.agentId)" :busy="busy" :disabled="disabled" @update:model-value="edit({ body: $event })" @update:attachments="edit({ attachments: $event })" @update:options="chooseOptions" @choose="choose" @send="submit" />
     </form>
   </section>
 </template>

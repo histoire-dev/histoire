@@ -79,6 +79,9 @@ export function createAgentDiscovery(options: {
               announced()
             },
             permission: async () => ({ outcome: { outcome: 'cancelled' } }),
+            // Discovery probes never prompt, so nobody can answer a form or link.
+            elicitation: async () => ({ action: 'cancel' }),
+            elicitationComplete: () => {},
           })
           runtimes.add(runtime)
           await runtime.ready

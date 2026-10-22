@@ -109,13 +109,16 @@ export async function promptAgent(record: AgentRecord, request: AcpPromptRequest
       const prompt = await buildPromptBlocks({ root: options.root, text: request.text, context, command: request.command, files: promptFiles(request, options.settings, reused), image })
       const result = await runtime.connection.agent.request(methods.agent.session.prompt, { sessionId, prompt })
       if (!options.isOwned()) throw new Error('Agent runtime closed')
-      if (result.stopReason === 'cancelled') throw new Error('Agent prompt cancelled')
+      // Only a cancel Histoire requested fails the reply; agents also stop a turn on
+      // their own after a user choice (Claude Code after "keep planning").
+      if (result.stopReason === 'cancelled' && record.active.cancelled) throw new Error('Agent prompt cancelled')
       const tail = record.active.output.finish()
       record.active.text += tail
       if (tail) options.reply(tail)
       const changes = record.active.changes.snapshot()
       const steps = record.active.activity.finish()
-      return { text: record.active.text, ...changes.length ? { changes } : {}, ...steps.length ? { steps } : {} }
+      const { plan, decisions } = record.active
+      return { text: record.active.text, ...changes.length ? { changes } : {}, ...steps.length ? { steps } : {}, ...plan?.length ? { plan } : {}, ...decisions?.length ? { decisions } : {} }
     }
     catch (error) { throw new Error(await runtime.failureMessage() ?? options.sanitize(error instanceof Error ? error.message : String(error))) }
     finally {

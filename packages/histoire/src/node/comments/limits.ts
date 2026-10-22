@@ -8,3 +8,9 @@ export const COMMENT_FILE_BYTE_LIMIT = 2 * 1024 * 1024
 export const COMMENT_AGENT_REPLY_BYTES = 24 * 1024
 /** Maximum persisted agent steps per message. */
 export const COMMENT_STEP_LIMIT = 64
+/** Maximum persisted plan entries per message. */
+export const COMMENT_PLAN_LIMIT = 50
+/** Maximum persisted plan decisions per message. */
+export const COMMENT_DECISION_LIMIT = 8
+/** Longest persisted plan text per decision. */
+export const COMMENT_DECISION_PLAN_CHARS = 16_000

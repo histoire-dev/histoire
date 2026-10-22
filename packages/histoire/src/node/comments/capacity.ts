@@ -1,9 +1,9 @@
-import type { UiAgentThreadBase, UiAiThread, UiCommentMessage } from '@histoire/shared'
+import type { UiAgentPlanDecision, UiAgentThreadBase, UiAiThread, UiCommentMessage } from '@histoire/shared'
 import type { ThreadFileCodec } from './file.js'
 import type { CommentAgentReply } from './store.js'
 import { Buffer } from 'node:buffer'
 import { commentsFileBytes, defaultCodec } from './file.js'
-import { COMMENT_AGENT_REPLY_BYTES, COMMENT_BYTE_LIMIT, COMMENT_FILE_BYTE_LIMIT, COMMENT_MESSAGE_LIMIT, COMMENT_STEP_LIMIT } from './limits.js'
+import { COMMENT_AGENT_REPLY_BYTES, COMMENT_BYTE_LIMIT, COMMENT_DECISION_LIMIT, COMMENT_DECISION_PLAN_CHARS, COMMENT_FILE_BYTE_LIMIT, COMMENT_MESSAGE_LIMIT, COMMENT_PLAN_LIMIT, COMMENT_STEP_LIMIT } from './limits.js'
 import { validateCommentMessage } from './validate.js'
 
 /** Safe user-facing admission failure; no agent is dispatched for this error. */
@@ -60,11 +60,25 @@ export function reserveCommentFileReplyCapacity<T extends UiAgentThreadBase = Ui
   return reply
 }
 
+/** Visible note ending plan text shortened for persistence. */
+const PLAN_TRUNCATED = '\n\n[Plan truncated to fit comment capacity.]'
+
+/**
+ * Plan text within `limit` characters, marking any cut.
+ * @param plan Plan markdown.
+ * @param limit Maximum length, note included.
+ */
+function clipPlan(plan: string, limit: number): string {
+  return plan.length <= limit ? plan : `${plan.slice(0, limit - PLAN_TRUNCATED.length).replace(/[\uD800-\uDBFF]$/, '')}${PLAN_TRUNCATED}`
+}
+
 /** Keep success text and useful change metadata; every omission is explicit in the reply. */
 export function boundedCommentAgentReply(result: CommentAgentReply, agentId: string): UiCommentMessage {
-  const raw = result.text.trim() ? result.text : 'Agent completed without a text reply.'
+  // An agent ending its turn after "Keep planning" has nothing to say; name what happened.
+  const empty = result.decisions?.at(-1)?.outcome === 'kept-planning' ? 'Kept planning.' : 'Agent completed without a text reply.'
+  const raw = result.text.trim() ? result.text : empty
   const normalized = raw.replaceAll('\0', '')
-  const text = normalized.trim() ? normalized : 'Agent completed without a text reply.'
+  const text = normalized.trim() ? normalized : empty
   const at = new Date().toISOString()
   const changes: NonNullable<UiCommentMessage['changes']> = []
   let omitted = 0
@@ -78,6 +92,11 @@ export function boundedCommentAgentReply(result: CommentAgentReply, agentId: str
   }
   // Steps are display-only; keep the most recent ones and shorten titles for persistence.
   const steps = (result.steps ?? []).slice(-COMMENT_STEP_LIMIT).map(step => ({ ...step, title: step.title.slice(0, 120) }))
+  let plan = result.plan?.length ? result.plan.slice(0, COMMENT_PLAN_LIMIT) : undefined
+  // Latest plan decisions, each with its own plan text length budget.
+  const sources: UiAgentPlanDecision[] = (result.decisions ?? []).slice(-COMMENT_DECISION_LIMIT).map(item => ({ outcome: item.outcome, plan: item.plan.replaceAll('\0', '') }))
+  const planLimits = sources.map(item => Math.min(item.plan.length, COMMENT_DECISION_PLAN_CHARS))
+  const decisions = () => sources.map((item, index) => ({ outcome: item.outcome, plan: clipPlan(item.plan, planLimits[index]) }))
   /** JSON escaping and Unicode bytes count toward capacity, not source character count. */
   function message(length: number): UiCommentMessage {
     const prefix = text.slice(0, length).replace(/[\uD800-\uDBFF]$/, '')
@@ -86,7 +105,7 @@ export function boundedCommentAgentReply(result: CommentAgentReply, agentId: str
       ...(omitted ? [`[Omitted ${omitted} reported file changes.]`] : []),
       ...(raw !== text ? ['[Removed unsupported text characters.]'] : []),
     ]
-    return { author: 'agent', agentId, at, body: [prefix, ...notes].join('\n\n'), ...(changes.length ? { changes } : {}), ...(steps.length ? { steps } : {}) }
+    return { author: 'agent', agentId, at, body: [prefix, ...notes].join('\n\n'), ...(changes.length ? { changes } : {}), ...(steps.length ? { steps } : {}), ...(plan ? { plan } : {}), ...(sources.length ? { decisions: decisions() } : {}) }
   }
   /** Largest visible text prefix under both validated character and encoded-byte limits. */
   function fit(): UiCommentMessage {
@@ -102,9 +121,23 @@ export function boundedCommentAgentReply(result: CommentAgentReply, agentId: str
     }
     return message(lower)
   }
-  // Prefer complete outcome text over activity history, then over agent-reported paths.
-  while (steps.length && Buffer.byteLength(JSON.stringify(message(Math.min(text.length, 8192)))) > COMMENT_AGENT_REPLY_BYTES) steps.shift()
-  while (changes.length && Buffer.byteLength(JSON.stringify(message(Math.min(text.length, 8192)))) > COMMENT_AGENT_REPLY_BYTES) {
+  /** Complete reply text no longer fits the byte budget. */
+  const over = () => Buffer.byteLength(JSON.stringify(message(Math.min(text.length, 8192)))) > COMMENT_AGENT_REPLY_BYTES
+  // Prefer complete outcome text over activity history, plans, then agent-reported paths.
+  while (steps.length && over()) steps.shift()
+  if (plan && over()) plan = undefined
+  // Halve the longest plan text until short, then drop the oldest decision.
+  while (sources.length && over()) {
+    const longest = planLimits.indexOf(Math.max(...planLimits))
+    if (planLimits[longest] > 512) {
+      planLimits[longest] = Math.floor(planLimits[longest] / 2)
+    }
+    else {
+      sources.shift()
+      planLimits.shift()
+    }
+  }
+  while (changes.length && over()) {
     changes.pop()
     omitted++
   }

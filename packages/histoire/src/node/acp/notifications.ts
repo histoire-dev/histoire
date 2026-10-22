@@ -2,6 +2,7 @@ import type { SessionNotification } from '@agentclientprotocol/sdk'
 import type { UiAgentCommand } from '@histoire/shared'
 import type { AgentRecord } from './record.js'
 import type { AcpUpdate } from './types.js'
+import { projectAgentPlan } from './plan.js'
 import { projectAgentCommands } from './projection.js'
 import { emitReplyChunks } from './reply-chunks.js'
 
@@ -36,6 +37,11 @@ export function routeAgentNotification(agentId: string, record: AgentRecord, not
   }
   const active = record.active
   if (!active || notification.sessionId !== active.sessionId) return
+  if (update.sessionUpdate === 'plan') {
+    active.plan = projectAgentPlan(update.entries ?? [], routing.sanitize)
+    routing.emit({ type: 'plan', value: { agentId, threadId: active.request.threadId, entries: active.plan } })
+    return
+  }
   active.changes.update(notification)
   for (const step of active.activity.update(notification)) routing.emit({ type: 'activity', value: { agentId, threadId: active.request.threadId, step } })
   if (update.sessionUpdate === 'agent_message_chunk' && update.content.type === 'text') {

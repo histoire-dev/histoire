@@ -8,6 +8,8 @@ import AttachmentStrip from '../prompt/AttachmentStrip.vue'
 import { groupActivityPhases } from './activity-phases.js'
 import AgentActivityPhase from './AgentActivityPhase.vue'
 import AgentMarkdown from './AgentMarkdown.vue'
+import AgentPlan from './AgentPlan.vue'
+import AgentPlanDecision from './AgentPlanDecision.vue'
 
 const props = defineProps<{
   /** Message origin. */
@@ -22,6 +24,10 @@ const props = defineProps<{
   body: string
   /** Agent steps preceding the reply text. */
   steps?: UiCommentMessage['steps']
+  /** Last plan the agent reported for this reply. */
+  plan?: UiCommentMessage['plan']
+  /** Plan approval answers given during this reply. */
+  decisions?: UiCommentMessage['decisions']
   /** Agent-reported file edits. */
   changes?: UiCommentMessage['changes']
   /** Agent request failure notice. */
@@ -42,9 +48,11 @@ const phases = computed(() => groupActivityPhases(props.steps ?? []))
     </span>
     <div>
       <header><strong>{{ name }}</strong><time v-if="at" :datetime="at" :title="at">{{ commentAge(at) }}</time></header>
+      <AgentPlan v-if="plan?.length" :entries="plan" :live="streaming" />
       <div v-if="phases.length" class="phases">
         <AgentActivityPhase v-for="phase in phases" :key="phase.id" :phase="phase" />
       </div>
+      <AgentPlanDecision v-for="(decision, index) in decisions" :key="index" :decision="decision" />
       <p v-if="failed" class="failed" role="alert">
         <BuiltinIcon icon="error-filled" :size="14" />{{ body }}
       </p>

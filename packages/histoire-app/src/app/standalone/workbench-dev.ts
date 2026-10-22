@@ -202,5 +202,7 @@ export function useWorkbenchDev(options: WorkbenchDevOptions) {
   useHistoireResource(threads.close)
   const controls = createWorkbenchDevControls(options, threads, agents)
   useHistoireResource(controls.close)
+  // Floating question cards open their thread through the same navigation as thread menus.
+  useHistoireResource(threads.bindReveal(controls.selectComment))
   return { agents, threads, ...controls }
 }

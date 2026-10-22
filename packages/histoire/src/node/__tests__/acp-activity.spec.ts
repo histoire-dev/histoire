@@ -41,4 +41,11 @@ describe('agent activity projection', () => {
     expect(activity.snapshot()).toHaveLength(200)
     expect(activity.snapshot()[0].title).toHaveLength(300)
   })
+
+  it('leaves plan mode exits to the plan decision instead of listing a failed step', () => {
+    const activity = createAgentActivity('/project', text => text)
+    expect(activity.update(note({ sessionUpdate: 'tool_call', toolCallId: 'exit', title: 'Ready to code?', kind: 'switch_mode', status: 'pending' }))).toEqual([])
+    expect(activity.update(note({ sessionUpdate: 'tool_call_update', toolCallId: 'exit', status: 'failed' }))).toEqual([])
+    expect(activity.finish()).toEqual([])
+  })
 })

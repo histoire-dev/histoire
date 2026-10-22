@@ -19,7 +19,7 @@ export function registerAgentsChannel(ctx: Context, channel: UiChannelServer, se
   }
   channel.addCleanup(manager.onUpdate((event) => {
     if (!active) return
-    const events = { 'snapshot': 'agents-snapshot', 'permission': 'agent-permission', 'permission-resolved': 'agent-permission-resolved', 'reply': 'agent-reply', 'activity': 'agent-activity' }
+    const events = { 'snapshot': 'agents-snapshot', 'permission': 'agent-permission', 'permission-resolved': 'agent-permission-resolved', 'reply': 'agent-reply', 'activity': 'agent-activity', 'plan': 'agent-plan', 'elicitation': 'agent-elicitation', 'elicitation-resolved': 'agent-elicitation-resolved' }
     channel.send(`histoire:ui:${events[event.type]}`, event.value)
   }))
   channel.onReady((client) => {
@@ -46,7 +46,13 @@ export function registerAgentsChannel(ctx: Context, channel: UiChannelServer, se
     }
     catch { snapshot(client, 'Cannot restart agent; check command and logs') }
   })
-  channel.on('histoire:ui:agent-permission-reply', value => z.object({ requestId: z.string().uuid(), allow: z.boolean(), remember: z.boolean().optional() }).strict().parse(value), ({ requestId, allow, remember }) => manager.replyPermission(requestId, allow, remember === true))
+  channel.on('histoire:ui:agent-permission-reply', value => z.object({ requestId: z.string().uuid(), allow: z.boolean(), remember: z.boolean().optional(), choice: z.string().max(64).optional() }).strict().parse(value), ({ requestId, allow, remember, choice }) => manager.replyPermission(requestId, allow, remember === true, choice))
+  // Content shape is checked against the card's own fields by the broker.
+  const elicitationValue = z.union([z.string().max(8192), z.number(), z.boolean(), z.array(z.string().max(1000)).max(100)])
+  channel.on('histoire:ui:agent-elicitation-reply', value => z.object({ requestId: z.string().uuid(), action: z.enum(['accept', 'decline', 'cancel']), content: z.record(z.string().max(64), elicitationValue).optional() }).strict().parse(value), ({ requestId, action, content }) => {
+    if (content && Object.keys(content).length > 32) return
+    manager.replyElicitation(requestId, action, content)
+  })
   if (server) {
     channel.addCleanup(registerAgentEnvironment(ctx, server, manager, () => active))
     channel.addCleanup(registerAgentsCatalog(ctx, server, manager, () => active))

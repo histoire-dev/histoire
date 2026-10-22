@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { RailBadgeTone } from './rail-items.js'
 import { BuiltinIcon, HstButton } from '@histoire/controls/vue'
 
 defineProps<{
@@ -15,7 +16,7 @@ defineProps<{
   /** Count supplies accessible status and small visual badge. */
   badge?: number
   /** Badge status semantics shared with its rail destination. */
-  badgeTone?: 'danger' | 'agent'
+  badgeTone?: RailBadgeTone
   /** Existing integration selector. */
   testId?: string
   /** Capability unavailable while route is unregistered. */
@@ -29,7 +30,7 @@ defineProps<{
     color="flat"
     type="button"
     class="histoire-rail-button"
-    :aria-label="badge ? `${label} (${badge})` : label"
+    :aria-label="badge ? `${label} (${badge}${badgeTone === 'attention' ? ', needs your input' : ''})` : label"
     :title="label"
     :aria-pressed="active"
     :aria-expanded="expanded"
@@ -62,4 +63,6 @@ defineProps<{
   background: var(--histoire-danger);
 }
 .histoire-rail-badge[data-tone="agent"] { background: var(--histoire-agent); }
+/* Waiting for the user: larger agent dot with a ring, static so it never reads as busy. */
+.histoire-rail-badge[data-tone="attention"] { inset-block-start: 5px; inset-inline-end: 5px; width: 9px; height: 9px; background: var(--histoire-agent); box-shadow: 0 0 0 2px var(--histoire-surface), 0 0 0 3px var(--histoire-agent); }
 </style>

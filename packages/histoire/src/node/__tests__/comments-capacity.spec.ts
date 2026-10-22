@@ -6,6 +6,7 @@ import { boundedCommentAgentReply } from '../comments/capacity.js'
 import { commentsFileBytes, writeCommentsFile } from '../comments/file.js'
 import { COMMENT_AGENT_REPLY_BYTES, COMMENT_FILE_BYTE_LIMIT } from '../comments/limits.js'
 import { createCommentsStore } from '../comments/store.js'
+import { validateCommentMessage } from '../comments/validate.js'
 import { commentFixture, commentMessages } from './utils/comments.js'
 import { deferred } from './utils/mcp/deferred.js'
 import { createMcpProjectFixture } from './utils/mcp/project.js'
@@ -221,5 +222,25 @@ describe('comment delivery capacity', () => {
     expect(long.body).toBe('€'.repeat(6000))
     expect(long.steps!.length).toBeLessThan(64)
     expect(long.steps!.at(-1)?.id).toBe('t299')
+  })
+  it('persists the last agent plan, rejects invalid plans and drops the plan before truncating reply text', () => {
+    const plan = [{ content: 'Read story', status: 'completed' as const, priority: 'high' as const }, { content: 'Add prop', status: 'in_progress' as const }]
+    expect(boundedCommentAgentReply({ text: 'Done', plan }, 'agent').plan).toEqual(plan)
+    expect(() => validateCommentMessage({ author: 'agent', body: 'Done', at: '2026-10-03T10:00:00.000Z', plan: [{ content: 'x', status: 'skipped' }] })).toThrow()
+    const long = boundedCommentAgentReply({ text: '€'.repeat(7000), plan: Array.from({ length: 50 }, (_, index) => ({ content: `${index} ${'y'.repeat(290)}`, status: 'pending' as const })) }, 'agent')
+    expect(long.body).toBe('€'.repeat(7000))
+    expect(long.plan).toBeUndefined()
+  })
+  it('persists plan decisions, names an empty kept-planning reply and trims plan text before reply text', () => {
+    const decisions = [{ plan: '# Plan', outcome: 'approved' as const }, { plan: '# Plan 2', outcome: 'kept-planning' as const }]
+    expect(boundedCommentAgentReply({ text: 'Done', decisions }, 'agent')).toMatchObject({ body: 'Done', decisions })
+    expect(boundedCommentAgentReply({ text: '', decisions }, 'agent').body).toBe('Kept planning.')
+    expect(boundedCommentAgentReply({ text: '', decisions: decisions.slice(0, 1) }, 'agent').body).toBe('Agent completed without a text reply.')
+    expect(() => validateCommentMessage({ author: 'agent', body: 'Done', at: '2026-10-03T10:00:00.000Z', decisions: [{ plan: 'x', outcome: 'maybe' }] })).toThrow()
+    const long = boundedCommentAgentReply({ text: '€'.repeat(6000), decisions: [{ plan: 'p'.repeat(40_000), outcome: 'kept-planning' }] }, 'agent')
+    expect(long.body).toBe('€'.repeat(6000))
+    expect(long.decisions).toHaveLength(1)
+    expect(long.decisions![0].plan.length).toBeLessThan(16_000)
+    expect(long.decisions![0].plan).toMatch(/^p+\n\n\[Plan truncated to fit comment capacity\.\]$/)
   })
 })

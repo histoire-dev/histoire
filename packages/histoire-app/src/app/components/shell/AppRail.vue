@@ -5,8 +5,9 @@ import { useHistoireContext, useHistoireResource } from '@histoire/vue/internal'
 import { computed, onMounted } from 'vue'
 import HistoireLogo from '../../assets/histoire.svg'
 import { useShell } from '../../composables/shell.js'
+import { useAgentsStore } from '../../stores/agents.js'
 import { useShortcutRegistry } from '../../util/shortcuts.js'
-import { railItems } from './rail-items.js'
+import { type RailBadgeTone, type RailItem, railItems } from './rail-items.js'
 import RailButton from './RailButton.vue'
 import { handleShellShortcut } from './shortcuts.js'
 
@@ -36,6 +37,23 @@ const context = useHistoireContext()
 const dark = useHistoireControls()!.dark
 const shortcuts = useShortcutRegistry()
 const items = computed(() => railItems.filter(item => shell.dev || !item.devOnly))
+const agents = useAgentsStore()
+/** Threads blocked on a question for the user. */
+const waiting = computed(() => agents?.needsInput.value.length ?? 0)
+/**
+ * Badge count; the AI destination always shows threads waiting for input.
+ * @param item Rail destination.
+ */
+function badgeFor(item: RailItem): number | undefined {
+  return item.id === 'ai' && waiting.value ? Math.max(props.badges?.ai ?? 0, waiting.value) : props.badges?.[item.id]
+}
+/**
+ * Badge tone, raised to attention while an agent waits for the user.
+ * @param item Rail destination.
+ */
+function toneFor(item: RailItem): RailBadgeTone | undefined {
+  return item.id === 'ai' && waiting.value ? 'attention' : item.badgeTone
+}
 const logo = computed(() => props.logos?.square ?? (dark.value ? props.logos?.dark : props.logos?.light) ?? HistoireLogo)
 let root: HTMLElement | null = null
 
@@ -81,8 +99,8 @@ useHistoireResource(() => {
         :active="(item.id === 'home' ? homeActive : !homeActive && shell.pane.value === item.id && shell.panelOpen.value) && !settingsActive"
         :expanded="item.id === 'home' ? undefined : shell.pane.value === item.id && shell.panelOpen.value"
         :controls="item.id === 'home' ? undefined : panelId"
-        :badge="badges?.[item.id]"
-        :badge-tone="item.badgeTone"
+        :badge="badgeFor(item)"
+        :badge-tone="toneFor(item)"
         :test-id="item.id === 'search' ? 'search-btn' : undefined"
         :data-shell-pane="item.id"
         @click="activate(item.id)"

@@ -43,6 +43,20 @@ describe('comment thread drafts', () => {
     }
     finally { wrapper.unmount() }
   })
+
+  it('renders plan decisions collapsed with their outcome', async () => {
+    const comment = commentFixture({ status: 'replied', agentId: 'agent', thread: [{ author: 'agent', agentId: 'agent', at: '2026-10-03T10:01:00.000Z', body: 'Kept planning.', decisions: [{ plan: '# Plan\n\n- Add **prop**', outcome: 'kept-planning' }] }] })
+    const wrapper = mount(CommentThread, { props: { thread: comment, title: 'Meow', agents: [{ id: 'agent', name: 'Claude Code', state: 'idle' }] }, global: { stubs: { CommentContext: true, BuiltinIcon: true } } })
+    try {
+      const decision = wrapper.get('[aria-label="Plan decision"]')
+      expect(decision.text()).toContain('Kept planning')
+      expect(decision.find('.agent-markdown').exists()).toBe(false)
+      await decision.get('button').trigger('click')
+      await expect.poll(() => decision.find('.agent-markdown strong').exists()).toBe(true)
+      expect(decision.get('.agent-markdown li').text()).toBe('Add prop')
+    }
+    finally { wrapper.unmount() }
+  })
 })
 
 /** Mount thread with icon stubs; message rendering is irrelevant for reply behavior. */
@@ -118,6 +132,18 @@ describe('comment thread reply', () => {
       wrapper.unmount()
       vi.unstubAllGlobals()
     }
+  })
+
+  it('asks for plan changes and focuses the composer when the agent kept planning', async () => {
+    const working = commentFixture({ status: 'working', agentId: 'claude' })
+    const wrapper = mount(CommentThread, { attachTo: document.body, props: { thread: working, title: 'Button', agents }, global: { stubs: { BuiltinIcon: true, ThreadMessage: true } } })
+    try {
+      await wrapper.setProps({ thread: { ...working, status: 'replied', thread: [{ author: 'agent', agentId: 'claude', at: '2026-10-03T10:01:00.000Z', body: 'Kept planning.', decisions: [{ plan: '# Plan', outcome: 'kept-planning' }] }] } })
+      await flushPromises()
+      expect(wrapper.get('textarea').attributes('placeholder')).toBe('What should change in the plan?')
+      expect(document.activeElement).toBe(wrapper.get('textarea').element)
+    }
+    finally { wrapper.unmount() }
   })
 
   it('drops session options when the destination agent changes', async () => {

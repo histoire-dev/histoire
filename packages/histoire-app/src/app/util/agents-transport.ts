@@ -10,6 +10,8 @@ export function createDevAgentsStore() {
     snapshot: callback => onUiEvent('histoire:ui:agents-snapshot', callback),
     permission: callback => onUiEvent('histoire:ui:agent-permission', callback),
     resolved: callback => onUiEvent('histoire:ui:agent-permission-resolved', callback),
+    elicitation: callback => onUiEvent('histoire:ui:agent-elicitation', callback),
+    elicitationResolved: callback => onUiEvent('histoire:ui:agent-elicitation-resolved', callback),
     disconnect: onUiDisconnect,
     async environment(agentId, env) {
       const endpoint = `${import.meta.env.BASE_URL.replace(/\/$/, '')}/__histoire/agents/environment`

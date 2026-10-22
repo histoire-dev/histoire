@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import type { UiAiThread, UiCommentAgent } from '@histoire/shared'
 import type { AiThreads } from '../../../stores/ai-threads.js'
-import { HstButton, HstPulsatingDisc } from '@histoire/controls/vue'
+import { BuiltinIcon, HstButton, HstPulsatingDisc } from '@histoire/controls/vue'
 import { useHistoireSnapshot } from '@histoire/vue'
 import { computed } from 'vue'
 import { isContextMenuShortcut } from '../../../composables/context-menu.js'
 import { isThreadBusy } from '../../../stores/agent-threads.js'
+import { useAgentsStore } from '../../../stores/agents.js'
 import AgentLogo from '../../agents/AgentLogo.vue'
 import { commentAge, groupThreads, isOnCanvas, pinNumbers } from '../../comments/presentation.js'
 import WorkbenchEmptyState from '../../shell/WorkbenchEmptyState.vue'
@@ -24,6 +25,9 @@ const emit = defineEmits<{
   contextmenu: [event: MouseEvent | KeyboardEvent, thread: UiAiThread]
 }>()
 const snapshot = useHistoireSnapshot()
+const agentsStore = useAgentsStore()
+/** Threads blocked on a question for the user. */
+const needsInput = computed(() => new Set(agentsStore?.needsInput.value))
 /** Selected story first, then the rest. */
 const groups = computed(() => groupThreads(props.model.visible.value, snapshot.value.selection?.storyId))
 /** Pin numbers follow all pinned threads, so filtering never renumbers them. */
@@ -53,7 +57,8 @@ function onKeydown(event: KeyboardEvent, thread: UiAiThread): void {
             <span v-if="numbers.has(thread.id)" class="ai-thread-pin" :data-muted="thread.status === 'draft' || thread.status === 'resolved' || undefined" data-pin>{{ numbers.get(thread.id) }}</span>
             <AgentLogo v-else :icon="icon(thread.agentId)" :size="16" />
             <span class="ai-thread-title">{{ thread.title }}</span>
-            <HstPulsatingDisc v-if="isThreadBusy(thread)" :size="10" />
+            <span v-if="needsInput.has(thread.id)" class="ai-thread-input" role="img" aria-label="Needs your input" title="Needs your input"><BuiltinIcon icon="help" :size="14" /></span>
+            <HstPulsatingDisc v-else-if="isThreadBusy(thread)" :size="10" />
             <time v-else :datetime="thread.updatedAt">{{ commentAge(thread.updatedAt) }}</time>
           </button>
         </li>
@@ -81,5 +86,6 @@ h3 { margin: 0; padding: 12px var(--histoire-pane-row-inset) 6px; color: var(--h
 .ai-thread-pin { display: grid; place-items: center; flex: none; width: 18px; height: 19px; border-radius: 50% 50% 50% 3px; background: var(--histoire-agent); color: #fff; font-size: 9px; font-weight: 700; }
 .ai-thread-pin[data-muted] { background: var(--histoire-muted); }
 .ai-thread-title { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ai-thread-input { display: flex; flex: none; color: var(--histoire-agent-text); }
 time { flex: none; color: var(--histoire-muted); font-size: 11px; }
 </style>

@@ -1,4 +1,4 @@
-import type { UiAgentStep, UiAgentThreadBase, UiAiThread, UiCommentAttachment, UiCommentMessage, UiCommentSessionOptions } from '@histoire/shared'
+import type { UiAgentPlanDecision, UiAgentPlanEntry, UiAgentStep, UiAgentThreadBase, UiAiThread, UiCommentAttachment, UiCommentMessage, UiCommentSessionOptions } from '@histoire/shared'
 import type { AiThreadDraftInput } from '../ai-threads/validate.js'
 import type { ThreadFileCodec } from './file.js'
 import { validateAiThreadDraft } from '../ai-threads/validate.js'
@@ -17,6 +17,10 @@ export interface CommentAgentReply {
   changes?: { file: string, added: number, removed: number }[]
   /** Agent tool calls and thinking spans, settled. */
   steps?: UiAgentStep[]
+  /** Last agent-reported plan. */
+  plan?: UiAgentPlanEntry[]
+  /** Plan approval answers given during the reply. */
+  decisions?: UiAgentPlanDecision[]
 }
 
 /** Comment dispatcher starts one independent agent session for each comment. */

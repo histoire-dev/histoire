@@ -1,10 +1,10 @@
-import type { RequestPermissionRequest, RequestPermissionResponse, SessionNotification } from '@agentclientprotocol/sdk'
 import type { UiAgentSettings } from '@histoire/shared'
+import type { AgentClientHandlers } from './client.js'
 import { launchAgentProcess } from './agent-process.js'
 import { connectAgentClient } from './client.js'
 
 /** Bounded subprocess + SDK lifetime, available before initialize resolves. */
-export function createAgentRuntime(preset: UiAgentSettings['presets'][number], options: {
+export function createAgentRuntime(preset: UiAgentSettings['presets'][number], options: AgentClientHandlers & {
   /** Launch root. */
   root: string
   /** Private user-level environment. */
@@ -17,10 +17,6 @@ export function createAgentRuntime(preset: UiAgentSettings['presets'][number], o
   log: (lines: string[]) => void
   /** Process failure observer. */
   failed: (error: string, missing: boolean) => void
-  /** Tool request broker. */
-  permission: (request: RequestPermissionRequest) => Promise<RequestPermissionResponse>
-  /** Streamed reply/tool updates. */
-  update: (notification: SessionNotification) => void
 }) {
   const process = launchAgentProcess(preset, options.root, options.environment)
   let stopped = false

@@ -1,4 +1,4 @@
-import type { UiAgentCommand, UiAgentStep } from './ui-agents.js'
+import type { UiAgentCommand, UiAgentPlanDecision, UiAgentPlanEntry, UiAgentStep } from './ui-agents.js'
 
 /** One plain-text comment message and optional agent-reported file edits. */
 export interface UiCommentMessage {
@@ -16,6 +16,10 @@ export interface UiCommentMessage {
   failed?: boolean
   /** Agent tool calls and thinking spans performed for this reply, in order. */
   steps?: UiAgentStep[]
+  /** Last plan the agent reported during this reply. */
+  plan?: UiAgentPlanEntry[]
+  /** Plan approval answers given during this reply, in order. */
+  decisions?: UiAgentPlanDecision[]
   /** Files attached to a user reply. */
   attachments?: UiCommentAttachment[]
 }

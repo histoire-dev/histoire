@@ -1,8 +1,8 @@
-import type { UiAgentStep, UiAiThreadAnchor, UiCommentAttachment, UiCommentMessage, UiCommentSessionOptions } from '@histoire/shared'
+import type { UiAgentPlanDecision, UiAgentPlanEntry, UiAgentStep, UiAiThreadAnchor, UiCommentAttachment, UiCommentMessage, UiCommentSessionOptions } from '@histoire/shared'
 import { Buffer } from 'node:buffer'
 import { COMMENT_ATTACHMENT_LIMIT } from '@histoire/shared'
 import { ATTACHMENT_BYTES, attachmentName } from './attachments.js'
-import { COMMENT_STEP_LIMIT } from './limits.js'
+import { COMMENT_DECISION_LIMIT, COMMENT_DECISION_PLAN_CHARS, COMMENT_PLAN_LIMIT, COMMENT_STEP_LIMIT } from './limits.js'
 
 /** User fields stay bounded before file IO or agent prompt construction. */
 function text(value: unknown, maximum: number, label: string): string {
@@ -96,6 +96,31 @@ function validateCommentSteps(value: unknown): UiAgentStep[] | undefined {
   })
 }
 
+/** Persisted plan entry statuses and priorities mirror ACP plans. */
+const PLAN_STATUSES = ['pending', 'in_progress', 'completed']
+const PLAN_PRIORITIES = ['high', 'medium', 'low']
+
+/** Agent plans keep only bounded display entries. */
+function validateCommentPlan(value: unknown): UiAgentPlanEntry[] {
+  if (!Array.isArray(value) || value.length > COMMENT_PLAN_LIMIT) throw new Error('Invalid comment plan')
+  return value.map((entry: any) => {
+    if (!entry || !PLAN_STATUSES.includes(entry.status) || (entry.priority !== undefined && !PLAN_PRIORITIES.includes(entry.priority))) throw new Error('Invalid comment plan')
+    return { content: text(entry.content, 300, 'plan entry'), status: entry.status, ...(entry.priority ? { priority: entry.priority } : {}) }
+  })
+}
+
+/** Plan approval outcomes. */
+const DECISION_OUTCOMES = ['approved', 'kept-planning']
+
+/** Plan decisions keep bounded markdown, possibly empty, and a known outcome. */
+function validateCommentDecisions(value: unknown): UiAgentPlanDecision[] {
+  if (!Array.isArray(value) || value.length > COMMENT_DECISION_LIMIT) throw new Error('Invalid comment decisions')
+  return value.map((item: any) => {
+    if (!item || !DECISION_OUTCOMES.includes(item.outcome) || typeof item.plan !== 'string' || item.plan.length > COMMENT_DECISION_PLAN_CHARS || item.plan.includes('\0')) throw new Error('Invalid comment decision')
+    return { plan: item.plan, outcome: item.outcome }
+  })
+}
+
 /** Preserve only project-relative agent-reported edits with finite line counts. */
 export function validateCommentMessage(value: unknown): UiCommentMessage {
   if (!value || typeof value !== 'object') throw new Error('Invalid comment reply')
@@ -109,5 +134,5 @@ export function validateCommentMessage(value: unknown): UiCommentMessage {
           return { file: change.file, added: change.added, removed: change.removed }
         })
       : (() => { throw new Error('Invalid comment changes') })()
-  return { author: input.author, body: text(input.body, 8192, 'reply'), at: input.at, agentId: input.agentId === undefined ? undefined : text(input.agentId, 128, 'agent'), changes, ...(input.failed === true && input.author === 'agent' ? { failed: true } : {}), ...(input.author === 'agent' && input.steps !== undefined ? { steps: validateCommentSteps(input.steps) } : {}), ...(input.author === 'user' && input.attachments !== undefined ? { attachments: validateCommentAttachments(input.attachments) } : {}) }
+  return { author: input.author, body: text(input.body, 8192, 'reply'), at: input.at, agentId: input.agentId === undefined ? undefined : text(input.agentId, 128, 'agent'), changes, ...(input.failed === true && input.author === 'agent' ? { failed: true } : {}), ...(input.author === 'agent' && input.steps !== undefined ? { steps: validateCommentSteps(input.steps) } : {}), ...(input.author === 'agent' && input.plan !== undefined ? { plan: validateCommentPlan(input.plan) } : {}), ...(input.author === 'agent' && input.decisions !== undefined ? { decisions: validateCommentDecisions(input.decisions) } : {}), ...(input.author === 'user' && input.attachments !== undefined ? { attachments: validateCommentAttachments(input.attachments) } : {}) }
 }

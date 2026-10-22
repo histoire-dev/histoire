@@ -21,6 +21,8 @@ export function createAgentActivity(root: string, sanitize: (text: string) => st
   const steps = new Map<string, UiAgentStep>()
   /** Line counts per tool and file; repeated diff updates replace, never add. */
   const diffs = new Map<string, Map<string, { added: number, removed: number }>>()
+  /** Plan mode exits; the reply's plan decision shows their outcome instead. */
+  const modeSwitches = new Set<string>()
   /** Currently open thinking span, closed by any other update. */
   let thinking: UiAgentStep | undefined
   let thoughts = 0
@@ -51,6 +53,9 @@ export function createAgentActivity(root: string, sanitize: (text: string) => st
         return update.sessionUpdate === 'agent_message_chunk' ? closeThinking() : []
       }
       const changed = closeThinking()
+      // Kept planning ends the exit tool as failed although nothing went wrong.
+      if (update.kind === 'switch_mode') modeSwitches.add(update.toolCallId)
+      if (modeSwitches.has(update.toolCallId)) return changed
       const previous = steps.get(update.toolCallId)
       if (!previous && steps.size >= STEP_LIMIT) return changed
       const step: UiAgentStep = previous ?? { id: update.toolCallId.slice(0, 200), kind: 'other', title: 'Tool call', status: 'pending' }
