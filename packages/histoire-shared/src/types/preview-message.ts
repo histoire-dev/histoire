@@ -79,7 +79,18 @@ export interface HistoireMeasureResult extends HistoireElementPickResult {
   padding: HistoireElementSpacing
   /** Computed element margin. */
   margin: HistoireElementSpacing
+  /** Visible element children of the parent, including this element, in document order. */
+  siblings?: HistoireElementRect[]
+  /** Position of this element in `siblings`. */
+  index?: number
+  /** Frame-local handle for navigating from this exact node later. */
+  token?: string
+  /** Short labels of the closest ancestors and this element, outermost first. */
+  path?: string[]
 }
+
+/** Element reached from a measured element by navigation. */
+export type HistoireMeasureRelation = 'parent' | 'child' | 'next' | 'previous'
 
 /** Host request to inspect a frame point. */
 export interface HistoireElementInspectionRequest extends HistoireInspectionIdentity {
@@ -89,6 +100,12 @@ export interface HistoireElementInspectionRequest extends HistoireInspectionIden
   x: number
   /** Vertical coordinate. */
   y: number
+  /** Measure from this previously measured node (`HistoireMeasureResult.token`) instead of the point. */
+  token?: string
+  /** Measure the element related to `token` instead of itself. */
+  relation?: HistoireMeasureRelation
+  /** Ancestor levels to climb for the `parent` relation (breadcrumb), default 1. */
+  depth?: number
 }
 
 /** Frame response, including null when no element exists at the point. */
@@ -97,6 +114,8 @@ export interface HistoireElementInspectionReply extends HistoireInspectionIdenti
   type: typeof MEASURE_RESULT | typeof ELEMENT_PICK_RESULT
   /** Element context for the requested point. */
   result: HistoireMeasureResult | HistoireElementPickResult | null
+  /** Set with a null result when the measured node of a navigation no longer exists. */
+  reason?: 'unresolved'
 }
 
 /** Complete overrides merge through the existing control state path. */
