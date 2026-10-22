@@ -115,6 +115,7 @@ describe('workbench shortcut registry', () => {
       expect(registry.handle(keyboard('m'), ['canvas'], false)).toBe(true)
       expect(canvas.tool).toBe('measure')
       expect(registry.hint('canvas.measure')).toBe('M')
+      expect(registry.hint('global.show-ui')).toBe('Esc')
       expect(registry.handle(keyboard('v'), ['canvas'], false)).toBe(true)
       expect(canvas.tool).toBe('select')
       registry.handle(keyboard('m'), ['canvas'], true)

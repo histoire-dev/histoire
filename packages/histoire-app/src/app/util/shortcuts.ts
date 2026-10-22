@@ -121,7 +121,9 @@ export function createShortcutRegistry() {
     /** Human-readable first alternative shared by every shortcut hint. */
     hint(id: string): string {
       const command = typeof navigator !== 'undefined' && /mac/i.test(navigator.platform) ? '⌘' : 'Ctrl'
-      return (entries.get(id) ?? reference.get(id))?.keys[0]?.split('+').map(key => ({ mod: command, shift: '⇧', alt: 'Alt', space: 'Space' })[key] ?? key.toUpperCase()).join(' ') ?? ''
+      // Single keys read as caps (M, 1); named keys as words (Enter, Tab, Esc).
+      const label = (key: string) => ({ mod: command, shift: '⇧', alt: 'Alt', space: 'Space', escape: 'Esc' } as Record<string, string>)[key] ?? (key.length === 1 ? key.toUpperCase() : key[0].toUpperCase() + key.slice(1))
+      return (entries.get(id) ?? reference.get(id))?.keys[0]?.split('+').map(label).join(' ') ?? ''
     },
   }
   return registry
