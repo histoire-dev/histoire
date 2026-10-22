@@ -13,7 +13,7 @@
   "scripts": {
     "lint": "eslint . --cache",
     "lint:fix": "eslint . --fix --cache",
-    "build": "pnpm run -r build",
+    "build": "pnpm run -r --filter \"./packages/**\" build",
     "watch": "pnpm run build && pnpm run -r --parallel --filter \"./packages/**\" watch",
     "test": "pnpm run -r --parallel --filter \"./packages/**\" test",
     "test:dev": "pnpm run -r --parallel --filter \"./packages/**\" test:dev",
