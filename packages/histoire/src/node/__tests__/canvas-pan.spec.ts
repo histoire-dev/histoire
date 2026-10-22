@@ -85,6 +85,7 @@ describe('canvas pointer pan', () => {
     const pan = usePointerPan({ enabled: () => enabled, getTool: () => 'pan', getSpace: () => false, getOffset: () => ({ x: 0, y: 0 }), setOffset: vi.fn() })
     const event = { ...pointer(7, 0, 0, 0), currentTarget: target } as PointerEvent
     expect(pan.onPointerDown(event)).toBe(true)
+    pan.onPointerMove(pointer(7, 0, 10, 0))
     enabled = false
     pan.release()
     expect(pan.isPanning.value).toBe(false)
@@ -109,13 +110,23 @@ describe('canvas pointer pan', () => {
     expect(pan.isPanning.value).toBe(false)
   })
 
-  it('captures accepted gestures and releases capture on cancellation', () => {
+  it('keeps native click target when released without dragging', () => {
+    const target = { setPointerCapture: vi.fn(), hasPointerCapture: vi.fn(() => false), releasePointerCapture: vi.fn() }
+    const pan = usePointerPan({ getTool: () => 'pan', getSpace: () => false, getOffset: () => ({ x: 0, y: 0 }), setOffset: vi.fn() })
+    pan.onPointerDown({ ...pointer(7, 0, 10, 10), currentTarget: target } as unknown as PointerEvent)
+    pan.onPointerMove(pointer(7, 0, 11, 11))
+    pan.onPointerUp(pointer(7, 0, 11, 11))
+    expect(target.setPointerCapture).not.toHaveBeenCalled()
+  })
+
+  it('captures dragged gestures and releases capture on cancellation', () => {
     const target = { setPointerCapture: vi.fn(), hasPointerCapture: vi.fn(() => true), releasePointerCapture: vi.fn() }
     const onActive = vi.fn()
     const pan = usePointerPan({ getTool: () => 'pan', getSpace: () => false, getOffset: () => ({ x: 0, y: 0 }), setOffset: vi.fn(), onActive })
     const start = { ...pointer(7, 0, 0, 0), currentTarget: target } as unknown as PointerEvent
     pan.onPointerDown(start)
     expect(start.preventDefault).toHaveBeenCalled()
+    pan.onPointerMove(pointer(7, 0, 10, 0))
     expect(target.setPointerCapture).toHaveBeenCalledWith(7)
     pan.onPointerCancel(pointer(7, 0, 0, 0))
     expect(target.releasePointerCapture).toHaveBeenCalledWith(7)

@@ -17,6 +17,9 @@ export interface PointerPanOptions {
   onActive?: (active: boolean) => void
 }
 
+/** Client-pixel travel before a pan captures the pointer; shorter presses stay native clicks. */
+const CAPTURE_THRESHOLD = 4
+
 /** Starts panning only for middle mouse or primary mouse with a pan intent. */
 export function isPanGesture(button: number, tool: string, space: boolean): boolean {
   return button === 1 || (button === 0 && (tool === 'pan' || space))
@@ -27,6 +30,8 @@ export function usePointerPan(options: PointerPanOptions) {
   const isPanning = ref(false)
   let pointerId: number | null = null
   let previous: CanvasPoint = { x: 0, y: 0 }
+  let start: CanvasPoint = { x: 0, y: 0 }
+  let captureCandidate: Element | null = null
   let captureTarget: Element | null = null
 
   /** Clears active state and releases capture after ending a gesture. */
@@ -35,11 +40,24 @@ export function usePointerPan(options: PointerPanOptions) {
       captureTarget.releasePointerCapture(pointerId)
     }
     pointerId = null
+    captureCandidate = null
     captureTarget = null
     if (isPanning.value) {
       isPanning.value = false
       options.onActive?.(false)
     }
+  }
+
+  /** Keeps a dragged pan alive outside the viewport once the press became a drag. */
+  function capture(id: number) {
+    captureTarget = captureCandidate
+    captureCandidate = null
+    // Same-origin iframe events are relayed into parent canvas. Browser may
+    // keep capture scoped to originating document; move/up relay still works.
+    try {
+      captureTarget?.setPointerCapture?.(id)
+    }
+    catch { captureTarget = null }
   }
 
   /** Begins an accepted pan and prevents native middle-click autoscroll. */
@@ -49,13 +67,10 @@ export function usePointerPan(options: PointerPanOptions) {
     event.preventDefault()
     pointerId = event.pointerId
     previous = { x: event.clientX, y: event.clientY }
-    captureTarget = event.currentTarget as Element | null
-    // Same-origin iframe events are relayed into parent canvas. Browser may
-    // keep capture scoped to originating document; move/up relay still works.
-    try {
-      captureTarget?.setPointerCapture?.(event.pointerId)
-    }
-    catch { captureTarget = null }
+    start = previous
+    // Capture waits for real drag: capturing immediately retargets pointerup,
+    // so a plain press on a frame label would never produce its click.
+    captureCandidate = event.currentTarget as Element | null
     isPanning.value = true
     options.onActive?.(true)
     return true
@@ -65,6 +80,7 @@ export function usePointerPan(options: PointerPanOptions) {
   function onPointerMove(event: PointerEvent): boolean {
     if (pointerId !== event.pointerId) return false
     event.preventDefault()
+    if (captureCandidate && Math.hypot(event.clientX - start.x, event.clientY - start.y) >= CAPTURE_THRESHOLD) capture(event.pointerId)
     const offset = options.getOffset()
     options.setOffset({ x: offset.x + event.clientX - previous.x, y: offset.y + event.clientY - previous.y })
     previous = { x: event.clientX, y: event.clientY }

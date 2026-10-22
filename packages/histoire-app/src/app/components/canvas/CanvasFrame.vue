@@ -7,6 +7,7 @@ import { useCanvasFrameBackground, useCanvasFrames, useCanvasStore } from '../..
 import { useContextMenu } from '../../composables/context-menu.js'
 import { getBackgroundStyle } from '../../util/background.js'
 import { useWorkbenchTestsModel } from '../panes/tests/model.js'
+import { getActiveCanvasTool } from './active-tool.js'
 
 import CanvasLoadingIndicator from './CanvasLoadingIndicator.vue'
 import CanvasReplicaPreview from './CanvasReplicaPreview.vue'
@@ -107,6 +108,11 @@ function select() {
   if (canSelect.value) emit('select', props.variant.id)
 }
 
+/** Pan tool keeps frame bodies as drag surfaces; only the label selects on plain click. */
+function selectFromBody() {
+  if (getActiveCanvasTool(canvas) !== 'pan') select()
+}
+
 /** Native menu key opens same chrome menu as pointer context menu. */
 function onKeyDown(event: KeyboardEvent) {
   if (isFrameMenuShortcut(event)) {
@@ -127,7 +133,7 @@ function openMenu(event: MouseEvent | KeyboardEvent) {
     <button v-if="!single" type="button" class="histoire-frame-label" data-canvas-overlay-occluder :aria-pressed="selected" :disabled="!canSelect" @click="select" @keydown="onKeyDown">
       <span class="histoire-frame-title" :title="variant.title">{{ variant.title }}</span><BuiltinIcon v-if="status === 'error'" icon="error-filled" :size="16" class="is-error" /><HstPulsatingDisc v-else-if="test?.running" :size="14" /><BuiltinIcon v-else-if="testIcon" :icon="testIcon" :size="16" :class="{ 'is-error': test?.failed || test?.error }" />
     </button>
-    <div class="histoire-frame-body" data-test-id="responsive-preview-bg" :style="{ height: `${height * scale}px`, ...getBackgroundStyle(background) }" @click="select">
+    <div class="histoire-frame-body" data-test-id="responsive-preview-bg" :style="{ height: `${height * scale}px`, ...getBackgroundStyle(background) }" @click="selectFromBody">
       <div class="histoire-frame-content" :style="previewStyle" :aria-busy="status !== 'ready'" :inert="status !== 'ready' || stale ? true : undefined">
         <CanvasReplicaPreview v-if="live" ref="replica" :frame-id="frame.id" :story-id="frame.storyId" :variant-id="frame.variantId" :preview-base="previewBase" :viewport="single ? { width, height } : undefined" @status="updateStatus" />
       </div>
