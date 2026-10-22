@@ -133,7 +133,7 @@ onBeforeUnmount(() => disposers.forEach(dispose => dispose()))
 </template>
 
 <style scoped>
-.histoire-canvas-toolbar { height: 42px; padding: 6px; border: 1px solid var(--histoire-border); border-radius: 12px; background: var(--histoire-surface); box-shadow: 0 2px 5px rgb(0 0 0 / .07); pointer-events: auto; }
+.histoire-canvas-toolbar { height: 42px; padding: 6px; border: 1px solid var(--histoire-border); border-radius: 12px; background: var(--histoire-surface); box-shadow: var(--histoire-shadow-canvas-toolbar); pointer-events: auto; }
 /* ToolSwitch retains its group inset while consuming duplicate toolbar inset only when leading inline. */
 .histoire-canvas-toolbar :deep(.overflow-toolbar-item[data-toolbar-presentation="inline"] .histoire-tool-switch--leading) { margin-inline-start: -3px; }
 </style>

@@ -277,7 +277,9 @@ defineExpose({ canvas, registry, getFrameLayout: (id: string) => frames.value.fi
     <div v-if="commentMode" class="histoire-comment-capture" @pointerdown="viewportEvents.framePointer" />
     <slot v-if="!uiHidden" name="overlays" :canvas="canvas" :frames="registry" :selected-frame="selectedFrame" />
     <CollectErrorCard v-if="diagnostics.length && !uiHidden" :errors="diagnostics" />
-    <CanvasStatus v-if="panning && !uiHidden" ref="panHint" :pan="true" />
+    <CanvasStatus v-if="panning && !uiHidden" ref="panHint" hint="pan" />
+    <!-- Measure hint floats over content; it never reserves footer space, so frames don't move. -->
+    <CanvasStatus v-else-if="canvas.measure && !uiHidden" hint="measure" />
     <div v-if="!story && !uiHidden" class="histoire-canvas-empty">
       <WorkbenchEmptyState icon="document" title="Select a story" />
     </div>

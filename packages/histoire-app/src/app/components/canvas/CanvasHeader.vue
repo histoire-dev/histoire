@@ -25,7 +25,7 @@ const showFile = computed(() => !!props.story.relativePath && isHistoireProjectF
         <span>{{ story.relativePath }}</span>
       </button>
       <span v-else-if="showFile" class="histoire-canvas-file"><BuiltinIcon icon="code" :size="14" /><span>{{ story.relativePath }}</span></span>
-      <CanvasStatus :pan="false" />
+      <CanvasStatus />
     </div>
   </header>
 </template>
