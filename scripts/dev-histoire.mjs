@@ -50,6 +50,19 @@ process.argv = [
   '**/.vite/**',
   '--ignore',
   '**/*.histoire.spec.*',
+  // Browser-only outputs are served through Vite `/@fs/`, whose watcher already
+  // reloads the page. Restarting Node for them only drops connections. App
+  // embed output and plugin bundles stay watched: Node imports or collects them.
+  '--ignore',
+  `${repository}/packages/histoire-app/dist/bundled/**`,
+  '--ignore',
+  `${repository}/packages/histoire-app/dist/app/**`,
+  '--ignore',
+  `${repository}/packages/histoire-app/dist/fonts/**`,
+  '--ignore',
+  `${repository}/packages/histoire-app/dist/bundle-*.js`,
+  '--ignore',
+  `${repository}/packages/histoire-app/dist/style.css`,
   // Include CSS, JSON, fonts and other runtime assets without maintaining an extension list.
   '--ext',
   '*',

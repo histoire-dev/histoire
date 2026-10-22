@@ -3,6 +3,7 @@ import vue from '@vitejs/plugin-vue'
 import fs from 'fs-extra'
 import { globbySync } from 'globby'
 import { defineConfig } from 'vite'
+import { rolldownWatchOptions } from '../../scripts/vite-watch.mjs'
 import { moduleFileName } from './scripts/module-file-name.mjs'
 
 /** Read package dependencies once, including when Vite uses its ESM config runner. */
@@ -54,6 +55,7 @@ export default defineConfig({
   },
 
   build: {
+    watch: rolldownWatchOptions('app'),
     emptyOutDir: false,
     outDir: 'dist/bundled',
     lib: {

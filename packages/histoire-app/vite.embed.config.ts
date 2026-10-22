@@ -1,6 +1,7 @@
 import { fileURLToPath } from 'node:url'
 import vue from '@vitejs/plugin-vue'
 import { defineConfig } from 'vite'
+import { rolldownWatchOptions } from '../../scripts/vite-watch.mjs'
 import { moduleFileName } from './scripts/module-file-name.mjs'
 
 /** Source UI uses Histoire's vendor Vue independently of the story framework. */
@@ -21,6 +22,7 @@ export default defineConfig({
     ],
   },
   build: {
+    watch: rolldownWatchOptions('app:embed'),
     emptyOutDir: false,
     outDir: 'dist/embed',
     minify: false,

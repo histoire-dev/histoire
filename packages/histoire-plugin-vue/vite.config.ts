@@ -1,6 +1,7 @@
 import fs from 'node:fs'
 import { globbySync } from 'globby'
 import { defineConfig } from 'vite'
+import { rolldownWatchOptions } from '../../scripts/vite-watch.mjs'
 
 export default defineConfig({
   plugins: [
@@ -32,6 +33,7 @@ export default defineConfig({
   ],
 
   build: {
+    watch: rolldownWatchOptions('plugin-vue'),
     emptyOutDir: false,
     outDir: 'dist/bundled',
     lib: {

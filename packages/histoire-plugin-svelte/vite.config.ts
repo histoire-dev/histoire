@@ -2,6 +2,7 @@ import { svelte } from '@sveltejs/vite-plugin-svelte'
 import fs from 'fs-extra'
 import { globbySync } from 'globby'
 import { defineConfig } from 'vite'
+import { rolldownWatchOptions } from '../../scripts/vite-watch.mjs'
 import pkg from './package.json'
 
 export default defineConfig({
@@ -66,6 +67,7 @@ export default defineConfig({
     },
   ],
   build: {
+    watch: rolldownWatchOptions('plugin-svelte'),
     emptyOutDir: false,
     outDir: 'dist',
     cssCodeSplit: false,

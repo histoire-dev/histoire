@@ -3,6 +3,7 @@
 import { fileURLToPath } from 'node:url'
 import vue from '@vitejs/plugin-vue'
 import { defineConfig } from 'vite'
+import { rolldownWatchOptions } from '../../scripts/vite-watch.mjs'
 
 export default defineConfig({
   define: { __HISTOIRE_CONTROLS_PEER__: 'false' },
@@ -24,6 +25,7 @@ export default defineConfig({
   },
 
   build: {
+    watch: rolldownWatchOptions('controls'),
     emptyOutDir: false,
 
     lib: {
