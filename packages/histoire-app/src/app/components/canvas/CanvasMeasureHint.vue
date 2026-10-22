@@ -51,11 +51,11 @@ function depth(index: number): number {
 
 <style scoped>
 /* Element selector outranks the shared hint row layout applied by CanvasStatus; padding, kbd and item styles come from there. */
-div.histoire-measure-toolbar { flex-direction: column; flex-wrap: nowrap; align-items: stretch; gap: 4px; pointer-events: auto; }
-.measure-path { display: flex; flex: none; align-items: center; gap: 2px; min-width: 0; padding-inline: 4px; overflow-x: auto; overflow-y: hidden; scrollbar-width: none; font: 11px var(--histoire-font-mono, "JetBrains Mono", monospace); }
+div.histoire-measure-toolbar { flex-direction: column; flex-wrap: nowrap; align-items: stretch; gap: 2px; pointer-events: auto; }
+.measure-path { display: flex; flex: none; align-items: center; gap: 2px; min-width: 0; overflow-x: auto; overflow-y: hidden; scrollbar-width: none; font: 11px var(--histoire-font-mono, "JetBrains Mono", monospace); }
 .measure-path > * { flex: none; }
-/* Breadcrumb entries share one 20px box whether clickable or current. */
-.measure-path > :is(.histoire-button, strong) { display: inline-flex; align-items: center; box-sizing: border-box; height: 20px; padding: 0 4px; border: 1px solid transparent; border-radius: 4px; line-height: 14px; }
+/* Breadcrumb entries use the same 24px chip box as the actions below, so edges and text line up across rows. */
+.measure-path > :is(.histoire-button, strong) { display: inline-flex; align-items: center; box-sizing: border-box; height: 24px; padding: 0 7px; border: 1px solid transparent; border-radius: 6px; line-height: 16px; }
 .measure-path strong { color: var(--histoire-text); font-weight: 600; }
 .measure-path .histoire-button { font: inherit; color: var(--histoire-muted); }
 .measure-path-separator { color: var(--histoire-muted); }
