@@ -1,6 +1,7 @@
 import type { CanvasArrangement, CanvasStore } from '../../stores/canvas.js'
 import type { SingleVariantPan } from './useSingleVariantPan.js'
 import { computed, onBeforeUnmount, watch } from 'vue'
+import { getActiveCanvasTool } from './active-tool.js'
 import { usePointerPan } from './pan/usePointerPan.js'
 import { useSpacePan } from './pan/useSpacePan.js'
 
@@ -22,16 +23,16 @@ interface CanvasPanOptions {
 export function useCanvasPan(options: CanvasPanOptions) {
   const single = () => options.arrangement() === 'single'
   const enabled = () => !single() || !!options.single()?.canPan
-  const space = useSpacePan({ enabled, getTool: () => options.canvas.tool, getRoot: options.viewport })
+  const space = useSpacePan({ enabled, getTool: () => getActiveCanvasTool(options.canvas), getRoot: options.viewport })
   const pointer = usePointerPan({
     enabled,
-    getTool: () => options.canvas.tool,
+    getTool: () => getActiveCanvasTool(options.canvas),
     getSpace: () => space.held.value,
     getOffset: () => single() ? options.single()?.getOffset() ?? { x: 0, y: 0 } : options.canvas.panOffset,
     setOffset: offset => single() ? options.single()?.setOffset(offset) : options.canvas.setPanOffset(offset),
     onActive: active => options.canvas.panning = active,
   })
-  const panning = computed(() => enabled() && (options.canvas.tool === 'pan' || space.held.value || options.canvas.panning))
+  const panning = computed(() => enabled() && (getActiveCanvasTool(options.canvas) === 'pan' || space.held.value || options.canvas.panning))
 
   /** Old pointer deltas must never cross a target, arrangement, or eligibility boundary. */
   function release(): void {
