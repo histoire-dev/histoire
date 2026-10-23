@@ -11,7 +11,7 @@ concurrency:
 
 jobs:
   build-and-test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     name: Build and test
     steps:
       - uses: actions/checkout@master
