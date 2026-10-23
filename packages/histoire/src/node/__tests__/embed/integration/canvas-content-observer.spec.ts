@@ -2,13 +2,17 @@ import { readFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { expect, it } from 'vitest'
 import { createEmbedBridgeFixture } from '../../utils/embed/bridge-fixture.js'
+import { trackPageReloads } from '../../utils/embed/browser.js'
 import { MCP_REPOSITORY_ROOT } from '../../utils/mcp/cli-project.js'
 
 it('measures real flow, fonts/images and viewport feedback, and releases retired documents', async () => {
   const fixture = await createEmbedBridgeFixture({ mode: 'source-dev', embedding: false, story: '<template><Story id="observer"><Variant id="one"><div /></Variant></Story></template>', config: 'routerMode:"hash",vite:{server:{watch:{ignored:["**/packages/histoire*/**"]}}},' })
   const page = await fixture.browser.newPage()
   try {
+    const reloads = trackPageReloads(page)
     await page.goto(fixture.bookUrl)
+    // A late dependency-discovery reload would drop the injected probe.
+    await reloads.settled()
     const modulePath = join(MCP_REPOSITORY_ROOT, 'packages/histoire-app/src/app/components/canvas/content-measure.ts')
     // Real exported observer runs against a real iframe; no geometry or observer doubles.
     await page.evaluate(`(async()=>{

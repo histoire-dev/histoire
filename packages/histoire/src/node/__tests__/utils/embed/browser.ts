@@ -1,5 +1,6 @@
 import { createRequire } from 'node:module'
 import { join } from 'node:path'
+import { expect } from 'vitest'
 import { MCP_REPOSITORY_ROOT } from '../mcp/cli-project.js'
 
 /** Ready selected workbench actor; excludes hidden canonical and sibling runtimes. */
@@ -25,4 +26,20 @@ export async function readEmbedBrowserSource(page: any) {
     const connection = await module.sourceConnection
     return { descriptor: connection.descriptor, allowedOrigins: connection.allowedOrigins }
   })()`)
+}
+
+/**
+ * Tracks main-frame navigations from now on. Dev servers reload the book while
+ * Vite discovers dependencies; `settled()` waits until the page stayed put for
+ * three seconds, so test-owned page state is not dropped by a late reload.
+ * @param page Playwright page, tracked before its first `goto`.
+ */
+export function trackPageReloads(page: any) {
+  let navigatedAt = Date.now()
+  page.on('framenavigated', (frame: unknown) => {
+    if (frame === page.mainFrame()) navigatedAt = Date.now()
+  })
+  return {
+    settled: () => expect.poll(() => Date.now() - navigatedAt, { interval: 500, timeout: 30_000 }).toBeGreaterThan(3000),
+  }
 }

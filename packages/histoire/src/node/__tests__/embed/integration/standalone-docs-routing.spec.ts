@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { createEmbedBridgeFixture } from '../../utils/embed/bridge-fixture.js'
-import { STANDALONE_SELECTED_FRAME } from '../../utils/embed/browser.js'
+import { STANDALONE_SELECTED_FRAME, trackPageReloads } from '../../utils/embed/browser.js'
 
 const story = '<template><Story id="normal" title="Normal story"><Variant id="one"><button>First preview</button></Variant><Variant id="two"><button>Second preview</button></Variant></Story></template>'
 const documentation = `# Story documentation
@@ -30,7 +30,10 @@ describe('standalone documentation navigation intent', () => {
       return iframe?.contentFrame()
     }
     try {
+      const reloads = trackPageReloads(page)
       await page.goto(`${fixture.bookUrl}${routerMode === 'hash' ? '#' : ''}story/normal?variantId=one&tab=docs`)
+      // Follow links only once the inspector bound to the selected frame runtime and no reload is pending.
+      await reloads.settled()
       await page.getByRole('link', { name: 'Data only', exact: true }).waitFor()
       await page.getByRole('link', { name: 'Data only', exact: true }).click()
       await expect.poll(() => currentRoute().searchParams.get('variantId'), { timeout: 15_000 }).toBe('')
