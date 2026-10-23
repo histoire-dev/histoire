@@ -32,7 +32,8 @@ describe('source document mode boundaries', () => {
       await dev.close()
       const build = await project.build()
       const files = await readdir(build.outDir, { recursive: true })
-      expect(files.filter(file => file.includes('embed'))).toEqual([])
+      // Shared chunks may carry protocol module names (`url/embed.js`); only embed outputs count.
+      expect(files.filter(file => /(?:^|\/)(?:__embed\.html|histoire-embed\.json|bundle-embed[^/]*|embed-data[^/]*)$/.test(file))).toEqual([])
       expect(files).toEqual(expect.arrayContaining(['index.html', '__sandbox.html', 'histoire.json']))
     }
     finally {

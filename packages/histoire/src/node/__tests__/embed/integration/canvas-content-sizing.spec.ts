@@ -22,8 +22,13 @@ async function sizes(page: any) {
 
 /** Select through actual toolbar; no injected preference can replace menu wiring proof. */
 async function autoFit(page: any) {
-  await page.getByRole('button', { name: 'Viewport', exact: true }).click()
-  await page.getByRole('button', { name: 'Auto fit content', exact: true }).click()
+  const option = page.getByRole('button', { name: 'Auto fit content', exact: true })
+  // Late boot renders can close the popover right after it opens; reopen until the option shows.
+  await expect.poll(async () => {
+    if (!await option.isVisible()) await page.getByRole('button', { name: 'Viewport', exact: true }).click()
+    return option.isVisible()
+  }, { timeout: 30_000 }).toBe(true)
+  await option.click()
 }
 
 describe('content-sized workbench browser acceptance', () => {
@@ -111,6 +116,8 @@ describe('content-sized workbench browser acceptance', () => {
     try {
       await page.goto(`${fixture.bookUrl}#/story/content?variantId=first&arrange=grid`)
       await autoFit(page)
+      // Hold the runtime frame only once the fitted document settled; earlier handles may be replaced.
+      await expect.poll(async () => (await sizes(page))[0], { timeout: 30_000 }).toEqual({ title: 'First', width: 120, height: 60, viewport: [120, 60] })
       const first = page.locator('.histoire-canvas-frame').filter({ has: page.getByRole('button', { name: 'First', exact: true }) })
       const second = page.locator('.histoire-canvas-frame').filter({ has: page.getByRole('button', { name: 'Second', exact: true }) })
       const firstRuntime = await (await first.locator('iframe').elementHandle())!.contentFrame()
