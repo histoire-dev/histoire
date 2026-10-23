@@ -206,7 +206,7 @@ describe('visual consumer acceptance', () => {
       await server.ready
       const run = await project.visual.run()
       expect(run.results).toHaveLength(1)
-      expect(run.results[0]).toMatchObject({ status: 'missing', currentDimensions: { width: 320, height: 240 } })
+      expect(run.results[0], run.results[0].error).toMatchObject({ status: 'missing', currentDimensions: { width: 320, height: 240 } })
       expect(run.results[0].currentHash).toMatch(/^[a-f0-9]{64}$/)
     }
     finally {

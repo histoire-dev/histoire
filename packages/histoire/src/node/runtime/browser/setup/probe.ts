@@ -22,7 +22,7 @@ export async function probeSetupBrowser(
     checkProbeAuthority(options)
     await awaitBrowserApi(page.goto('about:blank', { waitUntil: 'domcontentloaded', timeout: remaining(options.deadline) }), options, options.closeBrowser)
     checkProbeAuthority(options)
-    const png = await awaitBrowserApi(page.screenshot({ type: 'png', fullPage: false, timeout: remaining(options.deadline) }), options, options.closeBrowser)
+    const png = await captureProbe(() => awaitBrowserApi(page.screenshot({ type: 'png', fullPage: false, timeout: remaining(options.deadline) }), options, options.closeBrowser), options)
     checkProbeAuthority(options)
     let dimensions: ReturnType<typeof readPngDimensions>
     try {
@@ -58,6 +58,38 @@ export async function probeSetupBrowser(
     }
   }
   if (failure) throw failure
+}
+
+/** Extra attempts for the transient compositor failure on a fresh page. */
+const PROBE_CAPTURE_RETRIES = 3
+
+/** Delay between probe capture attempts, giving the compositor time to produce a frame. */
+const PROBE_CAPTURE_RETRY_DELAY = 100
+
+/**
+ * Headless Chromium can reject the first capture of a freshly created page with
+ * `Unable to capture screenshot` before its first compositor frame exists. Retry
+ * only that transient protocol failure, bounded by attempts and the setup deadline.
+ */
+async function captureProbe<T>(
+  capture: () => Promise<T>,
+  options: { signal: AbortSignal, deadline: number, isActive: () => boolean },
+): Promise<T> {
+  for (let attempt = 0; ; attempt++) {
+    try {
+      return await capture()
+    }
+    catch (error) {
+      if (attempt >= PROBE_CAPTURE_RETRIES || !isTransientCaptureError(error)) throw error
+      await new Promise(resolve => setTimeout(resolve, PROBE_CAPTURE_RETRY_DELAY))
+      checkProbeAuthority(options)
+    }
+  }
+}
+
+/** Matches Chromium's transient no-frame capture rejection only. */
+function isTransientCaptureError(error: unknown): boolean {
+  return error instanceof Error && /Protocol error \(Page\.captureScreenshot\): Unable to capture screenshot/.test(error.message)
 }
 
 /** Rejects stale, cancelled, or expired setup work before publishing success. */

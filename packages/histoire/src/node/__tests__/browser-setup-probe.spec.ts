@@ -70,4 +70,20 @@ describe('bounded neutral browser probe', () => {
     expect(owner.getSnapshot()).toMatchObject({ state: 'unverified', repairs: [] })
     await owner.close()
   })
+
+  it('retries transient compositor capture failure on the neutral page', async () => {
+    const fixture = createNeutralBrowserFixture()
+    fixture.page.screenshot.mockRejectedValueOnce(new Error('page.screenshot: Protocol error (Page.captureScreenshot): Unable to capture screenshot'))
+    const launch = vi.fn(async () => asPlaywrightBrowser(fixture.browser))
+    const setup = createBrowserSetupOwnerFixture({ launch })
+    mocked.resolveDriver.mockResolvedValue({ status: 'available', driver: setup.driver })
+    mocked.discoverCandidates.mockResolvedValue([candidate('headless-shell')])
+    const { owner } = setup
+    const lease = await owner.acquire(new AbortController().signal, Date.now() + 2_000)
+
+    expect(fixture.page.screenshot).toHaveBeenCalledTimes(2)
+    expect(launch).toHaveBeenCalledOnce()
+    await lease.release()
+    await owner.close()
+  })
 })
