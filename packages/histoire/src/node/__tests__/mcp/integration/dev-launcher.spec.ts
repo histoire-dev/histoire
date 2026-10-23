@@ -232,7 +232,7 @@ it('retains source UI mode and forwards config path containing spaces', async ()
   }
 }, 120000)
 
-it('runs Vue example lifecycle tests from workbench before and after app CSS rebuild', async () => {
+it('runs Vue example lifecycle tests from workbench before and after package rebuild restart', async () => {
   const fixture = await createDevLauncherVueProject()
   const reservation = createServer()
   const endpoint = await listenOwnedServer(reservation, 0, '127.0.0.1')
@@ -264,7 +264,8 @@ it('runs Vue example lifecycle tests from workbench before and after app CSS reb
     expect(results[0]).toMatchObject({ result: { ok: true, passed: 5, failed: 0, total: 5 } })
     const reload = page.waitForEvent('domcontentloaded', { timeout: 45000 })
     void reload.catch(() => {})
-    await appendFile(resolve(fixture.repository, 'packages/histoire-app/dist/bundled/app.css'), '\n/* private app rebuild */\n')
+    // Browser-only app outputs reload through Vite without restarting; Node-loaded outputs restart.
+    await writeFile(resolve(fixture.repository, 'packages/histoire-shared/dist/rebuild.json'), JSON.stringify({ revision: 3 }))
     await expect.poll(async () => (await state(fixture.root)).pid, { timeout: 30000 }).not.toBe(pid)
     expect(processExists(pid)).toBe(false)
     pid = (await state(fixture.root)).pid
