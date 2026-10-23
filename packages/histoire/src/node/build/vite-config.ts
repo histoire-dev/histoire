@@ -10,6 +10,7 @@ import { APP_PATH } from '../alias.js'
 import { resolveEmbedConfig } from '../config/embed.js'
 import { getViteConfigWithPlugins } from '../vite/index.js'
 import { createBuildChunkOutput } from './chunks.js'
+import { routeImportsThroughDynamicFacades } from './mock-facades.js'
 
 /**
  * Builds the Vite config of the final bundle: the histoire app entries plus the
@@ -112,6 +113,17 @@ export async function createBuildViteConfig(ctx: Context, collectServer: ViteDev
       config.define.__HST_COLLECT__ = false
     },
   })
+
+  if (bundlerKey === 'rolldownOptions') {
+    buildViteConfig.plugins.push({
+      name: 'histoire-build-dynamic-facades',
+      enforce: 'post',
+      generateBundle(_options, bundle) {
+        // Keeps Vitest mocks on dynamically imported story dependencies effective.
+        routeImportsThroughDynamicFacades(bundle as never)
+      },
+    })
+  }
 
   return buildViteConfig
 }
