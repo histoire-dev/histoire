@@ -14,18 +14,24 @@ import { createMcpProjectFixture } from './utils/mcp/project.js'
 describe('comment delivery capacity', () => {
   /** Fill valid unrelated history while retaining precise physical-file headroom. */
   function commentsNearFileLimit(headroom: number) {
-    const comments = [commentFixture()]
-    while (true) {
-      const next = commentFixture({ body: 'x'.repeat(8192) })
-      if (commentsFileBytes([...comments, next]) > COMMENT_FILE_BYTE_LIMIT - headroom) break
-      comments.push(next)
+    const budget = COMMENT_FILE_BYTE_LIMIT - headroom
+    const first = commentFixture()
+    const large = Array.from({ length: Math.ceil(COMMENT_FILE_BYTE_LIMIT / 8192) }, () => commentFixture({ body: 'x'.repeat(8192) }))
+    // Binary search the large-comment count: serializing ~2 MiB per added comment is too slow under CI load.
+    let low = 0
+    let high = large.length
+    while (low < high) {
+      const count = Math.ceil((low + high) / 2)
+      if (commentsFileBytes([first, ...large.slice(0, count)]) <= budget) low = count
+      else high = count - 1
     }
+    const comments = [first, ...large.slice(0, low)]
     const filler = commentFixture({ body: 'x' })
     let lower = 1
     let upper = 8192
     while (lower < upper) {
       const middle = Math.ceil((lower + upper) / 2)
-      if (commentsFileBytes([...comments, { ...filler, body: 'x'.repeat(middle) }]) <= COMMENT_FILE_BYTE_LIMIT - headroom) lower = middle
+      if (commentsFileBytes([...comments, { ...filler, body: 'x'.repeat(middle) }]) <= budget) lower = middle
       else upper = middle - 1
     }
     // Persisted shape: the codec derives each (shortened) title from the body.
