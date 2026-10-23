@@ -86,6 +86,17 @@ export function selectHistoireStoryLink(session: HistoireSession, link: Histoire
   }
 }
 
+/**
+ * Routes docs story links of `session` through `owner`, keeping its other delegates.
+ * Passive replica sessions own isolated selection; their documentation links must
+ * still navigate the workbench that owns the canonical selection and URL.
+ */
+export function delegateHistoireStoryLinks(session: HistoireSession, owner: HistoireSession): void {
+  const current = internals(session)
+  if (!current) throw new TypeError('Session internals unavailable')
+  sessions.set(session, { ...current, storyLink: link => selectHistoireStoryLink(owner, link) })
+}
+
 /** Trust is granted by first-party local adapter, never URL/origin/source descriptor. */
 export function getHistoireDocsPolicy(session: HistoireSession): 'trusted-local' | 'remote' {
   return internals(session)?.docsPolicy ?? 'remote'

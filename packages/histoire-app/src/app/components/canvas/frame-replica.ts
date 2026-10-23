@@ -1,5 +1,5 @@
 import type { HistoireSession } from '@histoire/sdk'
-import { getAcceptedHistoireSessionDescriptor } from '@histoire/sdk/internal'
+import { delegateHistoireStoryLinks, getAcceptedHistoireSessionDescriptor } from '@histoire/sdk/internal'
 import { createStandaloneSession } from '../../standalone/session.js'
 
 /** Reuse source/runtime adapters with isolated passive selection, state and events. */
@@ -10,7 +10,7 @@ export function createCanvasReplicaSession(canonical: HistoireSession, previewBa
   nativeScroll?: boolean
 } = {}): HistoireSession {
   const original = getAcceptedHistoireSessionDescriptor(canonical)
-  return createStandaloneSession({ url: previewBase, matrix: options.matrix, nativeScroll: options.nativeScroll, loadDescriptor: async () => original, subscribe(listener) {
+  const replica = createStandaloneSession({ url: previewBase, matrix: options.matrix, nativeScroll: options.nativeScroll, loadDescriptor: async () => original, subscribe(listener) {
     const initial = canonical.getSnapshot()
     let generationStatus = initial.status
     let generationSource = initial.source
@@ -28,4 +28,7 @@ export function createCanvasReplicaSession(canonical: HistoireSession, previewBa
       }
     })
   } })
+  // Inspector docs bind to the selected replica; their story links must move the workbench.
+  delegateHistoireStoryLinks(replica, canonical)
+  return replica
 }

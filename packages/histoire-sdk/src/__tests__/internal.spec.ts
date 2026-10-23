@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 import { createHistoireSessionWithAdapters } from '../session/controller.js'
-import { getAcceptedHistoireSessionDescriptor, getHistoireSessionDescriptor, isAcceptedHistoireSourceDescriptor, registerHistoireSessionInternals, requestHistoireOpenInEditor, requestHistoireStatePreset } from '../session/internal.js'
+import { delegateHistoireStoryLinks, getAcceptedHistoireSessionDescriptor, getHistoireSessionDescriptor, isAcceptedHistoireSourceDescriptor, registerHistoireSessionInternals, requestHistoireOpenInEditor, requestHistoireStatePreset, selectHistoireStoryLink } from '../session/internal.js'
 import { sourceFixture } from './fixtures/session.js'
 
 describe('first-party source metadata', () => {
@@ -47,6 +47,22 @@ describe('first-party source metadata', () => {
     expect(fixture.request).not.toHaveBeenCalledWith('openInEditor', expect.anything(), expect.anything())
     await session.dispose()
   })
+  it('routes replica story links through owner while keeping replica delegates', async () => {
+    const link = { selection: { storyId: 'docs', variantId: null }, panel: 'docs', anchor: '#part' } as const
+    const owner = { selection: { select: vi.fn() } } as any
+    const ownerLink = vi.fn(async () => {})
+    registerHistoireSessionInternals(owner, { descriptor: () => ({}) as any, presets: async () => ({}) as any, storyLink: ownerLink })
+    const replica = { selection: { select: vi.fn() } } as any
+    const presets = vi.fn(async () => ({ presets: [] }) as any)
+    registerHistoireSessionInternals(replica, { descriptor: () => ({}) as any, presets })
+    delegateHistoireStoryLinks(replica, owner)
+    await selectHistoireStoryLink(replica, link)
+    expect(ownerLink).toHaveBeenCalledWith(link)
+    expect(replica.selection.select).not.toHaveBeenCalled()
+    await requestHistoireStatePreset(replica, { action: 'list' })
+    expect(presets).toHaveBeenCalledOnce()
+  })
+
   it('exposes synchronously failing proxy delegates as observed rejected operations', async () => {
     const session = {} as any
     registerHistoireSessionInternals(session, { descriptor: () => {
