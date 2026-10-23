@@ -1,13 +1,15 @@
 import type { Plugin as VitePlugin } from 'vite'
 import type { Context } from '../context.js'
+import { createRequire } from 'node:module'
 import { relative } from 'pathe'
+
+const require = createRequire(import.meta.url)
 
 /**
  * Packages the local Histoire development setup redirects to the prebuilt
  * `@histoire/vendors` bundles, so the examples share one copy of each.
  */
 const DEV_VENDOR_ALIASES: Array<[name: string, entry: string]> = [
-  ['floating-vue/dist/style.css', 'node_modules/floating-vue/dist/style.css'],
   ['floating-vue', 'floating-vue'],
   ['@iconify/vue', 'iconify'],
   ['pinia', 'pinia'],
@@ -87,6 +89,11 @@ export function createFileNamePlugin(ctx: Context): VitePlugin {
   }
 }
 
+/** Absolute path of the floating-vue stylesheet installed for `@histoire/vendors`. */
+function resolveVendoredFloatingVueStyle(): string {
+  return createRequire(require.resolve('@histoire/vendors/package.json')).resolve('floating-vue/dist/style.css')
+}
+
 /**
  * Aliases the app dependencies to `@histoire/vendors` when running Histoire
  * itself from source (the examples context).
@@ -104,6 +111,9 @@ export function createHistoireDevPlugin(): VitePlugin {
         },
         resolve: {
           alias: [
+            // Exports targets may not contain `node_modules` (Vite 8 enforces it),
+            // so point the vendored stylesheet at its file instead of a subpath.
+            { find: /^floating-vue\/dist\/style\.css$/, replacement: resolveVendoredFloatingVueStyle() },
             ...DEV_VENDOR_ALIASES.reduce((acc, [name, entry]) => {
               acc.push({
                 find: new RegExp(`^${name.replace(/\//g, '\\/')}$`),
