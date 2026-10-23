@@ -287,7 +287,7 @@ describe('canvas overlay geometry', () => {
     cy.get('.histoire-canvas-frame.is-selected').then(($frame) => {
       const before = $frame[0].getBoundingClientRect()
       cy.get(canvas).focus().trigger('keydown', { eventConstructor: 'KeyboardEvent', key: ' ', code: 'Space', force: true })
-      cy.get('.histoire-pan-hint').should('be.visible')
+      cy.get('.histoire-canvas-hint').should('be.visible')
       cy.get('.histoire-canvas-frame.is-selected').should(($current) => {
         const after = $current[0].getBoundingClientRect()
         expect(after.x).to.be.closeTo(before.x, 0.1)
@@ -296,7 +296,7 @@ describe('canvas overlay geometry', () => {
       })
       cy.get(canvas).trigger('keyup', { eventConstructor: 'KeyboardEvent', key: ' ', code: 'Space', force: true })
       cy.get(canvas).trigger('pointerdown', { eventConstructor: 'PointerEvent', pointerId: 43, button: 1, clientX: before.x, clientY: before.y, force: true })
-      cy.get('.histoire-pan-hint').should('be.visible')
+      cy.get('.histoire-canvas-hint').should('be.visible')
       cy.get('.histoire-canvas-frame.is-selected').should(($current) => {
         const after = $current[0].getBoundingClientRect()
         expect(after.y).to.be.closeTo(before.y, 0.1)

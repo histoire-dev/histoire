@@ -27,7 +27,7 @@ describe('Search', () => {
       cy.get('[aria-label="Search results"]').should('not.contain', 'EventButton').and('not.contain', 'Style Isolation')
     }
     openSearch().type('{enter}')
-    cy.get('[aria-label="Histoire documentation"]').should('contain', 'Welcome')
+    cy.get('[aria-label="Histoire documentation"]').should('contain', 'Vue 3 examples')
     cy.contains('[aria-label="Search scope"] button', 'Docs').click()
     cy.get('[data-test-id="search-item"]').first().should('have.attr', 'data-search-kind', 'docs').and('contain', 'Introduction')
     cy.contains('[aria-label="Search scope"] button', 'All').click()
@@ -76,7 +76,7 @@ describe('Search', () => {
 
   it('should search docs', () => {
     cy.visit('/')
-    openSearch().type('welcome')
+    openSearch().type('vue 3 examples')
     cy.get('[data-test-id="search-item"][data-search-kind="docs"]').should('have.length.greaterThan', 0)
     cy.contains('[data-test-id="search-item"][data-search-kind="docs"]', 'Introduction')
   })

@@ -177,6 +177,8 @@ describe('measurement hit input', () => {
       const release = vi.fn()
       Object.assign(hit, { setPointerCapture: vi.fn(), hasPointerCapture: () => true, releasePointerCapture: release })
       hit.dispatchEvent(pointer('pointerdown', { pointerId: 7, button: 1, clientX: 60, clientY: 70 }))
+      // Capture starts only once press becomes a drag.
+      hit.dispatchEvent(pointer('pointermove', { pointerId: 7, button: 1, clientX: 70, clientY: 70 }))
       expect(test.canvas.panning).toBe(true)
       test.fixture.source.emitCatalog()
       expect(test.canvas.panning).toBe(true)

@@ -64,15 +64,24 @@ describe('bounded single variant pan', () => {
     finally { test.wrapper.unmount() }
   })
 
+  it('treats saved Pan tool as Select in single view', async () => {
+    const test = await panFixture()
+    try {
+      test.canvas.setTool('pan')
+      expect(test.pointer('down', 0, 0)).toBe(false)
+      expect(test.canvas.panning).toBe(false)
+    }
+    finally { test.wrapper.unmount() }
+  })
+
   it.each([
-    { tool: 'pan', space: false, button: 0 },
     { tool: 'select', space: true, button: 0 },
     { tool: 'select', space: false, button: 1 },
   ])('clamps $tool / Space=$space / button=$button and reverses immediately', async ({ tool, space, button }) => {
     const test = await panFixture()
     const offset = { ...test.canvas.panOffset }
     try {
-      test.canvas.tool = tool as 'pan' | 'select'
+      test.canvas.tool = tool as 'select'
       test.gestures.space.held.value = space
       expect(test.pointer('down', 0, 0, button)).toBe(true)
       test.pointer('move', -2000, -2000, button)
@@ -167,6 +176,8 @@ describe('bounded single variant pan', () => {
     test.observer.deliver()
     expect(test.single.getOffset()).toEqual({ x: -200, y: -100 })
     test.pointer('down', 0, 0, 1)
+    // Capture starts only once press becomes a drag.
+    test.pointer('move', 10, 0, 1)
     test.wrapper.unmount()
     expect(test.canvas.panning).toBe(false)
     expect(test.target.releasePointerCapture).toHaveBeenCalledWith(7)

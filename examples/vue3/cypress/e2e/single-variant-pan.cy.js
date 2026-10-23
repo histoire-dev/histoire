@@ -45,18 +45,19 @@ describe('bounded single variant camera', () => {
 
   it('pans zoomed frame to both edges and releases input after Fit', () => {
     zoom(/^200%$/)
+    // Single view has no free camera: Pan tool is disabled, middle mouse still scrolls bounded content.
+    cy.get('button[aria-label="Pan"]').should('be.disabled')
     cy.get(surface).invoke('height').then((height) => {
-      cy.get('button[aria-label="Pan"]').click().should('have.attr', 'aria-pressed', 'true')
+      drag(-10000, -10000, 1)
+      assertEdge(true, true)
       cy.get(surface).invoke('height').should('equal', height)
     })
-    drag(-10000, -10000)
-    assertEdge(true, true)
-    drag(10000, 10000)
+    drag(10000, 10000, 1)
     assertEdge(false, false)
     zoom(/^\s*Fit to canvas/)
-    drag(-200, -200)
+    drag(-200, -200, 1)
     assertEdge(false, false)
-    // Pan tool remains selected; fitting frame must still accept native input.
+    // Fitting frame must still accept native input after panning.
     cy.getPreviewIframeBody().find('input').first().clear().type('Pan released').should('have.value', 'Pan released')
     cy.getPreviewIframeBody().contains('button', 'Send').click()
     cy.get('button[aria-label="Show inspector"]').click()

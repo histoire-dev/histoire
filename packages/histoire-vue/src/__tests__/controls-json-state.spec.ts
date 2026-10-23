@@ -48,7 +48,8 @@ describe('generic controls JSON eligibility', () => {
       await wrapper.get('button[aria-label="Remove config override"]').trigger('click')
       await vi.waitFor(() => expect(session.getSnapshot().state?.value._hPropState[0]).toEqual({}))
       await session.state.patch({ graph: { editable: true } })
-      await vi.waitFor(() => expect(wrapper.findAll('.cm-editor').length).toBeGreaterThan(0))
+      // JSON editor chunk loads lazily; parallel suites can delay it past default 1s.
+      await vi.waitFor(() => expect(wrapper.findAll('.cm-editor').length).toBeGreaterThan(0), { timeout: 5000 })
       expect(wrapper.text()).not.toContain('JSON editing unavailable')
       await session.state.patch({ graph: value })
       await vi.waitFor(() => expect(wrapper.text()).toContain('JSON editing unavailable'))

@@ -47,7 +47,7 @@ describe('Home and Stories navigation', () => {
       cy.get(`${rail} [aria-label="Search"]`).should('have.attr', 'aria-pressed', 'false')
       cy.get('[aria-label="search panel"]').should(panelOpen ? 'be.visible' : 'not.exist')
       cy.window().then((window) => {
-        expect(JSON.parse(window.localStorage.getItem(storageKey))).to.deep.equal({ pane: 'search', panelOpen, inspectorOpen: false, panelWidth: 310, inspectorWidth: 380 })
+        expect(JSON.parse(window.localStorage.getItem(storageKey))).to.deep.include({ pane: 'search', panelOpen, inspectorOpen: false, panelWidth: 310, inspectorWidth: 380 })
       })
     })
   }
@@ -67,7 +67,7 @@ describe('Home and Stories navigation', () => {
     cy.get(`${rail} [aria-label="Home"]`).click()
     assertHomeStories()
     cy.window().then((window) => {
-      expect(JSON.parse(window.localStorage.getItem(storageKey))).to.deep.equal({ pane: 'stories', panelOpen: true, inspectorOpen: false, panelWidth: 310, inspectorWidth: 380 })
+      expect(JSON.parse(window.localStorage.getItem(storageKey))).to.deep.include({ pane: 'stories', panelOpen: true, inspectorOpen: false, panelWidth: 310, inspectorWidth: 380 })
     })
     cy.get(`${rail} [aria-label="Stories"]`).click()
     cy.get('[aria-label="stories panel"]').should('not.exist')

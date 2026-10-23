@@ -33,12 +33,12 @@ describe('UI review regressions', () => {
     cy.getPreviewIframeBody().contains('Hello world!')
     cy.get('[data-test-id="search-btn"]').click()
     cy.contains('[aria-label="Search scope"] button', /^Docs$/).click()
-    cy.get(searchInput).type('Deserunt')
+    cy.get(searchInput).type('usage notes')
     cy.contains('[data-test-id="search-item"][data-search-kind="docs"]', 'Docs').click()
     cy.location('pathname').should('equal', '/story/src-components-docs-story-vue')
     cy.location('search').should('include', 'variantId').and('include', 'tab=docs')
     cy.contains('[aria-label="Inspector"] [role="tab"]', /^\s*Docs\s*$/).should('have.attr', 'aria-selected', 'true')
-    cy.contains(`${docs} h1`, /^Title/).should('be.visible')
+    cy.contains(`${docs} h1`, /^Component documentation/).should('be.visible')
     cy.get('[data-test-id="search-modal"]').should('not.exist')
     cy.get('[data-test-id="search-btn"]').should('be.focused').trigger('keydown', {
       eventConstructor: 'KeyboardEvent',

@@ -70,7 +70,7 @@ function assertCanvasInfo({ inspector = true, matrix = false, pan = false } = {}
     }
     if (pan) {
       expect(panHint, 'Pan hint overlay').to.not.equal(null)
-      const hint = window.document.querySelector('.histoire-pan-hint')
+      const hint = window.document.querySelector('.histoire-canvas-hint')
       expect(hint, 'pan hint').to.not.equal(null)
       const hintBounds = hint.getBoundingClientRect()
       expect(hintBounds.left + hintBounds.width / 2, 'pan hint center').to.be.closeTo((canvasBounds.left + usableEnd) / 2, 1)
