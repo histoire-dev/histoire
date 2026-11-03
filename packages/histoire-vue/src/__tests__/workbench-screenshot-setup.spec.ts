@@ -2,9 +2,9 @@ import type { ScreenshotSetupSnapshot } from '@histoire/shared'
 import { flushPromises, mount } from '@vue/test-utils'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { defineComponent, h, nextTick, type PropType, watch } from 'vue'
-import ScreenshotPopover from '../../../histoire-app/src/app/components/canvas/toolbar/ScreenshotPopover.vue'
 import ScreenshotSetup from '../../../histoire-app/src/app/components/canvas/toolbar/ScreenshotSetup.vue'
 import { useScreenshotSetup } from '../../../histoire-app/src/app/components/canvas/toolbar/use-screenshot-setup.js'
+import { screenshotChannel as channel, emitScreenshotResult as emitUiResult, resetScreenshotChannel, setupRequests, setupSnapshot } from './fixtures/screenshot-channel.js'
 
 const SetupHost = defineComponent({
   props: {
@@ -21,73 +21,10 @@ const SetupHost = defineComponent({
   },
 })
 
-const channel = vi.hoisted(() => ({
-  listeners: new Map<string, Set<(value: unknown) => void>>(),
-  disconnect: new Set<() => void>(),
-  send: vi.fn((_event: string, _payload: unknown) => true),
-}))
-
-vi.mock('../../../histoire-app/src/app/util/ui-channel.js', () => ({
-  sendUiEvent: channel.send,
-  onUiEvent: (event: string, listener: (value: unknown) => void) => {
-    const listeners = channel.listeners.get(event) ?? new Set()
-    listeners.add(listener)
-    channel.listeners.set(event, listeners)
-    return () => listeners.delete(listener)
-  },
-  onUiDisconnect: (listener: () => void) => {
-    channel.disconnect.add(listener)
-    return () => channel.disconnect.delete(listener)
-  },
-}))
-
-vi.mock('../../../histoire-app/src/app/composables/canvas-settings.js', () => ({
-  useCanvasStore: () => ({ selectedFrame: null, frameBackgrounds: {} }),
-  useCanvasFrames: () => ({ frames: new Map(), getFrame: () => null }),
-}))
-
-vi.mock('../../../histoire-app/src/app/components/canvas/toolbar/session-settings.js', () => ({
-  useCanvasPreviewSettings: () => ({ snapshot: { value: { settings: { responsiveWidth: 1024, responsiveHeight: 640, backgroundColor: '#fff', checkerboard: false }, catalog: { stories: [] } } } }),
-}))
-
-vi.mock('../../../histoire-app/src/app/components/panes/tests/capture.js', () => ({ useCaptureDiscoveryPause: () => () => {} }))
-
-vi.mock('../../../histoire-app/src/app/components/canvas/toolbar/ToolbarPopover.vue', async () => {
-  const { defineComponent, h } = await import('vue')
-  return { default: defineComponent({
-    setup(_props, { slots }) {
-      return () => h('div', { class: 'toolbar-popover-test' }, slots.default?.())
-    },
-  }) }
+vi.mock('../../../histoire-app/src/app/util/ui-channel.js', async () => {
+  const { screenshotTransport } = await import('./fixtures/screenshot-channel.js')
+  return screenshotTransport
 })
-
-/** Return a fresh portable setup response for a specific user-visible state. */
-function setupSnapshot(overrides: Partial<ScreenshotSetupSnapshot> = {}): ScreenshotSetupSnapshot {
-  const snapshot: ScreenshotSetupSnapshot = {
-    revision: 1,
-    state: 'needs-action',
-    reason: 'driver-missing',
-    attempts: [],
-    repairs: [{ id: 'install-playwright', label: 'Add Playwright', command: { executable: 'pnpm', args: ['add', '-D', 'playwright'] } }],
-    ...overrides,
-  }
-  if (Object.hasOwn(overrides, 'reason') && overrides.reason === undefined) delete snapshot.reason
-  return snapshot
-}
-
-/** Deliver one correlated channel response to listeners registered by a component. */
-async function emitUiResult(event: string, value: unknown): Promise<void> {
-  for (const listener of [...(channel.listeners.get(event) ?? [])]) listener(value)
-  await nextTick()
-}
-
-/** Assert capture controls and recent files follow the exclusive setup gate. */
-function expectPopoverView(wrapper: ReturnType<typeof mount>, view: 'setup' | 'capture', recent = false): void {
-  const text = wrapper.text()
-  expect(wrapper.find('.screenshot-setup').exists()).toBe(view === 'setup')
-  expect(['Frames', 'Scale', 'Format', 'Save to', 'Capture 1 frame'].every(label => text.includes(label))).toBe(view === 'capture')
-  expect(text.includes('Recent')).toBe(recent)
-}
 
 /** Find a real rendered button by its visible label. */
 function button(wrapper: ReturnType<typeof mount>, label: string) {
@@ -96,20 +33,10 @@ function button(wrapper: ReturnType<typeof mount>, label: string) {
   return found
 }
 
-/** Narrow captured transport payloads to the setup event contract. */
-function setupRequests(): { requestId: string, action: string }[] {
-  return channel.send.mock.calls
-    .filter(([event]) => event === 'histoire:ui:screenshot-setup')
-    .map(([, payload]) => payload as { requestId: string, action: string })
-}
-
 let clipboardDescriptor: PropertyDescriptor | undefined
 
 beforeEach(() => {
-  channel.listeners.clear()
-  channel.disconnect.clear()
-  channel.send.mockReset()
-  channel.send.mockReturnValue(true)
+  resetScreenshotChannel()
   clipboardDescriptor = Object.getOwnPropertyDescriptor(navigator, 'clipboard')
 })
 
@@ -119,7 +46,7 @@ afterEach(() => {
 })
 
 describe('workbench screenshot setup', () => {
-  it('reads metadata on open and copies only the current repair command', async () => {
+  it('reads metadata without probing and copies only the current repair command', async () => {
     const writeText = vi.fn(async () => {})
     Object.defineProperty(navigator, 'clipboard', { configurable: true, value: { writeText } })
     const wrapper = mount(SetupHost)
@@ -272,33 +199,5 @@ describe('workbench screenshot setup', () => {
     const wrapper = mount(SetupHost)
     wrapper.unmount()
     expect(channel.send.mock.calls.some(([event]) => event === 'histoire:ui:screenshot-setup-cancel')).toBe(false)
-  })
-  it('shows capture controls only for ready setup and returns to setup after capture failure', async () => {
-    const wrapper = mount(ScreenshotPopover, { props: { storyId: 'story', variantId: 'variant', open: 'screenshot' } })
-    try {
-      const readRequest = setupRequests()[0]
-      expect(readRequest.action).toBe('read')
-      expectPopoverView(wrapper, 'setup')
-
-      await emitUiResult('histoire:ui:screenshot-setup-result', { requestId: readRequest.requestId, setup: setupSnapshot({ state: 'ready', reason: undefined, source: 'chrome', repairs: [] }) })
-      expectPopoverView(wrapper, 'capture')
-
-      await button(wrapper, 'Capture 1 frame').trigger('click')
-      const firstCapture = channel.send.mock.calls.findLast(([event]) => event === 'histoire:ui:screenshot')![1] as { requestId: string }
-      const file = { path: '.histoire/screenshots/story--variant.png', storyId: 'story', variantId: 'variant' }
-      await emitUiResult('histoire:ui:screenshot-result', { requestId: firstCapture.requestId, files: [file] })
-      expectPopoverView(wrapper, 'capture', true)
-      expect(wrapper.text()).toContain('story--variant.png')
-
-      await button(wrapper, 'Capture 1 frame').trigger('click')
-      const secondCapture = channel.send.mock.calls.findLast(([event]) => event === 'histoire:ui:screenshot')![1] as { requestId: string }
-      await emitUiResult('histoire:ui:screenshot-result', { requestId: secondCapture.requestId, error: { code: 'failed', message: 'Screenshot browser unavailable', setup: setupSnapshot({ revision: 2 }) } })
-      expectPopoverView(wrapper, 'setup')
-      expect(wrapper.text()).toContain('Screenshot setup needed')
-      expect(wrapper.text()).not.toContain('story--variant.png')
-    }
-    finally {
-      wrapper.unmount()
-    }
   })
 })

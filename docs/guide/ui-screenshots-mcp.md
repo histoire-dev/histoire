@@ -8,7 +8,7 @@ Matrix captures include each cell's displayed props, copied when capture is requ
 
 ## Check existing setup
 
-Open **Screenshot setup** in the canvas screenshot toolbar before installing a browser. **Check setup** starts a bounded neutral browser probe; it does not load a story or install anything. After installing a driver or browser, **Check again** refreshes discovery and probes the new setup. **Copy command** copies the one repair selected by the server.
+Opening **Screenshot** in the canvas toolbar automatically checks browser setup each time. Reopening while a check is running reuses that check. Capture controls appear after setup succeeds. Checks use existing browser discovery and reuse rules; they do not load a story or install anything. After installing a driver or browser, **Check again** refreshes discovery and checks the new setup. **Copy command** copies the one repair selected by the server.
 
 The CLI can inspect setup independently of Vite:
 

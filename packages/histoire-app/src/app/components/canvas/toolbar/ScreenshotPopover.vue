@@ -49,8 +49,8 @@ const recent = ref<UiScreenshotFile[]>([])
 const error = ref<UiChannelError | null>(null)
 const capturedSetup = ref<ScreenshotSetupSnapshot | null>(null)
 const screenshotSetup = useScreenshotSetup()
-/** Capture controls exist only after the owned setup snapshot is ready. */
-const setupReady = computed(() => screenshotSetup.snapshot.value?.state === 'ready')
+/** A previous ready snapshot cannot admit captures during a check or after its failure. */
+const setupReady = computed(() => !screenshotSetup.checking.value && !screenshotSetup.error.value && screenshotSetup.snapshot.value?.state === 'ready')
 const message = ref('')
 const copied = ref('')
 const listRequest = ref('')
@@ -77,7 +77,7 @@ function identity() {
 
 /** Submit CSS size, device scale, and preview background through the shared lane. */
 function capture() {
-  if (requestId.value || !targets.value.length) return
+  if (!setupReady.value || requestId.value || !targets.value.length) return
   const frame = selectedFrame.value
   const settings = snapshot.value.settings
   const viewport = props.viewport ?? { width: frame?.rect.width ?? settings.responsiveWidth ?? 1024, height: frame?.rect.height ?? settings.responsiveHeight ?? 640 }
@@ -139,7 +139,7 @@ const disposers = [
 watch(capturedSetup, value => screenshotSetup.acceptCaptureSetup(value))
 watch(() => open.value === 'screenshot', (opened) => {
   if (!opened) return
-  screenshotSetup.read()
+  screenshotSetup.checkSetup()
   listRequest.value = identity()
   sendUiEvent('histoire:ui:screenshot-list', { requestId: listRequest.value })
 }, { immediate: true })

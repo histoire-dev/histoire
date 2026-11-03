@@ -1,84 +1,24 @@
-import type { CanvasArrangement } from '../../../histoire-app/src/app/stores/canvas.js'
-import { createHistoireSessionWithAdapters } from '@histoire/sdk/internal'
-import { HistoireProvider } from '@histoire/vue'
-import { mount } from '@vue/test-utils'
-import { afterEach, describe, expect, it, vi } from 'vitest'
-import { defineComponent, h, nextTick, ref } from 'vue'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { nextTick } from 'vue'
 import BasePopover from '../../../histoire-app/src/app/components/base/popover/BasePopover.vue'
-import CanvasToolbar from '../../../histoire-app/src/app/components/canvas/toolbar/CanvasToolbar.vue'
-import ScreenshotPopover from '../../../histoire-app/src/app/components/canvas/toolbar/ScreenshotPopover.vue'
-import { createCanvasFrames, provideCanvas } from '../../../histoire-app/src/app/composables/canvas-settings.js'
-import { createCanvasStore } from '../../../histoire-app/src/app/stores/canvas.js'
-import { sourceFixture } from '../../../histoire-sdk/src/__tests__/fixtures/session.js'
-import { toolbarGeometry } from './fixtures/toolbar-geometry.js'
+import { toolbarButton as button, toolbarFixture as fixture } from './fixtures/canvas-toolbar.js'
+import { resetScreenshotChannel, screenshotChannel as uiChannel } from './fixtures/screenshot-channel.js'
 
 vi.mock('virtual:$histoire-config', () => ({ config: { responsivePresets: [], backgroundPresets: [], theme: {} }, logos: {} }))
-const uiChannel = vi.hoisted(() => ({
-  listeners: new Map<string, Set<(value: unknown) => void>>(),
-  disconnect: new Set<() => void>(),
-  send: vi.fn((_event: string, _payload: unknown) => true),
-}))
-vi.mock('../../../histoire-app/src/app/util/ui-channel.js', () => ({
-  sendUiEvent: (event: string, payload: Record<string, unknown>) => {
-    uiChannel.send(event, payload)
-    if (event === 'histoire:ui:screenshot-setup' && payload.action === 'read') {
-      const result = { requestId: payload.requestId, setup: { revision: 1, state: 'ready', source: 'chrome', attempts: [], repairs: [] } }
-      for (const listener of [...(uiChannel.listeners.get('histoire:ui:screenshot-setup-result') ?? [])]) listener(result)
-    }
-    return true
-  },
-  onUiEvent: (event: string, listener: (value: unknown) => void) => {
-    const listeners = uiChannel.listeners.get(event) ?? new Set()
-    listeners.add(listener)
-    uiChannel.listeners.set(event, listeners)
-    return () => listeners.delete(listener)
-  },
-  onUiDisconnect: (listener: () => void) => {
-    uiChannel.disconnect.add(listener)
-    return () => uiChannel.disconnect.delete(listener)
-  },
-}))
+vi.mock('../../../histoire-app/src/app/util/ui-channel.js', async () => {
+  const { screenshotTransport } = await import('./fixtures/screenshot-channel.js')
+  return screenshotTransport
+})
 
+beforeEach(() => {
+  uiChannel.autoReady = true
+})
 afterEach(() => {
   vi.restoreAllMocks()
   vi.unstubAllGlobals()
-  uiChannel.send.mockClear()
-  uiChannel.listeners.clear()
-  uiChannel.disconnect.clear()
+  resetScreenshotChannel()
   document.body.replaceChildren()
 })
-
-/** Compose genuine toolbar controls with existing canonical session fixture. */
-async function fixture() {
-  const geometry = toolbarGeometry(1000)
-  const source = sourceFixture()
-  const session = createHistoireSessionWithAdapters({ url: 'https://book.example/' }, source.adapters)
-  await session.connect()
-  const canvas = createCanvasStore()
-  const frames = createCanvasFrames(canvas)
-  const arrange = ref<CanvasArrangement>('grid')
-  const arrangement = vi.fn((value: CanvasArrangement) => arrange.value = value)
-  const wheel = vi.fn()
-  const pointer = vi.fn()
-  const Host = defineComponent({
-    setup() {
-      provideCanvas(canvas, frames)
-      return () => h('div', { class: 'toolbar-test-host histoire-canvas-viewport', onWheel: wheel, onPointerdown: pointer }, h(CanvasToolbar, { arrange: arrange.value, onArrange: arrangement }, {
-        screenshot: (slot: { open: string | null, setOpen: (value: string | null) => void }) => h(ScreenshotPopover, { 'storyId': 'a:b', 'variantId': 'c', 'open': slot.open, 'onUpdate:open': slot.setOpen }),
-      }))
-    },
-  })
-  const wrapper = mount(HistoireProvider, { props: { session }, attachTo: document.body, slots: { default: () => h(Host) } })
-  await geometry.flush()
-  return { wrapper, geometry, session, canvas, frames, arrange, arrangement, wheel, pointer }
-}
-
-/** Resolve a genuine native action whether inline or teleported into dropdown. */
-function button(label: string): HTMLButtonElement {
-  const value = document.querySelector<HTMLButtonElement>(`button[aria-label="${label}"]`)
-  if (!value) throw new Error(`Missing toolbar action: ${label}`)
-  return value
-}
 
 describe('canvas toolbar overflow integration', () => {
   it('uses native Single dimensions for capture and responsive rotation', async () => {
