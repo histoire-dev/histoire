@@ -106,8 +106,12 @@ onMounted(() => {
 onBeforeUnmount(() => treeObserver?.disconnect())
 watch([items, focused], scheduleTreeTabStop, { flush: 'post' })
 
-/** Await canonical selection so same-story variant activation keeps current runtime. */
+/** Toggle current story without reselecting; await canonical selection for other targets. */
 async function select(row: StoryTreeRow): Promise<void> {
+  if (row.kind === 'story' && row.expanded !== undefined && row.story?.id === selection.value?.storyId) {
+    toggle(row)
+    return
+  }
   if (!row.target) return
   const generation = ++activationGeneration
   selectionIntent = { ...row.target }

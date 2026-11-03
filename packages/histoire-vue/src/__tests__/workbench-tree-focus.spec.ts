@@ -55,6 +55,29 @@ async function tree(density: 'comfortable' | 'compact', options: { count?: numbe
 }
 
 describe('production story tree keyboard focus', () => {
+  it.each(['click', 'Enter', ' '] as const)('toggles current story with %j without changing selected variant', async (action) => {
+    const owner = await tree('comfortable', {
+      count: 1,
+      variants: [{ id: 'default', title: 'Default' }, { id: 'other', title: 'Other' }],
+    })
+    try {
+      await owner.session.selection.select({ storyId: 'story-0', variantId: 'other' })
+      await nextTick()
+      const story = owner.wrapper.get('[data-test-id="story-list-item"]')
+      expect(owner.wrapper.findAll('[data-test-id="story-list-variant"]')).toHaveLength(2)
+      await story.trigger(action === 'click' ? 'click' : 'keydown', { key: action })
+      expect(story.attributes('aria-expanded')).toBe('false')
+      expect(owner.wrapper.findAll('[data-test-id="story-list-variant"]')).toHaveLength(0)
+      expect(owner.session.getSnapshot().selection).toEqual({ storyId: 'story-0', variantId: 'other' })
+      await story.trigger(action === 'click' ? 'click' : 'keydown', { key: action })
+      expect(story.attributes('aria-expanded')).toBe('true')
+      expect(owner.wrapper.findAll('[data-test-id="story-list-variant"]')).toHaveLength(2)
+      expect(owner.wrapper.get('[data-test-id="story-list-variant"][aria-selected="true"]').text()).toBe('Other')
+      expect(owner.session.getSnapshot().selection).toEqual({ storyId: 'story-0', variantId: 'other' })
+    }
+    finally { await owner.close() }
+  })
+
   it('offers story creation guidance when the catalog becomes empty', async () => {
     const owner = await tree('comfortable', { count: 1 })
     try {
