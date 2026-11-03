@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import type { FrameScopedContext, PluginChannel, SessionContextSource, SessionFrameActor, WorkbenchPluginApi } from '../index.js'
+import type { FrameScopedContext, PluginChannel, SessionContextSource, SessionFrameActor, TestsService, WorkbenchPluginApi } from '../index.js'
 import { getHistoireTargetKey } from '@histoire/protocol'
 import { createElement, useEffect, useRef } from 'react'
 import { flushSync } from 'react-dom'
@@ -127,6 +127,23 @@ describe('embedding hosts', () => {
     expect(off).toHaveBeenCalledOnce()
     await expect(opened.post('ping', 1)).rejects.toMatchObject({ code: 'RUNTIME_CHANGED' })
     expect(channel.post).not.toHaveBeenCalled()
+  })
+
+  it('exposes host test runs and releases plugin subscriptions with the plugin', async () => {
+    const off = vi.fn()
+    const tests: TestsService = { entries: () => [], running: false, canRun: true, progress: null, error: null, runAll: vi.fn(async () => {}), run: vi.fn(async () => {}), subscribe: vi.fn(() => off) }
+    expect(createSessionContext({ session: createSession() }).context.capabilities.has('tests')).toBe(false)
+    const root = createSessionContext({ session: createSession(), tests })
+    let api!: WorkbenchPluginApi
+    const host = createExtensionHost({ plugins: [plugin('acme', value => void (api = value))], services: { context: root.context } })
+    await host.ready
+    expect(api.context.capabilities.has('tests')).toBe(true)
+    expect(api.context.tests!.canRun).toBe(true)
+    await api.context.tests!.runAll()
+    expect(tests.runAll).toHaveBeenCalledOnce()
+    api.context.tests!.subscribe(() => {})
+    await host.dispose()
+    expect(off).toHaveBeenCalledOnce()
   })
 
   it('selects stories through the session and ignores destinations the host lacks', async () => {

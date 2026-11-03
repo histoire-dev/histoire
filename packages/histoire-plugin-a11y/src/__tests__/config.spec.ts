@@ -8,6 +8,7 @@ describe('hstA11y configuration', () => {
     expect(plugin.workbench).toMatchObject({ id: 'a11y', apiVersion: 1, devOnly: false, options: { autoRun: true, exclude: [], timeoutMs: 10000 } })
     expect(plugin.workbench?.client).toMatch(/client\.js$/)
     expect(plugin.workbench?.frame).toMatch(/frame\.js$/)
+    expect(HstA11y({ test: true, build: true }).workbench?.options).toMatchObject({ tests: true, report: true })
   })
 
   it('registers tests only when enabled and preserves other setup', async () => {

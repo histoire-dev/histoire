@@ -2,7 +2,8 @@ import type { HistoireBridgeCommand } from './types.js'
 import { validateInspectionOwner, validateInspectionResult } from '../inspection/validation.js'
 import { HISTOIRE_ERROR_CODES } from '../types/error.js'
 import { validateHistoireCatalogStory } from './catalog.js'
-import { validateWireValue } from './size.js'
+import { HISTOIRE_TEST_DATA_LIMIT } from './limits.js'
+import { measureWireValue, validateWireValue } from './size.js'
 import { validateHistoireStateSnapshot } from './snapshot.js'
 import { validateHistoireTestExecution } from './test-execution.js'
 import { invalid, validateHistoireTarget, wireId, wireRecord } from './validation.js'
@@ -22,6 +23,12 @@ function validateTestError(value: unknown): void {
   for (const key of ['name', 'stack', 'diff']) {
     if (input[key] !== undefined && typeof input[key] !== 'string') invalid('Invalid test error field')
   }
+}
+
+/** Plugin-keyed JSON attached to one test result, bounded per test. */
+export function validateHistoireTestData(value: unknown): void {
+  wireRecord(value)
+  measureWireValue(value, { mode: 'json', maxBytes: HISTOIRE_TEST_DATA_LIMIT })
 }
 
 /** Existing wire-safe definition/summary fields retain names and assertion semantics. */
@@ -47,6 +54,7 @@ export function validateHistoireTestResult(value: unknown, summary: boolean): vo
     const test = wireRecord(value)
     if (!wireId(test.id) || typeof test.name !== 'string' || typeof test.fullName !== 'string' || !['passed', 'failed', 'skipped'].includes(test.state as string) || !Array.isArray(test.errors)) invalid('Invalid test case')
     for (const error of test.errors) validateTestError(error)
+    if (test.data !== undefined) validateHistoireTestData(test.data)
     for (const key of ['storyId', 'variantId']) {
       if (test[key] !== undefined && !wireId(test[key])) invalid('Invalid test target')
     }

@@ -124,7 +124,7 @@ Project/story/operation resources contain JSON. Docs/source resources contain ra
 | Terminal retention | Ten minutes after finish, subject to storage eviction |
 | Preview readiness / browser cleanup | 30 seconds / 10 seconds |
 
-Whole-job test safety budgets come from existing `test.collectTimeout`, `test.storyCollectTimeout`, and `test.runTimeout`. Embedded test/hook deadlines remain unchanged.
+Whole-job test safety budgets come from existing `test.collectTimeout`, `test.storyCollectTimeout`, and `test.runStallTimeout`. Embedded test/hook deadlines remain unchanged.
 
 ## Troubleshooting
 

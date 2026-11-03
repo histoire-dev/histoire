@@ -17,6 +17,7 @@ const KINDS = {
   'context-menu.item': true,
   'canvas.overlay': true,
   'canvas.frame-overlay': true,
+  'canvas.frame-badge': true,
   'canvas.tool': true,
   'canvas.view': true,
   'shell.pane': true,

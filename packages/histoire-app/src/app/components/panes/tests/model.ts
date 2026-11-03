@@ -2,12 +2,12 @@ import type { HistoireCatalog, HistoireTarget } from '@histoire/protocol'
 import type { HistoireSession } from '@histoire/sdk'
 import type { HistoireTestsModel } from '@histoire/vue/internal'
 import type { InjectionKey } from 'vue'
-import type { WorkbenchTestEntry, WorkbenchTestsOptions } from './types.js'
+import type { WorkbenchTestEntry, WorkbenchTestRunProgress, WorkbenchTestsOptions } from './types.js'
 import { getHistoireTargetKey } from '@histoire/protocol'
 import { useHistoireContext } from '@histoire/vue/internal'
 import { computed, inject, provide, shallowRef, watch } from 'vue'
 import { createWorkbenchTestDiscovery } from './discovery.js'
-import { assertWorkbenchTestRunOwner, createWorkbenchTestJobs, projectWorkbenchTestResult } from './execution.js'
+import { assertWorkbenchTestRunOwner, createWorkbenchTestJobs, projectWorkbenchTestResult, workbenchRunError } from './execution.js'
 import { emptyTestEntry, isVisibleTestRow, projectTestRows, summarizeTestRows } from './projection.js'
 
 /** Capture catalog-executable provenance by story so unrelated catalog fields retain completed cache. */
@@ -28,6 +28,8 @@ export function createWorkbenchTestsModel(session: HistoireSession, selected?: H
   const error = shallowRef<unknown>(null)
   const completed = shallowRef(0)
   const total = shallowRef(0)
+  // Raw phase progress of the running bulk job, as reported by the server.
+  const runProgress = shallowRef<WorkbenchTestRunProgress | null>(null)
   const executionDuration = shallowRef<number | null>(null)
   const serverTargets = new Set<string>()
   const watchTests = shallowRef(false)
@@ -193,13 +195,22 @@ export function createWorkbenchTestsModel(session: HistoireSession, selected?: H
         const started = performance.now()
         for (const target of job.targets) serverTargets.add(getHistoireTargetKey(target))
         updateTargets(job.targets, () => ({ running: true, error: null }))
+        const base = completed.value
+        // Bulk jobs report phases; until the first report the job waits for the lane or a worker.
+        if (job.bulk) runProgress.value = { phase: 'queued', completed: 0, total: 0 }
         try {
-          const result = await job.run(signal)
+          // Server spec counts map onto this job's targets (variants without tests have no spec).
+          const result = await job.run(signal, (progress) => {
+            if (!active || current !== generation || !Number.isFinite(progress.completed) || !Number.isFinite(progress.total)) return
+            runProgress.value = progress
+            if (progress.phase === 'run') completed.value = base + Math.min(job.targets.length, Math.floor(progress.completed / progress.total * job.targets.length))
+          })
           if (active && current === generation) {
             assertWorkbenchTestRunOwner(result, runSource)
             const patches = projectWorkbenchTestResult(result, job.targets, snapshot.value.catalog, job.bulk)
             const valid = job.targets.filter(target => (epochs.get(target.storyId) ?? 0) === captured.get(target.storyId))
             updateTargets(valid, target => ({ ...patches.get(getHistoireTargetKey(target)), duration: job.bulk ? null : performance.now() - started, stale: false }))
+            error.value = workbenchRunError(result) ?? error.value
           }
         }
         catch (failure) {
@@ -214,7 +225,8 @@ export function createWorkbenchTestsModel(session: HistoireSession, selected?: H
           if (active && current === generation) {
             for (const target of job.targets) serverTargets.delete(getHistoireTargetKey(target))
             updateTargets(job.targets, () => ({ running: false }))
-            completed.value += job.targets.length
+            runProgress.value = null
+            completed.value = base + job.targets.length
           }
         }
       }
@@ -259,7 +271,7 @@ export function createWorkbenchTestsModel(session: HistoireSession, selected?: H
   discovery.refresh()
   return { discoveryStatus: discovery.status, discoveryError: discovery.error, discoveryProgress: discovery.progress, retryCollection: discovery.retry,
     /** Explicit refresh is available only while an idle ready dev publication owns discovery. */
-    canRefresh: computed(() => !!options.collectProject && snapshot.value.source?.mode === 'dev' && snapshot.value.status === 'ready' && !snapshot.value.stale && !running.value && discovery.status.value !== 'collecting'), session, rows, visibleRows, summary, entries, running, error, completed, total, watchTests, canRun, cancel, invalidate, setWatch,
+    canRefresh: computed(() => !!options.collectProject && snapshot.value.source?.mode === 'dev' && snapshot.value.status === 'ready' && !snapshot.value.stale && !running.value && discovery.status.value !== 'collecting'), session, rows, visibleRows, summary, entries, running, error, completed, total, runProgress, watchTests, canRun, cancel, invalidate, setWatch,
     /** Pause only this provider's background definitions while an interactive capture owns work. */
     suspendDiscovery: discovery.suspend,
     /** Explicit execution of one exact variant, sharing the project execution lane. */

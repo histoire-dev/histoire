@@ -1,6 +1,7 @@
 import type { HistoireTestRunSummary } from '@histoire/protocol'
 import { getHistoireTargetKey } from '@histoire/protocol'
 import { createHistoireSessionWithAdapters } from '@histoire/sdk/internal'
+import { HISTOIRE_UNHANDLED_ERROR_NAME } from '@histoire/shared'
 import { describe, expect, it, vi } from 'vitest'
 import { createWorkbenchTestsModel } from '../../../histoire-app/src/app/components/panes/tests/model.js'
 import { deferred, sourceFixture } from '../../../histoire-sdk/src/__tests__/fixtures/session.js'
@@ -50,6 +51,21 @@ describe('project bulk test execution', () => {
       expect(model.rows.value.every(row => !row.running)).toBe(true)
       expect(model.completed.value).toBe(3)
       expect(session.getSnapshot().selection).toEqual({ storyId: 'a:b', variantId: 'c' })
+    }
+    finally {
+      model.close()
+      await session.dispose()
+    }
+  })
+
+  it('reports run-level unhandled errors without discarding per-variant results', async () => {
+    const { session } = await setup()
+    const runProject = vi.fn(async () => ({ ...batch(), errors: [{ name: HISTOIRE_UNHANDLED_ERROR_NAME, message: 'TypeError: loadAnimation\n    at mount' }] }))
+    const model = createWorkbenchTestsModel(session, undefined, { runProject })
+    try {
+      await model.runAll()
+      expect(model.entries.value.get(getHistoireTargetKey({ storyId: 'a:b', variantId: 'c' }))?.summary).toMatchObject({ passed: 1 })
+      expect(String(model.error.value)).toContain('TypeError: loadAnimation')
     }
     finally {
       model.close()

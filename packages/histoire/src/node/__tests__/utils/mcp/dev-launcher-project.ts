@@ -56,7 +56,7 @@ export default { plugins: [HstVue(), { name: 'launcher-observer', onDev() {
   writeFileSync(${JSON.stringify(resolve(project.root, 'launcher-state.json'))}, JSON.stringify({ pid: process.pid, source: process.env.HISTOIRE_DEV === 'true' }))
 } }], vite: { plugins: [{ name: 'launcher-document-observer', transformIndexHtml() {
   return [{ tag: 'meta', attrs: { name: 'launcher-pid', content: String(process.pid) }, injectTo: 'head' }, { tag: 'meta', attrs: { name: 'launcher-build', content: process.env.HISTOIRE_LAUNCHER_BUILD || 'initial' }, injectTo: 'head' }]
-} }] }, storyMatch: ${JSON.stringify(storyMatch)}, mcp: false, test: { collectTimeout: 60000, runTimeout: 60000 } }
+} }] }, storyMatch: ${JSON.stringify(storyMatch)}, mcp: false, test: { collectTimeout: 60000, runStallTimeout: 60000 } }
 `)
     return { ...project, repository, launcher,
       /** Release private snapshots after every owned process has exited. */

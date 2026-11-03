@@ -1,4 +1,5 @@
 import type { HistoireProjectTestCollectionResult } from '@histoire/protocol'
+import type { HistoireTestRunProgress } from './progress-reporter.js'
 
 export interface RunHistoireTestsOptions {
   /** Isolates Vitest process handlers and exit state from library caller. */
@@ -24,6 +25,8 @@ export interface RunHistoireTestsOptions {
    * collection of such a run never writes back into the context.
    */
   skipStoryScan?: boolean
+  /** Receives finished variant specs while assertions run. */
+  onRunProgress?: (progress: HistoireTestRunProgress) => void
 }
 
 /**

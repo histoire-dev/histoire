@@ -1,7 +1,7 @@
 import type { HistoireRect } from '@histoire/protocol'
 import type { ContributionBase } from './base.js'
 import type { WorkbenchIcon } from './common.js'
-import type { CanvasScopedContext, FrameRef, FrameScopedContext } from './context.js'
+import type { CanvasScopedContext, FrameHeaderContext, FrameRef, FrameScopedContext } from './context.js'
 import type { CanvasPoint, CanvasService } from './services.js'
 import type { ToolbarGroup } from './toolbar.js'
 import type { ContributionView } from './view.js'
@@ -26,6 +26,29 @@ export type CanvasFrameOverlayInput = ContributionBase<FrameScopedContext> & {
   /** Receive pointer events; passive overlays never intercept story pointer events. */
   interactive?: boolean
 } & ContributionView<FrameScopedContext>
+
+/** Color of a frame header badge: `danger` and `warning` for problems, `accent` for highlights. */
+export type CanvasFrameBadgeTone = 'neutral' | 'accent' | 'warning' | 'danger'
+
+/** Frame header badge with a tone and an accessible description. */
+export interface CanvasFrameBadgeValue {
+  /** Short visible text, usually a count. */
+  text: string | number
+  /** Badge color; `neutral` by default. */
+  tone?: CanvasFrameBadgeTone
+  /** Full description for tooltips and assistive technology (e.g. `3 accessibility violations`). */
+  label?: string
+}
+
+/**
+ * Badge shown in the header of every laid-out canvas frame, next to the variant title. The
+ * callback is re-read on context, registry and `api.invalidate()` changes; returning `null`,
+ * `undefined` or `''` hides the badge for that frame.
+ */
+export type CanvasFrameBadgeInput = ContributionBase<FrameHeaderContext> & {
+  /** Badge of one frame. */
+  badge: (context: FrameHeaderContext) => string | number | CanvasFrameBadgeValue | null | undefined
+}
 
 /** Pointer event delivered to an active canvas tool. */
 export interface CanvasToolPointerEvent {
@@ -121,6 +144,9 @@ export type CanvasOverlayContribution = CanvasOverlayInput & { kind: 'canvas.ove
 
 /** Registered per-frame overlay. */
 export type CanvasFrameOverlayContribution = CanvasFrameOverlayInput & { kind: 'canvas.frame-overlay' }
+
+/** Registered frame header badge. */
+export type CanvasFrameBadgeContribution = CanvasFrameBadgeInput & { kind: 'canvas.frame-badge' }
 
 /** Registered canvas tool. */
 export type CanvasToolContribution = CanvasToolInput & { kind: 'canvas.tool' }

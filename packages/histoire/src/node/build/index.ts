@@ -110,7 +110,7 @@ export async function build(ctx: Context, options: BuildOptions = {}) {
     const previewStoryCallbacks: PreviewStoryCallback[] = []
     for (const plugin of ctx.config.plugins) {
       if (plugin.onBuild) {
-        const api = new BuildPluginApi(ctx, plugin, moduleLoader)
+        const api = new BuildPluginApi(ctx, plugin, moduleLoader, outputRoot)
         await plugin.onBuild(api)
         changeViteConfigCallbacks.push(...api.changeViteConfigCallbacks)
         buildEndCallbacks.push(...api.buildEndCallbacks)

@@ -1,25 +1,7 @@
 import type { TestModule } from 'vitest/node'
 import { normalize } from 'pathe'
 import pc from 'picocolors'
-import { formatVitestError } from '../util/vitest-errors.js'
 import { reportStuckVitestRun } from '../util/vitest-stuck-run.js'
-
-/**
- * Throws when a generated spec failed before Vitest could register individual
- * test case results.
- * @param testModules The test modules Vitest executed.
- */
-export function assertVitestModulesHaveNoErrors(testModules: TestModule[]) {
-  const errors = testModules.flatMap((module) => {
-    return typeof module.errors === 'function'
-      ? module.errors().map(formatVitestError)
-      : []
-  })
-
-  if (errors.length) {
-    throw new Error(errors.join('\n\n'))
-  }
-}
 
 /**
  * Vitest resolves `include` entries as glob patterns, so glob-special

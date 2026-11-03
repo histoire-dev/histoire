@@ -6,6 +6,7 @@ import { assertA11y } from '../test.ts'
 window.fixture = {
   async scan(options) { const result = await runAudit(document.querySelector('#variant'), options); return result.report },
   async assert(options) { try { await assertA11y(document.querySelector('#variant'), options); return 'passed' } catch (error) { return error.message } },
+  async data(options) { const task = { meta: {} }; try { await assertA11y(document.querySelector('#variant'), options, { task }) } catch {} return task.meta.histoireData },
   repair() { document.querySelector('#story-image').setAttribute('alt', 'Example'); document.querySelector('#story-button').textContent = 'Save' },
 }
 </script></body></html>

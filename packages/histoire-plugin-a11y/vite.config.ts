@@ -17,6 +17,8 @@ function privateAxe(): Plugin {
 
 export default defineConfig({
   plugins: [vue(), privateAxe()],
+  // Library mode would bake `/` in; the book build must resolve its own base.
+  define: { 'import.meta.env.BASE_URL': 'import.meta.env.BASE_URL' },
   css: { postcss: {} },
   build: {
     target: 'es2022',

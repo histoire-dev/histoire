@@ -47,10 +47,14 @@
   "peerDependencies": {
     "@histoire/controls": "workspace:^",
     "histoire": "workspace:^",
+    "playwright": ">=1.40.0",
     "vue": "^3.5.0"
   },
   "peerDependenciesMeta": {
     "@histoire/controls": {
+      "optional": true
+    },
+    "playwright": {
       "optional": true
     },
     "vue": {

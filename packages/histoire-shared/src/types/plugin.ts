@@ -105,6 +105,8 @@ export type BuildEndCallback = () => Awaitable<void>
 export type PreviewStoryCallback = (payload: { file: string, story: ServerStory, variant: ServerVariant, url: string }) => Awaitable<void>
 
 export interface PluginApiBuild extends PluginApiBase {
+  /** Directory receiving the static book; files written there by `onBuildEnd` are published with it. */
+  outputDir: string
   changeViteConfigCallbacks: ChangeViteConfigCallback[]
   buildEndCallbacks: BuildEndCallback[]
   previewStoryCallbacks: PreviewStoryCallback[]

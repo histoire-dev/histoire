@@ -8,6 +8,7 @@
 - Empty areas in the workbench (no search results, no variant selected, no docs, no events, ...) must use `WorkbenchEmptyState` from `packages/histoire-app/src/app/components/shell/WorkbenchEmptyState.vue` instead of ad-hoc muted paragraphs.
   - `icon`: offline Carbon glyph name (see `packages/histoire-shared/src/icons/icon-names.json`).
   - `title`: short headline, no trailing period.
+  - `tone`: `accent` (default) or `neutral`; use `neutral` when emptiness is the normal starting state (nothing run yet).
   - Default slot: optional detail line. `actions` slot: optional follow-up buttons (flat `HstButton` gets accent color).
   - Example: `<WorkbenchEmptyState icon="search" title="No matches">Nothing for <q>{{ query }}</q></WorkbenchEmptyState>`.
 

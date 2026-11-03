@@ -5,6 +5,7 @@ import { performance } from 'node:perf_hooks'
 import fs from 'fs-extra'
 import pc from 'picocolors'
 import { getCollectionVitestCliOptions } from '../collect/reporter.js'
+import { progressReporterOptions } from '../test/progress-reporter.js'
 import { getRunTempDir } from '../util/temp-paths.js'
 import { throwIfTestAborted } from '../util/test-abort.js'
 import { getCollectTimeout } from '../util/test-timeouts.js'
@@ -95,6 +96,7 @@ async function collect(ctx: Context, options: CollectStoriesBrowserOptions, spec
           include: specPaths,
           ...collectionVitestCliOptions,
           ...vitestOptions,
+          ...progressReporterOptions(collectionVitestCliOptions.reporters, specPaths.length, options.onProgress),
         },
         viteConfig,
         browserProjectOptions: vitestOptions,

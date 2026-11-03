@@ -94,7 +94,21 @@ export class DevPluginApi extends BasePluginApi implements PluginApiDev {
 }
 
 export class BuildPluginApi extends BasePluginApi implements PluginApiBuild {
+  /** Directory receiving the static book. */
+  outputDir: string
   changeViteConfigCallbacks: ChangeViteConfigCallback[] = []
+
+  /**
+   * @param ctx Histoire context.
+   * @param plugin Plugin owning this API.
+   * @param moduleLoader Loader bound to the build collection server.
+   * @param outputDir Static book directory; defaults to the configured `outDir`.
+   */
+  constructor(ctx: Context, plugin: Plugin, moduleLoader: ModuleLoader, outputDir = ctx.config.outDir) {
+    super(ctx, plugin, moduleLoader)
+    this.outputDir = outputDir
+  }
+
   buildEndCallbacks: BuildEndCallback[] = []
   previewStoryCallbacks: PreviewStoryCallback[] = []
 

@@ -28,8 +28,10 @@ export interface A11yOptions extends A11yScanOptions {
   devOnly?: boolean
   /** Initial user preference for live checks while tab open; defaults to true. */
   autoRun?: boolean
-  /** Register fresh-mount tests per variant; defaults to false. */
+  /** Register fresh-mount tests per variant; defaults to false. Feeds the Accessibility pane on the dev server. */
   test?: boolean | Pick<A11yTestOptions, 'minimumImpact'>
+  /** Check every variant during `histoire build` and embed the report into the book's Accessibility pane; needs Playwright. Defaults to false. */
+  build?: boolean
 }
 
 /** Serializable settings shared with workbench and frame modules. */
@@ -44,7 +46,7 @@ export interface BrowserOptions extends A11yScanOptions {
 
 /** Validate public settings before generating browser configuration. */
 export function normalizeOptions(options: A11yOptions = {}): BrowserOptions {
-  for (const key of ['enabled', 'devOnly', 'autoRun'] as const) {
+  for (const key of ['enabled', 'devOnly', 'autoRun', 'build'] as const) {
     if (options[key] !== undefined && typeof options[key] !== 'boolean') throw new Error(`[HstA11y] ${key} must be a boolean`)
   }
   const timeoutMs = options.timeoutMs ?? 10000

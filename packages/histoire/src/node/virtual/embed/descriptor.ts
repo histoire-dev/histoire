@@ -8,7 +8,7 @@ import { resolveInspectionConfig } from '../../config/inspection.js'
 import { resolveMatrixNumericValues } from '../../config/matrix.js'
 import { hasProjectVitest } from '../../util/has-vitest.js'
 import { resolveAccessibilityRuntime } from '../../util/resolve-accessibility-runtime.js'
-import { DEFAULT_RUN_TIMEOUT, DEFAULT_STORY_COLLECT_TIMEOUT, getTestMaxWorkers } from '../../util/test-timeouts.js'
+import { DEFAULT_STORY_COLLECT_TIMEOUT, getRunStallTimeout, getTestMaxWorkers } from '../../util/test-timeouts.js'
 import { projectEmbedCatalog } from './catalog.js'
 import { projectEmbedAssets } from './content.js'
 import { getEmbedSourceId } from './identity.js'
@@ -80,7 +80,7 @@ export function createEmbedDescriptor(ctx: Context, snapshot: CatalogSnapshot, m
       backgroundPresets: (ctx.config.backgroundPresets ?? []).map(({ label, color, contrastColor }) => ({ label, color, ...(contrastColor === undefined ? {} : { contrastColor }) })),
       autoApplyContrastColor: ctx.config.autoApplyContrastColor ?? false,
       storyCollectTimeout: ctx.config.test?.storyCollectTimeout ?? DEFAULT_STORY_COLLECT_TIMEOUT,
-      runTimeout: ctx.config.test?.runTimeout ?? DEFAULT_RUN_TIMEOUT,
+      runTimeout: getRunStallTimeout(ctx),
       testMaxWorkers: getTestMaxWorkers(ctx),
       globals: ctx.config.preview?.globals ?? {},
       textDirection: ctx.config.preview?.textDirection ?? 'ltr',

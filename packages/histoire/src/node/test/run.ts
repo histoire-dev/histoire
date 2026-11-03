@@ -1,5 +1,6 @@
 import type { HistoireTestRunSummary } from '@histoire/shared'
 import type { Context } from '../context.js'
+import type { HistoireSpecProgress } from './progress-reporter.js'
 import type { RunHistoireTestsOptions } from './types.js'
 import { basename } from 'node:path'
 import { performance } from 'node:perf_hooks'
@@ -12,12 +13,13 @@ import { collectStoriesBrowser } from '../story-collection/index.js'
 import { loadProjectVitest } from '../util/project-vitest.js'
 import { getRunTempDir } from '../util/temp-paths.js'
 import { throwIfTestAborted } from '../util/test-abort.js'
-import { getRunTimeout, getTestMaxWorkers } from '../util/test-timeouts.js'
-import { assertVitestRunHasNoUnhandledErrors } from '../util/vitest-errors.js'
+import { getRunStallTimeout, getTestMaxWorkers } from '../util/test-timeouts.js'
 import { runVitestAttempts } from '../util/vitest-run.js'
+import { createVitestRunActivity } from '../util/vitest-start-timeout.js'
 import { debugVitestBrowserLifecycle } from '../vitest-browser-config/index.js'
-import { assertVitestModulesHaveNoErrors, reportStuckTestRun, warnAboutMissingTestModules } from './diagnostics.js'
+import { reportStuckTestRun, warnAboutMissingTestModules } from './diagnostics.js'
 import { ensureBrowserTestDepsInstalled, ensureProjectVitest } from './preflight.js'
+import { progressReporterOptions } from './progress-reporter.js'
 import { generateSpecFiles } from './spec-files.js'
 import { createEmptyTestSummary, summarizeResults } from './summary.js'
 import { formatNoMatchingTestsWarning, getTargetStoryFiles, selectSpecFiles } from './targeting.js'
@@ -88,6 +90,7 @@ async function runTests(ctx: Context, options: RunHistoireTestsOptions, specRoot
       // Discovering eligibility means collecting stories the user never asked
       // about: one broken unrelated story must not abort their test run.
       tolerateStoryFailures: true,
+      onProgress: options.onRunProgress && (progress => options.onRunProgress!({ phase: 'collect', ...progress })),
       signal: options.signal,
       strictCleanup: options.strictCleanup,
     })
@@ -142,6 +145,12 @@ async function runTests(ctx: Context, options: RunHistoireTestsOptions, specRoot
     setup: async () => {
       const runtimeConfig = await getTestVitestConfig(ctx, include)
       debugVitestBrowserLifecycle('test:starting vitest...')
+      // Every finished spec restarts the stall timeout and reaches progress listeners (dev UI runs).
+      const activity = createVitestRunActivity()
+      const onSpecProgress = (progress: HistoireSpecProgress) => {
+        activity.touch()
+        options.onRunProgress?.({ phase: 'run', ...progress })
+      }
 
       return {
         vitestOptions: {
@@ -149,6 +158,7 @@ async function runTests(ctx: Context, options: RunHistoireTestsOptions, specRoot
           include,
           ...runtimeConfig.vitestOptions,
           ...vitestOptions,
+          ...progressReporterOptions(vitestOptions.reporters, include.length, onSpecProgress),
           // Keep raw Vitest flags useful while retaining Histoire's configured
           // concurrency ceiling for generated browser specs.
           maxWorkers: getTestMaxWorkers(ctx),
@@ -163,20 +173,19 @@ async function runTests(ctx: Context, options: RunHistoireTestsOptions, specRoot
         viteConfig: runtimeConfig.viteConfig,
         browserProjectOptions: runtimeConfig.vitestOptions,
         filter,
-        timeoutMs: getRunTimeout(ctx),
-        timeoutMessage: 'Histoire test run timed out. The Vitest browser runner never completed.',
+        timeoutMs: getRunStallTimeout(ctx),
+        activity,
+        timeoutMessage: `Histoire test run timed out: no variant finished for ${Math.round(getRunStallTimeout(ctx) / 1000)}s (test.runStallTimeout).`,
         onTimeout: reportStuckTestRun,
         context: undefined,
       }
     },
     read: (vitest) => {
       debugVitestBrowserLifecycle('test:vitest.start() resolved')
-      assertVitestRunHasNoUnhandledErrors(vitest)
-
       const testModules = vitest.state.getTestModules()
-      assertVitestModulesHaveNoErrors(testModules)
       warnAboutMissingTestModules(testModules, include)
-      return withUncollectedStories(summarizeResults(testModules, specFiles), collection.failures)
+      // Errors outside test cases fail their variant (or the run) without discarding other results.
+      return withUncollectedStories(summarizeResults(testModules, specFiles, vitest.state.getUnhandledErrors()), collection.failures)
     },
   })
 

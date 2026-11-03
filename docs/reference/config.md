@@ -657,19 +657,23 @@ export default defineConfig({
 })
 ```
 
-## `test.runTimeout` <Badge type="tip" text="1.0-beta.2+" />
+## `test.runStallTimeout` <Badge type="tip" text="1.0-beta.2+" />
 
 `number` - Default: `300000`
 
-Maximum time in milliseconds a `histoire test` run is allowed to take before it is aborted.
+Maximum time in milliseconds a Histoire test run may go without finishing a variant before it is considered stuck and aborted. Large projects can run as long as they keep making progress. Story collection keeps its own [`test.collectTimeout`](#test-collecttimeout).
 
 ```ts
 export default defineConfig({
   test: {
-    runTimeout: 900_000,
+    runStallTimeout: 600_000,
   },
 })
 ```
+
+## `test.runTimeout` <Badge type="danger" text="deprecated" />
+
+Alias of [`test.runStallTimeout`](#test-runstalltimeout), kept for existing configs. It used to cap the total duration of a run; it now only applies while the run makes no progress.
 
 ## `test.maxWorkers` <Badge type="tip" text="1.0-beta.2+" />
 

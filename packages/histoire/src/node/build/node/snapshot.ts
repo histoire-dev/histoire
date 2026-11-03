@@ -6,7 +6,7 @@ import { normalizeNodeBase } from '../../deploy/base.js'
 import { hashContent } from '../../mcp/project/content-hash.js'
 import { indexStoryContent, readRegisteredText } from '../../mcp/project/content-index.js'
 import { captureCatalogSnapshot } from '../../mcp/project/snapshot.js'
-import { getCollectTimeout, getRunTimeout, getStoryCollectTimeout } from '../../util/test-timeouts.js'
+import { getCollectTimeout, getRunStallTimeout, getStoryCollectTimeout } from '../../util/test-timeouts.js'
 
 /** Pre-execution identities and bounded bytes, never serialized as project paths. */
 export interface NodeBuildInput {
@@ -91,7 +91,7 @@ export async function createNodeBuildSnapshot(ctx: Context, inputs: ReadonlyMap<
       textDirection: ctx.config.preview?.textDirection ?? 'ltr',
       globals: { ...ctx.config.preview?.globals },
       mcpEnabled: mcp !== false && (typeof mcp !== 'object' || mcp.enabled !== false),
-      timeouts: { collect: getCollectTimeout(ctx), storyCollect: getStoryCollectTimeout(ctx), run: getRunTimeout(ctx) },
+      timeouts: { collect: getCollectTimeout(ctx), storyCollect: getStoryCollectTimeout(ctx), run: getRunStallTimeout(ctx) },
       diagnostics: captured.diagnostics.slice(),
       diagnosticsTruncated: captured.diagnosticsTruncated,
     },

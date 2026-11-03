@@ -60,6 +60,16 @@ export interface WorkbenchTestCollectionOptions {
   force?: boolean
 }
 
+/** Server run progress: story collection (one spec per story), then assertions (one per variant). */
+export interface WorkbenchTestRunProgress {
+  /** Current phase; `queued` until the server reports (the shared lane may be busy). */
+  phase: 'queued' | 'collect' | 'run'
+  /** Finished specs. */
+  completed: number
+  /** Specs in the run; variants without tests have none. */
+  total: number
+}
+
 /** First-party execution adapter uses existing shared server lane. */
 export interface WorkbenchTestsOptions {
   /** Discover every project variant without running assertion bodies. */
@@ -67,7 +77,7 @@ export interface WorkbenchTestsOptions {
   /** Refresh all variants of one executable story after HMR. */
   collectStory?: (storyId: string, signal: AbortSignal, onProgress?: (collection: HistoireProjectTestCollectionResult) => void, options?: WorkbenchTestCollectionOptions) => Promise<HistoireProjectTestCollectionResult>
   /** One project-wide server worker; returned cases retain exact target attribution. */
-  runProject?: (signal: AbortSignal) => Promise<HistoireTestRunSummary>
+  runProject?: (signal: AbortSignal, onProgress?: (progress: WorkbenchTestRunProgress) => void) => Promise<HistoireTestRunSummary>
   /** One changed story worker, including all currently collected variants. */
   runStory?: (storyId: string, signal: AbortSignal) => Promise<HistoireTestRunSummary>
   /** Explicit target operation; never changes active selection. */

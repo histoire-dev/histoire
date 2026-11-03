@@ -72,6 +72,10 @@ Increase [`test.storyCollectTimeout`](../reference/config.md#test-storycollectti
 
 See [Visual testing](./visual-testing.md) for tracked baselines, Matrix cases, image review, and CI comparisons.
 
+## Errors outside tests
+
+A story that throws outside its test cases (failed import, mount timeout, uncaught error or rejection) fails the run without discarding results of other variants. When the error can be traced to a variant, that variant gets a failed `Variant error` result; otherwise the run reports it as a whole.
+
 ## Accessibility checks
 
 Install [official accessibility plugin](./plugins/a11y.md) and enable `HstA11y({ test: true })` to add fresh-mount axe-core test per variant, including stories without authored tests. All violations fail by default; checks needing manual review remain informational.

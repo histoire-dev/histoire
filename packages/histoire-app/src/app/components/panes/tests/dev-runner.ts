@@ -1,5 +1,5 @@
 import type { HistoireProjectTestCollectionResult, HistoireTestRunSummary } from '@histoire/protocol'
-import type { WorkbenchTestsOptions } from './types.js'
+import type { WorkbenchTestRunProgress, WorkbenchTestsOptions } from './types.js'
 import { HistoireSdkError } from '@histoire/protocol'
 import { DEFAULT_COLLECT_TIMEOUT, TEST_COLLECTION_REPLY_GRACE } from '@histoire/shared'
 import { STORY_CHANGED_EVENT } from '../../../util/hot.js'
@@ -30,10 +30,10 @@ export function createDevWorkbenchTestsOptions(window: Window, collectTimeout = 
     })
   }
   /** Assertion results stay distinct from definition-only discovery. */
-  const run = (target: { storyId?: string, variantId?: string | null }, signal: AbortSignal) => request<HistoireTestRunSummary>('runStoryTests', target, signal)
+  const run = (target: { storyId?: string, variantId?: string | null }, signal: AbortSignal, onProgress?: (progress: WorkbenchTestRunProgress) => void) => request<HistoireTestRunSummary>('runStoryTests', target, signal, onProgress as ((progress: unknown) => void) | undefined)
   return { storage, run, collectProject: (signal, progress, options) => request<HistoireProjectTestCollectionResult>('collectStoryTests', options?.force ? { force: true } : {}, signal, progress), collectStory: (storyId, signal, progress, options) => request<HistoireProjectTestCollectionResult>('collectStoryTests', { storyId, ...(options?.force ? { force: true } : {}) }, signal, progress),
     /** Project execution avoids starting an isolated Vitest worker per variant. */
-    runProject: signal => run({}, signal),
+    runProject: (signal, onProgress) => run({}, signal, onProgress),
     /** Watch executes all variants in one changed story with one worker. */
     runStory: (storyId, signal) => run({ storyId }, signal),
     /** HMR already identifies affected story; no polling or duplicate source watcher. */

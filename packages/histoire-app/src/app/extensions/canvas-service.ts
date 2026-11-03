@@ -136,13 +136,14 @@ export function createCanvasScopedContext<S extends CanvasService>(root: Workben
     return release
   }
 
-  const { source, catalog, navigation, devEvents } = root
+  const { source, catalog, navigation, devEvents, tests } = root
   const context: CanvasScopedContext & { readonly canvas: S } = Object.freeze({
     capabilities: new Set<WorkbenchCapability>([...root.capabilities, 'canvas']),
     source,
     catalog,
     navigation,
     ...(devEvents ? { devEvents } : {}),
+    ...(tests ? { tests } : {}),
     get selection() {
       return root.selection
     },

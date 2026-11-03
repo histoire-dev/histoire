@@ -6,6 +6,7 @@ import {
   cleanupRunTestsTempDirs,
   createRunTestsContext,
   createRunTestsStoryFile,
+  createVitestInstanceStub,
   installRunTestsMocks,
 } from './utils/run-tests-harness.js'
 
@@ -104,10 +105,12 @@ describe('runHistoireTests generated specs', () => {
           {
             name: 'first collected test',
             result: () => ({ state: 'passed', errors: [] }),
+            meta: () => ({}),
           },
           {
             name: 'second collected test',
             result: () => ({ state: 'passed', errors: [] }),
+            meta: () => ({}),
           },
         ],
       },
@@ -125,8 +128,8 @@ describe('runHistoireTests generated specs', () => {
       moduleId,
       errors: () => [],
       children: { allTests: () => index === 0
-        ? [{ name: 'first', result: () => ({ state: 'passed', errors: [] }) }, { name: 'skipped', result: () => ({ state: 'skipped', errors: [] }) }]
-        : [{ name: 'second', result: () => ({ state: 'failed', errors: [new Error('second target assertion')] }) }] },
+        ? [{ name: 'first', result: () => ({ state: 'passed', errors: [] }), meta: () => ({}) }, { name: 'skipped', result: () => ({ state: 'skipped', errors: [] }), meta: () => ({}) }]
+        : [{ name: 'second', result: () => ({ state: 'failed', errors: [new Error('second target assertion')] }), meta: () => ({}) }] },
     })))
 
     const summary = await runHistoireTests(createRunTestsContext(stories))
@@ -170,14 +173,15 @@ describe('runHistoireTests generated specs', () => {
       variantId: 'failing-variant',
       source: 'onTest(() => {})',
     })
-    mocks.setTestModules(options => [{
-      moduleId: options.include[0],
-      errors: () => [new Error('story import exploded')],
-      children: { allTests: () => [] },
-    }])
+    mocks.setCreateVitest(vi.fn(async (_mode: string, options: any) => createVitestInstanceStub({
+      options,
+      start: vi.fn(async () => {
+        throw new Error('runner exploded')
+      }),
+    })))
     const ctx = createRunTestsContext([story])
 
-    await expect(runHistoireTests(ctx)).rejects.toThrow(/story import exploded/)
+    await expect(runHistoireTests(ctx)).rejects.toThrow(/runner exploded/)
 
     expect(fs.readdirSync(join(ctx.root, '.histoire', 'tmp', 'tests'))).toEqual([])
   })

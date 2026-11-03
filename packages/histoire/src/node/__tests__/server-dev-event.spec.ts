@@ -88,6 +88,7 @@ describe('dev-event handler', () => {
     expect(runHistoireTests).toHaveBeenCalledWith(expect.anything(), {
       storyId: 'story',
       variantId: 'variant',
+      onRunProgress: expect.any(Function),
       skipStoryScan: true,
       signal: expect.any(AbortSignal),
       strictCleanup: true,

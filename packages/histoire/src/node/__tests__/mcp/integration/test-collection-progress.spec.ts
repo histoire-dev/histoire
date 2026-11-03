@@ -41,7 +41,7 @@ import {onTest} from 'histoire/client';import {it} from 'vitest';
 onTest(()=>it('slow definition',()=>{}))
 async function setup(){await fetch('${origin}/setup')}
 </script><template><Story id="slow"><Variant id="main" :setup-app="setup"><span>Slow</span></Variant></Story></template>`)
-    await writeFile(resolve(fixture.root, 'custom config.ts'), `import {HstVue} from '@histoire/plugin-vue';export default {plugins:[HstVue()],storyMatch:['*.story.vue'],mcp:false,test:{collectTimeout:8000,runTimeout:60000}}`)
+    await writeFile(resolve(fixture.root, 'custom config.ts'), `import {HstVue} from '@histoire/plugin-vue';export default {plugins:[HstVue()],storyMatch:['*.story.vue'],mcp:false,test:{collectTimeout:8000,runStallTimeout:60000}}`)
     project = await createHistoireProject({ root: fixture.root, configFile: 'custom config.ts' })
     const dev = await project.startDev({ host: '127.0.0.1', port: 0 })
     await dev.ready

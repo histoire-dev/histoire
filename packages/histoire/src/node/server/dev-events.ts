@@ -77,6 +77,11 @@ export function registerDevEvents(ctx: Context, server: ViteDevServer, moduleLoa
             if (isActive() && !retiredClients.has(client)) client.send('histoire:dev-event-progress', { event: 'collectStoryTests', requestId, progress })
           }
         : undefined,
+      onRunProgress: operation === 'run'
+        ? (progress) => {
+            if (isActive() && !retiredClients.has(client)) client.send('histoire:dev-event-progress', { event: 'runStoryTests', requestId, progress })
+          }
+        : undefined,
     }, isActive, operation)
     const key = requestKey(requestId)
     if (!key) return handle

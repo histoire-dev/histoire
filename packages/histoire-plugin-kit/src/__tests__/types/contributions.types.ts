@@ -63,6 +63,14 @@ defineWorkbenchPlugin({
     // @ts-expect-error canvas view mounts receive canvas-scoped context, not frame-scoped context
     api.canvas.addView({ id: 'stack', label: 'Stack', icon: 'layers', mount: (_container, _context: FrameScopedContext) => {} })
     api.home.addSection({ id: 'news', column: 'primary', title: 'News', component: {} })
+    api.canvas.addFrameBadge({ id: 'count', badge: (context) => {
+      expectTypeOf(context.frame.target.storyId).toBeString()
+      return { text: 2, tone: 'danger', label: '2 issues' }
+    } })
+    // @ts-expect-error header badges run for frames without a live runtime
+    api.canvas.addFrameBadge({ id: 'count', badge: context => context.runtime.getSnapshot() ? 1 : 0 })
+    // @ts-expect-error unknown badge tone
+    api.canvas.addFrameBadge({ id: 'count', badge: () => ({ text: 1, tone: 'loud' }) })
   },
 })
 

@@ -7,6 +7,15 @@ import type {
 } from './types/test.js'
 import { serializeTestError } from './test-errors.js'
 
+/**
+ * Name of the synthetic failed test case reporting errors a variant raised outside its
+ * test cases (failed spec import, mount timeout, uncaught error), so they stay attributed.
+ */
+export const HISTOIRE_VARIANT_ERROR_TEST_NAME = 'Variant error'
+
+/** Name of run-level errors no variant could be blamed for (e.g. an unhandled rejection without spec). */
+export const HISTOIRE_UNHANDLED_ERROR_NAME = 'HistoireUnhandledError'
+
 /** Merge existing summaries without changing per-variant test identities or semantics. */
 export function mergeHistoireTestSummaries(values: HistoireTestRunSummary[]): HistoireTestRunSummary {
   const summary: HistoireTestRunSummary = { ok: true, total: 0, passed: 0, failed: 0, skipped: 0, errors: [], tests: [] }
@@ -98,6 +107,7 @@ export function createHistoireTestSummary(storyId: string, variantId: string, te
       errors: test.errors,
       storyId,
       variantId,
+      ...(test.data ? { data: test.data } : {}),
     })),
   }
 }

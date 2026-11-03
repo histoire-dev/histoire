@@ -3,8 +3,10 @@ import { BuiltinIcon } from '@histoire/controls/vue'
 import WorkbenchStateLayout from './WorkbenchStateLayout.vue'
 
 defineProps<{
-  /** Offline Carbon glyph name shown in accent badge. */
+  /** Offline Carbon glyph name shown in the badge. */
   icon: string
+  /** Badge color: `accent` (default) or `neutral` for areas that are empty by default. */
+  tone?: 'accent' | 'neutral'
   /** Short headline describing why area is empty. */
   title: string
   /** Grow to fill available flex-panel space. */
@@ -23,7 +25,7 @@ defineSlots<{
 <template>
   <WorkbenchStateLayout :title="title" :fill="fill" :flush="flush" role="status">
     <template #visual>
-      <span class="htw:grid htw:place-items-center htw:flex-none htw:size-12 htw:mb-2 htw:text-accent htw:rounded-full htw:bg-accent-soft">
+      <span class="htw:grid htw:place-items-center htw:flex-none htw:size-12 htw:mb-2 htw:rounded-full" :class="tone === 'neutral' ? 'htw:text-muted htw:bg-chip' : 'htw:text-accent htw:bg-accent-soft'">
         <BuiltinIcon :icon="icon" :size="22" />
       </span>
     </template>

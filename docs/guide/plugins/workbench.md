@@ -107,6 +107,7 @@ Each helper on `api` registers one contribution kind. Every contribution has a l
 | `menus.addContextAction` | `context-menu.item` | context menu | Workbench context menu for the listed `targets` (`story`, `folder`, `test`, ...) |
 | `canvas.addOverlay` | `canvas.overlay` | canvas | Layer over the canvas, in `viewport` or `canvas` space |
 | `canvas.addFrameOverlay` | `canvas.frame-overlay` | frame | One instance per rendered frame, over its document box |
+| `canvas.addFrameBadge` | `canvas.frame-badge` | frame header | Badge next to the variant title of every laid-out frame |
 | `canvas.addTool` | `canvas.tool` | canvas | Tool switch, after built-in tools |
 | `canvas.addView` | `canvas.view` | canvas | Arrangement switch, after Grid, List and Matrix; `?arrange=acme:compare` |
 | `shell.addPane` | `shell.pane` | root | Rail, after built-in panes |
@@ -278,16 +279,17 @@ If a view embeds an interface that cannot adopt the workbench theme, set `degrad
 
 | Context | Surfaces | Adds |
 | --- | --- | --- |
-| `WorkbenchContext` (root) | toolbar, commands, shortcuts, panes, settings, home | `capabilities`, `source.mode` (`dev`, `static`, `remote`), `catalog`, `selection`, `navigation`, `devEvents?`, `subscribe` |
+| `WorkbenchContext` (root) | toolbar, commands, shortcuts, panes, settings, home | `capabilities`, `source.mode` (`dev`, `static`, `remote`), `catalog`, `selection`, `navigation`, `devEvents?`, `tests?`, `subscribe` |
 | `FrameScopedContext` | inspector tabs and sections, frame menu, frame overlays | `frame` (`key`, `target`) and `runtime` (`getSnapshot`, `subscribe`) of exactly that frame |
 | `CanvasScopedContext` | canvas overlays, tools, views | `canvas`: zoom, pan, coordinate transforms, frame geometry, frame leases |
 | `ContextMenuContext` | context menu | captured `target` (`kind`, `label`, `selection?`, `frame?`) |
 
-Check `context.capabilities` before relying on optional services (`devEvents`, `canvas`, `frames`). A missing service is absent from the context; reading it never throws. `context.subscribe` notifies after selection or source changes; read fresh values from the context then.
+Check `context.capabilities` before relying on optional services (`devEvents`, `tests`, `canvas`, `frames`). A missing service is absent from the context; reading it never throws. `context.subscribe` notifies after selection or source changes; read fresh values from the context then.
 
 - `catalog`: metadata-only `list()`, `getStory(id)`, `search(query)`.
 - `navigation`: `selectStory`, `openInspectorTab`, `openPane`, `openSettings`, `openCanvasView`, taking `builtin:` or qualified plugin ids.
 - `devEvents.send(event, payload)`: reaches your Node `onDevEvent` hook; dev server only.
+- `tests`: project test runs shared with the Tests pane; dev server only. `entries()` lists per-variant `summary`, `running`, `stale` and `error`; `progress` reports the current run phase: waiting to start (`queued`), stories collected (`collect`), then variants checked (`run`); `error` is the failure of a whole run; `runAll()`/`run(target)` start runs; `subscribe` notifies after changes. Tests attach JSON to their result with `setHistoireTestData(context, key, value)` from `@histoire/shared` (48 KiB per test), read back as `summary.tests[n].data[key]`.
 
 ## Options and preferences
 
@@ -310,6 +312,18 @@ api.preferences.subscribe('compact', value => render(value))
 
 - **Overlays** (`canvas.addOverlay`): `space: 'viewport'` uses viewport pixels; `space: 'canvas'` uses canvas units, and the host applies pan and zoom to the layer. Overlays are passive (`inert`, no pointer events) unless `interactive: true`, which lets only the elements you render receive input.
 - **Frame overlays** (`canvas.addFrameOverlay`): one instance per rendered frame, sized and positioned over the frame's document box through pan, zoom, scroll and resize. Two frames of the same variant get two instances with different `context.frame.key` values.
+- **Frame badges** (`canvas.addFrameBadge`): a short count or status next to the variant title in every frame header, including frames that are not live yet. `badge(context)` returns text, a number or `{ text, tone, label }` (`tone`: `neutral`, `accent`, `warning` or `danger`; `label` is the tooltip and accessible description); `null`, `undefined` or `''` hides it. The context has `frame` but no `runtime`. Badges re-evaluate like tab badges, so call `api.invalidate()` when they read plugin state.
+
+```ts
+api.canvas.addFrameBadge({
+  id: 'issues',
+  badge: ({ frame }) => {
+    const count = issues.get(frame.key)
+    return count ? { text: count, tone: 'danger', label: `${count} issues` } : null
+  },
+})
+```
+
 - **Tools** (`canvas.addTool`): `onPointerDown`, `onPointerMove`, `onPointerUp`, `onCancel` receive viewport and canvas points and the frame under the pointer. Built-in panning (Space, middle button, Pan tool) always wins. A throwing handler switches back to Select. `shortcut` keys are registered in the canvas scope.
 - **Views** (`canvas.addView`): an arrangement beside Grid, List and Matrix. The view covers the canvas body and places content with `context.canvas` transforms. `layout(zoom)` returns content boxes used by Fit; `toolbar` lists the toolbar groups the view supports.
   - The canvas reads `layout` when it measures (switch, resize, frame registry changes). When your content changes on its own, call `context.canvas.requestLayout()`: the canvas re-reads `layout` once after the current update, without remounting the view. At Fit zoom the camera frames the new boxes; at a fixed zoom, or after the user panned, the camera stays.

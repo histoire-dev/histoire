@@ -18,6 +18,7 @@ import { createContextMenu, provideContextMenu } from '../composables/context-me
 import { useContributionLookup } from '../composables/shell-extensions.js'
 import { useWorkbenchPluginActions } from '../extensions/action-surfaces.js'
 import { useStandaloneExtensionHost } from '../extensions/standalone.js'
+import { createTestsService } from '../extensions/tests-service.js'
 import { createMcpStore, provideMcpStore } from '../stores/mcp.js'
 import { createProjectConfigStore, provideProjectConfigStore } from '../stores/project-config.js'
 import { histoireConfig } from '../util/config.js'
@@ -130,7 +131,7 @@ export function useWorkbench(props: WorkbenchProps, error: (error: unknown) => v
     pane: value => value === 'home' ? navigate('home') : void activatePane(value as WorkspacePane).catch(error),
     settings: section => navigate('settings', section),
     canvasView: value => void props.navigation.query({ arrange: value }).catch(error),
-  })
+  }, __HISTOIRE_DEV__ ? createTestsService(projectTests) : undefined)
   // Plugin commands, shortcuts and menu entries join the registries above (toolbar reads the host).
   useWorkbenchPluginActions(extensions, { commands: props.commands, shortcuts, actions, menu, error, frameSession: target => canvas.value?.registry.getFrame(target.frameKey)?.session ?? props.session })
   useHistoireResource(shortcuts.bind('global.search', () => openSearch(), { allowInput: true }))

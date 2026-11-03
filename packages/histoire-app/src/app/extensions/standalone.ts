@@ -1,3 +1,4 @@
+import type { TestsService } from '@histoire/plugin-kit'
 import type { WorkbenchProps } from '../standalone/workbench-types.js'
 import type { WorkbenchHost } from './create-workbench-host.js'
 import type { WorkbenchNavigationTargets } from './navigation.js'
@@ -16,8 +17,9 @@ import { createWorkbenchStorage, getWorkbenchStorageNamespace } from './storage.
  * the background; the host is disposed with the workbench provider.
  * @param props Standalone workbench ownership.
  * @param targets Existing workbench navigation, except story selection which uses the session.
+ * @param tests Project test runs exposed to plugins; dev server only.
  */
-export function useStandaloneExtensionHost(props: WorkbenchProps, targets: Omit<WorkbenchNavigationTargets, 'selectStory'>): WorkbenchHost {
+export function useStandaloneExtensionHost(props: WorkbenchProps, targets: Omit<WorkbenchNavigationTargets, 'selectStory'>, tests?: TestsService): WorkbenchHost {
   const mode = props.session.getSnapshot().source?.mode ?? (__HISTOIRE_DEV__ ? 'dev' : 'static')
   const workbench = createWorkbenchHost({
     session: props.session,
@@ -25,6 +27,7 @@ export function useStandaloneExtensionHost(props: WorkbenchProps, targets: Omit<
     plugins: inspectionPluginEntries(injectWorkbenchPlugins(), histoireConfig.inspection?.enabled === true, props.session, props.runtime.current, message => console.warn(message), () => workbench?.selectedFrame.current() ?? null),
     navigation: { ...targets, selectStory: input => props.session.selection.select(input) },
     devEvents: __HISTOIRE_DEV__ ? resolveDevEventService({ mode, hot: Boolean(import.meta.hot), window: props.hostWindow }) : undefined,
+    tests,
     storage: createWorkbenchStorage(props.hostWindow),
     storageNamespace: getWorkbenchStorageNamespace(props.previewBase),
   })

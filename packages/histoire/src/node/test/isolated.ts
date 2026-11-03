@@ -8,7 +8,7 @@ import { getHistoireTargetKey, HistoireSdkError, validateBridgeResult, validateP
 import { waitForChildExit } from '../runtime/child-process.js'
 import { ExecutionError } from '../runtime/execution-types.js'
 import { throwIfTestAborted } from '../util/test-abort.js'
-import { getCollectTimeout, getRunTimeout } from '../util/test-timeouts.js'
+import { getCollectTimeout, getRunStallTimeout } from '../util/test-timeouts.js'
 import { captureTestContextFiles } from './context-transfer.js'
 
 /** Existing runner executes in owned process; caller's cwd/env/handlers/exitCode never borrowed. */
@@ -49,15 +49,28 @@ async function isolatedTestOperation(ctx: Context, options: CollectHistoireTests
   try {
     result = await new Promise<HistoireTestRunSummary | HistoireProjectTestCollectionResult>((resolve, reject) => {
       rejectOperation = reject
-      timer = setTimeout(() => {
-        reject(new HistoireSdkError('TIMEOUT', 'Histoire test worker timed out'))
-        abort()
-      }, operation === 'collect' ? Math.max(0, (options.collectionDeadline ?? Date.now() + getCollectTimeout(ctx)) - Date.now()) : getRunTimeout(ctx) + 60_000)
+      /** (Re)starts the worker guard: a collection deadline, or a run stall timeout plus margin for the worker's own. */
+      const arm = () => {
+        clearTimeout(timer)
+        timer = setTimeout(() => {
+          reject(new HistoireSdkError('TIMEOUT', 'Histoire test worker timed out'))
+          abort()
+        }, operation === 'collect' ? Math.max(0, (options.collectionDeadline ?? Date.now() + getCollectTimeout(ctx)) - Date.now()) : getRunStallTimeout(ctx) + 60_000)
+      }
+      arm()
       child.once('error', reject)
       child.once('exit', () => {
         if (!received) reject(new HistoireSdkError('INTERNAL_ERROR', 'Test worker exited without confirmed result'))
       })
       child.on('message', (message: any) => {
+        if (!received && message?.type === 'run-progress' && operation === 'run' && !options.signal?.aborted) {
+          // A progressing run is not stuck, however long it takes.
+          arm()
+          // Counts only; malformed values are dropped rather than failing the run.
+          const { phase, completed, total } = message.progress ?? {}
+          if ((phase === 'collect' || phase === 'run') && Number.isSafeInteger(completed) && Number.isSafeInteger(total) && completed >= 0 && completed <= total) options.onRunProgress?.({ phase, completed, total })
+          return
+        }
         if (!received && message?.type === 'progress' && operation === 'collect' && !options.signal?.aborted) {
           try {
             const progress = message.collection

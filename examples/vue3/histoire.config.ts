@@ -19,7 +19,7 @@ export default defineConfig({
   // outDir: 'hdist',
   plugins: [
     HstVue(),
-    HstA11y(),
+    HstA11y({ test: true }),
     HstVueDevtools({
       enabled: process.env.HISTOIRE_VUE_DEVTOOLS !== 'false',
       clientAuthToken: process.env.HISTOIRE_VUE_DEVTOOLS_TOKEN,

@@ -125,7 +125,7 @@ it('reuses cleaned-up definitions across reloads and tabs, refreshes explicitly,
     const epoch = services.dev!.controller.current!.epoch
     label = 'after restart'
     await writeFile(resolve(fixture.root, 'setup.ts'), `import {onTest} from 'histoire/client';import {it} from 'vitest';onTest(()=>it('shared one',()=>{}))`)
-    await writeFile(resolve(fixture.root, 'custom config.ts'), `import {HstVue} from '@histoire/plugin-vue';export default {plugins:[HstVue()],storyMatch:['*.story.vue'],setupFile:'setup.ts',mcp:false,test:{collectTimeout:60000,runTimeout:60000}}`)
+    await writeFile(resolve(fixture.root, 'custom config.ts'), `import {HstVue} from '@histoire/plugin-vue';export default {plugins:[HstVue()],storyMatch:['*.story.vue'],setupFile:'setup.ts',mcp:false,test:{collectTimeout:60000,runStallTimeout:60000}}`)
     await vi.waitFor(() => {
       expect(services.dev!.controller.current?.epoch).not.toBe(epoch)
       expect(services.dev!.catalog?.updating).toBe(false)

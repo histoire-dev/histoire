@@ -1,4 +1,4 @@
-import type { CanvasFrameOverlayContribution, CanvasOverlayContribution, CanvasToolContribution, CanvasViewContribution } from './canvas.js'
+import type { CanvasFrameBadgeContribution, CanvasFrameOverlayContribution, CanvasOverlayContribution, CanvasToolContribution, CanvasViewContribution } from './canvas.js'
 import type { CommandContribution, ShortcutContribution } from './commands.js'
 import type { InspectorSectionContribution, InspectorTabContribution } from './inspector.js'
 import type { ContextMenuItemContribution, FrameMenuItemContribution } from './menus.js'
@@ -25,6 +25,8 @@ export interface ContributionKindMap {
   'canvas.overlay': CanvasOverlayContribution
   /** Per-frame overlay. */
   'canvas.frame-overlay': CanvasFrameOverlayContribution
+  /** Frame header badge. */
+  'canvas.frame-badge': CanvasFrameBadgeContribution
   /** Canvas tool. */
   'canvas.tool': CanvasToolContribution
   /** Canvas arrangement. */

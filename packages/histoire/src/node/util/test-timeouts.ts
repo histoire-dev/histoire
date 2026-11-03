@@ -7,8 +7,8 @@ export { DEFAULT_COLLECT_TIMEOUT } from '@histoire/shared'
 /** Default maximum time (ms) a single story may take to load and mount while collecting. */
 export const DEFAULT_STORY_COLLECT_TIMEOUT = 30_000
 
-/** Default maximum time (ms) to wait for the Histoire test run. */
-export const DEFAULT_RUN_TIMEOUT = 300_000
+/** Default maximum time (ms) a Histoire test run may go without finishing a spec. */
+export const DEFAULT_RUN_STALL_TIMEOUT = 300_000
 
 /** Default concurrent test workers, based on the host scheduling capacity. */
 export const DEFAULT_TEST_MAX_WORKERS = Math.max(1, availableParallelism())
@@ -37,11 +37,12 @@ export function getStoryCollectTimeout(ctx: Context) {
 }
 
 /**
- * Resolves the safety timeout (ms) of the Histoire test run.
+ * Resolves the stall timeout (ms) of the Histoire test run: how long it may go without
+ * finishing a spec. Falls back to the deprecated `test.runTimeout` alias.
  * @param ctx The histoire context.
  */
-export function getRunTimeout(ctx: Context) {
-  return ctx.config?.test?.runTimeout ?? DEFAULT_RUN_TIMEOUT
+export function getRunStallTimeout(ctx: Context) {
+  return ctx.config?.test?.runStallTimeout ?? ctx.config?.test?.runTimeout ?? DEFAULT_RUN_STALL_TIMEOUT
 }
 
 /**

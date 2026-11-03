@@ -1,5 +1,6 @@
 import type { ServerStory, ServerStoryFile } from '@histoire/shared'
 import type { Context } from '../context.js'
+import type { HistoireSpecProgress } from '../test/progress-reporter.js'
 
 /**
  * What a single story file reported back from the browser collection run.
@@ -37,6 +38,8 @@ export interface CollectStoriesBrowserOptions {
    * @default false
    */
   tolerateStoryFailures?: boolean
+  /** Receives collected story specs while the browser collects. */
+  onProgress?: (progress: HistoireSpecProgress) => void
 }
 
 /**

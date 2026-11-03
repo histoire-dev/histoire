@@ -15,7 +15,7 @@ import type { Plugin } from 'histoire'
 | `config` | `(config, mode, context?) => Partial<HistoireConfig> \| void` | Changes the user config. Plugins added here are not resolved. |
 | `configResolved` | `(config, context?) => void` | Reads the final config. |
 | `onDev` | `(api: PluginApiDev, onCleanup) => void` | Runs with the dev server; register cleanup with `onCleanup`. `api.watcher` is chokidar. |
-| `onBuild` | `(api: PluginApiBuild) => void` | Runs during `histoire build`: `changeViteConfig`, `onBuildEnd`, `onPreviewStory`. |
+| `onBuild` | `(api: PluginApiBuild) => void` | Runs during `histoire build`: `changeViteConfig`, `onBuildEnd`, `onPreviewStory`, `outputDir` (static book directory). |
 | `onPreview` | `() => void` | Runs when the static server starts. |
 | `onDevEvent` | `(api: PluginApiDevEvent) => any` | Handles `event`/`payload` sent from the browser in dev (`context.devEvents.send` in workbench plugins); the return value is sent back. |
 | `vitePlugins` | `(plugins) => void` | Mutates the Vite plugin list. |
@@ -82,7 +82,7 @@ declare function defineWorkbenchPlugin(definition: {
 | `toolbar.addItem` | Toolbar item. |
 | `commands.add`, `shortcuts.add` | Command search entry, key binding. |
 | `menus.addFrameAction`, `menus.addContextAction` | Frame menu entry, workbench context menu entry. |
-| `canvas.addOverlay`, `canvas.addFrameOverlay`, `canvas.addTool`, `canvas.addView` | Canvas contributions. |
+| `canvas.addOverlay`, `canvas.addFrameOverlay`, `canvas.addFrameBadge`, `canvas.addTool`, `canvas.addView` | Canvas contributions. |
 | `shell.addPane`, `settings.addSection`, `home.addSection` | Shell contributions. |
 | `frames.list()`, `frames.open(frame)`, `frames.subscribe(listener)` | Frames running this plugin's frame module; channel to one actor; attach/detach notification. |
 | `reportError(error)` | Records a diagnostic attributed to the plugin. |
@@ -107,7 +107,7 @@ All contributions: `id`, `order?`, `available?(context)`, `devOnly?`. View-beari
 | `canvas.frame-overlay` | `interactive?`, view |
 | `canvas.tool` | `label`, `icon`, `cursor?`, `shortcut?`, `onPointerDown?`, `onPointerMove?`, `onPointerUp?`, `onCancel?` |
 | `canvas.view` | `label`, `icon`, view (`CanvasViewContext`), `layout?(zoom)`, `toolbar?` |
-| `shell.pane` | `label`, `icon`, view, `badge?(context)` |
+| `shell.pane` | `label`, `icon`, view, `badge?(context)`, `header?` (`false` when the view renders its own `WorkbenchPaneHeader`) |
 | `settings.section` | `label`, `icon`, view |
 | `home.section` | `column` (`primary`, `secondary`), `title`, view |
 
@@ -146,7 +146,7 @@ The `/vue` state and pane components render the implementation the host provides
 
 ```ts
 interface WorkbenchContext {
-  capabilities: ReadonlySet<'catalog' | 'navigation' | 'devEvents' | 'canvas' | 'frames' | 'preferences'>
+  capabilities: ReadonlySet<'catalog' | 'navigation' | 'devEvents' | 'tests' | 'canvas' | 'frames' | 'preferences'>
   source: { mode: 'dev' | 'static' | 'remote' }
   catalog: {
     list: () => Promise<readonly HistoireCatalogStory[]>
@@ -162,6 +162,16 @@ interface WorkbenchContext {
     openCanvasView: (viewId: string) => void
   }
   devEvents?: { send: (event: string, payload?: HistoireJsonValue) => Promise<unknown> }
+  tests?: {
+    entries: () => ReadonlyArray<{ target: HistoireTarget, summary: HistoireTestRunSummary | null, running: boolean, stale: boolean, error: string | null }>
+    readonly running: boolean
+    readonly canRun: boolean
+    readonly progress: { phase: 'queued' | 'collect' | 'run', completed: number, total: number } | null
+    readonly error: string | null
+    runAll: () => Promise<void>
+    run: (target: HistoireTarget) => Promise<void>
+    subscribe: (listener: () => void) => Disposer
+  }
   subscribe: (listener: () => void) => Disposer
 }
 
@@ -171,6 +181,11 @@ interface FrameScopedContext extends WorkbenchContext {
     getSnapshot: () => HistoireSnapshot
     subscribe: (listener: (snapshot: HistoireSnapshot) => void) => Disposer
   }
+}
+
+// Frame header badges: any laid-out frame, live or not
+interface FrameHeaderContext extends WorkbenchContext {
+  frame: { key: string, target: HistoireTarget }
 }
 
 interface CanvasScopedContext extends WorkbenchContext {

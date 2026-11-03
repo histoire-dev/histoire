@@ -19,9 +19,18 @@ export function HstA11y(options: A11yOptions = {}): Plugin {
           apiVersion: 1,
           client: fileURLToPath(new URL('./client.js', import.meta.url)),
           frame: fileURLToPath(new URL('./frame.js', import.meta.url)),
-          options: browser as unknown as HistoireJsonValue,
+          // `tests`/`report` tell the workbench which project-wide source exists.
+          options: { ...browser, tests: !!options.test, report: !!options.build } as unknown as HistoireJsonValue,
           devOnly: options.devOnly ?? false,
         },
+    async onBuild(api) {
+      // Static books without the UI have no pane to read the report.
+      if (!options.build || options.enabled === false || options.devOnly) return
+      const { createBuildScanner } = await import('./build/scan.js')
+      const scanner = createBuildScanner(browser)
+      api.onPreviewStory(scanner.scan)
+      api.onBuildEnd(() => scanner.write(api.outputDir))
+    },
     config(config, mode) {
       if (mode === 'build' || options.enabled === false || !options.test) return
       const names = new Set(['setupVanilla', ...config.plugins.flatMap(plugin => plugin.supportPlugin?.setupFn ?? [])])

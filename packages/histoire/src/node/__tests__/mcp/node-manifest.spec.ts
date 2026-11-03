@@ -18,7 +18,7 @@ describe('portable Node manifest', () => {
   /** Creates explicit settings consumed by the artifact, never arbitrary config. */
   function context(files = [createMcpStory(fixture.root)]) {
     const ctx = createMcpContext(fixture.root, files)
-    ctx.config = { theme: { title: 'Book', defaultColorScheme: 'auto' }, routerMode: 'history', mcp: false, build: { node: { includeSource: true } }, test: { collectTimeout: 100, storyCollectTimeout: 20, runTimeout: 200 } } as any
+    ctx.config = { theme: { title: 'Book', defaultColorScheme: 'auto' }, routerMode: 'history', mcp: false, build: { node: { includeSource: true } }, test: { collectTimeout: 100, storyCollectTimeout: 20, runStallTimeout: 200 } } as any
     ctx.resolvedViteConfig = { base: '/book/' }
     return ctx
   }

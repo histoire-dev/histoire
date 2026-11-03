@@ -10,7 +10,7 @@ export async function createMcpArtifactProject(includeSource = true, routerMode 
   const project = await createMcpBrowserTestProject()
   let portable: Awaited<ReturnType<typeof copyMcpArtifact>> | undefined
   try {
-    await writeFile(resolve(project.root, 'custom config.ts'), `import { HstVue } from '@histoire/plugin-vue'; export default { plugins:[HstVue()], storyMatch:['*.story.vue'], routerMode:${JSON.stringify(routerMode)}, mcp:true, build:{node:{includeSource:${includeSource}}}, test:{collectTimeout:60000,runTimeout:60000} };`)
+    await writeFile(resolve(project.root, 'custom config.ts'), `import { HstVue } from '@histoire/plugin-vue'; export default { plugins:[HstVue()], storyMatch:['*.story.vue'], routerMode:${JSON.stringify(routerMode)}, mcp:true, build:{node:{includeSource:${includeSource}}}, test:{collectTimeout:60000,runStallTimeout:60000} };`)
     await writeFile(resolve(project.root, 'vite.config.ts'), `import vue from '@vitejs/plugin-vue'; export default { base:'/book/',plugins:[vue()] };`)
     if (bodyMarker) await addMcpTestBodyMarker(project.root, bodyMarker)
     const previewFixture = resolve(MCP_REPOSITORY_ROOT, 'packages/histoire/src/node/__tests__/fixtures/mcp-preview/vue')

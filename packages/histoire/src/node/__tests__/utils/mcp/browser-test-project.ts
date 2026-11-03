@@ -8,7 +8,7 @@ export async function createMcpBrowserTestProject() {
   await writeFile(resolve(project.root, 'package.json'), JSON.stringify({ type: 'module', devDependencies: { 'vitest': '4.1.10', '@vitest/browser-playwright': '4.1.10', 'playwright': '1.59.1' } }))
   await writeFile(resolve(project.root, 'custom config.ts'), `
 import { HstVue } from '@histoire/plugin-vue';
-export default { plugins: [HstVue()], storyMatch: ['*.story.vue'], mcp: false, test: { collectTimeout: 60000, runTimeout: 60000 } };
+export default { plugins: [HstVue()], storyMatch: ['*.story.vue'], mcp: false, test: { collectTimeout: 60000, runStallTimeout: 60000 } };
 `)
   await writeFile(resolve(project.root, 'Book.story.vue'), `<script lang="ts">
 import { onTest } from 'histoire/client'

@@ -1,5 +1,5 @@
 import type { HistoireJsonValue } from '@histoire/protocol'
-import type { CanvasFrameOverlayInput, CanvasOverlayInput, CanvasToolInput, CanvasViewInput } from './canvas.js'
+import type { CanvasFrameBadgeInput, CanvasFrameOverlayInput, CanvasOverlayInput, CanvasToolInput, CanvasViewInput } from './canvas.js'
 import type { PluginChannel } from './channel.js'
 import type { CommandInput, ShortcutInput } from './commands.js'
 import type { Awaitable, Disposer } from './common.js'
@@ -79,6 +79,8 @@ export interface WorkbenchPluginApi {
     addOverlay: (overlay: CanvasOverlayInput) => Disposer
     /** Adds an overlay instantiated per frame. */
     addFrameOverlay: (overlay: CanvasFrameOverlayInput) => Disposer
+    /** Adds a badge to every frame header (counts, statuses). */
+    addFrameBadge: (badge: CanvasFrameBadgeInput) => Disposer
     /** Adds a tool to the tool switch. */
     addTool: (tool: CanvasToolInput) => Disposer
     /** Adds an arrangement beside Grid, List and Matrix. */

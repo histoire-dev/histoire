@@ -22,7 +22,16 @@ Select a variant and open **Accessibility**. Auto-run checks current rendered co
 
 Expand a rule to read affected selectors, failure details, and rule guidance. **Highlight** locates affected element without changing focus. Violations and checks needing manual review stay separate. Outcome, severity, and auto-run preferences persist per project; they never change CI policy.
 
+Each canvas frame header shows its violation count, colored by the worst impact: from the frame's live check when the inspector ran one, otherwise from the latest project results (see below).
+
 Old results remain available during reruns or recoverable failures, marked outdated. Truncated results show omitted-detail count. Automated checks do not establish accessibility compliance; test interaction states and perform manual checks too.
+
+## Project pane
+
+The **Accessibility** rail pane lists findings across every story and variant, worst impact first. Filters are shared with the inspector tab. **Open variant** selects the variant and opens its inspector tab for live checks. **Highlight** on an element does the same, checks the variant live when its result is missing or outdated, then highlights the matching element; it reports when the element changed since the run.
+
+- Development: requires `test: true`. **Run all** runs project tests on the dev server, the same run as the Tests pane **Run all**, and the pane reads the accessibility results of each variant. Results from Tests pane runs show up too.
+- Static books: requires `build: true`. `histoire build` checks every variant in headless Chromium and embeds `a11y-report.json` into the book; the pane shows it read-only with the build time. Needs `playwright` with Chromium installed (`npx playwright install chromium`). A check that fails is reported for its variant without failing the build.
 
 ## Options
 
@@ -38,6 +47,7 @@ HstA11y({
     rules: { 'color-contrast': { enabled: false } },
   },
   test: { minimumImpact: 'serious' },
+  build: true,
 })
 ```
 
@@ -48,6 +58,7 @@ HstA11y({
 - `exclude`: defaults to `[]`; selectors resolve only within variant root. Excluding root checks no content.
 - `axe`: `runOnly` and `rules` from axe-core `RunOptions`. Omitted uses axe defaults. Selection precedence follows axe; explicitly selected `runOnly` rules take precedence over per-rule disabled overrides.
 - `test`: defaults to `false`. `true` or object registers accessibility test per variant. Optional `minimumImpact` accepts `minor`, `moderate`, `serious`, or `critical`. Unknown impact always fails.
+- `build`: defaults to `false`. `true` checks every variant during `histoire build` and embeds the report for the project pane. Ignored with `devOnly`.
 
 Scanner uses bundled axe-core **4.14.0**, loaded lazily and locally. No CDN, network service, or runtime dependency installation. Story-owned `window.axe` stays unchanged. Reports exclude raw HTML and are bounded; unsupported nested selector paths are omitted rather than resolved against wrong elements.
 
@@ -78,7 +89,7 @@ onTest(({ canvas }) => {
 })
 ```
 
-Wait for interaction’s rendered state before asserting. `assertA11y(canvas, options?)` accepts `axe`, `exclude`, `timeoutMs`, and `minimumImpact`; it does not read workbench preferences. Complete axe output determines failure before diagnostics are bounded.
+Wait for interaction’s rendered state before asserting. `assertA11y(canvas, options?, context?)` accepts `axe`, `exclude`, `timeoutMs`, and `minimumImpact`; it does not read workbench preferences. Complete axe output determines failure before diagnostics are bounded. Pass the test context (`it('…', async (context) => …)`) to attach findings to the test result; the project pane only lists the automatic **Accessibility (axe-core)** test.
 
 ## Embedded hosts
 

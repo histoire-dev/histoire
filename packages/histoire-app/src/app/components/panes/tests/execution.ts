@@ -1,7 +1,7 @@
 import type { HistoireCatalog, HistoireSourceIdentity, HistoireTarget, HistoireTestCollectionResult, HistoireTestRunSummary } from '@histoire/protocol'
-import type { WorkbenchTestEntry, WorkbenchTestsOptions } from './types.js'
+import type { WorkbenchTestEntry, WorkbenchTestRunProgress, WorkbenchTestsOptions } from './types.js'
 import { getHistoireTargetKey, HistoireSdkError } from '@histoire/protocol'
-import { createHistoireTestSummary } from '@histoire/shared'
+import { createHistoireTestSummary, formatTestError, HISTOIRE_UNHANDLED_ERROR_NAME } from '@histoire/shared'
 
 /** One server admission may execute many variants without another browser worker. */
 export interface WorkbenchTestJob {
@@ -9,8 +9,8 @@ export interface WorkbenchTestJob {
   targets: readonly HistoireTarget[]
   /** Bulk jobs lack attributable individual variant timing. */
   bulk: boolean
-  /** Adapter keeps server lane and cleanup ownership. */
-  run: (signal: AbortSignal) => Promise<HistoireTestRunSummary>
+  /** Adapter keeps server lane and cleanup ownership; bulk project jobs may report progress. */
+  run: (signal: AbortSignal, onProgress?: (progress: WorkbenchTestRunProgress) => void) => Promise<HistoireTestRunSummary>
 }
 
 /** Prefer one project worker or one worker per changed story, preserving finite fallback. */
@@ -60,4 +60,10 @@ export function projectWorkbenchTestResult(result: HistoireTestRunSummary, targe
 /** Completed assertion work supplies current definitions, including successful empty collections. */
 function collectionFromTests(tests: HistoireTestRunSummary['tests']): HistoireTestCollectionResult {
   return { definitions: tests.map(test => ({ id: test.id, name: test.name, fullName: test.fullName, ...(test.state === 'skipped' ? { mode: 'skip' as const } : {}) })) }
+}
+
+/** Errors no variant could be blamed for: reported as the run failure while variant results stay. */
+export function workbenchRunError(result: HistoireTestRunSummary): Error | null {
+  const messages = result.errors.flatMap(error => typeof error === 'object' && error.name === HISTOIRE_UNHANDLED_ERROR_NAME ? [formatTestError(error)] : [])
+  return messages.length ? new Error(messages.join('\n\n')) : null
 }

@@ -1,6 +1,9 @@
 /** Hard traversal bounds for all untrusted payloads. */
 export const HISTOIRE_WIRE_LIMITS = { metadata: 64 * 1024, request: 1024 * 1024, event: 64 * 1024, catalog: 8 * 1024 * 1024, state: 1024 * 1024, error: 16 * 1024, depth: 128, containers: 100_000, edges: 200_000 } as const
 
+/** Per-test bound of plugin data attached to a test result (`HistoireTestCaseResult.data`). */
+export const HISTOIRE_TEST_DATA_LIMIT = 48 * 1024
+
 /** Sizing policy selected from validated command and captured role. */
 export interface HistoireWirePolicy {
   /** Request, successful result, event, metadata or error representation. */

@@ -31,6 +31,8 @@ async function run(input: { operation?: 'run' | 'collect', root: string, configF
     if (input.files) restoreTestContextFiles(context, input.files)
     summary = await (input.operation === 'collect' ? collectHistoireProjectTests : runHistoireTests)(context, { ...input.options, isolate: false, signal, onProgress(collection) {
       if (!signal.aborted && process.connected) process.send?.({ type: 'progress', collection }, undefined, undefined, () => {})
+    }, onRunProgress(progress) {
+      if (!signal.aborted && process.connected) process.send?.({ type: 'run-progress', progress }, undefined, undefined, () => {})
     } })
   }
   catch (error) { failure = error }

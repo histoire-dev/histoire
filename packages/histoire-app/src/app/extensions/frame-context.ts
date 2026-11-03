@@ -1,4 +1,4 @@
-import type { Disposer, FrameRef, FrameRuntimeView, FrameScopedContext, WorkbenchContext } from '@histoire/plugin-kit'
+import type { Disposer, FrameHeaderContext, FrameRef, FrameRuntimeView, FrameScopedContext, WorkbenchContext } from '@histoire/plugin-kit'
 import type { HistoireTarget } from '@histoire/protocol'
 import type { HistoireSession } from '@histoire/sdk'
 import type { RootContext } from './context.js'
@@ -68,13 +68,14 @@ export function createFrameContext(root: RootContext, options: FrameContextOptio
     getSnapshot: () => options.session.getSnapshot(),
     subscribe: listener => own(() => options.session.subscribe(listener)),
   })
-  const { capabilities, source, catalog, navigation, devEvents } = root.context
+  const { capabilities, source, catalog, navigation, devEvents, tests } = root.context
   const context: FrameScopedContext = Object.freeze({
     capabilities,
     source,
     catalog,
     navigation,
     ...(devEvents ? { devEvents } : {}),
+    ...(tests ? { tests } : {}),
     get selection() {
       return root.context.selection
     },
@@ -83,6 +84,36 @@ export function createFrameContext(root: RootContext, options: FrameContextOptio
     runtime,
   })
   return { context, signal: scope.signal, retire: scope.retire }
+}
+
+/**
+ * Header contexts of laid-out frames, live or not: the root context plus the frame. Cached per
+ * frame key and target so badge callbacks see a stable object.
+ * @param root Root context.
+ */
+export function createFrameHeaderContexts(root: RootContext): (frame: FrameRef) => FrameHeaderContext {
+  const cache = new Map<string, FrameHeaderContext>()
+  return (input) => {
+    const key = `${input.key}\n${getHistoireTargetKey(input.target)}`
+    let context = cache.get(key)
+    if (!context) {
+      const frame: FrameRef = Object.freeze({ key: input.key, target: Object.freeze({ ...input.target }) })
+      // Getters read the root context live, so cached entries never hold stale services.
+      context = Object.freeze({
+        get capabilities() { return root.context.capabilities },
+        get source() { return root.context.source },
+        get catalog() { return root.context.catalog },
+        get navigation() { return root.context.navigation },
+        get devEvents() { return root.context.devEvents },
+        get tests() { return root.context.tests },
+        get selection() { return root.context.selection },
+        subscribe: listener => root.context.subscribe(listener),
+        frame,
+      })
+      cache.set(key, context)
+    }
+    return context
+  }
 }
 
 /** Frame context following the selected ready frame. */

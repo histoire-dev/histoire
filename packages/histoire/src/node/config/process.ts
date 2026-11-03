@@ -2,7 +2,7 @@ import type { Context } from '../context.js'
 import fs from 'node:fs'
 import path from 'pathe'
 import pc from 'picocolors'
-import { getTestMaxWorkers } from '../util/test-timeouts.js'
+import { DEFAULT_RUN_STALL_TIMEOUT, getTestMaxWorkers } from '../util/test-timeouts.js'
 import { resolveVisualConfig } from '../visual/config.js'
 import { normalizeBrowserConfig } from './browser.js'
 import { resolveEmbedConfig } from './embed.js'
@@ -22,6 +22,10 @@ export async function processConfig(ctx: Context) {
   config.embed = resolveEmbedConfig(config.embed)
   config.ui = { ...config.ui, matrix: { ...config.ui?.matrix, numericValues: resolveMatrixNumericValues(config.ui?.matrix?.numericValues) } }
   getTestMaxWorkers(ctx)
+  if (config.test?.runTimeout !== undefined) {
+    console.warn(pc.yellow('Histoire config: test.runTimeout is deprecated, use test.runStallTimeout (a run now only times out when it stops making progress)'))
+  }
+  config.test = { ...config.test, runStallTimeout: config.test?.runStallTimeout ?? config.test?.runTimeout ?? DEFAULT_RUN_STALL_TIMEOUT }
 
   // Resolve files paths
 

@@ -1,4 +1,4 @@
-import type { HistoireCatalogStory, HistoireJsonValue, HistoireRect, HistoireSearchResult, HistoireSelectionInput, HistoireTarget } from '@histoire/protocol'
+import type { HistoireCatalogStory, HistoireJsonValue, HistoireReadonly, HistoireRect, HistoireSearchResult, HistoireSelectionInput, HistoireTarget, HistoireTestRunSummary } from '@histoire/protocol'
 import type { Disposer } from './common.js'
 import type { FrameRef } from './context.js'
 
@@ -33,6 +33,47 @@ export interface NavigationService {
 export interface DevEventService {
   /** Sends one event and resolves with the Node hook's result. */
   send: (event: string, payload?: HistoireJsonValue) => Promise<unknown>
+}
+
+/** Latest test facts of one variant. */
+export interface TestsEntry {
+  /** Variant the facts belong to. */
+  readonly target: HistoireTarget
+  /** Latest completed run of the variant, `null` before its first run. */
+  readonly summary: HistoireReadonly<HistoireTestRunSummary> | null
+  /** A run including this variant is in progress. */
+  readonly running: boolean
+  /** Sources changed since the summary was produced. */
+  readonly stale: boolean
+  /** Message of a failure that kept the variant from reporting, `null` otherwise. */
+  readonly error: string | null
+}
+
+/**
+ * Project test runs shared with the workbench Tests pane (same results, same execution lane).
+ * Present only where the host can run tests (dev server).
+ */
+export interface TestsService {
+  /** Variants that reported or are running, in no particular order. */
+  entries: () => ReadonlyArray<TestsEntry>
+  /** A run is in progress. */
+  readonly running: boolean
+  /** Runs can start now (server tests available, source ready). */
+  readonly canRun: boolean
+  /**
+   * Progress of the current run; `null` when idle or unknown. Server runs wait to start (`queued`,
+   * for example behind other test work), collect stories (`collect`, counted in stories), then run
+   * assertions (`run`, counted in variants).
+   */
+  readonly progress: { readonly phase: 'queued' | 'collect' | 'run', readonly completed: number, readonly total: number } | null
+  /** Failure of the latest run as a whole (not of single tests), `null` otherwise. */
+  readonly error: string | null
+  /** Runs every selectable variant, like the Tests pane "Run all". */
+  runAll: () => Promise<void>
+  /** Runs one variant. */
+  run: (target: HistoireTarget) => Promise<void>
+  /** Notified after entries or run state change; read fresh values from the service. */
+  subscribe: (listener: () => void) => Disposer
 }
 
 /** Point in CSS pixels. */

@@ -2,7 +2,7 @@
 // renders the implementation its host provides under `WORKBENCH_COMPONENTS_KEY` (the standalone
 // workbench's own components, or a native host's), so plugin views match built-in panels without
 // importing the host. Outside any host they render plain, unstyled, accessible markup.
-import type { Component, SlotsType, VNode } from 'vue'
+import type { Component, PropType, SlotsType, VNode } from 'vue'
 import type { WorkbenchComponents } from '../render/workbench-components.js'
 import { createLoadingDelay } from '@histoire/shared/loading-delay'
 import { defineComponent, h, inject, onScopeDispose, ref } from 'vue'
@@ -58,6 +58,8 @@ export const WorkbenchEmptyState = defineComponent({
     icon: { type: String, required: true },
     /** Short headline, no trailing period. */
     title: { type: String, required: true },
+    /** Badge color: `accent` (default) or `neutral` for areas that are empty by default. */
+    tone: { type: String as PropType<'accent' | 'neutral'>, default: undefined },
   },
   slots: Object as SlotsType<StateSlots>,
   setup(props, { slots }) {

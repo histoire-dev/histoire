@@ -1,6 +1,6 @@
 import type { HistoireReadonly, HistoireSnapshot, HistoireTarget } from '@histoire/protocol'
 import type { Disposer } from './common.js'
-import type { CanvasService, CatalogService, DevEventService, NavigationService } from './services.js'
+import type { CanvasService, CatalogService, DevEventService, NavigationService, TestsService } from './services.js'
 
 /**
  * Optional services a host may provide. A missing capability means the matching
@@ -13,6 +13,7 @@ export type WorkbenchCapability =
   | 'canvas'
   | 'frames'
   | 'preferences'
+  | 'tests'
 
 /** Where the workbench reads stories from. */
 export interface WorkbenchSource {
@@ -40,6 +41,8 @@ export interface WorkbenchContext {
   readonly navigation: NavigationService
   /** Present only with a compatible dev transport. */
   readonly devEvents?: DevEventService
+  /** Present only where the host runs project tests (dev server). */
+  readonly tests?: TestsService
   /** Notified after any context value changes; read fresh values from the context. */
   subscribe: (listener: () => void) => Disposer
 }
@@ -66,6 +69,15 @@ export interface FrameScopedContext extends WorkbenchContext {
   readonly frame: FrameRef
   /** Readonly runtime state/settings of exactly this frame. */
   readonly runtime: FrameRuntimeView
+}
+
+/**
+ * Context of one laid-out canvas frame, whether or not its document is live (frame header
+ * badges). It has no runtime: frames outside the live budget still show their header.
+ */
+export interface FrameHeaderContext extends WorkbenchContext {
+  /** Frame whose header is rendered. */
+  readonly frame: FrameRef
 }
 
 /** Context bound to one canvas viewport (overlays, tools, custom views). */

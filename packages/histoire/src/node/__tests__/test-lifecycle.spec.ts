@@ -102,7 +102,7 @@ describe('runHistoireTests lifecycle', () => {
     consoleWarn.mockRestore()
   })
 
-  it('fails when Vitest reports module-level errors', async () => {
+  it('reports module-level errors on their variant instead of discarding the run', async () => {
     const eligibleStory = createRunTestsStoryFile({
       id: 'module-error-story',
       variantId: 'module-error-variant',
@@ -119,7 +119,22 @@ describe('runHistoireTests lifecycle', () => {
       },
     }])
 
-    await expect(runHistoireTests(createRunTestsContext([eligibleStory]))).rejects.toThrow(/story import exploded/)
+    const summary = await runHistoireTests(createRunTestsContext([eligibleStory]))
+    expect(summary.ok).toBe(false)
+    expect(summary.tests).toEqual([expect.objectContaining({ variantId: 'module-error-variant', state: 'failed', errors: [expect.objectContaining({ message: expect.stringContaining('story import exploded') })] })])
+  })
+
+  it('keeps results when the browser reports unhandled errors', async () => {
+    const story = createRunTestsStoryFile({ id: 'unhandled-story', variantId: 'unhandled-variant', source: 'onTest(() => {})' })
+    mocks.setCreateVitest(vi.fn(async (_mode: string, options: any) => createVitestInstanceStub({
+      options,
+      getUnhandledErrors: () => [{ message: 'Cannot read properties of undefined (reading \'loadAnimation\')' }],
+      getTestModules: () => [{ moduleId: options.include[0], errors: () => [], children: { allTests: () => [{ name: 'renders', result: () => ({ state: 'passed', errors: [] }), meta: () => ({}) }] } }],
+    })))
+
+    const summary = await runHistoireTests(createRunTestsContext([story]))
+    expect(summary).toMatchObject({ ok: false, passed: 1, tests: [expect.objectContaining({ variantId: 'unhandled-variant', state: 'passed' })] })
+    expect(summary.errors).toEqual([expect.objectContaining({ message: expect.stringContaining('loadAnimation') })])
   })
 
   it('clears the safety timeout on the start() reject/retry path without leaking timers', async () => {
@@ -210,10 +225,28 @@ describe('runHistoireTests lifecycle', () => {
       source: 'onTest(() => {})',
     })
     // The default 300s safety timeout would spuriously kill large projects,
-    // so the run timeout comes from the histoire config.
-    const ctx = createRunTestsContext([story], { test: { runTimeout: 10 } } as Partial<Context['config']>)
+    // so the stall timeout comes from the histoire config.
+    const ctx = createRunTestsContext([story], { test: { runStallTimeout: 10 } } as Partial<Context['config']>)
 
     await expect(runHistoireTests(ctx)).rejects.toMatchObject({ code: 'TIMEOUT', message: expect.stringMatching(/timed out/) })
+  })
+
+  it('keeps a run alive while specs keep finishing', async () => {
+    mocks.setCreateVitest(vi.fn(async (_mode: string, options: any) => createVitestInstanceStub({
+      options,
+      // Lasts several stall timeouts, finishing one spec every 10ms.
+      start: vi.fn(async () => {
+        const reporter = options.reporters.find((item: any) => typeof item === 'object')
+        for (let index = 0; index < 8; index++) {
+          await new Promise(resolve => setTimeout(resolve, 10))
+          reporter.onTestModuleEnd()
+        }
+      }),
+    })))
+    const story = createRunTestsStoryFile({ id: 'slow-story', variantId: 'slow-variant', source: 'onTest(() => {})' })
+    const ctx = createRunTestsContext([story], { test: { runStallTimeout: 40 } } as Partial<Context['config']>)
+
+    await expect(runHistoireTests(ctx)).resolves.toMatchObject({ ok: true })
   })
 
   it('resolves browser test deps from the project root', async () => {

@@ -15,7 +15,7 @@ defineProps<{
 
 <template>
   <template v-if="pane && context">
-    <WorkbenchPaneHeader :title="pane.label" />
+    <WorkbenchPaneHeader v-if="pane.header !== false" :title="pane.label" />
     <ExtensionView :key="contributionKey(pane)" class="htw:flex htw:flex-1 htw:flex-col htw:min-h-0 htw:overflow-auto" :contribution="pane" :context="context" />
   </template>
   <WorkbenchLoadingState v-else title="Loading pane" />

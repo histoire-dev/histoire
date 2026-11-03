@@ -1,4 +1,4 @@
-import type { DevEventService, ExtensionHost, FrameRef, StorageLike, WorkbenchContext, WorkbenchSource } from '@histoire/plugin-kit'
+import type { DevEventService, ExtensionHost, FrameHeaderContext, FrameRef, StorageLike, TestsService, WorkbenchContext, WorkbenchSource } from '@histoire/plugin-kit'
 import type { HistoireFramePluginInfo } from '@histoire/protocol'
 import type { ContextSession, RootContext } from './context.js'
 import type { FrameChannels } from './frame-channels.js'
@@ -8,7 +8,7 @@ import type { WorkbenchPluginEntry } from './plugins.js'
 import { createExtensionHost } from '@histoire/plugin-kit'
 import { createRootContext } from './context.js'
 import { createFrameChannels, sessionFramePlugins } from './frame-channels.js'
-import { createFrameContext, createSelectedFrameContext } from './frame-context.js'
+import { createFrameContext, createFrameHeaderContexts, createSelectedFrameContext } from './frame-context.js'
 import { createWorkbenchNavigation } from './navigation.js'
 import { toExtensionHostPlugins } from './plugins.js'
 
@@ -24,6 +24,8 @@ export interface WorkbenchHostOptions {
   navigation: WorkbenchNavigationTargets
   /** Dev event service; absent for static books and remote sources. */
   devEvents?: DevEventService
+  /** Project test runs; absent for static books and remote sources. */
+  tests?: TestsService
   /** Preference storage; memory only when absent. */
   storage?: StorageLike
   /** Project namespace of preference keys. */
@@ -46,6 +48,8 @@ export interface WorkbenchHost {
   readonly selectedFrame: SelectedFrameContext
   /** Captures the root context with the current selection scope. */
   rootScope: () => ScopedContext
+  /** Context of one laid-out frame's header (badges); no runtime, so frames need not be live. */
+  frameHeader: (frame: FrameRef) => FrameHeaderContext
   /**
    * Captures a context bound to one explicit frame (frame menu, frame overlays). It survives
    * selection changes and retires with the source generation, `signal` or `retire()`.
@@ -92,7 +96,7 @@ export function createWorkbenchHost(options: WorkbenchHostOptions): WorkbenchHos
   const warn = options.warn ?? ((message: string) => console.warn(message))
   const navigation = createWorkbenchNavigation({ targets: options.navigation, warn })
   const frames = createFrameChannels({ installed: options.framePlugins ?? (() => sessionFramePlugins(options.session)) })
-  const root: RootContext = createRootContext({ session: options.session, mode: options.mode, navigation: navigation.service, devEvents: options.devEvents, frames: frames.service })
+  const root: RootContext = createRootContext({ session: options.session, mode: options.mode, navigation: navigation.service, devEvents: options.devEvents, tests: options.tests, frames: frames.service })
   const selectedFrame = createSelectedFrameContext(root)
   const host = createExtensionHost({
     plugins: toExtensionHostPlugins(options.plugins),
@@ -114,6 +118,7 @@ export function createWorkbenchHost(options: WorkbenchHostOptions): WorkbenchHos
     frames,
     rootScope,
     frameScope: (frame, session, signal) => createFrameContext(root, { frame, session, signal }),
+    frameHeader: createFrameHeaderContexts(root),
     run(contributionId, scope = rootScope()) {
       return host.run(contributionId, scope.context, { signal: scope.signal })
     },

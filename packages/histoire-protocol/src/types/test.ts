@@ -1,4 +1,7 @@
-import type { HistoireTarget } from './common.js'
+import type { HistoireJsonValue, HistoireTarget } from './common.js'
+
+/** Plugin-keyed JSON a test attaches to its result (for example structured findings). */
+export type HistoireTestData = Readonly<Record<string, HistoireJsonValue>>
 
 /** One engine result retains initiating request and source/document ownership. */
 export interface HistoireTestExecutionIdentity {
@@ -148,6 +151,8 @@ export interface HistoireTestCaseResultInput {
   state: 'passed' | 'failed' | 'skipped'
   /** Formatted assertion or lifecycle failures. */
   errors: HistoireTestError[]
+  /** Plugin-keyed data attached by the test. */
+  data?: HistoireTestData
 }
 
 /** Portable serialized test data; callbacks stay runtime-local. */
@@ -166,6 +171,8 @@ export interface HistoireTestCaseResult {
   storyId?: string
   /** Exact collected variant identity. */
   variantId?: string
+  /** Plugin-keyed data attached by the test. */
+  data?: HistoireTestData
 }
 
 /**

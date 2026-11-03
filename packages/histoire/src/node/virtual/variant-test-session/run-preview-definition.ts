@@ -1,6 +1,6 @@
 import type { HistoireSerializedTestDefinition, HistoireTestCaseResultInput } from '@histoire/shared'
 import type { VariantSession } from './session.js'
-import { createHistoireTestSummary, serializeTestError } from '@histoire/shared'
+import { createHistoireTestSummary, readHistoireTestData, serializeTestError } from '@histoire/shared'
 import { createMissingHandlerError, getMatchingDefinition } from './definitions.js'
 import { resetSharedExpectState } from './expect-state.js'
 import { runSingleDefinition } from './run-single-definition.js'
@@ -19,8 +19,10 @@ function toResult(
   definition: HistoireSerializedTestDefinition,
   state: HistoireTestCaseResultInput['state'],
   errors: HistoireTestCaseResultInput['errors'],
+  meta?: unknown,
 ): HistoireTestCaseResultInput {
-  return { id: definition.id, name: definition.name, fullName: definition.fullName, state, errors }
+  const data = readHistoireTestData(meta)
+  return { id: definition.id, name: definition.name, fullName: definition.fullName, state, errors, ...(data ? { data } : {}) }
 }
 
 /**
@@ -81,5 +83,6 @@ export async function runPreviewDefinition(
     definition,
     errors.length ? 'failed' : 'passed',
     errors,
+    task.meta,
   )])
 }

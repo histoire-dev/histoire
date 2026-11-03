@@ -11,6 +11,11 @@ export type ShellPaneInput = ContributionBase<WorkbenchContext> & {
   icon: WorkbenchIcon
   /** Optional count or short text shown on the rail item. */
   badge?: (context: WorkbenchContext) => string | number | null | undefined
+  /**
+   * Whether the host renders a title header above the view; defaults to `true`. Set `false` when
+   * the view renders its own `WorkbenchPaneHeader` (for example to hold actions).
+   */
+  header?: boolean
 } & ContributionView<WorkbenchContext>
 
 /** Settings section appended after built-in sections. */

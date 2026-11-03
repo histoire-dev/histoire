@@ -1,5 +1,6 @@
 import type { InlineConfig as ViteInlineConfig } from 'vite'
 import type { Vitest } from 'vitest/node'
+import type { VitestRunActivity } from './vitest-start-timeout.js'
 import pc from 'picocolors'
 import { ExecutionError } from '../runtime/execution-types.js'
 import { cleanupVitestBrowserRun } from '../vitest-browser-cleanup.js'
@@ -65,8 +66,10 @@ export interface VitestAttemptSetup<TContext> {
   browserProjectOptions?: { plugins: any[] }
   /** Test name filters passed to `vitest.start()`. */
   filter?: string[]
-  /** Maximum time `vitest.start()` may take before the run is considered stuck. */
+  /** Maximum time `vitest.start()` may take, or go without activity when `activity` is set, before the run is considered stuck. */
   timeoutMs: number
+  /** Progress signal restarting the timeout (see {@link runWithVitestStartTimeout}). */
+  activity?: VitestRunActivity
   /** Message of the error thrown when the start times out. */
   timeoutMessage: string
   /** Prints diagnostics about a stuck run. */
@@ -177,6 +180,7 @@ export async function runVitestAttempts<TContext, TResult>(
         return vitest!.start(setup.filter ?? [])
       }, options.signal), {
         timeoutMs: options.deadline === undefined ? setup.timeoutMs : Math.max(1, options.deadline - Date.now()),
+        activity: setup.activity,
         message: setup.timeoutMessage,
         onTimeout: () => setup.onTimeout?.(vitest!),
       })

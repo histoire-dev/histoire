@@ -2,7 +2,7 @@ import type { HistoireReadonly, HistoireSelectionInput, HistoireSnapshot } from 
 import type { PluginFrameService } from '../host/frames.js'
 import type { Disposer } from '../types/common.js'
 import type { WorkbenchCapability, WorkbenchContext, WorkbenchSelection, WorkbenchSource } from '../types/context.js'
-import type { CatalogService, DevEventService, NavigationService } from '../types/services.js'
+import type { CatalogService, DevEventService, NavigationService, TestsService } from '../types/services.js'
 import { PLUGIN_FRAMES_SERVICE } from '../host/frames.js'
 import { createScope } from '../host/generation.js'
 
@@ -31,6 +31,8 @@ export interface SessionContextOptions {
   navigation?: NavigationService
   /** Dev event service; absent without a compatible dev transport. */
   devEvents?: DevEventService
+  /** Project test runs; adds the `tests` capability. */
+  tests?: TestsService
   /** Frame messaging; adds the `frames` capability (see `createSessionFrameService`). */
   frames?: PluginFrameService
 }
@@ -139,6 +141,7 @@ export function createSessionContext(options: SessionContextOptions): SessionCon
   const capabilities = new Set<WorkbenchCapability>(['catalog', 'navigation', 'preferences'])
   if (options.devEvents) capabilities.add('devEvents')
   if (options.frames) capabilities.add('frames')
+  if (options.tests) capabilities.add('tests')
   const context: WorkbenchContext = {
     capabilities,
     source: Object.freeze({ mode: options.mode ?? 'remote' }),
@@ -154,6 +157,7 @@ export function createSessionContext(options: SessionContextOptions): SessionCon
     },
     navigation: options.navigation ?? createSessionNavigation(session),
     ...(options.devEvents ? { devEvents: options.devEvents } : {}),
+    ...(options.tests ? { tests: options.tests } : {}),
     subscribe(listener): Disposer {
       if (!lifetime.active) return () => {}
       const entry = (): void => listener()

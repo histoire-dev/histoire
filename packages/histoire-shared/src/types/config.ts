@@ -234,10 +234,15 @@ export interface HistoireConfig extends HistoireUiConfig {
      */
     storyCollectTimeout?: number
     /**
-     * Maximum time in milliseconds a `histoire test` run is allowed to take
-     * before it is aborted.
+     * Maximum time in milliseconds a Histoire test run may go without finishing
+     * a variant before it is considered stuck and aborted. Long runs stay alive
+     * as long as they progress; story collection keeps `collectTimeout`.
      *
      * @default 300000
+     */
+    runStallTimeout?: number
+    /**
+     * @deprecated Use `runStallTimeout`, which this option is an alias of.
      */
     runTimeout?: number
     /**

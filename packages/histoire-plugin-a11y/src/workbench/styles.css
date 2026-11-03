@@ -7,24 +7,94 @@
   font-size: 13px;
 }
 .histoire-a11y-auto { display: inline-flex; gap: 5px; align-items: center; font-size: 12px; white-space: nowrap; --histoire-control-margin: 0px; --histoire-control-wrapper-padding: 0px; }
-.histoire-a11y-summary { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; padding: 10px var(--histoire-pane-gutter); font-size: 12px; }
-.histoire-a11y-summary > span:last-child:not(:nth-child(3)) { opacity: .7; }
+/* Project pane counters row, between the pane header and the filters. */
+.histoire-a11y-summary { flex-wrap: wrap; row-gap: 4px; padding: 0 var(--histoire-pane-gutter); font-size: 12px; }
+/* Counts take the text color of their most severe impact tag. */
+.histoire-a11y-severity-text[data-impact="critical"], .histoire-a11y-severity-text[data-impact="serious"] { color: rgb(var(--histoire-danger-text-rgb, 220 60 80)); }
+.histoire-a11y-severity-text[data-impact="moderate"] { color: rgb(var(--histoire-warn-rgb, 190 140 40)); }
 .histoire-a11y-filter { min-width: 0; --histoire-control-margin: 0px; --histoire-control-wrapper-padding: 0px; }
-.histoire-a11y-filters { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 128px), 1fr)); gap: 8px; width: 100%; }
+.histoire-a11y-filters { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 104px), 1fr)); gap: 8px; width: 100%; }
 .histoire-a11y-rule { margin-bottom: 6px; border-radius: var(--histoire-radius-control, 6px); background: var(--histoire-chip, rgb(128 128 128 / .06)); }
-.histoire-a11y-rule summary { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; cursor: pointer; padding: var(--histoire-comment-row-padding, 10px) var(--histoire-pane-row-inset); list-style: none; }
+/* Expanded rows separate header and details; a text-derived tone stays visible on the chip background in both themes. */
+.histoire-a11y-rule[open] > summary { border-bottom: 1px solid color-mix(in srgb, currentColor 14%, transparent); }
+.histoire-a11y-rule[open] > .histoire-a11y-details { padding-top: 6px; }
+/* Two rows: caret, severity and count, then the title aligned under the severity tag. */
+.histoire-a11y-rule summary { display: flex; flex-direction: column; gap: 4px; cursor: pointer; padding: var(--histoire-comment-row-padding, 10px) var(--histoire-pane-row-inset); list-style: none; }
 .histoire-a11y-rule summary::-webkit-details-marker { display: none; }
-.histoire-a11y-rule summary::before { content: '›'; font-size: 18px; }
-.histoire-a11y-rule[open] summary::before { content: '⌄'; }
-.histoire-a11y-rule summary strong { flex: 1; min-width: 120px; font-size: 12px; }
-.histoire-a11y-rule summary > span:last-child { font-size: 11px; opacity: .7; }
-.histoire-a11y-impact { padding: 2px 5px; border-radius: 4px; font-size: 10px; background: rgb(128 128 128 / .12); }
-.histoire-a11y-impact[data-impact="critical"], .histoire-a11y-impact[data-impact="serious"] { background: rgb(var(--histoire-danger-rgb, 220 60 80) / .13); }
-.histoire-a11y-impact[data-impact="moderate"] { background: rgb(var(--histoire-warn-rgb, 190 140 40) / .13); }
-.histoire-a11y-details { padding: 0 var(--histoire-pane-row-inset) 8px; }
-.histoire-a11y-rule-link { display: flex; flex-wrap: wrap; gap: 8px; justify-content: space-between; padding: 4px 0; font-size: 11px; }
+.histoire-a11y-rule-meta { display: flex; align-items: center; gap: 6px; min-height: 18px; }
+/* One drawn chevron rotated per state, so collapsed and expanded share the same size. */
+.histoire-a11y-rule-meta::before, .histoire-a11y-variant > summary::before { content: ''; flex: none; width: 5px; height: 5px; margin: 0 4px 0 2px; border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; transform: rotate(-45deg); }
+.histoire-a11y-rule[open] > summary .histoire-a11y-rule-meta::before, .histoire-a11y-variant[open] > summary::before { transform: rotate(45deg); }
+.histoire-a11y-rule-count { font-size: 11px; opacity: .7; }
+.histoire-a11y-rule summary strong { padding-left: 18px; font-size: 12px; line-height: 1.4; }
+/* Impact tags: tinted fill, matching full border and status-colored text; critical is the strongest. */
+.histoire-a11y-impact { padding: 1px 5px; border-radius: 4px; font-size: 10px; font-weight: 600; border: 1px solid rgb(128 128 128 / .35); background: rgb(128 128 128 / .16); }
+.histoire-a11y-impact[data-impact="critical"], .histoire-a11y-impact[data-impact="serious"] { color: rgb(var(--histoire-danger-text-rgb, 220 60 80)); border-color: rgb(var(--histoire-danger-rgb, 220 60 80) / .5); background: rgb(var(--histoire-danger-rgb, 220 60 80) / .2); }
+.histoire-a11y-impact[data-impact="critical"] { color: rgb(var(--histoire-danger-soft-rgb, 255 255 255)); border-color: rgb(var(--histoire-danger-rgb, 220 60 80)); background: rgb(var(--histoire-danger-rgb, 220 60 80) / .85); }
+.histoire-a11y-impact[data-impact="moderate"] { color: rgb(var(--histoire-warn-rgb, 190 140 40)); border-color: rgb(var(--histoire-warn-rgb, 190 140 40) / .5); background: rgb(var(--histoire-warn-rgb, 190 140 40) / .2); }
+.histoire-a11y-details { display: flex; flex-direction: column; gap: 10px; padding: 0 var(--histoire-pane-row-inset) 8px; }
+/* Direction B: numbered elements, then the fix they share. */
+.histoire-a11y-fix-group { display: flex; flex-direction: column; gap: 6px; }
+.histoire-a11y-elements { margin: 0; padding: 0; list-style: none; border: 1px solid color-mix(in srgb, currentColor 12%, transparent); border-radius: 5px; overflow: hidden; }
+.histoire-a11y-element { display: flex; align-items: center; gap: 2px; min-height: 30px; padding: 0 3px 0 8px; }
+.histoire-a11y-element + .histoire-a11y-element { border-top: 1px solid color-mix(in srgb, currentColor 12%, transparent); }
+.histoire-a11y-element-number { flex: none; width: 14px; font-family: var(--histoire-font-mono, ui-monospace, monospace); font-size: 10px; opacity: .6; }
+.histoire-a11y-selector { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; }
+.histoire-a11y-icon-button { display: inline-grid; place-items: center; flex: none; width: 24px; height: 24px; padding: 0; border: 0; border-radius: 5px; background: transparent; color: inherit; opacity: .7; cursor: pointer; }
+.histoire-a11y-icon-button:hover, .histoire-a11y-icon-button:focus-visible { opacity: 1; background: color-mix(in srgb, currentColor 10%, transparent); }
+/* Copy stays out of the way until the element row is hovered or focused. */
+.histoire-a11y-copy { opacity: 0; }
+.histoire-a11y-element:hover .histoire-a11y-copy, .histoire-a11y-element:focus-within .histoire-a11y-copy { opacity: .7; }
+.histoire-a11y-icon-button svg, .histoire-a11y-rule-id svg, .histoire-a11y-counter svg, .histoire-a11y-variant-flag svg { width: 14px; height: 14px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+.histoire-a11y-fix { padding: 8px; border-radius: 5px; background: color-mix(in srgb, currentColor 5%, transparent); }
+.histoire-a11y-fix-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.histoire-a11y-fix-label { font-size: 10px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; opacity: .7; }
+.histoire-a11y-rule-id { display: inline-flex; align-items: center; gap: 4px; font-family: var(--histoire-font-mono, ui-monospace, monospace); font-size: 11px; text-decoration: none; opacity: .75; }
+.histoire-a11y-rule-id:hover { opacity: 1; }
+.histoire-a11y-rule-id svg { width: 12px; height: 12px; }
+.histoire-a11y-fix-items { display: flex; flex-direction: column; gap: 3px; margin: 4px 0 0; padding: 0 0 0 14px; font-size: 12px; line-height: 1.45; }
+.histoire-a11y-more { margin: 4px 0 0 14px; padding: 0; border: 0; background: none; color: inherit; font: inherit; font-size: 11px; opacity: .7; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
 .histoire-a11y a { color: inherit; text-underline-offset: 3px; }
-.histoire-a11y-node { padding: 8px 0; }
-.histoire-a11y-node code { display: block; overflow-wrap: anywhere; white-space: pre-wrap; font-size: 11px; }
-.histoire-a11y-node p { white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.6; font-size: 12px; margin: 6px 0; }
 .histoire-a11y-note { padding: 6px var(--histoire-pane-gutter); margin: 0; font-size: 12px; }
+/* Inspector tab: the host already pads the content, so blocks drop their gutters and share one gap. */
+.histoire-a11y-tab { gap: 12px; }
+.histoire-a11y-tab-header { display: flex; flex: none; align-items: center; gap: 10px; min-width: 0; font-size: 12px; }
+.histoire-a11y-tab-header > .histoire-a11y-auto { margin-left: auto; }
+/* Same gap as the header row, so counters and controls space evenly. */
+.histoire-a11y-counters { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.histoire-a11y-counter { display: inline-flex; align-items: center; gap: 3px; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.histoire-a11y-counter:not(.histoire-a11y-severity-text) { opacity: .75; }
+.histoire-a11y-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.histoire-a11y-tab > .histoire-a11y-note { padding: 0; }
+.histoire-a11y-tab > .histoire-a11y-filters { flex: none; }
+.histoire-a11y-tab-list { flex: 1; min-height: 0; overflow: auto; }
+.histoire-a11y-tab-list > .histoire-a11y-rule:last-child { margin-bottom: 0; }
+/* Project pane: flat variant rows; only the rule cards inside are boxed, indented under the title. */
+.histoire-a11y-variant + .histoire-a11y-variant { margin-top: 2px; }
+.histoire-a11y-variant > summary { display: flex; align-items: center; gap: 6px; min-height: 28px; padding: var(--histoire-list-row-padding, 8px) var(--histoire-pane-row-inset); border-radius: var(--histoire-radius-control, 6px); cursor: pointer; list-style: none; }
+.histoire-a11y-variant > summary::-webkit-details-marker { display: none; }
+.histoire-a11y-variant > summary:hover { background: var(--histoire-chip, rgb(128 128 128 / .08)); }
+.histoire-a11y-variant-title { display: flex; flex: 1; flex-wrap: wrap; column-gap: 4px; min-width: 0; font-size: 12px; line-height: 1.4; overflow-wrap: anywhere; }
+.histoire-a11y-variant-story { opacity: .65; }
+.histoire-a11y-variant-story::after { content: ' /'; }
+.histoire-a11y-variant-name { font-weight: 600; }
+.histoire-a11y-variant-flag { display: inline-flex; flex: none; opacity: .7; }
+.histoire-a11y-variant-failed { color: rgb(var(--histoire-danger-text-rgb, 220 60 80)); opacity: 1; }
+/* Rule count pill, tinted like the worst impact tag of the variant. */
+.histoire-a11y-count { flex: none; min-width: 18px; padding: 1px 5px; border-radius: 9px; font-size: 11px; font-weight: 600; line-height: 16px; text-align: center; font-variant-numeric: tabular-nums; background: rgb(128 128 128 / .16); }
+.histoire-a11y-count[data-impact="critical"], .histoire-a11y-count[data-impact="serious"] { color: rgb(var(--histoire-danger-text-rgb, 220 60 80)); background: rgb(var(--histoire-danger-rgb, 220 60 80) / .2); }
+.histoire-a11y-count[data-impact="moderate"] { color: rgb(var(--histoire-warn-rgb, 190 140 40)); background: rgb(var(--histoire-warn-rgb, 190 140 40) / .2); }
+/* Open action shows on hover or focus, so many rows don't repeat the same icon. */
+.histoire-a11y-variant > summary > .histoire-a11y-icon-button { opacity: 0; }
+.histoire-a11y-variant > summary:hover > .histoire-a11y-icon-button, .histoire-a11y-variant > summary:focus-within > .histoire-a11y-icon-button, .histoire-a11y-variant[open] > summary > .histoire-a11y-icon-button { opacity: .7; }
+.histoire-a11y-variant > summary > .histoire-a11y-icon-button:hover, .histoire-a11y-variant > summary > .histoire-a11y-icon-button:focus-visible { opacity: 1; }
+/* Narrow panes: rule cards use the full row width, no indentation. */
+.histoire-a11y-variant-body { display: flex; flex-direction: column; gap: 6px; padding: 4px 0 10px; }
+.histoire-a11y-variant-body > .histoire-a11y-rule { margin-bottom: 0; }
+.histoire-a11y-error { margin: 0; padding: 8px; max-height: 14em; overflow: auto; border-radius: 5px; color: rgb(var(--histoire-danger-text-rgb, 220 60 80)); background: rgb(var(--histoire-danger-rgb, 220 60 80) / .1); font-family: var(--histoire-font-mono, ui-monospace, monospace); font-size: 11px; line-height: 1.5; white-space: pre-wrap; overflow-wrap: anywhere; }
+.histoire-a11y-run-progress { display: flex; flex-direction: column; gap: 6px; padding: 0 var(--histoire-pane-gutter) 8px; font-size: 11px; font-variant-numeric: tabular-nums; opacity: .8; }
+.histoire-a11y-progress { flex: none; height: 4px; overflow: hidden; border-radius: 4px; background: var(--histoire-chip, rgb(128 128 128 / .12)); }
+.histoire-a11y-progress > span { display: block; height: 100%; border-radius: inherit; background: rgb(var(--histoire-accent-rgb, 52 211 153)); transition: width .2s; }
+.histoire-a11y-progress[data-indeterminate] > span { width: 35%; background: var(--histoire-muted, currentColor); animation: histoire-a11y-indeterminate 1.2s ease-in-out infinite; }
+@keyframes histoire-a11y-indeterminate { from { transform: translateX(-100%) } to { transform: translateX(290%) } }
+@media (prefers-reduced-motion: reduce) { .histoire-a11y-progress[data-indeterminate] > span { width: 100%; animation: none; opacity: .5; } }

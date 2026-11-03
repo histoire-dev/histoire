@@ -57,6 +57,18 @@ describe('real axe scanner and public assertion', () => {
     finally { await page.close() }
   })
 
+  it('attaches bounded findings to failing test results', async () => {
+    const page = await browser.newPage()
+    try {
+      await page.goto(url)
+      await page.waitForFunction(() => Boolean((window as any).fixture))
+      const data = await page.evaluate(options => (window as any).fixture.data(options), options)
+      expect(data.a11y.report.violationsCount).toBe(2)
+      expect(data.a11y.report.violations.map((rule: any) => rule.id).sort()).toEqual(['button-name', 'image-alt'])
+    }
+    finally { await page.close() }
+  })
+
   it('applies rule overrides and rejects invalid selectors/rules rather than passing', async () => {
     const page = await browser.newPage()
     try {
