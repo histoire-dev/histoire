@@ -9,8 +9,9 @@ import { useExtensionHost } from '../composables/extensions.js'
 export type PluginToolbarItem = QualifiedContribution<'toolbar.item'>
 
 /**
- * Documented canvas toolbar groups, in toolbar order. Plugin items render at the end of their
- * group's overflow item; `plugins` is a trailing group of its own. Unknown groups fall back to it.
+ * Documented canvas contribution groups, in toolbar order. Plugin items follow their group's
+ * controls; `plugins` is the final contribution group and receives unknown groups. The built-in
+ * inspector action occupies a separate final overflow item after all contribution groups.
  */
 export const TOOLBAR_GROUPS = ['search', 'tools', 'arrange', 'viewport', 'zoom', 'background', 'screenshot', 'embed', 'inspector', 'ui', 'plugins'] as const satisfies readonly ToolbarGroup[]
 

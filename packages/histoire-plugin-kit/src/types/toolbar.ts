@@ -4,7 +4,7 @@ import type { WorkbenchIcon } from './common.js'
 import type { WorkbenchContext } from './context.js'
 import type { ContributionView } from './view.js'
 
-/** Existing canvas toolbar overflow groups, plus `plugins` appended after them. */
+/** Canvas contribution groups; `plugins` trails them before the built-in inspector action. */
 export type ToolbarGroup =
   | 'search'
   | 'tools'

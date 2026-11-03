@@ -44,7 +44,7 @@ const open = ref<string | null>(null)
 const toolbar = shallowRef<InstanceType<typeof BaseOverflowToolbar> | null>(null)
 const { bounds, overlayTarget } = useCanvasPopoverBounds(() => toolbar.value?.$el)
 const disposers: (() => void)[] = []
-// Plugin items render at the end of their named group; `plugins` trails the built-in groups.
+// Plugin items follow their named controls; the built-in inspector action stays last.
 const plugin = usePluginToolbar()
 const pluginItems = plugin.groups
 // Custom canvas views declare the groups they support; arrange and inspector always show.
@@ -141,7 +141,6 @@ onBeforeUnmount(() => disposers.forEach(dispose => dispose()))
       <PluginToolbarItem v-for="item in pluginItems?.embed" :key="plugin.keyOf(item)" :item="item" :workbench="plugin.workbench!" :revision="plugin.revision.value" :open="open" @update:open="setOpen" @error="emit('error', $event)" />
     </BaseOverflowToolbarItem>
     <BaseOverflowToolbarItem id="inspector">
-      <slot name="inspector" />
       <PluginToolbarItem v-for="item in pluginItems?.inspector" :key="plugin.keyOf(item)" :item="item" :workbench="plugin.workbench!" :revision="plugin.revision.value" :open="open" @update:open="setOpen" @error="emit('error', $event)" />
     </BaseOverflowToolbarItem>
     <BaseOverflowToolbarItem v-if="view.showsGroup('ui')" id="ui" separator-before>
@@ -150,6 +149,9 @@ onBeforeUnmount(() => disposers.forEach(dispose => dispose()))
     </BaseOverflowToolbarItem>
     <BaseOverflowToolbarItem v-if="pluginItems?.plugins.length && view.showsGroup('plugins')" id="plugins" separator-before>
       <PluginToolbarItem v-for="item in pluginItems?.plugins" :key="plugin.keyOf(item)" :item="item" :workbench="plugin.workbench!" :revision="plugin.revision.value" :open="open" @update:open="setOpen" @error="emit('error', $event)" />
+    </BaseOverflowToolbarItem>
+    <BaseOverflowToolbarItem id="inspector-toggle" separator-before>
+      <slot name="inspector" />
     </BaseOverflowToolbarItem>
   </BaseOverflowToolbar>
 </template>

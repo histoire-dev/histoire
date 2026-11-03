@@ -1,10 +1,12 @@
+import type { VNode } from 'vue'
 import type { WorkbenchPluginApi } from '../../../histoire-plugin-kit/src/index.js'
 import { createHistoireSessionWithAdapters } from '@histoire/sdk/internal'
 import { HistoireProvider } from '@histoire/vue'
 import { mount } from '@vue/test-utils'
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { defineComponent, h } from 'vue'
+import { defineComponent, h, ref } from 'vue'
 import CanvasToolbar from '../../../histoire-app/src/app/components/canvas/toolbar/CanvasToolbar.vue'
+import ToolbarButton from '../../../histoire-app/src/app/components/canvas/toolbar/ToolbarButton.vue'
 import { createCanvasFrames, provideCanvas } from '../../../histoire-app/src/app/composables/canvas-settings.js'
 import { provideExtensionHost } from '../../../histoire-app/src/app/composables/extensions.js'
 import { registerPluginShortcuts } from '../../../histoire-app/src/app/extensions/shortcuts.js'
@@ -27,8 +29,9 @@ afterEach(() => {
  * shortcuts mirrored into the workbench shortcut registry.
  * @param setup Plugin setup registering toolbar items.
  * @param arrange Active canvas arrangement.
+ * @param slots Optional built-in toolbar controls.
  */
-async function fixture(setup: (api: WorkbenchPluginApi) => void, arrange = 'grid') {
+async function fixture(setup: (api: WorkbenchPluginApi) => void, arrange = 'grid', slots: Record<string, () => VNode | null> = {}) {
   const geometry = toolbarGeometry(1000)
   const source = sourceFixture()
   const session = createHistoireSessionWithAdapters({ url: 'https://book.example/' }, source.adapters)
@@ -43,7 +46,7 @@ async function fixture(setup: (api: WorkbenchPluginApi) => void, arrange = 'grid
     provideCanvas(canvas, frames)
     provideExtensionHost(workbench)
     provideShortcutRegistry(shortcuts)
-    return () => h('div', { class: 'toolbar-test-host histoire-canvas-viewport' }, h(CanvasToolbar, { arrange }))
+    return () => h('div', { class: 'toolbar-test-host histoire-canvas-viewport' }, h(CanvasToolbar, { arrange }, slots))
   })
   const wrapper = mount(HistoireProvider, { props: { session }, attachTo: document.body, slots: { default: () => h(Host) } })
   await geometry.flush()
@@ -67,7 +70,78 @@ function button(label: string): HTMLButtonElement {
   return value
 }
 
+/** Accessible action order within a toolbar or open overflow menu. */
+function actionLabels(container: Element): (string | null)[] {
+  return [...container.querySelectorAll('button[aria-label]')]
+    .filter(element => !element.closest('[hidden]'))
+    .map(element => element.getAttribute('aria-label'))
+}
+
 describe('plugin toolbar items', () => {
+  it('keeps Show inspector last through plugin registration, overflow and inspector visibility changes', async () => {
+    const inspectorOpen = ref(false)
+    const run = vi.fn()
+    let api!: WorkbenchPluginApi
+    const test = await fixture((plugin) => {
+      api = plugin
+      // Register out of toolbar order so contribution insertion cannot determine action order.
+      api.toolbar.addItem({ id: 'extra', group: 'plugins', type: 'action', label: 'Plugin extra', icon: 'help', run })
+      api.toolbar.addItem({ id: 'ui', group: 'ui', type: 'action', label: 'Plugin UI', icon: 'help', run })
+      api.toolbar.addItem({ id: 'inspector', group: 'inspector', type: 'action', label: 'Plugin inspector', icon: 'help', run })
+      api.toolbar.addItem({ id: 'fallback', group: 'unknown' as 'plugins', type: 'action', label: 'Fallback', icon: 'help', run })
+    }, 'grid', {
+      inspector: () => inspectorOpen.value ? null : h(ToolbarButton, { label: 'Show inspector', icon: 'side-panel-open', onClick: () => inspectorOpen.value = true }),
+      ui: () => h(ToolbarButton, { label: 'Hide UI', icon: 'screen-off' }),
+    })
+    const expected = ['Plugin inspector', 'Hide UI', 'Plugin UI', 'Plugin extra', 'Fallback', 'Show inspector']
+    try {
+      const toolbar = document.querySelector('[role="toolbar"][aria-label="Canvas tools"]')!
+      expect(actionLabels(toolbar).slice(-expected.length)).toEqual(expected)
+
+      test.geometry.resize(40)
+      await test.geometry.flush()
+      button('More canvas tools').click()
+      await test.geometry.flush()
+      const menu = document.querySelector('[role="menu"][aria-label="More canvas tools"]')!
+      expect(actionLabels(menu).slice(-expected.length)).toEqual(expected)
+
+      api.toolbar.addItem({ id: 'late', group: 'plugins', type: 'action', label: 'Late plugin', icon: 'help', run })
+      await test.geometry.flush()
+      expect(actionLabels(menu).slice(-3)).toEqual(['Fallback', 'Late plugin', 'Show inspector'])
+
+      button('Show inspector').click()
+      await test.geometry.flush()
+      expect(inspectorOpen.value).toBe(true)
+      expect(document.querySelector('button[aria-label="Show inspector"]')).toBeNull()
+      button('More canvas tools').click()
+      await test.geometry.flush()
+      button('Late plugin').click()
+      await test.geometry.flush()
+      expect(run).toHaveBeenCalledTimes(1)
+
+      inspectorOpen.value = false
+      test.geometry.resize(1000)
+      await test.geometry.flush()
+      expect(actionLabels(toolbar).slice(-3)).toEqual(['Fallback', 'Late plugin', 'Show inspector'])
+    }
+    finally { await test.close() }
+  })
+
+  it.each(['grid', 'acme:compare'])('keeps Show inspector last without plugin buttons in %s view', async (arrange) => {
+    const test = await fixture((api) => {
+      api.canvas.addView({ id: 'compare', label: 'Compare', icon: 'compare', toolbar: ['tools'], mount: () => {} })
+    }, arrange, {
+      inspector: () => h(ToolbarButton, { label: 'Show inspector', icon: 'side-panel-open' }),
+      ui: () => h(ToolbarButton, { label: 'Hide UI', icon: 'screen-off' }),
+    })
+    try {
+      const toolbar = document.querySelector('[role="toolbar"][aria-label="Canvas tools"]')!
+      expect(actionLabels(toolbar).at(-1)).toBe('Show inspector')
+      expect(actionLabels(toolbar).includes('Hide UI')).toBe(arrange === 'grid')
+    }
+    finally { await test.close() }
+  })
+
   it('run once against the root context after moving to the overflow menu', async () => {
     const run = vi.fn()
     const test = await fixture((api) => {
