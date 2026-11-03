@@ -260,7 +260,7 @@ function icon(row: StoryTreeRow): string {
             type="button"
             role="treeitem"
             class="stories-row htw:group/story htw:flex htw:items-center htw:gap-[7px] htw:w-full htw:h-[var(--histoire-virtual-row-height,_31px)] htw:py-row-story htw:pe-pane-row-inset htw:text-inherit htw:leading-4.5 htw:text-start htw:hover:bg-chip htw:data-[current]:bg-chip htw:data-[current]:font-bold htw:aria-[selected=true]:bg-chip htw:aria-[selected=true]:text-text htw:aria-[selected=true]:font-bold htw:focus-visible:[outline:2px_solid_var(--histoire-accent)] htw:focus-visible:outline-offset-[-2px]"
-            :data-current="row.kind === 'story' && selection?.storyId === row.story?.id || undefined"
+            :data-current="row.kind === 'story' && !row.expanded && selection?.storyId === row.story?.id || undefined"
             :style="{ paddingInlineStart: `calc(var(--histoire-pane-row-inset) + ${row.depth * 16}px)` }"
             :data-tree-key="row.key"
             :data-test-id="row.kind === 'story' ? 'story-list-item' : row.kind === 'folder' ? 'story-list-folder' : 'story-list-variant'"
