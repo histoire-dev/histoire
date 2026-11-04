@@ -677,11 +677,15 @@ Alias of [`test.runStallTimeout`](#test-runstalltimeout), kept for existing conf
 
 ## `test.maxWorkers` <Badge type="tip" text="1.0-beta.2+" />
 
-`number` - Default: available CPU parallelism
+`number` - Default: half the CPUs, within available memory
 
 Maximum number of tests Histoire runs concurrently. Applies to both
 `histoire test` and tests run from a book. Browser cases run in separate
 hidden story documents, so each gets a fresh mount and suite lifecycle.
+
+Each worker drives its own browser page. By default Histoire uses half the
+CPUs, and fewer when the memory available at the start of a run would give
+each worker less than 1 GiB.
 
 ```ts
 export default defineConfig({

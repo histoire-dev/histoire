@@ -83,6 +83,7 @@ it('keeps Vitest attachments (failure screenshots) under .histoire', async () =>
 
 it('bakes the collection flag matching the kind of run', async () => {
   const ctx = createContext()
+  ctx.config.test!.maxWorkers = 6
   const collection = await getHistoireBrowserRunConfig(ctx, { collecting: true, entries: [] })
   const test = await getHistoireBrowserRunConfig(ctx, { collecting: false, entries: [] })
 
@@ -93,7 +94,7 @@ it('bakes the collection flag matching the kind of run', async () => {
   expect(collection.viteConfig.test.fileParallelism).toBe(false)
   expect(collection.viteConfig.test.maxWorkers).toBe(1)
   expect(test.viteConfig.test.fileParallelism).toBeUndefined()
-  expect(test.viteConfig.test.maxWorkers).toBe(ctx.config.test?.maxWorkers)
+  expect(test.viteConfig.test.maxWorkers).toBe(6)
 })
 
 it('keeps definition optimizer roots stable across runs and preserves explicit user policy', async () => {

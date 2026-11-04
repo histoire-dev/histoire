@@ -2,7 +2,7 @@ import type { Context } from '../context.js'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { getDefaultConfig } from '../config/defaults.js'
 import { processConfig } from '../config/process.js'
-import { DEFAULT_RUN_STALL_TIMEOUT, getRunStallTimeout } from '../util/test-timeouts.js'
+import { DEFAULT_RUN_STALL_TIMEOUT, defaultTestMaxWorkers, getRunStallTimeout } from '../util/test-timeouts.js'
 
 afterEach(() => {
   vi.restoreAllMocks()
@@ -30,5 +30,19 @@ describe('test run stall timeout', () => {
     ctx.config.test = { ...ctx.config.test, runTimeout: 900_000, runStallTimeout: 60_000 }
     await processConfig(ctx)
     expect(getRunStallTimeout(ctx)).toBe(60_000)
+  })
+})
+
+describe('default test workers', () => {
+  const GiB = 1024 ** 3
+
+  it('uses half the CPUs when memory allows', () => {
+    expect(defaultTestMaxWorkers(32, 64 * GiB)).toBe(16)
+  })
+
+  // Every worker drives its own browser page: a busy machine must not run out of memory.
+  it('fits the workers in the available memory, keeping at least one', () => {
+    expect(defaultTestMaxWorkers(32, 3 * GiB)).toBe(3)
+    expect(defaultTestMaxWorkers(1, 0)).toBe(1)
   })
 })

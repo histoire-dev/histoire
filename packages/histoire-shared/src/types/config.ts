@@ -248,8 +248,9 @@ export interface HistoireConfig extends HistoireUiConfig {
     /**
      * Maximum number of test cases allowed to execute at once.
      *
-     * Defaults to the parallelism available to the current machine. Applies to
-     * both the Vitest browser runner and in-book test execution.
+     * Defaults to half the CPUs, lowered so each worker gets 1 GiB of the memory
+     * available when the run starts. Applies to both the Vitest browser runner and
+     * in-book test execution.
      */
     maxWorkers?: number
   }
