@@ -11,12 +11,15 @@ import { createScope } from '../host/generation.js'
  * satisfies it structurally; plugin-kit never imports the SDK.
  */
 export interface SessionContextSource {
-  /** Latest coherent snapshot; only `source` and `selection` are read. */
-  getSnapshot: () => HistoireReadonly<Pick<HistoireSnapshot, 'source' | 'selection'>>
+  /**
+   * Latest coherent snapshot; `source`, `selection` and, when present, `catalog` (its identity
+   * changes on each publication) are read.
+   */
+  getSnapshot: () => HistoireReadonly<Pick<HistoireSnapshot, 'source' | 'selection'> & Partial<Pick<HistoireSnapshot, 'catalog'>>>
   /** Observes snapshot publications. */
   subscribe: (listener: () => void) => Disposer
   /** Metadata-only catalog. */
-  catalog: CatalogService
+  catalog: Omit<CatalogService, 'subscribe'>
   /** Canonical selection; the default navigation selects stories through it. */
   selection?: { select: (input: HistoireSelectionInput) => Promise<unknown> }
 }
@@ -99,6 +102,23 @@ function freezeSelection(session: SessionContextSource): WorkbenchSelection {
 }
 
 /**
+ * Runs every listener, isolating failures: one throwing plugin listener must not skip the
+ * others. Failures are logged since the session context has no plugin attribution.
+ * @param listeners Listeners to run; copied so (un)subscribing during a run is safe.
+ * @param kind Listener kind, for the log.
+ */
+function notify(listeners: Set<() => void>, kind: string): void {
+  for (const listener of [...listeners]) {
+    try {
+      listener()
+    }
+    catch (error) {
+      console.error(`[histoire plugin] ${kind} listener failed`, error)
+    }
+  }
+}
+
+/**
  * Creates a root-scoped context from public session methods (standalone workbench, native Vue,
  * React and plain DOM hosts share it). Selection and source changes rotate generation scopes;
  * actions capture the current scope when they start, so a later change aborts them.
@@ -108,6 +128,8 @@ export function createSessionContext(options: SessionContextOptions): SessionCon
   const { session } = options
   const lifetime = createScope()
   const listeners = new Set<() => void>()
+  const catalogListeners = new Set<() => void>()
+  let catalog = session.getSnapshot().catalog
   let source = { key: sourceKey(session), scope: lifetime.child() }
   let selection = { key: selectionKey(session), scope: source.scope.child(), value: freezeSelection(session) }
 
@@ -134,8 +156,13 @@ export function createSessionContext(options: SessionContextOptions): SessionCon
   }
 
   const stop = session.subscribe(() => {
-    if (!synchronize()) return
-    for (const listener of [...listeners]) listener()
+    const nextCatalog = session.getSnapshot().catalog
+    const catalogChanged = lifetime.active && nextCatalog !== catalog
+    catalog = nextCatalog
+    // Scopes rotate before any listener runs, so listeners never capture a stale scope.
+    const changed = synchronize()
+    if (catalogChanged) notify(catalogListeners, 'catalog')
+    if (changed) notify(listeners, 'context')
   })
 
   const capabilities = new Set<WorkbenchCapability>(['catalog', 'navigation', 'preferences'])
@@ -150,6 +177,12 @@ export function createSessionContext(options: SessionContextOptions): SessionCon
       list: () => session.catalog.list(),
       getStory: (storyId: string) => session.catalog.getStory(storyId),
       search: (query: string) => session.catalog.search(query),
+      subscribe: (listener: () => void): Disposer => {
+        if (!lifetime.active) return () => {}
+        const entry = (): void => listener()
+        catalogListeners.add(entry)
+        return () => void catalogListeners.delete(entry)
+      },
     }),
     get selection() {
       synchronize()
@@ -183,6 +216,7 @@ export function createSessionContext(options: SessionContextOptions): SessionCon
       lifetime.retire()
       stop()
       listeners.clear()
+      catalogListeners.clear()
     },
   }
 }

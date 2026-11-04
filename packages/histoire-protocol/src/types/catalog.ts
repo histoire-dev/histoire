@@ -1,4 +1,5 @@
 import type { HistoireMatrixHint } from '../helpers/matrix.js'
+import type { HistoireMeta } from '../helpers/meta.js'
 import type { HistoireFramePluginInfo } from '../plugin-channels.js'
 import type { HistoireCapabilities, HistoireTarget } from './common.js'
 import type { HistoireInspectionCapabilities } from './inspection.js'
@@ -38,6 +39,8 @@ export interface HistoireCatalogVariant {
   hasTests?: boolean
   /** Available content modes. */
   source?: { raw: boolean, dynamic: boolean }
+  /** JSON part of collected variant `meta`, read by workbench plugins. */
+  meta?: HistoireMeta
 }
 
 /** Portable story metadata used by every source projection. */
@@ -72,6 +75,8 @@ export interface HistoireCatalogStory {
   relativePath?: string
   /** File ownership; absent only on compatible older source descriptors. */
   fileOrigin?: HistoireStoryFileOrigin
+  /** JSON part of collected story `meta`, read by workbench plugins. */
+  meta?: HistoireMeta
   /** Collected variants in selection order. */
   variants: readonly HistoireCatalogVariant[]
   /** Available static documentation and source. */

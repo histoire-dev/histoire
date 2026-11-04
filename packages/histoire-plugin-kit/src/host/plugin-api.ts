@@ -4,7 +4,7 @@ import type { WorkbenchContext } from '../types/context.js'
 import type { ContributionKind, WorkbenchContribution } from '../types/contribution.js'
 import type { WorkbenchPluginApi } from '../types/plugin.js'
 import type { PluginPreferences } from '../types/preferences.js'
-import type { TestsService } from '../types/services.js'
+import type { CatalogService, TestsService } from '../types/services.js'
 import { createPluginFrames } from './frames.js'
 import { NOOP } from './resources.js'
 
@@ -31,7 +31,8 @@ export interface PluginApiOptions {
 }
 
 /**
- * Wraps the root context so `subscribe` is owned by the plugin and released with it.
+ * Wraps the root context so `subscribe` (and `catalog.subscribe`, `tests.subscribe`) are owned
+ * by the plugin and released with it.
  * The proxy targets an empty object so frozen contexts never violate proxy invariants;
  * every other property reads through to the live context (getters stay fresh).
  * @param context Root context.
@@ -40,18 +41,39 @@ export interface PluginApiOptions {
  */
 function createOwnedContext(context: WorkbenchContext, signal: AbortSignal, track: (release: () => void) => Disposer): WorkbenchContext {
   const subscribe: WorkbenchContext['subscribe'] = listener => signal.aborted ? NOOP : track(context.subscribe(listener))
-  const tests = context.tests && createOwnedTests(context.tests, signal, track)
+  // Owned replacements of root context fields; every other field reads through.
+  const owned = new Map<PropertyKey, unknown>([
+    ['subscribe', subscribe],
+    ['catalog', createOwnedCatalog(context.catalog, signal, track)],
+    ['tests', context.tests && createOwnedTests(context.tests, signal, track)],
+  ])
   return new Proxy({} as WorkbenchContext, {
-    get: (_, key) => key === 'subscribe' ? subscribe : key === 'tests' ? tests : Reflect.get(context, key, context),
+    get: (_, key) => owned.has(key) ? owned.get(key) : Reflect.get(context, key, context),
     has: (_, key) => Reflect.has(context, key),
     ownKeys: () => Reflect.ownKeys(context),
     getOwnPropertyDescriptor(_, key) {
       const descriptor = Reflect.getOwnPropertyDescriptor(context, key)
       if (!descriptor) return undefined
-      if (key === 'subscribe') return { value: subscribe, writable: false, enumerable: descriptor.enumerable, configurable: true }
-      if (key === 'tests') return { value: tests, writable: false, enumerable: descriptor.enumerable, configurable: true }
+      if (owned.has(key)) return { value: owned.get(key), writable: false, enumerable: descriptor.enumerable, configurable: true }
       return { ...descriptor, configurable: true }
     },
+  })
+}
+
+/**
+ * Wraps the catalog service so its publication subscriptions are owned by the plugin.
+ * @param catalog Host catalog service.
+ * @param signal Plugin scope signal; subscriptions after retirement are refused.
+ * @param track Ties a subscription to the plugin lifetime.
+ */
+function createOwnedCatalog(catalog: CatalogService, signal: AbortSignal, track: (release: () => void) => Disposer): CatalogService {
+  const { subscribe } = catalog
+  return Object.freeze({
+    list: () => catalog.list(),
+    getStory: (storyId: string) => catalog.getStory(storyId),
+    search: (query: string) => catalog.search(query),
+    // Hosts that cannot observe publications keep `subscribe` absent.
+    ...(subscribe ? { subscribe: (listener: () => void) => signal.aborted ? NOOP : track(subscribe.call(catalog, listener)) } : {}),
   })
 }
 

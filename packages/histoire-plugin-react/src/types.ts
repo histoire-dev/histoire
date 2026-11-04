@@ -24,4 +24,4 @@ export interface VariantProps<S = Record<string, any>> extends Omit<SharedVarian
 }
 
 /** React story declaration; inherited props supply defaults to variants. */
-export interface StoryProps<S = Record<string, any>> extends Omit<SharedStoryProps, 'setupApp'>, VariantProps<S> {}
+export interface StoryProps<S = Record<string, any>> extends Omit<SharedStoryProps, 'setupApp'>, Omit<VariantProps<S>, 'meta'> {}

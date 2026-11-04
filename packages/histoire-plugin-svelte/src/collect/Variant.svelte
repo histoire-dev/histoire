@@ -5,6 +5,8 @@ export let title = 'untitled'
 export let id = null
 export let icon = null
 export let iconColor = null
+/** JSON metadata published in the catalog for plugins. */
+export let meta = undefined
 
 const story = getContext('__hstStory')
 const addVariant = getContext('__hstAddVariant')
@@ -18,6 +20,7 @@ const variant = {
   title,
   icon,
   iconColor,
+  meta,
 }
 
 addVariant(variant)

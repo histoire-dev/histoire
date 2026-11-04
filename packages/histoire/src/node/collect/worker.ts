@@ -14,6 +14,7 @@ import pc from 'picocolors'
 import { ModuleCacheMap, ViteNodeRunner } from 'vite-node/client'
 import { createDomEnv } from '../dom/env.js'
 import { formatCollectCrash, toCloneableError } from './errors.js'
+import { sanitizeCollectedMeta } from './meta.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
@@ -131,7 +132,8 @@ export default async (payload: Payload): Promise<ReturnData> => {
     console.log(pc.dim(`${payload.storyFile.relativePath} ${Math.round(endTime - startTime)}ms (setup:${Math.round(beforeExecuteTime - startTime)}ms, execute:${Math.round(afterExecuteTime - beforeExecuteTime)}ms, run:${Math.round(afterRunTime - afterExecuteTime)}ms)`))
 
     return {
-      storyData,
+      // Structured clone of the result would reject framework values left in `meta`.
+      storyData: sanitizeCollectedMeta(storyData),
     }
   }
   catch (e) {

@@ -20,7 +20,7 @@ Without `Variant` children, Histoire creates an implicit `_default` variant. Exp
 
 Declare variants directly inside `Story`, optionally inside fragments or elements. Collection reads declarations without rendering their preview content. Components that dynamically create variant declarations are unsupported.
 
-`Story` accepts `id`, `title`, `group`, `layout`, `icon`, `iconColor`, `docsOnly`, `initState`, `setupApp`, `source`, `responsiveDisabled`, `autoPropsDisabled`, and `controls`. `Variant` accepts the same props except `group`, `layout`, and `docsOnly`. Variant props override story defaults.
+`Story` accepts `id`, `title`, `group`, `layout`, `icon`, `iconColor`, `docsOnly`, `meta`, `initState`, `setupApp`, `source`, `responsiveDisabled`, `autoPropsDisabled`, and `controls`. `Variant` accepts the same props except `group`, `layout`, and `docsOnly`. Variant props override story defaults.
 
 `source` displays explicit source text. Automatic React source generation and automatic prop controls are unavailable. Add `Button.story.md` beside `Button.story.tsx` for Markdown documentation.
 

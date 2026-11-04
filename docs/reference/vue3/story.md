@@ -195,6 +195,29 @@ Disables the automatic detection of props of the components in the story.
 </template>
 ```
 
+## `meta`
+
+JSON metadata published in the story catalog for plugins, for example `design` for [@histoire/plugin-designs](../../guide/plugins/designs.md). Only JSON values (strings, numbers, booleans, `null`, arrays and plain objects) reach plugins; functions and components are left out. Large or deeply nested metadata is left out of the catalog with a warning; keep each story or variant `meta` under 64 KiB.
+
+```vue
+<template>
+  <Story :meta="{ design: { type: 'figma', url: 'https://www.figma.com/design/KEY/Button' } }">
+    <!-- ... -->
+  </Story>
+</template>
+```
+
+Type your own keys by augmenting `histoire`:
+
+```ts
+declare module 'histoire' {
+  // Story and Variant
+  interface CommonMeta {
+    owner?: string
+  }
+}
+```
+
 ## Slot: `controls`
 
 Content of the 'Controls' pane used to interact with the story. This will be the default content for variants of the story but you can override it by defining a `controls` slot in a variant.

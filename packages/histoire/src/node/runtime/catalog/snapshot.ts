@@ -3,6 +3,7 @@ import type { Context } from '../../context.js'
 import type { StoryContentEntry } from '../content/types.js'
 import type { CatalogDiagnostic, CatalogSnapshot, CatalogStory, SnapshotOptions } from './types.js'
 import { normalizeHistoireMatrixHint } from '@histoire/protocol'
+import { normalizeCollectedMeta } from '../../collect/meta.js'
 import { CatalogContentChangedError, hashContent, indexStoryContent } from '../content/index.js'
 import { boundedDiagnostics, sanitizeDiagnosticMessage } from './diagnostics.js'
 import { immutableMap } from './immutable.js'
@@ -19,7 +20,7 @@ export async function captureCatalogSnapshot(ctx: Context, options: SnapshotOpti
   let validOutcomes = 0
   // Clone the entire metadata projection before awaiting file reads. A later
   // queued collector batch cannot leak partially mutated runtime objects.
-  const files = ctx.storyFiles.map(file => ({ ...file, treePath: file.treePath?.slice(), story: file.story && { ...file.story, layout: file.story.layout && { ...file.story.layout }, matrix: normalizeHistoireMatrixHint(file.story.matrix), variants: (file.story.variants ?? []).map(v => ({ id: v.id, title: v.title, ...(typeof v.icon === 'string' ? { icon: v.icon } : {}), ...(typeof (v as { hasTests?: boolean }).hasTests === 'boolean' ? { hasTests: (v as { hasTests?: boolean }).hasTests } : {}) })) }, markdownFile: file.markdownFile && { ...file.markdownFile } }))
+  const files = ctx.storyFiles.map(file => ({ ...file, treePath: file.treePath?.slice(), story: file.story && { ...file.story, layout: file.story.layout && { ...file.story.layout }, matrix: normalizeHistoireMatrixHint(file.story.matrix), meta: undefined, metaOmitted: undefined, ...normalizeCollectedMeta(file.story), variants: (file.story.variants ?? []).map(v => ({ id: v.id, title: v.title, ...(typeof v.icon === 'string' ? { icon: v.icon } : {}), ...(typeof (v as { hasTests?: boolean }).hasTests === 'boolean' ? { hasTests: (v as { hasTests?: boolean }).hasTests } : {}), ...normalizeCollectedMeta(v) })) }, markdownFile: file.markdownFile && { ...file.markdownFile } }))
   for (const file of files) {
     const outcome = outcomes.get(file.path)
     if (outcome?.status === 'failed') {
@@ -92,7 +93,7 @@ export async function captureCatalogSnapshot(ctx: Context, options: SnapshotOpti
   }
   const bounded = boundedDiagnostics(diagnostics, options.maxDiagnostics)
   const failed = failedFiles > 0 && validOutcomes === 0
-  const catalog = projectCatalog(stories, bounded.diagnostics, files, ctx.config)
+  const catalog = projectCatalog(stories, bounded.diagnostics, files, ctx.config, options.maxDiagnostics)
   const fingerprint = hashContent(JSON.stringify({ catalog, stories, ...bounded, failed, content: [...contents].map(([file, entry]) => [file, entry.source.sha256, entry.source.reason, entry.docsUnavailableReason, entry.docs?.sha256, entry.docs?.physicalSha256, entry.docs?.html]) }))
   const outcome = failed ? 'failed' : diagnostics.length > 0 ? 'partial' : 'success'
   return { catalog, outcome, projectId: options.projectId, epoch: options.epoch, stories: Object.freeze(stories), ...bounded, failed, contents: immutableMap(contents), fingerprint }

@@ -1,6 +1,6 @@
 import type { WorkbenchPluginApi } from '../index.js'
 import { describe, expect, it, vi } from 'vitest'
-import { addCommand, createTestHost, deferred, ids, plugin } from './fixtures/host.js'
+import { addCommand, createTestContext, createTestHost, deferred, ids, plugin } from './fixtures/host.js'
 
 describe('extension host disposal', () => {
   it('prevents late registration and disposes late setup results after disposal', async () => {
@@ -59,6 +59,26 @@ describe('extension host disposal', () => {
     await host.ready
     await host.dispose()
     expect(host.context.listenerCount).toBe(0)
+  })
+
+  it('releases plugin-owned catalog subscriptions on disposal and refuses later ones', async () => {
+    const context = createTestContext()
+    const catalogListeners = new Set<() => void>()
+    context.catalog = { list: async () => [], getStory: async () => ({}) as never, search: async () => [], subscribe: (listener) => {
+      catalogListeners.add(listener)
+      return () => void catalogListeners.delete(listener)
+    } }
+    let api!: WorkbenchPluginApi
+    const host = createTestHost([plugin('acme', (value) => {
+      api = value
+      value.context.catalog.subscribe!(() => {})
+    })], { context })
+    await host.ready
+    expect(catalogListeners.size).toBe(1)
+    await host.dispose()
+    expect(catalogListeners.size).toBe(0)
+    api.context.catalog.subscribe!(() => {})
+    expect(catalogListeners.size).toBe(0)
   })
 
   it('records plugin disposer failures and keeps tearing down', async () => {

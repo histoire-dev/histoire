@@ -10,6 +10,8 @@ export let matrix = null
 export let icon = null
 export let iconColor = null
 export let docsOnly = false
+/** JSON metadata published in the catalog for plugins. */
+export let meta = undefined
 
 const addStory = getContext('__hstAddStory')
 const file = getContext('__hstStoryFile')
@@ -23,6 +25,7 @@ const story = {
   icon,
   iconColor,
   docsOnly,
+  meta,
   variants: [],
 }
 

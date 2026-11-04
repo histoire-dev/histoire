@@ -17,6 +17,8 @@ export function Variant<S extends Record<string, any> = Record<string, any>>(pro
         title: context.implicit ? 'default' : props.title ?? 'untitled',
         icon: props.icon,
         iconColor: props.iconColor,
+        // Implicit variants receive story props: their meta stays on the story.
+        meta: context.implicit ? undefined : props.meta,
       }
     }
     else if (context.mode === 'mount' && variant) {

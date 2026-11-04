@@ -35,7 +35,8 @@ export interface InheritedProps {
 }
 
 export interface VariantProps extends CommonProps, InheritedProps {
-  // No additional properties
+  /** JSON metadata published in the catalog for plugins (e.g. `design`). */
+  meta?: VariantMeta
 }
 
 export interface StoryProps extends CommonProps, InheritedProps {
@@ -44,6 +45,8 @@ export interface StoryProps extends CommonProps, InheritedProps {
   docsOnly?: boolean
   /** Explicit finite values for props matrix axes. */
   matrix?: HistoireMatrixDeclaration
+  /** JSON metadata published in the catalog for plugins (e.g. `design`). */
+  meta?: StoryMeta
 }
 
 export interface CommonMeta {}
@@ -182,6 +185,8 @@ export interface ServerStory {
   docsOnly?: boolean
   docsText?: string
   meta?: StoryMeta
+  /** Collected `meta` exceeded the catalog metadata bounds and was dropped at collection. */
+  metaOmitted?: boolean
   /**
    * Whether the story or one of its variants declares a `controls` slot.
    * Set by support plugins that know at collection; absent when unknown.
@@ -195,6 +200,8 @@ export interface ServerVariant {
   icon?: string
   iconColor?: string
   meta?: VariantMeta
+  /** Collected `meta` exceeded the catalog metadata bounds and was dropped at collection. */
+  metaOmitted?: boolean
 }
 
 export interface ServerTreeFile {

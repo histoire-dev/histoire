@@ -2,7 +2,7 @@ import type { HistoireCatalog, HistoireCatalogStory, HistoireSourceDescriptor } 
 import { validateHostChannelNames } from '../channels.js'
 import { getHistoireMatrixValues, isHistoireMatrixPropName } from '../helpers/matrix.js'
 import { validateInspectionCapabilities, validateInspectionPolicy } from '../inspection/capabilities.js'
-import { HISTOIRE_WIRE_LIMITS } from './limits.js'
+import { HISTOIRE_META_LIMITS, HISTOIRE_WIRE_LIMITS } from './limits.js'
 import { measureWireValue } from './size.js'
 import { validateSourceDescriptorFields } from './source-descriptor.js'
 import { invalid, wireId, wireRecord } from './validation.js'
@@ -39,6 +39,14 @@ function validateRelativeLabel(value: unknown): void {
   if (value !== undefined && (typeof value !== 'string' || /^(?:\/|[a-z]:[\\/]|\\\\|\0)/i.test(value))) invalid('Expected relative file label')
 }
 
+/** Story/variant `meta` must be a JSON object within the per-meta bounds. */
+function validateMeta(value: unknown): void {
+  if (value === undefined) return
+  if (!value || typeof value !== 'object' || Array.isArray(value)) invalid('Invalid catalog metadata')
+  const { bytes, depth, nodes } = HISTOIRE_META_LIMITS
+  measureWireValue(value, { mode: 'json', maxBytes: bytes, maxDepth: depth, maxContainers: nodes, maxEdges: nodes })
+}
+
 /** Validates projected story/variant metadata without importing story modules. */
 export function validateHistoireCatalogStory(value: unknown): HistoireCatalogStory {
   const input = wireRecord(value)
@@ -52,7 +60,9 @@ export function validateHistoireCatalogStory(value: unknown): HistoireCatalogSto
       const source = wireRecord(variant.source)
       if (typeof source.raw !== 'boolean' || typeof source.dynamic !== 'boolean') invalid('Invalid source availability')
     }
+    validateMeta(variant.meta)
   }
+  validateMeta(input.meta)
   const content = wireRecord(input.content)
   if (typeof content.docs !== 'boolean' || typeof content.rawSource !== 'boolean') invalid('Invalid content availability')
   for (const key of ['group', 'icon', 'iconColor', 'supportPluginId']) {

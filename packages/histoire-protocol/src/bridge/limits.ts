@@ -25,3 +25,21 @@ export function getHistoireWireLimit(policy: HistoireWirePolicy): number {
   if (policy.kind === 'event' && ['state.changed', 'layout.changed'].includes(policy.name)) return HISTOIRE_WIRE_LIMITS.state
   return policy.kind === 'event' ? HISTOIRE_WIRE_LIMITS.event : HISTOIRE_WIRE_LIMITS.request
 }
+
+/**
+ * Bounds of story/variant `meta` published in the catalog. Per-meta bounds stop the copy early;
+ * catalog-wide bounds keep many valid metas from pushing the whole catalog past
+ * `HISTOIRE_WIRE_LIMITS.catalog` / `containers` / `edges`.
+ */
+export const HISTOIRE_META_LIMITS = {
+  /** JSON bytes of one `meta`. */
+  bytes: HISTOIRE_WIRE_LIMITS.metadata,
+  /** Nesting depth inside one `meta` (root is 0); deeper values are dropped. */
+  depth: 32,
+  /** JSON values (containers and leaves, each shared reference counted again) of one `meta`. */
+  nodes: 8192,
+  /** JSON bytes of all `meta` in one catalog. */
+  catalogBytes: 2 * 1024 * 1024,
+  /** JSON values of all `meta` in one catalog. */
+  catalogNodes: 40_000,
+} as const

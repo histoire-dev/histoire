@@ -27,6 +27,7 @@ export async function run({ file, storyData }: ServerRunPayload) {
     icon: options.icon,
     iconColor: options.iconColor,
     docsOnly: options.docsOnly ?? false,
+    meta: options.meta,
     variants: null,
   }
 
@@ -35,6 +36,7 @@ export async function run({ file, storyData }: ServerRunPayload) {
     title: v.title ?? 'untitled',
     icon: v.icon ?? options.icon,
     iconColor: v.iconColor ?? options.iconColor,
+    meta: v.meta,
   }))
 
   story.variants = variants

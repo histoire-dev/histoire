@@ -32,20 +32,21 @@ describe('react story collection', () => {
     const content = vi.fn(() => <button type="button">Hidden</button>)
     const payload = collectionPayload()
     await collectStory(() => (
-      <Story title="Buttons" group="ui">
-        <Variant title="Normal">{content}</Variant>
+      <Story title="Buttons" group="ui" meta={{ tag: 'story' }}>
+        <Variant title="Normal" meta={{ tag: 'variant' }}>{content}</Variant>
         <Variant id="disabled" title="Disabled">{content}</Variant>
       </Story>
     ), payload)
-    expect(payload.storyData).toMatchObject([{ id: 'button', title: 'Buttons', group: 'ui', variants: [{ id: 'button-0', title: 'Normal' }, { id: 'disabled', title: 'Disabled' }] }])
+    expect(payload.storyData).toMatchObject([{ id: 'button', title: 'Buttons', group: 'ui', meta: { tag: 'story' }, variants: [{ id: 'button-0', title: 'Normal', meta: { tag: 'variant' } }, { id: 'disabled', title: 'Disabled' }] }])
     expect(content).not.toHaveBeenCalled()
     expect(payload.el.childNodes).toHaveLength(0)
   })
 
   it('collects implicit variant and respects explicit story id', async () => {
     const payload = collectionPayload()
-    await collectStory(() => <Story id="custom"><button type="button">Implicit</button></Story>, payload)
-    expect(payload.storyData[0]).toMatchObject({ id: 'custom', variants: [{ id: '_default', title: 'default' }] })
+    await collectStory(() => <Story id="custom" meta={{ tag: 'story' }}><button type="button">Implicit</button></Story>, payload)
+    expect(payload.storyData[0]).toMatchObject({ id: 'custom', meta: { tag: 'story' }, variants: [{ id: '_default', title: 'default' }] })
+    expect(payload.storyData[0].variants[0].meta).toBeUndefined()
   })
 })
 

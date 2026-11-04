@@ -178,6 +178,20 @@ Disables the automatic detection of props of the components in the story.
 </template>
 ```
 
+## `meta`
+
+JSON metadata published in the story catalog for plugins. A variant `meta` key does not merge with the story's: plugins such as [@histoire/plugin-designs](../../guide/plugins/designs.md) use the variant value first, then the story value.
+
+```vue
+<template>
+  <Story>
+    <Variant :meta="{ design: { type: 'image', url: '/designs/button-dark.png' } }">
+      <!-- ... -->
+    </Variant>
+  </Story>
+</template>
+```
+
 ## Slot: `default`
 
 Content of the variant.

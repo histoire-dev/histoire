@@ -35,6 +35,7 @@ export function Story<S extends Record<string, any> = Record<string, any>>(props
       icon: props.icon,
       iconColor: props.iconColor,
       docsOnly: props.docsOnly,
+      meta: props.meta,
       variants: [],
     }
     // Replace repeated React renders instead of duplicating metadata.

@@ -109,6 +109,18 @@ Disables the automatic detection of props of the components in the story.
 </Hst.Story>
 ```
 
+## `meta`
+
+JSON metadata published in the story catalog for plugins. Plugins use the variant value of a key first, then the story value.
+
+```svelte
+<Hst.Story>
+  <Hst.Variant meta={{ design: { type: 'image', url: '/designs/button-dark.png' } }}>
+    <!-- ... -->
+  </Hst.Variant>
+</Hst.Story>
+```
+
 ## Slot: `default`
 
 Content of the variant.

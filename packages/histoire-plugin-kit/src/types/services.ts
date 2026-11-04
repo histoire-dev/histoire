@@ -10,6 +10,11 @@ export interface CatalogService {
   getStory: (storyId: string) => Promise<HistoireCatalogStory>
   /** Searches titles and docs without mounting stories. */
   search: (query: string) => Promise<readonly HistoireSearchResult[]>
+  /**
+   * Notified after each catalog publication (story edits in dev); re-read stories from the
+   * catalog. Absent on hosts that cannot observe publications.
+   */
+  subscribe?: (listener: () => void) => Disposer
 }
 
 /**

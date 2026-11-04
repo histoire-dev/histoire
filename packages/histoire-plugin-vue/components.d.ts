@@ -89,7 +89,7 @@ interface VueStoryProps {
    * You can type it with:
    *
    * ```ts
-   * declare module 'histoire' {
+   * declare module '@histoire/shared' {
    *    // For both Story and Variant
    *    interface CommonMeta {
    *     myMeta: string
@@ -171,7 +171,7 @@ interface VueVariantProps {
    * You can type it with:
    *
    * ```ts
-   * declare module 'histoire' {
+   * declare module '@histoire/shared' {
    *    // For both Story and Variant
    *    interface CommonMeta {
    *     myMeta: string
@@ -184,7 +184,7 @@ interface VueVariantProps {
    * }
    * ```
    */
-  variant?: VariantMeta
+  meta?: VariantMeta
 }
 
 type VueVariantComponent = import('vue').DefineComponent<

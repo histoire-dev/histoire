@@ -19,6 +19,7 @@ export function getStoryRuntimeRevision(sourceSha256: string | undefined, file: 
     matrix: story.matrix,
     icon: story.icon,
     iconColor: story.iconColor,
-    variants: story.variants,
+    // `meta` is plugin data, never executed: editing it must not invalidate mounted variants.
+    variants: story.variants.map(({ meta: _meta, metaOmitted: _metaOmitted, ...variant }) => variant),
   }))
 }

@@ -104,6 +104,16 @@ Disables the automatic detection of props of the components in the story.
 </Hst.Story>
 ```
 
+## `meta`
+
+JSON metadata published in the story catalog for plugins, for example `design` for [@histoire/plugin-designs](../../guide/plugins/designs.md). Functions and components are left out. Large or deeply nested metadata is left out of the catalog with a warning; keep each story or variant `meta` under 64 KiB.
+
+```svelte
+<Hst.Story meta={{ design: { type: 'figma', url: 'https://www.figma.com/design/KEY/Button' } }}>
+  <!-- ... -->
+</Hst.Story>
+```
+
 ## Slot: `controls`
 
 Content of the 'Controls' pane used to interact with the story. This will be the default content for variants of the story but you can override it by defining a `controls` slot in a variant.

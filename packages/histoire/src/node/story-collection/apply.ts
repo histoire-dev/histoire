@@ -3,6 +3,7 @@ import type { Context } from '../context.js'
 import type { BrowserCollectedStoryResult, CollectedStoryFile, CollectStoriesBrowserOptions } from './types.js'
 import pc from 'picocolors'
 import { finalizeCollectedStoryFile } from '../collect/finalize.js'
+import { sanitizeCollectedMeta } from '../collect/meta.js'
 
 /**
  * Finalizes the stories collected in the browser. Mirrors the legacy node
@@ -44,7 +45,8 @@ export function applyCollectedStories(ctx: Context, results: Map<string, Browser
 
     const draft: ServerStoryFile = {
       ...storyFile,
-      story: collected.storyData[0],
+      // Browser results arrive as plain JSON; still bound depth and size like the worker.
+      story: sanitizeCollectedMeta(collected.storyData.slice(0, 1))[0],
     }
 
     finalizeCollectedStoryFile(draft, ctx)
