@@ -71,7 +71,8 @@
 .histoire-a11y-tab-list > .histoire-a11y-rule:last-child { margin-bottom: 0; }
 /* Project pane: flat variant rows; only the rule cards inside are boxed, indented under the title. */
 .histoire-a11y-variant + .histoire-a11y-variant { margin-top: 2px; }
-.histoire-a11y-variant > summary { display: flex; align-items: center; gap: 6px; min-height: 28px; padding: var(--histoire-list-row-padding, 8px) var(--histoire-pane-row-inset); border-radius: var(--histoire-radius-control, 6px); cursor: pointer; list-style: none; }
+/* Positioned: anchors the visually hidden labels inside, which otherwise escape the scrolling list and stretch the page. */
+.histoire-a11y-variant > summary { position: relative; display: flex; align-items: center; gap: 6px; min-height: 28px; padding: var(--histoire-list-row-padding, 8px) var(--histoire-pane-row-inset); border-radius: var(--histoire-radius-control, 6px); cursor: pointer; list-style: none; }
 .histoire-a11y-variant > summary::-webkit-details-marker { display: none; }
 .histoire-a11y-variant > summary:hover { background: var(--histoire-chip, rgb(128 128 128 / .08)); }
 .histoire-a11y-variant-title { display: flex; flex: 1; flex-wrap: wrap; column-gap: 4px; min-width: 0; font-size: 12px; line-height: 1.4; overflow-wrap: anywhere; }
