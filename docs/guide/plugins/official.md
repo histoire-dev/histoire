@@ -1,6 +1,7 @@
 # Official Plugins
 
 - [@histoire/plugin-a11y](./a11y.md): axe-core accessibility audits and optional story tests
+- [@histoire/plugin-designs](./designs.md): Figma, Penpot, Sketch, image and iframe designs next to stories
 - [@histoire/plugin-vue](https://github.com/histoire-dev/histoire/tree/main/packages/histoire-plugin-vue): Vue 3 (support plugin)
 - [@histoire/plugin-vue-devtools](https://github.com/histoire-dev/histoire/tree/main/packages/histoire-plugin-vue-devtools): Devframe-based Vue DevTools for Vue story frames
 - [@histoire/plugin-nuxt](https://github.com/histoire-dev/histoire/tree/main/packages/histoire-plugin-nuxt): Nuxt 3 and 4

@@ -27,6 +27,7 @@
     "@histoire/app": "workspace:*",
     "@histoire/devframe": "workspace:*",
     "@histoire/plugin-a11y": "workspace:*",
+    "@histoire/plugin-designs": "workspace:*",
     "@histoire/plugin-vue": "workspace:*",
     "@histoire/plugin-vue-devtools": "workspace:*",
     "@histoire/sdk": "workspace:*",

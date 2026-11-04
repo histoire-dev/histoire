@@ -72,6 +72,10 @@ utilities also win equal-specificity conflicts across files.
 
 `packages/histoire-plugin-a11y/src/workbench/styles.css` is external-plugin CSS, scoped to `.histoire-a11y`, compiled inline and installed through shared plugin-kit stylesheet owner. It is outside `histoire-app` styling boundary. `src/frame/highlight.ts` uses temporary fixed-position translucent overlay in story document; runtime geometry cannot be expressed in app templates. Overlay has no colored border and is removed on actor retirement.
 
+## Official designs plugin
+
+`packages/histoire-plugin-designs/src/workbench/styles.css` is external-plugin CSS, scoped to `.histoire-designs`, compiled inline and installed through shared plugin-kit stylesheet owner like the accessibility plugin. Its canvas arrangement positions columns from runtime geometry. No colored borders.
+
 ## Standalone development startup document
 
 `packages/histoire-dev-proxy/src/client/styles.ts` owns minimal inline document CSS for proxy loading/error screen. Public HTTP responds before project config, Vite, Vue, or workbench styles exist; startup cannot import Tailwind workbench bundle. Styles stay scoped to standalone document and include light/dark appearance. Keyframes animate the wireframe logo (marching dashes, failure falter), the status shimmer and state transitions in place of a spinner; no colored border decoration. Every animation and transition is disabled under reduced motion. This exception is listed in `app-styling-guard.spec.ts`.

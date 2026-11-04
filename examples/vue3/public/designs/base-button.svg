@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="300" viewBox="0 0 480 300" font-family="system-ui, sans-serif">
+  <rect width="480" height="300" fill="#f8fafc"/>
+  <text x="24" y="40" font-size="18" font-weight="600" fill="#0f172a">BaseButton</text>
+  <text x="24" y="62" font-size="12" fill="#64748b">Sizes and colors</text>
+  <rect x="24" y="96" width="132" height="48" rx="8" fill="#22c55e"/>
+  <text x="90" y="126" font-size="16" fill="#fff" text-anchor="middle">Click me</text>
+  <text x="90" y="166" font-size="11" fill="#64748b" text-anchor="middle">big · green · 48px</text>
+  <rect x="196" y="104" width="104" height="32" rx="6" fill="#3b82f6"/>
+  <text x="248" y="125" font-size="14" fill="#fff" text-anchor="middle">Click me</text>
+  <text x="248" y="166" font-size="11" fill="#64748b" text-anchor="middle">default · 32px</text>
+  <rect x="340" y="108" width="84" height="24" rx="4" fill="#f43f5e"/>
+  <text x="382" y="124" font-size="12" fill="#fff" text-anchor="middle">Click me!</text>
+  <text x="382" y="166" font-size="11" fill="#64748b" text-anchor="middle">small · red · 24px</text>
+  <line x1="24" y1="200" x2="456" y2="200" stroke="#e2e8f0"/>
+  <text x="24" y="230" font-size="12" fill="#334155">Padding 8 × 16 · Radius 6 · Label 14/20 medium</text>
+  <text x="24" y="254" font-size="12" fill="#334155">Disabled: 40% opacity, no hover</text>
+</svg>

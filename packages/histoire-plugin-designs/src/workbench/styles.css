@@ -1,0 +1,94 @@
+/* Inspector tab: the host already pads the content, so blocks share one gap and the design fills the rest. */
+.histoire-designs-tab {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  height: 100%;
+  min-height: 0;
+  color: var(--histoire-text, inherit);
+  font-size: 13px;
+}
+.histoire-designs-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: var(--histoire-control-height, 28px); }
+.histoire-designs-switch { flex: 1; min-width: 0; --histoire-control-margin: 0px; --histoire-control-wrapper-padding: 0px; }
+.histoire-designs-name { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.histoire-designs-note { margin: 0; font-size: 12px; opacity: .75; }
+.histoire-designs-issue { display: block; }
+
+/* Embedded documents and image viewer fill the tab below the toolbar. */
+.histoire-designs-embed, .histoire-designs-image-viewport {
+  position: relative;
+  flex: 1;
+  min-height: 320px;
+  overflow: hidden;
+  border: 1px solid var(--histoire-border, rgb(128 128 128 / .25));
+  border-radius: var(--histoire-radius-control, 6px);
+  background: var(--histoire-surface, transparent);
+}
+.histoire-designs-embed iframe { display: block; width: 100%; height: 100%; border: 0; }
+.histoire-designs-overlay { position: absolute; inset: 0; display: grid; place-content: center; background: var(--histoire-surface, transparent); }
+
+.histoire-designs-image { display: flex; flex: 1; flex-direction: column; gap: 6px; min-height: 0; }
+.histoire-designs-image-tools { display: flex; align-items: center; gap: 2px; }
+.histoire-designs-zoom { min-width: 44px; font-size: 12px; text-align: center; font-variant-numeric: tabular-nums; }
+.histoire-designs-image-viewport { cursor: grab; touch-action: none; }
+.histoire-designs-image-viewport[data-panning] { cursor: grabbing; }
+/* Inset ring: the viewport clips its content and may touch the scroll edges of the tab. */
+.histoire-designs-image-viewport:focus-visible { outline: 2px solid var(--histoire-accent, currentColor); outline-offset: -2px; }
+.histoire-designs-image-viewport img { position: absolute; top: 0; left: 0; max-width: none; transform-origin: 0 0; user-select: none; }
+
+/* Canvas arrangement: variant frame and design side by side, following pan and zoom. */
+.histoire-designs-canvas { position: absolute; inset: 0; overflow: hidden; }
+.histoire-designs-canvas-layer { position: absolute; top: 0; left: 0; transform-origin: 0 0; }
+.histoire-designs-canvas-column { position: absolute; display: flex; flex-direction: column; gap: 6px; }
+.histoire-designs-canvas-label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 26px;
+  color: var(--histoire-text);
+  font: 600 13px/26px var(--histoire-font-sans, "Manrope", system-ui, sans-serif);
+}
+/* Groups the design switches next to the label. */
+.histoire-designs-canvas-switches { display: inline-flex; align-items: center; gap: 2px; }
+.histoire-designs-canvas-switch {
+  height: 24px;
+  padding: 0 8px;
+  border: 1px solid transparent;
+  border-radius: var(--histoire-radius-control, 6px);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  opacity: .7;
+  cursor: pointer;
+}
+.histoire-designs-canvas-switch:hover { opacity: 1; }
+.histoire-designs-canvas-switch[aria-pressed="true"] { opacity: 1; border-color: var(--histoire-border); background: var(--histoire-surface); }
+.histoire-designs-canvas-box {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  border: 1px solid var(--histoire-border);
+  border-radius: var(--histoire-radius-panel, 12px);
+  background: var(--histoire-surface);
+  box-shadow: var(--histoire-shadow-toolbar);
+}
+.histoire-designs-canvas-box > * { display: block; width: 100%; height: 100%; border: 0; }
+.histoire-designs-canvas-image { object-fit: contain; user-select: none; }
+.histoire-designs-canvas-link { display: flex; flex-direction: column; justify-content: center; gap: 6px; padding: 16px; color: var(--histoire-text); font: 14px var(--histoire-font-sans, "Manrope", system-ui, sans-serif); box-sizing: border-box; }
+.histoire-designs-canvas-link a { color: inherit; font-weight: 600; text-underline-offset: 3px; }
+.histoire-designs-canvas-url { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; opacity: .7; }
+/* Design that failed to load, shown inside its box. */
+.histoire-designs-canvas-error {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 6px;
+  padding: 16px;
+  color: rgb(var(--histoire-danger-text-rgb, 220 60 80));
+  font: 14px var(--histoire-font-sans, "Manrope", system-ui, sans-serif);
+  overflow-wrap: anywhere;
+  box-sizing: border-box;
+}
+.histoire-designs-canvas-state { position: absolute; inset: 0; display: grid; place-content: center; }
+/* Cleared state: never cover the canvas. */
+.histoire-designs-canvas-state:empty { display: none; }

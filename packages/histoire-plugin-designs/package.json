@@ -1,0 +1,60 @@
+{
+  "name": "@histoire/plugin-designs",
+  "type": "module",
+  "version": "1.0.0-beta.1",
+  "description": "Show Figma, Penpot, Sketch and other designs next to Histoire stories",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/histoire-dev/histoire.git",
+    "directory": "packages/histoire-plugin-designs"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./client": {
+      "types": "./dist/client.d.ts",
+      "default": "./dist/client.js"
+    }
+  },
+  "files": [
+    "LICENSE",
+    "dist"
+  ],
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "build": "rimraf dist && vite build && vue-tsc --emitDeclarationOnly && tsc -p tsconfig.node.json",
+    "watch": "concurrently -k \"vite build --watch\" \"vue-tsc --emitDeclarationOnly --watch\" \"tsc -p tsconfig.node.json --watch\"",
+    "test": "vitest run"
+  },
+  "peerDependencies": {
+    "@histoire/controls": "workspace:^",
+    "histoire": "workspace:^",
+    "vue": "^3.5.0"
+  },
+  "dependencies": {
+    "@histoire/plugin-kit": "workspace:^",
+    "@histoire/protocol": "workspace:^",
+    "@histoire/shared": "workspace:^"
+  },
+  "devDependencies": {
+    "@histoire/controls": "workspace:*",
+    "@types/node": "^22.10.1",
+    "@vitejs/plugin-vue": "^6.0.10",
+    "concurrently": "^9.1.0",
+    "histoire": "workspace:*",
+    "jsdom": "^27.4.0",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vitest": "4.1.10",
+    "vue": "^3.5.26",
+    "vue-tsc": "^3.3.13"
+  }
+}
