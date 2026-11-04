@@ -5,6 +5,9 @@ import { importResolvedModule } from '../util/import-resolved.js'
 import { resolveVitestModule } from '../util/resolve-vitest-package.js'
 import { createDefinitionOptimizerPolicy } from './definition-optimizer.js'
 
+/** Chromium flags giving test pages a callable collector and live heap figures. */
+const TEST_BROWSER_ARGS = ['--js-flags=--expose-gc', '--enable-precise-memory-info']
+
 /**
  * Builds the default `test` options of a browser run: headless chromium through
  * the project's own `@vitest/browser-playwright`, with Histoire's plugins.
@@ -25,7 +28,9 @@ export async function getVitestBrowserProjectConfig(
       enabled: true,
       ui: false,
       headless: true,
-      provider: wrapBrowserProviderWithPlugins(playwright(), plugins, optimizeDeps, serverConfig),
+      // Specs free the documents of finished spec files themselves (see `releaseFinishedSpecs`):
+      // Chromium alone keeps them until its heap limit, gigabytes per test tab.
+      provider: wrapBrowserProviderWithPlugins(playwright({ launchOptions: { args: TEST_BROWSER_ARGS } }), plugins, optimizeDeps, serverConfig),
       instances: [
         {
           browser: 'chromium' as const,

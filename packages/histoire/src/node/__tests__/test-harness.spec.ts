@@ -45,6 +45,7 @@ function evaluateHarness(source: string): HarnessSessionOptions {
           captured = options
           return {}
         },
+        releaseFinishedSpecs: () => {},
       }
     }
     // `virtual:$histoire-theme` is a side-effect-only style import.

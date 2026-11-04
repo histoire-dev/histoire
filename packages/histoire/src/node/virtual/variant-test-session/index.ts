@@ -16,6 +16,7 @@ import { getStoryVariant } from './variant.js'
 import { getVitestWorkerState } from './worker-state.js'
 
 export { getMatchingDefinition } from './definitions.js'
+export { releaseFinishedSpecs } from './finished-specs.js'
 export type { VariantSession } from './session.js'
 export { hasVanillaSetupHooks } from './setup-hooks.js'
 export type { SerializedStoryFile, VariantTestSessionOptions } from './types.js'

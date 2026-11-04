@@ -30,7 +30,10 @@ export function buildTestHarnessSource({ variantTestSessionId, files, mountTimeo
 
   return `
 import 'virtual:$histoire-theme'
-import { createVariantTestSession, hasVanillaSetupHooks } from ${JSON.stringify(variantTestSessionId)}
+import { createVariantTestSession, hasVanillaSetupHooks, releaseFinishedSpecs } from ${JSON.stringify(variantTestSessionId)}
+
+// Evaluated once per spec file, each in a fresh iframe: free the documents of the previous ones.
+releaseFinishedSpecs()
 
 const files = ${JSON.stringify(files)}
 const moduleLoaders = {

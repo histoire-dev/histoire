@@ -5,6 +5,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { expect, it, vi } from 'vitest'
 import { resolveVitestModule } from '../util/resolve-vitest-package.js'
+import { getVitestBrowserProjectConfig } from '../vitest-browser-config/browser-project.js'
 import { getVitestBrowserDependencyNames } from '../vitest-browser-config/dependencies.js'
 import { createVitestBrowserResolvePlugin } from '../vitest-browser-config/index.js'
 import { getHistoireBrowserRunConfig } from '../vitest-browser-config/run-config.js'
@@ -143,6 +144,15 @@ it('runs against the Vitest major its @internal patches were verified on', async
 
   expect(vitestPackageJson.version.split('.')[0]).toBe('4')
   expect(peerRange.peerDependencies.vitest).toBe('^4.0.0')
+})
+
+// Specs free the documents of finished spec files themselves (Chromium collects them late):
+// the test browser must expose its collector and report a live heap size.
+it('launches the test browser with a callable garbage collector', async () => {
+  const config = await getVitestBrowserProjectConfig(process.cwd())
+  const args = (config.browser.provider.options as { launchOptions?: { args?: string[] } }).launchOptions?.args
+
+  expect(args).toEqual(expect.arrayContaining(['--js-flags=--expose-gc', '--enable-precise-memory-info']))
 })
 
 it('creates the browser resolve plugin when optional testing-library packages are missing', () => {
