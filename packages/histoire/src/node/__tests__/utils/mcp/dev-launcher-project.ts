@@ -15,7 +15,9 @@ export async function createDevLauncherProject(createProject: () => Promise<{ ro
     for (const entry of entries) {
       const source = resolve(MCP_REPOSITORY_ROOT, 'packages', entry)
       const destination = resolve(repository, 'packages', entry)
-      const manifest = JSON.parse(await readFile(resolve(source, 'package.json'), 'utf8'))
+      // Tooling directories (for example `.claude`) are not workspace packages.
+      const manifest = await readFile(resolve(source, 'package.json'), 'utf8').then(JSON.parse, () => undefined)
+      if (!manifest) continue
       packages.set(manifest.name, destination)
       await mkdir(destination, { recursive: true })
       // Copy sources too: source UI assets must stay inside private Vite filesystem roots.

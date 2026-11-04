@@ -25,7 +25,7 @@ export async function createPackageConsumer(directory: string) {
   }
   const require = createRequire(resolve(installed, 'package.json'))
   const appDirectory = resolve(dirname(require.resolve('@histoire/app/package.json')), 'dist')
-  return { root, cli: resolve(root, 'node_modules/histoire/bin.mjs'), appDirectory, tarball, inventory }
+  return { root, cli: resolve(root, 'node_modules/histoire/bin.mjs'), appDirectory, tarball, inventory, inventories: consumer.inventories }
 }
 
 /** Pin optional peers to the already verified fixture versions, then install. */

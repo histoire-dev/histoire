@@ -72,6 +72,36 @@ Increase [`test.storyCollectTimeout`](../reference/config.md#test-storycollectti
 
 See [Visual testing](./visual-testing.md) for tracked baselines, Matrix cases, image review, and CI comparisons.
 
+## Terminal tests <Badge type="tip" text="1.0-beta.2+" />
+
+Press `t` in the [dev console](./getting-started.md#dev-console) to run browser tests without leaving the terminal. Tests use the same isolated runner and queue as the workbench and `histoire test`; they need the [Vitest browser packages](#install-vitest-browser-runtime) installed in the project. Histoire never installs them. When they are missing, the console shows the same actionable error as other test entry points.
+
+Left and right select the scope: all stories, the selected story, or the selected variant. Story and variant scopes are available after you pick a target in the stories view (`p`, then `t`, which also runs it) and become unresolved after a restart until the catalog confirms the target.
+
+| Key | Action |
+| --- | --- |
+| `r` | Run the scope |
+| `s` | Stop running tests and disable watch |
+| `f` | Show failures only |
+| `w` | Toggle watch |
+| `Enter` | Case detail |
+| `[` / `]` | Step through retained runs |
+| `/`, `y`, `Y` | Search, copy selected, copy filtered |
+
+Failed assertions give a completed result with failure counts; they do not fail the dev server or change its exit status. A run cancelled by `s`, a restart or a newer edit stays "cancelling" until browser cleanup finishes. In plain mode, `tests` runs the current scope and prints totals, uncollected stories, run errors and up to 10 failures; `stop` cancels.
+
+### Watch
+
+```bash
+pnpm histoire dev --test-watch
+```
+
+`--test-watch` runs the whole book once collection is ready, then reruns only the stories affected by each edit. Without the flag, watch is off; toggle it with `w` (or `watch` in plain mode). Watch applies to the scope selected when it is enabled; navigating views never retargets it.
+
+Selection is conservative: shared setup files, structural or resolution changes, and parts of the module graph Histoire cannot trace rerun the whole selected scope. Modules known to be unrelated to the scope trigger no run. Edits made during a run cancel it, wait for confirmed cleanup, then run one successor covering the interrupted and new stories.
+
+Watch pauses instead of broadening when the selected story or variant was removed, when collection fails (it resumes after collection completes), and after a runner failure (it resumes on the next edit). When the queue is full it retries with a short backoff. After a runtime restart the retained watch scope runs once the new catalog is ready. Generated output does not trigger runs.
+
 ## Errors outside tests
 
 A story that throws outside its test cases (failed import, mount timeout, uncaught error or rejection) fails the run without discarding results of other variants. When the error can be traced to a variant, that variant gets a failed `Variant error` result; otherwise the run reports it as a whole.

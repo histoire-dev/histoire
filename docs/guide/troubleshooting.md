@@ -1,5 +1,24 @@
 # Troubleshooting
 
+## Dev console falls back to plain output
+
+The terminal panel needs a TTY for stdin and stdout, raw input, `TERM` set to something other than `dumb`, and at least 40 columns by 10 rows. Automatic mode is also disabled by `CI` and by an attached Node inspector (including `--inspect` in `NODE_OPTIONS`). Check the reason:
+
+- Piped output or a task runner without a TTY: run the command in a real terminal.
+- Small window: enlarge it. The panel returns by itself.
+- CI or debugger: pass `--tui` to force the panel. This does not bypass a missing TTY or small terminal.
+- Panel unwanted: pass `--no-tui` or set `HISTOIRE_TUI=plain`.
+
+Invalid `HISTOIRE_TUI` values fail at startup; use `plain`, `auto` or `1`.
+
+Copy shortcuts (`y`, `Y`) use `pbcopy`, `clip`, `wl-copy`, `xclip` or `xsel` when available. Otherwise Histoire sends an OSC 52 request on an interactive terminal; the terminal must allow it (over SSH or tmux you may need to enable clipboard passthrough). Very large copies can exceed the OSC 52 size limit. If copying fails, the console says so and nothing is copied.
+
+Terminal behavior is verified on Linux only.
+
+### Retention limits
+
+The console keeps the latest 2,000 log entries (2 MiB), 500 HTTP requests and 20 completed test runs (8 MiB). Older entries are dropped and the views show how many were omitted. Test results from a run that finished before a restart stay readable as historical; pages not fetched before the old runtime ended are unavailable, and Histoire does not rerun tests to recover them.
+
 ## Chrome tabs crash on Linux with Flatpak
 
 A Histoire tab can become blank or unresponsive during repeated canvas scrolling or panning if Flatpak Chrome's sandboxed processes inherit a low file descriptor limit. The browser window can remain open after the tab's renderer exits. A debugger may report `Render process gone`.

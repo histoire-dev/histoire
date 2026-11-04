@@ -5,7 +5,7 @@ import chokidar from 'chokidar'
 import { readFileSnapshot } from './snapshots.js'
 
 /** Owns byte-aware directory watches, retaining dependencies through failed loads. */
-export async function watchConfiguration(inputs: readonly WatchInput[], changed: (source: string) => void, onError: (error: unknown) => void = console.error) {
+export async function watchConfiguration(inputs: readonly WatchInput[], changed: (source: string, file: string) => void, onError: (error: unknown) => void = console.error) {
   const files = new Map<string, WatchInput>()
   let stopped = false
   let changes = Promise.resolve()
@@ -21,7 +21,7 @@ export async function watchConfiguration(inputs: readonly WatchInput[], changed:
       const next = (await readFileSnapshot(file))?.toString('base64') ?? null
       if (stopped || next === previous.bytes) return
       files.set(file, { ...previous, bytes: next })
-      changed(previous.source)
+      changed(previous.source, file)
     }).catch((error) => {
       if (!stopped) onError(error)
     })

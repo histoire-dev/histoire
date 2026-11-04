@@ -228,6 +228,14 @@ export function createTestCollectionEligibility(ctx: Context, server: ViteDevSer
       const captured = token
       /** Leaf fingerprints shared by every story verified in this operation. */
       const fingerprints = new Map<string, Promise<string | undefined>>()
+      /** Compares leaf fingerprints; memoized per operation so shared leaves are read once. */
+      async function verifyLeaves(leaves: ReadonlyMap<string, string>): Promise<boolean> {
+        const current = await Promise.all([...leaves.keys()].map((id) => {
+          if (!fingerprints.has(id)) fingerprints.set(id, fingerprintLeaf(id, load))
+          return fingerprints.get(id)!
+        }))
+        return [...leaves.values()].every((fingerprint, index) => current[index] === fingerprint)
+      }
       return {
         token: captured,
         assertCurrent() {
@@ -236,12 +244,10 @@ export function createTestCollectionEligibility(ctx: Context, server: ViteDevSer
         /** Evidence holds while its graph files saw no edit and every unwatched leaf keeps its content. */
         async verify(evidence: CollectionEvidence): Promise<boolean> {
           if (evidence.owner !== service || services.get(ctx) !== service || !tracker.unchanged(evidence.since, evidence.files)) return false
-          const current = await Promise.all([...evidence.leaves.keys()].map((id) => {
-            if (!fingerprints.has(id)) fingerprints.set(id, fingerprintLeaf(id, load))
-            return fingerprints.get(id)!
-          }))
-          return [...evidence.leaves.values()].every((fingerprint, index) => current[index] === fingerprint)
+          return verifyLeaves(evidence.leaves)
         },
+        /** Unwatched leaves alone: true while every one still has its recorded fingerprint (unverifiable counts as changed). */
+        verifyLeaves,
       }
     },
     /** Late dependency edits revoke both queued proof and partial publication authority. */

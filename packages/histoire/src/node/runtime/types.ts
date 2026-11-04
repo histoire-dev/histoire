@@ -5,6 +5,7 @@ import type { ConfigurationObserver } from '../config/dependencies.js'
 import type { Context } from '../context.js'
 import type { CollectionEvent } from '../server/collect.js'
 import type { CreateServerOptions } from '../server/index.js'
+import type { ProgressEvent } from '@histoire/cli/protocol/progress'
 
 /** Observable lifecycle of one independently owned project. */
 export type ProjectRuntimeStatus = 'starting' | 'ready' | 'restarting' | 'failed' | 'closed'
@@ -58,6 +59,8 @@ export interface ProjectRuntimeOptions extends CreateServerOptions {
   onGeneration?: (handle: ProjectRuntimeHandle) => void | Promise<void>
   /** Confirms server work stopped after ownership invalidation, before project teardown. */
   onBeforeRelease?: (handle: ProjectRuntimeHandle) => void | Promise<void>
+  /** Internal observer of real startup work for this generation; never part of the public plugin API. */
+  onProgress?: (event: ProgressEvent) => void
   /** Reports observed restart or startup failures without escaping watcher callbacks. */
   onError?: (error: unknown) => void
 }

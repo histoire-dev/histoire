@@ -9,8 +9,6 @@ import { createBrowserSetupPolicy } from '../runtime/browser/setup/policy.js'
 import { classifyBrowserSetupFailure } from '../runtime/browser/setup/report.js'
 import { createExecutionService } from '../runtime/execution-service.js'
 
-export { reportInvalidScreenshotSetupArguments, validateScreenshotSetupArguments } from './screenshot-setup-args.js'
-
 /** Options accepted by the metadata-only setup command. */
 export interface ScreenshotSetupOptions {
   /** Project root; defaults to the current working directory. */

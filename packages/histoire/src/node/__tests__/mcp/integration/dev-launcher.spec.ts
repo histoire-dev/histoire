@@ -106,7 +106,7 @@ onTest(({ canvas }) => {
     await runAll(page, () => requests.length)
 
     // Defect oracle: direct CLI retains same PID and old execution lane after rebuild.
-    const rebuilt = resolve(fixture.repository, 'packages/histoire/dist/node/commands/dev.js')
+    const rebuilt = resolve(fixture.repository, 'packages/histoire-cli/dist/commands/dev.js')
     let reloaded = page.waitForEvent('domcontentloaded', { timeout: 45000 })
     void reloaded.catch(() => {})
     await Promise.all([appendFile(rebuilt, '\nprocess.env.HISTOIRE_LAUNCHER_BUILD = "after-burst"\n'), appendFile(resolve(fixture.repository, 'packages/histoire/dist/node/bin.js'), '\n// same emitter burst\n')])

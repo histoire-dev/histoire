@@ -1,14 +1,7 @@
+import type { DevMcpCliOptions } from '@histoire/cli'
 import type { HistoireConfig } from '@histoire/shared'
 
-/** CLI fields accepted without importing MCP SDK on the disabled dev path. */
-export interface DevMcpCliOptions {
-  /** Explicit enable, or false from Sade's --no-mcp handling. */
-  'mcp'?: boolean
-  /** Explicit disable, preserved separately to detect conflicting CLI flags. */
-  'no-mcp'?: boolean
-  /** Explicit listening port; zero requests an ephemeral port. */
-  'mcp-port'?: string | number
-}
+export type { DevMcpCliOptions }
 
 /** Resolved loopback listener policy, retaining collision fallback intent. */
 export interface DevMcpOptions {

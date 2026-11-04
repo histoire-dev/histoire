@@ -1,13 +1,2 @@
-/**
- * Drains the microtask queue without advancing any (fake) clock.
- *
- * Anything the code under test does after a flush provably did not wait on a
- * timer — which is what lets the request/queue specs prove a promise settled on
- * its own rather than by timing out.
- * @param ticks How many microtask turns to drain.
- */
-export async function flushMicrotasks(ticks = 10) {
-  for (let tick = 0; tick < ticks; tick++) {
-    await Promise.resolve()
-  }
-}
+// Single implementation lives with the CLI package's specs; histoire specs reuse it from here.
+export { flushMicrotasks, settleTimers } from '../../../../../histoire-cli/src/__tests__/utils/flush.js'

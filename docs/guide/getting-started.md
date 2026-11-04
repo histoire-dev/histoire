@@ -80,6 +80,45 @@ Vite 8 is supported alongside Vite 7. Use a framework Vite plugin compatible wit
 
 Start with [workbench layout](./ui-shell.md), [navigation and search](./ui-navigation.md), [the inspector](./ui-inspector.md), and [props matrix](./ui-matrix.md).
 
+## Dev console <Badge type="tip" text="1.0-beta.2+" />
+
+`histoire dev` shows an interactive terminal panel in a capable terminal: logs scroll above a pinned status area with the Histoire version, workbench address, startup progress, story and variant counts, and test or watch activity. Press `?` for the shortcuts that fit your terminal.
+
+| Key | Action |
+| --- | --- |
+| `r` / `R` | Restart / fresh restart (ignores the cached catalog and forces dependency optimization once) |
+| `o` | Open the workbench |
+| `y` | Copy the workbench address |
+| `i` | Session information: versions, root, config, counts, addresses, MCP state |
+| `l` | Logs |
+| `e` | Latest error |
+| `n` | HTTP requests through the workbench address since the console started (method, path, status, duration; query strings, headers and WebSocket traffic are not kept) |
+| `p` | Stories and variants |
+| `t` | Tests, see [Terminal tests](./testing.md#terminal-tests) |
+| `c` | Clear visible output |
+| `x` | Delete retained log and request history (test results are kept) |
+| `q` | Quit |
+
+Full-screen views scroll with arrows, `Page Up`/`Page Down`, `Home` and `End`. Press `/` to search, `Enter` to open an entry, `y` to copy the selected entry and `Y` to copy all filtered contents. `Esc` (or `Enter` again) goes back from a log or error detail to its list, and from a list to the main screen; `q` returns to the main screen. `Ctrl+C` always quits.
+
+In session information, `Up`/`Down` select an address, `y` copies it, `o` opens it, `r` shows its QR code to scan from a phone and `u` refreshes the runtime facts. Network addresses are listed only when the server listens beyond loopback (`--host`).
+
+In the stories view, `Enter` lists a story's variants and opens a variant in the workbench. `o` opens the selected story or variant, `t` opens Tests for it and runs it, and `u` reloads the catalog.
+
+### Activation
+
+The panel starts automatically when stdin and stdout are a TTY with raw input, `TERM` is not `dumb`, the terminal is at least 40 columns by 10 rows, `CI` is not set, and no Node inspector is attached. Override it:
+
+- `--tui` forces the panel, ignoring CI and inspector detection. A missing TTY, raw input or terminal size still falls back to plain output.
+- `--no-tui` always uses plain output.
+- `HISTOIRE_TUI=plain|auto|1` sets the default (`1` forces, `auto` is the default). A flag wins over the variable. Other values fail before the project loads.
+
+If the terminal shrinks below 40x10, Histoire switches to plain output and returns to the panel when it grows. If the renderer fails, plain output is used for the rest of the session. Suspending with `Ctrl+Z` restores the terminal and redetects the mode on resume.
+
+### Plain mode
+
+Plain mode prints the `Histoire:`, `Local:` and `MCP:` address lines, restart and ready lines, and project output, with no control sequences. When stdin is interactive it reads these newline-terminated commands: `help`, `restart`, `restart fresh`, `open`, `tests`, `watch`, `stop`, `quit`. With piped or closed stdin no reader is installed.
+
 ## Community
 
 If you have questions or need help, reach out to the community at [Discord](https://discord.gg/KpCnT72rJk) and [GitHub Discussions](https://github.com/histoire-dev/histoire/discussions).

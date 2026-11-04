@@ -66,6 +66,7 @@
     "test:embed:integration": "vitest run --config vitest.embed.config.ts",
     "test:embed:consumers": "vitest run --config vitest.consumers.config.ts",
     "test:mcp:integration": "vitest run --config vitest.mcp.config.ts",
+    "test:terminal": "vitest run --config vitest.terminal.config.ts",
     "test:mcp:package": "vitest run --config vitest.package.config.ts",
     "test:dev": "vitest",
     "test:visual:integration": "vitest run --config vitest.visual.config.ts"
@@ -95,6 +96,7 @@
     "@agentclientprotocol/sdk": "^1.7.0",
     "@akryum/tinypool": "^0.3.1",
     "@histoire/app": "workspace:^",
+    "@histoire/cli": "workspace:^",
     "@histoire/controls": "workspace:^",
     "@histoire/dev-proxy": "workspace:^",
     "@histoire/protocol": "workspace:^",
@@ -132,7 +134,6 @@
     "postcss": "catalog:",
     "postcss-selector-parser": "^6.1.2",
     "rollup": "^4.28.0",
-    "sade": "^1.8.1",
     "shiki": "^3.0.0",
     "sirv": "^3.0.0",
     "tar": "7.5.22",

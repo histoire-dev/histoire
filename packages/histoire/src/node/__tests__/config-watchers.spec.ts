@@ -44,7 +44,7 @@ describe('project config creation ownership', () => {
     let cleanup: (() => Promise<void>) | undefined
     try {
       cleanup = await watchProjectConfiguration({ context: { root } } as RuntimeGeneration, {}, restart)
-      await vi.waitFor(() => expect(restart).toHaveBeenCalledWith('Histoire'))
+      await vi.waitFor(() => expect(restart).toHaveBeenCalledWith('Histoire', expect.stringMatching(/histoire\.config\.ts$/)))
       expect(restart).toHaveBeenCalledTimes(1)
     }
     finally {
@@ -97,7 +97,7 @@ describe('project config creation ownership', () => {
     try {
       await writeConfig(join(root, name), 'export default { ui: { defaultArrange: "list" } }', { root, expectedHash: undefined })
       await vi.waitFor(() => expect(restart).toHaveBeenCalledTimes(1))
-      expect(restart).toHaveBeenCalledWith('Histoire')
+      expect(restart).toHaveBeenCalledWith('Histoire', expect.stringMatching(new RegExp(`${name.replace('.', '\\.')}$`)))
     }
     finally { await cleanup() }
     await writeFile(join(root, name), 'export default {}')

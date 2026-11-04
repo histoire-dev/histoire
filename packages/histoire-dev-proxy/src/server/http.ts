@@ -1,10 +1,12 @@
 import type { PublicState } from '../protocol.js'
+import type { ProxyRequestObserver, RequestObservation } from './observe.js'
 import { readFile } from 'node:fs/promises'
 import { createServer } from 'node:http'
 import { isIP } from 'node:net'
 import { renderLoadingPage } from '../client/page.js'
 import { designPlaygroundPath, renderDesignPlayground } from '../client/playground.js'
 import { createStatusChannel } from './events.js'
+import { observeRequest } from './observe.js'
 
 /** Proxy-owned responses expose startup errors; reject DNS-rebinding hosts like Vite's default allowedHosts. */
 function isTrustedHost(host: string | undefined) {
@@ -14,7 +16,9 @@ function isTrustedHost(host: string | undefined) {
 }
 
 /** Stable HTTP listener delegates only after coherent generation readiness. */
-export function createProxyHttp(read: () => PublicState, restart: () => Promise<void>) {
+export function createProxyHttp(read: () => PublicState, restart: () => Promise<void>, observer?: ProxyRequestObserver) {
+  /** Exchange counter; only used when an observer exists. */
+  let exchanges = 0
   let target: string | undefined
   let proxy: Awaited<ReturnType<typeof import('httpxy')['createProxyServer']>> | undefined
   const sockets = new Set<import('node:net').Socket>()
@@ -23,6 +27,8 @@ export function createProxyHttp(read: () => PublicState, restart: () => Promise<
   const assets = new Map<string, Promise<string>>()
   const server = createServer(async (request, response) => {
     const pathname = (request.url ?? '/').split('?')[0]
+    // Registered before any dispatch. Proxy-owned routes (status stream, loading assets, restart) are not traffic of the project.
+    const observation: RequestObservation | undefined = observer && !pathname.startsWith('/__histoire/dev/') ? observeRequest(request, response, ++exchanges, observer) : undefined
     try {
       // Proxied runtime requests keep Vite's own host policy; everything answered here is checked.
       if (!(target && proxy && !pathname.startsWith('/__histoire/dev/')) && !isTrustedHost(request.headers.host)) {
@@ -75,6 +81,7 @@ export function createProxyHttp(read: () => PublicState, restart: () => Promise<
     catch {
       // Appending text to a partially proxied body would corrupt it; abort instead.
       if (response.headersSent) {
+        observation?.fail()
         response.destroy()
         return
       }

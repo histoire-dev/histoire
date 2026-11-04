@@ -9,14 +9,15 @@ import { DevPluginApi } from '../plugin.js'
 import { createExecutionService } from '../runtime/execution-service.js'
 import { resolveDevServerPort } from '../runtime/port.js'
 import { getContextRegistry } from '../runtime/registry.js'
+import { inertProgress } from '../runtime/terminal/progress.js'
 import { waitForRuntimeWork } from '../runtime/wait.js'
 import { onStoryListChange, watchStories } from '../stories.js'
 import { attachTestCollectionEligibility } from '../test/eligibility/index.js'
 import * as VirtualFiles from '../virtual/index.js'
 import { closeDevPreviewHost } from '../vite/mcp-preview-html.js'
-import { prepareDevClient, waitForDevClientOptimizer } from './client-ready.js'
 import { createStoryCollector } from './collect.js'
 import { registerDevEvents } from './dev-events.js'
+import { runInitialCollection } from './initial-collection.js'
 import { createModuleInvalidators } from './invalidate.js'
 import { registerAgentsChannel } from './ui-channel/agents.js'
 import { registerAiThreadsChannel } from './ui-channel/ai-threads.js'
@@ -44,6 +45,7 @@ export async function createServer(ctx: Context, options: CreateServerOptions = 
   let stopCollection: (() => Promise<void>) | undefined
   const isActive = () => !stopped && !options.signal?.aborted && (options.isActive?.() ?? true)
   const execution = options.execution ?? createExecutionService()
+  const progress = options.progress ?? inertProgress
   getContextRegistry(ctx).execution = { service: execution, isActive }
   if (!options.execution) cleanup.add(() => execution.close())
   /** Rejects work acquired after a startup cancellation. */
@@ -62,27 +64,32 @@ export async function createServer(ctx: Context, options: CreateServerOptions = 
   try {
     checkActive()
     if (options.middleware?.base) ctx.resolvedViteConfig = { ...ctx.resolvedViteConfig, base: options.middleware.base }
-    const { nodeServer, server, viteConfigFile } = await createViteServers(ctx, options)
+    const { nodeServer, server, viteConfigFile } = await progress.track('vite', () => createViteServers(ctx, options))
     cleanup.add(() => nodeServer.close())
     cleanup.add(() => server.close())
     cleanup.add(() => closeDevPreviewHost(server))
     checkActive()
 
-    const storyWatcher = await watchStories(ctx)
-    cleanup.add(() => storyWatcher.close())
-    await waitForRuntimeWork(storyWatcher.ready, options.signal)
+    await progress.track('scan', async () => {
+      const storyWatcher = await watchStories(ctx)
+      cleanup.add(() => storyWatcher.close())
+      await waitForRuntimeWork(storyWatcher.ready, options.signal)
+    })
     checkActive()
     // Markdown associations require the complete story scan, including siblings.
-    await createMarkdownFilesWatcher(ctx, options.signal)
+    await progress.track('markdown', () => createMarkdownFilesWatcher(ctx, options.signal))
     checkActive()
 
     const moduleLoader = useModuleLoader({ server: nodeServer })
-    for (const plugin of ctx.config.plugins) {
-      if (plugin.onDev) {
-        const api = new DevPluginApi(ctx, plugin, moduleLoader)
-        await plugin.onDev(api, callback => cleanup.add(callback))
-        checkActive()
-      }
+    const hooked = ctx.config.plugins.filter(plugin => plugin.onDev)
+    if (hooked.length) {
+      await progress.track('plugins', async () => {
+        for (const plugin of hooked) {
+          progress.update('plugins', { label: plugin.name })
+          await plugin.onDev!(new DevPluginApi(ctx, plugin, moduleLoader), callback => cleanup.add(callback))
+          checkActive()
+        }
+      })
     }
     attachTestCollectionEligibility(ctx, server)
     registerDevEvents(ctx, server, moduleLoader, execution, isActive)
@@ -98,7 +105,7 @@ export async function createServer(ctx: Context, options: CreateServerOptions = 
     if (!options.middleware) {
       const port = await resolveDevServerPort(options.port ?? server.config.server?.port)
       checkActive()
-      await server.listen(port)
+      await progress.track('listen', () => server.listen(port))
       if (options.devProxy) server.resolvedUrls = { local: [new URL(server.config.base, options.devProxy.origin).href], network: [] }
     }
     checkActive()
@@ -113,7 +120,7 @@ export async function createServer(ctx: Context, options: CreateServerOptions = 
       }
       finally { await draining }
     })
-    collector = createStoryCollector({ ctx, server, collectStories, invalidateModule, invalidateModuleSilently, isActive, cache: createCollectionCache(ctx) })
+    collector = createStoryCollector({ ctx, server, collectStories, invalidateModule, invalidateModuleSilently, isActive, cache: createCollectionCache(ctx), onProgress: ({ loaded, total, revalidate }) => progress.update(revalidate ? 'revalidate' : 'collect', { current: loaded, total }) })
     stopCollection = collector.stop
 
     cleanup.add(onStoryListChange(ctx, () => {
@@ -130,17 +137,7 @@ export async function createServer(ctx: Context, options: CreateServerOptions = 
     // collection (story files boot the whole app) and for the client warmup:
     // its stories import what they imported last run. Both run afterwards,
     // one after the other, so the first frames keep most of the main thread.
-    const ready = collector.restore().then(async (restored) => {
-      if (!restored) {
-        await collector.collect()
-        await prepareDevClient(server)
-        checkActive()
-        return
-      }
-      await waitForDevClientOptimizer(server)
-      checkActive()
-      void prepareDevClient(server).then(() => collector.revalidate()).catch(error => console.error(error))
-    })
+    const ready = runInitialCollection({ collector, server, progress, fresh: options.fresh, checkActive })
     // Returned readiness still rejects for callers, but ordinary dev never leaks
     // an unhandled rejection while the controller attaches its observer.
     void ready.catch(() => {})

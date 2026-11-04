@@ -56,3 +56,13 @@ jobs:
         env:
           BROWSER: none
         run: pnpm --filter histoire test:mcp:integration
+
+      - name: Run terminal integration tests
+        env:
+          BROWSER: none
+        run: pnpm --filter histoire test:terminal
+
+      - name: Run package install tests
+        env:
+          BROWSER: none
+        run: pnpm --filter histoire test:mcp:package

@@ -1,0 +1,57 @@
+{
+  "name": "@histoire/cli",
+  "type": "module",
+  "version": "1.0.0-beta.1",
+  "description": "Command line parsing and the development terminal for Histoire",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Akryum/histoire.git",
+    "directory": "packages/histoire-cli"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./protocol/*": {
+      "types": "./dist/terminal/protocol/*.d.ts",
+      "default": "./dist/terminal/protocol/*.js"
+    },
+    "./sanitize": {
+      "types": "./dist/terminal/output/sanitize.d.ts",
+      "default": "./dist/terminal/output/sanitize.js"
+    },
+    "./workbench-url": {
+      "types": "./dist/workbench-url.d.ts",
+      "default": "./dist/workbench-url.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "build": "rimraf dist && tsc",
+    "watch": "tsc -w",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@histoire/dev-proxy": "workspace:^",
+    "@histoire/protocol": "workspace:^",
+    "sade": "^1.8.1",
+    "uqr": "^0.1.2"
+  },
+  "devDependencies": {
+    "@histoire/vendors": "workspace:^",
+    "@types/node": "^22.10.1",
+    "@typescript/native": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "4.1.10"
+  }
+}

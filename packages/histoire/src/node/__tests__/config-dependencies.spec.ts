@@ -38,7 +38,7 @@ async function pluginProject() {
  * @param config Loaded config.
  * @param restart Restart spy.
  */
-function watch(root: string, config: Awaited<ReturnType<typeof resolveConfig>>, restart: (source: string) => void) {
+function watch(root: string, config: Awaited<ReturnType<typeof resolveConfig>>, restart: (source: string, file: string) => void) {
   return watchProjectConfiguration({ context: { root, config } } as unknown as RuntimeGeneration, {}, restart)
 }
 
@@ -59,9 +59,9 @@ describe('config module dependencies', () => {
     const cleanup = await watch(root, await resolveConfig(root, 'dev'), restart)
     try {
       await writeFile(files.options, `export const arrange = 'list'\n`)
-      await vi.waitFor(() => expect(restart).toHaveBeenCalledWith('Histoire'))
+      await vi.waitFor(() => expect(restart).toHaveBeenCalledWith('Histoire', files.options))
       await writeFile(files.viteHelper, `export const base = '/book/'\n`)
-      await vi.waitFor(() => expect(restart).toHaveBeenCalledWith('Vite'))
+      await vi.waitFor(() => expect(restart).toHaveBeenCalledWith('Vite', files.viteHelper))
       expect(restart).toHaveBeenCalledTimes(2)
     }
     finally { await cleanup() }
@@ -74,7 +74,7 @@ describe('config module dependencies', () => {
     const restart = vi.fn()
     const cleanup = await watch(root, config, restart)
     try {
-      expect(restart).toHaveBeenCalledExactlyOnceWith('Histoire')
+      expect(restart).toHaveBeenCalledExactlyOnceWith('Histoire', files.plugin)
     }
     finally { await cleanup() }
   })

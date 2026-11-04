@@ -1,3 +1,4 @@
+import { encodeUriSegment } from '@histoire/cli/workbench-url'
 import { z } from 'zod/v4'
 import { McpDomainError } from './errors.js'
 import { mcpHandleSchema, mcpIdSchema, mcpProjectIdSchema, mcpRevisionSchema } from './ids.js'
@@ -16,10 +17,7 @@ const addressSchema = z.discriminatedUnion('kind', [
 export type McpResourceAddress = z.infer<typeof addressSchema>
 
 /** Encode exact ID as one RFC 3986 segment; dot-only segments never undergo URL normalization. */
-export function encodeMcpUriSegment(value: string): string {
-  const encoded = encodeURIComponent(value).replace(/[!'()*]/g, char => `%${char.charCodeAt(0).toString(16).toUpperCase()}`)
-  return /^\.+$/.test(value) ? encoded.replace(/\./g, '%2E') : encoded
-}
+export const encodeMcpUriSegment = encodeUriSegment
 
 /** Decode once and compare canonical re-encoding. A literal percent sequence remains a valid ID. */
 function decodeSegment(value: string): string {

@@ -1,4 +1,5 @@
-import type { ChildMessage, ParentMessage, WatchInput } from '../protocol.js'
+import type { Buffer } from 'node:buffer'
+import type { ChildMessage, ParentMessage, RuntimeCommand, RuntimeEvent, RuntimeOutput, RuntimeReply, RuntimeSendResult, WatchInput } from '../protocol.js'
 import { fork, spawn } from 'node:child_process'
 import { isChildMessage } from '../protocol.js'
 
@@ -24,12 +25,58 @@ export function startRuntimeChild(options: {
   onExit: (error: Error) => void
   /** Winddown deadline; defaults to ten seconds. */
   shutdownTimeout?: number
+  /** Receives raw stdout/stderr instead of the default piping to this process; each chunk is consumed once. */
+  onOutput?: (output: RuntimeOutput) => void
+  /** Receives validated reply/event frames of this generation, independently of readiness. */
+  onRuntimeMessage?: (message: RuntimeReply | RuntimeEvent) => void
+  /** Runs once when this runtime stops being usable (winddown start or exit), before cleanup completes. */
+  onRetire?: () => void
+  /** Reports observer failures and winddown notices; defaults to `console.error`. */
+  onDiagnostic?: (message: string) => void
 }) {
+  const diagnostic = options.onDiagnostic ?? ((message: string) => console.error(message))
+  /** Observer faults must never disturb process ownership. */
+  function guarded(action: () => void) {
+    try {
+      action()
+    }
+    catch (error) {
+      try {
+        diagnostic(`Histoire runtime observer failed: ${error instanceof Error ? error.message : String(error)}`)
+      }
+      catch {}
+    }
+  }
+  let retired = false
+  /** Signals retirement exactly once. */
+  function retire() {
+    if (retired) return
+    retired = true
+    if (options.onRetire) guarded(options.onRetire)
+  }
   const environment = { ...process.env }
   delete environment.HISTOIRE_MCP_TOKEN
   const child = fork(options.entry, [], { cwd: options.root, env: environment, detached: process.platform !== 'win32', execArgv: [], stdio: ['ignore', 'pipe', 'pipe', 'ipc'] })
-  child.stdout!.pipe(process.stdout, { end: false })
-  child.stderr!.pipe(process.stderr, { end: false })
+  // Without an observer the streams keep their historical direct piping.
+  const outputListeners: Array<() => void> = []
+  if (options.onOutput) {
+    const observe = options.onOutput
+    for (const stream of ['stdout', 'stderr'] as const) {
+      const source = child[stream]!
+      const onData = (chunk: Buffer) => guarded(() => observe({ stream, generation: options.generation, chunk }))
+      const onEnd = () => guarded(() => observe({ stream, generation: options.generation }))
+      source.on('data', onData)
+      source.once('end', onEnd)
+      outputListeners.push(() => {
+        source.off('data', onData)
+        source.off('end', onEnd)
+      })
+    }
+  }
+  else {
+    child.stdout!.pipe(process.stdout, { end: false })
+    child.stderr!.pipe(process.stderr, { end: false })
+  }
   let closing: Promise<void> | undefined
   let settled = false
   let backend: Extract<ChildMessage, { type: 'ready' }> | undefined
@@ -46,6 +93,11 @@ export function startRuntimeChild(options: {
   child.on('error', reject)
   child.on('message', (raw) => {
     if (!isChildMessage(raw) || raw.generation !== options.generation || closing) return
+    if (raw.type === 'runtime-reply' || raw.type === 'runtime-event') {
+      // Runtime traffic is independent of the startup message chain.
+      if (options.onRuntimeMessage) guarded(() => options.onRuntimeMessage!(raw))
+      return
+    }
     messages = messages.then(async () => {
       if (closing) return
       if (raw.type === 'watch') await options.onWatch(raw.inputs, raw.complete === true)
@@ -60,6 +112,7 @@ export function startRuntimeChild(options: {
     }).catch(reject)
   })
   child.once('exit', (code, signal) => {
+    retire()
     const error = new Error(`Histoire runtime exited (${signal ?? code ?? 'unknown'})`)
     reject(error)
     if (settled && !closing) options.onExit(error)
@@ -107,16 +160,26 @@ export function startRuntimeChild(options: {
     },
     /** Process identity used only by parent diagnostics and ownership tests. */
     pid: child.pid,
+    /** Hands a command to this process; resolves once IPC accepted the frame. */
+    sendRuntimeCommand(command: Omit<RuntimeCommand, 'type' | 'generation'>): Promise<RuntimeSendResult> {
+      if (closing || !settled || !child.connected) return Promise.resolve({ ok: false, reason: 'closed' })
+      // Envelope fields last: a stray `type` or `generation` on the command can never readdress it.
+      const message: ParentMessage = { ...command, type: 'runtime-command', generation: options.generation }
+      return new Promise((resolve) => {
+        child.send(message, error => resolve(error ? { ok: false, reason: 'closed' } : { ok: true, generation: options.generation }))
+      })
+    },
     /** IPC first permits framework cleanup; forced tree termination is last resort. */
     close() {
       return closing ??= (async () => {
+        retire()
         reject(new Error('Histoire runtime closed'))
         if (child.connected) {
           child.send({ type: 'shutdown' } satisfies ParentMessage, () => {
           })
         }
         if (!await wait(options.shutdownTimeout ?? 10_000)) {
-          console.error('Histoire runtime winddown timed out; terminating owned process tree')
+          diagnostic('Histoire runtime winddown timed out; terminating owned process tree')
           await killTree()
           if (!await wait(3000)) throw new Error('Histoire runtime termination could not be confirmed')
         }
@@ -124,6 +187,7 @@ export function startRuntimeChild(options: {
         if (process.platform !== 'win32') await killTree()
         child.stdout!.unpipe(process.stdout)
         child.stderr!.unpipe(process.stderr)
+        for (const stop of outputListeners) stop()
         if (child.connected) child.disconnect()
       })()
     },

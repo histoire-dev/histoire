@@ -27,6 +27,8 @@ export interface StoryCollectorOptions {
   isActive?: () => boolean
   /** Catalog of the previous run, restored by `restore()`; rewritten after each batch. */
   cache?: Pick<CollectionCache, 'read' | 'write'>
+  /** Observes loaded/total story files of every full collection, including background revalidation. */
+  onProgress?: (progress: { loaded: number, total: number, revalidate: boolean }) => void
 }
 
 /** Collection lifecycle observed by generation-owned catalog publishers. */
@@ -196,6 +198,7 @@ export function createStoryCollector(options: StoryCollectorOptions) {
       const fileCount = ctx.storyFiles.length
       let loadedFilesCount = 0
       const sendProgress = () => {
+        if (isActive()) options.onProgress?.({ loaded: loadedFilesCount, total: fileCount, revalidate })
         if (!isActive() || revalidate) return
         server.ws.send('histoire:stories-loading-progress', {
           loadedFileCount: loadedFilesCount,

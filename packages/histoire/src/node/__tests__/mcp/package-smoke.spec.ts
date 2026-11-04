@@ -8,6 +8,7 @@ import { createMcpBrowserTestProject } from '../utils/mcp/browser-test-project.j
 import { MCP_REPOSITORY_ROOT } from '../utils/mcp/cli-project.js'
 import { assertPackageBrowserBoundary, createPackageConsumer, installConsumerBrowserPeers, runPackageCommand } from '../utils/mcp/package-consumer.js'
 import { probePackageBrowserExecution, probePackageJob, probePackageReads } from '../utils/mcp/package-probes.js'
+import { assertShippedImportsResolve, assertTerminalModulesPacked, probePackageTerminal } from '../utils/mcp/package-terminal.js'
 import { assertMcpProcessReleased, closeMcpFixtures, connectMcpHttp, createMcpProcessEnvironment, startMcpProcess } from '../utils/mcp/process.js'
 
 /** Real publication contents, clean installs, and copied deployment are one owned gate. */
@@ -25,6 +26,12 @@ it('serves packed Node 22 consumers and copied artifacts with optional peers iso
     expect(manifest.dependencies.esbuild).toBeTruthy()
     expect(manifest.devDependencies?.esbuild).toBeUndefined()
     await assertPackageBrowserBoundary(consumer.appDirectory)
+    // Terminal console and runtime modules ship, and everything they import is declared and installed.
+    assertTerminalModulesPacked(consumer.inventories)
+    await assertShippedImportsResolve(consumer.root, 'histoire', ['dist/node/runtime', 'dist/node/commands', 'dist/node/bin.js'])
+    // The CLI package owns the terminal; `uqr` (QR code) must be declared by it and installed next to it.
+    await assertShippedImportsResolve(consumer.root, '@histoire/cli', ['dist'])
+    await assertShippedImportsResolve(consumer.root, '@histoire/dev-proxy', ['dist'])
 
     // Parse the documented client object, substituting only installation paths.
     const guide = await readFile(resolve(MCP_REPOSITORY_ROOT, 'docs/guide/mcp.md'), 'utf8')
@@ -58,6 +65,9 @@ it('serves packed Node 22 consumers and copied artifacts with optional peers iso
     expect(stoppedDev.signal).toBeNull()
     expect([0, 143]).toContain(stoppedDev.code)
     await assertMcpProcessReleased(dev.child, devEndpoint)
+
+    // Terminal console from the installed package: TUI test run and plain `--test-watch` rerun, no MCP.
+    await probePackageTerminal(consumer)
 
     const node = process.env.HISTOIRE_MCP_TEST_NODE || process.execPath
     await runPackageCommand(node, [consumer.cli, 'build', '-c', 'custom config.ts', '--target', 'static'], consumer.root)

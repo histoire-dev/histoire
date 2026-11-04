@@ -690,6 +690,9 @@ importers:
       '@histoire/app':
         specifier: workspace:^
         version: link:../histoire-app
+      '@histoire/cli':
+        specifier: workspace:^
+        version: link:../histoire-cli
       '@histoire/controls':
         specifier: workspace:^
         version: link:../histoire-controls
@@ -807,9 +810,6 @@ importers:
       rollup:
         specifier: ^4.28.0
         version: 4.55.1
-      sade:
-        specifier: ^1.8.1
-        version: 1.8.1
       shiki:
         specifier: ^3.0.0
         version: 3.21.0
@@ -960,6 +960,37 @@ importers:
       vue:
         specifier: ^3.5.26
         version: 3.5.26(@typescript/typescript6@6.0.2)
+
+  packages/histoire-cli:
+    dependencies:
+      '@histoire/dev-proxy':
+        specifier: workspace:^
+        version: link:../histoire-dev-proxy
+      '@histoire/protocol':
+        specifier: workspace:^
+        version: link:../histoire-protocol
+      sade:
+        specifier: ^1.8.1
+        version: 1.8.1
+      uqr:
+        specifier: ^0.1.2
+        version: 0.1.2
+    devDependencies:
+      '@histoire/vendors':
+        specifier: workspace:^
+        version: link:../histoire-vendors
+      '@types/node':
+        specifier: ^22.10.1
+        version: 22.19.3
+      '@typescript/native':
+        specifier: 'catalog:'
+        version: typescript@7.0.2
+      typescript:
+        specifier: 'catalog:'
+        version: '@typescript/typescript6@6.0.2'
+      vitest:
+        specifier: 4.1.10
+        version: 4.1.10(@types/node@22.19.3)(@vitest/browser-playwright@4.1.10)(jsdom@27.4.0)(msw@2.14.6(@types/node@22.19.3)(@typescript/typescript6@6.0.2))(vite@8.3.5)
 
   packages/histoire-controls:
     dependencies:

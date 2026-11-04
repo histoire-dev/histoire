@@ -1,5 +1,6 @@
 import type { Context } from '../context.js'
 import type { MiddlewareHostingOptions } from '../runtime/hosting/types.js'
+import type { StartupProgress } from '../runtime/terminal/progress.js'
 import type { DevProxyTransport } from '../vite/dev-proxy.js'
 import { mergeConfig as mergeViteConfig } from 'vite'
 import { RuntimeCleanupError } from '../runtime/cleanup.js'
@@ -20,6 +21,13 @@ export interface CreateServerOptions {
   host?: string | boolean
   /** SDK listeners share middleware lifecycle without Vite-owned process handlers. */
   middleware?: MiddlewareHostingOptions
+  /** Internal observer of real startup work; absent is inert. */
+  progress?: StartupProgress
+  /**
+   * One-shot fresh generation: the client server re-optimizes its dependencies
+   * instead of reusing the cache it owns, and the catalog cache is not restored.
+   */
+  fresh?: boolean
 }
 
 /**
@@ -31,6 +39,7 @@ export interface CreateServerOptions {
  */
 export async function createViteServers(ctx: Context, options: CreateServerOptions) {
   const getViteServer = async (collecting: boolean) => {
+    options.progress?.update('vite', { label: collecting ? 'collection server' : 'client server' })
     const { viteConfig, viteConfigFile } = await getViteConfigWithPlugins(collecting, ctx)
     let proxyEvents: ReturnType<typeof createHostingProxyEvents> | undefined
     if (options.middleware) {
@@ -71,7 +80,11 @@ export async function createViteServers(ctx: Context, options: CreateServerOptio
         mergeViteConfig(viteConfig, {
           // Collection must not discover browser dependencies. Client config
           // retains its explicit policy and inherited include list exactly once.
-          optimizeDeps: { noDiscovery: collecting ? true : viteConfig.optimizeDeps?.noDiscovery ?? false },
+          optimizeDeps: {
+            noDiscovery: collecting ? true : viteConfig.optimizeDeps?.noDiscovery ?? false,
+            // Vite removes only the cache directory this server owns (never another context's).
+            ...(options.fresh && !collecting ? { force: true } : {}),
+          },
         }),
       )
     }

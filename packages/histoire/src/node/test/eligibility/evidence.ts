@@ -17,6 +17,11 @@ export interface CollectionEvidence {
 /** Script, SFC and style modules: only these can be edited without touching any proved graph. */
 const SOURCE_MODULE = /\.(?:vue|svelte|[cm]?[jt]sx?|css|scss|sass|less|styl|stylus|pcss|postcss)$/
 
+/** Whether a path is a source module; shared with the affected-story classifier so both agree on what an independent edit is. */
+export function isSourceModule(file: string): boolean {
+  return SOURCE_MODULE.test(file)
+}
+
 /**
  * Orders watcher events so each story's evidence outlives edits outside its own graph.
  *
@@ -41,7 +46,7 @@ export function createDependencyTracker() {
     record(event: string, file: string, dependency: boolean): boolean {
       // Content edits of modules outside every proof leave those graphs intact:
       // resolution only moves on add/unlink, which stay structural below.
-      if (!dependency && event === 'change' && SOURCE_MODULE.test(file)) return false
+      if (!dependency && event === 'change' && isSourceModule(file)) return false
       sequence++
       if (dependency && event === 'change') changes.set(file, sequence)
       else structure = sequence
