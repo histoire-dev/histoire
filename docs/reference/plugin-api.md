@@ -6,6 +6,84 @@ A Histoire plugin is an object in the `plugins` array of your config. Node hooks
 import type { Plugin } from 'histoire'
 ```
 
+## Marketplace manifest
+
+`package.json#histoire.marketplace` supplies public JSON metadata for browsing, options and migrations. It is independent of the runtime `Plugin.metadata` object. Include `histoire-plugin` in npm `keywords` for community discovery. See [publishing example](../guide/plugins/development.md#publish-to-the-marketplace) and [user guide](../guide/plugins/marketplace.md).
+
+### Fields
+
+Required fields:
+
+- `displayName: string`: nonempty, at most 40 characters.
+- `summary: string`: nonempty, at most 160 characters.
+- `category`: `testing | design | inspection | frameworks | data`.
+- `monogram: string`: nonempty fallback tile text.
+- `tint`: `green | violet | blue | amber | rose | sky | slate`.
+- `config.import: string`: JavaScript identifier naming a factory exported from the package root.
+
+Optional fields:
+
+- `frameworks: string[]`: supported framework identifiers; omitted/empty means any.
+- `requires: Record<string, string>`: package version requirements, intersected with registry peer dependencies for compatibility. Optional peers are checked only when installed.
+- `logoUrl: string`: HTTPS logo URL.
+- `adds: Array<{ kind, text: string, contribution?: string }>`: advertised contributions. `kind` is `rail-pane | inspector-tab | toolbar-tool | story-tests | cli-command | settings-section | canvas-view`. `contribution` names the live registration's local id, with no namespace, colon or whitespace. Invalid relations are dropped with a diagnostic while keeping the description. The tour matches exact local ids within the declared kind; legacy first-of-kind fallback requires a single registration of that kind owned by the plugin.
+- `access: string[]`: `story-frames | story-dom | network | filesystem | child-process`. Descriptive metadata, not enforced permissions.
+- `config.options: MarketplaceOption[]`: fields in display order; described below.
+- `recommend: Array<{ dependency: string, reason: string } | { missing: true, reason: string }>`: dependency-presence or missing-category signals for Discover. `missing` matches when no installed plugin has this entry's category; installed entries are excluded from recommendations.
+- `collections: string[]`: collection identifiers. Discover exposes `visual-testing` (Visual testing), `design-handoff` (Design handoff), `inspection` (Inspection) and `data-mocks` (Data & mocks). Other ids can be filtered but do not create a Discover row.
+- `releaseNotes: Array<{ kind: 'breaking' | 'feature' | 'fix', text: string, code?: string[] }>`: notes for this package version, displayed without executing code.
+- `migrations: Array<{ from: string, ops: MigrationOp[] }>`: installed-version range and nonempty list of ordered option edits.
+
+All descriptive strings are bounded to 500 characters unless a smaller limit is stated. Optional JSON default/value strings may be empty. Unknown fields are dropped with diagnostics. Invalid required fields reject the whole manifest; invalid optional array members are independently dropped. A malformed migration is dropped atomically. No registry field can grant Official status.
+
+### Official history inputs
+
+Bundled official packages keep release snapshots in `marketplace-history.json`: `version`, `requires`, `frameworks`, optional `releaseNotes`, `migrations` and `publishedAt`. `pnpm marketplace:history` snapshots current versions without replacing existing same-version metadata. `pnpm marketplace:index` generates the bundled catalog and requires a current-version snapshot. Both read JSON without importing plugin code. History keeps the newest 50 unique npm-semver versions; server readers use each release's requirements/frameworks for offline compatibility and update/migration selection. These files are maintainer inputs, not fields accepted from registry manifests. See [official history workflow](../guide/plugins/development.md#official-release-history).
+
+### Option fields
+
+Each option has `key`, `label`, optional `description` and optional `when: Record<string, HistoireJsonValue>`. Every condition must reference another declared option with a valid literal value; all conditions must match for the field to show.
+
+`key` is a dot path made of JavaScript identifiers. `__proto__`, `prototype` and `constructor` segments are forbidden. Duplicate and overlapping paths are dropped. Generated config nests dot paths and emits only values different from declared defaults.
+
+Supported variants:
+
+```ts
+type MarketplaceOption = {
+  key: string
+  label: string
+  description?: string
+  when?: Record<string, HistoireJsonValue>
+} & (
+  | { type: 'boolean', default?: boolean }
+  | { type: 'string', default?: string }
+  | { type: 'string-list', default?: string[] }
+  | {
+    type: 'enum'
+    display?: 'select' | 'segmented'
+    choices: Array<{ value: string, label: string }>
+    default?: string
+  }
+)
+```
+
+Enum choices must be nonempty and have distinct string values. A supplied enum default must match a choice. Defaults must have the control's declared type.
+
+### Declarative migrations
+
+```ts
+type MigrationOp =
+  | { op: 'rename-option', from: string, to: string }
+  | { op: 'remove-option', path: string }
+  | { op: 'set-option', path: string, value: HistoireJsonValue }
+```
+
+Paths follow the same safe dot-path rules as options. `value` must be finite JSON with safe object keys. Migrations affect only the first object argument of one enabled, imported factory call. Unrelated properties and source remain intact. Missing rename sources are ignored; a destination with a different value, overlapping rename paths, computed affected values or unsupported calls makes the migration manual. `set-option` can add an absent property. No migration executes plugin code.
+
+For updates, Histoire selects releases in `(installed, target]`, sorts ascending, and selects each migration whose `from` matches the original installed version. Operations keep release/declaration order. Equal-version changes and downgrades select no operations. The update dialog can disable migrations; pins do not run them.
+
+With community disabled, official metadata contains only the bundled current release, so intervening historical notes/operations are unavailable. The current version evaluator handles comparator, union, caret, tilde, wildcard, hyphen and prerelease ranges; full `node-semver` syntax parity is not claimed.
+
 ## Node hooks
 
 | Field | Signature | Description |
@@ -96,7 +174,7 @@ All contributions: `id`, `order?`, `available?(context)`, `devOnly?`. View-beari
 
 | Kind | Fields |
 | --- | --- |
-| `inspector.tab` | `label`, `icon`, view, `badge?(context)` |
+| `inspector.tab` | `label`, `icon`, view, `badge?(context)`, `primaryCommand?` (local or same-plugin qualified command id) |
 | `inspector.section` | `tab` (`builtin:props`, `builtin:docs`, `builtin:events`, `builtin:tests`, `footer` or a qualified plugin tab), `position` (`before`, `after`), view |
 | `toolbar.item` | `group`, `label`, `icon`, `type`: `action` (`run`), `toggle` (`pressed`, `run`), `popover` (view), `custom` (view); `command?` (qualified command id whose bound shortcut is shown as the hint; not on `custom`) |
 | `command` | `label`, `icon`, `searchText?`, `run` |
@@ -107,11 +185,13 @@ All contributions: `id`, `order?`, `available?(context)`, `devOnly?`. View-beari
 | `canvas.frame-overlay` | `interactive?`, view |
 | `canvas.tool` | `label`, `icon`, `cursor?`, `shortcut?`, `onPointerDown?`, `onPointerMove?`, `onPointerUp?`, `onCancel?` |
 | `canvas.view` | `label`, `icon`, view (`CanvasViewContext`), `layout?(zoom)`, `toolbar?` |
-| `shell.pane` | `label`, `icon`, view, `badge?(context)`, `header?` (`false` when the view renders its own `WorkbenchPaneHeader`) |
+| `shell.pane` | `label`, `icon`, view, `badge?(context)`, `primaryCommand?` (local or same-plugin qualified command id), `header?` (`false` when the view renders its own `WorkbenchPaneHeader`) |
 | `settings.section` | `label`, `icon`, view |
 | `home.section` | `column` (`primary`, `secondary`), `title`, view |
 
 `icon` is a bundled Carbon glyph name (`plug`, `chat`, `compare`, `list-checked`, ...); unknown names render `plug`. Actions are `run(context, { signal })`.
+
+For `shell.pane` and `inspector.tab`, the host normalizes `primaryCommand` to a qualified id and rejects malformed or cross-plugin ids during registration. The command may register later. The marketplace tour offers an action only when that same plugin's command is registered and available in the current workbench context; execution uses the host command runner. Toolbar items keep their existing `command` relation. Neither labels nor marketplace metadata grant command availability.
 
 ### Views
 

@@ -334,6 +334,7 @@ module.exports = {
         {
           text: 'Plugins',
           items: [
+            { text: 'Plugin marketplace', link: '/guide/plugins/marketplace' },
             {
               text: 'Official plugins',
               link: '/guide/plugins/official',

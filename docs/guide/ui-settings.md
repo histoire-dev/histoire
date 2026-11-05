@@ -25,3 +25,16 @@ Imported, computed, and function-only settings cannot be overwritten. Copy snipp
 Browser storage denial leaves preferences functional in memory. Corrupt stored preferences are discarded with a warning. Settings stores and socket observers belong to one workbench lifetime; embedded providers do not inherit standalone storage or config writers.
 
 Default arrangement supports **Single variant**, **Grid**, and **List**. Explicit story layouts override this default; URL and remembered story/shared view choices retain precedence. Single viewport Responsive/fixed intent stays in workbench memory, while chosen fixed dimensions use existing viewport settings.
+
+## Plugins
+
+Plugins lists installed versions, Required labels and compatible updates. **Browse marketplace** opens the [plugin marketplace](./plugins/marketplace.md). More actions provides Options, Changelog, Pin version and Remove. Required plugins cannot be disabled or removed. Development enable switches stage changes for **Apply and restart**.
+
+Marketplace preferences are local to this browser:
+
+- **Community plugins**: off by default; permits development-server registry reads for community discovery and release history.
+- **Package manager**: automatic detection, or pnpm, npm, Yarn or Bun override.
+- **After install**: restart automatically, or ask before continuing the config write/restart.
+- **Skip this version**: remembers dismissed update targets per package.
+
+These preferences persist alongside other UI settings and reset with them. Plugin changes write to `package.json` and the Histoire config; the package manager can also change lockfiles and `node_modules`. Review each change before installation. Static books provide copyable manual commands and config snippets instead of project writes.
