@@ -77,7 +77,7 @@
         {
           "kind": "canvas-view",
           "contribution": "side-by-side",
-          "text": "Side-by-side design arrangement"
+          "text": "Side-by-side, overlay and split design comparison"
         }
       ],
       "access": [
@@ -106,7 +106,7 @@
           },
           {
             "key": "canvasView",
-            "label": "Side-by-side arrangement",
+            "label": "Canvas design comparison",
             "type": "boolean",
             "default": true
           }

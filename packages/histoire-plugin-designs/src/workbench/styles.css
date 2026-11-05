@@ -43,6 +43,7 @@
 .histoire-designs-canvas-label {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 4px;
   height: 26px;
   color: var(--histoire-text);
@@ -92,3 +93,72 @@
 .histoire-designs-canvas-state { position: absolute; inset: 0; display: grid; place-content: center; }
 /* Cleared state: never cover the canvas. */
 .histoire-designs-canvas-state:empty { display: none; }
+
+/* Overlay and Split: the design lies over the frame and lets pointer input through to the story. */
+.histoire-designs-canvas[data-mode="overlay"] .histoire-designs-canvas-design,
+.histoire-designs-canvas[data-mode="split"] .histoire-designs-canvas-design { pointer-events: none; }
+.histoire-designs-canvas[data-mode="overlay"] .histoire-designs-canvas-design > .histoire-designs-canvas-box,
+.histoire-designs-canvas[data-mode="split"] .histoire-designs-canvas-design > .histoire-designs-canvas-box { border: 0; border-radius: 0; box-shadow: none; background: transparent; }
+.histoire-designs-canvas-title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* Grips keep their pixel size at any zoom: `--histoire-designs-zoom` follows the canvas. */
+.histoire-designs-overlay-chrome { position: absolute; outline: calc(1px / var(--histoire-designs-zoom, 1)) dashed rgb(var(--histoire-accent-rgb, 5 150 105)); pointer-events: none; }
+.histoire-designs-overlay-grip {
+  position: absolute;
+  display: grid;
+  place-content: center;
+  width: 22px;
+  height: 22px;
+  border: 1px solid var(--histoire-border);
+  border-radius: var(--histoire-radius-control, 6px);
+  background: var(--histoire-surface);
+  color: var(--histoire-text);
+  box-shadow: var(--histoire-shadow-toolbar);
+  box-sizing: border-box;
+  pointer-events: auto;
+  touch-action: none;
+  scale: calc(1 / var(--histoire-designs-zoom, 1));
+}
+.histoire-designs-overlay-grip:focus-visible { outline: 2px solid rgb(var(--histoire-accent-rgb, 5 150 105)); outline-offset: 1px; }
+.histoire-designs-overlay-move { right: 100%; bottom: 100%; transform-origin: bottom right; cursor: move; }
+.histoire-designs-overlay-resize { right: 0; bottom: 0; transform-origin: bottom right; cursor: nwse-resize; }
+/* Corner mark of the resize grip. */
+.histoire-designs-overlay-resize::after { content: ""; width: 8px; height: 8px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; }
+.histoire-designs-overlay-divider {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: calc(2px / var(--histoire-designs-zoom, 1));
+  translate: -50% 0;
+  background: rgb(var(--histoire-accent-rgb, 5 150 105));
+}
+.histoire-designs-overlay-knob { top: 50%; left: 50%; translate: -50% -50%; cursor: ew-resize; }
+
+/* Floating comparison bar, centered at the bottom of the canvas area left of the floating inspector. */
+.histoire-designs-canvas-bar {
+  position: absolute;
+  bottom: 20px;
+  inset-inline: 0 var(--histoire-canvas-inspector-reserve, 0px);
+  display: flex;
+  justify-content: center;
+  padding-inline: 16px;
+  pointer-events: none;
+}
+.histoire-designs-canvas-bar[hidden] { display: none; }
+.histoire-designs-mode {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 100%;
+  padding: 4px;
+  border: 1px solid var(--histoire-border);
+  border-radius: 12px;
+  background: rgb(var(--histoire-surface-rgb, 255 255 255) / 88%);
+  box-shadow: var(--histoire-shadow-popover);
+  backdrop-filter: blur(10px);
+  pointer-events: auto;
+}
+.histoire-designs-mode-switch, .histoire-designs-mode-opacity { --histoire-control-margin: 0px; --histoire-control-wrapper-padding: 0px; }
+.histoire-designs-mode-opacity { width: 96px; }
+/* Labels differ in length: equal-width choices would clip "Side by side". */
+.histoire-designs-mode .histoire-designs-mode-option { flex: none; }

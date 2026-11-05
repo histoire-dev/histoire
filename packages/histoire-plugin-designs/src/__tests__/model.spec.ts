@@ -1,6 +1,7 @@
-import type { HistoireCatalogStory, HistoireJsonValue } from '@histoire/protocol'
+import type { HistoireCatalogStory } from '@histoire/protocol'
 import { describe, expect, it, vi } from 'vitest'
 import { createDesignModel } from '../workbench/model.js'
+import { createPreferences } from './fixtures/preferences.js'
 
 /**
  * Catalog story whose variant `a` declares the given designs.
@@ -29,7 +30,7 @@ function deferred<T>() {
 function createApi(initial: HistoireCatalogStory | undefined) {
   let current = initial
   let onCatalog: () => void = () => {}
-  const values = new Map<string, HistoireJsonValue>()
+  const { preferences, values } = createPreferences()
   const getStory = vi.fn(async (storyId: string) => {
     if (!current) throw new Error(`Story ${storyId} not found`)
     return storyId === current.id ? current : { ...current, id: storyId }
@@ -39,7 +40,7 @@ function createApi(initial: HistoireCatalogStory | undefined) {
       onCatalog = listener
       return () => {}
     } } },
-    preferences: { get: (key: string, fallback: HistoireJsonValue) => values.get(key) ?? fallback, set: (key: string, value: HistoireJsonValue) => values.set(key, value) },
+    preferences,
     invalidate: vi.fn(),
     signal: new AbortController().signal,
   }

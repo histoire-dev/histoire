@@ -68,3 +68,24 @@ export function createDesignElement(design: ResolvedDesign, events: DesignElemen
   for (const [name, value] of Object.entries(iframeAttributes(design))) frame.setAttribute(name, value)
   return { node: frame, size: EMBED_SIZE }
 }
+
+/**
+ * Lays an embedded document out at its native size and scales it into a box, so resizing an
+ * overlay zooms the embed instead of reflowing it. Without a box, the embed fills its parent.
+ * @param node Rendered design element; only iframes are scaled.
+ * @param native Native box size of the design.
+ * @param box Target size in canvas units.
+ */
+export function scaleEmbed(node: Element | null, native: BoxSize, box?: BoxSize): void {
+  if (!(node instanceof HTMLIFrameElement)) return
+  if (!box) {
+    Object.assign(node.style, { width: '', height: '', transform: '', transformOrigin: '' })
+    return
+  }
+  Object.assign(node.style, {
+    width: `${native.width}px`,
+    height: `${native.height}px`,
+    transform: `scale(${box.width / native.width}, ${box.height / native.height})`,
+    transformOrigin: '0 0',
+  })
+}

@@ -49,7 +49,15 @@ Images open fitted to the tab, or at `scale`, then shifted by `offset`. Scroll t
 
 ## Canvas arrangement
 
-The **Design** canvas arrangement places the selected variant next to its design, following canvas pan and zoom. **Fit** frames both. Images show whole there; `scale` and `offset` only apply to the inspector. Disable it with `canvasView: false`.
+The **Design** canvas arrangement compares the selected variant with its design, following canvas pan and zoom. **Fit** frames both. Images show whole there; `scale` and `offset` only apply to the inspector. Disable it with `canvasView: false`.
+
+Pick a comparison in the floating bar at the bottom of the arrangement:
+
+- **Side by side**: the design sits next to the variant.
+- **Overlay**: the design lies over the variant; the bar's slider sets its opacity.
+- **Split**: the design lies over the variant, shown right of a divider; drag the divider to compare both halves.
+
+In **Overlay** and **Split**, the story stays interactive under the design. Drag the top-left grip to move the design and the bottom-right grip to resize it (proportions stay unless Shift is held). Embedded documents keep their own layout and scale with the box. Focused grips and the divider also follow arrow keys (Shift for bigger steps). The design starts on the variant frame, scaled down to its width; the reset button in the bar restores that. The comparison and opacity are remembered, and placements per variant design.
 
 ## Design types
 

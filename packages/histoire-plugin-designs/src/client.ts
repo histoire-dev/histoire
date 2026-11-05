@@ -2,6 +2,7 @@ import type { BrowserOptions } from './options.js'
 import { defineWorkbenchPlugin, installPluginStyles } from '@histoire/plugin-kit'
 import { defineWorkbenchComponent } from '@histoire/plugin-kit/vue'
 import { defineComponent, h } from 'vue'
+import { createOverlayState } from './workbench/canvas/overlay-state.js'
 import { sideBySideView } from './workbench/canvas/side-by-side-view.js'
 import DesignPanel from './workbench/DesignPanel.vue'
 import { createDesignModel } from './workbench/model.js'
@@ -38,6 +39,7 @@ export default defineWorkbenchPlugin({
       })),
     })
     if (options.canvasView === false) return
-    api.canvas.addView({ id: 'side-by-side', label: 'Design', icon: 'color-palette', ...sideBySideView(model) })
+    const overlay = createOverlayState(api)
+    api.canvas.addView({ id: 'side-by-side', label: 'Design', icon: 'color-palette', ...sideBySideView(model, overlay) })
   },
 })

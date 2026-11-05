@@ -1,6 +1,6 @@
 # @histoire/plugin-designs
 
-Show Figma, Penpot, Sketch, image and iframe designs next to Histoire stories, in a **Design** inspector tab and a side-by-side canvas arrangement.
+Show Figma, Penpot, Sketch, image and iframe designs next to Histoire stories, in a **Design** inspector tab and a canvas arrangement showing them side by side, as a transparent overlay or split over the story.
 
 ```sh
 pnpm add -D @histoire/plugin-designs
