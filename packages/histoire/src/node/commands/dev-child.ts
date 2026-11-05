@@ -1,6 +1,7 @@
 import type { ParentMessage } from '@histoire/dev-proxy/protocol'
 import type { createDevSession } from '../runtime/dev-session.js'
 import type { TerminalAdapter } from '../runtime/terminal/adapter.js'
+import { RESTART_SOURCE_MAX_LENGTH } from '@histoire/dev-proxy/protocol'
 import { installConsoleObserver } from '../runtime/terminal/console-hook.js'
 
 // Credentials arrive over private IPC, never through project-visible environment.
@@ -47,15 +48,18 @@ function close() {
 
 /** Evaluate project only after proxy has bound and supplied external origin. */
 async function start(message: Extract<ParentMessage, { type: 'start' }>) {
-  const [{ createDevSession }, { createSingleRunProjectRuntimeController }, { configurationWatchInputs, encodeWatchInputs }, { getConfigDependencies }, { createTerminalAdapter }, { setSessionMcp }] = await Promise.all([
+  const [{ createDevSession }, { createSingleRunProjectRuntimeController }, { configurationWatchInputs, encodeWatchInputs }, { getConfigDependencies }, { createTerminalAdapter }, { setSessionMcp }, { setHostRestart }] = await Promise.all([
     import('../runtime/dev-session.js'),
     import('../runtime/controller.js'),
     import('@histoire/dev-proxy/config'),
     import('../config/dependencies.js'),
     import('../runtime/terminal/adapter.js'),
     import('../runtime/terminal/session-info.js'),
+    import('../runtime/host-restart.js'),
   ])
   if (stopped) return
+  // Plugin changes need a new process: only the parent can drop modules this one loaded.
+  setHostRestart(request => send({ type: 'restart', generation: message.generation, source: request.source.slice(0, RESTART_SOURCE_MAX_LENGTH), ...(request.fresh ? { fresh: true } : {}) }))
   const { terminalLogs, ...runtimeOptions } = message.options
   const terminal = adapter = createTerminalAdapter({ generation: message.generation, send, execution: () => session!.execution })
   // Intercepted console text replaces the raw echo only when the parent consumes it.

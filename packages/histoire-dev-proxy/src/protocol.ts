@@ -35,6 +35,8 @@ export type RestartCauseKind =
   | 'browser'
   /** The runtime process exited unexpectedly; `source` carries the exit detail. */
   | 'exit'
+  /** The runtime asked to be replaced by a new process (e.g. after a plugin change); `source` labels why. */
+  | 'runtime'
 
 /** Observed reason of one restart transition, delivered once per transition. */
 export interface RestartCause {
@@ -55,6 +57,8 @@ export interface RestartRequest {
 
 /** Frozen bounds for generic runtime frames; payload semantics belong to the framework adapter. */
 export const RUNTIME_FRAME_MAX_BYTES = 256 * 1024
+/** Longest accepted runtime restart label. */
+export const RESTART_SOURCE_MAX_LENGTH = 200
 /** Longest accepted correlation, operation and event identifier. */
 export const RUNTIME_ID_MAX_LENGTH = 100
 
@@ -113,6 +117,8 @@ export type ChildMessage =
   | { type: 'watch', generation: string, inputs: WatchInput[], complete?: boolean }
   | { type: 'ready', generation: string, target: string, base: string, open?: boolean | string }
   | { type: 'failed', generation: string, error: string }
+  /** Ready runtime asks the parent for a full process replacement; only the parent restarts. */
+  | { type: 'restart', generation: string, source: string, fresh?: boolean }
   | RuntimeReply
   | RuntimeEvent
 
@@ -175,6 +181,7 @@ export function isChildMessage(value: unknown): value is ChildMessage {
   }
   if (message.type === 'runtime-event') return isIdentifier(message.event) && isBoundedFrame(value)
   if (message.type === 'failed') return typeof message.error === 'string' && message.error.length <= 4096
+  if (message.type === 'restart') return typeof message.source === 'string' && message.source.length > 0 && message.source.length <= RESTART_SOURCE_MAX_LENGTH && (message.fresh === undefined || typeof message.fresh === 'boolean')
   if (message.type === 'ready') return typeof message.target === 'string' && /^http:\/\/127\.0\.0\.1:\d+$/.test(message.target) && isSafeBase(message.base)
   return message.type === 'watch' && Array.isArray(message.inputs) && message.inputs.length <= 10000 && message.inputs.every(input => input && typeof input.file === 'string' && typeof input.source === 'string' && (input.bytes === null || typeof input.bytes === 'string'))
 }

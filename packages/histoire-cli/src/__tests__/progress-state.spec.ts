@@ -67,4 +67,5 @@ it('names each restart cause once in plain lines', () => {
   expect(describeRestartCause({ kind: 'manual', fresh: true })).toContain('fresh')
   expect(describeRestartCause({ kind: 'browser', fresh: false })).toBe('Restart requested from the browser...')
   expect(describeRestartCause({ kind: 'exit', source: 'Histoire runtime exited (SIGKILL)', fresh: false })).toBe('Histoire runtime exited (SIGKILL), restarting...')
+  expect(describeRestartCause({ kind: 'runtime', source: 'Installed @histoire/plugin-a11y', fresh: true })).toBe('Installed @histoire/plugin-a11y, restarting fresh...')
 })

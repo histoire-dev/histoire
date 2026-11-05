@@ -45,6 +45,8 @@ export function describeRestartCause(cause: RestartCause, secrets: readonly stri
       return `Restart requested from the browser${cause.fresh ? ' (fresh)' : ''}...`
     case 'exit':
       return `${cleaned ?? 'Runtime exited'}, restarting${cause.fresh ? ' fresh' : ''}...`
+    case 'runtime':
+      return `${cleaned ?? 'Runtime requested a restart'}, restarting${cause.fresh ? ' fresh' : ''}...`
     default:
       return cause.fresh ? 'Restarting fresh, skipping cached catalog and dependencies...' : 'Restarting...'
   }

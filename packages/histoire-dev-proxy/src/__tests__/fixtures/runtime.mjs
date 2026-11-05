@@ -61,6 +61,8 @@ process.on('message', (message) => {
     const base = { generation: message.generation, id: message.id }
     // `hold` is answered only while the runtime is being wound down.
     if (message.operation === 'hold') held = base
+    // Mirrors a runtime asking its parent for a full process replacement.
+    else if (message.operation === 'request-restart') process.send({ type: 'restart', generation: message.args?.generation ?? message.generation, source: message.args.source, fresh: message.args.fresh })
     else process.send({ type: 'runtime-reply', ...base, ok: true, result: { pid: process.pid, args: message.args } })
     return
   }

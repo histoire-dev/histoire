@@ -12,3 +12,11 @@ it('accepts same-origin absolute bases', () => {
 it.each(['//evil.com/x', '/\\evil.com/x', 'relative', '/a\\b'])('rejects ready base %s', (base) => {
   expect(isChildMessage(ready(base))).toBe(false)
 })
+
+it('accepts bounded runtime restart requests only', () => {
+  expect(isChildMessage({ type: 'restart', generation: 'g', source: 'Installed plugin' })).toBe(true)
+  expect(isChildMessage({ type: 'restart', generation: 'g', source: 'Installed plugin', fresh: true })).toBe(true)
+  expect(isChildMessage({ type: 'restart', generation: 'g', source: '' })).toBe(false)
+  expect(isChildMessage({ type: 'restart', generation: 'g', source: 'x'.repeat(201) })).toBe(false)
+  expect(isChildMessage({ type: 'restart', generation: 'g', source: 'ok', fresh: 'yes' })).toBe(false)
+})

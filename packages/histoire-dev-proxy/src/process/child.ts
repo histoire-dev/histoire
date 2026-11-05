@@ -33,6 +33,8 @@ export function startRuntimeChild(options: {
   onRetire?: () => void
   /** Reports observer failures and winddown notices; defaults to `console.error`. */
   onDiagnostic?: (message: string) => void
+  /** Ready runtime asked to be replaced by a new process. */
+  onRestartRequest?: (request: { source: string, fresh: boolean }) => void
 }) {
   const diagnostic = options.onDiagnostic ?? ((message: string) => console.error(message))
   /** Observer faults must never disturb process ownership. */
@@ -93,6 +95,11 @@ export function startRuntimeChild(options: {
   child.on('error', reject)
   child.on('message', (raw) => {
     if (!isChildMessage(raw) || raw.generation !== options.generation || closing) return
+    if (raw.type === 'restart') {
+      // Only a served generation may ask; startup failures already report through `failed`.
+      if (settled && options.onRestartRequest) guarded(() => options.onRestartRequest!({ source: raw.source, fresh: raw.fresh === true }))
+      return
+    }
     if (raw.type === 'runtime-reply' || raw.type === 'runtime-event') {
       // Runtime traffic is independent of the startup message chain.
       if (options.onRuntimeMessage) guarded(() => options.onRuntimeMessage!(raw))

@@ -161,6 +161,12 @@ export async function startDevProxy(options: DevProxyOptions) {
         onReady: async () => {
           if (completeInputs) await watcher?.replace(completeInputs, isActive)
         },
+        onRestartRequest: ({ source, fresh }) => {
+          // A retired generation can't schedule the successor of its replacement.
+          if (closed || !isActive()) return
+          record({ cause: 'runtime', source, fresh })
+          void controller.restart().catch(error => publish('failed', error))
+        },
         onExit: (error) => {
           if (closed || !isActive()) return
           // Coordinator still owns crashed child as ready; replace it instead of serving dead handle.
