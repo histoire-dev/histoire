@@ -91,6 +91,11 @@ These slices close the functional gaps listed in [follow-ups](#follow-ups-and-pr
   27. [27 — Settings, manage, update, spotlight](27-polish-settings.md).
 - **Wave 13**
   28. [28 — Official plugin logos](28-official-logos.md).
+- **Cleanup** (four-angle review of `f5798ef7..bae8feb0`)
+  - Wave A, parallel: [29 — Shared catalog and command logic](29-cleanup-shared-logic.md), [30 — Node catalog, registry, inventory](30-cleanup-node-registry.md), [31 — Node jobs, migrations, channel](31-cleanup-node-jobs.md), [32 — App marketplace state](32-cleanup-app-state.md).
+  - Wave B: [33 — App UI components](33-cleanup-app-ui.md).
+  - Wave C: [34 — Test infrastructure](34-cleanup-tests.md).
+  - Deliberately skipped (behavior or design changes, recorded for later): one `BaseDialog` for native dialogs; routing plugin-toggle config reloads through the host process restart; tint colors as theme tokens; a dedicated logo-kind field instead of the data-URI check; builtin tile metadata declared by plugins server-side; one inventory row builder without the `'local'` version sentinel; a unified error class across planner/jobs/catalog; per-kind command-relation table in plugin-kit; lazy server-side marketplace imports; pre-serialized channel replies; a11y command independent of tab mount timing.
 
 Deliberately not planned:
 
