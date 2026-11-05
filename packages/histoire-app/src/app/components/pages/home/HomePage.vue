@@ -71,7 +71,7 @@ function start(): void {
           <HstButton v-if="first" class="htw:flex htw:items-center htw:justify-center htw:gap-[8px] htw:p-[12px_16px] htw:text-text htw:font-bold" color="flat" type="button" @click="start">
             <BuiltinIcon icon="document" :size="16" />Get started
           </HstButton>
-          <HstButton v-if="dev && projectTests?.canRun.value" color="primary" type="button" class="htw:flex htw:items-center htw:justify-center htw:gap-[8px] htw:p-[12px_16px] htw:text-text htw:font-bold" :disabled="projectTests.running.value" @click="emit('runTests')">
+          <HstButton v-if="dev && projectTests?.canRun.value" color="primary" type="button" class="htw:flex htw:items-center htw:justify-center htw:gap-[8px] htw:p-[12px_16px] htw:font-bold" :disabled="projectTests.running.value" @click="emit('runTests')">
             <BuiltinIcon icon="play-filled-alt" :size="16" />Run all tests
           </HstButton>
         </div>
