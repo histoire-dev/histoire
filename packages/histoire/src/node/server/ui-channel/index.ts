@@ -2,6 +2,7 @@ import type { ViteDevServer } from 'vite'
 import type { Context } from '../../context.js'
 import type { ExecutionService } from '../../runtime/execution-service.js'
 import type { UiChannelServer } from './types.js'
+import { registerMarketplaceChannels } from '../../marketplace/channel.js'
 import { getContextRegistry } from '../../runtime/registry.js'
 import { createUiChannel } from './channel.js'
 import { registerMcpChannel } from './mcp.js'
@@ -26,6 +27,7 @@ export function registerUiChannel(ctx: Context, server: ViteDevServer, execution
   registerVisualChannel(ctx, server, channel, execution, isActive)
   registerScreenshotSetupChannel(ctx, channel, execution, isActive)
   registerMcpChannel(ctx, channel)
+  registerMarketplaceChannels(ctx, channel, isActive)
   return channel
 }
 

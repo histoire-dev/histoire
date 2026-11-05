@@ -12,6 +12,9 @@
   "publishConfig": {
     "access": "public"
   },
+  "keywords": [
+    "histoire-plugin"
+  ],
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -80,5 +83,91 @@
     "vitest": "4.1.10",
     "vue": "^3.5.26",
     "vue-tsc": "^3.3.13"
+  },
+  "histoire": {
+    "marketplace": {
+      "displayName": "Accessibility",
+      "summary": "axe-core audits in the inspector, project results, and optional story tests.",
+      "category": "testing",
+      "frameworks": [],
+      "monogram": "Ax",
+      "tint": "blue",
+      "adds": [
+        {
+          "kind": "inspector-tab",
+          "contribution": "accessibility",
+          "text": "Live accessibility audits"
+        },
+        {
+          "kind": "rail-pane",
+          "contribution": "issues",
+          "text": "Project results with story tests or build reports"
+        },
+        {
+          "kind": "story-tests",
+          "text": "Optional axe-core tests per variant"
+        }
+      ],
+      "access": [
+        "story-frames",
+        "story-dom",
+        "filesystem",
+        "child-process"
+      ],
+      "config": {
+        "import": "HstA11y",
+        "options": [
+          {
+            "key": "enabled",
+            "label": "Enable audits",
+            "type": "boolean",
+            "default": true
+          },
+          {
+            "key": "devOnly",
+            "label": "Development only",
+            "type": "boolean",
+            "default": false
+          },
+          {
+            "key": "autoRun",
+            "label": "Run while inspector is open",
+            "type": "boolean",
+            "default": true
+          },
+          {
+            "key": "test",
+            "label": "Run as story tests",
+            "type": "boolean",
+            "default": false
+          },
+          {
+            "key": "build",
+            "label": "Include build report",
+            "type": "boolean",
+            "default": false
+          },
+          {
+            "key": "exclude",
+            "label": "Excluded selectors",
+            "type": "string-list",
+            "default": []
+          }
+        ]
+      },
+      "recommend": [
+        {
+          "dependency": "vitest",
+          "reason": "Vitest detected"
+        },
+        {
+          "missing": true,
+          "reason": "Add accessibility audits"
+        }
+      ],
+      "requires": {
+        "histoire": "^1.0.0-beta.1"
+      }
+    }
   }
 }

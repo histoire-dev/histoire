@@ -108,7 +108,7 @@ describe('context collection', () => {
     try {
       const source = resolvedConfig(ctx)
       const module = await import(`data:text/javascript,${encodeURIComponent(source)}`)
-      expect(module.installedPlugins.find((item: { name: string }) => item.name === 'acme-plugin')).toEqual({ name: 'acme-plugin', builtin: false, enabled: true, id: 'acme', client: true, frame: false, displayName: 'Acme', description: 'Package description', docsUrl: 'https://example.com/docs' })
+      expect(module.installedPlugins.find((item: { name: string }) => item.name === 'acme-plugin')).toEqual({ name: 'acme-plugin', builtin: false, enabled: true, id: 'acme', client: true, frame: false, displayName: 'Acme', description: 'Package description', docsUrl: 'https://example.com/docs', packageName: 'acme-plugin', version: 'local', local: true, required: false, official: false, pinned: false })
       expect(source).not.toContain('hidden')
       expect(JSON.stringify(module.installedPlugins)).not.toContain(project.root)
     }

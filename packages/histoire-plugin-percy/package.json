@@ -15,6 +15,9 @@
   "publishConfig": {
     "access": "public"
   },
+  "keywords": [
+    "histoire-plugin"
+  ],
   "exports": {
     ".": "./dist/index.js",
     "./*": "./*"
@@ -41,5 +44,31 @@
     "@typescript/native": "catalog:",
     "histoire": "workspace:*",
     "typescript": "catalog:"
+  },
+  "histoire": {
+    "marketplace": {
+      "displayName": "Percy",
+      "summary": "Send story snapshots to Percy during static builds. Requires Percy CLI.",
+      "category": "testing",
+      "frameworks": [],
+      "monogram": "Pe",
+      "tint": "violet",
+      "adds": [],
+      "access": [
+        "story-frames",
+        "network",
+        "child-process"
+      ],
+      "config": {
+        "import": "HstPercy",
+        "options": []
+      },
+      "collections": [
+        "visual-testing"
+      ],
+      "requires": {
+        "histoire": "^1.0.0-beta.1"
+      }
+    }
   }
 }

@@ -1,4 +1,5 @@
 import type { Context } from '../context.js'
+import { pluginInventoryFlags } from '../marketplace/inventory/package-resolve.js'
 
 /**
  * Generates the `virtual:$histoire-config` module code served to the browser.
@@ -24,6 +25,8 @@ export function resolvedConfig(ctx: Context) {
     client: Boolean(plugin.workbench?.client && !(ctx.mode === 'build' && plugin.workbench.devOnly)),
     frame: Boolean(plugin.workbench?.frame && !(ctx.mode === 'build' && plugin.workbench.devOnly)),
     ...ctx.pluginMetadata?.[index],
+    ...pluginInventoryFlags(plugin),
+    ...(ctx.pluginMetadata?.[index]?.version ? { local: false } : {}),
     enabled: true,
   }))
   js += `export const installedPlugins = ${JSON.stringify(installedPlugins)}\n`

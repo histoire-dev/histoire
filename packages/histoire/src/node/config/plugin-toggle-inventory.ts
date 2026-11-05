@@ -2,8 +2,13 @@ import type { Context } from '../context.js'
 import type { DisabledPluginMetadata, PluginSourceEntry } from './plugin-toggle-source.js'
 import { randomUUID } from 'node:crypto'
 import { histoireIconNames } from '@histoire/shared/dist/icons/index.js'
+import { dirname } from 'pathe'
+import { detectProjectSignals } from '../marketplace/catalog/signals.js'
+import { packageNameFromSpecifier, pluginInventoryFlags, resolvePluginPackage } from '../marketplace/inventory/package-resolve.js'
+import { parseConfigCode, unwrapNode } from './codemod/parse.js'
 import { configFileHash, hashConfigCode } from './codemod/write.js'
 import { getPluginConfigSource, resolveConfigFile } from './load.js'
+import { resolvePluginMetadata } from './plugin-metadata.js'
 import { analyzePluginSource } from './plugin-toggle-source.js'
 
 /** Safe row data sent to the workbench. */
@@ -12,6 +17,18 @@ export interface PluginInventoryRow extends DisabledPluginMetadata {
   builtin: boolean
   /** Effective state in this runtime. */
   enabled: boolean
+  /** Actual installed npm identity. */
+  packageName?: string
+  /** Installed version, or local for authored/workspace code. */
+  version?: string
+  /** Excluded from registry updates. */
+  local: boolean
+  /** Framework support or builtin, protected from marketplace removal. */
+  required: boolean
+  /** Bundled entry under the first-party npm scope. */
+  official: boolean
+  /** Exact dependency declaration; updates remain visible. */
+  pinned?: boolean
   /** Generation-scoped identifier for a safely editable entry. */
   toggleId?: string
 }
@@ -36,6 +53,7 @@ export interface PluginToggleInventory {
 
 /** Projects resolved plugins and, where safely identified, disabled source entries. */
 export async function createPluginInventory(ctx: Context): Promise<{ rows: PluginInventoryRow[], toggle?: PluginToggleInventory }> {
+  const frameworks = (await detectProjectSignals(ctx.root)).project.frameworks
   const rows: PluginInventoryRow[] = (ctx.config.plugins ?? []).map((plugin, index) => ({
     name: plugin.name,
     builtin: plugin.name.startsWith('builtin:'),
@@ -43,8 +61,10 @@ export async function createPluginInventory(ctx: Context): Promise<{ rows: Plugi
     client: Boolean(plugin.workbench?.client && !(ctx.mode === 'build' && plugin.workbench.devOnly)),
     frame: Boolean(plugin.workbench?.frame && !(ctx.mode === 'build' && plugin.workbench.devOnly)),
     ...ctx.pluginMetadata?.[index],
+    ...pluginInventoryFlags(plugin),
     enabled: true,
   }))
+  await Promise.all(rows.map(row => enrichRow(row)))
   const captured = getPluginConfigSource(ctx.config)
   const file = resolveConfigFile(ctx.root, ctx.configFile)
   if (!captured || !file) return { rows }
@@ -55,12 +75,21 @@ export async function createPluginInventory(ctx: Context): Promise<{ rows: Plugi
     if (entries.filter(entry => entry.enabled).length !== captured.plugins.length) return { rows }
     const matches = captured.plugins.map(plugin => ctx.config.plugins.flatMap((item, index) => item === plugin ? [index] : []))
     if (matches.some(indices => indices.length !== 1) || new Set(matches.map(indices => indices[0])).size !== matches.length) return { rows }
-    const configured = entries.map((entry) => {
-      if (entry.enabled) return rows[matches.shift()![0]]
+    const parsed = parseConfigCode(captured.source)
+    const configured = await Promise.all(entries.map(async (entry) => {
+      // analyzePluginSource already restricts entries to directly imported factories.
+      const specifier = sourceSpecifier(entry.expression, parsed.imports)
+      if (entry.enabled) {
+        const row = rows[matches.shift()![0]]
+        await enrichRow(row, specifier)
+        return row
+      }
       const { devOnly, ...info } = entry.metadata!
       const icon = info.icon && histoireIconNames.includes(info.icon) ? info.icon : undefined
-      return { ...info, icon, ...(ctx.mode === 'build' && devOnly ? { client: false, frame: false } : {}), builtin: info.name.startsWith('builtin:'), enabled: false } satisfies PluginInventoryRow
-    })
+      const row: PluginInventoryRow = { ...info, icon, ...(ctx.mode === 'build' && devOnly ? { client: false, frame: false } : {}), builtin: info.name.startsWith('builtin:'), ...pluginInventoryFlags({ name: info.name }), enabled: false }
+      await enrichRow(row, specifier)
+      return row
+    }))
     // Place disabled rows next to their source neighbors without changing resolved active order.
     for (let index = 0; index < configured.length; index++) {
       if (entries[index].enabled) continue
@@ -83,4 +112,25 @@ export async function createPluginInventory(ctx: Context): Promise<{ rows: Plugi
     return { rows, toggle: { file, hash, source: captured.source, entries, rows, configured, targets } }
   }
   catch { return { rows } }
+
+  /** Read safe package metadata only; disabled factories remain unevaluated. */
+  async function enrichRow(row: PluginInventoryRow, specifier?: string): Promise<void> {
+    const file = resolveConfigFile(ctx.root, ctx.configFile)
+    const root = specifier && file ? dirname(file) : ctx.root
+    const resolved = await resolvePluginPackage(root, row.name, specifier, frameworks)
+    const packageName = specifier ? packageNameFromSpecifier(specifier) : resolved.packageName
+    const [metadata] = packageName ? await resolvePluginMetadata(root, [{ name: packageName }]) : [{}]
+    // Relative source imports override coincidentally matching installed package names.
+    delete row.packageName
+    delete row.version
+    Object.assign(row, { ...metadata, ...row, ...resolved })
+  }
+}
+
+/** Resolve the directly imported factory already admitted by analyzePluginSource. */
+function sourceSpecifier(expression: string, imports: Map<string, string>): string | undefined {
+  const statement = parseConfigCode(`export default ${expression}`).program.body[0]
+  if (statement.type !== 'ExportDefaultDeclaration') return
+  const call = unwrapNode(statement.declaration)
+  return call.type === 'CallExpression' && call.callee.type === 'Identifier' ? imports.get(call.callee.name) : undefined
 }

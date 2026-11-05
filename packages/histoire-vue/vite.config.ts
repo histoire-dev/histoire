@@ -17,6 +17,8 @@ export default defineConfig({
   // tests use this package's genuine host router without another Vue runtime.
   resolve: { alias: {
     'vue-router': new URL('./node_modules/vue-router/dist/vue-router.mjs', import.meta.url).pathname,
+    // Marketplace specs read the same generated official index as the production virtual module.
+    'virtual:$histoire-marketplace-official': new URL('./src/__tests__/utils/marketplace-official.ts', import.meta.url).pathname,
   } },
   define: { __HISTOIRE_DEV__: 'true' },
   // Behavioral SFC tests do not compile the app's Tailwind presentation bundle.

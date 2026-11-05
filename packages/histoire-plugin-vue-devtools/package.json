@@ -1,7 +1,7 @@
 {
   "name": "@histoire/plugin-vue-devtools",
-  "version": "1.0.0-beta.1",
   "type": "module",
+  "version": "1.0.0-beta.1",
   "description": "Vue DevTools for Histoire story frames",
   "license": "MIT",
   "repository": {
@@ -10,19 +10,23 @@
     "directory": "packages/histoire-plugin-vue-devtools"
   },
   "publishConfig": { "access": "public" },
+  "keywords": [
+    "histoire-plugin"
+  ],
   "exports": { ".": { "types": "./dist/index.d.ts", "default": "./dist/index.js" } },
   "files": ["dist"],
+  "engines": { "node": ">=22.12.0" },
   "scripts": { "build": "rimraf dist && tsc", "watch": "tsc --watch", "test": "node --test test/*.test.mjs" },
-  "dependencies": {
-    "@histoire/plugin-kit": "workspace:^",
-    "@histoire/shared": "workspace:^",
-    "vite-plugin-vue-devtools": "9.0.0-rc.2"
-  },
   "peerDependencies": {
     "@vitejs/devtools": "0.8.0",
     "histoire": "workspace:^",
     "vite": "^8.3.0",
     "vue": "^3.5.26"
+  },
+  "dependencies": {
+    "@histoire/plugin-kit": "workspace:^",
+    "@histoire/shared": "workspace:^",
+    "vite-plugin-vue-devtools": "9.0.0-rc.2"
   },
   "devDependencies": {
     "@types/node": "^22.10.1",
@@ -32,5 +36,45 @@
     "vite": "catalog:",
     "vue": "^3.5.26"
   },
-  "engines": { "node": ">=22.12.0" }
+  "histoire": {
+    "marketplace": {
+      "displayName": "Vue DevTools",
+      "summary": "Inspect Vue component trees and state in the development inspector.",
+      "category": "inspection",
+      "frameworks": [
+        "vue"
+      ],
+      "monogram": "Vd",
+      "tint": "green",
+      "adds": [
+        {
+          "kind": "inspector-tab",
+          "contribution": "vue",
+          "text": "Vue DevTools"
+        }
+      ],
+      "access": [
+        "story-frames",
+        "story-dom",
+        "network"
+      ],
+      "config": {
+        "import": "HstVueDevtools",
+        "options": [
+          {
+            "key": "enabled",
+            "label": "Enable Vue DevTools",
+            "type": "boolean",
+            "default": true
+          }
+        ]
+      },
+      "requires": {
+        "histoire": "^1.0.0-beta.1",
+        "@vitejs/devtools": "0.8.0",
+        "vite": "^8.3.0",
+        "vue": "^3.5.26"
+      }
+    }
+  }
 }

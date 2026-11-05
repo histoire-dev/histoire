@@ -12,6 +12,9 @@
   "publishConfig": {
     "access": "public"
   },
+  "keywords": [
+    "histoire-plugin"
+  ],
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -56,5 +59,66 @@
     "vitest": "4.1.10",
     "vue": "^3.5.26",
     "vue-tsc": "^3.3.13"
+  },
+  "histoire": {
+    "marketplace": {
+      "displayName": "Designs",
+      "summary": "Figma, Penpot, Sketch, image and iframe designs beside stories.",
+      "category": "design",
+      "frameworks": [],
+      "monogram": "Ds",
+      "tint": "violet",
+      "adds": [
+        {
+          "kind": "inspector-tab",
+          "contribution": "design",
+          "text": "Design references"
+        },
+        {
+          "kind": "canvas-view",
+          "contribution": "side-by-side",
+          "text": "Side-by-side design arrangement"
+        }
+      ],
+      "access": [
+        "network"
+      ],
+      "config": {
+        "import": "HstDesigns",
+        "options": [
+          {
+            "key": "enabled",
+            "label": "Enable designs",
+            "type": "boolean",
+            "default": true
+          },
+          {
+            "key": "devOnly",
+            "label": "Development only",
+            "type": "boolean",
+            "default": false
+          },
+          {
+            "key": "embedHost",
+            "label": "Figma embed host",
+            "type": "string",
+            "default": "histoire"
+          },
+          {
+            "key": "canvasView",
+            "label": "Side-by-side arrangement",
+            "type": "boolean",
+            "default": true
+          }
+        ]
+      },
+      "collections": [
+        "design-handoff"
+      ],
+      "requires": {
+        "histoire": "^1.0.0-beta.1",
+        "vue": "^3.5.0"
+      }
+    }
   }
 }

@@ -1,0 +1,8 @@
+{
+  "empty": "import { defineConfig } from 'histoire'\nexport default defineConfig({})\n",
+  "array": "import { defineConfig } from 'histoire'\nexport default defineConfig({ plugins: [] })\n",
+  "entries": "import { Other } from 'other-plugin'\nexport default { plugins: [Other()], theme: { title: 'Kept' } }\n",
+  "plain": "export default {}\n",
+  "variable": "const plugins = []\nexport default { plugins }\n",
+  "spread": "import { Other } from 'other-plugin'\nexport default { plugins: [...other, Other()] }\n"
+}

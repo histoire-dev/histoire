@@ -1,0 +1,6 @@
+{
+  "extends": "./tsconfig.node.json",
+  "compilerOptions": { "declaration": false, "declarationMap": false },
+  "include": ["./npm-config.spec.ts", "./registry-auth.spec.ts"],
+  "exclude": []
+}

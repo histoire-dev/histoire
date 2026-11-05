@@ -67,7 +67,7 @@ onBeforeUnmount(() => {
 
 <template>
   <ToolbarButton v-if="item.type === 'action' || item.type === 'toggle'" :label="item.label" :icon="item.icon" :pressed="pressed" :shortcut="shortcut" :disabled="pending" :data-histoire-contribution="item.id" @click="run" />
-  <ToolbarPopover v-else-if="item.type === 'popover'" :id="item.id" :open="open" :label="item.label" :icon="item.icon" :shortcut="shortcut" @update:open="emit('update:open', $event)">
+  <ToolbarPopover v-else-if="item.type === 'popover'" :id="item.id" :open="open" :label="item.label" :icon="item.icon" :shortcut="shortcut" :data-histoire-contribution="item.id" @update:open="emit('update:open', $event)">
     <ExtensionView :contribution="item" :context="workbench.context" :host="workbench.host" />
   </ToolbarPopover>
   <ExtensionView v-else :contribution="item" :context="workbench.context" :host="workbench.host" />

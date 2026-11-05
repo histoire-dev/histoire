@@ -5,6 +5,7 @@ import { getHistoireSessionDescriptor } from '@histoire/sdk/internal'
 import { useHistoireContext, useHistoireResource } from '@histoire/vue/internal'
 import { watch } from 'vue'
 import { provideShell } from '../composables/shell.js'
+import { createMarketplaceStore, provideMarketplaceStore } from '../stores/marketplace.js'
 import { createMatrixStore, provideMatrix } from '../stores/matrix.js'
 import { createPresetConfigStore, providePresetConfigStore } from '../stores/presets-config.js'
 import { createUiSettingsStore, provideUiSettingsStore } from '../stores/settings.js'
@@ -25,6 +26,9 @@ export function useWorkbenchStores(hostWindow: WorkbenchProps['hostWindow'], sna
   useHistoireResource(shell.close)
   const settings = createUiSettingsStore({ storage, warn: console.warn })
   provideUiSettingsStore(settings)
+  const marketplace = createMarketplaceStore({ settings, storage })
+  provideMarketplaceStore(marketplace)
+  useHistoireResource(marketplace.dispose)
   const storyCanvasViews = createStoryCanvasViews()
   provideStoryCanvasViews(storyCanvasViews)
   const presets = createPresetConfigStore({ storage, config: () => histoireConfig, warn: console.warn })
@@ -45,5 +49,5 @@ export function useWorkbenchStores(hostWindow: WorkbenchProps['hostWindow'], sna
     rows: typeof route.value.query.rows === 'string' ? route.value.query.rows : undefined,
     cols: typeof route.value.query.cols === 'string' ? route.value.query.cols : undefined,
   }), { immediate: true })
-  return { shell, settings, storyCanvasViews, presets, matrix }
+  return { shell, settings, marketplace, storyCanvasViews, presets, matrix }
 }

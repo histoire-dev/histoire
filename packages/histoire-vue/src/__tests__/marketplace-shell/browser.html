@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+  <head><meta charset="UTF-8"><title>Marketplace shell behavior</title></head>
+  <body>
+    <div id="app"></div>
+    <script type="module">
+      import { createApp, defineComponent, h } from 'vue'
+      import MarketplaceModal from '../../../../histoire-app/src/app/components/marketplace/shell/MarketplaceModal.vue'
+      import { createMarketplaceStore, provideMarketplaceStore } from '../../../../histoire-app/src/app/stores/marketplace.ts'
+      import { createUiSettingsStore } from '../../../../histoire-app/src/app/stores/settings.ts'
+      import { createMarketplaceClient } from '../../../../histoire-app/src/app/util/marketplace-client.ts'
+
+      const client = createMarketplaceClient({ transport: { available: () => false, send: () => false, on: () => () => {} } })
+      const store = createMarketplaceStore({ settings: createUiSettingsStore({}), client })
+      const Host = defineComponent(() => {
+        provideMarketplaceStore(store)
+        return () => [
+          h('button', { onClick: event => store.openMarketplace('discover', event.currentTarget) }, 'Browse marketplace'),
+          h(MarketplaceModal),
+        ]
+      })
+      createApp(Host).mount('#app')
+    </script>
+  </body>
+</html>

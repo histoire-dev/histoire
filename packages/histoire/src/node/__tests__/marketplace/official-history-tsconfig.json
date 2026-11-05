@@ -1,0 +1,6 @@
+{
+  "extends": "./tsconfig.node.json",
+  "compilerOptions": { "declaration": false, "declarationMap": false },
+  "include": ["./official-history.spec.ts", "./snapshot-history.spec.ts", "./manifest.spec.ts"],
+  "exclude": []
+}

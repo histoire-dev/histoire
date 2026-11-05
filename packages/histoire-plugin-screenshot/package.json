@@ -15,6 +15,9 @@
   "publishConfig": {
     "access": "public"
   },
+  "keywords": [
+    "histoire-plugin"
+  ],
   "exports": {
     ".": "./dist/index.js",
     "./*": "./*"
@@ -40,5 +43,44 @@
     "@typescript/native": "catalog:",
     "histoire": "workspace:*",
     "typescript": "catalog:"
+  },
+  "histoire": {
+    "marketplace": {
+      "displayName": "Screenshot",
+      "summary": "Save screenshots of story variants during static builds.",
+      "category": "testing",
+      "frameworks": [],
+      "monogram": "Sc",
+      "tint": "sky",
+      "adds": [],
+      "access": [
+        "story-frames",
+        "filesystem",
+        "child-process"
+      ],
+      "config": {
+        "import": "HstScreenshot",
+        "options": [
+          {
+            "key": "saveFolder",
+            "label": "Screenshot folder",
+            "type": "string",
+            "default": ".histoire/screenshots"
+          },
+          {
+            "key": "launchOptionsArgs",
+            "label": "Browser launch arguments",
+            "type": "string-list",
+            "default": []
+          }
+        ]
+      },
+      "collections": [
+        "visual-testing"
+      ],
+      "requires": {
+        "histoire": "^1.0.0-beta.1"
+      }
+    }
   }
 }

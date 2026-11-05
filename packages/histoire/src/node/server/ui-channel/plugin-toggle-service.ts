@@ -1,10 +1,7 @@
 import type { Context } from '../../context.js'
-import { randomUUID } from 'node:crypto'
-import { rm, writeFile } from 'node:fs/promises'
-import path from 'pathe'
-import { configFileHash, restoreConfigBackup, writeConfig } from '../../config/codemod/write.js'
-import { loadConfigFile } from '../../config/load.js'
+import { configFileHash } from '../../config/codemod/write.js'
 import { analyzePluginSource, disablePluginEntry, enablePluginEntry } from '../../config/plugin-toggle-source.js'
+import { safeConfigWrite } from '../../config/safe-config-write.js'
 
 /** One bounded browser-requested state change. */
 export interface PluginToggleChange {
@@ -92,31 +89,7 @@ export async function applyPluginChanges(ctx: Context, request: { requestId: str
     }
     const edited = analyzePluginSource(code)
     const expectedNames = edited.flatMap((entry, index) => entry.enabled ? [inventory.configured[index].name] : [])
-    // Loading from the config directory preserves relative imports before touching the watched file.
-    const temporary = path.join(path.dirname(inventory.file), `.histoire-config-check-${randomUUID()}${path.extname(inventory.file)}`)
-    try {
-      await writeFile(temporary, code, { flag: 'wx', mode: 0o600 })
-      const loaded = await loadConfigFile(temporary)
-      if (!Array.isArray(loaded.plugins) || loaded.plugins.length !== expectedNames.length || loaded.plugins.some((plugin, index) => plugin?.name !== expectedNames[index])) throw new Error('Plugin config did not preserve identities')
-    }
-    finally { await rm(temporary, { force: true }) }
-    if (!isActive()) throw new Error('Plugin changes cancelled. Reload settings.')
-    const written = await writeConfig(inventory.file, code, { root: ctx.root, expectedHash: inventory.hash })
-    try {
-      const loaded = await loadConfigFile(inventory.file)
-      if (!Array.isArray(loaded.plugins) || loaded.plugins.length !== expectedNames.length || loaded.plugins.some((plugin, index) => plugin?.name !== expectedNames[index])) throw new Error('Plugin config did not preserve identities')
-    }
-    catch {
-      let restored = false
-      try {
-        if (written.backup) {
-          await restoreConfigBackup(inventory.file, written.backup, { root: ctx.root, expectedHash: written.hash })
-          restored = true
-        }
-      }
-      catch { /* A concurrent edit or retired backup must not be overwritten. */ }
-      throw new Error(restored ? 'Plugin config could not be loaded. Original config restored.' : 'Plugin config could not be verified. Check the config; changes may remain.')
-    }
+    const written = await safeConfigWrite({ root: ctx.root, file: inventory.file, code, expectedHash: inventory.hash, expectedNames, isActive })
     receipt.hash = written.hash
   }
   catch (error) {

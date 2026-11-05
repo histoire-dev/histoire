@@ -1,11 +1,12 @@
 import type { Plugin, PluginMetadata } from '@histoire/shared'
-import { readFile } from 'node:fs/promises'
 import { histoireIconNames } from '@histoire/shared/dist/icons/index.js'
-import { join } from 'pathe'
-import { findProjectPackageDirectories } from '../util/resolve-package.js'
+import { readInstalledPackage } from '../marketplace/inventory/package-resolve.js'
 
 /** Validated public information projected into a browser module. */
-export type PublicPluginMetadata = PluginMetadata
+export interface PublicPluginMetadata extends PluginMetadata {
+  /** Actual installed npm identity. */ packageName?: string
+  /** Version from the installed package, never its dependency range. */ version?: string
+}
 
 /** Accept bounded nonempty metadata rather than unexpected package JSON shapes. */
 function text(value: unknown): string | undefined {
@@ -35,29 +36,13 @@ function repositoryUrl(value: unknown): string | undefined {
   return valid?.replace(/\.git\/?$/, '')
 }
 
-/** Only exact npm package identities can be used as project-relative lookup paths. */
-function isPackageName(value: string): boolean {
-  return value.length <= 214 && /^(?:@[a-z0-9][a-z0-9._-]*\/)?[a-z0-9][a-z0-9._-]*$/.test(value)
-}
-
-/** Read the nearest installed copy; mismatches and unreadable packages are ignored. */
-async function packageMetadata(root: string, name: string): Promise<Record<string, unknown>> {
-  if (!isPackageName(name)) return {}
-  try {
-    const directory = findProjectPackageDirectories(root, name)[0]
-    if (!directory) return {}
-    const value = JSON.parse(await readFile(join(directory, 'package.json'), 'utf8'))
-    return value && value.name === name ? value : {}
-  }
-  catch { return {} }
-}
-
 /** Resolve package fallback once per plugin, preserving duplicate identities and order. */
 export async function resolvePluginMetadata(root: string, plugins: readonly Plugin[]): Promise<PublicPluginMetadata[]> {
   const icons = new Set(histoireIconNames)
   return Promise.all(plugins.map(async (plugin) => {
     const info = plugin.metadata ?? {}
-    const pkg = await packageMetadata(root, plugin.name)
+    const pkg = await readInstalledPackage(root, plugin.name)
+    const version = text(pkg.version)
     const displayName = text(info.displayName)
     const description = text(info.description) ?? text(pkg.description)
     const icon = text(info.icon)
@@ -65,6 +50,7 @@ export async function resolvePluginMetadata(root: string, plugins: readonly Plug
     const docsUrl = webUrl(info.docsUrl) ?? webUrl(pkg.homepage)
     const repoUrl = repositoryUrl(info.repoUrl) ?? repositoryUrl(pkg.repository)
     return {
+      ...version ? { packageName: pkg.name as string, version } : {},
       ...displayName ? { displayName } : {},
       ...description ? { description } : {},
       ...icon && icons.has(icon) ? { icon } : {},

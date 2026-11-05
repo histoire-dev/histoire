@@ -7,6 +7,7 @@ import { resolveAccessibilityRuntime } from '../util/resolve-accessibility-runti
 import { createAxeEngineModule } from './axe-engine.js'
 import { EMBED_SOURCE_ID, embedSourceModule, LOCAL_SOURCE_ID, RESOLVED_EMBED_SOURCE_ID, RESOLVED_LOCAL_SOURCE_ID } from './embed/virtual.js'
 import * as VirtualFiles from './index.js'
+import { MARKETPLACE_OFFICIAL_ID, RESOLVED_MARKETPLACE_OFFICIAL_ID, resolvedMarketplaceOfficial } from './resolved-marketplace-official.js'
 import { ID_SEPARATOR } from './util.js'
 
 export function createVirtualFilesPlugin(ctx: Context, isServer: boolean) {
@@ -20,6 +21,7 @@ export function createVirtualFilesPlugin(ctx: Context, isServer: boolean) {
     },
 
     async resolveId(id, importer) {
+      if (id === MARKETPLACE_OFFICIAL_ID) return RESOLVED_MARKETPLACE_OFFICIAL_ID
       if (id === VirtualFiles.AXE_ENGINE_ID && resolveAccessibilityRuntime(ctx.root, ctx.config.inspection)) return VirtualFiles.RESOLVED_AXE_ENGINE_ID
       if (id === EMBED_SOURCE_ID) return RESOLVED_EMBED_SOURCE_ID
       if (id === LOCAL_SOURCE_ID) return RESOLVED_LOCAL_SOURCE_ID
@@ -117,6 +119,7 @@ export function createVirtualFilesPlugin(ctx: Context, isServer: boolean) {
     },
 
     async load(id) {
+      if (id === RESOLVED_MARKETPLACE_OFFICIAL_ID) return resolvedMarketplaceOfficial()
       if (id === VirtualFiles.RESOLVED_AXE_ENGINE_ID) {
         const runtime = resolveAccessibilityRuntime(ctx.root, ctx.config.inspection)
         if (!runtime) throw new Error('Accessibility audit unavailable')

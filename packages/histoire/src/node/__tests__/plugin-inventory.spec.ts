@@ -13,9 +13,9 @@ describe('installed plugin inventory', () => {
     const source = resolvedConfig(ctx)
     const module = await import(`data:text/javascript,${encodeURIComponent(source)}`)
     expect(module.installedPlugins).toEqual([
-      { name: 'builtin:vanilla-support', builtin: true, enabled: true, client: false, frame: false },
-      { name: 'alpha', builtin: false, enabled: true, id: 'alpha', client: true, frame: true },
-      { name: 'alpha', builtin: false, enabled: true, client: false, frame: false },
+      { name: 'builtin:vanilla-support', builtin: true, enabled: true, client: false, frame: false, local: false, required: true, official: false },
+      { name: 'alpha', builtin: false, enabled: true, id: 'alpha', client: true, frame: true, local: true, required: false, official: false },
+      { name: 'alpha', builtin: false, enabled: true, client: false, frame: false, local: true, required: false, official: false },
     ])
     expect(source).not.toContain('secret-one')
     expect(source).not.toContain('secret-two')
@@ -30,15 +30,15 @@ describe('installed plugin inventory', () => {
   it('does not advertise dev-only browser entries in a static book', async () => {
     const ctx = { mode: 'build', config: { plugins: [{ name: 'dev-tools', workbench: { id: 'tools', client: 'tools/client', frame: 'tools/frame', devOnly: true } }] } } as unknown as Context
     const module = await import(`data:text/javascript,${encodeURIComponent(resolvedConfig(ctx))}`)
-    expect(module.installedPlugins).toEqual([{ name: 'dev-tools', builtin: false, enabled: true, id: 'tools', client: false, frame: false }])
+    expect(module.installedPlugins).toEqual([{ name: 'dev-tools', builtin: false, enabled: true, id: 'tools', client: false, frame: false, local: true, required: false, official: false }])
   })
 
   it('emits resolved public metadata alongside the correct duplicate plugin', async () => {
     const ctx = { mode: 'dev', config: { plugins: [{ name: 'same' }, { name: 'same' }] }, pluginMetadata: [{ displayName: 'First' }, { description: 'Second' }] } as unknown as Context
     const module = await import(`data:text/javascript,${encodeURIComponent(resolvedConfig(ctx))}`)
     expect(module.installedPlugins).toEqual([
-      { name: 'same', builtin: false, enabled: true, client: false, frame: false, displayName: 'First' },
-      { name: 'same', builtin: false, enabled: true, client: false, frame: false, description: 'Second' },
+      { name: 'same', builtin: false, enabled: true, client: false, frame: false, displayName: 'First', local: true, required: false, official: false },
+      { name: 'same', builtin: false, enabled: true, client: false, frame: false, description: 'Second', local: true, required: false, official: false },
     ])
   })
 })

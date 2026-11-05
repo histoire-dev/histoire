@@ -1,0 +1,5 @@
+{
+  "extends": "../../../../histoire/src/node/__tests__/marketplace/tsconfig.app.json",
+  "include": ["../../../../histoire-app/src", "../marketplace-shell.spec.ts", "../utils/marketplace-transport.ts", "../utils/marketplace-official.ts"],
+  "exclude": ["../../../../histoire-app/src/**/*.spec.ts"]
+}

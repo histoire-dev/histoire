@@ -1,9 +1,11 @@
+import type { MarketplacePrefs } from '@histoire/shared'
 import type { InjectionKey } from 'vue'
 import type { SingleViewportState } from '../components/canvas/single-viewport.js'
 import type { ContributionPresence } from '../extensions/shell-registry.js'
 import type { CanvasDefaultArrangement } from './canvas-arrangement.js'
 import { inject, provide, reactive, ref } from 'vue'
 import { isPluginContributionId } from '../extensions/shell-registry.js'
+import { marketplaceDefaults } from '../util/marketplace-preferences.js'
 
 /** Small storage interface lets standalone persist while embeddings stay memory-only. */
 export interface SettingsStorage {
@@ -23,6 +25,8 @@ export interface UiSettings {
   syncZoom: boolean
   /** Rerun tests after story updates. */
   watchTests: boolean
+  /** Marketplace preferences, hydrated and validated by the marketplace store. */
+  marketplace?: MarketplacePrefs
 }
 
 /** Settings sections, ordered like the supplied design. */
@@ -106,7 +110,11 @@ export function createUiSettingsStore(options: { storage?: SettingsStorage, warn
       catch { /* Runtime does not depend on browser storage availability. */ }
     },
     /** Reset keeps project defaults authoritative. */
-    reset(): void { update(defaults) },
+    reset(): void {
+      // Keep the marketplace store's shared reactive object alive during reset.
+      if (state.marketplace) Object.assign(state.marketplace, marketplaceDefaults())
+      update(defaults)
+    },
   }
 }
 

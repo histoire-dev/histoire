@@ -1,5 +1,13 @@
+/* Same backdrop in light and dark themes; hosts may override the public token. */
+@layer theme {
+  :root {
+    --histoire-scrim: rgb(0 0 0 / 45%);
+  }
+}
+
 /* Public tokens remain runtime values, including opacity-bearing host colors. */
 @theme inline {
+  --color-scrim: var(--histoire-scrim);
   --color-surface: rgb(var(--histoire-surface-rgb) / var(--histoire-surface-alpha, 1));
   --color-canvas: rgb(var(--histoire-canvas-rgb) / var(--histoire-canvas-alpha, 1));
   --color-home: rgb(var(--histoire-home-rgb) / var(--histoire-home-alpha, 1));

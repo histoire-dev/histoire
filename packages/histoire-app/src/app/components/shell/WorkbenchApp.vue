@@ -15,6 +15,9 @@ import MeasureOverlay from '../canvas/MeasureOverlay.vue'
 import CanvasToolbar from '../canvas/toolbar/CanvasToolbar.vue'
 import ToolbarButton from '../canvas/toolbar/ToolbarButton.vue'
 import EmbedMenu from '../embed/EmbedMenu.vue'
+import MarketplaceModal from '../marketplace/shell/MarketplaceModal.vue'
+import MarketplaceSpotlightHost from '../marketplace/spotlight/MarketplaceSpotlightHost.vue'
+import MarketplaceUpdateDialog from '../marketplace/update/MarketplaceUpdateDialog.vue'
 import ContextMenu from '../menu/ContextMenu.vue'
 import HomePage from '../pages/home/HomePage.vue'
 import SearchPanel from '../panes/search/SearchPanel.vue'
@@ -164,5 +167,8 @@ function setSelectedSession(session: HistoireSession | undefined): void {
   </ShellLayout>
   <!-- Menus remain reachable from the canvas while workbench chrome is hidden. -->
   <ContextMenu />
+  <MarketplaceModal />
+  <MarketplaceSpotlightHost />
+  <MarketplaceUpdateDialog />
   <EmbedDialog v-if="workbench.embed.target.value" :controller="workbench.embed" :book-url="previewBase" :enabled="histoireConfig.embed?.enabled ?? false" :allowed-origins="histoireConfig.embed?.allowedOrigins ?? []" />
 </template>

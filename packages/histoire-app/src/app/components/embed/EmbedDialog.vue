@@ -125,7 +125,7 @@ function changeFormat(event: KeyboardEvent): void {
 </script>
 
 <template>
-  <dialog ref="dialog" class="htw:box-border htw:flex htw:flex-col htw:w-[min(640px,_calc(100vw_-_32px))] htw:max-h-[calc(100vh_-_48px)] htw:m-auto htw:p-0 htw:overflow-hidden htw:[border:1px_solid_var(--histoire-border)] htw:rounded-panel htw:text-text htw:bg-surface htw:shadow-panel htw:text-[13px] htw:[&:not([open])]:hidden htw:backdrop:[background:rgb(0_0_0_/_.45)]" :aria-labelledby="`${id}-title`" @cancel.prevent="controller.close()" @close="target && controller.close()" @keydown.stop @pointerdown.stop @wheel.stop>
+  <dialog ref="dialog" class="htw:box-border htw:flex htw:flex-col htw:w-[min(640px,_calc(100vw_-_32px))] htw:max-h-[calc(100vh_-_48px)] htw:m-auto htw:p-0 htw:overflow-hidden htw:[border:1px_solid_var(--histoire-border)] htw:rounded-panel htw:text-text htw:bg-surface htw:shadow-panel htw:text-[13px] htw:[&:not([open])]:hidden htw:backdrop:bg-scrim" :aria-labelledby="`${id}-title`" @cancel.prevent="controller.close()" @close="target && controller.close()" @keydown.stop @pointerdown.stop @wheel.stop>
     <header class="htw:flex htw:items-center htw:gap-[12px] htw:p-[14px_14px_14px_20px] htw:[border-bottom:1px_solid_var(--histoire-border)]">
       <div class="htw:flex-1 htw:min-w-0">
         <h2 :id="`${id}-title`" class="htw:m-0 htw:text-[15px] htw:font-bold htw:leading-[1.3]">

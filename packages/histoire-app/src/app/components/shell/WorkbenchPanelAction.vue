@@ -15,6 +15,8 @@ const props = defineProps<{
   menuLabel?: string
   /** Options menu width in pixels. */
   menuWidth?: number
+  /** Native dialog or other surface owning the options menu. */
+  overlayTarget?: HTMLElement | null
 }>()
 const emit = defineEmits<{
   /** Main action activated. */
@@ -27,6 +29,8 @@ defineSlots<{
 
 const context = useHistoireContext()
 const open = ref(false)
+/** Keyboard opening selects the first or last enabled option. */
+const focusLast = ref(false)
 const chevron = shallowRef<InstanceType<typeof HstButton> | null>(null)
 const anchor = computed(() => (chevron.value?.element as HTMLElement | undefined) ?? null)
 const resolvedMenuLabel = computed(() => props.menuLabel ?? `${props.label} options`)
@@ -34,6 +38,29 @@ const resolvedMenuLabel = computed(() => props.menuLabel ?? `${props.label} opti
 /** Dismiss options menu after an item runs. */
 function close(): void {
   open.value = false
+}
+/** Arrow keys open at either enabled edge; Enter/Space stay native. */
+function openMenu(event: KeyboardEvent): void {
+  if (!['ArrowDown', 'ArrowUp'].includes(event.key)) return
+  event.preventDefault()
+  focusLast.value = event.key === 'ArrowUp'
+  open.value = true
+}
+
+/** Keep movement on enabled menu items; Tab returns to its trigger. */
+function navigate(event: KeyboardEvent): void {
+  if (event.key === 'Tab') {
+    event.preventDefault()
+    close()
+    anchor.value?.focus()
+    return
+  }
+  const rows = [...(event.currentTarget as HTMLElement).querySelectorAll<HTMLButtonElement>('[role="menuitem"]:not(:disabled)')]
+  const current = rows.indexOf(event.target as HTMLButtonElement)
+  const next = event.key === 'ArrowDown' ? (current + 1) % rows.length : event.key === 'ArrowUp' ? (current + rows.length - 1) % rows.length : event.key === 'Home' ? 0 : event.key === 'End' ? rows.length - 1 : -1
+  if (next < 0) return
+  event.preventDefault()
+  rows[next]?.focus()
 }
 </script>
 
@@ -43,10 +70,10 @@ function close(): void {
       <BuiltinIcon :icon="icon" :size="16" />{{ label }}
     </HstButton>
     <template v-if="$slots.menu">
-      <HstButton ref="chevron" color="primary" type="button" class="htw:rounded-s-none" icon-only :aria-label="resolvedMenuLabel" aria-haspopup="menu" :aria-expanded="open" :disabled="disabled" @click="open = !open">
+      <HstButton ref="chevron" color="primary" type="button" class="htw:rounded-s-none" icon-only :aria-label="resolvedMenuLabel" aria-haspopup="menu" :aria-expanded="open" :disabled="disabled" @click="focusLast = false; open = !open" @keydown="openMenu">
         <BuiltinIcon icon="chevron-down" :size="16" />
       </HstButton>
-      <BasePopover v-if="open" v-model:open="open" :anchor="anchor" :label="resolvedMenuLabel" role="menu" :width="menuWidth ?? 160" :overlay-target="context.overlay.value ?? context.root.value">
+      <BasePopover v-if="open" v-model:open="open" :anchor="anchor" :label="resolvedMenuLabel" role="menu" :width="menuWidth ?? 160" :overlay-target="overlayTarget ?? context.overlay.value ?? context.root.value" :focus-last="focusLast" @keydown="navigate">
         <slot name="menu" :close="close" />
       </BasePopover>
     </template>

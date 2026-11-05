@@ -1,0 +1,19 @@
+{
+  "extends": "../../../../../histoire-app/tsconfig.json",
+  "compilerOptions": {
+    // Preserve app vendor aliases while reading unbuilt shared contract sources.
+    "rootDir": "../../../../../..",
+    "paths": {
+      "@histoire/shared": ["../../../../../histoire-shared/src/index.ts"],
+      "floating-vue": ["../../../../../histoire-app/node_modules/@histoire/vendors/floating-vue"],
+      "@iconify/vue": ["../../../../../histoire-app/node_modules/@histoire/vendors/iconify"],
+      "pinia": ["../../../../../histoire-app/node_modules/@histoire/vendors/pinia"],
+      "scroll-into-view-if-needed": ["../../../../../histoire-app/node_modules/@histoire/vendors/scroll"],
+      "vue-router": ["../../../../../histoire-app/node_modules/@histoire/vendors/vue-router"],
+      "@vueuse/core": ["../../../../../histoire-app/node_modules/@histoire/vendors/vue-use"],
+      "vue": ["../../../../../histoire-app/node_modules/@histoire/vendors/vue"]
+    },
+    "typeRoots": ["../../../../../histoire-app/node_modules/@types"]
+  },
+  "include": ["../../../../../histoire-app/src"]
+}
