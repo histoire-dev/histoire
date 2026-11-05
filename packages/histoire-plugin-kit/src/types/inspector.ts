@@ -18,6 +18,8 @@ export type InspectorTabInput = ContributionBase<FrameScopedContext> & {
   label: string
   /** Tab icon. */
   icon: WorkbenchIcon
+  /** Local or same-plugin qualified command id; the host publishes its qualified identity. */
+  primaryCommand?: string
   /** Optional count or short text shown on the tab. */
   badge?: (context: FrameScopedContext) => string | number | null | undefined
 } & ContributionView<FrameScopedContext>

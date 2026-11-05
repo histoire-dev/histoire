@@ -134,3 +134,37 @@ describe('extension host isolation', () => {
     })
   })
 })
+
+// Real plugin registration must normalize command ownership before publishing surfaces.
+describe('pane and tab primary commands', () => {
+  it('qualifies local command ids and retains an explicit same-plugin id', async () => {
+    const host = createTestHost([plugin('acme', (api) => {
+      api.shell.addPane({ id: 'results', label: 'Results', icon: 'document', primaryCommand: 'run', mount: () => {} })
+      api.inspector.addTab({ id: 'audit', label: 'Audit', icon: 'document', primaryCommand: 'acme:run', mount: () => {} })
+      addCommand(api, 'run')
+    })])
+    try {
+      await host.ready
+      expect(host.diagnostics()).toEqual([])
+      expect(host.contributions('shell.pane')[0]).toMatchObject({ id: 'acme:results', primaryCommand: 'acme:run' })
+      expect(host.contributions('inspector.tab')[0]).toMatchObject({ id: 'acme:audit', primaryCommand: 'acme:run' })
+    }
+    finally { await host.dispose() }
+  })
+
+  describe.each(['pane', 'tab'] as const)('%s command validation', (surface) => {
+    it.each(['foreign:run', 'builtin:run', '', 'bad id', 'acme:bad:id', 'acme:'])('rejects primary command %j through registration diagnostics', async (primaryCommand) => {
+      const host = createTestHost([plugin('acme', (api) => {
+        const input = { id: 'results', label: 'Results', icon: 'document', primaryCommand, mount: () => {} }
+        if (surface === 'pane') api.shell.addPane(input)
+        else api.inspector.addTab(input)
+      })])
+      try {
+        await host.ready
+        expect(host.contributions(surface === 'pane' ? 'shell.pane' : 'inspector.tab')).toEqual([])
+        expect(host.diagnostics()).toEqual(expect.arrayContaining([expect.objectContaining({ pluginId: 'acme', phase: 'register', error: expect.any(Error) })]))
+      }
+      finally { await host.dispose() }
+    })
+  })
+})

@@ -1,6 +1,7 @@
 import type { ContributionKind, QualifiedContribution, WorkbenchContribution } from '../types/contribution.js'
 import type { ContributionRank } from './ordering.js'
 import { PluginDefinitionError } from '../errors.js'
+import { parseQualifiedId } from '../ids.js'
 import { compareRanks } from './ordering.js'
 
 /**
@@ -59,7 +60,17 @@ const EMPTY: ReadonlyArray<never> = Object.freeze([])
  * @param qualifiedId Already validated `${namespace}:${id}`.
  */
 export function qualifyContribution(contribution: WorkbenchContribution, namespace: string, qualifiedId: string): QualifiedContribution {
-  return Object.freeze({ ...contribution, id: qualifiedId, pluginId: namespace, localId: contribution.id })
+  const qualified = { ...contribution, id: qualifiedId, pluginId: namespace, localId: contribution.id }
+  if ((qualified.kind === 'shell.pane' || qualified.kind === 'inspector.tab') && qualified.primaryCommand !== undefined) {
+    // Relations may precede their command registration, but must stay inside the owner namespace.
+    const input = qualified.primaryCommand
+    const command = typeof input === 'string' ? parseQualifiedId(input.includes(':') ? input : `${namespace}:${input}`) : null
+    if (!command || command.namespace !== namespace) {
+      throw new PluginDefinitionError(`invalid primary command ${JSON.stringify(input)}; expected a command id owned by "${namespace}"`, namespace)
+    }
+    qualified.primaryCommand = `${namespace}:${command.localId}`
+  }
+  return Object.freeze(qualified)
 }
 
 /**

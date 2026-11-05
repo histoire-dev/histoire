@@ -9,6 +9,8 @@ export type ShellPaneInput = ContributionBase<WorkbenchContext> & {
   label: string
   /** Rail icon. */
   icon: WorkbenchIcon
+  /** Local or same-plugin qualified command id; the host publishes its qualified identity. */
+  primaryCommand?: string
   /** Optional count or short text shown on the rail item. */
   badge?: (context: WorkbenchContext) => string | number | null | undefined
   /**
