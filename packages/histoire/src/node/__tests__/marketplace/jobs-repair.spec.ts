@@ -1,6 +1,7 @@
 import type { MarketplacePrefs } from '@histoire/shared'
 import { readFile } from 'node:fs/promises'
 import { afterEach, expect, it } from 'vitest'
+import { marketplaceDefaults } from '../../../../../histoire-app/src/app/util/marketplace-preferences.js'
 import { createJobRunner } from '../../marketplace/jobs/runner.js'
 import { disposeConfigProjects } from '../utils/config-codemod.js'
 import { jobProject, lockBytes, packageBytes } from './jobs-fixture.js'
@@ -20,7 +21,7 @@ it.each([
   ['yarn', { berry: true }, ['install', '--immutable'], 'yarn.lock'],
   ['bun', {}, ['install', '--frozen-lockfile'], 'bun.lock'],
 ] as const)('repairs failed %s change with frozen argv %j', async (manager, script, argv, lockfile) => {
-  const prefs: MarketplacePrefs = { community: false, packageManager: manager, afterInstall: 'restart', skippedVersions: {} }
+  const prefs: MarketplacePrefs = { ...marketplaceDefaults(), packageManager: manager }
   const fixture = await jobProject({ ...script, fail: 'ENOTFOUND registry\n' }, 'restart', { prefs })
   await fixture.runner.start(fixture.plan.planId, fixture.plan.hash)
   await fixture.runner.wait()

@@ -2,6 +2,7 @@
 import type { CatalogPage } from '@histoire/shared'
 import { HstButton } from '@histoire/controls/vue'
 import { useMarketplaceStore } from '../../../stores/marketplace.js'
+import BaseChip from '../../base/BaseChip.vue'
 import PluginTile from '../shell/PluginTile.vue'
 import PluginInstallAction from './PluginInstallAction.vue'
 
@@ -29,7 +30,9 @@ const store = useMarketplaceStore()
     <p class="htw:m-0 htw:text-[14px] htw:text-body">
       {{ plugin.summary }}
     </p>
-    <span class="htw:inline-flex htw:min-h-[22px] htw:self-start htw:items-center htw:rounded-full htw:bg-accent-soft htw:px-[9px] htw:text-[11px] htw:font-semibold htw:text-accent-text">{{ plugin.reason }}</span>
+    <BaseChip tone="accent" class="htw:self-start">
+      {{ plugin.reason }}
+    </BaseChip>
     <div class="htw:mt-auto htw:flex htw:items-center htw:gap-[8px]">
       <PluginInstallAction :plugin="plugin" primary />
       <HstButton color="flat" :aria-label="`Details for ${plugin.displayName}`" @click="store.showPlugin(plugin.id)">

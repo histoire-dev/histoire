@@ -6,7 +6,7 @@ import { configTestProject, disposeConfigProjects } from '../utils/config-codemo
 import { deferred } from '../utils/mcp/deferred.js'
 import { denyRegistryCacheWrites } from './catalog-cache-fixture.js'
 
-/** Real parser rejects invalid retained metadata on every access. */
+/** Real parser validates fetched data and persisted metadata before memory admission. */
 const schema = z.string()
 afterEach(disposeConfigProjects)
 
@@ -14,6 +14,29 @@ afterEach(disposeConfigProjects)
 // external responses. Exact survivors distinguish LRU from FIFO and excess
 // retention; controlled clock distinguishes unchanged fetch time from renewed TTL.
 describe('generation registry cache', () => {
+  it('validates fetched and disk metadata once, reusing admitted memory objects across readers', async () => {
+    const { root } = await configTestProject()
+    onTestFinished(() => clearRegistryMemory(root))
+    let parses = 0
+    const objectSchema = z.object({ version: z.string() })
+    /** Observe real validation; duplicate parses allocate unnecessary metadata copies. */
+    const parse = (value: unknown) => {
+      parses++
+      return objectSchema.parse(value)
+    }
+    const cache = createRegistryCache(root)
+    const first = await cache.get('package', parse, async () => ({ version: '1.0.0' }))
+    expect(first.value).toEqual({ version: '1.0.0' })
+    expect((await createRegistryCache(root).read('package', parse))?.value).toBe(first.value)
+    expect(parses).toBe(1)
+    clearRegistryMemory(root)
+    const reader = createRegistryCache(root)
+    const disk = await reader.read('package', parse)
+    expect(disk?.value).toEqual({ version: '1.0.0' })
+    expect((await reader.read('package', parse))?.value).toBe(disk?.value)
+    expect(parses).toBe(2)
+  })
+
   it('shares 200 entries per normalized root and evicts least recently read metadata', async () => {
     const { root } = await configTestProject()
     await denyRegistryCacheWrites(root)

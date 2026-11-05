@@ -1,6 +1,7 @@
 import type { PluginDetail } from '@histoire/shared'
 import { Buffer } from 'node:buffer'
 import { z } from 'zod'
+import { repositoryUrl, webUrl } from '../../config/plugin-metadata.js'
 import { validateMarketplaceManifest } from '../manifest/index.js'
 import { packageName } from './validation.js'
 import { compareVersions } from './version.js'
@@ -24,19 +25,16 @@ export const packumentSchema = z.object({
   'dist-tags': z.object({ latest: z.string().min(1).max(128) }),
   'versions': z.record(z.string().max(128), z.unknown()),
   'time': z.record(z.string(), z.string().max(128)).optional(),
-})
+}).transform(packument => ({
+  ...packument,
+  // Unknown version fields (scripts, readmes, tarball metadata) are never consumed.
+  versions: Object.fromEntries(Object.entries(packument.versions).map(([version, raw]) => {
+    const parsed = versionSchema.safeParse(raw)
+    return [version, parsed.success ? parsed.data : {}]
+  })),
+}))
 /** Parsed packument without any executable content. */
 export type RegistryPackument = z.infer<typeof packumentSchema>
-
-/** Admit browser links only; credentials and arbitrary protocols are discarded. */
-function webUrl(raw: string | undefined): string | undefined {
-  if (!raw) return
-  try {
-    const url = new URL(raw.replace(/^git\+https:/, 'https:'))
-    if (['https:', 'http:'].includes(url.protocol) && !url.username && !url.password) return url.href.replace(/\.git$/, '')
-  }
-  catch { /* Optional malformed links are not catalog failures. */ }
-}
 
 /** Declarative version metadata exported for update/planner consumers. */
 export interface RegistryRelease {
@@ -45,6 +43,14 @@ export interface RegistryRelease {
   /** Optional peer package names, which do not require an absent install. */ optionalPeers: string[]
   /** Deprecated releases cannot be offered as updates. */ deprecated: boolean
 }
+/** Immutable packument objects own their parsed releases, including invalid misses. */
+const releaseCache = new WeakMap<RegistryPackument, Map<string, RegistryRelease | undefined>>()
+/** Latest detail owns a separate copy so its version table never mutates a release. */
+const detailCache = new WeakMap<RegistryPackument, RegistryRelease | undefined>()
+
+/** Stable history projections shared by updates, migrations and failure advice. */
+const historyCache = new WeakMap<RegistryPackument, RegistryRelease[]>()
+
 /** Intersect declared peers and manifest requirements, preserving union precedence. */
 function requirements(peers: Record<string, string> = {}, declared: Record<string, string> = {}): Record<string, string> {
   return Object.fromEntries([...new Set([...Object.keys(peers), ...Object.keys(declared)])].map((name) => {
@@ -56,6 +62,16 @@ function requirements(peers: Record<string, string> = {}, declared: Record<strin
 }
 /** Read published version without trusting its package identity or official claims. */
 export function registryRelease(packument: RegistryPackument, version: string): RegistryRelease | undefined {
+  let releases = releaseCache.get(packument)
+  if (!releases) releaseCache.set(packument, releases = new Map())
+  if (releases.has(version)) return releases.get(version)
+  const release = readRelease(packument, version)
+  releases.set(version, release)
+  return release
+}
+
+/** Validate and project one exact release only on its first use. */
+function readRelease(packument: RegistryPackument, version: string): RegistryRelease | undefined {
   if (!Object.hasOwn(packument.versions, version)) return
   const parsed = versionSchema.safeParse(packument.versions[version])
   if (!parsed.success || parsed.data.name !== packument.name || parsed.data.version !== version) return
@@ -77,7 +93,7 @@ export function registryRelease(packument: RegistryPackument, version: string): 
     latest: version,
     updatedAt: packument.time?.[version],
     license: pkg.license,
-    repoUrl: webUrl(typeof pkg.repository === 'object' ? pkg.repository.url : pkg.repository),
+    repoUrl: repositoryUrl(pkg.repository),
     docsUrl: webUrl(pkg.homepage),
     compatible: { ok: true },
     manifest,
@@ -94,13 +110,32 @@ export function registryRelease(packument: RegistryPackument, version: string): 
 
 /** Latest valid manifest plus bounded version metadata; never evaluate package code. */
 export function registryDetail(packument: RegistryPackument): RegistryRelease | undefined {
+  if (detailCache.has(packument)) return detailCache.get(packument)
   const release = registryRelease(packument, packument['dist-tags'].latest)
-  if (!release) return
-  release.detail.versions = Object.keys(packument.versions).sort((a, b) => compareVersions(b, a)).slice(0, 100).flatMap((version) => {
+  if (!release) {
+    detailCache.set(packument, undefined)
+    return
+  }
+  const versions = Object.keys(packument.versions).sort((a, b) => compareVersions(b, a)).slice(0, 100).flatMap((version) => {
     const parsed = versionSchema.safeParse(packument.versions[version])
     return parsed.success && parsed.data.name === packument.name && parsed.data.version === version
       ? [{ version, date: packument.time?.[version], deprecated: Boolean(parsed.data.deprecated), compatible: true }]
       : []
   })
-  return release
+  const result = { ...release, detail: { ...release.detail, versions } }
+  detailCache.set(packument, result)
+  return result
+}
+
+/** All valid version-specific releases, memoized through the exact-version reader. */
+export function registryReleases(packument: RegistryPackument): RegistryRelease[] {
+  let releases = historyCache.get(packument)
+  if (!releases) {
+    releases = Object.keys(packument.versions).flatMap((version) => {
+      const release = registryRelease(packument, version)
+      return release ? [release] : []
+    })
+    historyCache.set(packument, releases)
+  }
+  return releases
 }

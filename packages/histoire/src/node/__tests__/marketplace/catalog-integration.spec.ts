@@ -1,5 +1,6 @@
 import type { Context } from '../../context.js'
 import { afterEach, expect, it, onTestFinished } from 'vitest'
+import { marketplaceDefaults } from '../../../../../histoire-app/src/app/util/marketplace-preferences.js'
 import { registerCatalogHandlers } from '../../marketplace/catalog/handlers.js'
 import { officialPlugins } from '../../marketplace/catalog/official.js'
 import { createCatalogService } from '../../marketplace/catalog/service.js'
@@ -8,7 +9,7 @@ import { configTestProject, disposeConfigProjects } from '../utils/config-codemo
 import { registryServer } from '../utils/marketplace/registry-server.js'
 import { uiChannelFixture } from '../utils/ui-channel.js'
 
-const prefs = { community: true, packageManager: 'auto' as const, afterInstall: 'ask' as const, skippedVersions: {} }
+const prefs = { ...marketplaceDefaults(), community: true, afterInstall: 'ask' as const }
 afterEach(disposeConfigProjects)
 
 it('filters complete collection membership before pagination and facet alternatives', async () => {

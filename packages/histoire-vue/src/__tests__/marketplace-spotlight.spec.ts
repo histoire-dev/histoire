@@ -94,7 +94,7 @@ it('waits for successful load and excludes updates and already-installed option 
 })
 
 it('opens opted-in actual pane before spotlight, then acknowledges on dismissal', async () => {
-  const { wrapper, deliver, button, targets, store } = await setup({ openPane: 'Project results with story tests or build reports' })
+  const { wrapper, deliver, button, targets, store } = await setup({ openPane: 'results' })
   await deliver()
   expect(targets.pane).toHaveBeenCalledExactlyOnceWith('a11y:results')
   expect(wrapper.get('[role="dialog"]').text()).toContain('Audit results pane added')
@@ -121,7 +121,7 @@ it.each(['popover', 'custom'] as const)('tours a real %s toolbar contribution', 
 })
 
 it('retains selected destination when mounted wizard handles navigation first', async () => {
-  const { wrapper, deliver, targets } = await setup({ openPane: 'Audit results', wizard: true })
+  const { wrapper, deliver, targets } = await setup({ openPane: 'results', wizard: true })
   await deliver()
   expect(targets.pane).toHaveBeenCalledExactlyOnceWith('a11y:results')
   expect(wrapper.get('[aria-label="Plugin added"]').text()).toContain('Audit results pane added')
@@ -140,8 +140,7 @@ it('removes stale anchor relation when control disappears during tour', async ()
   await deliver()
   const tab = wrapper.get('[role="tab"]')
   tab.element.setAttribute('hidden', '')
-  await flushMicrotasks(32)
-  expect(tab.attributes('aria-details')).toBeUndefined()
+  await vi.waitFor(() => expect(tab.attributes('aria-details')).toBeUndefined())
   expect(wrapper.get('[aria-label="Plugin added"]').text()).toContain('Audit results pane added')
 })
 
@@ -219,4 +218,53 @@ it.each(['pane', 'tab'])('omits missing and unavailable %s primary actions', asy
     expect(actions).toEqual([])
     for (const cleanup of cleanups.splice(0).reverse()) await cleanup()
   }
+})
+
+it.each([false, true])('opens selected contribution id despite pane order (mounted wizard: %s)', async (wizard) => {
+  const { wrapper, deliver, targets } = await setup({ openPane: 'history', secondPane: true, wizard, adds: [
+    { kind: 'rail-pane', contribution: 'history', text: 'Past findings' },
+    { kind: 'rail-pane', contribution: 'results', text: 'Current findings' },
+  ] })
+  await deliver()
+  expect(targets.pane).toHaveBeenCalledExactlyOnceWith('a11y:history')
+  expect(wrapper.get('[aria-label="Plugin added"]').text()).toContain('Audit history pane added')
+})
+
+it('attaches layout listeners only during an eligible tour and coalesces refreshes', async () => {
+  const add = vi.spyOn(window, 'addEventListener')
+  const remove = vi.spyOn(window, 'removeEventListener')
+  const frames = vi.spyOn(window, 'requestAnimationFrame')
+  const { wrapper, deliver, button } = await setup()
+  expect(add.mock.calls.filter(([event]) => event === 'scroll')).toHaveLength(0)
+  await deliver()
+  // Card positioning and live target lookup each own one active listener.
+  const scrolls = add.mock.calls.filter(([event]) => event === 'scroll')
+  expect(scrolls.length - remove.mock.calls.filter(([event]) => event === 'scroll').length).toBe(2)
+  await new Promise(resolve => setTimeout(resolve, 30))
+  frames.mockClear()
+  wrapper.get('[role="tab"]').element.setAttribute('hidden', '')
+  window.dispatchEvent(new Event('scroll'))
+  window.dispatchEvent(new Event('resize'))
+  await flushMicrotasks(8)
+  expect(frames).toHaveBeenCalledTimes(1)
+  await vi.waitFor(() => expect(wrapper.get('[aria-label="Plugin added"]').text()).toContain('Audit results pane added'))
+  await button('Got it').trigger('click')
+  expect(remove.mock.calls.filter(([event]) => event === 'scroll')).toHaveLength(add.mock.calls.filter(([event]) => event === 'scroll').length)
+  frames.mockClear()
+  window.dispatchEvent(new Event('scroll'))
+  await flushMicrotasks(8)
+  expect(frames).not.toHaveBeenCalled()
+})
+
+// Anchors belong to contribution identity, independent of DOM ids and legacy selectors.
+it('tours contribution controls after legacy selector attributes change', async () => {
+  const { wrapper, deliver, button } = await setup()
+  wrapper.get('[role="tab"]').element.id = 'another-inspector-id'
+  const pane = wrapper.get('[data-shell-pane="a11y:results"]')
+  pane.element.removeAttribute('data-shell-pane')
+  await deliver()
+  expect(wrapper.get('[aria-label="Plugin added"]').text()).toContain('A11y tab added')
+  await button('Next').trigger('click')
+  expect(wrapper.get('[aria-label="Plugin added"]').text()).toContain('Audit results pane added')
+  expect(pane.attributes('aria-details')).toBe(wrapper.get('[aria-label="Plugin added"]').attributes('id'))
 })

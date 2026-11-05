@@ -4,17 +4,15 @@ import type { RepairReceipt } from './repair.js'
 import type { JobRunnerOptions } from './types.js'
 import path from 'pathe'
 import { configFileHash, hashConfigCode } from '../../config/codemod/write.js'
-import { SafeConfigWriteError } from '../../config/safe-config-write.js'
+import { safeConfigWrite, SafeConfigWriteError } from '../../config/safe-config-write.js'
 import { officialPlugins } from '../catalog/official.js'
-import { writeJobConfig } from './config-step.js'
 import { parseFailure, suggestVersion } from './failure.js'
 import { createJobOutput } from './output.js'
 import { findUnmetPeer, PeerConflictError } from './peers.js'
-import { readReceipt, releaseJob, writeReceipt } from './receipt.js'
+import { JOB_RECEIPT_TTL_MS, readReceipt, releaseJob, writeReceipt } from './receipt.js'
 import { repairDependencies } from './repair.js'
 import { restoreProject, snapshotProject } from './snapshot.js'
 import { spawnPackage } from './spawn.js'
-import { copyJob } from './types.js'
 
 /** Past-tense verbs for the host's restart notice. */
 const restartVerbs: Record<JobState['kind'], string> = { install: 'Installed', remove: 'Removed', update: 'Updated', pin: 'Pinned', options: 'Configured' }
@@ -103,17 +101,18 @@ export async function executeJob(options: JobRunnerOptions, receipt: RepairRecei
     }
     receipt.configHash = hashConfigCode(change.configCode!)
     receipt.originalConfigHash = change.configHash
-    receipt.expires = Date.now() + 10 * 60_000
+    receipt.expires = Date.now() + JOB_RECEIPT_TTL_MS
     const restart = job.steps.find(step => step.id === 'restart')!
     if (configChanged) {
       await step('config', async () => {
-        await writeJobConfig(options.root, options.configFile, change, abort.signal, async () => {
+        if (change.configHash === undefined || change.configCode === undefined) throw new Error('Plugin configuration cannot be edited safely')
+        await safeConfigWrite({ root: options.root, file: options.configFile, code: change.configCode, expectedHash: change.configHash, isActive: () => !abort.signal.aborted, beforeWrite: async () => {
           // The watcher can retire this process immediately after the atomic write.
           // Save handoff first; successor must prove the exact loaded revision.
           receipt.handoff = true
           restart.state = 'running'
           await writeReceipt(options.root, receipt)
-        })
+        } })
         configCommitted = true
       })
     }
@@ -166,9 +165,9 @@ export async function executeJob(options: JobRunnerOptions, receipt: RepairRecei
     if (!configRestored && configFailure) leftovers.push(path.relative(options.root, options.configFile))
     const wasCancelled = cancelled || repairSignal.aborted
     const suggestion = !wasCancelled && failure.code === 'peer-conflict' && (change.request.prefs.community || officialPlugins.some(entry => entry.id === job.id && entry.official))
-      ? await suggestVersion(options.root, job.id, failure)
+      ? await suggestVersion(options.context ?? options.root, job.id, failure)
       : undefined
-    const failed = copyJob(job)
+    const failed = structuredClone(job)
     failed.failure = { code: configFailure ? 'config-write' : failure.code, message: wasCancelled ? 'Plugin change cancelled' : configFailure ? 'Plugin configuration could not be saved. Run the change manually.' : failure.message, restored, leftovers: [...new Set(leftovers)], ...(suggestion ? { suggestion } : {}) }
     delete failed.awaiting
     failed.status = wasCancelled ? 'cancelled' : 'failed'
@@ -176,7 +175,7 @@ export async function executeJob(options: JobRunnerOptions, receipt: RepairRecei
     for (const entry of failed.steps) {
       if (entry.state === 'pending') entry.state = 'skipped'
     }
-    receipt.expires = Date.now() + 10 * 60_000
+    receipt.expires = Date.now() + JOB_RECEIPT_TTL_MS
     await terminal(failed)
   }
 }

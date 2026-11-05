@@ -1,14 +1,12 @@
 import type { ChangeRequest, JobState, PluginDetail } from '@histoire/shared'
-import type { MarketplaceTransport } from '../../../util/marketplace-client.js'
 import { computed, onScopeDispose, ref, shallowRef, watch } from 'vue'
 import { useMarketplaceStore } from '../../../stores/marketplace.js'
-import { createMarketplaceClient } from '../../../util/marketplace-client.js'
 import { useInstallPlan } from '../install/use-install-plan.js'
+import { jobProgressLabel } from '../shell/job-progress-label.js'
 
 /** Dialog reads belong to its visit; admitted jobs and restart policy belong to the store. */
-export function useUpdateDialog(transport?: MarketplaceTransport) {
+export function useUpdateDialog() {
   const store = useMarketplaceStore()
-  const client = createMarketplaceClient({ transport })
   const detail = shallowRef<PluginDetail>()
   const apply = ref(true)
   const loading = ref(false)
@@ -31,20 +29,7 @@ export function useUpdateDialog(transport?: MarketplaceTransport) {
     : undefined)
   const review = useInstallPlan(request)
   const busy = computed(() => starting.value || active.value?.status === 'running')
-  const progress = computed(() => {
-    const job = active.value
-    if (job?.awaiting === 'restart') return 'Restart the dev server to finish'
-    if (job?.awaiting) return 'Restart required'
-    if (job?.status === 'cancelled') return 'Update cancelled'
-    const step = job?.steps.find(step => step.state === 'running')?.id ?? 'resolve'
-    return {
-      /** Resolve package metadata. */ resolve: 'Resolving plugin',
-      /** Package-manager execution. */ install: 'Installing package',
-      /** Guarded config write. */ config: 'Updating histoire.config.ts',
-      /** Dev proxy replaces the server process. */ restart: 'Restarting dev server',
-      /** Successor confirms installed plugin. */ load: 'Loading plugin',
-    }[step]
-  })
+  const progress = computed(() => jobProgressLabel(active.value))
 
   /** Retire metadata and review authority synchronously before another visit can start. */
   async function load(): Promise<void> {
@@ -60,7 +45,7 @@ export function useUpdateDialog(transport?: MarketplaceTransport) {
     if (!id) return
     const current = controller = new AbortController()
     try {
-      const value = await client.updateDetail(id, store.prefs.value, { signal: current.signal })
+      const value = await store.client.updateDetail(id, store.prefs.value, { signal: current.signal })
       if (current.signal.aborted || revision !== currentRevision) return
       apply.value = true
       detail.value = value
@@ -106,8 +91,7 @@ export function useUpdateDialog(transport?: MarketplaceTransport) {
     if (!plan || !change || busy.value || store.job.value?.status === 'running') return
     if (plan.manual) {
       dismiss()
-      store.startInstall(change)
-      store.showManual(plan)
+      store.startInstall(change, plan)
       return
     }
     const current = revision

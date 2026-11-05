@@ -23,7 +23,8 @@ it('loads updates on startup, retains session cache, filters skipped targets and
   const storage = memoryStorage()
   const session = createHistoireSessionWithAdapters({ url: 'https://book.example/' }, sourceFixture().adapters)
   const shell = createShell({ dev: true, storage })
-  const store = createMarketplaceStore({ client: createMarketplaceClient({ transport: channel.transport }), settings: createUiSettingsStore({ storage }), storage })
+  const store = createMarketplaceStore({ client: createMarketplaceClient({ transport: channel.transport }), settings: createUiSettingsStore({ storage }) })
+  store.connect()
   const shown = ref(true)
   const Host = defineComponent(() => {
     provideShell(shell)
@@ -50,6 +51,7 @@ it('loads updates on startup, retains session cache, filters skipped targets and
     store.prefs.value.skippedVersions = Object.fromEntries(updates.map(item => [item.id, item.to]))
     await nextTick()
     expect(wrapper.find('[aria-label="Settings"]').exists()).toBe(true)
+    expect(requests()).toHaveLength(2)
     channel.emit('histoire:ui:marketplace-updates-result', { requestId: requests()[1].value.requestId, updates: [] })
     await flushMicrotasks(10)
     store.prefs.value.skippedVersions = {}

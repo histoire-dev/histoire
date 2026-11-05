@@ -1,11 +1,12 @@
 import type { Context } from '../../context.js'
 import { afterEach, expect, it, onTestFinished, vi } from 'vitest'
+import { marketplaceDefaults } from '../../../../../histoire-app/src/app/util/marketplace-preferences.js'
 import { registerMigrationHandlers } from '../../marketplace/migrations/handlers.js'
 import { disposeConfigProjects } from '../utils/config-codemod.js'
 import { uiChannelFixture } from '../utils/ui-channel.js'
 import { inventoryPackage, inventoryProject } from './inventory-fixture.js'
 
-const prefs = { community: false, packageManager: 'auto', afterInstall: 'ask', skippedVersions: {} }
+const prefs = { ...marketplaceDefaults(), afterInstall: 'ask' as const }
 afterEach(async () => {
   vi.unstubAllEnvs()
   await disposeConfigProjects()

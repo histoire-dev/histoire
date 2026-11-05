@@ -14,7 +14,7 @@ export interface RepairReceipt extends JobReceipt {
 }
 
 /** Recovery inputs captured before executing the original package command. */
-export interface DependencyRepair {
+interface DependencyRepair {
   /** Project directory used by the original command. */ root: string
   /** Exact manifest and lockfile bytes captured before execution. */ snapshot: ProjectSnapshot
   /** Package intent whose installed state must be restored. */ request: ChangeRequest

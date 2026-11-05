@@ -3,6 +3,7 @@ import type { Context } from '../../context.js'
 import { readdir, readFile, writeFile } from 'node:fs/promises'
 import { join } from 'pathe'
 import { afterEach, beforeEach, describe, expect, it, onTestFinished, vi } from 'vitest'
+import { marketplaceDefaults } from '../../../../../histoire-app/src/app/util/marketplace-preferences.js'
 import { registerCatalogHandlers } from '../../marketplace/catalog/handlers.js'
 import { createRegistryClient } from '../../marketplace/catalog/registry.js'
 import { createCatalogService } from '../../marketplace/catalog/service.js'
@@ -15,7 +16,7 @@ import { registryServer } from '../utils/marketplace/registry-server.js'
 import { uiChannelFixture } from '../utils/ui-channel.js'
 
 /** Explicit consent for real catalog, planning, migration and update consumers. */
-const prefs: MarketplacePrefs = { community: true, packageManager: 'npm', afterInstall: 'ask', skippedVersions: {} }
+const prefs: MarketplacePrefs = { ...marketplaceDefaults(), community: true, packageManager: 'npm' as const, afterInstall: 'ask' as const }
 /** Distinct test secret must never appear in persisted responses or channel replies. */
 const token = 'marketplace-private-token-19'
 /** One declarative fixture package reused across the actual consumer paths. */

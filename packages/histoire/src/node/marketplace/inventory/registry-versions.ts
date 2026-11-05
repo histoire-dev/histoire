@@ -1,40 +1,28 @@
+import type { MarketplacePrefs } from '@histoire/shared'
 import type { Context } from '../../context.js'
 import type { RegistryOptions } from '../catalog/registry.js'
 import type { ReadUpdateVersions, UpdateVersion } from './updates.js'
-import packageJson from '../../../../package.json' with { type: 'json' }
 import { compatibility } from '../catalog/compat.js'
 import { officialReleases } from '../catalog/official.js'
-import { registryRelease } from '../catalog/registry-entry.js'
-import { createRegistryClient } from '../catalog/registry.js'
+import { registryReleases } from '../catalog/registry-entry.js'
+import { getCatalogService } from '../catalog/service.js'
 import { detectProjectSignals } from '../catalog/signals.js'
 
-/** Read version-specific manifests through catalog's bounded registry client and compatibility rules. */
-export function createRegistryUpdateReader(ctx: Context, options: RegistryOptions = {}): ReadUpdateVersions {
-  let registry: ReturnType<typeof createRegistryClient> | undefined
-  return async (id, prefs) => {
-    const project = await detectProjectSignals(ctx.root)
-    if (!prefs.community) {
-      return officialReleases(id).map(release => ({
-        version: release.latest,
-        compatible: compatibility(release.requires, release.frameworks, project, packageJson.version).ok,
-        releaseNotes: release.releaseNotes,
-      }))
-    }
-    registry ??= createRegistryClient(ctx.root, options)
-    const { value: packument } = await registry.packument(id)
-    return Object.keys(packument.versions).flatMap((version): UpdateVersion[] => {
-      const release = registryRelease(packument, version)
-      if (!release) return []
-      const { detail, optionalPeers } = release
-      const requires = Object.fromEntries(Object.entries(detail.requires).filter(([name]) => !optionalPeers.includes(name) || project.versions[name]))
-      // registryRelease validates this exact version; deprecation stays version-scoped.
-      const metadata = packument.versions[version] as { /** npm deprecation marker. */ deprecated?: string | boolean }
-      return [{
-        version,
-        deprecated: Boolean(metadata.deprecated),
-        compatible: compatibility(requires, detail.frameworks, project, packageJson.version).ok,
-        releaseNotes: detail.releaseNotes,
-      }]
-    })
-  }
+/** Read every version against one generation's project evidence and shared registry client. */
+export async function readUpdateVersions(ctx: Context, id: string, prefs: MarketplacePrefs, options?: RegistryOptions): Promise<UpdateVersion[]> {
+  const releases = prefs.community
+    ? registryReleases((await getCatalogService(ctx, options).packument(id)).value)
+    : officialReleases(id).map(detail => ({ version: detail.latest, detail, optionalPeers: [], deprecated: false }))
+  const project = await detectProjectSignals(ctx, releases.flatMap(release => Object.keys(release.detail.requires)))
+  return releases.map(({ version, detail, optionalPeers, deprecated }) => ({
+    version,
+    ...(prefs.community ? { deprecated } : {}),
+    compatible: compatibility(detail, project, optionalPeers).ok,
+    releaseNotes: detail.releaseNotes,
+  }))
+}
+
+/** Transport adapter; every reader for this context uses the catalog-owned client. */
+export function createRegistryUpdateReader(ctx: Context, options?: RegistryOptions): ReadUpdateVersions {
+  return (id, prefs) => readUpdateVersions(ctx, id, prefs, options)
 }

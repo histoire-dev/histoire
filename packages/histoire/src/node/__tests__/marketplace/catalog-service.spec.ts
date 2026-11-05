@@ -1,29 +1,25 @@
 import type { CatalogQuery, MarketplaceManifest, MarketplacePrefs } from '@histoire/shared'
-import { mkdir, writeFile } from 'node:fs/promises'
+import { writeFile } from 'node:fs/promises'
 import { join } from 'pathe'
 import { afterEach, describe, expect, it, onTestFinished } from 'vitest'
+import { marketplaceDefaults } from '../../../../../histoire-app/src/app/util/marketplace-preferences.js'
 import { officialPlugins } from '../../marketplace/catalog/official.js'
 import { createCatalogService } from '../../marketplace/catalog/service.js'
 import { configTestProject, disposeConfigProjects } from '../utils/config-codemod.js'
-import { registryServer } from '../utils/marketplace/registry-server.js'
+import { packument, registryServer } from '../utils/marketplace/registry-server.js'
+import { inventoryPackage } from './inventory-fixture.js'
 
 /** Portable preferences used by real service calls. */
-const prefs: MarketplacePrefs = { community: true, packageManager: 'auto', afterInstall: 'ask', skippedVersions: {} }
+const prefs: MarketplacePrefs = { ...marketplaceDefaults(), community: true, afterInstall: 'ask' as const }
 /** A valid independently named community package manifest. */
 const manifest: MarketplaceManifest = { displayName: 'Second page audit', summary: 'Audit Vue stories', category: 'testing', monogram: 'Au', tint: 'blue', config: { import: 'Audit' }, frameworks: ['vue'], adds: [{ kind: 'story-tests', text: 'Audit checks' }], recommend: [{ dependency: 'vitest', reason: 'Vitest detected' }], collections: ['visual-testing'] }
-
-/** Build plain registry JSON; no package module is imported. */
-function packument(id: string, data = manifest, peers = {}) {
-  return { 'name': id, 'dist-tags': { latest: '2.0.0' }, 'versions': { '2.0.0': { name: id, version: '2.0.0', histoire: { marketplace: data }, peerDependencies: peers, dist: { attestations: { url: 'https://registry.example/attestation' } } } } }
-}
 
 /** Real scratch package installation used for dependency signal detection. */
 async function project() {
   const { root } = await configTestProject()
   await writeFile(join(root, 'package.json'), JSON.stringify({ devDependencies: { vue: '^3', vite: '^7', vitest: '^4' } }))
   for (const [name, version] of Object.entries({ vue: '3.5.0', vite: '7.2.0', vitest: '4.0.0' })) {
-    await mkdir(join(root, 'node_modules', name), { recursive: true })
-    await writeFile(join(root, 'node_modules', name, 'package.json'), JSON.stringify({ name, version }))
+    await inventoryPackage(root, name, version)
   }
   return root
 }
@@ -60,7 +56,9 @@ describe('catalog service', () => {
       'community-audit': packument('community-audit', { ...manifest, official: true } as MarketplaceManifest),
       '@histoire/plugin-a11y': packument('@histoire/plugin-a11y', { ...manifest, displayName: 'Spoof' }),
     } }
-    const { service, registry } = await setup(options)
+    const { root, registry } = await setup(options)
+    // Pagination tests use the production deadline; timeout behavior has its own delayed case.
+    const service = createCatalogService({ root }, { registryUrl: registry.url })
     const page = await service.catalog({ view: 'all', query: 'second', prefs, limit: 1 })
     expect(page.total).toBe(1)
     expect(page.entries[0]).toMatchObject({ id: 'community-audit', official: false, match: [{ field: 'displayName', ranges: [[0, 5]] }] })
@@ -82,7 +80,7 @@ describe('catalog service', () => {
   })
 
   it('shares concurrent fetches, persists cache, and serves stale data after expiry and errors', async () => {
-    const { root, registry } = await setup({ packages: { 'community-audit': packument('community-audit') } })
+    const { root, registry } = await setup({ packages: { 'community-audit': packument('community-audit', manifest) } })
     let now = 1000
     const options = { registryUrl: registry.url, now: () => now }
     const service = createCatalogService({ root }, options)
@@ -101,7 +99,7 @@ describe('catalog service', () => {
   })
 
   it('reports installed dependency signals, contextual picks, collections and failing peer reason', async () => {
-    const { service } = await setup({ packages: { 'community-audit': packument('community-audit'), 'new-vite-audit': packument('new-vite-audit', { ...manifest, displayName: 'New Vite audit' }, { vite: '^8.0.0' }) } })
+    const { service } = await setup({ packages: { 'community-audit': packument('community-audit', manifest), 'new-vite-audit': packument('new-vite-audit', { ...manifest, displayName: 'New Vite audit' }, { vite: '^8.0.0' }) } })
     const page = await service.catalog({ view: 'discover', prefs })
     expect(page.project).toEqual({ frameworks: ['vue'], signals: ['vitest', 'vite 7'] })
     expect([page.discover!.hero, ...page.discover!.picks]).toContainEqual(expect.objectContaining({ id: 'community-audit', reason: 'Vitest detected' }))
@@ -115,7 +113,7 @@ describe('catalog service', () => {
   })
 
   it('checks each published version against its own peers and deprecation metadata', async () => {
-    const pkg = packument('community-audit')
+    const pkg = packument('community-audit', manifest)
     pkg.versions['1.0.0'] = { ...pkg.versions['2.0.0'], version: '1.0.0', peerDependencies: { vite: '^8.0.0' } }
     const { service } = await setup({ packages: { 'community-audit': pkg } })
     const detail = await service.detail('community-audit', prefs)

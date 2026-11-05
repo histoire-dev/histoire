@@ -1,6 +1,0 @@
-{
-  "extends": "./tsconfig.node.json",
-  "compilerOptions": { "declaration": false, "declarationMap": false },
-  "include": ["./jobs-*.ts"],
-  "exclude": []
-}

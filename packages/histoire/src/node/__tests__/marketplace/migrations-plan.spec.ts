@@ -2,14 +2,17 @@ import type { ChangeRequest } from '@histoire/shared'
 import type { Context } from '../../context.js'
 import { readFile, writeFile } from 'node:fs/promises'
 import { afterEach, expect, it } from 'vitest'
+import { marketplaceDefaults } from '../../../../../histoire-app/src/app/util/marketplace-preferences.js'
 import { getPlanStore } from '../../marketplace/changes/handlers.js'
+import { createPlanStore } from '../../marketplace/changes/plan-store.js'
+import { withMigrations } from '../../marketplace/migrations/plan.js'
 import { disposeConfigProjects } from '../utils/config-codemod.js'
 import { deferred } from '../utils/mcp/deferred.js'
 import { inventoryPackage, inventoryProject } from './inventory-fixture.js'
 import { jobManifest } from './jobs-fixture.js'
 
 const manifest = { ...jobManifest, migrations: [{ from: '<1', ops: [{ op: 'rename-option' as const, from: 'old', to: 'new' }] }] }
-const request = { kind: 'update' as const, id: 'test-plugin', version: '1.2.3', migrate: true, prefs: { community: false, packageManager: 'pnpm' as const, afterInstall: 'restart' as const, skippedVersions: {} } }
+const request = { kind: 'update' as const, id: 'test-plugin', version: '1.2.3', migrate: true, prefs: { ...marketplaceDefaults(), packageManager: 'pnpm' as const } }
 afterEach(disposeConfigProjects)
 
 /** Production handler's shared store is also the job runner's admission boundary. */
@@ -72,4 +75,43 @@ it('captures caller intent before asynchronous metadata resolution', async () =>
   const baseline = await store.plan(request)
   expect(reviewed.hash).toBe(baseline.hash)
   expect((await store.verifyPlan(reviewed.planId, reviewed.hash)).request).toMatchObject({ version: '1.2.3', prefs: { afterInstall: 'restart' } })
+})
+
+// Real planner and migration decorator; resolver observes metadata reads without
+// replacing filesystem planning. Duplicate computes multiply resolver I/O.
+it('resolves base and migration metadata once each per review and admission', async () => {
+  let reads = 0
+  const { store } = await fixture(undefined, async () => {
+    reads++
+    return { manifest, version: '1.2.3' }
+  })
+  const plan = await store.plan(request)
+  expect(reads).toBe(2)
+  reads = 0
+  const admitted = await store.verifyPlan(plan.planId, plan.hash)
+  expect(reads).toBe(2)
+  expect(admitted.configCode).toContain('new: \'secret\'')
+  expect(admitted.configCode).not.toContain('old:')
+})
+
+// The real planner clock advances during migration metadata I/O. Admission must
+// still reject expired or retired capabilities after the final await.
+it.each(['expired', 'retired'] as const)('rejects %s capabilities after migration metadata resolves', async (ending) => {
+  const { root, file } = await fixture()
+  let now = 0
+  let reads = 0
+  let store: ReturnType<typeof createPlanStore>
+  const options = { root, configFile: file, now: () => now,
+    /** Expensive metadata can cross capability lifetime boundaries. */
+    resolvePlugin: async () => {
+      if (++reads === 4) {
+        if (ending === 'expired') now = 15 * 60_000
+        else store.clear()
+      }
+      return { manifest, version: '1.2.3' }
+    } }
+  store = withMigrations({ root } as Context, createPlanStore(options), options)
+  const plan = await store.plan(request)
+  await expect(store.verifyPlan(plan.planId, plan.hash)).rejects.toMatchObject({ code: 'stale' })
+  expect(await readFile(file, 'utf8')).toContain('old:')
 })

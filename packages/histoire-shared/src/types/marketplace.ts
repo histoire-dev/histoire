@@ -1,15 +1,16 @@
 import type { HistoireJsonValue } from '@histoire/protocol'
+import type { accessKinds, addKinds, categories, packageManagers, tints } from '../marketplace/enums.js'
 
 /** npm package name, including its scope. */
 export type PluginId = string
 /** Primary marketplace category. */
-export type Category = 'testing' | 'design' | 'inspection' | 'frameworks' | 'data'
+export type Category = typeof categories[number]
 /** Fallback tile palette. */
-export type Tint = 'green' | 'violet' | 'blue' | 'amber' | 'rose' | 'sky' | 'slate'
+export type Tint = typeof tints[number]
 /** Declarative contribution category. */
-export type AddKind = 'rail-pane' | 'inspector-tab' | 'toolbar-tool' | 'story-tests' | 'cli-command' | 'settings-section' | 'canvas-view'
+export type AddKind = typeof addKinds[number]
 /** Declared plugin access, not a runtime permission grant. */
-export type Access = 'story-frames' | 'story-dom' | 'network' | 'filesystem' | 'child-process'
+export type Access = typeof accessKinds[number]
 /** Contribution advertised by a manifest. */
 export interface Add {
   /** Contribution category. */ kind: AddKind
@@ -80,7 +81,7 @@ export interface MarketplaceManifest {
 /** Browser-local preferences, sent with every read or plan. */
 export interface MarketplacePrefs {
   /** Enable registry reads for community plugins. */ community: boolean
-  /** Package manager override. */ packageManager: 'auto' | 'pnpm' | 'npm' | 'yarn' | 'bun'
+  /** Package manager override. */ packageManager: typeof packageManagers[number]
   /** Restart policy after configuration changes. */ afterInstall: 'restart' | 'ask'
   /** Per-plugin update dismissal. */ skippedVersions: Record<PluginId, string>
 }
@@ -202,7 +203,7 @@ export interface ChangePlan {
   /** Generation-local identity. */ planId: string
   /** SHA256 of argv, diffs and config hash. */ hash: string
   /** Selected command tool. */ packageManager: {
-    /** Tool name. */ name: 'pnpm' | 'npm' | 'yarn' | 'bun'
+    /** Tool name. */ name: Exclude<typeof packageManagers[number], 'auto'>
     /** Selection evidence. */ source: 'lockfile' | 'packageManager' | 'override'
   }
   /** Optional command; run as argv without a shell. */ command?: {

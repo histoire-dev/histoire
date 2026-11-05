@@ -1,13 +1,16 @@
 {
   "extends": "../../../../tsconfig.json",
   "compilerOptions": {
-    // Check current shared contracts without rebuilding another package's dist.
     "rootDir": "../../../../../..",
     "paths": {
       "@histoire/shared": ["../../../../../histoire-shared/src/index.ts"],
       "vue-router": ["../../../../../histoire-vendors/node_modules/vue-router"]
     },
-    "typeRoots": ["../../../../node_modules/@types"]
+    "typeRoots": ["../../../../node_modules/@types"],
+    // Check current shared contracts without rebuilding another package's dist.
+    "declaration": false,
+    "declarationMap": false
   },
-  "include": ["../../.."]
+  "include": ["./**/*.ts", "../utils/marketplace/**/*.ts", "../../../../../histoire-app/src/virtual.d.ts", "../../../../../histoire-app/src/shim.d.ts"],
+  "exclude": ["../../../../node_modules", "../../../../generated", "../../../../dist"]
 }

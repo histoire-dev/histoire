@@ -1,6 +1,7 @@
-import type { Context } from '../../context.js'
 import { describe, expect, it, onTestFinished } from 'vitest'
+import { closeContext, createContext } from '../../context.js'
 import { registerMarketplaceChannels } from '../../marketplace/channel.js'
+import { configTestProject, disposeConfigProjects } from '../utils/config-codemod.js'
 import { uiChannelFixture } from '../utils/ui-channel.js'
 
 describe('marketplace channel', () => {
@@ -8,7 +9,13 @@ describe('marketplace channel', () => {
     let active = true
     const fixture = uiChannelFixture(() => active)
     onTestFinished(() => fixture.channel.close())
-    registerMarketplaceChannels({} as Context, fixture.channel, () => active)
+    const { root } = await configTestProject('export default { plugins: [] }')
+    const context = await createContext({ root, mode: 'dev' })
+    onTestFinished(async () => {
+      await closeContext(context)
+      await disposeConfigProjects()
+    })
+    registerMarketplaceChannels(context, fixture.channel, () => active)
     await fixture.request('histoire:ui:marketplace-catalog', { requestId: '' })
     expect(fixture.client.send).not.toHaveBeenCalled()
     active = false

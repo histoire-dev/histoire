@@ -7,13 +7,13 @@ import { computed, ref, shallowRef } from 'vue'
 export interface PostInstall {
   /** Server receipt identity. */ jobId: string
   /** npm package identity, resolved through installed inventory by spotlight. */ pluginId: string
-  /** Selected manifest rail-pane label; actual registrations remain authoritative. */ openPane?: string
+  /** Selected manifest rail-pane contribution id; actual registrations remain authoritative. */ openPane?: string
 }
 /** Reviewed intent survives the dev server restart that loads the plugin. */
-interface ReviewedJob {
+export interface ReviewedJob {
   /** Server receipt identity. */ jobId: string
   /** Exact reviewed request, including its restart policy. */ request: ChangeRequest
-  /** Selected manifest rail-pane label. */ openPane?: string
+  /** Selected manifest rail-pane contribution id. */ openPane?: string
 }
 
 /** Workbench lifetime owns restart observation; modal visits own only their reads. */
@@ -111,5 +111,5 @@ export function createMarketplaceJobs(client: typeof marketplaceClient, job: Sha
     disposed = true
     for (const controller of admissions) controller.abort()
   }
-  return { postInstall, restarting, restartError, startJob, restartJob, receiveJob, acknowledgePostInstall, disposeJobs }
+  return { reviewedJob: reviewed, postInstall, restarting, restartError, startJob, restartJob, receiveJob, acknowledgePostInstall, disposeJobs }
 }

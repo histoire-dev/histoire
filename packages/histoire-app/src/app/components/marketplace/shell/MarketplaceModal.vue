@@ -1,14 +1,17 @@
 <script setup lang="ts">
 import { provideHistoireControls, useHistoireControls } from '@histoire/controls/vue'
-import { onBeforeUnmount, onMounted, ref, useId, watch } from 'vue'
+import { defineAsyncComponent, onBeforeUnmount, onMounted, ref, useId, watch } from 'vue'
 import { useMarketplaceStore } from '../../../stores/marketplace.js'
+import { providePopoverOverlay } from '../../base/popover/overlay.js'
 import MarketplaceHeader from './MarketplaceHeader.vue'
-import MarketplaceView from './MarketplaceView.vue'
 import { useMarketplaceKeys } from './use-marketplace-keys.js'
 
+/** Catalog and wizard components load on first marketplace visit. */
+const MarketplaceView = defineAsyncComponent(() => import('./MarketplaceView.vue'))
 const store = useMarketplaceStore()
 /** Share the native top-layer element without passing it through detail views. */
-const dialog = store.overlayTarget
+const dialog = ref<HTMLDialogElement | null>(null)
+providePopoverOverlay(dialog)
 const controls = useHistoireControls()
 // Selects must teleport into the native top layer while inheriting the host theme.
 provideHistoireControls({ overlay: dialog, dark: controls?.dark ?? ref(false) })

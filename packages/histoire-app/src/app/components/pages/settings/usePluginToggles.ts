@@ -1,5 +1,6 @@
 import { installedPlugins } from 'virtual:$histoire-config'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { createClientUuid } from '../../../util/dev-event-api.js'
 import { uiHttpUrl } from '../../../util/http-json.js'
 
 /** A controlled rejection received before the runtime restarts. */
@@ -70,7 +71,7 @@ export function usePluginToggles() {
   /** Saves all staged switches together and leaves a receipt for the next page. */
   async function apply(): Promise<void> {
     if (pending.value || !changes.value.length) return
-    const requestId = crypto.randomUUID()
+    const requestId = createClientUuid()
     const started = Date.now()
     pending.value = true
     error.value = ''

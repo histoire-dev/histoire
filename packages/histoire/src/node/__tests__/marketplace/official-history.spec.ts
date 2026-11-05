@@ -1,20 +1,13 @@
 import type { PluginDetail } from '@histoire/shared'
 import type { Context } from '../../context.js'
 import { afterEach, expect, it, onTestFinished, vi } from 'vitest'
-import { officialPlugins, officialReleases } from '../../marketplace/catalog/official.js'
-import index from '../../marketplace/catalog/official.json' with { type: 'json' }
-import { createCatalogService } from '../../marketplace/catalog/service.js'
-import { createRegistryUpdateReader } from '../../marketplace/inventory/registry-versions.js'
-import { suggestVersion } from '../../marketplace/jobs/failure.js'
-import { updateDetails } from '../../marketplace/migrations/details.js'
-import { readReleases } from '../../marketplace/migrations/releases.js'
-import { resolvedMarketplaceOfficial } from '../../virtual/resolved-marketplace-official.js'
+import { marketplaceDefaults } from '../../../../../histoire-app/src/app/util/marketplace-preferences.js'
 import { disposeConfigProjects } from '../utils/config-codemod.js'
 import { registryServer } from '../utils/marketplace/registry-server.js'
 import { inventoryPackage, inventoryProject } from './inventory-fixture.js'
 
 /** Consent-off scenario must keep all release consumers offline. */
-const prefs = { community: false, packageManager: 'auto' as const, afterInstall: 'ask' as const, skippedVersions: {} }
+const prefs = { ...marketplaceDefaults(), afterInstall: 'ask' as const }
 /** Existing bundled identity remains authoritative while test supplies version data. */
 const id = '@histoire/plugin-a11y'
 /** Version-scoped data accepted by the bundled history format. */
@@ -27,7 +20,9 @@ type History = Array<{
 }>
 
 /** Supply three real data records to the production reader; no module or algorithm is mocked. */
-function bundledHistory(): void {
+async function bundledHistory(prerelease = false) {
+  vi.resetModules()
+  const { default: index } = await import('../../marketplace/catalog/official.json', { with: { type: 'json' } })
   const entry: { /** Generator-only data. */ history?: History } = index.find(entry => entry.id === id)!
   const before = entry.history
   entry.history = [
@@ -35,10 +30,22 @@ function bundledHistory(): void {
     { version: '2.0.0', requires: { vite: '^6 || ^7' }, frameworks: [], releaseNotes: [{ kind: 'feature', text: 'Second release' }], migrations: [{ from: '<2', ops: [{ op: 'rename-option', from: 'old', to: 'middle' }] }] },
     { version: '1.0.0', requires: { vite: '^6' }, frameworks: [] },
   ]
+  if (prerelease) entry.history.unshift({ version: '4.0.0-beta.1', requires: { vite: '^6' }, frameworks: [] })
   onTestFinished(() => {
     if (before === undefined) delete entry.history
     else entry.history = before
   })
+  // Bundled projections are built at module load, after declarative fixture input exists.
+  const [official, catalog, updates, failure, details, releases, virtual] = await Promise.all([
+    import('../../marketplace/catalog/official.js'),
+    import('../../marketplace/catalog/service.js'),
+    import('../../marketplace/inventory/registry-versions.js'),
+    import('../../marketplace/jobs/failure.js'),
+    import('../../marketplace/migrations/details.js'),
+    import('../../marketplace/migrations/releases.js'),
+    import('../../virtual/resolved-marketplace-official.js'),
+  ])
+  return { ...official, ...catalog, ...updates, ...failure, ...details, ...releases, ...virtual }
 }
 
 afterEach(async () => {
@@ -49,7 +56,7 @@ afterEach(async () => {
 // Boundary: bundled JSON data, real update selection and migration aggregation, local registry observer.
 // Defect: reusing latest metadata loses skipped notes/migrations or marks incompatible versions usable.
 it('reads all bundled releases and combines skipped notes and ordered migrations without registry requests', async () => {
-  bundledHistory()
+  const { readReleases, createRegistryUpdateReader, updateDetails } = await bundledHistory()
   const registry = await registryServer()
   onTestFinished(registry.close)
   vi.stubEnv('npm_config_registry', registry.url)
@@ -77,9 +84,7 @@ it('reads all bundled releases and combines skipped notes and ordered migrations
 })
 
 it('suggests newest stable official release accepting the found peer without contacting registry', async () => {
-  bundledHistory()
-  const entry: { /** Generator-only data. */ history: History } = index.find(entry => entry.id === id)!
-  entry.history.unshift({ version: '4.0.0-beta.1', requires: { vite: '^6' }, frameworks: [] })
+  const { suggestVersion } = await bundledHistory(true)
   const registry = await registryServer()
   onTestFinished(registry.close)
   const { root } = await inventoryProject()
@@ -89,7 +94,7 @@ it('suggests newest stable official release accepting the found peer without con
 })
 
 it('keeps history private and returns independent version metadata', async () => {
-  bundledHistory()
+  const { officialReleases, officialPlugins, resolvedMarketplaceOfficial } = await bundledHistory()
   const releases = officialReleases(id)
   releases[0].requires.vite = '*'
   expect(officialReleases(id)[0].requires.vite).toBe('^7')
@@ -109,7 +114,7 @@ it('keeps history private and returns independent version metadata', async () =>
 // Boundary: real catalog service detail over bundled history and installed project signals.
 // Defect: official Versions rows keep generated placeholders instead of per-version verdicts.
 it('evaluates each bundled official version against its own requirements in plugin details', async () => {
-  bundledHistory()
+  const { createCatalogService } = await bundledHistory()
   const { root } = await inventoryProject(undefined, { vite: '^7' })
   await inventoryPackage(root, 'vite', '7.2.0')
   const detail = await createCatalogService({ root }).detail(id, prefs)

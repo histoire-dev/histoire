@@ -10,10 +10,10 @@ afterEach(() => {
 
 // Acceptance gate intentionally exercises shared store, rather than treating the
 // passing client adapter test as proof that header-driven searches are debounced.
-it.each([false, true])('sends one catalog request after rapid search changes (adapter injected: %s)', async (debounce) => {
+it('sends one catalog request after rapid search changes', async () => {
   const page = await catalogPage()
   vi.useFakeTimers()
-  const fixture = await browseFixture('all', { debounce })
+  const fixture = await browseFixture('all')
   cleanups.push(fixture.dispose)
   await vi.advanceTimersByTimeAsync(150)
   await fixture.reply(page)

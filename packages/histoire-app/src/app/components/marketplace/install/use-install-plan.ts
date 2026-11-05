@@ -50,6 +50,10 @@ export function useInstallPlan(request: Ref<ChangeRequest | undefined>) {
       timer = setTimeout(replan, 200)
     }
   }, { deep: true, immediate: true, flush: 'sync' })
-  onScopeDispose(retire)
+  const offClose = store.onClose(retire)
+  onScopeDispose(() => {
+    offClose()
+    retire()
+  })
   return { plan, loading, error, replan }
 }

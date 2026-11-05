@@ -5,6 +5,7 @@ import { useContributionLookup } from '../../../composables/shell-extensions.js'
 import WorkbenchEmptyState from '../../shell/WorkbenchEmptyState.vue'
 import WorkbenchErrorState from '../../shell/WorkbenchErrorState.vue'
 import WorkbenchLoadingState from '../../shell/WorkbenchLoadingState.vue'
+import { workbenchPluginId } from '../shell/workbench-plugin-id.js'
 import FailureStep from './FailureStep.vue'
 import ManualStep from './ManualStep.vue'
 import OptionsStep from './OptionsStep.vue'
@@ -39,7 +40,11 @@ const panes = useContributionLookup('shell.pane')
 const paneLabel = computed(() => detail.value?.adds.find(add => add.kind === 'rail-pane')?.text)
 // Only actual browser registrations enable navigation; manifest adds are promises.
 const pluginId = ref<string>()
-const pane = computed(() => panes.list().find(item => item.pluginId === pluginId.value))
+/** Keep reviewed manifest destination when one plugin registers several panes. */
+const pane = computed(() => {
+  const destination = store.postInstall.value?.jobId === activeJob.value?.jobId ? store.postInstall.value?.openPane : undefined
+  return panes.list().find(item => item.pluginId === pluginId.value && (!destination || item.id === `${pluginId.value}:${destination}`))
+})
 const loaded = computed(() => activeJob.value?.status === 'succeeded' && activeJob.value.steps.some(item => item.id === 'load' && item.state === 'done'))
 let disposed = false
 // npm identity differs from descriptor id (e.g. @histoire/plugin-a11y owns a11y:*).
@@ -47,8 +52,8 @@ watch([loaded, () => activeJob.value?.id], async ([ready, id]) => {
   pluginId.value = undefined
   if (!ready || !id) return
   try {
-    const { installedPlugins } = await import('virtual:$histoire-config')
-    if (!disposed && activeJob.value?.id === id && loaded.value) pluginId.value = installedPlugins.find(plugin => plugin.packageName === id)?.id
+    const resolved = await workbenchPluginId(id)
+    if (!disposed && activeJob.value?.id === id && loaded.value) pluginId.value = resolved
   }
   catch { /* Hosts without standalone metadata keep pane navigation unavailable. */ }
 }, { immediate: true })
@@ -69,7 +74,7 @@ watch(canOpenPane, (available) => {
 </script>
 
 <template>
-  <section v-if="store.open.value" aria-label="Install plugin" class="htw:min-h-0 htw:min-w-0 htw:flex-1 htw:overflow-auto htw:bg-canvas htw:px-6 htw:py-6 htw:md:px-8">
+  <section aria-label="Install plugin" class="htw:min-h-0 htw:min-w-0 htw:flex-1 htw:overflow-auto htw:bg-canvas htw:px-6 htw:py-6 htw:md:px-8">
     <div class="htw:mx-auto htw:flex htw:w-full htw:flex-col htw:gap-3.5" :class="failed ? 'htw:max-w-[600px]' : 'htw:max-w-[920px]'">
       <nav aria-label="Install breadcrumb" class="htw:flex htw:flex-wrap htw:items-center htw:gap-1.5 htw:text-[13px] htw:font-semibold htw:text-muted">
         <HstButton color="flat" class="htw:h-auto htw:p-0" @click="store.setView('all')">

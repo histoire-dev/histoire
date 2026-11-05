@@ -2,6 +2,7 @@ import type { ChangeRequest, MarketplaceManifest } from '@histoire/shared'
 import type { Context } from '../../context.js'
 import { readdir, readFile, writeFile } from 'node:fs/promises'
 import { afterEach, describe, expect, it, onTestFinished } from 'vitest'
+import { marketplaceDefaults } from '../../../../../histoire-app/src/app/util/marketplace-preferences.js'
 import { analyzePluginSource } from '../../config/plugin-toggle-source.js'
 import { registerPlanHandlers } from '../../marketplace/changes/handlers.js'
 import { createPlanStore } from '../../marketplace/changes/plan-store.js'
@@ -9,9 +10,10 @@ import { configTestProject, disposeConfigProjects } from '../utils/config-codemo
 import { deferred } from '../utils/mcp/deferred.js'
 import { uiChannelFixture } from '../utils/ui-channel.js'
 import { inventoryPackage } from './inventory-fixture.js'
+import { jobManifest } from './jobs-fixture.js'
 
-const manifest: MarketplaceManifest = { displayName: 'Test', summary: 'Test plugin', category: 'testing', monogram: 'T', tint: 'blue', config: { import: 'TestPlugin', options: [{ key: 'test', label: 'Tests', type: 'boolean', default: false }] } }
-const prefs: ChangeRequest['prefs'] = { community: false, packageManager: 'pnpm', afterInstall: 'restart', skippedVersions: {} }
+const manifest: MarketplaceManifest = { ...jobManifest, config: { ...jobManifest.config, options: [{ key: 'test', label: 'Tests', type: 'boolean', default: false }] } }
+const prefs: ChangeRequest['prefs'] = { ...marketplaceDefaults(), packageManager: 'pnpm' as const }
 const request: ChangeRequest = { kind: 'install', id: 'test-plugin', version: '1.2.3', prefs, options: { test: true } }
 afterEach(disposeConfigProjects)
 

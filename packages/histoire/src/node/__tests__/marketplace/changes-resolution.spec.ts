@@ -1,15 +1,17 @@
 import type { ChangeRequest, MarketplaceManifest } from '@histoire/shared'
 import { createHash } from 'node:crypto'
-import { mkdir, readFile, writeFile } from 'node:fs/promises'
+import { readFile, writeFile } from 'node:fs/promises'
 import { afterEach, describe, expect, it } from 'vitest'
+import { marketplaceDefaults } from '../../../../../histoire-app/src/app/util/marketplace-preferences.js'
 import { clearRegistryMemory, createRegistryCache } from '../../marketplace/catalog/cache.js'
 import { packumentSchema } from '../../marketplace/catalog/registry-entry.js'
 import { createPlanStore } from '../../marketplace/changes/plan-store.js'
 import { projectPluginResolver } from '../../marketplace/changes/resolve-plugin.js'
 import { configTestProject, disposeConfigProjects } from '../utils/config-codemod.js'
+import { inventoryPackage } from './inventory-fixture.js'
 
 const manifest: MarketplaceManifest = { displayName: 'Cached', summary: 'Cached metadata', category: 'testing', monogram: 'C', tint: 'blue', config: { import: 'CachedPlugin' } }
-const prefs: ChangeRequest['prefs'] = { community: true, packageManager: 'npm', afterInstall: 'ask', skippedVersions: {} }
+const prefs: ChangeRequest['prefs'] = { ...marketplaceDefaults(), community: true, packageManager: 'npm' as const, afterInstall: 'ask' as const }
 afterEach(disposeConfigProjects)
 
 describe('read-only planning metadata', () => {
@@ -41,9 +43,7 @@ describe('read-only planning metadata', () => {
   it('reads installed community options with registry disabled without importing its executable', async () => {
     const code = 'import { CachedPlugin } from \'community-plugin\'\nexport default { plugins: [CachedPlugin()] }\n'
     const { root, file } = await configTestProject(code)
-    await mkdir(`${root}/node_modules/community-plugin`, { recursive: true })
-    await writeFile(`${root}/node_modules/community-plugin/package.json`, JSON.stringify({ name: 'community-plugin', version: '1.0.0', main: 'index.js', histoire: { marketplace: manifest } }))
-    await writeFile(`${root}/node_modules/community-plugin/index.js`, 'throw new Error("Package code must not execute")')
+    await inventoryPackage(root, 'community-plugin', '1.0.0', { histoire: { marketplace: manifest } })
     const store = createPlanStore({ root, configFile: file, resolvePlugin: projectPluginResolver(root) })
     const plan = await store.plan({ kind: 'remove', id: 'community-plugin', prefs: { ...prefs, community: false } })
     expect(plan.manual).toBeUndefined()

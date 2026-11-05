@@ -1,12 +1,13 @@
 import type { MarketplacePrefs } from '@histoire/shared'
 import type { Context } from '../../context.js'
 import { afterEach, describe, expect, it, onTestFinished } from 'vitest'
+import { marketplaceDefaults } from '../../../../../histoire-app/src/app/util/marketplace-preferences.js'
 import { registerCatalogHandlers } from '../../marketplace/catalog/handlers.js'
 import { configTestProject, disposeConfigProjects } from '../utils/config-codemod.js'
 import { uiChannelFixture } from '../utils/ui-channel.js'
 
 /** Offline policy protects this test against external registry contact. */
-const prefs: MarketplacePrefs = { community: false, packageManager: 'auto', afterInstall: 'ask', skippedVersions: {} }
+const prefs: MarketplacePrefs = { ...marketplaceDefaults(), afterInstall: 'ask' as const }
 
 afterEach(disposeConfigProjects)
 

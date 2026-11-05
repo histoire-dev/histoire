@@ -5,7 +5,7 @@ import { guardProjectPath } from '../../config/codemod/security.js'
 import { findWorkspaceRoot, lockfiles } from '../changes/package-manager.js'
 
 /** Exact original file bytes retained privately for rollback. */
-export interface SnapshotFile {
+interface SnapshotFile {
   /** Absolute destination captured from the trusted project. */ file: string
   /** Base64 bytes; null means the file did not exist. */ bytes: string | null
   /** Original filesystem permission bits. */ mode?: number

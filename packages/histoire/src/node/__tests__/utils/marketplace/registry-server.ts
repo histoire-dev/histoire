@@ -1,3 +1,4 @@
+import type { MarketplaceManifest } from '@histoire/shared'
 import type { IncomingHttpHeaders } from 'node:http'
 import { once } from 'node:events'
 import { createServer } from 'node:http'
@@ -10,6 +11,7 @@ export interface RegistryFixtureOptions {
   /** Response delay, including headers. */ delayMs?: number
   /** HTTP status for every response. */ status?: number
   /** Raw response override for malformed/oversized body checks. */ body?: string
+  /** Binary routes share registry origin, authentication and request observations. */ routes?: Map<string, Uint8Array>
   /** Registry mount path, including leading and trailing slashes. */ basePath?: string
   /** Reject requests without this exact authorization header. */ authorization?: string
   /** Redirect target for credential forwarding checks. */ redirect?: string
@@ -20,7 +22,7 @@ export async function registryServer(options: RegistryFixtureOptions = {}) {
   const requests: URL[] = []
   const headers: IncomingHttpHeaders[] = []
   const server = createServer((request, response) => {
-    const url = new URL(request.url!, 'http://localhost')
+    const url = new URL(request.url!, `http://${request.headers.host}`)
     requests.push(url)
     headers.push({ ...request.headers })
     /** Write only while the requesting client remains connected. */
@@ -33,6 +35,11 @@ export async function registryServer(options: RegistryFixtureOptions = {}) {
       if (options.redirect) {
         response.writeHead(302, { location: options.redirect })
         return response.end()
+      }
+      const archive = options.routes?.get(url.pathname)
+      if (archive) {
+        response.writeHead(options.status ?? 200, { 'content-type': 'application/octet-stream' })
+        return response.end(archive)
       }
       response.writeHead(options.status ?? 200, { 'content-type': 'application/json' })
       if (options.body !== undefined) return response.end(options.body)
@@ -64,4 +71,9 @@ export async function registryServer(options: RegistryFixtureOptions = {}) {
       server.close()
       await once(server, 'close')
     } }
+}
+
+/** Build declarative registry JSON without importing or executing package code. */
+export function packument(id: string, manifest: MarketplaceManifest, peers: Record<string, string> = {}, version = '2.0.0') {
+  return { 'name': id, 'dist-tags': { latest: version }, 'versions': { [version]: { name: id, version, histoire: { marketplace: manifest }, peerDependencies: peers, dist: { attestations: { url: 'https://registry.example/attestation' } } } } }
 }

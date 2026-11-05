@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { Access, PluginDetail } from '@histoire/shared'
 import { useMarketplaceStore } from '../../../stores/marketplace.js'
+import BaseChip from '../../base/BaseChip.vue'
 import { frameworkLabel } from '../browse/labels.js'
 
 defineProps<{
@@ -47,7 +48,9 @@ const accessLabels: Record<Access, string> = { 'story-frames': 'Story frames', '
         Frameworks
       </dt>
       <dd class="htw:m-0 htw:flex htw:flex-wrap htw:gap-[4px] htw:font-semibold">
-        <span v-for="framework in plugin.frameworks" :key="framework" class="htw:inline-flex htw:h-[22px] htw:items-center htw:rounded-full htw:px-[9px] htw:text-[11px] htw:whitespace-nowrap" :class="store.page.value?.project.frameworks.includes(framework) ? 'htw:bg-accent-soft htw:text-accent-text' : 'htw:bg-chip htw:text-body'">{{ frameworkLabel(framework) }}</span>
+        <BaseChip v-for="framework in plugin.frameworks" :key="framework" :tone="store.page.value?.project.frameworks.includes(framework) ? 'accent' : 'neutral'">
+          {{ frameworkLabel(framework) }}
+        </BaseChip>
         <span v-if="!plugin.frameworks.length">Any</span>
       </dd>
     </dl>

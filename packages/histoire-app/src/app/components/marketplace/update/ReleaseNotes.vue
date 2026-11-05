@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { ReleaseNote } from '@histoire/shared'
+import BaseChip from '../../base/BaseChip.vue'
 import WorkbenchEmptyState from '../../shell/WorkbenchEmptyState.vue'
 
 defineProps<{
@@ -12,7 +13,9 @@ const labels = { breaking: 'Breaking', feature: 'New', fix: 'Fix' }
 <template>
   <ul v-if="notes.length" aria-label="Release notes" class="htw:m-0 htw:list-none htw:p-0">
     <li v-for="(note, index) in notes" :key="index" class="htw:flex htw:items-baseline htw:gap-2.5 htw:py-1.5">
-      <span class="htw:inline-flex htw:h-[22px] htw:shrink-0 htw:items-center htw:rounded-full htw:px-[9px] htw:text-[11px] htw:font-semibold" :class="note.kind === 'breaking' ? 'htw:bg-warn/10 htw:text-warn' : note.kind === 'feature' ? 'htw:bg-accent-soft htw:text-accent-text' : 'htw:bg-chip htw:text-body'">{{ labels[note.kind] }}</span>
+      <BaseChip :tone="note.kind === 'breaking' ? 'warn' : note.kind === 'feature' ? 'accent' : 'neutral'">
+        {{ labels[note.kind] }}
+      </BaseChip>
       <div class="htw:min-w-0 htw:break-words">
         <p class="htw:m-0">
           {{ note.text }}

@@ -1,45 +1,34 @@
 import type { CatalogPage, CatalogQuery } from '../../../../histoire-shared/src/index.js'
-import { mount } from '@vue/test-utils'
 import { vi } from 'vitest'
-import { defineComponent, h, nextTick } from 'vue'
-import { createDebouncedCatalogClient } from '../../../../histoire-app/src/app/components/marketplace/browse/catalog-client.js'
+import { h, nextTick } from 'vue'
 import MarketplaceAll from '../../../../histoire-app/src/app/components/marketplace/browse/MarketplaceAll.vue'
 import MarketplaceDiscover from '../../../../histoire-app/src/app/components/marketplace/browse/MarketplaceDiscover.vue'
-import { createMarketplaceStore, provideMarketplaceStore } from '../../../../histoire-app/src/app/stores/marketplace.js'
-import { createUiSettingsStore } from '../../../../histoire-app/src/app/stores/settings.js'
 import { createMarketplaceClient } from '../../../../histoire-app/src/app/util/marketplace-client.js'
+import { marketplaceDefaults } from '../../../../histoire-app/src/app/util/marketplace-preferences.js'
 import { flushMicrotasks } from '../../../../histoire/src/node/__tests__/utils/flush.js'
-import { memoryStorage } from '../../../../histoire/src/node/__tests__/utils/settings-storage.js'
-import { createMarketplaceTransport, flushCatalog } from '../utils/marketplace-transport.js'
+import { createMarketplaceTransport, flushCatalog, lastRequest, mountMarketplace } from '../utils/marketplace-transport.js'
 
 /** Real bundled metadata supplies rows/facets, avoiding a second catalog fixture. */
 export async function catalogPage(): Promise<CatalogPage> {
   const channel = createMarketplaceTransport()
   const client = createMarketplaceClient({ transport: { ...channel.transport, available: () => false } })
-  const page = await client.catalog({ view: 'all', prefs: { community: false, packageManager: 'auto', afterInstall: 'restart', skippedVersions: {} } })
+  const page = await client.catalog({ view: 'all', prefs: marketplaceDefaults() })
   page.project = { frameworks: ['vue'], signals: ['vue', 'vitest'] }
   return page
 }
 
 /** Mount owned screens with real store/client; only external UI channel is substituted. */
-export async function browseFixture(view: CatalogQuery['view'] = 'all', options: { /** Verify an already wrapped client does not acquire a second debounce delay. */ debounce?: boolean } = {}) {
-  const channel = createMarketplaceTransport()
-  const storage = memoryStorage()
-  const client = createMarketplaceClient({ transport: channel.transport })
-  const store = createMarketplaceStore({ client: options.debounce ? createDebouncedCatalogClient(client) : client, storage, settings: createUiSettingsStore({ storage }) })
-  const Host = defineComponent(() => {
-    provideMarketplaceStore(store)
-    return () => store.view.value === 'discover' ? h(MarketplaceDiscover) : store.view.value === 'all' ? h(MarketplaceAll) : h('p', store.view.value)
+export async function browseFixture(view: CatalogQuery['view'] = 'all') {
+  const { channel, store, wrapper, dispose } = mountMarketplace({
+    provider: false,
+    render: store => store.view.value === 'discover' ? h(MarketplaceDiscover) : store.view.value === 'all' ? h(MarketplaceAll) : h('p', store.view.value),
   })
-  const container = document.createElement('div')
-  document.body.append(container)
-  const wrapper = mount(Host, { attachTo: container })
   store.openMarketplace(view)
   await flushCatalog()
   await flushMicrotasks(5)
   /** Snapshot latest outbound request, including query and preferences. */
   function request() {
-    return channel.sent.filter(item => item.event === 'histoire:ui:marketplace-catalog').at(-1)!
+    return lastRequest(channel, 'catalog')
   }
   /** Settle actual client promise and Vue rendering after a correlated reply. */
   async function reply(page: CatalogPage): Promise<void> {
@@ -62,12 +51,6 @@ export async function browseFixture(view: CatalogQuery['view'] = 'all', options:
     choice.click()
     await nextTick()
     return labels
-  }
-  /** Dispose requests even when an assertion fails. */
-  function dispose(): void {
-    wrapper.unmount()
-    container.remove()
-    store.dispose()
   }
   return { store, channel, wrapper, request, reply, selectSort, dispose }
 }

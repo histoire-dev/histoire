@@ -5,12 +5,8 @@ import type { marketplaceClient, MarketplaceRequestOptions } from '../../../util
 type DebouncedCatalogClient = typeof marketplaceClient & {
   /** Release scheduled reads and their eventual channel subscriptions. */ disposeCatalog: () => void
 }
-/** Avoid stacking delays when an embedding injects an already decorated client. */
-const decoratedClients = new WeakSet<object>()
-
 /** Debounce channel reads and retire listeners immediately, including during the delay. */
 export function createDebouncedCatalogClient(client: typeof marketplaceClient): DebouncedCatalogClient {
-  if (decoratedClients.has(client)) return client as DebouncedCatalogClient
   let cancel: (() => void) | undefined
   /** One pending read owns its timer, signal and eventual channel listener. */
   function catalog(query: CatalogQuery, options: MarketplaceRequestOptions = {}): Promise<CatalogPage> {
@@ -52,7 +48,5 @@ export function createDebouncedCatalogClient(client: typeof marketplaceClient): 
   function disposeCatalog(): void {
     cancel?.()
   }
-  const decorated = { ...client, catalog, disposeCatalog }
-  decoratedClients.add(decorated)
-  return decorated
+  return { ...client, catalog, disposeCatalog }
 }

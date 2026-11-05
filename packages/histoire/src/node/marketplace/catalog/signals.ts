@@ -1,7 +1,8 @@
 import type { CatalogPage } from '@histoire/shared'
+import type { Context } from '../../context.js'
 import { readFile } from 'node:fs/promises'
 import { join } from 'pathe'
-import { findProjectPackageDirectories } from '../../util/resolve-package.js'
+import { readInstalledPackage } from '../inventory/package-resolve.js'
 import { packageName } from './validation.js'
 
 /** Actual installed versions and public project chips. */
@@ -10,26 +11,49 @@ export interface ProjectSignals {
   /** Actual installed package versions, never dependency ranges. */ versions: Record<string, string>
   /** Declared dependency names used by recommendation rules. */ dependencies: string[]
 }
-/** Detect stack without importing or executing installed packages. */
-export async function detectProjectSignals(root: string): Promise<ProjectSignals> {
+/** Object identity bounds captured evidence to a configuration generation. */
+export type ProjectContext = Pick<Context, 'root'>
+/** Shared dependency discovery and per-name installed-version work. */
+interface SignalState {
+  /** One package.json read for this generation. */ project: Promise<ProjectSignals>
+  /** Missing packages are memoized too, avoiding repeated filesystem walks. */ reads: Map<string, Promise<void>>
+}
+/** Contexts disappear with their runtime generation. */
+const states = new WeakMap<ProjectContext, SignalState>()
+
+/** Read dependency names without walking installed packages or evaluating code. */
+async function projectSignals(root: string): Promise<ProjectSignals> {
   let pkg: Record<string, any> = {}
   try {
     pkg = JSON.parse(await readFile(join(root, 'package.json'), 'utf8')) ?? {}
   }
   catch { /* Missing package.json is a valid empty project. */ }
   const dependencies = [...new Set([...Object.keys(pkg.dependencies ?? {}), ...Object.keys(pkg.devDependencies ?? {}), ...Object.keys(pkg.peerDependencies ?? {})])].filter(name => packageName.safeParse(name).success)
-  const versions: Record<string, string> = Object.create(null)
-  await Promise.all(dependencies.map(async (name) => {
-    try {
-      const directory = findProjectPackageDirectories(root, name)[0]
-      if (!directory) return
-      const installed = JSON.parse(await readFile(join(directory, 'package.json'), 'utf8'))
-      if (installed.name === name && typeof installed.version === 'string') versions[name] = installed.version
-    }
-    catch { /* An unresolved declaration is never an installed version. */ }
-  }))
-  const frameworks = ['vue', 'react', 'svelte'].filter(name => dependencies.includes(name) || versions[name])
+  const frameworks = ['vue', 'react', 'svelte'].filter(name => dependencies.includes(name))
   const signals = ['vitest', 'tailwindcss'].filter(name => dependencies.includes(name))
-  if (versions.vite && /^\d+\./.test(versions.vite)) signals.push(`vite ${versions.vite.split('.')[0]}`)
-  return { project: { frameworks, signals }, versions, dependencies }
+  return { project: { frameworks, signals }, versions: Object.create(null), dependencies }
+}
+
+/** Capture project evidence once; resolve only peers currently consulted and the Vite chip. */
+export async function detectProjectSignals(context: ProjectContext | string, requires: Iterable<string> = []): Promise<ProjectSignals> {
+  // Root-only callers have no generation lifetime; owned consumers pass their context.
+  const ctx = typeof context === 'string' ? { root: context } : context
+  let state = states.get(ctx)
+  if (!state) {
+    state = { project: projectSignals(ctx.root), reads: new Map() }
+    states.set(ctx, state)
+  }
+  const project = await state.project
+  await Promise.all([...new Set(['vite', ...requires])].filter(name => project.dependencies.includes(name)).map((name) => {
+    let read = state.reads.get(name)
+    if (!read) {
+      read = readInstalledPackage(ctx.root, name).then((pkg) => {
+        if (typeof pkg.version === 'string') project.versions[name] = pkg.version
+        if (name === 'vite' && /^\d+\./.test(project.versions.vite ?? '')) project.project.signals.push(`vite ${project.versions.vite.split('.')[0]}`)
+      })
+      state.reads.set(name, read)
+    }
+    return read
+  }))
+  return project
 }

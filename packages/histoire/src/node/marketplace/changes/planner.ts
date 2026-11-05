@@ -1,6 +1,6 @@
 import type { ChangePlan, ChangeRequest, MarketplaceManifest } from '@histoire/shared'
 import { createHash } from 'node:crypto'
-import { readFile } from 'node:fs/promises'
+import { open, readFile } from 'node:fs/promises'
 import path from 'pathe'
 import { guardConfigFile, guardProjectPath } from '../../config/codemod/security.js'
 import { hashConfigCode } from '../../config/codemod/write.js'
@@ -70,9 +70,12 @@ export async function computePlan(options: PlannerOptions, input: ChangeRequest)
   const request: ChangeRequest = { ...parsed.data, version: parsed.data.version ?? plugin.version }
   exactVersion.parse(request.version)
   optionEdits(plugin.manifest.config.options ?? [], request.options)
-  const manager = options.static ? undefined : await detectPackageManager(options.root, request.prefs.packageManager)
   const packageFile = await guardProjectPath(path.join(options.root, 'package.json'), options.root)
   const packageBefore = await optionalRead(packageFile) ?? '{}\n'
+  const packageData = JSON.parse(packageBefore)
+  const packages = new Map<string, Record<string, unknown>>([[packageFile, packageData]])
+  const boundary = await findWorkspaceRoot(options.root, packages)
+  const manager = options.static ? undefined : await detectPackageManager(options.root, request.prefs.packageManager, boundary, packages)
   const configFile = options.configFile && await guardConfigFile(options.configFile, { root: options.root })
   const configBefore = configFile ? await optionalRead(configFile) : undefined
   const plan: ChangePlan = {
@@ -100,7 +103,6 @@ export async function computePlan(options: PlannerOptions, input: ChangeRequest)
   else if (await hasManagedConfigInput(configFile, options.configDependencies?.())) reason = 'config-not-literal'
   else if (!manager) reason = 'no-package-manager'
   else if (request.migrate) reason = 'migration-manual'
-  const packageData = JSON.parse(packageBefore)
   const ranges = ['dependencies', 'devDependencies', 'optionalDependencies'].map(key => packageData[key]?.[request.id])
   if (!reason && ranges.some(value => typeof value === 'string' && /^(?:workspace:|file:|link:|portal:)/.test(value))) reason = 'workspace-unsupported'
   if (!reason) {
@@ -119,15 +121,43 @@ export async function computePlan(options: PlannerOptions, input: ChangeRequest)
     if (result.packageCode !== packageBefore) plan.files.push(fileDiff('package.json', packageBefore, result.packageCode))
     if (plan.command) plan.warnings.push('Package manager may also change the lockfile and node_modules')
   }
-  const boundary = await findWorkspaceRoot(options.root)
   const lockPaths: string[] = []
   for (let directory = path.resolve(options.root); ; directory = path.dirname(directory)) {
     for (const name of [...lockfiles, 'pnpm-workspace.yaml']) lockPaths.push(path.join(directory, name))
     if (directory === boundary) break
   }
-  const locks = await Promise.all(lockPaths.map(async file => [file, await optionalRead(await guardProjectPath(file, boundary))]))
   // Bind the review to exact source bytes as well as displayed hunks. This also
   // catches changes outside diff context, formatting, lockfiles and EOF newlines.
-  plan.hash = createHash('sha256').update(JSON.stringify({ argv: plan.command?.argv, files: plan.files, warnings: plan.warnings, installedVersion: installed?.version, configHash: result.configHash, configCode: result.configCode, packageHash: result.packageHash, packageCode: result.packageCode, locks, manifest: plugin.manifest, manual: plan.manual })).digest('hex')
+  const hash = createHash('sha256').update(JSON.stringify({ argv: plan.command?.argv, files: plan.files, warnings: plan.warnings, installedVersion: installed?.version, configHash: result.configHash, configCode: result.configCode, packageHash: result.packageHash, packageCode: result.packageCode, manifest: plugin.manifest, manual: plan.manual }))
+  await hashLockfiles(hash, lockPaths, boundary)
+  plan.hash = hash.digest('hex')
   return result
+}
+
+/** Stream length-framed lock bytes into one hash; binary Bun locks stay distinct. */
+async function hashLockfiles(hash: ReturnType<typeof createHash>, files: string[], boundary: string): Promise<void> {
+  for (const file of files) {
+    const safe = await guardProjectPath(file, boundary)
+    let handle: Awaited<ReturnType<typeof open>>
+    try {
+      handle = await open(safe, 'r')
+    }
+    catch (error) {
+      if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error
+      hash.update(JSON.stringify([file, null]))
+      continue
+    }
+    try {
+      const { size } = await handle.stat()
+      // Length frames prevent adjacent file contents from being interchangeable.
+      hash.update(JSON.stringify([file, size]))
+      let bytes = 0
+      for await (const chunk of handle.createReadStream({ autoClose: false })) {
+        hash.update(chunk)
+        bytes += chunk.length
+      }
+      if (bytes !== size) throw new PlanningError('stale', 'Lockfile changed while planning')
+    }
+    finally { await handle.close() }
+  }
 }

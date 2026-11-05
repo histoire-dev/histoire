@@ -1,5 +1,5 @@
 import type { Context } from '../../context.js'
-import { writeFile } from 'node:fs/promises'
+import { mkdir, writeFile } from 'node:fs/promises'
 import { join } from 'pathe'
 import { afterEach, describe, expect, it } from 'vitest'
 import { resolveConfig } from '../../config/load.js'
@@ -30,6 +30,23 @@ describe('marketplace installed package resolution', () => {
     const { root } = await inventoryProject(undefined, { plugin: range })
     await inventoryPackage(root, 'plugin', '9.0.0')
     expect(await resolvePluginPackage(root, 'plugin')).toMatchObject({ packageName: 'plugin', version: 'local', local: true })
+  })
+
+  it('preserves nearest declarations for plugins imported by a nested config', async () => {
+    const { root } = await inventoryProject(undefined, { 'plugin': '^1', 'registry-plugin': '^2' })
+    for (const [name, version] of [['plugin', '1.0.0'], ['registry-plugin', '2.0.0']]) {
+      await inventoryPackage(root, name, version)
+      await writeFile(join(root, 'node_modules', name, 'subpath.js'), `exports.make = () => ({ name: '${name}' })`)
+    }
+    const directory = join(root, 'config')
+    await mkdir(directory)
+    const configFile = join(directory, 'histoire.config.ts')
+    await writeFile(join(directory, 'package.json'), JSON.stringify({ dependencies: { plugin: 'workspace:*' } }))
+    await writeFile(configFile, `import { make } from 'plugin/subpath'; import { make as second } from 'registry-plugin/subpath'; export default { plugins: [make(), second()] }`)
+    const config = await resolveConfig(root, 'dev', configFile)
+    const { rows } = await createPluginInventory({ root, config, configFile, mode: 'dev' } as Context)
+    expect(rows.find(row => row.name === 'plugin')).toMatchObject({ packageName: 'plugin', version: 'local', local: true })
+    expect(rows.find(row => row.name === 'registry-plugin')).toMatchObject({ packageName: 'registry-plugin', version: '2.0.0', local: false })
   })
 
   it('maps imported aliases and disabled factories, preserves toggle IDs, and emits both modes', async () => {

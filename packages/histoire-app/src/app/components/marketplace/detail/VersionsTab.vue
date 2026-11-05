@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import type { PluginDetail } from '@histoire/shared'
+import BaseChip from '../../base/BaseChip.vue'
 import WorkbenchEmptyState from '../../shell/WorkbenchEmptyState.vue'
+import { incompatibleReason } from '../shell/compatibility-reason.js'
 
 defineProps<{
   /** Version-scoped compatibility and publication metadata. */ plugin: PluginDetail
@@ -12,8 +14,10 @@ defineProps<{
     <li v-for="version in plugin.versions" :key="version.version" class="htw:flex htw:flex-wrap htw:items-center htw:gap-[12px]">
       <code class="htw:font-mono htw:text-[12px] htw:font-semibold htw:whitespace-nowrap htw:text-text">{{ version.version }}</code>
       <time v-if="version.date" :datetime="version.date" class="htw:text-muted htw:text-[12px]">{{ version.date.slice(0, 10) }}</time>
-      <span v-if="version.deprecated" class="htw:inline-flex htw:h-[22px] htw:items-center htw:rounded-full htw:bg-warn/10 htw:px-[9px] htw:text-[11px] htw:font-semibold htw:text-warn">Deprecated</span>
-      <span class="htw:ml-auto htw:text-muted htw:text-[12px]">{{ version.compatible ? 'Compatible' : version.reason ?? 'Incompatible with this project' }}</span>
+      <BaseChip v-if="version.deprecated" tone="warn">
+        Deprecated
+      </BaseChip>
+      <span class="htw:ml-auto htw:text-muted htw:text-[12px]">{{ version.compatible ? 'Compatible' : incompatibleReason(version.reason) }}</span>
     </li>
   </ul>
   <WorkbenchEmptyState v-else icon="catalog" title="No versions" tone="neutral" />

@@ -4,7 +4,7 @@ import { computed, ref, watch } from 'vue'
 
 const props = withDefaults(defineProps<{
   /** Public catalog identity and bundled visual metadata. */ plugin: Pick<CatalogEntry, 'displayName' | 'logoUrl' | 'monogram' | 'tint'>
-  /** Supported tile edge lengths in pixels. */ size?: 32 | 34 | 40 | 48 | 64
+  /** Supported tile edge lengths in pixels. */ size?: 34 | 36 | 40 | 48 | 64
 }>(), { size: 48 })
 const failed = ref(false)
 watch(() => props.plugin.logoUrl, () => {
@@ -26,7 +26,13 @@ const tints = {
   slate: 'htw:bg-slate-500/10 htw:text-slate-600 htw:dark:text-slate-300',
 } satisfies Record<CatalogEntry['tint'], string>
 /** Keep every supported size in the static utility scan. */
-const sizes = { 32: 'htw:size-[32px]', 34: 'htw:size-[34px]', 40: 'htw:size-[40px]', 48: 'htw:size-[48px]', 64: 'htw:size-[64px]' }
+const sizes = {
+  /** Collection card. */ 34: 'htw:size-[34px]',
+  /** Installed settings row. */ 36: 'htw:size-[36px]',
+  /** Catalog row and update header. */ 40: 'htw:size-[40px]',
+  /** Discover hero. */ 48: 'htw:size-[48px]',
+  /** Detail header. */ 64: 'htw:size-[64px]',
+}
 </script>
 
 <template>

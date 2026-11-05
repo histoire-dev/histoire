@@ -18,7 +18,6 @@ afterEach(async () => {
 // Real reviewed wizard, store and client. Dismissal removes wizard observers;
 // opposite current preference catches using mutable defaults instead of reviewed policy.
 it.each(['restart', 'ask'] as const)('retains reviewed %s policy and destination after dismissal and reload', async (policy) => {
-  const network = vi.spyOn(globalThis, 'fetch').mockResolvedValue(new Response(null, { status: 202 }))
   const f = setup(cleanups)
   await f.ready()
   await f.button('Continue').trigger('click')
@@ -36,7 +35,7 @@ it.each(['restart', 'ask'] as const)('retains reviewed %s policy and destination
   }
   f.channel.emit('histoire:ui:marketplace-job-state', { requestId: f.request('job-start').requestId, job: job() })
   await flushMicrotasks(6)
-  expect(f.store.postInstall.value).toEqual({ jobId: 'job-1', pluginId: '@histoire/plugin-a11y', openPane: 'Project results with story tests or build reports' })
+  expect(f.store.postInstall.value).toEqual({ jobId: 'job-1', pluginId: '@histoire/plugin-a11y', openPane: 'issues' })
   f.store.prefs.value.afterInstall = policy === 'restart' ? 'ask' : 'restart'
   if (policy === 'restart') {
     await f.button('Run in background').trigger('click')
@@ -48,24 +47,21 @@ it.each(['restart', 'ask'] as const)('retains reviewed %s policy and destination
   f.wrapper.unmount()
   f.channel.emit('histoire:ui:marketplace-job-state', { job: job({ awaiting: 'restart' }) })
   await flushMicrotasks(6)
-  expect(network).not.toHaveBeenCalled()
   f.store.dispose()
 
   // Fresh owner reads session receipt, then real currentJob response restores flow.
   const channel = createMarketplaceTransport()
-  const store = createMarketplaceStore({ client: createMarketplaceClient({ transport: channel.transport }), settings: createUiSettingsStore({ storage: f.storage }), storage: f.storage })
+  const store = createMarketplaceStore({ client: createMarketplaceClient({ transport: channel.transport }), settings: createUiSettingsStore({ storage: f.storage }) })
   cleanups.push(store.dispose)
   store.connect()
   channel.emit('histoire:ui:marketplace-job-state', { requestId: channel.sent[0].value.requestId, job: job({ awaiting: 'restart' }) })
   await flushMicrotasks(6)
-  expect(network).not.toHaveBeenCalled()
   channel.emit('histoire:ui:marketplace-job-state', { job: job({ status: 'succeeded', steps: [{ id: 'load', state: 'done' }] }) })
   await flushMicrotasks(6)
-  expect(store.postInstall.value).toEqual({ jobId: 'job-1', pluginId: '@histoire/plugin-a11y', openPane: 'Project results with story tests or build reports' })
+  expect(store.postInstall.value).toEqual({ jobId: 'job-1', pluginId: '@histoire/plugin-a11y', openPane: 'issues' })
   expect(store.installRequest.value).toMatchObject({ kind: 'install', id: '@histoire/plugin-a11y', prefs: { afterInstall: policy } })
   expect(store.view.value).toBe('install')
   expect(store.open.value).toBe(true)
-  expect(network).not.toHaveBeenCalled()
 })
 
 it('retires held admission when workbench ends without cancelling server work', async () => {

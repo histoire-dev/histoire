@@ -3,7 +3,8 @@ import type { InjectionKey } from 'vue'
 import type { SingleViewportState } from '../components/canvas/single-viewport.js'
 import type { ContributionPresence } from '../extensions/shell-registry.js'
 import type { CanvasDefaultArrangement } from './canvas-arrangement.js'
-import { inject, provide, reactive, ref } from 'vue'
+import { inject, provide, reactive, ref, watch } from 'vue'
+import { validateMarketplacePrefs } from '../components/marketplace/shell/marketplace-prefs.js'
 import { isPluginContributionId } from '../extensions/shell-registry.js'
 import { marketplaceDefaults } from '../util/marketplace-preferences.js'
 
@@ -25,8 +26,8 @@ export interface UiSettings {
   syncZoom: boolean
   /** Rerun tests after story updates. */
   watchTests: boolean
-  /** Marketplace preferences, hydrated and validated by the marketplace store. */
-  marketplace?: MarketplacePrefs
+  /** Browser-local marketplace preferences. */
+  marketplace: MarketplacePrefs
 }
 
 /** Settings sections, ordered like the supplied design. */
@@ -38,7 +39,7 @@ export const SETTINGS_SECTIONS = [
   { id: 'agents', label: 'AI agents (ACP)', icon: 'bot', devOnly: true },
   { id: 'mcp', label: 'MCP server', icon: 'plug', devOnly: true },
   { id: 'shortcuts', label: 'Keyboard shortcuts', icon: 'keyboard' },
-  { id: 'plugins', label: 'Plugins', icon: 'puzzle' },
+  { id: 'plugins', label: 'Plugins', icon: 'puzzle', /** Shared store badge source. */ badge: 'marketplaceUpdates' },
   { id: 'about', label: 'About', icon: 'info' },
 ] as const
 
@@ -63,8 +64,9 @@ export function normalizeSettingsSection(section: unknown, dev: boolean, section
 
 /** Creates one workbench preference owner; no active Pinia/global state. */
 export function createUiSettingsStore(options: { storage?: SettingsStorage, warn?: (message: string) => void }) {
-  const defaults: UiSettings = { density: 'comfortable', syncZoom: false, watchTests: false }
-  const state = reactive({ ...defaults })
+  /** Each reset receives fresh nested values. */
+  const defaults = (): UiSettings => ({ density: 'comfortable', syncZoom: false, watchTests: false, marketplace: marketplaceDefaults() })
+  const state = reactive(defaults())
   const singleViewport = reactive<SingleViewportState>({ mode: 'responsive' })
   const defaultArrange = ref<CanvasDefaultArrangement | undefined>()
   try {
@@ -72,7 +74,7 @@ export function createUiSettingsStore(options: { storage?: SettingsStorage, warn
     if (raw) {
       const saved = JSON.parse(raw)
       if (!saved || !['comfortable', 'compact'].includes(saved.density) || typeof saved.syncZoom !== 'boolean' || typeof saved.watchTests !== 'boolean') throw new Error('Invalid settings')
-      Object.assign(state, { density: saved.density, syncZoom: saved.syncZoom, watchTests: saved.watchTests })
+      Object.assign(state, { density: saved.density, syncZoom: saved.syncZoom, watchTests: saved.watchTests, marketplace: validateMarketplacePrefs(saved.marketplace) })
     }
     const arrange = options.storage?.getItem('_histoire-ui-arrange')
     if (arrange) {
@@ -87,15 +89,22 @@ export function createUiSettingsStore(options: { storage?: SettingsStorage, warn
     }
     catch { /* Denied storage cannot prevent mounting settings. */ }
   }
-  /** Persists valid local preferences immediately. */
-  function update(patch: Partial<UiSettings>): void {
-    Object.assign(state, patch)
+  /** One persistence path also observes nested preference edits and replacement. */
+  const stop = watch(state, persist, { deep: true, flush: 'sync' })
+  /** Serialize the owning settings state, including direct marketplace edits. */
+  function persist(): void {
     try {
       options.storage?.setItem('_histoire-ui-settings', JSON.stringify(state))
     }
     catch { /* Memory preferences still apply when storage is unavailable. */ }
   }
+  /** Apply partial local preferences through the same persistence owner. */
+  function update(patch: Partial<UiSettings>): void {
+    Object.assign(state, patch)
+  }
   return {
+    /** Release persistence observation with the owning workbench. */
+    dispose: stop,
     state,
     defaultArrange,
     singleViewport,
@@ -111,9 +120,7 @@ export function createUiSettingsStore(options: { storage?: SettingsStorage, warn
     },
     /** Reset keeps project defaults authoritative. */
     reset(): void {
-      // Keep the marketplace store's shared reactive object alive during reset.
-      if (state.marketplace) Object.assign(state.marketplace, marketplaceDefaults())
-      update(defaults)
+      update(defaults())
     },
   }
 }

@@ -52,7 +52,7 @@ it('persists all marketplace preferences while retaining other settings', async 
   await f.button('pnpm').trigger('click')
   await f.button('Ask').trigger('click')
   const nextSettings = createUiSettingsStore({ storage: f.storage })
-  const nextStore = createMarketplaceStore({ settings: nextSettings, storage: f.storage })
+  const nextStore = createMarketplaceStore({ settings: nextSettings })
   cleanups.push(nextStore.dispose)
   expect(nextStore.prefs.value).toEqual({ community: true, packageManager: 'pnpm', afterInstall: 'ask', skippedVersions: {} })
   expect(nextSettings.state.density).toBe('compact')

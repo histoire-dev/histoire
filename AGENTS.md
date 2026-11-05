@@ -25,7 +25,7 @@
 
 - Primary call-to-action in panel/tab headers (Run, Stop, ...) must use `WorkbenchPanelAction` from `packages/histoire-app/src/app/components/shell/WorkbenchPanelAction.vue` so every tab CTA shares same size (follows `--histoire-control-height`).
   - `icon`: offline Carbon glyph name. `label`: short visible label. `disabled`: disables action and options trigger.
-  - `overlayTarget`: pass native dialog element to keep menus in its top layer; defaults to provider overlay/root.
+  - Menus inherit the owning overlay through `BasePopover`; native dialogs call `providePopoverOverlay(dialog)` from `components/base/popover/overlay.ts` with their element ref.
   - Optional `menu` slot (scoped `{ close }`) adds split chevron with options popover; `menuLabel` overrides its accessible name.
   - Example: `<WorkbenchPanelAction icon="play-filled-alt" label="Run" @click="run"><template #menu="{ close }"><MenuItem label="Run all" @click="close()" /></template></WorkbenchPanelAction>`.
 

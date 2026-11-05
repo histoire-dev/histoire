@@ -2,6 +2,8 @@
 import type { PopoverBoundary } from './position.js'
 import type { PopoverScope } from './scope.js'
 import { inject, nextTick, onBeforeUnmount, onMounted, provide, ref, watch } from 'vue'
+import { menuItems } from '../use-menu-keyboard.js'
+import { usePopoverOverlay } from './overlay.js'
 import { positionPopover } from './position.js'
 import { closePopoverChildren, createPopoverScope, deepestOpenPopover, popoverScopeKey } from './scope.js'
 
@@ -33,6 +35,7 @@ const props = withDefaults(defineProps<{
   side?: 'bottom' | 'top'
 }>(), { role: 'dialog', width: 280 })
 const emit = defineEmits<{ 'update:open': [value: boolean] }>()
+const overlay = usePopoverOverlay()
 const injected = inject(popoverScopeKey, undefined)
 const parent = props.scope ? props.scope.parent : injected
 const scope = props.scope ?? createPopoverScope(parent)
@@ -92,7 +95,9 @@ watch(() => props.open, async (value) => {
   await nextTick()
   if (!active || !shown || current !== version) return
   place()
-  const controls = [...panel.value?.querySelectorAll<HTMLElement>('button:not(:disabled), input:not(:disabled), select:not(:disabled), [tabindex="0"]') ?? []]
+  const controls = props.role === 'menu' && panel.value
+    ? menuItems(panel.value)
+    : [...panel.value?.querySelectorAll<HTMLElement>('button:not(:disabled), input:not(:disabled), select:not(:disabled), [tabindex="0"]') ?? []]
   ;(controls[props.focusLast ? controls.length - 1 : 0] ?? panel.value)?.focus({ preventScroll: true })
 }, { immediate: true })
 watch([() => typeof props.bounds === 'function' ? props.bounds() : props.bounds, () => props.anchor], place, { deep: true, flush: 'post' })
@@ -134,7 +139,7 @@ defineExpose({ panel, close, place })
 </script>
 
 <template>
-  <Teleport :to="overlayTarget ?? 'body'">
+  <Teleport :to="overlayTarget ?? overlay">
     <div v-if="persistent || open" v-show="open" ref="panel" v-bind="$attrs" class="histoire-base-popover histoire-control-popover htw:fixed htw:box-border htw:max-w-[calc(100vw-16px)]" :role="role" :aria-label="label" tabindex="-1" :style="{ left: `${position.left}px`, top: `${position.top}px`, width: `${position.width}px`, maxHeight: `${position.maxHeight}px`, zIndex: 50 + scope.depth }" @wheel.stop @pointerdown.stop>
       <slot :close="close" />
     </div>

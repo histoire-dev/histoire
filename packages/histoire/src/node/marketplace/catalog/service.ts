@@ -2,7 +2,6 @@ import type { CatalogEntry, CatalogPage, CatalogQuery, MarketplacePrefs, PluginD
 import type { Context } from '../../context.js'
 import type { RegistryOptions } from './registry.js'
 import type { ProjectSignals } from './signals.js'
-import { createRequire } from 'node:module'
 import { getInstalledIndex } from '../inventory/index.js'
 import { compatibility } from './compat.js'
 import { discoverCatalog } from './discover.js'
@@ -14,9 +13,6 @@ import { createRegistryClient } from './registry.js'
 import { searchCatalog } from './search.js'
 import { detectProjectSignals } from './signals.js'
 import { catalogQuerySchema, packageName, prefsSchema } from './validation.js'
-
-/** Running Histoire package version, independent of the project's dependency range. */
-const histoireVersion: string = createRequire(import.meta.url)('../../../../package.json').version
 
 /** Remove detail-only metadata from list replies to preserve channel capacity. */
 function catalogEntry(detail: PluginDetail): CatalogEntry {
@@ -36,15 +32,14 @@ export function createCatalogService(ctx: CatalogContext, options: RegistryOptio
   /** Apply project compatibility and inventory without mutating bundled or cached metadata. */
   function decorate(detail: PluginDetail, project: ProjectSignals, optionalPeers: string[] = []): PluginDetail {
     const installed = getInstalledIndex(ctx as Context).get(detail.id)
-    const requires = Object.fromEntries(Object.entries(detail.requires).filter(([name]) => !optionalPeers.includes(name) || project.versions[name]))
-    const compatible = compatibility(requires, detail.frameworks, project, histoireVersion)
+    const compatible = compatibility(detail, project, optionalPeers)
     return { ...detail, installed, compatible, versions: detail.versions.map(version => version.version === detail.latest
       ? { ...version, compatible: compatible.ok, ...(!compatible.ok ? { reason: compatible.reason } : {}) }
       : version) }
   }
   /** Read all allowed sources; official index wins every collision. */
-  async function entries(prefs: MarketplacePrefs, project: ProjectSignals) {
-    const merged = new Map(officialPlugins.map(detail => [detail.id, decorate(detail, project)]))
+  async function entries(prefs: MarketplacePrefs) {
+    const merged = new Map(officialPlugins.map(detail => [detail.id, { detail, optionalPeers: [] as string[] }]))
     let community: CatalogPage['sources']['community'] = 'off'
     if (prefs.community) {
       try {
@@ -53,18 +48,20 @@ export function createCatalogService(ctx: CatalogContext, options: RegistryOptio
         for (const pkg of result.packuments) {
           if (merged.has(pkg.name)) continue
           const release = registryDetail(pkg)
-          if (release) merged.set(pkg.name, decorate(release.detail, project, release.optionalPeers))
+          if (release) merged.set(pkg.name, release)
         }
       }
       catch { community = 'error' }
     }
-    return { entries: [...merged.values()], community }
+    const releases = [...merged.values()]
+    const project = await detectProjectSignals(ctx, releases.flatMap(release => Object.keys(release.detail.requires)))
+    return { entries: releases.map(release => decorate(release.detail, project, release.optionalPeers)), community, project }
   }
   /** Filter and rank every source entry before pagination, including facet alternatives. */
   async function catalog(input: CatalogQuery): Promise<CatalogPage> {
     const query = catalogQuerySchema.parse(input) as CatalogQuery
-    const project = await detectProjectSignals(ctx.root)
-    const result = await entries(query.prefs, project)
+    const result = await entries(query.prefs)
+    const { project } = result
     // Collection membership narrows every facet alternative as well as paged rows.
     const collection = query.filters?.collection
     const members = collection ? result.entries.filter(entry => entry.manifest.collections?.includes(collection)) : result.entries
@@ -78,7 +75,7 @@ export function createCatalogService(ctx: CatalogContext, options: RegistryOptio
       entries: filtered.slice(offset, offset + limit).map(catalogEntry),
       total: filtered.length,
       cursor: offset + limit < filtered.length ? String(offset + limit) : undefined,
-      facets: catalogFacets(ranked, query.filters, project.frameworks),
+      facets: catalogFacets(ranked, query.filters, project.project.frameworks),
       project: project.project,
       sources: { official: 'ok', community: result.community },
     }
@@ -97,12 +94,12 @@ export function createCatalogService(ctx: CatalogContext, options: RegistryOptio
   async function detail(id: string, prefs: MarketplacePrefs): Promise<PluginDetail> {
     packageName.parse(id)
     prefsSchema.parse(prefs)
-    const project = await detectProjectSignals(ctx.root)
     const official = officialPlugins.find(entry => entry.id === id)
     if (official) {
-      const output = decorate(structuredClone(official), project)
       // Bundled history carries each version's own requirements, so older rows get real verdicts.
       const releases = officialReleases(id)
+      const project = await detectProjectSignals(ctx, [official, ...releases].flatMap(release => Object.keys(release.requires)))
+      const output = decorate(official, project)
       if (releases.length) {
         output.versions = releases.map((release) => {
           const verdict = decorate(release, project).compatible
@@ -115,6 +112,10 @@ export function createCatalogService(ctx: CatalogContext, options: RegistryOptio
     const { value: pkg } = await client().packument(id)
     const release = registryDetail(pkg)
     if (!release) throw new CatalogNotFoundError()
+    const project = await detectProjectSignals(ctx, [
+      ...Object.keys(release.detail.requires),
+      ...release.detail.versions.flatMap(version => Object.keys(registryRelease(pkg, version.version)?.detail.requires ?? {})),
+    ])
     const output = decorate(release.detail, project, release.optionalPeers)
     output.versions = output.versions.map((version) => {
       const entry = registryRelease(pkg, version.version)
@@ -123,16 +124,23 @@ export function createCatalogService(ctx: CatalogContext, options: RegistryOptio
     })
     return output
   }
-  return { catalog, detail }
+  return {
+    catalog,
+    detail,
+    /** Exact metadata fetch shared by update checks, migrations and failure advice. */
+    packument: (id: string) => client().packument(id),
+    /** Read-only planning lookup through the same registry configuration and identity guards. */
+    cachedPackument: (id: string) => client().cachedPackument(id),
+  }
 }
 
 /** Context lifetime owns registry cache/in-flight sharing across transport consumers. */
 const services = new WeakMap<CatalogContext, ReturnType<typeof createCatalogService>>()
 /** Shared catalog export for inventory, planning and jobs. */
-export function getCatalogService(ctx: CatalogContext) {
+export function getCatalogService(ctx: CatalogContext, options: RegistryOptions = {}) {
   let service = services.get(ctx)
   if (!service) {
-    service = createCatalogService(ctx)
+    service = createCatalogService(ctx, options)
     services.set(ctx, service)
   }
   return service

@@ -2,7 +2,7 @@ import type { MarketplaceManifest, MigrationOp } from '@histoire/shared'
 import { compareVersions, satisfiesVersion } from '../catalog/version.js'
 
 /** Validated release metadata, ordered explicitly before migration selection. */
-export interface MigrationRelease {
+interface MigrationRelease {
   /** Exact package version. */ version: string
   /** Declarative version manifest. */ manifest: MarketplaceManifest
 }

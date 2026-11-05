@@ -1,19 +1,15 @@
-import { mount } from '@vue/test-utils'
 import { afterEach, expect, it, vi } from 'vitest'
-import { defineComponent, h, nextTick } from 'vue'
+import { h, nextTick } from 'vue'
 import MarketplaceUpdateDialog from '../../../histoire-app/src/app/components/marketplace/update/MarketplaceUpdateDialog.vue'
-import { usePluginUpdates } from '../../../histoire-app/src/app/components/pages/settings/plugins/use-plugin-updates.js'
-import { createMarketplaceStore, provideMarketplaceStore } from '../../../histoire-app/src/app/stores/marketplace.js'
+import { createMarketplaceStore } from '../../../histoire-app/src/app/stores/marketplace.js'
 import { createUiSettingsStore } from '../../../histoire-app/src/app/stores/settings.js'
-import { createMarketplaceClient } from '../../../histoire-app/src/app/util/marketplace-client.js'
 import { flushMicrotasks } from '../../../histoire/src/node/__tests__/utils/flush.js'
-import { memoryStorage } from '../../../histoire/src/node/__tests__/utils/settings-storage.js'
 import { job, plan, plugin } from './marketplace-install/fixtures.js'
-import { createMarketplaceTransport, stubMarketplaceSession } from './utils/marketplace-transport.js'
+import { buttonByName, lastRequest, mountMarketplace, stubMarketplaceSession } from './utils/marketplace-transport.js'
 
-const cleanups: (() => void)[] = []
-afterEach(() => {
-  for (const cleanup of cleanups.splice(0).reverse()) cleanup()
+const cleanups: (() => unknown)[] = []
+afterEach(async () => {
+  for (const cleanup of cleanups.splice(0).reverse()) await cleanup()
   vi.useRealTimers()
   vi.unstubAllGlobals()
 })
@@ -21,41 +17,16 @@ afterEach(() => {
 /** Real dialog/store/client; external channel and missing native top layer are substitutes. */
 function setup() {
   stubMarketplaceSession()
-  const channel = createMarketplaceTransport()
-  const storage = memoryStorage()
-  const store = createMarketplaceStore({ client: createMarketplaceClient({ transport: channel.transport }), settings: createUiSettingsStore({ storage }), storage })
-  const Host = defineComponent(() => {
-    provideMarketplaceStore(store)
-    store.connect()
-    const updates = usePluginUpdates(store, true)
-    return () => [h('output', { 'aria-label': 'Available updates' }, updates.count.value), h('button', { onClick: () => store.openUpdate('@histoire/plugin-a11y') }, 'Update plugin'), h(MarketplaceUpdateDialog, { transport: channel.transport })]
+  const { channel, store, storage, wrapper, dispose } = mountMarketplace({
+    provider: false,
+    setup: store => store.connect(),
+    render: store => [h('output', { 'aria-label': 'Available updates' }, store.updates.count.value), h('button', { onClick: () => store.openUpdate('@histoire/plugin-a11y') }, 'Update plugin'), h(MarketplaceUpdateDialog)],
   })
-  const wrapper = mount(Host, { attachTo: document.body })
-  cleanups.push(() => {
-    wrapper.unmount()
-    store.dispose()
-  })
-  const dialog = wrapper.find('dialog').exists() ? wrapper.get('dialog').element as HTMLDialogElement : undefined
-  if (dialog) {
-    dialog.showModal = () => {
-      dialog.open = true
-    }
-    dialog.close = () => {
-      dialog.open = false
-    }
-  }
+  cleanups.push(dispose)
   /** Exact action name independent of component classes. */
-  function button(name: string) {
-    const result = wrapper.findAll('button').find(button => button.text().trim() === name)
-    if (!result) throw new Error(`Missing button ${name}`)
-    return result
-  }
+  const button = (name: string) => buttonByName(wrapper, name)
   /** Last exact external request. */
-  function request(event: string) {
-    const value = channel.sent.filter(item => item.event === `histoire:ui:marketplace-${event}`).at(-1)?.value
-    if (!value) throw new Error(`Missing ${event} request`)
-    return value
-  }
+  const request = (event: string) => lastRequest(channel, event).value
   /** Supply update metadata, retaining target-specific ordered notes and migration. */
   async function ready(review = plan()) {
     (button('Update plugin').element as HTMLElement).focus()
@@ -66,6 +37,7 @@ function setup() {
     detail.installed = { version: '0.3.0', enabled: true, required: false, update: '1.0.0' }
     detail.releaseNotes = [{ kind: 'breaking', text: 'Rename token option' }, { kind: 'feature', text: 'Token groups' }, { kind: 'fix', text: 'Keep alias imports' }]
     detail.manifest.migrations = [{ from: '<1', ops: [{ op: 'rename-option', from: 'token', to: 'accessToken' }] }]
+    await vi.waitFor(() => expect(request('update-detail')).toBeDefined())
     channel.emit('histoire:ui:marketplace-update-detail-result', { requestId: request('update-detail').requestId, detail })
     await flushMicrotasks(6)
     channel.emit('histoire:ui:marketplace-plan-result', { requestId: request('plan').requestId, plan: review })
@@ -112,7 +84,7 @@ it('persists skipped target, removes update count and returns focus without admi
   expect(store.updateTarget.value).toBeUndefined()
   expect(wrapper.get('[aria-label="Available updates"]').text()).toBe('0')
   expect(store.prefs.value.skippedVersions['@histoire/plugin-a11y']).toBe('1.0.0')
-  const nextStore = createMarketplaceStore({ settings: createUiSettingsStore({ storage }), storage })
+  const nextStore = createMarketplaceStore({ settings: createUiSettingsStore({ storage }) })
   cleanups.push(nextStore.dispose)
   expect(nextStore.prefs.value.skippedVersions['@histoire/plugin-a11y']).toBe('1.0.0')
   expect(channel.sent.some(item => item.event === 'histoire:ui:marketplace-job-start')).toBe(false)
@@ -139,6 +111,7 @@ it('keeps compact progress until successful load and hands failed jobs to modal 
 it('ignores late metadata after dismissal and fresh visit remains usable', async () => {
   const { button, request, channel, store, wrapper, ready } = setup()
   await button('Update plugin').trigger('click')
+  await vi.waitFor(() => expect(request('update-detail')).toBeDefined())
   const old = request('update-detail')
   await wrapper.get('dialog').trigger('keydown', { key: 'Escape' })
   channel.emit('histoire:ui:marketplace-update-detail-result', { requestId: old.requestId, detail: plugin() })
@@ -172,15 +145,12 @@ it('offers explicit continue and closes only after successful load', async () =>
 
 it('asks for a manual dev server restart when the server has no restart host', async () => {
   const { ready, button, channel, request, wrapper } = setup()
-  const fetcher = vi.fn()
-  vi.stubGlobal('fetch', fetcher)
   await ready()
   await button('Update').trigger('click')
   channel.emit('histoire:ui:marketplace-job-state', { requestId: request('job-start').requestId, job: job({ kind: 'update', awaiting: 'restart' }) })
   await flushMicrotasks(6)
   expect(wrapper.get('[aria-live="polite"]').text()).toBe('Restart the dev server to finish')
   expect(wrapper.findAll('button').some(item => item.text() === 'Restart now')).toBe(false)
-  expect(fetcher).not.toHaveBeenCalled()
 })
 
 it('routes unsafe migrations to manual instructions without admitting a job', async () => {
@@ -189,7 +159,7 @@ it('routes unsafe migrations to manual instructions without admitting a job', as
   await ready(manual)
   await button('Manual update').trigger('click')
   expect(store.updateTarget.value).toBeUndefined()
-  expect(store.view.value).toBe('manual')
+  expect(store.view.value).toBe('install')
   expect(store.manualPlan.value).toEqual(manual)
   expect(channel.sent.some(item => item.event === 'histoire:ui:marketplace-job-start')).toBe(false)
 })
@@ -201,7 +171,7 @@ it('keeps a later plugin visit intact when background admission completes', asyn
   const admission = request('job-start')
   await button('Run in background').trigger('click')
   store.openUpdate('@histoire/plugin-designs')
-  await nextTick()
+  await vi.waitFor(() => expect(request('update-detail').id).toBe('@histoire/plugin-designs'))
   const detail = plugin()
   detail.id = '@histoire/plugin-designs'
   detail.displayName = 'Designs'

@@ -1,14 +1,15 @@
 <script setup lang="ts">
 import type { CatalogEntry } from '@histoire/shared'
 import { useMarketplaceStore } from '../../../stores/marketplace.js'
+import BaseChip from '../../base/BaseChip.vue'
+import { incompatibleReason } from '../shell/compatibility-reason.js'
 import PluginTile from '../shell/PluginTile.vue'
 import { additions } from './labels.js'
 import MatchText from './MatchText.vue'
 import PluginInstallAction from './PluginInstallAction.vue'
 
 const props = withDefaults(defineProps<{
-  /** Server-owned metadata and joined installation state. */ plugin: CatalogEntry
-  /** Optional project recommendation supplied by Discover. */ reason?: string
+  /** Server-owned metadata and joined installation state. */ plugin: CatalogEntry & { /** Project recommendation supplied by Discover. */ reason?: string }
   /** Result row inside a shared card, or compact project recommendation. */ layout?: 'list' | 'pick'
 }>(), { layout: 'list' })
 const store = useMarketplaceStore()
@@ -37,18 +38,24 @@ function ranges(field: 'displayName' | 'summary' | 'id'): Array<[number, number]
         </h3>
       </div>
       <span v-if="layout === 'list'" class="htw:break-all htw:font-mono htw:text-[11px] htw:text-muted"><MatchText :text="plugin.id" :ranges="ranges('id')" /></span>
-      <span v-if="plugin.official && layout === 'list'" class="htw:inline-flex htw:h-[18px] htw:items-center htw:rounded-full htw:bg-accent-soft htw:px-[6px] htw:text-[11px] htw:font-semibold htw:text-accent-text">Official</span>
+      <BaseChip v-if="plugin.official && layout === 'list'" tone="accent" compact>
+        Official
+      </BaseChip>
     </div>
     <PluginInstallAction :plugin="plugin" class="htw:col-start-3 htw:row-start-1 htw:self-start" />
     <p class="htw:col-start-2 htw:row-start-2 htw:m-0 htw:text-body">
       <MatchText :text="plugin.summary" :ranges="ranges('summary')" />
     </p>
     <div v-if="layout === 'list'" class="htw:col-start-2 htw:row-start-3 htw:mt-[4px] htw:flex htw:flex-wrap htw:items-center htw:gap-[6px]">
-      <span v-for="kind in [...new Set(plugin.adds.map(add => add.kind))]" :key="kind" class="htw:inline-flex htw:h-[22px] htw:items-center htw:rounded-full htw:bg-chip htw:px-[9px] htw:text-[11px] htw:font-semibold htw:text-body">{{ additions[kind] }}</span>
+      <BaseChip v-for="kind in [...new Set(plugin.adds.map(add => add.kind))]" :key="kind">
+        {{ additions[kind] }}
+      </BaseChip>
     </div>
-    <span v-if="reason && layout === 'pick'" class="htw:col-start-2 htw:row-start-3 htw:inline-flex htw:min-h-[22px] htw:justify-self-start htw:items-center htw:rounded-full htw:bg-accent-soft htw:px-[9px] htw:text-[11px] htw:font-semibold htw:text-accent-text">{{ reason }}</span>
+    <BaseChip v-if="plugin.reason && layout === 'pick'" tone="accent" class="htw:col-start-2 htw:row-start-3 htw:justify-self-start">
+      {{ plugin.reason }}
+    </BaseChip>
     <p v-if="!plugin.compatible.ok" class="htw:col-span-full htw:m-0 htw:text-[12px] htw:text-muted">
-      {{ plugin.compatible.reason || 'Incompatible with this project' }}
+      {{ incompatibleReason(plugin.compatible.reason) }}
     </p>
   </article>
 </template>

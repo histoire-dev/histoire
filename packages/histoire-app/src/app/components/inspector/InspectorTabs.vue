@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import type { InspectorTab, InspectorTabItem } from './state.js'
 import { BuiltinIcon, HstButton } from '@histoire/controls/vue'
-import { useHistoireContext } from '@histoire/vue/internal'
 import { computed, nextTick, ref, shallowRef, watch } from 'vue'
 import BasePopover from '../base/popover/BasePopover.vue'
+import { useMenuKeyboard } from '../base/use-menu-keyboard.js'
 import MenuItem from '../menu/MenuItem.vue'
-import { getInspectorTabKey } from './state.js'
+import { getInspectorTabId, getInspectorTabKey } from './state.js'
 import { useTabOverflow } from './tab-overflow.js'
 
 const props = defineProps<{
@@ -17,12 +17,11 @@ const props = defineProps<{
   idPrefix: string
 }>()
 const emit = defineEmits<{ select: [value: InspectorTab] }>()
-const context = useHistoireContext()
 const list = shallowRef<HTMLElement | null>(null)
 const more = shallowRef<InstanceType<typeof HstButton> | null>(null)
 const trigger = computed(() => (more.value?.element as HTMLElement | undefined) ?? null)
 const open = ref(false)
-const focusLast = ref(false)
+const { focusLast, openMenu: triggerKey, navigate: menuKey } = useMenuKeyboard({ open, anchor: () => trigger.value })
 const values = computed(() => props.tabs.map(tab => tab.value))
 const { overflowed, compact } = useTabOverflow(list, () => trigger.value, () => values.value, () => props.activeTab, () => Boolean(props.tabs.find(tab => tab.value === props.activeTab)?.icon))
 const menu = computed(() => props.tabs.filter(tab => overflowed.value.has(tab.value)))
@@ -69,30 +68,6 @@ function navigate(event: KeyboardEvent) {
   select(tabs[index].value)
 }
 
-/** ArrowDown/ArrowUp open the menu on its first or last row. */
-function triggerKey(event: KeyboardEvent): void {
-  if (event.key !== 'ArrowDown' && event.key !== 'ArrowUp') return
-  event.preventDefault()
-  focusLast.value = event.key === 'ArrowUp'
-  open.value = true
-}
-
-/** Arrow/Home/End move between menu rows; Tab closes the menu back to its trigger. */
-function menuKey(event: KeyboardEvent): void {
-  const rows = [...(event.currentTarget as HTMLElement).querySelectorAll<HTMLElement>('[role="menuitem"]')]
-  if (event.key === 'Tab') {
-    event.preventDefault()
-    open.value = false
-    trigger.value?.focus()
-    return
-  }
-  const current = rows.indexOf(event.target as HTMLElement)
-  const index = event.key === 'ArrowDown' ? (current + 1) % rows.length : event.key === 'ArrowUp' ? (current + rows.length - 1) % rows.length : event.key === 'Home' ? 0 : event.key === 'End' ? rows.length - 1 : -1
-  if (index < 0 || !rows.length) return
-  event.preventDefault()
-  rows[index].focus()
-}
-
 /**
  * Picks an overflowed tab from the menu.
  * @param value Tab value.
@@ -106,7 +81,7 @@ function choose(value: InspectorTab): void {
 <template>
   <div class="histoire-button-group-options htw:mt-0 htw:mx-inspector-gutter htw:mb-pane-gutter">
     <div ref="list" class="htw:relative htw:flex htw:flex-1 htw:gap-[3px] htw:min-w-0" role="tablist" aria-label="Inspector" @keydown="navigate">
-      <HstButton v-for="tab in tabs" :id="`${idPrefix}-tab-${getInspectorTabKey(tab.value)}`" :key="tab.value" class="htw:flex htw:items-center htw:justify-center htw:gap-[5px] htw:min-w-0 htw:min-h-[32px] htw:overflow-hidden htw:text-muted htw:font-bold htw:flex-auto htw:hover:text-text htw:[[hidden]]:hidden" :class="{ 'htw:opacity-60': tab.dimmed }" color="flat" type="button" role="tab" :hidden="overflowed.has(tab.value)" :aria-selected="activeTab === tab.value" :aria-controls="`${idPrefix}-panel-${getInspectorTabKey(tab.value)}`" :tabindex="activeTab === tab.value || (activeTab === undefined && !tab.value) ? 0 : -1" :data-test-id="tab.value === 'tests' ? 'story-tests-tab' : undefined" @click="select(tab.value)">
+      <HstButton v-for="tab in tabs" :id="`${idPrefix}-tab-${getInspectorTabKey(tab.value)}`" :key="tab.value" class="htw:flex htw:items-center htw:justify-center htw:gap-[5px] htw:min-w-0 htw:min-h-[32px] htw:overflow-hidden htw:text-muted htw:font-bold htw:flex-auto htw:hover:text-text htw:[[hidden]]:hidden" :class="{ 'htw:opacity-60': tab.dimmed }" color="flat" type="button" role="tab" :hidden="overflowed.has(tab.value)" :aria-selected="activeTab === tab.value" :aria-controls="`${idPrefix}-panel-${getInspectorTabKey(tab.value)}`" :tabindex="activeTab === tab.value || (activeTab === undefined && !tab.value) ? 0 : -1" :data-histoire-contribution="getInspectorTabId(tab.value)" :data-test-id="tab.value === 'tests' ? 'story-tests-tab' : undefined" @click="select(tab.value)">
         <!-- Direct-child variants leave measurement clones at natural width. The space keeps label and badge separate words in the accessible name; flex layout ignores it. -->
         <BuiltinIcon v-if="tab.icon" :icon="tab.icon" class="htw:flex-none" :size="16" />
         <span class="htw:min-w-0 htw:overflow-hidden htw:text-ellipsis htw:whitespace-nowrap htw:[[role=tablist]>[role=tab]>&]:data-[compact=true]:absolute htw:[[role=tablist]>[role=tab]>&]:data-[compact=true]:w-px htw:[[role=tablist]>[role=tab]>&]:data-[compact=true]:h-px htw:[[role=tablist]>[role=tab]>&]:data-[compact=true]:[clip-path:inset(50%)]" :data-compact="compact && activeTab === tab.value">{{ tab.label }}</span>{{ ' ' }}<component :is="tab.badge" v-if="tab.badge" />
@@ -116,9 +91,9 @@ function choose(value: InspectorTab): void {
     <HstButton ref="more" class="htw:hover:text-text htw:[[hidden]]:hidden htw:[--histoire-icon-button-size:32px] htw:flex-none htw:text-muted" color="flat" type="button" icon-only aria-label="More tabs" aria-haspopup="menu" :aria-expanded="open" :hidden="!menu.length" @click="open = !open" @keydown="triggerKey">
       <BuiltinIcon icon="chevron-down" class="htw:flex-none" :size="16" />
     </HstButton>
-    <BasePopover v-if="open" v-model:open="open" :anchor="trigger" label="More tabs" role="menu" :width="200" :focus-last="focusLast" :overlay-target="context.overlay.value ?? context.root.value">
+    <BasePopover v-if="open" v-model:open="open" :anchor="trigger" label="More tabs" role="menu" :width="200" :focus-last="focusLast">
       <div @keydown="menuKey">
-        <MenuItem v-for="tab in menu" :key="tab.value" :label="tab.label" :icon="tab.icon" :class="{ 'htw:opacity-60': tab.dimmed }" @click="choose(tab.value)">
+        <MenuItem v-for="tab in menu" :key="tab.value" :label="tab.label" :icon="tab.icon" :data-histoire-contribution="getInspectorTabId(tab.value)" :class="{ 'htw:opacity-60': tab.dimmed }" @click="choose(tab.value)">
           <component :is="tab.badge" v-if="tab.badge" />
           <span v-else-if="tab.badgeText !== undefined" class="htw:text-muted htw:text-[13px] htw:tabular-nums">{{ tab.badgeText }}</span>
         </MenuItem>

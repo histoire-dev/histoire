@@ -1,7 +1,8 @@
 import type { PluginDetail } from '@histoire/shared'
 import type { AnchoredSpotlightTarget } from './use-spotlight-targets.js'
-import { computed, nextTick, onMounted, onScopeDispose, ref, shallowRef, watch } from 'vue'
+import { computed, nextTick, onScopeDispose, ref, shallowRef, watch } from 'vue'
 import { useMarketplaceStore } from '../../../stores/marketplace.js'
+import { workbenchPluginId } from '../shell/workbench-plugin-id.js'
 import { useSpotlightTargets } from './use-spotlight-targets.js'
 
 /** Own one install tour, with receipt acknowledgement and visit-fenced asynchronous reads. */
@@ -19,7 +20,7 @@ export function usePostInstallSpotlight() {
   const acknowledged = new Set<string>()
   let controller: AbortController | undefined
   let opener: HTMLElement | undefined
-  let observer: MutationObserver | undefined
+  let frame: number | undefined
   const prefix = `_histoire-marketplace-spotlight:${import.meta.env.BASE_URL}:`
   const eligible = computed(() => {
     const job = store.job.value
@@ -68,9 +69,9 @@ export function usePostInstallSpotlight() {
     // Metadata supplies copy only. A failed/late catalog read cannot fabricate an anchor.
     const metadata = store.client.detail(job.id, store.prefs.value, { signal: visit.signal, timeoutMs: 3000 }).catch(() => undefined)
     try {
-      const { installedPlugins } = await import('virtual:$histoire-config')
+      const id = await workbenchPluginId(job.id)
       if (visit.signal.aborted) return
-      pluginId.value = installedPlugins.find(plugin => plugin.packageName === job.id)?.id
+      pluginId.value = id
     }
     catch { /* Missing inventory leaves the honest unanchored fallback. */ }
     const result = await metadata
@@ -82,7 +83,7 @@ export function usePostInstallSpotlight() {
     await nextTick()
     if (visit.signal.aborted) return
     const panes = targets.value.filter(item => item.kind === 'rail-pane')
-    const pane = destination ? panes.find(item => item.label === destination) ?? (panes.length === 1 && panes[0].description === destination ? panes[0] : undefined) : undefined
+    const pane = destination ? panes.find(item => item.id === `${pluginId.value}:${destination}`) : undefined
     // Wizard may already have opened and acknowledged this destination during metadata loading.
     if (pane && store.postInstall.value?.jobId === job.jobId) workbench?.context.navigation.openPane(pane.id)
     await nextTick()
@@ -134,7 +135,10 @@ export function usePostInstallSpotlight() {
   }
   /** Recheck anchors when layout or surface availability changes without registry changes. */
   function refresh(): void {
-    revision.value++
+    frame ??= requestAnimationFrame(() => {
+      frame = undefined
+      revision.value++
+    })
   }
   /** Escape dismisses even after keyboard focus moves back to a highlighted control. */
   function onKeydown(event: KeyboardEvent): void {
@@ -143,19 +147,26 @@ export function usePostInstallSpotlight() {
     event.stopPropagation()
     dismiss()
   }
-  onMounted(() => {
-    observer = new MutationObserver(refresh)
-    if (root.value) observer.observe(root.value, { childList: true, subtree: true, attributes: true, attributeFilter: ['hidden', 'inert', 'aria-hidden', 'class', 'style'] })
+  // Observing the whole workbench while idle is expensive. Each eligible receipt
+  // owns one observer; dismissing or replacing it releases all layout listeners.
+  watch([root, () => active.value || Boolean(eligible.value && !seen(eligible.value.jobId))], ([element, observing], _, cleanup) => {
+    if (!element || !observing) return
+    const observer = new MutationObserver(refresh)
+    observer.observe(element, { childList: true, subtree: true, attributes: true, attributeFilter: ['hidden', 'inert', 'aria-hidden', 'class', 'style'] })
     window.addEventListener('keydown', onKeydown, true)
     window.addEventListener('resize', refresh)
     window.addEventListener('scroll', refresh, true)
-  })
+    cleanup(() => {
+      observer.disconnect()
+      window.removeEventListener('keydown', onKeydown, true)
+      window.removeEventListener('resize', refresh)
+      window.removeEventListener('scroll', refresh, true)
+      if (frame !== undefined) cancelAnimationFrame(frame)
+      frame = undefined
+    })
+  }, { immediate: true, flush: 'post' })
   onScopeDispose(() => {
     controller?.abort()
-    observer?.disconnect()
-    window.removeEventListener('keydown', onKeydown, true)
-    window.removeEventListener('resize', refresh)
-    window.removeEventListener('scroll', refresh, true)
     hide()
   })
   return { active, target, name, page, total, running, error, next, dismiss, openSettings, run }

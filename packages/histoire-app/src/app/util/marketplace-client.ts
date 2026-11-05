@@ -1,4 +1,6 @@
 import type { CatalogPage, CatalogQuery, ChangePlan, ChangeRequest, JobState, MarketplaceError, MarketplaceJobEvent, MarketplacePrefs, MarketplaceUpdate, PluginDetail, UiClientEvents, UiServerEvents } from '@histoire/shared'
+import { catalogFacets, catalogPageSize, filterCatalog, manualConfigSteps, packageCommand, searchCatalog, sortCatalog } from '@histoire/shared'
+import { createClientUuid } from './dev-event-api.js'
 import { isUiChannelAvailable, onUiEvent, sendUiEvent } from './ui-channel'
 
 /** Transport boundary shared by development HMR and transport tests. */
@@ -24,38 +26,13 @@ function requestError(error: MarketplaceError): Error & MarketplaceError {
 }
 /** Count facets over the actual offline result set. */
 function staticPage(entries: PluginDetail[], query: CatalogQuery): CatalogPage {
-  const filters = query.filters
-  const search = query.query?.trim().toLowerCase()
-  /** Exclude a facet's own filter so users can see alternate choices. */
-  function matchesQuery(entry: PluginDetail, omitted?: keyof NonNullable<CatalogQuery['filters']>): boolean {
-    return (!search || `${entry.id} ${entry.displayName} ${entry.summary}`.toLowerCase().includes(search))
-      && (!filters?.collection || !!entry.manifest.collections?.includes(filters.collection))
-      && (omitted === 'category' || !filters?.category || entry.category === filters.category)
-      && (omitted === 'officialOnly' || !filters?.officialOnly || entry.official)
-      && (omitted === 'frameworks' || !filters?.frameworks?.length || !entry.frameworks.length || filters.frameworks.some(framework => entry.frameworks.includes(framework)))
-      && (omitted === 'adds' || !filters?.adds?.length || filters.adds.some(kind => entry.adds.some(add => add.kind === kind)))
-  }
-  const matches = entries.filter(entry => matchesQuery(entry))
-  if (query.sort === 'name') matches.sort((a, b) => a.displayName.localeCompare(b.displayName))
-  if (query.sort === 'updated') matches.sort((a, b) => (b.updatedAt ?? '').localeCompare(a.updatedAt ?? ''))
-  const facets: CatalogPage['facets'] = {
-    category: { testing: 0, design: 0, inspection: 0, frameworks: 0, data: 0 },
-    frameworks: {},
-    official: 0,
-    adds: { 'rail-pane': 0, 'inspector-tab': 0, 'toolbar-tool': 0, 'story-tests': 0, 'cli-command': 0, 'settings-section': 0, 'canvas-view': 0 },
-  }
-  for (const entry of entries) {
-    if (matchesQuery(entry, 'category')) facets.category[entry.category]++
-    if (matchesQuery(entry, 'officialOnly') && entry.official) facets.official++
-    if (matchesQuery(entry, 'frameworks')) {
-      for (const framework of new Set(entry.frameworks)) facets.frameworks[framework] = (facets.frameworks[framework] ?? 0) + 1
-    }
-    if (matchesQuery(entry, 'adds')) {
-      for (const kind of new Set(entry.adds.map(add => add.kind))) facets.adds[kind]++
-    }
-  }
+  const collection = query.filters?.collection
+  const members = collection ? entries.filter(entry => entry.manifest.collections?.includes(collection)) : entries
+  const ranked = searchCatalog(members, query.query)
+  const matches = sortCatalog(filterCatalog(ranked, query.filters), query.sort)
+  const facets = catalogFacets(ranked, query.filters)
   const offset = Math.max(0, Number.parseInt(query.cursor ?? '0', 10) || 0)
-  const limit = Math.max(1, Math.min(60, query.limit ?? 60))
+  const limit = Math.max(1, Math.min(60, query.limit ?? catalogPageSize))
   return {
     entries: matches.slice(offset, offset + limit),
     total: matches.length,
@@ -69,28 +46,7 @@ function staticPage(entries: PluginDetail[], query: CatalogQuery): CatalogPage {
 function staticPlan(request: ChangeRequest, detail: PluginDetail): ChangePlan {
   const name = request.prefs.packageManager === 'auto' ? 'npm' : request.prefs.packageManager
   const removing = request.kind === 'remove'
-  const packageName = `${detail.id}${request.version ? `@${request.version}` : ''}`
-  const exact = request.kind === 'pin' ? name === 'yarn' || name === 'bun' ? ' --exact' : ' --save-exact' : ''
-  const command = removing
-    ? `${name} ${name === 'npm' ? 'uninstall' : 'remove'} ${detail.id}`
-    : `${name} ${name === 'npm' ? 'install' : 'add'} ${name === 'bun' ? '-d' : '-D'}${exact} ${packageName}`
-  const factory = detail.manifest.config.import
-  // Forms carry dot paths, but factory calls require nested literal objects.
-  const values: Record<string, unknown> = Object.create(null)
-  for (const [key, value] of Object.entries(request.options ?? {})) {
-    const declaration = detail.manifest.config.options?.find(option => option.key === key)
-    if (declaration && JSON.stringify(declaration.default) === JSON.stringify(value)) continue
-    const parts = key.split('.')
-    if (parts.some(part => !/^[a-z_$][\w$]*$/i.test(part) || ['__proto__', 'constructor', 'prototype'].includes(part))) throw requestError({ code: 'invalid', message: 'Invalid option path' })
-    let target = values
-    for (const part of parts.slice(0, -1)) {
-      if (Object.hasOwn(target, part) && (!target[part] || typeof target[part] !== 'object' || Array.isArray(target[part]))) throw requestError({ code: 'invalid', message: 'Overlapping option paths' })
-      target = target[part] ??= Object.create(null)
-    }
-    if (Object.hasOwn(target, parts.at(-1)!)) throw requestError({ code: 'invalid', message: 'Overlapping option paths' })
-    target[parts.at(-1)!] = structuredClone(value)
-  }
-  const serialized = Object.keys(values).length ? JSON.stringify(values, null, 2) : ''
+  const command = packageCommand({ name, workspaceRoot: false }, { ...request, version: request.version ?? detail.latest })
   return {
     planId: `static:${detail.id}`,
     hash: '',
@@ -98,11 +54,8 @@ function staticPlan(request: ChangeRequest, detail: PluginDetail): ChangePlan {
     files: [],
     warnings: [],
     manual: { reason: 'static', steps: [
-      ...(request.kind === 'options' ? [] : [{ title: removing ? 'Remove package' : 'Install package', code: command }]),
-      { title: 'Update histoire.config.ts', code: removing
-        ? `Remove the ${factory}() entry and unused import from histoire.config.ts.`
-        : `import { ${factory} } from '${detail.id}'\n\n// ${request.kind === 'options' ? 'Update this call in' : 'Add this call to'} the plugins array in histoire.config.ts\n${factory}(${serialized})` },
-      { title: 'Restart Histoire' },
+      ...(request.kind === 'options' ? [] : [{ title: removing ? 'Remove package' : 'Install package', code: command!.display }]),
+      ...manualConfigSteps(request, detail),
     ] },
   }
 }
@@ -123,7 +76,7 @@ export function createMarketplaceClient(options: MarketplaceClientOptions = {}) 
         reject(requestError({ code: 'unavailable', message: 'Plugin jobs require a development server' }))
         return
       }
-      const requestId = crypto.randomUUID()
+      const requestId = createClientUuid()
       let off = () => {}
       let timer: ReturnType<typeof setTimeout> | undefined
       let settled = false
@@ -163,11 +116,10 @@ export function createMarketplaceClient(options: MarketplaceClientOptions = {}) 
     requestOptions?.signal?.throwIfAborted()
     const detail = entries.find(entry => entry.id === id)
     if (!detail) throw requestError({ code: 'not-found', message: 'Plugin not found' })
-    const result = structuredClone(detail)
-    result.versions = result.versions.map(version => !version.compatible && !version.reason
-      ? { ...version, reason: (version.version === result.latest ? result.compatible.reason : undefined) ?? 'Incompatible with this project' }
+    const versions = detail.versions.map(version => !version.compatible && !version.reason
+      ? { ...version, reason: (version.version === detail.latest ? detail.compatible.reason : undefined) ?? 'Incompatible with this project' }
       : version)
-    return result
+    return { ...detail, versions }
   }
   return {
     /** Query catalog; static books never contact the registry. */
@@ -176,7 +128,7 @@ export function createMarketplaceClient(options: MarketplaceClientOptions = {}) 
       requestOptions?.signal?.throwIfAborted()
       const entries = await loadOfficial()
       requestOptions?.signal?.throwIfAborted()
-      return staticPage(structuredClone(entries), query)
+      return staticPage(entries, query)
     },
     /** Read declarative plugin details. */
     detail(id: string, prefs: MarketplacePrefs, requestOptions?: MarketplaceRequestOptions): Promise<PluginDetail> {

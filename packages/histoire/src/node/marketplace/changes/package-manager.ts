@@ -1,14 +1,16 @@
-import type { ChangePlan, ChangeRequest, MarketplacePrefs } from '@histoire/shared'
+import type { ChangePlan, MarketplacePrefs } from '@histoire/shared'
 import { access, readFile } from 'node:fs/promises'
+import { executablePackageManagers } from '@histoire/shared'
 import path from 'pathe'
 
 /** Detected manager plus pnpm's workspace-root install requirement. */
 export type DetectedPackageManager = ChangePlan['packageManager'] & {
   /** Current project is the pnpm workspace root. */ workspaceRoot: boolean
 }
-/** Supported executables; never resolved or run during planning. */
-const managers = ['pnpm', 'npm', 'yarn', 'bun'] as const
-/** Lockfile names in stable precedence within one directory. */
+// Existing job and change-editor consumers still import this path.
+export { displayCommand, packageCommand } from '@histoire/shared'
+
+/** Lockfile names in stable manager precedence within one directory. */
 export const lockfiles = ['pnpm-lock.yaml', 'package-lock.json', 'yarn.lock', 'bun.lock', 'bun.lockb'] as const
 
 /** Tests existence without treating permission or IO errors as absence. */
@@ -23,65 +25,65 @@ async function exists(file: string): Promise<boolean> {
   }
 }
 
-/** Reads JSON without swallowing malformed project manifests or IO failures. */
-export async function readPackage(file: string): Promise<Record<string, unknown>> {
+/**
+ * Read JSON without swallowing malformed manifests or IO failures.
+ * @param file Absolute manifest path.
+ * @param cache Parsed inputs retained only within one plan computation.
+ */
+export async function readPackage(file: string, cache?: Map<string, Record<string, unknown>>): Promise<Record<string, unknown>> {
+  if (cache?.has(file)) return cache.get(file)!
+  let data: Record<string, unknown>
   try {
-    return JSON.parse(await readFile(file, 'utf8'))
+    data = JSON.parse(await readFile(file, 'utf8'))
   }
   catch (error) {
-    if ((error as NodeJS.ErrnoException).code === 'ENOENT') return {}
-    throw error
+    if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error
+    data = {}
   }
+  cache?.set(file, data)
+  return data
 }
 
-/** Finds the nearest declared workspace; isolated roots never inherit foreign locks. */
-export async function findWorkspaceRoot(root: string): Promise<string> {
+/**
+ * Find the nearest workspace; isolated roots never inherit foreign locks.
+ * @param root Project directory.
+ * @param cache Parsed inputs shared with manager detection within this plan only.
+ */
+export async function findWorkspaceRoot(root: string, cache?: Map<string, Record<string, unknown>>): Promise<string> {
   root = path.resolve(root)
   for (let directory = root; ; directory = path.dirname(directory)) {
-    const data = await readPackage(path.join(directory, 'package.json'))
+    const data = await readPackage(path.join(directory, 'package.json'), cache)
     if (await exists(path.join(directory, 'pnpm-workspace.yaml')) || data.workspaces) return directory
     if (path.dirname(directory) === directory) return root
   }
 }
 
-/** Detects override, packageManager, then nearest lockfile inside a workspace. */
-export async function detectPackageManager(root: string, override: MarketplacePrefs['packageManager']): Promise<DetectedPackageManager | undefined> {
+/**
+ * Detect override, packageManager, then nearest lockfile inside a workspace.
+ * @param root Project directory.
+ * @param override Browser preference.
+ * @param boundary Already discovered workspace root, avoiding another ancestor walk.
+ * @param cache Parsed inputs shared with workspace discovery within this plan only.
+ */
+export async function detectPackageManager(root: string, override: MarketplacePrefs['packageManager'], boundary?: string, cache = new Map<string, Record<string, unknown>>()): Promise<DetectedPackageManager | undefined> {
   root = path.resolve(root)
   const workspaceRoot = await exists(path.join(root, 'pnpm-workspace.yaml'))
   if (override !== 'auto') return { name: override, source: 'override', workspaceRoot }
-  const project = await readPackage(path.join(root, 'package.json'))
+  const project = await readPackage(path.join(root, 'package.json'), cache)
   const declared = typeof project.packageManager === 'string' ? /^(pnpm|npm|yarn|bun)@\S+$/.exec(project.packageManager)?.[1] : undefined
   if (declared) return { name: declared as DetectedPackageManager['name'], source: 'packageManager', workspaceRoot }
-  const boundary = await findWorkspaceRoot(root)
+  boundary ??= await findWorkspaceRoot(root, cache)
   for (let directory = root; ; directory = path.dirname(directory)) {
-    const data = await readPackage(path.join(directory, 'package.json'))
+    const data = await readPackage(path.join(directory, 'package.json'), cache)
     if (directory !== root && typeof data.packageManager === 'string') {
       const name = /^(pnpm|npm|yarn|bun)@\S+$/.exec(data.packageManager)?.[1]
       if (name) return { name: name as DetectedPackageManager['name'], source: 'packageManager', workspaceRoot }
     }
     for (const [index, file] of lockfiles.entries()) {
-      if (await exists(path.join(directory, file))) return { name: managers[Math.min(index, 3)], source: 'lockfile', workspaceRoot }
+      if (await exists(path.join(directory, file))) return { name: executablePackageManagers[Math.min(index, 3)], source: 'lockfile', workspaceRoot }
     }
     if (directory === boundary) break
   }
-}
-
-/** Quotes display-only words for POSIX shells; execution always uses argv. */
-export function displayCommand(argv: string[]): string {
-  return argv.map(word => /^[\w@./:=+-]+$/.test(word) ? word : `'${word.replace(/'/g, `'"'"'`)}'`).join(' ')
-}
-
-/** Generates command argv for a validated, concrete package change. */
-export function packageCommand(manager: DetectedPackageManager, request: Pick<ChangeRequest, 'kind' | 'id' | 'version'>): ChangePlan['command'] {
-  if (request.kind === 'options') return undefined
-  const name = manager.name
-  const remove = request.kind === 'remove'
-  const argv: string[] = [name, remove ? (name === 'npm' ? 'uninstall' : 'remove') : (name === 'npm' ? 'install' : 'add')]
-  if (!remove) argv.push(name === 'bun' ? '-d' : '-D')
-  if (name === 'pnpm' && manager.workspaceRoot) argv.push('-w')
-  if (request.kind === 'pin') argv.push(name === 'pnpm' || name === 'npm' ? '--save-exact' : '-E')
-  argv.push(remove ? request.id : `${request.id}@${request.version ?? 'latest'}`)
-  return { argv, display: displayCommand(argv) }
 }
 
 /** Restores the reviewed dependency graph without saving a new dependency intent. */

@@ -20,7 +20,7 @@ export function usePluginDetail() {
     notFound.value = false
     loading.value = false
     const id = store.selectedId.value
-    if (!store.open.value || store.view.value !== 'detail' || !id) return
+    if (!id) return
     const current = controller = new AbortController()
     loading.value = true
     try {
@@ -37,8 +37,10 @@ export function usePluginDetail() {
       if (controller === current) loading.value = false
     }
   }
-  const stop = watch([store.open, store.view, store.selectedId, store.prefs], load, { deep: true, immediate: true, flush: 'sync' })
+  const stop = watch([store.selectedId, () => store.prefs.value.community], load, { deep: true, immediate: true, flush: 'sync' })
+  const offClose = store.onClose(() => controller?.abort())
   onScopeDispose(() => {
+    offClose()
     stop()
     controller?.abort()
   })

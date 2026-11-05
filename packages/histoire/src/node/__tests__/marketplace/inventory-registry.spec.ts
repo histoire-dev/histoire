@@ -1,6 +1,7 @@
 import type { MarketplaceManifest, MarketplacePrefs } from '@histoire/shared'
 import type { Context } from '../../context.js'
 import { afterEach, describe, expect, it, onTestFinished } from 'vitest'
+import { marketplaceDefaults } from '../../../../../histoire-app/src/app/util/marketplace-preferences.js'
 import { createPluginInventory } from '../../config/plugin-toggle-inventory.js'
 import { registerInventoryHandlers } from '../../marketplace/inventory/handlers.js'
 import { createRegistryUpdateReader } from '../../marketplace/inventory/registry-versions.js'
@@ -11,7 +12,7 @@ import { uiChannelFixture } from '../utils/ui-channel.js'
 import { inventoryPackage, inventoryProject } from './inventory-fixture.js'
 
 /** Community consent applies to every registry update read. */
-const prefs: MarketplacePrefs = { community: true, packageManager: 'auto', afterInstall: 'ask', skippedVersions: { plugin: '2.0.0' } }
+const prefs: MarketplacePrefs = { ...marketplaceDefaults(), community: true, afterInstall: 'ask' as const, skippedVersions: { plugin: '2.0.0' } }
 /** Small declarative manifest, independently authored for compatibility cases. */
 const manifest: MarketplaceManifest = { displayName: 'Audit', summary: 'Audit stories', category: 'testing', monogram: 'Au', tint: 'slate', frameworks: ['vue'], config: { import: 'Audit' } }
 

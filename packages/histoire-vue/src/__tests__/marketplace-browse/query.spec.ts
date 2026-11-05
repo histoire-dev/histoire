@@ -1,6 +1,7 @@
 import { afterEach, expect, it, vi } from 'vitest'
 import { createDebouncedCatalogClient } from '../../../../histoire-app/src/app/components/marketplace/browse/catalog-client.js'
 import { createMarketplaceClient } from '../../../../histoire-app/src/app/util/marketplace-client.js'
+import { marketplaceDefaults } from '../../../../histoire-app/src/app/util/marketplace-preferences.js'
 import { createMarketplaceTransport } from '../utils/marketplace-transport.js'
 import { catalogPage } from './fixture.js'
 
@@ -18,8 +19,7 @@ it('coalesces typing at 150 ms, snapshots inputs, and retires active channel lis
   const channel = createMarketplaceTransport()
   const client = createDebouncedCatalogClient(createMarketplaceClient({ transport: channel.transport }))
   cleanups.push(client.disposeCatalog)
-  expect(createDebouncedCatalogClient(client)).toBe(client)
-  const query = { view: 'all' as const, query: 'a', prefs: { community: false, packageManager: 'auto' as const, afterInstall: 'restart' as const, skippedVersions: {} } }
+  const query = { view: 'all' as const, query: 'a', prefs: marketplaceDefaults() }
   const first = client.catalog(query).catch(error => error)
   query.query = 'ax'
   const second = client.catalog(query).catch(error => error)
@@ -50,7 +50,7 @@ it('aborts scheduled and active work on owner cancellation and allows a fresh vi
   const channel = createMarketplaceTransport()
   const client = createDebouncedCatalogClient(createMarketplaceClient({ transport: channel.transport }))
   cleanups.push(client.disposeCatalog)
-  const query = { view: 'all' as const, prefs: { community: false, packageManager: 'auto' as const, afterInstall: 'restart' as const, skippedVersions: {} } }
+  const query = { view: 'all' as const, prefs: marketplaceDefaults() }
   const controller = new AbortController()
   const delayed = client.catalog(query, { signal: controller.signal }).catch(error => error)
   controller.abort()

@@ -1,6 +1,6 @@
 import type { MarketplacePrefs, MarketplaceUpdate, ReleaseNote } from '@histoire/shared'
 import type { Context } from '../../context.js'
-import { compareVersions } from '../catalog/version.js'
+import { compareVersions, isPrerelease, majorVersion } from '../catalog/version.js'
 import { getInstalledIndex } from './index.js'
 
 /** Plain registry version data after catalog compatibility checks. */
@@ -17,15 +17,15 @@ export type ReadUpdateVersions = (id: string, prefs: MarketplacePrefs) => Promis
 /** Pick a newer compatible release; stable installs never drift onto prerelease channels. */
 export function selectUpdate(id: string, from: string, versions: readonly UpdateVersion[], prefs: MarketplacePrefs): MarketplaceUpdate | undefined {
   const target = versions.filter(item => item.compatible && !item.deprecated && prefs.skippedVersions[id] !== item.version
-    && (from.split('+')[0].includes('-') || !item.version.split('+')[0].includes('-'))
-    && compareVersions(item.version, from) > 0)
+    && compareVersions(item.version, from) > 0
+    && (isPrerelease(from) || !isPrerelease(item.version)))
     .sort((a, b) => compareVersions(b.version, a.version))[0]
   if (!target) return
   return {
     id,
     from,
     to: target.version,
-    breaking: Number(target.version.replace(/^v/, '').split('.')[0]) > Number(from.replace(/^v/, '').split('.')[0])
+    breaking: majorVersion(target.version) > majorVersion(from)
       || Boolean(target.releaseNotes?.some(note => note.kind === 'breaking')),
   }
 }

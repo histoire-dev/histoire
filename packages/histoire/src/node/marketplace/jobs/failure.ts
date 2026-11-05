@@ -1,8 +1,9 @@
 import type { JobState } from '@histoire/shared'
 import type { RegistryOptions } from '../catalog/registry.js'
+import type { CatalogContext } from '../catalog/service.js'
 import { officialPlugins, officialReleases } from '../catalog/official.js'
-import { registryRelease } from '../catalog/registry-entry.js'
-import { createRegistryClient } from '../catalog/registry.js'
+import { registryReleases } from '../catalog/registry-entry.js'
+import { getCatalogService } from '../catalog/service.js'
 import { compareVersions, satisfiesVersion } from '../catalog/version.js'
 import { sanitizeOutput } from './output.js'
 
@@ -29,7 +30,7 @@ export function parseFailure(output: string): ParsedFailure {
 }
 
 /** Selects the newest validated stable release accepting the actual unmet peer version. */
-export async function suggestVersion(root: string, id: string, failure: ParsedFailure, options?: RegistryOptions): Promise<NonNullable<JobState['failure']>['suggestion']> {
+export async function suggestVersion(context: CatalogContext | string, id: string, failure: ParsedFailure, options?: RegistryOptions): Promise<NonNullable<JobState['failure']>['suggestion']> {
   if (!failure.peer || !failure.found) return
   try {
     if (officialPlugins.some(entry => entry.id === id && entry.official)) {
@@ -37,8 +38,9 @@ export async function suggestVersion(root: string, id: string, failure: ParsedFa
       if (release) return { version: release.latest, reason: sanitizeOutput(`Last version that supports ${failure.peer} ${failure.found.split('.')[0]}`) }
       return
     }
-    const { value } = await createRegistryClient(root, options).packument(id)
-    const release = Object.keys(value.versions).sort((a, b) => compareVersions(b, a)).map(version => registryRelease(value, version)).find(release => release && !release.deprecated && !release.version.includes('-') && release.detail.requires[failure.peer!] && satisfiesVersion(failure.found!, release.detail.requires[failure.peer!]))
+    const ctx = typeof context === 'string' ? { root: context } : context
+    const { value } = await getCatalogService(ctx, options).packument(id)
+    const release = [...registryReleases(value)].sort((a, b) => compareVersions(b.version, a.version)).find(release => !release.deprecated && !release.version.includes('-') && release.detail.requires[failure.peer!] && satisfiesVersion(failure.found!, release.detail.requires[failure.peer!]))
     if (release) return { version: release.version, reason: sanitizeOutput(`Last version that supports ${failure.peer} ${failure.found.split('.')[0]}`) }
   }
   catch { /* Failure advice is optional and must not delay or reverse rollback. */ }

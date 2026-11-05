@@ -2,6 +2,7 @@ import type { ChangeRequest } from '@histoire/shared'
 import type { Context } from '../../context.js'
 import { chmod, readdir, readFile, stat, writeFile } from 'node:fs/promises'
 import { afterEach, expect, it, onTestFinished } from 'vitest'
+import { marketplaceDefaults } from '../../../../../histoire-app/src/app/util/marketplace-preferences.js'
 import { createCatalogService } from '../../marketplace/catalog/service.js'
 import { getPlanStore } from '../../marketplace/changes/handlers.js'
 import { registerMarketplaceChannels } from '../../marketplace/channel.js'
@@ -13,7 +14,7 @@ import { inventoryPackage, inventoryProject } from './inventory-fixture.js'
 import { jobManifest } from './jobs-fixture.js'
 
 /** Consent is explicit, and npm override avoids unrelated manager detection. */
-const prefs: ChangeRequest['prefs'] = { community: true, packageManager: 'npm', afterInstall: 'ask', skippedVersions: {} }
+const prefs: ChangeRequest['prefs'] = { ...marketplaceDefaults(), community: true, packageManager: 'npm' as const, afterInstall: 'ask' as const }
 /** History needs both intervening and target migrations, in version order. */
 const pkg = {
   'name': 'test-plugin',

@@ -1,8 +1,9 @@
-import { mkdir, readFile, writeFile } from 'node:fs/promises'
+import { readFile, writeFile } from 'node:fs/promises'
 import { afterEach, describe, expect, it } from 'vitest'
 import { closeContext, createContext } from '../../context.js'
 import { createJobRunner } from '../../marketplace/jobs/runner.js'
 import { disposeConfigProjects } from '../utils/config-codemod.js'
+import { inventoryPackage } from './inventory-fixture.js'
 import { jobProject, lockBytes, packageBytes } from './jobs-fixture.js'
 
 afterEach(disposeConfigProjects)
@@ -46,8 +47,7 @@ describe('marketplace install jobs', () => {
     [{ vite: '^6.0.0' }, undefined, false],
   ])('checks installed peers %j (meta %j) after a zero exit, conflict %s', async (peers, peersMeta, conflict) => {
     const fixture = await jobProject({ peers, peersMeta })
-    await mkdir(`${fixture.root}/node_modules/vite`, { recursive: true })
-    await writeFile(`${fixture.root}/node_modules/vite/package.json`, JSON.stringify({ name: 'vite', version: '6.1.0' }))
+    await inventoryPackage(fixture.root, 'vite', '6.1.0')
     await fixture.runner.start(fixture.plan.planId, fixture.plan.hash)
     await fixture.runner.wait()
     const job = await fixture.runner.current()

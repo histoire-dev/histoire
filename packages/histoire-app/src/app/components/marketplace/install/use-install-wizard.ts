@@ -8,7 +8,6 @@ import { useInstallPlan } from './use-install-plan.js'
 /** One visible wizard visit owns reads; project jobs remain owned by the server. */
 export function useInstallWizard() {
   const store = useMarketplaceStore()
-  const visible = computed(() => store.open.value && (store.view.value === 'install' || store.view.value === 'manual'))
   const detail = shallowRef<PluginDetail>()
   const values = ref<Record<string, HistoireJsonValue>>({})
   const intent = shallowRef<ChangeRequest>()
@@ -23,7 +22,7 @@ export function useInstallWizard() {
   const activeJob = shallowRef<JobState>()
   const fields = computed(() => (detail.value?.manifest.config.options ?? []).filter(field => Object.entries(field.when ?? {}).every(([key, value]) => JSON.stringify(values.value[key]) === JSON.stringify(value))))
   const request = computed(() => {
-    if (!visible.value || !intent.value || !detail.value) return undefined
+    if (!intent.value || !detail.value) return undefined
     // Hidden options are omitted, so disabled dependent values cannot leak into config.
     const options = Object.fromEntries(fields.value.filter(field => values.value[field.key] !== undefined).map(field => [field.key, values.value[field.key]]))
     // JSON values cross the transport boundary without Vue proxies (notably string lists).
@@ -36,13 +35,11 @@ export function useInstallWizard() {
   let jobController: AbortController | undefined
   let manualRevision = 0
   let ignoredJob: string | undefined
-  // Closing retires pending reads synchronously, before the modal's next render unmounts us.
-  watch(visible, (active) => {
-    if (active) return
+  const offClose = store.onClose(() => {
     manualRevision++
     detailController?.abort()
     jobController?.abort()
-  }, { flush: 'sync' })
+  })
 
   /** Load declarative fields for the current install request, retaining defaults as literals. */
   async function load(): Promise<void> {
@@ -109,7 +106,7 @@ export function useInstallWizard() {
     starting.value = true
     error.value = undefined
     try {
-      const job = await store.startJob(reviewed.planId, reviewed.hash, request.value!, openAfter.value ? detail.value?.adds.find(add => add.kind === 'rail-pane')?.text : undefined)
+      const job = await store.startJob(reviewed.planId, reviewed.hash, request.value!, openAfter.value ? detail.value?.adds.find(add => add.kind === 'rail-pane')?.contribution : undefined)
       if (!current.signal.aborted) activeJob.value = job
     }
     catch (cause) {
@@ -154,6 +151,7 @@ export function useInstallWizard() {
     void showManual()
   }
   onScopeDispose(() => {
+    offClose()
     disposed = true
     manualRevision++
     detailController?.abort()

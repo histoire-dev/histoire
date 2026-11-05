@@ -1,4 +1,4 @@
-import type { JobState, MarketplaceError } from '@histoire/shared'
+import type { MarketplaceError } from '@histoire/shared'
 import type { Context } from '../../context.js'
 import type { HostRestart } from '../../runtime/host-restart.js'
 import type { createPlanStore } from '../changes/plan-store.js'
@@ -21,8 +21,4 @@ export class JobError extends Error {
     super(message)
     this.code = code
   }
-}
-/** Detached public snapshots prevent consumers from mutating engine state. */
-export function copyJob(job: JobState): JobState {
-  return structuredClone(job)
 }

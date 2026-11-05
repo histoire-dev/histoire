@@ -9,8 +9,6 @@ import InstalledPluginRow from './plugins/InstalledPluginRow.vue'
 import MarketplacePrefs from './plugins/MarketplacePrefs.vue'
 import PluginSettingsCard from './plugins/PluginSettingsCard.vue'
 import { usePackageManager } from './plugins/use-package-manager.js'
-import { usePluginUpdates } from './plugins/use-plugin-updates.js'
-import { useSettingsJobs } from './plugins/use-settings-jobs.js'
 import { usePluginToggles } from './usePluginToggles.js'
 
 const emit = defineEmits<{ section: [section: string] }>()
@@ -19,8 +17,8 @@ const props = withDefaults(defineProps<{
 }>(), { dev: __HISTOIRE_DEV__ })
 const dev = props.dev
 const store = useMarketplaceStore()
-const updates = usePluginUpdates(store, dev)
-const jobs = useSettingsJobs(store, dev)
+const updates = store.updates
+const jobs = store.settingsJobs
 const manager = usePackageManager(store, dev)
 const sections = useContributionLookup('settings.section')
 const toggles = usePluginToggles()

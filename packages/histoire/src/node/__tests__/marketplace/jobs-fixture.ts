@@ -1,9 +1,13 @@
 import type { ChangeRequest, MarketplaceManifest } from '@histoire/shared'
-import { mkdir, writeFile } from 'node:fs/promises'
+import { writeFile } from 'node:fs/promises'
 import { fileURLToPath } from 'node:url'
+import { executablePackageManagers } from '@histoire/shared'
+import { marketplaceDefaults } from '../../../../../histoire-app/src/app/util/marketplace-preferences.js'
+import { lockfiles } from '../../marketplace/changes/package-manager.js'
 import { createPlanStore } from '../../marketplace/changes/plan-store.js'
 import { createJobRunner } from '../../marketplace/jobs/runner.js'
 import { configTestProject } from '../utils/config-codemod.js'
+import { inventoryPackage } from './inventory-fixture.js'
 
 /** Test metadata supplied as declarative planner input, without registry access. */
 export const jobManifest: MarketplaceManifest = { displayName: 'Test', summary: 'Test plugin', category: 'testing', monogram: 'T', tint: 'blue', config: { import: 'TestPlugin' } }
@@ -16,20 +20,17 @@ export async function jobProject(script: Record<string, unknown> = {}, afterInst
   const fixture = await configTestProject('export default { plugins: [] }\n')
   await writeFile(`${fixture.root}/package.json`, packageBytes)
   const manager = overrides.prefs?.packageManager ?? 'pnpm'
-  const lockfile = manager === 'npm' ? 'package-lock.json' : manager === 'yarn' ? 'yarn.lock' : manager === 'bun' ? 'bun.lock' : 'pnpm-lock.yaml'
+  const lockfile = lockfiles[executablePackageManagers.indexOf(manager === 'auto' ? 'pnpm' : manager)]
   if (!script.noLock) await writeFile(`${fixture.root}/${lockfile}`, lockBytes)
   if (script.berry) await writeFile(`${fixture.root}/.yarnrc.yml`, 'nodeLinker: node-modules\n')
   if (script.workspace) await writeFile(`${fixture.root}/pnpm-workspace.yaml`, 'packages: []\n')
   if (script.installedVersion) {
-    const directory = `${fixture.root}/node_modules/test-plugin`
-    await mkdir(directory, { recursive: true })
-    await writeFile(`${directory}/package.json`, JSON.stringify({ name: 'test-plugin', version: script.installedVersion, main: 'index.cjs' }))
-    await writeFile(`${directory}/index.cjs`, 'exports.TestPlugin = () => ({ name: "test-plugin" })')
+    await inventoryPackage(fixture.root, 'test-plugin', String(script.installedVersion), {}, { source: 'exports.TestPlugin = () => ({ name: "test-plugin" })' })
     await writeFile(`${fixture.root}/package.json`, '{ "devDependencies": { "test-plugin": "^0.8.0" } }\r\n')
     await writeFile(fixture.file, 'import { TestPlugin } from "test-plugin"; export default { plugins: [TestPlugin()] }\n')
   }
   await writeFile(`${fixture.root}/manager.json`, JSON.stringify({ lockfile, ...script }))
-  const request: ChangeRequest = { kind: 'install', id: 'test-plugin', version: '1.2.3', prefs: { community: false, packageManager: 'pnpm', afterInstall, skippedVersions: {} }, ...overrides }
+  const request: ChangeRequest = { kind: 'install', id: 'test-plugin', version: '1.2.3', prefs: { ...marketplaceDefaults(), packageManager: 'pnpm' as const, afterInstall }, ...overrides }
   const plans = createPlanStore({ root: fixture.root, configFile: fixture.file, resolvePlugin: async () => ({ manifest: jobManifest, version: '1.2.3' }) })
   const plan = await plans.plan(request)
   const env = { PATH: `${fileURLToPath(new URL('../fixtures/marketplace/bin', import.meta.url))}:${process.env.PATH}` }

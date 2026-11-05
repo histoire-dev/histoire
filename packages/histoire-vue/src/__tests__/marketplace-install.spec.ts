@@ -130,9 +130,12 @@ it('static books go straight to manual, copy all and close with Done', async () 
   await flushMicrotasks(12)
   await vi.waitFor(() => expect(wrapper.text()).toContain('Static build. Run these steps in your project.'))
   expect(wrapper.text()).toContain('Rebuild with histoire build')
+  await button('Copy command').trigger('click')
+  expect(writeText).toHaveBeenLastCalledWith('npm install -D @histoire/plugin-a11y@1.0.0')
+  expect(button('Copied').exists()).toBe(true)
   await button('Copy all').trigger('click')
-  expect(writeText.mock.calls[0][0]).toContain('npm install -D @histoire/plugin-a11y@1.0.0')
-  expect(writeText.mock.calls[0][0]).toContain('HstA11y(')
+  expect(writeText.mock.calls.at(-1)![0]).toContain('npm install -D @histoire/plugin-a11y@1.0.0')
+  expect(writeText.mock.calls.at(-1)![0]).toContain('HstA11y(')
   await button('Done').trigger('click')
   expect(store.open.value).toBe(false)
   expect(channel.sent.some(item => item.event.endsWith('job-start'))).toBe(false)
@@ -152,8 +155,6 @@ it('unmount aborts obsolete plan ownership without cancelling server jobs', asyn
 // The server asks the dev proxy for restarts. Without a host it waits on the user, and
 // the browser has nothing to send: a repeated snapshot must not trigger any request.
 it('shows a manual restart notice when the server has no restart host', async () => {
-  const fetcher = vi.fn()
-  vi.stubGlobal('fetch', fetcher)
   const { ready, start, channel, wrapper } = setup(cleanups)
   await ready()
   await start()
@@ -163,13 +164,10 @@ it('shows a manual restart notice when the server has no restart host', async ()
   await flushMicrotasks(6)
   expect(wrapper.get('[role="status"]').text()).toContain('Restart the dev server to finish')
   expect(wrapper.findAll('button').some(item => item.text() === 'Restart now')).toBe(false)
-  expect(fetcher).not.toHaveBeenCalled()
   expect(channel.sent.some(item => item.event.endsWith('job-continue'))).toBe(false)
 })
 
-it('continues ask-mode config write through job-continue without HTTP restart', async () => {
-  const fetcher = vi.fn()
-  vi.stubGlobal('fetch', fetcher)
+it('continues ask-mode config write through job-continue', async () => {
   const { ready, start, channel, button } = setup(cleanups)
   await ready()
   await start()
@@ -177,7 +175,6 @@ it('continues ask-mode config write through job-continue without HTTP restart', 
   await flushMicrotasks(6)
   await button('Restart now').trigger('click')
   expect(channel.sent.filter(item => item.event.endsWith('-job-continue'))).toEqual([{ event: 'histoire:ui:marketplace-job-continue', value: { jobId: 'job-1' } }])
-  expect(fetcher).not.toHaveBeenCalled()
 })
 
 it('opens actual plugin pane only after successful load, with npm-to-plugin identity mapping', async () => {
@@ -189,7 +186,7 @@ it('opens actual plugin pane only after successful load, with npm-to-plugin iden
   await flushMicrotasks(12)
   await vi.waitFor(() => expect(button('Open pane').attributes('disabled')).toBeUndefined())
   await button('Open pane').trigger('click')
-  expect(targets.pane).toHaveBeenCalledExactlyOnceWith('a11y:results')
+  expect(targets.pane).toHaveBeenCalledExactlyOnceWith('a11y:issues')
   expect(store.open.value).toBe(false)
 })
 

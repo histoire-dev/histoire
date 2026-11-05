@@ -1,6 +1,7 @@
 import type { ChangeRequest } from '@histoire/shared'
 import { readFile, writeFile } from 'node:fs/promises'
 import { afterEach, expect, it } from 'vitest'
+import { marketplaceDefaults } from '../../../../../histoire-app/src/app/util/marketplace-preferences.js'
 import { closeContext, createContext } from '../../context.js'
 import { getPlanStore } from '../../marketplace/changes/handlers.js'
 import { createPlanStore } from '../../marketplace/changes/plan-store.js'
@@ -10,7 +11,7 @@ import { jobManifest } from './jobs-fixture.js'
 /** Pure metadata input; project modules must never execute while planning. */
 const resolvePlugin = async () => ({ manifest: jobManifest, version: '1.2.3' })
 /** A package-changing intent requiring safe config inputs. */
-const request: ChangeRequest = { kind: 'install', id: 'test-plugin', prefs: { community: false, packageManager: 'pnpm', afterInstall: 'ask', skippedVersions: {} } }
+const request: ChangeRequest = { kind: 'install', id: 'test-plugin', prefs: { ...marketplaceDefaults(), packageManager: 'pnpm' as const, afterInstall: 'ask' as const } }
 afterEach(disposeConfigProjects)
 
 it.each([

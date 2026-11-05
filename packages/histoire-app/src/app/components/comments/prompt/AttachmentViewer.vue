@@ -24,7 +24,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <dialog ref="dialog" class="htw:flex htw:flex-col htw:[max-width:min(90vw,_1200px)] htw:[max-height:90vh] htw:p-0 htw:overflow-hidden htw:border htw:border-border htw:rounded-panel htw:bg-surface htw:text-text htw:shadow-panel htw:backdrop:bg-black/60" :aria-label="name" @close="emit('close')" @click.self="emit('close')">
+  <dialog ref="dialog" class="htw:flex htw:flex-col htw:[max-width:min(90vw,_1200px)] htw:[max-height:90vh] htw:p-0 htw:overflow-hidden htw:border htw:border-border htw:rounded-panel htw:bg-surface htw:text-text htw:shadow-panel htw:backdrop:bg-scrim" :aria-label="name" @close="emit('close')" @click.self="emit('close')">
     <header class="htw:flex htw:items-center htw:gap-1 htw:pt-1.5 htw:pr-1.5 htw:pb-1.5 htw:pl-3 htw:border-b htw:border-border">
       <span class="htw:flex-1 htw:min-w-0 htw:overflow-hidden htw:text-[12px] htw:font-semibold htw:text-ellipsis htw:whitespace-nowrap">{{ name }}</span>
       <a v-if="href" class="htw:inline-flex htw:p-1.5 htw:text-muted" :href="href" :download="name" aria-label="Download" title="Download"><BuiltinIcon icon="launch" :size="14" /></a>

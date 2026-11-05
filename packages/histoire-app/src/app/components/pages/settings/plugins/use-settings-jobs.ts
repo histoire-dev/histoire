@@ -1,14 +1,10 @@
 import type { ChangePlan, ChangeRequest, JobState, MarketplaceUpdate } from '@histoire/shared'
-import type { MarketplaceStore } from '../../../../stores/marketplace.js'
-import { computed, onMounted, onUnmounted, ref, shallowRef, watch } from 'vue'
+import type { MarketplaceServiceOwner } from '../../../marketplace/shell/marketplace-services.js'
+import { computed, ref, shallowRef, watch } from 'vue'
+import { jobProgressLabel } from '../../../marketplace/shell/job-progress-label.js'
 
-/** Settings jobs remain owned while their section is closed and rail stays mounted. */
-const sessions = new WeakMap<MarketplaceStore, ReturnType<typeof createJobs>>()
-/** Labels shared by inline progress, including receipt recovery. */
-const labels = { resolve: 'Resolving plugin', install: 'Installing package', config: 'Updating histoire.config.ts', restart: 'Restarting dev server', load: 'Loading plugin' }
-
-/** Create a sequential queue that advances on terminal success, never admission. */
-function createJobs(store: MarketplaceStore) {
+/** Keep sequential settings work alive independently of mounted surfaces. */
+export function createSettingsJobs(store: MarketplaceServiceOwner, dev: boolean) {
   const preparing = ref<string>()
   const active = shallowRef<JobState>()
   const error = ref('')
@@ -16,33 +12,35 @@ function createJobs(store: MarketplaceStore) {
   const queue = ref<MarketplaceUpdate[]>([])
   const handled = new Set<string>()
   const storageKey = `_histoire-settings-job:${import.meta.env.BASE_URL}`
-  let recoveredId: string | undefined
-  let request: ChangeRequest | undefined
   let controller: AbortController | undefined
-  let consumers = 0
-  let stop: (() => void) | undefined
+  let disposed = false
   const busy = computed(() => Boolean(preparing.value || active.value?.status === 'running' || store.job.value?.status === 'running'))
-  const step = computed(() => active.value?.awaiting === 'restart' ? 'Restart the dev server to finish' : active.value?.awaiting ? 'Restart required' : labels[active.value?.steps.find(item => item.state === 'running')?.id ?? 'resolve'])
-
+  const step = computed(() => jobProgressLabel(active.value))
+  const request = computed(() => store.reviewedJob.value?.request)
+  const recoveredId = request.value && ['pin', 'remove', 'update'].includes(request.value.kind) ? store.reviewedJob.value?.jobId : undefined
   try {
     const saved = JSON.parse(sessionStorage.getItem(storageKey) ?? 'null')
-    if (typeof saved?.jobId === 'string' && typeof saved?.request?.id === 'string' && ['pin', 'remove', 'update'].includes(saved.request.kind)) {
-      recoveredId = saved.jobId
-      request = saved.request
-      if (Array.isArray(saved.queue)) queue.value = saved.queue.filter(item => typeof item.id === 'string' && typeof item.to === 'string' && item.breaking === false)
-    }
+    if (recoveredId && Array.isArray(saved)) queue.value = saved.filter(item => typeof item?.id === 'string' && typeof item?.to === 'string' && item.breaking === false)
   }
-  catch { /* Blocked or malformed session storage never prevents plugin management. */ }
-
+  catch { /* Blocked or malformed storage never prevents management. */ }
+  /** Queue is the only settings-owned receipt; reviewed intent belongs to the store. */
+  function persist(): void {
+    try {
+      if (queue.value.length) sessionStorage.setItem(storageKey, JSON.stringify(queue.value))
+      else sessionStorage.removeItem(storageKey)
+    }
+    catch { /* Live queue remains usable when storage is blocked. */ }
+  }
+  const stopQueue = watch(queue, persist, { deep: true, flush: 'sync', immediate: true })
   /** Route errors through the wizard's existing failure surface and retained receipt. */
-  function showFailure(): void {
+  function showFailure(change = request.value): void {
     queue.value = []
-    if (request) store.startInstall(request)
+    if (change) store.startInstall(change)
   }
   /** Plan before starting; read-only results reuse the shared manual flow. */
   async function run(change: ChangeRequest): Promise<void> {
-    if (busy.value) return
-    request = { ...change, prefs: JSON.parse(JSON.stringify(change.prefs)) }
+    if (disposed || busy.value) return
+    const request = { ...change, prefs: JSON.parse(JSON.stringify(change.prefs)) }
     preparing.value = change.id
     error.value = ''
     const current = controller = new AbortController()
@@ -52,41 +50,34 @@ function createJobs(store: MarketplaceStore) {
       manager.value = plan.packageManager
       if (plan.manual) {
         queue.value = []
-        store.startInstall(request)
-        store.showManual(plan)
+        store.startInstall(request, plan)
         return
       }
       const job = await store.startJob(plan.planId, plan.hash, request)
       if (!current.signal.aborted) {
         active.value = job
-        try {
-          sessionStorage.setItem(storageKey, JSON.stringify({ jobId: job.jobId, request, queue: queue.value }))
-        }
-        catch { /* Live progress still works without restart recovery storage. */ }
-        store.job.value = job
         await observe(job)
       }
     }
     catch (cause) {
       if (!current.signal.aborted) {
         error.value = cause instanceof Error ? cause.message : 'Plugin change failed'
-        showFailure()
+        showFailure(request)
       }
     }
     finally { if (controller === current) preparing.value = undefined }
   }
   /** Expose the running receipt immediately, then advance after confirmed load. */
   async function observe(job: JobState | undefined): Promise<void> {
-    if (!job || (job.jobId !== active.value?.jobId && job.jobId !== recoveredId)) return
+    if (disposed || !job) return
+    if (job.jobId !== active.value?.jobId && job.jobId !== recoveredId) {
+      // A queue is valid only for the reviewed receipt recovered by this owner.
+      if (!active.value && !preparing.value) queue.value = []
+      return
+    }
     active.value = job
     if (handled.has(job.jobId)) return
-    if (job.status !== 'running') {
-      handled.add(job.jobId)
-      try {
-        sessionStorage.removeItem(storageKey)
-      }
-      catch { /* Optional recovery storage may be unavailable. */ }
-    }
+    if (job.status !== 'running') handled.add(job.jobId)
     if (job.status === 'failed') {
       error.value = job.failure?.message ?? 'Plugin change failed'
       showFailure()
@@ -116,32 +107,18 @@ function createJobs(store: MarketplaceStore) {
     const first = queue.value.shift()
     if (first) await run({ kind: 'update', id: first.id, version: first.to, prefs: store.prefs.value })
   }
-  /** Only mounted owners observe progress; leaving settings never cancels server work. */
-  function acquire(): void {
-    if (consumers++ === 0) {
-      stop = watch(store.job, (job) => {
+  const stop = dev
+    ? watch(store.job, (job) => {
         void observe(job)
       }, { immediate: true })
-    }
-  }
-  /** Retire browser requests and queued work when the owning workbench unmounts. */
-  function release(): void {
-    if (--consumers > 0) return
+    : undefined
+  /** Retire browser work while preserving restart recovery and server ownership. */
+  function dispose(): void {
+    disposed = true
     stop?.()
+    stopQueue()
     controller?.abort()
-    queue.value = []
     preparing.value = undefined
   }
-  return { active, preparing, busy, step, error: computed(() => error.value || (active.value?.jobId === store.job.value?.jobId ? store.restartError.value : '')), manager, run, updateAll, restart, acquire, release }
-}
-
-/** Share job progress between settings and the workbench rail. */
-export function useSettingsJobs(store: MarketplaceStore, dev = __HISTOIRE_DEV__) {
-  let state = sessions.get(store)
-  if (!state) sessions.set(store, state = createJobs(store))
-  if (dev) {
-    onMounted(state.acquire)
-    onUnmounted(state.release)
-  }
-  return state
+  return { active, preparing, busy, step, error: computed(() => error.value || (active.value?.jobId === store.job.value?.jobId ? store.restartError.value : '')), manager, run, updateAll, restart, dispose }
 }

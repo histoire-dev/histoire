@@ -2,9 +2,12 @@ import type { ChangeRequest } from '@histoire/shared'
 import type { ManagerName } from './managers.js'
 import { mkdir, readFile, symlink, writeFile } from 'node:fs/promises'
 import { dirname, join, resolve } from 'node:path'
+import { executablePackageManagers } from '@histoire/shared'
 import { expect, onTestFinished, vi } from 'vitest'
+import { marketplaceDefaults } from '../../../../../../histoire-app/src/app/util/marketplace-preferences.js'
 import { createRegistryClient } from '../../../marketplace/catalog/registry.js'
 import { getPlanStore } from '../../../marketplace/changes/handlers.js'
+import { lockfiles } from '../../../marketplace/changes/package-manager.js'
 import { createJobRunner } from '../../../marketplace/jobs/runner.js'
 import { spawnPackage } from '../../../marketplace/jobs/spawn.js'
 import { configTestProject } from '../../utils/config-codemod.js'
@@ -48,7 +51,7 @@ export async function interopProject(manager: ManagerName, options: ProjectOptio
     'auto-install-peers=false',
     'offline=false',
     'manage-package-manager-versions=false',
-    ...(options.authenticated ? [registry.url, registry.tarballUrl].map(url => `//${new URL(url).host}/:_authToken=${registryToken}`) : []),
+    ...(options.authenticated ? [`//${new URL(registry.url).host}/:_authToken=${registryToken}`] : []),
   ].join('\n')
   await writeFile(join(root, '.npmrc'), `${npmrc}\n`)
   if (manager === 'pnpm') await writeFile(join(root, 'pnpm-workspace.yaml'), 'packages: []\nstrictPeerDependencies: true\nautoInstallPeers: false\nmanagePackageManagerVersions: false\n')
@@ -96,7 +99,7 @@ export async function interopProject(manager: ManagerName, options: ProjectOptio
     throw new Error(`Initial ${manager} install failed: ${output}`, { cause: error })
   })
   if (options.installed) await writeFile(file, `import { TestPlugin } from '${pluginId}'\nexport default { plugins: [TestPlugin({ old: 'retained', keep: true })] }\n`)
-  const lockfile = join(root, { npm: 'package-lock.json', pnpm: 'pnpm-lock.yaml', yarn: 'yarn.lock', bun: 'bun.lock' }[manager])
+  const lockfile = join(root, lockfiles[executablePackageManagers.indexOf(manager)])
   const coordinator = await jobCoordinator(root)
   onTestFinished(() => coordinator.close())
   await coordinator.start()
@@ -129,7 +132,7 @@ export async function interopProject(manager: ManagerName, options: ProjectOptio
       const context = (await coordinator.waitForReady()).context
       await createRegistryClient(root).packument(pluginId)
       const plans = getPlanStore(context)
-      const request: ChangeRequest = { kind, id: pluginId, version, migrate, prefs: { community: true, packageManager: manager, afterInstall: 'restart', skippedVersions: {} } }
+      const request: ChangeRequest = { kind, id: pluginId, version, migrate, prefs: { ...marketplaceDefaults(), community: true, packageManager: manager } }
       const plan = await plans.plan(request)
       expect(plan.manual).toBeUndefined()
       const config = plan.files.find(item => item.path === 'histoire.config.ts')

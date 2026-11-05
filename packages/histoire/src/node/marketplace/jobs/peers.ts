@@ -2,7 +2,7 @@ import { satisfiesVersion } from '../catalog/version.js'
 import { readInstalledPackage } from '../inventory/package-resolve.js'
 
 /** Installed peer that the plugin's declared range rejects. */
-export interface UnmetPeer {
+interface UnmetPeer {
   /** Peer package name. */ peer: string
   /** Range declared by the installed plugin. */ range: string
   /** Version actually installed in the project. */ found: string

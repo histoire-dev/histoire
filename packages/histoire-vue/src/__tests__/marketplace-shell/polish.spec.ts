@@ -22,6 +22,7 @@ it('opens usable sort choices inside the marketplace dialog', async () => {
   const request = channel.sent.filter(item => item.event === 'histoire:ui:marketplace-catalog').at(-1)!
   channel.emit('histoire:ui:marketplace-catalog-result', { requestId: request.value.requestId, page })
   await flushMicrotasks(5)
+  await vi.waitFor(() => expect(wrapper.find('button[aria-label="Sort plugins"]').exists()).toBe(true))
   await wrapper.get('button[aria-label="Sort plugins"]').trigger('click')
   await vi.waitFor(() => expect(document.querySelector('[role="listbox"]')).not.toBeNull())
   const list = document.querySelector('[role="listbox"]')!

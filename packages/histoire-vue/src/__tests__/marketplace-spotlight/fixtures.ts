@@ -1,29 +1,22 @@
 import type { JobState, PluginDetail } from '../../../../histoire-shared/src/index.js'
 import { createHistoireSessionWithAdapters } from '@histoire/sdk/internal'
-import { HistoireProvider } from '@histoire/vue'
-import { mount } from '@vue/test-utils'
-import { defineComponent, h } from 'vue'
+import { h } from 'vue'
 import PluginToolbarItem from '../../../../histoire-app/src/app/components/canvas/toolbar/PluginToolbarItem.vue'
 import InspectorTabs from '../../../../histoire-app/src/app/components/inspector/InspectorTabs.vue'
 import MarketplaceInstall from '../../../../histoire-app/src/app/components/marketplace/install/MarketplaceInstall.vue'
 import MarketplaceSpotlightHost from '../../../../histoire-app/src/app/components/marketplace/spotlight/MarketplaceSpotlightHost.vue'
 import RailButton from '../../../../histoire-app/src/app/components/shell/RailButton.vue'
 import { provideCanvas } from '../../../../histoire-app/src/app/composables/canvas-settings.js'
-import { provideExtensionHost } from '../../../../histoire-app/src/app/composables/extensions.js'
 import { createCanvasStore } from '../../../../histoire-app/src/app/stores/canvas.js'
-import { createMarketplaceStore, provideMarketplaceStore } from '../../../../histoire-app/src/app/stores/marketplace.js'
-import { createUiSettingsStore } from '../../../../histoire-app/src/app/stores/settings.js'
-import { createMarketplaceClient } from '../../../../histoire-app/src/app/util/marketplace-client.js'
 import { sourceFixture } from '../../../../histoire-sdk/src/__tests__/fixtures/session.js'
 import { flushMicrotasks } from '../../../../histoire/src/node/__tests__/utils/flush.js'
-import { memoryStorage } from '../../../../histoire/src/node/__tests__/utils/settings-storage.js'
 import { createTestWorkbenchHost, pluginEntry } from '../../../../histoire/src/node/__tests__/utils/workbench-extensions.js'
 import { job } from '../marketplace-install/fixtures.js'
-import { officialPlugins } from '../utils/marketplace-official.js'
-import { createMarketplaceTransport } from '../utils/marketplace-transport.js'
+import { plugin } from '../utils/marketplace-official.js'
+import { buttonByName, mountMarketplace } from '../utils/marketplace-transport.js'
 
 /** Bundled manifest reused without a second catalog fixture. */
-export const accessibility = officialPlugins.find(item => item.id === '@histoire/plugin-a11y')! as PluginDetail
+export const accessibility = plugin()
 /** Release mounted books and their owned hosts in reverse acquisition order. */
 export const cleanups: (() => unknown)[] = []
 // Real host/store/SFC lifecycle; only socket, browser storage and geometry are substituted.
@@ -43,9 +36,6 @@ interface SpotlightOptions {
 /** Mount registered inspector, rail and toolbar surfaces alongside the spotlight. */
 export async function setup(options: SpotlightOptions = {}) {
   const anchors = options.anchors ?? ['tab', 'pane']
-  const channel = createMarketplaceTransport()
-  const storage = memoryStorage()
-  const store = createMarketplaceStore({ client: createMarketplaceClient({ transport: channel.transport }), settings: createUiSettingsStore({ storage }), storage })
   const session = createHistoireSessionWithAdapters({ url: 'https://book.example/' }, sourceFixture().adapters)
   const actions: string[] = []
   const { workbench, targets } = createTestWorkbenchHost({ session, plugins: [pluginEntry({
@@ -72,29 +62,24 @@ export async function setup(options: SpotlightOptions = {}) {
     api.shell.addPane({ id: 'results', label: 'Other results', icon: 'document', mount: () => {} })
   } })] })
   await workbench.host.ready
-  const Host = defineComponent(() => {
-    provideCanvas(createCanvasStore())
-    provideMarketplaceStore(store)
-    provideExtensionHost(workbench)
-    store.connect()
-    return () => h('main', [
+  const { channel, store, wrapper, dispose } = mountMarketplace({
+    session,
+    workbench,
+    setup: store => store.connect(),
+    // Canvas context must be provided from component setup, not fixture setup.
+    provide: () => provideCanvas(createCanvasStore()),
+    render: () => h('main', [
       h('button', { id: 'opener' }, 'Install finished'),
       anchors.includes('tab') ? h(InspectorTabs, { idPrefix: 'inspector', tabs: [{ value: 'a11y:audit', label: 'A11y' }], activeTab: 'a11y:audit' }) : null,
       anchors.includes('pane') ? h(RailButton, { 'label': 'Audit results', 'icon': 'document', 'data-shell-pane': 'a11y:results' }) : null,
       anchors.includes('toolbar') ? h(PluginToolbarItem, { item: workbench.host.contributions('toolbar.item')[0], workbench, revision: 0, open: null }) : null,
-      options.secondPane ? h('button', { 'data-shell-pane': 'a11y:history' }, 'Audit history') : null,
-      h('button', { 'data-shell-pane': 'other:results' }, 'Other results'),
+      options.secondPane ? h(RailButton, { 'data-shell-pane': 'a11y:history', 'label': 'Audit history', 'icon': 'document' }) : null,
+      h(RailButton, { 'data-shell-pane': 'other:results', 'label': 'Other results', 'icon': 'document' }),
       options.wizard ? h(MarketplaceInstall) : null,
       h(MarketplaceSpotlightHost),
-    ])
+    ]),
   })
-  const wrapper = mount(HistoireProvider, { props: { session }, slots: { default: () => h(Host) }, attachTo: document.body })
-  cleanups.push(async () => {
-    wrapper.unmount()
-    store.dispose()
-    await workbench.dispose()
-    await session.dispose()
-  })
+  cleanups.push(dispose)
   const opener = wrapper.get<HTMLButtonElement>('#opener').element
   opener.focus()
   /** Deliver server lifecycle with empty contribution evidence; browser registry is authoritative. */
@@ -107,11 +92,7 @@ export async function setup(options: SpotlightOptions = {}) {
     await flushMicrotasks(32)
   }
   /** Find actions by visible name, not implementation classes. */
-  function button(name: string) {
-    const found = wrapper.findAll('button').find(item => item.text().trim() === name || item.attributes('aria-label') === name)
-    if (!found) throw new Error(`Missing button: ${name}`)
-    return found
-  }
+  const button = (name: string) => buttonByName(wrapper, name)
   if (options.wizard) store.startInstall({ kind: 'install', id: '@histoire/plugin-a11y', prefs: store.prefs.value })
   if (options.openPane) {
     const admission = store.startJob('plan-1', 'hash-1', { kind: 'install', id: '@histoire/plugin-a11y', prefs: store.prefs.value }, options.openPane)

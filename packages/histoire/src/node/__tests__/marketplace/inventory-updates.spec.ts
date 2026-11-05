@@ -1,6 +1,7 @@
 import type { MarketplacePrefs } from '@histoire/shared'
 import type { Context } from '../../context.js'
 import { afterEach, describe, expect, it, onTestFinished } from 'vitest'
+import { marketplaceDefaults } from '../../../../../histoire-app/src/app/util/marketplace-preferences.js'
 import { createPluginInventory } from '../../config/plugin-toggle-inventory.js'
 import { registerInventoryHandlers } from '../../marketplace/inventory/handlers.js'
 import { createUpdateService, selectUpdate } from '../../marketplace/inventory/updates.js'
@@ -9,7 +10,7 @@ import { uiChannelFixture } from '../utils/ui-channel.js'
 import { inventoryPackage, inventoryProject } from './inventory-fixture.js'
 
 /** Browser preferences; exact target dismissal must not hide another plugin's update. */
-const prefs: MarketplacePrefs = { community: true, packageManager: 'auto', afterInstall: 'ask', skippedVersions: { plugin: '2.0.0' } }
+const prefs: MarketplacePrefs = { ...marketplaceDefaults(), community: true, afterInstall: 'ask' as const, skippedVersions: { plugin: '2.0.0' } }
 
 afterEach(disposeConfigProjects)
 

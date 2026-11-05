@@ -1,4 +1,0 @@
-{
-  "extends": "../marketplace-install/tsconfig.json",
-  "include": ["../../../../histoire-app/src", "../marketplace-update.spec.ts", "../utils/marketplace-transport.ts"]
-}

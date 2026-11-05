@@ -1,14 +1,17 @@
 import type { Context } from '../context.js'
+import type { ParsedConfig } from './codemod/types.js'
 import type { DisabledPluginMetadata, PluginSourceEntry } from './plugin-toggle-source.js'
 import { randomUUID } from 'node:crypto'
 import { histoireIconNames } from '@histoire/shared/dist/icons/index.js'
 import { dirname } from 'pathe'
 import { detectProjectSignals } from '../marketplace/catalog/signals.js'
-import { packageNameFromSpecifier, pluginInventoryFlags, resolvePluginPackage } from '../marketplace/inventory/package-resolve.js'
+import { packageNameFromSpecifier, pluginInventoryFlags, projectDependencies, readInstalledPackage, resolvePluginPackage } from '../marketplace/inventory/package-resolve.js'
+import { locateConfigObject } from './codemod/locate.js'
 import { parseConfigCode, unwrapNode } from './codemod/parse.js'
+import { findProperty } from './codemod/walk.js'
 import { configFileHash, hashConfigCode } from './codemod/write.js'
 import { getPluginConfigSource, resolveConfigFile } from './load.js'
-import { resolvePluginMetadata } from './plugin-metadata.js'
+import { resolvePackageMetadata } from './plugin-metadata.js'
 import { analyzePluginSource } from './plugin-toggle-source.js'
 
 /** Safe row data sent to the workbench. */
@@ -53,7 +56,9 @@ export interface PluginToggleInventory {
 
 /** Projects resolved plugins and, where safely identified, disabled source entries. */
 export async function createPluginInventory(ctx: Context): Promise<{ rows: PluginInventoryRow[], toggle?: PluginToggleInventory }> {
-  const frameworks = (await detectProjectSignals(ctx.root)).project.frameworks
+  const frameworks = (await detectProjectSignals(ctx)).project.frameworks
+  const dependencies = new Map<string, ReturnType<typeof projectDependencies>>()
+  const file = resolveConfigFile(ctx.root, ctx.configFile)
   const rows: PluginInventoryRow[] = (ctx.config.plugins ?? []).map((plugin, index) => ({
     name: plugin.name,
     builtin: plugin.name.startsWith('builtin:'),
@@ -64,21 +69,21 @@ export async function createPluginInventory(ctx: Context): Promise<{ rows: Plugi
     ...pluginInventoryFlags(plugin),
     enabled: true,
   }))
-  await Promise.all(rows.map(row => enrichRow(row)))
+  const enriched = new Set<PluginInventoryRow>()
+  const metadata = new Map(rows.map((row, index) => [row, ctx.pluginMetadata?.[index]]))
   const captured = getPluginConfigSource(ctx.config)
-  const file = resolveConfigFile(ctx.root, ctx.configFile)
-  if (!captured || !file) return { rows }
+  if (!captured || !file) return fallback()
   try {
     const hash = hashConfigCode(captured.source)
-    if (await configFileHash(file, { root: ctx.root }) !== hash) return { rows }
+    if (await configFileHash(file, { root: ctx.root }) !== hash) return fallback()
     const entries = analyzePluginSource(captured.source)
-    if (entries.filter(entry => entry.enabled).length !== captured.plugins.length) return { rows }
+    if (entries.filter(entry => entry.enabled).length !== captured.plugins.length) return fallback()
     const matches = captured.plugins.map(plugin => ctx.config.plugins.flatMap((item, index) => item === plugin ? [index] : []))
-    if (matches.some(indices => indices.length !== 1) || new Set(matches.map(indices => indices[0])).size !== matches.length) return { rows }
-    const parsed = parseConfigCode(captured.source)
-    const configured = await Promise.all(entries.map(async (entry) => {
+    if (matches.some(indices => indices.length !== 1) || new Set(matches.map(indices => indices[0])).size !== matches.length) return fallback()
+    const specifiers = sourceSpecifiers(parseConfigCode(captured.source))
+    const configured = await Promise.all(entries.map(async (entry, index) => {
       // analyzePluginSource already restricts entries to directly imported factories.
-      const specifier = sourceSpecifier(entry.expression, parsed.imports)
+      const specifier = specifiers[index]
       if (entry.enabled) {
         const row = rows[matches.shift()![0]]
         await enrichRow(row, specifier)
@@ -90,6 +95,7 @@ export async function createPluginInventory(ctx: Context): Promise<{ rows: Plugi
       await enrichRow(row, specifier)
       return row
     }))
+    await Promise.all(rows.map(row => enrichRow(row)))
     // Place disabled rows next to their source neighbors without changing resolved active order.
     for (let index = 0; index < configured.length; index++) {
       if (entries[index].enabled) continue
@@ -111,26 +117,55 @@ export async function createPluginInventory(ctx: Context): Promise<{ rows: Plugi
     }
     return { rows, toggle: { file, hash, source: captured.source, entries, rows, configured, targets } }
   }
-  catch { return { rows } }
+  catch { return fallback() }
+
+  /** Unsupported source still exposes fully enriched active plugins without toggle capabilities. */
+  async function fallback(): Promise<{ rows: PluginInventoryRow[] }> {
+    await Promise.all(rows.map(row => enrichRow(row)))
+    return { rows }
+  }
 
   /** Read safe package metadata only; disabled factories remain unevaluated. */
   async function enrichRow(row: PluginInventoryRow, specifier?: string): Promise<void> {
-    const file = resolveConfigFile(ctx.root, ctx.configFile)
+    if (enriched.has(row)) return
+    enriched.add(row)
     const root = specifier && file ? dirname(file) : ctx.root
-    const resolved = await resolvePluginPackage(root, row.name, specifier, frameworks)
-    const packageName = specifier ? packageNameFromSpecifier(specifier) : resolved.packageName
-    const [metadata] = packageName ? await resolvePluginMetadata(root, [{ name: packageName }]) : [{}]
+    const packageName = packageNameFromSpecifier(specifier ?? row.name)
+    const data = packageName ? await readInstalledPackage(root, packageName) : {}
+    // Nested configs may have closer declarations than the project root. Share
+    // one dependency walk per resolution root without losing that precedence.
+    const declarations = dependencies.get(root) ?? projectDependencies(root)
+    dependencies.set(root, declarations)
+    const resolved = await resolvePluginPackage(root, row.name, specifier, frameworks, { dependencies: await declarations, package: data })
+    const capturedMetadata = metadata.get(row)
+    const info = capturedMetadata && packageName === row.name
+      ? capturedMetadata
+      : { ...(packageName ? resolvePackageMetadata({ name: packageName }, data) : {}), ...capturedMetadata }
+    const { packageName: _packageName, version: _version, ...publicInfo } = info
     // Relative source imports override coincidentally matching installed package names.
     delete row.packageName
     delete row.version
-    Object.assign(row, { ...metadata, ...row, ...resolved })
+    Object.assign(row, { ...publicInfo, ...row, ...resolved })
   }
 }
 
-/** Resolve the directly imported factory already admitted by analyzePluginSource. */
-function sourceSpecifier(expression: string, imports: Map<string, string>): string | undefined {
-  const statement = parseConfigCode(`export default ${expression}`).program.body[0]
-  if (statement.type !== 'ExportDefaultDeclaration') return
-  const call = unwrapNode(statement.declaration)
-  return call.type === 'CallExpression' && call.callee.type === 'Identifier' ? imports.get(call.callee.name) : undefined
+/** Read imported factories from the parsed array already admitted by analyzePluginSource. */
+function sourceSpecifiers(parsed: ParsedConfig): Array<string | undefined> {
+  const config = locateConfigObject(parsed)
+  if (!config.object) return []
+  const property = findProperty(config.object, 'plugins').property
+  if (!property) return []
+  const array = unwrapNode(property.value)
+  if (array.type !== 'ArrayExpression') return []
+  return array.elements.map((entry) => {
+    if (!entry) return undefined
+    let call = unwrapNode(entry)
+    // Disabled entries retain the imported call inside their false conditional wrapper.
+    if (call.type === 'SpreadElement') {
+      const conditional = unwrapNode(call.argument)
+      if (conditional.type !== 'ConditionalExpression' || conditional.consequent.type !== 'ArrayExpression' || !conditional.consequent.elements[0]) return undefined
+      call = unwrapNode(conditional.consequent.elements[0])
+    }
+    return call.type === 'CallExpression' && call.callee.type === 'Identifier' ? parsed.imports.get(call.callee.name) : undefined
+  })
 }

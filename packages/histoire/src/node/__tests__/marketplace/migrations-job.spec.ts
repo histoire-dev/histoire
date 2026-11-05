@@ -1,6 +1,7 @@
 import type { Context } from '../../context.js'
 import { readFile, writeFile } from 'node:fs/promises'
 import { afterEach, expect, it, onTestFinished, vi } from 'vitest'
+import { marketplaceDefaults } from '../../../../../histoire-app/src/app/util/marketplace-preferences.js'
 import { closeContext, createContext } from '../../context.js'
 import { getPlanStore } from '../../marketplace/changes/handlers.js'
 import { createJobRunner } from '../../marketplace/jobs/runner.js'
@@ -11,7 +12,7 @@ import { uiChannelFixture } from '../utils/ui-channel.js'
 import { inventoryPackage } from './inventory-fixture.js'
 import { jobManifest, jobProject } from './jobs-fixture.js'
 
-const prefs = { community: true, packageManager: 'pnpm' as const, afterInstall: 'restart' as const, skippedVersions: {} }
+const prefs = { ...marketplaceDefaults(), community: true, packageManager: 'pnpm' as const }
 afterEach(async () => {
   vi.unstubAllEnvs()
   await disposeConfigProjects()

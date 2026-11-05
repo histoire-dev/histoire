@@ -3,9 +3,11 @@ import type { PluginDetail } from '@histoire/shared'
 import { BuiltinIcon } from '@histoire/controls/vue'
 import { computed } from 'vue'
 import { useMarketplaceStore } from '../../../stores/marketplace.js'
+import BaseChip from '../../base/BaseChip.vue'
 import MenuItem from '../../menu/MenuItem.vue'
 import WorkbenchPanelAction from '../../shell/WorkbenchPanelAction.vue'
 import { categories } from '../browse/labels.js'
+import { incompatibleReason } from '../shell/compatibility-reason.js'
 import PluginTile from '../shell/PluginTile.vue'
 
 const props = defineProps<{
@@ -21,7 +23,7 @@ const disabled = computed(() => !props.plugin.compatible.ok || Boolean(props.plu
 
 /** Show the server's version-specific incompatibility in disabled menu items. */
 function reason(version: PluginDetail['versions'][number]): string | undefined {
-  return version.compatible ? undefined : version.reason ?? 'Incompatible with this project'
+  return version.compatible ? undefined : incompatibleReason(version.reason)
 }
 /** Start a wizard only; project changes still require the later review action. */
 function install(version = target.value): void {
@@ -54,7 +56,9 @@ function browseCategory(): void {
           <h1 class="htw:m-0 htw:text-[28px] htw:font-extrabold htw:tracking-[-0.02em] htw:text-text">
             {{ plugin.displayName }}
           </h1>
-          <span v-if="plugin.official" class="htw:inline-flex htw:h-[22px] htw:shrink-0 htw:items-center htw:rounded-full htw:bg-accent-soft htw:px-[9px] htw:text-[11px] htw:font-semibold htw:text-accent-text">Official</span>
+          <BaseChip v-if="plugin.official" tone="accent">
+            Official
+          </BaseChip>
         </div>
         <p class="htw:m-0 htw:mt-[2px] htw:text-muted">
           <code class="htw:font-mono">{{ plugin.id }}</code> · by {{ plugin.publisher }}
@@ -63,7 +67,7 @@ function browseCategory(): void {
           Installed {{ plugin.installed.version }}
         </p>
       </div>
-      <WorkbenchPanelAction icon="add-alt" :label="label" :disabled="disabled" menu-label="Choose version" :menu-width="280" :overlay-target="store.overlayTarget.value" @click="install()">
+      <WorkbenchPanelAction icon="add-alt" :label="label" :disabled="disabled" menu-label="Choose version" :menu-width="280" @click="install()">
         <template v-if="plugin.versions.length" #menu="{ close }">
           <MenuItem v-for="version in plugin.versions" :key="version.version" :label="version.version" :disabled="reason(version)" @click="install(version.version); close()" />
         </template>
@@ -73,7 +77,7 @@ function browseCategory(): void {
       </a>
     </div>
     <p v-if="!plugin.compatible.ok" role="status" class="htw:m-0 htw:mt-[18px] htw:rounded-lg htw:bg-warn/10 htw:p-3 htw:text-warn">
-      {{ plugin.compatible.reason ?? 'Incompatible with this project' }}
+      {{ incompatibleReason(plugin.compatible.reason) }}
     </p>
   </header>
 </template>

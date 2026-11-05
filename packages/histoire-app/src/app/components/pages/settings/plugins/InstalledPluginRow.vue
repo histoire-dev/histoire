@@ -5,6 +5,7 @@ import { BuiltinIcon, HstButton, HstPulsatingDisc, HstSwitch } from '@histoire/c
 import { officialPlugins } from 'virtual:$histoire-marketplace-official'
 import { computed } from 'vue'
 import { useMarketplaceStore } from '../../../../stores/marketplace.js'
+import BaseChip from '../../../base/BaseChip.vue'
 import PluginTile from '../../../marketplace/shell/PluginTile.vue'
 import { builtinLogos } from './builtin-logos.js'
 import PluginActionsMenu from './PluginActionsMenu.vue'
@@ -50,13 +51,13 @@ const tile = computed<Pick<CatalogEntry, 'displayName' | 'logoUrl' | 'monogram' 
 
 <template>
   <div class="htw:flex htw:flex-wrap htw:items-center htw:gap-3.5 htw:border-0 htw:border-b htw:border-solid htw:border-border htw:px-5 htw:py-3 htw:last:border-b-0" :class="isNew ? 'htw:bg-accent-soft' : ''">
-    <PluginTile :plugin="tile" :size="40" class="htw:size-[36px]! htw:text-[12px]" />
+    <PluginTile :plugin="tile" :size="36" class="htw:text-[12px]" />
     <div class="htw:flex-1 htw:min-w-0">
       <div class="htw:flex htw:flex-wrap htw:items-center htw:gap-2">
         <strong class="htw:break-words htw:text-[14px] htw:font-bold">{{ name }}</strong>
-        <HstButton v-if="isNew" color="flat" tone="accent" class="htw:h-[22px] htw:rounded-full htw:bg-accent-soft htw:px-[9px] htw:text-[11px] htw:font-semibold" :aria-label="`Acknowledge ${name}`" @click="emit('acknowledge')">
+        <BaseChip v-if="isNew" as="button" tone="accent" :aria-label="`Acknowledge ${name}`" @click="emit('acknowledge')">
           New
-        </HstButton>
+        </BaseChip>
       </div>
       <span v-if="plugin.packageName" class="htw:block htw:text-muted htw:font-mono htw:text-[11px] htw:break-all">{{ plugin.packageName }}</span>
       <span v-if="plugin.description" class="htw:block htw:text-muted htw:text-[12px]">{{ plugin.description }}</span>
@@ -75,8 +76,12 @@ const tile = computed<Pick<CatalogEntry, 'displayName' | 'logoUrl' | 'monogram' 
     <HstButton v-for="item in sections" :key="item.id" icon-only color="default" :aria-label="`Settings: ${item.label}`" @click="emit('section', item.id)">
       <BuiltinIcon icon="settings" :size="16" />
     </HstButton>
-    <span v-if="plugin.builtin" class="htw:inline-flex htw:h-[22px] htw:shrink-0 htw:items-center htw:rounded-full htw:bg-chip htw:px-[9px] htw:text-[11px] htw:font-semibold htw:text-body">Built in</span>
-    <span v-if="plugin.required || plugin.builtin" class="htw:inline-flex htw:h-[22px] htw:shrink-0 htw:items-center htw:rounded-full htw:bg-chip htw:px-[9px] htw:text-[11px] htw:font-semibold htw:text-body">Required</span>
+    <BaseChip v-if="plugin.builtin">
+      Built in
+    </BaseChip>
+    <BaseChip v-if="plugin.required || plugin.builtin">
+      Required
+    </BaseChip>
     <HstSwitch v-if="dev && plugin.toggleId && !plugin.required && !plugin.builtin" layout="inline" :aria-label="`Enable ${name}`" :model-value="enabled" :disabled="busy" @update:model-value="emit('toggle', $event)" />
     <span class="htw:flex htw:w-[28px] htw:shrink-0 htw:justify-end">
       <PluginActionsMenu v-if="plugin.packageName || plugin.docsUrl || plugin.repoUrl" :plugin="plugin" :dev="dev" :busy="busy || writesBlocked" @options="emit('options')" @changelog="emit('changelog')" @pin="emit('pin')" @remove="emit('remove')" />

@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, it, onTestFinished } from 'vitest'
+import { clearRegistryMemory, createRegistryCache } from '../../marketplace/catalog/cache.js'
 import { createRegistryClient } from '../../marketplace/catalog/registry.js'
 import { configTestProject, disposeConfigProjects } from '../utils/config-codemod.js'
 import { registryServer } from '../utils/marketplace/registry-server.js'
@@ -6,6 +7,25 @@ import { registryServer } from '../utils/marketplace/registry-server.js'
 afterEach(disposeConfigProjects)
 
 describe('registry response boundaries', () => {
+  it.each([
+    { name: 'different', latest: '1.0.0' },
+    { name: 'audit', latest: 'missing' },
+  ])('rejects cached identity/latest mismatch without fetching: $name / $latest', async ({ name, latest }) => {
+    const registry = await registryServer({ packages: { audit: { 'name': 'audit', 'dist-tags': { latest: '1.0.0' }, 'versions': { '1.0.0': {} } } } })
+    onTestFinished(registry.close)
+    const { root } = await configTestProject()
+    const key = `${registry.url}/audit`
+    // Persist external malformed metadata, then cross a generation boundary so disk is untrusted.
+    await createRegistryCache(root).get(key, value => value, async () => ({ 'name': name, 'dist-tags': { latest }, 'versions': { '1.0.0': {} } }))
+    clearRegistryMemory(root)
+    onTestFinished(() => clearRegistryMemory(root))
+    const client = createRegistryClient(root, { registryUrl: registry.url })
+    expect(await client.cachedPackument('audit')).toBeUndefined()
+    expect(registry.requests).toEqual([])
+    expect((await client.packument('audit')).value.name).toBe('audit')
+    expect(registry.requests.map(url => url.pathname)).toEqual(['/audit'])
+  })
+
   it('keeps request timeout even when caller supplies its own cancellation signal', async () => {
     const registry = await registryServer({ delayMs: 100 })
     onTestFinished(registry.close)

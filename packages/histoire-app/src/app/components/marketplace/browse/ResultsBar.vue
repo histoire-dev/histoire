@@ -2,6 +2,7 @@
 import { BuiltinIcon, HstSelect, HstSwitch } from '@histoire/controls/vue'
 import { computed } from 'vue'
 import { useMarketplaceStore } from '../../../stores/marketplace.js'
+import BaseChip from '../../base/BaseChip.vue'
 import { frameworkLabel } from './labels.js'
 import { useCatalogFilters } from './use-catalog-filters.js'
 
@@ -20,12 +21,12 @@ const matchesProject = computed(() => props.frameworks.length > 0 && props.frame
 <template>
   <div class="htw:flex htw:flex-wrap htw:items-center htw:gap-[8px] htw:text-[13px]">
     <span aria-live="polite" class="htw:mr-[4px] htw:font-semibold htw:text-muted">{{ total }} {{ total === 1 ? 'plugin' : 'plugins' }}</span>
-    <span v-for="chip in chips" :key="chip.key" class="htw:inline-flex htw:h-[22px] htw:shrink-0 htw:items-center htw:gap-[4px] htw:rounded-full htw:bg-accent-soft htw:px-[9px] htw:text-[11px] htw:font-semibold htw:text-accent-text">
+    <BaseChip v-for="chip in chips" :key="chip.key" tone="accent">
       {{ chip.label }}
       <button type="button" :aria-label="`Remove ${chip.label} filter`" class="htw:m-0 htw:flex htw:cursor-pointer htw:items-center htw:rounded-[3px] htw:border-0 htw:bg-transparent htw:p-0 htw:text-inherit htw:[font:inherit] htw:focus-visible:outline-2 htw:focus-visible:outline-accent" @click="remove(chip)">
         <BuiltinIcon icon="close" :size="12" />
       </button>
-    </span>
+    </BaseChip>
     <div class="htw:ml-auto htw:flex htw:items-center htw:gap-[16px]">
       <label v-if="frameworks.length" class="htw:flex htw:cursor-pointer htw:items-center htw:gap-[8px] htw:font-semibold htw:text-body">
         <HstSwitch layout="inline" :aria-label="frameworkTitle" :model-value="matchesProject" @update:model-value="toggle('frameworks', frameworks, $event)" />

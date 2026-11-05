@@ -14,7 +14,7 @@ function text(value: unknown): string | undefined {
 }
 
 /** Admit only web URLs, excluding embedded credentials. */
-function webUrl(value: unknown, httpsOnly = false): string | undefined {
+export function webUrl(value: unknown, httpsOnly = false): string | undefined {
   const raw = text(value)
   if (!raw) return
   try {
@@ -26,7 +26,7 @@ function webUrl(value: unknown, httpsOnly = false): string | undefined {
 }
 
 /** Convert common npm Git URLs to browser URLs without accepting arbitrary schemes. */
-function repositoryUrl(value: unknown): string | undefined {
+export function repositoryUrl(value: unknown): string | undefined {
   const raw = text(typeof value === 'object' && value ? (value as { url?: unknown }).url : value)
   if (!raw) return
   const https = raw
@@ -36,27 +36,31 @@ function repositoryUrl(value: unknown): string | undefined {
   return valid?.replace(/\.git\/?$/, '')
 }
 
+/** Offline icon membership shared by all public metadata projections. */
+const icons = new Set(histoireIconNames)
+
+/** Project safe public metadata from JSON already read for this plugin. */
+export function resolvePackageMetadata(plugin: Plugin, pkg: Record<string, any>): PublicPluginMetadata {
+  const info = plugin.metadata ?? {}
+  const version = text(pkg.version)
+  const displayName = text(info.displayName)
+  const description = text(info.description) ?? text(pkg.description)
+  const icon = text(info.icon)
+  const logoUrl = webUrl(info.logoUrl, true)
+  const docsUrl = webUrl(info.docsUrl) ?? webUrl(pkg.homepage)
+  const repoUrl = repositoryUrl(info.repoUrl) ?? repositoryUrl(pkg.repository)
+  return {
+    ...version ? { packageName: pkg.name as string, version } : {},
+    ...displayName ? { displayName } : {},
+    ...description ? { description } : {},
+    ...icon && icons.has(icon) ? { icon } : {},
+    ...logoUrl ? { logoUrl } : {},
+    ...docsUrl ? { docsUrl } : {},
+    ...repoUrl ? { repoUrl } : {},
+  }
+}
+
 /** Resolve package fallback once per plugin, preserving duplicate identities and order. */
 export async function resolvePluginMetadata(root: string, plugins: readonly Plugin[]): Promise<PublicPluginMetadata[]> {
-  const icons = new Set(histoireIconNames)
-  return Promise.all(plugins.map(async (plugin) => {
-    const info = plugin.metadata ?? {}
-    const pkg = await readInstalledPackage(root, plugin.name)
-    const version = text(pkg.version)
-    const displayName = text(info.displayName)
-    const description = text(info.description) ?? text(pkg.description)
-    const icon = text(info.icon)
-    const logoUrl = webUrl(info.logoUrl, true)
-    const docsUrl = webUrl(info.docsUrl) ?? webUrl(pkg.homepage)
-    const repoUrl = repositoryUrl(info.repoUrl) ?? repositoryUrl(pkg.repository)
-    return {
-      ...version ? { packageName: pkg.name as string, version } : {},
-      ...displayName ? { displayName } : {},
-      ...description ? { description } : {},
-      ...icon && icons.has(icon) ? { icon } : {},
-      ...logoUrl ? { logoUrl } : {},
-      ...docsUrl ? { docsUrl } : {},
-      ...repoUrl ? { repoUrl } : {},
-    }
-  }))
+  return Promise.all(plugins.map(async plugin => resolvePackageMetadata(plugin, await readInstalledPackage(root, plugin.name))))
 }

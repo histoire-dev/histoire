@@ -1,8 +1,9 @@
 import { constants } from 'node:fs'
 import { access } from 'node:fs/promises'
-import { delimiter, join, win32 } from 'node:path'
+import { delimiter, join } from 'node:path'
 import { StringDecoder } from 'node:string_decoder'
 import crossSpawn from 'cross-spawn'
+import { stopProcessTree } from '../../util/stop-process-tree.js'
 
 /** Resolves supported manager executables without invoking shell resolution. */
 export async function resolveBinary(name: string, environment: NodeJS.ProcessEnv = process.env): Promise<string> {
@@ -24,36 +25,9 @@ export async function resolveBinary(name: string, environment: NodeJS.ProcessEnv
 export async function spawnPackage(argv: string[], root: string, signal: AbortSignal, output: (text: string, stream: 'stdout' | 'stderr') => void, environment: NodeJS.ProcessEnv = process.env): Promise<void> {
   signal.throwIfAborted()
   const child = crossSpawn(argv[0], argv.slice(1), { cwd: root, env: { ...environment, CI: '1' }, shell: false, detached: process.platform !== 'win32', windowsHide: true, stdio: ['ignore', 'pipe', 'pipe'] })
-  let stopping: Promise<void> | undefined
-  /** Signals only this invocation's POSIX group, including inherited grandchildren. */
-  function group(signal: NodeJS.Signals | 0): boolean {
-    if (!child.pid) return false
-    try {
-      process.kill(-child.pid, signal)
-      return true
-    }
-    catch (error) {
-      if ((error as NodeJS.ErrnoException).code === 'ESRCH') return false
-      throw error
-    }
-  }
-  /** Retires descendants even after a package-manager leader exits first. */
+  /** Join shared descendant cleanup with the package manager's grace period. */
   function stop(): Promise<void> {
-    return stopping ??= (async () => {
-      if (!child.pid) return
-      if (process.platform === 'win32') {
-        const killer = crossSpawn(win32.join(environment.SystemRoot ?? 'C:\\Windows', 'System32/taskkill.exe'), ['/PID', String(child.pid), '/T', '/F'], { shell: false, stdio: 'ignore', windowsHide: true, timeout: 3000 })
-        await new Promise<void>((resolve) => {
-          killer.once('close', () => resolve())
-          killer.once('error', () => resolve())
-        })
-        return
-      }
-      if (!group('SIGTERM')) return
-      const deadline = Date.now() + 3000
-      while (Date.now() < deadline && group(0)) await new Promise(resolve => setTimeout(resolve, 25))
-      group('SIGKILL')
-    })()
+    return stopProcessTree(child, { terminate: 3000, poll: 25, windows: 3000, systemRoot: environment.SystemRoot })
   }
   /** Starts termination immediately when cancellation arrives. */
   const cancel = () => {

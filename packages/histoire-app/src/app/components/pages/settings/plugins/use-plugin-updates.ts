@@ -1,12 +1,9 @@
 import type { MarketplaceUpdate } from '@histoire/shared'
-import type { MarketplaceStore } from '../../../../stores/marketplace.js'
-import { computed, onMounted, onUnmounted, ref, shallowRef, watch } from 'vue'
+import type { MarketplaceServiceOwner } from '../../../marketplace/shell/marketplace-services.js'
+import { computed, ref, shallowRef, watch } from 'vue'
 
-/** One cache per workbench; embeddings never share project inventory. */
-const sessions = new WeakMap<MarketplaceStore, ReturnType<typeof createUpdates>>()
-
-/** Create retained data separately from the lifetime of mounted consumers. */
-function createUpdates(store: MarketplaceStore) {
+/** Retain project update inventory until its workbench is disposed. */
+export function createPluginUpdates(store: MarketplaceServiceOwner, dev: boolean) {
   const entries = shallowRef<MarketplaceUpdate[]>([])
   const loading = ref(false)
   const error = ref('')
@@ -16,20 +13,22 @@ function createUpdates(store: MarketplaceStore) {
     acknowledged.value = sessionStorage.getItem(receiptKey) ?? undefined
   }
   catch { /* Receipt acknowledgement is optional when storage is blocked. */ }
+  let connected = false
+  let disposed = false
   let cached: string | undefined
   let controller: AbortController | undefined
-  let consumers = 0
-  let stops: Array<() => void> = []
   const available = computed(() => entries.value.filter(item => store.prefs.value.skippedVersions[item.id] !== item.to))
   const count = computed(() => available.value.length)
+  // Update selection can fall back to an older release when its newest version is skipped.
   const preferenceKey = computed(() => JSON.stringify([store.prefs.value.community, store.prefs.value.skippedVersions]))
   const newPlugin = computed(() => {
     const job = store.job.value
     return job?.kind === 'install' && job.status === 'succeeded' && acknowledged.value !== job.jobId ? job.id : undefined
   })
 
-  /** Coalesce mounted consumers; changed consent retires the earlier request. */
+  /** Coalesce workbench reads; changed consent retires the earlier request. */
   async function refresh(force = false): Promise<void> {
+    if (!connected || disposed || !dev) return
     const key = preferenceKey.value
     if (!force && (cached === key || loading.value)) return
     controller?.abort()
@@ -65,32 +64,22 @@ function createUpdates(store: MarketplaceStore) {
     }
     catch { /* Live acknowledgement still works without persistence. */ }
   }
-  /** Only the first mounted consumer starts session observers. */
-  function acquire(): void {
-    if (consumers++ > 0) return
-    stops = [watch(preferenceKey, () => {
-      void refresh(true)
-    }), watch(store.job, completed)]
+  const stops = dev
+    ? [watch(preferenceKey, () => {
+        void refresh(true)
+      }), watch(store.job, completed)]
+    : []
+  /** Begin inventory reads with the owning workbench connection. */
+  function connect(): void {
+    connected = true
     void refresh()
   }
-  /** Last consumer cancels pending reads without discarding cached data. */
-  function release(): void {
-    if (--consumers > 0) return
+  /** Retire pending reads without depending on rail or settings mounts. */
+  function dispose(): void {
+    disposed = true
     stops.forEach(stop => stop())
-    stops = []
     controller?.abort()
     loading.value = false
   }
-  return { available, count, loading, error, newPlugin, acknowledge, refresh, acquire, release }
-}
-
-/** Mount in both rail and section; both share one request and retained count. */
-export function usePluginUpdates(store: MarketplaceStore, dev = __HISTOIRE_DEV__) {
-  let state = sessions.get(store)
-  if (!state) sessions.set(store, state = createUpdates(store))
-  if (dev) {
-    onMounted(state.acquire)
-    onUnmounted(state.release)
-  }
-  return state
+  return { available, count, loading, error, newPlugin, acknowledge, refresh, connect, dispose }
 }

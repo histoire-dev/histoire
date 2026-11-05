@@ -30,7 +30,7 @@ it('opens registered pane automatically only when user selected post-install nav
   await flushMicrotasks(6)
   expect(targets.pane).not.toHaveBeenCalled()
   channel.emit('histoire:ui:marketplace-job-state', { job: job({ status: 'succeeded', steps: [{ id: 'load', state: 'done' }] }) })
-  await vi.waitFor(() => expect(targets.pane).toHaveBeenCalledExactlyOnceWith('a11y:results'))
+  await vi.waitFor(() => expect(targets.pane).toHaveBeenCalledExactlyOnceWith('a11y:issues'))
   expect(store.open.value).toBe(false)
   expect(store.postInstall.value).toBeUndefined()
 })

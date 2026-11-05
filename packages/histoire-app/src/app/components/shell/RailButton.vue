@@ -36,6 +36,7 @@ defineProps<{
     :aria-expanded="expanded"
     :aria-controls="controls"
     :data-test-id="testId"
+    :data-histoire-contribution="$attrs['data-shell-pane']"
     :disabled="disabled"
   >
     <BuiltinIcon :icon="icon" :size="22" />

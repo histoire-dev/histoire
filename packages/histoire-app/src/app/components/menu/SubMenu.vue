@@ -2,6 +2,7 @@
 import type { FrameAction, FrameActionTarget } from '../../util/frame-actions.js'
 import { nextTick, ref } from 'vue'
 import { useShortcutRegistry } from '../../util/shortcuts.js'
+import { useMenuKeyboard } from '../base/use-menu-keyboard.js'
 import MenuItem from './MenuItem.vue'
 
 /** Submenu shares target capture and restores its parent row on keyboard dismissal. */
@@ -22,7 +23,8 @@ async function show() {
   menu.value?.querySelector<HTMLButtonElement>('button:not(:disabled)')?.focus()
 }
 
-/** Native arrow navigation is scoped to currently open submenu. */
+const { navigate } = useMenuKeyboard({ open, tab: 'bubble' })
+/** Submenu owns Left/Escape dismissal; row movement stays shared. */
 function keyboard(event: KeyboardEvent) {
   if (['ArrowLeft', 'Escape'].includes(event.key)) {
     event.preventDefault()
@@ -30,13 +32,9 @@ function keyboard(event: KeyboardEvent) {
     open.value = false
     root.value?.querySelector<HTMLButtonElement>('button')?.focus()
   }
-  if (!['ArrowUp', 'ArrowDown', 'Home', 'End'].includes(event.key)) return
-  event.preventDefault()
-  event.stopPropagation()
-  const buttons = [...menu.value!.querySelectorAll<HTMLButtonElement>('button:not(:disabled)')]
-  const index = buttons.indexOf(document.activeElement as HTMLButtonElement)
-  const next = event.key === 'Home' ? 0 : event.key === 'End' ? buttons.length - 1 : (index + (event.key === 'ArrowDown' ? 1 : -1) + buttons.length) % buttons.length
-  buttons[next]?.focus()
+  else {
+    navigate(event)
+  }
 }
 </script>
 

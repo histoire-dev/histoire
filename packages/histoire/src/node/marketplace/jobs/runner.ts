@@ -4,19 +4,28 @@ import type { JobRunnerOptions } from './types.js'
 import { randomUUID } from 'node:crypto'
 import { configFileHash } from '../../config/codemod/write.js'
 import { getConfigDependencies } from '../../config/dependencies.js'
+import { isAlive } from '../../util/persistent-dir.js'
 import { hasManagedConfigInput } from '../changes/config-inputs.js'
 import { readInstalledPackage } from '../inventory/package-resolve.js'
 import { executeJob } from './execute.js'
 import { completeLoad } from './load-check.js'
-import { claimJob, expireReceipt, processAlive, readReceipt, releaseJob, sweepReceipts, writeReceipt } from './receipt.js'
+import { claimJob, expireReceipt, JOB_RECEIPT_TTL_MS, readReceipt, releaseJob, sweepReceipts, writeReceipt } from './receipt.js'
 import { resolveBinary } from './spawn.js'
-import { copyJob, JobError } from './types.js'
+import { JobError } from './types.js'
 
 /** Stable identity prevents another engine on the same loaded context consuming its handoff. */
 const generations = new WeakMap<object, string>()
 
+/** Generation-local sweep coalesces runners sharing the same loaded context. */
+const sweeps = new WeakMap<object, Promise<void>>()
+
 /** In-process admission closes the async disk-claim race across generation-local runners. */
-const lanes = new Map<string, { jobId: string }>()
+const lanes = new Map<string, { /** Exact job holding this lane. */ jobId: string }>()
+
+/** Releases only the matching in-memory lane, preserving newer ownership. */
+function releaseLane(root: string, owner: { /** Exact job holding this lane. */ jobId: string }): void {
+  if (lanes.get(root)?.jobId === owner.jobId) lanes.delete(root)
+}
 
 /** Creates a server-owned project lane; browser disconnection never cancels it. */
 export function createJobRunner(options: JobRunnerOptions) {
@@ -32,6 +41,7 @@ export function createJobRunner(options: JobRunnerOptions) {
   let completing: Promise<JobState | null> | undefined
   let timer: ReturnType<typeof setTimeout> | undefined
   let last = 0
+  let swept: Promise<void> | undefined
   let resume: (() => void) | undefined
   /** Gives rollback a fresh signal; another cancellation can stop its process. */
   function beginRepair(): AbortSignal {
@@ -69,7 +79,7 @@ export function createJobRunner(options: JobRunnerOptions) {
     if (current) {
       for (const listener of listeners) {
         try {
-          listener(copyJob(current))
+          listener(structuredClone(current))
         }
         catch { /* A disconnected observer cannot fail the project transaction. */ }
       }
@@ -77,38 +87,43 @@ export function createJobRunner(options: JobRunnerOptions) {
   }
   /** Coalesces progress/output updates to at most ten broadcasts per second. */
   function changed() {
-    if ((current?.status === 'failed' || current?.status === 'cancelled') && lanes.get(options.root) === owner) lanes.delete(options.root)
+    if (current?.status === 'failed' || current?.status === 'cancelled') releaseLane(options.root, owner)
     if (timer) return
     timer = setTimeout(publish, Math.max(0, 100 - (Date.now() - last)))
     timer.unref?.()
   }
   /** Reconciles durable handoff only from a distinct engine with a loaded successor. */
   async function recover(): Promise<JobState | null> {
-    await sweepReceipts(options.root)
+    if (!swept) {
+      swept = options.context ? sweeps.get(options.context) : undefined
+      swept ??= sweepReceipts(options.root)
+      if (options.context) sweeps.set(options.context, swept)
+    }
+    await swept
     if (current && receipt && receipt.expires <= Date.now() && current.status !== 'running') {
       await expireReceipt(options.root, current.jobId)
-      if (lanes.get(options.root) === owner) lanes.delete(options.root)
+      releaseLane(options.root, owner)
       current = undefined
       receipt = undefined
       return null
     }
-    if (current) return copyJob(current)
+    if (current) return structuredClone(current)
     const saved = await readReceipt(options.root)
     if (!saved) return null
     const pendingRestart = saved.job.steps.some(step => step.id === 'restart' && ['pending', 'running'].includes(step.state))
     if (saved.expires <= Date.now() && saved.job.status !== 'running') {
       await expireReceipt(options.root, saved.job.jobId)
-      if (lanes.get(options.root)?.jobId === saved.job.jobId) lanes.delete(options.root)
+      releaseLane(options.root, saved.job)
       return null
     }
     if (saved.job.status === 'running' || pendingRestart) {
       const revision = await configFileHash(options.configFile, { root: options.root })
       const committed = saved.configHash && saved.configHash === revision
       const loadedRevision = options.context?.pluginToggle?.hash
-      if (saved.configHash && options.context && saved.generation !== generation && (saved.handoff || !processAlive(saved.pid)) && (!loadedRevision || loadedRevision === revision)) {
+      if (saved.configHash && options.context && saved.generation !== generation && (saved.handoff || !isAlive(saved.pid)) && (!loadedRevision || loadedRevision === revision)) {
         saved.job = await completeLoad(options.context, options.configFile, saved)
       }
-      else if (!processAlive(saved.pid) || saved.expires <= Date.now()) {
+      else if (!isAlive(saved.pid) || saved.expires <= Date.now()) {
         // A crashed detached package-manager tree may still be running. Do not
         // restore underneath unknown live writers; retain snapshot for recovery.
         const leftovers = ['package.json', 'node_modules', ...(revision !== saved.originalConfigHash ? [options.configFile] : [])]
@@ -116,20 +131,20 @@ export function createJobRunner(options: JobRunnerOptions) {
         delete saved.job.awaiting
         const active = saved.job.steps.find(step => step.state === 'running') ?? saved.job.steps.find(step => step.id === 'load')!
         active.state = 'failed'
-        saved.job.failure = { code: committed ? 'load' : 'unknown', message: 'Plugin job was interrupted. Check project files before retrying.', restored: false, leftovers: [...new Set([...leftovers, 'node_modules'])] }
+        saved.job.failure = { code: committed ? 'load' : 'unknown', message: 'Plugin job was interrupted. Check project files before retrying.', restored: false, leftovers }
       }
       else {
-        return copyJob(saved.job)
+        return structuredClone(saved.job)
       }
-      saved.expires = Date.now() + 10 * 60_000
+      saved.expires = Date.now() + JOB_RECEIPT_TTL_MS
       await writeReceipt(options.root, saved)
       await releaseJob(options.root, saved.job.jobId)
-      if (lanes.get(options.root)?.jobId === saved.job.jobId) lanes.delete(options.root)
+      releaseLane(options.root, saved.job)
     }
     current = saved.job
     receipt = saved
     changed()
-    return copyJob(current)
+    return structuredClone(current)
   }
   return {
     /** Claims the project, freshly verifies the reviewed plan, then starts background work. */
@@ -166,21 +181,22 @@ export function createJobRunner(options: JobRunnerOptions) {
           current!.failure = { code: 'unknown', message: 'Plugin job recovery failed. Check project files and server output.', restored: false, leftovers: ['package.json', 'node_modules', options.configFile] }
         }).finally(() => {
           if (current?.status === 'failed' || current?.status === 'cancelled') {
-            if (lanes.get(options.root) === owner) lanes.delete(options.root)
+            releaseLane(options.root, owner)
           }
           publish()
         })
         changed()
-        return copyJob(current)
+        return structuredClone(current)
       }
       catch (error) {
         if (claimed) await releaseJob(options.root, jobId)
-        if (lanes.get(options.root) === owner) lanes.delete(options.root)
+        releaseLane(options.root, owner)
         throw error
       }
     },
     /** Reads latest state, completing disk receipts against a loaded successor. */
     current(): Promise<JobState | null> {
+      if (current && swept && (current.status === 'running' || !receipt || receipt.expires > Date.now())) return Promise.resolve(structuredClone(current))
       return completing ??= recover().finally(() => {
         completing = undefined
       })

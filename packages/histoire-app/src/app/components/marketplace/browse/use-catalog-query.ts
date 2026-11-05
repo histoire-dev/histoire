@@ -1,20 +1,12 @@
-import type { CatalogEntry, CatalogPage } from '@histoire/shared'
-import type { ShallowRef } from 'vue'
-import type { MarketplaceStore } from '../../../stores/marketplace.js'
+import type { CatalogEntry } from '@histoire/shared'
 import { computed, onBeforeUnmount, ref, shallowRef, watch } from 'vue'
 import { useMarketplaceStore } from '../../../stores/marketplace.js'
-
-/** Collection membership received from the server, never inferred from its title. */
-type Collection = NonNullable<CatalogPage['discover']>['collections'][number]
-/** Weak keys release disposed workbenches; no cross-project catalog state is shared. */
-const selections = new WeakMap<MarketplaceStore, ShallowRef<Collection[]>>()
+import { useCatalogCollections } from './catalog-collections.js'
 
 /** Adapt shared store data without starting a second first-page request owner. */
 export function useCatalogQuery() {
   const store = useMarketplaceStore()
-  const collections = selections.get(store) ?? shallowRef<Collection[]>([])
-  selections.set(store, collections)
-  const selectedCollection = computed(() => collections.value.find(collection => collection.id === store.filters.value.collection))
+  const { collections, selectedCollection, selectCollection } = useCatalogCollections(store)
   let activeMore: AbortController | undefined
   /** Additional server pages, separate from the store's retained first page. */
   const extra = shallowRef<CatalogEntry[]>([])
@@ -27,13 +19,12 @@ export function useCatalogQuery() {
   const entries = computed(() => [...(store.page.value?.entries ?? []), ...extra.value])
   watch(() => store.page.value, (page) => {
     retireMore()
-    if (page?.discover) collections.value = page.discover.collections
     extra.value = []
     cursor.value = page?.cursor
     moreError.value = undefined
   }, { immediate: true })
   // Retire old cursors immediately, before the store's debounced first-page read.
-  watch([store.query, store.filters, store.sort, store.prefs, store.open], () => {
+  watch([store.query, store.filters, store.sort, () => store.prefs.value.community], () => {
     retireMore()
     cursor.value = undefined
     moreError.value = undefined
@@ -43,15 +34,6 @@ export function useCatalogQuery() {
     activeMore?.abort()
     activeMore = undefined
     loadingMore.value = false
-  }
-  watch(store.prefs, () => {
-    collections.value = []
-  }, { deep: true, flush: 'sync' })
-  /** Query full collection membership; discovery rows are only bounded samples. */
-  function selectCollection(value: Collection): void {
-    store.setQuery('')
-    store.setFilters({ collection: value.id })
-    store.setView('all')
   }
   /** Reset search and facets together so empty-state recovery always widens results. */
   function clearFilters(): void {
@@ -76,6 +58,10 @@ export function useCatalogQuery() {
     }
     finally { if (activeMore === controller) loadingMore.value = false }
   }
-  onBeforeUnmount(retireMore)
+  const offClose = store.onClose(retireMore)
+  onBeforeUnmount(() => {
+    offClose()
+    retireMore()
+  })
   return { store, entries, selectedCollection, collections, cursor, loadingMore, moreError, selectCollection, clearFilters, loadMore }
 }

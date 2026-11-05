@@ -1,4 +1,0 @@
-{
-  "extends": "./migrations-tsconfig.json",
-  "include": ["./client.spec.ts", "./changes-plan.spec.ts", "./changes-safety.spec.ts", "../../../../../histoire-app/src/shim.d.ts", "../../../../../histoire-app/src/virtual.d.ts"]
-}

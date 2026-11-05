@@ -3,7 +3,6 @@ import type { Ref } from 'vue'
 import { useHistoireContext } from '@histoire/vue/internal'
 import { computed, onScopeDispose, ref } from 'vue'
 import { useOptionalExtensionHost } from '../../../composables/extensions.js'
-import { getInspectorTabKey } from '../../inspector/state.js'
 
 /** Actual browser registration with optional manifest description and command. */
 export interface SpotlightTarget {
@@ -74,13 +73,8 @@ export function useSpotlightTargets(pluginId: Ref<string | undefined>, detail: R
   })
   /** Resolve IDs by exact attribute values without interpolating plugin data into CSS. */
   function anchorFor(target: SpotlightTarget): HTMLElement | undefined {
-    const selector = target.kind === 'inspector-tab' ? '[role="tab"][id]' : target.kind === 'rail-pane' ? 'button[data-shell-pane]' : '[data-histoire-contribution]'
-    return [...provider.root.value?.querySelectorAll<HTMLElement>(selector) ?? []].find((element) => {
-      const matches = target.kind === 'inspector-tab'
-        ? element.id.endsWith(`-tab-${getInspectorTabKey(target.id)}`)
-        : element.getAttribute(target.kind === 'rail-pane' ? 'data-shell-pane' : 'data-histoire-contribution') === target.id
-      return matches && visible(element)
-    })
+    return [...provider.root.value?.querySelectorAll<HTMLElement>('[data-histoire-contribution]') ?? []]
+      .find(element => element.getAttribute('data-histoire-contribution') === target.id && visible(element))
   }
   return { workbench, root: provider.root, ready, targets, anchorFor }
 }

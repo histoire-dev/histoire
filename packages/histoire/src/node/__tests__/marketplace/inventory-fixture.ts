@@ -3,11 +3,11 @@ import { join } from 'pathe'
 import { configTestProject } from '../utils/config-codemod.js'
 
 /** Create installed package bytes; factories throw when inventory accidentally executes them. */
-export async function inventoryPackage(root: string, name: string, version: string, extra: Record<string, unknown> = {}) {
+export async function inventoryPackage(root: string, name: string, version: string, extra: Record<string, unknown> = {}, options: { /** Executable body used only by real config-load scenarios. */ source?: string } = {}) {
   const directory = join(root, 'node_modules', name)
   await mkdir(directory, { recursive: true })
   await writeFile(join(directory, 'package.json'), JSON.stringify({ name, version, main: 'index.cjs', ...extra }))
-  await writeFile(join(directory, 'index.cjs'), 'throw new Error("inventory executed package code")')
+  await writeFile(join(directory, 'index.cjs'), options.source ?? 'throw new Error("inventory executed package code")')
 }
 
 /** Create project metadata alongside the shared config fixture. */

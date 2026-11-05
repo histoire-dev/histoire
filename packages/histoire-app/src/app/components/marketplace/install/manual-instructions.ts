@@ -1,23 +1,18 @@
 import type { ChangePlan, ChangeRequest, PluginDetail } from '@histoire/shared'
-import { createMarketplaceClient } from '../../../util/marketplace-client.js'
+import { executablePackageManagers, manualConfigSteps, packageCommand } from '@histoire/shared'
 
-/** Reuse static client's safe option serializer instead of duplicating snippet generation. */
+/** Add copyable manager alternatives while retaining reviewed commands and config bytes. */
 export async function manualInstructions(request: ChangeRequest, detail: PluginDetail, reviewed: ChangePlan): Promise<ChangePlan> {
-  const client = createMarketplaceClient({
-    transport: { available: () => false, send: () => false, on: () => () => {} },
-    loadOfficial: async () => [detail],
+  const commands = executablePackageManagers.flatMap((name) => {
+    const command = packageCommand({ name, workspaceRoot: false }, { ...request, version: request.version ?? detail.latest })
+    if (!command) return []
+    return [{ title: `Run with ${name}`, code: name === reviewed.packageManager.name && reviewed.command ? reviewed.command.display : command.display }]
   })
-  const names = ['pnpm', 'npm', 'yarn', 'bun'] as const
-  const alternatives = await Promise.all(names.map(packageManager => client.plan({ ...request, prefs: { ...request.prefs, packageManager } })))
-  const original = reviewed.manual?.steps ?? alternatives[names.indexOf(reviewed.packageManager.name)].manual!.steps
-  // Server manual plans already include all manager commands. Preserve their exact bytes.
-  if (original.some(step => step.title.startsWith('Run with '))) return reviewed
-  const commands = request.kind === 'options'
-    ? []
-    : alternatives.map((plan, index) => ({
-        title: `Run with ${names[index]}`,
-        code: names[index] === reviewed.packageManager.name && reviewed.command ? reviewed.command.display : plan.manual!.steps[0].code,
-      }))
-  const steps = original.filter(step => !['Install package', 'Remove package'].includes(step.title))
+  const codes = new Set(commands.map(command => command.code))
+  // Match command bytes rather than English titles. Keep server-provided steps
+  // intact, including workspace-specific flags not inferable in the browser.
+  const original = reviewed.manual?.steps
+  if (original && commands.length && commands.every(command => original.some(step => step.code === command.code))) return reviewed
+  const steps = (original ?? manualConfigSteps(request, detail)).filter(step => !codes.has(step.code ?? '') && !['Install package', 'Remove package'].includes(step.title))
   return { ...reviewed, manual: { reason: reviewed.manual?.reason ?? 'config-not-literal', steps: [...commands, ...steps] } }
 }

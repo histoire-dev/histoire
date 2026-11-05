@@ -1,25 +1,15 @@
 import type { HistoireJsonValue } from '@histoire/protocol'
+import { accessKinds, addKinds, categories, isOptionPath, isSafeObjectKey, tints } from '@histoire/shared'
 import { z } from 'zod'
 
 /** Bounded nonempty descriptive text. */
 const text = z.string().min(1).max(500)
-/** Prototype-sensitive paths never reach config editing. */
-const forbidden = new Set(['__proto__', 'prototype', 'constructor'])
 /** Accept only ordinary identifiers in declarative object paths. */
-export const optionPath = text.refine(value => value.split('.').every(part => /^[a-z_$][\w$]*$/i.test(part) && !forbidden.has(part)), 'Invalid option path')
+export const optionPath = text.refine(isOptionPath, 'Invalid option path')
 /** JSON object keys cannot mutate object prototypes. */
-const safeKey = text.refine(value => !forbidden.has(value), 'Invalid object key')
+const safeKey = text.refine(isSafeObjectKey, 'Invalid object key')
 /** JSON strings may be empty, but cannot carry unbounded form defaults. */
 const json: z.ZodType<HistoireJsonValue> = z.lazy(() => z.union([z.string().max(500), z.number().finite(), z.boolean(), z.null(), z.array(json), z.record(safeKey, json)]))
-/** Allowed catalog categories. */
-export const categories = ['testing', 'design', 'inspection', 'frameworks', 'data'] as const
-/** Allowed tile tints. */
-export const tints = ['green', 'violet', 'blue', 'amber', 'rose', 'sky', 'slate'] as const
-/** Extension contribution categories supported by this milestone. */
-export const addKinds = ['rail-pane', 'inspector-tab', 'toolbar-tool', 'story-tests', 'cli-command', 'settings-section', 'canvas-view'] as const
-/** Declared access categories, never runtime grants. */
-export const accessKinds = ['story-frames', 'story-dom', 'network', 'filesystem', 'child-process'] as const
-
 /** Fields shared across all option controls. */
 const optionBase = z.object({ key: optionPath, label: text, description: text.optional(), when: z.record(optionPath, json).optional() })
 /** Individual option, including a default of the correct control type. */

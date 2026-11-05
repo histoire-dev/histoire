@@ -15,11 +15,11 @@ import { installedVersion, readReleases } from './releases.js'
 import { selectMigrations } from './select.js'
 
 /** Resolve migration input without executing package code or mutating project files. */
-export async function planMigrations(ctx: Pick<Context, 'root'>, request: ChangeRequest, resolvePlugin: PlannerOptions['resolvePlugin'] = projectPluginResolver(ctx.root)) {
+export async function planMigrations(ctx: Pick<Context, 'root'>, request: ChangeRequest, resolvePlugin: PlannerOptions['resolvePlugin'] = projectPluginResolver(ctx)) {
   const from = await installedVersion(ctx.root, request.id)
   const target = await resolvePlugin(request)
   const to = request.version ?? target.version
-  const history = await readReleases(ctx.root, request.id, request.prefs, true)
+  const history = await readReleases(ctx, request.id, request.prefs, true)
   const releases = history.filter(item => item.latest !== to).map(item => ({ version: item.latest, manifest: item.manifest }))
   releases.push({ version: to, manifest: target.manifest })
   return { from, to, ops: selectMigrations(releases, from, to) }
@@ -59,19 +59,23 @@ export function withMigrations(ctx: Context, base: ReturnType<typeof createPlanS
     return change
   }
   return {
+    ...base,
     /** Ordinary changes use the original planner unchanged. */
     async plan(request) {
       if (request.kind !== 'update' || !request.migrate || options.static) return base.plan(request)
       const reviewed = changeRequestSchema.safeParse(request)
       if (!reviewed.success) throw new PlanningError('invalid', 'Invalid plugin change')
       const plain = { ...reviewed.data, migrate: false }
-      const plan = await base.plan(plain)
+      const change = await base.planChange(plain)
+      const plan = change.plan
       // Preserve base planner's manual classification; migration execution cannot
       // grant a capability the underlying config/package planner refused.
       if (plan.manual) return plan
-      const change = await decorate(await base.verifyPlan(plan.planId, plan.hash), reviewed.data)
+      const baseHash = plan.hash
+      await decorate(change, reviewed.data)
+      base.checkPlan(plan.planId, baseHash)
       if (records.size >= 100) records.delete(records.keys().next().value)
-      records.set(plan.planId, { baseHash: plan.hash, hash: change.plan.hash, request: reviewed.data })
+      records.set(plan.planId, { baseHash, hash: change.plan.hash, request: reviewed.data })
       return change.plan
     },
     /** Fresh base verification precedes fresh metadata and exact migration hash comparison. */
@@ -80,9 +84,10 @@ export function withMigrations(ctx: Context, base: ReturnType<typeof createPlanS
       if (!record) return base.verifyPlan(planId, hash)
       if (record.hash !== hash) throw new PlanningError('stale', 'Plugin change plan expired or changed')
       const change = await decorate(await base.verifyPlan(planId, record.baseHash), record.request)
-      // Metadata work may cross expiry or a concurrent edit; retain the base
-      // planner's final capability guard after that asynchronous boundary.
-      await base.verifyPlan(planId, record.baseHash)
+      // Metadata work can outlive a review or its generation. Check the original
+      // capability without repeating filesystem planning and metadata resolution.
+      base.checkPlan(planId, record.baseHash)
+      if (records.get(planId) !== record) throw new PlanningError('stale', 'Plugin change plan expired or changed')
       if (change.plan.hash !== hash) throw new PlanningError('stale', 'Project changed. Review plugin changes again')
       if (change.plan.manual) throw new PlanningError('unavailable', 'This change needs manual steps')
       return change

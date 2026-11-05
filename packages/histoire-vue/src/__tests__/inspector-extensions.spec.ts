@@ -164,7 +164,7 @@ describe('inspector extensions', () => {
     await fixture.selectFrame('c')
     await fixture.workbench.host.ready
     await flushPromises()
-    const order = [...fixture.inspector().element.querySelectorAll('[data-histoire-contribution], [data-test-id="story-controls"], .inspector-source')]
+    const order = [...fixture.inspector().element.querySelectorAll('[data-histoire-contribution]:not([role="tab"], [role="menuitem"]), [data-test-id="story-controls"], .inspector-source')]
       .map(element => element.getAttribute('data-histoire-contribution') ?? element.getAttribute('data-test-id') ?? 'source')
     expect(order).toEqual(['acme:before', 'story-controls', 'acme:after', 'acme:footer', 'source'])
 

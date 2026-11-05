@@ -1,4 +1,6 @@
 import type { WorkbenchPluginApi } from '../../../histoire-plugin-kit/src/index.js'
+import { createHistoireSessionWithAdapters } from '@histoire/sdk/internal'
+import { HistoireProvider } from '@histoire/vue'
 import { mount } from '@vue/test-utils'
 import { afterEach, expect, it, vi } from 'vitest'
 import { defineComponent, h } from 'vue'
@@ -7,6 +9,7 @@ import { provideExtensionHost } from '../../../histoire-app/src/app/composables/
 import { createMarketplaceStore, provideMarketplaceStore } from '../../../histoire-app/src/app/stores/marketplace.js'
 import { createUiSettingsStore } from '../../../histoire-app/src/app/stores/settings.js'
 import { createMarketplaceClient } from '../../../histoire-app/src/app/util/marketplace-client.js'
+import { sourceFixture } from '../../../histoire-sdk/src/__tests__/fixtures/session.js'
 import { getHistoireIcon } from '../../../histoire-shared/src/icons/index.js'
 import { flushMicrotasks } from '../../../histoire/src/node/__tests__/utils/flush.js'
 import { memoryStorage } from '../../../histoire/src/node/__tests__/utils/settings-storage.js'
@@ -32,19 +35,21 @@ it('lists configured plugins and opens the associated settings section', async (
   resizeObserverFixture()
   const storage = memoryStorage()
   const channel = createMarketplaceTransport()
-  const marketplace = createMarketplaceStore({ client: createMarketplaceClient({ transport: channel.transport }), settings: createUiSettingsStore({ storage }), storage })
+  const marketplace = createMarketplaceStore({ client: createMarketplaceClient({ transport: channel.transport }), settings: createUiSettingsStore({ storage }) })
   cleanups.push(marketplace.dispose)
   const plugin = { id: 'acme', apiVersion: 1 as const, setup(api: WorkbenchPluginApi) {
     api.settings.addSection({ id: 'prefs', label: 'Acme settings', icon: 'settings', mount: () => {} })
   } }
-  const { workbench } = createTestWorkbenchHost({ plugins: [pluginEntry(plugin)] })
+  const session = createHistoireSessionWithAdapters({ url: 'https://book.example/' }, sourceFixture().adapters)
+  cleanups.push(() => session.dispose())
+  const { workbench } = createTestWorkbenchHost({ session, plugins: [pluginEntry(plugin)] })
   cleanups.push(() => workbench.dispose())
   const Parent = defineComponent((_props, { emit }) => {
     provideExtensionHost(workbench)
     provideMarketplaceStore(marketplace)
     return () => h(SettingsPage, { section: 'plugins', onSection: (value: string) => emit('section', value) })
   }, { emits: ['section'] })
-  const wrapper = mount(Parent, { attachTo: document.body })
+  const wrapper = mount(HistoireProvider, { props: { session }, slots: { default: () => h(Parent) }, attachTo: document.body })
   cleanups.push(() => wrapper.unmount())
   await workbench.host.ready
   await flushMicrotasks(30)
@@ -67,7 +72,7 @@ it('lists configured plugins and opens the associated settings section', async (
   expect(document.querySelector('a[aria-label="Repository for Acme"]')?.getAttribute('href')).toBe('https://example.com/repo')
   await wrapper.get('button[aria-label="More actions for Acme"]').trigger('click')
   await wrapper.get('main button[aria-label="Settings: Acme settings"]').trigger('click')
-  expect(wrapper.emitted('section')).toEqual([['acme:prefs']])
+  expect(wrapper.findComponent(Parent).emitted('section')).toEqual([['acme:prefs']])
 
   const network = vi.spyOn(globalThis, 'fetch').mockResolvedValue(new Response(JSON.stringify({ error: 'Config changed on disk. Reload settings.' }), { status: 400, headers: { 'content-type': 'application/json' } }))
   const toggle = wrapper.get('main input[role="switch"][aria-label="Enable Acme"]')
@@ -78,10 +83,12 @@ it('lists configured plugins and opens the associated settings section', async (
   expect((toggle.element as HTMLInputElement).checked).toBe(true)
   expect(network).not.toHaveBeenCalled()
   await toggle.setValue(false)
+  vi.stubGlobal('crypto', { getRandomValues: crypto.getRandomValues.bind(crypto) })
   await wrapper.findAll('button').find(button => button.text() === 'Apply and restart')!.trigger('click')
   await flushMicrotasks(10)
   expect(network).toHaveBeenCalledTimes(1)
   const body = JSON.parse(String(network.mock.calls[0][1]?.body))
+  expect(body.requestId).toMatch(/^[\da-f]{8}-[\da-f]{4}-4[\da-f]{3}-[89ab][\da-f]{3}-[\da-f]{12}$/)
   expect(body).toMatchObject({ action: 'apply', changes: [{ id: '11111111-1111-4111-8111-111111111111', enabled: false }] })
   expect(wrapper.get('[role="alert"]').text()).toContain('Config changed on disk')
 })

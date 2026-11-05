@@ -19,13 +19,11 @@ export const officialPlugins: PluginDetail[] = index.map(({ history: _history, .
   installed: undefined,
 }))
 
-/** Overlay version fields without leaking newer release notes, migrations or requirements backwards. */
-export function officialReleases(id: string): PluginDetail[] {
-  const current = officialPlugins.find(entry => entry.id === id && entry.official)
-  const bundled = index.find(entry => entry.id === id)
-  if (!current || !bundled) return []
+/** Version projections are built once; consumers only override their own outer DTOs. */
+const releasesById = new Map(officialPlugins.filter(entry => entry.official).map((current) => {
+  const bundled = index.find(entry => entry.id === current.id)!
   const history: OfficialHistoryEntry[] = bundled.history
-  return history.map(release => structuredClone({
+  return [current.id, history.map(release => ({
     ...current,
     latest: release.version,
     updatedAt: release.publishedAt,
@@ -39,5 +37,11 @@ export function officialReleases(id: string): PluginDetail[] {
       releaseNotes: release.releaseNotes,
       migrations: release.migrations,
     },
-  }))
+  }))]
+}))
+
+/** Overlay release fields without leaking newer notes, migrations or requirements backwards. */
+export function officialReleases(id: string): PluginDetail[] {
+  // A fresh list lets callers sort history without changing its shared ordering.
+  return (releasesById.get(id) ?? []).map(release => ({ ...release, requires: { ...release.requires }, manifest: { ...release.manifest, requires: { ...release.manifest.requires } } }))
 }

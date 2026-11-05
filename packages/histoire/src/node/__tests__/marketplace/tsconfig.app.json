@@ -15,5 +15,6 @@
     },
     "typeRoots": ["../../../../../histoire-app/node_modules/@types"]
   },
-  "include": ["../../../../../histoire-app/src"]
+  "include": ["../../../../../histoire-app/src", "../../../../../histoire-vue/src/__tests__/marketplace-*/**/*.ts", "../../../../../histoire-vue/src/__tests__/marketplace-*.spec.ts", "../../../../../histoire-vue/src/__tests__/utils/marketplace-*.ts"],
+  "exclude": ["../../../../../histoire-app/src/**/*.spec.ts"]
 }

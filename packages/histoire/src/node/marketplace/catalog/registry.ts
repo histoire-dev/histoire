@@ -1,3 +1,4 @@
+import type { RegistryPackument } from './registry-entry.js'
 import { Buffer } from 'node:buffer'
 import { z } from 'zod'
 import { createRegistryCache } from './cache.js'
@@ -74,11 +75,17 @@ export function createRegistryClient(root: string, options: RegistryOptions = {}
     const requestSignal = signal ? AbortSignal.any([signal, deadline]) : deadline
     const config = await settings()
     const url = registryPackumentUrl(config, id)
-    return cache.get(url, (value) => {
-      const parsed = packumentSchema.parse(value)
-      if (parsed.name !== id || !Object.hasOwn(parsed.versions, parsed['dist-tags'].latest)) throw new Error('Invalid registry identity or latest version')
-      return parsed
-    }, () => readJson(url, 8 * 1024 * 1024, requestSignal, config.authorizationFor(url)))
+    const result = await cache.get(url, value => validateIdentity(packumentSchema.parse(value), id), () => readJson(url, 8 * 1024 * 1024, requestSignal, config.authorizationFor(url)))
+    validateIdentity(result.value, id)
+    return result
+  }
+  /** Planning reads existing memory/disk metadata without fetching or persisting anything. */
+  async function cachedPackument(id: string) {
+    packageName.parse(id)
+    const config = await settings()
+    const result = await cache.read(registryPackumentUrl(config, id), value => validateIdentity(packumentSchema.parse(value), id))
+    if (result) validateIdentity(result.value, id)
+    return result
   }
   /** Search every page before local filtering; a whole refresh shares one deadline. */
   async function catalog() {
@@ -104,5 +111,11 @@ export function createRegistryClient(root: string, options: RegistryOptions = {}
     stale ||= entries.some(entry => entry.stale)
     return { packuments: entries.map(entry => entry.value), stale }
   }
-  return { packument, catalog }
+  return { packument, cachedPackument, catalog }
+}
+
+/** Check every cache boundary, including memory inserted by other registry consumers. */
+function validateIdentity(value: RegistryPackument, id: string): RegistryPackument {
+  if (value.name !== id || !Object.hasOwn(value.versions, value['dist-tags'].latest)) throw new Error('Invalid registry identity or latest version')
+  return value
 }

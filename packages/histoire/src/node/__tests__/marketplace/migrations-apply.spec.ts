@@ -3,8 +3,9 @@ import { describe, expect, it } from 'vitest'
 import { validateMarketplaceManifest } from '../../marketplace/manifest/index.js'
 import { applyMigrations } from '../../marketplace/migrations/apply.js'
 import { selectMigrations } from '../../marketplace/migrations/select.js'
+import { jobManifest } from './jobs-fixture.js'
 
-const manifest: MarketplaceManifest = { displayName: 'Test', summary: 'Test', category: 'testing', monogram: 'T', tint: 'blue', config: { import: 'TestPlugin' } }
+const manifest: MarketplaceManifest = { ...jobManifest, summary: 'Test' }
 /** Real source editor: target alias differs from unrelated call; callbacks must survive. */
 function source(options: string): string {
   return `import { TestPlugin as Target } from 'test-plugin'\nimport { Other } from 'other'\nexport default { plugins: [Other({ figma: { token: 'keep' } }), Target(${options})], theme: { title: 'Keep' } }\n`

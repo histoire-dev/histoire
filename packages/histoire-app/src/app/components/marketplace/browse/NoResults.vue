@@ -3,6 +3,7 @@ import type { CatalogPage } from '@histoire/shared'
 import { BuiltinIcon, HstButton } from '@histoire/controls/vue'
 import { computed } from 'vue'
 import { useMarketplaceStore } from '../../../stores/marketplace.js'
+import BaseChip from '../../base/BaseChip.vue'
 import WorkbenchEmptyState from '../../shell/WorkbenchEmptyState.vue'
 import { additions, categories, frameworkLabel } from './labels.js'
 
@@ -40,9 +41,9 @@ const context = computed(() => [
       </template>
     </WorkbenchEmptyState>
     <div v-if="collections.length" class="htw:flex htw:flex-wrap htw:items-center htw:justify-center htw:gap-[8px] htw:text-[12px]">
-      <span class="htw:text-muted">Try</span><HstButton v-for="collection in collections" :key="collection.id" color="flat" class="htw:h-[22px] htw:rounded-full htw:bg-surface htw:px-[9px] htw:py-0 htw:text-[11px] htw:font-semibold htw:text-body htw:inset-ring htw:inset-ring-border" :aria-label="`Try ${collection.title}`" @click="$emit('collection', collection)">
+      <span class="htw:text-muted">Try</span><BaseChip v-for="collection in collections" :key="collection.id" as="button" tone="outline" :aria-label="`Try ${collection.title}`" @click="$emit('collection', collection)">
         {{ collection.title }}
-      </HstButton>
+      </BaseChip>
     </div>
     <div class="htw:mt-[32px] htw:box-border htw:flex htw:w-full htw:max-w-[560px] htw:items-center htw:gap-[14px] htw:rounded-[14px] htw:border htw:border-solid htw:border-border htw:bg-surface htw:px-[18px] htw:py-[16px]">
       <span aria-hidden="true" class="htw:grid htw:size-[36px] htw:shrink-0 htw:place-items-center htw:rounded-[10px] htw:bg-chip htw:text-body"><BuiltinIcon icon="code" :size="18" /></span>

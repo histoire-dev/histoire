@@ -17,27 +17,38 @@ export function createPlanStore(options: PlannerOptions) {
       if (record.expires <= now()) plans.delete(id)
     }
   }
+  /** Returns a private planned change so decorators need no admission recompute. */
+  async function planChange(request: ChangeRequest): Promise<PlannedChange> {
+    if (retired) throw new PlanningError('stale', 'Plugin change generation retired')
+    prune()
+    const result = await computePlan(options, request)
+    if (retired) throw new PlanningError('stale', 'Plugin change generation retired')
+    result.plan.planId = randomUUID()
+    // Evict oldest reviews when a client repeatedly changes form values.
+    if (plans.size >= 100) plans.delete(plans.keys().next().value)
+    plans.set(result.plan.planId, { request: structuredClone(result.request), hash: result.plan.hash, expires: now() + 15 * 60 * 1000 })
+    return result
+  }
+  /** Checks capability lifetime again after asynchronous decorator work. */
+  function checkPlan(planId: string, hash: string): void {
+    prune()
+    if (retired) throw new PlanningError('stale', 'Plugin change generation retired')
+    const record = plans.get(planId)
+    if (!record || record.hash !== hash) throw new PlanningError('stale', 'Plugin change plan expired or changed')
+  }
   return {
+    planChange,
+    checkPlan,
     /** Stores a read-only plan; caller mutation cannot alter later admission. */
     async plan(request: ChangeRequest) {
-      if (retired) throw new PlanningError('stale', 'Plugin change generation retired')
-      prune()
-      const result = await computePlan(options, request)
-      if (retired) throw new PlanningError('stale', 'Plugin change generation retired')
-      result.plan.planId = randomUUID()
-      // Evict oldest reviews when a client repeatedly changes form values.
-      if (plans.size >= 100) plans.delete(plans.keys().next().value)
-      plans.set(result.plan.planId, { request: structuredClone(result.request), hash: result.plan.hash, expires: now() + 15 * 60 * 1000 })
-      return result.plan
+      return (await planChange(request)).plan
     },
     /** Recomputes from disk and metadata before granting private execution input. */
     async verifyPlan(planId: string, hash: string): Promise<PlannedChange> {
-      prune()
-      const stored = plans.get(planId)
-      if (!stored || stored.hash !== hash) throw new PlanningError('stale', 'Plugin change plan expired or changed')
+      checkPlan(planId, hash)
+      const stored = plans.get(planId)!
       const current = await computePlan(options, stored.request)
-      prune()
-      if (retired || !plans.has(planId)) throw new PlanningError('stale', 'Plugin change generation retired')
+      checkPlan(planId, hash)
       if (current.plan.hash !== hash) throw new PlanningError('stale', 'Project changed. Review plugin changes again')
       if (current.plan.manual) throw new PlanningError('unavailable', 'This change needs manual steps')
       current.plan.planId = planId

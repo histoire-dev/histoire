@@ -9,8 +9,6 @@ import { useShell } from '../../composables/shell.js'
 import { useAgentsStore } from '../../stores/agents.js'
 import { useOptionalMarketplaceStore } from '../../stores/marketplace.js'
 import { useShortcutRegistry } from '../../util/shortcuts.js'
-import { usePluginUpdates } from '../pages/settings/plugins/use-plugin-updates.js'
-import { useSettingsJobs } from '../pages/settings/plugins/use-settings-jobs.js'
 import { getPluginRailBadge, type RailBadgeTone, type RailItem, railItems, toPluginRailItem } from './rail-items.js'
 import RailButton from './RailButton.vue'
 import { handleShellShortcut } from './shortcuts.js'
@@ -46,8 +44,7 @@ const items = computed(() => [...railItems.filter(item => shell.dev || !item.dev
 const agents = useAgentsStore()
 // Standalone workbenches provide marketplace; embedded shells may omit it.
 const marketplace = useOptionalMarketplaceStore()
-const updates = marketplace ? usePluginUpdates(marketplace, shell.dev) : undefined
-if (marketplace) useSettingsJobs(marketplace, shell.dev)
+const updates = marketplace?.updates
 /** Threads blocked on a question for the user. */
 const waiting = computed(() => agents?.needsInput.value.length ?? 0)
 /**

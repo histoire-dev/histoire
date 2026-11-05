@@ -1,24 +1,16 @@
 import type { ChangePlan, JobState, PluginDetail } from '../../../../histoire-shared/src/index.js'
 import { createHistoireSessionWithAdapters } from '@histoire/sdk/internal'
-import { HistoireProvider } from '@histoire/vue'
-import { mount } from '@vue/test-utils'
-import { defineComponent, h, nextTick } from 'vue'
+import { h, nextTick } from 'vue'
 import MarketplaceInstall from '../../../../histoire-app/src/app/components/marketplace/install/MarketplaceInstall.vue'
-import { provideExtensionHost } from '../../../../histoire-app/src/app/composables/extensions.js'
-import { createMarketplaceStore, provideMarketplaceStore } from '../../../../histoire-app/src/app/stores/marketplace.js'
-import { createUiSettingsStore } from '../../../../histoire-app/src/app/stores/settings.js'
-import { createMarketplaceClient } from '../../../../histoire-app/src/app/util/marketplace-client.js'
 import { sourceFixture } from '../../../../histoire-sdk/src/__tests__/fixtures/session.js'
 import { flushMicrotasks } from '../../../../histoire/src/node/__tests__/utils/flush.js'
-import { memoryStorage } from '../../../../histoire/src/node/__tests__/utils/settings-storage.js'
 import { createTestWorkbenchHost, pluginEntry } from '../../../../histoire/src/node/__tests__/utils/workbench-extensions.js'
-import { resizeObserverFixture } from '../fixtures/resize-observer.js'
-import { officialPlugins } from '../utils/marketplace-official.js'
-import { createMarketplaceTransport } from '../utils/marketplace-transport.js'
+import { plugin as bundledPlugin } from '../utils/marketplace-official.js'
+import { buttonByName, lastRequest, mountMarketplace } from '../utils/marketplace-transport.js'
 
 /** Bundled metadata, extended only for conditional form coverage. */
 export function plugin(): PluginDetail {
-  const detail = structuredClone(officialPlugins.find(item => item.id === '@histoire/plugin-a11y')!) as PluginDetail
+  const detail = bundledPlugin()
   detail.provenance = true
   detail.manifest.config.options = [
     { key: 'test', label: 'Run as story tests', type: 'boolean', default: false },
@@ -52,42 +44,30 @@ export function job(overrides: Partial<JobState> = {}): JobState {
 
 /** Real wizard/store/client; substitute external transport and Map-backed storage. */
 export function setup(cleanups: (() => unknown)[], offline = false, withPane = false) {
-  resizeObserverFixture()
-  const channel = createMarketplaceTransport()
-  if (offline) channel.transport.available = () => false
-  const storage = memoryStorage()
-  const store = createMarketplaceStore({ client: createMarketplaceClient({ transport: channel.transport }), settings: createUiSettingsStore({ storage }), storage })
-  store.openMarketplace('all')
-  store.startInstall({ id: '@histoire/plugin-a11y', kind: 'install', version: '1.0.0', prefs: store.prefs.value })
   const session = createHistoireSessionWithAdapters({ url: 'https://book.example/' }, sourceFixture().adapters)
   const { workbench, targets } = createTestWorkbenchHost({ session, plugins: withPane
     ? [pluginEntry({
         id: 'a11y',
         apiVersion: 1,
         setup(api) {
-          api.shell.addPane({ id: 'results', label: 'Audit results', icon: 'document', mount: () => {} })
+          api.shell.addPane({ id: 'issues', label: 'Audit results', icon: 'document', mount: () => {} })
         },
       })]
     : [] })
-  const Host = defineComponent(() => {
-    provideMarketplaceStore(store)
-    provideExtensionHost(workbench)
-    store.connect()
-    return () => h(MarketplaceInstall)
+  const { channel, store, storage, wrapper, dispose } = mountMarketplace({
+    offline,
+    session,
+    workbench,
+    setup(store) {
+      store.openMarketplace('all')
+      store.startInstall({ id: '@histoire/plugin-a11y', kind: 'install', version: '1.0.0', prefs: store.prefs.value })
+      store.connect()
+    },
+    render: () => h(MarketplaceInstall),
   })
-  const wrapper = mount(HistoireProvider, { props: { session }, slots: { default: () => h(Host) }, attachTo: document.body })
-  cleanups.push(async () => {
-    wrapper.unmount()
-    store.dispose()
-    await workbench.dispose()
-    await session.dispose()
-  })
+  cleanups.push(dispose)
   /** Last outbound request of one exact event. */
-  function request(event = 'plan') {
-    const found = channel.sent.filter(item => item.event === `histoire:ui:marketplace-${event}`).at(-1)
-    if (!found) throw new Error(`Missing request: ${event}`)
-    return found.value
-  }
+  const request = (event = 'plan') => lastRequest(channel, event).value
   /** Resolve detail followed by initial plan. */
   async function ready() {
     await nextTick()
@@ -97,11 +77,7 @@ export function setup(cleanups: (() => unknown)[], offline = false, withPane = f
     await flushMicrotasks(6)
   }
   /** Visible action, independent of component or styling. */
-  function button(name: string) {
-    const found = wrapper.findAll('button').find(item => item.text().trim() === name || item.attributes('aria-label') === name)
-    if (!found) throw new Error(`Missing button: ${name}`)
-    return found
-  }
+  const button = (name: string) => buttonByName(wrapper, name)
   /** Complete successful start; later states use the real store subscription. */
   async function start() {
     await button('Continue').trigger('click')

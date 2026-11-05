@@ -8,15 +8,24 @@ export function sanitizeOutput(text: string): string {
     .replace(/((?:_authToken|_password|authorization)\s*[:=]\s*)\S+/gi, '$1[credential]')
 }
 
+/** Both streams share one retained-output budget while keeping separate partial lines. */
+const budgets = new WeakMap<string[], { /** Serialized array bytes, including separators. */ bytes: number }>()
+
 /** Keeps complete sanitized lines without publishing credential fragments between chunks. */
 export function createJobOutput(lines: string[], changed: () => void) {
   const strip = createControlStripper()
+  const budget = budgets.get(lines) ?? { bytes: Buffer.byteLength(JSON.stringify(lines)) }
+  budgets.set(lines, budget)
   let pending = ''
   let dropping = false
   /** Retains bounded complete lines; JSON overhead is counted before publication. */
   function append(line: string) {
-    lines.push(sanitizeOutput(line).slice(0, 2000))
-    while (lines.length > 400 || Buffer.byteLength(JSON.stringify(lines)) > 40000) lines.shift()
+    const sanitized = sanitizeOutput(line).slice(0, 2000)
+    budget.bytes += Buffer.byteLength(JSON.stringify(sanitized)) + (lines.length ? 1 : 0)
+    lines.push(sanitized)
+    while (lines.length > 400 || budget.bytes > 40000) {
+      budget.bytes -= Buffer.byteLength(JSON.stringify(lines.shift()!)) + (lines.length ? 1 : 0)
+    }
     changed()
   }
   return {

@@ -23,6 +23,18 @@ describe('marketplace package output', () => {
     output.write(`${'"'.repeat(2000)}\n`.repeat(400))
     expect(Buffer.byteLength(JSON.stringify(lines))).toBeLessThanOrEqual(40000)
   })
+  it('shares the serialized budget across stdout and stderr, including escaped and UTF-8 bytes', () => {
+    const lines: string[] = []
+    const stdout = createJobOutput(lines, () => {})
+    const stderr = createJobOutput(lines, () => {})
+    stdout.write(`${'é'.repeat(1900)}\n`.repeat(12))
+    stderr.write(`${'"'.repeat(1900)}\n`.repeat(12))
+    expect(lines).toEqual(Array.from({ length: 10 }, () => '"'.repeat(1900)))
+    expect(Buffer.byteLength(JSON.stringify(lines))).toBe(38031)
+    stdout.write('done\n')
+    expect(lines.at(-1)).toBe('done')
+    expect(Buffer.byteLength(JSON.stringify(lines))).toBeLessThanOrEqual(40000)
+  })
   it.each([
     ['ERR_PNPM_PEER_DEP_ISSUES\nunmet peer vite@"^7.0.0": found 6.1.0', 'peer-conflict'],
     ['npm error ERESOLVE unable to resolve dependency tree\nFound: vite@6.1.0', 'peer-conflict'],

@@ -3,15 +3,16 @@ import type { WorkbenchContextAction } from '../../composables/context-menu.js'
 import type { FrameAction } from '../../util/frame-actions.js'
 import { getControlElement, HstButton, HstTextarea } from '@histoire/controls/vue'
 import { useHistoireSnapshot } from '@histoire/vue'
-import { useHistoireContext } from '@histoire/vue/internal'
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useContextMenu } from '../../composables/context-menu.js'
 import { useFrameActions } from '../../util/frame-actions.js'
 import { useShortcutRegistry } from '../../util/shortcuts.js'
+import { usePopoverOverlay } from '../base/popover/overlay.js'
+import { useMenuKeyboard } from '../base/use-menu-keyboard.js'
 import MenuItem from './MenuItem.vue'
 import SubMenu from './SubMenu.vue'
 
-const context = useHistoireContext()
+const overlay = usePopoverOverlay()
 const snapshot = useHistoireSnapshot()
 const state = useContextMenu()
 const registry = useFrameActions()
@@ -48,24 +49,17 @@ function run(entry: MenuEntry) {
   else if (entry.kind === 'context' && captured) void state?.run(entry.action, captured)
 }
 
-/** Root arrow navigation skips disabled items and hidden submenu descendants. */
-function keyboard(event: KeyboardEvent) {
+const { navigate } = useMenuKeyboard({ close: () => state?.close(), tab: 'native' })
+/** Context controller owns Escape and focus return; movement stays shared. */
+function keyboard(event: KeyboardEvent): void {
   if (event.key === 'Escape') {
     event.preventDefault()
     event.stopPropagation()
     state?.close(true)
-    return
   }
-  if (event.key === 'Tab') {
-    state?.close()
-    return
+  else {
+    navigate(event)
   }
-  if (!['ArrowUp', 'ArrowDown', 'Home', 'End'].includes(event.key)) return
-  event.preventDefault()
-  const buttons = [...menu.value!.querySelectorAll<HTMLButtonElement>('[role="menuitem"]:not(:disabled)')].filter(button => button.closest('[role="menu"]') === menu.value)
-  const index = buttons.indexOf(document.activeElement as HTMLButtonElement)
-  const next = event.key === 'Home' ? 0 : event.key === 'End' ? buttons.length - 1 : (index + (event.key === 'ArrowDown' ? 1 : -1) + buttons.length) % buttons.length
-  buttons[next]?.focus()
 }
 
 /** Pointer dismissal leaves native preview content contextmenu untouched. */
@@ -101,7 +95,7 @@ onBeforeUnmount(() => document.removeEventListener('pointerdown', outside, true)
 </script>
 
 <template>
-  <Teleport :to="context.overlay.value ?? context.root.value ?? 'body'">
+  <Teleport :to="overlay">
     <div v-if="target && actions.length" ref="menu" class="histoire-context-menu histoire-control-popover htw:fixed htw:z-60 htw:w-[264px] htw:max-w-[calc(100vw-16px)] htw:max-h-[calc(100vh-16px)] htw:p-[5px]" role="menu" :aria-label="label" :style="{ left: `${position.left}px`, top: `${position.top}px` }" @keydown="keyboard">
       <p class="htw:mt-[7px] htw:mx-[9px] htw:mb-[9px] htw:truncate htw:text-muted htw:text-[11px] htw:font-bold">
         {{ label }}

@@ -1,12 +1,11 @@
 import type { ChangePlan, ChangeRequest, MarketplaceManifest } from '@histoire/shared'
+import { executablePackageManagers, packageCommand, pluginOptions } from '@histoire/shared'
 import { printValue } from '../../config/codemod/source-edit.js'
-import { pluginOptions } from './options.js'
-import { packageCommand } from './package-manager.js'
 
 /** Builds copyable commands and literal snippet without an executable capability. */
 export function manualPlan(reason: NonNullable<ChangePlan['manual']>['reason'], request: ChangeRequest, manifest: MarketplaceManifest): NonNullable<ChangePlan['manual']> {
-  const steps = (['pnpm', 'npm', 'yarn', 'bun'] as const).flatMap((name) => {
-    const command = packageCommand({ name, source: 'override', workspaceRoot: false }, request)
+  const steps = executablePackageManagers.flatMap((name) => {
+    const command = packageCommand({ name, workspaceRoot: false }, request)
     return command ? [{ title: `Run with ${name}`, code: command.display }] : []
   })
   const values = pluginOptions(manifest.config.options ?? [], request.options)

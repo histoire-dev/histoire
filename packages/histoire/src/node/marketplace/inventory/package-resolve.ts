@@ -5,6 +5,7 @@ import { findProjectPackageDirectories } from '../../util/resolve-package.js'
 import { officialPlugins } from '../catalog/official.js'
 import { detectProjectSignals } from '../catalog/signals.js'
 import { packageName as packageNameSchema } from '../catalog/validation.js'
+import { exactVersion } from '../changes/validation.js'
 import { validateMarketplaceManifest } from '../manifest/index.js'
 
 /** Resolved public package identity; no filesystem locations cross the channel. */
@@ -43,7 +44,7 @@ export async function readInstalledPackage(root: string, name: string): Promise<
 }
 
 /** Nearest declaration wins, including workspace-root declarations inherited by child packages. */
-async function projectDependencies(root: string): Promise<Record<string, string>> {
+export async function projectDependencies(root: string): Promise<Record<string, string>> {
   const dependencies: Record<string, string> = {}
   let directory = root
   while (true) {
@@ -66,11 +67,11 @@ function packageManifest(name: string, data: Record<string, any>): MarketplaceMa
 }
 
 /** Resolve aliases through source specifiers, keeping project ranges separate from installed bytes. */
-export async function resolvePluginPackage(root: string, name: string, specifier?: string, frameworks?: readonly string[]): Promise<InstalledPackage> {
+export async function resolvePluginPackage(root: string, name: string, specifier?: string, frameworks?: readonly string[], inputs: PackageResolutionInputs = {}): Promise<InstalledPackage> {
   const builtin = name.startsWith('builtin:')
   const packageName = packageNameFromSpecifier(specifier ?? name)
-  const data = packageName ? await readInstalledPackage(root, packageName) : {}
-  const dependencies = await projectDependencies(root)
+  const data = inputs.package ?? (packageName ? await readInstalledPackage(root, packageName) : {})
+  const dependencies = inputs.dependencies ?? await projectDependencies(root)
   const range = packageName ? dependencies[packageName] : undefined
   const installedVersion = typeof data.version === 'string' && data.version.length <= 128 ? data.version : undefined
   const local = !builtin && (!packageName || !installedVersion || /^(?:workspace:|file:|link:)/.test(range ?? ''))
@@ -81,9 +82,15 @@ export async function resolvePluginPackage(root: string, name: string, specifier
     ...(local ? { version: 'local' } : installedVersion ? { version: installedVersion } : {}),
     local,
     official: Boolean(officialPlugins.find(entry => entry.id === packageName)?.official),
-    pinned: Boolean(range && /^\d+\.\d+\.\d+(?:-[\w.-]+)?(?:\+[\w.-]+)?$/.test(range)),
+    pinned: exactVersion.safeParse(range).success,
     required: builtin || Boolean(manifest?.category === 'frameworks' && manifest.frameworks?.some(framework => detected.includes(framework))),
   }
+}
+
+/** Inventory-scoped evidence avoids rereading dependencies and installed JSON per projection. */
+export interface PackageResolutionInputs {
+  /** Nearest project declarations, captured once for all inventory rows. */ dependencies?: Readonly<Record<string, string>>
+  /** Identity-checked package JSON, shared with metadata projection. */ package?: Record<string, any>
 }
 
 /** Synchronous fallback for callers rendering a virtual module without a captured inventory. */
