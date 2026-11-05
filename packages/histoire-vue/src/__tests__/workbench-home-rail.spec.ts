@@ -27,10 +27,17 @@ describe('home rail ownership', () => {
     })
     const wrapper = mount(HistoireProvider, { props: { session }, slots: { default: () => h(host) } })
     try {
-      expect(wrapper.get('[aria-label="Home"]').attributes('aria-pressed')).toBe('true')
       if (action === 'home') {
+        // Open pane outranks Home route; Home highlights only while panel is collapsed.
         expect(wrapper.findAll('[data-shell-pane][aria-pressed="true"]')).toHaveLength(1)
+        expect(wrapper.get('[aria-label="Home"]').attributes('aria-pressed')).toBe('false')
+        expect(wrapper.get('[aria-label="Search"]').attributes('aria-pressed')).toBe('true')
         expect(wrapper.get('[aria-label="Search"]').attributes('aria-expanded')).toBe('true')
+        shell.togglePanel()
+        await nextTick()
+        expect(wrapper.get('[aria-label="Home"]').attributes('aria-pressed')).toBe('true')
+        expect(wrapper.get('[aria-label="Search"]').attributes('aria-pressed')).toBe('false')
+        shell.togglePanel()
         homeActive.value = false
         await nextTick()
         expect(wrapper.get('[aria-label="Home"]').attributes('aria-pressed')).toBe('false')

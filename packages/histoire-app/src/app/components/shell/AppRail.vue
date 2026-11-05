@@ -20,7 +20,7 @@ const props = defineProps<{
   panelId: string
   /** Exact home destination is supplied by standalone route adapter. */
   homeHref: string
-  /** Active Home route takes highlight priority over every side pane. */
+  /** Active Home route; highlights Home only while side panel is collapsed. */
   homeActive?: boolean
   /** Configured external logo target, if any. */
   logoHref?: string
@@ -66,6 +66,16 @@ function badgeFor(item: RailItem): number | string | undefined {
 function toneFor(item: RailItem): RailBadgeTone | undefined {
   return item.id === 'ai' && waiting.value ? 'attention' : item.badgeTone
 }
+/**
+ * Exactly one highlighted destination: open pane outranks Home route; Settings outranks both.
+ * @param item Rail destination.
+ */
+function isActive(item: RailItem): boolean {
+  if (props.settingsActive) return false
+  // Pane 'home' is the transient state Settings leaves behind, so it counts as collapsed.
+  if (item.id === 'home') return !!props.homeActive && (!shell.panelOpen.value || shell.pane.value === 'home')
+  return shell.pane.value === item.id && shell.panelOpen.value
+}
 const logo = computed(() => props.logos?.square ?? (dark.value ? props.logos?.dark : props.logos?.light) ?? HistoireLogo)
 let root: HTMLElement | null = null
 
@@ -109,7 +119,7 @@ useHistoireResource(() => {
       <RailButton
         v-for="item in items" :key="item.id"
         :label="item.label" :icon="item.icon"
-        :active="(item.id === 'home' ? homeActive : !homeActive && shell.pane.value === item.id && shell.panelOpen.value) && !settingsActive"
+        :active="isActive(item)"
         :expanded="item.id === 'home' ? undefined : shell.pane.value === item.id && shell.panelOpen.value"
         :controls="item.id === 'home' ? undefined : panelId"
         :badge="badgeFor(item)"
