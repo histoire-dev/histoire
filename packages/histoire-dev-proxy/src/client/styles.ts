@@ -1,7 +1,9 @@
+import { startupBackground } from '../appearance.js'
+
 /** Workbench dark palette (`histoire-app` tokens.pcss), so the handoff keeps the same colors. */
 const darkTokens = `
   color-scheme: dark;
-  --background: rgb(13 14 17);
+  --background: ${startupBackground.dark};
   --surface: rgb(22 23 27);
   --text: rgb(230 231 234);
   --muted: rgb(138 142 151);
@@ -16,7 +18,7 @@ export const startupStyles = `
 /* Light palette mirrors workbench home tokens; dark follows the stored app choice, else the system. */
 :root {
   color-scheme: light;
-  --background: rgb(247 247 248);
+  --background: ${startupBackground.light};
   --surface: rgb(255 255 255);
   --text: rgb(24 24 27);
   --muted: rgb(95 99 112);

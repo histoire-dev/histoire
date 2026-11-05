@@ -6,6 +6,7 @@ import { APP_PATH, getHistoireStyleFiles } from '../alias.js'
 import { getDevClientPreloads } from '../server/client-ready.js'
 import { RESOLVED_PREVIEW_RUNTIME_ID } from '../virtual/index.js'
 import { renderVitestRunnerBootstrap } from '../virtual/vitest-runner-bootstrap.js'
+import { renderAppShellAppearance } from './app-shell-appearance.js'
 import { ENTRY_RELOAD_SCRIPT, renderModuleEntry, UNHANDLED_MODULE_FAILURE_SCRIPT } from './entry-reload.js'
 import { versionModuleFile } from './module-version.js'
 
@@ -99,6 +100,7 @@ function renderAppHtml(ctx: Context, server: ViteDevServer) {
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="description" content="">
+    ${renderAppShellAppearance(ctx.config.theme)}
     ${preloads}
     ${ctx.config.theme?.favicon ? `<link rel="icon" type="${lookupMime(ctx.config.theme.favicon)}" href="${base}${ctx.config.theme.favicon}"/>` : ''}
   </head>

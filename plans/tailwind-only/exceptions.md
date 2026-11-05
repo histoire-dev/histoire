@@ -79,3 +79,5 @@ utilities also win equal-specificity conflicts across files.
 ## Standalone development startup document
 
 `packages/histoire-dev-proxy/src/client/styles.ts` owns minimal inline document CSS for proxy loading/error screen. Public HTTP responds before project config, Vite, Vue, or workbench styles exist; startup cannot import Tailwind workbench bundle. Styles stay scoped to standalone document and include light/dark appearance. Keyframes animate the wireframe logo (marching dashes, failure falter), the status shimmer and state transitions in place of a spinner; no colored border decoration. Every animation and transition is disabled under reduced motion. This exception is listed in `app-styling-guard.spec.ts`.
+
+`packages/histoire/src/node/vite/app-shell-appearance.ts` sets an inline `background-color`/`color-scheme` on the dev app shell `<html>` (and the `htw-dark` class) before first paint, from `startupBackground` in `packages/histoire-dev-proxy/src/appearance.ts`. The workbench bundle injects its CSS only once JS runs, so without it the handoff from the startup document flashes white. The mounted workbench covers the viewport and owns appearance afterwards.

@@ -28,6 +28,10 @@
     "./protocol": {
       "types": "./dist/protocol.d.ts",
       "default": "./dist/protocol.js"
+    },
+    "./appearance": {
+      "types": "./dist/appearance.d.ts",
+      "default": "./dist/appearance.js"
     }
   },
   "files": [
