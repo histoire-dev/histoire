@@ -50,13 +50,13 @@ describe('canvas preference ownership', () => {
   it('clamps saved zoom and persists preferences without pan or selected target', () => {
     const setItem = vi.fn()
     const store = createCanvasStore({ storage: { getItem: () => '{"zoomByArrange":{"grid":99,"list":99,"matrix":99},"tool":"measure","frameBackground":"white"}', setItem } })
-    expect(store.zoom).toBe(4)
+    expect(store.zoom).toBe(20)
     expect(store.tool).toBe('measure')
     expect(setItem).not.toHaveBeenCalled()
     store.selectedFrame = 'frame'
     store.panBy({ x: 50, y: 20 })
     store.setTool('select')
-    expect(JSON.parse(setItem.mock.calls.at(-1)![1])).toEqual({ version: 3, zoomByArrange: { single: 'fit', grid: 4, list: 4, matrix: 4 }, tool: 'select', frameBackground: 'white', autoFitContent: false })
+    expect(JSON.parse(setItem.mock.calls.at(-1)![1])).toEqual({ version: 3, zoomByArrange: { single: 'fit', grid: 20, list: 20, matrix: 20 }, tool: 'select', frameBackground: 'white', autoFitContent: false })
     expect(createCanvasStore().selectedFrame).toBe(null)
   })
 

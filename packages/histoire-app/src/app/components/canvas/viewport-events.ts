@@ -2,6 +2,7 @@ import type { CanvasFrames } from '../../composables/canvas-settings.js'
 import type { CanvasStore } from '../../stores/canvas.js'
 import type { CanvasFrameLayout } from './frame-layout.js'
 import type { usePointerPan } from './pan/usePointerPan.js'
+import { wheelZoom } from './pan/usePanZoom.js'
 import { isCanvasViewContent } from './views/view-input.js'
 
 /** Frame pointer coordinates emitted to the comment placement flow. */
@@ -47,7 +48,7 @@ export function createCanvasViewportEvents(options: {
     event.preventDefault()
     if (event.ctrlKey || event.metaKey) {
       const rect = viewport.getBoundingClientRect()
-      options.canvas.setZoom(options.canvas.effectiveZoom * Math.exp(-event.deltaY * 0.002), { x: event.clientX - rect.left, y: event.clientY - rect.top })
+      options.canvas.setZoom(wheelZoom(options.canvas.effectiveZoom, event.deltaY), { x: event.clientX - rect.left, y: event.clientY - rect.top })
     }
     else {
       options.canvas.panBy({ x: -event.deltaX, y: -event.deltaY })

@@ -44,11 +44,21 @@ export interface PanZoomState {
 /** Smallest usable canvas scale, which preserves readable frame chrome. */
 const MIN_ZOOM = 0.1
 /** Largest supported canvas scale. */
-const MAX_ZOOM = 4
+const MAX_ZOOM = 20
 
-/** Keeps zoom within the supported 10%–400% range. */
+/** Keeps zoom within the supported 10%–2000% range. */
 export function clampZoom(value: number): number {
   return Number.isNaN(value) ? 1 : Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, value))
+}
+
+/**
+ * Zoom after one wheel step, exponential so each notch scales by the same factor.
+ * A step crossing 100% stops on it, keeping natural size reachable from any starting zoom.
+ * Starting exactly on 100% always moves away, so the next step is never swallowed.
+ */
+export function wheelZoom(zoom: number, deltaY: number): number {
+  const next = zoom * Math.exp(-deltaY * 0.002)
+  return (zoom < 1 && next >= 1) || (zoom > 1 && next <= 1) ? 1 : next
 }
 
 /** Converts canvas coordinates into pixels relative to the viewport. */

@@ -172,14 +172,14 @@ describe('canvas zoom preferences', () => {
   it('repairs malformed slots, clamps numeric values, and preserves other preferences', () => {
     const storage = createStorage({
       '_histoire-ui-canvas': {
-        zoomByArrange: { grid: -3, list: 'invalid', matrix: 9 },
+        zoomByArrange: { grid: -3, list: 'invalid', matrix: 99 },
         tool: 'pan',
         frameBackground: '#abcdef',
       },
     })
     const canvas = createCanvasStore({ storage })
 
-    expect(canvas.zoomByArrange).toEqual({ single: 'fit', grid: 0.1, list: 'selection', matrix: 4 })
+    expect(canvas.zoomByArrange).toEqual({ single: 'fit', grid: 0.1, list: 'selection', matrix: 20 })
     expect(canvas.tool).toBe('pan')
     expect(canvas.frameBackground).toBe('#abcdef')
   })

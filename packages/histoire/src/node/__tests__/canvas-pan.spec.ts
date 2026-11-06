@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 import { ref } from 'vue'
-import { canvasToClient, clampZoom, clientToCanvas, fitCanvas, usePanZoom, zoomAroundPoint } from '../../../../histoire-app/src/app/components/canvas/pan/usePanZoom.js'
+import { canvasToClient, clampZoom, clientToCanvas, fitCanvas, usePanZoom, wheelZoom, zoomAroundPoint } from '../../../../histoire-app/src/app/components/canvas/pan/usePanZoom.js'
 import { usePointerPan } from '../../../../histoire-app/src/app/components/canvas/pan/usePointerPan.js'
 import { isTypingTarget, useSpacePan } from '../../../../histoire-app/src/app/components/canvas/pan/useSpacePan.js'
 
@@ -22,8 +22,17 @@ describe('canvas transforms', () => {
     const next = zoomAroundPoint(0.75, 2, offset, cursor)
     expect(canvasToClient(canvasPoint, next.zoom, next.offset)).toEqual(cursor)
     expect(clampZoom(0)).toBe(0.1)
-    expect(clampZoom(5)).toBe(4)
+    expect(clampZoom(21)).toBe(20)
     expect(clampZoom(Number.NaN)).toBe(1)
+  })
+
+  it('lands on 100% when a wheel step crosses it, from either side, and leaves it again', () => {
+    expect(wheelZoom(0.9, -100)).toBe(1)
+    expect(wheelZoom(1.1, 100)).toBe(1)
+    expect(wheelZoom(1, -100)).toBeGreaterThan(1)
+    expect(wheelZoom(1, 100)).toBeLessThan(1)
+    expect(wheelZoom(0.3, -100)).toBeCloseTo(0.3 * Math.exp(0.2))
+    expect(wheelZoom(2, -100)).toBeGreaterThan(2)
   })
 
   it('fits bounds within the remaining viewport beside the inspector', () => {

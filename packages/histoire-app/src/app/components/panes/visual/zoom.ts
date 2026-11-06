@@ -7,7 +7,7 @@ export interface VisualSize {
 /** Smallest zoom reachable from viewer controls. */
 export const MIN_VISUAL_ZOOM = 0.05
 /** Largest zoom reachable from viewer controls. */
-export const MAX_VISUAL_ZOOM = 4
+export const MAX_VISUAL_ZOOM = 20
 
 /** Keep zoom within viewer control bounds. */
 export function clampVisualZoom(zoom: number): number {
