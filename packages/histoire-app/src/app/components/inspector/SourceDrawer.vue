@@ -138,28 +138,34 @@ function status(value: { status: 'idle' | 'loading' | 'ready' | 'error' }) {
 
 <template>
   <section ref="root" class="inspector-source htw:flex-none htw:min-h-0 htw:data-[expanded=true]:flex htw:data-[expanded=true]:flex-col htw:data-[expanded=true]:basis-[42%] htw:data-[tone=surface]:bg-surface htw:[border-top:1px_solid_var(--histoire-border)]" :data-expanded="expanded" :data-tone="tone" aria-label="Source">
-    <div class="htw:flex htw:items-center htw:gap-[7px] htw:min-h-[46px] htw:py-0 htw:px-inspector-gutter" @contextmenu="emit('contextmenu', $event)" @keydown="onHeaderKeydown">
-      <HstButton color="flat" type="button" class="htw:flex htw:items-center htw:gap-[9px] htw:p-0" :aria-expanded="expanded" :aria-controls="drawerId" @click="toggleSource">
-        <BuiltinIcon class="htw:text-muted" icon="code" :size="16" />
+    <div class="htw:flex htw:items-center htw:gap-[7px] htw:min-h-[46px]" :class="{ 'htw:px-inspector-gutter': expanded }" @contextmenu="emit('contextmenu', $event)" @keydown="onHeaderKeydown">
+      <button
+        type="button"
+        class="htw:flex htw:min-w-0 htw:cursor-pointer htw:items-center htw:gap-[9px] htw:border-0 htw:bg-transparent htw:text-left htw:text-text htw:hover:bg-chip htw:focus-visible:bg-chip htw:focus-visible:outline-2 htw:focus-visible:-outline-offset-2"
+        :class="expanded ? 'htw:-ms-pane-row-inset htw:h-control htw:rounded-control htw:px-pane-row-inset' : 'htw:w-full htw:self-stretch htw:px-inspector-gutter'"
+        :aria-label="expanded ? 'Collapse source' : 'Expand source'"
+        :aria-expanded="expanded"
+        :aria-controls="drawerId"
+        @click="toggleSource"
+      >
+        <BuiltinIcon class="htw:shrink-0 htw:text-muted" icon="code" :size="16" />
         <strong class="htw:text-[12px] htw:font-extrabold">Source</strong>
-      </HstButton>
+        <span v-if="!expanded" class="htw:min-w-0 htw:flex-1 htw:truncate htw:text-right htw:font-mono htw:text-[10px] htw:text-muted" :title="story?.relativePath">{{ fileLabel }}</span>
+        <BuiltinIcon class="htw:shrink-0 htw:text-muted" :icon="expanded ? 'chevron-down' : 'chevron-up'" :size="12" />
+      </button>
       <HstButtonGroup v-if="expanded" v-model="mode" layout="inline" class="htw:flex htw:flex-1 htw:min-w-0" aria-label="Source mode" :options="[{ value: 'dynamic', label: 'Variant' }, { value: 'raw', label: 'Story file' }]" />
-      <span v-else class="htw:flex-1 htw:overflow-hidden htw:text-right htw:text-ellipsis htw:whitespace-nowrap htw:text-muted htw:[font:10px_var(--histoire-font-mono)]" :title="story?.relativePath">{{ fileLabel }}</span>
       <SourceAction v-if="expanded" :disabled="!content" :aria-label="copied ? 'Source copied' : 'Copy source'" :title="copied ? 'Copied' : 'Copy source'" @click="copy">
         <BuiltinIcon :icon="copied ? 'checkmark' : 'copy'" :size="16" />
       </SourceAction>
       <SourceAction v-if="expanded && canEdit" aria-label="Open source in editor" title="Open source in editor" @click="editor">
         <BuiltinIcon icon="launch" :size="16" />
       </SourceAction>
-      <SourceAction :aria-label="expanded ? 'Collapse source' : 'Expand source'" :aria-expanded="expanded" @click="toggleSource">
-        <BuiltinIcon :icon="expanded ? 'chevron-down' : 'chevron-up'" :size="12" />
-      </SourceAction>
     </div>
-    <div v-if="expanded" :id="drawerId" class="htw:relative htw:flex-1 htw:min-h-0 htw:mt-0 htw:mx-inspector-gutter htw:mb-4 htw:overflow-auto htw:rounded-[10px] htw:bg-code htw:[color:#e6e7ea]">
-      <p v-if="!available" class="htw:p-[16px] htw:[color:#b4b8c0] htw:text-[12px]">
+    <div v-show="expanded" :id="drawerId" class="htw:relative htw:flex-1 htw:min-h-0 htw:mt-0 htw:mx-inspector-gutter htw:mb-4 htw:overflow-auto htw:rounded-[10px] htw:bg-code htw:[color:#e6e7ea]">
+      <p v-if="expanded && !available" class="htw:p-[16px] htw:[color:#b4b8c0] htw:text-[12px]">
         {{ mode === 'dynamic' ? 'No variant source available.' : 'No story file source available.' }}
       </p>
-      <template v-else>
+      <template v-else-if="expanded">
         <HistoireSource
           v-if="dynamicReady" ref="panel" :show-actions="false" :classes="{
             root: 'htw:h-full',

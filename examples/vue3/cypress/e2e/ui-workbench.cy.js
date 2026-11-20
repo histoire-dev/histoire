@@ -167,6 +167,16 @@ describe('Vue workbench integration', () => {
     cy.getPreviewIframeBody().find('[data-test-id="shared-controls-state"]').should('contain', 'Selected frame edit')
   })
 
+  it('opens Source from the space between the label and filename', () => {
+    cy.visit('/story/src-components-demo-story-vue?variantId=src-components-demo-story-vue-0')
+    const source = 'section[aria-label="Source"]'
+    cy.get(source, { timeout: 20000 }).click('center')
+    cy.get(source).should(($source) => {
+      expect($source.find('button[aria-expanded="true"]'), 'Source opened by clicking the row').to.have.length(1)
+    })
+    cy.get('[aria-label="Source mode"]').should('be.visible')
+  })
+
   it('preserves docs tab deep link and reveals generated and story-file source', () => {
     cy.visit('/story/src-components-demo-story-vue?variantId=src-components-demo-story-vue-0')
     cy.getPreviewIframeBody().contains('Hello world!')
