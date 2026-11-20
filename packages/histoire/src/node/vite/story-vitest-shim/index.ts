@@ -4,6 +4,7 @@ import { STORY_COLLECTORS_CODE } from './collectors.js'
 import { STORY_COMPATIBILITY_CODE } from './compatibility.js'
 import { STORY_EXPECT_CODE } from './expect.js'
 import { STORY_MOCKS_CODE } from './mocks.js'
+import { VITEST_5_EXPECT_CODE, VITEST_5_IMPORT_CODE } from './native-expect.js'
 import { STORY_POLLING_CODE } from './polling.js'
 
 /**
@@ -16,13 +17,18 @@ import { STORY_POLLING_CODE } from './polling.js'
  * static builds without adding virtual-module resolution rules.
  */
 export function generateStoryVitestShim(paths: BrowserRuntimePaths) {
+  const assertions = paths.vitestHasBundledExpect
+    ? VITEST_5_IMPORT_CODE
+    : `
+import { chai, JestAsymmetricMatchers, JestChaiExpect, JestExtend, ASYMMETRIC_MATCHERS_OBJECT, GLOBAL_EXPECT, addCustomEqualityTesters, customMatchers, getState, setState } from ${JSON.stringify(paths.vitestExpect)}
+import { clearAllMocks, fn, isMockFunction, resetAllMocks, restoreAllMocks, spyOn } from ${JSON.stringify(paths.vitestSpy)}
+`
+
   return `
 import { createHistoireSuiteCollector, createHistoireTestCollector, registerCollectedAroundHook, registerCollectedTestHook, registerHistoireTestTaskCallback } from ${JSON.stringify(histoireSharedPath)}
 import { createCompilerHints } from ${JSON.stringify(paths.vitestMockerBrowser)}
-import { chai, JestAsymmetricMatchers, JestChaiExpect, JestExtend, ASYMMETRIC_MATCHERS_OBJECT, GLOBAL_EXPECT, addCustomEqualityTesters, customMatchers, getState, setState } from ${JSON.stringify(paths.vitestExpect)}
-import { clearAllMocks, fn, isMockFunction, resetAllMocks, restoreAllMocks, spyOn } from ${JSON.stringify(paths.vitestSpy)}
-
-${STORY_EXPECT_CODE}
+${assertions}
+${paths.vitestHasBundledExpect ? VITEST_5_EXPECT_CODE : STORY_EXPECT_CODE}
 ${STORY_POLLING_CODE}
 ${STORY_MOCKS_CODE}
 ${STORY_COMPATIBILITY_CODE}

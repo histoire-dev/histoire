@@ -3,28 +3,21 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { expect, it } from 'vitest'
 import { TEST_HARNESS_ID } from '../virtual/index.js'
-import { VITEST_BROWSER_OPTIMIZER_EXCLUDES } from '../vitest-browser-config/dependencies.js'
 import { getHistoireBrowserRunConfig } from '../vitest-browser-config/run-config.js'
 import { createBrowserRunContext, startBrowserOnlyDependencyRun, withVitestBrowserServer, writeProjectFiles } from './utils/vitest-browser-run.js'
 
-// Real Vitest browser servers (no browser launched): Vitest builds them from
-// `project.options`, apart from the Node-side server and its inline config.
-
-it('keeps browser-only optimizer includes out of Vitest\'s Node-side server', async () => {
-  // Vitest's Node-side server resolves with Node conditions and never serves
-  // the page: pre-bundling the browser dependency list there crashed startup.
+it('keeps browser-only dependencies in the client optimizer', async () => {
   for (const reachableDependencies of [false, true]) {
-    const servers = await startBrowserOnlyDependencyRun({ reachableDependencies })
-    expect(servers.node?.environments.client.optimizeDeps).toMatchObject({ noDiscovery: true, include: [] })
+    const config = await startBrowserOnlyDependencyRun({ reachableDependencies })
+    expect(config.environments.client.optimizeDeps.include).toContain('browser-only')
+    expect(config.environments.__vitest__.optimizeDeps.include ?? []).not.toContain('browser-only')
   }
 }, 60_000)
 
 it('keeps the framework optimizer policy for the definition browser server', async () => {
-  const servers = await startBrowserOnlyDependencyRun({ reachableDependencies: true }, () => ({ optimizeDeps: { include: ['browser-only'], exclude: ['framework-exclude'] } }))
-  const optimizer = servers.browser?.environments.client.optimizeDeps
+  const config = await startBrowserOnlyDependencyRun({ reachableDependencies: true }, () => ({ optimizeDeps: { include: ['browser-only'], exclude: ['framework-exclude'] } }))
+  const optimizer = config.environments.client.optimizeDeps
   expect(optimizer?.include).toContain('browser-only')
-  // Prebundling Vitest internals would fork the copy the page resolves to.
-  expect(optimizer?.exclude).toEqual(expect.arrayContaining(VITEST_BROWSER_OPTIMIZER_EXCLUDES))
   // Vitest's own excludes stay: discovering its `msw/browser` client import
   // after the first optimization reloaded every tester page mid-run.
   expect(optimizer?.exclude).toEqual(expect.arrayContaining(['framework-exclude', 'msw', 'msw/browser']))
@@ -34,7 +27,7 @@ it('gives the browser server the framework Vite config, not only its plugins', a
   // Nuxt's `#app` aliases never reached the browser server, so every story
   // importing Nuxt UI failed with `Missing "#app/config" specifier`.
   let channelStatus: number | undefined
-  const servers = await startBrowserOnlyDependencyRun({}, root => ({
+  const browser = await startBrowserOnlyDependencyRun({}, root => ({
     resolve: { alias: { '#framework': join(root, 'framework') }, dedupe: ['framework-dedupe'] },
     publicDir: join(root, 'framework-public'),
     server: { port: 6006, fs: { allow: [root] }, watch: { ignored: ['**/framework/**'] } },
@@ -51,7 +44,6 @@ it('gives the browser server the framework Vite config, not only its plugins', a
   }), async (server) => {
     channelStatus = (await fetch(new URL('/__run_channel__', server.resolvedUrls!.local[0]), { method: 'POST' })).status
   })
-  const browser = servers.browser!
   expect(browser.resolve.alias).toEqual(expect.arrayContaining([expect.objectContaining({ find: '#framework', replacement: expect.stringMatching(/framework$/) })]))
   expect(browser.resolve.dedupe).toContain('framework-dedupe')
   expect(browser.publicDir).toMatch(/framework-public$/)
@@ -63,8 +55,8 @@ it('gives the browser server the framework Vite config, not only its plugins', a
 it('gives collection and test browser servers the framework optimizer lists', async () => {
   // CommonJS dependencies a framework pre-bundles (Nuxt's `vite.optimizeDeps`)
   // were served raw: "does not provide an export named 'default'".
-  const servers = await startBrowserOnlyDependencyRun({}, () => ({ optimizeDeps: { include: ['browser-only'], exclude: ['framework-exclude'] } }))
-  const optimizer = servers.browser?.environments.client.optimizeDeps
+  const config = await startBrowserOnlyDependencyRun({}, () => ({ optimizeDeps: { include: ['browser-only'], exclude: ['framework-exclude'] } }))
+  const optimizer = config.environments.client.optimizeDeps
   expect(optimizer?.include).toContain('browser-only')
   expect(optimizer?.exclude).toContain('framework-exclude')
 }, 60_000)

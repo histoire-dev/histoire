@@ -81,7 +81,7 @@ async function collectProjectTests(ctx: Context, options: CollectHistoireTestsOp
         return {
           vitestOptions: { ...config.vitestOptions, config: false, run: true, watch: false, passWithNoTests: true, include },
           viteConfig: config.viteConfig,
-          browserProjectOptions: config.vitestOptions,
+          browserProjectOptions: config.browserProjectOptions,
           timeoutMs: Math.max(1, options.collectionDeadline! - Date.now()),
           timeoutMessage: 'Histoire test collection timed out.',
           context: undefined,

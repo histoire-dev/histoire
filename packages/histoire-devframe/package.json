@@ -48,7 +48,7 @@
     "devframe": "1.2.2",
     "esbuild": "^0.27.2",
     "typescript": "catalog:",
-    "vitest": "4.1.10"
+    "vitest": "5.1.1"
   },
   "publishConfig": {
     "access": "public"

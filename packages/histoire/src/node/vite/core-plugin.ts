@@ -70,6 +70,9 @@ export function createHistoireVitePlugin(ctx: Context, options: HistoireVitePlug
             // discovered when the first document loads them, they reload it.
             ...browserRuntimePaths.mswBrowser ? ['msw/browser'] : [],
             ...browserRuntimePaths.mswCoreHttp ? ['msw/core/http'] : [],
+            ...browserRuntimePaths.mswHttpFallback ? ['msw/http'] : [],
+            // The virtual v5 story shim imports Vitest after the initial scan.
+            ...browserRuntimePaths.vitestHasBundledExpect ? ['vitest'] : [],
           ]
 
       return {
@@ -102,6 +105,12 @@ export function createHistoireVitePlugin(ctx: Context, options: HistoireVitePlug
                   replacement: browserRuntimePaths.mswCoreHttp,
                 }]
               : []),
+            ...(browserRuntimePaths.mswHttpFallback
+              ? [{
+                  find: /^msw\/http$/,
+                  replacement: browserRuntimePaths.mswHttpFallback,
+                }]
+              : []),
           ],
           ...(isServer
             ? {
@@ -117,7 +126,7 @@ export function createHistoireVitePlugin(ctx: Context, options: HistoireVitePlug
           exclude: [
             'histoire',
             '@histoire/vendors',
-            ...browserRuntime
+            ...browserRuntime && !browserRuntimePaths.vitestHasBundledExpect
               ? ['vitest']
               : [],
           ],

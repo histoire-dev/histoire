@@ -57,8 +57,7 @@ describe('generateCollectionSpecFiles', () => {
     expect(fs.existsSync(files[0].path)).toBe(true)
 
     const specCode = fs.readFileSync(files[0].path, 'utf8')
-    expect(specCode).toContain(`import { test } from '@vitest/runner'`)
-    expect(specCode).not.toContain(`from 'vitest'`)
+    expect(specCode).toContain(`import { test } from 'vitest'`)
   })
 
   it('generates distinct temp paths for story paths that flatten identically', async () => {
@@ -125,7 +124,7 @@ describe('generateCollectionSpecFiles', () => {
         },
       }
       // eslint-disable-next-line no-new-func -- evaluates the generated module with stubbed imports
-      new Function('require', 'module', 'exports', code)((id: string) => id === '@vitest/runner' ? runner : collector, { exports: {} }, {})
+      new Function('require', 'module', 'exports', code)((id: string) => id === 'vitest' ? runner : collector, { exports: {} }, {})
       await tests[0]()
       expect(pageFetch).toHaveBeenCalledWith('/__histoire_browser_collect__', expect.objectContaining({ method: 'POST' }))
     }

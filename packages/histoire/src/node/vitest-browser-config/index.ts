@@ -1,8 +1,10 @@
 import type { InlineConfig, Plugin as VitePlugin } from 'vite'
 import type { Context } from '../context.js'
 import { debugVitestBrowser } from '../util/browser-debug.js'
+import { tryResolveDependency } from '../util/resolve-package.js'
+import { getVitestMajor } from '../util/resolve-vitest-package.js'
 import { getVitestBrowserProjectConfig, getVitestBrowserServerConfig } from './browser-project.js'
-import { getVitestBrowserOptimizeDeps } from './dependencies.js'
+import { getVitestBrowserOptimizeDeps, getVitestFrameworkDependencyNames } from './dependencies.js'
 import { createVitestBrowserResolvePlugin } from './resolve-plugin.js'
 
 export { assignVitestBrowserProjectOptions } from './browser-project.js'
@@ -19,6 +21,8 @@ export interface VitestBrowserRuntimeConfigResult {
   vitestOptions: {
     plugins: VitePlugin[]
   }
+  /** Options injected only into Vitest 4's separate browser server. */
+  browserProjectOptions?: { plugins: VitePlugin[] }
   viteConfig: InlineConfig & {
     test: Record<string, any>
   }
@@ -50,6 +54,7 @@ export async function createVitestBrowserRuntimeConfig(
   viteConfig: InlineConfig,
   options: CreateVitestBrowserRuntimeConfigOptions = {},
 ): Promise<VitestBrowserRuntimeConfigResult> {
+  const sharedServer = getVitestMajor(ctx.root) >= 5
   const plugins = [...((viteConfig.plugins as VitePlugin[] | undefined) ?? [])]
   plugins.push(createVitestBrowserResolvePlugin(ctx, options.isServer))
   const runViteConfig: InlineConfig = {
@@ -75,25 +80,45 @@ export async function createVitestBrowserRuntimeConfig(
   // Applied by the browser server only (see `getVitestBrowserProjectConfig`).
   const browserOptimizer = options.reachableDependencies ? { ...viteConfig.optimizeDeps, ...options.optimizeDeps } : undefined
   const defaultTest = await getVitestBrowserProjectConfig(ctx.root, plugins, browserOptimizer, getVitestBrowserServerConfig(runViteConfig, viteConfig.optimizeDeps))
+  if (sharedServer) {
+    // Vitest 5 serves its browser environment from the project Vite server.
+    // Set client-specific entries/includes there and keep Vitest's own optimizer active.
+    const client = viteConfig.environments?.client
+    const framework = getVitestFrameworkDependencyNames(ctx).filter(id => tryResolveDependency(ctx.root, id, { fallback: false }))
+    // The shared runtime is linked source in the workspace and an optimizable
+    // dependency in published packages. Include it before generated specs load.
+    const include = [...new Set(['@histoire/shared', ...framework, ...runViteConfig.optimizeDeps?.include ?? [], ...client?.optimizeDeps?.include ?? []])]
+    runViteConfig.optimizeDeps = { ...runViteConfig.optimizeDeps, include }
+    runViteConfig.environments = {
+      ...viteConfig.environments,
+      client: {
+        ...client,
+        optimizeDeps: {
+          ...client?.optimizeDeps,
+          ...browserOptimizer,
+          ...options.optimizeDeps,
+          include,
+        },
+      },
+    }
+  }
+
+  // Only the v4 Node-side server needs its unused client optimizer disabled.
+  const legacyTestDeps = sharedServer ? {} : { optimizer: { client: { enabled: false } } }
 
   return {
     vitestOptions: {
       plugins,
     },
+    browserProjectOptions: sharedServer ? undefined : { plugins },
     viteConfig: {
       ...(runViteConfig as InlineConfig & { test?: Record<string, any> }),
       test: {
         ...defaultTest,
+        ...(sharedServer ? { clearMocks: false } : {}),
         ...options.test,
         deps: {
-          optimizer: {
-            // Vitest applies this to the `client` environment of its Node-side
-            // server, which resolves with Node conditions and never serves the
-            // page (the browser server has its own optimizer). Pre-bundling
-            // browser dependencies there fails on packages without a Node
-            // entry (e.g. `@tiptap/pm`, which has no `.` export).
-            client: { enabled: false },
-          },
+          ...legacyTestDeps,
           ...options.test?.deps,
         },
         browser: {

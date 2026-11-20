@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
 import { tryResolveDependency } from './resolve-package.js'
 
@@ -13,6 +14,12 @@ function resolveVitestPackageJson(root: string) {
     throw new Error(`Cannot resolve "vitest" from ${root} nor from Histoire's own dependencies.`)
   }
   return resolved
+}
+
+/** Reads the version of the same Vitest install used for browser resolution. */
+export function getVitestMajor(root: string) {
+  const manifest = JSON.parse(readFileSync(resolveVitestPackageJson(root), 'utf8')) as { version: string }
+  return Number.parseInt(manifest.version, 10)
 }
 
 /**

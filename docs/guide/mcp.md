@@ -110,10 +110,10 @@ The shell install leaves other installed browsers in place. For Playwright 1.49 
 
 Older supported drivers do not provide a separate shell/full-channel choice. Install their default Chromium with `pnpm exec playwright install chromium` or `pnpm exec playwright-core install chromium`, or upgrade the driver before explicitly selecting `headless-shell` or full-channel `chromium`.
 
-Development tests still require Vitest 4 and `@vitest/browser-playwright`:
+Development tests use the project's Vitest and matching `@vitest/browser-playwright` provider:
 
 ```sh
-pnpm add -D vitest @vitest/browser-playwright
+pnpm add -D vitest@^5.1.1 @vitest/browser-playwright@^5.1.1 playwright
 ```
 
 The `playwright-core` opt-in does not satisfy those test-runner dependencies. Headed Vitest work may also need full Chromium. Missing peers leave read tools available; project capabilities explain unavailable execution. Browser installation happens explicitly, never during an MCP call.

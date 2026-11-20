@@ -37,7 +37,7 @@
     "@typescript/native": "catalog:",
     "@vitejs/devtools": "0.8.0",
     "@vitejs/plugin-vue": "^6.0.10",
-    "@vitest/browser-playwright": "4.1.10",
+    "@vitest/browser-playwright": "5.1.1",
     "cypress": "^13.16.1",
     "devframe": "1.2.2",
     "globby": "^14.0.2",
@@ -49,6 +49,6 @@
     "start-server-and-test": "^2.0.8",
     "typescript": "catalog:",
     "vite": "catalog:",
-    "vitest": "4.1.10"
+    "vitest": "5.1.1"
   }
 }

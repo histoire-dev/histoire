@@ -5,7 +5,7 @@ import { createMcpCliProject } from './cli-project.js'
 /** Real Vue tests shared by project-Vitest and copied Node-artifact parity probes. */
 export async function createMcpBrowserTestProject() {
   const project = await createMcpCliProject()
-  await writeFile(resolve(project.root, 'package.json'), JSON.stringify({ type: 'module', devDependencies: { 'vitest': '4.1.10', '@vitest/browser-playwright': '4.1.10', 'playwright': '1.59.1' } }))
+  await writeFile(resolve(project.root, 'package.json'), JSON.stringify({ type: 'module', devDependencies: { 'vitest': '5.1.1', '@vitest/browser-playwright': '5.1.1', 'playwright': '1.59.1' } }))
   await writeFile(resolve(project.root, 'custom config.ts'), `
 import { HstVue } from '@histoire/plugin-vue';
 export default { plugins: [HstVue()], storyMatch: ['*.story.vue'], mcp: false, test: { collectTimeout: 60000, runStallTimeout: 60000 } };

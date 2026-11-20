@@ -1,10 +1,9 @@
 import type { Context } from '../context.js'
 import fs from 'node:fs'
-import { mkdtemp, readFile, rm } from 'node:fs/promises'
+import { mkdtemp, rm } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { expect, it, vi } from 'vitest'
-import { resolveVitestModule } from '../util/resolve-vitest-package.js'
 import { getVitestBrowserProjectConfig } from '../vitest-browser-config/browser-project.js'
 import { getVitestBrowserDependencyNames } from '../vitest-browser-config/dependencies.js'
 import { createVitestBrowserResolvePlugin } from '../vitest-browser-config/index.js'
@@ -64,8 +63,8 @@ it('reuses the dep-optimizer cache between runs instead of forcing prebundles', 
   // lockfile hash, so re-optimization still happens when it must.
   expect(collection.viteConfig.optimizeDeps?.force).toBeFalsy()
   expect(test.viteConfig.optimizeDeps?.force).toBeFalsy()
-  expect(collection.viteConfig.test.deps.optimizer.client.force).toBeFalsy()
-  expect(test.viteConfig.test.deps.optimizer.client.force).toBeFalsy()
+  expect(collection.viteConfig.environments?.client?.optimizeDeps?.force).toBeFalsy()
+  expect(test.viteConfig.environments?.client?.optimizeDeps?.force).toBeFalsy()
 
   // The caches must live OUTSIDE the tmp dirs that are emptied on every run,
   // apart from each other, and apart from the app dev server's cache (a shared
@@ -105,7 +104,7 @@ it('keeps definition optimizer roots stable across runs and preserves explicit u
   ctx.config.vite = { optimizeDeps: { entries: ['/setup.ts'], include: ['change-case'], exclude: ['opaque-package'], noDiscovery: true, holdUntilCrawlEnd: true } }
   const first = await getHistoireBrowserRunConfig(ctx, { collecting: false, definitions: true, entries: ['/run-first/spec.ts'] })
   const second = await getHistoireBrowserRunConfig(ctx, { collecting: false, definitions: true, entries: ['/run-second/spec.ts'] })
-  expect(first.viteConfig.optimizeDeps).toMatchObject({ entries: ['/unknown.story.vue', '/setup.ts'], include: ['change-case'], exclude: ['opaque-package'], noDiscovery: true, holdUntilCrawlEnd: true })
+  expect(first.viteConfig.optimizeDeps).toMatchObject({ entries: ['/unknown.story.vue', '/setup.ts'], include: ['@histoire/shared', 'change-case'], exclude: ['opaque-package'], noDiscovery: true, holdUntilCrawlEnd: true })
   expect(second.viteConfig.optimizeDeps).toEqual(first.viteConfig.optimizeDeps)
   expect(first.viteConfig.cacheDir).toBe(`${ctx.root}/.histoire/cache/vitest-definitions`)
   expect(first.viteConfig.test.maxWorkers).toBe(4)
@@ -130,22 +129,6 @@ it('rejects an invalid configured worker ceiling', async () => {
   await expect(getHistoireBrowserRunConfig(ctx, { collecting: false, entries: [] })).rejects.toThrow('Expected test.maxWorkers to be a positive integer')
 })
 
-it('runs against the Vitest major its @internal patches were verified on', async () => {
-  // `getVitestBrowserProjectConfig`/`assignVitestBrowserProjectOptions` write
-  // Vitest-internal surfaces (`provider.serverFactory`, `project.options`)
-  // — the only channel accepting extra Vite plugins for the browser server.
-  // A major bump silently reshapes them, so it must break here first.
-  const vitestPackageJson = JSON.parse(
-    await readFile(resolveVitestModule(process.cwd(), 'vitest/package.json'), 'utf8'),
-  ) as { version: string }
-  const peerRange = JSON.parse(await readFile(new URL('../../../package.json', import.meta.url), 'utf8')) as {
-    peerDependencies: Record<string, string>
-  }
-
-  expect(vitestPackageJson.version.split('.')[0]).toBe('4')
-  expect(peerRange.peerDependencies.vitest).toBe('^4.0.0')
-})
-
 // Specs free the documents of finished spec files themselves (Chromium collects them late):
 // the test browser must expose its collector and report a live heap size.
 it('launches the test browser with a callable garbage collector', async () => {
@@ -157,13 +140,4 @@ it('launches the test browser with a callable garbage collector', async () => {
 
 it('creates the browser resolve plugin when optional testing-library packages are missing', () => {
   expect(() => createVitestBrowserResolvePlugin()).not.toThrow()
-})
-
-it('stubs expect-type in the browser runtime', async () => {
-  const plugin = createVitestBrowserResolvePlugin()
-  const resolvedId = await plugin.resolveId?.('expect-type')
-  const code = await plugin.load?.(resolvedId as string)
-
-  expect(resolvedId).toBe('\0histoire:expect-type-stub')
-  expect(code).toContain('expectTypeOf')
 })

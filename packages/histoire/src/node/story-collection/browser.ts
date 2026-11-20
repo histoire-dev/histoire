@@ -85,7 +85,7 @@ async function collect(ctx: Context, options: CollectStoriesBrowserOptions, spec
       const specFiles = await generateCollectionSpecFiles(ctx, runToken, specRoot, storyFiles)
       const specPaths = specFiles.map(spec => spec.path)
       throwIfTestAborted(options.signal)
-      const { vitestOptions, viteConfig } = await getCollectionVitestConfig(ctx, specPaths, channel.plugin)
+      const { vitestOptions, viteConfig, browserProjectOptions } = await getCollectionVitestConfig(ctx, specPaths, channel.plugin)
 
       return {
         vitestOptions: {
@@ -99,7 +99,7 @@ async function collect(ctx: Context, options: CollectStoriesBrowserOptions, spec
           ...progressReporterOptions(collectionVitestCliOptions.reporters, specPaths.length, options.onProgress),
         },
         viteConfig,
-        browserProjectOptions: vitestOptions,
+        browserProjectOptions,
         timeoutMs: collectionTimeout,
         timeoutMessage: 'Histoire browser collection timed out during vitest.start(). '
           + 'The Vitest browser runner never completed. This usually means the browser '

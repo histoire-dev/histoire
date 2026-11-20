@@ -36,6 +36,6 @@
     "@typescript/native": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",
-    "vitest": "4.1.10"
+    "vitest": "5.1.1"
   }
 }

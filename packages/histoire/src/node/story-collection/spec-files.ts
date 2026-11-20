@@ -125,7 +125,7 @@ async function generateBrowserStoryModuleFiles(
  * generated literals and corrupt the module.
  */
 function generateCollectionSpecCode(relativePath: string, collectorModulePath: string, runToken: string) {
-  return `import { test } from '@vitest/runner'
+  return `import { test } from 'vitest'
 import { collectStoryFile } from ${JSON.stringify(collectorModulePath)}
 
 // Story setup may replace \`fetch\` (Nuxt answers relative URLs from an

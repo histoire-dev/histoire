@@ -2,7 +2,7 @@ import type { InlineConfig, Plugin as VitePlugin } from 'vite'
 import type { BrowserProviderOption, Vitest } from 'vitest/node'
 import { debugVitestBrowser } from '../util/browser-debug.js'
 import { importResolvedModule } from '../util/import-resolved.js'
-import { resolveVitestModule } from '../util/resolve-vitest-package.js'
+import { getVitestMajor, resolveVitestModule } from '../util/resolve-vitest-package.js'
 import { createBrowserOptimizerPolicy } from './browser-optimizer.js'
 
 /** Chromium flags giving test pages a callable collector and live heap figures. */
@@ -23,6 +23,8 @@ export async function getVitestBrowserProjectConfig(
   serverConfig: InlineConfig = {},
 ) {
   const { playwright } = await importResolvedModule(resolveVitestModule(root, '@vitest/browser-playwright'))
+  const provider = playwright({ launchOptions: { args: TEST_BROWSER_ARGS } })
+  const sharedServer = getVitestMajor(root) >= 5
   return {
     browser: {
       enabled: true,
@@ -30,7 +32,7 @@ export async function getVitestBrowserProjectConfig(
       headless: true,
       // Specs free the documents of finished spec files themselves (see `releaseFinishedSpecs`):
       // Chromium alone keeps them until its heap limit, gigabytes per test tab.
-      provider: wrapBrowserProviderWithPlugins(playwright({ launchOptions: { args: TEST_BROWSER_ARGS } }), plugins, optimizeDeps, serverConfig),
+      provider: sharedServer ? provider : wrapBrowserProviderWithPlugins(provider, plugins, optimizeDeps, serverConfig),
       instances: [
         {
           browser: 'chromium' as const,
@@ -67,7 +69,7 @@ export function getVitestBrowserServerConfig(viteConfig: InlineConfig, optimizeD
 }
 
 /**
- * COMPAT: this and `assignVitestBrowserProjectOptions` write Vitest
+ * COMPAT: Vitest 4 embeds a separate browser server. This and `assignVitestBrowserProjectOptions` write
  * `@internal` API surfaces (`provider.serverFactory`, `project.options`,
  * `coreWorkspaceProject`) — the only channel through which `@vitest/browser`
  * accepts extra Vite plugins and options for its browser server (it spreads
@@ -109,7 +111,7 @@ function wrapBrowserProviderWithPlugins(
       // conditions, where browser-only framework includes fail to resolve.
       project.options.plugins = optimizeDeps ? [...plugins, createBrowserOptimizerPolicy(optimizeDeps)] : plugins
       if (optimizeDeps) project.options.optimizeDeps = optimizeDeps
-      return await provider.serverFactory(options)
+      return await (provider.serverFactory as (options: unknown) => Promise<unknown>)(options)
     },
   } as BrowserProviderOption
 }

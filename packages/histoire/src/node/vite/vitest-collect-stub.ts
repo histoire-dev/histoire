@@ -31,6 +31,11 @@ export function isVitestRuntimeImporter(importer?: string) {
     || normalized?.includes('/node_modules/vitest/')
 }
 
+/** Generated specs register with the real runner, even during story collection. */
+export function isGeneratedVitestSpec(importer?: string) {
+  return !!importer && /\.histoire\.spec\.[^/?]+(?:\?|$)/.test(importer)
+}
+
 /**
  * Redirects user story/helper `vitest` imports to the collect stub.
  *
@@ -45,7 +50,7 @@ function createVitestCollectStubPlugin(name: string): VitePlugin {
     name,
     enforce: 'pre',
     resolveId(id, importer) {
-      if (id === 'vitest' && !isVitestRuntimeImporter(importer)) {
+      if (id === 'vitest' && !isVitestRuntimeImporter(importer) && !isGeneratedVitestSpec(importer)) {
         return vitestCollectStubPath
       }
     },

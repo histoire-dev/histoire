@@ -1,5 +1,6 @@
 import { collectHistoireTests } from '@histoire/shared'
 import { transform } from 'esbuild'
+import { STORY_EXPECT_KEY } from '../../virtual/variant-test-session/expect-state.js'
 import { runSessionTests } from '../../virtual/variant-test-session/run.js'
 import { resolveBrowserRuntimePaths } from '../../vite/resolve-paths.js'
 import { createStoryVitestShimPlugin } from '../../vite/story-vitest-shim.js'
@@ -19,6 +20,7 @@ export async function loadStoryVitestShim() {
   const module = { exports: {} as any }
   const key = Symbol.for('expect-global')
   const previous = (globalThis as any)[key]
+  const previousStoryExpect = (globalThis as any)[STORY_EXPECT_KEY]
   try {
     delete (globalThis as any)[key]
     // eslint-disable-next-line no-new-func -- execute the generated facade with real, preloaded dependencies
@@ -30,6 +32,7 @@ export async function loadStoryVitestShim() {
   }
   finally {
     ;(globalThis as any)[key] = previous
+    ;(globalThis as any)[STORY_EXPECT_KEY] = previousStoryExpect
   }
   return module.exports
 }
@@ -39,9 +42,10 @@ export async function runStoryVitestTests(register: (shim: any) => void) {
   const shim = await loadStoryVitestShim()
   const key = Symbol.for('expect-global')
   const previous = (globalThis as any)[key]
+  const previousStoryExpect = (globalThis as any)[STORY_EXPECT_KEY]
   const file = createSessionOptions().files[0] as any
   try {
-    ;(globalThis as any)[key] = shim.expect
+    ;(globalThis as any)[STORY_EXPECT_KEY] = shim.expect
     return await runSessionTests({
       file,
       definitions: collectHistoireTests([() => register(shim)], {} as any),
@@ -50,5 +54,6 @@ export async function runStoryVitestTests(register: (shim: any) => void) {
   }
   finally {
     ;(globalThis as any)[key] = previous
+    ;(globalThis as any)[STORY_EXPECT_KEY] = previousStoryExpect
   }
 }

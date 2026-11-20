@@ -50,7 +50,7 @@ export async function generateSpecFiles(storyFiles: ServerStoryFile[], root: str
 
 /** Inert task metadata carries exact definitions through Vitest's collection reporting. */
 function generateCollectionSpecCode(storyId: string, variantId: string, token?: string): string {
-  return `import { test } from '@vitest/runner'
+  return `import { test } from 'vitest'
 import { serializeTestErrors } from '@histoire/shared'
 import { collectVariantTests } from ${JSON.stringify(TEST_HARNESS_ID)}
 
@@ -76,12 +76,12 @@ test('Histoire test collection', { meta: { histoireCollection: collection } }, (
 /**
  * Generates the spec running every test a variant collected.
  *
- * Imports `@vitest/runner` rather than `vitest`: the story runs inside
- * Histoire's own harness, and the definitions (including their
+ * Vitest owns the outer cases. Story imports use Histoire's harness, which
+ * provides the definitions (including their
  * `.only`/`.skip`/`.todo` mode) come from the collection.
  */
 function generateSpecCode(storyId: string, variantId: string, storyTitle: string, variantTitle: string) {
-  return `import { describe, test } from '@vitest/runner'
+  return `import { describe, test } from 'vitest'
 import { prepareVariantTestRun } from ${JSON.stringify(TEST_HARNESS_ID)}
 
 const { definitions, run } = await prepareVariantTestRun(${JSON.stringify(storyId)}, ${JSON.stringify(variantId)})

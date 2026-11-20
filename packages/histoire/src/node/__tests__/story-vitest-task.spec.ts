@@ -29,6 +29,19 @@ describe('preview Vitest task lifecycle', () => {
     expect(order).toEqual(['assertion', 'afterEach', 'assertion', 'afterEach', 'afterEach'])
   })
 
+  it('reports an async assertion that fails before the story body finishes', async () => {
+    const summary = await runStoryVitestTests((shim) => {
+      shim.it('fails early', async () => {
+        shim.expect(Promise.resolve(1)).resolves.toBe(2)
+        await new Promise<void>(resolve => setImmediate(resolve))
+      })
+      shim.it('passes next', () => shim.expect(1).toBe(1))
+    })
+
+    expect(summary.tests.map(test => test.state)).toEqual(['failed', 'passed'])
+    expect(summary.tests[0].errors).toEqual([expect.objectContaining({ message: expect.stringContaining('expected 1 to be 2') })])
+  })
+
   it('passes one task context to callbacks and unwinds completion callbacks in reverse', async () => {
     const contexts: any[] = []
     const order: string[] = []

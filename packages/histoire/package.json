@@ -72,11 +72,11 @@
     "test:visual:integration": "vitest run --config vitest.visual.config.ts"
   },
   "peerDependencies": {
-    "@vitest/browser-playwright": "^4.0.0",
+    "@vitest/browser-playwright": "^4.1.10 || ^5.1.1",
     "playwright": "^1.0.0",
     "playwright-core": "^1.0.0",
     "vite": "^7.0.0 || ^8.0.0",
-    "vitest": "^4.0.0"
+    "vitest": "^4.1.10 || ^5.1.1"
   },
   "peerDependenciesMeta": {
     "@vitest/browser-playwright": {
@@ -152,10 +152,10 @@
     "@types/pngjs": "^6.0.5",
     "@types/semver": "^7.8.0",
     "@typescript/native": "catalog:",
-    "@vitest/browser-playwright": "4.1.10",
+    "@vitest/browser-playwright": "5.1.1",
     "concurrently": "^9.1.0",
     "typescript": "catalog:",
     "vite": "catalog:",
-    "vitest": "4.1.10"
+    "vitest": "5.1.1"
   }
 }

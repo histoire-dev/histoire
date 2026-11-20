@@ -20,12 +20,12 @@
     "@types/react-dom": "^19.0.0",
     "@typescript/native": "catalog:",
     "@vitejs/plugin-react": "^5.2.0",
-    "@vitest/browser-playwright": "4.1.10",
+    "@vitest/browser-playwright": "5.1.1",
     "histoire": "workspace:*",
     "histoire-example-plugin-reference": "workspace:*",
     "playwright": "^1.58.0",
     "typescript": "catalog:",
     "vite": "catalog:",
-    "vitest": "4.1.10"
+    "vitest": "5.1.1"
   }
 }

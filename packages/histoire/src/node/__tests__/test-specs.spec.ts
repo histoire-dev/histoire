@@ -81,8 +81,7 @@ describe('runHistoireTests generated specs', () => {
     const specPath = mocks.createVitestMock.mock.calls[0][1].include[0]
     const specCode = mocks.generatedSpecCode.get(specPath) ?? ''
 
-    expect(specCode).toContain(`import { describe, test } from '@vitest/runner'`)
-    expect(specCode).not.toContain(`from 'vitest'`)
+    expect(specCode).toContain(`import { describe, test } from 'vitest'`)
     expect(specCode).toContain(`if (definition.mode === 'todo')`)
     expect(specCode).toContain(`definition.mode === 'only' ? test.only`)
     expect(specCode).toContain(`: definition.mode === 'skip' ? test.skip`)

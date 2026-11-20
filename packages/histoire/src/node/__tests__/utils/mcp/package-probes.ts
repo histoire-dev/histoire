@@ -49,5 +49,5 @@ export async function probePackageBrowserExecution(client: Client, engine: 'proj
   const tests = await probePackageJob(client, 'histoire_run_tests', `package-tests-${engine}`)
   expect(tests, JSON.stringify({ engine, error: tests.error })).toMatchObject({ state: 'completed' })
   expect(tests.result.engine).toBe(engine)
-  expect(tests.result.summary).toMatchObject({ passed: 3, failed: 0, skipped: 1 })
+  expect(tests.result.summary, JSON.stringify(tests.result.summary.errors)).toMatchObject({ passed: 3, failed: 0, skipped: 1 })
 }

@@ -84,9 +84,8 @@ export async function getViteConfigWithPlugins(
   if (!isServer
     && !options.collecting
     && projectHasVitest
-    && browserRuntimePaths.vitestExpect
     && browserRuntimePaths.vitestMockerBrowser
-    && browserRuntimePaths.vitestSpy) {
+    && (browserRuntimePaths.vitestHasBundledExpect || (browserRuntimePaths.vitestExpect && browserRuntimePaths.vitestSpy))) {
     plugins.push(createStoryVitestShimPlugin(ctx, browserRuntimePaths))
   }
 

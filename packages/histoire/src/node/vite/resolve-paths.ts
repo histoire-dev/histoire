@@ -4,7 +4,7 @@ import { dirname } from 'pathe'
 import { findUp } from '../util/find-up.js'
 import { resolveHistoireSharedEntry } from '../util/resolve-histoire-shared.js'
 import { tryResolveDependency } from '../util/resolve-package.js'
-import { tryResolveVitestModule } from '../util/resolve-vitest-package.js'
+import { getVitestMajor, tryResolveVitestModule } from '../util/resolve-vitest-package.js'
 
 const require = createRequire(import.meta.url)
 
@@ -84,10 +84,14 @@ export interface BrowserRuntimePaths {
   mswBrowser: string | null
   /** Resolved `msw/core/http` entry, aliased for the same reason. */
   mswCoreHttp: string | null
+  /** MSW 2 entry used when Vitest 5's mocker asks for the MSW 3 subpath. */
+  mswHttpFallback?: string | null
   /** Directories of the resolved msw entries, added to `server.fs.allow`. */
   mswAllowPaths: string[]
   /** Resolved `@vitest/expect`, used by the story `vitest` shim. */
   vitestExpect: string | null
+  /** Vitest 5 supplies assertions and spies from its own entry point. */
+  vitestHasBundledExpect?: boolean
   /** Resolved `@vitest/mocker/browser`, used by the story `vitest` shim. */
   vitestMockerBrowser: string | null
   /** Resolved `@vitest/spy`, used by the story `vitest` shim. */
@@ -103,6 +107,7 @@ export interface BrowserRuntimePaths {
  * @param projectHasVitest Whether Vitest is available in the user project.
  */
 export function resolveBrowserRuntimePaths(ctx: Context, projectHasVitest: boolean): BrowserRuntimePaths {
+  const vitestHasBundledExpect = projectHasVitest && getVitestMajor(ctx.root) >= 5
   const allowPaths = projectHasVitest
     ? BROWSER_RUNTIME_PACKAGE_IDS.flatMap((id) => {
         // Vitest's own tree first (so `@vitest/*` matches the project's Vitest),
@@ -122,9 +127,11 @@ export function resolveBrowserRuntimePaths(ctx: Context, projectHasVitest: boole
     allowPaths,
     mswBrowser,
     mswCoreHttp,
+    mswHttpFallback: vitestHasBundledExpect && !tryResolveDependency(ctx.root, 'msw/http') ? mswCoreHttp : null,
     mswAllowPaths: [mswBrowser, mswCoreHttp]
       .filter((value): value is string => Boolean(value))
       .map(dirname),
+    vitestHasBundledExpect,
     vitestExpect: projectHasVitest
       ? tryResolveVitestModule(ctx.root, '@vitest/expect')
       : null,

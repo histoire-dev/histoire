@@ -1,5 +1,6 @@
 import type { HistoireTestDefinition } from '@histoire/shared'
 import { registerHistoireTestTaskCallback } from '@histoire/shared'
+import { getSharedExpect, STORY_EXPECT_KEY } from './expect-state.js'
 
 /** Tasks currently executing Histoire-collected story definitions. */
 const histoireTasks = new WeakSet<object>()
@@ -35,10 +36,11 @@ export function createPreviewTestTask(definition: HistoireTestDefinition, id: st
     onFinished: [] as ((context: any) => unknown)[],
     context: {} as any,
     promises: [] as Promise<unknown>[],
+    [STORY_EXPECT_KEY]: true,
   }
   task.context = {
     task,
-    expect: (globalThis as any)[Symbol.for('expect-global')],
+    expect: getSharedExpect(),
     onTestFailed: (callback: (context: any) => unknown, timeout?: number) => registerHistoireTestTaskCallback(task, 'onFailed', callback, timeout),
     onTestFinished: (callback: (context: any) => unknown, timeout?: number) => registerHistoireTestTaskCallback(task, 'onFinished', callback, timeout),
   }

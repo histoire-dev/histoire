@@ -2,7 +2,7 @@ import type { Plugin as VitePlugin } from 'vite'
 import type { Context } from '../context.js'
 import type { BrowserRuntimePaths } from './resolve-paths.js'
 import { generateStoryVitestShim } from './story-vitest-shim/index.js'
-import { isVitestRuntimeImporter } from './vitest-collect-stub.js'
+import { isGeneratedVitestSpec, isVitestRuntimeImporter } from './vitest-collect-stub.js'
 
 /** Owned shim identity is also trusted by non-executing dependency analysis. */
 export const STORY_VITEST_SHIM_ID = '\0virtual:$histoire-story-vitest'
@@ -20,7 +20,7 @@ export function createStoryVitestShimPlugin(ctx: Context, paths: BrowserRuntimeP
     name: 'histoire:story-vitest-shim',
     enforce: 'pre',
     resolveId(id, importer) {
-      if (id === 'vitest' && importer && !isVitestRuntimeImporter(importer) && !/\.histoire\.spec\.[^/?]+(?:\?|$)/.test(importer)) {
+      if (id === 'vitest' && importer && importer !== STORY_VITEST_SHIM_ID && !isVitestRuntimeImporter(importer) && !isGeneratedVitestSpec(importer)) {
         return STORY_VITEST_SHIM_ID
       }
     },

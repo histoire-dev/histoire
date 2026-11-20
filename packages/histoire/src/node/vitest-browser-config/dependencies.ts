@@ -64,22 +64,7 @@ export function getVitestBrowserOptimizeDeps(ctx: Context) {
  * @param ctx The histoire context, used for the project root and support plugins.
  */
 export function getVitestBrowserDependencyNames(ctx: Context) {
-  const deps = new Set<string>()
-
-  if (ctx.supportPlugins.some(plugin => plugin.id === 'vue3')) {
-    deps.add('vue')
-    deps.add('pinia')
-    deps.add('floating-vue')
-    deps.add('@vueuse/core')
-  }
-
-  if (ctx.supportPlugins.some(plugin => plugin.id === 'svelte4')) {
-    deps.add('svelte')
-  }
-
-  if (ctx.supportPlugins.some(plugin => plugin.id === 'react')) {
-    for (const name of ['react', 'react-dom', 'react-dom/client', 'react/jsx-runtime', 'react/jsx-dev-runtime']) deps.add(name)
-  }
+  const deps = new Set(getVitestFrameworkDependencyNames(ctx))
 
   try {
     const packageJson = JSON.parse(fs.readFileSync(resolve(ctx.root, 'package.json'), 'utf8')) as {
@@ -107,6 +92,28 @@ export function getVitestBrowserDependencyNames(ctx: Context) {
     }
   }
   catch {}
+
+  return [...deps]
+}
+
+/** Framework runtimes reached through virtual modules before ordinary entry scanning. */
+export function getVitestFrameworkDependencyNames(ctx: Context) {
+  const deps = new Set<string>()
+
+  if (ctx.supportPlugins.some(plugin => plugin.id === 'vue3')) {
+    deps.add('vue')
+    deps.add('pinia')
+    deps.add('floating-vue')
+    deps.add('@vueuse/core')
+  }
+
+  if (ctx.supportPlugins.some(plugin => plugin.id === 'svelte4')) {
+    deps.add('svelte')
+  }
+
+  if (ctx.supportPlugins.some(plugin => plugin.id === 'react')) {
+    for (const name of ['react', 'react-dom', 'react-dom/client', 'react/jsx-runtime', 'react/jsx-dev-runtime']) deps.add(name)
+  }
 
   return [...deps]
 }

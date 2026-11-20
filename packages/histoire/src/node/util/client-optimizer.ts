@@ -4,13 +4,19 @@ import { analyzeCollectionModule } from '../test/eligibility/analysis.js'
 import { isHistoireModuleVersionUrl } from '../vite/module-version.js'
 import { debugVitestBrowser } from './browser-debug.js'
 
+/** Vite methods used here, across Histoire's and the consumer's Vite installs. */
+type ClientEnvironment = Pick<DevEnvironment, 'depsOptimizer' | 'transformRequest' | 'waitForRequestsIdle'>
+
 /** Warm runtime imports; collection may also prepare user-owned literal imports before browser dispatch. */
-export async function warmClientModules(client: DevEnvironment, entries: string[], dynamicRoot?: string): Promise<ReadonlyMap<string, readonly string[]>> {
+export async function warmClientModules(client: ClientEnvironment, entries: string[], dynamicRoot?: string, skipOptimizedDependencies = false): Promise<ReadonlyMap<string, readonly string[]>> {
   const visited = new Set<string>()
   const graph = new Map<string, readonly string[]>()
   /** Root stories are admitted separately because generated harness loaders use dynamic imports. */
   async function warm(url: string): Promise<void> {
     if (visited.has(url) || !url.startsWith('/')) return
+    // Vitest 5 prebundles its runner. Its optimized modules already have
+    // browser-ready imports and need no further traversal from generated specs.
+    if (skipOptimizedDependencies && client.depsOptimizer?.isOptimizedDepUrl(url)) return
     visited.add(url)
     try {
       const module = await client.transformRequest(url.replace('/@id/__x00__', '\0'))
@@ -54,7 +60,7 @@ export function getStaticClientPreloads(graph: ReadonlyMap<string, readonly stri
 }
 
 /** Finish initial optimization before any tester can race dependency export interop. */
-export async function finishClientOptimization(client: DevEnvironment): Promise<void> {
+export async function finishClientOptimization(client: ClientEnvironment): Promise<void> {
   const optimizer = client.depsOptimizer
   if (!optimizer) return
   await optimizer.init()

@@ -59,7 +59,9 @@ it('serves packed Node 22 consumers and copied artifacts with optional peers iso
     const devClient = await connectMcpHttp(devEndpoint)
     cleanup.push(() => devClient.close())
     await probePackageReads(devClient)
-    await probePackageBrowserExecution(devClient, 'project-vitest')
+    await probePackageBrowserExecution(devClient, 'project-vitest').catch((cause) => {
+      throw new Error(`Packed browser test failed:\n${dev.output()}`, { cause })
+    })
     await devClient.close()
     const stoppedDev = await dev.close()
     expect(stoppedDev.signal).toBeNull()

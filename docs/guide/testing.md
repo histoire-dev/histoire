@@ -4,13 +4,13 @@ Histoire renders every story inside browser iframe runtime. Same runtime collect
 
 ## Install Vitest browser runtime
 
-Install current stable Vitest packages in project:
+Install Vitest 5 and its Playwright provider in the project:
 
 ```bash
-pnpm add -D vitest@latest @vitest/browser-playwright@latest playwright
+pnpm add -D vitest@^5.1.1 @vitest/browser-playwright@^5.1.1 playwright
 ```
 
-Keep `vitest` and `@vitest/browser-playwright` on same version. Histoire uses project installation instead of bundling separate Vitest copy.
+Keep `vitest` and `@vitest/browser-playwright` on the same version. Histoire uses the project's installation. Existing projects can also use a matched Vitest 4 pair from 4.1.10 onward.
 
 This remains required for development story tests even when the screenshot setup uses an already installed Chrome/Edge or the optional `playwright-core` driver. Screenshot browser discovery does not configure or replace the project Vitest browser runner; see [screenshot setup](./ui-screenshots-mcp.md) for that separate path.
 

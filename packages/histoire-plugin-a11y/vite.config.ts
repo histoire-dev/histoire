@@ -15,10 +15,10 @@ function privateAxe(): Plugin {
   }
 }
 
-export default defineConfig({
+export default defineConfig(({ command }) => ({
   plugins: [vue(), privateAxe()],
   // Library mode would bake `/` in; the book build must resolve its own base.
-  define: { 'import.meta.env.BASE_URL': 'import.meta.env.BASE_URL' },
+  define: command === 'build' ? { 'import.meta.env.BASE_URL': 'import.meta.env.BASE_URL' } : undefined,
   css: { postcss: {} },
   build: {
     target: 'es2022',
@@ -30,4 +30,4 @@ export default defineConfig({
     rolldownOptions: { external: id => /^(?:node:|vue(?:\/|$)|@histoire\/)/.test(id), output: { chunkFileNames: 'chunks/[name]-[hash].js' } },
   },
   test: { include: ['src/__tests__/**/*.spec.ts'], exclude: ['src/__tests__/browser.spec.ts'], testTimeout: 30000 },
-})
+}))

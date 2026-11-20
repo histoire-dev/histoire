@@ -9,7 +9,6 @@ import { onStoryChange } from '../stories.js'
 import { onVisualSourceRetired } from '../visual/source.js'
 import { getViteConfigWithPlugins } from '../vite/index.js'
 import { closeDevPreviewHost } from '../vite/mcp-preview-html.js'
-import { createVitestBrowserRuntimeConfig } from '../vitest-browser-config/index.js'
 
 describe('getViteConfigWithPlugins', () => {
   function createContext(): Context {
@@ -109,7 +108,7 @@ describe('getViteConfigWithPlugins', () => {
     }
   })
 
-  it('excludes vitest from optimized deps in browser runtime', async () => {
+  it('lets Vitest 5 prebundle its browser runtime', async () => {
     const ctx = createContext()
 
     const { viteConfig } = await getViteConfigWithPlugins(false, ctx, {
@@ -117,7 +116,7 @@ describe('getViteConfigWithPlugins', () => {
     })
     const resolvedConfig = await resolveConfig(viteConfig, 'serve')
 
-    expect(resolvedConfig.optimizeDeps.exclude).toContain('vitest')
+    expect(resolvedConfig.optimizeDeps.exclude).not.toContain('vitest')
   }, 15000)
 
   it('pre-bundles the msw modules of the Vitest browser runtime up front', async () => {
@@ -252,22 +251,16 @@ describe('getViteConfigWithPlugins', () => {
     expect(resolvedId).toBeFalsy()
   })
 
-  it('resolves @vitest/runner for generated browser collection specs', async () => {
+  it('keeps generated browser collection specs on the real Vitest entry', async () => {
     const ctx = createContext()
     const { viteConfig } = await getViteConfigWithPlugins(false, ctx, {
       browserRuntime: true,
       collecting: true,
     })
-    const runtimeConfig = await createVitestBrowserRuntimeConfig(ctx, viteConfig)
-    const browserResolvePlugin = runtimeConfig.vitestOptions.plugins.find(plugin => plugin?.name === 'histoire-vitest-browser-resolve')
+    const collectStub = viteConfig.plugins?.find(plugin => plugin?.name === 'histoire:collect-story-vitest-stub')
 
-    expect(browserResolvePlugin).toBeTruthy()
-
-    const resolvedId = await browserResolvePlugin!.resolveId?.('@vitest/runner')
-
-    expect(typeof resolvedId).toBe('string')
-    expect(resolvedId).toMatch(/@vitest[+/]runner/)
-  }, 15000)
+    expect(await collectStub!.resolveId?.('vitest', `${ctx.root}/collect.histoire.spec.ts`)).toBeUndefined()
+  })
 
   it('matches root-relative and query-suffixed story importers in browser collection mode', async () => {
     const ctx = createContext()

@@ -3,7 +3,7 @@ import type { Context } from '../context.js'
 import { createRequire } from 'node:module'
 import { fileURLToPath } from 'node:url'
 import { dirname, resolve } from 'pathe'
-import { resolveVitestModule } from '../util/resolve-vitest-package.js'
+import { getVitestMajor, resolveVitestModule } from '../util/resolve-vitest-package.js'
 import {
   BROWSER_COLLECTOR_ID,
   GENERATED_GLOBAL_SETUP,
@@ -29,8 +29,8 @@ const EXPECT_TYPE_STUB_ID = '\0histoire:expect-type-stub'
  * copy of Vitest (the project's own) is used everywhere.
  * @param root Project root, falling back to the histoire package itself.
  */
-function getResolvedIds(root?: string) {
-  const resolveFromVitest = (id: string) => resolveVitestModule(root ?? histoireRoot, id)
+function getResolvedVitest4Ids(root: string) {
+  const resolveFromVitest = (id: string) => resolveVitestModule(root, id)
   const vitestDir = dirname(resolveFromVitest('vitest/package.json'))
   const vitestBrowserDir = dirname(resolveFromVitest('@vitest/browser/package.json'))
 
@@ -38,8 +38,14 @@ function getResolvedIds(root?: string) {
     'vitest': resolve(vitestDir, 'dist/index.js'),
     'vitest/internal/browser': resolve(vitestDir, 'dist/browser.js'),
     '@vitest/browser/dist/context.js': resolve(vitestBrowserDir, 'dist/context.js'),
-    '@vitest/runner': resolveFromVitest('@vitest/runner'),
     'vitest/runners': resolve(vitestDir, 'dist/runners.js'),
+  }
+}
+
+/** Resolves Histoire's virtual ids and the older browser runtime's physical entries. */
+function getResolvedIds(root: string | undefined, legacyVitest: boolean) {
+  return {
+    ...(legacyVitest ? getResolvedVitest4Ids(root ?? histoireRoot) : {}),
     [BROWSER_COLLECTOR_ID]: RESOLVED_BROWSER_COLLECTOR_ID,
     [TEST_HARNESS_ID]: RESOLVED_TEST_HARNESS_ID,
     [PREVIEW_RUNTIME_ID]: RESOLVED_PREVIEW_RUNTIME_ID,
@@ -73,7 +79,8 @@ function getOptionalResolvedIds(root: string | undefined, ids: string[]) {
  * @param isServer Selects the `server` half of a split `setupFile` config.
  */
 export function createVitestBrowserResolvePlugin(ctx?: Context, isServer = false): VitePlugin {
-  const resolvedIds = getResolvedIds(ctx?.root)
+  const legacyVitest = getVitestMajor(ctx?.root ?? histoireRoot) === 4
+  const resolvedIds = getResolvedIds(ctx?.root, legacyVitest)
 
   return {
     name: 'histoire-vitest-browser-resolve',
@@ -83,7 +90,7 @@ export function createVitestBrowserResolvePlugin(ctx?: Context, isServer = false
         return resolvedIds[id]
       }
 
-      if (id === 'expect-type') {
+      if (legacyVitest && id === 'expect-type') {
         return EXPECT_TYPE_STUB_ID
       }
 

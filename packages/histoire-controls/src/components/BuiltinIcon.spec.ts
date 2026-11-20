@@ -3,7 +3,7 @@ import { mount } from '@vue/test-utils'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import BuiltinIcon from './BuiltinIcon.vue'
 
-const iconifyMock = vi.hoisted(() => ({ addCollection: vi.fn() }))
+const iconifyMock = vi.hoisted(() => ({ collections: [] as unknown[] }))
 
 vi.mock('@iconify/vue', async () => {
   const { defineComponent, h } = await import('vue')
@@ -24,7 +24,12 @@ vi.mock('@iconify/vue', async () => {
     },
   })
 
-  return { Icon, addCollection: iconifyMock.addCollection }
+  return {
+    Icon,
+    addCollection(collection: unknown) {
+      iconifyMock.collections.push(collection)
+    },
+  }
 })
 
 afterEach(() => {
@@ -33,7 +38,7 @@ afterEach(() => {
 
 describe('builtin icon', () => {
   it('registers the bundled Carbon collection for direct Iconify consumers', () => {
-    expect(iconifyMock.addCollection).toHaveBeenCalledWith(histoireCarbonIcons)
+    expect(iconifyMock.collections).toContainEqual(histoireCarbonIcons)
   })
 
   it.each([

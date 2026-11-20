@@ -24,6 +24,8 @@ interface BrowserMountState {
   cleanups?: (() => void)[]
   /** Setup must run after before-case resets when any of these are enabled. */
   config?: {
+    /** Test-file isolation setting shared by v5 Node and browser projects. */
+    isolate?: boolean
     browser?: { isolate?: boolean }
     clearMocks?: boolean
     mockReset?: boolean
@@ -35,11 +37,11 @@ interface BrowserMountState {
 
 /** Only isolated browser specs with confirmed teardown can retain the discovery mount. */
 export function getVitestBrowserMountCleanups(): (() => void)[] | undefined {
-  // COMPAT: Vitest 4.1's tester drains the browser state's cleanups in its
-  // finalizer. Fall back to fresh mounts if that internal surface is absent.
+  // Vitest drains these cleanups from the tester finalizer. Browser isolation
+  // moved from browser.isolate in v4 to the shared isolate option in v5.
   const state = (globalThis as typeof globalThis & { __vitest_browser_runner__?: BrowserMountState }).__vitest_browser_runner__
   const config = state?.config
-  if (!Array.isArray(state?.cleanups) || !config?.browser?.isolate) return
+  if (!Array.isArray(state?.cleanups) || !(config?.browser?.isolate ?? config?.isolate)) return
   if (config.clearMocks || config.mockReset || config.restoreMocks || config.unstubEnvs || config.unstubGlobals) return
   return state.cleanups
 }

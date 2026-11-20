@@ -1,7 +1,8 @@
-import type { InlineConfig, ResolvedConfig, ViteDevServer, Plugin as VitePlugin } from 'vite'
+import type { InlineConfig, ResolvedConfig, ViteDevServer } from 'vite'
 import type { Context } from '../../context.js'
 import type { VitestBrowserRuntimeConfigResult } from '../../vitest-browser-config/index.js'
-import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises'
+import { mkdir, mkdtemp, rm, symlink, writeFile } from 'node:fs/promises'
+import { createRequire } from 'node:module'
 import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
 import { expect, vi } from 'vitest'
@@ -46,13 +47,15 @@ export async function writeProjectFiles(root: string, files: Record<string, unkn
  * @param inspect Called with the listening browser server.
  */
 export async function withVitestBrowserServer(root: string, config: VitestBrowserRuntimeConfigResult, inspect: (server: ViteDevServer) => Promise<void> = async () => {}) {
+  // Vitest 5's optimizer resolves native browser modules from the fixture root.
+  const require = createRequire(import.meta.url)
+  const modules = join(root, 'node_modules')
+  await mkdir(join(modules, '@histoire'), { recursive: true })
+  await Promise.all(['vite', 'vitest', '@histoire/shared'].map(name => symlink(dirname(require.resolve(`${name}/package.json`)), join(modules, name), 'junction')))
   const vitest = await createVitest('test', { ...config.vitestOptions, root, watch: false } as any, config.viteConfig as any)
   try {
-    // COMPAT: internal entry Vitest uses to create the browser server before
-    // the first browser run.
-    const project = vitest.projects[0] as any
-    await project._initBrowserServer()
-    const server: ViteDevServer = (project._parent ?? project)._parentBrowser.vite
+    const server = vitest.projects[0].browser!.vite as unknown as ViteDevServer
+    if (!server.resolvedUrls) await server.listen()
     await inspect(server)
     await settleDependencyOptimizer(server)
   }
@@ -78,8 +81,7 @@ async function settleDependencyOptimizer(server: ViteDevServer) {
  * Starts the Vitest instance of a browser run in a project depending on
  * `browser-only`, a package exporting its entry under the `browser` condition
  * alone: like `@tiptap/pm` (no `.` entry at all), Node resolve conditions
- * cannot load it. Records the resolved config of each Vite server Vitest
- * creates (its Node-side server and the browser server).
+ * cannot load it. Returns the shared server's resolved configuration.
  * @param options Per-run overrides passed to `createVitestBrowserRuntimeConfig`.
  * @param frameworkConfig Extra base Vite config (e.g. a framework plugin's), given the project root.
  * @param inspect Called with the listening browser server.
@@ -90,32 +92,28 @@ export async function startBrowserOnlyDependencyRun(
   inspect?: (server: ViteDevServer) => Promise<void>,
 ) {
   const root = await mkdtemp(join(tmpdir(), 'histoire-browser-optimizer-'))
-  const servers: { node?: ResolvedConfig, browser?: ResolvedConfig } = {}
+  let resolved!: ResolvedConfig
   try {
     await writeProjectFiles(root, {
       'package.json': { type: 'module', dependencies: { 'browser-only': '1' } },
       'node_modules/browser-only/package.json': { name: 'browser-only', type: 'module', exports: { '.': { browser: './index.js' } } },
       'node_modules/browser-only/index.js': 'export const value = 1\n',
     })
-    // Only Vitest's Node-side server declares its `__vitest__` environment.
-    const recorder: VitePlugin = {
-      name: 'record-resolved-config',
-      configResolved(config) {
-        servers['__vitest__' in config.environments ? 'node' : 'browser'] = config
-      },
-    }
     const { plugins = [], ...framework } = frameworkConfig(root)
     const config = await createVitestBrowserRuntimeConfig(createBrowserRunContext(root), {
       root,
       configFile: false,
       cacheDir: join(root, '.cache'),
-      plugins: [recorder, ...plugins],
+      plugins,
       // Framework client optimizer list (e.g. Nuxt's) at the top level.
       optimizeDeps: { include: ['browser-only'] },
       ...framework,
     }, options)
-    await withVitestBrowserServer(root, config, inspect)
-    return servers
+    await withVitestBrowserServer(root, config, async (server) => {
+      resolved = server.config
+      await inspect?.(server)
+    })
+    return resolved
   }
   finally { await rm(root, { recursive: true, force: true }) }
 }

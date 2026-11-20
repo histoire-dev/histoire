@@ -171,7 +171,7 @@ async function runTests(ctx: Context, options: RunHistoireTestsOptions, specRoot
           watch: false,
         },
         viteConfig: runtimeConfig.viteConfig,
-        browserProjectOptions: runtimeConfig.vitestOptions,
+        browserProjectOptions: runtimeConfig.browserProjectOptions,
         prepareBrowser: true,
         filter,
         timeoutMs: getRunStallTimeout(ctx),

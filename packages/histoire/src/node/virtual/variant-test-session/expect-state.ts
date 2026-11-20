@@ -1,8 +1,13 @@
 const SHARED_EXPECT_KEY = Symbol.for('expect-global')
 
+/** Identifies the story facade on the iframe and marks Histoire-owned test tasks. */
+export const STORY_EXPECT_SYMBOL = 'histoire:story-expect'
+export const STORY_EXPECT_KEY = Symbol.for(STORY_EXPECT_SYMBOL)
+
 /** Reads the shared expect object installed by Vitest (or the preview shim). */
-function getSharedExpect() {
-  return (globalThis as Record<symbol, any>)[SHARED_EXPECT_KEY]
+export function getSharedExpect() {
+  const globals = globalThis as Record<symbol, any>
+  return globals[STORY_EXPECT_KEY] ?? globals[SHARED_EXPECT_KEY]
 }
 
 /** Selects Vitest's context-local expect when a test requested it. */
