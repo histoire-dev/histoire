@@ -2,6 +2,16 @@ import type { MarketplaceManifest } from '@histoire/shared'
 import type { IncomingHttpHeaders } from 'node:http'
 import { once } from 'node:events'
 import { createServer } from 'node:http'
+import { onTestFinished, vi } from 'vitest'
+
+/** Keep a local registry scenario independent of npm lifecycle environment overrides. */
+export function useProjectRegistry() {
+  vi.stubEnv('npm_config_registry', undefined)
+  vi.stubEnv('NPM_CONFIG_REGISTRY', undefined)
+  onTestFinished(() => {
+    vi.unstubAllEnvs()
+  })
+}
 
 /** Mutable HTTP responses let tests simulate registry failures without replacing clients. */
 export interface RegistryFixtureOptions {

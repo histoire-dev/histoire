@@ -8,6 +8,7 @@ import { createServer } from '../../server/index.js'
 import { registerAgentsChannel } from '../../server/ui-channel/agents.js'
 import { registerAiThreadsChannel } from '../../server/ui-channel/ai-threads.js'
 import { registerConfigChannel } from '../../server/ui-channel/config.js'
+import { installUiHttpRouter } from '../../server/ui-channel/http.js'
 import { registerUiChannel } from '../../server/ui-channel/index.js'
 import { createViteServers } from '../../server/vite-servers.js'
 import { watchStories } from '../../stories.js'
@@ -53,7 +54,8 @@ describe('dev startup ownership', () => {
     channel = { close: channelClose }
     vi.mocked(registerUiChannel).mockReturnValue(channel)
     vi.mocked(registerAgentsChannel).mockReturnValue({} as any)
-    server = { close: serverClose, listen: vi.fn(async () => {}), config: { server: {} }, ws: { send: vi.fn() }, watcher: { on: vi.fn(), off: vi.fn(), add: vi.fn() }, moduleGraph: { getModuleById: () => undefined } }
+    server = { close: serverClose, listen: vi.fn(async () => {}), config: { base: '/', server: {} }, middlewares: { use: vi.fn() }, ws: { send: vi.fn() }, watcher: { on: vi.fn(), off: vi.fn(), add: vi.fn() }, moduleGraph: { getModuleById: () => undefined } }
+    installUiHttpRouter(server)
     vi.mocked(createViteServers).mockResolvedValue({ nodeServer: { close: nodeClose } as any, server, viteConfigFile: undefined })
     vi.mocked(watchStories).mockResolvedValue({ ready: Promise.resolve(), close: storyClose } as any)
     vi.mocked(createMarkdownFilesWatcher).mockImplementation(async (ctx) => {

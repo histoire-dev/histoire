@@ -1,12 +1,10 @@
 {
   "name": "@histoire/devframe",
-  "version": "1.0.0-beta.1",
   "type": "module",
+  "version": "1.0.0-beta.1",
   "description": "Optional authenticated live inspection adapter for Histoire",
+  "license": "MIT",
   "sideEffects": false,
-  "files": [
-    "dist"
-  ],
   "exports": {
     "./client": {
       "types": "./dist/client/index.d.ts",
@@ -25,31 +23,33 @@
       "default": "./dist/host/index.js"
     }
   },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=22.12.0"
+  },
   "scripts": {
     "build": "rimraf dist && tsc",
     "test": "vitest run"
+  },
+  "peerDependencies": {
+    "devframe": "1.2.2"
   },
   "dependencies": {
     "@histoire/protocol": "workspace:^",
     "@histoire/sdk": "workspace:^",
     "@modelcontextprotocol/server": "2.3.1"
   },
-  "peerDependencies": {
-    "devframe": "1.2.2"
-  },
   "devDependencies": {
     "@modelcontextprotocol/client": "2.3.1",
     "@modelcontextprotocol/node": "2.1.0",
     "@types/node": "^22.0.0",
     "devframe": "1.2.2",
+    "esbuild": "^0.27.2",
     "typescript": "catalog:",
-    "vitest": "4.1.10",
-    "esbuild": "^0.27.2"
+    "vitest": "4.1.10"
   },
-  "engines": {
-    "node": ">=22.12.0"
-  },
-  "license": "MIT",
   "publishConfig": {
     "access": "public"
   }

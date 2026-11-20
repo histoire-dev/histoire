@@ -7,8 +7,10 @@ import { fileURLToPath, pathToFileURL } from 'node:url'
 const require = createRequire(new URL('../../packages/histoire/package.json', import.meta.url))
 /** Existing source validator works without a rebuilt dist. */
 const { createJiti } = require('jiti')
-/** Source imports are transformed independently of the release workspace being inspected. */
-const jiti = createJiti(import.meta.url)
+/** Catalog preparation uses shared marketplace source before any workspace package is built. */
+const jiti = createJiti(import.meta.url, {
+  alias: { '@histoire/shared': fileURLToPath(new URL('../../packages/histoire-shared/src/marketplace/index.ts', import.meta.url)) },
+})
 /** Shared validator enforces the same field limits as registry metadata. */
 const { validateMarketplaceManifest } = await jiti.import('../../packages/histoire/src/node/marketplace/manifest/index.ts')
 /** Exact install targets use the planner's existing syntax and length bound. */

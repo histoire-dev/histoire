@@ -7,7 +7,7 @@ import { createCatalogService } from '../../marketplace/catalog/service.js'
 import { getPlanStore } from '../../marketplace/changes/handlers.js'
 import { registerMarketplaceChannels } from '../../marketplace/channel.js'
 import { disposeConfigProjects } from '../utils/config-codemod.js'
-import { registryServer } from '../utils/marketplace/registry-server.js'
+import { registryServer, useProjectRegistry } from '../utils/marketplace/registry-server.js'
 import { uiChannelFixture } from '../utils/ui-channel.js'
 import { denyRegistryCacheWrites } from './catalog-cache-fixture.js'
 import { inventoryPackage, inventoryProject } from './inventory-fixture.js'
@@ -31,6 +31,7 @@ afterEach(disposeConfigProjects)
 // substituted. Missing shared memory must reject planning; a missing cleanup
 // hook must leave metadata available after channel close, failing the last check.
 it.each(['install', 'update'] as const)('reviews %s after detail despite denied disk persistence, then retires metadata', async (kind) => {
+  useProjectRegistry()
   const registry = await registryServer({ packages: { [pkg.name]: pkg } })
   onTestFinished(registry.close)
   const code = kind === 'update'

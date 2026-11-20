@@ -1,3 +1,4 @@
+import type { ProgressEvent } from '@histoire/cli/protocol/progress'
 import type { ConfigurationRevision } from '@histoire/dev-proxy/config'
 import type { ViteDevServer } from 'vite'
 import type { StoryCollectionOutcome } from '../collect/outcome.js'
@@ -5,7 +6,6 @@ import type { ConfigurationObserver } from '../config/dependencies.js'
 import type { Context } from '../context.js'
 import type { CollectionEvent } from '../server/collect.js'
 import type { CreateServerOptions } from '../server/index.js'
-import type { ProgressEvent } from '@histoire/cli/protocol/progress'
 
 /** Observable lifecycle of one independently owned project. */
 export type ProjectRuntimeStatus = 'starting' | 'ready' | 'restarting' | 'failed' | 'closed'

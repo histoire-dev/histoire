@@ -117,21 +117,8 @@
         }
       ]
     },
-    "history": [
-      {
-        "version": "1.0.0-beta.1",
-        "requires": {
-          "histoire": "^1.0.0-beta.1"
-        },
-        "frameworks": []
-      }
-    ],
-    "versions": [
-      {
-        "version": "1.0.0-beta.1",
-        "compatible": true
-      }
-    ],
+    "history": [],
+    "versions": [],
     "provenance": false,
     "requires": {
       "histoire": "^1.0.0-beta.1"
@@ -232,22 +219,8 @@
         "design-handoff"
       ]
     },
-    "history": [
-      {
-        "version": "1.0.0-beta.1",
-        "requires": {
-          "histoire": "^1.0.0-beta.1",
-          "vue": "^3.5.0"
-        },
-        "frameworks": []
-      }
-    ],
-    "versions": [
-      {
-        "version": "1.0.0-beta.1",
-        "compatible": true
-      }
-    ],
+    "history": [],
+    "versions": [],
     "provenance": false,
     "requires": {
       "histoire": "^1.0.0-beta.1",
@@ -477,26 +450,8 @@
         }
       ]
     },
-    "history": [
-      {
-        "version": "1.0.0-beta.1",
-        "requires": {
-          "histoire": "^1.0.0-beta.1",
-          "@quasar/app-vite": "^3.0.0",
-          "quasar": "^2.16.0",
-          "vite": "^7.0.0 || ^8.0.0"
-        },
-        "frameworks": [
-          "vue"
-        ]
-      }
-    ],
-    "versions": [
-      {
-        "version": "1.0.0-beta.1",
-        "compatible": true
-      }
-    ],
+    "history": [],
+    "versions": [],
     "provenance": false,
     "requires": {
       "histoire": "^1.0.0-beta.1",
@@ -558,25 +513,8 @@
         }
       ]
     },
-    "history": [
-      {
-        "version": "1.0.0-beta.1",
-        "requires": {
-          "histoire": "^1.0.0-beta.1",
-          "react": "^18.0.0 || ^19.0.0",
-          "react-dom": "^18.0.0 || ^19.0.0"
-        },
-        "frameworks": [
-          "react"
-        ]
-      }
-    ],
-    "versions": [
-      {
-        "version": "1.0.0-beta.1",
-        "compatible": true
-      }
-    ],
+    "history": [],
+    "versions": [],
     "provenance": false,
     "requires": {
       "histoire": "^1.0.0-beta.1",
@@ -890,26 +828,8 @@
         ]
       }
     },
-    "history": [
-      {
-        "version": "1.0.0-beta.1",
-        "requires": {
-          "histoire": "^1.0.0-beta.1",
-          "@vitejs/devtools": "0.8.0",
-          "vite": "^8.3.0",
-          "vue": "^3.5.26"
-        },
-        "frameworks": [
-          "vue"
-        ]
-      }
-    ],
-    "versions": [
-      {
-        "version": "1.0.0-beta.1",
-        "compatible": true
-      }
-    ],
+    "history": [],
+    "versions": [],
     "provenance": false,
     "requires": {
       "histoire": "^1.0.0-beta.1",

@@ -3,11 +3,11 @@ import { createEmbedBridgeFixture } from '../../utils/embed/bridge-fixture.js'
 
 /**
  * Upper bound of Histoire-owned module requests one dev sandbox document may
- * make. Inspection adds one entry and its shared provider registry chunk to
- * the prior budget of 25. Unbundled output was about 180, so exceeding this
+ * make. Inspection adds its entry and shared provider registry chunk, and
+ * delayed loading indicators use one separate shared entry. Unbundled output was about 180, so exceeding this
  * budget indicates a runtime fell back to per-file modules.
  */
-const HISTOIRE_MODULE_BUDGET = 27
+const HISTOIRE_MODULE_BUDGET = 28
 
 /** Matches the Histoire package owning a served file, workspace or installed. */
 const HISTOIRE_PACKAGE_RE = /\/(?:packages\/histoire(?:-([\w-]+))?|node_modules\/(?:@histoire\/([\w-]+)|histoire))\//
@@ -86,10 +86,12 @@ const dark = ref(isDark())
       const main = shared.filter(url => /\/dist\/index\.js\?/.test(url))
       const inspection = shared.filter(url => /\/dist\/inspection\/index\.js\?/.test(url))
       const registry = shared.filter(url => /\/dist\/chunks\/provider-registry-[^/]+\.js\?/.test(url))
+      const loadingDelay = shared.filter(url => /\/dist\/loading-delay\.js\?/.test(url))
       expect(main).toHaveLength(1)
       expect(inspection).toHaveLength(1)
       expect(registry).toHaveLength(1)
-      expect(shared.filter(url => !url.includes('/dist/icons/'))).toHaveLength(3)
+      expect(loadingDelay).toHaveLength(1)
+      expect(shared.filter(url => !url.includes('/dist/icons/'))).toHaveLength(4)
       const sharedRegistry = await page.evaluate(`Promise.all([import(${JSON.stringify(main[0])}), import(${JSON.stringify(inspection[0])})]).then(([main, inspection]) => {
         const root = document.createElement('div')
         const provider = { marker: true }

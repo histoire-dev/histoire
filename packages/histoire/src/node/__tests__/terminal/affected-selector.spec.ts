@@ -15,7 +15,7 @@ afterEach(async () => {
  * Real Vite transforms: A and B share `shared.js`, C owns `c-only.js`, every
  * story reaches `setup.js`. `d` is opaque (`eval`) when requested.
  */
-async function createFixture(options: { opaque?: boolean } = {}) {
+async function createFixture(options: { opaque?: boolean, settleMs?: number } = {}) {
   const stories = ['a', 'b', 'c', ...options.opaque ? ['d'] : []]
   const project = await createEligibilityProject({
     stories,
@@ -45,7 +45,7 @@ async function createFixture(options: { opaque?: boolean } = {}) {
     } },
     catalog: catalog as never,
     signal: controller.signal,
-    settleMs: 10,
+    settleMs: options.settleMs ?? 10,
   })
   return { ...project, selector, catalog, collections, controller, file: (name: string) => join(project.root, name) }
 }
@@ -80,7 +80,8 @@ it('intersects with story and variant scope without broadening it', async () => 
 })
 
 it('keeps the old graph through helper deletion and a replacement analysis cut short by an edit', async () => {
-  const { selector, file, root, server } = await createFixture()
+  // Keep automatic reanalysis outside this test so refresh reports only the interrupted pass.
+  const { selector, file, root, server } = await createFixture({ settleMs: 60_000 })
   await selector.refresh()
   await rm(join(root, 'shared.js'))
   const removed = await selector.classify('unlink', file('shared.js'))

@@ -10,7 +10,7 @@ import { getCatalogService } from '../../marketplace/catalog/service.js'
 import { detectProjectSignals } from '../../marketplace/catalog/signals.js'
 import { updateDetails } from '../../marketplace/migrations/details.js'
 import { disposeConfigProjects } from '../utils/config-codemod.js'
-import { registryServer } from '../utils/marketplace/registry-server.js'
+import { registryServer, useProjectRegistry } from '../utils/marketplace/registry-server.js'
 import { inventoryPackage, inventoryProject } from './inventory-fixture.js'
 
 /** Community consent applies to every real consumer in these scenarios. */
@@ -21,6 +21,7 @@ afterEach(disposeConfigProjects)
 // Real service and update consumers share HTTP fixture only. A second client would
 // issue duplicate held requests; root-only memoization would keep a new generation stale.
 it('shares registry work between catalog details and update details within one context', async () => {
+  useProjectRegistry()
   const id = 'generation-plugin'
   const manifest = { ...officialPlugins[0].manifest, frameworks: [], requires: {} }
   const registry = await registryServer({ delayMs: 50, packages: { [id]: {
@@ -54,6 +55,7 @@ it('keeps dependency evidence stable for a generation and refreshes it for a new
 })
 
 it('retains only consumer metadata in persisted packuments', async () => {
+  useProjectRegistry()
   const id = 'metadata-plugin'
   const registry = await registryServer({ packages: { [id]: {
     'name': id,

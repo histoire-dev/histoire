@@ -2,14 +2,14 @@
   "compilerOptions": {
     "target": "ESNext",
     "lib": ["ESNext", "DOM"],
+    "rootDir": "src",
     "module": "ESNext",
     "moduleResolution": "bundler",
-    "rootDir": "src",
-    "outDir": "dist",
-    "declaration": true,
+    "types": ["node", "vite/client"],
     "strict": true,
-    "skipLibCheck": true,
-    "types": ["node", "vite/client"]
+    "declaration": true,
+    "outDir": "dist",
+    "skipLibCheck": true
   },
   "include": ["src/**/*.ts"],
   "exclude": ["src/**/*.spec.ts"]

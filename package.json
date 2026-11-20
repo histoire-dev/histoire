@@ -21,7 +21,7 @@
     "test:dev": "pnpm run -r --parallel --filter \"./packages/**\" test:dev",
     "test:examples": "pnpm run -r --workspace-concurrency 1 --filter \"./examples/vue**\"  test:examples",
     "test:examples:all": "pnpm run -r --workspace-concurrency 1 --filter \"./examples/**\" test:examples",
-    "release": "pnpm run lint && pnpm run test && pnpm run build && sheep release -b main --force",
+    "release": "node scripts/release.mjs",
     "docs:demo": "pnpm --filter histoire-example-vue3 story:build:docs",
     "docs:dev": "pnpm docs:demo && vitepress dev docs",
     "docs:build": "pnpm --recursive --filter \"histoire-example-vue3^...\" run build && pnpm docs:demo && vitepress build docs",

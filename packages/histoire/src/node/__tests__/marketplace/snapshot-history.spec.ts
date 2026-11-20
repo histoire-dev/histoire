@@ -22,9 +22,20 @@ async function historyProject() {
     const directory = `${root}/packages/histoire-${entry.id.slice('@histoire/'.length)}`
     await mkdir(directory, { recursive: true })
     await writeFile(`${directory}/package.json`, JSON.stringify({ name: entry.id, version: '1.0.0', histoire: { marketplace: jobManifest } }))
+    await writeFile(`${directory}/marketplace-history.json`, '[]\n')
   }
   return { root, directory: `${root}/packages/histoire-plugin-a11y` }
 }
+
+it('keeps a first release out of version history until it is prepared', async () => {
+  const { root } = await historyProject()
+  const draft = (await generateOfficialIndex(root)).find(entry => entry.id === '@histoire/plugin-a11y')!
+  expect(draft.versions).toEqual([])
+
+  await execute(process.execPath, [script, root])
+  const prepared = (await generateOfficialIndex(root)).find(entry => entry.id === '@histoire/plugin-a11y')!
+  expect(prepared.versions).toEqual([{ version: '1.0.0', compatible: true }])
+})
 
 // Boundary: real snapshot CLI, real validator, persisted JSON and actual generator consumer.
 // Defect: append on every invocation, retain malformed metadata, lose old releases or copy current peers backwards.

@@ -3,6 +3,7 @@ import type { Context } from '../../context.js'
 import { readdir, readFile, writeFile } from 'node:fs/promises'
 import { afterEach, describe, expect, it, onTestFinished } from 'vitest'
 import { marketplaceDefaults } from '../../../../../histoire-app/src/app/util/marketplace-preferences.js'
+import a11y from '../../../../../histoire-plugin-a11y/package.json' with { type: 'json' }
 import { analyzePluginSource } from '../../config/plugin-toggle-source.js'
 import { registerPlanHandlers } from '../../marketplace/changes/handlers.js'
 import { createPlanStore } from '../../marketplace/changes/plan-store.js'
@@ -162,7 +163,7 @@ describe('marketplace reviewed plans', () => {
     await fixture.request('histoire:ui:marketplace-plan', { requestId: 'invalid', request: { ...request, id: '--package' } })
     expect(fixture.client.send).toHaveBeenLastCalledWith('histoire:ui:marketplace-plan-result', { requestId: 'invalid', error: expect.objectContaining({ code: 'invalid' }) })
     await fixture.request('histoire:ui:marketplace-plan', { requestId: 'valid', request: { kind: 'install', id: '@histoire/plugin-a11y', prefs } })
-    expect(fixture.client.send).toHaveBeenLastCalledWith('histoire:ui:marketplace-plan-result', { requestId: 'valid', plan: expect.objectContaining({ command: expect.objectContaining({ argv: expect.arrayContaining(['@histoire/plugin-a11y@1.0.0-beta.1']) }) }) })
+    expect(fixture.client.send).toHaveBeenLastCalledWith('histoire:ui:marketplace-plan-result', { requestId: 'valid', plan: expect.objectContaining({ command: expect.objectContaining({ argv: expect.arrayContaining([`@histoire/plugin-a11y@${a11y.version}`]) }) }) })
     expect(fixture.ws.send).not.toHaveBeenCalled()
   })
 })

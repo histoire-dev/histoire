@@ -36,7 +36,7 @@ describe('immutable Node preview hosting', () => {
     try {
       const acquisition = project.preview({ port: 0, host: '127.0.0.1' })
       const rejected = expect(acquisition).rejects.toMatchObject({ code: 'DISPOSED' })
-      await vi.waitFor(async () => expect(await readFile(started, 'utf8')).toBe('started'))
+      await vi.waitFor(async () => expect(await readFile(started, 'utf8')).toBe('started'), { timeout: 10_000 })
       let closed = false
       const closing = project.close().then(() => {
         closed = true

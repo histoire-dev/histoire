@@ -12,7 +12,7 @@ The host must verify browser credentials and supply its own project, document, a
 import { createDevframeBridge, createMcpEndpoint } from '@histoire/devframe/node'
 import { initDevframe } from 'devframe/initiate'
 
-let authorityVersion = 0
+const authorityVersion = 0
 const bridge = createDevframeBridge({
   identifyPeer: session => policy.browserPrincipal(session),
   verifyAttachment: (session, identity, sourceUrl) =>

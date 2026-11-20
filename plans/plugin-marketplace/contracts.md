@@ -12,20 +12,21 @@ Plain JSON. It is validated by `NODE/marketplace/manifest/`; anything invalid is
     "marketplace": {
       "displayName": "Accessibility",
       "summary": "axe-core audits per variant, a project pane and optional story tests.",
-      "category": "testing",            // testing | design | inspection | frameworks | data
+      "category": "testing", // testing | design | inspection | frameworks | data
       "frameworks": ["vue", "react", "svelte"], // empty or absent = any
       "requires": { "histoire": ">=1.0.0" },
-      "monogram": "Ax", "tint": "blue",  // tile fallback when no logoUrl; tints: green violet blue amber rose sky slate
-      "logoUrl": "https://…",            // optional HTTPS
+      "monogram": "Ax",
+      "tint": "blue", // tile fallback when no logoUrl; tints: green violet blue amber rose sky slate
+      "logoUrl": "https://…", // optional HTTPS
       "adds": [{ "kind": "rail-pane", "text": "Project-wide audit results" }],
       // kinds: rail-pane inspector-tab toolbar-tool story-tests cli-command settings-section canvas-view
       "access": ["story-frames", "story-dom"], // story-frames story-dom network filesystem child-process
       "config": {
-        "import": "HstA11y",             // named export of the package root
-        "options": [                     // form fields, in order
+        "import": "HstA11y", // named export of the package root
+        "options": [ // form fields, in order
           { "key": "test", "label": "Run as story tests", "description": "One check per variant in the Tests pane", "type": "boolean", "default": false },
           { "key": "rules", "label": "Rule set", "type": "enum", "choices": [{ "value": "wcag22aa", "label": "WCAG 2.2 AA" }], "default": "wcag22aa" },
-          { "key": "failOn", "label": "Fail tests on", "type": "enum", "display": "segmented", "choices": […], "default": "serious", "when": { "test": true } },
+          { "key": "failOn", "label": "Fail tests on", "type": "enum", "display": "segmented", "choices": [{ "value": "serious", "label": "Serious" }], "default": "serious", "when": { "test": true } },
           { "key": "skip", "label": "Skip selectors", "type": "string-list", "default": [] }
         ]
       },
@@ -59,39 +60,62 @@ They apply to the plugin call's first object argument only. An op that can't be 
 type PluginId = string // npm package name
 
 interface CatalogEntry {
-  id: PluginId; displayName: string; summary: string; publisher: string
-  official: boolean; category: Category; frameworks: string[]; adds: Add[]
-  monogram: string; tint: Tint; logoUrl?: string
-  latest: string; updatedAt?: string; license?: string; repoUrl?: string; docsUrl?: string
-  installed?: { version: string; enabled: boolean; required: boolean; update?: string }
-  compatible: { ok: boolean; reason?: string } // vs project histoire/framework/peers
+  id: PluginId
+  displayName: string
+  summary: string
+  publisher: string
+  official: boolean
+  category: Category
+  frameworks: string[]
+  adds: Add[]
+  monogram: string
+  tint: Tint
+  logoUrl?: string
+  latest: string
+  updatedAt?: string
+  license?: string
+  repoUrl?: string
+  docsUrl?: string
+  installed?: { version: string, enabled: boolean, required: boolean, update?: string }
+  compatible: { ok: boolean, reason?: string } // vs project histoire/framework/peers
   score?: number // relevance for current query
-  match?: Array<{ field: 'displayName' | 'summary' | 'id'; ranges: Array<[number, number]> }>
+  match?: Array<{ field: 'displayName' | 'summary' | 'id', ranges: Array<[number, number]> }>
 }
 
 interface CatalogQuery {
-  view: 'all' | 'discover'; query?: string
-  filters?: { category?: Category; frameworks?: string[]; officialOnly?: boolean; adds?: AddKind[] }
+  view: 'all' | 'discover'
+  query?: string
+  filters?: { category?: Category, frameworks?: string[], officialOnly?: boolean, adds?: AddKind[] }
   sort?: 'relevance' | 'name' | 'updated'
-  prefs: MarketplacePrefs; cursor?: string; limit?: number // ≤ 60
+  prefs: MarketplacePrefs
+  cursor?: string
+  limit?: number // ≤ 60
 }
 
 interface CatalogPage {
-  entries: CatalogEntry[]; total: number; cursor?: string
-  facets: { category: Record<Category, number>; frameworks: Record<string, number>; official: number; adds: Record<AddKind, number> }
-  project: { frameworks: string[]; signals: string[] } // e.g. detected stack chips
-  sources: { official: 'ok'; community: 'off' | 'ok' | 'stale' | 'error' }
-  discover?: { hero?: CatalogEntry & { reason: string }; picks: Array<CatalogEntry & { reason: string }>; collections: Array<{ id: string; title: string; entries: CatalogEntry[] }> }
+  entries: CatalogEntry[]
+  total: number
+  cursor?: string
+  facets: { category: Record<Category, number>, frameworks: Record<string, number>, official: number, adds: Record<AddKind, number> }
+  project: { frameworks: string[], signals: string[] } // e.g. detected stack chips
+  sources: { official: 'ok', community: 'off' | 'ok' | 'stale' | 'error' }
+  discover?: { hero?: CatalogEntry & { reason: string }, picks: Array<CatalogEntry & { reason: string }>, collections: Array<{ id: string, title: string, entries: CatalogEntry[] }> }
 }
 
 interface PluginDetail extends CatalogEntry {
-  manifest: MarketplaceManifest; versions: Array<{ version: string; date?: string; deprecated?: boolean; compatible: boolean }>
-  provenance: boolean; requires: Record<string, string>; access: Access[]; releaseNotes?: ReleaseNote[]
+  manifest: MarketplaceManifest
+  versions: Array<{ version: string, date?: string, deprecated?: boolean, compatible: boolean }>
+  provenance: boolean
+  requires: Record<string, string>
+  access: Access[]
+  releaseNotes?: ReleaseNote[]
 }
 
 interface MarketplacePrefs {
-  community: boolean; packageManager: 'auto' | 'pnpm' | 'npm' | 'yarn' | 'bun'
-  afterInstall: 'restart' | 'ask'; skippedVersions: Record<PluginId, string>
+  community: boolean
+  packageManager: 'auto' | 'pnpm' | 'npm' | 'yarn' | 'bun'
+  afterInstall: 'restart' | 'ask'
+  skippedVersions: Record<PluginId, string>
 }
 ```
 
@@ -100,17 +124,21 @@ interface MarketplacePrefs {
 ```ts
 interface ChangeRequest {
   kind: 'install' | 'remove' | 'update' | 'pin' | 'options'
-  id: PluginId; version?: string; options?: Record<string, HistoireJsonValue>; migrate?: boolean
+  id: PluginId
+  version?: string
+  options?: Record<string, HistoireJsonValue>
+  migrate?: boolean
   prefs: MarketplacePrefs
 }
 
 interface ChangePlan {
-  planId: string; hash: string // sha256 of argv + diffs + config hash
-  packageManager: { name: 'pnpm' | 'npm' | 'yarn' | 'bun'; source: 'lockfile' | 'packageManager' | 'override' }
-  command?: { argv: string[]; display: string } // no shell; display is for copy
-  files: Array<{ path: string; added: number; removed: number; lines: DiffLine[] }>
+  planId: string
+  hash: string // sha256 of argv + diffs + config hash
+  packageManager: { name: 'pnpm' | 'npm' | 'yarn' | 'bun', source: 'lockfile' | 'packageManager' | 'override' }
+  command?: { argv: string[], display: string } // no shell; display is for copy
+  files: Array<{ path: string, added: number, removed: number, lines: DiffLine[] }>
   warnings: string[]
-  manual?: { reason: 'static' | 'config-not-literal' | 'no-package-manager' | 'migration-manual' | 'workspace-unsupported'; steps: ManualStep[] }
+  manual?: { reason: 'static' | 'config-not-literal' | 'no-package-manager' | 'migration-manual' | 'workspace-unsupported', steps: ManualStep[] }
 }
 ```
 
@@ -122,12 +150,15 @@ interface ChangePlan {
 ```ts
 type JobStepId = 'resolve' | 'install' | 'config' | 'restart' | 'load'
 interface JobState {
-  jobId: string; kind: ChangeRequest['kind']; id: PluginId; version: string
-  steps: Array<{ id: JobStepId; state: 'pending' | 'running' | 'done' | 'failed' | 'skipped'; ms?: number }>
+  jobId: string
+  kind: ChangeRequest['kind']
+  id: PluginId
+  version: string
+  steps: Array<{ id: JobStepId, state: 'pending' | 'running' | 'done' | 'failed' | 'skipped', ms?: number }>
   status: 'running' | 'succeeded' | 'failed' | 'cancelled'
   output: string[] // sanitized, ≤ 400 lines kept, ≤ 64 KiB per event
-  failure?: { code: 'peer-conflict' | 'not-found' | 'network' | 'config-write' | 'load' | 'unknown'; message: string; restored: boolean; leftovers: string[]; suggestion?: { version: string; reason: string } }
-  contributions?: Array<{ kind: AddKind; id: string; label: string }> // filled by `load`
+  failure?: { code: 'peer-conflict' | 'not-found' | 'network' | 'config-write' | 'load' | 'unknown', message: string, restored: boolean, leftovers: string[], suggestion?: { version: string, reason: string } }
+  contributions?: Array<{ kind: AddKind, id: string, label: string }> // filled by `load`
 }
 ```
 

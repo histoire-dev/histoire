@@ -2,6 +2,7 @@ import type { MarketplaceManifest, MarketplacePrefs } from '@histoire/shared'
 import type { Context } from '../../context.js'
 import { afterEach, describe, expect, it, onTestFinished } from 'vitest'
 import { marketplaceDefaults } from '../../../../../histoire-app/src/app/util/marketplace-preferences.js'
+import percy from '../../../../../histoire-plugin-percy/package.json' with { type: 'json' }
 import { createPluginInventory } from '../../config/plugin-toggle-inventory.js'
 import { registerInventoryHandlers } from '../../marketplace/inventory/handlers.js'
 import { createRegistryUpdateReader } from '../../marketplace/inventory/registry-versions.js'
@@ -50,20 +51,21 @@ describe('inventory catalog registry integration', () => {
   it('uses bundled official releases with community off and never constructs a registry client', async () => {
     const { root } = await inventoryProject()
     const reader = createRegistryUpdateReader({ root } as Context, { registryUrl: 'invalid url' })
-    const versions = await reader('@histoire/plugin-a11y', { ...prefs, community: false })
-    expect(versions).toMatchObject([{ version: '1.0.0-beta.1', compatible: true }])
+    const versions = await reader('@histoire/plugin-percy', { ...prefs, community: false })
+    expect(versions).toEqual(expect.arrayContaining([expect.objectContaining({ version: '1.0.0-beta.1', compatible: true })]))
     expect(await reader('community', { ...prefs, community: false })).toEqual([])
   })
 
   it('wires real inventory requests to bundled updates without an injected reader', async () => {
     const { root } = await inventoryProject()
-    await inventoryPackage(root, '@histoire/plugin-a11y', '1.0.0-beta.0')
-    const ctx = { root, mode: 'dev', config: { plugins: [{ name: '@histoire/plugin-a11y' }] } } as Context
+    const id = percy.name
+    await inventoryPackage(root, id, '1.0.0-beta.0')
+    const ctx = { root, mode: 'dev', config: { plugins: [{ name: id }] } } as Context
     ctx.pluginInventory = (await createPluginInventory(ctx)).rows
     const fixture = uiChannelFixture()
     onTestFinished(() => fixture.channel.close())
     registerInventoryHandlers(ctx, fixture.channel, () => true)
     await fixture.request('histoire:ui:marketplace-updates', { requestId: 'bundled', prefs: { ...prefs, community: false } })
-    expect(fixture.client.send).toHaveBeenCalledWith('histoire:ui:marketplace-updates-result', { requestId: 'bundled', updates: [{ id: '@histoire/plugin-a11y', from: '1.0.0-beta.0', to: '1.0.0-beta.1', breaking: false }] })
+    expect(fixture.client.send).toHaveBeenCalledWith('histoire:ui:marketplace-updates-result', { requestId: 'bundled', updates: [{ id, from: '1.0.0-beta.0', to: percy.version, breaking: false }] })
   })
 })

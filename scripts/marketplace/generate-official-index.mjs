@@ -43,7 +43,8 @@ export async function generateOfficialIndex(root = officialRoot) {
     if (pkg.name !== `@histoire/plugin-${plugin}`) throw new Error(`Invalid official package identity: ${plugin}`)
     const manifest = validateOfficialManifest(pkg.histoire?.marketplace, `${plugin}/package.json`)
     const history = await readOfficialHistory(resolve(root, `packages/histoire-plugin-${plugin}`), manifest)
-    if (!history.some(entry => entry.version === pkg.version)) throw new Error(`Snapshot current official release before generating index: ${plugin}`)
+    // A plugin can be listed before its first publication without inventing a previous release.
+    if (history.length && !history.some(entry => entry.version === pkg.version)) throw new Error(`Snapshot current official release before generating index: ${plugin}`)
     const logoUrl = await readOfficialLogo(resolve(root, `packages/histoire-plugin-${plugin}`), plugin) ?? manifest.logoUrl
     return {
       id: pkg.name,
@@ -77,7 +78,12 @@ export async function generateOfficialIndex(root = officialRoot) {
   return entries.sort((left, right) => left.id < right.id ? -1 : left.id > right.id ? 1 : 0)
 }
 
+/** Write the catalog consumed by the Node build and the static workbench. */
+export async function writeOfficialIndex(root = officialRoot) {
+  const target = resolve(root, 'packages/histoire/src/node/marketplace/catalog/official.json')
+  await writeFile(target, `${JSON.stringify(await generateOfficialIndex(root), null, 2)}\n`)
+}
+
 if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {
-  const target = new URL('../../packages/histoire/src/node/marketplace/catalog/official.json', import.meta.url)
-  await writeFile(target, `${JSON.stringify(await generateOfficialIndex(), null, 2)}\n`)
+  await writeOfficialIndex()
 }

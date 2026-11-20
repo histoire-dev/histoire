@@ -10,7 +10,7 @@ function visitCanvas(path = codegen, zoom = 'fit') {
   cy.visit(path, {
     onBeforeLoad(window) {
       window.localStorage.setItem('_histoire-ui-shell', JSON.stringify({ pane: 'stories', panelOpen: true, inspectorOpen: true, panelWidth: 280, inspectorWidth: 344 }))
-      window.localStorage.setItem('_histoire-ui-canvas', JSON.stringify({ zoom, tool: 'select', frameBackground: 'transparent' }))
+      window.localStorage.setItem('_histoire-ui-canvas', JSON.stringify({ version: 3, zoomByArrange: { grid: zoom }, tool: 'select', frameBackground: 'transparent' }))
       window.localStorage.setItem('_histoire-sandbox-settings-v3', JSON.stringify({ responsiveWidth: 431, responsiveHeight: 640, rotate: false }))
     },
   })

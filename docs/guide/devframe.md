@@ -55,7 +55,7 @@ import { createMcpEndpoint } from '@histoire/devframe/node'
 import { toNodeHandler } from '@modelcontextprotocol/node'
 
 const origin = 'https://tools.example.com'
-let authorityVersion = 0
+const authorityVersion = 0
 const host = await mountDevframeHost({
   server,
   origin,

@@ -37,9 +37,10 @@ describe('Plugin marketplace', () => {
       cy.get(`${dialog} [aria-label="All plugins"]`).click()
       cy.get(`${dialog} [aria-label="Search plugins"]`).type('Percy')
       cy.get(`${dialog} [aria-label="Install Percy"]`).click()
-      cy.get(dialog).should('contain', 'Manual install').and('contain', 'Static build. Run these steps in your project.')
-      cy.get(`${dialog} [role="tabpanel"]:visible`).should('contain', '@histoire/plugin-percy').and('contain', 'HstPercy').and('contain', 'Rebuild with histoire build')
-      cy.contains(`${dialog} button`, /^Done$/).click()
+      cy.get(dialog).should('contain', 'Install Percy manually').and('contain', 'Static build. Run these steps in your project.')
+      cy.get(`${dialog} [role="tabpanel"]:visible`).should('contain', '@histoire/plugin-percy')
+      cy.get(dialog).should('contain', 'HstPercy').and('contain', 'Rebuild with histoire build')
+      cy.get(dialog).contains('button', /^\s*Done\s*$/).click()
       cy.get(dialog).should('not.exist')
     })
   }

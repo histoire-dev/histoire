@@ -129,7 +129,6 @@ describe('marketplace manifest', () => {
     expect(generated).toHaveLength(10)
     for (const entry of generated) {
       expect(validateMarketplaceManifest(entry.manifest).diagnostics, entry.id).toEqual([])
-      expect(entry.history.length).toBeGreaterThan(0)
       expect(entry.history.length).toBeLessThanOrEqual(50)
       expect(entry.versions).toEqual(entry.history.map(release => ({ version: release.version, ...(release.publishedAt ? { date: release.publishedAt } : {}), compatible: true })))
       expect(entry.official).toBe(true)

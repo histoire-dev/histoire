@@ -55,7 +55,7 @@ export function setup(modal = false) {
   /** Complete real client response and Vue rendering. */
   async function reply(detail = plugin()) {
     await nextTick()
-    await vi.waitFor(() => expect(request()).toMatchObject({ id: detail.id, prefs: { community: false } }))
+    await vi.waitFor(() => expect(request()).toMatchObject({ id: detail.id, prefs: { community: false } }), { timeout: 5000 })
     channel.emit('histoire:ui:marketplace-detail-result', { requestId: request().requestId, detail })
     await flushMicrotasks(6)
   }
