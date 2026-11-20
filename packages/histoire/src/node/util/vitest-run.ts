@@ -6,7 +6,7 @@ import { ExecutionError } from '../runtime/execution-types.js'
 import { cleanupVitestBrowserRun } from '../vitest-browser-cleanup.js'
 import { assignVitestBrowserProjectOptions } from '../vitest-browser-config/index.js'
 import { debugVitestBrowser } from './browser-debug.js'
-import { prepareCollectionBrowser } from './collection-browser.js'
+import { prepareTestBrowser } from './collection-browser.js'
 import { loadProjectVitest } from './project-vitest.js'
 import { throwIfTestAborted, withTestAbort } from './test-abort.js'
 import { CLEANUP_TIMEOUT } from './test-timeouts.js'
@@ -64,6 +64,8 @@ export interface VitestAttemptSetup<TContext> {
   viteConfig?: ViteInlineConfig
   /** Project-level browser options assigned right after creation. */
   browserProjectOptions?: { plugins: any[] }
+  /** Prepare reachable browser dependencies before executing generated specs. */
+  prepareBrowser?: boolean
   /** Test name filters passed to `vitest.start()`. */
   filter?: string[]
   /** Maximum time `vitest.start()` may take, or go without activity when `activity` is set, before the run is considered stuck. */
@@ -172,9 +174,11 @@ export async function runVitestAttempts<TContext, TResult>(
       }
 
       await runWithVitestStartTimeout(() => withTestAbort(async () => {
-        if (options.mode === 'collect') {
-          await (startup = prepareCollectionBrowser(vitest!, options.runId))
+        if (options.mode === 'collect' || setup.prepareBrowser) {
+          await (startup = prepareTestBrowser(vitest!, options.runId, options.mode === 'collect'))
           throwIfTestAborted(options.signal)
+        }
+        if (options.mode === 'collect') {
           return vitest!.collect(setup.filter ?? [], { staticParse: false })
         }
         return vitest!.start(setup.filter ?? [])
@@ -200,8 +204,8 @@ export async function runVitestAttempts<TContext, TResult>(
           // work can exit the isolated worker without a cleanup acknowledgement.
           // Resource release still waits for cleanupRun, even if cancellation fails.
           await cancelVitestBeforeCleanup(vitest)
-          await settleInterruptedStartup(startup)
         }
+        await settleInterruptedStartup(startup)
         await cleanupRun(vitest, options.label, error, options.strictCleanup, options.runId)
       }
 

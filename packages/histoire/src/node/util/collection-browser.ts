@@ -3,8 +3,13 @@ import { prepareVitestCollectionProvider } from '../vitest-browser-config/browse
 import { debugVitestBrowser } from './browser-debug.js'
 import { finishClientOptimization, warmClientModules } from './client-optimizer.js'
 
-/** Finish entry scanning and initial prebundling before isolated tester documents open. */
-export async function prepareCollectionBrowser(vitest: Vitest, runId?: string): Promise<void> {
+/**
+ * Finish entry scanning and initial prebundling before isolated tester documents open.
+ * @param vitest The attempt-local runner.
+ * @param runId Optional collection operation identity for diagnostics.
+ * @param warmAllSpecs Warm every definition spec, or one representative execution spec.
+ */
+export async function prepareTestBrowser(vitest: Vitest, runId?: string, warmAllSpecs = true): Promise<void> {
   const started = performance.now()
   // COMPAT: browser server initialization matches existing provider adapter's
   // internal Vitest API. Real browser integration covers supported Vitest 4.1.
@@ -19,9 +24,10 @@ export async function prepareCollectionBrowser(vitest: Vitest, runId?: string): 
       await prepareVitestCollectionProvider(project.browser?.provider)
     })(), (async () => {
       const { testFiles } = await project.globTestFiles()
-      // Scan roots retain stable optimizer metadata, but only admitted specs
-      // need transforms now. Cached stories never enter mounted discovery.
-      await warmClientModules(client, [...testFiles, ...project.config.setupFiles].map(file => `/@fs/${file}`), project.browser?.vite.config.root)
+      // Execution specs share the same harness. Warming one reaches its imports
+      // without making a large run wait for every generated file to transform.
+      const specs = warmAllSpecs ? testFiles : testFiles.slice(0, 1)
+      await warmClientModules(client, [...specs, ...project.config.setupFiles].map(file => `/@fs/${file}`), project.browser?.vite.config.root)
       await finishClientOptimization(client)
     })()])
   }))

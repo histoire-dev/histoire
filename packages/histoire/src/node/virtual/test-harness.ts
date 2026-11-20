@@ -30,7 +30,7 @@ export function buildTestHarnessSource({ variantTestSessionId, files, mountTimeo
 
   return `
 import 'virtual:$histoire-theme'
-import { createVariantTestSession, hasVanillaSetupHooks, releaseFinishedSpecs } from ${JSON.stringify(variantTestSessionId)}
+import { createVariantTestSession, getVitestBrowserMountCleanups, hasVanillaSetupHooks, releaseFinishedSpecs } from ${JSON.stringify(variantTestSessionId)}
 
 // Evaluated once per spec file, each in a fresh iframe: free the documents of the previous ones.
 releaseFinishedSpecs()
@@ -59,8 +59,8 @@ export async function collectVariantTests(storyId, variantId) {
   return await variantTestSession.collectVariantTests(storyId, variantId)
 }
 
-export async function runCollectedTest(storyId, variantId, definition) {
-  await variantTestSession.runCollectedTest(storyId, variantId, definition)
+export async function prepareVariantTestRun(storyId, variantId) {
+  return await variantTestSession.prepareVariantTestRun(storyId, variantId, getVitestBrowserMountCleanups())
 }
 `
 }

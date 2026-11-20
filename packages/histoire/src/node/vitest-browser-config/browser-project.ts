@@ -3,7 +3,7 @@ import type { BrowserProviderOption, Vitest } from 'vitest/node'
 import { debugVitestBrowser } from '../util/browser-debug.js'
 import { importResolvedModule } from '../util/import-resolved.js'
 import { resolveVitestModule } from '../util/resolve-vitest-package.js'
-import { createDefinitionOptimizerPolicy } from './definition-optimizer.js'
+import { createBrowserOptimizerPolicy } from './browser-optimizer.js'
 
 /** Chromium flags giving test pages a callable collector and live heap figures. */
 const TEST_BROWSER_ARGS = ['--js-flags=--expose-gc', '--enable-precise-memory-info']
@@ -13,7 +13,7 @@ const TEST_BROWSER_ARGS = ['--js-flags=--expose-gc', '--enable-precise-memory-in
  * the project's own `@vitest/browser-playwright`, with Histoire's plugins.
  * @param root Project root, used to resolve the provider package.
  * @param plugins Vite plugins the browser server must also apply.
- * @param optimizeDeps Definition-run optimizer options, applied to the browser server only.
+ * @param optimizeDeps Reachable dependency policy, applied to the browser server only.
  * @param serverConfig Other Vite options of the browser server (see {@link getVitestBrowserServerConfig}).
  */
 export async function getVitestBrowserProjectConfig(
@@ -55,8 +55,8 @@ export async function getVitestBrowserProjectConfig(
  * `optimizeDeps` comes from the framework and user config, not from the run's
  * own lists: their `include` pre-bundles CommonJS dependencies the page would
  * fail to import raw. Its `entries` and `noDiscovery` are left out: Histoire's
- * core plugin disables discovery in the browser runtime, and definition runs
- * replace the whole optimizer config with their own policy.
+ * core plugin disables discovery by default, and variant tests apply their
+ * optimizer policy on the browser server separately.
  * @param viteConfig The run's Vite config.
  * @param optimizeDeps The framework and user optimizer config.
  */
@@ -104,10 +104,10 @@ function wrapBrowserProviderWithPlugins(
     async serverFactory(options: any) {
       const project = options.project as any
       project.options = { ...project.options, ...serverConfig }
-      // The definition optimizer policy belongs to the browser server alone:
+      // The optimizer policy belongs to the browser server alone:
       // Vitest's Node-side server shares `plugins` but resolves with Node
       // conditions, where browser-only framework includes fail to resolve.
-      project.options.plugins = optimizeDeps ? [...plugins, createDefinitionOptimizerPolicy(optimizeDeps)] : plugins
+      project.options.plugins = optimizeDeps ? [...plugins, createBrowserOptimizerPolicy(optimizeDeps)] : plugins
       if (optimizeDeps) project.options.optimizeDeps = optimizeDeps
       return await provider.serverFactory(options)
     },

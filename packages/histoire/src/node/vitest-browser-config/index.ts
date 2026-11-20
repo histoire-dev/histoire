@@ -73,8 +73,8 @@ export async function createVitestBrowserRuntimeConfig(
     plugins,
   }
   // Applied by the browser server only (see `getVitestBrowserProjectConfig`).
-  const definitionOptimizer = options.reachableDependencies ? { ...viteConfig.optimizeDeps, ...options.optimizeDeps } : undefined
-  const defaultTest = await getVitestBrowserProjectConfig(ctx.root, plugins, definitionOptimizer, getVitestBrowserServerConfig(runViteConfig, viteConfig.optimizeDeps))
+  const browserOptimizer = options.reachableDependencies ? { ...viteConfig.optimizeDeps, ...options.optimizeDeps } : undefined
+  const defaultTest = await getVitestBrowserProjectConfig(ctx.root, plugins, browserOptimizer, getVitestBrowserServerConfig(runViteConfig, viteConfig.optimizeDeps))
 
   return {
     vitestOptions: {

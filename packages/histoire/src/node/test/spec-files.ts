@@ -82,9 +82,9 @@ test('Histoire test collection', { meta: { histoireCollection: collection } }, (
  */
 function generateSpecCode(storyId: string, variantId: string, storyTitle: string, variantTitle: string) {
   return `import { describe, test } from '@vitest/runner'
-import { collectVariantTests, runCollectedTest } from ${JSON.stringify(TEST_HARNESS_ID)}
+import { prepareVariantTestRun } from ${JSON.stringify(TEST_HARNESS_ID)}
 
-const definitions = await collectVariantTests(${JSON.stringify(storyId)}, ${JSON.stringify(variantId)})
+const { definitions, run } = await prepareVariantTestRun(${JSON.stringify(storyId)}, ${JSON.stringify(variantId)})
 
 describe(${JSON.stringify(`${storyTitle} > ${variantTitle}`)}, () => {
   for (const definition of definitions) {
@@ -95,7 +95,7 @@ describe(${JSON.stringify(`${storyTitle} > ${variantTitle}`)}, () => {
 
     const testFn = definition.mode === 'only' ? test.only : definition.mode === 'skip' ? test.skip : test
     testFn(definition.fullName, async () => {
-      await runCollectedTest(${JSON.stringify(storyId)}, ${JSON.stringify(variantId)}, definition)
+      await run(definition)
     // Embedded runtime owns body and hook deadlines. A second outer deadline
     // races it, duplicates failures, and can preempt a valid longer test.
     }, 0)

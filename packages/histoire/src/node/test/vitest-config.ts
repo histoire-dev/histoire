@@ -5,7 +5,7 @@ import { getHistoireBrowserRunConfig } from '../vitest-browser-config/run-config
 /**
  * Builds the Vitest browser config of a Histoire test run.
  * @param ctx The histoire context.
- * @param entries The generated specs, used as dependency optimizer entries.
+ * @param entries The generated specs admitted by this run.
  * @param mode Definition discovery or fresh assertion execution.
  * @param plugins Attempt-owned result transport plugins.
  * @param collectionOptimizerEntries Private captured catalog roots, independent of mounted targets.

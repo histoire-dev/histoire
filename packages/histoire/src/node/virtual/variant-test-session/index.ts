@@ -20,6 +20,7 @@ export { releaseFinishedSpecs } from './finished-specs.js'
 export type { VariantSession } from './session.js'
 export { hasVanillaSetupHooks } from './setup-hooks.js'
 export type { SerializedStoryFile, VariantTestSessionOptions } from './types.js'
+export { getVitestBrowserMountCleanups } from './worker-state.js'
 
 /**
  * Creates the browser-side session driving story test collection and execution.
@@ -61,49 +62,51 @@ export function createVariantTestSession(options: VariantTestSessionOptions) {
     return runExclusive(async () => (await storyModules.createSessionStoryFile(storyId, false)).file)
   }
 
-  /**
-   * Collects the tests a variant registers, without running them.
-   * @returns The serialized definitions, in registration order.
-   */
-  async function collectVariantTests(storyId: string, variantId: string): Promise<HistoireSerializedTestDefinition[]> {
-    return runExclusive(async () => {
-      const storyFile = await storyModules.createSessionStoryFile(storyId)
-      const setupProbe = options.canSkipKnownEmptyCollection
-      if (
-        setupProbe
-        && !storyFile.importedDefinitions.length
-        && isGeneratedStoryKnownEmpty(storyFile.file.component)
-        && !hasStorySetupApp(storyFile.file.component)
-      ) {
-        const setupRegistrations: HistoireTestRegistration[] = []
-        let canSkip = setupProbe === true
+  /** Opens a discovery mount unless runtime evidence proves it cannot register tests. */
+  async function openDiscoveryMount(storyId: string, variantId: string): Promise<VariantSession | undefined> {
+    const storyFile = await storyModules.createSessionStoryFile(storyId)
+    const setupProbe = options.canSkipKnownEmptyCollection
+    if (
+      setupProbe
+      && !storyFile.importedDefinitions.length
+      && isGeneratedStoryKnownEmpty(storyFile.file.component)
+      && !hasStorySetupApp(storyFile.file.component)
+    ) {
+      const setupRegistrations: HistoireTestRegistration[] = []
+      let canSkip = setupProbe === true
 
-        if (typeof setupProbe === 'function') {
-          try {
-            await withRegistry(setupRegistrations, true, async () => {
-              canSkip = await setupProbe()
-            })
-          }
-          catch {
-            // If the probe fails, leave setup imports and errors to real mounts.
-            canSkip = false
-          }
-
-          if (setupRegistrations.length) {
-            storyModules.rememberSetupModuleRegistrations(storyId, setupRegistrations)
-            storyFile.importedDefinitions.push(...setupRegistrations)
-          }
+      if (typeof setupProbe === 'function') {
+        try {
+          await withRegistry(setupRegistrations, true, async () => {
+            canSkip = await setupProbe()
+          })
+        }
+        catch {
+          // If the probe fails, leave setup imports and errors to real mounts.
+          canSkip = false
         }
 
-        if (canSkip && !setupRegistrations.length) {
-          // Validate against current catalog metadata before taking the shortcut.
-          getStoryVariant(storyFile.file, variantId)
-          return []
+        if (setupRegistrations.length) {
+          storyModules.rememberSetupModuleRegistrations(storyId, setupRegistrations)
+          storyFile.importedDefinitions.push(...setupRegistrations)
         }
       }
 
-      const session = await openVariantSession(storyId, variantId, storyFile)
+      if (canSkip && !setupRegistrations.length) {
+        // Validate against current catalog metadata before taking the shortcut.
+        getStoryVariant(storyFile.file, variantId)
+        return
+      }
+    }
 
+    return openVariantSession(storyId, variantId, storyFile)
+  }
+
+  /** Collects definitions without retaining a live mount for definition-only callers. */
+  async function collectVariantTests(storyId: string, variantId: string): Promise<HistoireSerializedTestDefinition[]> {
+    return runExclusive(async () => {
+      const session = await openDiscoveryMount(storyId, variantId)
+      if (!session) return []
       try {
         return serializeTestDefinitions(session.definitions)
       }
@@ -113,13 +116,45 @@ export function createVariantTestSession(options: VariantTestSessionOptions) {
     })
   }
 
+  /** Gives the first executed case the fresh discovery mount, at most once. */
+  async function prepareVariantTestRun(storyId: string, variantId: string, cleanups: (() => void)[] | undefined) {
+    if (!cleanups) {
+      const definitions = await collectVariantTests(storyId, variantId)
+      return { definitions, run: (definition: HistoireSerializedTestDefinition) => runCollectedTest(storyId, variantId, definition) }
+    }
+    return runExclusive(async () => {
+      let mount = await openDiscoveryMount(storyId, variantId)
+      /** Take ownership before executing or disposing, including concurrent cleanup. */
+      function takeMount() {
+        const current = mount
+        mount = undefined
+        return current
+      }
+      try {
+        const definitions = serializeTestDefinitions(mount?.definitions ?? [])
+        if (definitions.some(definition => definition.mode !== 'skip' && definition.mode !== 'todo')) {
+          // Filtered and cancelled files can leave the first case unexecuted.
+          cleanups.push(() => takeMount()?.cleanup())
+        }
+        else {
+          takeMount()?.cleanup()
+        }
+        return { definitions, run: (definition: HistoireSerializedTestDefinition) => runCollectedTest(storyId, variantId, definition, takeMount) }
+      }
+      catch (error) {
+        takeMount()?.cleanup()
+        throw error
+      }
+    })
+  }
+
   /**
    * Runs a single previously collected test, re-resolving it against a freshly
    * mounted variant. Used by the Vitest test harness, which owns the reporting.
    */
-  async function runCollectedTest(storyId: string, variantId: string, definition: HistoireSerializedTestDefinition) {
+  async function runCollectedTest(storyId: string, variantId: string, definition: HistoireSerializedTestDefinition, takeMount?: () => VariantSession | undefined) {
     return runExclusive(async () => {
-      const session = await openVariantSession(storyId, variantId)
+      const session = takeMount?.() ?? await openVariantSession(storyId, variantId)
       const leaveTask = enterHistoireTestTask(getVitestWorkerState()?.current)
 
       try {
@@ -172,6 +207,7 @@ export function createVariantTestSession(options: VariantTestSessionOptions) {
 
   return {
     collectVariantTests,
+    prepareVariantTestRun,
     loadStoryFile,
     // Exposed so the preview runtime imports the story at the same version as
     // the session, instead of ending up with two module instances of it.

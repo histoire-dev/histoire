@@ -1,10 +1,10 @@
 import type { InlineConfig, Plugin } from 'vite'
 import { VITEST_BROWSER_OPTIMIZER_EXCLUDES } from './dependencies.js'
 
-/** Definition discovery scans remaining entries after Histoire/framework config hooks settle. */
-export function createDefinitionOptimizerPolicy(options: NonNullable<InlineConfig['optimizeDeps']>): Plugin {
+/** Scan reachable dependencies after Histoire and framework config hooks settle. */
+export function createBrowserOptimizerPolicy(options: NonNullable<InlineConfig['optimizeDeps']>): Plugin {
   return {
-    name: 'histoire:definition-optimizer-ownership',
+    name: 'histoire:browser-optimizer-ownership',
     enforce: 'post',
     /** Vite resolves separate root/client copies; both must override runtime noDiscovery default. */
     configResolved(config) {

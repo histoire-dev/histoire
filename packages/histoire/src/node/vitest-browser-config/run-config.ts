@@ -15,7 +15,7 @@ export interface HistoireBrowserRunConfigOptions {
   collecting: boolean
   /** Definition discovery keeps test runtime flags but uses bounded browser work. */
   definitions?: boolean
-  /** The generated specs, used as dependency optimizer entries. */
+  /** Generated specs for metadata collection. Test runs scan stable story roots. */
   entries: string[]
   /** Extra Vite plugins (the collection results channel). */
   plugins?: VitePlugin[]
@@ -37,15 +37,12 @@ export async function getHistoireBrowserRunConfig(
     browserRuntime: true,
     collecting,
   })
-  // Generated specs are warmed directly before dispatch. Their fresh run paths
-  // must not invalidate persistent optimizer hashes on every collection.
-  // Controller-owned catalog roots keep the hash stable when cache misses
-  // shrink. These are transform/scan inputs; only filtered specs mount stories.
-  // Other callers retain their existing remaining-story entry policy.
+  // Random spec paths would invalidate the persistent optimizer on every run.
+  // Story roots only drive dependency discovery; specs still own admission.
   const userEntries = viteConfig.optimizeDeps?.entries ?? []
-  const optimizerEntries = options.definitions
-    ? [...new Set([...options.collectionOptimizerEntries ?? ctx.storyFiles.map(file => file.path), ...typeof userEntries === 'string' ? [userEntries] : userEntries])]
-    : entries
+  const optimizerEntries = collecting
+    ? entries
+    : [...new Set([...options.collectionOptimizerEntries ?? ctx.storyFiles.map(file => file.path), ...typeof userEntries === 'string' ? [userEntries] : userEntries])]
 
   if (options.plugins?.length) {
     viteConfig.plugins = [...((viteConfig.plugins as VitePlugin[] | undefined) ?? []), ...options.plugins]
@@ -69,7 +66,7 @@ export async function getHistoireBrowserRunConfig(
   // reusable; Vite re-optimizes on config/lockfile changes, so no `force` is
   // needed.
   viteConfig.cacheDir = resolve(ctx.root, '.histoire', 'cache', collecting ? 'vitest-collect' : options.definitions ? 'vitest-definitions' : 'vitest-test')
-  if (options.definitions) viteConfig.optimizeDeps = { ...viteConfig.optimizeDeps, holdUntilCrawlEnd: viteConfig.optimizeDeps?.holdUntilCrawlEnd ?? false }
+  if (!collecting) viteConfig.optimizeDeps = { ...viteConfig.optimizeDeps, holdUntilCrawlEnd: viteConfig.optimizeDeps?.holdUntilCrawlEnd ?? false }
   // Failure screenshots and other Vitest attachments stay with Histoire's own
   // files instead of Vitest's default `<root>/.vitest-attachments`.
   const attachmentsDir = resolve(ctx.root, '.histoire', 'vitest-attachments')
@@ -81,9 +78,9 @@ export async function getHistoireBrowserRunConfig(
     },
     optimizeDeps: {
       entries: optimizerEntries,
-      ...(options.definitions ? { noDiscovery: viteConfig.optimizeDeps?.noDiscovery ?? false } : {}),
+      ...(!collecting ? { noDiscovery: viteConfig.optimizeDeps?.noDiscovery ?? false } : {}),
     },
-    reachableDependencies: options.definitions,
+    reachableDependencies: !collecting,
     ...(collecting
       ? {
           test: {
