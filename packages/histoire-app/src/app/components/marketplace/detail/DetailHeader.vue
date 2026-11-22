@@ -15,19 +15,27 @@ const props = defineProps<{
 }>()
 const store = useMarketplaceStore()
 /** Prefer the compatible installed update over the latest catalog release. */
-const target = computed(() => props.plugin.installed?.update ?? props.plugin.latest)
+const target = computed(() => props.plugin.installed?.update ?? props.plugin.installVersion ?? props.plugin.latest)
 /** Main action reflects installation state and its exact target version. */
 const label = computed(() => props.plugin.installed ? props.plugin.installed.update ? `Update to ${target.value}` : `Installed ${props.plugin.installed.version}` : 'Install')
-/** Installed packages without updates and incompatible packages cannot install. */
-const disabled = computed(() => !props.plugin.compatible.ok || Boolean(props.plugin.installed && !props.plugin.installed.update))
+/** Installed packages without a suggested update retain their existing management actions. */
+const installedWithoutUpdate = computed(() => Boolean(props.plugin.installed && !props.plugin.installed.update))
+const disabled = computed(() => installedWithoutUpdate.value || Boolean(versionReason(target.value)))
+const menuDisabled = computed(() => installedWithoutUpdate.value || (disabled.value && props.plugin.versions.every(version => reason(version))))
 
 /** Show the server's version-specific incompatibility in disabled menu items. */
 function reason(version: PluginDetail['versions'][number]): string | undefined {
   return version.compatible ? undefined : incompatibleReason(version.reason)
 }
+/** Resolve a suggested target independently of the listing's compatibility verdict. */
+function versionReason(version: string): string | undefined {
+  if (version === props.plugin.latest && !props.plugin.compatible.ok) return incompatibleReason(props.plugin.compatible.reason)
+  const row = props.plugin.versions.find(item => item.version === version)
+  return row ? reason(row) : undefined
+}
 /** Start a wizard only; project changes still require the later review action. */
 function install(version = target.value): void {
-  if (disabled.value || props.plugin.versions.some(item => item.version === version && !item.compatible)) return
+  if (installedWithoutUpdate.value || versionReason(version)) return
   store.startInstall({ id: props.plugin.id, kind: props.plugin.installed ? 'update' : 'install', version, prefs: { ...store.prefs.value, skippedVersions: { ...store.prefs.value.skippedVersions } } })
 }
 
@@ -67,7 +75,7 @@ function browseCategory(): void {
           Installed {{ plugin.installed.version }}
         </p>
       </div>
-      <WorkbenchPanelAction icon="add-alt" :label="label" :disabled="disabled" menu-label="Choose version" :menu-width="280" @click="install()">
+      <WorkbenchPanelAction icon="add-alt" :label="label" :disabled="disabled" :menu-disabled="menuDisabled" menu-label="Choose version" :menu-width="280" @click="install()">
         <template v-if="plugin.versions.length" #menu="{ close }">
           <MenuItem v-for="version in plugin.versions" :key="version.version" :label="version.version" :disabled="reason(version)" @click="install(version.version); close()" />
         </template>

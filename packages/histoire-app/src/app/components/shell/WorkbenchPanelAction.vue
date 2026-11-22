@@ -4,18 +4,20 @@ import { computed, ref, shallowRef } from 'vue'
 import BasePopover from '../base/popover/BasePopover.vue'
 import { useMenuKeyboard } from '../base/use-menu-keyboard.js'
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   /** Offline Carbon glyph name shown before label. */
   icon: string
   /** Short visible action label. */
   label: string
   /** Disables main action and options trigger. */
   disabled?: boolean
+  /** Override menu availability when the main action is disabled. */
+  menuDisabled?: boolean
   /** Accessible name of options trigger and its menu. */
   menuLabel?: string
   /** Options menu width in pixels. */
   menuWidth?: number
-}>()
+}>(), { menuDisabled: undefined })
 const emit = defineEmits<{
   /** Main action activated. */
   click: [event: MouseEvent]
@@ -43,7 +45,7 @@ const { focusLast, openMenu, navigate } = useMenuKeyboard({ open, anchor: () => 
       <BuiltinIcon :icon="icon" :size="16" />{{ label }}
     </HstButton>
     <template v-if="$slots.menu">
-      <HstButton ref="chevron" color="primary" type="button" class="htw:rounded-s-none" icon-only :aria-label="resolvedMenuLabel" aria-haspopup="menu" :aria-expanded="open" :disabled="disabled" @click="focusLast = false; open = !open" @keydown="openMenu">
+      <HstButton ref="chevron" color="primary" type="button" class="htw:rounded-s-none" icon-only :aria-label="resolvedMenuLabel" aria-haspopup="menu" :aria-expanded="open" :disabled="menuDisabled ?? disabled" @click="focusLast = false; open = !open" @keydown="openMenu">
         <BuiltinIcon icon="chevron-down" :size="16" />
       </HstButton>
       <BasePopover v-if="open" v-model:open="open" :anchor="anchor" :label="resolvedMenuLabel" role="menu" :width="menuWidth ?? 160" :focus-last="focusLast" @keydown="navigate">

@@ -140,7 +140,7 @@ See the [plugin API reference](../../reference/plugin-api.md).
 
 ## Publish to the marketplace
 
-Publish your package to npm with the `histoire-plugin` keyword and a declarative `histoire.marketplace` object. Export the configured factory by name from the package root. Listing metadata never imports your package code; community entries appear only when users enable community plugins. Publishing under `@histoire/` alone does not grant Official status: that also requires inclusion in Histoire's bundled index.
+Publish your package to npm with the `histoire-plugin` keyword and a declarative `histoire.marketplace` object. Export the configured factory by name from the package root. Listing metadata never imports your package code; community entries appear only when users enable community plugins. Publishing under `@histoire/` alone does not grant Official status: that also requires listing in Histoire's curated official catalog.
 
 ```json
 {
@@ -186,7 +186,7 @@ Set `adds[].contribution` to the registration's local id, such as `results`, wit
 
 Panes (`api.shell.pane`) and inspector tabs (`api.inspector.tab`) can declare `primaryCommand` using a local command id or a qualified id owned by the same plugin. The host qualifies local ids and rejects malformed or cross-plugin relations. Register the command through `api.commands.add`; the tour shows its action only while that command is available. Toolbar items continue to use `command`. Labels never infer command relationships. See [contribution fields](../../reference/plugin-api.md#contribution-fields).
 
-Write release notes for each published version using `breaking`, `feature` or `fix`. Optional `code` strings are displayed as text. Updates collect intervening notes newest first from registry metadata when enabled, or from committed official history when offline.
+Write release notes for each published version using `breaking`, `feature` or `fix`. Optional `code` strings are displayed as text. Updates collect intervening notes newest first from the hosted official catalog, the opt-in registry source, or bundled official history.
 
 Migrations support `rename-option`, `remove-option` and `set-option`. Histoire selects releases above the installed version through the target, orders them oldest first, then matches every migration's `from` against the original installed version. Operations apply in declaration order to one enabled plugin factory's first literal object argument. There is no JavaScript migration hook. Renames cannot overwrite a different destination value; computed values, ambiguous calls and unsupported structures require manual edits. Downgrades never run migrations. Test upgrade paths from every version range your metadata claims to support.
 
@@ -206,6 +206,19 @@ Review and commit the history files and generated `packages/histoire/src/node/ma
 Snapshots contain `version`, `requires`, `frameworks`, optional `releaseNotes`, `migrations` and `publishedAt`. Publication dates are optional and must be valid date strings when supplied; the command does not invent dates. History is validated, deduplicated and sorted with npm semver, retaining the newest 50 versions. The index command requires every current package version to have a snapshot. Diagnostics identify dropped fields; review them before committing.
 
 Initial seeds hold only current versions. Recover older releases from their actual published metadata before adding history; do not fabricate notes, migrations or compatibility requirements. Bundled server readers evaluate each version's own requirements and frameworks without contacting a registry. History files are release inputs and excluded from published plugin package contents.
+
+### Publish changes to the hosted official catalog
+
+After publishing the plugin to npm, update `scripts/marketplace/official-catalog-input.json` with its listing version and the exact published versions to retain. Every selected release must contain valid marketplace metadata. Run:
+
+```sh
+pnpm marketplace:catalog
+pnpm marketplace:catalog --check
+```
+
+Review and include the input and generated `docs/public/marketplace/v1/official.json` in the same PR. The docs deploy serves the snapshot at `https://histoire.dev/marketplace/v1/official.json`. Verify it responds with JSON and the intended release after deploy. To roll back a catalog change, revert its data commit and redeploy the docs. Existing consumers use the `v1` URL, so breaking format changes need a new URL.
+
+Plugin installation without a Histoire upgrade still depends on the plugin's published peer ranges. In particular, pnpm packs `workspace:^` against the version in the current workspace. Check the packed manifest against the oldest Histoire version you intend to support before promoting an independent plugin release.
 
 ## Extending Vite configuration
 

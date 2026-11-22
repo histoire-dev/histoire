@@ -50,11 +50,16 @@ export function useInstallWizard() {
     detail.value = undefined
     error.value = undefined
     try {
-      const result = await store.client.detail(change.id, change.prefs, { signal: current.signal })
+      const options = { signal: current.signal, version: change.version }
+      let result = await store.client.detail(change.id, change.prefs, options)
+      if (!change.version && change.kind === 'install' && result.installVersion) {
+        result = await store.client.detail(change.id, change.prefs, { ...options, version: result.installVersion })
+      }
       if (current.signal.aborted) return
       values.value = Object.fromEntries((result.manifest.config.options ?? []).filter(field => field.default !== undefined).map(field => [field.key, structuredClone(field.default!)]))
       Object.assign(values.value, change.options)
-      intent.value = { ...change, prefs: { ...change.prefs } }
+      const version = change.version ?? (change.kind === 'install' ? result.latest : undefined)
+      intent.value = { ...change, ...(version ? { version } : {}), prefs: { ...change.prefs } }
       detail.value = result
     }
     catch (cause) {

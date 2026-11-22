@@ -12,6 +12,7 @@
   },
   "scripts": {
     "marketplace:history": "node scripts/marketplace/snapshot-official-history.mjs",
+    "marketplace:catalog": "node scripts/marketplace/publish-official-catalog.mjs",
     "marketplace:index": "node scripts/marketplace/generate-official-index.mjs",
     "lint": "eslint . --cache",
     "lint:fix": "eslint . --fix --cache",

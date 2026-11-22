@@ -1,7 +1,8 @@
 import { afterEach, beforeEach, expect, it, vi } from 'vitest'
+import { nextTick } from 'vue'
 import { flushMicrotasks } from '../../../../histoire/src/node/__tests__/utils/flush.js'
 import { stubMarketplaceSession } from '../utils/marketplace-transport.js'
-import { plan, setup } from './fixtures.js'
+import { plan, plugin, setup } from './fixtures.js'
 
 vi.mock('virtual:$histoire-config', () => ({ installedPlugins: [] }))
 beforeEach(stubMarketplaceSession)
@@ -24,6 +25,23 @@ it('cancels options to selected plugin details without starting install', async 
   expect(channel.sent.some(item => item.event.endsWith('job-start'))).toBe(false)
   store.back()
   expect(store.view.value).toBe('all')
+})
+
+it('loads and reviews options from the selected exact release', async () => {
+  const { channel, request, wrapper } = setup(cleanups)
+  await nextTick()
+  const detailRequest = request('detail')
+  expect(detailRequest).toMatchObject({ id: '@histoire/plugin-a11y', version: '1.0.0' })
+  const metadata = plugin()
+  channel.emit('histoire:ui:marketplace-detail-result', {
+    requestId: detailRequest.requestId,
+    detail: { ...metadata, latest: '1.0.0', manifest: { ...metadata.manifest, config: {
+      import: 'HstA11y',
+      options: [{ key: 'legacyRule', label: 'Legacy rule', type: 'string', default: 'older' }],
+    } } },
+  })
+  await vi.waitFor(() => expect(request().request).toMatchObject({ version: '1.0.0', options: { legacyRule: 'older' } }))
+  expect((wrapper.get('input[type="text"]').element as HTMLInputElement).value).toBe('older')
 })
 
 // Returning through completed steps must retain edits and require same current

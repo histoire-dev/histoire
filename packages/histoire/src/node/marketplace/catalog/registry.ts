@@ -1,8 +1,7 @@
 import type { RegistryPackument } from './registry-entry.js'
-import { Buffer } from 'node:buffer'
 import { z } from 'zod'
 import { createRegistryCache } from './cache.js'
-import { CatalogNotFoundError } from './errors.js'
+import { fetchMarketplaceJson } from './fetch-json.js'
 import { registryPackumentUrl, resolveNpmConfig } from './npm-config.js'
 import { packumentSchema } from './registry-entry.js'
 import { packageName } from './validation.js'
@@ -15,38 +14,6 @@ export interface RegistryOptions {
 }
 /** Validated npm search page. */
 const searchSchema = z.object({ objects: z.array(z.object({ package: z.object({ name: packageName }) })).max(250), total: z.number().int().min(0).max(100000) })
-
-/** Read bounded streaming JSON, including chunked bodies lacking content-length. */
-async function readJson(url: string, bytes: number, signal: AbortSignal, authorization?: string): Promise<unknown> {
-  const response = await fetch(url, { signal, redirect: 'error', headers: { accept: 'application/json', ...(authorization ? { authorization } : {}) } })
-  if (!response.ok) {
-    await response.body?.cancel()
-    if (response.status === 404) throw new CatalogNotFoundError()
-    throw new Error(`Registry HTTP ${response.status} (${new URL(url).host})`)
-  }
-  if (Number(response.headers.get('content-length')) > bytes) {
-    await response.body?.cancel()
-    throw new Error('Registry response too large')
-  }
-  const reader = response.body?.getReader()
-  if (!reader) throw new Error('Registry response is empty')
-  let size = 0
-  const chunks: Uint8Array[] = []
-  try {
-    while (true) {
-      const { value, done } = await reader.read()
-      if (done) break
-      size += value.byteLength
-      if (size > bytes) throw new Error('Registry response too large')
-      chunks.push(value)
-    }
-    return JSON.parse(Buffer.concat(chunks).toString('utf8'))
-  }
-  finally {
-    await reader.cancel().catch(() => {})
-    reader.releaseLock()
-  }
-}
 
 /** npm-only metadata client: validated, deduplicated, cached, bounded and code-free. */
 export function createRegistryClient(root: string, options: RegistryOptions = {}) {
@@ -62,7 +29,7 @@ export function createRegistryClient(root: string, options: RegistryOptions = {}
     url.searchParams.set('text', 'keywords:histoire-plugin')
     url.searchParams.set('size', '250')
     url.searchParams.set('from', String(from))
-    return cache.get(url.href, value => searchSchema.parse(value), () => readJson(url.href, 2 * 1024 * 1024, signal, config.authorizationFor(url.href)))
+    return cache.get(url.href, value => searchSchema.parse(value), () => fetchMarketplaceJson(url.href, 2 * 1024 * 1024, signal, config.authorizationFor(url.href)))
   }
   /** Exact identity fetch, also available to inventory and job consumers. */
   function packument(id: string, signal?: AbortSignal) {
@@ -75,7 +42,7 @@ export function createRegistryClient(root: string, options: RegistryOptions = {}
     const requestSignal = signal ? AbortSignal.any([signal, deadline]) : deadline
     const config = await settings()
     const url = registryPackumentUrl(config, id)
-    const result = await cache.get(url, value => validateIdentity(packumentSchema.parse(value), id), () => readJson(url, 8 * 1024 * 1024, requestSignal, config.authorizationFor(url)))
+    const result = await cache.get(url, value => validateIdentity(packumentSchema.parse(value), id), () => fetchMarketplaceJson(url, 8 * 1024 * 1024, requestSignal, config.authorizationFor(url)))
     validateIdentity(result.value, id)
     return result
   }

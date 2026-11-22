@@ -6,3 +6,9 @@ NPM_FLAGS = "--version" # prevent Netlify npm install
 from = "/*"
 to = "/index.html"
 status = 200
+
+[[headers]]
+for = "/marketplace/v1/official.json"
+
+[headers.values]
+Cache-Control = "public, max-age=300"

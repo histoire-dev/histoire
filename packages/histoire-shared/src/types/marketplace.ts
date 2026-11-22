@@ -91,7 +91,7 @@ export interface CatalogEntry {
   /** Visible name. */ displayName: string
   /** Short description. */ summary: string
   /** Publisher identity. */ publisher: string
-  /** Bundled entry AND @histoire scope. */ official: boolean
+  /** Curated official entry under the @histoire scope. */ official: boolean
   /** Primary category. */ category: Category
   /** Supported frameworks; empty means any. */ frameworks: string[]
   /** Declared contributions. */ adds: Add[]
@@ -99,6 +99,7 @@ export interface CatalogEntry {
   /** Tile color. */ tint: Tint
   /** Optional HTTPS logo. */ logoUrl?: string
   /** Latest version. */ latest: string
+  /** Compatible approved install target when the listing version is incompatible. */ installVersion?: string
   /** Registry update timestamp. */ updatedAt?: string
   /** License identifier. */ license?: string
   /** Source repository link. */ repoUrl?: string
@@ -126,7 +127,7 @@ export interface CatalogQuery {
   /** Active facets. */ filters?: {
     /** Primary category. */ category?: Category
     /** Framework facets. */ frameworks?: string[]
-    /** Restrict to bundled official entries. */ officialOnly?: boolean
+    /** Restrict to curated official entries. */ officialOnly?: boolean
     /** Contribution facets. */ adds?: AddKind[]
     /** Curated collection identity from the manifest `collections` list. */ collection?: string
   }
@@ -151,7 +152,7 @@ export interface CatalogPage {
     /** Detected dependency signals. */ signals: string[]
   }
   /** Source health. */ sources: {
-    /** Bundled index is always available. */ official: 'ok'
+    /** Live or bundled data is available, including after a failed refresh. */ official: 'ok' | 'stale' | 'fallback'
     /** Registry state. */ community: 'off' | 'ok' | 'stale' | 'error'
   }
   /** Optional curated discovery content. */ discover?: {

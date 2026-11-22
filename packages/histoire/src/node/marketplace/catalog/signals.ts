@@ -35,7 +35,7 @@ async function projectSignals(root: string): Promise<ProjectSignals> {
 }
 
 /** Capture project evidence once; resolve only peers currently consulted and the Vite chip. */
-export async function detectProjectSignals(context: ProjectContext | string, requires: Iterable<string> = []): Promise<ProjectSignals> {
+export async function detectProjectSignals(context: ProjectContext | string, requires: Iterable<string> = [], inspectAllPeers = false): Promise<ProjectSignals> {
   // Root-only callers have no generation lifetime; owned consumers pass their context.
   const ctx = typeof context === 'string' ? { root: context } : context
   let state = states.get(ctx)
@@ -44,12 +44,16 @@ export async function detectProjectSignals(context: ProjectContext | string, req
     states.set(ctx, state)
   }
   const project = await state.project
-  await Promise.all([...new Set(['vite', ...requires])].filter(name => project.dependencies.includes(name)).map((name) => {
+  // Hosted peer ranges apply to root-resolvable packages, including hoisted peers.
+  const peers = [...requires].filter(name => name !== 'histoire' && (inspectAllPeers || project.dependencies.includes(name)))
+  const hasViteDependency = project.dependencies.includes('vite')
+  if (hasViteDependency) peers.push('vite')
+  await Promise.all([...new Set(peers)].map((name) => {
     let read = state.reads.get(name)
     if (!read) {
       read = readInstalledPackage(ctx.root, name).then((pkg) => {
         if (typeof pkg.version === 'string') project.versions[name] = pkg.version
-        if (name === 'vite' && /^\d+\./.test(project.versions.vite ?? '')) project.project.signals.push(`vite ${project.versions.vite.split('.')[0]}`)
+        if (name === 'vite' && hasViteDependency && /^\d+\./.test(project.versions.vite ?? '')) project.project.signals.push(`vite ${project.versions.vite.split('.')[0]}`)
       })
       state.reads.set(name, read)
     }

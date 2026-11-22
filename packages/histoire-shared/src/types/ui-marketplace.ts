@@ -23,7 +23,7 @@ export type MarketplaceJobEvent =
 declare module './ui-channel.js' {
   interface UiClientEvents {
     /** Query catalog. */ 'histoire:ui:marketplace-catalog': { /** Correlation. */ requestId: string, /** Search and preferences. */ query: CatalogQuery }
-    /** Read plugin details. */ 'histoire:ui:marketplace-detail': { /** Correlation. */ requestId: string, /** npm identity. */ id: PluginId, /** Preferences. */ prefs: MarketplacePrefs }
+    /** Read plugin details. */ 'histoire:ui:marketplace-detail': { /** Correlation. */ requestId: string, /** npm identity. */ id: PluginId, /** Preferences. */ prefs: MarketplacePrefs, /** Exact release requested by the install wizard. */ version?: string }
     /** Read compatible target notes and migrations. */ 'histoire:ui:marketplace-update-detail': { /** Correlation. */ requestId: string, /** npm identity. */ id: PluginId, /** Preferences. */ prefs: MarketplacePrefs }
     /** Prepare reviewable changes. */ 'histoire:ui:marketplace-plan': { /** Correlation. */ requestId: string, /** Intent. */ request: ChangeRequest }
     /** Admit an already reviewed plan. */ 'histoire:ui:marketplace-job-start': { /** Correlation. */ requestId: string, /** Plan identity. */ planId: string, /** Reviewed hash. */ hash: string }

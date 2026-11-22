@@ -1,0 +1,82 @@
+[
+  {
+    "id": "@histoire/plugin-a11y",
+    "listing": "1.0.0-beta.2",
+    "versions": [
+      "1.0.0-beta.2"
+    ],
+    "docsUrl": "https://histoire.dev/guide/plugins/a11y.html"
+  },
+  {
+    "id": "@histoire/plugin-designs",
+    "listing": "1.0.0-beta.2",
+    "versions": [
+      "1.0.0-beta.2"
+    ],
+    "docsUrl": "https://histoire.dev/guide/plugins/designs.html"
+  },
+  {
+    "id": "@histoire/plugin-nuxt",
+    "listing": "1.0.0-beta.2",
+    "versions": [
+      "1.0.0-beta.2"
+    ],
+    "docsUrl": "https://histoire.dev/guide/plugins/official.html"
+  },
+  {
+    "id": "@histoire/plugin-percy",
+    "listing": "1.0.0-beta.2",
+    "versions": [
+      "1.0.0-beta.2"
+    ],
+    "docsUrl": "https://histoire.dev/guide/plugins/official.html"
+  },
+  {
+    "id": "@histoire/plugin-quasar",
+    "listing": "1.0.0-beta.2",
+    "versions": [
+      "1.0.0-beta.2"
+    ],
+    "docsUrl": "https://histoire.dev/guide/plugins/official.html"
+  },
+  {
+    "id": "@histoire/plugin-react",
+    "listing": "1.0.0-beta.2",
+    "versions": [
+      "1.0.0-beta.2"
+    ],
+    "docsUrl": "https://histoire.dev/guide/plugins/official.html"
+  },
+  {
+    "id": "@histoire/plugin-screenshot",
+    "listing": "1.0.0-beta.2",
+    "versions": [
+      "1.0.0-beta.2"
+    ],
+    "docsUrl": "https://histoire.dev/guide/plugins/official.html"
+  },
+  {
+    "id": "@histoire/plugin-svelte",
+    "listing": "1.0.0-beta.2",
+    "versions": [
+      "1.0.0-beta.2"
+    ],
+    "docsUrl": "https://histoire.dev/guide/plugins/official.html"
+  },
+  {
+    "id": "@histoire/plugin-vue",
+    "listing": "1.0.0-beta.2",
+    "versions": [
+      "1.0.0-beta.2"
+    ],
+    "docsUrl": "https://histoire.dev/guide/plugins/official.html"
+  },
+  {
+    "id": "@histoire/plugin-vue-devtools",
+    "listing": "1.0.0-beta.2",
+    "versions": [
+      "1.0.0-beta.2"
+    ],
+    "docsUrl": "https://histoire.dev/guide/devframe.html"
+  }
+]

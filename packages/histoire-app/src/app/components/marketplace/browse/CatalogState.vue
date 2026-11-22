@@ -25,5 +25,8 @@ const ready = computed(() => !!store.page.value && store.pageView.value === prop
   <p v-if="ready && ['stale', 'error'].includes(store.page.value.sources.community)" role="status" class="htw:m-0 htw:rounded-control htw:bg-chip htw:p-[12px] htw:text-[12px] htw:text-muted">
     Community plugins unavailable<span v-if="store.page.value.sources.community === 'stale'"> · Showing saved results</span>
   </p>
+  <p v-if="ready && store.page.value.sources.official !== 'ok'" role="status" class="htw:m-0 htw:rounded-control htw:bg-chip htw:p-[12px] htw:text-[12px] htw:text-muted">
+    {{ store.page.value.sources.official === 'stale' ? 'Showing saved official plugins' : 'Showing bundled official plugins' }}
+  </p>
   <slot v-if="ready" />
 </template>

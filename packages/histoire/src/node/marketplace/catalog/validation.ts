@@ -3,6 +3,8 @@ import { z } from 'zod'
 
 /** Exact npm identity, safe for registry paths and project lookups. */
 export const packageName = z.string().max(214).regex(/^(?:@[a-z0-9][a-z0-9._-]*\/)?[a-z0-9][a-z0-9._-]*$/)
+/** Only exact registry versions are accepted. */
+export const exactVersion = z.string().max(128).regex(/^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-[0-9a-z.-]+)?(?:\+[0-9a-z.-]+)?$/i)
 /** Browser-local preferences, never project settings. */
 export const prefsSchema = z.object({ community: z.boolean(), packageManager: z.enum(packageManagers), afterInstall: z.enum(['restart', 'ask']), skippedVersions: z.record(packageName, z.string().max(128)) })
 /** Bounded correlation envelope parsed before feature validation. */

@@ -63,9 +63,11 @@ function remember(store: MemoryStore, key: string, entry: CacheEntry, serialized
 }
 
 /** Project-shared bounded metadata, with per-client identical in-flight work sharing. */
-export function createRegistryCache(root: string, now: () => number = Date.now) {
+export function createRegistryCache(root: string, now: () => number = Date.now, cachePath = REGISTRY_CACHE_PATH) {
   root = resolve(root)
-  const directory = join(root, REGISTRY_CACHE_PATH)
+  const directory = join(root, cachePath)
+  /** Keep different schemas distinct even if an npm registry uses the catalog host. */
+  const memoryKey = (key: string) => `${cachePath}:${key}`
   let memory = stores.get(root)
   if (!memory) {
     memory = { entries: new Map(), bytes: 0, active: true }
@@ -81,16 +83,17 @@ export function createRegistryCache(root: string, now: () => number = Date.now) 
   /** Trust admitted memory; validate untrusted disk metadata without rewriting files. */
   async function readEntry<T>(key: string, parse: (value: unknown) => T): Promise<CacheEntry<T> | undefined> {
     if (!memory.active) return
-    const cached = memory.entries.get(key)
+    const id = memoryKey(key)
+    const cached = memory.entries.get(id)
     if (cached) {
       try {
         if (cached.at > now()) throw new Error('Invalid cache time')
         // Promote reads without resetting fetch time or serializing the payload again.
-        memory.entries.delete(key)
-        memory.entries.set(key, cached)
+        memory.entries.delete(id)
+        memory.entries.set(id, cached)
         return { at: cached.at, value: cached.value as T }
       }
-      catch { forget(memory, key) }
+      catch { forget(memory, id) }
     }
     try {
       const raw = await readFile(filename(key), 'utf8')
@@ -98,7 +101,7 @@ export function createRegistryCache(root: string, now: () => number = Date.now) 
       const entry = JSON.parse(raw)
       if (typeof entry.at !== 'number' || !Number.isFinite(entry.at) || entry.at > now()) return
       const validated = { at: entry.at, value: parse(entry.value) }
-      remember(memory, key, validated, JSON.stringify(validated))
+      remember(memory, id, validated, JSON.stringify(validated))
       return validated
     }
     catch { /* Invalid or absent cache is a miss. */ }
@@ -127,7 +130,7 @@ export function createRegistryCache(root: string, now: () => number = Date.now) 
         try {
           // Serialize once for both the memory budget and atomic disk publication.
           const serialized = JSON.stringify(entry)
-          remember(memory, key, entry, serialized)
+          remember(memory, memoryKey(key), entry, serialized)
           if (memory.active) {
             await mkdir(directory, { recursive: true })
             await writeFile(temporary, serialized)

@@ -1,9 +1,8 @@
 import { z } from 'zod'
-import { correlationSchema, packageName, prefsSchema } from '../catalog/validation.js'
+import { correlationSchema, exactVersion, packageName, prefsSchema } from '../catalog/validation.js'
 import { optionPath } from '../manifest/schema.js'
 
-/** Only exact registry versions are accepted; never tags, URLs, flags or paths. */
-export const exactVersion = z.string().max(128).regex(/^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-[0-9a-z.-]+)?(?:\+[0-9a-z.-]+)?$/i)
+export { exactVersion } from '../catalog/validation.js'
 /** Form controls admit only bounded values, never executable source. */
 export const changeRequestSchema = z.strictObject({
   kind: z.enum(['install', 'remove', 'update', 'pin', 'options']),

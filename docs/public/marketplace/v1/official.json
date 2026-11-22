@@ -1,0 +1,737 @@
+{
+  "schemaVersion": 1,
+  "packages": [
+    {
+      "packument": {
+        "name": "@histoire/plugin-a11y",
+        "dist-tags": {
+          "latest": "1.0.0-beta.2"
+        },
+        "versions": {
+          "1.0.0-beta.2": {
+            "name": "@histoire/plugin-a11y",
+            "version": "1.0.0-beta.2",
+            "histoire": {
+              "marketplace": {
+                "adds": [
+                  {
+                    "kind": "inspector-tab",
+                    "text": "Live accessibility audits",
+                    "contribution": "accessibility"
+                  },
+                  {
+                    "kind": "rail-pane",
+                    "text": "Project results with story tests or build reports",
+                    "contribution": "issues"
+                  },
+                  {
+                    "kind": "story-tests",
+                    "text": "Optional axe-core tests per variant"
+                  }
+                ],
+                "tint": "blue",
+                "access": [
+                  "story-frames",
+                  "story-dom",
+                  "filesystem",
+                  "child-process"
+                ],
+                "config": {
+                  "import": "HstA11y",
+                  "options": [
+                    {
+                      "key": "enabled",
+                      "type": "boolean",
+                      "label": "Enable audits",
+                      "default": true
+                    },
+                    {
+                      "key": "devOnly",
+                      "type": "boolean",
+                      "label": "Development only",
+                      "default": false
+                    },
+                    {
+                      "key": "autoRun",
+                      "type": "boolean",
+                      "label": "Run while inspector is open",
+                      "default": true
+                    },
+                    {
+                      "key": "test",
+                      "type": "boolean",
+                      "label": "Run as story tests",
+                      "default": false
+                    },
+                    {
+                      "key": "build",
+                      "type": "boolean",
+                      "label": "Include build report",
+                      "default": false
+                    },
+                    {
+                      "key": "exclude",
+                      "type": "string-list",
+                      "label": "Excluded selectors",
+                      "default": []
+                    }
+                  ]
+                },
+                "summary": "axe-core audits in the inspector, project results, and optional story tests.",
+                "category": "testing",
+                "monogram": "Ax",
+                "requires": {
+                  "histoire": "^1.0.0-beta.1"
+                },
+                "recommend": [
+                  {
+                    "reason": "Vitest detected",
+                    "dependency": "vitest"
+                  },
+                  {
+                    "reason": "Add accessibility audits",
+                    "missing": true
+                  }
+                ],
+                "frameworks": [],
+                "displayName": "Accessibility"
+              }
+            },
+            "peerDependencies": {
+              "vue": "^3.5.0",
+              "histoire": "^1.0.0-beta.2",
+              "playwright": ">=1.40.0",
+              "@histoire/controls": "^1.0.0-beta.2"
+            },
+            "peerDependenciesMeta": {
+              "vue": {
+                "optional": true
+              },
+              "playwright": {
+                "optional": true
+              },
+              "@histoire/controls": {
+                "optional": true
+              }
+            },
+            "dist": {},
+            "license": "MIT",
+            "homepage": "https://github.com/histoire-dev/histoire#readme",
+            "repository": {
+              "url": "git+https://github.com/histoire-dev/histoire.git"
+            }
+          }
+        },
+        "time": {
+          "1.0.0-beta.2": "2026-11-22T22:43:39.065Z"
+        }
+      },
+      "docsUrl": "https://histoire.dev/guide/plugins/a11y.html"
+    },
+    {
+      "packument": {
+        "name": "@histoire/plugin-designs",
+        "dist-tags": {
+          "latest": "1.0.0-beta.2"
+        },
+        "versions": {
+          "1.0.0-beta.2": {
+            "name": "@histoire/plugin-designs",
+            "version": "1.0.0-beta.2",
+            "histoire": {
+              "marketplace": {
+                "adds": [
+                  {
+                    "kind": "inspector-tab",
+                    "text": "Design references",
+                    "contribution": "design"
+                  },
+                  {
+                    "kind": "canvas-view",
+                    "text": "Side-by-side, overlay and split design comparison",
+                    "contribution": "side-by-side"
+                  }
+                ],
+                "tint": "violet",
+                "access": [
+                  "network"
+                ],
+                "config": {
+                  "import": "HstDesigns",
+                  "options": [
+                    {
+                      "key": "enabled",
+                      "type": "boolean",
+                      "label": "Enable designs",
+                      "default": true
+                    },
+                    {
+                      "key": "devOnly",
+                      "type": "boolean",
+                      "label": "Development only",
+                      "default": false
+                    },
+                    {
+                      "key": "embedHost",
+                      "type": "string",
+                      "label": "Figma embed host",
+                      "default": "histoire"
+                    },
+                    {
+                      "key": "canvasView",
+                      "type": "boolean",
+                      "label": "Canvas design comparison",
+                      "default": true
+                    }
+                  ]
+                },
+                "summary": "Figma, Penpot, Sketch, image and iframe designs beside stories.",
+                "category": "design",
+                "monogram": "Ds",
+                "requires": {
+                  "vue": "^3.5.0",
+                  "histoire": "^1.0.0-beta.1"
+                },
+                "frameworks": [],
+                "collections": [
+                  "design-handoff"
+                ],
+                "displayName": "Designs"
+              }
+            },
+            "peerDependencies": {
+              "vue": "^3.5.0",
+              "histoire": "^1.0.0-beta.2",
+              "@histoire/controls": "^1.0.0-beta.2"
+            },
+            "dist": {},
+            "license": "MIT",
+            "homepage": "https://github.com/histoire-dev/histoire#readme",
+            "repository": {
+              "url": "git+https://github.com/histoire-dev/histoire.git"
+            }
+          }
+        },
+        "time": {
+          "1.0.0-beta.2": "2026-11-22T22:44:11.418Z"
+        }
+      },
+      "docsUrl": "https://histoire.dev/guide/plugins/designs.html"
+    },
+    {
+      "packument": {
+        "name": "@histoire/plugin-nuxt",
+        "dist-tags": {
+          "latest": "1.0.0-beta.2"
+        },
+        "versions": {
+          "1.0.0-beta.2": {
+            "name": "@histoire/plugin-nuxt",
+            "version": "1.0.0-beta.2",
+            "histoire": {
+              "marketplace": {
+                "adds": [],
+                "tint": "green",
+                "access": [
+                  "filesystem"
+                ],
+                "config": {
+                  "import": "HstNuxt",
+                  "options": [
+                    {
+                      "key": "buildDir",
+                      "type": "string",
+                      "label": "Nuxt build directory",
+                      "default": ".histoire/nuxt"
+                    },
+                    {
+                      "key": "prebundle",
+                      "type": "string-list",
+                      "label": "Dependencies to prebundle",
+                      "default": []
+                    },
+                    {
+                      "key": "excludePlugins",
+                      "type": "string-list",
+                      "label": "Excluded app plugins",
+                      "default": []
+                    },
+                    {
+                      "key": "uiApp",
+                      "type": "boolean",
+                      "label": "Wrap stories in Nuxt UI UApp",
+                      "default": true
+                    }
+                  ]
+                },
+                "summary": "Load Nuxt 3 and 4 configuration, modules and auto-imports in Vue stories.",
+                "category": "frameworks",
+                "monogram": "Nu",
+                "requires": {
+                  "nuxt": "^3.0.0-rc.11 || ^4.0.0",
+                  "histoire": "^1.0.0-beta.1"
+                },
+                "recommend": [
+                  {
+                    "reason": "Nuxt detected",
+                    "dependency": "nuxt"
+                  }
+                ],
+                "frameworks": [
+                  "vue"
+                ],
+                "displayName": "Nuxt"
+              }
+            },
+            "peerDependencies": {
+              "nuxt": "^3.0.0-rc.11 || ^4.0.0",
+              "histoire": "^1.0.0-beta.2",
+              "@histoire/plugin-vue": "^1.0.0-beta.2"
+            },
+            "dist": {},
+            "license": "MIT",
+            "homepage": "https://github.com/Akryum/histoire#readme",
+            "repository": {
+              "url": "git+https://github.com/Akryum/histoire.git"
+            }
+          }
+        },
+        "time": {
+          "1.0.0-beta.2": "2026-11-22T22:42:53.117Z"
+        }
+      },
+      "docsUrl": "https://histoire.dev/guide/plugins/official.html"
+    },
+    {
+      "packument": {
+        "name": "@histoire/plugin-percy",
+        "dist-tags": {
+          "latest": "1.0.0-beta.2"
+        },
+        "versions": {
+          "1.0.0-beta.2": {
+            "name": "@histoire/plugin-percy",
+            "version": "1.0.0-beta.2",
+            "histoire": {
+              "marketplace": {
+                "adds": [],
+                "tint": "violet",
+                "access": [
+                  "story-frames",
+                  "network",
+                  "child-process"
+                ],
+                "config": {
+                  "import": "HstPercy",
+                  "options": []
+                },
+                "summary": "Send story snapshots to Percy during static builds. Requires Percy CLI.",
+                "category": "testing",
+                "monogram": "Pe",
+                "requires": {
+                  "histoire": "^1.0.0-beta.1"
+                },
+                "frameworks": [],
+                "collections": [
+                  "visual-testing"
+                ],
+                "displayName": "Percy"
+              }
+            },
+            "peerDependencies": {
+              "histoire": "^1.0.0-beta.2"
+            },
+            "dist": {},
+            "license": "MIT",
+            "homepage": "https://github.com/Akryum/histoire#readme",
+            "repository": {
+              "url": "git+https://github.com/Akryum/histoire.git"
+            }
+          }
+        },
+        "time": {
+          "1.0.0-beta.2": "2026-11-22T22:43:11.314Z"
+        }
+      },
+      "docsUrl": "https://histoire.dev/guide/plugins/official.html"
+    },
+    {
+      "packument": {
+        "name": "@histoire/plugin-quasar",
+        "dist-tags": {
+          "latest": "1.0.0-beta.2"
+        },
+        "versions": {
+          "1.0.0-beta.2": {
+            "name": "@histoire/plugin-quasar",
+            "version": "1.0.0-beta.2",
+            "histoire": {
+              "marketplace": {
+                "adds": [],
+                "tint": "blue",
+                "access": [
+                  "filesystem"
+                ],
+                "config": {
+                  "import": "HstQuasar",
+                  "options": []
+                },
+                "summary": "Load Quasar CLI configuration, styles, store and client boot files.",
+                "category": "frameworks",
+                "monogram": "Qu",
+                "requires": {
+                  "vite": "^7.0.0 || ^8.0.0",
+                  "quasar": "^2.16.0",
+                  "histoire": "^1.0.0-beta.1",
+                  "@quasar/app-vite": "^3.0.0"
+                },
+                "recommend": [
+                  {
+                    "reason": "Quasar CLI detected",
+                    "dependency": "@quasar/app-vite"
+                  }
+                ],
+                "frameworks": [
+                  "vue"
+                ],
+                "displayName": "Quasar"
+              }
+            },
+            "peerDependencies": {
+              "vite": "^7.0.0 || ^8.0.0",
+              "quasar": "^2.16.0",
+              "histoire": "^1.0.0-beta.2",
+              "@quasar/app-vite": "^3.0.0",
+              "@histoire/plugin-vue": "^1.0.0-beta.2"
+            },
+            "dist": {},
+            "license": "MIT",
+            "homepage": "https://github.com/Akryum/histoire#readme",
+            "repository": {
+              "url": "git+https://github.com/Akryum/histoire.git"
+            }
+          }
+        },
+        "time": {
+          "1.0.0-beta.2": "2026-11-22T22:43:26.050Z"
+        }
+      },
+      "docsUrl": "https://histoire.dev/guide/plugins/official.html"
+    },
+    {
+      "packument": {
+        "name": "@histoire/plugin-react",
+        "dist-tags": {
+          "latest": "1.0.0-beta.2"
+        },
+        "versions": {
+          "1.0.0-beta.2": {
+            "name": "@histoire/plugin-react",
+            "version": "1.0.0-beta.2",
+            "histoire": {
+              "marketplace": {
+                "adds": [],
+                "tint": "sky",
+                "access": [
+                  "story-frames"
+                ],
+                "config": {
+                  "import": "HstReact",
+                  "options": []
+                },
+                "summary": "Collect and render React 18 and 19 stories.",
+                "category": "frameworks",
+                "monogram": "Re",
+                "requires": {
+                  "react": "^18.0.0 || ^19.0.0",
+                  "histoire": "^1.0.0-beta.1",
+                  "react-dom": "^18.0.0 || ^19.0.0"
+                },
+                "recommend": [
+                  {
+                    "reason": "React detected",
+                    "dependency": "react"
+                  }
+                ],
+                "frameworks": [
+                  "react"
+                ],
+                "displayName": "React"
+              }
+            },
+            "peerDependencies": {
+              "react": "^18.0.0 || ^19.0.0",
+              "histoire": "^1.0.0-beta.2",
+              "react-dom": "^18.0.0 || ^19.0.0"
+            },
+            "dist": {},
+            "license": "MIT",
+            "homepage": "https://github.com/Akryum/histoire#readme",
+            "repository": {
+              "url": "git+https://github.com/Akryum/histoire.git"
+            }
+          }
+        },
+        "time": {
+          "1.0.0-beta.2": "2026-11-22T22:42:23.357Z"
+        }
+      },
+      "docsUrl": "https://histoire.dev/guide/plugins/official.html"
+    },
+    {
+      "packument": {
+        "name": "@histoire/plugin-screenshot",
+        "dist-tags": {
+          "latest": "1.0.0-beta.2"
+        },
+        "versions": {
+          "1.0.0-beta.2": {
+            "name": "@histoire/plugin-screenshot",
+            "version": "1.0.0-beta.2",
+            "histoire": {
+              "marketplace": {
+                "adds": [],
+                "tint": "sky",
+                "access": [
+                  "story-frames",
+                  "filesystem",
+                  "child-process"
+                ],
+                "config": {
+                  "import": "HstScreenshot",
+                  "options": [
+                    {
+                      "key": "saveFolder",
+                      "type": "string",
+                      "label": "Screenshot folder",
+                      "default": ".histoire/screenshots"
+                    },
+                    {
+                      "key": "launchOptionsArgs",
+                      "type": "string-list",
+                      "label": "Browser launch arguments",
+                      "default": []
+                    }
+                  ]
+                },
+                "summary": "Save screenshots of story variants during static builds.",
+                "category": "testing",
+                "monogram": "Sc",
+                "requires": {
+                  "histoire": "^1.0.0-beta.1"
+                },
+                "frameworks": [],
+                "collections": [
+                  "visual-testing"
+                ],
+                "displayName": "Screenshot"
+              }
+            },
+            "peerDependencies": {
+              "histoire": "^1.0.0-beta.2"
+            },
+            "dist": {},
+            "license": "MIT",
+            "homepage": "https://github.com/Akryum/histoire#readme",
+            "repository": {
+              "url": "git+https://github.com/Akryum/histoire.git"
+            }
+          }
+        },
+        "time": {
+          "1.0.0-beta.2": "2026-11-22T22:42:44.612Z"
+        }
+      },
+      "docsUrl": "https://histoire.dev/guide/plugins/official.html"
+    },
+    {
+      "packument": {
+        "name": "@histoire/plugin-svelte",
+        "dist-tags": {
+          "latest": "1.0.0-beta.2"
+        },
+        "versions": {
+          "1.0.0-beta.2": {
+            "name": "@histoire/plugin-svelte",
+            "version": "1.0.0-beta.2",
+            "histoire": {
+              "marketplace": {
+                "adds": [],
+                "tint": "amber",
+                "access": [
+                  "story-frames",
+                  "filesystem"
+                ],
+                "config": {
+                  "import": "HstSvelte",
+                  "options": []
+                },
+                "summary": "Svelte 4 and 5 stories, SvelteKit integration and story generation.",
+                "category": "frameworks",
+                "monogram": "Sv",
+                "requires": {
+                  "svelte": "^4.0.0 || ^5.0.0",
+                  "histoire": "^1.0.0-beta.1"
+                },
+                "recommend": [
+                  {
+                    "reason": "Svelte detected",
+                    "dependency": "svelte"
+                  }
+                ],
+                "frameworks": [
+                  "svelte"
+                ],
+                "displayName": "Svelte"
+              }
+            },
+            "peerDependencies": {
+              "svelte": "^4.0.0 || ^5.0.0",
+              "histoire": "^1.0.0-beta.2"
+            },
+            "dist": {},
+            "license": "MIT",
+            "homepage": "https://github.com/Akryum/histoire#readme",
+            "repository": {
+              "url": "git+https://github.com/Akryum/histoire.git"
+            }
+          }
+        },
+        "time": {
+          "1.0.0-beta.2": "2026-11-22T22:42:25.501Z"
+        }
+      },
+      "docsUrl": "https://histoire.dev/guide/plugins/official.html"
+    },
+    {
+      "packument": {
+        "name": "@histoire/plugin-vue",
+        "dist-tags": {
+          "latest": "1.0.0-beta.2"
+        },
+        "versions": {
+          "1.0.0-beta.2": {
+            "name": "@histoire/plugin-vue",
+            "version": "1.0.0-beta.2",
+            "histoire": {
+              "marketplace": {
+                "adds": [],
+                "tint": "green",
+                "access": [
+                  "story-frames",
+                  "filesystem"
+                ],
+                "config": {
+                  "import": "HstVue",
+                  "options": []
+                },
+                "summary": "Vue 3 story collection, rendering and story generation.",
+                "category": "frameworks",
+                "monogram": "Vu",
+                "requires": {
+                  "vue": "^3.5.26",
+                  "histoire": "^1.0.0-beta.1"
+                },
+                "recommend": [
+                  {
+                    "reason": "Vue detected",
+                    "dependency": "vue"
+                  }
+                ],
+                "frameworks": [
+                  "vue"
+                ],
+                "displayName": "Vue"
+              }
+            },
+            "peerDependencies": {
+              "vue": "^3.5.26",
+              "histoire": "^1.0.0-beta.2"
+            },
+            "dist": {},
+            "license": "MIT",
+            "homepage": "https://github.com/Akryum/histoire#readme",
+            "repository": {
+              "url": "git+https://github.com/Akryum/histoire.git"
+            }
+          }
+        },
+        "time": {
+          "1.0.0-beta.2": "2026-11-22T22:43:50.315Z"
+        }
+      },
+      "docsUrl": "https://histoire.dev/guide/plugins/official.html"
+    },
+    {
+      "packument": {
+        "name": "@histoire/plugin-vue-devtools",
+        "dist-tags": {
+          "latest": "1.0.0-beta.2"
+        },
+        "versions": {
+          "1.0.0-beta.2": {
+            "name": "@histoire/plugin-vue-devtools",
+            "version": "1.0.0-beta.2",
+            "histoire": {
+              "marketplace": {
+                "adds": [
+                  {
+                    "kind": "inspector-tab",
+                    "text": "Vue DevTools",
+                    "contribution": "vue"
+                  }
+                ],
+                "tint": "green",
+                "access": [
+                  "story-frames",
+                  "story-dom",
+                  "network"
+                ],
+                "config": {
+                  "import": "HstVueDevtools",
+                  "options": [
+                    {
+                      "key": "enabled",
+                      "type": "boolean",
+                      "label": "Enable Vue DevTools",
+                      "default": true
+                    }
+                  ]
+                },
+                "summary": "Inspect Vue component trees and state in the development inspector.",
+                "category": "inspection",
+                "monogram": "Vd",
+                "requires": {
+                  "vue": "^3.5.26",
+                  "vite": "^8.3.0",
+                  "histoire": "^1.0.0-beta.1",
+                  "@vitejs/devtools": "0.8.0"
+                },
+                "frameworks": [
+                  "vue"
+                ],
+                "displayName": "Vue DevTools"
+              }
+            },
+            "peerDependencies": {
+              "vue": "^3.5.26",
+              "vite": "^8.3.0",
+              "histoire": "^1.0.0-beta.2",
+              "@vitejs/devtools": "0.8.0"
+            },
+            "dist": {},
+            "license": "MIT",
+            "homepage": "https://github.com/Akryum/histoire#readme",
+            "repository": {
+              "url": "git+https://github.com/Akryum/histoire.git"
+            }
+          }
+        },
+        "time": {
+          "1.0.0-beta.2": "2026-11-22T22:42:31.805Z"
+        }
+      },
+      "docsUrl": "https://histoire.dev/guide/devframe.html"
+    }
+  ]
+}

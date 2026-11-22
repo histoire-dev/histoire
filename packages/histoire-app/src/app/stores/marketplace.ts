@@ -131,6 +131,7 @@ export function createMarketplaceStore(options: MarketplaceStoreOptions) {
     if (!open.value) {
       const active = target ?? (typeof document !== 'undefined' && document.activeElement instanceof HTMLElement ? document.activeElement : undefined)
       opener.value = active ? markRaw(active) : undefined
+      void updates.refresh()
     }
     setView(value)
     open.value = true

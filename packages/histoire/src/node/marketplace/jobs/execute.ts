@@ -5,7 +5,6 @@ import type { JobRunnerOptions } from './types.js'
 import path from 'pathe'
 import { configFileHash, hashConfigCode } from '../../config/codemod/write.js'
 import { safeConfigWrite, SafeConfigWriteError } from '../../config/safe-config-write.js'
-import { officialPlugins } from '../catalog/official.js'
 import { parseFailure, suggestVersion } from './failure.js'
 import { createJobOutput } from './output.js'
 import { findUnmetPeer, PeerConflictError } from './peers.js'
@@ -164,8 +163,8 @@ export async function executeJob(options: JobRunnerOptions, receipt: RepairRecei
     }
     if (!configRestored && configFailure) leftovers.push(path.relative(options.root, options.configFile))
     const wasCancelled = cancelled || repairSignal.aborted
-    const suggestion = !wasCancelled && failure.code === 'peer-conflict' && (change.request.prefs.community || officialPlugins.some(entry => entry.id === job.id && entry.official))
-      ? await suggestVersion(options.context ?? options.root, job.id, failure)
+    const suggestion = !wasCancelled && failure.code === 'peer-conflict'
+      ? await suggestVersion(options.context ?? options.root, job.id, failure, undefined, change.request.prefs.community)
       : undefined
     const failed = structuredClone(job)
     failed.failure = { code: configFailure ? 'config-write' : failure.code, message: wasCancelled ? 'Plugin change cancelled' : configFailure ? 'Plugin configuration could not be saved. Run the change manually.' : failure.message, restored, leftovers: [...new Set(leftovers)], ...(suggestion ? { suggestion } : {}) }

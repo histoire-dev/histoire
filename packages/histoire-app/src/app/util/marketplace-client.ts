@@ -131,8 +131,11 @@ export function createMarketplaceClient(options: MarketplaceClientOptions = {}) 
       return staticPage(entries, query)
     },
     /** Read declarative plugin details. */
-    detail(id: string, prefs: MarketplacePrefs, requestOptions?: MarketplaceRequestOptions): Promise<PluginDetail> {
-      return transport.available() ? request('histoire:ui:marketplace-detail', 'histoire:ui:marketplace-detail-result', 'detail', { id, prefs }, requestOptions) : offlineDetail(id, requestOptions)
+    detail(id: string, prefs: MarketplacePrefs, requestOptions?: MarketplaceRequestOptions & {
+      /** Exact published release for install options. */ version?: string
+    }): Promise<PluginDetail> {
+      const version = requestOptions?.version
+      return transport.available() ? request('histoire:ui:marketplace-detail', 'histoire:ui:marketplace-detail-result', 'detail', { id, prefs, ...(version ? { version } : {}) }, requestOptions) : offlineDetail(id, requestOptions)
     },
     /** Read compatible target notes and migrations from the development server. */
     updateDetail(id: string, prefs: MarketplacePrefs, requestOptions?: MarketplaceRequestOptions): Promise<PluginDetail> {

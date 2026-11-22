@@ -2,6 +2,7 @@
 import type { InstalledPlugin } from './plugins/types.js'
 import { BuiltinIcon, HstButton, HstPulsatingDisc } from '@histoire/controls/vue'
 import { installedPlugins } from 'virtual:$histoire-config'
+import { onMounted } from 'vue'
 import { useContributionLookup } from '../../../composables/shell-extensions.js'
 import { useMarketplaceStore } from '../../../stores/marketplace.js'
 import WorkbenchEmptyState from '../../shell/WorkbenchEmptyState.vue'
@@ -18,6 +19,9 @@ const props = withDefaults(defineProps<{
 const dev = props.dev
 const store = useMarketplaceStore()
 const updates = store.updates
+onMounted(() => {
+  void updates.refresh()
+})
 const jobs = store.settingsJobs
 const manager = usePackageManager(store, dev)
 const sections = useContributionLookup('settings.section')

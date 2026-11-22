@@ -43,6 +43,19 @@ it.each([['latest', '2.0.0'], ['menu', '1.5.0']])('starts install with %s versio
   expect(store.installRequest.value).toEqual({ id: '@histoire/plugin-a11y', kind: 'install', version, prefs: store.prefs.value })
 })
 
+// The listing and the installable release can have distinct Histoire requirements.
+it('starts installation of the suggested older release when the listing needs a newer Histoire', async () => {
+  const { store, reply, button } = setup()
+  await reply({
+    ...plugin(),
+    installVersion: '1.4.0',
+    compatible: { ok: false, reason: 'Needs histoire ^2.0.0' },
+    versions: [{ version: '2.0.0', compatible: false, reason: 'Needs histoire ^2.0.0' }, { version: '1.4.0', compatible: true }],
+  })
+  await button('Install').trigger('click')
+  expect(store.installRequest.value).toMatchObject({ id: '@histoire/plugin-a11y', kind: 'install', version: '1.4.0' })
+})
+
 it('opens version menu by keyboard, skips incompatible rows and restores trigger on Escape', async () => {
   const { wrapper, reply } = setup(true)
   await reply()

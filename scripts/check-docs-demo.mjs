@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict'
-import { copyFile, mkdir } from 'node:fs/promises'
+import { copyFile, mkdir, readFile } from 'node:fs/promises'
 import { createServer } from 'node:http'
 import { createRequire } from 'node:module'
 import { fileURLToPath } from 'node:url'
@@ -59,6 +59,11 @@ try {
     server.listen(0, '127.0.0.1', resolve)
   })
   const origin = `http://127.0.0.1:${server.address().port}`
+  const catalogPath = 'marketplace/v1/official.json'
+  const catalog = await fetch(`${origin}/${catalogPath}`)
+  assert.equal(catalog.status, 200)
+  assert.match(catalog.headers.get('content-type') ?? '', /^application\/json/)
+  assert.equal(await catalog.text(), await readFile(new URL(`../docs/public/${catalogPath}`, import.meta.url), 'utf8'))
   browser = await chromium.launch()
   const context = await browser.newContext({
     viewport: { width: 1600, height: 1000 },

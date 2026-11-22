@@ -2,13 +2,21 @@
 
 Open **Settings › Plugins › Browse marketplace**. The marketplace opens over the workbench. **Discover** suggests plugins from project dependencies and installed tools; **All plugins** supports search, categories, framework, publisher and contribution filters. Press `/` to focus search and `Esc` to close and return focus to the opener.
 
-Official entries ship with Histoire and remain available offline. A package is **Official** only when included in that index and published under `@histoire/`. Community packages cannot award themselves that label.
+Development servers refresh the official catalog from `histoire.dev` when the marketplace opens or installed plugins are checked for updates. Changes to the catalog reach existing versions of Histoire that support the feed. A package is **Official** when it is listed in Histoire's curated catalog and published under `@histoire/`.
+
+The server caches official data for one hour. If the feed fails, Histoire uses the last valid saved catalog or the copy bundled with Histoire. The official catalog request uses no npm credentials. To use bundled official data in a development project, set this in `histoire.config.ts`:
+
+```ts
+export default defineConfig({
+  marketplace: { refreshOfficialCatalog: false },
+})
+```
 
 ## Community plugins
 
 **Community plugins** is off by default. Enable it in Plugins settings to include npm packages with the `histoire-plugin` keyword and valid marketplace metadata. Registry requests run on the development server, using its npm registry setting; the browser does not fetch registry metadata directly.
 
-Registry results are cached for one hour. If refresh fails, cached results can remain available with a stale-source notice. Official entries remain available when the registry is unreachable. Turning community plugins off stops registry reads, including update history reads. Compatibility uses npm semver ranges; prereleases require the range to admit their prerelease tuple.
+Registry results are cached for one hour. If refresh fails, cached results can remain available with a stale-source notice. Official entries remain available when the registry is unreachable. Turning community plugins off stops direct npm registry metadata requests. The official catalog refresh still runs unless disabled in project configuration. Compatibility uses npm semver ranges; prereleases require the range to admit their prerelease tuple.
 
 Plugin details show compatibility, declared access, contributions, requirements, options, changelog and versions. Declared access describes the plugin; it is not a sandbox permission grant. Installed plugins run as trusted project code. **Published with npm provenance** means the registry supplied an attestation, not that Histoire verified it.
 
@@ -43,7 +51,7 @@ Installation adds a development dependency to `package.json` and a named import/
 
 The server detects pnpm, npm, Yarn or Bun from project metadata and lockfiles. **Package manager** can override detection. The command runs without a shell. Package managers may change lockfiles, formatting and `node_modules`; the review's package diff is an estimate of their manifest output.
 
-Config changes use revision checks, a temporary config load and a backup. Recovery receipts are stored in `.histoire/marketplace`. Registry cache lives under `node_modules/.cache/histoire/marketplace/registry`.
+Config changes use revision checks, a temporary config load and a backup. Recovery receipts are stored in `.histoire/marketplace`. Official and registry metadata caches live under `node_modules/.cache/histoire/marketplace`.
 
 ### Dependency repair after failure
 
@@ -61,11 +69,11 @@ Plugins settings shows installed versions, Required labels and compatible update
 
 **Skip this version** dismisses that target version. **Update all** processes eligible updates in sequence.
 
-### Offline official history
+### Official release history
 
-With community plugins off, development servers use committed official release snapshots for version compatibility, updates, intervening notes, declarative migrations and compatible-version advice after peer conflicts. Each snapshot retains that release's requirements and frameworks. No registry request is needed. History keeps at most the 50 newest unique releases per official package.
+The hosted catalog includes up to 50 approved published releases per official plugin. Each release supplies its own options, requirements, notes and migrations. Older releases without published marketplace metadata may appear only in bundled history. Installation still requires a release compatible with the project's Histoire and peers. Use **Choose version** to see the available releases and their requirements.
 
-The initial history files contain only each package's current version. Older notes and migrations become available only when their real snapshots are committed and included in a later Histoire release; missing history is never invented. Registry access can supply additional published history when community plugins are enabled. Static books expose bundled catalog metadata and versions for manual instructions; server-side update aggregation and install jobs remain unavailable.
+When the bundled source is active, committed release snapshots provide offline compatibility checks, release notes, migrations, and compatible-version advice. Community consent can enable additional history from the configured registry. Static books use bundled data for manual instructions.
 
 ### Restart and preferences
 

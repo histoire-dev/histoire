@@ -44,6 +44,11 @@ export * from './config-theme.js'
 export * from './config-ui.js'
 
 export interface HistoireConfig extends HistoireUiConfig {
+  /** Development marketplace source policy. */
+  marketplace?: {
+    /** Use the hosted first-party catalog by default. Set false to use bundled data. */
+    refreshOfficialCatalog?: boolean
+  }
   /** Explicit source policy for optional live inspection. */
   inspection?: HistoireInspectionConfig
   /** Opt-in story visual regression testing. */

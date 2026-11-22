@@ -1,22 +1,15 @@
 import { readFile, writeFile } from 'node:fs/promises'
-import { createRequire } from 'node:module'
 import { resolve } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 
-/** Resolve existing Node tooling from its owning package; never load plugin modules. */
-const require = createRequire(new URL('../../packages/histoire/package.json', import.meta.url))
-/** Existing source validator works without a rebuilt dist. */
-const { createJiti } = require('jiti')
-/** Catalog preparation uses shared marketplace source before any workspace package is built. */
-const jiti = createJiti(import.meta.url, {
-  alias: { '@histoire/shared': fileURLToPath(new URL('../../packages/histoire-shared/src/marketplace/index.ts', import.meta.url)) },
-})
+import { marketplaceRequire, marketplaceSource } from './source-loader.mjs'
+
 /** Shared validator enforces the same field limits as registry metadata. */
-const { validateMarketplaceManifest } = await jiti.import('../../packages/histoire/src/node/marketplace/manifest/index.ts')
+const { validateMarketplaceManifest } = await marketplaceSource.import('../../packages/histoire/src/node/marketplace/manifest/index.ts')
 /** Exact install targets use the planner's existing syntax and length bound. */
-const { exactVersion } = await jiti.import('../../packages/histoire/src/node/marketplace/changes/validation.ts')
+const { exactVersion } = await marketplaceSource.import('../../packages/histoire/src/node/marketplace/changes/validation.ts')
 /** npm ordering and semantic validation, shared with catalog version evaluation. */
-const { compare, valid } = require('semver')
+const { compare, valid } = marketplaceRequire('semver')
 
 /** Fixed first-party allowlist; registry manifests cannot add official entries. */
 export const officialPluginNames = ['a11y', 'designs', 'screenshot', 'percy', 'vue-devtools', 'nuxt', 'quasar', 'vue', 'react', 'svelte']

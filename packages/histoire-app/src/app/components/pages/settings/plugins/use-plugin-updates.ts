@@ -15,7 +15,7 @@ export function createPluginUpdates(store: MarketplaceServiceOwner, dev: boolean
   catch { /* Receipt acknowledgement is optional when storage is blocked. */ }
   let connected = false
   let disposed = false
-  let cached: string | undefined
+  let cached: { key: string, refreshedAt: number } | undefined
   let controller: AbortController | undefined
   const available = computed(() => entries.value.filter(item => store.prefs.value.skippedVersions[item.id] !== item.to))
   const count = computed(() => available.value.length)
@@ -30,7 +30,7 @@ export function createPluginUpdates(store: MarketplaceServiceOwner, dev: boolean
   async function refresh(force = false): Promise<void> {
     if (!connected || disposed || !dev) return
     const key = preferenceKey.value
-    if (!force && (cached === key || loading.value)) return
+    if (!force && (loading.value || (cached?.key === key && Date.now() - cached.refreshedAt < 3_600_000))) return
     controller?.abort()
     const current = controller = new AbortController()
     loading.value = true
@@ -39,7 +39,7 @@ export function createPluginUpdates(store: MarketplaceServiceOwner, dev: boolean
       const value = await store.client.updates(store.prefs.value, { signal: current.signal })
       if (!current.signal.aborted) {
         entries.value = value
-        cached = key
+        cached = { key, refreshedAt: Date.now() }
       }
     }
     catch (cause) {
