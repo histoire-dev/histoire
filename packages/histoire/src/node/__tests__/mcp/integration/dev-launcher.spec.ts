@@ -2,6 +2,8 @@ import type { Page } from 'playwright'
 import { appendFile, cp, readFile, rm, writeFile } from 'node:fs/promises'
 import { createServer } from 'node:http'
 import { resolve } from 'node:path'
+import { createInterface } from 'node:readline'
+import { stripVTControlCharacters } from 'node:util'
 import { expect, it } from 'vitest'
 import { closeOwnedServer, listenOwnedServer } from '../../../runtime/hosting/listener.js'
 import { launchEmbedBrowser } from '../../utils/embed/browser.js'
@@ -86,6 +88,7 @@ it('recovers rebuilt example runtime, preserves HMR, and retires interrupted tes
   let browser: Awaited<ReturnType<typeof launchEmbedBrowser>> | undefined
   let latestPid: number | undefined
   let page!: Page
+  let restarts = 0
   try {
     const origin = await listenOwnedServer(marker, 0, '127.0.0.1')
     await writeFile(resolve(fixture.root, 'Book.story.vue'), `<script lang="ts">
@@ -97,6 +100,10 @@ onTest(({ canvas }) => {
 })
 </script><template><Story id="test-book"><Variant id="normal"><button>Normal</button></Variant><Variant id="second"><button>Normal sibling</button></Variant></Story></template>`)
     runtime = startMcpProcess(['--', '--config', 'custom config.ts', '--port', new URL(url).port, '--host', '127.0.0.1', '--no-mcp'], fixture.root, {}, fixture.launcher)
+    // Count lifetime events before the bounded diagnostic tail drops them.
+    createInterface({ input: runtime.child.stdout, crlfDelay: Infinity }).on('line', (line) => {
+      if (stripVTControlCharacters(line).startsWith('[nodemon] restarting due to changes')) restarts++
+    })
     await runtime.waitFor(/Local:\s+(http:\/\/\S+)/)
     latestPid = (await state(fixture.root)).pid
     browser = await launchEmbedBrowser()
@@ -184,7 +191,7 @@ onTest(({ canvas }) => {
     }, { timeout: 5000, message: 'Story HMR must not restart server after rebuild debounce' }).toBe(true)
 
     expect((await state(fixture.root)).source).toBe(false)
-    expect(runtime.output().match(/\[nodemon\] restarting due to changes/g)).toHaveLength(5)
+    expect(restarts).toBe(5)
   }
   catch (error) {
     throw new Error(`${String(error)}\n${await page?.locator('body').textContent().catch(() => '')}\n${runtime?.output().slice(-6000)}`, { cause: error })

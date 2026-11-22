@@ -6,6 +6,17 @@ import { TEST_HARNESS_ID } from '../virtual/index.js'
 import { getHistoireBrowserRunConfig } from '../vitest-browser-config/run-config.js'
 import { createBrowserRunContext, startBrowserOnlyDependencyRun, withVitestBrowserServer, writeProjectFiles } from './utils/vitest-browser-run.js'
 
+it('isolates consecutive browser runs from reconnects to the previous server', async () => {
+  let previousOrigin: string | undefined
+  await startBrowserOnlyDependencyRun({}, undefined, async (server) => {
+    previousOrigin = new URL(server.resolvedUrls!.local[0]).origin
+  })
+  expect(previousOrigin).toBeDefined()
+  await startBrowserOnlyDependencyRun({}, undefined, async (server) => {
+    expect(new URL(server.resolvedUrls!.local[0]).origin).not.toBe(previousOrigin)
+  })
+}, 60_000)
+
 it('keeps browser-only dependencies in the client optimizer', async () => {
   for (const reachableDependencies of [false, true]) {
     const config = await startBrowserOnlyDependencyRun({ reachableDependencies })

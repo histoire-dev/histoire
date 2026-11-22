@@ -105,6 +105,9 @@ export async function createVitestBrowserRuntimeConfig(
 
   // Only the v4 Node-side server needs its unused client optimizer disabled.
   const legacyTestDeps = sharedServer ? {} : { optimizer: { client: { enabled: false } } }
+  // v5 defaults to the same port in each worker process, so late browser
+  // reconnects can reach a different run and register an unknown-session error.
+  const sharedServerOptions = sharedServer ? { api: { port: 0 }, clearMocks: false } : {}
 
   return {
     vitestOptions: {
@@ -115,7 +118,7 @@ export async function createVitestBrowserRuntimeConfig(
       ...(runViteConfig as InlineConfig & { test?: Record<string, any> }),
       test: {
         ...defaultTest,
-        ...(sharedServer ? { clearMocks: false } : {}),
+        ...sharedServerOptions,
         ...options.test,
         deps: {
           ...legacyTestDeps,

@@ -1,4 +1,4 @@
-import { appendFile } from 'node:fs/promises'
+import { appendFile, writeFile } from 'node:fs/promises'
 import { resolve } from 'node:path'
 import { createHistoireProject } from 'histoire/node'
 import { expect, it } from 'vitest'
@@ -14,22 +14,30 @@ import { createVue3DiscoveryProject } from '../../utils/mcp/vue3-discovery-proje
  */
 const budgetScale = process.env.CI ? 3 : 1
 
-it('publishes complete real Vue3 inventory within 5s on three cold source pages, refresh and HMR', async () => {
+it('publishes Vue3 inventory and sparse story tests within budget on cold load, refresh and HMR', async () => {
   for (let sample = 1; sample <= 3; sample++) {
     const fixture = await createVue3DiscoveryProject()
     let project: Awaited<ReturnType<typeof createHistoireProject>> | undefined
     let browser: Awaited<ReturnType<typeof launchEmbedBrowser>> | undefined
     try {
-      project = await createHistoireProject({ root: fixture.root })
+      // This budget covers sparse authored tests. Automatic audits require a
+      // discovery mount for every variant and are covered in the packed consumer suite.
+      const configFile = resolve(fixture.root, 'discovery-benchmark.config.ts')
+      await writeFile(configFile, `
+import config from './histoire.config.ts'
+import { HstA11y } from '@histoire/plugin-a11y'
+export default { ...config, plugins: config.plugins.map(plugin => plugin.name === '@histoire/plugin-a11y' ? HstA11y() : plugin) }
+`)
+      project = await createHistoireProject({ root: fixture.root, configFile })
       const dev = await project.startDev({ host: '127.0.0.1', port: 0, open: false })
       await dev.ready
       const services = getProjectServices(project)
       const stories = services.dev!.controller.current!.context.storyFiles.filter(file => file.story && !file.story.docsOnly)
       const targets = services.dev!.catalog!.current!.catalog.stories.filter(story => !story.docsOnly).flatMap(story => story.variants.map(variant => ({ storyId: story.id, variantId: variant.id })))
       const inventory = stories.map(file => ({ title: file.story!.title, raw: file.story!.variants.length, projected: services.dev!.catalog!.current!.catalog.stories.find(story => story.id === file.story!.id)?.variants.length ?? 0 }))
-      // The async mock factory adds one variant; the Devframe example adds two.
-      expect(targets, JSON.stringify(inventory)).toHaveLength(1098)
-      expect(stories).toHaveLength(43)
+      expect(targets, JSON.stringify(inventory)).toHaveLength(1105)
+      expect(stories).toHaveLength(44)
+      expect(stories.find(file => file.story!.title === 'Accessibility issues')!.story!.variants).toHaveLength(7)
       expect(stories.find(file => file.story!.title === 'Devframe example')!.story!.variants).toHaveLength(2)
       expect(stories.find(file => file.story!.title === 'HugeGrid')!.story!.variants).toHaveLength(1000)
       const asyncFactory = stories.find(file => file.story!.title === 'Vitest Mocking Async Factory')!
