@@ -39,6 +39,7 @@ async function main() {
   await writeOfficialIndex()
   run('pnpm', ['run', 'lint'])
   run('pnpm', ['run', 'build'])
+  run('pnpm', ['--filter', 'histoire-example-vue3', 'exec', 'playwright', 'install', 'chromium', '--only-shell'])
   run('pnpm', ['run', 'test'])
 
   const files = releaseFiles()

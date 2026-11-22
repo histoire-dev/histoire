@@ -83,7 +83,6 @@ describe('content-sized workbench browser acceptance', () => {
       expect(await page.getByRole('button', { name: 'Viewport', exact: true }).textContent()).toContain('Auto fit')
 
       await page.getByRole('button', { name: 'Screenshot', exact: true }).click()
-      await page.getByRole('button', { name: 'Check setup', exact: true }).click()
       await page.getByRole('button', { name: 'Capture 1 frame', exact: true }).click()
       await expect.poll(() => page.locator('.recent-capture img').first().evaluate((image: HTMLImageElement) => [image.naturalWidth, image.naturalHeight]), { timeout: 30_000 }).toEqual([120, 60])
       await page.getByRole('button', { name: 'Screenshot', exact: true }).click()

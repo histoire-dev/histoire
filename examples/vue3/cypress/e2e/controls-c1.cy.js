@@ -79,7 +79,7 @@ describe('C1 shared controls acceptance', () => {
       cy.visit('/story/src-components-controlsoverlays-story-vue?variantId=src-components-controlsoverlays-story-vue-0')
       cy.get('[aria-label="Collapse side panel"]').click()
       cy.getControlsIframeBody({ timeout: 20000 }).find('button[aria-label="Option"]').click()
-      cy.focused().type('{end}')
+      cy.focused().should('have.attr', 'role', 'option').type('{end}')
       cy.focused().should('have.text', 'Option 49').and('be.visible')
       cy.get('[role="listbox"]').should($menu => expect($menu[0].getBoundingClientRect().height).to.be.at.most(361))
       cy.screenshot('c1-narrow-iframe-menu')

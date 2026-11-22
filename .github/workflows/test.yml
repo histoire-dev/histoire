@@ -46,11 +46,11 @@ jobs:
       - name: Build
         run: pnpm run build
 
+      - name: Install test Chromium
+        run: pnpm --filter histoire exec playwright install --with-deps chromium
+
       - name: Run tests
         run: pnpm run test
-
-      - name: Install MCP Chromium
-        run: pnpm --filter histoire exec playwright install --with-deps chromium
 
       - name: Run MCP integration tests
         env:

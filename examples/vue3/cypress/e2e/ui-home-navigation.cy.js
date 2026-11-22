@@ -24,8 +24,9 @@ function visit(path, saved) {
 /** Assert route and pane through public navigation and accessibility contracts. */
 function assertHomeStories() {
   cy.location('pathname').should('equal', '/')
-  cy.get(`${rail} [aria-label="Home"]`).should('have.attr', 'aria-pressed', 'true')
+  cy.get(`${rail} [aria-label="Home"]`).should('have.attr', 'aria-pressed', 'false')
   cy.get(`${rail} [aria-label="Stories"]`).should('have.attr', 'aria-expanded', 'true')
+  cy.get(`${rail} [aria-label="Stories"]`).should('have.attr', 'aria-pressed', 'true')
   cy.get(`${rail} [data-shell-pane][aria-pressed="true"]`).should('have.length', 1)
   cy.get('[aria-label="stories panel"]').should('be.visible')
 }
@@ -42,9 +43,9 @@ describe('Home and Stories navigation', () => {
   for (const panelOpen of [true, false]) {
     it(`restores saved Search ${panelOpen ? 'open' : 'closed'} on Home startup`, () => {
       visit('/', { pane: 'search', panelOpen, inspectorOpen: false, panelWidth: 310, inspectorWidth: 380 })
-      cy.get(`${rail} [aria-label="Home"]`).should('have.attr', 'aria-pressed', 'true')
+      cy.get(`${rail} [aria-label="Home"]`).should('have.attr', 'aria-pressed', String(!panelOpen))
       cy.get(`${rail} [aria-label="Search"]`).should('have.attr', 'aria-expanded', String(panelOpen))
-      cy.get(`${rail} [aria-label="Search"]`).should('have.attr', 'aria-pressed', 'false')
+      cy.get(`${rail} [aria-label="Search"]`).should('have.attr', 'aria-pressed', String(panelOpen))
       cy.get('[aria-label="search panel"]').should(panelOpen ? 'be.visible' : 'not.exist')
       cy.window().then((window) => {
         expect(JSON.parse(window.localStorage.getItem(storageKey))).to.deep.include({ pane: 'search', panelOpen, inspectorOpen: false, panelWidth: 310, inspectorWidth: 380 })

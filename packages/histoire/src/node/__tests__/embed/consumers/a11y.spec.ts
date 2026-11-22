@@ -1,3 +1,4 @@
+import type { Locator } from 'playwright'
 import { access, mkdir, readdir, readFile, realpath, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { afterAll, describe, expect, it } from 'vitest'
@@ -55,6 +56,11 @@ async function selectInspectorTab(page: any, label: string): Promise<void> {
   }
 }
 
+/** The status counter exposes its count and label together in its tooltip. */
+function violationCounter(panel: Locator) {
+  return panel.getByRole('status').getByTitle('1 violation', { exact: true })
+}
+
 let cliConsumer: ReturnType<typeof consumer> | undefined
 
 /** Reuse packed dependency closure across sequential browser-runtime smoke checks. */
@@ -79,7 +85,7 @@ describe('installed accessibility plugin', () => {
     await page.goto(`${server.url}story/audit?variantId=issues&tab=a11y:accessibility`)
     await reloads.settled()
     const panel = page.getByRole('region', { name: 'Accessibility audit' })
-    await expect.poll(() => panel.textContent(), { timeout: 60000 }).toContain('1 violation')
+    await violationCounter(panel).waitFor({ timeout: 60_000 })
     if (process.env.HISTOIRE_A11Y_EVIDENCE_DIR) {
       const directory = process.env.HISTOIRE_A11Y_EVIDENCE_DIR
       await mkdir(directory, { recursive: true })
@@ -102,7 +108,7 @@ describe('installed accessibility plugin', () => {
     await page.getByRole('option', { name: 'All severities', exact: true }).click()
     await expect.poll(() => panel.locator('summary').count()).toBe(1)
     await panel.locator('summary').click()
-    await panel.getByRole('button', { name: 'Highlight', exact: true }).click()
+    await panel.getByRole('button', { name: 'Highlight in canvas', exact: true }).click()
     const frame = page.frameLocator(STANDALONE_SELECTED_FRAME)
     await expect.poll(() => frame.locator('[data-histoire-a11y-highlight]').count()).toBe(1)
     // Live repair must replace findings, not merely hide existing result rows.
@@ -113,11 +119,11 @@ describe('installed accessibility plugin', () => {
     await expect.poll(() => panel.getByRole('switch', { name: 'Auto-run' }).isChecked(), { timeout: 30000 }).toBe(false)
     await expect.poll(() => panel.textContent()).toContain('Ready to check')
     await panel.getByRole('button', { name: 'Run', exact: true }).click()
-    await expect.poll(() => panel.textContent(), { timeout: 30000 }).toContain('1 violation')
+    await violationCounter(panel).waitFor()
     // Manual mode preserves findings but marks them stale until explicitly rerun.
     await frame.locator('img').evaluate((image: Element) => image.setAttribute('alt', 'Manual repair'))
     await expect.poll(() => panel.textContent()).toContain('Results may be outdated')
-    expect(await panel.textContent()).toContain('1 violation')
+    expect(await violationCounter(panel).isVisible()).toBe(true)
     await panel.getByRole('button', { name: 'Run', exact: true }).click()
     await expect.poll(() => panel.textContent(), { timeout: 30000 }).toContain('No violations found')
     await panel.getByRole('switch', { name: 'Auto-run' }).check()
@@ -127,7 +133,7 @@ describe('installed accessibility plugin', () => {
     await expect.poll(() => frame.locator('img').getAttribute('alt'), { timeout: 30000 }).toBe('Hot repair')
     await expect.poll(() => panel.textContent(), { timeout: 30000 }).toContain('No violations found')
     await frame.getByRole('button', { name: 'Remove image label' }).click()
-    await expect.poll(() => panel.textContent(), { timeout: 15000 }).toContain('1 violation')
+    await violationCounter(panel).waitFor({ timeout: 15_000 })
     await selectInspectorTab(page, 'Props')
     await frame.getByRole('button', { name: 'Repair image label' }).click()
     await expect.poll(() => frame.locator('img').getAttribute('alt')).toBe('Hot repair')
@@ -145,7 +151,7 @@ describe('installed accessibility plugin', () => {
     cleanup.push(() => browser.close())
     const page = await browser.newPage()
     await page.goto(`${server.url}story/audit?variantId=issues&tab=a11y:accessibility`)
-    await expect.poll(() => page.getByRole('region', { name: 'Accessibility audit' }).textContent(), { timeout: 60000 }).toContain('1 violation')
+    await violationCounter(page.getByRole('region', { name: 'Accessibility audit' })).waitFor({ timeout: 60_000 })
   })
 
   it('adds opt-in CLI case to otherwise testless variant and reports failure then repair', async () => {

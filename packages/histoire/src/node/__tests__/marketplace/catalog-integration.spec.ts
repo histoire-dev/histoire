@@ -50,8 +50,10 @@ it('returns typed not-found replies and official version reasons without registr
   const { root } = await configTestProject()
   const offline = { ...prefs, community: false }
   const service = createCatalogService({ root })
-  const detail = await service.detail('@histoire/plugin-react', offline)
-  expect(detail.versions[0]).toMatchObject({ compatible: false, reason: 'Needs react' })
+  const detail = await service.detail('@histoire/plugin-vue', offline)
+  expect(detail.versions[0]).toMatchObject({ compatible: false, reason: 'Needs vue' })
+  const react = await service.detail('@histoire/plugin-react', offline)
+  expect(react.compatible).toEqual({ ok: false, reason: 'Needs react' })
   await expect(service.detail('missing-plugin', offline)).rejects.toMatchObject({ code: 'not-found' })
   const fixture = uiChannelFixture()
   onTestFinished(() => fixture.channel.close())

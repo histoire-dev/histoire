@@ -64,8 +64,8 @@ export async function checkSourcePane(browser, origin, expect) {
         await page.screenshot({ path: join(directory, `source-${theme}.png`), animations: 'disabled' })
       }
 
-      // Both header controls update the same saved preference.
-      await page.getByRole('button', { name: 'Source', exact: true }).click()
+      // The drawer toggle updates the saved preference before navigating and reloading.
+      await page.getByRole('button', { name: 'Collapse source', exact: true }).click()
       await expect(page.getByRole('button', { name: 'Expand source', exact: true })).toHaveAttribute('aria-expanded', 'false')
       await page.getByRole('treeitem', { name: 'html', exact: true }).click()
       await page.reload()

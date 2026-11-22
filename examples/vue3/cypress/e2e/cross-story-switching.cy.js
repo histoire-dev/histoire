@@ -1,6 +1,6 @@
 /// <reference types="cypress" />
 
-import { getGeneratedSource, selectCanvasVariant } from '../../../cypress/workbench-actions.js'
+import { getGeneratedSource, getTreeStory, selectCanvasVariant } from '../../../cypress/workbench-actions.js'
 
 const baseStory = 'src-components-basebutton-story-vue'
 const codegenStory = 'src-components-codegen-story-vue'
@@ -56,8 +56,8 @@ function expectAllFramesReady(storyId, variantIds) {
 }
 
 /** Opens one story through its real story-tree row. */
-function selectStory(storyId) {
-  cy.get(`[data-test-id="story-list-item"][data-tree-key*="${storyId}"]`).click()
+function selectStory(storyId, title) {
+  getTreeStory(title).click()
   cy.location('pathname').should('include', `/story/${storyId}`)
 }
 
@@ -192,7 +192,7 @@ describe('Cross-story frame admission', () => {
     })
     cy.getControlsIframeBody().find('[role="checkbox"][aria-label="Disabled"]').should('have.attr', 'aria-checked', 'false').click().should('have.attr', 'aria-checked', 'true')
 
-    selectStory(codegenStory)
+    selectStory(codegenStory, 'Code gen')
     expectAllFramesReady(codegenStory, codegenVariants)
     selectCanvasVariant('html', 'html')
     cy.location('search').should('include', 'variantId=html')
@@ -203,7 +203,7 @@ describe('Cross-story frame admission', () => {
     getGeneratedSource().should('contain', 'data-test-id="object"')
     cy.then(() => expect(baseFirst.iframe.isConnected, 'BaseButton document retired after story change').to.equal(false))
 
-    selectStory(baseStory)
+    selectStory(baseStory, 'BaseButton')
     expectAllFramesReady(baseStory, baseVariants)
     selectCanvasVariant('playground', baseVariants[0])
     cy.then(() => expect(codegenFirst.iframe.isConnected, 'Code gen document retired after story change').to.equal(false))
@@ -218,7 +218,7 @@ describe('Cross-story frame admission', () => {
       expect(url.searchParams.get('variantId')).to.equal(baseVariants[0])
     })
 
-    selectStory(codegenStory)
+    selectStory(codegenStory, 'Code gen')
     expectAllFramesReady(codegenStory, codegenVariants)
     selectCanvasVariant('html', 'html')
     captureFrameDocument(codegenStory, 'html').then((frame) => {

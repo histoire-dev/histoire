@@ -48,7 +48,10 @@ it('reveals measured dynamic rows after delayed native scroll without clearing c
     expect(dynamic.getItemSize(items[0], 0)).toBe(61)
     host.focus()
     const removed = list.focus('row-999')
-    await new Promise<void>(resolve => requestAnimationFrame(() => requestAnimationFrame(() => resolve())))
+    // Retire the requested row after scrolling starts, before the recycler can mount it.
+    await nextTick()
+    expect(list.getScrollTop()).toBeGreaterThan(0)
+    expect(wrapper.find('[data-virtual-key="row-999"]').exists()).toBe(false)
     await wrapper.setProps({ items: items.slice(0, 10) })
     await removed
     viewport.deliverScroll()
@@ -60,7 +63,9 @@ it('reveals measured dynamic rows after delayed native scroll without clearing c
     await restoredHome
     host.focus()
     const retired = list.focus('row-999')
-    await new Promise<void>(resolve => requestAnimationFrame(() => requestAnimationFrame(() => resolve())))
+    await nextTick()
+    expect(list.getScrollTop()).toBeGreaterThan(0)
+    expect(wrapper.find('[data-virtual-key="row-999"]').exists()).toBe(false)
     wrapper.unmount()
     host.focus()
     await retired

@@ -31,6 +31,12 @@ export function HstA11y(options: A11yOptions = {}): Plugin {
       api.onPreviewStory(scanner.scan)
       api.onBuildEnd(() => scanner.write(api.outputDir))
     },
+    /** Serve the already-built ESM test hook directly when generated setup first imports it. */
+    viteConfig(_config, { browserRuntime }) {
+      if (browserRuntime && options.enabled !== false && options.test) {
+        return { optimizeDeps: { exclude: ['@histoire/plugin-a11y/test'] } }
+      }
+    },
     config(config, mode) {
       if (mode === 'build' || options.enabled === false || !options.test) return
       const names = new Set(['setupVanilla', ...config.plugins.flatMap(plugin => plugin.supportPlugin?.setupFn ?? [])])

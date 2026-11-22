@@ -3,8 +3,8 @@ import fs from 'node:fs'
 import { join, resolve } from 'pathe'
 import { findProjectPackageDirectories, withPackageDirs } from '../util/resolve-package.js'
 
-/** Node browser providers are executed by Vitest, never by its browser page. */
-const NODE_BROWSER_PROVIDERS = new Set(['playwright', 'playwright-core', '@playwright/test'])
+/** Browser providers and filesystem globbing are Node-only. */
+const NODE_ONLY_DEPENDENCIES = new Set(['playwright', 'playwright-core', '@playwright/test', 'globby'])
 
 /**
  * Tells whether an installed package extends Vite (it depends or peer-depends
@@ -31,7 +31,7 @@ function isVitePlugin(root: string, name: string) {
  * resolve plugin, and optimizing them would fork that copy.
  */
 export const VITEST_BROWSER_OPTIMIZER_EXCLUDES = [
-  ...NODE_BROWSER_PROVIDERS,
+  ...NODE_ONLY_DEPENDENCIES,
   'vitest',
   'expect-type',
   '@vitest/expect',
@@ -57,10 +57,8 @@ export function getVitestBrowserOptimizeDeps(ctx: Context) {
  * Deliberately broad (every project dependency AND devDependency): the browser
  * run disables Vite's dep discovery, so a story importing a package that was not
  * pre-bundled triggers a mid-run optimizer reload that kills the browser
- * connection — the failure `shouldRetryBrowserRun` in `test.ts` has to retry.
- * Node browser providers and Vite plugins stay excluded: scanning their server
- * graph can fail on optional platform modules such as Playwright's Chromium
- * BiDi implementation or Vite's `fsevents` watcher.
+ * connection. Node-only dependencies and Vite plugins stay excluded because
+ * their server graphs can reference browser-incompatible modules and exports.
  * @param ctx The histoire context, used for the project root and support plugins.
  */
 export function getVitestBrowserDependencyNames(ctx: Context) {
@@ -78,7 +76,7 @@ export function getVitestBrowserDependencyNames(ctx: Context) {
     ]) {
       if (
         dep !== 'histoire'
-        && !NODE_BROWSER_PROVIDERS.has(dep)
+        && !NODE_ONLY_DEPENDENCIES.has(dep)
         && dep !== 'vite'
         && dep !== 'vitest'
         && !dep.startsWith('@histoire/')

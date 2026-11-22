@@ -19,11 +19,11 @@ const selection = { storyId: 'story', variantId: 'variant' }
 const owner = { sourceId: source.sourceId, epoch: source.epoch, revision: source.revision, runtimeId: 'runtime', target: selection }
 
 /** Minimal external SDK surface; real browser/runtime proof is separate. */
-function createSession(value: string, beforeRead: (signal: AbortSignal) => Promise<void> = async () => {}, events: any = { items: [], droppedCount: 0 }) {
-  const snapshot = { source, selection, events, runtime: { status: 'ready', mountId: 'mount', runtimeId: 'runtime' }, inspection: { variant: { available: true } } }
+function createSession(value: string, beforeRead: (signal: AbortSignal) => Promise<void> = async () => {}, unsubscribe: () => void = () => {}) {
+  const snapshot = { source, selection, events: { items: [], droppedCount: 0 }, runtime: { status: 'ready', mountId: 'mount', runtimeId: 'runtime' }, inspection: { variant: { available: true } } }
   return { get debug() {
     throw new Error('Unexpected diagnostics instrumentation')
-  }, getSnapshot: () => snapshot, subscribe: () => () => {}, inspect: { variant: async ({ signal }: { signal: AbortSignal }) => {
+  }, getSnapshot: () => snapshot, subscribe: () => unsubscribe, inspect: { variant: async ({ signal }: { signal: AbortSignal }) => {
     await beforeRead(signal)
     return ({ mode: 'live', owner, observedAt: '2026-10-28T12:00:00.000Z', durationMs: 1, truncated: false, inspection: 'variant', state: { draft: value }, components: [], propsAvailable: false, omittedValues: 0 })
   } } } as unknown as HistoireSession
@@ -33,7 +33,6 @@ it('pairs two actual authenticated WebSocket peers, targets each session, and pr
   const principals = new Map<number, string>()
   const tokens = new Map<string, string>([[randomUUID(), 'alice'], [randomUUID(), 'bob']])
   const bridge = createDevframeBridge({
-    leaseMs: 400,
     identifyPeer: peer => principals.get(peer.meta.id),
     verifyAttachment: async (_peer, identity) => ({ identity, scopes: ['inspection', 'events', 'diagnostics', 'components', 'accessibility', 'highlight'] }),
     isCurrent: () => true,
@@ -109,11 +108,11 @@ it('pairs two actual authenticated WebSocket peers, targets each session, and pr
     abort.abort()
     await rejected
     await cancelled
-    a.dispose()
-    await vi.waitFor(async () => expect((await bridge.broker.list('alice')).length).toBe(0))
+    await a.dispose()
+    expect(await bridge.broker.list('alice')).toEqual([])
     expect((await bridge.broker.call('bob', b.attachment.attachmentId, 'histoire_inspect_session', args) as any).state.draft).toBe('bob draft')
-    b.dispose()
-    await vi.waitFor(() => expect(bridge.getStatus().attachments).toBe(0))
+    await b.dispose()
+    expect(bridge.getStatus().attachments).toBe(0)
     const eventGrant = bridge.broker.createGrant({ principal: 'alice', sourceUrl: source.url, scopes: ['events'] })
     const eventSnapshot = { source, selection, runtime: { status: 'ready', mountId: 'mount', runtimeId: 'runtime' }, events: { items: [{ sequence: 4, timestamp: 4, runtimeId: 'runtime', target: selection, payload: { action: 'clicked' } }], droppedCount: 2 } }
     const observers = new Set<(value: any) => void>()
@@ -149,9 +148,9 @@ it('pairs two actual authenticated WebSocket peers, targets each session, and pr
     finally {
       await agent.close()
       await endpoint.close()
-      eventAttachment.dispose()
+      await eventAttachment.dispose()
     }
-    await vi.waitFor(() => expect(bridge.getStatus().attachments).toBe(0))
+    expect(bridge.getStatus().attachments).toBe(0)
     let diagnosticStopped = () => {}
     let loseObservation = (_reason: Error) => {}
     const lostObservation = new Promise<void>((_resolve, reject) => {
@@ -277,32 +276,43 @@ it('pairs two actual authenticated WebSocket peers, targets each session, and pr
       await lateAttachment.dispose()
     }
     for (let index = 0; index < 3; index++) {
-      const expiredGrant = bridge.broker.createGrant({ principal: 'alice', sourceUrl: source.url, scopes: ['inspection'] })
-      const expired = await attachDevframe({ session: createSession('old'), connection: clients[0], grant: expiredGrant.token, projectId: 'project' })
-      await vi.waitFor(() => expect(bridge.getStatus().attachments).toBe(0), { timeout: 2000 })
+      let retired = false
+      const oldGrant = bridge.broker.createGrant({ principal: 'alice', sourceUrl: source.url, scopes: ['inspection'] })
+      const oldSession = createSession('old', undefined, () => {
+        retired = true
+      })
+      const old = await attachDevframe({ session: oldSession, connection: clients[0], grant: oldGrant.token, projectId: 'project' })
+      // Lease expiry uses the same server retirement path. Observe it on the client.
+      bridge.invalidate(old.attachment.attachmentId)
+      await vi.waitFor(() => expect(retired).toBe(true))
+      expect(bridge.getStatus().attachments).toBe(0)
       const freshGrant = bridge.broker.createGrant({ principal: 'alice', sourceUrl: source.url, scopes: ['inspection'] })
       const fresh = await attachDevframe({ session: createSession('fresh'), connection: clients[0], grant: freshGrant.token, projectId: 'project' })
-      expired.dispose()
+      await old.dispose()
       expect((await bridge.broker.call('alice', fresh.attachment.attachmentId, 'histoire_inspect_session', args) as any).state.draft).toBe('fresh')
       expect(bridge.getStatus().attachments).toBe(1)
-      fresh.dispose()
-      await vi.waitFor(() => expect(bridge.getStatus().attachments).toBe(0))
+      await fresh.dispose()
+      expect(bridge.getStatus().attachments).toBe(0)
     }
     await bridge.dispose()
     expect((await (clients[1].call as (name: string) => Promise<{ isTrusted: boolean }>)('anonymous:devframe:auth')).isTrusted).toBe(true)
     expect(await (await fetch(`${origin}/health`)).text()).toBe('alive')
   }
   finally {
-    await bridge.dispose()
-    clients.forEach(client => client.close?.())
-    await instance?.close()
-    if (server.listening) {
-      await new Promise<void>((resolve) => {
-        server.close(() => resolve())
-        server.closeAllConnections()
-      })
+    try {
+      await bridge.dispose()
     }
-    vi.unstubAllGlobals()
+    finally {
+      clients.forEach(client => client.close?.())
+      await instance?.close()
+      if (server.listening) {
+        await new Promise<void>((resolve) => {
+          server.close(() => resolve())
+          server.closeAllConnections()
+        })
+      }
+      vi.unstubAllGlobals()
+    }
   }
 })
 

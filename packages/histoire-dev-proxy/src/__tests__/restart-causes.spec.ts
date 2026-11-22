@@ -48,7 +48,8 @@ it('reports one labelled cause per transition and keeps a fresh request through 
     expect(causes).toEqual([])
 
     await writeFile(file, config('two'))
-    await expect.poll(async () => (await served().catch(() => undefined))?.value).toBe('two')
+    // Allow graceful child shutdown (up to two seconds) and a fresh process boot.
+    await expect.poll(async () => (await served().catch(() => undefined))?.value, { timeout: 5000 }).toBe('two')
     expect(causes).toEqual([{ kind: 'config', source: 'Histoire: histoire.config.ts', fresh: false }])
 
     await proxy.restart()
