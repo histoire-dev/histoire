@@ -1,7 +1,7 @@
 {
   "name": "@histoire/plugin-vue-devtools",
   "type": "module",
-  "version": "1.0.0-beta.1",
+  "version": "1.0.0-beta.2",
   "description": "Vue DevTools for Histoire story frames",
   "license": "MIT",
   "repository": {
@@ -9,14 +9,29 @@
     "url": "https://github.com/Akryum/histoire.git",
     "directory": "packages/histoire-plugin-vue-devtools"
   },
-  "publishConfig": { "access": "public" },
+  "publishConfig": {
+    "access": "public"
+  },
   "keywords": [
     "histoire-plugin"
   ],
-  "exports": { ".": { "types": "./dist/index.d.ts", "default": "./dist/index.js" } },
-  "files": ["dist"],
-  "engines": { "node": ">=22.12.0" },
-  "scripts": { "build": "rimraf dist && tsc", "watch": "tsc --watch", "test": "node --test test/*.test.mjs" },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "build": "rimraf dist && tsc",
+    "watch": "tsc --watch",
+    "test": "node --test test/*.test.mjs"
+  },
   "peerDependencies": {
     "@vitejs/devtools": "0.8.0",
     "histoire": "workspace:^",

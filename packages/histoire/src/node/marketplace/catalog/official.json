@@ -26,7 +26,7 @@
     "monogram": "Ax",
     "tint": "blue",
     "logoUrl": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+PHBhdGggZmlsbD0iY3VycmVudENvbG9yIiBkPSJNMjMgMTR2LTJIOXYyaDV2Mi43MzRsLTMuODY4IDYuNzdsMS43MzYuOTkyTDE1LjU4IDE4aC44NGwzLjcxMiA2LjQ5NmwxLjczNi0uOTkyTDE4IDE2LjczNFYxNHoiLz48Y2lyY2xlIGN4PSIxNiIgY3k9IjkiIHI9IjIiIGZpbGw9ImN1cnJlbnRDb2xvciIvPjxwYXRoIGZpbGw9ImN1cnJlbnRDb2xvciIgZD0iTTE2IDMwYTE0IDE0IDAgMSAxIDE0LTE0YTE0LjAxNiAxNC4wMTYgMCAwIDEtMTQgMTRtMC0yNmExMiAxMiAwIDEgMCAxMiAxMkExMi4wMTQgMTIuMDE0IDAgMCAwIDE2IDQiLz48L3N2Zz4=",
-    "latest": "1.0.0-beta.1",
+    "latest": "1.0.0-beta.2",
     "license": "MIT",
     "repoUrl": "https://github.com/histoire-dev/histoire/tree/main/packages/histoire-plugin-a11y",
     "docsUrl": "https://histoire.dev/guide/plugins/a11y.html",
@@ -117,8 +117,21 @@
         }
       ]
     },
-    "history": [],
-    "versions": [],
+    "history": [
+      {
+        "version": "1.0.0-beta.2",
+        "requires": {
+          "histoire": "^1.0.0-beta.1"
+        },
+        "frameworks": []
+      }
+    ],
+    "versions": [
+      {
+        "version": "1.0.0-beta.2",
+        "compatible": true
+      }
+    ],
     "provenance": false,
     "requires": {
       "histoire": "^1.0.0-beta.1"
@@ -153,7 +166,7 @@
     "monogram": "Ds",
     "tint": "violet",
     "logoUrl": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+PGNpcmNsZSBjeD0iMTAiIGN5PSIxMiIgcj0iMiIgZmlsbD0iY3VycmVudENvbG9yIi8+PGNpcmNsZSBjeD0iMTYiIGN5PSI5IiByPSIyIiBmaWxsPSJjdXJyZW50Q29sb3IiLz48Y2lyY2xlIGN4PSIyMiIgY3k9IjEyIiByPSIyIiBmaWxsPSJjdXJyZW50Q29sb3IiLz48Y2lyY2xlIGN4PSIyMyIgY3k9IjE4IiByPSIyIiBmaWxsPSJjdXJyZW50Q29sb3IiLz48Y2lyY2xlIGN4PSIxOSIgY3k9IjIzIiByPSIyIiBmaWxsPSJjdXJyZW50Q29sb3IiLz48cGF0aCBmaWxsPSJjdXJyZW50Q29sb3IiIGQ9Ik0xNi41NCAyQTE0IDE0IDAgMCAwIDIgMTZhNC44MiA0LjgyIDAgMCAwIDYuMDkgNC42NWwxLjEyLS4zMWEzIDMgMCAwIDEgMy43OSAyLjlWMjdhMyAzIDAgMCAwIDMgM2ExNCAxNCAwIDAgMCAxNC0xNC41NEExNC4wNSAxNC4wNSAwIDAgMCAxNi41NCAybTguMTEgMjIuMzFBMTEuOTMgMTEuOTMgMCAwIDEgMTYgMjhhMSAxIDAgMCAxLTEtMXYtMy43NmE1IDUgMCAwIDAtNS01YTUgNSAwIDAgMC0xLjMzLjE4bC0xLjEyLjMxQTIuODIgMi44MiAwIDAgMSA0IDE2QTEyIDEyIDAgMCAxIDE2LjQ3IDRBMTIuMTggMTIuMTggMCAwIDEgMjggMTUuNTNhMTEuOSAxMS45IDAgMCAxLTMuMzUgOC43OVoiLz48L3N2Zz4=",
-    "latest": "1.0.0-beta.1",
+    "latest": "1.0.0-beta.2",
     "license": "MIT",
     "repoUrl": "https://github.com/histoire-dev/histoire/tree/main/packages/histoire-plugin-designs",
     "docsUrl": "https://histoire.dev/guide/plugins/designs.html",
@@ -219,8 +232,22 @@
         "design-handoff"
       ]
     },
-    "history": [],
-    "versions": [],
+    "history": [
+      {
+        "version": "1.0.0-beta.2",
+        "requires": {
+          "histoire": "^1.0.0-beta.1",
+          "vue": "^3.5.0"
+        },
+        "frameworks": []
+      }
+    ],
+    "versions": [
+      {
+        "version": "1.0.0-beta.2",
+        "compatible": true
+      }
+    ],
     "provenance": false,
     "requires": {
       "histoire": "^1.0.0-beta.1",
@@ -244,7 +271,7 @@
     "monogram": "Nu",
     "tint": "green",
     "logoUrl": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0iY3VycmVudENvbG9yIiBkPSJNMTMuNDY0IDE5LjgzaDguOTIyYy4yODMgMCAuNTYyLS4wNzMuODA3LS4yMWExLjYgMS42IDAgMCAwIC41OTEtLjU3NGExLjUzIDEuNTMgMCAwIDAgLjIxNi0uNzgzYTEuNTMgMS41MyAwIDAgMC0uMjE3LS43ODJMMTcuNzkyIDcuNDE0YTEuNiAxLjYgMCAwIDAtLjU5MS0uNTczYTEuNjUgMS42NSAwIDAgMC0uODA3LS4yMWMtLjI4MyAwLS41NjIuMDczLS44MDcuMjFhMS42IDEuNiAwIDAgMC0uNTkuNTczTDEzLjQ2MyA5Ljk5TDEwLjQ3IDQuOTUzYTEuNiAxLjYgMCAwIDAtLjU5MS0uNTczYTEuNjUgMS42NSAwIDAgMC0uODA3LS4yMWMtLjI4NCAwLS41NjIuMDczLS44MDcuMjFhMS42IDEuNiAwIDAgMC0uNTkxLjU3M0wuMjE2IDE3LjQ4MWExLjUzIDEuNTMgMCAwIDAtLjIxNy43ODJjMCAuMjc1LjA3NC41NDUuMjE2Ljc4M2ExLjYgMS42IDAgMCAwIC41OS41NzRjLjI0Ni4xMzcuNTI1LjIxLjgwOC4yMWg1LjZjMi4yMiAwIDMuODU2LS45NDYgNC45ODItMi43OWwyLjczMy00LjU5M2wxLjQ2NC0yLjQ1N2w0LjM5NSA3LjM4MmgtNS44NTlabS02LjM0MS0yLjQ2bC0zLjkwOC0uMDAybDUuODU4LTkuODQybDIuOTIzIDQuOTIxbC0xLjk1NyAzLjI5Yy0uNzQ4IDEuMTk2LTEuNTk3IDEuNjMyLTIuOTE2IDEuNjMyIi8+PC9zdmc+",
-    "latest": "1.0.0-beta.1",
+    "latest": "1.0.0-beta.2",
     "license": "MIT",
     "repoUrl": "https://github.com/histoire-dev/histoire/tree/main/packages/histoire-plugin-nuxt",
     "docsUrl": "https://histoire.dev/guide/plugins/official.html",
@@ -306,6 +333,16 @@
     },
     "history": [
       {
+        "version": "1.0.0-beta.2",
+        "requires": {
+          "histoire": "^1.0.0-beta.1",
+          "nuxt": "^3.0.0-rc.11 || ^4.0.0"
+        },
+        "frameworks": [
+          "vue"
+        ]
+      },
+      {
         "version": "1.0.0-beta.1",
         "requires": {
           "histoire": "^1.0.0-beta.1",
@@ -317,6 +354,10 @@
       }
     ],
     "versions": [
+      {
+        "version": "1.0.0-beta.2",
+        "compatible": true
+      },
       {
         "version": "1.0.0-beta.1",
         "compatible": true
@@ -343,7 +384,7 @@
     "monogram": "Pe",
     "tint": "violet",
     "logoUrl": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0iY3VycmVudENvbG9yIiBkPSJNMTMuMjM1IDIuNHMuNTY5IDEuMTY5LjYxNiAxLjU0N2MwIDAtMS44NTYtLjY0Ni00LjQ1OC0uODkxYzAgMCAxLjI1Ljg3MiAxLjczNCAxLjUzOGMwIDAtMS44NC0uMDkzLTQuNTg2IDBjMCAwIDEuNTYxLjYzNCAyLjI1MiAxLjIxNWMwIDAtMy4yNi4zMzEtNS4xMDMuODYyYzAgMCAyLjA3Ni43MyAyLjY1MiAxLjI3NmMwIDAtMi42NDguNzU0LTUuMzE2IDIuMjk0YzAgMCAxLjQ4Mi4yNiAyLjY0Mi43NjZjMCAwLTEuNDc4IDEuMDMzLTMuNjY4IDMuODUyYzAgMCAxLjYyLS4zMDkgMi43My0uMjIyYzAgMC0xLjQwNyAxLjY0NC0yLjE0MSA0LjE1OGMwIDAgLjgxMy0uNTE4IDEuNjAyLS43MDZjMCAwIC4wODQgMi45OTggMS43MjQgMy40Nzh2LS4wMDJhLjguOCAwIDAgMCAuMjI1LjAzNHEuMTIgMCAuMjQ4LS4wMzZjLjUyLS4xNS45MTUtLjY2MyAxLjM3LTEuMjU2Yy4xNS0uMTk1LjMwMy0uMzk1LjQ2Ni0uNTlxLjMwMi0uNDI3LjcwNi0uNzYyYy41OC0uNDc4IDEuMzgtLjg0IDIuMzU4LS42OTVjMS4xLjA5MyAxLjc4IDEuMTg5IDIuMzI3IDIuMDdjLjI4My40NTguNjU5IDEuMjcgMS4yODkgMS4yN2MuNjk2IDAgLjk0LS44MzQgMS4yNS0xLjg2MmMuMjkyLS45Ny43MjYtMS44OTEgMS4yOS0yLjczMmMxLjA4NS0xLjYxNyAyLjQ3NC0yLjQ5NSA0LjE0LTMuMzZjMS41OTUtLjgzIDMuMTAyLTEuNjE0IDMuODU4LTIuODAzYy4zNzktLjU5NC41NjctMS4zMjUuNTU4LTIuMTY5YTcgNyAwIDAgMC0uMzEtMS45MDljLS4xMzktLjQ1NS0uNTA1LS45MDItLjkzOS0uNzJhMy40IDMuNCAwIDAgMS0xLjE1MS4yNTZjLS44NTgtLjgwNS0zLjM3OS0yLjQtNS4wMzgtMy4zMDNjMCAwIC4yMDIuNTkyLjQ4MiAxLjY5OWMwIDAtMS43ODctMS4zOTYtMy44MS0yLjI5NnptMCAyLjdsMy44MS45NDVsLTEuMjMzLjI1NXpNOS45NTcgNi42N2w0LjU3MS4zNTRsLTEuMzg4LjQ2Wm02Ljk1NSAxLjA4MmwtLjY3OC41MTRsLTIuMzgzLjEzNHptLTUuNzg0LjUxNGwtMS4wODguNzNsLTMuMDE4LS4yODdabTQuNTA1IDEuMjA2bC0xLjEwNS42MTdsLTMuMDAyLS4xNzZ6bS04LjI4Mi43N2wtLjY3OSAxLjMxMmwtMi45ODIgMS4zMTN6bTQuMTM1LjUzM2wtLjc3IDEuMjY1bC0zLjg1My45NDJ6bS01Ljg0NSAyLjM1NGwtLjExOCAxLjMxM0wzLjYgMTYuMnptMTEuMzEgMy4xNTFjLTEuMDkzIDEuMTI3LTIuMDAyIDIuODA2LTIuMjMyIDQuMTIxYy4zOS41OC43NDYuODY3IDEuMDguODczaC4wMTJxLjUyLS4wMDIuNjgtLjY5M2MuMDc3LS4zNDMuMDk0LS44MTMuMTE0LTEuMzZjLjAyOS0uODQ0LjA2Ny0xLjg5NC4zNDYtMi45NHptLTcuOTA0IDIuNTEyYy0xLjAxOC4wMTEtMi4wMDguODMtMi41MDYgMS41MzJ2LjAwMWMuMjgzLjY0LjU4Ny45NTMuOTI1Ljk1M2wuMDgyLS4wMDdjLjQ2LS4wNzIuODg2LS45NjMgMS4yNDItMS44MjVhMjAgMjAgMCAwIDAgLjI1Ny0uNjU0Ii8+PC9zdmc+",
-    "latest": "1.0.0-beta.1",
+    "latest": "1.0.0-beta.2",
     "license": "MIT",
     "repoUrl": "https://github.com/histoire-dev/histoire/tree/main/packages/histoire-plugin-percy",
     "docsUrl": "https://histoire.dev/guide/plugins/official.html",
@@ -376,6 +417,13 @@
     },
     "history": [
       {
+        "version": "1.0.0-beta.2",
+        "requires": {
+          "histoire": "^1.0.0-beta.1"
+        },
+        "frameworks": []
+      },
+      {
         "version": "1.0.0-beta.1",
         "requires": {
           "histoire": "^1.0.0-beta.1"
@@ -384,6 +432,10 @@
       }
     ],
     "versions": [
+      {
+        "version": "1.0.0-beta.2",
+        "compatible": true
+      },
       {
         "version": "1.0.0-beta.1",
         "compatible": true
@@ -413,7 +465,7 @@
     "monogram": "Qu",
     "tint": "blue",
     "logoUrl": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0iY3VycmVudENvbG9yIiBkPSJNMTMuNzQzIDEyYTEuNzQyIDEuNzQyIDAgMSAxLTMuNDg0IDBhMS43NDIgMS43NDIgMCAwIDEgMy40ODQgMG01LjU4NS0xLjY1bDEuMjY3LS43MzJhOSA5IDAgMCAwLS44NjEtMi4wODRhOSA5IDAgMCAwLTEuMzY5LTEuNzg5bC0yLjAxNCAxLjE2M2E2LjcgNi43IDAgMCAwLTIuMTAzLTEuMjE5YTguMyA4LjMgMCAwIDAtMS42MjcgMi4zMjJjMi4yNDItLjE1MiA0LjU1Ny42NiA2LjcwNyAyLjMzOW0tOS41NjIgOC44MnYxLjQ2NGE5IDkgMCAwIDAgMi4yMzUuMjk1YTkgOSAwIDAgMCAyLjIzNC0uMjl2LTIuMzI2YTYuNyA2LjcgMCAwIDAgMi4xMDYtMS4yMTFhOC4zIDguMyAwIDAgMC0xLjE5Ny0yLjU3Yy0uOTg5IDIuMDE3LTIuODUgMy42MTYtNS4zNzggNC42MzhtLTQuMzU0LTUuOTYyYy45NDcuMjQ3IDEuODk0LjMzIDIuODI1LjI0OEM2Ljk4MyAxMS41OTEgNi41MjggOS4xOCA2LjkwOCA2LjQ4TDUuNjQgNS43NDdhOSA5IDAgMCAwLTEuMzczIDEuNzg4YTkgOSAwIDAgMC0uODY1IDIuMDhsMi4wMTQgMS4xNjNhNi43IDYuNyAwIDAgMC0uMDA0IDIuNDNtMTMuMTczLjAxNGE2LjcgNi43IDAgMCAwIC4wMDQtMi40M2E4LjMgOC4zIDAgMCAwLTIuODI0LS4yNWMxLjI1MyAxLjg2NiAxLjcwOCA0LjI3NyAxLjMyOCA2Ljk3OGwxLjI2Ny43MzJhOSA5IDAgMCAwIDEuMzc0LTEuNzg4YTkgOSAwIDAgMCAuODY1LTIuMDh6bS0xMy45MTIuNDI4bC0xLjI2Ny43MzFhOSA5IDAgMCAwIC44NjEgMi4wODRhOSA5IDAgMCAwIDEuMzY5IDEuNzg5TDcuNjUgMTcuMDlhNi43IDYuNyAwIDAgMCAyLjEwMiAxLjIxOWE4LjMgOC4zIDAgMCAwIDEuNjI4LTIuMzIyYy0yLjI0Mi4xNTItNC41NTctLjY1OS02LjcwNy0yLjMzOHptOS41NjItOC44MjFWMy4zNjZBOSA5IDAgMCAwIDEyIDMuMDdhOSA5IDAgMCAwLTIuMjM0LjI5djIuMzI2QTYuNyA2LjcgMCAwIDAgNy42NiA2Ljg5OGMuMjYuOTQ0LjY2IDEuODA2IDEuMTk3IDIuNTdjLjk4OS0yLjAxOCAyLjg1LTMuNjE3IDUuMzc4LTQuNjM5TTI0IDEyYzAgNi42MjctNS4zNzMgMTItMTIgMTJTMCAxOC42MjcgMCAxMlM1LjM3MyAwIDEyIDBzMTIgNS4zNzMgMTIgMTJtLTEuNTM1IDBDMjIuNDY1IDYuMjMgMTcuNzcgMS41MzUgMTIgMS41MzVTMS41MzUgNi4yMyAxLjUzNSAxMlM2LjIzIDIyLjQ2NSAxMiAyMi40NjVTMjIuNDY1IDE3Ljc3IDIyLjQ2NSAxMiIvPjwvc3ZnPg==",
-    "latest": "1.0.0-beta.1",
+    "latest": "1.0.0-beta.2",
     "license": "MIT",
     "repoUrl": "https://github.com/histoire-dev/histoire/tree/main/packages/histoire-plugin-quasar",
     "docsUrl": "https://histoire.dev/guide/plugins/official.html",
@@ -450,8 +502,26 @@
         }
       ]
     },
-    "history": [],
-    "versions": [],
+    "history": [
+      {
+        "version": "1.0.0-beta.2",
+        "requires": {
+          "histoire": "^1.0.0-beta.1",
+          "@quasar/app-vite": "^3.0.0",
+          "quasar": "^2.16.0",
+          "vite": "^7.0.0 || ^8.0.0"
+        },
+        "frameworks": [
+          "vue"
+        ]
+      }
+    ],
+    "versions": [
+      {
+        "version": "1.0.0-beta.2",
+        "compatible": true
+      }
+    ],
     "provenance": false,
     "requires": {
       "histoire": "^1.0.0-beta.1",
@@ -477,7 +547,7 @@
     "monogram": "Re",
     "tint": "sky",
     "logoUrl": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0iY3VycmVudENvbG9yIiBkPSJNMTQuMjMgMTIuMDA0YTIuMjM2IDIuMjM2IDAgMCAxLTIuMjM1IDIuMjM2YTIuMjM2IDIuMjM2IDAgMCAxLTIuMjM2LTIuMjM2YTIuMjM2IDIuMjM2IDAgMCAxIDIuMjM1LTIuMjM2YTIuMjM2IDIuMjM2IDAgMCAxIDIuMjM2IDIuMjM2bTIuNjQ4LTEwLjY5Yy0xLjM0NiAwLTMuMTA3Ljk2LTQuODg4IDIuNjIyYy0xLjc4LTEuNjUzLTMuNTQyLTIuNjAyLTQuODg3LTIuNjAyYy0uNDEgMC0uNzgzLjA5My0xLjEwNi4yNzhjLTEuMzc1Ljc5My0xLjY4MyAzLjI2NC0uOTczIDYuMzY1QzEuOTggOC45MTcgMCAxMC40MiAwIDEyLjAwNGMwIDEuNTkgMS45OSAzLjA5NyA1LjA0MyA0LjAzYy0uNzA0IDMuMTEzLS4zOSA1LjU4OC45ODggNi4zOGMuMzIuMTg3LjY5LjI3NSAxLjEwMi4yNzVjMS4zNDUgMCAzLjEwNy0uOTYgNC44ODgtMi42MjRjMS43OCAxLjY1NCAzLjU0MiAyLjYwMyA0Ljg4NyAyLjYwM2MuNDEgMCAuNzgzLS4wOSAxLjEwNi0uMjc1YzEuMzc0LS43OTIgMS42ODMtMy4yNjMuOTczLTYuMzY1QzIyLjAyIDE1LjA5NiAyNCAxMy41OSAyNCAxMi4wMDRjMC0xLjU5LTEuOTktMy4wOTctNS4wNDMtNC4wMzJjLjcwNC0zLjExLjM5LTUuNTg3LS45ODgtNi4zOGEyLjE3IDIuMTcgMCAwIDAtMS4wOTItLjI3OHptLS4wMDUgMS4wOXYuMDA2Yy4yMjUgMCAuNDA2LjA0NC41NTguMTI3Yy42NjYuMzgyLjk1NSAxLjgzNS43MyAzLjcwNGMtLjA1NC40Ni0uMTQyLjk0NS0uMjUgMS40NGEyMy41IDIzLjUgMCAwIDAtMy4xMDctLjUzNEEyNCAyNCAwIDAgMCAxMi43NjkgNC43YzEuNTkyLTEuNDggMy4wODctMi4yOTIgNC4xMDUtMi4yOTV6bS05Ljc3LjAyYzEuMDEyIDAgMi41MTQuODA4IDQuMTEgMi4yOGMtLjY4Ni43Mi0xLjM3IDEuNTM3LTIuMDIgMi40NDJhMjMgMjMgMCAwIDAtMy4xMTMuNTM4YTE1IDE1IDAgMCAxLS4yNTQtMS40MmMtLjIzLTEuODY4LjA1NC0zLjMyLjcxNC0zLjcwN2MuMTktLjA5LjQtLjEyNy41NjMtLjEzMnptNC44ODIgMy4wNXEuNjg0LjcwNCAxLjM2IDEuNTY0Yy0uNDQtLjAyLS44OS0uMDM0LTEuMzQ1LS4wMzRxLS42OTEtLjAwMS0xLjM2LjAzNGMuNDQtLjU3Mi44OTUtMS4wOTYgMS4zNDUtMS41NjV6TTEyIDguMWMuNzQgMCAxLjQ3Ny4wMzQgMi4yMDIuMDkzcS42MS44NzQgMS4xODMgMS44NnEuNTU3Ljk2MSAxLjAxOCAxLjk0NmMtLjMwOC42NTUtLjY0NiAxLjMxLTEuMDEzIDEuOTVjLS4zOC42Ni0uNzczIDEuMjg4LTEuMTggMS44N2EyNS42IDI1LjYgMCAwIDEtNC40MTIuMDA1YTI3IDI3IDAgMCAxLTEuMTgzLTEuODZxLS41NTctLjk2MS0xLjAxOC0xLjk0NmEyNSAyNSAwIDAgMSAxLjAxMy0xLjk1NGMuMzgtLjY2Ljc3My0xLjI4NiAxLjE4LTEuODY4QTI1IDI1IDAgMCAxIDEyIDguMDk4em0tMy42MzUuMjU0Yy0uMjQuMzc3LS40OC43NjMtLjcwNCAxLjE2cS0uMzM2LjU4NS0uNjM1IDEuMTc0Yy0uMjY1LS42NTYtLjQ5LTEuMzEtLjY3Ni0xLjk0N2MuNjQtLjE1IDEuMzE1LS4yODMgMi4wMTUtLjM4NnptNy4yNiAwcTEuMDQ0LjE1MyAyLjAwNi4zODdjLS4xOC42MzItLjQwNSAxLjI4Mi0uNjYgMS45MzNhMjYgMjYgMCAwIDAtMS4zNDUtMi4zMnptMy4wNjMuNjc1cS43MjcuMjI2IDEuMzc1LjQ5OGMxLjczMi43NCAyLjg1MiAxLjcwOCAyLjg1MiAyLjQ3NmMtLjAwNS43NjgtMS4xMjUgMS43NC0yLjg1NyAyLjQ3NWMtLjQyLjE4LS44OC4zNDItMS4zNTUuNDkzYTI0IDI0IDAgMCAwLTEuMS0yLjk4Yy40NS0xLjAxNy44MS0yLjAxIDEuMDg1LTIuOTY0em0tMTMuMzk1LjAwNGMuMjc4Ljk2LjY0NSAxLjk1NyAxLjEgMi45OGEyMyAyMyAwIDAgMC0xLjA4NiAyLjk2NGMtLjQ4NC0uMTUtLjk0NC0uMzE4LTEuMzctLjVjLTEuNzMyLS43MzctMi44NTItMS43MDYtMi44NTItMi40NzRzMS4xMi0xLjc0MiAyLjg1Mi0yLjQ3NmMuNDItLjE4Ljg4LS4zNDIgMS4zNTYtLjQ5NG0xMS42NzggNC4yOGMuMjY1LjY1Ny40OSAxLjMxMi42NzYgMS45NDhjLS42NC4xNTctMS4zMTYuMjktMi4wMTYuMzlhMjYgMjYgMCAwIDAgMS4zNDEtMi4zMzh6bS05Ljk0NS4wMmMuMi4zOTIuNDEuNzgzLjY0IDEuMTc1cS4zNDUuNTg2LjcwNSAxLjE0M2EyMiAyMiAwIDAgMS0yLjAwNi0uMzg2Yy4xOC0uNjMuNDA2LTEuMjgyLjY2LTEuOTMzek0xNy45MiAxNi4zMmMuMTEyLjQ5My4yLjk2OC4yNTQgMS40MjNjLjIzIDEuODY4LS4wNTQgMy4zMi0uNzE0IDMuNzA4Yy0uMTQ3LjA5LS4zMzguMTI4LS41NjMuMTI4Yy0xLjAxMiAwLTIuNTE0LS44MDctNC4xMS0yLjI4Yy42ODYtLjcyIDEuMzctMS41MzYgMi4wMi0yLjQ0YzEuMTA3LS4xMTggMi4xNTQtLjMgMy4xMTMtLjU0em0tMTEuODMuMDFjLjk2LjIzNCAyLjAwNi40MTUgMy4xMDcuNTMyYy42Ni45MDUgMS4zNDUgMS43MjcgMi4wMzUgMi40NDZjLTEuNTk1IDEuNDgzLTMuMDkyIDIuMjk1LTQuMTEgMi4yOTVhMS4yIDEuMiAwIDAgMS0uNTUzLS4xMzJjLS42NjYtLjM4LS45NTUtMS44MzQtLjczLTMuNzAzYy4wNTQtLjQ2LjE0Mi0uOTQ0LjI1LTEuNDM4em00LjU2LjY0cS42NjEuMDMyIDEuMzQ1LjAzNHEuNjkxLjAwMSAxLjM2LS4wMzRjLS40NC41NzItLjg5NSAxLjA5NS0xLjM0NSAxLjU2NXEtLjY4NC0uNzA2LTEuMzYtMS41NjUiLz48L3N2Zz4=",
-    "latest": "1.0.0-beta.1",
+    "latest": "1.0.0-beta.2",
     "license": "MIT",
     "repoUrl": "https://github.com/histoire-dev/histoire/tree/main/packages/histoire-plugin-react",
     "docsUrl": "https://histoire.dev/guide/plugins/official.html",
@@ -513,8 +583,25 @@
         }
       ]
     },
-    "history": [],
-    "versions": [],
+    "history": [
+      {
+        "version": "1.0.0-beta.2",
+        "requires": {
+          "histoire": "^1.0.0-beta.1",
+          "react": "^18.0.0 || ^19.0.0",
+          "react-dom": "^18.0.0 || ^19.0.0"
+        },
+        "frameworks": [
+          "react"
+        ]
+      }
+    ],
+    "versions": [
+      {
+        "version": "1.0.0-beta.2",
+        "compatible": true
+      }
+    ],
     "provenance": false,
     "requires": {
       "histoire": "^1.0.0-beta.1",
@@ -537,7 +624,7 @@
     "monogram": "Sc",
     "tint": "sky",
     "logoUrl": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+PHBhdGggZmlsbD0iY3VycmVudENvbG9yIiBkPSJNMjkgMjZIM2ExIDEgMCAwIDEtMS0xVjhhMSAxIDAgMCAxIDEtMWg2LjQ2bDEuNzEtMi41NUExIDEgMCAwIDEgMTIgNGg4YTEgMSAwIDAgMSAuODMuNDVMMjIuNTQgN0gyOWExIDEgMCAwIDEgMSAxdjE3YTEgMSAwIDAgMS0xIDFNNCAyNGgyNFY5aC02YTEgMSAwIDAgMS0uODMtLjQ1TDE5LjQ2IDZoLTYuOTJsLTEuNzEgMi41NUExIDEgMCAwIDEgMTAgOUg0WiIvPjxwYXRoIGZpbGw9ImN1cnJlbnRDb2xvciIgZD0iTTE2IDIyYTYgNiAwIDEgMSA2LTZhNiA2IDAgMCAxLTYgNm0wLTEwYTQgNCAwIDEgMCA0IDRhNCA0IDAgMCAwLTQtNCIvPjwvc3ZnPg==",
-    "latest": "1.0.0-beta.1",
+    "latest": "1.0.0-beta.2",
     "license": "MIT",
     "repoUrl": "https://github.com/histoire-dev/histoire/tree/main/packages/histoire-plugin-screenshot",
     "docsUrl": "https://histoire.dev/guide/plugins/official.html",
@@ -583,6 +670,13 @@
     },
     "history": [
       {
+        "version": "1.0.0-beta.2",
+        "requires": {
+          "histoire": "^1.0.0-beta.1"
+        },
+        "frameworks": []
+      },
+      {
         "version": "1.0.0-beta.1",
         "requires": {
           "histoire": "^1.0.0-beta.1"
@@ -591,6 +685,10 @@
       }
     ],
     "versions": [
+      {
+        "version": "1.0.0-beta.2",
+        "compatible": true
+      },
       {
         "version": "1.0.0-beta.1",
         "compatible": true
@@ -620,7 +718,7 @@
     "monogram": "Sv",
     "tint": "amber",
     "logoUrl": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0iY3VycmVudENvbG9yIiBkPSJNMTAuMzU0IDIxLjEyNWE0LjQ0IDQuNDQgMCAwIDEtNC43NjUtMS43NjdhNC4xIDQuMSAwIDAgMS0uNzAzLTMuMTA3YTQgNCAwIDAgMSAuMTM0LS41MjJsLjEwNS0uMzIxbC4yODcuMjFhNy4yIDcuMiAwIDAgMCAyLjE4NiAxLjA5MmwuMjA4LjA2M2wtLjAyLjIwOGExLjI1IDEuMjUgMCAwIDAgLjIyNi44M2ExLjM0IDEuMzQgMCAwIDAgMS40MzUuNTMzYTEuMiAxLjIgMCAwIDAgLjM0My0uMTVsNS41OS0zLjU2MmExLjE2IDEuMTYgMCAwIDAgLjUyNC0uNzc4YTEuMjQgMS4yNCAwIDAgMC0uMjExLS45MzdhMS4zNCAxLjM0IDAgMCAwLTEuNDM1LS41MzNhMS4yIDEuMiAwIDAgMC0uMzQzLjE1bC0yLjEzMyAxLjM2YTQgNCAwIDAgMS0xLjEzNS40OTlhNC40NCA0LjQ0IDAgMCAxLTQuNzY1LTEuNzY2YTQuMSA0LjEgMCAwIDEtLjcwMi0zLjEwOGEzLjg2IDMuODYgMCAwIDEgMS43NDItMi41ODJsNS41ODktMy41NjNhNCA0IDAgMCAxIDEuMTM1LS40OTlhNC40NCA0LjQ0IDAgMCAxIDQuNzY1IDEuNzY3YTQuMSA0LjEgMCAwIDEgLjcwMyAzLjEwN2E0IDQgMCAwIDEtLjEzNC41MjJsLS4xMDUuMzIxbC0uMjg2LS4yMWE3LjIgNy4yIDAgMCAwLTIuMTg3LTEuMDkzbC0uMjA4LS4wNjNsLjAyLS4yMDdhMS4yNSAxLjI1IDAgMCAwLS4yMjYtLjgzMWExLjM0IDEuMzQgMCAwIDAtMS40MzUtLjUzMmExLjIgMS4yIDAgMCAwLS4zNDMuMTVMOC42MiA5LjM2OGExLjE2IDEuMTYgMCAwIDAtLjUyNC43NzhhMS4yNCAxLjI0IDAgMCAwIC4yMTEuOTM3YTEuMzQgMS4zNCAwIDAgMCAxLjQzNS41MzNhMS4yIDEuMiAwIDAgMCAuMzQ0LS4xNTFsMi4xMzItMS4zNmE0IDQgMCAwIDEgMS4xMzUtLjQ5OGE0LjQ0IDQuNDQgMCAwIDEgNC43NjUgMS43NjZhNC4xIDQuMSAwIDAgMSAuNzAyIDMuMTA4YTMuODYgMy44NiAwIDAgMS0xLjc0MiAyLjU4M2wtNS41ODkgMy41NjJhNCA0IDAgMCAxLTEuMTM1LjQ5OW0xMC4zNTgtMTcuOTVDMTguNDg0LS4wMTUgMTQuMDgyLS45NiAxMC45IDEuMDY4TDUuMzEgNC42M2E2LjQgNi40IDAgMCAwLTIuODk2IDQuMjk1YTYuNzUgNi43NSAwIDAgMCAuNjY2IDQuMzM2YTYuNCA2LjQgMCAwIDAtLjk2IDIuMzk2YTYuODMgNi44MyAwIDAgMCAxLjE2OCA1LjE2N2MyLjIyOSAzLjE5IDYuNjMgNC4xMzUgOS44MTIgMi4xMDhsNS41OS0zLjU2MmE2LjQgNi40IDAgMCAwIDIuODk2LTQuMjk1YTYuNzYgNi43NiAwIDAgMC0uNjY1LTQuMzM2YTYuNCA2LjQgMCAwIDAgLjk1OC0yLjM5NmE2LjgzIDYuODMgMCAwIDAtMS4xNjctNS4xNjgiLz48L3N2Zz4=",
-    "latest": "1.0.0-beta.1",
+    "latest": "1.0.0-beta.2",
     "license": "MIT",
     "repoUrl": "https://github.com/histoire-dev/histoire/tree/main/packages/histoire-plugin-svelte",
     "docsUrl": "https://histoire.dev/guide/plugins/official.html",
@@ -658,6 +756,16 @@
     },
     "history": [
       {
+        "version": "1.0.0-beta.2",
+        "requires": {
+          "histoire": "^1.0.0-beta.1",
+          "svelte": "^4.0.0 || ^5.0.0"
+        },
+        "frameworks": [
+          "svelte"
+        ]
+      },
+      {
         "version": "1.0.0-beta.1",
         "requires": {
           "histoire": "^1.0.0-beta.1",
@@ -669,6 +777,10 @@
       }
     ],
     "versions": [
+      {
+        "version": "1.0.0-beta.2",
+        "compatible": true
+      },
       {
         "version": "1.0.0-beta.1",
         "compatible": true
@@ -698,7 +810,7 @@
     "monogram": "Vu",
     "tint": "green",
     "logoUrl": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0iY3VycmVudENvbG9yIiBkPSJNMjQgMS42MWgtOS45NEwxMiA1LjE2TDkuOTQgMS42MUgwbDEyIDIwLjc4Wk0xMiAxNC4wOEw1LjE2IDIuMjNoNC40M0wxMiA2LjQxbDIuNDEtNC4xOGg0LjQzWiIvPjwvc3ZnPg==",
-    "latest": "1.0.0-beta.1",
+    "latest": "1.0.0-beta.2",
     "license": "MIT",
     "repoUrl": "https://github.com/histoire-dev/histoire/tree/main/packages/histoire-plugin-vue",
     "docsUrl": "https://histoire.dev/guide/plugins/official.html",
@@ -736,6 +848,16 @@
     },
     "history": [
       {
+        "version": "1.0.0-beta.2",
+        "requires": {
+          "histoire": "^1.0.0-beta.1",
+          "vue": "^3.5.26"
+        },
+        "frameworks": [
+          "vue"
+        ]
+      },
+      {
         "version": "1.0.0-beta.1",
         "requires": {
           "histoire": "^1.0.0-beta.1",
@@ -747,6 +869,10 @@
       }
     ],
     "versions": [
+      {
+        "version": "1.0.0-beta.2",
+        "compatible": true
+      },
       {
         "version": "1.0.0-beta.1",
         "compatible": true
@@ -782,7 +908,7 @@
     "monogram": "Vd",
     "tint": "green",
     "logoUrl": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+PHBhdGggZmlsbD0iY3VycmVudENvbG9yIiBkPSJtMjkuODMgMjBsLjM0LTJsLTUuMTctLjg1di00LjM4bDUuMDYtMS4zNmwtLjUxLTEuOTNsLTQuODMgMS4yOUE5IDkgMCAwIDAgMjAgNVYyaC0ydjIuMjNhOC44IDguOCAwIDAgMC00IDBWMmgtMnYzYTkgOSAwIDAgMC00LjcxIDUuODJMMi40NiA5LjQ4TDIgMTEuNDFsNSAxLjM2djQuMzhMMS44NCAxOGwuMzIgMkw3IDE5LjE4YTguOSA4LjkgMCAwIDAgLjgyIDMuNTdsLTQuNTMgNC41NGwxLjQyIDEuNDJsNC4xOS00LjJhOSA5IDAgMCAwIDE0LjIgMGw0LjE5IDQuMmwxLjQyLTEuNDJsLTQuNTQtNC41NGE4LjkgOC45IDAgMCAwIC44My0zLjU3Wk0xNSAyNS45MkE3IDcgMCAwIDEgOSAxOXYtNmg2Wk05LjI5IDExYTcgNyAwIDAgMSAxMy40MiAwWk0yMyAxOWE3IDcgMCAwIDEtNiA2LjkyVjEzaDZaIi8+PC9zdmc+",
-    "latest": "1.0.0-beta.1",
+    "latest": "1.0.0-beta.2",
     "license": "MIT",
     "repoUrl": "https://github.com/histoire-dev/histoire/tree/main/packages/histoire-plugin-vue-devtools",
     "docsUrl": "https://histoire.dev/guide/devframe.html",
@@ -828,8 +954,26 @@
         ]
       }
     },
-    "history": [],
-    "versions": [],
+    "history": [
+      {
+        "version": "1.0.0-beta.2",
+        "requires": {
+          "histoire": "^1.0.0-beta.1",
+          "@vitejs/devtools": "0.8.0",
+          "vite": "^8.3.0",
+          "vue": "^3.5.26"
+        },
+        "frameworks": [
+          "vue"
+        ]
+      }
+    ],
+    "versions": [
+      {
+        "version": "1.0.0-beta.2",
+        "compatible": true
+      }
+    ],
     "provenance": false,
     "requires": {
       "histoire": "^1.0.0-beta.1",

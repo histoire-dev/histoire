@@ -1,7 +1,7 @@
 {
   "name": "@histoire/devframe",
   "type": "module",
-  "version": "1.0.0-beta.1",
+  "version": "1.0.0-beta.2",
   "description": "Optional authenticated live inspection adapter for Histoire",
   "license": "MIT",
   "sideEffects": false,

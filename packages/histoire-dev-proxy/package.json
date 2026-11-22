@@ -1,7 +1,7 @@
 {
   "name": "@histoire/dev-proxy",
   "type": "module",
-  "version": "1.0.0-beta.1",
+  "version": "1.0.0-beta.2",
   "description": "Early HTTP hosting and process lifecycle for Histoire development",
   "license": "MIT",
   "repository": {

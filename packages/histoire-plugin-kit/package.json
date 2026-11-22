@@ -1,7 +1,7 @@
 {
   "name": "@histoire/plugin-kit",
   "type": "module",
-  "version": "1.0.0-beta.1",
+  "version": "1.0.0-beta.2",
   "description": "Contracts and helpers for Histoire workbench and frame plugins",
   "license": "MIT",
   "repository": {

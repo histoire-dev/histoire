@@ -1,7 +1,7 @@
 {
   "name": "@histoire/plugin-react",
   "type": "module",
-  "version": "1.0.0-beta.1",
+  "version": "1.0.0-beta.2",
   "description": "Histoire plugin for React 18/19 stories",
   "license": "MIT",
   "repository": {
@@ -9,12 +9,18 @@
     "type": "git",
     "directory": "packages/histoire-plugin-react"
   },
-  "publishConfig": { "access": "public" },
+  "publishConfig": {
+    "access": "public"
+  },
   "keywords": [
     "histoire-plugin"
   ],
   "exports": {
-    ".": { "types": "./dist/index.node.d.ts", "browser": "./dist/index.js", "default": "./dist/index.node.js" },
+    ".": {
+      "types": "./dist/index.node.d.ts",
+      "browser": "./dist/index.js",
+      "default": "./dist/index.node.js"
+    },
     "./client": "./dist/client/index.js",
     "./collect": "./dist/collect/index.js",
     "./*": "./*"
@@ -22,7 +28,10 @@
   "main": "./dist/index.node.js",
   "module": "./dist/index.node.js",
   "types": "./dist/index.node.d.ts",
-  "files": ["assets", "dist"],
+  "files": [
+    "assets",
+    "dist"
+  ],
   "scripts": {
     "build": "rimraf dist && vite build && tsc --emitDeclarationOnly",
     "watch": "vite build --watch",

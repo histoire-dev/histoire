@@ -1,1 +1,13 @@
-[]
+[
+  {
+    "version": "1.0.0-beta.2",
+    "requires": {
+      "histoire": "^1.0.0-beta.1",
+      "react": "^18.0.0 || ^19.0.0",
+      "react-dom": "^18.0.0 || ^19.0.0"
+    },
+    "frameworks": [
+      "react"
+    ]
+  }
+]
