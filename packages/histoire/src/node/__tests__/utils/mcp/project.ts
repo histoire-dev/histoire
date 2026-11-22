@@ -29,7 +29,7 @@ export async function createMcpProjectFixture() {
       await writeFile(file.path, text)
       return file
     },
-    /** Removes only this fixture's directory. */
-    async close() { await rm(root, { recursive: true, force: true }) },
+    /** Removes only this fixture's directory, allowing Vite's cache cleanup to settle. */
+    async close() { await rm(root, { recursive: true, force: true, maxRetries: 6, retryDelay: 50 }) },
   }
 }

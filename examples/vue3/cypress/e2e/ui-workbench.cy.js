@@ -182,7 +182,11 @@ describe('Vue workbench integration', () => {
     cy.getPreviewIframeBody().contains('Hello world!')
     cy.contains('[aria-label="Inspector"] [role="tab"]', /^\s*Docs\s*$/).click()
     cy.location('search').should('include', 'tab=docs')
-    cy.contains('[aria-label="Histoire documentation"] h1', 'Message').should('be.visible')
+    cy.get('[aria-label="Histoire documentation"][aria-busy="false"]').should(($docs) => {
+      const heading = $docs.find('h1#message')
+      expect(heading).to.contain('Message')
+      expect(Cypress.dom.isVisible(heading), 'docs heading visibility').to.equal(true)
+    })
     cy.reload()
     cy.contains('[aria-label="Inspector"] [role="tab"]', /^\s*Docs\s*$/).should('have.attr', 'aria-selected', 'true')
     getGeneratedSource().should('contain', 'Hello world!')

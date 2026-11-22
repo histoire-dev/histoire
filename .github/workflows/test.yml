@@ -50,7 +50,8 @@ jobs:
         run: pnpm --filter histoire exec playwright install --with-deps chromium
 
       - name: Run tests
-        run: pnpm run test
+        # Vitest already runs test files concurrently within each package.
+        run: pnpm run -r --workspace-concurrency 1 --filter './packages/**' test
 
       - name: Run MCP integration tests
         env:

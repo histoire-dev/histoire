@@ -129,10 +129,13 @@ describe('installed accessibility plugin', () => {
     await panel.getByRole('switch', { name: 'Auto-run' }).check()
     // HMR replaces actor; newly mounted DOM must receive fresh, correctly scoped report.
     const source = join(directory, 'Audit.story.vue')
-    await writeFile(source, `<template><Story id="audit" title="Audit"><Variant id="issues" title="Issues" :init-state="() => ({ broken: false })"><template #default="{ state }"><button @click="state.broken = true">Remove image label</button><button @click="state.broken = false">Repair image label</button><img :alt="state.broken ? undefined : 'Hot repair'"></template></Variant></Story></template>`)
+    await writeFile(source, `<template><Story id="audit" title="Audit"><Variant id="issues" title="Updated issues" :init-state="() => ({ broken: false })"><template #default="{ state }"><button @click="state.broken = true">Remove image label</button><button @click="state.broken = false">Repair image label</button><img :alt="state.broken ? undefined : 'Hot repair'"></template></Variant></Story></template>`)
+    // Vite can patch the template before Histoire republishes the catalog and replaces the actor.
+    await page.getByRole('region', { name: 'Story inspector' }).getByRole('heading', { name: 'Updated issues', exact: true }).waitFor({ timeout: 30_000 })
     await expect.poll(() => frame.locator('img').getAttribute('alt'), { timeout: 30000 }).toBe('Hot repair')
     await expect.poll(() => panel.textContent(), { timeout: 30000 }).toContain('No violations found')
     await frame.getByRole('button', { name: 'Remove image label' }).click()
+    await expect.poll(() => frame.locator('img').getAttribute('alt')).toBeNull()
     await violationCounter(panel).waitFor({ timeout: 15_000 })
     await selectInspectorTab(page, 'Props')
     await frame.getByRole('button', { name: 'Repair image label' }).click()
