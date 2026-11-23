@@ -36,7 +36,7 @@ Optional fields:
 
 All descriptive strings are bounded to 500 characters unless a smaller limit is stated. Optional JSON default/value strings may be empty. Unknown fields are dropped with diagnostics. Invalid required fields reject the whole manifest; invalid optional array members are independently dropped. A malformed migration is dropped atomically. No registry field can grant Official status.
 
-### Bundled official releases {#official-history-inputs}
+### Bundled official releases
 
 Histoire's bundled official release history supplies version-specific requirements, frameworks, release notes, and migrations for offline use. To see which releases the Marketplace offers for your project, see [official release history](../guide/plugins/marketplace.md#official-release-history).
 

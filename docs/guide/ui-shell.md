@@ -33,5 +33,3 @@ Panel and inspector preferences stay in your browser. Use a story URL with `vari
 ## Hide and restore UI
 
 Choose **Hide UI** in the canvas toolbar or press **Ctrl/⌘ Shift H** to focus on the canvas. Right-click the canvas and choose **Show UI**, or use the same shortcut, to restore workbench controls. Context menus remain available while UI is hidden.
-
-<a id="internal-shell-contracts"></a>

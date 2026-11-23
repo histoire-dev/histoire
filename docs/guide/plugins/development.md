@@ -195,9 +195,6 @@ Migrations support `rename-option`, `remove-option` and `set-option`. Histoire s
 
 See [using the marketplace](./marketplace.md) for installation, local preferences and recovery behavior.
 
-<a id="official-release-history"></a>
-<a id="publish-changes-to-the-hosted-official-catalog"></a>
-
 ## Extending Vite configuration
 
 Use `viteConfig` when an integration must change Vite options before Vite resolves its plugins. It receives the merged Vite config and a context containing Histoire `mode`, `isServer`, `browserRuntime`, and `collecting`. Return a partial Vite config to merge, or nothing to leave it unchanged. The hook also runs for collection and test runtimes, so restrict interactive tools to the intended environment.

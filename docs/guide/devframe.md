@@ -266,6 +266,6 @@ Disposal can reject when retirement fails or times out; propagate that failure t
 
 For historical JSON and standalone HTML exports, see [detached reports](../reference/devframe.md#detached-reports). For connection and stale-owner errors, see [troubleshooting](../reference/devframe.md#troubleshooting).
 
-## Example integration {#run-the-repository-example}
+## Example integration
 
 The local Devframe example shows how an MCP client can read a counter after you edit it in the browser. The example uses temporary credentials and a loopback server. Use your application's authentication and document ownership policy in production. See the [Devframe example README](https://github.com/histoire-dev/histoire/blob/main/examples/vue3/devframe/README.md).

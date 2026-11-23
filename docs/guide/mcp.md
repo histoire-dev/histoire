@@ -145,7 +145,7 @@ For example, call `histoire_inspect_dom` with:
 
 Poll `histoire_get_operation` with the returned `operationId`, as for screenshots. All four accept screenshot viewport, globals, color scheme and direction settings. Inspection reports the fresh mount; it does not read unsaved control changes in an open book. Results remain bounded and report `truncated`; prop metadata depends on framework support. Diagnostics can complete with `previewReady: false` and captured mount failures. See [rendered inspection reference](../reference/mcp.md#rendered-inspection) for inputs, output fields and limits.
 
-## Framework compatibility {#validated-framework-combinations}
+## Framework compatibility
 
 Use the [supported framework and Vite versions](./getting-started.md#supported-frameworks) for your project. Follow the framework’s getting-started guide before connecting an MCP client. Browser operations also need the [browser setup](#screenshots-and-tests) for the environment where Histoire runs.
 
