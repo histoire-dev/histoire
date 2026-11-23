@@ -1,9 +1,14 @@
 import type { Story } from '@histoire/shared'
 import type { PropType, VNode } from 'vue'
 import { omitInheritStoryProps } from '@histoire/shared'
-import { cloneVNode, computed, defineComponent, getCurrentInstance, h, isRef, provide, reactive, renderSlot, useAttrs } from 'vue'
+import { cloneVNode, computed, defineComponent, getCurrentInstance, h, isReadonly, isRef, provide, reactive, renderSlot, useAttrs } from 'vue'
 import { useRenderContext } from './render-context.js'
 import Variant from './Variant'
+
+/** Vue sets this flag on component instances and values explicitly kept raw. */
+function isLocalBinding(value: unknown): boolean {
+  return typeof value === 'object' && value !== null && (value as { __v_skip?: boolean }).__v_skip === true
+}
 
 export default defineComponent({
 
@@ -59,6 +64,7 @@ export default defineComponent({
       },
     })
 
+    /** Expose a story binding without giving the state bridge ownership of local values. */
     function addImplicitState(source: Record<string, any>, key: string) {
       const value = source[key]
 
@@ -71,10 +77,13 @@ export default defineComponent({
         configurable: true,
         get: () => {
           const currentValue = source[key]
-          return isRef(currentValue) ? currentValue.value : currentValue
+          const value = isRef(currentValue) ? currentValue.value : currentValue
+          return isLocalBinding(value) ? undefined : value
         },
         set: (newValue) => {
           const currentValue = source[key]
+          const value = isRef(currentValue) ? currentValue.value : currentValue
+          if (isLocalBinding(value) || isReadonly(currentValue)) return
 
           if (isRef(currentValue)) {
             currentValue.value = newValue

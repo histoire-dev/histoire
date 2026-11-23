@@ -62,6 +62,8 @@ Call `handle.update(overlay)` when content changes and `handle.close()` on unmou
 
 Define the state your story and controls share. Histoire synchronizes Options API `data` and reactive data returned from `setup`.
 
+Top-level `<script setup>` refs to component instances stay in the story. Use Vue's `markRaw()` to keep another top-level object out of shared state.
+
 Options API example:
 
 ```vue{11-18}
