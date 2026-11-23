@@ -12,6 +12,39 @@ import { getViteConfigWithPlugins } from '../vite/index.js'
 import { createBuildChunkOutput } from './chunks.js'
 import { routeImportsThroughDynamicFacades } from './mock-facades.js'
 
+/** Vue's legacy mapping of template tags to asset attributes. */
+type VueAssetTags = Record<string, string[]>
+
+interface VueAssetOptions {
+  /** Direct URL prefix, or null to let Vite bundle imported assets. */
+  base?: string | null
+  /** Also process asset URLs starting at the project root. */
+  includeAbsolute?: boolean
+  /** Custom mapping of template tags to asset attributes. */
+  tags?: VueAssetTags
+}
+
+interface VuePluginOptions {
+  /** Template compiler options exposed through the Vue Vite plugin API. */
+  template?: { /** Options or legacy tag mapping for static template asset URLs. */ transformAssetUrls?: VueAssetOptions | VueAssetTags | boolean }
+}
+
+/** Use Vue's build-time asset defaults while its collection server keeps story bindings available. */
+function configureVueBuildAssets(plugin: VitePlugin) {
+  const options: VuePluginOptions | undefined = plugin.api?.options
+  const configured = options?.template?.transformAssetUrls
+  if (!options || configured === false) return
+
+  const assetOptions = configured && typeof configured === 'object' ? configured : {}
+  const overrides = Object.values(assetOptions).some(Array.isArray) ? { tags: assetOptions as VueAssetTags } : assetOptions
+  options.template = {
+    ...options.template,
+    // Without an explicit base, the synthetic dev server makes Vue emit
+    // unbundled URLs pointing to source files instead of build output.
+    transformAssetUrls: { base: null, includeAbsolute: true, ...overrides },
+  }
+}
+
 /**
  * Builds the Vite config of the final bundle: the histoire app entries plus the
  * overrides that must win over anything a user plugin sets (no externals, a
@@ -85,6 +118,7 @@ export async function createBuildViteConfig(ctx: Context, collectServer: ViteDev
         }
         // @ts-expect-error vue plugin use function form
         vuePlugin.configureServer(collectServer)
+        configureVueBuildAssets(vuePlugin)
       }
     },
   })
