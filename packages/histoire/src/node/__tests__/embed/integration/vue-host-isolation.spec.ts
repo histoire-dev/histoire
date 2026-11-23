@@ -35,8 +35,10 @@ describe('native Vue host isolation', () => {
           const app=createApp({render:()=>h(HistoireProvider,{session,onError:error=>nativeErrors.push(error.code)},{default:()=>h(Child)})}); app.mount(index?'#second':'#first'); window.apps.push(app);
         }
       })()`)
-      await expect.poll(() => page.locator('[data-native-status="0"]').textContent()).toBe('ready')
-      await expect.poll(() => page.locator('[data-native-status="1"]').textContent()).toBe('ready')
+      // Each native host waits for its cross-origin story document to finish loading.
+      for (const index of [0, 1]) {
+        await page.locator(`[data-native-status="${index}"]`).filter({ hasText: /^ready$/ }).waitFor()
+      }
       // Native actions operate inside caller forms without submitting them.
       const rotate = page.locator('#first').getByRole('button', { name: 'Rotate', exact: true })
       await rotate.click()

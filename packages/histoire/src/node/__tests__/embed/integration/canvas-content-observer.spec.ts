@@ -5,6 +5,17 @@ import { createEmbedBridgeFixture } from '../../utils/embed/bridge-fixture.js'
 import { trackPageReloads } from '../../utils/embed/browser.js'
 import { MCP_REPOSITORY_ROOT } from '../../utils/mcp/cli-project.js'
 
+/** Browser context hosting the real content observer probe. */
+type ContentProbeWindow = typeof window & {
+  /** Probe installed after the source-development page settles. */
+  contentProbe: {
+    /** Live document whose intrinsic size is observed. */
+    iframe: HTMLIFrameElement
+    /** Load a packaged font into that document. */
+    loadFont: (name: string, base64: string) => Promise<void>
+  }
+}
+
 it('measures real flow, fonts/images and viewport feedback, and releases retired documents', async () => {
   const fixture = await createEmbedBridgeFixture({ mode: 'source-dev', embedding: false, story: '<template><Story id="observer"><Variant id="one"><div /></Variant></Story></template>', config: 'routerMode:"hash",vite:{server:{watch:{ignored:["**/packages/histoire*/**"]}}},' })
   const page = await fixture.browser.newPage()
@@ -19,7 +30,14 @@ it('measures real flow, fonts/images and viewport feedback, and releases retired
       const {observeCanvasContentSize}=await import(${JSON.stringify(new URL(`@fs${modulePath}`, fixture.bookUrl).pathname)});
       const iframe=document.createElement('iframe');iframe.style.cssText='width:400px;height:300px;border:0';document.body.append(iframe);
       const doc=iframe.contentDocument;doc.open();doc.write('<html><head><style>body{margin:0}html,body,#app{height:100%}.__histoire-render-story{min-height:100%;overflow:auto}</style></head><body><div id="app"><div data-histoire-runtime-content data-histoire-variant-id="one"><div class="__histoire-render-story"><div id="box" style="box-sizing:content-box;width:120px;height:60px;padding:10px;margin:5px"></div></div></div></div></body></html>');doc.close();
-      window.contentProbe={iframe,values:[],active:true};
+      /** Load a real packaged font in the measured document. */
+      async function loadFont(name,base64) {
+        const face=new doc.defaultView.FontFace(name,'url(data:font/woff2;base64,'+base64+')');
+        doc.fonts.add(face);
+        await face.load();
+        await doc.fonts.ready;
+      }
+      window.contentProbe={iframe,values:[],active:true,loadFont};
       contentProbe.stop=observeCanvasContentSize({document:doc,variantId:'one',fallback:{width:400,height:300},isCurrent:()=>contentProbe.active,publish(size){contentProbe.values.push(size);iframe.style.width=size.width+'px';iframe.style.height=size.height+'px'}});
     })()`)
     const last = () => page.evaluate('contentProbe.values.at(-1)')
@@ -34,19 +52,20 @@ it('measures real flow, fonts/images and viewport feedback, and releases retired
     await page.evaluate(`contentProbe.iframe.contentDocument.querySelector('#image').src='data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="80" height="40"/>')`)
     await expect.poll(last).toEqual({ width: 80, height: 40 })
 
-    await page.evaluate(`contentProbe.iframe.contentDocument.querySelector('.__histoire-render-story').innerHTML='<span id="text" style="font:40px monospace">MMMMMMMMMMMMMMMMMMMMMMMMMMMM</span>'`)
+    // A bundled fallback makes the initial width independent of system font metrics.
+    const fonts = join(MCP_REPOSITORY_ROOT, 'packages/histoire-controls/src/style/fonts')
+    const [mono, manrope] = await Promise.all([
+      readFile(join(fonts, 'jetbrains-mono-latin-wght-normal.woff2'), 'base64'),
+      readFile(join(fonts, 'manrope-latin-wght-normal.woff2'), 'base64'),
+    ])
+    await page.evaluate(async (base64: string) => {
+      const probe = (window as ContentProbeWindow).contentProbe
+      await probe.loadFont('ProbeMono', base64)
+      probe.iframe.contentDocument!.querySelector('.__histoire-render-story')!.innerHTML = '<span style="font:40px ProbeManrope, ProbeMono">MMMMMMMMMMMMMMMMMMMMMMMMMMMM</span>'
+    }, mono)
     await expect.poll(async () => (await last()).width).toBeGreaterThan(600)
     const beforeFont = await last()
-    const font = await readFile(join(MCP_REPOSITORY_ROOT, 'packages/histoire-app/node_modules/@fontsource-variable/manrope/files/manrope-latin-wght-normal.woff2'))
-    await page.evaluate(async (base64: string) => {
-      const probe = (window as any).contentProbe
-      const doc = probe.iframe.contentDocument
-      const face = new doc.defaultView.FontFace('ContentProbe', Uint8Array.from(atob(base64), char => char.charCodeAt(0)))
-      doc.fonts.add(face)
-      doc.querySelector('#text').style.fontFamily = 'ContentProbe, monospace'
-      await face.load()
-      await doc.fonts.ready
-    }, font.toString('base64'))
+    await page.evaluate((base64: string) => (window as ContentProbeWindow).contentProbe.loadFont('ProbeManrope', base64), manrope)
     await expect.poll(last).not.toEqual(beforeFont)
     await expect.poll(async () => page.evaluate(`(()=>{const probe=contentProbe;const root=probe.iframe.contentDocument.querySelector('[data-histoire-runtime-content]');return Math.ceil(root.getBoundingClientRect().width)===probe.values.at(-1).width})()`)).toBe(true)
 

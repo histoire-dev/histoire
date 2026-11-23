@@ -1,13 +1,14 @@
+/** Locate the selected workbench frame or a standalone native surface in one Cypress query. */
+const previewIframe = 'iframe[title="Histoire variant"]'
+const selectedPreviewIframe = `[data-frame-id].is-selected ${previewIframe}, [aria-busy] ${previewIframe}:not([data-frame-id] iframe)`
+
 /**
  * Yields exact selected ready frame, including native single-surface hosts.
  * @param {object} [options] Options forwarded to `cy.get`, including timeout.
  */
 export function getSelectedPreviewIframe(options = {}) {
-  return cy.get('iframe[title="Histoire variant"]', { timeout: 20000, ...options })
-    .filter((_, iframe) => {
-      const frame = iframe.closest('[data-frame-id]')
-      return frame ? frame.classList.contains('is-selected') : Boolean(iframe.closest('[aria-busy]'))
-    })
+  // A chained filter restarts Cypress's retry window at the default timeout.
+  return cy.get(selectedPreviewIframe, { timeout: 20000, ...options })
     .should('have.length', 1)
     .should(($frames) => {
       // Loaded story DOM cannot accept input until retained-state restoration finishes.

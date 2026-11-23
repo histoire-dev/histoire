@@ -191,6 +191,8 @@ describe('Cross-story frame admission', () => {
       baseFirst = frame
     })
     cy.getControlsIframeBody().find('[role="checkbox"][aria-label="Disabled"]').should('have.attr', 'aria-checked', 'false').click().should('have.attr', 'aria-checked', 'true')
+    // Wait for the control edit to reach the variant before retiring its document.
+    cy.getPreviewIframeBody().contains('button', 'Click me').should('be.disabled')
 
     selectStory(codegenStory, 'Code gen')
     expectAllFramesReady(codegenStory, codegenVariants)

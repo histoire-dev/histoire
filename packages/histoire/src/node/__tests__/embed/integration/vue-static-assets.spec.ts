@@ -39,9 +39,16 @@ it.each([
     browser = await launchEmbedBrowser()
     const page = await browser.newPage()
     await page.goto(new URL('story/relative-image?variantId=_default', server.url).href)
-    const image = page.frameLocator(STANDALONE_SELECTED_FRAME).getByRole('img', { name: 'Relative image' })
-    await expect.poll(() => image.evaluate((element: HTMLImageElement) => element.naturalWidth, undefined, { timeout: 8_000 })).toBe(40)
-    expect(await image.evaluate((element: HTMLImageElement) => new URL(element.currentSrc).pathname)).toMatch(new RegExp(`^${base}assets/`))
+    const image = page.frameLocator(STANDALONE_SELECTED_FRAME)
+      .locator('[data-test-id="sandbox-render"]')
+      .getByRole('img', { name: 'Relative image', exact: true })
+    // Let Playwright resolve the frame, then wait for the browser to decode the image.
+    const { naturalWidth, pathname } = await image.evaluate(async (element: HTMLImageElement) => {
+      await element.decode()
+      return { naturalWidth: element.naturalWidth, pathname: new URL(element.currentSrc).pathname }
+    }, undefined, { timeout: 8_000 })
+    expect(naturalWidth).toBe(40)
+    expect(pathname).toMatch(new RegExp(`^${base}assets/`))
   }
   finally {
     await browser?.close()

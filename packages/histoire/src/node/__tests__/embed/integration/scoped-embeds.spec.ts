@@ -43,7 +43,8 @@ describe('generated scoped embeds', () => {
       await embed.getByRole('tab', { name: 'Events', exact: true }).click()
       await expect.poll(() => embed.getByRole('button', { name: /Count changed/ }).count()).toBe(1)
       await embed.getByRole('tab', { name: 'Source', exact: true }).click()
-      await expect.poll(() => embed.locator('pre').textContent()).toContain('Normal story')
+      // Development loads the syntax highlighter on demand. Wait for the visible source text.
+      await embed.getByLabel('Histoire source', { exact: true }).locator('pre').filter({ hasText: /Normal story/ }).waitFor()
       await embed.getByRole('tab', { name: 'Docs', exact: true }).click()
       await expect.poll(() => embed.getByLabel('Histoire documentation').textContent({ timeout: 500 }), { timeout: 15_000 }).toContain('Embed documentation')
       const popupPromise = page.waitForEvent('popup')

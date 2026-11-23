@@ -1,3 +1,4 @@
+import type { Locator } from 'playwright'
 import { writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
@@ -40,6 +41,13 @@ async function autoFit(page: any) {
   await option.click()
 }
 
+/** Check the viewport after the restored variant is ready, excluding temporary snapshots. */
+async function expectViewportSize(frame: Locator, expected: [number, number]) {
+  const iframe = frame.locator('.histoire-frame-content[aria-busy="false"] iframe[title="Histoire variant"]')
+  await iframe.waitFor()
+  await expect.poll(() => iframe.evaluateAll(frames => frames.map(frame => [frame.clientWidth, frame.clientHeight]))).toEqual([expected])
+}
+
 describe('content-sized workbench browser acceptance', () => {
   it('fits distinct variants, tracks growth/shrink without remounting, and retains mode across layouts/reload', async () => {
     const fixture = await createEmbedBridgeFixture({ mode: 'source-dev', embedding: false, story, config: 'routerMode:"hash",ui:{frameBudget:8},vite:{server:{watch:{ignored:["**/packages/histoire*/**"]}}},' })
@@ -48,7 +56,8 @@ describe('content-sized workbench browser acceptance', () => {
     page.on('pageerror', error => errors.push(error.message))
     try {
       await linkEmbedFixturePlaywright(fixture.root)
-      await page.goto(`${fixture.bookUrl}#/story/content?variantId=first&arrange=grid`)
+      // The toolbar and exact measured viewports below gate startup, which can outlast navigation.
+      await page.goto(`${fixture.bookUrl}#/story/content?variantId=first&arrange=grid`, { waitUntil: 'commit' })
       await autoFit(page)
       const expected = [
         { title: 'First', width: 120, height: 60, viewport: [120, 60] },
@@ -78,7 +87,7 @@ describe('content-sized workbench browser acceptance', () => {
       await page.getByRole('button', { name: 'Zoom level', exact: true }).click()
       await page.getByRole('button', { name: '50%', exact: true }).click()
       await expect.poll(() => sizes(page)).toEqual([{ ...expected[0], title: undefined }])
-      await page.reload()
+      await page.reload({ waitUntil: 'commit' })
       await expect.poll(() => sizes(page), { timeout: 30_000 }).toEqual([{ ...expected[0], title: undefined }])
       expect(await page.getByRole('button', { name: 'Viewport', exact: true }).textContent()).toContain('Auto fit')
 
@@ -122,7 +131,7 @@ describe('content-sized workbench browser acceptance', () => {
     const fixture = await createEmbedBridgeFixture({ mode: 'source-dev', embedding: false, story, config: 'routerMode:"hash",ui:{frameBudget:1},vite:{server:{watch:{ignored:["**/packages/histoire*/**"]}}},' })
     const page = await fixture.browser.newPage({ viewport: { width: 1920, height: 1080 } })
     try {
-      await page.goto(`${fixture.bookUrl}#/story/content?variantId=first&arrange=grid`)
+      await page.goto(`${fixture.bookUrl}#/story/content?variantId=first&arrange=grid`, { waitUntil: 'commit' })
       await autoFit(page)
       // Hold the runtime frame only once the fitted document settled; earlier handles may be replaced.
       await expect.poll(async () => (await sizes(page))[0], { timeout: 30_000 }).toEqual({ title: 'First', width: 120, height: 60, viewport: [120, 60] })
@@ -137,15 +146,14 @@ describe('content-sized workbench browser acceptance', () => {
       await second.getByRole('button', { name: 'Second', exact: true }).click()
       await expect.poll(() => first.locator('iframe').count()).toBe(0)
       await expect.poll(() => page.locator('.histoire-canvas-frame iframe').count()).toBe(1)
-      await expect.poll(() => second.locator('iframe').evaluate((frame: HTMLIFrameElement) => [frame.clientWidth, frame.clientHeight])).toEqual([200, 90])
+      await expectViewportSize(second, [200, 90])
       await page.evaluate('retiredContentDocument.querySelector("[data-box]").style.cssText="width:900px;height:900px"')
       await page.evaluate('new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)))')
       expect((await sizes(page))[0].width).toBe(240)
       await first.getByRole('button', { name: 'First', exact: true }).click()
-      await expect.poll(() => first.locator('iframe').evaluate((frame: HTMLIFrameElement) => [frame.clientWidth, frame.clientHeight])).toEqual([240, 150])
+      await expectViewportSize(first, [240, 150])
       await second.getByRole('button', { name: 'Second', exact: true }).click()
-      await expect.poll(() => second.locator('iframe').evaluate((frame: HTMLIFrameElement) => [frame.clientWidth, frame.clientHeight])).toEqual([200, 90])
-      await second.locator('.histoire-frame-content[aria-busy="false"]').waitFor()
+      await expectViewportSize(second, [200, 90])
       await writeFile(join(fixture.root, 'Book.story.vue'), story.replace('width:200px;height:90px', 'width:210px;height:95px'))
       await expect.poll(() => second.locator('iframe').evaluateAll((frames: HTMLIFrameElement[]) => frames.map(frame => [frame.clientWidth, frame.clientHeight])), { timeout: 30_000 }).toEqual([[210, 95]])
       expect(await page.locator('.histoire-canvas-frame iframe').count()).toBe(1)
@@ -166,7 +174,7 @@ describe('content-sized workbench browser acceptance', () => {
     })
     const page = await fixture.browser.newPage({ viewport: { width: 1920, height: 1080 } })
     try {
-      await page.goto(`${fixture.bookUrl}#/story/matrix?variantId=one&arrange=matrix&rows=wide&cols=tall`)
+      await page.goto(`${fixture.bookUrl}#/story/matrix?variantId=one&arrange=matrix&rows=wide&cols=tall`, { waitUntil: 'commit' })
       await autoFit(page)
       const cells = page.locator('.histoire-matrix-cell')
       const dimensions = () => cells.evaluateAll((cells: HTMLElement[]) => cells.map((cell) => {
