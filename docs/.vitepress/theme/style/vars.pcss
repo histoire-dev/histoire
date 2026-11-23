@@ -1,11 +1,22 @@
 :root {
-  --c-brand: #10B981;
-  --c-brand-light:#34D399;
+  --vp-c-brand-1: theme('colors.primary.700');
+  --vp-c-brand-2: theme('colors.primary.800');
+  --vp-c-brand-3: theme('colors.primary.900');
+  --vp-c-brand-soft: theme('colors.primary.500 / 12%');
+
+  --vp-button-brand-bg: var(--vp-c-brand-1);
+  --vp-button-brand-active-bg: var(--vp-c-brand-3);
 }
 
 html.dark {
-  --c-brand: #3aa675;
-  --c-brand-light: #349469;
+  --vp-c-brand-1: theme('colors.primary.400');
+  --vp-c-brand-2: theme('colors.primary.300');
+  --vp-c-brand-3: theme('colors.primary.200');
+  --vp-c-brand-soft: theme('colors.primary.400 / 12%');
+
+  --vp-button-brand-text: theme('colors.gray.950');
+  --vp-button-brand-hover-text: var(--vp-button-brand-text);
+  --vp-button-brand-active-text: var(--vp-button-brand-text);
 
   --c-bg: #22272e;
   --c-bg-light: #2b313a;
