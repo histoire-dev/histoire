@@ -42,8 +42,27 @@ export async function compileConsumerTypes(root: string) {
   await writeFile(join(root, 'public-types.ts'), `
 import {createHistoireSession,type HistoireSession,type HistoireSurface} from '@histoire/sdk';
 import {HistoireProvider,HistoireExplorer,HistoirePreview,HistoireStoryTree,HistoireSearch,HistoireToolbar,HistoireControls,HistoireDocs,HistoireSource,HistoireEvents,HistoireTests,useHistoireSession,useHistoireSnapshot} from '@histoire/vue';
-import {HstText} from '@histoire/controls/vue';import {createApp,h,type Component} from 'vue';import {createServer} from 'node:http';import {createHistoireProject} from 'histoire/node';
+import {HstText} from '@histoire/controls/vue';import {createApp,h,type Component,type GlobalComponents} from 'vue';import {createServer} from 'node:http';import {createHistoireProject} from 'histoire/node';
 import {useHostChannel} from 'histoire/client';
+import type {} from '@histoire/plugin-vue/components';
+import {defineSetupVue3} from '@histoire/plugin-vue';
+
+// Read setupApp from the options constructor, before the generic initState constructor.
+type LocalSetupProp<T> = T extends {
+  new (...args: never[]): { $props: { setupApp?: infer Callback } };
+  new (...args: never[]): { $props: unknown };
+} ? Callback : never;
+const fullSetup = defineSetupVue3(({ hooks, onDarkChange }) => {
+  hooks.onReady(() => {});
+  onDarkChange(() => {});
+});
+const storySetup: LocalSetupProp<GlobalComponents['Story']> = fullSetup;
+const variantSetup: LocalSetupProp<GlobalComponents['Variant']> = fullSetup;
+const localSetup: LocalSetupProp<GlobalComponents['Variant']> = ({ app, story, variant }) => { app.provide(story.id, variant.id); };
+// @ts-expect-error setupApp accepts callbacks only
+const invalidSetup: LocalSetupProp<GlobalComponents['Story']> = 42;
+void storySetup;void variantSetup;void localSetup;void invalidSetup;
+
 const session:HistoireSession=createHistoireSession({url:'https://book.example/book/'});
 const snapshot=session.getSnapshot();
 const color:'light'|'dark'|'auto'=snapshot.settings.colorScheme;

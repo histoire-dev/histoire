@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-types */
 
+import type { Vue3StorySetupApi, Vue3StorySetupHandler } from '@histoire/plugin-vue'
 import type {
   StoryLayout,
   Story,
@@ -38,6 +39,9 @@ declare type TypePropsToRuntimeProps<T> = {
   }
 }
 
+/** Local setup receives the current story and variant along with the shared setup API. */
+type VueLocalSetupHandler = (api: Vue3StorySetupApi & { story: Story, variant: Variant }) => ReturnType<Vue3StorySetupHandler>
+
 // <Story>
 
 interface VueStoryProps {
@@ -56,7 +60,7 @@ interface VueStoryProps {
   /**
    * A function to configure the Vue application. This will be the default for the variants in the story.
    */
-  setupApp?: (payload: { app: import('vue').App, story: Story, variant: Variant }) => void | Promise<void>
+  setupApp?: VueLocalSetupHandler
   /**
    * The id of a group to include the story in.
    */
@@ -146,7 +150,7 @@ interface VueVariantProps {
   /**
    * A function to configure the Vue application.
    */
-  setupApp?: (payload: { app: import('vue').App, story: Story, variant: Variant }) => void | Promise<void>
+  setupApp?: VueLocalSetupHandler
   /**
    * An Iconify id to customize the variant icon in the UI.
    * https://icones.js.org/
