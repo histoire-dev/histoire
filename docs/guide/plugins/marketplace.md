@@ -1,6 +1,6 @@
 # Plugin marketplace
 
-Open **Settings › Plugins › Browse marketplace**. The marketplace opens over the workbench. **Discover** suggests plugins from project dependencies and installed tools; **All plugins** supports search, categories, framework, publisher and contribution filters. Press `/` to focus search and `Esc` to close and return focus to the opener.
+Open **Settings › Plugins › Browse marketplace**. Use **Discover** for suggestions based on the project, or **All plugins** to search and filter by category, framework, publisher, or contribution. Press `/` to focus search or `Esc` to close the marketplace.
 
 Development servers refresh the official catalog from `histoire.dev` when the marketplace opens or installed plugins are checked for updates. Changes to the catalog reach existing versions of Histoire that support the feed. A package is **Official** when it is listed in Histoire's curated catalog and published under `@histoire/`.
 
@@ -37,9 +37,9 @@ Credentials stay server-side and attach only to the matching host, port and path
 ## Install
 
 1. Open a plugin and choose **Install**, or select a compatible version from **Choose version**.
-2. In **Options**, adjust declared fields. The config diff updates as values change; default values are omitted from the generated call.
-3. In **Review**, check the package-manager command, changed files and warnings.
-4. Start installation. Progress shows resolution, package installation, config update, server restart and plugin loading.
+2. In **Options**, adjust the fields the plugin exposes, then choose **Continue**. The diff updates as you edit. The generated call includes values that differ from the defaults.
+3. In **Review**, check the package-manager command, changed files, and warnings. Choose **Install** to start.
+4. Follow the progress through package resolution, installation, config update, restart, and plugin loading.
 
 Only one plugin job runs per project. Changing project files after review invalidates the plan and requires another review. Closing the marketplace or choosing **Run in background** leaves the server-owned job running.
 
@@ -55,7 +55,9 @@ Config changes use revision checks, a temporary config load and a backup. Recove
 
 ### Dependency repair after failure
 
-A failed or cancelled package step restores saved manifest and lockfile bytes, then runs a frozen dependency install with the same manager. The log shows **Restoring dependencies**. Recovery checks that a newly added package is absent, or that an updated, pinned or removed package has its original installed version. Manifest and lockfile bytes are restored again after repair, even when repair fails. Non-optional peer requirements are also checked after installation, including when the manager exits successfully despite a conflict.
+If a package step fails or is cancelled, look for **Restoring dependencies** in the log. Histoire restores the saved manifest and lockfiles, runs a frozen install with the same package manager, then restores those files again. It verifies that a new package is absent or that an updated, pinned, or removed package is back to its original version.
+
+Histoire checks required peers after installation, even if the package manager reports success.
 
 The failure says **No project files were changed** only when recovery succeeded. Failed or unverifiable repair reports remaining `node_modules` paths and does not claim restoration. Repair checks the requested package's presence/version; it does not compare every transitive file. Inspect the log and reported leftovers before retrying or restoring dependencies manually with the project's package manager.
 
@@ -68,6 +70,8 @@ Plugins settings shows installed versions, Required labels and compatible update
 **Update** shows release notes and the reviewed config diff. When available, **Apply config migration** controls declarative changes to literal options. Migrations never execute package code. Computed arguments, conflicting destinations or unsupported edits require manual steps. A lower-version pin warns about the downgrade and does not apply migrations. Exact pins still receive update notifications.
 
 **Skip this version** dismisses that target version. **Update all** processes eligible updates in sequence.
+
+<a id="offline-official-history"></a>
 
 ### Official release history
 
@@ -85,7 +89,7 @@ Community consent, package-manager override, restart policy and skipped versions
 
 ## Manual and static books
 
-Static books show only bundled official entries and always use **Manual install**. They cannot install packages or write project files. Copy the package-manager command and config snippet, apply them in your project, then rebuild the book with `histoire build`.
+Static books list bundled official plugins. Choose **Install** to open manual instructions. Copy the package-manager command and config snippet, apply them in your project, then rebuild the book with `histoire build`.
 
 Development also uses manual instructions when there is no safe standalone literal config, package-manager detection fails, a workspace dependency cannot be edited safely, or a migration requires hand editing. Config module graphs importing `package.json` or a managed lockfile require manual changes because installation could otherwise restart Histoire before its config write. Literal local imports and loader-reported Histoire/Vite dependencies are inspected without executing them; runtime-computed imports remain outside that static analysis.
 

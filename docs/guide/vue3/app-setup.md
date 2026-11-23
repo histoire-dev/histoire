@@ -2,9 +2,7 @@
 
 ## Global setup
 
-You can define a setup function globally in your setup file defined by the `setupFile` option in the global configuration ([learn more](../config.md#global-js-and-css)).
-
-For Vue 3, it must be called `setupVue3`. Histoire provides an optional `defineSetupVue3` helper to have better types in your IDE:
+Set [`setupFile`](../config.md#global-js-and-css) in your Histoire config to share Vue setup across stories. Export a function named `setupVue3`. Use `defineSetupVue3` to type its parameters in your editor.
 
 ```ts
 import { defineSetupVue3 } from '@histoire/plugin-vue'
@@ -26,12 +24,12 @@ export const setupVue3 = defineSetupVue3(({ app, story, variant }) => {
 ```
 
 ::: tip
-You can also import global CSS files or JS files in this setup file.
+Import any shared CSS or JavaScript in the same file.
 :::
 
 ## Local setup
 
-Inside each story, you can define a `setupApp` prop that will be called by Histoire allowing you to configure the sandbox application as well. It will **not** override the global setup function, but will be called after it. It works the same way with the same parameters.
+Use `setupApp` to configure the Vue app for a story or variant. It receives the same parameters as `setupVue3` and runs after global setup.
 
 ```vue{17}
 <script setup>
@@ -58,7 +56,7 @@ function mySetupApp ({ app, story, variant }) {
 </template>
 ```
 
-You can put the prop on the `<Story>` component too, so that `<Variant>` will have a default value for it. Redefining the prop on a `<Variant>` will **override** the function though.
+Set `setupApp` on `<Story>` to share a default. A `<Variant>` with its own `setupApp` uses that callback in place of the story default.
 
 ## Dark mode <Badge type="tip" text="1.0-beta.2+" />
 

@@ -1,8 +1,8 @@
 # Wrapper
 
-A Wrapper allows you to render things around the displayed story/variant.
+Use a wrapper to surround each rendered variant with a provider or shared layout.
 
-In your [setup file](./app-setup.md), you can add wrapper components with `addWrapper`:
+Register wrapper components with `addWrapper` in your [setup file](./app-setup.md).
 
 ```ts
 import { defineSetupVue3 } from '@histoire/plugin-vue'
@@ -13,9 +13,7 @@ export const setupVue3 = defineSetupVue3(({ addWrapper }) => {
 })
 ```
 
-The rendering will recursively occur in all the wrappers `default` slot.
-
-Wrappers only surround rendered stories and controls. The hidden story mount Histoire uses to register variants runs without them, like story collection, so app-level providers (overlays, toasts, ...) exist once per document. Install anything story setup code needs with `app.use()` or `app.provide()` instead.
+Each wrapper renders its contents through the default slot. Histoire applies wrappers to rendered stories and controls. Collection and the hidden mount that registers variants run without wrappers, so install dependencies needed during story setup with `app.use()` or `app.provide()`.
 
 ## Controls wrappers <Badge type="tip" text="1.0-beta.2+" />
 
@@ -56,9 +54,7 @@ function hasWrapper() {
 </template>
 ```
 
-Now, all stories and variants will be rendered with a small padding and a border.
-
-In the above example, we also use the `meta` prop to allow disabling the wrapper style:
+The wrapper adds padding and a border. Set `meta.wrapper` to `false` on a story or variant to remove those styles.
 
 ```vue
 <template>

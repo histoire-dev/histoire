@@ -2,7 +2,7 @@
 
 ## Dev console falls back to plain output
 
-The terminal panel needs a TTY for stdin and stdout, raw input, `TERM` set to something other than `dumb`, and at least 40 columns by 10 rows. Automatic mode is also disabled by `CI` and by an attached Node inspector (including `--inspect` in `NODE_OPTIONS`). Check the reason:
+The interactive panel needs a TTY for stdin and stdout, raw input, and at least 40 columns by 10 rows. On non-Windows systems it also needs a usable `TERM`. CI and an attached Node inspector disable automatic activation. Match your setup to one of these cases.
 
 - Piped output or a task runner without a TTY: run the command in a real terminal.
 - Small window: enlarge it. The panel returns by itself.
@@ -23,7 +23,7 @@ The console keeps the latest 2,000 log entries (2 MiB), 500 HTTP requests and 20
 
 A Histoire tab can become blank or unresponsive during repeated canvas scrolling or panning if Flatpak Chrome's sandboxed processes inherit a low file descriptor limit. The browser window can remain open after the tab's renderer exits. A debugger may report `Render process gone`.
 
-Canvas previews mount and dispose as they enter and leave the viewport. This creates IPC sockets and shared-memory handles. Switching variants within the same story can remain healthy because it reuses the primary preview and causes less iframe turnover.
+As you move around the canvas, Histoire mounts and unmounts story frames. This creates IPC sockets and shared-memory handles. Switching variants within one story can reuse the primary frame and create fewer handles.
 
 These symptoms alone do not establish descriptor exhaustion. Check the inherited limits before applying this workaround.
 
@@ -103,7 +103,7 @@ The reproduced case used Flatpak Chrome **154.0.8037.97**. A soft limit of **102
 
 The higher limit resolved this reproduced failure. It does not establish that native descriptor retention stays bounded during longer sessions, or that every Chrome crash has this cause. If failures continue with verified higher child limits, collect Chrome version, installation type, live limits, reproduction steps, and relevant browser logs for a separate diagnosis.
 
-For smoother canvas movement, Histoire keeps existing previews mounted and updates admission after pointer release or 150 ms without wheel/zoom input. [`ui.frameBudget`](../reference/config.md#ui-framebudget) defaults to **12** and caps live previews. These controls reduce rendering churn; they do not replace fixing the inherited descriptor limit.
+Histoire keeps existing canvas frames mounted while you move, then updates them after pointer release or 150 ms without wheel or zoom input. [`ui.frameBudget`](../reference/config.md#ui-framebudget) defaults to **6** and caps live frames. If you confirmed a low inherited descriptor limit, apply the limit fix above.
 
 To undo, remove only the drop-in added for this workaround and reload service configuration:
 

@@ -1,14 +1,16 @@
 # Visual testing <Badge type="tip" text="1.0-beta.2+" />
 
-Histoire can capture story variants, compare approved PNGs, and review changes locally or in CI. Enable it in your project config:
+Use visual tests to capture story variants and compare them with approved images locally or in CI. Enable visual testing in your Histoire config.
 
 ```ts
+import { defineConfig } from 'histoire'
+
 export default defineConfig({
   visual: {},
 })
 ```
 
-Every renderable variant becomes a visual case. Default profile is `desktop-light`: 1024 × 640 CSS pixels, scale 1, light theme, white background, left-to-right text. Docs-only stories are excluded. Visual testing needs a Playwright Chromium installation available to the project.
+Each renderable variant becomes a visual case. The default `desktop-light` profile uses 1024 × 640 CSS pixels at 1× scale, with a light theme, white background, and left-to-right text. Install Playwright and Chromium in the project before running comparisons.
 
 ```bash
 pnpm add -D playwright
@@ -20,6 +22,8 @@ pnpm exec playwright install chromium
 Profiles define reproducible rendering independently from workbench theme, zoom, pan, edited props, and viewport preferences.
 
 ```ts
+import { defineConfig } from 'histoire'
+
 export default defineConfig({
   visual: {
     baselineDir: '.histoire-visual',
@@ -36,9 +40,11 @@ export default defineConfig({
 })
 ```
 
-Each profile supports `deviceScaleFactor` (1–3), `backgroundColor`, `textDirection`, and scalar `globals`. Explicit globals replace project globals; omitted globals inherit them. Profiles require unique IDs and explicit light/dark themes. Empty profile arrays and invalid viewport sizes fail configuration processing.
+Give each profile a unique ID. Set `colorScheme` to `light` (the default) or `dark`. You can also set `deviceScaleFactor` (1–3), `backgroundColor`, `textDirection`, and scalar `globals`. Set `globals` to replace the project defaults, or omit it to inherit them. Use at least one profile and valid viewport sizes.
 
-`threshold` controls per-pixel color sensitivity. `maxDiffPixelRatio` is allowed fraction of differing pixels, between 0 and 1. Default accepts zero differing pixels after anti-aliasing detection. Different dimensions or changed capture specifications require explicit baseline replacement, rather than resizing or silently passing.
+`threshold` controls per-pixel color sensitivity. `maxDiffPixelRatio` sets the allowed fraction of differing pixels, from 0 to 1. By default, Histoire accepts zero differences after anti-aliasing detection.
+
+If the capture specification changes and the pixels still match, the comparison passes. Histoire can refresh the working-tree baseline to match the new specification, including its PNG. A changed specification with different pixels or dimensions requires a new approved baseline.
 
 Captures wait for selected variant, fonts, and two equal consecutive images. Animations/transitions are disabled, motion reduced, locale fixed to en-US, and timezone fixed to UTC. Story authors must provide stable dates, random values, network data, and loading states. Histoire does not rewrite application clocks or responses.
 
@@ -46,7 +52,7 @@ Captures wait for selected variant, fonts, and two equal consecutive images. Ani
 
 Open Tests and choose **Visual**. Select profile and baseline source, then **Run**. **Run** captures only comparisons that need it: never captured, stale (source, case, profile, baseline, or comparison policy changed), errored, or cancelled. Valid passing and awaiting-review results are reused. Open the menu next to **Run** and choose **Run all** to capture every selected comparison again. **Changes** includes missing baselines, changed images, incompatible captures, and errors. **All** also includes passing results.
 
-Select result to open wide image review. Compare baseline/current side by side, inspect diff, or use opacity overlay. Images share zoom and pan when dimensions match. **Create baseline** or **Approve baseline** writes exact captured image, without recapturing. Check specific results for bulk approval; failures remain selected.
+Select a result to compare the baseline and current capture side by side, view the diff, or use the opacity overlay. Images with matching dimensions share zoom and pan. **Create baseline** and **Approve baseline** use the captured image. Select multiple results to approve them together. Failed saves stay selected.
 
 Approval shows **Saving baseline** immediately, then **Approved** after baseline and recovery evidence are saved. Bulk results update individually as each save finishes. Offline reports rebuild separately; pending report updates survive server restarts. Report failures do not undo saved baselines. Node API and CLI wait for report publication before returning.
 
@@ -86,13 +92,13 @@ Filters are exact IDs and combine by intersection. `--variant` requires `--story
 
 CLI starts an ephemeral loopback dev server with MCP and agent services disabled, awaits catalog readiness, and uses same capture/comparison lane as workbench. It shuts down owned resources afterward. Static-book execution is unsupported.
 
-Exit codes: `0` for passing or explicitly approved captures, `1` for comparison/capture failures, `2` for setup/config/ref/filter failure, `130` for interruption. Ordinary runs never change approved baselines. Update does not stage, commit, or push files.
+The CLI exits with `0` for passing or explicitly approved captures, `1` for comparison or capture failures, `2` for setup, config, ref, or filter errors, and `130` for interruption. A comparison with `--baseline-ref` reads committed baselines without the automatic working-tree refresh. `--update` writes approved baselines to the working tree. Review and commit those files separately.
 
 Commit `.histoire-visual/cases`, baseline metadata, and referenced images after review. Reports stay ignored in `.histoire/visual/runs/<run-id>/`; command prints JSON and HTML paths. An `--incremental` run that captures nothing writes no report. Upload entire run directory, including `images`, using an always-running CI artifact step. HTML review works offline and is read-only.
 
 Baselines are separated by OS/architecture, such as `linux-x64`. macOS approval does not replace Linux CI baseline. Use same OS distribution, fonts, Playwright lockfile, and Chromium build when creating and comparing CI baselines. Chromium version differences appear as warnings. Browser upgrades can require reviewed baseline updates.
 
-Set `browser: { source: 'headless-shell' }` to use Playwright's pinned headless Chromium consistently. Repository's adoption job uses Ubuntu 24.04, locked Playwright 1.59.1, and deterministic SVG fixtures. Recreate Linux baselines in that environment when upgrading browser. Ordinary CI compares tracked baselines and never approves them.
+Set `browser: { source: 'headless-shell' }` to use Playwright's pinned headless Chromium. This repository's adoption job uses Ubuntu 24.04, Playwright 1.59.1, and deterministic SVG fixtures. Recreate Linux baselines in that environment when upgrading the browser. In comparison-only CI, pass `--baseline-ref <ref>` to compare with committed images without refreshing working-tree baselines.
 
 Write conflicts fail without overwriting another writer's metadata. An abandoned lock under `.histoire/visual/locks` requires removing exact lock only after confirming writer process has exited.
 

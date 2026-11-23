@@ -1,10 +1,12 @@
 # Plugin development
 
+Write a plugin to customize how Histoire collects and builds stories or to add workbench features.
+
 ::: warning
-This doc and the Plugin API are work-in-progress. Expect changes.
+The plugin API is still evolving.
 :::
 
-Create a new npm package. Example `package.json`:
+Create an npm package that exports a named plugin factory.
 
 ```json
 {
@@ -39,6 +41,7 @@ Create a new npm package. Example `package.json`:
     "defu": "^6.0.0"
   },
   "devDependencies": {
+    "@types/node": "^22.0.0",
     "histoire": "latest",
     "rimraf": "^3.0.0",
     "typescript": "^5.4.4"
@@ -49,7 +52,7 @@ Create a new npm package. Example `package.json`:
 }
 ```
 
-Don't forget to put `histoire` in your `peerDependencies`. We also put it in the `devDependencies` to install it and be able to import things from it.
+Declare your supported Histoire range in `peerDependencies`. Include Histoire in `devDependencies` so you can build and test the plugin locally.
 
 Example `tsconfig.json`:
 
@@ -93,7 +96,7 @@ Example `tsconfig.json`:
 }
 ```
 
-Create a new `src/index.ts` file:
+Export the plugin factory from `src/index.ts`.
 
 ```ts
 import type { Plugin } from 'histoire'
@@ -117,7 +120,7 @@ export function MyHistoirePlugin(options: MyPluginOptions = {}): Plugin {
 }
 ```
 
-Usage of your plugin:
+Register the factory in the project's Histoire config.
 
 ```js
 // In your histoire config
@@ -184,7 +187,7 @@ Recommendations use either `{ "dependency": "vitest", "reason": "Vitest detected
 
 Set `adds[].contribution` to the registration's local id, such as `results`, without a plugin namespace, colon or whitespace. This matches a description to one live contribution of the declared kind. An invalid relation is dropped with a diagnostic while keeping the description. Without an exact relation, legacy first-of-kind descriptions are used only when that plugin registers a single contribution of that kind. Metadata never creates a registration or opens an unmatched pane.
 
-Panes (`api.shell.pane`) and inspector tabs (`api.inspector.tab`) can declare `primaryCommand` using a local command id or a qualified id owned by the same plugin. The host qualifies local ids and rejects malformed or cross-plugin relations. Register the command through `api.commands.add`; the tour shows its action only while that command is available. Toolbar items continue to use `command`. Labels never infer command relationships. See [contribution fields](../../reference/plugin-api.md#contribution-fields).
+When you register a pane with `api.shell.addPane` or a tab with `api.inspector.addTab`, use `primaryCommand` to link it to a command from the same plugin. Pass a local or qualified ID. Register the command with `api.commands.add` so the tour can offer the action when it is available. For toolbar items, use `command`. See [contribution fields](../../reference/plugin-api.md#contribution-fields).
 
 Write release notes for each published version using `breaking`, `feature` or `fix`. Optional `code` strings are displayed as text. Updates collect intervening notes newest first from the hosted official catalog, the opt-in registry source, or bundled official history.
 

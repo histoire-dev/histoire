@@ -1,6 +1,6 @@
 # Browser tests and runtime migration <Badge type="tip" text="1.0-beta.2+" />
 
-Histoire renders every story inside browser iframe runtime. Same runtime collects and runs story tests, supports Vitest mocks, and owns live variant state.
+Histoire collects and runs story tests in the same kind of browser iframe it uses to render variants. Tests use your project's Vitest installation and can use Vitest mocks.
 
 ## Install Vitest browser runtime
 
@@ -16,7 +16,7 @@ This remains required for development story tests even when the screenshot setup
 
 ## Register story tests
 
-Use `onTest` inside story and import test APIs from `vitest`:
+Register tests with `onTest` in the story and import assertions and helpers from `vitest`. Use the provided `canvas` to inspect the rendered variant.
 
 ```ts
 import { onTest } from 'histoire/client'
@@ -39,36 +39,38 @@ onTest(({ canvas }) => {
 })
 ```
 
-Run once:
+Run the tests from your project:
 
 ```bash
 pnpm histoire test
 ```
 
-Histoire supports `describe`/`suite`, `it`/`test`, `.only`, `.skip`, `.todo`, standard before/after lifecycle hooks, `onTestFinished`, and `onTestFailed`. Benchmarks are ignored. Each case gets a fresh story mount in both `histoire test` and in-book runs; suite hooks therefore surround each isolated mount rather than sharing mutable mounted state between cases. Set [`test.maxWorkers`](../reference/config.md#test-maxworkers) to limit concurrent cases; default uses half the CPUs, fewer when memory is short.
+Histoire supports `describe`/`suite`, `it`/`test`, `.only`, `.skip`, `.todo`, standard before and after hooks, `onTestFinished`, and `onTestFailed`. It skips benchmarks.
 
-Low-level Vitest runner classes, snapshot assertions, artifacts, and fake timers are not available inside embedded story runner. Unsupported calls fail with explicit error instead of silently passing. Keep tests needing those APIs in regular Vitest spec files.
+Each test case gets an isolated story mount in the workbench and in `histoire test`. Suite hooks wrap each mount. Set [`test.maxWorkers`](../reference/config.md#test-maxworkers) to limit concurrency. Histoire defaults to half the CPUs or fewer when memory is short.
+
+Keep tests that use low-level Vitest runner classes, snapshot assertions, artifacts, or fake timers in regular Vitest spec files. Those calls report an error in story tests.
 
 ## State ownership
 
-Preview iframe owns canonical live state. Host UI keeps serializable mirror for generic controls, URLs, and presets. Host boot snapshot never overwrites newly mounted runtime.
+The story iframe owns live variant state. The workbench keeps a serializable copy for generic controls, URLs, and presets. A newly mounted story starts from its own state.
 
-Custom `#controls` content also runs in sandbox iframe, so it receives same story environment and Vitest mock support. Primary preview remains canonical; host relays serializable edits between preview and controls replica.
+Custom `#controls` content runs in a separate iframe with the same story environment and Vitest mock support. The workbench relays serializable edits between the story and controls frames.
 
-Functions, class instances, Maps, DOM nodes, and other non-serializable values remain usable inside iframe that created them. They cannot preserve identity across preview, controls replica, and host. Keep such logic inside story/custom controls runtime and synchronize serializable fields when cross-frame coordination is needed.
+Keep functions, class instances, Maps, DOM nodes, and other non-serializable values in the iframe that creates them. Use serializable fields to coordinate state across frames.
 
 ## Migrating from integrated rendering
 
-Remove `iframe: false` from story layouts. Option is deprecated and ignored:
+Remove the deprecated `iframe: false` option from story layouts.
 
 ```diff
 - :layout="{ type: 'single', iframe: false }"
 + :layout="{ type: 'single' }"
 ```
 
-Code that accessed host document or host app globals must use story iframe document instead. In a test, use provided `canvas`; in story code, use runtime-local `window` and `document`.
+Use the provided `canvas` in tests. In story code, use the story iframe's `window` and `document`.
 
-Increase [`test.storyCollectTimeout`](../reference/config.md#test-storycollecttimeout) for legitimately slow imports or mounts. Same budget protects bootstrap and render readiness.
+For slow imports or mounts, increase [`test.storyCollectTimeout`](../reference/config.md#test-storycollecttimeout). This timeout also covers startup and render readiness.
 
 See [Visual testing](./visual-testing.md) for tracked baselines, Matrix cases, image review, and CI comparisons.
 
@@ -108,4 +110,4 @@ A story that throws outside its test cases (failed import, mount timeout, uncaug
 
 ## Accessibility checks
 
-Install [official accessibility plugin](./plugins/a11y.md) and enable `HstA11y({ test: true })` to add fresh-mount axe-core test per variant, including stories without authored tests. All violations fail by default; checks needing manual review remain informational.
+Install the [official accessibility plugin](./plugins/a11y.md) and set `HstA11y({ test: true })` to run an axe-core test on a fresh mount of each variant, including variants without their own tests. Violations fail by default. Checks that need manual review are informational.

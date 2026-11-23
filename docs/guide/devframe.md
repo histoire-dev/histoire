@@ -1,10 +1,12 @@
 # Devframe live inspection
 
-Use `@histoire/devframe` to let an authenticated MCP agent inspect an already mounted Histoire variant, including unsaved state and component events. The adapter exposes a separate, explicitly configured endpoint. The [Histoire MCP server](./mcp.md) performs rendered inspection in a fresh isolated runtime and does not read changes in an open canvas.
+Use `@histoire/devframe` to let an authenticated MCP agent inspect a mounted Histoire variant, including its unsaved state and events. The adapter uses its own endpoint. Use the [Histoire MCP server](./mcp.md) for inspection in a fresh isolated runtime.
 
 ## Prerequisites and installation
 
-You need Node.js `>=22.12.0`, a running or deployed Histoire source, a browser host with an SDK session, and a caller-owned HTTP or HTTPS server. Your application supplies browser authentication, independent agent authentication, and document ownership verification.
+Use Node.js `>=22.12.0`, a running or deployed Histoire source, and a browser host that mounts a variant through the SDK. Your application owns the HTTP or HTTPS server.
+
+Authenticate browsers and MCP agents separately. The host also verifies document ownership before pairing a browser session.
 
 Install the browser SDK and optional adapter in the host project:
 
@@ -39,9 +41,9 @@ export default defineConfig({
 })
 ```
 
-This enables available variant and DOM reads. Additional `inspection.components`, `inspection.accessibility`, and `inspection.diagnostics` flags each default to `false`. Component inspection needs a supported framework provider. Accessibility needs locally available `axe-core`, which Histoire declares as an optional dependency; inspection never installs it. Check `session.getSnapshot().inspection` for capabilities available in the current mounted runtime.
+Enabling inspection makes variant and DOM reads available. Enable `inspection.components`, `inspection.accessibility`, or `inspection.diagnostics` for additional reads. Component inspection needs a supported framework provider. To use accessibility reads, make the optional `axe-core` dependency available locally. Check `session.getSnapshot().inspection` for the mounted runtime's capabilities.
 
-Origin allowlists do not authenticate browsers or agents. For cross-origin framing, also configure the [embedding response headers and host CSP](./embedding.md#origins-and-deployment-headers). See [inspection configuration](../reference/config.md#inspection) for all source options.
+For cross-origin framing, also configure the [embedding response headers and host CSP](./embedding.md#origins-and-deployment-headers). The allowlists permit embedding and inspection from the host origin. The next steps authenticate the browser and agent. See [inspection configuration](../reference/config.md#inspection) for the source options.
 
 ## Mount the host
 
@@ -174,7 +176,7 @@ Configure your MCP client with the endpoint routed above and an independently is
 }
 ```
 
-Use your client's secret storage for the real token. Do not use the browser token or grant as the agent credential. Tools are advertised according to currently authorized attachment scopes; resource discovery returns only authorized active attachments.
+Store the independently issued agent token in your client's secret storage. The browser token and pairing grant belong to the browser session. The endpoint advertises tools for the authorized scopes and lists active attachments the agent can access.
 
 For a programmatic Node client, install `@modelcontextprotocol/client@2.3.1`. Discover a resource and copy its exact owner into each call:
 
@@ -219,7 +221,7 @@ For multiple attachments, choose the resource matching your intended source and 
 
 ## Recovery and cleanup
 
-Selection, source or runtime replacement, disconnect, policy revocation, and disposal retire the attachment. After the intended replacement becomes ready, obtain a fresh grant and explicitly attach again. Rediscover its resource; never reuse an old owner or redeemed grant.
+Changing selection, replacing the source or runtime, disconnecting, revoking policy, or disposing the session retires the attachment. Wait for the replacement to be ready, get a fresh grant, and attach again. Discover its resource to get the current owner.
 
 On host policy, source, or runtime authority changes, invalidate synchronously:
 

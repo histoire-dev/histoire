@@ -1,6 +1,6 @@
 # AI agents <Badge type="tip" text="1.0-beta.2+" />
 
-Histoire connects local coding agents to AI threads and canvas comments through [Agent Client Protocol](https://agentclientprotocol.com/). Agents run in development mode. Open **Settings → AI agents**, search registry, enable local agents, then enable selected agent.
+Histoire uses the [Agent Client Protocol](https://agentclientprotocol.com/) (ACP) to connect local coding agents to threads and canvas comments in development. Open **Settings › AI agents (ACP)**, enable local agents, then enable an agent from the registry or add your own. Complete the agent's authentication setup before choosing a model or sending a message.
 
 Settings lists full [ACP registry](https://cdn.agentclientprotocol.com/registry/v1/latest/registry.json), alongside existing custom commands. Configured default appears first, then enabled agents, then remaining catalog. Agents without compatible platform distribution remain visible but cannot be enabled.
 
@@ -8,11 +8,13 @@ Registry agents display their published logos in both themes. Missing or unavail
 
 ## Models and advanced settings
 
-Enabled agents expose **Model** and **Effort** defaults. **Agent default** leaves selection to adapter. Choices come from temporary ACP sessions using [session configuration options](https://agentclientprotocol.com/protocol/v1/session-config-options); changing model clears saved effort and loads compatible choices. Unsupported selectors stay disabled. Discovery sends no prompt and exposes no Histoire MCP tools. Complete agent's own authentication setup before discovery or sending messages.
+Set default **Model** and **Effort** for an enabled agent. Choose **Agent default** to use the adapter's own setting. Changing the model clears saved effort and loads compatible choices. Unsupported selectors stay disabled. Histoire reads these choices from a temporary ACP session without sending a prompt or exposing Histoire MCP tools.
 
 Saved defaults apply to later comment sessions. If adapter rejects saved model or effort, comment still sends with accepted configuration and warning. Configuration changes retire existing processes before applying new preferences.
 
-**Advanced settings** starts collapsed. It contains name, command, arguments, working directory, environment, logs and maintenance actions. Closing it preserves unsaved drafts. **Add agent** creates custom command. Renaming registry agent or changing working directory retains managed launch; changing command or arguments and selecting **Save command** converts it to custom override.
+Open **Advanced settings** for a registry agent or **Configure** for a custom agent. Change its name, command, arguments, working directory, or environment there. Closing the section keeps unsaved changes.
+
+A registry agent keeps its managed launch when you rename it or change its working directory. If you edit its command or arguments and choose **Save**, Histoire uses your command instead.
 
 Removing configured registry agent leaves its catalog entry available. Removing custom agent removes its configuration. Neither deletes saved credentials.
 
@@ -26,7 +28,7 @@ Install Node/npm or `uv` separately when required. Histoire does not install pac
 
 Caches live in `$XDG_CACHE_HOME/histoire` or `~/.cache/histoire` on Linux, `~/Library/Caches/histoire` on macOS, and `%LOCALAPPDATA%/histoire` on Windows. Binary versions cache separately so refreshing catalog does not delete executable used by active process.
 
-Use **Add agent** for another ACP executable. Arguments accept a JSON array of strings. Commands execute directly without a shell; set command and arguments separately. Working directories resolve from the project root. **Set default** chooses the destination for new threads and comments; **Ask each time** requires an explicit choice.
+Use **Add agent** to configure another ACP executable. Enter the command separately, then choose **Add argument** for each argument. Histoire runs the command directly without a shell, with working directories relative to the project root. Choose **Make default** to set the agent for new threads and comments, or **Ask each time** to choose when you send.
 
 ## Threads and context
 
@@ -55,7 +57,7 @@ Agents own their file and terminal tools. Histoire does not provide ACP client-s
 
 ## Environment and persistence
 
-Save environment variables through each agent's password field. Existing values are never returned to the browser; only variable names appear. Updates preserve previously saved variables. The credential endpoint is write-only, accepts same-origin JSON POST requests, and does not use the HMR channel.
+In the agent's environment settings, enter the variable name and its value, then choose **Add** or **Replace**. Histoire shows saved variable names and keeps their values server-side. Updating one variable preserves the others. The write-only endpoint accepts same-origin JSON POST requests outside the HMR channel.
 
 User preferences and credentials live in Histoire's private user file:
 
@@ -75,6 +77,4 @@ After verified save completion, only matching submitted presets or permission fi
 
 ## Troubleshooting
 
-**Not installed** means executable or package runner could not be found. Install required package manager, or set custom executable path in **Advanced settings**. Logs show bounded, redacted stderr output. Initialization timeout, ACP protocol mismatch, and process exit have separate messages. **Restart** retires a running or failed process and reacquires it; agents that have never run remain lazy.
-
-Automated coverage uses test-only ACP process for initialization, grouped model/effort discovery, configuration fallback, thread sessions, streaming, permission choices, crashes, secret redaction, diff summaries and teardown. Archive fixtures check managed installation and path/link containment. Real-agent authentication and interactive edit approval remain manual validation steps.
+**Not installed** means Histoire could not find the executable or package runner. Install the required package manager, or set the executable under **Advanced settings** or **Configure**. Use the redacted logs to distinguish startup timeout, ACP protocol mismatch, and process exit. Choose **Restart** to replace a running or failed agent process.

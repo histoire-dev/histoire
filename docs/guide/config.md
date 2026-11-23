@@ -1,16 +1,14 @@
 # Configuring Histoire
 
-To customize your experience, you can configure several parts of Histoire.
+Put Histoire options in a standalone config file or under `histoire` in your Vite config. When both are present, Histoire merges them, giving standalone values priority where they overlap. Some fields, such as plugins, combine entries.
 
-[See the full configuration reference →](../reference/config.md)
+[Configuration reference](../reference/config.md)
 
 ## Config file
 
 ### Standalone file
 
-The first option is to create a new file at the root of your project called `histoire.config.{js,ts}` or `.histoire.{js,ts}`. The configuration file must export the configuration object as default. Histoire provides a helper function `defineConfig` to enforce TypeScript typing.
-
-Detected files:
+Create a config file in your project and export its settings as the default export. Use `defineConfig` for TypeScript checking and completion. Histoire checks the project root first, then parent directories. In each directory, it looks for these names in order:
 
 - `histoire.config.ts`
 - `histoire.config.js`
@@ -30,13 +28,7 @@ export default defineConfig({
 
 ### Vite config file
 
-The second option is to provide the Histoire config object directly in your Vite config file `vite.config.{js,ts}`. To have the correct TypeScript check, make sure to use this [triple slash directive](https://www.typescriptlang.org/docs/handbook/triple-slash-directives.html) at the very top of your config file:
-
-```ts
-/// <reference types="histoire" />
-```
-
-Here's what your vite config file should look like:
+Put Histoire settings under the `histoire` key. Add `/// <reference types="histoire" />` at the top to type-check that key.
 
 ```ts
 // vite.config.js
@@ -51,11 +43,9 @@ export default defineConfig({
 })
 ```
 
-You can use the `process.env.HISTOIRE` environment variable in conditions to modify the vite configuration for Histoire.
-
 ## Overriding Vite configuration
 
-Sometimes you need to change some Vite configuration specifically for Histoire. You can do this with the `vite` object inside the Histoire configuration:
+Set the `vite` property in your Histoire config to override Vite options for the book.
 
 ```ts
 // histoire.config.js
@@ -85,7 +75,7 @@ export default defineConfig({
 ```
 ::: warning
 
-CommonJS modules must be specified in `vite.optimizeDeps.include` to work in Dev mode.
+If a CommonJS dependency needs pre-bundling in development and Vite misses it, add the dependency to `vite.optimizeDeps.include`.
 
 ```ts
 // histoire.config.js
@@ -103,7 +93,7 @@ export default defineConfig({
 
 ### Conditions in Vite config
 
-It might be more convenient to toggle some values in the Vite config using conditions instead, with the `process.env.HISTOIRE` environment variable.
+Use `process.env.HISTOIRE` to choose values conditionally in your Vite config.
 
 ```ts
 // vite.config.js
@@ -118,7 +108,7 @@ export default defineConfig({
 
 ### Ignoring plugins
 
-Some Vite plugins may not work well with Histoire - you can disabled them with the `viteIgnorePlugins` option which is an array for Vite plugin **names**:
+To skip a Vite plugin when Histoire runs, add its name to `viteIgnorePlugins`.
 
 ```ts
 // histoire.config.js
@@ -136,17 +126,19 @@ You can get the name of the plugins with `console.log(somePlugin().name)` or by 
 
 ## Global JS and CSS
 
-Your components may be using globally defined CSS (like CSS frameworks) or JS (like stores or helpers). Histoire provides an easy way to inject anything into each story by linking a setup file.
+Set `setupFile` to load shared CSS or JavaScript in your stories.
 
 ```ts
 // histoire.config.ts
+
+import { defineConfig } from 'histoire'
 
 export default defineConfig({
   setupFile: '/src/histoire.setup.ts'
 })
 ```
 
-In this file, you can import global CSS files or JS files.
+Import shared styles or helpers in that file.
 
 ```ts
 // src/histoire.setup.ts
@@ -154,15 +146,16 @@ In this file, you can import global CSS files or JS files.
 import './histoire.css' // Import global CSS
 ```
 
-You can also tell Histoire to configure the sandbox application using the corresponding setup function (more details afterwards).
+Export the setup function for your framework to configure the story app.
 
 | Framework | Setup function |
 | --------- | -------------- |
 | Vue 3 | `setupVue3` |
+| React | `setupReact` |
 
 ### Vue setup
 
-Inside your setup file, you can export a `setupVue3` function that will be called by Histoire allowing you to configure the Vue 3 sandbox application. Histoire provides an optional `defineSetupVue3` helper to have better types in your IDE :
+Export `setupVue3` from your setup file to configure the Vue story app. Use `defineSetupVue3` to type the callback parameters.
 
 ```ts
 // src/histoire.setup.ts
@@ -176,14 +169,16 @@ export const setupVue3 = defineSetupVue3(({ app, story, variant }) => {
 })
 ```
 
-[Learn more](./vue3/app-setup.md)
+[Vue app setup](./vue3/app-setup.md) covers setup order, lifecycle hooks, and examples.
 
 ## Theming
 
-Histoire can be white-labeled to match your brand guidelines. Here are the available options:
+Set the book's title, logo, logo link, and favicon under `theme`.
 
 ```ts
 // histoire.config.ts
+
+import { defineConfig } from 'histoire'
 
 export default defineConfig({
   theme: {
@@ -201,16 +196,16 @@ export default defineConfig({
 
 ### Colors
 
-To better match your colors guidelines, you can customize every colors used in the app. Note that Histoire uses Tailwind for its UI, so the colors pattern must match the Tailwind pattern.
+Set `theme.colors.primary` and `theme.colors.gray` to brand and neutral palettes. Each palette uses numbered shades.
 
-#### Builtin colors
+#### Built-in colors {#builtin-colors}
 
-Histoire provides some builtin patterns to easily change the color of the app.
+Import a palette from `defaultColors`.
 
 ```ts
 // histoire.config.ts
 
-import { defaultColors } from 'histoire'
+import { defaultColors, defineConfig } from 'histoire'
 
 export default defineConfig({
   theme: {
@@ -248,10 +243,12 @@ Available colors patterns:
 
 #### Custom colors
 
-You can also define your own colors.
+To use a custom palette, map shade numbers to color values.
 
 ```ts
 // histoire.config.ts
+
+import { defineConfig } from 'histoire'
 
 export default defineConfig({
   theme: {

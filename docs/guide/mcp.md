@@ -1,8 +1,8 @@
 # MCP server <Badge type="tip" text="1.0-beta.2+" />
 
-Histoire exposes stories, docs, source, preview URLs, screenshots, rendered inspection, and story tests through Model Context Protocol (MCP).
+Connect a Model Context Protocol (MCP) client to read stories, docs, source, and variant URLs. With a browser available, the client can also capture screenshots, inspect rendered variants, and run story tests.
 
-Rendered inspection here uses a fresh isolated runtime. For unsaved state and events in an already mounted browser session, configure the separate authenticated adapter in the [Devframe live-inspection guide](./devframe.md).
+Rendered inspection uses a fresh isolated runtime. To read unsaved state and events in a mounted browser session, configure the authenticated adapter in the [Devframe live-inspection guide](./devframe.md).
 
 ## Development HTTP
 
@@ -90,25 +90,7 @@ pnpm exec histoire screenshot-setup --json
 
 The command accepts `--root <directory>` or `-c, --config <file>` to inspect another project. The first command reads setup metadata without launching a browser. `--check` performs a bounded neutral launch and closes it; neither action installs dependencies. `--json` writes one setup snapshot, or one bounded `{ error }` object, to stdout. Metadata reads exit `0` when unverified or ready and `1` when setup needs action. Explicit checks exit `0` only when ready and otherwise `1`; invalid arguments, project roots, or config exit `2`. After installing a driver or browser, rerun the command to refresh discovery. Setup can also be checked from the canvas screenshot toolbar during development.
 
-With Playwright 1.49 or newer, automatic selection tries a matching Chromium headless shell, matching cached full Chromium, stable Google Chrome, then stable Microsoft Edge. Older supported drivers try their default Chromium headless executable before Chrome and Edge; they do not have separate shell/full-channel choices. Pin a supported explicit [`browser.source`](../reference/config.md#browser) to keep renderer choice stable. Explicit choices never fall back. Existing Chrome or Edge needs a driver but no browser download; install only `playwright` or opt into `playwright-core` for screenshot and rendered-inspection execution:
-
-```sh
-pnpm add -D playwright-core
-pnpm exec histoire screenshot-setup --check
-```
-
-If the check reports no supported browser and the selected driver is Playwright 1.49 or newer, install its Chromium headless shell:
-
-```sh
-pnpm add -D playwright
-pnpm exec playwright install chromium --only-shell
-```
-
-If the project uses only `playwright-core`, run `pnpm exec playwright-core install chromium --only-shell` instead. With an older driver, install its default Chromium using `pnpm exec playwright install chromium` or `pnpm exec playwright-core install chromium`.
-
-The shell install leaves other installed browsers in place. For Playwright 1.49 or newer, a confirmed shell-specific incompatibility or explicitly pinned full renderer uses `browser: { source: 'chromium' }` with `pnpm exec playwright install chromium --no-shell` or `pnpm exec playwright-core install chromium --no-shell`. Older drivers install their default Chromium with the same command without `--no-shell`. Installing full Chromium alone does not change the default shell choice. On supported Linux systems with a classified missing-library failure, install OS dependencies with `pnpm exec playwright install-deps chromium` or `pnpm exec playwright-core install-deps chromium`.
-
-Older supported drivers do not provide a separate shell/full-channel choice. Install their default Chromium with `pnpm exec playwright install chromium` or `pnpm exec playwright-core install chromium`, or upgrade the driver before explicitly selecting `headless-shell` or full-channel `chromium`.
+For browser discovery and installation, follow [screenshot browser setup](./ui-screenshots-mcp.md#check-existing-setup). Screenshots and rendered inspection can use `playwright-core` and an existing browser. For a deployed artifact, follow [Node browser setup](./deploy-node.md#optional-browser-execution) on the deployment machine.
 
 Development tests use the project's Vitest and matching `@vitest/browser-playwright` provider:
 
@@ -136,13 +118,13 @@ Screenshot input also accepts integer `deviceScaleFactor` from 1 to 3 and primit
 
 `sandboxUrl` needs Histoire's trusted same-origin wrapper to become ready. Use `histoire_capture_screenshot` or the shared Node SDK capture API for external screenshot automation.
 
-Development uses the project's Vitest browser runner (`project-vitest`). [Node deployments](./deploy-node.md) run the compiled embedded preview tests (`built-preview`) with Playwright, without project Vitest or runtime source collection. This covers selected story/variant tests, not project-wide tests, coverage, snapshot updates, watch mode, or CLI reporter behavior. Existing explicit test/hook deadlines still apply. A story with no tests succeeds with zero tests; failed assertions, uncollected stories, and infrastructure failures remain distinct.
+Development uses the project's Vitest browser runner (`project-vitest`). [Node deployments](./deploy-node.md) run compiled story tests (`built-preview`) with Playwright, without project Vitest or runtime source collection. This covers selected story or variant tests, not project-wide tests, coverage, snapshot updates, watch mode, or CLI reporters. Explicit test and hook deadlines still apply. A story with no tests succeeds with zero tests. Failed assertions, uncollected stories, and infrastructure failures are reported separately.
 
 Each job gets a fresh browser context. Jobs share one owned execution lane; a config restart invalidates old operations and artifacts. If browser/Vitest teardown cannot be confirmed, execution stays unavailable until the process restarts. Read tools remain usable. See [MCP reference](../reference/mcp.md) for limits and error codes.
 
 ## Inspect a rendered variant
 
-Four tools inspect a fresh isolated preview:
+Four tools start a fresh isolated variant for inspection:
 
 - `histoire_inspect_variant`: current JSON state and framework-provided automatic prop metadata, including defaults and current values.
 - `histoire_inspect_dom`: bounded element subtree, selected attributes, text, CSS geometry and computed styles.
@@ -165,7 +147,7 @@ Poll `histoire_get_operation` with the returned `operationId`, as for screenshot
 
 ## Validated framework combinations
 
-Local checks cover story/source discovery, preview URLs, live screenshots, Node builds, and screenshots from copied artifacts with original projects removed. React and SvelteKit 3 checks use Node.js 24; earlier framework checks use Node.js 22:
+Local checks cover story and source discovery, variant URLs, screenshots, Node builds, and screenshots from copied artifacts with the original projects removed. React and SvelteKit 3 checks use Node.js 24. The earlier framework checks use Node.js 22.
 
 | Framework | Tested versions and setup |
 | --- | --- |

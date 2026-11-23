@@ -1,6 +1,6 @@
 # How to write stories?
 
-Stories are svelte files ending with `.story.svelte`. Add a `Hst` prop so histoire can provide its builtin components. You then need to use the `<Hst.Story>` tag at the root of your template.
+Create a Svelte file ending in `.story.svelte`, export the `Hst` prop, and put `<Hst.Story>` at the root of its template.
 
 ```svelte
 <!-- Meow.story.svelte -->
@@ -14,10 +14,10 @@ Stories are svelte files ending with `.story.svelte`. Add a `Hst` prop so histoi
 ```
 
 ::: tip
-We use a prop instead of an import because Histoire provides different implementations of those components in different situations (for example when collecting the stories).
+Histoire uses the `Hst` prop to supply the components appropriate for story collection or rendering.
 :::
 
-The title of the story is provided with the (optional) `title` prop:
+Set the optional `title` prop to name the story in the workbench.
 
 ```svelte
 <script>
@@ -29,9 +29,7 @@ The title of the story is provided with the (optional) `title` prop:
 </Hst.Story>
 ```
 
-You can of course add `<script>` sections just like you would with any `.svelte` file.
-
-For example, you will usually import and use a component in your story:
+Import and render your components as you would in any Svelte file.
 
 ```svelte{2,7}
 <script>
@@ -61,7 +59,7 @@ To get typings for the `Hst` prop, you can import the `Hst` type from `@histoire
 
 ## Variants
 
-Stories can have different variants representing the same component. You can define variants using the `<Hst.Variant>` tag. Similar to the story, you can provide a title to your variant with the `title` prop.
+Use variants to show different states or use cases. Add each variant with the `<Hst.Variant>` tag. Give each variant a readable `title`, such as “Disabled”.
 
 ```svelte{6-14}
 <script>
@@ -83,13 +81,13 @@ Stories can have different variants representing the same component. You can def
 
 ## Layout
 
-You can change the layout of the variant by using the `layout` prop with an object. The `type` property is required to specify which layout to use.
+Set the story’s `layout.type` to choose how its variants appear. For stories without an explicit layout, Histoire uses your local or project default, which falls back to Grid. A view in the URL or a remembered view can override the story layout.
 
 ### Single layout
 
-This is the default layout, displaying one variant at a time. The story is isolated with an iframe so CSS media queries work correctly.
+Use `type: "single"` to display one variant at a time. The variant runs in an iframe so CSS media queries use its own viewport.
 
-Stories always render inside an iframe. Remove the `iframe` option when migrating. Preview runtime owns live state; see [browser runtime migration](../testing.md#state-ownership).
+Stories always render inside an iframe. Remove the `iframe` option when migrating. The story iframe owns live state. See [state ownership during migration](../testing.md#state-ownership).
 
 ```svelte{7}
 <script>
@@ -114,7 +112,7 @@ Stories always render inside an iframe. Remove the `iframe` option when migratin
 
 ### Grid layout
 
-Display all the variants in a grid.
+Use `type: "grid"` to compare variants side by side.
 
 ```svelte{7}
 <script>

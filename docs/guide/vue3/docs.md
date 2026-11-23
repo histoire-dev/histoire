@@ -4,7 +4,7 @@
 
 ### Custom block
 
-Histoire lets you write markdown documentation for your stories using Vue custom blocks. Add a `docs` tag in your story file:
+Add a `docs` block to a Vue story to show Markdown in its **Docs** tab.
 
 ```vue{5-9}
 <template>
@@ -20,17 +20,13 @@ Checkout this [cool video](https://www.youtube.com/watch?v=dQw4w9WgXcQ)!
 
 ### Sibling markdown
 
-To add documentation to a story, you can also create a file with the same name next to it, with the `.md` extension.
-
-For example, if your story is `BaseButton.story.vue`, create a `BaseButton.story.md` file.
-
-Sibling markdown files are higher priority than custom blocks.
+To write docs in a separate file, put `BaseButton.story.md` beside `BaseButton.story.vue`. When both a sibling file and a `docs` block exist, Histoire uses the sibling file.
 
 ### Standalone page
 
-If you create a markdown file ending with `.story.md` that isn't related to a sibling story file, it will automatically create a virtual story that renders the markdown as a page.
+Create a `.story.md` file without a matching story file to add a standalone documentation page. Histoire displays it in the Stories tree.
 
-You can add a frontmatter to the markdown to customize the virtual story with the following properties:
+Use Markdown frontmatter to set these properties.
 
 - `id` ([reference](../../reference/vue3/story.md#id))
 - `title` ([reference](../../reference/vue3/story.md#title))
@@ -57,7 +53,7 @@ Learn more about Histoire [here](https://histoire.dev/).
 
 ### Links
 
-You can link to other stories using a relative path to the story file:
+Link to another story by its relative file path. Add `variantId` to link to a specific variant.
 
 ```md
 - [Go to Story](./BaseButton.story.vue)
@@ -67,13 +63,7 @@ You can link to other stories using a relative path to the story file:
 
 ## Source code
 
-By default, Histoire will attempt to generate a copyable source code from the story, dynamically from the current state.
-
-Currently automatic source code generation is only supported for:
-
-- Vue 3
-
-To document a copyable source code manually you can use either the `source` prop or the `source` slot.
+Histoire can generate copyable source from a Vue variant's current state. Set the `source` prop or fill the `source` slot to supply your own text.
 
 ```vue{31,55-74}
 <script lang="ts" setup>
@@ -156,5 +146,5 @@ const source = `<h1>Toto</h1>
 ```
 
 :::tip
-You should use a `<textarea v-pre>` element in the `source` slot to prevent Vue from compiling the template.
+Wrap source text in `<textarea v-pre>` inside the `source` slot so Vue leaves the template as text.
 :::

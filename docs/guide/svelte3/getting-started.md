@@ -14,20 +14,20 @@ function playAudio () {
 
 > Histoire is the French word for "Story" and is pronounced `/is.twaʁ/`, like "is·twar" <button class="btn p-1 leading-none" v-on:click="playAudio"><Icon icon="carbon:volume-up-filled" class="w-4 h-4 align-middle"/></button>
 
-Histoire is a tool to generate stories applications (or "books").
+Use Histoire to develop and document Svelte components in a component book. Check the [Node.js and Vite requirements](../getting-started.md#overview), then set up the Svelte plugin in your project.
 
-[Learn more about Histoire here &raquo;](../index.md)
+[Learn what you can build with Histoire](../index.md).
 
 <DemoLinks framework="svelte3" />
 
 ## Sponsors
 
-Histoire is an Open-Source project supported by our sponsors - thank you!
+Our sponsors support Histoire's open-source development.
 
 <div class="flex justify-center mt-6 mb-12 gap-2">
   <SponsorButton/>
   <a
-    href="./index.html#sponsors"
+    href="../index.html#sponsors"
     class="px-4 py-2 btn inline-flex items-center gap-2 !font-normal"
   >
     See our sponsors &raquo;
@@ -67,14 +67,23 @@ export default defineConfig({
 })
 ```
 
+## Write your first story
+
+Create `Button.story.svelte` in your project.
+
+```svelte
+<script>
+  export let Hst
+</script>
+
+<Hst.Story title="Button">
+  <button>Continue</button>
+</Hst.Story>
+```
+
 ## Command Line Interface
 
-Histoire provides the following commands:
-- `histoire dev`: starts a development server with hot-reload
-- `histoire build`: builds the app for production
-- `histoire preview`: starts an HTTP server that serves the built app
-
-You can add these to your `package.json` like this:
+Add these scripts to `package.json`.
 
 ```json
 {
@@ -86,13 +95,13 @@ You can add these to your `package.json` like this:
 }
 ```
 
-And then run them with `npm run story:dev` or `npm run story:build`.
+Run `pnpm story:dev` (or `npm run story:dev`) and open the printed address. Select **Button** in Stories. Changes to the story appear as you edit.
 
-You can specify additional CLI options like `--port`. For a full list of CLI options, run `npx histoire --help` in your project.
+Use `story:build` to build a static book and `story:preview` to serve it locally. Run `npx histoire --help` for CLI options such as `--port`.
 
 ## Configuration
 
-Learn more about configuring Histoire [here](../config.md).
+See [configuring Histoire](../config.md) for shared setup, Vite overrides, and theming.
 
 ## Community
 

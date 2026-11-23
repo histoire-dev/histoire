@@ -1,6 +1,6 @@
 # Story hierarchy <Badge type="tip" text="1.0-beta.2+" />
 
-Use `title` paths to group React stories in navigation:
+Use slashes in `title` to organize React stories into folders.
 
 ```tsx
 <Story title="Components/Actions/Button">
@@ -8,4 +8,4 @@ Use `title` paths to group React stories in navigation:
 </Story>
 ```
 
-Set `group` to a group id declared in [`tree.groups`](../../reference/config.md#tree-groups). Stable story and variant ids preserve preview links when titles change.
+Set `group` to an ID declared in [`tree.groups`](../vue3/hierarchy.md#groups). Set stable story and variant IDs to keep existing links working when titles change.

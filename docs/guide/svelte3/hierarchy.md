@@ -1,10 +1,10 @@
 # Hierarchy
 
-You can customize the story explorer tree.
+Organize the Stories tree by title, file path, or groups.
 
 ## Using the title
 
-By default, Histoire uses the title of your stories to create the hierarchy. If you want to put a story in a specific folder or subfolder, just write the path as the title of your Story.
+By default, Histoire splits story titles on slashes to build the tree. Use a title such as `Components/Button` to place Button in the Components folder.
 
 ```svelte{1}
 <Hst.Story title="Folder/Sub Folder/My story" >
@@ -14,7 +14,7 @@ By default, Histoire uses the title of your stories to create the hierarchy. If 
 
 ## Using the file path
 
-If you want to use the real path of your story files, you can change that in your [Histoire configuration file](/guide/config).
+Set `tree.file` to `"path"` in your [Histoire config](/guide/config) to organize stories by file path.
 
 ```ts{5}
 // histoire.config.ts
@@ -28,7 +28,7 @@ export default defineConfig({
 
 ## Custom logic
 
-If you want a custom hierarchy, you can define your own function that takes an object with the `title` and the `path` of your story as an argument, and returns an array of string being the path of your story in the app.
+Set `tree.file` to a function for custom grouping by path. It receives the story’s `title` and `path` and returns the tree path as an array of strings.
 
 ```ts{5}
 // histoire.config.ts
@@ -42,7 +42,7 @@ export default defineConfig({
 
 ## Sorting
 
-By default, files and stories are sorted by ascending order. But you might want to sort things differently, for example display some stories at the beginning. You can do so by providing a sorting function in your configuration file.
+Entries sort in ascending order by default. Set `tree.order` to a comparison function to change the order.
 
 ```ts{5}
 // histoire.config.ts
@@ -56,14 +56,9 @@ export default defineConfig({
 
 ## Groups
 
-Sometimes, you might have additional organization needs for the stories. Besides folders, Histoire also provides groups, which are little different:
+Groups sit at the root of the tree and start expanded. They follow the order in `tree.groups` and work alongside the folder hierarchy from `tree.file`.
 
-- expanded by default
-- only root level
-- manual order
-- independant from the hierarchy defined thanks to `tree.file` (see above)
-
-You can define groups in your configuration with the `groups` property. It's an array of group objects with the following properties:
+Add group objects to `tree.groups` in your Histoire config.
 
 - `title`: the title of the group (use an empty string to have an untoggable group)
 - `id` (optional): the id of the group, useful to reference it using the `Story` `group` prop
@@ -77,7 +72,7 @@ The stories are distributed in groups according to the following rules in this o
 - `group` prop of the `<Story>`
 - `include` function of the groups, respecting the order in the `groups` array (a story may only appear in one group maximum)
 
-Files not included in a group are always displayed after the last group.
+Ungrouped stories appear after the last group.
 
 Example:
 

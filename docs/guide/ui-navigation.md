@@ -1,44 +1,40 @@
 # Workbench navigation <Badge type="tip" text="1.0-beta.2+" />
 
-Histoire keeps story selection in the URL. Existing `/story/:storyId`, `variantId`, and `tab` links continue to work. Rail panes and panel visibility are local preferences.
+Select a story and variant, then copy the URL to share that selection. Story links use `/story/:storyId` with `variantId` and `tab` when applicable. Rail panes and panel visibility stay local to your browser.
 
 ## Stories
 
 The Stories pane follows configured tree groups, folder order, and titles. Opening a story reveals its variants. Selecting another variant keeps the same story active; document-only stories open a scrolling Markdown page.
 
-Use the Search pane to search titles, folder paths, source paths, documentation and loaded props. Stories keeps one browse tree without a second filter. Folder state persists in `_histoire-tree-state`.
+Use Search to find titles, folder paths, source paths, docs, and loaded props. The Stories pane remembers open folders in `_histoire-tree-state`.
 
 Within the tree, Up and Down move focus. Right opens a folder or enters its children; Left closes it or returns to its parent. Enter selects a story or variant. Test failures and collection warnings appear beside their related rows.
 
 ## Search
 
-Use the Search rail button or `⌘K` (`Ctrl+K` on Windows/Linux). Scopes select All, Stories, Docs, or Props. Story and documentation results retain the source search ranking. Props searches definitions from variants already loaded in the workbench.
+Open **Search** from the rail or press `⌘K` (`Ctrl+K` on Windows and Linux). Choose **All**, **Stories**, **Docs**, or **Props**. The Props scope searches definitions from variants already loaded in the workbench.
 
-Up and Down move through results. Enter opens the selected result; `⌘Enter` or `Ctrl+Enter` opens its isolated preview. Documentation results open the Docs tab. A supplied heading anchor is preserved during activation.
+Use the arrow keys to move through results. Press Enter to open a result, or `⌘Enter` or `Ctrl+Enter` to open the isolated variant. Documentation results open the **Docs** tab at the result's heading when available.
 
 Matching variants in the current story are highlighted; other frames dim while results are current. The toolbar shows match position and Previous/Next actions. These actions, and Tab from the search input, pan through matching frames in catalog order without selecting a variant or changing its URL. Escape clears search and returns focus through the shell. Clearing or closing Search removes the dimming.
 
 Matrix cells can share a story and variant with different props. Search does not guess which cell matches: Matrix omits frame dimming and the match stepper.
 
-In development, prefix a query with `>` to find registered commands. Commands with prompts open their existing parameter form.
+Prefix a query with `>` to find commands. Development books can also offer built-in and server-backed commands. Static books can offer commands registered by workbench plugins. Commands that need input open a form.
 
 ## Tests
 
-Development mode includes a project Tests pane. Run all executes one project batch through the shared server execution lane without changing the currently open story. Stories are collected once, then Vitest owns test-file parallelism. Failed assertions, skipped tests, collection problems, and outdated results remain distinct.
+Open **Tests** in development for project-wide browser tests. When visual testing is enabled, use **Functional** for browser assertions and **Visual** for [image comparisons](./visual-testing.md).
 
-Failing shows assertion failures and collection problems. All lists the collected variants. Changed shows results invalidated by a story edit. Selecting a result opens that variant and the inspector's Tests tab.
+In functional tests, **Run all** runs a single project batch while leaving your current story open. **Failing** shows failed assertions and collection problems. **All** lists the collected variants, and **Changed** shows outdated results after story edits. Select a result to open its variant and the inspector's **Tests** tab.
 
 Watch mode runs all variants of an edited story in one request. Changes arriving during a run are queued for a later batch. Disabling Watch stops automatic reruns. Watch preferences persist in `_histoire-ui-settings`.
 
-Stopping a batch cancels its local result publication and marks the active target outdated. Server execution retains ownership of its current operation and the shared lane until teardown finishes.
+**Stop** stops new results appearing for that batch and marks the active target outdated. The server finishes cleaning up before another run can start.
 
 ## Home and guides
 
-Home derives Browse sections and Guides from the configured story tree. Search opens the shared Search pane. Build metadata shows project version, build time, and Git information when available. Release updates appear when the build has change metadata.
-
-In development, collected story changes update Home's catalog counts and build metadata without a page reload. Build time identifies the server generation, rather than each story edit.
-
-The development home also shows collected errors and failed tests. Static builds omit development sections and server test actions.
+**Home** uses the story tree to organize **Browse** and **Guides**. In development, it shows live story counts, collection errors, failed tests, and Git branch and commit when available. A built book shows its build date and available project version, Git information, and release updates.
 
 Document-only stories use a normal scrolling reading layout. On this page follows headings within the document. Previous and next links follow documentation order within the same tree group. Copy link preserves the current URL and heading anchor. Edit is available when the development source permits opening its collected file in an editor.
 

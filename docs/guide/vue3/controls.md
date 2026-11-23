@@ -1,6 +1,6 @@
 # State & Controls
 
-Controls give you the ability to interact with your components arguments.
+Use controls to change a variant’s state while it runs on the canvas.
 
 ## Controls sandbox <Badge type="tip" text="1.0-beta.2+" />
 
@@ -8,7 +8,7 @@ Custom `#controls` slots run in a dedicated sandbox. Their background, typograph
 
 ## Shared component contracts <Badge type="tip" text="1.0-beta.2+" />
 
-Builtin `Hst*` controls use C1 styling with bundled Manrope and JetBrains Mono fonts. No font requests leave the book. Provider appearance and density stay local; standalone controls receive C1 defaults.
+Built-in `Hst*` controls use the workbench style with bundled Manrope and JetBrains Mono fonts. Appearance and density follow their provider. Standalone controls use the workbench defaults.
 
 Wrapped fields accept `layout="stacked"`, `layout="horizontal"`, or `layout="inline"`. Text, number, textarea, select, JSON and button groups default to stacked labels; checkbox and switch rows default to horizontal. Inline fields fit toolbars and external labels without reserving label space. Prop type metadata uses `data-histoire-control-type` in normal label flow.
 
@@ -16,7 +16,7 @@ Wrapped fields accept `layout="stacked"`, `layout="horizontal"`, or `layout="inl
 
 `HstSwitch` edits Boolean state with native switch semantics. `HstCheckbox` retains Boolean and string Boolean compatibility. `HstSelect` and `HstButtonGroup` accept string/numeric arrays, records and `{ value, label, disabled? }` options. Values retain their types and local object identity. Select adds `disabled`, `placeholder`, selected-label default slot and `option` slot. Rich slots stay local; host menus receive labels and opaque IDs only. Disabled options remain visible and cannot be selected.
 
-Both controls entrypoints keep existing exports. Native Vue hosts import `@histoire/controls/vue` and its provider-scoped stylesheet; JavaScript import alone does not install global styles or theme state. Preview components retain their own styling.
+Native Vue hosts import `@histoire/controls/vue` and its provider-scoped stylesheet. Import both to apply the controls styles in your host. Story components keep their own styles.
 
 ## Custom overlays <Badge type="tip" text="1.0-beta.2+" />
 
@@ -60,9 +60,9 @@ Call `handle.update(overlay)` when content changes and `handle.close()` on unmou
 
 ## Defining a state
 
-The first step is to define the state that will be shared to your story. Histoire will automatically synchronize the `data` or reactive data returned in your `setup`. Then you can proceed using your state as usual.
+Define the state your story and controls share. Histoire synchronizes Options API `data` and reactive data returned from `setup`.
 
-Example with Option API:
+Options API example:
 
 ```vue{11-18}
 <script lang="ts">
@@ -203,7 +203,7 @@ const colors = {
 
 ## Controls panel
 
-To create the control panel, Histoire provides a `controls` slot. You are free to render any element or components inside the slot.
+Add inputs or components to the `controls` slot to build a custom control panel.
 
 ```vue{18-21}
 <script lang="ts" setup>
@@ -261,9 +261,9 @@ You can also share the same default controls for all variants by putting the slo
 
 A variant can then override the slot if needed.
 
-## Builtin controls
+## Built-in controls {#builtin-controls}
 
-To build a control panel a bit more easily, Histoire provides builtin controls with design that fits the rest of the UI.
+Use built-in fields and buttons when you want controls that match the workbench.
 
 ```vue{19-20}
 <script lang="ts" setup>
@@ -292,7 +292,7 @@ const state = reactive({
 </template>
 ```
 
-Check out all the available controls in their book: [controls.histoire.dev](https://controls.histoire.dev/).
+Browse the [built-in controls book](https://controls.histoire.dev/) for examples.
 
 ## Init state
 

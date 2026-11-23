@@ -26,11 +26,13 @@ Dev and static books expose `__embed.html` and versioned `histoire-embed.json` u
 
 ## Embed selected variant or story
 
-Right-click a variant tree row or canvas frame and choose **Embed this variant**. Right-click a story row and choose **Embed this story**. Canvas toolbar's **Embed** menu offers both for the current selection. Opening a tree or frame action captures that exact target without selecting it. Matrix cells capture their underlying variant; cell overrides are excluded.
+Right-click a variant row or canvas frame and choose **Embed this variant**. For a whole story, right-click its row and choose **Embed this story**. The canvas toolbar's **Embed** menu offers both actions for the current selection.
 
-The dialog offers **Iframe**, **JavaScript**, and **Vue** code, optional **Controls**, **Docs**, **Source**, and **Events** panels, **Copy**, and **Open embed**. Controls starts enabled. Docs and Source require available story content; Source shows raw source. Clear all checkboxes for canvas only. Width stays responsive at `100%`; height starts at `600px` and accepts positive numeric values. Each new target resets these choices.
+Choose **Iframe**, **JavaScript**, or **Vue**, then select any of **Controls**, **Docs**, **Source**, and **Events**. **Controls** starts enabled. **Docs** and **Source** require content, and Source displays the raw story source. Clear every panel to show only the canvas. Width stays at `100%` and height starts at `600px`. Set a positive height and then choose **Copy** or **Open embed**. Opening the dialog for a new target resets these choices.
 
-Variant scope renders only the captured variant. Story scope starts with the first authored variant and offers a dropdown limited to that story. Both use a single canvas even for stories authored with grid layout. New embeds start from authored state and project settings, excluding current state edits, matrix overrides, viewport presets, zoom, and pan. Docs-only stories cannot be embedded this way.
+Embedding from a tree row or frame uses that target without changing your selection. Variant embeds render one variant. Story embeds start at the first authored variant and add a picker for that story. Both use a single canvas.
+
+Embeds start from authored state and project settings, independent of current edits, viewport presets, zoom, or pan. A Matrix cell embeds its underlying variant without the cell overrides. This flow requires a renderable story.
 
 When `embed.enabled` is false, the dialog shows configuration guidance instead of snippets. Configured allowed parents appear in the enabled dialog; deployment headers still require [static hosting setup](#origins-and-deployment-headers).
 
@@ -121,9 +123,11 @@ await explorer.unmount()
 await session.dispose()
 ```
 
-Give the mount container a real width and height. `ready` resolves after the surface is ready; iframe `load` alone does not establish story runtime readiness. Construction and package imports are safe without browser globals. `connect()` and mounting belong in the client lifecycle. Full explorer needs usable space for navigation, toolbar, preview, and panels: iframe acceptance covers 1100×800, while native compact acceptance covers 600×700. For smaller native hosts, use `showNavigation`, `showToolbar`, and `showPanels` to leave a measurable preview; zero preview height cannot establish runtime readiness.
+Give the container enough width and height for the toolbar, navigation, panels, and canvas. For smaller native hosts, use `showNavigation`, `showToolbar`, and `showPanels` to leave measurable canvas space. The story runtime needs a nonzero canvas height to become ready.
 
-`selection.select()` waits for selected runtime in current primary. Before acting on replacement iframe DOM or geometry, observe its current `runtimeId` with `runtime.status === 'ready'`; operations captured for retired document reject.
+Call `connect()` and mount surfaces in the client lifecycle. Package imports and session construction are safe without browser globals. Await the mount handle's `ready` promise to wait for the surface.
+
+When a primary surface is already mounted and you select a variant, `selection.select()` waits for that variant's runtime. Before using a replacement iframe's DOM or geometry, observe its current `runtimeId` and `runtime.status === 'ready'`. Operations targeting the retired document reject.
 
 ## Compose independent surfaces
 
@@ -148,9 +152,9 @@ await session.state.patch({ label: 'Updated' })
 
 Supported names are `explorer`, `preview`, `tree`, `search`, `toolbar`, `controls`, `docs`, `source`, `events`, and `tests`. Inspect `session.getSnapshot().capabilities` before presenting an operation.
 
-Each session permits one primary preview, including the preview inside an explorer. A second primary fails with `RUNTIME_IN_USE`. Await the first handle's `unmount()` before replacing it. Create separate sessions to show independent books, targets, or theme directions.
+Mount one primary story surface per session, including the canvas inside an explorer. A second primary fails with `RUNTIME_IN_USE`. Await the first handle's `unmount()` before replacing it. Use separate sessions for independent books, selections, or themes.
 
-Catalog, search, docs, and raw source reads do not mount story modules. State operations, custom controls, dynamic source, and preview tests require a ready primary runtime. For headless interaction, create one explicitly:
+Read the catalog, search results, docs, and raw source without mounting a story. State operations, custom controls, generated source, and tests in `preview` mode need a ready primary runtime. Mount one explicitly for headless use.
 
 ```ts
 await session.settings.update({ responsiveWidth: 720, responsiveHeight: 560 })
@@ -235,7 +239,7 @@ const summary = await session.tests.run({ mode: 'preview', signal: abort.signal 
 console.log(summary.passed, summary.failed)
 ```
 
-Preview mode uses the ready owned runtime. Server mode uses a dev book's server execution lane. Static books do not provide server mode. Failed assertions resolve a completed summary; unavailable engines, dependency failures, collection failures, cancellation, and transport failures remain typed errors. There is no automatic execution retry or preview-to-server fallback. Preview cancellation retires its sandbox; unmount/remount the primary before another preview run.
+Use `mode: 'preview'` to run tests in the ready story runtime. Use `mode: 'server'` to queue tests on a development server. Failed assertions return a completed summary. Unavailable engines, dependency or collection failures, cancellation, and transport failures return typed errors. Rerun explicitly after a failed operation. If you cancel a run in `preview` mode, unmount and remount the primary runtime before running again.
 
 Embedded persistence is off by default. `persistenceKey` opts into source-scoped host settings storage; state and event history are not persisted. Denied storage retains in-memory behavior. Embedded sessions leave host URL, title, router, and document theme under host control.
 
@@ -267,7 +271,7 @@ const stop = channel.on('ping', (data) => {
 // Call stop() when this listener is no longer needed.
 ```
 
-After connecting and explicitly mounting a ready primary preview, the host uses the same configured name:
+Connect and mount the primary story surface, wait for it to be ready, then open the same channel name on the host.
 
 ```ts
 const channel = session.channels.open('preview-bridge')

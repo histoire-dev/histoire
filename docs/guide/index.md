@@ -22,7 +22,7 @@ function playAudio () {
 
 > Histoire is the French word for "Story" and is pronounced `/is.twaʁ/`, like "is·twar" <button class="btn p-1 leading-none" v-on:click="playAudio"><Icon icon="carbon:volume-up-filled" class="w-4 h-4 align-middle"/></button>
 
-Histoire is a tool to generate stories applications (or "books").
+Histoire builds a component book from stories in your Vite project. Browse the book to see how components look and behave in different states.
 
 <div class="demo-links-box border-green-200 dark:border-green-900">
   <img src="/vue.svg" class="w-10 h-10 mt-3" />
@@ -34,87 +34,55 @@ Histoire is a tool to generate stories applications (or "books").
   <DemoLinks framework="svelte3" />
 </div>
 
-A story is a scenario where you showcase in your browser one or more components for specific use cases.
+A story renders one or more components in isolation. Each variant shows a specific use case or state. A button story might have default, disabled, and loading variants.
 
-Stories are useful for several reasons:
-- Organize and document components for other developers
-- Showcase different use cases covered by your components
-- Develop components in isolation
-- Test visual regressions by taking screenshots
+Write a story in your framework, import the components, and render them in each variant. Add controls to change props or state and Markdown to explain when to use each variant. The book gives your team one place to develop, document, and test components.
 
-It is typically used when building a company's design system or a components library.
-
-In Histoire, Stories contains one or more Variants, which are different use cases around the same topic or around the same components. Stories in Histoire are built this way:
-- Create a Story file:
-  - Import components
-  - Create a Variant:
-    - Initialize some state (optional)
-    - Mount components
-    - Add controls to allow interacting with the state (optional)
-  - Add more variants (optional)
-
-It basically gives you:
-- An interactive preview of the story (or even a grid of all the variants!)
-- Copyable code to reproduce the same result in your own code
-- Controls to interact with the preview
-- Documentation rendered from Markdown
-- Many other features!
+Follow the [getting started guide](./getting-started.md) to create your first story.
 
 ## Why should I use Histoire?
 
-Histoire is built from the ground up to be a Vite-native Story builder. Our core values when designing Histoire are:
+Histoire reuses your Vite configuration, including the plugins that handle TypeScript, JSX, and styles. Write stories in the same Vue, Svelte, or React syntax you use in your project, and see edits through Vite's hot updates.
 
-- **Native to Vite projects**: By reusing your Vite config, it takes less time setting up and more time writing stories. Same building pipeline means no duplicate effort and configuration! Out-of-the-box support of TypeScript, JSX, Styles...
-
-- **Idiomatic**: No mandatory JSX-oriented and funky template/args syntax! Write your story naturally in either `.vue` files, `.svelte` files, JSX or whatever feel the most at home with the framework you are using in the rest of your project. We also want to have the least amount of Histoire API leaking into your story code.
-
-- **Fast and light**: Enjoy writing stories using Vite instant server startup and instant HMR! Books built with Histoire will be fast in production as well thanks to code-splitting and lean bundle sizes.
-
-- **Customizable**: You can very easily change the look and feel to match your branding, or install plugins to extend Histoire's features.
-
-- **Great User Experience**: We care about UX and we strive to make the Histoire UI as beautiful and intuitive as possible. It also supports phones!
+Build a code-split book to share with your team. Configure its theme to match your project, or install plugins to add workbench features.
 
 ## Features
 
-Here are some highlights of our favorite features:
-
 ### :zap: Dynamic source
 
-The copyable source code is an important part of the documentation purpose of stories.
-For supported frameworks, Histoire can generate the template/JSX/source code that you can one-click-copy and paste in your project.
+In Vue stories, copy generated source that reflects the selected variant's current state. You can also supply source text yourself.
 
 ### :bento: Variant grids
 
-Display many variants of your story on a single grid page. Finally, you can glance at all the possible buttons at once.
+Compare variants of the same story side by side in a grid.
 
 ### :book: Markdown docs
 
-Add documentation to your stories with (extendable) Markdown with code snippets and syntax highlighting.
+Add Markdown documentation with syntax-highlighted code examples.
 
 ### :moon: Dark theme
 
-Rest your eyes with the alternative darker theme for your book.
-Change the story background (with an optional checkerboard) to test your design in different situations.
+Switch the book between light and dark appearance. Change the canvas background or use a checkerboard to check transparency.
 
 ### :iphone: Responsive testing
 
-Resize the preview to test your design on different screen sizes. Customize the presets to your liking!
+Resize the selected variant or use viewport presets to check how components behave at different screen sizes.
 
 ### :musical_keyboard: Flexible controls
 
-Put your own components and logic in the story controls pane! Or use the [builtin controls](https://controls.histoire.dev).
+Use the [built-in controls](https://controls.histoire.dev) or write custom controls to change a variant's state.
 
 ### :camera: Visual regression testing
 
-Take snapshots of your stories when your book is built on your CI, with [Percy](/examples/visual-regression-testing/percy) & [Lost Pixel](/examples/visual-regression-testing/lost-pixel) support.
+Capture variants and compare them with approved baselines using [visual testing](./visual-testing.md). You can also run screenshot checks with [Percy](/examples/visual-regression-testing/percy) or [Lost Pixel](/examples/visual-regression-testing/lost-pixel).
 
 ### :art: Automatic design tokens
 
-Histoire will automatically detect your Tailwind CSS configuration and generate design system stories for you.
+Histoire discovers [Tailwind CSS v3 configurations and v4 theme stylesheets](/examples/tailwind) and generates stories for their design tokens.
 
 ### :mag: Fast fuzzy search
 
-A real search index is built in your book! Search for your stories or even text in your documentation without the need for an external service. Plus it's really fast!
+Search story titles and documentation using the book's built-in index.
 
 ## Meet the team
 

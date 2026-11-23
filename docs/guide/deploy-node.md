@@ -1,6 +1,6 @@
 # Deploy to Node.js <Badge type="tip" text="1.0-beta.2+" />
 
-Node deployment bundles a standalone production server with the compiled book and MCP. Runtime needs Node.js 22 or later. The original project, config, Vite, framework compiler, and project `node_modules` are not required.
+Build a Node.js artifact to serve your compiled book and MCP from one production server. The artifact runs with Node.js 22 or later and includes everything needed to serve the book.
 
 ## Build
 
@@ -8,7 +8,7 @@ Node deployment bundles a standalone production server with the compiled book an
 pnpm exec histoire build --target node
 ```
 
-`histoire build` remains a static build. Config can select Node output:
+`histoire build` defaults to a static book. To make Node.js the project default, set `build.target`.
 
 ```ts
 import { defineConfig } from 'histoire'
@@ -36,20 +36,20 @@ CLI `--target static|node` overrides config. Node output contains:
 
 Copy the entire output directory. Serve it through `server.mjs`, which validates the manifest and asset/content hashes before accepting requests. The private directory has no public HTTP route. Failed builds preserve the previous successfully published output.
 
-`build.node.includeSource: false` omits raw source from the private MCP content store and marks it unavailable. It does **not** hide source displayed by the existing book Source panel or included in browser assets. Review public build contents according to your project's requirements.
+`build.node.includeSource: false` omits raw source from the private MCP content store. The book's **Source** panel and public browser assets still contain whatever source the book normally builds. Review those public files before deploying.
 
 ## Run
 
-Supply a strong token through deployment secrets when MCP is enabled:
+With MCP enabled, set `HISTOIRE_MCP_TOKEN` through deployment secrets before starting. Use canonical hexadecimal or base64url encoding of at least 32 random bytes. See [token setup](./mcp.md#development-http).
 
 ```sh
 cd .histoire/dist
 HOST=0.0.0.0 PORT=3000 PUBLIC_ORIGIN=https://stories.example.com npm start
 ```
 
-Set `HISTOIRE_MCP_TOKEN` in that environment before starting. Use canonical hexadecimal or base64url encoding of at least 32 random bytes. See [token setup](./mcp.md#development-http). Tokens are captured privately before optional browser dependencies load.
+The server captures the token privately before loading optional browser dependencies.
 
-`node server.mjs` and `npm start` start the same server. Default HOST is `0.0.0.0`; default PORT is `3000`. `PUBLIC_ORIGIN` is required for a remote bind and must be an exact HTTP(S) origin without trailing slash, path, query, or credentials. Loopback binds can derive their actual origin:
+`node server.mjs` and `npm start` start the same server. `HOST` defaults to `0.0.0.0` and `PORT` to `3000`. For a remote bind, set `PUBLIC_ORIGIN` to the exact HTTP(S) origin, including any non-default port. Omit paths, queries, credentials, and the trailing slash. Loopback binds derive the origin from the listener.
 
 ```sh
 HOST=127.0.0.1 PORT=3000 node server.mjs
@@ -89,7 +89,7 @@ SIGINT/SIGTERM stop admission, mark readiness unavailable, cancel owned jobs, an
 
 ## Optional browser execution
 
-Metadata, docs, source, and preview URLs work with Node alone. Node artifacts do not include the development screenshot setup panel. Screenshots, rendered inspection, and compiled tests use the existing SDK and MCP routes and discover browsers on the deployment machine.
+Node alone can serve metadata, docs, source, and variant URLs. To use screenshots, rendered inspection, or compiled tests through the SDK or MCP, set up a browser on the deployment machine. The development screenshot setup panel is available only on the dev server.
 
 The default source is `auto`. With Playwright 1.49 or newer it tries matching Chromium headless shell, matching cached full Chromium, stable Google Chrome, then stable Microsoft Edge. Older supported drivers try their default Chromium headless executable before Chrome and Edge; they do not provide separate shell/full-channel choices. A copied artifact never treats the build machine's browser path or probe result as target setup. The generated `package.json` records at most one optional driver (`playwright` or `playwright-core`) selected during the build. Install that dependency in the deployment directory:
 

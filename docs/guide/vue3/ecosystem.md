@@ -1,8 +1,8 @@
 # Ecosystem <Badge type="tip" text="1.0-beta.2+" />
 
-Recipes for popular Vue libraries and frameworks. Most of them go in your [setup file](./app-setup.md#global-setup).
+Configure shared Vue libraries in your [setup file](./app-setup.md#global-setup), or follow the linked plugin instructions for Nuxt and Quasar CLI.
 
-In dark mode, Histoire adds the `dark` class (the `theme.darkClass` option) to the `<html>` element of each story. Libraries that support a class-based dark selector follow it automatically. For the others, use [`onDarkChange`](./app-setup.md#dark-mode).
+In dark mode, Histoire adds the class from `theme.darkClass` (default `dark`) to each story's `<html>` element. Libraries with a matching CSS selector follow the change automatically. Use [`onDarkChange`](./app-setup.md#dark-mode) for libraries with a programmatic theme setting.
 
 ## Nuxt
 

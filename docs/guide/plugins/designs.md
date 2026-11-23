@@ -1,6 +1,6 @@
 # Designs plugin
 
-`@histoire/plugin-designs` shows the design a story was built from next to the rendered variant: Figma, Penpot and Sketch embeds, any embeddable page, images and plain links. Works with Vue, Svelte, React and vanilla stories in development and static books.
+`@histoire/plugin-designs` shows a design alongside the rendered variant. Use Figma, Penpot, Sketch, an embeddable page, an image, or a link. The plugin supports Vue, Svelte, React, and vanilla stories in development and static books.
 
 ```sh
 pnpm add -D @histoire/plugin-designs
@@ -37,13 +37,13 @@ Add a `design` entry, or a list of entries, to the story or variant `meta`:
 </template>
 ```
 
-A variant `design` replaces the story's; variants without one show the story `design`.
+Set `design` on the story as a default. A variant's `design` replaces that default for the variant.
 
 `meta` is published in the story catalog, so it ends up in static books: never put secrets in it. Large or deeply nested metadata is left out of the catalog with a warning; keep each story or variant `meta` under 64 KiB.
 
 ## Inspector
 
-Select a variant and open **Design**. The tab only shows for variants with designs. Several designs get a switch; the selected one is remembered per variant. **Open in new tab** opens the original link.
+Select a variant with design entries and open **Design**. Choose a design if there are several. Histoire remembers that choice per variant. The tab reports invalid entries. Choose **Open in new tab** to open the original link.
 
 Images open fitted to the tab, or at `scale`, then shifted by `offset`. Scroll to zoom around the cursor, drag to pan, or use the zoom buttons, **Fit** and **100%**. With the image focused, arrow keys pan (hold Shift for bigger steps), `+` and `-` zoom, and `0` fits.
 
@@ -57,11 +57,13 @@ Pick a comparison in the floating bar at the bottom of the arrangement:
 - **Overlay**: the design lies over the variant; the bar's slider sets its opacity.
 - **Split**: the design lies over the variant, shown right of a divider; drag the divider to compare both halves.
 
-In **Overlay** and **Split**, the story stays interactive under the design. Drag the top-left grip to move the design and the bottom-right grip to resize it (proportions stay unless Shift is held). Embedded documents keep their own layout and scale with the box. Focused grips and the divider also follow arrow keys (Shift for bigger steps). The design starts on the variant frame, scaled down to its width; the reset button in the bar restores that. The comparison and opacity are remembered, and placements per variant design.
+In **Overlay** and **Split**, the story stays interactive. Drag the top-left grip to move the design or the bottom-right grip to resize it. Hold Shift while dragging to resize without preserving proportions. Embedded documents keep their layout and scale with the box. Use arrow keys on a focused grip or divider, and hold Shift for larger steps.
+
+Choose **Reset design placement** to align the design with the variant frame and fit it to the frame width. Histoire remembers comparison mode and opacity for the project, and placement for each variant design.
 
 ## Design types
 
-All entries take `url` and an optional `name` (switch label, defaults to the tool or host name; `link` entries default to their `label` first). Only `http(s)` links are accepted.
+Each entry takes a `url` and an optional `name` for the picker. The name defaults to the tool or host, and a `link` entry uses its `label` first when available. Use HTTP or HTTPS URLs, or a book-relative path for an `image`.
 
 | `type` | Shows | Extra options |
 | --- | --- | --- |

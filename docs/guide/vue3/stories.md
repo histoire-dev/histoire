@@ -1,6 +1,6 @@
 # How to write stories?
 
-Stories are vue files ending with `.story.vue`. You just need to use the `<Story>` tag at the root of your template.
+Create a Vue file ending in `.story.vue` and put `<Story>` at the root of its template.
 
 ```vue
 <!-- Meow.story.vue -->
@@ -11,7 +11,7 @@ Stories are vue files ending with `.story.vue`. You just need to use the `<Story
 </template>
 ```
 
-The title of the story is provided with the (optional) `title` prop:
+Set the optional `title` prop to name the story in the workbench.
 
 ```vue
 <template>
@@ -21,9 +21,7 @@ The title of the story is provided with the (optional) `title` prop:
 </template>
 ```
 
-You can of course add `<style>` and/or `<script>` elements just like you would with any `.vue` file.
-
-For example, you will usually import and use a component in your story:
+Import components and add styles as you would in any Vue file.
 
 ```vue
 <!-- Meow.story.vue -->
@@ -40,7 +38,7 @@ import Meow from './Meow.vue'
 
 ## Variants
 
-Stories can have different variants representing the same component. You can define variants using the `<Variant>` tag. Similar to the story, you can provide a title to your variant with the `title` prop.
+Use variants to show different states or use cases. Add each variant with the `<Variant>` tag. Give each variant a readable `title`, such as “Disabled”.
 
 ```vue{3-11}
 <template>
@@ -60,13 +58,13 @@ Stories can have different variants representing the same component. You can def
 
 ## Layout
 
-You can change the layout of the variant by using the `layout` prop with an object. The `type` property is required to specify which layout to use.
+Set the story’s `layout.type` to choose how its variants appear. For stories without an explicit layout, Histoire uses your local or project default, which falls back to Grid. A view in the URL or a remembered view can override the story layout.
 
 ### Single layout
 
-This is the default layout, displaying one variant at a time. The story is isolated with an iframe so CSS media queries work correctly.
+Use `type: "single"` to display one variant at a time. The variant runs in an iframe so CSS media queries use its own viewport.
 
-Stories always render inside an iframe. Remove the `iframe` option when migrating. Preview runtime owns live state; see [browser runtime migration](../testing.md#state-ownership).
+Stories always render inside an iframe. Remove the `iframe` option when migrating. The story iframe owns live state. See [state ownership during migration](../testing.md#state-ownership).
 
 ```vue{4}
 <template>
@@ -89,7 +87,7 @@ Stories always render inside an iframe. Remove the `iframe` option when migratin
 
 ### Grid layout
 
-Display all the variants in a grid.
+Use `type: "grid"` to compare variants side by side.
 
 ```vue{4}
 <template>

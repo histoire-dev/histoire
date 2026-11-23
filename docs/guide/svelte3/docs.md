@@ -4,15 +4,13 @@
 
 ### Sibling markdown
 
-To add documentation to a story, create a file with the same name next to it, with the `.md` extension.
-
-For example, if your story is `BaseButton.story.svelte`, create a `BaseButton.story.md` file.
+Put `BaseButton.story.md` beside `BaseButton.story.svelte` to show Markdown in the story's **Docs** tab.
 
 ### Standalone page
 
-If you create a markdown file ending with `.story.md` that isn't related to a sibling story file, it will automatically create a virtual story that renders the markdown as a page.
+Create a `.story.md` file without a matching story file to add a standalone documentation page. Histoire displays it in the Stories tree.
 
-You can add a frontmatter to the markdown to customize the virtual story with the following properties:
+Use Markdown frontmatter to set these properties.
 
 - `id` ([reference](../../reference/svelte3/story.md#id))
 - `title` ([reference](../../reference/svelte3/story.md#title))
@@ -39,7 +37,7 @@ Learn more about Histoire [here](https://histoire.dev/).
 
 ### Links
 
-You can link to other stories using a relative path to the story file:
+Link to another story by its relative file path. Add `variantId` to link to a specific variant.
 
 ```md
 - [Go to Story](./BaseButton.story.svelte)
@@ -49,20 +47,21 @@ You can link to other stories using a relative path to the story file:
 
 ## Source code
 
-::: warning
-Auto-CodeGen is not available for Svelte.
-:::
+Use the `source` prop to supply copyable source for a Svelte variant.
 
-To document a copyable source code manually you can use the `source` prop.
-
-```svelte{31,55-74}
+```svelte
 <script>
   export let Hst
+  let count = 0
 
-  const source = `<h1>Toto</h1>
+  const source = `<script>
+  let count = 0
+<\/script>
+
+<h1>Counter</h1>
 
 <input
-  bind:value={count}"
+  bind:value={count}
   type="number"
 >`
 </script>
@@ -72,10 +71,10 @@ To document a copyable source code manually you can use the `source` prop.
     title="Source prop"
     {source}
   >
-    <h1>Toto</h1>
+    <h1>Counter</h1>
 
     <input
-      bind:value={count}"
+      bind:value={count}
       type="number"
     >
   </Hst.Variant>

@@ -14,9 +14,15 @@ function playAudio () {
 
 > Histoire is the French word for "Story" and is pronounced `/is.twaʁ/`, like "is·twar" <button class="btn p-1 leading-none" v-on:click="playAudio"><Icon icon="carbon:volume-up-filled" class="w-4 h-4 align-middle"/></button>
 
-Histoire is a tool to generate stories applications (or "books").
+Use Node.js **22.12 or later** and [Vite](https://vitejs.dev) **7 or 8**. Check your framework's Node.js requirements as well.
 
-[Learn more about Histoire here &raquo;](./index.md)
+Choose your framework to install Histoire and write your first story.
+
+- [Vue 3](./vue3/getting-started.md), including Nuxt and Quasar
+- [React](./react/getting-started.md)
+- [Svelte](./svelte3/getting-started.md), including SvelteKit
+
+[Learn what you can build with Histoire](./index.md).
 
 <div class="demo-links-box border-green-200 dark:border-green-900">
   <img src="/vue.svg" class="w-10 h-10 mt-3" />
@@ -30,7 +36,7 @@ Histoire is a tool to generate stories applications (or "books").
 
 ## Sponsors
 
-Histoire is an Open-Source project supported by our sponsors - thank you!
+Our sponsors support Histoire's open-source development.
 
 <div class="flex justify-center mt-6 mb-12 gap-2">
   <SponsorButton/>
@@ -44,13 +50,9 @@ Histoire is an Open-Source project supported by our sponsors - thank you!
 
 ## Supported frameworks
 
-Titles marked <Badge type="tip" text="1.0-beta.2+" /> describe unreleased features for the next beta. Use [continuous releases](https://nightly.akryum.dev/histoire-dev/histoire) to try them before publication.
+Titles marked <Badge type="tip" text="1.0-beta.2+" /> describe features available from Histoire 1.0.0-beta.2. Use [continuous releases](https://nightly.akryum.dev/histoire-dev/histoire) to try changes between releases.
 
-Use Node.js **22.12 or later** and [Vite](https://vitejs.dev) **7 or 8**. Framework tooling can impose a higher Node.js requirement.
-
----
-
-| Framework | Version | Support* | Auto-CodeGen* | Auto-Docs* |
+| Framework | Version | Story support | Generated source | Automatic docs |
 | --------- | -------- | ------- | ------------ | ---- |
 | [Vue →](./vue3/getting-started.md) | `3.5.26+` | ✅ | ✅ | ✅ |
 | [Svelte →](./svelte3/getting-started.md) | `4 / 5` | ✅ | - | 🏗️ |
@@ -58,15 +60,7 @@ Use Node.js **22.12 or later** and [Vite](https://vitejs.dev) **7 or 8**. Framew
 | Angular | - | - | - | - |
 | [React →](./react/getting-started.md) | `18 / 19` | ✅ | - | - |
 
-**<u>Support</u> means the following is available*:
-- Collect and render stories
-- Render controls pane content with state sync
-- Builtin controls wrappers
-- Static source
-
-*<u>*Auto-CodeGen*</u>: Generates copiable source code dynamically from the current story state. Generally requires a Virtual DOM.
-
-*<u>*Auto-Docs*</u>: Generates documentation and controls automatically by analyzing the imported components.
+Story support includes story discovery, rendering, built-in controls, synchronized custom controls, and static source. Generated source reflects the current state and can be copied. Automatic docs generate documentation and controls from component definitions.
 
 Nuxt **3 / 4** uses `@histoire/plugin-nuxt` alongside the Vue plugin. SvelteKit **2 / 3** uses the Svelte plugin.
 
@@ -76,13 +70,13 @@ Vite 8 is supported alongside Vite 7. Use a framework Vite plugin compatible wit
 
 ## Explore the workbench <Badge type="tip" text="1.0-beta.2+" />
 
-<a href="/demo/" target="_self">Open the demo</a> to browse stories, select variants, edit props, read docs and inspect generated source. The demo is a static book built with this documentation. Tests, comments, canvas screenshots and MCP activity require a development server.
+<a href="/demo/" target="_self">Open the demo</a> to browse stories, select variants, edit props, read docs, and inspect generated source. The demo is a static book. To try project tests, comments, canvas screenshots, or MCP activity, run a development server.
 
 Start with [workbench layout](./ui-shell.md), [navigation and search](./ui-navigation.md), [the inspector](./ui-inspector.md), and [props matrix](./ui-matrix.md).
 
 ## Dev console <Badge type="tip" text="1.0-beta.2+" />
 
-`histoire dev` shows an interactive terminal panel in a capable terminal: logs scroll above a pinned status area with the Histoire version, workbench address, startup progress, story and variant counts, and test or watch activity. Press `?` for the shortcuts that fit your terminal.
+`histoire dev` opens an interactive panel in supported terminals. Logs scroll above the workbench address, startup progress, story and variant counts, and test activity. Press `?` to see available shortcuts.
 
 | Key | Action |
 | --- | --- |
@@ -99,7 +93,9 @@ Start with [workbench layout](./ui-shell.md), [navigation and search](./ui-navig
 | `x` | Delete retained log and request history (test results are kept) |
 | `q` | Quit |
 
-Full-screen views scroll with arrows, `Page Up`/`Page Down`, `Home` and `End`. Press `/` to search, `Enter` to open an entry, `y` to copy the selected entry and `Y` to copy all filtered contents. `Esc` (or `Enter` again) goes back from a log or error detail to its list, and from a list to the main screen; `q` returns to the main screen. `Ctrl+C` always quits.
+In full-screen views, scroll with the arrow keys, `Page Up`, `Page Down`, `Home`, or `End`. Press `/` to search, `Enter` to open an entry, `y` to copy it, or `Y` to copy all filtered entries.
+
+Press `Esc` (or `Enter` again) to return from a log or error detail to its list, or from a list to the main screen. Press `q` to return to the main screen. `Ctrl+C` always quits.
 
 In session information, `Up`/`Down` select an address, `y` copies it, `o` opens it, `r` shows its QR code to scan from a phone and `u` refreshes the runtime facts. Network addresses are listed only when the server listens beyond loopback (`--host`).
 
@@ -107,13 +103,13 @@ In the stories view, `Enter` lists a story's variants and opens a variant in the
 
 ### Activation
 
-The panel starts automatically when stdin and stdout are a TTY with raw input, `TERM` is not `dumb`, the terminal is at least 40 columns by 10 rows, `CI` is not set, and no Node inspector is attached. Override it:
+The panel starts automatically outside CI and without a Node inspector. It needs interactive stdin and stdout, raw input, at least 40 columns by 10 rows, and a usable `TERM` on non-Windows systems. To choose a mode explicitly:
 
 - `--tui` forces the panel, ignoring CI and inspector detection. A missing TTY, raw input or terminal size still falls back to plain output.
 - `--no-tui` always uses plain output.
 - `HISTOIRE_TUI=plain|auto|1` sets the default (`1` forces, `auto` is the default). A flag wins over the variable. Other values fail before the project loads.
 
-If the terminal shrinks below 40x10, Histoire switches to plain output and returns to the panel when it grows. If the renderer fails, plain output is used for the rest of the session. Suspending with `Ctrl+Z` restores the terminal and redetects the mode on resume.
+If the terminal shrinks below 40 × 10, Histoire switches to plain output and restores the panel when the terminal grows. If the renderer fails, Histoire uses plain output for the rest of the session. On Unix, `Ctrl+Z` restores the terminal and Histoire checks the mode again on resume.
 
 ### Plain mode
 

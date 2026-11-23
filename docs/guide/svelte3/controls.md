@@ -1,10 +1,10 @@
 # State & Controls
 
-Controls give you the ability to interact with your components arguments.
+Use controls to change a variant’s state while it runs on the canvas.
 
 ## Defining state
 
-The first step is to define the state that will be shared to your story. Histoire will automatically synchronize the reactive data of your component. Then you can proceed using your state as usual.
+Define the state your story and controls share. Histoire synchronizes reactive variables declared with the legacy Svelte syntax used in these examples.
 
 ```svelte{6-8,13,14,17}
 <script lang="ts">
@@ -30,7 +30,7 @@ The first step is to define the state that will be shared to your story. Histoir
 
 ## Controls panel
 
-To create the control panel, Histoire provides a `controls` slot on `<Hst.Variant>` (and `<Hst.Story>`, more on that later). You are free to render any element or components inside the slot.
+Add inputs or components to the `controls` slot on `<Hst.Variant>`. Put the slot on `<Hst.Story>` to share a default across variants.
 
 ```svelte{16-19}
 <script>
@@ -83,9 +83,9 @@ You can also share the same default controls for all variants by putting the slo
 
 A variant can then override the slot if needed.
 
-## Builtin controls
+## Built-in controls {#builtin-controls}
 
-To build a control panel a bit more easily, Histoire provides builtin controls with design that fits the rest of the UI.
+Use built-in fields and buttons when you want controls that match the workbench.
 
 ```svelte{17-18}
 <script>
@@ -111,4 +111,4 @@ To build a control panel a bit more easily, Histoire provides builtin controls w
 </Hst.Story>
 ```
 
-Check out all the available controls in their book: [controls.histoire.dev](https://controls.histoire.dev/).
+Browse the [built-in controls book](https://controls.histoire.dev/) for examples.

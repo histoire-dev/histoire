@@ -1,14 +1,18 @@
 # Getting started with React <Badge type="tip" text="1.0-beta.2+" />
 
-React 18 and 19 stories use `.story.tsx` or `.story.jsx` files with a default component export.
+Use Histoire with React 18 or 19. Check the [Node.js and Vite requirements](../getting-started.md#overview) before installing.
 
-Install Histoire and React support alongside your React dependencies:
+Install Histoire and its React plugin in your React project.
 
 ```sh
-pnpm add -D histoire @histoire/plugin-react @vitejs/plugin-react
+pnpm add -D histoire @histoire/plugin-react
 ```
 
-Keep your JSX plugin in `vite.config.ts`. Histoire reuses your Vite configuration:
+Histoire reuses the JSX plugin in your Vite config. If the project has no JSX plugin yet, install `@vitejs/plugin-react` and add it to `vite.config.ts`.
+
+```sh
+pnpm add -D @vitejs/plugin-react
+```
 
 ```ts
 import react from '@vitejs/plugin-react'
@@ -26,7 +30,17 @@ import { defineConfig } from 'histoire'
 export default defineConfig({ plugins: [HstReact()] })
 ```
 
-Add scripts to `package.json`:
+Create a `.story.tsx` or `.story.jsx` file with a default component export. For example, create `Button.story.tsx`:
+
+```tsx
+import { Story } from '@histoire/plugin-react'
+
+export default function ButtonStory() {
+  return <Story title="Button"><button>Continue</button></Story>
+}
+```
+
+Add these scripts to `package.json`.
 
 ```json
 {
@@ -38,17 +52,6 @@ Add scripts to `package.json`:
 }
 ```
 
-Create `Button.story.tsx`:
-
-```tsx
-import { Story } from '@histoire/plugin-react'
-import { Button } from './Button'
-
-export default function ButtonStory() {
-  return <Story title="Button"><Button>Hi</Button></Story>
-}
-```
-
-Run `pnpm story:dev`. See [stories](./stories.md) and [state and controls](./controls.md) for variants and interactive state.
+Run `pnpm story:dev` and open the printed address. Select **Button** in Stories. To add variants and interactive state, see [React stories](./stories.md) and [state and controls](./controls.md).
 
 For TypeScript, set `jsx: "react-jsx"` and `moduleResolution: "bundler"` in your project configuration.

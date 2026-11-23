@@ -16,11 +16,11 @@ export default function ButtonStory() {
 }
 ```
 
-Without `Variant` children, Histoire creates an implicit `_default` variant. Explicit variants default to `${storyId}-${index}` ids. Supply stable `id` values when changing order should preserve links.
+Without `Variant` children, Histoire creates an implicit `_default` variant. Explicit variants default to `${storyId}-${index}` IDs. Set `id` to keep links working when you reorder variants.
 
-Declare variants directly inside `Story`, optionally inside fragments or elements. Collection reads declarations without rendering their preview content. Components that dynamically create variant declarations are unsupported.
+Declare `Variant` inside `Story`, optionally inside fragments or elements. Histoire reads these declarations during collection without rendering their contents. Keep the declarations in the story component so Histoire can find them.
 
-`Story` accepts `id`, `title`, `group`, `layout`, `icon`, `iconColor`, `docsOnly`, `meta`, `initState`, `setupApp`, `source`, `responsiveDisabled`, `autoPropsDisabled`, and `controls`. `Variant` accepts the same props except `group`, `layout`, and `docsOnly`. Variant props override story defaults.
+Set `group`, `layout`, `docsOnly`, and `matrix` on `Story`. Use the story's `initState` and `controls` as defaults for every variant, or override them on an individual `Variant`.
 
 `source` displays explicit source text. Automatic React source generation and automatic prop controls are unavailable. Add `Button.story.md` beside `Button.story.tsx` for Markdown documentation.
 
@@ -37,7 +37,9 @@ export const setupReact = defineSetupReact(({ app, story, variant, addWrapper })
 })
 ```
 
-Payload includes React `Root` as `app`, plus story and selected variant. Story and variant are `null` during collection; variant is `null` during hidden configuration. Setup may return a wrapper component instead of calling `addWrapper`. First registered wrapper is outermost. Story and variant `setupApp` callbacks run after global setup, for preview and controls roots.
+The callback receives the React `Root` as `app`, along with the story and selected variant. Both story and variant are `null` during collection. The variant is also `null` during hidden configuration.
+
+Return a wrapper component or register one with `addWrapper`. The first registered wrapper is outermost. For both the canvas and custom controls, Histoire runs global setup first, then the story's `setupApp`, then the variant's `setupApp`.
 
 Histoire supplies `isActive()` on the setup payload. Check it after awaited work before changing state or using `app`; switching stories can dispose the captured root. Histoire stops remaining setup callbacks when that root is disposed.
 

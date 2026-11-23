@@ -2,13 +2,13 @@
 
 Development mode exposes screenshots from the canvas toolbar. Choose selected frames or all story frames, PNG or WebP, and 1×, 2×, or 3× output. Files remain under `.histoire/screenshots/`; recent captures offer **Copy path**. A per-image JSON sidecar records its story and variant for the recent list after restart.
 
-Capture uses the same preview host, deterministic browser session, viewport limits, and server execution queue as MCP. Each request captures up to 64 frames so its result fits the dev channel. Checkerboard becomes transparent pixels. Concurrent UI and MCP work shares one lane; cancelling a canvas capture affects only that browser's request. Failed targets preserve successful captures and report partial failure.
+Each request captures up to 64 frames. PNGs show transparent pixels where the canvas uses a checkerboard. Canvas captures and MCP jobs share the server queue, but cancelling a canvas capture cancels only your request. If some frames fail, Histoire keeps the successful captures and reports the failures.
 
 Matrix captures include each cell's displayed props, copied when capture is requested. Later edits cannot change a queued cell's capture. Results retain the cell identity even when several cells share one story and variant.
 
 ## Check existing setup
 
-Opening **Screenshot** in the canvas toolbar automatically checks browser setup each time. Reopening while a check is running reuses that check. Capture controls appear after setup succeeds. Checks use existing browser discovery and reuse rules; they do not load a story or install anything. After installing a driver or browser, **Check again** refreshes discovery and checks the new setup. **Copy command** copies the one repair selected by the server.
+Open **Screenshot** in the canvas toolbar to check your browser setup. Capture controls appear when the check passes. If setup needs attention, follow the setup message. When **Copy command** appears, use it to copy the repair command and run it in your terminal. After making changes, choose **Check again**. Reopening the menu while a check is running reuses that check.
 
 The CLI can inspect setup independently of Vite:
 
@@ -18,7 +18,9 @@ pnpm exec histoire screenshot-setup --check
 pnpm exec histoire screenshot-setup --json
 ```
 
-The command accepts `--root <directory>` and `-c, --config <file>` to select another project. Its default reads package and installation metadata without launching a browser. `--check` explicitly starts and closes a neutral browser. Neither action installs packages or browsers. `--json` writes one setup snapshot, or one bounded `{ error }` object, to stdout. Metadata reads exit `0` when unverified or ready and `1` when setup needs action; explicit checks exit `0` only when ready and otherwise `1`. Invalid arguments, project roots, or config exit `2`; a check that cannot finish cleanly exits `1`. After installing a driver or browser, run the command again to refresh discovery.
+Use `--root <directory>` or `--config <file>` (`-c`) to inspect another setup. By default, the command reads package and installation metadata. Add `--check` to launch and close a browser without loading a story. Both forms leave the installation alone. Add `--json` to write one setup snapshot or bounded `{ error }` object to stdout.
+
+Metadata reads exit `0` for unverified or ready setups and `1` when action is needed. Explicit checks exit `0` only when ready and `1` otherwise, including incomplete checks. Invalid arguments, roots, or config exit `2`.
 
 With Playwright 1.49 or newer, automatic setup tries compatible local choices in this order: matching Chromium headless shell, matching cached full Chromium, stable Google Chrome, then stable Microsoft Edge. Older supported drivers use their default matching Chromium headless executable before checking Chrome and Edge; they do not have separate shell/full-channel choices. Bundled Chromium stays aligned with the selected driver version. Chrome and Edge may render differently from that pinned version; set an explicit supported browser source when repeatable renderer choice matters. See the [`browser` config](../reference/config.md#browser).
 
@@ -38,21 +40,27 @@ pnpm add -D playwright
 pnpm exec playwright install chromium --only-shell
 ```
 
-If the project uses only `playwright-core`, run `pnpm exec playwright-core install chromium --only-shell` instead. With an older driver, install its default Chromium using `pnpm exec playwright install chromium` or `pnpm exec playwright-core install chromium`.
+If the project uses only `playwright-core`, run `pnpm exec playwright-core install chromium --only-shell`. The headless shell installation leaves existing browsers in place.
 
-This installs only Chromium's headless shell and leaves already installed browser binaries in place. For Playwright 1.49 or newer, a confirmed shell-specific issue or pinned full renderer uses `browser: { source: 'chromium' }` with `pnpm exec playwright install chromium --no-shell` or `pnpm exec playwright-core install chromium --no-shell`. Older drivers install their default Chromium with the same command without `--no-shell`. A full browser install alone does not change the default shell choice. On supported Linux systems where the browser reports missing libraries, install OS dependencies with `pnpm exec playwright install-deps chromium` or `pnpm exec playwright-core install-deps chromium`.
+For a confirmed shell issue or an explicit full Chromium choice on Playwright 1.49 or newer, set `browser: { source: 'chromium' }` and install with `pnpm exec playwright install chromium --no-shell` or `pnpm exec playwright-core install chromium --no-shell`. The automatic source still prefers a matching headless shell when available. Explicit sources have no fallback.
 
-Older supported drivers do not offer separate shell/full-channel choices. Use their default Chromium install (`pnpm exec playwright install chromium` or `pnpm exec playwright-core install chromium`) or upgrade the selected driver before requesting `headless-shell` or full-channel `chromium` explicitly.
+For older supported Playwright drivers, install default Chromium with `pnpm exec playwright install chromium` or `pnpm exec playwright-core install chromium`. Upgrade the driver for explicit `headless-shell` or full-channel `chromium` selection.
+
+If the browser reports missing system libraries on supported Linux systems, run `pnpm exec playwright install-deps chromium` or `pnpm exec playwright-core install-deps chromium`, matching your driver. Run the check again after each change.
 
 Project Vitest tests still need `vitest`, `@vitest/browser-playwright`, and their browser setup as described in the [browser testing guide](./testing.md). Screenshot setup does not replace those development test dependencies. The setup panel exists in development; static books do not expose screenshot controls. Node artifacts discover browsers on the deployment machine and use the existing [SDK and MCP capture routes](./deploy-node.md#optional-browser-execution).
 
-The **MCP** section of the AI tab shows the actual bound HTTP endpoint, connected exchanges, current operation, and recent tool activity. Copy client configuration from that endpoint or use Histoire's existing stdio CLI. **Cancel** appears only for queued or running work with an owned cancellable execution handle. Cancellation rejection clears the pending state and shows the server's feedback; accepted cancellation waits for the operation's terminal status.
+## MCP activity
 
-**Follow** navigates to a running operation's story and variant. Its cursor appears only on that exact ready, visible preview document. It stays hidden for a stale or unrelated frame and for ambiguous Matrix cells. Turning Follow off keeps activity history without navigating.
+Open **MCP** in the **AI** tab to see the HTTP endpoint, connections, current operation, and recent calls. Copy the client configuration or use [stdio](./mcp.md#stdio).
+
+Use **Cancel** for a queued or running operation that supports cancellation. Histoire shows the server's response if it rejects cancellation. After acceptance, the operation stays pending until cleanup finishes.
+
+Turn on **Follow** to open the running operation's story and variant. The cursor appears on the matching frame once it is ready and visible. In Matrix, it appears only when Histoire can identify the cell. Turn Follow off to keep activity history without navigating.
 
 Activity retains at most 50 completed calls, subject to the byte limit, while keeping admitted active work. Reconnect snapshots trim completed history and optional metadata to fit the complete channel message; omission counts report missing rows. Operation IDs stay exact. Large read traffic may continue without activity rows rather than blocking the read.
 
-Development features communicate through Vite custom events named `histoire:ui:*`. JSON payloads are bounded to 64 KB; MCP notifications project tool names, scoped targets, lifecycle, and opaque client identities. Credentials, source text, arguments, and artifact bytes stay server-owned. Listener cleanup follows the captured runtime generation, preventing stale completions after restart.
+Development features use Vite custom events named `histoire:ui:*`, with JSON payloads capped at 64 KiB. MCP notifications include the tool name, target, status, and an opaque client ID. Credentials, source text, arguments, and image bytes stay on the server. A restart discards activity from the old runtime.
 
 Static builds hide screenshots and MCP activity and provide no UI channel HTTP fallback.
 

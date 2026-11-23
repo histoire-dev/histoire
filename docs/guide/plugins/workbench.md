@@ -1,11 +1,11 @@
 # Workbench plugins
 
-A Histoire plugin can add UI to the workbench and code to story frames, next to its Node hooks:
+A Histoire plugin can add workbench UI and story frame code alongside its Node hooks.
 
 - **Workbench module** (`workbench.client`): inspector tabs and sections, toolbar items, commands, shortcuts, menus, rail panes, settings and home sections, canvas overlays, tools and views.
-- **Frame module** (`workbench.frame`): runs inside interactive story frames, once per rendered variant, and talks to the workbench module over a per-plugin channel.
+- **Frame module** (`workbench.frame`): attaches once per mounted variant instance and communicates with the workbench module over the plugin's channel.
 
-Plugins are trusted code: they run with the same rights as the workbench and your stories. There is no sandbox, marketplace or runtime installer.
+Install plugins through the [plugin marketplace](./marketplace.md) or add them to your Histoire config. Plugins run as trusted project code.
 
 A complete plugin covering every contribution kind lives in [`examples/plugin-reference`](https://github.com/Akryum/histoire/tree/main/examples/plugin-reference). It ships the same plugin with five interchangeable UI variants (workbench Vue, DOM, React, Svelte 5, Svelte 4) and is used by the `vue3`, `react` and `svelte4` examples.
 
@@ -24,7 +24,7 @@ export function myPlugin(options: { threshold?: number } = {}): Plugin {
       apiVersion: 1,
       client: fileURLToPath(new URL('./client.js', import.meta.url)),
       frame: fileURLToPath(new URL('./frame.js', import.meta.url)),
-      // The only plugin data that reaches the browser.
+      // Public JSON passed to both browser hooks.
       options: { threshold: options.threshold ?? 24 },
     },
   }
@@ -79,7 +79,7 @@ Install `@histoire/plugin-kit` as a dependency of your plugin package.
 | `options` | JSON value handed to both modules (`api.options`, `frame.options`). |
 | `devOnly` | Leave both entries out of static builds. |
 
-Entries are resolved by Vite from the project root: a bare specifier (`my-plugin/client`) or an absolute path. Resolve your own relative paths before returning them, as above; a remaining relative path is read as project-root relative. An invalid descriptor or an entry that does not resolve stops Histoire at startup with a message naming the plugin and field.
+Use a package specifier such as `my-plugin/client` or an absolute path for each entry. Vite resolves relative paths from the project root. Resolve paths relative to your plugin before returning them, as in the example. At startup, Histoire reports the plugin and field if an entry is invalid or cannot resolve.
 
 ## Lifecycle
 
@@ -134,7 +134,7 @@ Inspector plugin tabs show their `icon` before the label. Tabs that do not fit t
 
 ## Rendering views
 
-Every view-bearing contribution takes either a workbench Vue `component` or a framework-neutral `mount`. Both are first class.
+Pass a Vue `component` to render with the workbench's Vue app. Use the framework-neutral `mount` callback for DOM, React, Svelte, or a separate app.
 
 ### Workbench Vue components
 
@@ -289,11 +289,11 @@ Check `context.capabilities` before relying on optional services (`devEvents`, `
 - `catalog`: metadata-only `list()`, `getStory(id)`, `search(query)`.
 - `navigation`: `selectStory`, `openInspectorTab`, `openPane`, `openSettings`, `openCanvasView`, taking `builtin:` or qualified plugin ids.
 - `devEvents.send(event, payload)`: reaches your Node `onDevEvent` hook; dev server only.
-- `tests`: project test runs shared with the Tests pane; dev server only. `entries()` lists per-variant `summary`, `running`, `stale` and `error`; `progress` reports the current run phase: waiting to start (`queued`), stories collected (`collect`), then variants checked (`run`); `error` is the failure of a whole run; `runAll()`/`run(target)` start runs; `subscribe` notifies after changes. Tests attach JSON to their result with `setHistoireTestData(context, key, value)` from `@histoire/shared` (48 KiB per test), read back as `summary.tests[n].data[key]`.
+- `tests`: development project runs shared with the Tests pane. Use `runAll()` or `run(target)` to start a run and `subscribe` to track changes. `entries()` lists each variant's `summary`, `running`, `stale`, and `error`. `progress` reports waiting (`queued`), collecting stories (`collect`), or running cases (`run`). The top-level `error` describes a whole-run failure. To attach JSON to a result, use `setHistoireTestData(context, key, value)` from `@histoire/shared` (48 KiB per test). Read it from `summary.tests[n].data[key]`.
 
 ## Options and preferences
 
-**Options** are what your Node factory puts in `workbench.options`: JSON only, validated at startup, the same for every user, and embedded in static builds. Nothing else from the Node plugin (functions, secrets, other fields) reaches the browser. Read them as `api.options` and `frame.options`, and validate them: they come from a user's config.
+Use `workbench.options` to pass public JSON from the Node factory to `api.options` and `frame.options`. Histoire validates the JSON at startup and includes it in static builds. Validate the fields your plugin reads from user config. Public `Plugin.metadata` reaches Settings separately.
 
 **Preferences** are per user:
 
@@ -382,7 +382,7 @@ for (const ref of api.frames.list()) {
 ## Embedding hosts
 
 - The **standalone** workbench and the book's own explorer page load the plugin manifest of the book.
-- `@histoire/vue` native hosts and other apps embedding a book through `@histoire/sdk` never evaluate code served by the book. They import the plugin's workbench module themselves and pass it to their own extension host (`HistoireProvider`'s `extensions` prop). Frame modules always run inside the book's story frames; host-imported workbench modules reach them through `session.plugins`.
+- Native `@histoire/vue` hosts and other apps using `@histoire/sdk` import the workbench modules they want to run and pass them to their own extension host (`HistoireProvider`'s `extensions` prop). The book still runs its frame modules inside story frames. Host workbench modules reach them through `session.plugins`.
 - Hosts render only the surfaces they have. Native hosts show inspector tabs and sections, toolbar items and shortcuts; rail panes, settings, home and canvas contributions stay registered but unrendered, and their capabilities are absent.
   - Toolbar items render after the built-ins of the group they name (`viewport`, `background`, `ui`); groups without a native counterpart, and `plugins`, trail after the built-in items.
   - Shortcuts fire in the `global`, `canvas` (explorer canvas) and `frame` (its single-variant frame) scopes, innermost first. `comment` has no native surface: such shortcuts are disabled and reported as a diagnostic when registered. Conflicting bindings are rejected at registration too, as in the standalone workbench; their commands stay runnable.

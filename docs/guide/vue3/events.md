@@ -1,8 +1,6 @@
 # Events
 
-Histoire can display a list of events emitted from your story. To register new events, use the `logEvent` function from `histoire/client`.
-
-The first parameter is the name of the event, and the second one is a data object you want to display when clicking on the event.
+Call `logEvent(name, payload)` from `histoire/client` in an event handler. Select the event in the inspector’s **Events** tab to inspect its payload.
 
 ```vue{3,10,11}
 <script lang="ts" setup>

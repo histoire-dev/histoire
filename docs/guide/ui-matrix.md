@@ -1,8 +1,10 @@
 # Props matrix <Badge type="tip" text="1.0-beta.2+" />
 
-Choose **Props matrix** to display every combination of two prop axes. This arrangement is always accessible. While Histoire reads prop values, the canvas shows a loading state. If fewer than two usable axes exist, it explains the requirement, names any detected axis, and suggests a custom axis or values declared in `Story matrix.axes`. **Add custom axis** opens the new-axis form in Props, showing the inspector if needed. Each axis needs at least two distinct values. Histoire detects Boolean component props, complete finite `values`/`enum` runtime metadata, and top-level Boolean variant state automatically. Numeric props receive configurable samples. Free text, nested state, and nonnumeric default values do not become axes automatically.
+Choose **Props matrix**, then select **Rows** and **Columns** in the canvas toolbar. The matrix renders each combination of the two props. Use **Swap** to switch the axes, **Axes** in the inspector to filter values, and **Base props** to apply shared overrides. Each cell's axis values take precedence over base props.
 
-When no frame is selected, Matrix keeps one hidden runtime for the first variant to discover props without selecting a variant or changing the URL. With a selected variant, its hidden canonical runtime supplies prop metadata and base defaults. Discovery also uses existing admitted frames in other arrangements. Source changes invalidate metadata from older executable revisions, and the canvas updates automatically when usable axes arrive.
+Each axis needs at least two distinct values. Histoire detects Boolean props, complete finite `values` or `enum` metadata, and top-level Boolean state. Numeric props use configurable samples. Use **Add custom axis** if Histoire detects too few usable axes, or declare values in the story.
+
+Histoire reads prop metadata and base defaults from the selected variant. With no selection, it uses the first variant in a hidden frame without changing the URL. It can also reuse metadata from mounted frames. The matrix updates when story edits change the available props.
 
 Use explicit hints for domains absent from runtime metadata, or to replace an automatically detected domain:
 
@@ -24,7 +26,7 @@ Use explicit hints for domains absent from runtime metadata, or to replace an au
 
 Svelte uses the same `matrix` object on `<Hst.Story>`. React accepts it as <code v-pre>matrix={{ axes: { ... } }}</code> on `<Story>`. Their top-level Boolean variant state also supplies automatic domains. Hints contain string, finite number, Boolean, or null values. They override automatic values for the same prop name. Detection does not execute validators or evaluate source code. At most 32 candidate axes and 64 values per axis are advertised; automatic metadata containing invalid members or more than 64 values is rejected. Each selected axis needs at least two distinct values.
 
-Choose Rows and Columns in the canvas axis bar. Swap reverses them while preserving their value filters. In Props, toggle values under Axes to show a subset; disabling every value produces an empty matrix. Edit Base props to apply the same override to every live cell. Axis values always take precedence over base props.
+Swapping axes preserves value filters. Turn off every value for an axis to show an empty matrix.
 
 ## Custom axes
 
@@ -80,9 +82,9 @@ For a selected numeric axis, choose its edit action, then use **Values** to edit
 
 Saved app values win over story hints, then complete runtime domains, then project samples, then built-in samples. Edits persist per story and prop across reloads, axis swaps, and base preset changes. **Reset values** restores current source defaults and shows all restored values. Numeric edits do not change canonical variant state or write story files. Custom values remain local preferences; links share axis names, not edited values.
 
-The Base preset selects an existing variant as each cell's starting point. Changing it updates untouched base props and preserves your explicit edits. Reset clears those edits and restores the current preset's values. Selecting a cell is local to the matrix; it does not invent a variant ID or replace the URL's base variant. **Save as variant** copies a `<Variant>` snippet using the selected cell's framework source generator. Svelte snippets use `<Hst.Variant>`. No story files are written.
+Use **Base preset** to pick an existing variant as the starting point for each cell. Changing the preset preserves your explicit base prop edits. Reset clears those edits. Selecting a cell stays local to the matrix and leaves the base variant URL in place. **Save as variant** copies a snippet you can paste into your story. Svelte snippets use `<Hst.Variant>`.
 
-The canvas frame budget includes its hidden canonical preview. Remaining slots render nearby matrix cells; other cells retain selectable placeholders until admitted. Cell overrides stay inside their own preview sessions. Runtime versions without `PROPS_OVERRIDE` acknowledgment show a cell error.
+The hidden story frame counts toward the canvas frame budget. Histoire uses the remaining slots to render nearby cells and shows selectable placeholders for the others. Overrides stay within each cell's runtime. A runtime that cannot acknowledge `PROPS_OVERRIDE` shows a cell error.
 
 Rows and columns restore from `arrange=matrix&rows=variant&cols=size`. Valid URL names win independently, followed by saved choices, explicit hint names, then the smallest domains in stable discovery order. Unknown names fall back to valid candidates. Per-story base props, filters, and explicit numeric values and custom axes persist under `_histoire-ui-matrix/<storyId>`. Passive source updates drop removed domain values from filters; an intentionally empty filter stays empty. Matrix remains available in static books through the same runtime discovery, defaults, and hints.
 
