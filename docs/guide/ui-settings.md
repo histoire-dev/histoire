@@ -20,9 +20,9 @@ Your local overrides stay active until Histoire verifies the saved file and effe
 
 Writable options are `responsivePresets`, `backgroundPresets`, `theme.defaultColorScheme`, `ui.defaultArrange`, `agents.presets`, and `agents.permissions`. ACP environment overrides remain user-level and are rejected by project saves. Density, zoom synchronization, test watching, agent opt-ins, and context preferences remain local.
 
-Imported, computed, and function-only settings cannot be overwritten. Copy snippet supplies valid TS/JS for manual integration. When no config exists, the server creates an appropriate TS/JS config. Before changing the watched file, the server loads candidate source from the same directory. A load failure preserves original config bytes and reports failure without exposing execution details to the browser. Config is also checked at its final filename after publication; a load failure restores the session backup while that exact write still owns the revision. Successful writes use the existing config watcher to restart once.
+For imported, computed, and function-only settings, use **Copy snippet** and edit the config manually. If there is no config, Histoire creates one. Histoire validates changes before and after writing. It can restore the original config after a failed save if the file still matches that save. A successful save restarts Histoire once.
 
-Browser storage denial leaves preferences functional in memory. Corrupt stored preferences are discarded with a warning. Settings stores and socket observers belong to one workbench lifetime; embedded providers do not inherit standalone storage or config writers.
+If your browser blocks storage, preferences work for the current session. Histoire discards invalid stored preferences and displays a warning.
 
 Default arrangement supports **Single variant**, **Grid**, and **List**. Explicit story layouts override this default; URL and remembered story/shared view choices retain precedence. Single viewport Responsive/fixed intent stays in workbench memory, while chosen fixed dimensions use existing viewport settings.
 

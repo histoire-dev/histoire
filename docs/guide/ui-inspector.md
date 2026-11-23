@@ -14,4 +14,4 @@ Expand **Source** and choose **Variant** for generated source or **Story file** 
 
 The workbench remembers whether Source and the inspector are open. To reopen a closed inspector, choose **Show inspector**.
 
-The standalone shell owns routing and panel visibility. Native `@histoire/vue` panels use the existing session and story runtime. Matrix controls use the `matrix-props` slot while keeping the session's selected variant.
+In [Props matrix](./ui-matrix.md), the inspector shows matrix controls while keeping the current story variant selected.

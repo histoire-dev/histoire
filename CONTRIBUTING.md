@@ -188,6 +188,34 @@ pnpm run story:dev
 pnpm run test:dev
 ```
 
+## Official plugin releases
+
+### Official release history
+
+Each bundled official plugin records release metadata in its `marketplace-history.json`. Set the package version, requirements, frameworks, notes, and migrations before taking its first snapshot. The release script generates the snapshots and index. To regenerate them manually, run these commands from the repository root:
+
+```sh
+pnpm marketplace:history
+pnpm marketplace:index
+```
+
+Review the diagnostics and commit the history files and generated `packages/histoire/src/node/marketplace/catalog/official.json` with the release changes. The scripts read plain JSON from the official package allowlist. Each version is snapshotted once, and reruns preserve existing entries. The index requires a snapshot for each current package version.
+
+Snapshots record `version`, `requires`, `frameworks`, and optional `releaseNotes`, `migrations`, and `publishedAt`. Supply a valid publication date if one is known. The history keeps the newest 50 unique versions by npm semver. Recover older entries from their published metadata. The server uses each release's requirements and frameworks for offline compatibility checks. History files are release inputs and stay out of published plugin packages.
+
+### Publish changes to the hosted official catalog
+
+After publishing to npm, set the listing version and exact published versions to retain in `scripts/marketplace/official-catalog-input.json`. Every selected release needs valid marketplace metadata. Run:
+
+```sh
+pnpm marketplace:catalog
+pnpm marketplace:catalog --check
+```
+
+Review and include the input and generated `docs/public/marketplace/v1/official.json` in the same PR. After the docs deploy, verify the feed serves valid JSON with the intended release at `https://histoire.dev/marketplace/v1/official.json`. To roll back, revert the catalog data commit and redeploy the docs. Publish breaking format changes at a new URL so existing consumers can continue to use the `v1` feed.
+
+Check the packed plugin manifest against the oldest Histoire version the release should support. pnpm packs `workspace:^` against the version in the current workspace, and Marketplace checks the published peer range before offering installation.
+
 ## Pull Request Guidelines
 
 - Checkout a topic branch from a base branch, e.g. `main`, and merge back against that branch.

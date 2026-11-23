@@ -195,33 +195,8 @@ Migrations support `rename-option`, `remove-option` and `set-option`. Histoire s
 
 See [using the marketplace](./marketplace.md) for installation, local preferences and recovery behavior.
 
-### Official release history
-
-Maintainers of bundled official plugins record release metadata alongside each package in `marketplace-history.json`. After setting the package version and its marketplace requirements, frameworks, notes and migrations, run from the repository root:
-
-```sh
-pnpm marketplace:history
-pnpm marketplace:index
-```
-
-Review and commit the history files and generated `packages/histoire/src/node/marketplace/catalog/official.json` with the release changes. The snapshot command reads the fixed official package allowlist and plain JSON; it never imports plugin code. It records the current exact version once. Reruns preserve an existing version's snapshot, so later manifest edits cannot silently rewrite a release. Update metadata before taking the first snapshot for that version.
-
-Snapshots contain `version`, `requires`, `frameworks`, optional `releaseNotes`, `migrations` and `publishedAt`. Publication dates are optional and must be valid date strings when supplied; the command does not invent dates. History is validated, deduplicated and sorted with npm semver, retaining the newest 50 versions. The index command requires every current package version to have a snapshot. Diagnostics identify dropped fields; review them before committing.
-
-Initial seeds hold only current versions. Recover older releases from their actual published metadata before adding history; do not fabricate notes, migrations or compatibility requirements. Bundled server readers evaluate each version's own requirements and frameworks without contacting a registry. History files are release inputs and excluded from published plugin package contents.
-
-### Publish changes to the hosted official catalog
-
-After publishing the plugin to npm, update `scripts/marketplace/official-catalog-input.json` with its listing version and the exact published versions to retain. Every selected release must contain valid marketplace metadata. Run:
-
-```sh
-pnpm marketplace:catalog
-pnpm marketplace:catalog --check
-```
-
-Review and include the input and generated `docs/public/marketplace/v1/official.json` in the same PR. The docs deploy serves the snapshot at `https://histoire.dev/marketplace/v1/official.json`. Verify it responds with JSON and the intended release after deploy. To roll back a catalog change, revert its data commit and redeploy the docs. Existing consumers use the `v1` URL, so breaking format changes need a new URL.
-
-Plugin installation without a Histoire upgrade still depends on the plugin's published peer ranges. In particular, pnpm packs `workspace:^` against the version in the current workspace. Check the packed manifest against the oldest Histoire version you intend to support before promoting an independent plugin release.
+<a id="official-release-history"></a>
+<a id="publish-changes-to-the-hosted-official-catalog"></a>
 
 ## Extending Vite configuration
 

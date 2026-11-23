@@ -120,6 +120,6 @@ On supported Linux systems with a classified missing-library failure, install OS
 
 Tests use engine `built-preview`. They run the compiled embedded test session in isolated Chromium contexts and preserve aggregate outcomes, skips, hooks, and explicit test/hook deadlines. They need neither project Vitest nor `@vitest/browser-playwright` on the server. Build with the embedded browser test runtime to enable them; artifacts lacking it report `CAPABILITY_UNAVAILABLE`. They do not provide project-wide Vitest execution or runtime source discovery.
 
-See [validated framework combinations](./mcp.md#validated-framework-combinations) for local live-preview and copied-artifact checks. Vue fixture tests additionally verify matching aggregate outcomes across the two engines. Project CLI reporters, workspace filtering, coverage, snapshot updates, and CLI `allowOnly` policy are outside compiled-preview execution.
+Compiled tests are limited to selected stories and variants. Use your project's Vitest workflow for project-level features such as CLI reporters, workspace filtering, coverage, snapshot updates, and CLI `allowOnly` policy.
 
 `histoire preview` remains the static preview command. Run `server.mjs` for Node deployment and MCP.

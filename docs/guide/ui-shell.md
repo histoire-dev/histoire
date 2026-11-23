@@ -28,14 +28,10 @@ Static builds include Home, Stories, Search, appearance controls, panel collapse
 
 Press **Ctrl/⌘ Shift D** to switch light/dark appearance. **Ctrl/⌘ K** retains the story and command palette. The existing `theme.hideColorSchemeSwitch` option controls the appearance switch.
 
-Panel and inspector preferences use `_histoire-ui-shell`. Story URLs and their `variantId` and `tab` query parameters remain independent of these local preferences.
+Panel and inspector preferences stay in your browser. Use a story URL with `variantId` and `tab` to share the variant and inspector tab.
 
 ## Hide and restore UI
 
 Choose **Hide UI** in the canvas toolbar or press **Ctrl/⌘ Shift H** to focus on the canvas. Right-click the canvas and choose **Show UI**, or use the same shortcut, to restore workbench controls. Context menus remain available while UI is hidden.
 
-## Internal shell contracts
-
-Each standalone workbench creates and provides its own shell through `createShell` and `provideShell`. Components access it through `useShell`. Calling `close` stops the shell's observers while the book session stays open.
-
-`ShellLayout` uses `stories`, `search`, `tests`, and `ai` for rail panes. It also accepts `main`, `inspector`, and `overlays`. Supply `inspector-header` for a shell-framed header and close button, or use only `inspector` when the inspector content has its own header.
+<a id="internal-shell-contracts"></a>

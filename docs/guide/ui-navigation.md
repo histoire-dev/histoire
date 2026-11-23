@@ -6,7 +6,7 @@ Select a story and variant, then copy the URL to share that selection. Story lin
 
 The Stories pane follows configured tree groups, folder order, and titles. Opening a story reveals its variants. Selecting another variant keeps the same story active; document-only stories open a scrolling Markdown page.
 
-Use Search to find titles, folder paths, source paths, docs, and loaded props. The Stories pane remembers open folders in `_histoire-tree-state`.
+Use Search to find titles, folder paths, source paths, docs, and loaded props. The Stories pane remembers open folders in your browser.
 
 Within the tree, Up and Down move focus. Right opens a folder or enters its children; Left closes it or returns to its parent. Enter selects a story or variant. Test failures and collection warnings appear beside their related rows.
 
@@ -28,7 +28,7 @@ Open **Tests** in development for project-wide browser tests. When visual testin
 
 In functional tests, **Run all** runs a single project batch while leaving your current story open. **Failing** shows failed assertions and collection problems. **All** lists the collected variants, and **Changed** shows outdated results after story edits. Select a result to open its variant and the inspector's **Tests** tab.
 
-Watch mode runs all variants of an edited story in one request. Changes arriving during a run are queued for a later batch. Disabling Watch stops automatic reruns. Watch preferences persist in `_histoire-ui-settings`.
+Watch mode runs all variants of an edited story in one request. Changes arriving during a run are queued for a later batch. Disable **Watch** to stop automatic reruns. The workbench remembers this setting in your browser.
 
 **Stop** stops new results appearing for that batch and marks the active target outdated. The server finishes cleaning up before another run can start.
 

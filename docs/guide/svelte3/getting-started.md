@@ -42,6 +42,8 @@ Svelte 5 is supported alongside Svelte 4. Both use `@histoire/plugin-svelte` and
 
 SvelteKit 2 and 3 projects use `@histoire/plugin-svelte` alongside their existing SvelteKit Vite setup. Register `HstSvelte()` as shown below.
 
+In a fresh SvelteKit checkout, run `pnpm exec svelte-kit sync` before starting Histoire to generate SvelteKit's project files.
+
 ## Installation
 
 Install the `histoire` and `@histoire/plugin-svelte` packages into your project:

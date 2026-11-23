@@ -52,16 +52,14 @@ Project Vitest tests still need `vitest`, `@vitest/browser-playwright`, and thei
 
 ## MCP activity
 
-Open **MCP** in the **AI** tab to see the HTTP endpoint, connections, current operation, and recent calls. Copy the client configuration or use [stdio](./mcp.md#stdio).
+In the development workbench, open **MCP** in the **AI** tab to see the HTTP endpoint, connections, current operation, and recent calls. Copy the client configuration or use [stdio](./mcp.md#stdio).
 
 Use **Cancel** for a queued or running operation that supports cancellation. Histoire shows the server's response if it rejects cancellation. After acceptance, the operation stays pending until cleanup finishes.
 
 Turn on **Follow** to open the running operation's story and variant. The cursor appears on the matching frame once it is ready and visible. In Matrix, it appears only when Histoire can identify the cell. Turn Follow off to keep activity history without navigating.
 
-Activity retains at most 50 completed calls, subject to the byte limit, while keeping admitted active work. Reconnect snapshots trim completed history and optional metadata to fit the complete channel message; omission counts report missing rows. Operation IDs stay exact. Large read traffic may continue without activity rows rather than blocking the read.
+Activity shows active work and up to 50 completed calls. If the history exceeds its size limit, the workbench reports how many rows it omitted. Large reads can complete without an activity row.
 
-Development features use Vite custom events named `histoire:ui:*`, with JSON payloads capped at 64 KiB. MCP notifications include the tool name, target, status, and an opaque client ID. Credentials, source text, arguments, and image bytes stay on the server. A restart discards activity from the old runtime.
-
-Static builds hide screenshots and MCP activity and provide no UI channel HTTP fallback.
+Activity identifies the tool, its target or client, and its status. Credentials, source text, arguments, and image bytes are excluded from activity. Restarting Histoire clears the activity history.
 
 See [Visual testing](./visual-testing.md) for tracked baselines, Matrix cases, image review, and CI comparisons.

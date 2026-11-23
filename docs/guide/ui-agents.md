@@ -57,7 +57,7 @@ Agents own their file and terminal tools. Histoire does not provide ACP client-s
 
 ## Environment and persistence
 
-In the agent's environment settings, enter the variable name and its value, then choose **Add** or **Replace**. Histoire shows saved variable names and keeps their values server-side. Updating one variable preserves the others. The write-only endpoint accepts same-origin JSON POST requests outside the HMR channel.
+In the agent's environment settings, enter the variable name and its value, then choose **Add** or **Replace**. Histoire shows saved variable names and keeps their values server-side. Updating one variable preserves the others.
 
 User preferences and credentials live in Histoire's private user file:
 

@@ -266,22 +266,6 @@ Disposal can reject when retirement fails or times out; propagate that failure t
 
 For historical JSON and standalone HTML exports, see [detached reports](../reference/devframe.md#detached-reports). For connection and stale-owner errors, see [troubleshooting](../reference/devframe.md#troubleshooting).
 
-## Run the repository example
+## Example integration {#run-the-repository-example}
 
-From the repository root:
-
-```sh
-pnpm install --frozen-lockfile
-pnpm run build
-pnpm --filter histoire-example-vue3 run dev:devframe
-```
-
-Open [the local example](http://127.0.0.1:4638/), wait for connected status, and click the counter. The command prints a temporary MCP endpoint and agent authorization header. Configure your MCP client, discover the `histoire://live/` resource, and inspect the variant; `state.count` reflects the browser edit. Set `HISTOIRE_DEVFRAME_PORT` to change host port. Refresh after a source change retires the attachment; credentials change on server restart. Stop with Ctrl+C.
-
-Run the existing browser/MCP smoke test:
-
-```sh
-pnpm --filter histoire-example-vue3 run test:devframe
-```
-
-See [example README](https://github.com/histoire-dev/histoire/blob/main/examples/vue3/devframe/README.md) for its files and commands. The example is loopback-only and trusts its temporary credentials; its document policy is not a production identity service. Do not expose it to a network or reuse that policy in production.
+The local Devframe example shows how an MCP client can read a counter after you edit it in the browser. The example uses temporary credentials and a loopback server. Use your application's authentication and document ownership policy in production. See the [Devframe example README](https://github.com/histoire-dev/histoire/blob/main/examples/vue3/devframe/README.md).

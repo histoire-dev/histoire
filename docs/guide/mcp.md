@@ -145,20 +145,9 @@ For example, call `histoire_inspect_dom` with:
 
 Poll `histoire_get_operation` with the returned `operationId`, as for screenshots. All four accept screenshot viewport, globals, color scheme and direction settings. Inspection reports the fresh mount; it does not read unsaved control changes in an open book. Results remain bounded and report `truncated`; prop metadata depends on framework support. Diagnostics can complete with `previewReady: false` and captured mount failures. See [rendered inspection reference](../reference/mcp.md#rendered-inspection) for inputs, output fields and limits.
 
-## Validated framework combinations
+## Framework compatibility {#validated-framework-combinations}
 
-Local checks cover story and source discovery, variant URLs, screenshots, Node builds, and screenshots from copied artifacts with the original projects removed. React and SvelteKit 3 checks use Node.js 24. The earlier framework checks use Node.js 22.
-
-| Framework | Tested versions and setup |
-| --- | --- |
-| Vue 3 | Vue 3.5.26, Vite 7.3.1, `@vitejs/plugin-vue` 5.2.4 |
-| React | React 19.3.0, Vite 8.3.2, `@vitejs/plugin-react` 5.2.0 |
-| Svelte 4 | Svelte 4.2.19, Vite 5.4.21, `@sveltejs/vite-plugin-svelte` 3.1.2; existing example combination, outside Histoire's current Vite 7/8 peer range |
-| Svelte 5 | Svelte 5.55.0, Vite 8.0.3, `@sveltejs/vite-plugin-svelte` 7.0.0 |
-| SvelteKit | SvelteKit 3.0.0, Svelte 5.57.1, Vite 8.3.2, `@sveltejs/vite-plugin-svelte` 7.0.0; run `svelte-kit sync` before Histoire |
-| Nuxt 4 | Nuxt 4.2.2, Vue 3.5.26 |
-
-Browser tests have additional Vue fixture evidence for both `project-vitest` and `built-preview`: passing tests, skipped tests, failed assertions, explicit timeouts, no-test variants, and cancellation followed by another job. The framework screenshot checks do not establish browser-test parity for every framework. These are tested combinations, not guarantees for every plugin/version pairing.
+Use the [supported framework and Vite versions](./getting-started.md#supported-frameworks) for your project. Follow the framework’s getting-started guide before connecting an MCP client. Browser operations also need the [browser setup](#screenshots-and-tests) for the environment where Histoire runs.
 
 ## Hosting and scope
 

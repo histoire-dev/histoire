@@ -84,12 +84,12 @@ Saved app values win over story hints, then complete runtime domains, then proje
 
 Use **Base preset** to pick an existing variant as the starting point for each cell. Changing the preset preserves your explicit base prop edits. Reset clears those edits. Selecting a cell stays local to the matrix and leaves the base variant URL in place. **Save as variant** copies a snippet you can paste into your story. Svelte snippets use `<Hst.Variant>`.
 
-The hidden story frame counts toward the canvas frame budget. Histoire uses the remaining slots to render nearby cells and shows selectable placeholders for the others. Overrides stay within each cell's runtime. A runtime that cannot acknowledge `PROPS_OVERRIDE` shows a cell error.
+The hidden story frame counts toward the canvas frame budget. Histoire uses the remaining slots to render nearby cells and shows selectable placeholders for the others. Overrides apply only to the cell. If a cell cannot apply its overrides, it shows an error.
 
-Rows and columns restore from `arrange=matrix&rows=variant&cols=size`. Valid URL names win independently, followed by saved choices, explicit hint names, then the smallest domains in stable discovery order. Unknown names fall back to valid candidates. Per-story base props, filters, and explicit numeric values and custom axes persist under `_histoire-ui-matrix/<storyId>`. Passive source updates drop removed domain values from filters; an intentionally empty filter stays empty. Matrix remains available in static books through the same runtime discovery, defaults, and hints.
+Rows and columns restore from `arrange=matrix&rows=variant&cols=size`. Valid URL names win independently, followed by saved choices, explicit hints, then the axes with the fewest values. Unknown names fall back to valid candidates. Your browser saves base props, filters, numeric overrides, and custom axes per story. If the available values change, filters drop the removed values. An intentionally empty filter stays empty. Static books use the same defaults and hints.
 
 ## Runtime prop metadata
 
-Vue declarations whose type is exclusively Boolean supply `[false, true]`. A mixed Boolean/String declaration has no proven finite domain. Runtime prop definitions may explicitly expose complete `values` or `enum` arrays; Histoire preserves their finite scalar values in `_hPropDefs`. The first component declaring a prop owns that name, matching matrix override routing. A `String` constructor alone does not expose a TypeScript union, so use a story hint when runtime enum metadata is absent.
+Vue declarations whose type is exclusively Boolean supply `[false, true]`. A mixed Boolean/String declaration needs explicit values. Histoire uses complete `values` or `enum` arrays exposed by runtime prop definitions. If several components declare the same prop, the matrix uses the first declaration. For string unions without runtime enum metadata, supply the values in a story hint.
 
 See [Visual testing](./visual-testing.md) for tracked baselines, Matrix cases, image review, and CI comparisons.

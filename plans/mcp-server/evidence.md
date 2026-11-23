@@ -175,3 +175,18 @@ Append exact commands, observed behavior, and remaining boundaries as each slice
 - **Remaining root-held acceptance gate:** Nuxt 4 nested-base dev/static/copied Node capture after SDK slice 08 finishes per-app Nuxt setup. Shared framework fixture now configures `/book/`; prior Nuxt base skip removed, static metadata/real capture and deployed base assertions added. Coordinated Nuxt index preserves configured base, supplies actual app/config to setup, and stops Nuxt's duplicate private HTTP/HMR acquisition; app runtime remains slice 08 ownership. Prepared command: `flock -s /tmp/histoire-sdk-build.lock env PATH=/home/akryum/.vite-plus/bin:/usr/bin:/bin pnpm --filter histoire exec vitest run --config vitest.mcp.config.ts src/node/__tests__/mcp/integration/frameworks.spec.ts -t nuxt4`. Current entry does **not** claim that gate passed or slice 16 aggregate acceptance complete.
 - SDK slice 13 handoff: `createScreenshotTask(options)` yields one `ExecutionTask<ScreenshotOutput>`; lane owns launch and confirmed cleanup. `createPreviewSession`, `createPreviewHostRegistry`, `readPngDimensions`, `CAPTURE_LIMITS`, and shared globals schema are canonical first-party services. `PreviewHostTarget` carries optional DPR/globals plus exact target/epoch/owner predicate. SDK adapter chooses captured dev/immutable preview authority, maps `PreviewError`, and uses existing project FIFO. No second browser host/queue/serializer. Batch capture and attribute rects remain later work; no arbitrary CSS/scripts/selectors, release, commit, push, deployment, or CI claim.
 - Root subsequently cleared prepared Nuxt acceptance against stable SDK08 compiled source: `pnpm --filter histoire test:mcp:integration frameworks -t nuxt4`, one passed / three skipped, 33.17 seconds. Actual `/book/` dev, static-preview, and copied-Node captures/resources passed. Log `/tmp/histoire-sdk-root-mcp16-nuxt.log`. This resolves the preceding root-held Nuxt capture gate; final SDK conformance remains separate.
+
+## Framework validation matrix
+
+Local checks cover story and source discovery, variant URLs, screenshots, Node builds, and screenshots from copied artifacts with the original projects removed. React and SvelteKit 3 checks use Node.js 24. The earlier framework checks use Node.js 22.
+
+| Framework | Tested versions and setup |
+| --- | --- |
+| Vue 3 | Vue 3.5.26, Vite 7.3.1, `@vitejs/plugin-vue` 5.2.4 |
+| React | React 19.3.0, Vite 8.3.2, `@vitejs/plugin-react` 5.2.0 |
+| Svelte 4 | Svelte 4.2.19, Vite 5.4.21, `@sveltejs/vite-plugin-svelte` 3.1.2; existing example combination, outside Histoire's current Vite 7/8 peer range |
+| Svelte 5 | Svelte 5.55.0, Vite 8.0.3, `@sveltejs/vite-plugin-svelte` 7.0.0 |
+| SvelteKit | SvelteKit 3.0.0, Svelte 5.57.1, Vite 8.3.2, `@sveltejs/vite-plugin-svelte` 7.0.0; run `svelte-kit sync` before Histoire |
+| Nuxt 4 | Nuxt 4.2.2, Vue 3.5.26 |
+
+Browser tests have additional Vue fixture evidence for both `project-vitest` and `built-preview`: passing tests, skipped tests, failed assertions, explicit timeouts, no-test variants, and cancellation followed by another job. The framework screenshot checks do not establish browser-test parity for every framework. These are tested combinations, not guarantees for every plugin/version pairing.

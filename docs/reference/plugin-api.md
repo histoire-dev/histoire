@@ -36,9 +36,9 @@ Optional fields:
 
 All descriptive strings are bounded to 500 characters unless a smaller limit is stated. Optional JSON default/value strings may be empty. Unknown fields are dropped with diagnostics. Invalid required fields reject the whole manifest; invalid optional array members are independently dropped. A malformed migration is dropped atomically. No registry field can grant Official status.
 
-### Official history inputs
+### Bundled official releases {#official-history-inputs}
 
-Bundled official packages keep release snapshots in `marketplace-history.json`: `version`, `requires`, `frameworks`, optional `releaseNotes`, `migrations` and `publishedAt`. `pnpm marketplace:history` snapshots current versions without replacing existing same-version metadata. `pnpm marketplace:index` generates the bundled catalog and requires a current-version snapshot. Both read JSON without importing plugin code. History keeps the newest 50 unique npm-semver versions; server readers use each release's requirements/frameworks for offline compatibility and update/migration selection. These files are maintainer inputs, not fields accepted from registry manifests. See [official history workflow](../guide/plugins/development.md#official-release-history).
+Histoire's bundled official release history supplies version-specific requirements, frameworks, release notes, and migrations for offline use. To see which releases the Marketplace offers for your project, see [official release history](../guide/plugins/marketplace.md#official-release-history).
 
 ### Option fields
 

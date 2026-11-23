@@ -98,7 +98,7 @@ Commit `.histoire-visual/cases`, baseline metadata, and referenced images after 
 
 Baselines are separated by OS/architecture, such as `linux-x64`. macOS approval does not replace Linux CI baseline. Use same OS distribution, fonts, Playwright lockfile, and Chromium build when creating and comparing CI baselines. Chromium version differences appear as warnings. Browser upgrades can require reviewed baseline updates.
 
-Set `browser: { source: 'headless-shell' }` to use Playwright's pinned headless Chromium. This repository's adoption job uses Ubuntu 24.04, Playwright 1.59.1, and deterministic SVG fixtures. Recreate Linux baselines in that environment when upgrading the browser. In comparison-only CI, pass `--baseline-ref <ref>` to compare with committed images without refreshing working-tree baselines.
+Set `browser: { source: 'headless-shell' }` to use Playwright's pinned headless Chromium. When upgrading the browser, recreate baselines in the same environment your CI uses. In comparison-only CI, pass `--baseline-ref <ref>` to compare with committed images without refreshing working-tree baselines.
 
 Write conflicts fail without overwriting another writer's metadata. An abandoned lock under `.histoire/visual/locks` requires removing exact lock only after confirming writer process has exited.
 
