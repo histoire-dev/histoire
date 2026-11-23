@@ -46,6 +46,7 @@ jobs:
           pnpm --filter @histoire/sdk test
           pnpm --filter @histoire/vue test
       - name: Install browser
+        timeout-minutes: 10
         run: pnpm --filter histoire exec playwright install --with-deps ${{ matrix.browser }}
       - name: Complete Chromium embed suite
         if: matrix.browser == 'chromium'
