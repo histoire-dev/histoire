@@ -1,8 +1,30 @@
+import type { DOMWindow } from 'jsdom'
+import { Blob as NodeBlob } from 'node:buffer'
+import { randomUUID } from 'node:crypto'
 import { IDBCursor, IDBCursorWithValue, IDBDatabase, IDBFactory, IDBIndex, IDBKeyRange, IDBObjectStore, IDBOpenDBRequest, IDBRequest, IDBTransaction, IDBVersionChangeEvent } from 'fake-indexeddb'
 
 /** Node's own event classes, captured before jsdom replaces the globals. */
 const NativeEventTarget = globalThis.EventTarget
 const NativeEvent = globalThis.Event
+
+/**
+ * Supplies opaque URLs for libraries that prepare workers while being imported.
+ * Collection cannot load browser workers, so the URLs hold no blob data and
+ * revoking them needs no cleanup. Browser story runs use the real API.
+ * @param window The individual jsdom window owned by this collection pass.
+ */
+export function installCollectObjectUrls(window: DOMWindow) {
+  const { Blob, URL, location: { origin } } = window
+  if (typeof URL.createObjectURL === 'function') return
+
+  URL.createObjectURL = (blob) => {
+    if (!(blob instanceof Blob || blob instanceof NodeBlob)) {
+      throw new TypeError('URL.createObjectURL requires a Blob')
+    }
+    return `blob:${origin}/${randomUUID()}`
+  }
+  URL.revokeObjectURL ??= () => {}
+}
 
 /**
  * Creates a `WebSocket` class for story collection that never connects.

@@ -1,4 +1,5 @@
 // @vitest-environment node
+import { Blob as NodeBlob } from 'node:buffer'
 import { expect, it, vi } from 'vitest'
 import { createDomEnv } from '../dom/env.js'
 
@@ -11,6 +12,28 @@ it('exposes the default scroll margin on collection IntersectionObservers', () =
   finally {
     env.destroy()
   }
+})
+
+it('lets story modules allocate distinct worker blob URLs during collection', () => {
+  const nativeURL = globalThis.URL
+  const nativeCreateObjectURL = nativeURL.createObjectURL
+  const env = createDomEnv()
+  try {
+    const worker = new window.Blob(['self.onmessage = () => {}'], { type: 'text/javascript' })
+    const urls = [worker, worker, new NodeBlob(['other worker'])].map(blob => window.URL.createObjectURL(blob))
+    expect(new Set(urls).size).toBe(3)
+    for (const href of urls) {
+      const url = new URL(href)
+      expect(url.protocol).toBe('blob:')
+      expect(url.origin).toBe(window.location.origin)
+      window.URL.revokeObjectURL(href)
+    }
+  }
+  finally {
+    env.destroy()
+  }
+  expect(globalThis.URL).toBe(nativeURL)
+  expect(globalThis.URL.createObjectURL).toBe(nativeCreateObjectURL)
 })
 
 it('releases window timers and document before restoring globals, once', async () => {
