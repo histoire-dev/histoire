@@ -17,7 +17,7 @@ import { createAppHooks, getAppHooks } from './app-hooks.js'
 import { registerGlobalComponents } from './global-components.js'
 import { PreviewHostRoot } from './host-root.js'
 import { mountStoryPass, type StoryMountPass } from './mount-pass.js'
-import { RouterLinkStub } from './RouterLinkStub'
+import { installRouterLinkFallback } from './RouterLinkStub.js'
 import { runSetupHooks } from './setup-hooks.js'
 
 // Reads story app's Vue instance, never Histoire's separate vendor Vue instance.
@@ -126,7 +126,7 @@ export function createPreviewHost(options: PreviewHostOptions) {
     const hooks = createAppHooks(ownerApp)
 
     registerGlobalComponents(app)
-    app.component('RouterLink', RouterLinkStub)
+    installRouterLinkFallback(app)
 
     const setupApi: Vue3StorySetupApi = {
       app,
