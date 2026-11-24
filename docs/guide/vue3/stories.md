@@ -89,6 +89,21 @@ Stories always render inside an iframe. Remove the `iframe` option when migratin
 
 Use `type: "grid"` to compare variants side by side.
 
+Set `width` and `height` to give every variant the same size in Grid and List, whatever viewport is picked in the toolbar. An omitted dimension follows the viewport, or the variant content when the canvas fits content. Set `padding` to leave space around each variant; aligners mark its corners.
+
+```vue{4}
+<template>
+  <Story
+    title="Button"
+    :layout="{ type: 'grid', width: 200, height: 80, padding: 24 }"
+  >
+    <Variant title="default">
+      <button>Click me</button>
+    </Variant>
+  </Story>
+</template>
+```
+
 ```vue{4}
 <template>
   <Story

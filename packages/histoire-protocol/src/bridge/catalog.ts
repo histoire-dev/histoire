@@ -76,6 +76,10 @@ export function validateHistoireCatalogStory(value: unknown): HistoireCatalogSto
   if (input.layout !== undefined) {
     const layout = wireRecord(input.layout)
     if (!['single', 'grid'].includes(layout.type as string)) invalid('Invalid story layout')
+    for (const key of ['width', 'height', 'padding']) {
+      const item = layout[key]
+      if (item !== undefined && !(typeof item === 'number' && Number.isFinite(item) && (key === 'padding' ? item >= 0 : item > 0))) invalid('Invalid story frame size')
+    }
   }
   if (input.matrix !== undefined) {
     const axes = wireRecord(wireRecord(input.matrix).axes)

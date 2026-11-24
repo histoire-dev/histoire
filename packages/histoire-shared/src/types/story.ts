@@ -1,4 +1,4 @@
-import type { HistoireMatrixDeclaration, HistoireMatrixValue, HistoireStoryFileOrigin } from '@histoire/protocol'
+import type { HistoireMatrixDeclaration, HistoireMatrixValue, HistoireStoryFileOrigin, HistoireStoryFrame } from '@histoire/protocol'
 
 export interface StoryFile {
   id: string
@@ -14,11 +14,11 @@ export interface StoryFile {
   source: () => Promise<{ default: string }>
 }
 
-export type StoryLayout = {
+export type StoryLayout = ({
   type: 'single'
 } | {
   type: 'grid'
-}
+}) & HistoireStoryFrame
 
 export interface CommonProps {
   id?: string

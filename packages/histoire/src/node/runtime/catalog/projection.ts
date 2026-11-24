@@ -1,10 +1,22 @@
 import type { HistoireCatalog, HistoireCatalogStory, HistoireCatalogTreeNode, HistoireDiagnostic } from '@histoire/protocol'
-import type { HistoireConfig, ServerStoryFile, ServerTree } from '@histoire/shared'
+import type { HistoireConfig, ServerStoryFile, ServerTree, StoryLayout } from '@histoire/shared'
 import type { CatalogDiagnostic, CatalogStory } from './types.js'
 import { normalizeHistoireMatrixHint } from '@histoire/protocol'
 import { makeTree } from '../../tree.js'
 import { boundedWarnings } from './diagnostics.js'
 import { createCatalogMetaBudget, projectMeta } from './meta.js'
+
+const FRAME_KEYS = ['width', 'height', 'padding'] as const
+
+/** Keeps the layout type and drops frame geometry the catalog bridge would reject. */
+function projectLayout(layout: StoryLayout | undefined): Pick<HistoireCatalogStory, 'layout'> {
+  if (layout?.type !== 'single' && layout?.type !== 'grid') return {}
+  const frame = FRAME_KEYS.flatMap((key) => {
+    const value = layout[key]
+    return typeof value === 'number' && Number.isFinite(value) && (key === 'padding' ? value >= 0 : value > 0) ? [[key, value] as const] : []
+  })
+  return { layout: Object.freeze({ type: layout.type, ...Object.fromEntries(frame) }) }
+}
 
 /**
  * Projects allowlisted metadata into portable immutable browser catalog.
@@ -37,7 +49,7 @@ export function projectCatalog(stories: readonly CatalogStory[], diagnostics: re
       ...(story.group == null ? {} : { group: story.group }),
       ...(typeof extra?.icon === 'string' ? { icon: extra.icon } : {}),
       ...(typeof extra?.iconColor === 'string' ? { iconColor: extra.iconColor } : {}),
-      ...(layout?.type === 'single' || layout?.type === 'grid' ? { layout: Object.freeze({ type: layout.type }) } : {}),
+      ...projectLayout(layout),
       ...projectMeta(extra, { storyId: story.id }, metaBudget, warnings),
       variants: Object.freeze(story.variants.map((variant) => {
         const collected = extra?.variants.find(value => value.id === variant.id)

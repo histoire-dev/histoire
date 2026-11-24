@@ -50,6 +50,18 @@ describe('completed runtime catalog publication', () => {
     expect(first.layoutExplicit).toBe(true)
   })
 
+  it('projects story frame geometry and drops invalid values', async () => {
+    const file = createMcpStory(fixture.root)
+    file.story.layout = { type: 'grid', width: 200, height: Number.NaN, padding: -1 }
+    const ctx = createMcpContext(fixture.root, [file])
+    const catalog = createRuntimeCatalog({ ...MCP_PROJECT_OPTIONS, root: fixture.root })
+    await catalog.publish(ctx)
+    expect(catalog.current.catalog.stories[0].layout).toEqual({ type: 'grid', width: 200 })
+    file.story.layout = { type: 'grid', width: 200, height: 96, padding: 0 }
+    await catalog.publish(ctx)
+    expect(catalog.current.catalog.stories[0].layout).toEqual({ type: 'grid', width: 200, height: 96, padding: 0 })
+  })
+
   it('distinguishes successful empty, partial and failed batches and rejects ambiguous exact IDs', async () => {
     const files = [createMcpStory(fixture.root, 'a', 'a.js'), createMcpStory(fixture.root, 'b', 'b.js')]
     const ctx = createMcpContext(fixture.root, files)

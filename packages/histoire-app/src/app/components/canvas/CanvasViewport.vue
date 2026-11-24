@@ -99,7 +99,14 @@ const viewBinding = bindStoryCanvasView({
   canvas,
   views: useStoryCanvasViews(),
 })
-const { size, frameContentSize } = useCanvasVariantSize(canvas)
+const { size, frameContentSize } = useCanvasVariantSize(canvas, () => story.value?.layout)
+/** Story-declared gutter around each grid and list frame. */
+const framePadding = computed(() => story.value?.layout?.padding ?? 0)
+/** Frame chrome includes the gutter on both sides of the variant. */
+function paddedFrameSize(variantId: string) {
+  const content = frameContentSize(variantId)
+  return { width: content.width + framePadding.value * 2, height: content.height + framePadding.value * 2 }
+}
 const { area: singleArea, size: singleSize, measure: measureSingle } = useSingleVariantGeometry(canvas, { settings: () => snapshot.value.settings, inspectorWidth: () => props.inspectorWidth, hidden: () => props.uiHidden, contentSize: () => canvas.autoFitContent ? frameContentSize(selectedVariantId.value) : undefined })
 /** Reuse arrangement geometry for rendering and target-zoom selection fitting; custom views lay out their own leases. */
 function layoutFrames(zoom = canvas.effectiveZoom) {
@@ -108,7 +115,7 @@ function layoutFrames(zoom = canvas.effectiveZoom) {
     const variantId = selectedVariantId.value ?? (diagnostics.value.length ? cachedVariantId.value : null)
     return selectedSingleFrame(story.value, variantId, singleSize.value)
   }
-  return story.value ? layoutCanvasFrames(story.value.id, story.value.variants.map(variant => variant.id), canvas.autoFitContent ? frameContentSize : size.value, renderedArrange.value === 'list' ? 'list' : 'grid', 3, zoom) : []
+  return story.value ? layoutCanvasFrames(story.value.id, story.value.variants.map(variant => variant.id), paddedFrameSize, renderedArrange.value === 'list' ? 'list' : 'grid', 3, zoom) : []
 }
 /** Resolve selection-fit geometry by stable target after visible-frame filtering. */
 function fitBoundsForFrame(frame: CanvasFrameLayout, zoom: number): CanvasFrameLayout {
@@ -265,7 +272,7 @@ defineExpose({ canvas, registry, getFrameLayout: (id: string) => frames.value.fi
     <slot v-else-if="renderedArrange === 'matrix'" name="matrix" :canvas="canvas" :frames="registry" :size="size" :content-insets="contentInsets" :preview-base="previewBase" :discovery-failed="matrixDiscoveryFailed" />
     <component :is="renderedArrange === 'list' ? FrameList : FrameGrid" v-else :frames="renderedFrames">
       <template #default="{ frame }">
-        <CanvasFrame :frame="frame" :fit-bounds="zoom => fitBoundsForFrame(frame, zoom)" :variant="variantsById.get(frame.variantId)!" :selected="frame.id === selectedFrame?.id" :live="live.has(frame.id)" :preview-base="previewBase" :stale="diagnostics.length > 0" v-bind="{ ...frameContentSize(frame.variantId), ...getSearchFrameState(frame.id, !!searchActive, highlightedTargets) }" @select="selectVariant" @contextmenu="(event, target) => emit('contextmenu', event, target)" />
+        <CanvasFrame :frame="frame" :fit-bounds="zoom => fitBoundsForFrame(frame, zoom)" :variant="variantsById.get(frame.variantId)!" :selected="frame.id === selectedFrame?.id" :live="live.has(frame.id)" :preview-base="previewBase" :padding="framePadding" :fixed-size="!!(story?.layout?.width || story?.layout?.height)" :stale="diagnostics.length > 0" v-bind="{ ...frameContentSize(frame.variantId), ...getSearchFrameState(frame.id, !!searchActive, highlightedTargets) }" @select="selectVariant" @contextmenu="(event, target) => emit('contextmenu', event, target)" />
       </template>
     </component>
     <CanvasMatrixPrimary :active="renderedArrange === 'matrix'" :preview-base="previewBase" :width="size.width" :height="size.height" @status="matrixDiscoveryFailed = $event === 'error'" @error="emit('error', $event)" />
