@@ -21,8 +21,20 @@ export function createDevProxyPlugin(transport: DevProxyTransport, collecting: b
       server.host = '127.0.0.1'
       server.port = 0
       // Public proxy binds before project config loads, so it can only serve plain HTTP.
-      if (server.https) config.logger.warn('server.https is not supported by `histoire dev`: stories are served over HTTP')
-      server.https = undefined
+      // Pinned, because plugins such as basic-ssl assign it after an await in their own configResolved.
+      let warned = false
+      function refuseHttps(value: unknown) {
+        if (!value || warned) return
+        warned = true
+        config.logger.warn('server.https is not supported by `histoire dev`: stories are served over HTTP')
+      }
+      refuseHttps(server.https)
+      Object.defineProperty(server, 'https', {
+        configurable: true,
+        enumerable: true,
+        get: () => undefined,
+        set: refuseHttps,
+      })
       server.strictPort = true
       server.origin = transport.origin
       config.__histoireProxyOpen = server.open
