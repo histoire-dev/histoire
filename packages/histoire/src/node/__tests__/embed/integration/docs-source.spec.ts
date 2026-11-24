@@ -84,10 +84,11 @@ describe('deployed documentation and source panels', () => {
       await page.evaluate('session.selection.select({storyId:"docs-main",variantId:"generated"})')
       expect(await page.evaluate('session.source.get({storyId:"docs-main",mode:"dynamic"})')).toMatchObject({ origin: 'generated', body: expect.stringContaining('first') })
       const frame = page.frames().find(frame => frame.url().includes('surface=source'))!
+      const renderedSource = frame.getByLabel('Histoire source').locator('pre')
       await frame.getByRole('button', { name: 'Dynamic', exact: true }).click()
-      await expect.poll(() => frame.getByLabel('Histoire source').textContent()).toContain('first')
+      await renderedSource.filter({ hasText: /<button>\s*first\s*<\/button>/ }).waitFor()
       await page.evaluate('session.state.patch({label:"updated"})')
-      await expect.poll(() => frame.getByLabel('Histoire source').textContent()).toContain('updated')
+      await renderedSource.filter({ hasText: /<button>\s*updated\s*<\/button>/ }).waitFor()
       await page.evaluate('session.selection.select({storyId:"docs-main",variantId:"broken"})')
       expect(await page.evaluate('(async()=>{try{await session.source.get({storyId:"docs-main",mode:"dynamic"})}catch(error){return{code:error.code,message:error.message}}})()')).toEqual({ code: 'INTERNAL_ERROR', message: 'source slot broke' })
       await expect.poll(() => frame.getByRole('alert').textContent()).toContain('source slot broke')
