@@ -1,5 +1,5 @@
 import type { Buffer } from 'node:buffer'
-import type { ChildMessage, ParentMessage, RuntimeCommand, RuntimeEvent, RuntimeOutput, RuntimeReply, RuntimeSendResult, WatchInput } from '../protocol.js'
+import type { ChildMessage, ConfiguredAddress, ParentMessage, RuntimeCommand, RuntimeEvent, RuntimeOutput, RuntimeReply, RuntimeSendResult, WatchInput } from '../protocol.js'
 import { fork, spawn } from 'node:child_process'
 import { isChildMessage } from '../protocol.js'
 
@@ -19,6 +19,8 @@ export function startRuntimeChild(options: {
   token?: string
   /** Evaluation snapshots must reconcile before readiness publication. */
   onWatch: (inputs: WatchInput[], complete: boolean) => Promise<void>
+  /** Applies the configured public address and returns the origin the runtime must use. */
+  onAddress?: (address: ConfiguredAddress) => Promise<string>
   /** Commit current dependency set before public readiness, if runtime reported one. */
   onReady?: () => Promise<void>
   /** Reports unexpected exits after readiness. */
@@ -108,6 +110,11 @@ export function startRuntimeChild(options: {
     messages = messages.then(async () => {
       if (closing) return
       if (raw.type === 'watch') await options.onWatch(raw.inputs, raw.complete === true)
+      if (raw.type === 'address') {
+        const publicOrigin = await options.onAddress?.({ port: raw.port, host: raw.host }) ?? options.publicOrigin
+        if (closing || !child.connected) return
+        child.send({ type: 'address', generation: options.generation, publicOrigin } satisfies ParentMessage, error => error && reject(error))
+      }
       if (raw.type === 'failed') reject(new Error(raw.error))
       if (raw.type === 'ready') {
         await options.onReady?.()

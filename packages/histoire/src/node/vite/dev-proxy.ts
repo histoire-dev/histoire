@@ -6,6 +6,8 @@ export interface DevProxyTransport {
   origin: string
   /** Parent-selected identity used for document handoff. */
   generation: string
+  /** Reports the configured public address; resolves with the origin the parent settled on. */
+  negotiate?: (address: { port?: number, host?: string | boolean }) => Promise<string>
 }
 
 /** Pin private listener while browser connections retain public origin and configured paths. */

@@ -373,10 +373,10 @@ interface PluginChannelMessage {
 
 ### Development proxy and config restarts
 
-`histoire dev` binds a lightweight public HTTP proxy before loading project configuration. Public address comes from `--port` and `--host`, defaulting to `localhost:6006`; `--port 0` selects an available port. Config-only Vite port, host, and HTTPS options do not change this public address. Vite runs privately on an ephemeral loopback HTTP port. HMR, story requests, and configured Vite proxy routes travel through public proxy.
+`histoire dev` binds a lightweight public HTTP proxy before loading project configuration. It first listens on `--port` and `--host`, defaulting to `localhost:6006`; `--port 0` selects an available port. Once project configuration is loaded, `server.port` from the `vite` option of `histoire.config` and `server.host` move the listener, unless the matching flag was given. `server.https` is not supported: the proxy serves plain HTTP. Vite runs privately on an ephemeral loopback HTTP port. HMR, story requests, and configured Vite proxy routes travel through public proxy.
 
 While configuration, story collection, or runtime setup runs, document requests receive a loading screen. Asset/API requests receive HTTP 503 until ready. The screen follows OS light/dark and reduced-motion settings; unsupported or software WebGL rendering uses a static Histoire mark.
 
-Proxy owns config watches and restarts. Each relevant edit withdraws old runtime, cancels its operations, runs plugin cleanup, closes Vite/MCP resources, and waits for child process exit before launching a replacement. Public port stays bound. Cleanup has ten seconds; a stuck owned process tree is terminated before replacement. Config errors remain visible until a watched edit fixes them. CLI shutdown drains child and proxy together.
+Proxy owns config watches and restarts. Each relevant edit withdraws old runtime, cancels its operations, runs plugin cleanup, closes Vite/MCP resources, and waits for child process exit before launching a replacement. Public port stays bound unless the edit changes the configured address. Cleanup has ten seconds; a stuck owned process tree is terminated before replacement. Config errors remain visible until a watched edit fixes them. CLI shutdown drains child and proxy together.
 
 SDK managed/middleware hosting and stdio MCP retain existing automatic config restarts and caller-owned listener behavior; their lifecycle adapters share restart coordination with proxy package.

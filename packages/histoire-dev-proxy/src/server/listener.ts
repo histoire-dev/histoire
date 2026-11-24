@@ -1,8 +1,13 @@
 import type { Server } from 'node:http'
 
+/** Check the effective port before opening or moving a listener. */
+export function assertValidPort(port: unknown): asserts port is number {
+  if (typeof port !== 'number' || !Number.isInteger(port) || port < 0 || port > 65535) throw new Error('Port must be an integer from 0 to 65535')
+}
+
 /** Binds public address before any project modules load, retaining occupied-port fallback. */
 export async function listen(server: Server, port: number, host: string | boolean = 'localhost'): Promise<string> {
-  if (!Number.isInteger(port) || port < 0 || port > 65535) throw new Error('Port must be an integer from 0 to 65535')
+  assertValidPort(port)
   for (;;) {
     try {
       await new Promise<void>((resolve, reject) => {

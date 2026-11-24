@@ -73,6 +73,8 @@ export async function createViteServers(ctx: Context, options: CreateServerOptio
       }
     }
 
+    // Collection server is created first: settle the public origin before either server pins it.
+    if (options.devProxy?.negotiate && collecting) options.devProxy.origin = await options.devProxy.negotiate({ port: viteConfig.server?.port, host: viteConfig.server?.host })
     if (options.devProxy) viteConfig.plugins.push(createDevProxyPlugin(options.devProxy, collecting))
     let server: Awaited<ReturnType<typeof createViteServer>>
     try {

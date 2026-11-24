@@ -7,6 +7,8 @@ let server
 let settings
 let descendant
 let fresh = false
+let origin
+let located
 /** Responses the `/hold` route keeps open until `/release`. */
 const pending = []
 /** Test peer obeys actual process protocol and serves its PID as observable identity. */
@@ -18,6 +20,12 @@ async function start(message) {
     process.stdout.write('fixture-out ')
     process.stdout.write('line\n')
     process.stderr.write('fixture-err\n')
+  }
+  if (config.address) {
+    origin = await new Promise((resolve) => {
+      located = resolve
+      process.send({ type: 'address', generation: message.generation, ...config.address })
+    })
   }
   if (config.gate) await fetch(config.gate)
   if (config.descendant) {
@@ -50,7 +58,7 @@ async function start(message) {
       return
     }
     response.setHeader('content-type', 'application/json')
-    response.end(JSON.stringify({ value: config.value, pid: process.pid, descendant, fresh }))
+    response.end(JSON.stringify({ value: config.value, pid: process.pid, descendant, fresh, origin }))
   })
   await new Promise(resolve => server.listen(0, '127.0.0.1', resolve))
   process.send({ type: 'ready', generation: message.generation, target: `http://127.0.0.1:${server.address().port}`, base: '/' })
@@ -66,6 +74,7 @@ process.on('message', (message) => {
     else process.send({ type: 'runtime-reply', ...base, ok: true, result: { pid: process.pid, args: message.args } })
     return
   }
+  if (message.type === 'address') located?.(message.publicOrigin)
   if (message.type === 'start') void start(message).catch(error => process.send({ type: 'failed', generation: message.generation, error: error.message }))
   if (message.type === 'shutdown') {
     if (settings?.hang) return
