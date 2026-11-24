@@ -114,8 +114,10 @@ export type ParentMessage = { type: 'start', generation: string, publicOrigin: s
 
 /** Public address asked by project configuration; command-line values win. */
 export interface ConfiguredAddress {
-  port?: number
-  host?: string | boolean
+  /** Unvalidated project port, checked only if the CLI did not override it. */
+  port?: unknown
+  /** Unvalidated project host, checked only if the CLI did not override it. */
+  host?: unknown
 }
 
 /** Runtime reports observations; only parent decides public availability/restarts. */
@@ -188,10 +190,7 @@ export function isChildMessage(value: unknown): value is ChildMessage {
     return isBoundedFrame(value)
   }
   if (message.type === 'runtime-event') return isIdentifier(message.event) && isBoundedFrame(value)
-  if (message.type === 'address') {
-    const { port, host } = message
-    return (port === undefined || (Number.isInteger(port) && (port as number) >= 0 && (port as number) <= 65535)) && (host === undefined || typeof host === 'boolean' || (typeof host === 'string' && host.length > 0 && host.length <= 255))
-  }
+  if (message.type === 'address') return isBoundedFrame(value)
   if (message.type === 'failed') return typeof message.error === 'string' && message.error.length <= 4096
   if (message.type === 'restart') return typeof message.source === 'string' && message.source.length > 0 && message.source.length <= RESTART_SOURCE_MAX_LENGTH && (message.fresh === undefined || typeof message.fresh === 'boolean')
   if (message.type === 'ready') return typeof message.target === 'string' && /^http:\/\/127\.0\.0\.1:\d+$/.test(message.target) && isSafeBase(message.base)

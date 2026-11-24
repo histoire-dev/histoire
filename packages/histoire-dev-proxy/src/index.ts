@@ -7,7 +7,7 @@ import { inspect } from 'node:util'
 import { createRestartCoordinator } from './lifecycle/index.js'
 import { startRuntimeChild } from './process/child.js'
 import { createProxyHttp } from './server/http.js'
-import { listen } from './server/listener.js'
+import { assertValidPort, listen } from './server/listener.js'
 
 /** Public port used when neither the command line nor project config names one. */
 const DEFAULT_PORT = 6006
@@ -73,7 +73,13 @@ export async function startDevProxy(options: DevProxyOptions) {
   }
   /** Moves the public listener to the address project config asks for. */
   async function relocate(configured: ConfiguredAddress) {
-    const next = { port: options.port ?? configured.port ?? DEFAULT_PORT, host: options.host ?? configured.host }
+    const port = options.port ?? (configured.port === undefined ? DEFAULT_PORT : configured.port)
+    const host = options.host ?? configured.host
+    assertValidPort(port)
+    if (host !== undefined && typeof host !== 'boolean' && (typeof host !== 'string' || !host.length || host.length > 255)) {
+      throw new Error('Host must be a boolean or a non-empty hostname of at most 255 characters')
+    }
+    const next = { port, host }
     if (next.port !== bound.port || next.host !== bound.host) {
       await http.unlisten()
       try {

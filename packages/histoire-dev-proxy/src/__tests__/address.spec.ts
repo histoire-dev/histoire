@@ -54,6 +54,39 @@ it('keeps the address given on the command line', async () => {
   }
 })
 
+it('allows command-line values to override invalid configured address values', async () => {
+  const root = await project({ port: 65536, host: '' })
+  const proxy = await startDevProxy({ root, port: 0, host: '127.0.0.1', runtime: new URL('./fixtures/runtime.mjs', import.meta.url) })
+  try {
+    const initialUrl = proxy.url
+    await expect.poll(() => proxy.status).toBe('ready')
+    expect(proxy.url).toBe(initialUrl)
+    expect((await (await fetch(initialUrl)).json()).origin).toBe(new URL(initialUrl).origin)
+  }
+  finally {
+    await proxy.close()
+    await rm(root, { recursive: true, force: true })
+  }
+})
+
+it('reports invalid effective settings and starts after the configuration is corrected', async () => {
+  const root = await project({ port: 65536 })
+  const proxy = await startDevProxy({ root, host: '127.0.0.1', runtime: new URL('./fixtures/runtime.mjs', import.meta.url) })
+  try {
+    const initialUrl = proxy.url
+    await expect.poll(() => proxy.status).toBe('failed')
+    await expect(proxy.ready).rejects.toThrow('Port must be an integer from 0 to 65535')
+    expect(proxy.url).toBe(initialUrl)
+    await writeFile(join(root, 'histoire.config.ts'), JSON.stringify({ address: { port: 0 } }))
+    await expect.poll(() => proxy.status).toBe('ready')
+    expect((await (await fetch(proxy.url)).json()).origin).toBe(new URL(proxy.url).origin)
+  }
+  finally {
+    await proxy.close()
+    await rm(root, { recursive: true, force: true })
+  }
+})
+
 it('follows a configuration edit that changes the address', async () => {
   const first = await freePort()
   const root = await project({ port: first })

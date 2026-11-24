@@ -1,5 +1,5 @@
 import { expect, it } from 'vitest'
-import { isChildMessage } from '../protocol.js'
+import { isChildMessage, RUNTIME_FRAME_MAX_BYTES } from '../protocol.js'
 
 /** A `ready` frame with the given workbench base. */
 const ready = (base: unknown) => ({ type: 'ready', generation: 'g', target: 'http://127.0.0.1:1234', base })
@@ -21,11 +21,10 @@ it('accepts bounded runtime restart requests only', () => {
   expect(isChildMessage({ type: 'restart', generation: 'g', source: 'ok', fresh: 'yes' })).toBe(false)
 })
 
-it('accepts bounded configured addresses only', () => {
+it('accepts bounded address frames for validation after CLI overrides', () => {
   expect(isChildMessage({ type: 'address', generation: 'g' })).toBe(true)
   expect(isChildMessage({ type: 'address', generation: 'g', port: 2000, host: true })).toBe(true)
   expect(isChildMessage({ type: 'address', generation: 'g', host: '0.0.0.0' })).toBe(true)
-  expect(isChildMessage({ type: 'address', generation: 'g', port: 70000 })).toBe(false)
-  expect(isChildMessage({ type: 'address', generation: 'g', port: '2000' })).toBe(false)
-  expect(isChildMessage({ type: 'address', generation: 'g', host: '' })).toBe(false)
+  expect(isChildMessage({ type: 'address', generation: 'g', port: 70000 })).toBe(true)
+  expect(isChildMessage({ type: 'address', generation: 'g', host: 'x'.repeat(RUNTIME_FRAME_MAX_BYTES) })).toBe(false)
 })

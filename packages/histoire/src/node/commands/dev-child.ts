@@ -1,7 +1,7 @@
 import type { ParentMessage } from '@histoire/dev-proxy/protocol'
 import type { createDevSession } from '../runtime/dev-session.js'
 import type { TerminalAdapter } from '../runtime/terminal/adapter.js'
-import { RESTART_SOURCE_MAX_LENGTH } from '@histoire/dev-proxy/protocol'
+import { isBoundedFrame, RESTART_SOURCE_MAX_LENGTH } from '@histoire/dev-proxy/protocol'
 import { installConsoleObserver } from '../runtime/terminal/console-hook.js'
 
 // Credentials arrive over private IPC, never through project-visible environment.
@@ -16,7 +16,7 @@ let startup: Promise<void> | undefined
 let closing: Promise<void> | undefined
 let stopped = false
 /** Settles the pending public address negotiation of the current generation. */
-let located: ((origin: string) => void) | undefined
+let pendingAddress: { generation: string, resolve: (origin: string) => void, reject: (error: Error) => void } | undefined
 
 /** Send observations only while owning parent remains connected. */
 function send(message: object) {
@@ -28,6 +28,8 @@ function send(message: object) {
 /** Drain runtime before releasing IPC; parent bounds full winddown. */
 function close() {
   stopped = true
+  pendingAddress?.reject(new Error('Histoire runtime closed'))
+  pendingAddress = undefined
   return closing ??= (async () => {
     try {
       await session?.close()
@@ -78,9 +80,11 @@ async function start(message: Extract<ParentMessage, { type: 'start' }>) {
     devProxy: {
       origin: message.publicOrigin,
       generation: message.generation,
-      negotiate: address => new Promise<string>((resolve) => {
-        located = resolve
-        if (!send({ type: 'address', generation: message.generation, ...address })) resolve(message.publicOrigin)
+      negotiate: address => new Promise<string>((resolve, reject) => {
+        const frame = { type: 'address', generation: message.generation, ...address }
+        if (!isBoundedFrame(frame)) throw new Error('Configured server address exceeds the IPC limit')
+        if (!send(frame)) throw new Error('Histoire runtime closed')
+        pendingAddress = { generation: message.generation, resolve, reject }
       }),
     },
     onConfigurationInputs(files) {
@@ -110,7 +114,10 @@ process.on('message', (raw: ParentMessage) => {
     return
   }
   if (raw?.type === 'address') {
-    located?.(raw.publicOrigin)
+    if (pendingAddress?.generation === raw.generation) {
+      pendingAddress.resolve(raw.publicOrigin)
+      pendingAddress = undefined
+    }
     return
   }
   if (raw?.type === 'shutdown') {
@@ -119,6 +126,7 @@ process.on('message', (raw: ParentMessage) => {
   }
   if (raw?.type !== 'start' || startup || stopped) return
   startup = start(raw).catch((error) => {
+    if (stopped) return
     console.error(error)
     send({ type: 'failed', generation: raw.generation, error: String(error instanceof Error ? error.message : error).slice(0, 4096) })
   })
