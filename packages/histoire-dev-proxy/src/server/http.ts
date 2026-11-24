@@ -8,15 +8,15 @@ import { designPlaygroundPath, renderDesignPlayground } from '../client/playgrou
 import { createStatusChannel } from './events.js'
 import { observeRequest } from './observe.js'
 
-/** Proxy-owned responses expose startup errors; reject DNS-rebinding hosts like Vite's default allowedHosts. */
-function isTrustedHost(host: string | undefined) {
+/** Trust the published hostname and Vite's default local hosts for proxy-owned responses. */
+function isTrustedHost(host: string | undefined, publicHostname: string | undefined) {
   if (!host) return false
-  const hostname = host.startsWith('[') ? host.slice(1, host.indexOf(']')) : host.replace(/:\d+$/, '')
-  return hostname === 'localhost' || hostname.endsWith('.localhost') || isIP(hostname) !== 0
+  const hostname = (host.startsWith('[') ? host.slice(1, host.indexOf(']')) : host.replace(/:\d+$/, '')).toLowerCase()
+  return hostname === publicHostname || hostname === 'localhost' || hostname.endsWith('.localhost') || isIP(hostname) !== 0
 }
 
 /** Stable HTTP listener delegates only after coherent generation readiness. */
-export function createProxyHttp(read: () => PublicState, restart: () => Promise<void>, observer?: ProxyRequestObserver) {
+export function createProxyHttp(read: () => PublicState, restart: () => Promise<void>, observer?: ProxyRequestObserver, readPublicHostname?: () => string | undefined) {
   /** Exchange counter; only used when an observer exists. */
   let exchanges = 0
   let target: string | undefined
@@ -31,7 +31,7 @@ export function createProxyHttp(read: () => PublicState, restart: () => Promise<
     const observation: RequestObservation | undefined = observer && !pathname.startsWith('/__histoire/dev/') ? observeRequest(request, response, ++exchanges, observer) : undefined
     try {
       // Proxied runtime requests keep Vite's own host policy; everything answered here is checked.
-      if (!(target && proxy && !pathname.startsWith('/__histoire/dev/')) && !isTrustedHost(request.headers.host)) {
+      if (!(target && proxy && !pathname.startsWith('/__histoire/dev/')) && !isTrustedHost(request.headers.host, readPublicHostname?.())) {
         response.writeHead(403, { 'content-type': 'text/plain; charset=utf-8', 'cache-control': 'no-store' })
         response.end('Blocked host')
         return

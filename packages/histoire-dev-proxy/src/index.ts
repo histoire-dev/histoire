@@ -61,9 +61,14 @@ export interface DevProxyOptions {
 export async function startDevProxy(options: DevProxyOptions) {
   const root = resolve(options.root ?? process.cwd())
   let state: PublicState = { status: 'starting', generation: randomUUID(), base: '/' }
-  const http = createProxyHttp(() => state, () => restart({ cause: 'browser' }), options.onRequest)
   let url: string
   let bound = { port: options.port ?? DEFAULT_PORT, host: options.host }
+  const http = createProxyHttp(
+    () => state,
+    () => restart({ cause: 'browser' }),
+    options.onRequest,
+    () => url ? new URL(url).hostname : undefined,
+  )
   try {
     url = `${await listen(http.server, bound.port, bound.host)}/`
   }
