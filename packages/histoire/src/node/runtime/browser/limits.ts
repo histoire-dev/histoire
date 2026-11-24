@@ -2,8 +2,8 @@
 export const CAPTURE_LIMITS = Object.freeze({
   /** Whole capture budget, including acquisition and ready document settling. */
   previewTimeoutMs: 30_000,
-  /** One candidate's launch and neutral probe share this bounded budget. */
-  browserCandidateTimeoutMs: 3_000,
+  /** Allow cold Chromium startup and the neutral probe on contended hosts. */
+  browserCandidateTimeoutMs: 8_000,
   /** Explicit setup checks share this total acquisition deadline. */
   setupCheckTimeoutMs: 15_000,
   /** PNG byte limit remains independent of device pixel dimensions. */
