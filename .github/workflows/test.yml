@@ -20,14 +20,22 @@ jobs:
         include:
           - name: Build and test
             suite: core
-          - name: Terminal integration
+          - name: Lint and package install
+            suite: checks
+          - name: Terminal integration (1/2)
             suite: terminal
+            shard: 1/2
+          - name: Terminal integration (2/2)
+            suite: terminal
+            shard: 2/2
           - name: MCP integration (1/2)
             suite: mcp
             shard: 1/2
           - name: MCP integration (2/2)
             suite: mcp
             shard: 2/2
+          - name: MCP execution and frameworks
+            suite: mcp
     steps:
       - uses: actions/checkout@master
 
@@ -55,7 +63,7 @@ jobs:
         run: pnpm install
 
       - name: Lint
-        if: matrix.suite == 'core'
+        if: matrix.suite == 'checks'
         run: pnpm run lint
 
       - name: Build
@@ -75,16 +83,31 @@ jobs:
         env:
           BROWSER: none
           SHARD: ${{ matrix.shard }}
-        run: pnpm --filter histoire test:mcp:integration --shard="$SHARD"
+        run: |
+          # Vitest shards by file count. Run these long specs together so the remaining shards finish sooner.
+          dedicated_specs=(
+            src/node/__tests__/mcp/integration/execution.spec.ts
+            src/node/__tests__/mcp/integration/frameworks.spec.ts
+          )
+          if [[ -z "$SHARD" ]]; then
+            pnpm --filter histoire test:mcp:integration "${dedicated_specs[@]}"
+          else
+            exclude_args=()
+            for spec in "${dedicated_specs[@]}"; do
+              exclude_args+=(--exclude "$spec")
+            done
+            pnpm --filter histoire test:mcp:integration --shard="$SHARD" "${exclude_args[@]}"
+          fi
 
       - name: Run terminal integration tests
         if: matrix.suite == 'terminal'
         env:
           BROWSER: none
-        run: pnpm --filter histoire test:terminal
+          SHARD: ${{ matrix.shard }}
+        run: pnpm --filter histoire test:terminal --shard="$SHARD"
 
       - name: Run package install tests
-        if: matrix.suite == 'core'
+        if: matrix.suite == 'checks'
         env:
           BROWSER: none
         run: pnpm --filter histoire test:mcp:package

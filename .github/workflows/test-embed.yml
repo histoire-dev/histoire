@@ -12,7 +12,7 @@ concurrency:
 
 jobs:
   browser:
-    name: Embed ${{ matrix.browser }}${{ matrix.shard && format(' ({0}/3)', matrix.shard) || '' }}
+    name: Embed ${{ matrix.browser }}${{ matrix.shard && format(' ({0}/4)', matrix.shard) || '' }}
     runs-on: ubuntu-24.04
     timeout-minutes: 40
     strategy:
@@ -25,6 +25,8 @@ jobs:
             shard: 2
           - browser: chromium
             shard: 3
+          - browser: chromium
+            shard: 4
           - browser: firefox
           - browser: webkit
     env:
@@ -57,7 +59,7 @@ jobs:
         if: matrix.browser == 'chromium'
         env:
           SHARD: ${{ matrix.shard }}
-        run: pnpm --filter histoire test:embed:integration --shard="$SHARD/3"
+        run: pnpm --filter histoire test:embed:integration --shard="$SHARD/4"
       - name: Firefox and WebKit embed smoke
         if: matrix.browser != 'chromium'
         run: pnpm --filter histoire test:embed:integration bridge-origins bridge-lifecycle preview-grid controls-overlays vue-host-isolation src/node/__tests__/embed/integration/host-channels.spec.ts

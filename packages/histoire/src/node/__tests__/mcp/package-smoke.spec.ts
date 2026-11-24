@@ -56,6 +56,8 @@ it('serves packed Node 22 consumers and copied artifacts with optional peers iso
     const dev = startMcpProcess(['dev', '-c', 'custom config.ts', '--port', '0', '--mcp-port', '0'], consumer.root, { BROWSER: 'none' }, consumer.cli)
     cleanup.push(() => dev.close())
     const devEndpoint = (await dev.waitFor(/MCP: (http:\/\/\S+)/))[1]
+    // The packed project can serve a cached catalog while Vite warmup and collection still run.
+    await dev.waitFor(/Collect stories end \d+ms/)
     const devClient = await connectMcpHttp(devEndpoint)
     cleanup.push(() => devClient.close())
     await probePackageReads(devClient)
