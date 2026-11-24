@@ -2,10 +2,7 @@ name: Publish Nightlies
 on:
   pull_request:
   push:
-    branches:
-      - '**'
-    tags:
-      - '!**'
+    branches: [main]
 
 jobs:
   build:

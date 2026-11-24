@@ -2,6 +2,7 @@ name: Continuous tests
 
 on:
   push:
+    branches: [main]
   pull_request:
   workflow_dispatch:
 
@@ -12,7 +13,21 @@ concurrency:
 jobs:
   build-and-test:
     runs-on: ubuntu-24.04
-    name: Build and test
+    name: ${{ matrix.name }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Build and test
+            suite: core
+          - name: Terminal integration
+            suite: terminal
+          - name: MCP integration (1/2)
+            suite: mcp
+            shard: 1/2
+          - name: MCP integration (2/2)
+            suite: mcp
+            shard: 2/2
     steps:
       - uses: actions/checkout@master
 
@@ -26,8 +41,7 @@ jobs:
 
       - name: Get pnpm store directory
         id: pnpm-cache
-        run: |
-          echo "::set-output name=pnpm_cache_dir::$(pnpm store path)"
+        run: echo "pnpm_cache_dir=$(pnpm store path)" >> "$GITHUB_OUTPUT"
 
       - name: Cache pnpm modules
         uses: actions/cache@v4
@@ -41,6 +55,7 @@ jobs:
         run: pnpm install
 
       - name: Lint
+        if: matrix.suite == 'core'
         run: pnpm run lint
 
       - name: Build
@@ -51,20 +66,25 @@ jobs:
         run: pnpm --filter histoire exec playwright install --with-deps chromium
 
       - name: Run tests
+        if: matrix.suite == 'core'
         # Vitest already runs test files concurrently within each package.
         run: pnpm run -r --workspace-concurrency 1 --filter './packages/**' test
 
       - name: Run MCP integration tests
+        if: matrix.suite == 'mcp'
         env:
           BROWSER: none
-        run: pnpm --filter histoire test:mcp:integration
+          SHARD: ${{ matrix.shard }}
+        run: pnpm --filter histoire test:mcp:integration --shard="$SHARD"
 
       - name: Run terminal integration tests
+        if: matrix.suite == 'terminal'
         env:
           BROWSER: none
         run: pnpm --filter histoire test:terminal
 
       - name: Run package install tests
+        if: matrix.suite == 'core'
         env:
           BROWSER: none
         run: pnpm --filter histoire test:mcp:package

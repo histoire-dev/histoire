@@ -2,6 +2,7 @@ name: Embed SDK tests
 
 on:
   push:
+    branches: [main]
   pull_request:
   workflow_dispatch:
 
@@ -11,13 +12,21 @@ concurrency:
 
 jobs:
   browser:
-    name: Embed ${{ matrix.browser }}
+    name: Embed ${{ matrix.browser }}${{ matrix.shard && format(' ({0}/3)', matrix.shard) || '' }}
     runs-on: ubuntu-24.04
     timeout-minutes: 40
     strategy:
       fail-fast: false
       matrix:
-        browser: [chromium, firefox, webkit]
+        include:
+          - browser: chromium
+            shard: 1
+          - browser: chromium
+            shard: 2
+          - browser: chromium
+            shard: 3
+          - browser: firefox
+          - browser: webkit
     env:
       BROWSER: none
       HISTOIRE_EMBED_BROWSER: ${{ matrix.browser }}
@@ -39,27 +48,23 @@ jobs:
         run: pnpm install --frozen-lockfile
       - name: Build dependency graph
         run: pnpm run build
-      - name: Test portable and native packages
-        if: matrix.browser == 'chromium'
-        run: |
-          pnpm --filter @histoire/protocol test
-          pnpm --filter @histoire/sdk test
-          pnpm --filter @histoire/vue test
       - name: Use Azure APT mirror for browser dependencies
         run: sudo sed -i -E 's|[a-z0-9-]+\.ec2\.archive\.ubuntu\.com/ubuntu|azure.archive.ubuntu.com/ubuntu|g' /etc/apt/apt-mirrors.txt
       - name: Install browser
         timeout-minutes: 10
         run: pnpm --filter histoire exec playwright install --with-deps ${{ matrix.browser }}
-      - name: Complete Chromium embed suite
+      - name: Run Chromium embed shard
         if: matrix.browser == 'chromium'
-        run: pnpm --filter histoire test:embed:integration
+        env:
+          SHARD: ${{ matrix.shard }}
+        run: pnpm --filter histoire test:embed:integration --shard="$SHARD/3"
       - name: Firefox and WebKit embed smoke
         if: matrix.browser != 'chromium'
         run: pnpm --filter histoire test:embed:integration bridge-origins bridge-lifecycle preview-grid controls-overlays vue-host-isolation src/node/__tests__/embed/integration/host-channels.spec.ts
       - uses: actions/upload-artifact@v4
         if: failure()
         with:
-          name: embed-${{ matrix.browser }}-screenshots
+          name: embed-${{ matrix.browser }}${{ matrix.shard && format('-{0}', matrix.shard) || '' }}-screenshots
           path: /tmp/histoire-sdk-*.png
           if-no-files-found: ignore
   consumers:
