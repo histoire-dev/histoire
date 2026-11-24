@@ -1,7 +1,9 @@
 import fs from 'node:fs'
+import Module from 'node:module'
 import os from 'node:os'
 import { join } from 'pathe'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
+import { hasProjectVitest } from '../util/has-vitest.js'
 
 const tempDirs: string[] = []
 
@@ -45,69 +47,55 @@ describe('vitest peer contract', () => {
   })
 })
 
-describe('hasProjectVitest', () => {
-  let hasProjectVitest: typeof import('../util/has-vitest.js').hasProjectVitest
+/**
+ * Installs a minimal `vitest` package under `directory/node_modules`.
+ */
+function installVitest(directory: string) {
+  const packageRoot = join(directory, 'node_modules', 'vitest')
+  fs.mkdirSync(packageRoot, { recursive: true })
+  fs.writeFileSync(join(packageRoot, 'package.json'), JSON.stringify({ name: 'vitest', version: '5.0.0', exports: { '.': './index.js', './node': './node.js' } }), 'utf8')
+  fs.writeFileSync(join(packageRoot, 'index.js'), '', 'utf8')
+  fs.writeFileSync(join(packageRoot, 'node.js'), '', 'utf8')
+}
 
-  beforeEach(async () => {
-    vi.doUnmock('node:module')
-    vi.resetModules()
+describe('hasProjectVitest', () => {
+  const nodePath = process.env.NODE_PATH
+
+  afterEach(() => {
+    if (nodePath === undefined) delete process.env.NODE_PATH
+    else process.env.NODE_PATH = nodePath
+    ;(Module as unknown as { _initPaths: () => void })._initPaths()
   })
 
-  it('returns false when vitest is declared but not installed', async () => {
-    vi.doMock('node:module', async (importOriginal) => {
-      const actual = await importOriginal<typeof import('node:module')>()
-      return {
-        ...actual,
-        createRequire: vi.fn(() => ({
-          resolve: vi.fn(() => {
-            throw new Error('Vitest is declared but missing from node_modules')
-          }),
-        })),
-      }
-    })
-    ;({ hasProjectVitest } = await import('../util/has-vitest.js'))
-    const root = createProjectRoot({ devDependencies: { vitest: '^4.0.0' } })
+  it('returns false when vitest is declared but not installed', () => {
+    const root = createProjectRoot({ devDependencies: { vitest: '^5.0.0' } })
 
     expect(hasProjectVitest(root)).toBe(false)
   })
 
-  it('returns true in hoisted workspaces where vitest is resolvable but not declared in package.json', async () => {
-    // Simulate a hoisted/monorepo install: the project package.json does NOT
-    // list vitest, but `vitest/node` resolves from the project root because it
-    // is hoisted to the workspace root.
-    vi.doMock('node:module', async (importOriginal) => {
-      const actual = await importOriginal<typeof import('node:module')>()
-      return {
-        ...actual,
-        createRequire: vi.fn(() => ({
-          resolve: vi.fn((id: string) => {
-            if (id === 'vitest/node' || id === 'vitest') {
-              return '/workspace/node_modules/vitest/dist/node.js'
-            }
-            throw new Error(`Cannot find module '${id}'`)
-          }),
-        })),
-      }
-    })
-    ;({ hasProjectVitest } = await import('../util/has-vitest.js'))
-    const root = createProjectRoot({ devDependencies: { foo: '^1.0.0' } })
+  it('returns true when the project installs vitest', () => {
+    const root = createProjectRoot({ devDependencies: { vitest: '^5.0.0' } })
+    installVitest(root)
 
     expect(hasProjectVitest(root)).toBe(true)
   })
 
-  it('returns false when vitest is neither declared nor resolvable', async () => {
-    vi.doMock('node:module', async (importOriginal) => {
-      const actual = await importOriginal<typeof import('node:module')>()
-      return {
-        ...actual,
-        createRequire: vi.fn(() => ({
-          resolve: vi.fn((id: string) => {
-            throw new Error(`Cannot find module '${id}'`)
-          }),
-        })),
-      }
-    })
-    ;({ hasProjectVitest } = await import('../util/has-vitest.js'))
+  it('returns true in hoisted workspaces where vitest is resolvable but not declared in package.json', () => {
+    const workspace = createProjectRoot({ private: true })
+    installVitest(workspace)
+    const root = join(workspace, 'packages', 'app')
+    fs.mkdirSync(root, { recursive: true })
+    fs.writeFileSync(join(root, 'package.json'), JSON.stringify({ devDependencies: { foo: '^1.0.0' } }), 'utf8')
+
+    expect(hasProjectVitest(root)).toBe(true)
+  })
+
+  it('returns false when vitest is only reachable through NODE_PATH', () => {
+    // pnpm bin shims export a NODE_PATH holding Histoire's own dependencies.
+    const store = createProjectRoot({ private: true })
+    installVitest(store)
+    process.env.NODE_PATH = join(store, 'node_modules')
+    ;(Module as unknown as { _initPaths: () => void })._initPaths()
     const root = createProjectRoot({ devDependencies: { foo: '^1.0.0' } })
 
     expect(hasProjectVitest(root)).toBe(false)
