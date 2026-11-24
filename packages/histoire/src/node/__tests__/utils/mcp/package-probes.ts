@@ -35,7 +35,15 @@ export async function probePackageJob(client: Client, name: string, requestKey: 
 
 /** Installed or copied runtime returns a PNG and passing hook/test summary. */
 export async function probePackageBrowserExecution(client: Client, engine: 'project-vitest' | 'built-preview') {
-  const screenshot = await probePackageJob(client, 'histoire_capture_screenshot', `package-screenshot-${engine}`)
+  const requestKey = `package-screenshot-${engine}`
+  let screenshot = await probePackageJob(client, 'histoire_capture_screenshot', requestKey)
+  const error = screenshot.error
+  // A cold Chromium launch can exceed the candidate budget on a busy runner.
+  // A new key starts one fresh capture instead of returning the failed operation.
+  if (screenshot.state === 'failed' && error?.code === 'TIMEOUT' && error.retryable === true && /^Browser setup exceeded its (?:candidate )?deadline$/.test(error.message)) {
+    console.warn(`Retrying packed screenshot (${engine}): ${error.message}`)
+    screenshot = await probePackageJob(client, 'histoire_capture_screenshot', `${requestKey}-retry`)
+  }
   expect(screenshot, JSON.stringify({ engine, error: screenshot.error })).toMatchObject({ state: 'completed' })
   expect(screenshot.result).toMatchObject({ mimeType: 'image/png', width: 1280, height: 800 })
   const artifact = await client.readResource({ uri: screenshot.result.artifactUri })
