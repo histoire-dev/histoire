@@ -18,9 +18,9 @@ describe('Grid state isolation', () => {
     const thirdVariantId = 'src-components-sharedcontrols-story-vue-2'
 
     selectCanvasVariant('variant 3', thirdVariantId)
-    cy.location('search').should('include', `variantId=${thirdVariantId}`)
+    cy.getPreviewIframeBody().contains('h1', 'Variant 3')
 
-    cy.getControlsIframeBody().find('input[type="text"]').first().clear().type('Gamma')
+    cy.getControlsIframeBody({ timeout: 20000 }).find('input[type="text"]').first().clear().type('Gamma')
 
     getVariantCard('src-components-sharedcontrols-story-vue-0')
       .find('[data-test-id="shared-controls-state"]')

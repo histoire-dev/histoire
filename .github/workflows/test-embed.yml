@@ -45,9 +45,8 @@ jobs:
           pnpm --filter @histoire/protocol test
           pnpm --filter @histoire/sdk test
           pnpm --filter @histoire/vue test
-      - name: Use Azure APT mirror for WebKit
-        if: matrix.browser == 'webkit'
-        run: sudo sed -i -E 's|[a-z0-9-]+\.ec2\.archive\.ubuntu\.com/ubuntu|azure.archive.ubuntu.com/ubuntu|g' /etc/apt/sources.list.d/ubuntu.sources
+      - name: Use Azure APT mirror for browser dependencies
+        run: sudo sed -i -E 's|[a-z0-9-]+\.ec2\.archive\.ubuntu\.com/ubuntu|azure.archive.ubuntu.com/ubuntu|g' /etc/apt/apt-mirrors.txt
       - name: Install browser
         timeout-minutes: 10
         run: pnpm --filter histoire exec playwright install --with-deps ${{ matrix.browser }}

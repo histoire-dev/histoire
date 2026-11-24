@@ -17,7 +17,7 @@ export async function createExampleDirectory(prefix: string) {
   }
   return {
     root,
-    /** Release project, shared styles, and generated caches after runtime stops. */
-    async close() { await rm(directory, { recursive: true, force: true }) },
+    /** Release the fixture, allowing pending Vite cache writes to settle. */
+    async close() { await rm(directory, { recursive: true, force: true, maxRetries: 6, retryDelay: 50 }) },
   }
 }

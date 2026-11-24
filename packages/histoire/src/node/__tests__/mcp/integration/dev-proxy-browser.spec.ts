@@ -57,7 +57,7 @@ it('shows accessible startup in light/dark/reduced-motion and hands deep link to
     expect(new URL(page.url()).hash).toBe('#selected')
     await expect.poll(() => page.getByText('Stdio Book', { exact: true }).count(), { timeout: 60_000 }).toBeGreaterThan(0)
     await page.getByText('Stdio Book', { exact: true }).first().click()
-    const story = page.frameLocator(STANDALONE_SELECTED_FRAME)
+    const story = page.frameLocator(STANDALONE_SELECTED_FRAME).locator('[data-test-id="sandbox-render"]')
     await story.getByRole('button', { name: 'Button', exact: true }).waitFor()
     await writeFile(join(fixture.root, 'Book.story.vue'), storySource.replace('>Button<', '>Updated action<'))
     await story.getByRole('button', { name: 'Updated action', exact: true }).waitFor()
