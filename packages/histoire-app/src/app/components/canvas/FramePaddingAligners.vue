@@ -15,7 +15,7 @@ const props = defineProps<{
 /** Distance between a mark and the variant edge it extends. */
 const GAP = 4
 /** Longest mark, kept inside the gutter. */
-const MAX_LENGTH = 12
+const MAX_LENGTH = 8
 
 /** Crop marks extend each variant corner outward, horizontally and vertically. */
 const path = computed(() => {
@@ -32,7 +32,7 @@ const path = computed(() => {
 </script>
 
 <template>
-  <svg v-if="path" class="histoire-frame-aligners htw:absolute htw:inset-0 htw:size-full htw:pointer-events-none htw:text-text htw:opacity-30 htw:z-[1]" :style="{ color }" aria-hidden="true">
+  <svg v-if="path" class="histoire-frame-aligners htw:absolute htw:inset-0 htw:size-full htw:pointer-events-none htw:text-text htw:opacity-15 htw:z-[1]" :style="{ color }" aria-hidden="true">
     <path :d="path" fill="none" stroke="currentColor" stroke-width="1" shape-rendering="crispEdges" />
   </svg>
 </template>
