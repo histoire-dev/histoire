@@ -90,6 +90,12 @@ describe('hasProjectVitest', () => {
     expect(hasProjectVitest(root)).toBe(true)
   })
 
+  it('returns false when vitest is neither declared nor resolvable', () => {
+    const root = createProjectRoot({ devDependencies: { foo: '^1.0.0' } })
+
+    expect(hasProjectVitest(root)).toBe(false)
+  })
+
   it('returns false when vitest is only reachable through NODE_PATH', () => {
     // pnpm bin shims export a NODE_PATH holding Histoire's own dependencies.
     const store = createProjectRoot({ private: true })
