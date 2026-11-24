@@ -1,36 +1,17 @@
-import { createRequire } from 'node:module'
-import { resolve } from 'pathe'
-
-/**
- * Checks whether the `vitest` package can be resolved from the project root.
- *
- * Uses real module resolution so it works in hoisted/monorepo installs where
- * vitest is declared at the workspace root rather than the project's own
- * package.json.
- */
-function canResolveVitest(root: string) {
-  try {
-    const require = createRequire(resolve(root, 'package.json'))
-    // `vitest/node` is what histoire actually imports; fall back to `vitest`.
-    try {
-      require.resolve('vitest/node')
-      return true
-    }
-    catch {
-      require.resolve('vitest')
-      return true
-    }
-  }
-  catch {
-    return false
-  }
-}
+import { tryResolveDependency } from './resolve-package.js'
 
 /**
  * Returns true when Vitest is resolvable from the project root.
- * A package.json declaration alone is insufficient: users may not have run
- * their package manager yet, or an install may be incomplete.
+ *
+ * Uses real module resolution so it works in hoisted/monorepo installs where
+ * vitest is declared at the workspace root rather than the project's own
+ * package.json. A package.json declaration alone is insufficient: users may not
+ * have run their package manager yet, or an install may be incomplete.
+ *
+ * Histoire's own copy never counts: pnpm bin shims export a `NODE_PATH` holding
+ * Histoire's dependencies, which Vite cannot resolve from the project.
  */
 export function hasProjectVitest(root: string) {
-  return canResolveVitest(root)
+  // `vitest/node` is what histoire actually imports; fall back to `vitest`.
+  return ['vitest/node', 'vitest'].some(id => tryResolveDependency(root, id, { fallback: false }) !== null)
 }
