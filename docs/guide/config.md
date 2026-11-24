@@ -100,13 +100,11 @@ Use `process.env.HISTOIRE` to choose values conditionally in your Vite config.
 import { defineConfig } from 'vite'
 
 export default defineConfig({
-  define: {
-    __IN_HISTOIRE__: Boolean(process.env.HISTOIRE),
+  server: {
+    port: process.env.HISTOIRE ? 6006 : 3000,
   },
 })
 ```
-
-`histoire dev` binds its public address before it loads your config: set it with `--port` and `--host`. `server.port`, `server.host` and `server.https` are ignored there.
 
 ### Ignoring plugins
 

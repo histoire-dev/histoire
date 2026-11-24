@@ -110,11 +110,19 @@ export interface RuntimeOutput {
 }
 
 /** Parent starts one runtime exactly once and requests graceful winddown. */
-export type ParentMessage = { type: 'start', generation: string, publicOrigin: string, options: Record<string, unknown>, token?: string } | { type: 'shutdown' } | RuntimeCommand
+export type ParentMessage = { type: 'start', generation: string, publicOrigin: string, options: Record<string, unknown>, token?: string } | { type: 'address', generation: string, publicOrigin: string } | { type: 'shutdown' } | RuntimeCommand
+
+/** Public address asked by project configuration; command-line values win. */
+export interface ConfiguredAddress {
+  port?: number
+  host?: string | boolean
+}
 
 /** Runtime reports observations; only parent decides public availability/restarts. */
 export type ChildMessage =
   | { type: 'watch', generation: string, inputs: WatchInput[], complete?: boolean }
+  /** Configured public address, sent before the runtime pins its origin; parent answers with the final one. */
+  | ({ type: 'address', generation: string } & ConfiguredAddress)
   | { type: 'ready', generation: string, target: string, base: string, open?: boolean | string }
   | { type: 'failed', generation: string, error: string }
   /** Ready runtime asks the parent for a full process replacement; only the parent restarts. */
@@ -180,6 +188,10 @@ export function isChildMessage(value: unknown): value is ChildMessage {
     return isBoundedFrame(value)
   }
   if (message.type === 'runtime-event') return isIdentifier(message.event) && isBoundedFrame(value)
+  if (message.type === 'address') {
+    const { port, host } = message
+    return (port === undefined || (Number.isInteger(port) && (port as number) >= 0 && (port as number) <= 65535)) && (host === undefined || typeof host === 'boolean' || (typeof host === 'string' && host.length > 0 && host.length <= 255))
+  }
   if (message.type === 'failed') return typeof message.error === 'string' && message.error.length <= 4096
   if (message.type === 'restart') return typeof message.source === 'string' && message.source.length > 0 && message.source.length <= RESTART_SOURCE_MAX_LENGTH && (message.fresh === undefined || typeof message.fresh === 'boolean')
   if (message.type === 'ready') return typeof message.target === 'string' && /^http:\/\/127\.0\.0\.1:\d+$/.test(message.target) && isSafeBase(message.base)

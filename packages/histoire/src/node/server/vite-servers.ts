@@ -2,12 +2,11 @@ import type { Context } from '../context.js'
 import type { MiddlewareHostingOptions } from '../runtime/hosting/types.js'
 import type { StartupProgress } from '../runtime/terminal/progress.js'
 import type { DevProxyTransport } from '../vite/dev-proxy.js'
-import pc from 'picocolors'
 import { mergeConfig as mergeViteConfig } from 'vite'
 import { RuntimeCleanupError } from '../runtime/cleanup.js'
 import { createHostingHmr, createHostingProxyEvents } from '../runtime/hosting/hmr.js'
 import { acquireViteServer as createViteServer } from '../vite/acquire-server.js'
-import { createDevProxyPlugin, getIgnoredPublicAddressWarnings } from '../vite/dev-proxy.js'
+import { createDevProxyPlugin } from '../vite/dev-proxy.js'
 import { getViteConfigWithPlugins } from '../vite/index.js'
 import { collectionWatchPlugin, forwardWatcherEvents } from './collection-watcher.js'
 
@@ -64,11 +63,6 @@ export async function createViteServers(ctx: Context, options: CreateServerOptio
     // The client server crawls the project; its file events are replayed here.
     if (collecting) viteConfig.plugins.push(collectionWatchPlugin())
 
-    // Read before the private listener replaces the configured address; both servers share one config.
-    if (options.devProxy && !collecting) {
-      for (const warning of getIgnoredPublicAddressWarnings(viteConfig.server, options.devProxy)) console.warn(pc.yellow(`Histoire config: ${warning}`))
-    }
-
     if (!collecting) {
       if (options.open !== undefined) {
         viteConfig.server.open = options.open
@@ -79,6 +73,8 @@ export async function createViteServers(ctx: Context, options: CreateServerOptio
       }
     }
 
+    // Collection server is created first: settle the public origin before either server pins it.
+    if (options.devProxy?.negotiate && collecting) options.devProxy.origin = await options.devProxy.negotiate({ port: viteConfig.server?.port, host: viteConfig.server?.host })
     if (options.devProxy) viteConfig.plugins.push(createDevProxyPlugin(options.devProxy, collecting))
     let server: Awaited<ReturnType<typeof createViteServer>>
     try {

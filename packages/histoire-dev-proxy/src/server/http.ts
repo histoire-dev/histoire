@@ -117,6 +117,13 @@ export function createProxyHttp(read: () => PublicState, restart: () => Promise<
         upgraded.clear()
       }
     },
+    /** Release the bound address while keeping the server reusable for another bind. */
+    async unlisten() {
+      if (!server.listening) return
+      const closing = new Promise<void>((resolve, reject) => server.close(error => error ? reject(error) : resolve()))
+      for (const socket of sockets) socket.destroy()
+      await closing
+    },
     /** Join listener close after terminating owned streams and idle connections. */
     async close() {
       target = undefined

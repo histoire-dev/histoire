@@ -106,7 +106,9 @@ export async function devCommand(options: DevOptions, host: DevHost) {
   terminal.bind({ restart: request => proxy.restart(request), openBrowser: target => proxy.openBrowser(target), close: closeRuntime })
   // Failed config keeps parent/watcher available for correction and automatic retry.
   void proxy.ready.catch(error => output.onDiagnostic(String(error)))
-  return { ...proxy, logs, requests, bridge, progress, retained, tests, get status() {
+  return { ...proxy, logs, requests, bridge, progress, retained, tests, get url() {
+    return proxy.url
+  }, get status() {
     return proxy.status
   }, close }
 }

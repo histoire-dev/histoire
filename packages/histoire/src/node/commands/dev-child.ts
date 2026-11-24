@@ -15,6 +15,8 @@ let session: ReturnType<typeof createDevSession> | undefined
 let startup: Promise<void> | undefined
 let closing: Promise<void> | undefined
 let stopped = false
+/** Settles the pending public address negotiation of the current generation. */
+let located: ((origin: string) => void) | undefined
 
 /** Send observations only while owning parent remains connected. */
 function send(message: object) {
@@ -73,7 +75,14 @@ async function start(message: Extract<ParentMessage, { type: 'start' }>) {
     root: process.cwd(),
     port: 0,
     host: '127.0.0.1',
-    devProxy: { origin: message.publicOrigin, generation: message.generation, cli: { port: runtimeOptions.port !== undefined, host: runtimeOptions.host !== undefined } },
+    devProxy: {
+      origin: message.publicOrigin,
+      generation: message.generation,
+      negotiate: address => new Promise<string>((resolve) => {
+        located = resolve
+        if (!send({ type: 'address', generation: message.generation, ...address })) resolve(message.publicOrigin)
+      }),
+    },
     onConfigurationInputs(files) {
       send({ type: 'watch', generation: message.generation, inputs: encodeWatchInputs(files) })
     },
@@ -98,6 +107,10 @@ async function start(message: Extract<ParentMessage, { type: 'start' }>) {
 process.on('message', (raw: ParentMessage) => {
   if (raw?.type === 'runtime-command') {
     adapter?.receive(raw)
+    return
+  }
+  if (raw?.type === 'address') {
+    located?.(raw.publicOrigin)
     return
   }
   if (raw?.type === 'shutdown') {

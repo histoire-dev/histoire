@@ -1,4 +1,4 @@
-import type { Plugin, ResolvedConfig, ServerOptions } from 'vite'
+import type { Plugin, ResolvedConfig } from 'vite'
 
 /** Private CLI transport policy cannot be replaced by framework Vite hooks. */
 export interface DevProxyTransport {
@@ -6,29 +6,8 @@ export interface DevProxyTransport {
   origin: string
   /** Parent-selected identity used for document handoff. */
   generation: string
-  /** Public address flags given on the command line: the only inputs able to move the public listener. */
-  cli?: { port?: boolean, host?: boolean }
-}
-
-/** Port Histoire merges into every project Vite config; any other value was configured by the project. */
-const DEFAULT_PORT = 6006
-
-/**
- * Lists the configured public address options the proxy cannot honor: it binds
- * before project config loads, so only `--port` and `--host` reach it.
- * @param server The project Vite server options, before Histoire pins the private listener.
- * @param transport The proxy transport, carrying which flags the command line gave.
- */
-export function getIgnoredPublicAddressWarnings(server: Pick<ServerOptions, 'port' | 'host'> | undefined, transport: DevProxyTransport): string[] {
-  const warnings: string[] = []
-  if (!transport.cli?.port && server?.port !== undefined && server.port !== DEFAULT_PORT) {
-    warnings.push(`server.port (${server.port}) is ignored by \`histoire dev\`: use \`histoire dev --port ${server.port}\``)
-  }
-  if (!transport.cli?.host && server?.host) {
-    const value = typeof server.host === 'string' ? ` ${server.host}` : ''
-    warnings.push(`server.host is ignored by \`histoire dev\`: use \`histoire dev --host${value}\``)
-  }
-  return warnings
+  /** Reports the configured public address; resolves with the origin the parent settled on. */
+  negotiate?: (address: { port?: number, host?: string | boolean }) => Promise<string>
 }
 
 /** Pin private listener while browser connections retain public origin and configured paths. */

@@ -20,3 +20,12 @@ it('accepts bounded runtime restart requests only', () => {
   expect(isChildMessage({ type: 'restart', generation: 'g', source: 'x'.repeat(201) })).toBe(false)
   expect(isChildMessage({ type: 'restart', generation: 'g', source: 'ok', fresh: 'yes' })).toBe(false)
 })
+
+it('accepts bounded configured addresses only', () => {
+  expect(isChildMessage({ type: 'address', generation: 'g' })).toBe(true)
+  expect(isChildMessage({ type: 'address', generation: 'g', port: 2000, host: true })).toBe(true)
+  expect(isChildMessage({ type: 'address', generation: 'g', host: '0.0.0.0' })).toBe(true)
+  expect(isChildMessage({ type: 'address', generation: 'g', port: 70000 })).toBe(false)
+  expect(isChildMessage({ type: 'address', generation: 'g', port: '2000' })).toBe(false)
+  expect(isChildMessage({ type: 'address', generation: 'g', host: '' })).toBe(false)
+})

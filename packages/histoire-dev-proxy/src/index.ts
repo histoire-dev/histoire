@@ -1,5 +1,5 @@
 import type { watchConfiguration } from './config/watcher.js'
-import type { PublicState, RestartCause, RestartRequest, RuntimeCommand, RuntimeEvent, RuntimeOutput, RuntimeReply, RuntimeSendResult, RuntimeStatus, WatchInput } from './protocol.js'
+import type { ConfiguredAddress, PublicState, RestartCause, RestartRequest, RuntimeCommand, RuntimeEvent, RuntimeOutput, RuntimeReply, RuntimeSendResult, RuntimeStatus, WatchInput } from './protocol.js'
 import type { ProxyRequestObserver } from './server/observe.js'
 import { randomUUID } from 'node:crypto'
 import { relative, resolve } from 'node:path'
@@ -9,6 +9,9 @@ import { startRuntimeChild } from './process/child.js'
 import { createProxyHttp } from './server/http.js'
 import { listen } from './server/listener.js'
 
+/** Public port used when neither the command line nor project config names one. */
+const DEFAULT_PORT = 6006
+
 export type { ProxyRequestEvent, ProxyRequestObserver, ProxyRequestOutcome } from './server/observe.js'
 
 /** Lightweight parent inputs; runtime executable remains an external adapter. */
@@ -17,11 +20,11 @@ export interface DevProxyOptions {
   root?: string
   /** Explicit config path relative to root. */
   config?: string
-  /** Public port; zero asks OS for an ephemeral port. */
+  /** Public port; zero asks OS for an ephemeral port. Overrides the port project config asks for. */
   port?: number
-  /** Public interface, default localhost. */
+  /** Public interface, default localhost. Overrides the host project config asks for. */
   host?: string | boolean
-  /** Open public URL once listener binds. */
+  /** Open public URL once its address is settled. */
   open?: boolean
   /** Framework runtime executable owned by proxy. */
   runtime: URL
@@ -31,7 +34,7 @@ export interface DevProxyOptions {
   token?: string
   /** Graceful child winddown budget; default 10000ms. */
   shutdownTimeout?: number
-  /** Observe public listener before project work begins. */
+  /** Observe public listener before project work begins, and again whenever project config moves it. */
   onListening?: (url: string) => void
   /** Optional terminal/application observation; receives detached browser-safe state. */
   onStatus?: (state: Readonly<PublicState>) => void
@@ -60,12 +63,31 @@ export async function startDevProxy(options: DevProxyOptions) {
   let state: PublicState = { status: 'starting', generation: randomUUID(), base: '/' }
   const http = createProxyHttp(() => state, () => restart({ cause: 'browser' }), options.onRequest)
   let url: string
+  let bound = { port: options.port ?? DEFAULT_PORT, host: options.host }
   try {
-    url = `${await listen(http.server, options.port ?? 6006, options.host)}/`
+    url = `${await listen(http.server, bound.port, bound.host)}/`
   }
   catch (error) {
     await http.close()
     throw error
+  }
+  /** Moves the public listener to the address project config asks for. */
+  async function relocate(configured: ConfiguredAddress) {
+    const next = { port: options.port ?? configured.port ?? DEFAULT_PORT, host: options.host ?? configured.host }
+    if (next.port !== bound.port || next.host !== bound.host) {
+      await http.unlisten()
+      try {
+        url = `${await listen(http.server, next.port, next.host)}/`
+        bound = next
+      }
+      catch (error) {
+        url = `${await listen(http.server, bound.port, bound.host)}/`
+        throw error
+      }
+      options.onListening?.(url)
+    }
+    if (options.open) void open().catch(diagnostic)
+    return new URL(url).origin
   }
   /** Proxy notices reach the observer when present, otherwise the console. */
   function diagnostic(error: unknown) {
@@ -153,6 +175,7 @@ export async function startDevProxy(options: DevProxyOptions) {
         onOutput: options.onOutput,
         onRuntimeMessage: options.onRuntimeMessage,
         onRetire: options.onRuntimeRetired && (() => options.onRuntimeRetired!(generation)),
+        onAddress: async address => closed || !isActive() ? new URL(url).origin : relocate(address),
         onDiagnostic: options.onDiagnostic && (message => diagnostic(message)),
         onWatch: async (inputs, complete) => {
           if (complete) completeInputs = inputs
@@ -205,11 +228,11 @@ export async function startDevProxy(options: DevProxyOptions) {
       http.setTarget(runtime.backend.target)
       if (runtime.backend.open) void open(typeof runtime.backend.open === 'string' ? runtime.backend.open : runtime.backend.base).catch(diagnostic)
     }
+    if (options.open && (status === 'ready' || status === 'failed')) void open().catch(diagnostic)
     publish(status)
   })
   const prepared = (async () => {
     options.onListening?.(url)
-    if (options.open) void open().catch(diagnostic)
     const config = await import('./config/index.js')
     if (closed) return
     watcher = await config.watchConfiguration([], (source, file) => {
@@ -253,8 +276,10 @@ export async function startDevProxy(options: DevProxyOptions) {
     })
   }
   return {
-    /** Actual public address, including OS-selected or fallback port. */
-    url,
+    /** Actual public address, including OS-selected or fallback port; project config can move it. */
+    get url() {
+      return url
+    },
     /** Initial runtime acquisition; watcher remains live after rejection. */
     ready,
     /** Latest public availability, independent of any runtime process. */
