@@ -73,7 +73,7 @@ async function start(message: Extract<ParentMessage, { type: 'start' }>) {
     root: process.cwd(),
     port: 0,
     host: '127.0.0.1',
-    devProxy: { origin: message.publicOrigin, generation: message.generation },
+    devProxy: { origin: message.publicOrigin, generation: message.generation, cli: { port: runtimeOptions.port !== undefined, host: runtimeOptions.host !== undefined } },
     onConfigurationInputs(files) {
       send({ type: 'watch', generation: message.generation, inputs: encodeWatchInputs(files) })
     },
