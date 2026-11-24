@@ -5,7 +5,9 @@ import { BuiltinIcon, HstButton, HstPulsatingDisc, useLoadingDelay } from '@hist
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useCanvasFrameBackground, useCanvasFrames, useCanvasStore } from '../../composables/canvas-settings.js'
 import { useContextMenu } from '../../composables/context-menu.js'
-import { getBackgroundStyle } from '../../util/background.js'
+import { usePresetConfigStore } from '../../stores/presets-config.js'
+import { getBackgroundContrastColor, getBackgroundStyle } from '../../util/background.js'
+import { histoireConfig } from '../../util/config.js'
 import { useWorkbenchTestsModel } from '../panes/tests/model.js'
 import { getActiveCanvasTool } from './active-tool.js'
 
@@ -78,6 +80,9 @@ const previewStyle = computed(() => ({ width: `${props.width}px`, height: `${pro
 const background = useCanvasFrameBackground(() => props.frame.id)
 /** Grid can extend the card beyond the intrinsic sandbox. */
 const bodyStyle = computed(() => ({ height: `${(props.frame.bodyHeight ?? (props.height + padding.value * 2)) * scale.value}px`, ...getBackgroundStyle(background.value) }))
+const presets = usePresetConfigStore()
+/** Aligners follow the frame background like story text does. */
+const alignerColor = computed(() => getBackgroundContrastColor(background.value, presets?.backgroundPresets.value ?? histoireConfig.backgroundPresets ?? []))
 const canSelect = computed(() => !props.stale)
 let unregister = () => {}
 
@@ -157,7 +162,7 @@ function openMenu(event: MouseEvent | KeyboardEvent) {
       <div class="histoire-frame-content htw:origin-top-left htw:group-data-[dimmed=true]/frame:group-data-[selected=true]/frame:opacity-35 htw:group-data-[stale=true]/frame:opacity-40 htw:group-data-[stale=true]/frame:pointer-events-none" :style="previewStyle" :aria-busy="status !== 'ready'" :inert="status !== 'ready' || stale ? true : undefined">
         <CanvasReplicaPreview v-if="live" ref="replica" :interactive="!dragging" :frame-id="frame.id" :story-id="frame.storyId" :variant-id="frame.variantId" :preview-base="previewBase" :viewport="single || fixedSize ? { width, height } : undefined" @status="updateStatus" @snapshot="snapshotShown = $event" />
       </div>
-      <FramePaddingAligners v-if="padding > 0" :width="width * scale" :height="height * scale" :padding="padding * scale" />
+      <FramePaddingAligners v-if="padding > 0" :width="width * scale" :height="height * scale" :padding="padding * scale" :color="alignerColor" />
       <div v-if="!live" class="htw:absolute htw:inset-0 htw:flex htw:flex-col htw:items-center htw:justify-center htw:gap-3 htw:p-4 htw:text-[12px] htw:text-center htw:text-muted htw:bg-input">
         {{ variant.title }}
       </div>
