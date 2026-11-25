@@ -1,5 +1,9 @@
 <script setup lang="ts">
+import type { CanvasBackground } from '../../util/background.js'
 import { computed } from 'vue'
+import { usePresetConfigStore } from '../../stores/presets-config.js'
+import { getBackgroundContrastColor } from '../../util/background.js'
+import { histoireConfig } from '../../util/config.js'
 
 const props = defineProps<{
   /** Variant width in screen pixels. */
@@ -8,9 +12,12 @@ const props = defineProps<{
   height: number
   /** Gutter around the variant in screen pixels. */
   padding: number
-  /** Contrast color of the frame background; the workbench text color when it has none. */
-  color?: string
+  /** Frame background; its contrast color tints the marks, else the workbench text color. */
+  background: CanvasBackground
 }>()
+
+const presets = usePresetConfigStore()
+const color = computed(() => getBackgroundContrastColor(props.background, presets?.backgroundPresets.value ?? histoireConfig.backgroundPresets ?? []))
 
 /** Distance between a mark and the variant edge it extends. */
 const GAP = 4

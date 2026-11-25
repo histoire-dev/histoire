@@ -25,6 +25,8 @@ const props = defineProps<{
   cols?: string
   /** Logical dimensions shared with normal canvas previews. */
   size: { width: number, height: number }
+  /** Gutter around each cell's variant, from the story or the project. */
+  padding?: number
   /** Absolute first-party preview source URL. */
   previewBase: string
   /** Measured fixed chrome; matrix adds its own axis-control reservation once. */
@@ -46,14 +48,19 @@ const { story, variant } = useSelection()
 const baseVariant = computed(() => variant.value?.id ?? story.value?.variants[0]?.id)
 const rowValues = computed(() => matrix.rowAxis.value ? filterMatrixValues(matrix.rowAxis.value, matrix.rowValues.value) : [])
 const colValues = computed(() => matrix.colAxis.value ? filterMatrixValues(matrix.colAxis.value, matrix.colValues.value) : [])
-/** Matrix projections share a variant, but never share intrinsic dimensions. */
+/** Matrix projections share a variant, but never share intrinsic dimensions; declared ones win. */
 function cellSize(cell: MatrixCellData) {
   const target = { storyId: story.value?.id ?? '', variantId: baseVariant.value ?? '' }
-  return canvas.contentSizes.get(cell.key, canvasContentKey(snapshot.value, target, cell.props)) ?? props.size
+  const measured = canvas.autoFitContent ? canvas.contentSizes.get(cell.key, canvasContentKey(snapshot.value, target, cell.props)) : undefined
+  if (!measured) return props.size
+  const declared = story.value?.layout
+  return { width: declared?.width ?? measured.width, height: declared?.height ?? measured.height }
 }
+const gutter = computed(() => props.padding ?? 0)
+const fixedSize = computed(() => !!(story.value?.layout?.width || story.value?.layout?.height))
 /** Rendering and selection share fixed-pixel matrix gutter/gap calculations. */
 function layoutFrames(zoom = canvas.effectiveZoom) {
-  return layoutMatrixFrames(matrix.cells.value, { storyId: story.value?.id ?? '', variantId: baseVariant.value ?? '', rows: rowValues.value, cols: colValues.value, size: canvas.autoFitContent ? cellSize : props.size, zoom })
+  return layoutMatrixFrames(matrix.cells.value, { storyId: story.value?.id ?? '', variantId: baseVariant.value ?? '', rows: rowValues.value, cols: colValues.value, size: cellSize, padding: gutter.value, zoom })
 }
 const frames = computed(() => layoutFrames())
 const topInset = computed(() => Math.max(props.uiHidden ? MATRIX_COLUMN_HEADER : MATRIX_TOP_INSET, props.contentInsets?.topInset ?? 0))
@@ -114,7 +121,7 @@ onMounted(() => {
       <div class="htw:absolute htw:inset-0" :style="{ top: `${-topInset}px` }">
         <span v-for="(position, index) in rowPosition" :key="index" class="htw:absolute htw:overflow-hidden htw:text-muted htw:font-mono htw:text-[11px] htw:whitespace-nowrap htw:text-ellipsis htw:[transform:translateY(-50%)] htw:pe-3" :style="position.style">{{ matrix.rows.value }}={{ JSON.stringify(position.value) }}</span>
         <span v-for="(position, index) in colPosition" :key="index" class="htw:absolute htw:overflow-hidden htw:text-muted htw:font-mono htw:text-[11px] htw:whitespace-nowrap htw:text-ellipsis htw:text-center" :style="position.style">{{ matrix.cols.value }}={{ JSON.stringify(position.value) }}</span>
-        <MatrixCell v-for="(cell, index) in matrix.cells.value" :key="cell.key" :cell="cell" :frame="frames[index]" :fit-bounds="zoom => layoutFrames(zoom)[index]" :live="live.has(cell.key)" :variant-id="baseVariant ?? ''" :preview-base="previewBase" />
+        <MatrixCell v-for="(cell, index) in matrix.cells.value" :key="cell.key" :cell="cell" :frame="frames[index]" :fit-bounds="zoom => layoutFrames(zoom)[index]" :live="live.has(cell.key)" :variant-id="baseVariant ?? ''" :preview-base="previewBase" :padding="gutter" :fixed-size="fixedSize" />
       </div>
     </div>
   </div>

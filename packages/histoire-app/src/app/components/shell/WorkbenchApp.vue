@@ -137,7 +137,7 @@ function setSelectedSession(session: HistoireSession | undefined): void {
           </CanvasToolbar>
         </template>
         <template #matrix="slot">
-          <MatrixView :rows="rows" :cols="cols" :preview-base="previewBase" :size="slot.size" :content-insets="slot.contentInsets" :ui-hidden="shell.uiHidden.value" :discovery-failed="slot.discoveryFailed" @axes="workbench.setAxes" @add-axis="revealMatrixProps" @error="emit('error', $event)" />
+          <MatrixView :rows="rows" :cols="cols" :preview-base="previewBase" :size="slot.size" :padding="slot.padding" :content-insets="slot.contentInsets" :ui-hidden="shell.uiHidden.value" :discovery-failed="slot.discoveryFailed" @axes="workbench.setAxes" @add-axis="revealMatrixProps" @error="emit('error', $event)" />
         </template>
         <template #overlays>
           <CommentsCanvasOverlay v-if="CommentsCanvasOverlay && dev" ref="commentOverlay" :model="dev.threads" :agents="dev.commentAgents.value" :active="dev.commentMode.value" @setup-agent="dev.setupAgents" />
