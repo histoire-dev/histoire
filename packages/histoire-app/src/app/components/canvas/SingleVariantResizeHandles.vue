@@ -15,6 +15,8 @@ const props = defineProps<{
   size: SingleResizeSize
   /** Current fixed display scale. */
   zoom: number
+  /** Story gutter between frame edge and viewport, in logical pixels. */
+  inset?: number
 }>()
 
 const emit = defineEmits<{
@@ -46,6 +48,7 @@ watch([surfaceBounds.left, surfaceBounds.top, surfaceBounds.width, surfaceBounds
 
 const controller = createSingleResizeController({
   getSize: () => props.size,
+  getInset: () => props.inset ?? 0,
   getGeometry: () => {
     if (!props.surface || !props.frame) return
     const surface = props.surface.getBoundingClientRect()

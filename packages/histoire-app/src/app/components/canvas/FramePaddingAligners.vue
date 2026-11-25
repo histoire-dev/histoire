@@ -3,7 +3,6 @@ import type { CanvasBackground } from '../../util/background.js'
 import { computed } from 'vue'
 import { usePresetConfigStore } from '../../stores/presets-config.js'
 import { getBackgroundContrastColor } from '../../util/background.js'
-import { histoireConfig } from '../../util/config.js'
 
 const props = defineProps<{
   /** Variant width in screen pixels. */
@@ -17,7 +16,7 @@ const props = defineProps<{
 }>()
 
 const presets = usePresetConfigStore()
-const color = computed(() => getBackgroundContrastColor(props.background, presets?.backgroundPresets.value ?? histoireConfig.backgroundPresets ?? []))
+const color = computed(() => getBackgroundContrastColor(props.background, presets?.backgroundPresets.value ?? []))
 
 /** Distance between a mark and the variant edge it extends. */
 const GAP = 4

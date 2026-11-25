@@ -32,7 +32,7 @@ const frameShell = ref<HTMLElement>()
 const resizing = ref(false)
 const canvas = useCanvasStore()
 const gutter = computed(() => props.padding ?? 0)
-/** Zoom, pan and grips own the whole frame, gutter included. */
+/** Zoom and pan own the whole frame, gutter included. */
 const outerSize = computed(() => props.frame && { width: props.frame.width + gutter.value * 2, height: props.frame.height + gutter.value * 2 })
 useSingleVariantZoom(canvas, surface, { area: () => props.area, size: () => outerSize.value, frameId: () => props.frame?.id })
 const pan = useSingleVariantPan(surface, { area: () => props.area, size: () => outerSize.value, zoom: () => canvas.effectiveZoom, resizing: () => resizing.value })
@@ -47,19 +47,14 @@ function startResize(): void {
   canvas.setAutoFitContent(false)
 }
 
-/** Grips measure the whole frame; the viewport excludes the gutter. */
-function innerSize(size: { width: number, height: number }) {
-  return { width: Math.max(1, size.width - gutter.value * 2), height: Math.max(1, size.height - gutter.value * 2) }
-}
-
 /** Publish physical dimensions without touching canonical settings per pointer move. */
 function resize(size: { width: number, height: number }): void {
-  canvas.setSingleViewportDraft(innerSize(size))
+  canvas.setSingleViewportDraft(size)
 }
 
 /** Let canonical settings publish synchronously before retiring transient geometry. */
 function commit(size: { width: number, height: number }): void {
-  emit('resize', innerSize(size))
+  emit('resize', size)
   canvas.setSingleViewportDraft(null)
 }
 
@@ -75,6 +70,6 @@ onBeforeUnmount(() => canvas.setSingleViewportDraft(null))
       <WorkbenchEmptyState v-else icon="document" title="Select a variant" />
     </div>
     <!-- Outside hit areas must stay out of native scroll content. -->
-    <SingleVariantResizeHandles v-if="resizable && frame && variant" :surface="surface" :frame="frameShell" :size="outerSize!" :zoom="canvas.effectiveZoom" @update:active="resizing = $event" @start="startResize" @resize="resize" @commit="commit" />
+    <SingleVariantResizeHandles v-if="resizable && frame && variant" :surface="surface" :frame="frameShell" :size="frame" :inset="gutter" :zoom="canvas.effectiveZoom" @update:active="resizing = $event" @start="startResize" @resize="resize" @commit="commit" />
   </div>
 </template>
