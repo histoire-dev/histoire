@@ -10,9 +10,10 @@ export interface DevProxyTransport {
   negotiate?: (address: { port?: number, host?: string | boolean }) => Promise<string>
 }
 
-/** Pin private listener while browser connections retain public origin and configured paths. */
-export function createDevProxyPlugin(transport: DevProxyTransport, collecting: boolean): Plugin {
-  return {
+/** Pin each private listener and share the HTTPS warning across one dev runtime. */
+export function createDevProxyPluginFactory(transport: DevProxyTransport): (collecting: boolean) => Plugin {
+  let warnedAboutHttps = false
+  return collecting => ({
     name: 'histoire:dev-proxy-transport',
     enforce: 'post',
     configResolved(config: ResolvedConfig) {
@@ -21,8 +22,20 @@ export function createDevProxyPlugin(transport: DevProxyTransport, collecting: b
       server.host = '127.0.0.1'
       server.port = 0
       // Public proxy binds before project config loads, so it can only serve plain HTTP.
-      if (server.https) config.logger.warn('server.https is not supported by `histoire dev`: stories are served over HTTP')
-      server.https = undefined
+      // Pinned, because plugins such as basic-ssl assign it after an await in their own configResolved.
+      /** Report the first attempt to enable HTTPS on either Vite server. */
+      function refuseHttps(value: unknown) {
+        if (!value || warnedAboutHttps) return
+        warnedAboutHttps = true
+        config.logger.warn('server.https is not supported by `histoire dev`: stories are served over HTTP')
+      }
+      refuseHttps(server.https)
+      Object.defineProperty(server, 'https', {
+        configurable: true,
+        enumerable: true,
+        get: () => undefined,
+        set: refuseHttps,
+      })
       server.strictPort = true
       server.origin = transport.origin
       config.__histoireProxyOpen = server.open
@@ -46,7 +59,7 @@ export function createDevProxyPlugin(transport: DevProxyTransport, collecting: b
       if (collecting || context.path.includes('__sandbox') || context.path.includes('__histoire')) return html
       return [{ tag: 'script', attrs: { 'type': 'module', 'src': '/__histoire/dev/lifecycle.js', 'data-histoire-generation': transport.generation, 'data-histoire-base': context.server?.config.base ?? '/' }, injectTo: 'head' }]
     },
-  }
+  })
 }
 
 declare module 'vite' {

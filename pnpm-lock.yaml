@@ -856,6 +856,9 @@ importers:
       '@typescript/native':
         specifier: 'catalog:'
         version: typescript@7.0.2
+      '@vitejs/plugin-basic-ssl':
+        specifier: ^2.3.0
+        version: 2.3.0(vite@8.3.5)
       '@vitest/browser-playwright':
         specifier: 5.1.1
         version: 5.1.1(msw@2.14.6(@types/node@22.19.3)(@typescript/typescript6@6.0.2))(playwright@1.59.1)(vite@8.3.5)(vitest@5.1.1)
@@ -5407,6 +5410,12 @@ packages:
         optional: true
       '@vitejs/devtools-vitest':
         optional: true
+
+  '@vitejs/plugin-basic-ssl@2.3.0':
+    resolution: {integrity: sha512-bdyo8rB3NnQbikdMpHaML9Z1OZPBu6fFOBo+OtxsBlvMJtysWskmBcnbIDhUqgC8tcxNv/a+BcV5U+2nQMm1OQ==}
+    engines: {node: ^18.0.0 || ^20.0.0 || >=22.0.0}
+    peerDependencies:
+      vite: ^6.0.0 || ^7.0.0 || ^8.0.0
 
   '@vitejs/plugin-react@5.2.0':
     resolution: {integrity: sha512-YmKkfhOAi3wsB1PhJq5Scj3GXMn3WvtQ/JC0xoopuHoXSdmtdStOpFrYaT1kie2YgFBcIe64ROzMYRjCrYOdYw==}
@@ -15856,6 +15865,10 @@ snapshots:
       - crossws
       - ocache
       - srvx
+
+  '@vitejs/plugin-basic-ssl@2.3.0(vite@8.3.5)':
+    dependencies:
+      vite: 8.3.5(@types/node@22.19.3)(@vitejs/devtools@0.8.0)(esbuild@0.27.2)(jiti@2.7.0)(sass-embedded@1.106.1)(sass@1.106.1)(terser@5.44.1)(yaml@2.8.2)
 
   '@vitejs/plugin-react@5.2.0(vite@8.3.5)':
     dependencies:
