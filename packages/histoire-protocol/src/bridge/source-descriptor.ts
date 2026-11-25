@@ -19,6 +19,7 @@ function keys(input: Record<string, unknown>, allowed: readonly string[]): void 
 export function validateSourceDescriptorFields(input: Record<string, unknown>): void {
   // Data only: ids and contract versions, never module paths or options.
   if (input.framePlugins !== undefined) validateFramePluginInventory(input.framePlugins)
+  if (input.framePadding !== undefined) validateEmbedPadding(input.framePadding)
   if (input.embed !== undefined) {
     const policy = wireRecord(input.embed)
     keys(policy, ['allowedOrigins', 'allowOpenInEditor', 'allowServerTests'])
@@ -55,7 +56,6 @@ export function validateSourceDescriptorFields(input: Record<string, unknown>): 
       if (config[key] !== undefined && (typeof config[key] !== 'number' || !Number.isFinite(config[key]) || (config[key] as number) <= 0)) invalid('Invalid source deadline')
     }
     if (config.testMaxWorkers !== undefined && (!Number.isSafeInteger(config.testMaxWorkers) || (config.testMaxWorkers as number) < 1)) invalid('Invalid source test worker limit')
-    if (config.framePadding !== undefined) validateEmbedPadding(config.framePadding)
     const theme = wireRecord(config.theme)
     validateSettingsPatch({ colorScheme: theme.defaultColorScheme })
     if (typeof theme.darkClass !== 'string' || (theme.hideColorSchemeSwitch !== undefined && typeof theme.hideColorSchemeSwitch !== 'boolean')) invalid('Invalid source theme')

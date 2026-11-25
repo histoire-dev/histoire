@@ -155,7 +155,7 @@ export function createEmbedRuntimeFrame(context: EmbedSurfaceContext) {
   /** Mount override first, then the story layout, then the project default; embeds draw no aligners. */
   function embedPadding(target: HistoireTarget): number {
     const story = context.session.getSnapshot().catalog.stories.find(item => item.id === target.storyId)
-    return context.padding ?? story?.layout?.padding ?? context.descriptor.config?.framePadding ?? 0
+    return context.padding ?? story?.layout?.padding ?? context.descriptor.framePadding ?? 0
   }
   /** New document minted before assigning src; WindowProxy equality cannot resurrect predecessor. */
   function navigate(target: HistoireTarget) {

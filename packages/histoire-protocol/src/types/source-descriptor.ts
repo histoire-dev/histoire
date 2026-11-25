@@ -38,8 +38,6 @@ export interface HistoireSourceConfig {
   globals?: HistoireSettings['globals']
   /** Source initial preview/capture direction. */
   textDirection?: HistoireSettings['textDirection']
-  /** Project gutter around embedded variants whose story layout sets no `padding`. */
-  framePadding?: number
 }
 
 /** Exact parent-origin policy; source document origin is always allowed. */

@@ -153,6 +153,8 @@ export interface HistoireSourceDescriptor {
   inspectionPolicy?: { allowedOrigins: readonly string[] }
   /** Portable source appearance populated by first-party dev/static adapters. */
   config?: HistoireSourceConfig
+  /** Project gutter around embedded variants whose story layout sets no `padding`. */
+  framePadding?: number
   /** Exact document parent-origin policy. */
   embed?: HistoireEmbedPolicy
   /** Lazy same-book content/search inventory. */

@@ -67,6 +67,8 @@ export function createEmbedDescriptor(ctx: Context, snapshot: CatalogSnapshot, m
     // Standalone never receives external authority from opt-in embed settings.
     embed: namespace === 'local' ? { allowedOrigins: [], allowServerTests: true, allowOpenInEditor: true } : embed,
     assets: projectEmbedAssets(snapshot, namespace),
+    // Older v1 readers tolerate top-level extensions and enforce the config schema.
+    ...(isEmbedPadding(framePadding) ? { framePadding } : {}),
     config: {
       title: theme?.title ?? 'Histoire',
       routerMode: ctx.config.routerMode ?? 'history',
@@ -85,7 +87,6 @@ export function createEmbedDescriptor(ctx: Context, snapshot: CatalogSnapshot, m
       testMaxWorkers: getTestMaxWorkers(ctx),
       globals: ctx.config.preview?.globals ?? {},
       textDirection: ctx.config.preview?.textDirection ?? 'ltr',
-      ...(isEmbedPadding(framePadding) ? { framePadding } : {}),
     },
   }
   return validateHistoireSourceDescriptor(descriptor)
