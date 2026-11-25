@@ -6,7 +6,7 @@ import { mergeConfig as mergeViteConfig } from 'vite'
 import { RuntimeCleanupError } from '../runtime/cleanup.js'
 import { createHostingHmr, createHostingProxyEvents } from '../runtime/hosting/hmr.js'
 import { acquireViteServer as createViteServer } from '../vite/acquire-server.js'
-import { createDevProxyPlugin } from '../vite/dev-proxy.js'
+import { createDevProxyPluginFactory } from '../vite/dev-proxy.js'
 import { getViteConfigWithPlugins } from '../vite/index.js'
 import { collectionWatchPlugin, forwardWatcherEvents } from './collection-watcher.js'
 
@@ -38,6 +38,8 @@ export interface CreateServerOptions {
  * `vite.config.js` — creating the collecting one second breaks HMR in Nuxt.
  */
 export async function createViteServers(ctx: Context, options: CreateServerOptions) {
+  const devProxy = options.devProxy
+  const createProxyPlugin = devProxy && createDevProxyPluginFactory(devProxy)
   const getViteServer = async (collecting: boolean) => {
     options.progress?.update('vite', { label: collecting ? 'collection server' : 'client server' })
     const { viteConfig, viteConfigFile } = await getViteConfigWithPlugins(collecting, ctx)
@@ -74,8 +76,8 @@ export async function createViteServers(ctx: Context, options: CreateServerOptio
     }
 
     // Collection server is created first: settle the public origin before either server pins it.
-    if (options.devProxy?.negotiate && collecting) options.devProxy.origin = await options.devProxy.negotiate({ port: viteConfig.server?.port, host: viteConfig.server?.host })
-    if (options.devProxy) viteConfig.plugins.push(createDevProxyPlugin(options.devProxy, collecting))
+    if (devProxy?.negotiate && collecting) devProxy.origin = await devProxy.negotiate({ port: viteConfig.server?.port, host: viteConfig.server?.host })
+    if (createProxyPlugin) viteConfig.plugins.push(createProxyPlugin(collecting))
     let server: Awaited<ReturnType<typeof createViteServer>>
     try {
       server = await createViteServer(

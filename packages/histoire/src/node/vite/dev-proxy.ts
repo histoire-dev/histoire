@@ -10,9 +10,10 @@ export interface DevProxyTransport {
   negotiate?: (address: { port?: number, host?: string | boolean }) => Promise<string>
 }
 
-/** Pin private listener while browser connections retain public origin and configured paths. */
-export function createDevProxyPlugin(transport: DevProxyTransport, collecting: boolean): Plugin {
-  return {
+/** Pin each private listener and share the HTTPS warning across one dev runtime. */
+export function createDevProxyPluginFactory(transport: DevProxyTransport): (collecting: boolean) => Plugin {
+  let warnedAboutHttps = false
+  return collecting => ({
     name: 'histoire:dev-proxy-transport',
     enforce: 'post',
     configResolved(config: ResolvedConfig) {
@@ -22,10 +23,10 @@ export function createDevProxyPlugin(transport: DevProxyTransport, collecting: b
       server.port = 0
       // Public proxy binds before project config loads, so it can only serve plain HTTP.
       // Pinned, because plugins such as basic-ssl assign it after an await in their own configResolved.
-      let warned = false
+      /** Report the first attempt to enable HTTPS on either Vite server. */
       function refuseHttps(value: unknown) {
-        if (!value || warned) return
-        warned = true
+        if (!value || warnedAboutHttps) return
+        warnedAboutHttps = true
         config.logger.warn('server.https is not supported by `histoire dev`: stories are served over HTTP')
       }
       refuseHttps(server.https)
@@ -58,7 +59,7 @@ export function createDevProxyPlugin(transport: DevProxyTransport, collecting: b
       if (collecting || context.path.includes('__sandbox') || context.path.includes('__histoire')) return html
       return [{ tag: 'script', attrs: { 'type': 'module', 'src': '/__histoire/dev/lifecycle.js', 'data-histoire-generation': transport.generation, 'data-histoire-base': context.server?.config.base ?? '/' }, injectTo: 'head' }]
     },
-  }
+  })
 }
 
 declare module 'vite' {

@@ -152,6 +152,7 @@
     "@types/pngjs": "^6.0.5",
     "@types/semver": "^7.8.0",
     "@typescript/native": "catalog:",
+    "@vitejs/plugin-basic-ssl": "^2.3.0",
     "@vitest/browser-playwright": "5.1.1",
     "concurrently": "^9.1.0",
     "typescript": "catalog:",

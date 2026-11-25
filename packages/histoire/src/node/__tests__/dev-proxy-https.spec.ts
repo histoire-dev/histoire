@@ -1,6 +1,6 @@
 import type { ResolvedConfig } from 'vite'
 import { describe, expect, it, vi } from 'vitest'
-import { createDevProxyPlugin } from '../vite/dev-proxy.js'
+import { createDevProxyPluginFactory } from '../vite/dev-proxy.js'
 
 function createConfig(https?: object) {
   return {
@@ -10,7 +10,8 @@ function createConfig(https?: object) {
 }
 
 function runConfigResolved(config: ResolvedConfig) {
-  const plugin = createDevProxyPlugin({ origin: 'http://localhost:6006', generation: 'test' }, false)
+  const createPlugin = createDevProxyPluginFactory({ origin: 'http://localhost:6006', generation: 'test' })
+  const plugin = createPlugin(false)
   return (plugin.configResolved as (config: ResolvedConfig) => void)(config)
 }
 
