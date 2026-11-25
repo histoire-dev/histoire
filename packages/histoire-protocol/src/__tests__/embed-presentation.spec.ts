@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { getEmbedRelativeUrl, parseEmbedDocumentOptions, parseEmbedPresentation, validateEmbedPresentation } from '../url/embed.js'
+import { getEmbedRelativeUrl, parseEmbedDocumentOptions, parseEmbedPadding, parseEmbedPresentation, validateEmbedPadding, validateEmbedPresentation } from '../url/embed.js'
 
 describe('scoped embed links', () => {
   it.each(['a:b/c & "quoted" </script> 日本語', '.', '..'])('preserves exact identities %s under a deployment base', (id) => {
@@ -12,6 +12,20 @@ describe('scoped embed links', () => {
     expect(parseEmbedDocumentOptions(new URLSearchParams('storyId=story'))).toEqual({ storyId: 'story', panels: ['controls'] })
     expect(parseEmbedDocumentOptions(new URLSearchParams('storyId=story&variantId=one&panels='))).toEqual({ storyId: 'story', variantId: 'one', panels: [] })
     expect(getEmbedRelativeUrl({ base: '/', storyId: 'story', panels: [] })).toBe('/__embed.html?view=embed&storyId=story&panels=')
+  })
+
+  it('round-trips an explicit padding override, including zero', () => {
+    expect(getEmbedRelativeUrl({ base: '/', storyId: 'story', variantId: 'one', panels: [], padding: 0 })).toBe('/__embed.html?view=embed&storyId=story&variantId=one&panels=&padding=0')
+    expect(parseEmbedDocumentOptions(new URLSearchParams('storyId=story&padding=16.5'))).toEqual({ storyId: 'story', panels: ['controls'], padding: 16.5 })
+    expect(parseEmbedPadding(new URLSearchParams('panels='))).toBeUndefined()
+  })
+
+  it.each(['padding=', 'padding=-1', 'padding=1e3', 'padding=abc', 'padding=2000', 'padding=4&padding=8'])('rejects malformed padding %s', (search) => {
+    expect(() => parseEmbedPadding(new URLSearchParams(search))).toThrow()
+  })
+
+  it.each([-1, Number.NaN, Number.POSITIVE_INFINITY, 2000, '8'])('rejects padding option %s', (value) => {
+    expect(() => validateEmbedPadding(value)).toThrow('Invalid embed padding')
   })
 
   it('rejects malformed Unicode before URLSearchParams can replace its identity', () => {

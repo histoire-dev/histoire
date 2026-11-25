@@ -46,6 +46,14 @@ function primaryUrl(base: string) {
   return createRuntimeFrameUrl(new URL(base), { target, documentId: 'primary', selectionVersion: 1, standalone: true })
 }
 
+describe('embed runtime padding', () => {
+  it('passes the gutter to embed documents only; the canvas draws its own', () => {
+    expect(new URL(createRuntimeFrameUrl(new URL(book), { target, documentId: 'embed', selectionVersion: 1, padding: 24 })).searchParams.get('padding')).toBe('24')
+    expect(new URL(createRuntimeFrameUrl(new URL(book), { target, documentId: 'embed', selectionVersion: 1, padding: 0 })).searchParams.has('padding')).toBe(false)
+    expect(new URL(createRuntimeFrameUrl(new URL(book), { target, documentId: 'canvas', selectionVersion: 1, standalone: true, padding: 24 })).searchParams.has('padding')).toBe(false)
+  })
+})
+
 describe('story frame document purpose', () => {
   it.each([
     ['primary runtime', () => primaryUrl(book), { purpose: 'interactive', controls: false, matrix: false }],

@@ -40,7 +40,7 @@ export default defineConfig({
 })
 ```
 
-Give each profile a unique ID. Set `colorScheme` to `light` (the default) or `dark`. You can also set `deviceScaleFactor` (1–3), `backgroundColor`, `textDirection`, and scalar `globals`. Set `globals` to replace the project defaults, or omit it to inherit them. Use at least one profile and valid viewport sizes.
+Give each profile a unique ID. Set `colorScheme` to `light` (the default) or `dark`. You can also set `deviceScaleFactor` (1–3), `backgroundColor`, `textDirection`, and scalar `globals`. Set `globals` to replace the project defaults, or omit it to inherit them. Use at least one profile and valid viewport sizes. A story that sets `layout.width` or `layout.height` is captured at that size in every profile; its `padding` is never part of the image.
 
 `threshold` controls per-pixel color sensitivity. `maxDiffPixelRatio` sets the allowed fraction of differing pixels, from 0 to 1. By default, Histoire accepts zero differences after anti-aliasing detection.
 

@@ -7,6 +7,8 @@ export interface EmbedSurfaceContext {
   standalone?: boolean
   /** Scoped explorer UI, independent of parent bridge authority. */
   presentation?: HistoireEmbedPresentation
+  /** Variant gutter override in CSS pixels, replacing the story and project padding. */
+  padding?: number
   /** Explicit source base for local standalone mounts whose route changes independently. */
   sourceBase?: string
   /** Native provider renders generic editors locally; independent iframe defaults to full panel. */

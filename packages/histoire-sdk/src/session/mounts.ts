@@ -1,7 +1,7 @@
 import type { HistoireEmbedPresentation, HistoireSurface } from '@histoire/protocol'
 import type { HistoireMount } from '../types.js'
 import type { OwnedMount, SessionContext } from './context.js'
-import { HistoireSdkError, validateEmbedPresentation } from '@histoire/protocol'
+import { HistoireSdkError, validateEmbedPadding, validateEmbedPresentation } from '@histoire/protocol'
 import { bindHistoireMountChannel } from '../mounts/channel.js'
 import { receiveNotification } from './notifications.js'
 import { publishRuntime } from './runtime.js'
@@ -56,11 +56,13 @@ function unmount(context: SessionContext, owned: OwnedMount): Promise<void> {
 }
 
 /** Reserve primary synchronously before invoking any browser/source adapter. */
-export function mountSurface(context: SessionContext, container: HTMLElement | undefined, surface: HistoireSurface, hidden = false, input?: HistoireEmbedPresentation): HistoireMount {
+export function mountSurface(context: SessionContext, container: HTMLElement | undefined, surface: HistoireSurface, hidden = false, input?: HistoireEmbedPresentation, paddingInput?: number): HistoireMount {
   const connection = context.assertConnected()
   if (!surfaces.has(surface)) throw new HistoireSdkError('INVALID_ARGUMENT', 'Unknown Histoire surface.')
   if (input !== undefined && surface !== 'explorer') throw new HistoireSdkError('INVALID_ARGUMENT', 'Embed presentation requires explorer surface')
   const presentation = input === undefined ? undefined : validateEmbedPresentation(input)
+  if (paddingInput !== undefined && surface !== 'preview' && !presentation) throw new HistoireSdkError('INVALID_ARGUMENT', 'Embed padding requires a preview surface or an explorer embed presentation')
+  const padding = paddingInput === undefined ? undefined : validateEmbedPadding(paddingInput)
   if (presentation && !context.snapshot.selection?.variantId) throw new HistoireSdkError('VARIANT_NOT_FOUND', 'Select a variant before mounting an embed')
   const primary = primarySurfaces.has(surface)
   if (primary && context.primaryId !== null) throw new HistoireSdkError('RUNTIME_IN_USE', 'Session already owns a primary runtime.')
@@ -74,7 +76,7 @@ export function mountSurface(context: SessionContext, container: HTMLElement | u
   if (primary) context.primaryId = mountId
   let transport
   try {
-    transport = context.adapters.mount({ session: context.session!, sessionId: context.sessionId, mountId, surface, presentation, hidden, container, source: connection, target, settings: context.snapshot.settings })
+    transport = context.adapters.mount({ session: context.session!, sessionId: context.sessionId, mountId, surface, presentation, ...(padding === undefined ? {} : { padding }), hidden, container, source: connection, target, settings: context.snapshot.settings })
   }
   catch (error) {
     if (primary) context.primaryId = null

@@ -152,6 +152,11 @@ export function createEmbedRuntimeFrame(context: EmbedSurfaceContext) {
     if (status === 'absent') selected = null
     if (publishNow) publish(status)
   }
+  /** Mount override first, then the story layout, then the project default; embeds draw no aligners. */
+  function embedPadding(target: HistoireTarget): number {
+    const story = context.session.getSnapshot().catalog.stories.find(item => item.id === target.storyId)
+    return context.padding ?? story?.layout?.padding ?? context.descriptor.config?.framePadding ?? 0
+  }
   /** New document minted before assigning src; WindowProxy equality cannot resurrect predecessor. */
   function navigate(target: HistoireTarget) {
     requests.invalidate()
@@ -165,7 +170,7 @@ export function createEmbedRuntimeFrame(context: EmbedSurfaceContext) {
     viewports = []
     sandboxViewports = []
     mounting()
-    iframe.src = createRuntimeFrameUrl(base, { target, documentId: owner.id!, selectionVersion: owner.selectionVersion, standalone: context.standalone })
+    iframe.src = createRuntimeFrameUrl(base, { target, documentId: owner.id!, selectionVersion: owner.selectionVersion, standalone: context.standalone, padding: embedPadding(target) })
     if (!iframe.isConnected) context.container.append(iframe)
     settings()
   }

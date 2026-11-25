@@ -1,6 +1,7 @@
 import { getHistoireNumericMatrixValues } from '../helpers/matrix-numeric.js'
 import { validateFramePluginInventory } from '../plugin-channels.js'
 import { validateEmbedOrigins } from '../url/embed-origins.js'
+import { validateEmbedPadding } from '../url/embed.js'
 import { invalid, validateSettingsPatch, wireId, wireRecord } from './validation.js'
 
 /** Strict same-base opaque reference; URL normalization must never hide traversal. */
@@ -54,6 +55,7 @@ export function validateSourceDescriptorFields(input: Record<string, unknown>): 
       if (config[key] !== undefined && (typeof config[key] !== 'number' || !Number.isFinite(config[key]) || (config[key] as number) <= 0)) invalid('Invalid source deadline')
     }
     if (config.testMaxWorkers !== undefined && (!Number.isSafeInteger(config.testMaxWorkers) || (config.testMaxWorkers as number) < 1)) invalid('Invalid source test worker limit')
+    if (config.framePadding !== undefined) validateEmbedPadding(config.framePadding)
     const theme = wireRecord(config.theme)
     validateSettingsPatch({ colorScheme: theme.defaultColorScheme })
     if (typeof theme.darkClass !== 'string' || (theme.hideColorSchemeSwitch !== undefined && typeof theme.hideColorSchemeSwitch !== 'boolean')) invalid('Invalid source theme')

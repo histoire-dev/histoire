@@ -11,13 +11,17 @@ export function createHistoirePrimary(name: string, surface: 'preview') {
   return defineComponent({
     name,
     inheritAttrs: false,
+    props: {
+      /** Gutter in CSS pixels around the variant, replacing the story and project padding. */
+      padding: { type: Number, default: undefined },
+    },
     emits: {
       /** Fires after source runtime readiness, including explicit empty-book readiness. */
       ready: () => true,
       /** Typed source/runtime or primary ownership failure. */
       error: (_error: unknown) => true,
     },
-    setup(_props, { attrs, slots, emit, expose }) {
+    setup(props, { attrs, slots, emit, expose }) {
       const context = useHistoireContext()
       const session = context.session
       const initial = session.getSnapshot()
@@ -75,7 +79,7 @@ export function createHistoirePrimary(name: string, surface: 'preview') {
       onMounted(() => {
         if (removed || !container.value) return
         try {
-          mount = session.mount(container.value, { surface })
+          mount = session.mount(container.value, { surface, ...(props.padding === undefined ? {} : { padding: props.padding }) })
           stopReadiness = session.subscribe(synchronizeReadiness)
           stopFocus = subscribeHistoireMountEvents(mount, (event) => {
             if (event.event !== 'focus.changed') return

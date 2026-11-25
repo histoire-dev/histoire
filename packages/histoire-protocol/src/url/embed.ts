@@ -14,6 +14,33 @@ export function validateEmbedPanels(value: unknown = ['controls']): HistoireEmbe
   return HISTOIRE_EMBED_PANELS.filter(panel => value.includes(panel))
 }
 
+/** Largest accepted embed gutter in CSS pixels. */
+export const HISTOIRE_EMBED_MAX_PADDING = 1024
+
+/** Whether a value is a usable embed gutter in CSS pixels. */
+export function isEmbedPadding(value: unknown): value is number {
+  return typeof value === 'number' && Number.isFinite(value) && value >= 0 && value <= HISTOIRE_EMBED_MAX_PADDING
+}
+
+/** Reject gutters that are negative, non-finite or unreasonably large. */
+export function validateEmbedPadding(value: unknown): number {
+  if (!isEmbedPadding(value)) invalid('Invalid embed padding')
+  return value
+}
+
+/** Read an optional `padding` hint written as plain CSS pixels. */
+export function parseEmbedPadding(query: URLSearchParams): number | undefined {
+  const value = hint(query, 'padding')
+  if (value === undefined) return
+  if (!/^\d+(?:\.\d+)?$/.test(value)) invalid('Invalid embed padding')
+  return validateEmbedPadding(Number(value))
+}
+
+/** Serialize a validated gutter so the embed document can read it back exactly. */
+export function writeEmbedPadding(query: URLSearchParams, value: number): void {
+  query.set('padding', String(validateEmbedPadding(value)))
+}
+
 /** Validate untyped SDK options before a surface reserves runtime ownership. */
 export function validateEmbedPresentation(value: unknown): HistoireEmbedPresentation {
   if (!value || typeof value !== 'object' || Array.isArray(value)) invalid('Expected embed presentation')
@@ -54,7 +81,8 @@ export function writeEmbedPresentation(query: URLSearchParams, input: HistoireEm
 export function parseEmbedDocumentOptions(query: URLSearchParams): HistoireEmbedDocumentOptions {
   const storyId = targetId(hint(query, 'storyId'))
   const variantId = hint(query, 'variantId')
-  return { storyId, ...(variantId === undefined ? {} : { variantId: targetId(variantId) }), panels: panels(query) }
+  const padding = parseEmbedPadding(query)
+  return { storyId, ...(variantId === undefined ? {} : { variantId: targetId(variantId) }), panels: panels(query), ...(padding === undefined ? {} : { padding }) }
 }
 
 /** Reject coercion and surrogate replacement before URLSearchParams encodes IDs. */
@@ -64,10 +92,11 @@ function targetId(value: unknown): string {
 }
 
 /** Build deployment-relative direct embed link without standalone route or runtime hints. */
-export function getEmbedRelativeUrl(options: { base: string, storyId: string, variantId?: string, panels?: readonly HistoireEmbedPanel[] }): string {
+export function getEmbedRelativeUrl(options: { base: string, storyId: string, variantId?: string, panels?: readonly HistoireEmbedPanel[], padding?: number }): string {
   const query = new URLSearchParams({ view: 'embed', storyId: targetId(options.storyId) })
   if (options.variantId !== undefined) query.set('variantId', targetId(options.variantId))
   query.set('panels', validateEmbedPanels(options.panels).join(','))
+  if (options.padding !== undefined) writeEmbedPadding(query, options.padding)
   parseEmbedDocumentOptions(query)
   return `${normalizePreviewBase(options.base)}__embed.html?${query}`
 }

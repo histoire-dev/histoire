@@ -124,6 +124,8 @@ export interface HistoireMountContext {
   surface: HistoireSurface
   /** Optional scoped explorer composition, never additional authority. */
   presentation?: HistoireEmbedPresentation
+  /** Validated variant gutter override in CSS pixels. */
+  padding?: number
   /** Explicit hidden primary request. */
   hidden: boolean
   /** Caller-owned container; absent for adapter-owned hidden container. */

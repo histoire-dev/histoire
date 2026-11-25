@@ -75,9 +75,13 @@ export interface HistoireMount {
 }
 
 /** Scoped presentation is supported only by explorer mounts. */
-export type HistoireMountOptions =
+export type HistoireMountOptions = (
   | { surface: 'explorer', presentation?: HistoireEmbedPresentation }
   | { surface: Exclude<HistoireSurface, 'explorer'>, presentation?: never }
+) & {
+  /** Gutter in CSS pixels around the variant of a `preview` or scoped explorer embed, replacing the story and project padding. */
+  padding?: number
+}
 
 /** Framework-neutral controller shared by iframe and native Vue consumers. */
 export interface HistoireSession {

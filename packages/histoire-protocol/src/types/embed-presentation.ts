@@ -22,4 +22,6 @@ export interface HistoireEmbedDocumentOptions {
   variantId?: string
   /** Enabled panels in canonical order. */
   panels: readonly HistoireEmbedPanel[]
+  /** Gutter in CSS pixels around the variant, replacing the story and project padding. */
+  padding?: number
 }

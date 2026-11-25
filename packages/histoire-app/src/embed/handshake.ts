@@ -1,6 +1,6 @@
 import type { HistoireBridgeAck, HistoireBridgeIdentity, HistoireSnapshot, HistoireSurface } from '@histoire/protocol'
 import type { EmbedSourceConnection } from './types.js'
-import { HistoireSdkError, negotiateHistoireProtocol, parseEmbedPresentation, validateEmbedOrigin, validateHistoireHello } from '@histoire/protocol'
+import { HistoireSdkError, negotiateHistoireProtocol, parseEmbedPadding, parseEmbedPresentation, validateEmbedOrigin, validateHistoireHello } from '@histoire/protocol'
 import { createBridgePort, getBridgeSurfaceRole } from '@histoire/sdk/internal'
 import { dispatchEmbedCommand, projectEmbedDescriptor } from './commands.js'
 import { createEmbedDocumentLifecycle } from './lifecycle.js'
@@ -48,6 +48,8 @@ export function installEmbedHandshake(sourcePromise: Promise<EmbedSourceConnecti
       }
       const presentation = parseEmbedPresentation(hints)
       if (presentation && surface !== 'explorer') throw new HistoireSdkError('INVALID_ARGUMENT', 'Embed presentation requires explorer surface')
+      const padding = parseEmbedPadding(hints)
+      if (padding !== undefined && surface !== 'preview' && !presentation) throw new HistoireSdkError('INVALID_ARGUMENT', 'Embed padding requires a preview surface or an explorer embed presentation')
       const descriptor = projectEmbedDescriptor(source.descriptor, parentOrigin, window.location.origin, source.allowedOrigins)
       const owner: HistoireBridgeIdentity = { protocolVersion, sessionId: hello.sessionId, mountId: hello.mountId, connectionId: surface ? `${hello.mountId}:connection` : `${hello.mountId}:connection:${hello.nonce}`, sourceId: descriptor.sourceId, epoch: descriptor.epoch, revision: descriptor.revision }
       let view: ReturnType<typeof createParentViewSession> | undefined
@@ -69,7 +71,7 @@ export function installEmbedHandshake(sourcePromise: Promise<EmbedSourceConnecti
         if (request.command === 'view.sync' && view && surface) {
           view.synchronize(request.payload as HistoireSnapshot)
           if (!instance) {
-            instance = mountEmbedSurface(surface, { container: window.document.body, session: view.session, bridge, descriptor, signal: lifecycle.signal, controlsCustomOnly, sourceBase: new URL('./', window.location.href).href, presentation })
+            instance = mountEmbedSurface(surface, { container: window.document.body, session: view.session, bridge, descriptor, signal: lifecycle.signal, controlsCustomOnly, sourceBase: new URL('./', window.location.href).href, presentation, padding })
             lifecycle.add(() => instance?.close())
             const capture = { ...bridge.getOwner(), target: view.session.getSnapshot().selection ?? undefined }
             /** First readiness cannot adopt a later source, target or document. */

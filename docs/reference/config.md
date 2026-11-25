@@ -763,7 +763,7 @@ export default defineConfig({
 
 `number` - Default: `0`
 
-Space in CSS pixels around each variant in Grid, List and Single, for stories whose `layout` sets no `padding`. Aligners mark the variant corners. A story `layout.padding`, including `0`, takes precedence.
+Space in CSS pixels around each variant in every arrangement, for stories whose `layout` sets no `padding`. Aligners mark the variant corners. A story `layout.padding`, including `0`, takes precedence. [Embeds](../guide/embedding.md#padding) apply the same padding as plain space, without aligners, and can override it.
 
 ```ts
 export default defineConfig({

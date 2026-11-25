@@ -45,6 +45,17 @@ async function fixture() {
   return { root, ctx, config, source, run, image }
 }
 
+describe('visual capture size', () => {
+  it('captures at the story-declared width and height instead of the profile viewport', () => {
+    const ctx = { root: '/project', config: { visual: { profiles: [{ id: 'small', width: 320, height: 240 }] } }, storyFiles: [{ relativePath: 'Button.story.vue', story: { id: 'button', title: 'Button', layout: { type: 'grid', width: 200, padding: 24 }, variants: [{ id: 'primary', title: 'Primary' }] } }] } as Context
+    const config = resolveVisualConfig(ctx.config.visual)!
+    const source = { ctx, isActive: () => true } as VisualSource
+    expect(visualCaptureSpec(source, config, createCanonicalCase('button', 'primary', 'primary'), 'small')).toMatchObject({ width: 200, height: 240 })
+    ctx.storyFiles[0].story.layout = { type: 'grid', width: 99999, height: 96 }
+    expect(visualCaptureSpec(source, config, createCanonicalCase('button', 'primary', 'primary'), 'small')).toMatchObject({ width: 3840, height: 96 })
+  })
+})
+
 describe('visual baseline ownership', () => {
   it('approves exact retained target and leaves another baseline untouched', async () => {
     const { root, source, config, run } = await fixture()

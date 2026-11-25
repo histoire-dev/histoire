@@ -11,6 +11,8 @@ export interface RuntimeFrameUrlOptions {
   selectionVersion: number
   /** Standalone workbench host, which forwards its own base presentation flags. */
   standalone?: boolean
+  /** Embed gutter in CSS pixels; the canvas draws its own, so standalone hosts never pass it. */
+  padding?: number
 }
 
 /** Base sandbox URL carrying the exact target identities; every caller holds a selected variant. */
@@ -32,6 +34,7 @@ export function createRuntimeFrameUrl(base: URL, options: RuntimeFrameUrlOptions
   url.searchParams.set('selectionVersion', String(options.selectionVersion))
   url.searchParams.set('embed', 'true')
   if (options.standalone) url.searchParams.set('standalone', 'true')
+  else if (options.padding) url.searchParams.set('padding', String(options.padding))
   if (options.standalone && base.searchParams.get('nativeScroll') === 'true') url.searchParams.set('nativeScroll', 'true')
   if (options.standalone && base.searchParams.get('matrix') === 'true') url.searchParams.set('matrix', 'true')
   return url.href

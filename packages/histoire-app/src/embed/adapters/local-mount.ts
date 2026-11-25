@@ -53,7 +53,7 @@ export function mountLocalHistoireSurface(context: HistoireMountContext, sourceB
   // controls can request replica-only UI before first render.
   acquired = Promise.resolve().then(() => {
     abort.signal.throwIfAborted()
-    instance = mountEmbedSurface(context.surface, { container: root, session: context.session, bridge: child, descriptor, signal: abort.signal, sourceBase, controlsCustomOnly: customOnly, standalone, presentation: context.presentation })
+    instance = mountEmbedSurface(context.surface, { container: root, session: context.session, bridge: child, descriptor, signal: abort.signal, sourceBase, controlsCustomOnly: customOnly, standalone, presentation: context.presentation, padding: context.padding })
     return instance
   })
   const ready = acquired.then(async (view) => {

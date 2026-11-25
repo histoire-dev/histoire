@@ -17,6 +17,8 @@ export const HistoireEmbed = defineComponent({
     scope: { type: String as PropType<'story' | 'variant'>, required: true },
     /** Enabled panels; empty array gives canvas only. */
     panels: { type: Array as PropType<readonly HistoireEmbedPanel[]>, default: () => ['controls'] },
+    /** Gutter in CSS pixels around the variant, replacing the story and project padding. */
+    padding: { type: Number, default: undefined },
   },
   emits: ['ready', 'error'],
   setup(props, { emit, slots }) {
@@ -70,7 +72,7 @@ export const HistoireEmbed = defineComponent({
           props.scope === 'story' ? h(HstSelect, { 'layout': 'inline', 'aria-label': 'Variant', 'modelValue': selected, 'options': story.value!.variants.map(variant => ({ value: variant.id, label: variant.title })), 'onUpdate:modelValue': selectVariant }) : null,
         ]),
         h('div', { class: 'histoire-embed-workspace' }, [
-          h('main', { 'ref': canvas, 'class': 'histoire-embed-canvas', 'aria-label': 'Canvas' }, [h(HistoirePreview, { onReady: () => active && emit('ready'), onError: error }, slots.canvas)]),
+          h('main', { 'ref': canvas, 'class': 'histoire-embed-canvas', 'aria-label': 'Canvas' }, [h(HistoirePreview, { padding: props.padding, onReady: () => active && emit('ready'), onError: error }, slots.canvas)]),
           panels.value.length ? h(EmbedPanels, { panels: panels.value, onError: error }) : null,
         ]),
       ])
