@@ -19,7 +19,7 @@ export type { BuiltinCanvasTool, CanvasContentInsets, CanvasFitTarget, CanvasPre
 /** Create independent canvas state; nearest shell provides instance to its tools. */
 export function createCanvasStore(options: { storage?: CanvasStorage, singleViewport?: SingleViewportState } = {}) {
   const preferences = readCanvasPreferences(options.storage)
-  const state = reactive({ ...preferences, singleViewport: options.singleViewport ?? { mode: 'responsive' as const }, singleViewportSize: { width: 1, height: 1 }, singleViewportDraft: null as CanvasSize | null, arrangement: 'grid' as CanvasArrangement, zoom: preferences.zoomByArrange.grid, effectiveZoom: typeof preferences.zoomByArrange.grid === 'number' ? preferences.zoomByArrange.grid : 1, panOffset: { x: 32, y: 32 }, selectedFrame: null as string | null, viewport: { width: 0, height: 0 }, bounds: { x: 0, y: 0, width: 0, height: 0 }, inspectorWidth: 0, contentInsets: { topInset: 0, bottomInset: 0 }, frameBackgrounds: {} as Record<string, CanvasBackground>, panning: false, measure: null as CanvasMeasureState | null })
+  const state = reactive({ ...preferences, singleViewport: options.singleViewport ?? { mode: 'responsive' as const }, singleViewportSize: { width: 1, height: 1 }, singleViewportDraft: null as CanvasSize | null, arrangement: 'grid' as CanvasArrangement, zoom: preferences.zoomByArrange.grid, effectiveZoom: typeof preferences.zoomByArrange.grid === 'number' ? preferences.zoomByArrange.grid : 1, panOffset: { x: 32, y: 32 }, selectedFrame: null as string | null, viewport: { width: 0, height: 0 }, bounds: { x: 0, y: 0, width: 0, height: 0 }, inspectorWidth: 0, contentInsets: { topInset: 0, bottomInset: 0 }, frameBackgrounds: {} as Record<string, CanvasBackground>, toolbarSizedStories: {} as Record<string, true>, panning: false, measure: null as CanvasMeasureState | null })
   let selectionBounds: CanvasFitTarget | undefined
   // Absent while the active view has no layout (plugin views may opt out of fitting).
   let fitBounds: CanvasFitTarget | undefined = state.bounds
@@ -228,6 +228,11 @@ export function createCanvasStore(options: { storage?: CanvasStorage, singleView
     setAutoFitContent(value: boolean) {
       state.autoFitContent = value
       save()
+    },
+    /** Use a story's declared size, or the toolbar viewport instead, until the page reloads. */
+    setStorySizeFromCode(storyId: string, fromCode: boolean) {
+      if (fromCode) delete state.toolbarSizedStories[storyId]
+      else state.toolbarSizedStories[storyId] = true
     },
     /** Switch Single sizing intent and retire any transient direct-resize draft. */
     setSingleViewportMode(mode: SingleViewportState['mode']) {

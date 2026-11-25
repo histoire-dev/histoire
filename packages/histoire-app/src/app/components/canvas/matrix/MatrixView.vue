@@ -12,6 +12,7 @@ import { canvasContentKey } from '../content-sizes.js'
 import { useCanvasFrameAdmission } from '../frame-admission.js'
 import { useCanvasFrameLedger } from '../frames/frame-ledger.js'
 import { canvasContentRect, clientToCanvas } from '../pan/usePanZoom.js'
+import { storyFrameSize } from '../story-frame-size.js'
 import { layoutMatrixFrames, MATRIX_COLUMN_HEADER, MATRIX_ROW_GUTTER, MATRIX_TOP_INSET, matrixLayoutBounds } from './matrix-layout.js'
 import { watchMatrixFrameSelection } from './matrix-selection.js'
 import MatrixAvailabilityState from './MatrixAvailabilityState.vue'
@@ -48,16 +49,18 @@ const { story, variant } = useSelection()
 const baseVariant = computed(() => variant.value?.id ?? story.value?.variants[0]?.id)
 const rowValues = computed(() => matrix.rowAxis.value ? filterMatrixValues(matrix.rowAxis.value, matrix.rowValues.value) : [])
 const colValues = computed(() => matrix.colAxis.value ? filterMatrixValues(matrix.colAxis.value, matrix.colValues.value) : [])
+/** Story-declared size unless switched to the toolbar viewport for this session. */
+const declaredFrame = computed(() => storyFrameSize(canvas, story.value))
 /** Matrix projections share a variant, but never share intrinsic dimensions; declared ones win. */
 function cellSize(cell: MatrixCellData) {
   const target = { storyId: story.value?.id ?? '', variantId: baseVariant.value ?? '' }
   const measured = canvas.autoFitContent ? canvas.contentSizes.get(cell.key, canvasContentKey(snapshot.value, target, cell.props)) : undefined
   if (!measured) return props.size
-  const declared = story.value?.layout
+  const declared = declaredFrame.value
   return { width: declared?.width ?? measured.width, height: declared?.height ?? measured.height }
 }
 const gutter = computed(() => props.padding ?? 0)
-const fixedSize = computed(() => !!(story.value?.layout?.width || story.value?.layout?.height))
+const fixedSize = computed(() => !!declaredFrame.value)
 /** Rendering and selection share fixed-pixel matrix gutter/gap calculations. */
 function layoutFrames(zoom = canvas.effectiveZoom) {
   return layoutMatrixFrames(matrix.cells.value, { storyId: story.value?.id ?? '', variantId: baseVariant.value ?? '', rows: rowValues.value, cols: colValues.value, size: cellSize, padding: gutter.value, zoom })

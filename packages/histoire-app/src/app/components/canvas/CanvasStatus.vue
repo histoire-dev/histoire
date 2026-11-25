@@ -7,7 +7,7 @@ import CanvasHintBar from './CanvasHintBar.vue'
 import CanvasHintItem from './CanvasHintItem.vue'
 import CanvasHintKey from './CanvasHintKey.vue'
 import CanvasMeasureHint from './CanvasMeasureHint.vue'
-import { useCanvasViewportDimensions } from './toolbar/viewport-size.js'
+import { useCanvasViewportDimensions, useStoryFrameSize } from './toolbar/viewport-size.js'
 
 defineProps<{
   /** Floating tool hint instead of the status line; pan covers temporary Space panning. */
@@ -16,7 +16,12 @@ defineProps<{
 const snapshot = useHistoireSnapshot()
 const canvas = useCanvasStore()
 const dimensions = useCanvasViewportDimensions()
-const size = computed(() => `${dimensions.value.width} × ${dimensions.value.height ?? 'Auto'}`)
+const declared = useStoryFrameSize()
+const size = computed(() => {
+  const width = (canvas.autoFitContent ? undefined : declared.value?.width) ?? dimensions.value.width
+  const height = (canvas.autoFitContent ? undefined : declared.value?.height) ?? dimensions.value.height
+  return `${width} × ${height ?? 'Auto'}`
+})
 </script>
 
 <template>
@@ -44,6 +49,6 @@ const size = computed(() => `${dimensions.value.width} × ${dimensions.value.hei
     </CanvasHintBar>
   </div>
   <div v-else class="histoire-canvas-status htw:[line-height:normal] htw:flex htw:w-full htw:items-center htw:justify-end htw:gap-2 htw:min-w-0 htw:font-mono htw:text-[11px] htw:text-muted">
-    <BuiltinIcon class="htw:flex-none" icon="laptop" :size="14" /><span class="htw:overflow-hidden htw:text-ellipsis htw:whitespace-nowrap">{{ size }} · {{ Math.round(canvas.effectiveZoom * 100) }}% · {{ snapshot.settings.backgroundColor }}</span>
+    <BuiltinIcon class="htw:flex-none" :icon="declared ? 'code' : 'laptop'" :size="14" /><span class="htw:overflow-hidden htw:text-ellipsis htw:whitespace-nowrap">{{ size }} · {{ Math.round(canvas.effectiveZoom * 100) }}% · {{ snapshot.settings.backgroundColor }}</span>
   </div>
 </template>

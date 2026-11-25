@@ -19,9 +19,9 @@ const presets = usePresetConfigStore()
 const color = computed(() => getBackgroundContrastColor(props.background, presets?.backgroundPresets.value ?? []))
 
 /** Distance between a mark and the variant edge it extends. */
-const GAP = 4
+const GAP = 6
 /** Longest mark, kept inside the gutter. */
-const MAX_LENGTH = 8
+const MAX_LENGTH = 4
 
 /** Crop marks extend each variant corner outward, horizontally and vertically. */
 const path = computed(() => {
