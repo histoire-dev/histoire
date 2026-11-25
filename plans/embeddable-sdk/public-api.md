@@ -198,6 +198,8 @@ Locally oversized requests and correctly correlated oversized responses reject R
 
 Source writes/serves __embed.html and histoire-embed.json at configured base. Descriptor includes version, source identity/generation/revision, portable config/theme/presets, catalog/tree, content/search references, and implemented capabilities. Heavy bodies separate/lazy. Legacy output remains compatible.
 
+Descriptor readers tolerate unknown optional fields in `config` and its theme, matrix, and preset records within existing JSON limits. Known fields still follow their declared types and requirements. Embed permissions, capability maps, and asset references retain closed schemas. To support earlier v1 readers with closed config schemas, publish new optional metadata as a top-level descriptor extension.
+
 Source bridge URL uses view=bridge. Surface URL uses view=surface&surface=<supported name>. SDK provides parentOrigin/sessionId/mountId as non-secret bootstrap hints. Hints alone never authorize messages.
 
 Handshake: parent sends hello to exact source origin after iframe load with session/mount/version/nonce and transferred port. Child requires event.source === window.parent, event.origin equal validated parentOrigin and allowed origin, matching hints/version, and exactly one port. Ack includes descriptor identity and negotiated connectionId over bound port. Data bridge makes no story import.

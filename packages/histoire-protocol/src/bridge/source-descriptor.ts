@@ -9,7 +9,7 @@ export function validateSourceAssetReference(value: unknown): string {
   return value as string
 }
 
-/** Rejects unexpected projected keys before source configuration reaches UI code. */
+/** Rejects unexpected policy and asset reference fields. */
 function keys(input: Record<string, unknown>, allowed: readonly string[]): void {
   if (Object.keys(input).some(key => !allowed.includes(key))) invalid('Unknown source descriptor field')
 }
@@ -40,12 +40,11 @@ export function validateSourceDescriptorFields(input: Record<string, unknown>): 
     }
   }
   if (input.config !== undefined) {
+    // The descriptor's bounded JSON check covers additive fields. Validate the settings this reader uses.
     const config = wireRecord(input.config)
-    keys(config, ['title', 'routerMode', 'matrix', 'theme', 'responsivePresets', 'backgroundPresets', 'autoApplyContrastColor', 'storyCollectTimeout', 'runTimeout', 'testMaxWorkers', 'globals', 'textDirection'])
     if (config.routerMode !== undefined && !['history', 'hash'].includes(config.routerMode as string)) invalid('Invalid source router mode')
     if (config.matrix !== undefined) {
       const matrix = wireRecord(config.matrix)
-      keys(matrix, ['numericValues'])
       if (!getHistoireNumericMatrixValues(matrix.numericValues)) invalid('Invalid matrix numeric values')
     }
     if (config.globals !== undefined) validateSettingsPatch({ globals: config.globals })
@@ -56,7 +55,6 @@ export function validateSourceDescriptorFields(input: Record<string, unknown>): 
     }
     if (config.testMaxWorkers !== undefined && (!Number.isSafeInteger(config.testMaxWorkers) || (config.testMaxWorkers as number) < 1)) invalid('Invalid source test worker limit')
     const theme = wireRecord(config.theme)
-    keys(theme, ['defaultColorScheme', 'darkClass', 'hideColorSchemeSwitch', 'colors'])
     validateSettingsPatch({ colorScheme: theme.defaultColorScheme })
     if (typeof theme.darkClass !== 'string' || (theme.hideColorSchemeSwitch !== undefined && typeof theme.hideColorSchemeSwitch !== 'boolean')) invalid('Invalid source theme')
     if (theme.colors !== undefined) {
@@ -67,12 +65,10 @@ export function validateSourceDescriptorFields(input: Record<string, unknown>): 
     if (!Array.isArray(config.responsivePresets) || !Array.isArray(config.backgroundPresets)) invalid('Invalid source presets')
     for (const value of config.responsivePresets) {
       const preset = wireRecord(value)
-      keys(preset, ['label', 'width', 'height'])
       if (typeof preset.label !== 'string' || typeof preset.width !== 'number' || !Number.isFinite(preset.width) || preset.width <= 0 || (preset.height != null && (typeof preset.height !== 'number' || !Number.isFinite(preset.height) || preset.height <= 0))) invalid('Invalid responsive preset')
     }
     for (const value of config.backgroundPresets) {
       const preset = wireRecord(value)
-      keys(preset, ['label', 'color', 'contrastColor'])
       if (['label', 'color'].some(key => typeof preset[key] !== 'string') || (preset.contrastColor !== undefined && typeof preset.contrastColor !== 'string')) invalid('Invalid background preset')
     }
   }

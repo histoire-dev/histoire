@@ -1,6 +1,16 @@
+import type { HistoireSourceConfig } from '../index.js'
 import { describe, expect, it } from 'vitest'
-import { createEmbedFrameAncestors, isHistoireProjectFileOrigin, mergeEmbedFrameAncestors, resolveEmbedOrigins, validateHistoireSourceDescriptor } from '../index.js'
+import { createEmbedFrameAncestors, isHistoireProjectFileOrigin, mergeEmbedFrameAncestors, resolveEmbedOrigins, validateBridgeEnvelope, validateHistoireAck, validateHistoireSourceDescriptor } from '../index.js'
 import { createProtocolDescriptor } from './fixtures/catalog.js'
+
+/** Known portable settings that older readers still consume. */
+const sourceConfig = {
+  title: 'Book',
+  theme: { defaultColorScheme: 'auto', darkClass: 'dark' },
+  responsivePresets: [{ label: 'Phone', width: 320 }],
+  backgroundPresets: [{ label: 'White', color: '#fff', contrastColor: '#000' }],
+  autoApplyContrastColor: false,
+} satisfies HistoireSourceConfig
 
 describe('portable source descriptor policy', () => {
   it('accepts old catalogs and validates explicit layout provenance', () => {
@@ -33,7 +43,7 @@ describe('portable source descriptor policy', () => {
       ...createProtocolDescriptor(),
       embed: { allowedOrigins: ['https://host.test:8443'], allowOpenInEditor: false, allowServerTests: false },
       assets: { search: 'assets/embed-search.json', content: [{ storyId: 'a:b', docs: 'assets/docs-123.json', rawSource: 'assets/source-123.json' }] },
-      config: { title: 'Book', theme: { defaultColorScheme: 'auto', darkClass: 'dark' }, responsivePresets: [{ label: 'Phone', width: 320 }], backgroundPresets: [{ label: 'White', color: '#fff', contrastColor: '#000' }], autoApplyContrastColor: false },
+      config: sourceConfig,
     }
     expect(validateHistoireSourceDescriptor(descriptor)).toBe(descriptor)
     expect(validateHistoireSourceDescriptor({ ...descriptor, config: { ...descriptor.config, matrix: { numericValues: [-1, 0, 0.5] } } }).config?.matrix?.numericValues).toEqual([-1, 0, 0.5])
@@ -46,7 +56,8 @@ describe('portable source descriptor policy', () => {
     for (const origin of ['*', 'null', 'https://host.test/path', 'https://user:pass@host.test', 'https://host.test/']) {
       expect(() => validateHistoireSourceDescriptor({ ...descriptor, embed: { ...descriptor.embed, allowedOrigins: [origin] } })).toThrow()
     }
-    expect(() => validateHistoireSourceDescriptor({ ...descriptor, config: { ...descriptor.config, loader: 'private' } })).toThrow()
+    expect(() => validateHistoireSourceDescriptor({ ...descriptor, assets: { ...descriptor.assets, extra: 'assets/other.json' } })).toThrow('Unknown source descriptor field')
+    expect(() => validateHistoireSourceDescriptor({ ...descriptor, config: { ...descriptor.config, loader: () => 'private' } })).toThrow('Unsupported wire value')
     expect(() => validateHistoireSourceDescriptor({ ...descriptor, config: { ...descriptor.config, theme: { darkClass: 'dark' } } })).toThrow()
     expect(validateHistoireSourceDescriptor({ ...descriptor, config: { ...descriptor.config, testMaxWorkers: 2 } })).toBeDefined()
     for (const testMaxWorkers of [0, -1, 1.5]) {
@@ -54,6 +65,27 @@ describe('portable source descriptor policy', () => {
     }
     // Descriptor wire validation rejects NaN before field-specific worker limits.
     expect(() => validateHistoireSourceDescriptor({ ...descriptor, config: { ...descriptor.config, testMaxWorkers: Number.NaN } })).toThrow('Non-finite wire number')
+  })
+
+  it.each([
+    ['config', { framePadding: 24 }],
+    ['matrix', { matrix: { numericValues: [0, 1], showEmptyCells: true } }],
+    ['theme', { theme: { ...sourceConfig.theme, surfaceStyle: 'plain' } }],
+    ['viewport preset', { responsivePresets: [{ ...sourceConfig.responsivePresets[0], category: 'mobile' }] }],
+    ['background preset', { backgroundPresets: [{ ...sourceConfig.backgroundPresets[0], category: 'solid' }] }],
+  ] as const)('accepts additive %s metadata in discovery, handshake and updates', (_, extension) => {
+    const base = { ...createProtocolDescriptor(), config: sourceConfig }
+    const descriptor = { ...base, config: { ...sourceConfig, ...extension } }
+    const hello = { kind: 'histoire:hello', protocolRange: { min: 1, max: 1 }, nonce: 'challenge', sessionId: 'session', mountId: 'mount', parentOrigin: 'https://host.test', role: 'data' } as const
+    const owner = { protocolVersion: 1, sessionId: hello.sessionId, connectionId: 'connection', mountId: hello.mountId, sourceId: base.sourceId, epoch: base.epoch, revision: base.revision }
+    const ack = { kind: 'histoire:ack', nonce: hello.nonce, protocolRange: hello.protocolRange, ok: true, owner }
+    const update = { ...descriptor, revision: 'updated' }
+    const event = { ...owner, revision: update.revision, kind: 'event', event: 'catalog.changed', sequence: 1, payload: { descriptor: update } }
+
+    expect(validateHistoireSourceDescriptor(base)).toBe(base)
+    expect(validateHistoireSourceDescriptor(descriptor)).toBe(descriptor)
+    expect(validateHistoireAck({ ...ack, descriptor }, hello)).toMatchObject({ ok: true, descriptor })
+    expect(validateBridgeEnvelope(event, owner, 'data', undefined, 'child-to-parent')).toBe(event)
   })
 
   it('replaces baked list and fails closed for malformed present deployment override', () => {
