@@ -1,5 +1,6 @@
 import { access, readFile, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
+import { normalize } from 'pathe'
 import { describe, expect, it } from 'vitest'
 import { createMcpFrameworkProject } from '../utils/mcp/framework-project.js'
 
@@ -16,7 +17,7 @@ describe('nuxt resolved project root', () => {
     const controller = createProjectRuntimeController({ root: project.root, port: 0, host: '127.0.0.1', open: false })
     try {
       const runtime = await controller.start()
-      expect(runtime.context.root).toBe(project.root)
+      expect(runtime.context.root).toBe(normalize(project.root))
       expect(runtime.context.storyFiles.some(file => file.story?.variants.length)).toBe(true)
       expect(runtime.context.config.setupCode.join('\n')).toContain('configFromNuxt')
       // Generated files stay apart from a concurrently running `nuxt dev`.
