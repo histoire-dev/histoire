@@ -1,6 +1,7 @@
 import { useHistoireSnapshot } from '@histoire/vue'
 import { computed } from 'vue'
 import { useCanvasFrames, useCanvasStore } from '../../../composables/canvas-settings.js'
+import { isBuiltinCanvasArrangement } from '../../../stores/canvas-arrangement.js'
 import { getSelectedCanvasFrame } from '../frame-target.js'
 import { declaredFrameSize } from '../story-frame-size.js'
 import { viewportDimensions } from './settings.js'
@@ -20,21 +21,14 @@ export function useCanvasViewportDimensions() {
   })
 }
 
-/** Selected story and its declared size outside Single, which ignores it and keeps the toolbar viewport. */
+/** Selected story and its declared size in arrangements that support From code. */
 export function useDeclaredStoryFrame() {
   const canvas = useCanvasStore()
   const snapshot = useHistoireSnapshot()
   return computed(() => {
-    if (canvas.arrangement === 'single') return undefined
+    if (canvas.arrangement === 'single' || !isBuiltinCanvasArrangement(canvas.arrangement)) return undefined
     const story = snapshot.value.catalog.stories.find(item => item.id === snapshot.value.selection?.storyId)
     const size = declaredFrameSize(story)
     return story && size ? { storyId: story.id, ...size } : undefined
   })
-}
-
-/** Declared size in use for the selected story; absent once switched to the toolbar viewport. */
-export function useStoryFrameSize() {
-  const canvas = useCanvasStore()
-  const declared = useDeclaredStoryFrame()
-  return computed(() => declared.value && !canvas.toolbarSizedStories[declared.value.storyId] ? declared.value : undefined)
 }

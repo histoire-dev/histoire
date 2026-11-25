@@ -1,5 +1,5 @@
 import type { HistoireCatalogStory } from '@histoire/sdk'
-import type { CanvasStore } from '../../stores/canvas.js'
+import type { StoryCanvasViews } from '../../stores/story-canvas-views.js'
 
 /** Width and height a story declares in its layout, whether or not they are in use. */
 export function declaredFrameSize(story: Pick<HistoireCatalogStory, 'layout'> | undefined): { width?: number, height?: number } | undefined {
@@ -9,7 +9,7 @@ export function declaredFrameSize(story: Pick<HistoireCatalogStory, 'layout'> | 
 }
 
 /** Declared size in use: absent once the story is switched to the toolbar viewport for this session. */
-export function storyFrameSize(canvas: CanvasStore, story: Pick<HistoireCatalogStory, 'id' | 'layout'> | undefined): { width?: number, height?: number } | undefined {
-  if (!story || canvas.toolbarSizedStories[story.id]) return undefined
+export function storyFrameSize(views: StoryCanvasViews, story: Pick<HistoireCatalogStory, 'id' | 'layout'> | undefined): { width?: number, height?: number } | undefined {
+  if (!story || views.usesToolbarViewport(story.id)) return undefined
   return declaredFrameSize(story)
 }

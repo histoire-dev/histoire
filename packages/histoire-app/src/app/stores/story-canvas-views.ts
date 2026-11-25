@@ -12,6 +12,10 @@ export interface StoryCanvasViews {
   getShared: () => CanvasViewSnapshot | undefined
   /** Replace the shared Sync zoom view with an isolated copy. */
   saveShared: (snapshot: CanvasViewSnapshot) => void
+  /** Whether this story uses toolbar sizing for the current session. */
+  usesToolbarViewport: (storyId: string) => boolean
+  /** Switch between the authored dimensions and toolbar sizing for one story. */
+  setStorySizeFromCode: (storyId: string, fromCode: boolean) => void
 }
 
 const storyCanvasViewsKey: InjectionKey<StoryCanvasViews> = Symbol('histoire-story-canvas-views')
@@ -25,6 +29,7 @@ function copyView(snapshot: CanvasViewSnapshot): CanvasViewSnapshot {
 export function createStoryCanvasViews(): StoryCanvasViews {
   const stories = shallowReactive(new Map<string, CanvasViewSnapshot>())
   const shared = shallowRef<CanvasViewSnapshot>()
+  const toolbarSizedStories = shallowReactive(new Set<string>())
   return {
     getStory: (storyId) => {
       const view = stories.get(storyId)
@@ -33,6 +38,11 @@ export function createStoryCanvasViews(): StoryCanvasViews {
     saveStory: (storyId, snapshot) => stories.set(storyId, copyView(snapshot)),
     getShared: () => shared.value ? copyView(shared.value) : undefined,
     saveShared: snapshot => shared.value = copyView(snapshot),
+    usesToolbarViewport: storyId => toolbarSizedStories.has(storyId),
+    setStorySizeFromCode(storyId, fromCode) {
+      if (fromCode) toolbarSizedStories.delete(storyId)
+      else toolbarSizedStories.add(storyId)
+    },
   }
 }
 

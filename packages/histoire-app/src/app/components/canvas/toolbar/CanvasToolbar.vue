@@ -119,7 +119,7 @@ onBeforeUnmount(() => disposers.forEach(dispose => dispose()))
     </BaseOverflowToolbarItem>
     <BaseOverflowToolbarItem v-if="view.showsGroup('viewport')" id="viewport" separator-before>
       <ViewportMenu v-model:open="open" @edit-presets="emit('editPresets')" />
-      <ToolbarButton label="Rotate viewport" icon="rotate" :pressed="!canvas.autoFitContent && snapshot.settings.rotate" @click="rotateViewport" />
+      <ToolbarButton label="Rotate viewport" icon="rotate" :disabled="!!canvas.frameSizeFromCode" :pressed="!canvas.frameSizeFromCode && !canvas.autoFitContent && snapshot.settings.rotate" @click="rotateViewport" />
       <PluginToolbarItem v-for="item in pluginItems?.viewport" :key="plugin.keyOf(item)" :item="item" :workbench="plugin.workbench!" :revision="plugin.revision.value" :open="open" @update:open="setOpen" @error="emit('error', $event)" />
     </BaseOverflowToolbarItem>
     <BaseOverflowToolbarItem v-if="view.showsGroup('zoom')" id="zoom" separator-before>

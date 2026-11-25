@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import type { HistoireCatalogStory, HistoireSession } from '@histoire/sdk'
-import type { CanvasArrangement } from '../../stores/canvas-arrangement.js'
 import { useHistoireSession, useHistoireSnapshot } from '@histoire/vue'
 import { useHistoireContext } from '@histoire/vue/internal'
 import { computed, onBeforeUnmount, onMounted, ref, shallowRef, watch } from 'vue'
 import { createCanvasFrames, provideCanvas, provideCanvasPointerPan } from '../../composables/canvas-settings.js'
 import { useContextMenu } from '../../composables/context-menu.js'
+import { type CanvasArrangement, isBuiltinCanvasArrangement } from '../../stores/canvas-arrangement.js'
 import { createCanvasStore, getCanvasStorage } from '../../stores/canvas.js'
 import { useUiSettingsStore } from '../../stores/settings.js'
 import { useStoryCanvasViews } from '../../stores/story-canvas-views.js'
@@ -84,10 +84,15 @@ const currentStory = computed(() => catalog.value.stories.find(story => story.id
 const diagnostics = computed(() => catalog.value.diagnostics.filter(error => error.code === 'COLLECTION_FAILED' && (error.storyId === (currentStory.value?.id ?? cachedStory.value?.id) || error.relativePath === (currentStory.value?.relativePath ?? cachedStory.value?.relativePath))))
 const story = computed(() => currentStory.value ?? (diagnostics.value.length ? cachedStory.value : undefined))
 const settings = useUiSettingsStore()
-const canvas = createCanvasStore({ singleViewport: settings?.singleViewport, storage: getCanvasStorage(typeof window === 'undefined' ? undefined : window) })
+const renderedArrange = computed(() => props.arrange)
+const views = useStoryCanvasViews()
+const canvas = createCanvasStore({
+  singleViewport: settings?.singleViewport,
+  storage: getCanvasStorage(typeof window === 'undefined' ? undefined : window),
+  frameSizeFromCode: () => renderedArrange.value !== 'single' && isBuiltinCanvasArrangement(renderedArrange.value) ? storyFrameSize(views, story.value) : undefined,
+})
 const registry = createCanvasFrames(canvas)
 const frameState = createCanvasFrameState(session)
-const renderedArrange = computed(() => props.arrange)
 const activeView = useCanvasViewDescriptor(() => renderedArrange.value)
 /** Failure belongs to the hidden runtime; usable axes still take precedence in Matrix. */
 const matrixDiscoveryFailed = ref(false)
@@ -100,11 +105,9 @@ const viewBinding = bindStoryCanvasView({
   hasArrangementOverride: () => props.arrangementOverride,
   getSyncZoom: () => settings?.state.syncZoom ?? false,
   canvas,
-  views: useStoryCanvasViews(),
+  views,
 })
-/** Story-declared size unless switched to the toolbar viewport for this session. */
-const declaredFrame = computed(() => storyFrameSize(canvas, story.value))
-const { size, frameContentSize, viewportContentSize } = useCanvasVariantSize(canvas, () => declaredFrame.value)
+const { size, frameContentSize, viewportContentSize } = useCanvasVariantSize(canvas)
 /** Story gutter around each frame, else the project one; unusable values leave none. */
 const framePadding = computed(() => {
   const value = story.value?.layout?.padding ?? props.framePadding
@@ -280,7 +283,7 @@ defineExpose({ canvas, registry, getFrameLayout: (id: string) => frames.value.fi
     <slot v-else-if="renderedArrange === 'matrix'" name="matrix" :canvas="canvas" :frames="registry" :size="size" :padding="framePadding" :content-insets="contentInsets" :preview-base="previewBase" :discovery-failed="matrixDiscoveryFailed" />
     <component :is="renderedArrange === 'list' ? FrameList : FrameGrid" v-else :frames="renderedFrames">
       <template #default="{ frame }">
-        <CanvasFrame :frame="frame" :fit-bounds="zoom => fitBoundsForFrame(frame, zoom)" :variant="variantsById.get(frame.variantId)!" :selected="frame.id === selectedFrame?.id" :live="live.has(frame.id)" :preview-base="previewBase" :padding="framePadding" :fixed-size="!!declaredFrame" :stale="diagnostics.length > 0" v-bind="{ ...frameContentSize(frame.variantId), ...getSearchFrameState(frame.id, !!searchActive, highlightedTargets) }" @select="selectVariant" @contextmenu="(event, target) => emit('contextmenu', event, target)" />
+        <CanvasFrame :frame="frame" :fit-bounds="zoom => fitBoundsForFrame(frame, zoom)" :variant="variantsById.get(frame.variantId)!" :selected="frame.id === selectedFrame?.id" :live="live.has(frame.id)" :preview-base="previewBase" :padding="framePadding" :fixed-size="!!canvas.frameSizeFromCode" :stale="diagnostics.length > 0" v-bind="{ ...frameContentSize(frame.variantId), ...getSearchFrameState(frame.id, !!searchActive, highlightedTargets) }" @select="selectVariant" @contextmenu="(event, target) => emit('contextmenu', event, target)" />
       </template>
     </component>
     <CanvasMatrixPrimary :active="renderedArrange === 'matrix'" :preview-base="previewBase" :width="size.width" :height="size.height" @status="matrixDiscoveryFailed = $event === 'error'" @error="emit('error', $event)" />

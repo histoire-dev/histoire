@@ -89,7 +89,7 @@ Stories always render inside an iframe. Remove the `iframe` option when migratin
 
 Use `type: "grid"` to compare variants side by side.
 
-Set `width` and `height` to give every variant the same size in Grid, List and Matrix. The toolbar viewport menu then selects **From code**; pick another option to size that story from the toolbar until the page reloads. An omitted dimension follows the viewport, or the variant content when the canvas fits content. Set `padding` to leave space around each variant in every arrangement; aligners mark its corners. Omit `type` to set these options and keep the default arrangement, as in `:layout="{ padding: 24 }"`.
+Set `width` and `height` to give every variant the same size in Grid, List and Matrix. The viewport menu selects **From code**, which uses the toolbar viewport for any omitted dimension and disables rotation. Pick another option, such as **Auto fit content**, to use toolbar sizing for that story until the page reloads. Set `padding` to leave space around each variant in every arrangement; aligners mark its corners. Omit `type` to set these options and keep the default arrangement, as in `:layout="{ padding: 24 }"`.
 
 ```vue{4}
 <template>

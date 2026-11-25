@@ -3,6 +3,7 @@ import { BuiltinIcon, HstButton, HstText } from '@histoire/controls/vue'
 import { computed, ref, watch } from 'vue'
 import { useCanvasStore } from '../../../composables/canvas-settings.js'
 import { usePresetConfigStore } from '../../../stores/presets-config.js'
+import { useStoryCanvasViews } from '../../../stores/story-canvas-views.js'
 import { histoireConfig } from '../../../util/config.js'
 
 import PopoverDivider from '../../base/popover/PopoverDivider.vue'
@@ -13,17 +14,18 @@ import PopoverTitle from '../../base/popover/PopoverTitle.vue'
 import { useCanvasPreviewSettings } from './session-settings.js'
 import { parseViewportSize } from './settings.js'
 import ToolbarPopover from './ToolbarPopover.vue'
-import { useCanvasViewportDimensions, useDeclaredStoryFrame, useStoryFrameSize } from './viewport-size.js'
+import { useCanvasViewportDimensions, useDeclaredStoryFrame } from './viewport-size.js'
 
 defineProps<{ open: string | null }>()
 const emit = defineEmits<{ 'update:open': [value: string | null], 'editPresets': [] }>()
 const { snapshot, update } = useCanvasPreviewSettings()
 const canvas = useCanvasStore()
+const views = useStoryCanvasViews()
 const presetsOwner = usePresetConfigStore()
 const presets = computed(() => presetsOwner?.responsivePresets.value ?? histoireConfig.responsivePresets ?? [])
 const dimensions = useCanvasViewportDimensions()
 const declared = useDeclaredStoryFrame()
-const fromCode = useStoryFrameSize()
+const fromCode = computed(() => !!canvas.frameSizeFromCode)
 /** The story's own size replaces the toolbar viewport, so the trigger says where it comes from. */
 const triggerLabel = computed(() => {
   if (fromCode.value) return 'From code'
@@ -40,13 +42,13 @@ watch(dimensions, (size) => {
 
 /** Size the selected story from its code until the page reloads. */
 function selectCode(): void {
-  if (declared.value) canvas.setStorySizeFromCode(declared.value.storyId, true)
+  if (declared.value) views.setStorySizeFromCode(declared.value.storyId, true)
   emit('update:open', null)
 }
 
 /** Any other option sizes the selected story from the toolbar viewport instead of its code. */
 function leaveCode(): void {
-  if (declared.value) canvas.setStorySizeFromCode(declared.value.storyId, false)
+  if (declared.value) views.setStorySizeFromCode(declared.value.storyId, false)
 }
 
 /** Named preset sizes retain logical orientation and use existing settings persistence. */

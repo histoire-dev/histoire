@@ -1,6 +1,16 @@
 /// <reference types="cypress" />
 
+import { getSelectedPreviewIframe } from '../../../cypress/frame-commands.js'
 import { selectCanvasVariant } from '../../../cypress/workbench-actions.js'
+
+const viewport = 'button[aria-label="Viewport"]'
+const rotate = 'button[aria-label="Rotate viewport"]'
+
+/** Choose a viewport through the workbench menu. */
+function selectViewport(option) {
+  cy.get(viewport).click()
+  cy.contains('[role="dialog"] button', option).click()
+}
 
 describe('BaseButton grid detection', () => {
   /** Opens canonical playground and waits until runtime admits controls. */
@@ -52,5 +62,43 @@ describe('BaseButton grid detection', () => {
     selectCanvasVariant('small red button', 'src-components-basebutton-story-vue-2')
     expectDetectedProps(1)
     expectNoDetectedState()
+  })
+
+  it('restores the authored viewport and flow after Auto fit content', () => {
+    getSelectedPreviewIframe().should(($frame) => {
+      const root = $frame[0].contentDocument.querySelector('[data-histoire-runtime-content]')
+      expect(root.getBoundingClientRect().width, 'initial story flow').to.equal(200)
+    })
+    selectViewport('Auto fit content')
+    getSelectedPreviewIframe().should($frame => expect($frame[0].clientWidth, 'fitted viewport').to.be.lessThan(200))
+    selectViewport(/^From code/)
+    getSelectedPreviewIframe().should(($frame) => {
+      const iframe = $frame[0]
+      const root = iframe.contentDocument.querySelector('[data-histoire-runtime-content]')
+      expect([iframe.clientWidth, iframe.clientHeight], 'restored viewport').to.deep.equal([200, 96])
+      expect(root.getBoundingClientRect().width, 'restored story flow').to.equal(200)
+    })
+  })
+
+  it('remembers a story viewport override after leaving the canvas until reload', () => {
+    selectViewport('Auto fit content')
+    cy.get(viewport).should('contain.text', 'Auto fit')
+    cy.get('[aria-label="Workbench"] [aria-label="Home"]').click()
+    cy.location('pathname').should('equal', '/')
+    cy.go('back')
+    cy.location('pathname').should('equal', '/story/src-components-basebutton-story-vue')
+    cy.get(viewport).should('contain.text', 'Auto fit')
+    cy.reload()
+    cy.get(viewport).should('contain.text', 'From code')
+  })
+
+  it('disables rotation for From code and allows it for a preset', () => {
+    cy.get(viewport).should('contain.text', 'From code')
+    cy.get(rotate).should('be.disabled')
+    selectViewport(/^Mobile \(Small\)/)
+    cy.get(rotate).should('be.enabled').click()
+    getSelectedPreviewIframe().should(($frame) => {
+      expect([$frame[0].clientWidth, $frame[0].clientHeight]).to.deep.equal([560, 320])
+    })
   })
 })
