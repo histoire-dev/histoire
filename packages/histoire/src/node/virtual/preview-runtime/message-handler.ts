@@ -35,7 +35,7 @@ export function previewMessageHandler() {
       // New opt-in traffic never inherits legacy optional document identity.
       if ((event.data.type === HOST_CHANNEL_MESSAGE || (event.data.type === RUNTIME_REQUEST && ['channel.post', 'plugin.post'].includes(event.data.command))) && event.data.documentId !== previewDocumentId) return
       if (event.data.documentId !== undefined && event.data.documentId !== previewDocumentId) return
-      if ([MEASURE_REQUEST, ELEMENT_PICK_REQUEST, PROPS_OVERRIDE].includes(event.data.type)) {
+      if ([MEASURE_REQUEST, ELEMENT_PICK_REQUEST, PROPS_OVERRIDE, STORY_REMOUNT].includes(event.data.type)) {
         if (initialSelection.controls) return
         if (event.data.storyId !== undefined && event.data.storyId !== story.value?.id) return
         if (event.data.variantId !== undefined && event.data.variantId !== variant.value?.id) return
@@ -95,6 +95,10 @@ export function previewMessageHandler() {
       }
       else if (event.data?.type === PROPS_OVERRIDE) {
         applyPropsOverride(event.data)
+      }
+      else if (event.data?.type === STORY_REMOUNT) {
+        // Variant state and props overrides live outside the renderer and survive the remount.
+        if (variant.value) storyMountRevision.value++
       }
       else if (event.data?.type === PREVIEW_SETTINGS_SYNC) {
         applyPreviewSettings(event.data.settings)

@@ -28,4 +28,23 @@ describe('preview UI operation authority', () => {
     expect(runtime.handleElementInspection).not.toHaveBeenCalled()
     expect(runtime.applyPropsOverride).not.toHaveBeenCalled()
   })
+
+  it('remounts only the current variant of the current document', async () => {
+    const runtime = createPreviewRuntime()
+    const message = { __histoire: true, type: '__histoire:story-remount', storyId: 'story-a', variantId: 'variant-a', documentId: 'document' }
+    await runtime.deliver(message, { source: {} })
+    await runtime.deliver({ ...message, documentId: 'old' })
+    await runtime.deliver({ ...message, storyId: 'old' })
+    await runtime.deliver({ ...message, variantId: 'old' })
+    expect(runtime.storyMountRevision.value).toBe(0)
+    await runtime.deliver(message)
+    await runtime.deliver(message)
+    expect(runtime.storyMountRevision.value).toBe(2)
+  })
+
+  it('never remounts the controls replica', async () => {
+    const runtime = createPreviewRuntime({ controls: true })
+    await runtime.deliver({ __histoire: true, type: '__histoire:story-remount', variantId: 'variant-a' })
+    expect(runtime.storyMountRevision.value).toBe(0)
+  })
 })

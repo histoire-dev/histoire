@@ -43,6 +43,7 @@ export function createPreviewRuntime(options: { onCollect?: () => void, onRun?: 
   const applyVariantStateUpdate = vi.fn()
   const handleElementInspection = vi.fn()
   const applyPropsOverride = vi.fn()
+  const storyMountRevision = { value: 0 }
   let listener: (event: any) => Promise<void>
 
   // The window embedding the sandbox, as `getHostWindow()` resolves it.
@@ -63,6 +64,8 @@ export function createPreviewRuntime(options: { onCollect?: () => void, onRun?: 
     MEASURE_REQUEST: '__histoire:measure-request',
     ELEMENT_PICK_REQUEST: '__histoire:element-pick-request',
     PROPS_OVERRIDE: '__histoire:props-override',
+    STORY_REMOUNT: '__histoire:story-remount',
+    storyMountRevision,
     reapplyPropsOverride: vi.fn(),
     handleElementInspection,
     applyPropsOverride,
@@ -122,6 +125,7 @@ export function createPreviewRuntime(options: { onCollect?: () => void, onRun?: 
     story,
     handleElementInspection,
     applyPropsOverride,
+    storyMountRevision,
     variant,
     /** Delivers a message to the runtime, awaiting the async dispatch. */
     async deliver(data: Record<string, any>, overrides: { source?: unknown, origin?: string } = {}) {

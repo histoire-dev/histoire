@@ -4,6 +4,7 @@ import type { CanvasFrameState } from '../components/canvas/frame-state.js'
 import type { CanvasPoint, CanvasRect } from '../components/canvas/pan/usePanZoom.js'
 import type { usePointerPan } from '../components/canvas/pan/usePointerPan.js'
 import type { CanvasStore } from '../stores/canvas.js'
+import { STORY_REMOUNT } from '@histoire/shared'
 import { useHistoireSnapshot } from '@histoire/vue'
 import { computed, inject, provide, shallowReactive } from 'vue'
 
@@ -27,12 +28,30 @@ export interface CanvasFrameRegistration {
   session?: HistoireSession
   /** Complete displayed matrix props; capture snapshots these without canonical mutation. */
   propsOverride?: Record<string, unknown>
+  /** Remount requests delivered to this frame, so chrome can acknowledge each one. */
+  remounts?: number
 }
 
 /** Registry is independent per mounted canvas, including multiple native hosts. */
 export function createCanvasFrames(store: CanvasStore) {
   const frames = shallowReactive(new Map<string, CanvasFrameRegistration>())
-  return { frames,
+  /** Finite additive preview requests stay pinned to current same-origin document. */
+  function postToFrame(id: string, payload: Record<string, unknown>): boolean {
+    const frame = frames.get(id)
+    if (!frame?.iframe?.contentWindow || !frame.documentId) return false
+    const window = frame.iframe.ownerDocument.defaultView
+    if (!window) return false
+    frame.iframe.contentWindow.postMessage({ ...payload, __histoire: true, documentId: frame.documentId }, window.location.origin)
+    return true
+  }
+  /** Replay the rendered variant's mount lifecycle without reloading its document. */
+  function remountFrame(id: string): boolean {
+    const frame = frames.get(id)
+    if (!frame || !postToFrame(id, { type: STORY_REMOUNT, storyId: frame.storyId, variantId: frame.variantId })) return false
+    frame.remounts = (frame.remounts ?? 0) + 1
+    return true
+  }
+  return { frames, postToFrame, remountFrame,
     /** Replacement cleanup cannot remove its successor registration. */
     registerFrame(frame: CanvasFrameRegistration) {
       const record = shallowReactive(frame)
@@ -57,14 +76,9 @@ export function createCanvasFrames(store: CanvasStore) {
       if (!frame || !rect) return null
       return { x: rect.left + point.x * rect.width / frame.rect.width, y: rect.top + point.y * rect.height / frame.rect.height }
     },
-    /** Finite additive preview requests stay pinned to current same-origin document. */
-    postToFrame(id: string, payload: Record<string, unknown>): boolean {
-      const frame = frames.get(id)
-      if (!frame?.iframe?.contentWindow || !frame.documentId) return false
-      const window = frame.iframe.ownerDocument.defaultView
-      if (!window) return false
-      frame.iframe.contentWindow.postMessage({ ...payload, __histoire: true, documentId: frame.documentId }, window.location.origin)
-      return true
+    /** Remount every running frame in the same task so their animations start together. */
+    remountAll(): number {
+      return [...frames.keys()].filter(remountFrame).length
     },
     /** Canvas scale exposed for overlay helpers without leaking root DOM. */
     get zoom() { return store.effectiveZoom } }
