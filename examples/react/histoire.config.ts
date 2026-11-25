@@ -8,4 +8,4 @@ import { referencePlugin } from 'histoire-example-plugin-reference'
  * workbench plugin uses its Vue views: they run on the workbench's Vue, so this project
  * does not install `vue`.
  */
-export default defineConfig({ plugins: [HstReact(), HstA11y(), referencePlugin({ ui: 'vue' })], setupFile: './src/histoire.setup.tsx' })
+export default defineConfig({ plugins: [HstReact(), HstA11y(), referencePlugin({ ui: 'vue' })], setupFile: './src/histoire.setup.tsx', ui: { framePadding: 24 } })

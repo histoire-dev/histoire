@@ -4,6 +4,7 @@ import { defineConfig } from 'histoire'
 
 export default defineConfig({
   setupFile: './app/histoire.setup.ts',
+  ui: { framePadding: 24 },
   plugins: [
     HstVue(),
     HstNuxt(),

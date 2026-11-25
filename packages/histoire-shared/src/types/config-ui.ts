@@ -30,6 +30,8 @@ export interface HistoireUiConfig {
     defaultArrange?: 'single' | 'grid' | 'list'
     /** Maximum simultaneously live preview frames. Defaults to 6. */
     frameBudget?: number
+    /** Gutter in CSS pixels around each variant when its story layout sets no `padding`. Defaults to 0. */
+    framePadding?: number
     /** Defaults for props matrix sampling. */
     matrix?: {
       /** Ordered samples for open numeric props; 2–64 distinct finite values. */

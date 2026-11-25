@@ -24,6 +24,8 @@ export function createCanvasStore(options: { storage?: CanvasStorage, singleView
   // Absent while the active view has no layout (plugin views may opt out of fitting).
   let fitBounds: CanvasFitTarget | undefined = state.bounds
   let singleArea: CanvasSize = { width: 0, height: 0 }
+  /** Story gutter around the Single variant; Fit keeps it in view. */
+  let singlePadding = 0
   const singleZoomListeners = new Set<SingleZoomListener>()
   /** Notify native scroll ownership before replacing the rendered scale. */
   function applySingleZoom(zoom: number, point?: CanvasPoint, fit = false) {
@@ -57,7 +59,7 @@ export function createCanvasStore(options: { storage?: CanvasStorage, singleView
   function fit() {
     setActiveZoom('fit')
     if (state.arrangement === 'single') {
-      if (singleArea.width && singleArea.height) applySingleZoom(fitSingleViewport(singleArea, state.singleViewportSize), undefined, true)
+      if (singleArea.width && singleArea.height) applySingleZoom(fitSingleViewport(singleArea, { width: state.singleViewportSize.width + singlePadding * 2, height: state.singleViewportSize.height + singlePadding * 2 }), undefined, true)
       return save()
     }
     // Setup runs before ResizeObserver measures; fitting an empty viewport would lock at 10%.
@@ -85,8 +87,9 @@ export function createCanvasStore(options: { storage?: CanvasStorage, singleView
     save()
   }
   /** Publish unscaled Single geometry; numeric zoom stays fixed during resizing. */
-  function setSingleGeometry(area: CanvasSize, size: CanvasSize) {
+  function setSingleGeometry(area: CanvasSize, size: CanvasSize, padding = 0) {
     singleArea = area
+    singlePadding = padding
     state.singleViewportSize = size
     if (state.arrangement === 'single' && state.zoom === 'fit') fit()
   }

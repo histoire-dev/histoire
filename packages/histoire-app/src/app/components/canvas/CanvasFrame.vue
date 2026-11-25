@@ -69,7 +69,7 @@ const single = computed(() => props.presentation === 'single')
 /** Snapshots need the title row to tell they aren't live yet; Single has none. */
 const showSnapshot = computed(() => snapshotShown.value && !single.value)
 const scale = computed(() => canvas.effectiveZoom)
-const padding = computed(() => single.value ? 0 : props.padding ?? 0)
+const padding = computed(() => props.padding ?? 0)
 const position = computed(() => ({
   'left': single.value ? undefined : `${props.frame.x * canvas.effectiveZoom + canvas.panOffset.x}px`,
   'top': single.value ? undefined : `${props.frame.y * canvas.effectiveZoom + canvas.panOffset.y}px`,

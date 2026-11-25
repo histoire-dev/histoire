@@ -14,11 +14,10 @@ export interface StoryFile {
   source: () => Promise<{ default: string }>
 }
 
-export type StoryLayout = ({
-  type: 'single'
-} | {
-  type: 'grid'
-}) & HistoireStoryFrame
+export type StoryLayout = {
+  /** Omitted, the story follows the default arrangement. */
+  type?: 'single' | 'grid'
+} & HistoireStoryFrame
 
 export interface CommonProps {
   id?: string

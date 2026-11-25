@@ -759,6 +759,18 @@ export default defineConfig({
 })
 ```
 
+## `ui.framePadding`
+
+`number` - Default: `0`
+
+Space in CSS pixels around each variant in Grid, List and Single, for stories whose `layout` sets no `padding`. Aligners mark the variant corners. A story `layout.padding`, including `0`, takes precedence.
+
+```ts
+export default defineConfig({
+  ui: { framePadding: 24 },
+})
+```
+
 ## `agents.enabled` <Badge type="tip" text="1.0-beta.2+" />
 
 `boolean` - Default: `false`

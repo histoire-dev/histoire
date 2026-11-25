@@ -15,6 +15,7 @@ export default defineConfig({
       HstSvelte(),
     ],
     setupFile: './src/histoire.setup.ts',
+    ui: { framePadding: 24 },
     tree: {
       groups: [
         {

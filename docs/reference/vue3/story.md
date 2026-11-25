@@ -29,10 +29,10 @@ Id of the story used in the URL. By default, the id is automatically generated f
 ## `layout`
 
 Layout of the story. Object with the following properties:
-  - `type`: `'single'` or `'grid'`
+  - `type` (optional): `'single'` or `'grid'`; omitted, the story follows the default arrangement
   - `width` (optional): variant width in pixels in Grid and List, instead of the canvas viewport width
   - `height` (optional): variant height in pixels in Grid and List, instead of the canvas viewport height
-  - `padding` (optional): space in pixels around each variant in Grid and List, with aligners marking its corners
+  - `padding` (optional): space in pixels around each variant in Grid, List and Single, with aligners marking its corners; defaults to [`ui.framePadding`](../config.md#ui-framepadding)
 
 [Learn more](../../guide/vue3/stories.md#layout)
 

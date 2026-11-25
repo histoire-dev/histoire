@@ -46,6 +46,8 @@ const props = withDefaults(defineProps<{
   previewBase: string
   /** Approved maximum live frames, including selected frame. */
   frameBudget: number
+  /** Project gutter for stories whose layout sets no padding. */
+  framePadding?: number
   /** URL arrangement provided by narrow standalone navigation adapter. */
   arrange?: CanvasArrangement
   /** Arrangement resolved without an explicit URL override. */
@@ -99,15 +101,18 @@ const viewBinding = bindStoryCanvasView({
   canvas,
   views: useStoryCanvasViews(),
 })
-const { size, frameContentSize } = useCanvasVariantSize(canvas, () => story.value?.layout)
-/** Story-declared gutter around each grid and list frame. */
-const framePadding = computed(() => story.value?.layout?.padding ?? 0)
+const { size, frameContentSize, viewportContentSize } = useCanvasVariantSize(canvas, () => story.value?.layout)
+/** Story gutter around each frame, else the project one; unusable values leave none. */
+const framePadding = computed(() => {
+  const value = story.value?.layout?.padding ?? props.framePadding
+  return typeof value === 'number' && Number.isFinite(value) && value > 0 ? value : 0
+})
 /** Frame chrome includes the gutter on both sides of the variant. */
 function paddedFrameSize(variantId: string) {
   const content = frameContentSize(variantId)
   return { width: content.width + framePadding.value * 2, height: content.height + framePadding.value * 2 }
 }
-const { area: singleArea, size: singleSize, measure: measureSingle } = useSingleVariantGeometry(canvas, { settings: () => snapshot.value.settings, inspectorWidth: () => props.inspectorWidth, hidden: () => props.uiHidden, contentSize: () => canvas.autoFitContent ? frameContentSize(selectedVariantId.value) : undefined })
+const { area: singleArea, size: singleSize, measure: measureSingle } = useSingleVariantGeometry(canvas, { settings: () => snapshot.value.settings, inspectorWidth: () => props.inspectorWidth, hidden: () => props.uiHidden, contentSize: () => canvas.autoFitContent ? viewportContentSize(selectedVariantId.value) : undefined, padding: () => framePadding.value })
 /** Reuse arrangement geometry for rendering and target-zoom selection fitting; custom views lay out their own leases. */
 function layoutFrames(zoom = canvas.effectiveZoom) {
   if (activeView.id.value) return []
@@ -267,7 +272,7 @@ defineExpose({ canvas, registry, getFrameLayout: (id: string) => frames.value.fi
         <CanvasHeader :story="story" :can-open-in-editor="canOpenInEditor" @open-in-editor="openInEditor" />
       </slot>
     </div>
-    <CanvasSingleVariant v-if="renderedArrange === 'single' && story" ref="singleVariant" :area="singleArea" :frame="selectedFrame" :variant="selectedVariant" :preview-base="previewBase" :stale="diagnostics.length > 0" :resizable="singleResizable" @resize="resizeSingleViewport" @contextmenu="(event, target) => emit('contextmenu', event, target)" />
+    <CanvasSingleVariant v-if="renderedArrange === 'single' && story" ref="singleVariant" :area="singleArea" :frame="selectedFrame" :variant="selectedVariant" :preview-base="previewBase" :stale="diagnostics.length > 0" :resizable="singleResizable" :padding="framePadding" @resize="resizeSingleViewport" @contextmenu="(event, target) => emit('contextmenu', event, target)" />
     <PluginCanvasView v-else-if="activeView.id.value" :key="activeView.id.value" :view="activeView.view.value" :presence="activeView.presence.value" :context="viewContext" :workbench="activeView.workbench" />
     <slot v-else-if="renderedArrange === 'matrix'" name="matrix" :canvas="canvas" :frames="registry" :size="size" :content-insets="contentInsets" :preview-base="previewBase" :discovery-failed="matrixDiscoveryFailed" />
     <component :is="renderedArrange === 'list' ? FrameList : FrameGrid" v-else :frames="renderedFrames">

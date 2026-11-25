@@ -19,9 +19,9 @@ export function finalizeCollectedStoryFile(storyFile: ServerStoryFile, ctx: Cont
   }
 
   // Finalization can repeat; its own fallback must never become an author declaration.
-  storyData.layoutExplicit ??= !!storyData.layout
+  storyData.layoutExplicit ??= !!storyData.layout?.type
 
-  storyData.layout ??= { type: 'single' }
+  storyData.layout = { ...storyData.layout, type: storyData.layout?.type ?? 'single' }
 
   storyFile.id = storyData.id
   storyFile.story = storyData
