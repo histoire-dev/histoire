@@ -6,6 +6,8 @@ import { createMcpContext, createMcpStory } from '../utils/mcp/project.js'
 describe('portable documentation story links', () => {
   it('retains exact file identity, structured variant query and local anchor before collection', async () => {
     const file = createMcpStory('/project', 'file-id', 'Custom story.js')
+    // Collected story paths are posix-normalized on every platform.
+    file.path = '/project/Custom story.js'
     file.story.id = 'custom:story'
     const context = createMcpContext('/project', [file])
     context.resolvedViteConfig.base = '/book/'

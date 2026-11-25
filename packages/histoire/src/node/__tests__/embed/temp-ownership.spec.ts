@@ -1,5 +1,6 @@
 import { access, mkdir, readFile, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
+import { normalize } from 'pathe'
 import { describe, expect, it } from 'vitest'
 import { closeContext, createContext } from '../../context.js'
 import { BasePluginApi } from '../../plugin.js'
@@ -18,10 +19,10 @@ describe('context root and generated output ownership', () => {
       }] }`)
       const ctx = await createContext({ root: fixture.root, configFile: 'custom.ts', mode: 'dev' })
       try {
-        expect(ctx.root).toBe(fixture.root)
-        expect(ctx.config.theme.title).toBe(fixture.root)
+        expect(ctx.root).toBe(normalize(fixture.root))
+        expect(ctx.config.theme.title).toBe(normalize(fixture.root))
         expect(ctx.config.responsivePresets).toEqual([])
-        expect(ctx.resolvedViteConfig.root).toBe(fixture.root)
+        expect(ctx.resolvedViteConfig.root).toBe(normalize(fixture.root))
         expect(process.cwd()).toBe(cwd)
       }
       finally { await closeContext(ctx) }
@@ -35,7 +36,7 @@ describe('context root and generated output ownership', () => {
     try {
       for (const mode of ['dev', 'build'] as const) contexts.push(await createContext({ root: fixture.root, mode }))
       const apis = contexts.map(ctx => new BasePluginApi(ctx, { name: 'test:generated' }, {} as any))
-      expect(apis[0].root).toBe(fixture.root)
+      expect(apis[0].root).toBe(normalize(fixture.root))
       expect(apis[0].pluginTempDir).not.toBe(apis[1].pluginTempDir)
       for (const [index, api] of apis.entries()) {
         await mkdir(api.pluginTempDir, { recursive: true })
@@ -44,7 +45,7 @@ describe('context root and generated output ownership', () => {
       await closeContext(contexts[0])
       await expect(access(apis[0].pluginTempDir)).rejects.toThrow()
       expect(await readFile(join(apis[1].pluginTempDir, 'owned'), 'utf8')).toBe('1')
-      expect(apis[1].getContext().tempDir).toContain(fixture.root)
+      expect(apis[1].getContext().tempDir).toContain(normalize(fixture.root))
     }
     finally {
       await Promise.all(contexts.map(ctx => closeContext(ctx)))

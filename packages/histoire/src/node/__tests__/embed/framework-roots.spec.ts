@@ -1,6 +1,7 @@
 import { writeFile } from 'node:fs/promises'
 import { createRequire } from 'node:module'
 import { dirname, join } from 'node:path'
+import { normalize } from 'pathe'
 import { describe, expect, it } from 'vitest'
 import { HstSvelte } from '../../../../../histoire-plugin-svelte/src/index.node.js'
 import { listComponentFiles as listSvelte } from '../../../../../histoire-plugin-svelte/src/util/list-components.js'
@@ -21,7 +22,7 @@ describe('framework project roots', () => {
       const config = await HstSvelte().defaultConfig({} as any, 'dev', getContextRegistry(ctx).pluginContext) as any
       const vite = await config.vite({}, { mode: 'dev', command: 'serve' })
       const alias = vite.resolve.alias.find(entry => entry.find.test('svelte'))
-      expect(alias.replacement.startsWith(`${packageDir}/src/`)).toBe(true)
+      expect(alias.replacement.startsWith(`${normalize(packageDir)}/src/`)).toBe(true)
       expect(alias.replacement).toMatch(/(?:index-client|runtime\/index)\.js$/)
     }
     finally {

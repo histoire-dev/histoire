@@ -1,5 +1,5 @@
 import { readFile } from 'node:fs/promises'
-import { join } from 'node:path'
+import { join, normalize } from 'pathe'
 import { describe, expect, it, vi } from 'vitest'
 import { createEmbedVueProject } from '../utils/embed/vue-project.js'
 
@@ -16,8 +16,8 @@ describe('real project runtime isolation', () => {
       await Promise.all([first.setTitle('First'), second.setTitle('Second')])
       const [one, two] = await Promise.all(controllers.map(controller => controller.start()))
       expect(process.cwd()).toBe(cwd)
-      expect(one.context.root).toBe(first.root)
-      expect(two.context.root).toBe(second.root)
+      expect(one.context.root).toBe(normalize(first.root))
+      expect(two.context.root).toBe(normalize(second.root))
       expect(one.context.config.theme.title).toBe('First')
       expect(two.context.config.theme.title).toBe('Second')
       expect(one.context.storyFiles.find(file => file.story?.id === 'overlap')?.story.title).toBe('First')
@@ -30,7 +30,7 @@ describe('real project runtime isolation', () => {
       const changed = vi.fn()
       one.server.watcher.on('change', changed)
       await first.setTitle('Updated')
-      await vi.waitFor(() => expect(changed.mock.calls.some(args => args[0] === join(first.root, 'Book.story.vue'))).toBe(true), { timeout: 5000 })
+      await vi.waitFor(() => expect(changed.mock.calls.some(args => normalize(args[0]) === join(first.root, 'Book.story.vue'))).toBe(true), { timeout: 5000 })
       await vi.waitFor(() => expect(one.context.storyFiles.find(file => file.story?.id === 'overlap')?.story.title).toBe('Updated'), { timeout: 15_000 })
       expect(two.context.storyFiles.find(file => file.story?.id === 'overlap')?.story.title).toBe('Second')
       await controllers[0].close()
