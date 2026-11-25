@@ -18,10 +18,10 @@ export function finalizeCollectedStoryFile(storyFile: ServerStoryFile, ctx: Cont
     }
   }
 
+  const layoutType = storyData.layout?.type ?? ctx.config.defaultStoryProps?.layout?.type
   // Finalization can repeat; its own fallback must never become an author declaration.
-  storyData.layoutExplicit ??= !!storyData.layout?.type
-
-  storyData.layout = { ...storyData.layout, type: storyData.layout?.type ?? 'single' }
+  storyData.layoutExplicit ??= !!layoutType
+  storyData.layout = { ...storyData.layout, type: layoutType ?? 'single' }
 
   storyFile.id = storyData.id
   storyFile.story = storyData

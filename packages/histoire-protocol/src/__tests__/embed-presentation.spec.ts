@@ -20,6 +20,11 @@ describe('scoped embed links', () => {
     expect(parseEmbedPadding(new URLSearchParams('panels='))).toBeUndefined()
   })
 
+  it.each([1.25e-7, Number.MIN_VALUE])('round-trips subpixel padding %s', (padding) => {
+    const url = new URL(getEmbedRelativeUrl({ base: '/', storyId: 'story', padding }), 'https://book.test')
+    expect(parseEmbedPadding(url.searchParams)).toBe(padding)
+  })
+
   it.each(['padding=', 'padding=-1', 'padding=1e3', 'padding=abc', 'padding=2000', 'padding=4&padding=8'])('rejects malformed padding %s', (search) => {
     expect(() => parseEmbedPadding(new URLSearchParams(search))).toThrow()
   })

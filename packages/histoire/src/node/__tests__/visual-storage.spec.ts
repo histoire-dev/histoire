@@ -54,6 +54,16 @@ describe('visual capture size', () => {
     ctx.storyFiles[0].story.layout = { type: 'grid', width: 99999, height: 96 }
     expect(visualCaptureSpec(source, config, createCanonicalCase('button', 'primary', 'primary'), 'small')).toMatchObject({ width: 3840, height: 96 })
   })
+
+  it.each([
+    { width: '100%', height: 96, expected: { width: 320, height: 96 } },
+    { width: 200, height: -1, expected: { width: 200, height: 240 } },
+  ])('keeps profile dimensions for unsupported story sizes $width × $height', async ({ width, height, expected }) => {
+    const { ctx, source, config } = await fixture()
+    // Legacy CSS values can still reach collection from JavaScript stories.
+    Object.assign(ctx.storyFiles[0].story, { layout: { type: 'grid', width, height } })
+    expect(visualCaptureSpec(source, config, createCanonicalCase('button', 'primary', 'primary'), 'small')).toMatchObject(expected)
+  })
 })
 
 describe('visual baseline ownership', () => {

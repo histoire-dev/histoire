@@ -1,16 +1,17 @@
 import type { HistoireVisualCaptureSpec, HistoireVisualCase } from '@histoire/shared'
 import type { ResolvedVisualConfig } from './config.js'
 import type { VisualSource } from './source.js'
+import { isHistoireStoryFrameValue } from '@histoire/protocol'
 import { CAPTURE_LIMITS } from '../runtime/browser/limits.js'
 import { stableVisualJson } from './identity.js'
 
 /** Story layout width and height replace the profile viewport, kept within capture bounds. */
 function declaredCaptureSize(source: VisualSource, storyId: string): Partial<Pick<HistoireVisualCaptureSpec, 'width' | 'height'>> {
-  const layout = source.ctx.storyFiles.find(file => file.story?.id === storyId)?.story?.layout
+  const { width, height } = source.ctx.storyFiles.find(file => file.story?.id === storyId)?.story?.layout ?? {}
   const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, Math.round(value)))
   return {
-    ...(layout?.width ? { width: clamp(layout.width, CAPTURE_LIMITS.minWidth, CAPTURE_LIMITS.width) } : {}),
-    ...(layout?.height ? { height: clamp(layout.height, CAPTURE_LIMITS.minHeight, CAPTURE_LIMITS.height) } : {}),
+    ...(isHistoireStoryFrameValue('width', width) ? { width: clamp(width, CAPTURE_LIMITS.minWidth, CAPTURE_LIMITS.width) } : {}),
+    ...(isHistoireStoryFrameValue('height', height) ? { height: clamp(height, CAPTURE_LIMITS.minHeight, CAPTURE_LIMITS.height) } : {}),
   }
 }
 

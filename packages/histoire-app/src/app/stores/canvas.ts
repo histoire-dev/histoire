@@ -7,7 +7,7 @@ import type { SingleZoomListener } from '../components/canvas/single-zoom.js'
 import type { CanvasBackground } from '../util/background.js'
 import type { CanvasArrangement } from './canvas-arrangement.js'
 import type { CanvasContentInsets, CanvasFitTarget, CanvasPreferences, CanvasStorage, CanvasViewSnapshot, CanvasZoom } from './canvas-types.js'
-import { computed, reactive, ref } from 'vue'
+import { computed, reactive, type Ref, ref } from 'vue'
 import { createCanvasContentSizes } from '../components/canvas/content-sizes.js'
 import { canvasContentRect, clampZoom, fitCanvas, zoomAroundPoint } from '../components/canvas/pan/usePanZoom.js'
 import { fitSingleViewport } from '../components/canvas/single-zoom.js'
@@ -23,16 +23,19 @@ export function createCanvasStore(options: {
   storage?: CanvasStorage
   /** Workbench-owned Single viewport sizing intent. */
   singleViewport?: SingleViewportState
+  /** Workbench-owned Auto fit preference that survives canvas remounts. */
+  autoFitPreference?: Ref<boolean | undefined>
   /** Authored size of the active story when From code applies. */
   frameSizeFromCode?: () => Pick<HistoireStoryFrame, 'width' | 'height'> | undefined
 } = {}) {
   const preferences = readCanvasPreferences(options.storage)
-  const autoFitPreference = ref(preferences.autoFitContent)
+  const autoFitPreference = options.autoFitPreference ?? ref<boolean>()
+  autoFitPreference.value ??= preferences.autoFitContent
   const frameSizeFromCode = computed(() => options.frameSizeFromCode?.())
   const state = reactive({
     ...preferences,
     frameSizeFromCode,
-    autoFitContent: computed(() => autoFitPreference.value && !frameSizeFromCode.value),
+    autoFitContent: computed(() => autoFitPreference.value === true && !frameSizeFromCode.value),
     singleViewport: options.singleViewport ?? { mode: 'responsive' as const },
     singleViewportSize: { width: 1, height: 1 },
     singleViewportDraft: null as CanvasSize | null,
@@ -70,7 +73,7 @@ export function createCanvasStore(options: {
     zoomByArrange: state.zoomByArrange,
     tool: state.tool,
     frameBackground: state.frameBackground,
-    autoFitContent: autoFitPreference.value,
+    autoFitContent: autoFitPreference.value === true,
   })
   /** Updates active arrangement preference without mutating another view's scale. */
   function setActiveZoom(zoom: CanvasZoom) {

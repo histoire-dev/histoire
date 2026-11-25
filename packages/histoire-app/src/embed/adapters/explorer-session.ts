@@ -27,14 +27,14 @@ export function createExplorerViewSession(context: EmbedSurfaceContext) {
     if (primary && snapshot.selection?.variantId != null) selected = new Promise<void>(resolve => settleSelection = resolve)
     else selected = Promise.resolve()
   })
-  const session: HistoireSession = { ...context.session, mount(container, { surface }) {
+  const session: HistoireSession = { ...context.session, mount(container, { surface, padding }) {
     if (!active) throw new HistoireSdkError('DISPOSED', 'Explorer detached')
     const isPrimary = surface === 'preview'
     if (surface === 'explorer' || (isPrimary && primary)) throw new HistoireSdkError('RUNTIME_IN_USE', 'Explorer already owns primary runtime')
     const owner = context.bridge.getOwner()
     const snapshot = session.getSnapshot()
     const mountId = isPrimary ? owner.mountId : `${owner.mountId}:child:${++counter}`
-    const transport = mountLocalHistoireSurface({ session, sessionId: owner.sessionId, mountId, surface, hidden: false, container, target: snapshot.selection, settings: snapshot.settings, source: { id: owner.connectionId, descriptor: context.descriptor, request: async () => {
+    const transport = mountLocalHistoireSurface({ session, sessionId: owner.sessionId, mountId, surface, padding, hidden: false, container, target: snapshot.selection, settings: snapshot.settings, source: { id: owner.connectionId, descriptor: context.descriptor, request: async () => {
       throw new HistoireSdkError('CAPABILITY_UNAVAILABLE', 'Use canonical parent data session')
     }, subscribe: () => () => {}, close: () => {} } }, context.sourceBase ?? new URL('./', window.location.href).href)
     if (isPrimary) {

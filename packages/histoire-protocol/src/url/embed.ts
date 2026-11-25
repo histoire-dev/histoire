@@ -28,11 +28,11 @@ export function validateEmbedPadding(value: unknown): number {
   return value
 }
 
-/** Read an optional `padding` hint written as plain CSS pixels. */
+/** Read CSS pixels, including the negative exponent used by the writer for tiny fractions. */
 export function parseEmbedPadding(query: URLSearchParams): number | undefined {
   const value = hint(query, 'padding')
   if (value === undefined) return
-  if (!/^\d+(?:\.\d+)?$/.test(value)) invalid('Invalid embed padding')
+  if (!/^\d+(?:\.\d+)?(?:e-\d+)?$/.test(value)) invalid('Invalid embed padding')
   return validateEmbedPadding(Number(value))
 }
 

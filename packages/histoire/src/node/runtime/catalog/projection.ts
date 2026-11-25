@@ -1,7 +1,7 @@
 import type { HistoireCatalog, HistoireCatalogStory, HistoireCatalogTreeNode, HistoireDiagnostic } from '@histoire/protocol'
 import type { HistoireConfig, ServerStoryFile, ServerTree, StoryLayout } from '@histoire/shared'
 import type { CatalogDiagnostic, CatalogStory } from './types.js'
-import { normalizeHistoireMatrixHint } from '@histoire/protocol'
+import { isHistoireStoryFrameValue, normalizeHistoireMatrixHint } from '@histoire/protocol'
 import { makeTree } from '../../tree.js'
 import { boundedWarnings } from './diagnostics.js'
 import { createCatalogMetaBudget, projectMeta } from './meta.js'
@@ -13,7 +13,7 @@ function projectLayout(layout: StoryLayout | undefined): Pick<HistoireCatalogSto
   if (layout?.type !== 'single' && layout?.type !== 'grid') return {}
   const frame = FRAME_KEYS.flatMap((key) => {
     const value = layout[key]
-    return typeof value === 'number' && Number.isFinite(value) && (key === 'padding' ? value >= 0 : value > 0) ? [[key, value] as const] : []
+    return isHistoireStoryFrameValue(key, value) ? [[key, value] as const] : []
   })
   return { layout: Object.freeze({ type: layout.type, ...Object.fromEntries(frame) }) }
 }

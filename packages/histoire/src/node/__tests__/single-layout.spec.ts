@@ -24,11 +24,17 @@ describe('explicit story layouts', () => {
     expect(story.layout).toEqual({ type: 'single', padding: 24 })
   })
 
-  it('treats project-declared default story layout as explicit', () => {
-    const story = { id: 'story', title: 'Story', variants: [] } as ServerStory
+  it.each([
+    ['single', undefined, { type: 'single' }],
+    ['single', { padding: 24 }, { type: 'single', padding: 24 }],
+    ['grid', { padding: 24 }, { type: 'grid', padding: 24 }],
+    ['single', { type: 'grid', padding: 24 }, { type: 'grid', padding: 24 }],
+  ] as const)('retains configured %s layout defaults for story layout %j', (type, layout, expected) => {
+    const story = { id: 'story', title: 'Story', variants: [], layout } as ServerStory
     const file = { path: '/project/Story.story.vue' } as ServerStoryFile
-    const context = { root: '/project', config: { tree: { file: 'title' }, defaultStoryProps: { layout: { type: 'single' } } } } as Context
+    const context = { root: '/project', config: { tree: { file: 'title' }, defaultStoryProps: { layout: { type } } } } as Context
     finalizeCollectedStoryFile(file, context, story)
     expect(story.layoutExplicit).toBe(true)
+    expect(story.layout).toEqual(expected)
   })
 })

@@ -1,9 +1,11 @@
-import type { InjectionKey } from 'vue'
+import type { InjectionKey, Ref } from 'vue'
 import type { CanvasViewSnapshot } from './canvas.js'
 import { inject, provide, shallowReactive, shallowRef } from 'vue'
 
 /** Workbench-local owner for story views and the optional shared view. */
 export interface StoryCanvasViews {
+  /** Toolbar Auto fit preference, initialized on the first canvas mount. */
+  autoFitPreference: Ref<boolean | undefined>
   /** Read one story view as a detached snapshot. */
   getStory: (storyId: string) => CanvasViewSnapshot | undefined
   /** Replace one story view with an isolated copy. */
@@ -25,12 +27,13 @@ function copyView(snapshot: CanvasViewSnapshot): CanvasViewSnapshot {
   return { arrangement: snapshot.arrangement, zoomByArrange: { ...snapshot.zoomByArrange }, panOffset: { ...snapshot.panOffset } }
 }
 
-/** Creates state scoped to one workbench provider; nothing reaches browser storage. */
+/** Creates view state scoped to one workbench provider. */
 export function createStoryCanvasViews(): StoryCanvasViews {
   const stories = shallowReactive(new Map<string, CanvasViewSnapshot>())
   const shared = shallowRef<CanvasViewSnapshot>()
   const toolbarSizedStories = shallowReactive(new Set<string>())
   return {
+    autoFitPreference: shallowRef<boolean>(),
     getStory: (storyId) => {
       const view = stories.get(storyId)
       return view ? copyView(view) : undefined

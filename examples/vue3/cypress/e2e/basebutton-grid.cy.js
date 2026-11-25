@@ -80,17 +80,28 @@ describe('BaseButton grid detection', () => {
     })
   })
 
-  it('remembers a story viewport override after leaving the canvas until reload', () => {
-    selectViewport('Auto fit content')
-    cy.get(viewport).should('contain.text', 'Auto fit')
-    cy.get('[aria-label="Workbench"] [aria-label="Home"]').click()
-    cy.location('pathname').should('equal', '/')
-    cy.go('back')
-    cy.location('pathname').should('equal', '/story/src-components-basebutton-story-vue')
-    cy.get(viewport).should('contain.text', 'Auto fit')
-    cy.reload()
-    cy.get(viewport).should('contain.text', 'From code')
-  })
+  for (const blocked of [false, true]) {
+    it(`remembers a story viewport override until reload with storage writes ${blocked ? 'blocked' : 'available'}`, () => {
+      if (blocked) {
+        cy.window().then((window) => {
+          const setItem = window.Storage.prototype.setItem
+          cy.stub(window.Storage.prototype, 'setItem').callsFake(function (key, value) {
+            if (key === '_histoire-ui-canvas') throw new window.DOMException('Storage write blocked', 'QuotaExceededError')
+            return setItem.call(this, key, value)
+          })
+        })
+      }
+      selectViewport('Auto fit content')
+      cy.get(viewport).should('contain.text', 'Auto fit')
+      cy.get('[aria-label="Workbench"] [aria-label="Home"]').click()
+      cy.location('pathname').should('equal', '/')
+      cy.go('back')
+      cy.location('pathname').should('equal', '/story/src-components-basebutton-story-vue')
+      cy.get(viewport).should('contain.text', 'Auto fit')
+      cy.reload()
+      cy.get(viewport).should('contain.text', 'From code')
+    })
+  }
 
   it('disables rotation for From code and allows it for a preset', () => {
     cy.get(viewport).should('contain.text', 'From code')

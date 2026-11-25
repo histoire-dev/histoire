@@ -88,6 +88,7 @@ const renderedArrange = computed(() => props.arrange)
 const views = useStoryCanvasViews()
 const canvas = createCanvasStore({
   singleViewport: settings?.singleViewport,
+  autoFitPreference: views.autoFitPreference,
   storage: getCanvasStorage(typeof window === 'undefined' ? undefined : window),
   frameSizeFromCode: () => renderedArrange.value !== 'single' && isBuiltinCanvasArrangement(renderedArrange.value) ? storyFrameSize(views, story.value) : undefined,
 })
