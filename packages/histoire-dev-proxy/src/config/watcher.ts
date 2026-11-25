@@ -40,7 +40,12 @@ export async function watchConfiguration(inputs: readonly WatchInput[], changed:
       }
     }
     if (added.size) {
-      const watcher = chokidar.watch([...added], { ignoreInitial: true, depth: 0 })
+      const watcher = chokidar.watch([...added], {
+        ignoreInitial: true,
+        depth: 0,
+        // Chokidar's default change throttle can drop a save just after a notification.
+        awaitWriteFinish: { stabilityThreshold: 50, pollInterval: 10 },
+      })
       watchers.set(watcher, added)
       watcher.on('add', inspect).on('change', inspect).on('unlink', inspect).on('error', onError)
       // Every new dependency directory gets a scan barrier before reconciliation;

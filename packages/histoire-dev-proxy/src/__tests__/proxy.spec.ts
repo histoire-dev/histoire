@@ -130,8 +130,8 @@ it('coalesces edits across successive blocked startup generations and publishes 
     await writeFile(file, JSON.stringify({ gate: `${origin}/second` }))
     await expect.poll(() => entered.has('/second')).toBe(true)
     await writeFile(file, JSON.stringify({ value: 'latest config' }))
+    await expect.poll(() => proxy.status, { timeout: 5000, message: 'Latest config should replace the blocked runtime' }).toBe('ready')
     await proxy.ready
-    expect(proxy.status).toBe('ready')
     expect((await (await fetch(proxy.url)).json()).value).toBe('latest config')
   }
   finally {
