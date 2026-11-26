@@ -14,6 +14,12 @@ export const MATRIX_COLUMN_HEADER = 28
 /** Adjacent previews retain the same screen-space separation. */
 const MATRIX_GAP = 16
 
+/** Matrix card geometry with its independently sized sandbox. */
+export interface MatrixFrameLayout extends CanvasFrameLayout {
+  /** Intrinsic sandbox bounds in canvas coordinates. */
+  contentRect: CanvasRect
+}
+
 /** Inputs keep runtime preview dimensions separate from fixed board chrome. */
 interface MatrixLayoutOptions {
   /** Exact catalog story owner. */
@@ -30,8 +36,8 @@ interface MatrixLayoutOptions {
   zoom: number
 }
 
-/** Place previews in world coordinates without scaling labels or gaps. */
-export function layoutMatrixFrames(cells: readonly MatrixCellData[], options: MatrixLayoutOptions): CanvasFrameLayout[] {
+/** Fill row and column tracks in world coordinates while retaining fixed-pixel chrome. */
+export function layoutMatrixFrames(cells: readonly MatrixCellData[], options: MatrixLayoutOptions): MatrixFrameLayout[] {
   const scale = clampZoom(options.zoom)
   const sizes = cells.map(cell => typeof options.size === 'function' ? options.size(cell) : options.size)
   const rows = cells.map(cell => options.rows.findIndex(value => equalMatrixValue(value, cell.row)))
@@ -44,16 +50,25 @@ export function layoutMatrixFrames(cells: readonly MatrixCellData[], options: Ma
   })
   const xs = canvasTrackOffsets(widths, MATRIX_GAP / scale, MATRIX_ROW_GUTTER / scale)
   const ys = canvasTrackOffsets(heights, MATRIX_GAP / scale, MATRIX_COLUMN_HEADER / scale)
-  return cells.map((cell, index) => ({
-    id: cell.key,
-    storyId: options.storyId,
-    variantId: options.variantId,
-    x: xs[cols[index]],
-    y: ys[rows[index]],
-    width: sizes[index].width,
-    height: sizes[index].height,
-    ...(typeof options.size === 'function' ? { rowBottom: ys[rows[index]] + heights[rows[index]] } : {}),
-  }))
+  return cells.map((cell, index) => {
+    const column = cols[index]
+    const row = rows[index]
+    const x = xs[column]
+    const y = ys[row]
+    const { width, height } = sizes[index]
+    const contentRect = { x, y, width, height }
+    return {
+      id: cell.key,
+      storyId: options.storyId,
+      variantId: options.variantId,
+      x,
+      y,
+      width: widths[column],
+      height: heights[row],
+      contentRect,
+      runtimeBounds: contentRect,
+    }
+  })
 }
 
 /** Include row and column labels once, without artificial scaled outer margins. */

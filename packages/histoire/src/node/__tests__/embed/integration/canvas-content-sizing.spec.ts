@@ -1,15 +1,17 @@
-import type { Locator } from 'playwright'
-import { writeFile } from 'node:fs/promises'
+import type { Locator, Page } from 'playwright'
+import { readFile, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { createEmbedBridgeFixture } from '../../utils/embed/bridge-fixture.js'
 import { linkEmbedFixturePlaywright } from '../../utils/embed/project.js'
+import { MCP_REPOSITORY_ROOT } from '../../utils/mcp/cli-project.js'
 
 /** Known independent dimensions exercise actual framework actors and state restoration. */
 const story = `<template><Story id="content" title="Content sizes" :init-state="()=>({large:false,count:0})">
   <Variant id="first" title="First" v-slot="{state}"><div data-box="first" :style="{boxSizing:'border-box',padding:'10px',width:(state.large?240:120)+'px',height:(state.large?150:60)+'px'}"><button @click="state.large=!state.large">Toggle size</button><button @click="state.count++">Count {{state.count}}</button></div></Variant>
   <Variant id="second" title="Second"><div data-box="second" style="width:200px;height:90px">Second</div></Variant>
   <Variant id="empty" title="Empty"><span /></Variant>
+  <Variant id="fourth" title="Fourth"><div style="width:160px;height:40px">Fourth</div></Variant>
 </Story></template>`
 
 /** Read logical frame pixels and actual sandbox viewport, excluding camera transforms. */
@@ -18,6 +20,14 @@ async function sizes(page: any) {
     const content = frame.querySelector<HTMLElement>('.histoire-frame-content')!
     const iframe = content.querySelector('iframe')!
     return { title: frame.querySelector('.histoire-frame-title')?.textContent, width: Number.parseFloat(content.style.width), height: Number.parseFloat(content.style.height), viewport: iframe ? [iframe.clientWidth, iframe.clientHeight] : null }
+  }))
+}
+
+/** Read visible card bodies at the current zoom, including any space around the sandbox. */
+function cardSizes(page: Page) {
+  return page.locator('.histoire-canvas-frame [data-test-id="responsive-preview-bg"]').evaluateAll(cards => cards.map((card) => {
+    const { width, height } = card.getBoundingClientRect()
+    return { width, height }
   }))
 }
 
@@ -63,8 +73,18 @@ describe('content-sized workbench browser acceptance', () => {
         { title: 'First', width: 120, height: 60, viewport: [120, 60] },
         { title: 'Second', width: 200, height: 90, viewport: [200, 90] },
         { title: 'Empty', width: 1, height: 1, viewport: [1, 1] },
+        { title: 'Fourth', width: 160, height: 40, viewport: [160, 40] },
       ]
       await expect.poll(() => sizes(page), { timeout: 30_000 }).toEqual(expected)
+      await page.getByRole('button', { name: 'Zoom level', exact: true }).click()
+      await page.getByRole('button', { name: /^100%/ }).click()
+      const expectedCards = [
+        { width: 160, height: 90 },
+        { width: 200, height: 90 },
+        expect.objectContaining({ height: 90 }),
+        { width: 160, height: 40 },
+      ]
+      await expect.poll(() => cardSizes(page)).toEqual(expectedCards)
       const first = page.locator('.histoire-canvas-frame').filter({ has: page.getByRole('button', { name: 'First', exact: true }) })
       const iframe = first.locator('iframe')
       const runtime = await (await iframe.elementHandle())!.contentFrame()
@@ -72,8 +92,15 @@ describe('content-sized workbench browser acceptance', () => {
       await runtimeContent(runtime).getByRole('button', { name: 'Count 0', exact: true }).click()
       await runtimeContent(runtime).getByRole('button', { name: 'Toggle size', exact: true }).click()
       await expect.poll(() => sizes(page)).toEqual([{ ...expected[0], width: 240, height: 150, viewport: [240, 150] }, ...expected.slice(1)])
+      await expect.poll(() => cardSizes(page)).toEqual([
+        { width: 240, height: 150 },
+        { width: 200, height: 150 },
+        expect.objectContaining({ height: 150 }),
+        { width: 240, height: 40 },
+      ])
       await runtimeContent(runtime).getByRole('button', { name: 'Toggle size', exact: true }).click()
       await expect.poll(() => sizes(page)).toEqual(expected)
+      await expect.poll(() => cardSizes(page)).toEqual(expectedCards)
       expect(await runtimeContent(runtime).getByRole('button', { name: 'Count 1', exact: true }).count()).toBe(1)
       expect(await runtime!.evaluate(() => (window as any).__HST_PREVIEW_DOCUMENT_ID__)).toBe(documentId)
       await page.screenshot({ path: '/tmp/histoire-content-grid.png' })
@@ -164,6 +191,57 @@ describe('content-sized workbench browser acceptance', () => {
     }
   }, 120_000)
 
+  it.each([12, 6])('fits every BaseButton Matrix cell on startup with frame budget %i', async (frameBudget) => {
+    const components = join(MCP_REPOSITORY_ROOT, 'examples/vue3/src/components')
+    const [story, button] = await Promise.all(['BaseButton.story.vue', 'BaseButton.vue'].map(name => readFile(join(components, name), 'utf8')))
+    const fixture = await createEmbedBridgeFixture({
+      mode: 'source-dev',
+      embedding: false,
+      story,
+      files: { 'BaseButton.vue': button },
+      config: `routerMode:"hash",ui:{frameBudget:${frameBudget}},vite:{server:{watch:{ignored:["**/packages/histoire*/**"]}}},`,
+    })
+    const page = await fixture.browser.newPage({ viewport: { width: 1862, height: 1334 } })
+    try {
+      await page.addInitScript(() => {
+        if (window !== window.top) return
+        localStorage.setItem('_histoire-ui-canvas', JSON.stringify({ version: 3, autoFitContent: true }))
+        localStorage.setItem('_histoire-ui-matrix/book-story-vue', JSON.stringify({
+          rows: 'size',
+          cols: 'color',
+          base: {},
+          customAxes: { size: ['small', 'default', 'big'], color: ['green', 'red', 'neutral'] },
+        }))
+      })
+      await page.goto(`${fixture.bookUrl}#/story/book-story-vue?variantId=book-story-vue-0&arrange=matrix&rows=size&cols=color`, { waitUntil: 'commit' })
+      const cells = page.locator('.histoire-matrix-cell')
+      await expect.poll(() => cells.evaluateAll((cells) => {
+        const fitted: boolean[] = []
+        const live: boolean[] = []
+        for (const cell of cells) {
+          // Cached sizes remain on the card after admission moves to other cells.
+          const content = cell.querySelector<HTMLElement>('.histoire-matrix-cell-content')!
+          const width = Number.parseFloat(content.style.width)
+          const height = Number.parseFloat(content.style.height)
+          fitted.push(width > 1 && width < 240 && height > 1 && height < 160)
+          const iframe = content.querySelector('iframe[title="Histoire variant"]')
+          if (iframe) {
+            const button = iframe.contentDocument?.querySelector('[data-histoire-runtime-content] button')
+            live.push(button?.textContent?.trim() === 'Click me' && iframe.clientWidth === width && iframe.clientHeight === height)
+          }
+        }
+        return { fitted, live }
+      }), { timeout: 20_000 }).toEqual({
+        fitted: Array.from({ length: 9 }, () => true),
+        live: Array.from({ length: Math.min(9, frameBudget - 1) }, () => true),
+      })
+    }
+    finally {
+      await page.close()
+      await fixture.close()
+    }
+  }, 120_000)
+
   it('fits each Matrix projection and rotates using locally selected cell dimensions', async () => {
     const fixture = await createEmbedBridgeFixture({
       mode: 'source-dev',
@@ -184,6 +262,10 @@ describe('content-sized workbench browser acceptance', () => {
       }))
       await expect.poll(dimensions, { timeout: 30_000 }).toEqual([[100, 50, 100, 50], [100, 160, 100, 160], [240, 50, 240, 50], [240, 160, 240, 160]])
       const geometry = await cells.evaluateAll((cells: HTMLElement[]) => cells.map(cell => cell.getBoundingClientRect().toJSON()))
+      expect(geometry[0].right).toBe(geometry[2].right)
+      expect(geometry[1].right).toBe(geometry[3].right)
+      expect(geometry[0].bottom).toBe(geometry[1].bottom)
+      expect(geometry[2].bottom).toBe(geometry[3].bottom)
       expect(geometry[0].right).toBeLessThan(geometry[1].left)
       expect(geometry[1].bottom).toBeLessThan(geometry[3].top)
       await page.screenshot({ path: '/tmp/histoire-content-matrix.png' })

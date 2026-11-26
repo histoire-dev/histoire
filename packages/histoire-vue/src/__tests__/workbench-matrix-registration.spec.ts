@@ -9,18 +9,19 @@ import { matrixCellKey } from '../../../histoire-app/src/app/util/matrix.js'
 describe('matrix preview request ownership', () => {
   it('updates exact base target but preserves attachment on geometry-only changes', () => {
     const registry = createCanvasFrames(createCanvasStore())
-    const frame = shallowRef({ id: 'cell', storyId: 'story', variantId: 'first', x: 0, y: 0, width: 720, height: 640 })
+    const frame = shallowRef({ id: 'cell', storyId: 'story', variantId: 'first', x: 0, y: 0, width: 720, height: 640, contentRect: { x: 0, y: 0, width: 420, height: 340 } })
     const variant = shallowRef('first')
     const overrides = shallowRef({ enabled: true })
     const retired = vi.fn()
     const stop = watchMatrixFrameRegistration({ registry, getFrame: () => frame.value, getVariantId: () => variant.value, getPropsOverride: () => overrides.value, onTargetChange: retired })
     const first = registry.getFrame('cell')!
+    expect(first.rect).toEqual({ x: 0, y: 0, width: 420, height: 340 })
     first.iframe = document.createElement('iframe')
     first.documentId = 'first-document'
-    frame.value = { ...frame.value, x: 25 }
+    frame.value = { ...frame.value, x: 25, width: 800, contentRect: { x: 25, y: 0, width: 420, height: 360 } }
     expect(registry.getFrame('cell')).toBe(first)
     expect(first.documentId).toBe('first-document')
-    expect(first.rect.x).toBe(25)
+    expect(first.rect).toEqual({ x: 25, y: 0, width: 420, height: 360 })
     expect(retired).toHaveBeenCalledTimes(1)
     expect(first.propsOverride).toEqual({ enabled: true })
     overrides.value = { enabled: false }
@@ -29,7 +30,7 @@ describe('matrix preview request ownership', () => {
     expect(registry.getFrame('cell')).toMatchObject({ variantId: 'alternate' })
     expect(registry.getFrame('cell')?.documentId).toBeUndefined()
     expect(retired).toHaveBeenCalledTimes(2)
-    const successor = registry.registerFrame({ ...frame.value, variantId: 'successor' })
+    const successor = registry.registerFrame({ id: 'cell', storyId: 'story', variantId: 'successor', rect: first.rect })
     stop()
     expect(registry.getFrame('cell')?.variantId).toBe('successor')
     successor()

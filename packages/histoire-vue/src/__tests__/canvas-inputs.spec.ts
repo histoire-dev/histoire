@@ -61,7 +61,8 @@ describe('matrix cell frame input', () => {
     const menu = createContextMenu()
     matrix.activate('a:b', [{ name: 'enabled', values: [false, true] }, { name: 'emphasized', values: [false, true] }], {})
     const cell = matrix.cells.value[0]!
-    const frame = { id: cell.key, storyId: 'a:b', variantId: 'c', x: 0, y: 0, width: 720, height: 640 }
+    const rect = { x: 0, y: 0, width: 720, height: 640 }
+    const frame = { id: cell.key, storyId: 'a:b', variantId: 'c', ...rect, contentRect: rect }
     const variant = ref('c')
     matrix.selectCell(cell.key)
     const selected = matrix.selectedCell.value?.key

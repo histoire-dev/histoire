@@ -76,16 +76,14 @@ const rowPosition = computed(() => {
   if (!frames.value.length) return []
   return rowValues.value.map((value, index) => {
     const frame = frames.value[index * colValues.value.length]
-    const height = Math.max(...frames.value.slice(index * colValues.value.length, (index + 1) * colValues.value.length).map(frame => frame.height))
-    return { value, style: { top: `${(frame.y + height / 2) * canvas.effectiveZoom + canvas.panOffset.y}px`, left: `${canvas.panOffset.x}px`, width: `${MATRIX_ROW_GUTTER}px` } }
+    return { value, style: { top: `${(frame.y + frame.height / 2) * canvas.effectiveZoom + canvas.panOffset.y}px`, left: `${canvas.panOffset.x}px`, width: `${MATRIX_ROW_GUTTER}px` } }
   })
 })
 const colPosition = computed(() => {
   if (!frames.value.length) return []
   return colValues.value.map((value, index) => {
     const frame = frames.value[index]
-    const width = Math.max(...frames.value.filter((_, cellIndex) => cellIndex % colValues.value.length === index).map(frame => frame.width))
-    return { value, style: { top: `${frame.y * canvas.effectiveZoom + canvas.panOffset.y - MATRIX_COLUMN_HEADER}px`, left: `${frame.x * canvas.effectiveZoom + canvas.panOffset.x}px`, width: `${width * canvas.effectiveZoom}px` } }
+    return { value, style: { top: `${frame.y * canvas.effectiveZoom + canvas.panOffset.y - MATRIX_COLUMN_HEADER}px`, left: `${frame.x * canvas.effectiveZoom + canvas.panOffset.x}px`, width: `${frame.width * canvas.effectiveZoom}px` } }
   })
 })
 

@@ -21,7 +21,7 @@ export interface CanvasPropsOverrideController {
   receive: (event: MessageEvent) => void
   /** Send current complete override set, replacing any prior pending request. */
   update: () => void
-  /** Wait for the current override acknowledgement before reading dynamic source. */
+  /** Wait for the latest override acknowledgement, following superseding requests. */
   wait: () => Promise<void>
   /** Clear its timeout and reject any pending wait during component teardown. */
   dispose: () => void
@@ -79,6 +79,20 @@ export function createCanvasPropsOverrideController(options: CanvasPropsOverride
     }, 3000)
   }
 
+  /** Startup may resend a projection while content sizing is already waiting. */
+  async function wait(): Promise<void> {
+    let pending: Promise<void>
+    do {
+      pending = readiness
+      try {
+        await pending
+      }
+      catch (error) {
+        if (pending === readiness) throw error
+      }
+    } while (pending !== readiness)
+  }
+
   /** Reject a pending source read when its owning component retires. */
   function dispose(): void {
     clearTimeout(timeout)
@@ -88,7 +102,7 @@ export function createCanvasPropsOverrideController(options: CanvasPropsOverride
   return {
     receive,
     update,
-    wait: () => readiness,
+    wait,
     dispose,
   }
 }

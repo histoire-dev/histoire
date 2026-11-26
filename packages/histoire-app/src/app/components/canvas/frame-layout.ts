@@ -13,8 +13,10 @@ const LIST_FRAME_GAP = GRID_FRAME_GAP + 64
 
 /** Canvas identity stays stable when mounted frames change. */
 export interface CanvasFrameLayout extends CanvasRect {
-  /** Shared row extent keeps visibility binary search valid for unequal sibling heights. */
-  rowBottom?: number
+  /** Logical card body height before adding the Grid or List title reserve. */
+  bodyHeight?: number
+  /** Individual frame bounds for live document admission and startup priority. */
+  runtimeBounds?: CanvasRect
   /** Stable key scoped to story and variant. */
   id: string
   /** Collected story identity. */
@@ -33,7 +35,10 @@ export function keepFrameLayouts(previous: CanvasFrameLayout[] | undefined, next
   for (let index = 0; index < next.length; index++) {
     const a = previous[index]
     const b = next[index]
-    if (a.id !== b.id || a.x !== b.x || a.y !== b.y || a.width !== b.width || a.height !== b.height || a.rowBottom !== b.rowBottom || a.storyId !== b.storyId || a.variantId !== b.variantId) return next
+    if (a.id !== b.id || a.x !== b.x || a.y !== b.y || a.width !== b.width || a.height !== b.height || a.bodyHeight !== b.bodyHeight || a.storyId !== b.storyId || a.variantId !== b.variantId) return next
+    const first = a.runtimeBounds
+    const second = b.runtimeBounds
+    if (first?.x !== second?.x || first?.y !== second?.y || first?.width !== second?.width || first?.height !== second?.height) return next
   }
   return previous
 }
@@ -51,20 +56,31 @@ export function layoutCanvasFrames(storyId: string, variantIds: readonly string[
   const heights = Array.from({ length: Math.ceil(variantIds.length / count) }, () => 0)
   sizes.forEach((size, index) => {
     widths[index % count] = Math.max(widths[index % count], size.width)
-    heights[Math.floor(index / count)] = Math.max(heights[Math.floor(index / count)], size.height + labelHeight)
+    const row = Math.floor(index / count)
+    heights[row] = Math.max(heights[row], size.height)
   })
   const xs = canvasTrackOffsets(widths, GRID_FRAME_GAP / scale)
-  const ys = canvasTrackOffsets(heights, gap)
-  return variantIds.map((variantId, index) => ({
-    id: getHistoireTargetKey({ storyId, variantId }),
-    storyId,
-    variantId,
-    x: xs[index % count],
-    y: ys[Math.floor(index / count)],
-    width: sizes[index].width,
-    height: sizes[index].height + labelHeight,
-    ...(typeof size === 'function' ? { rowBottom: ys[Math.floor(index / count)] + heights[Math.floor(index / count)] } : {}),
-  }))
+  const ys = canvasTrackOffsets(heights, labelHeight + gap)
+  return variantIds.map((variantId, index) => {
+    const column = index % count
+    const row = Math.floor(index / count)
+    const x = xs[column]
+    const y = ys[row]
+    const { width, height } = sizes[index]
+    const cardWidth = list ? width : widths[column]
+    const bodyHeight = heights[row]
+    return {
+      id: getHistoireTargetKey({ storyId, variantId }),
+      storyId,
+      variantId,
+      x,
+      y,
+      width: cardWidth,
+      height: bodyHeight + labelHeight,
+      bodyHeight,
+      runtimeBounds: cardWidth === width && bodyHeight === height ? undefined : { x, y, width, height: height + labelHeight },
+    }
+  })
 }
 
 /** Accumulate unequal tracks once rather than summing preceding sizes for every cell. */
@@ -96,7 +112,7 @@ export function visibleCanvasFrames(frames: readonly CanvasFrameLayout[], viewpo
   let high = frames.length
   while (low < high) {
     const middle = Math.floor((low + high) / 2)
-    if ((frames[middle].rowBottom ?? frames[middle].y + frames[middle].height) <= viewport.y) low = middle + 1
+    if (frames[middle].y + frames[middle].height <= viewport.y) low = middle + 1
     else high = middle
   }
   const start = low
@@ -119,15 +135,18 @@ function visibleArea(frame: CanvasRect, viewport: CanvasRect): number {
   return width * height
 }
 
-/** Admit selected frame first, then largest visible frames, never above live budget. */
+/** Admit selected frame first, then by visible content area, up to the live budget. */
 export function liveCanvasFrames(frames: readonly CanvasFrameLayout[], viewport: CanvasRect, budget: number, selected: string | null, margin = 160): Set<string> {
   const limit = Math.max(1, Math.floor(Number.isFinite(budget) ? budget : 1))
   const selectedFrame = frames.find(frame => frame.id === selected)
   const intersectsMargin = (frame: CanvasRect) => frame.x + frame.width >= viewport.x - margin && frame.x <= viewport.x + viewport.width + margin
     && frame.y + frame.height >= viewport.y - margin && frame.y <= viewport.y + viewport.height + margin
   const candidates = frames
-    .map((frame, index) => ({ frame, index, area: visibleArea(frame, viewport) }))
-    .filter(candidate => candidate.frame !== selectedFrame && intersectsMargin(candidate.frame))
+    .flatMap((frame, index) => {
+      const bounds = frame.runtimeBounds ?? frame
+      if (frame === selectedFrame || !intersectsMargin(bounds)) return []
+      return [{ frame, index, area: visibleArea(bounds, viewport) }]
+    })
     // Layout order makes ties deterministic and lets margin-only frames prefetch predictably.
     .sort((first, second) => second.area - first.area || first.index - second.index)
   return new Set([...(selectedFrame ? [selectedFrame] : []), ...candidates.map(candidate => candidate.frame)].slice(0, limit).map(frame => frame.id))
@@ -143,12 +162,14 @@ export function rankCanvasStartupFrames(frames: readonly CanvasFrameLayout[], ad
   // Without a selection, admission order already encodes visible-area and layout priority.
   const anchorId = selectedFrameId && admitted.includes(selectedFrameId) ? selectedFrameId : admitted[0]
   const anchor = byId.get(anchorId)!
-  const centerX = anchor.x + anchor.width / 2
-  const centerY = anchor.y + anchor.height / 2
+  const anchorBounds = anchor.runtimeBounds ?? anchor
+  const centerX = anchorBounds.x + anchorBounds.width / 2
+  const centerY = anchorBounds.y + anchorBounds.height / 2
   const distances = new Map<string, number>(admitted.map((id): [string, number] => {
     const frame = byId.get(id)!
-    const dx = frame.x + frame.width / 2 - centerX
-    const dy = frame.y + frame.height / 2 - centerY
+    const bounds = frame.runtimeBounds ?? frame
+    const dx = bounds.x + bounds.width / 2 - centerX
+    const dy = bounds.y + bounds.height / 2 - centerY
     return [id, dx * dx + dy * dy]
   }))
 

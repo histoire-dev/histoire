@@ -1,21 +1,34 @@
 import { describe, expect, it } from 'vitest'
-import { canvasFrameBounds, layoutCanvasFrames, visibleCanvasFrames } from '../../../../histoire-app/src/app/components/canvas/frame-layout.js'
+import { canvasFrameBounds, keepFrameLayouts, layoutCanvasFrames, liveCanvasFrames, visibleCanvasFrames } from '../../../../histoire-app/src/app/components/canvas/frame-layout.js'
 import { layoutMatrixFrames, matrixLayoutBounds } from '../../../../histoire-app/src/app/components/canvas/matrix/matrix-layout.js'
 import { createCanvasStore } from '../../../../histoire-app/src/app/stores/canvas.js'
+import { expandMatrixCells } from '../../../../histoire-app/src/app/util/matrix.js'
 
 const sizes = [{ width: 100, height: 400 }, { width: 200, height: 20 }, { width: 80, height: 60 }, { width: 300, height: 50 }]
 
 describe('content-sized canvas layout', () => {
-  it('uses each variant size and reserves largest grid track without losing tall visible siblings', () => {
-    const frames = layoutCanvasFrames('story', ['0', '1', '2', '3'], id => sizes[Number(id)], 'grid')
+  it('fills each grid row and column and keeps the expanded card area visible', () => {
+    const frames = layoutCanvasFrames('story', ['0', '1', '2', '3'], id => sizes[Number(id)], 'grid', 2)
     expect(frames.map(({ x, y, width, height }) => ({ x, y, width, height }))).toEqual([
       { x: 0, y: 0, width: 100, height: 432 },
-      { x: 324, y: 0, width: 200, height: 52 },
-      { x: 548, y: 0, width: 80, height: 92 },
-      { x: 0, y: 456, width: 300, height: 82 },
+      { x: 124, y: 0, width: 300, height: 432 },
+      { x: 0, y: 456, width: 100, height: 92 },
+      { x: 124, y: 456, width: 300, height: 92 },
     ])
-    expect(canvasFrameBounds(frames)).toEqual({ x: 0, y: 0, width: 628, height: 538 })
-    expect(visibleCanvasFrames(frames, { x: 0, y: 200, width: 700, height: 80 }).map(frame => frame.variantId)).toEqual(['0'])
+    expect(canvasFrameBounds(frames)).toEqual({ x: 0, y: 0, width: 424, height: 548 })
+    expect(visibleCanvasFrames(frames, { x: 350, y: 200, width: 40, height: 80 }).map(frame => frame.variantId)).toEqual(['1'])
+  })
+
+  it('admits visible Grid content ahead of an empty part of a taller card', () => {
+    const ids = ['0', '1', '2', '3']
+    const frames = layoutCanvasFrames('story', ids, id => sizes[Number(id)], 'grid', 2)
+    const viewport = { x: 350, y: 200, width: 40, height: 300 }
+    expect([...liveCanvasFrames(frames, viewport, 2, frames[0].id)]).toEqual([frames[0].id, frames[3].id])
+
+    const grown = layoutCanvasFrames('story', ids, id => id === '1' ? { width: 250, height: 380 } : sizes[Number(id)], 'grid', 2)
+    // The card still fills the same tracks, but its newly visible content earns a live slot.
+    const relaid = keepFrameLayouts(frames, grown)
+    expect([...liveCanvasFrames(relaid, viewport, 2, frames[0].id)]).toEqual([frames[0].id, frames[1].id])
   })
 
   it('accumulates actual List heights while retaining fixed screen-space gaps and labels', () => {
@@ -27,16 +40,39 @@ describe('content-sized canvas layout', () => {
     ])
   })
 
-  it('sizes Matrix cells independently and reserves complete row and column tracks', () => {
+  it('fills Matrix tracks while keeping each projection at its measured size', () => {
     const cells = sizes.map((_, index) => ({ key: String(index), row: Math.floor(index / 2), col: index % 2, props: {} }))
     const frames = layoutMatrixFrames(cells, { storyId: 'story', variantId: 'variant', rows: [0, 1], cols: [0, 1], size: cell => sizes[Number(cell.key)], zoom: 1 })
     expect(frames.map(({ x, y, width, height }) => ({ x, y, width, height }))).toEqual([
       { x: 128, y: 28, width: 100, height: 400 },
-      { x: 244, y: 28, width: 200, height: 20 },
-      { x: 128, y: 444, width: 80, height: 60 },
-      { x: 244, y: 444, width: 300, height: 50 },
+      { x: 244, y: 28, width: 300, height: 400 },
+      { x: 128, y: 444, width: 100, height: 60 },
+      { x: 244, y: 444, width: 300, height: 60 },
     ])
     expect(matrixLayoutBounds(frames)).toEqual({ x: 0, y: 0, width: 544, height: 504 })
+  })
+
+  it('measures a visible Matrix larger than its live budget over successive admissions', () => {
+    const rows = [0, 1]
+    const cols = Array.from({ length: 8 }, (_, index) => index)
+    const cells = expandMatrixCells('story', { name: 'row', values: rows }, { name: 'col', values: cols }, {})
+    const measured = new Set<string>()
+    const viewport = { x: 0, y: 0, width: 6200, height: 1440 }
+    for (let batch = 0; batch < 4; batch++) {
+      const frames = layoutMatrixFrames(cells, {
+        storyId: 'story',
+        variantId: 'variant',
+        rows,
+        cols,
+        size: cell => measured.has(cell.key) ? { width: 100, height: 50 } : { width: 720, height: 640 },
+        zoom: 1,
+      })
+      // An admitted document reports its intrinsic size before the next ranking.
+      const admitted = liveCanvasFrames(frames, viewport, 5, null)
+      expect(admitted.size).toBe(5)
+      for (const id of admitted) measured.add(id)
+    }
+    expect(measured).toEqual(new Set(cells.map(cell => cell.key)))
   })
 
   it('persists mode without changing remembered zoom and tolerates legacy preferences', () => {

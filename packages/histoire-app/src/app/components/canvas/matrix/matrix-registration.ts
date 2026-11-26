@@ -1,6 +1,6 @@
 import type { CanvasFrames } from '../../../composables/canvas-settings.js'
-import type { CanvasFrameLayout } from '../frame-layout.js'
 import type { CanvasRect } from '../pan/usePanZoom.js'
+import type { MatrixFrameLayout } from './matrix-layout.js'
 import { watch } from 'vue'
 
 /** Bind exact base preset ownership while geometry-only updates retain its document. */
@@ -8,7 +8,7 @@ export function watchMatrixFrameRegistration(options: {
   /** Canvas registry owned by nearest viewport. */
   registry: CanvasFrames
   /** Current layout can change without changing target. */
-  getFrame: () => CanvasFrameLayout
+  getFrame: () => MatrixFrameLayout
   /** Candidate-zoom cell bounds supplied by arrangement owner. */
   getFitBounds?: (zoom: number) => CanvasRect
   /** Collected base variant shared by cells. */
@@ -23,11 +23,11 @@ export function watchMatrixFrameRegistration(options: {
     options.onTargetChange()
     unregister()
     const frame = options.getFrame()
-    unregister = options.registry.registerFrame({ id: frame.id, storyId: frame.storyId, variantId: options.getVariantId(), rect: frame, fitBounds: options.getFitBounds, propsOverride: options.getPropsOverride?.() })
+    unregister = options.registry.registerFrame({ id: frame.id, storyId: frame.storyId, variantId: options.getVariantId(), rect: frame.contentRect, fitBounds: options.getFitBounds, propsOverride: options.getPropsOverride?.() })
   }, { immediate: true, flush: 'sync' })
   const stopGeometry = watch(options.getFrame, (frame) => {
     const entry = options.registry.getFrame(frame.id)
-    if (entry) entry.rect = frame
+    if (entry) entry.rect = frame.contentRect
   }, { flush: 'sync' })
   const stopProps = watch(() => options.getPropsOverride?.(), (value) => {
     const entry = options.registry.getFrame(options.getFrame().id)
