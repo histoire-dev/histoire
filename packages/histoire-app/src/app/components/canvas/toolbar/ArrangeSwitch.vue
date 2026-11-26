@@ -15,7 +15,7 @@ const presentation = useToolbarPresentation()
 </script>
 
 <template>
-  <div :data-presentation="presentation" class="histoire-button-group-options htw:data-[presentation=menu]:flex-col htw:data-[presentation=menu]:items-stretch htw:data-[presentation=menu]:gap-0 htw:data-[presentation=menu]:p-0 htw:data-[presentation=menu]:bg-transparent" role="group" aria-label="Arrange frames">
+  <div :data-presentation="presentation" class="histoire-button-group-options htw:data-[presentation=menu]:flex-col htw:data-[presentation=menu]:items-stretch htw:data-[presentation=menu]:gap-px htw:data-[presentation=menu]:p-0 htw:data-[presentation=menu]:bg-transparent" role="group" aria-label="Arrange frames">
     <ToolbarButton menu-role="menuitemradio" label="Single variant" icon="document" :pressed="arrange === 'single'" @click="emit('arrange', 'single')" />
     <ToolbarButton menu-role="menuitemradio" label="Grid" icon="grid" :pressed="arrange === 'grid'" @click="emit('arrange', 'grid')" />
     <ToolbarButton menu-role="menuitemradio" label="List" icon="list-boxes" :pressed="arrange === 'list'" @click="emit('arrange', 'list')" />

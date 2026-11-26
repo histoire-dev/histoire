@@ -67,6 +67,14 @@
   50% { opacity: 1; }
 }
 
+/* Keep menu items at their intrinsic heights when a panel has to scroll. */
+@utility menu-rows {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-content: start;
+  row-gap: 1px;
+}
+
 /* Keep the existing markdown contract while typography supplies structural defaults. */
 @utility prose {
   --tw-prose-invert-quote-borders: rgb(var(--_histoire-color-gray-800) / var(--_histoire-color-gray-800-alpha, 1));

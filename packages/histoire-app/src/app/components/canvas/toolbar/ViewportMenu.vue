@@ -75,19 +75,21 @@ function autoFit(): void {
     <PopoverTitle>
       Viewport
     </PopoverTitle>
-    <PopoverRow :aria-pressed="!canvas.autoFitContent && canvas.arrangement === 'single' && canvas.singleViewport.mode === 'responsive'" @click="responsive">
-      <BuiltinIcon icon="arrows-horizontal" :size="16" />{{ canvas.arrangement === 'single' ? 'Fill viewport' : 'Responsive' }}<PopoverMeta>fill</PopoverMeta>
-    </PopoverRow>
-    <PopoverRow :aria-pressed="canvas.autoFitContent" @click="autoFit">
-      <BuiltinIcon icon="ruler" :size="16" />Auto fit content
-    </PopoverRow>
-    <PopoverRow v-for="(option, index) in presets" :key="index" :aria-pressed="!canvas.autoFitContent && (canvas.arrangement !== 'single' || canvas.singleViewport.mode === 'fixed') && snapshot.settings.responsiveWidth === option.width && snapshot.settings.responsiveHeight === (option.height ?? null)" @click="preset(option.width, option.height)">
-      <BuiltinIcon :icon="option.width < 500 ? 'mobile' : option.width < 900 ? 'tablet' : 'screen'" :size="16" /><span>{{ option.label }}</span><PopoverMeta>
-        {{ option.width }}<template v-if="option.height">
-          × {{ option.height }}
-        </template>
-      </PopoverMeta>
-    </PopoverRow>
+    <div class="htw:menu-rows">
+      <PopoverRow :aria-pressed="!canvas.autoFitContent && canvas.arrangement === 'single' && canvas.singleViewport.mode === 'responsive'" @click="responsive">
+        <BuiltinIcon icon="arrows-horizontal" :size="16" />{{ canvas.arrangement === 'single' ? 'Fill viewport' : 'Responsive' }}<PopoverMeta>fill</PopoverMeta>
+      </PopoverRow>
+      <PopoverRow :aria-pressed="canvas.autoFitContent" @click="autoFit">
+        <BuiltinIcon icon="ruler" :size="16" />Auto fit content
+      </PopoverRow>
+      <PopoverRow v-for="(option, index) in presets" :key="index" :aria-pressed="!canvas.autoFitContent && (canvas.arrangement !== 'single' || canvas.singleViewport.mode === 'fixed') && snapshot.settings.responsiveWidth === option.width && snapshot.settings.responsiveHeight === (option.height ?? null)" @click="preset(option.width, option.height)">
+        <BuiltinIcon :icon="option.width < 500 ? 'mobile' : option.width < 900 ? 'tablet' : 'screen'" :size="16" /><span>{{ option.label }}</span><PopoverMeta>
+          {{ option.width }}<template v-if="option.height">
+            × {{ option.height }}
+          </template>
+        </PopoverMeta>
+      </PopoverRow>
+    </div>
     <PopoverDivider />
     <form class="viewport-custom htw:flex htw:items-center htw:gap-1.5 htw:py-1.5 htw:px-2 htw:text-muted htw:text-[11px]" @submit.prevent="custom">
       <span class="htw:mr-auto">Custom</span><HstText v-model="customWidth" class="htw:flex-1 htw:min-w-0" layout="inline" aria-label="Custom width" inputmode="numeric" @change="custom" /><span>×</span><HstText v-model="customHeight" class="htw:flex-1 htw:min-w-0" layout="inline" aria-label="Custom height" placeholder="Auto" inputmode="numeric" @change="custom" />

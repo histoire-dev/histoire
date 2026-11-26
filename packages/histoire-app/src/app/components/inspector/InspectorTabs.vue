@@ -92,7 +92,7 @@ function choose(value: InspectorTab): void {
       <BuiltinIcon icon="chevron-down" class="htw:flex-none" :size="16" />
     </HstButton>
     <BasePopover v-if="open" v-model:open="open" :anchor="trigger" label="More tabs" role="menu" :width="200" :focus-last="focusLast">
-      <div @keydown="menuKey">
+      <div class="htw:menu-rows" @keydown="menuKey">
         <MenuItem v-for="tab in menu" :key="tab.value" :label="tab.label" :icon="tab.icon" :data-histoire-contribution="getInspectorTabId(tab.value)" :class="{ 'htw:opacity-60': tab.dimmed }" @click="choose(tab.value)">
           <component :is="tab.badge" v-if="tab.badge" />
           <span v-else-if="tab.badgeText !== undefined" class="htw:text-muted htw:text-[13px] htw:tabular-nums">{{ tab.badgeText }}</span>

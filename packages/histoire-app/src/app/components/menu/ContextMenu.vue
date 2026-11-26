@@ -96,7 +96,7 @@ onBeforeUnmount(() => document.removeEventListener('pointerdown', outside, true)
 
 <template>
   <Teleport :to="overlay">
-    <div v-if="target && actions.length" ref="menu" class="histoire-context-menu histoire-control-popover htw:fixed htw:z-60 htw:w-[264px] htw:max-w-[calc(100vw-16px)] htw:max-h-[calc(100vh-16px)] htw:p-[5px]" role="menu" :aria-label="label" :style="{ left: `${position.left}px`, top: `${position.top}px` }" @keydown="keyboard">
+    <div v-if="target && actions.length" ref="menu" class="histoire-context-menu histoire-control-popover htw:fixed htw:z-60 htw:w-[264px] htw:max-w-[calc(100vw-16px)] htw:max-h-[calc(100vh-16px)] htw:p-[5px] htw:menu-rows" role="menu" :aria-label="label" :style="{ left: `${position.left}px`, top: `${position.top}px` }" @keydown="keyboard">
       <p class="htw:mt-[7px] htw:mx-[9px] htw:mb-[9px] htw:truncate htw:text-muted htw:text-[11px] htw:font-bold">
         {{ label }}
       </p>

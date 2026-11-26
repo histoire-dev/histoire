@@ -37,17 +37,19 @@ function selection() {
     <template #trigger>
       <span class="htw:text-text htw:font-mono htw:text-[11px] htw:min-w-[29px]">{{ label }}</span>
     </template>
-    <PopoverRow :aria-pressed="canvas.zoom === 'fit'" @click="zoom('fit')">
-      Fit to canvas<PopoverMeta>{{ shortcuts?.hint('canvas.fit') || '⇧1' }}</PopoverMeta>
-    </PopoverRow>
-    <PopoverRow v-if="canvas.arrangement !== 'single'" :disabled="!selectedFrame" :aria-pressed="canvas.zoom === 'selection'" @click="selection">
-      Zoom to selection<PopoverMeta>{{ shortcuts?.hint('canvas.selection') || '⇧2' }}</PopoverMeta>
-    </PopoverRow>
-    <PopoverRow v-for="value in [.25, .5, 1, 2]" :key="value" :aria-pressed="canvas.zoom === value" @click="zoom(value)">
-      {{ value * 100 }}%<PopoverMeta v-if="value === 1">
-        {{ shortcuts?.hint('canvas.actual') || '⇧0' }}
-      </PopoverMeta>
-    </PopoverRow>
+    <div class="htw:menu-rows">
+      <PopoverRow :aria-pressed="canvas.zoom === 'fit'" @click="zoom('fit')">
+        Fit to canvas<PopoverMeta>{{ shortcuts?.hint('canvas.fit') || '⇧1' }}</PopoverMeta>
+      </PopoverRow>
+      <PopoverRow v-if="canvas.arrangement !== 'single'" :disabled="!selectedFrame" :aria-pressed="canvas.zoom === 'selection'" @click="selection">
+        Zoom to selection<PopoverMeta>{{ shortcuts?.hint('canvas.selection') || '⇧2' }}</PopoverMeta>
+      </PopoverRow>
+      <PopoverRow v-for="value in [.25, .5, 1, 2]" :key="value" :aria-pressed="canvas.zoom === value" @click="zoom(value)">
+        {{ value * 100 }}%<PopoverMeta v-if="value === 1">
+          {{ shortcuts?.hint('canvas.actual') || '⇧0' }}
+        </PopoverMeta>
+      </PopoverRow>
+    </div>
     <template v-if="settings">
       <PopoverDivider />
       <PopoverRow class="htw:cursor-default" as="label">

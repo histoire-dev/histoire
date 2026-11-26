@@ -57,7 +57,7 @@ sendUiEvent('histoire:ui:screenshot-list', { requestId })
       <PopoverTitle>
         Recent screenshots
       </PopoverTitle>
-      <div class="htw:grid htw:[grid-template-columns:repeat(3,_1fr)] htw:gap-1.5 htw:pt-0 htw:px-2 htw:pb-2">
+      <div class="htw:grid htw:[grid-template-columns:repeat(3,_1fr)] htw:gap-px htw:pt-0 htw:px-2 htw:pb-2">
         <button v-for="file in recent" :key="file.path" type="button" role="menuitem" tabindex="-1" :aria-label="`Attach screenshot of ${catalogTargetLabel(file, snapshot.catalog)}`" :title="catalogTargetLabel(file, snapshot.catalog)" class="htw:[aspect-ratio:4_/_3] htw:p-0 htw:overflow-hidden htw:border htw:border-border htw:rounded-control htw:bg-chip htw:cursor-pointer htw:hover:border-agent htw:hover:outline-none htw:focus-visible:border-agent htw:focus-visible:outline-none" @click="emit('screenshot', file.path)">
           <img :src="screenshotUrl(file.path)" alt="" class="htw:block htw:w-full htw:h-full htw:object-cover">
         </button>

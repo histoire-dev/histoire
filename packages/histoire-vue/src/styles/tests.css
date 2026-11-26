@@ -18,7 +18,7 @@
 :where(.histoire-provider) .histoire-tests-run:not(:disabled){color:var(--histoire-tests-passed)}
 :where(.histoire-provider) .histoire-tests-run-trigger{--histoire-icon-button-size:30px;border-inline-start:1px solid var(--histoire-control-resolved-border,var(--histoire-border))!important;color:var(--histoire-muted)}
 :where(.histoire-provider) .histoire-tests-cancel{color:var(--histoire-tests-failed-text)}
-:where(.histoire-provider) .histoire-tests-run-menu{min-width:156px}
+:where(.histoire-provider) .histoire-tests-run-menu{display:flex;flex-direction:column;row-gap:1px;min-width:156px}
 :where(.histoire-provider) .histoire-tests-run-menu .histoire-button{width:100%;justify-content:flex-start;padding:6px 10px;text-align:start}
 :where(.histoire-provider) .histoire-tests-status{flex:1;min-width:0;overflow:hidden;color:var(--histoire-muted);font-size:12px;font-variant-numeric:tabular-nums;text-align:end;white-space:nowrap;text-overflow:ellipsis}
 :where(.histoire-provider) .histoire-tests-status [data-state="passed"]{color:var(--histoire-tests-passed)}

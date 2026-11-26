@@ -103,7 +103,7 @@ function keyboard(event: KeyboardEvent): void {
     </div>
     <ToolbarButton :ref="setTrigger" class="htw:flex-none htw:[&[hidden]]:hidden" :hidden="!overflowing" :label="overflowLabel" icon="chevron-down" aria-haspopup="menu" :aria-expanded="open" @click="open ? close(true) : show()" @keydown="triggerKey" />
     <BasePopover :open="open" :anchor="trigger" :label="overflowLabel" role="menu" :scope="scope" :overlay-target="props.overlayTarget" :bounds="props.bounds" :focus-last="focusLast" persistent @update:open="close">
-      <div @keydown="keyboard">
+      <div class="htw:menu-rows" @keydown="keyboard">
         <div v-for="item in items" :key="item.id" :ref="element => setHost(item.id, element)" class="htw:[&[hidden]]:hidden" :hidden="!item.overflow.value || item.empty.value" />
       </div>
     </BasePopover>

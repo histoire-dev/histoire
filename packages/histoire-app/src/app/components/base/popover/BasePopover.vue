@@ -140,7 +140,7 @@ defineExpose({ panel, close, place })
 
 <template>
   <Teleport :to="overlayTarget ?? overlay">
-    <div v-if="persistent || open" v-show="open" ref="panel" v-bind="$attrs" class="histoire-base-popover histoire-control-popover htw:fixed htw:box-border htw:max-w-[calc(100vw-16px)]" :role="role" :aria-label="label" tabindex="-1" :style="{ left: `${position.left}px`, top: `${position.top}px`, width: `${position.width}px`, maxHeight: `${position.maxHeight}px`, zIndex: 50 + scope.depth }" @wheel.stop @pointerdown.stop>
+    <div v-if="persistent || open" v-show="open" ref="panel" v-bind="$attrs" class="histoire-base-popover histoire-control-popover htw:fixed htw:box-border htw:max-w-[calc(100vw-16px)]" :class="{ 'htw:menu-rows': role === 'menu' }" :role="role" :aria-label="label" tabindex="-1" :style="{ left: `${position.left}px`, top: `${position.top}px`, width: `${position.width}px`, maxHeight: `${position.maxHeight}px`, zIndex: 50 + scope.depth }" @wheel.stop @pointerdown.stop>
       <slot :close="close" />
     </div>
   </Teleport>

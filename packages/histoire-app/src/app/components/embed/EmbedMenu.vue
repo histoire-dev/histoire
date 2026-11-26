@@ -26,11 +26,13 @@ function open(scope: 'story' | 'variant'): void {
 
 <template>
   <ToolbarPopover id="embed" ref="popover" :open="props.open" label="Embed" icon="code" :width="220" @update:open="emit('update:open', $event)">
-    <PopoverRow :disabled="!snapshot.selection?.variantId || !controller.available(snapshot.selection.storyId, snapshot.selection.variantId)" @click="open('variant')">
-      Embed this variant
-    </PopoverRow>
-    <PopoverRow :disabled="!snapshot.selection || !controller.available(snapshot.selection.storyId)" @click="open('story')">
-      Embed this story
-    </PopoverRow>
+    <div class="htw:menu-rows">
+      <PopoverRow :disabled="!snapshot.selection?.variantId || !controller.available(snapshot.selection.storyId, snapshot.selection.variantId)" @click="open('variant')">
+        Embed this variant
+      </PopoverRow>
+      <PopoverRow :disabled="!snapshot.selection || !controller.available(snapshot.selection.storyId)" @click="open('story')">
+        Embed this story
+      </PopoverRow>
+    </div>
   </ToolbarPopover>
 </template>

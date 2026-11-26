@@ -20,7 +20,7 @@
 :where(.histoire-provider) .histoire-preset-dropdown { flex: none; }
 :where(.histoire-provider) .histoire-preset-trigger { --histoire-icon-button-size: 32px; cursor: pointer; }
 :where(.histoire-provider) :is(.histoire-preset-menu, .histoire-preset-form) { width: 200px; max-width: 100%; padding: 4px;  }
-:where(.histoire-provider) .histoire-preset-menu { display: flex; flex-direction: column; }
+:where(.histoire-provider) .histoire-preset-menu { display: flex; flex-direction: column; row-gap: 1px; }
 :where(.histoire-provider) .histoire-preset-menu :where(button) { width: 100%; justify-content: flex-start; text-align: left; }
 :where(.histoire-provider) .histoire-preset-form { padding: 10px; }
 :where(.histoire-provider) .histoire-preset-form-actions { display: flex; justify-content: flex-end; gap: 4px; margin-top: 6px; }
