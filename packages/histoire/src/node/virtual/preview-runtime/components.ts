@@ -10,7 +10,10 @@
  * test capture leaves that to the support plugin's RenderStory when it can.
  */
 export function previewComponents() {
-  return `const PreviewFrameActor = defineComponent({
+  return `/** Host remount requests bump this to give the selected variant a fresh renderer within its actor. */
+const storyMountRevision = ref(0)
+
+const PreviewFrameActor = defineComponent({
   name: 'PreviewFrameActor',
   props: {
     story: {
@@ -40,7 +43,9 @@ export function previewComponents() {
     const slot = createFrameActorSlot(() => ({ storyId: props.story.id, variantId: props.variant.id }), props.getElement)
     // Before unmount, so plugins clean up while the rendered variant still exists.
     onBeforeUnmount(() => disposeFrameActorSlot(slot))
+    // Remount replaces only the renderer: the actor and its plugin attachments stay.
     return () => h(GenericRenderStory, {
+      key: storyMountRevision.value,
       story: props.story,
       variant: props.variant,
       configureStory: props.configureStory,

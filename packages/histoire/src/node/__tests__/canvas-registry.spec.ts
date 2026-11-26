@@ -20,6 +20,22 @@ describe('canvas frame registry', () => {
     expect(registry.postToFrame('absent', { type: 'request' })).toBe(false)
   })
 
+  it('remounts the exact variant of each running document', () => {
+    const registry = createCanvasFrames(createCanvasStore())
+    const postMessage = vi.fn()
+    const iframe = { contentWindow: { postMessage }, ownerDocument: { defaultView: { location: { origin: 'https://book.test' } } } } as unknown as HTMLIFrameElement
+    registry.registerFrame({ id: 'a', storyId: 'story', variantId: 'a', rect: { x: 0, y: 0, width: 1, height: 1 }, iframe, documentId: 'doc-a' })
+    registry.registerFrame({ id: 'b', storyId: 'story', variantId: 'b', rect: { x: 0, y: 0, width: 1, height: 1 }, iframe, documentId: 'doc-b' })
+    registry.registerFrame({ id: 'placeholder', storyId: 'story', variantId: 'c', rect: { x: 0, y: 0, width: 1, height: 1 } })
+    expect(registry.remountFrame('placeholder')).toBe(false)
+    expect(registry.remountFrame('a')).toBe(true)
+    expect(postMessage).toHaveBeenLastCalledWith({ type: '__histoire:story-remount', storyId: 'story', variantId: 'a', __histoire: true, documentId: 'doc-a' }, 'https://book.test')
+    postMessage.mockClear()
+    expect(registry.remountAll()).toBe(2)
+    expect(postMessage.mock.calls.map(([message]) => message.documentId)).toEqual(['doc-a', 'doc-b'])
+    expect([registry.getFrame('a')?.remounts, registry.getFrame('b')?.remounts, registry.getFrame('placeholder')?.remounts]).toEqual([2, 1, undefined])
+  })
+
   it('publishes readiness mutation and prevents retired cleanup deleting successor', () => {
     const registry = createCanvasFrames(createCanvasStore())
     const original = registry.registerFrame({ id: 'frame', storyId: 'story', variantId: 'variant', rect: { x: 0, y: 0, width: 1, height: 1 } })

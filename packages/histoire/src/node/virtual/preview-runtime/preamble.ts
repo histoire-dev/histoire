@@ -104,7 +104,7 @@ import { ModuleMocker, ModuleMockerMSWInterceptor } from ${JSON.stringify(vitest
 import FloatingVue from ${JSON.stringify(histoireVendorIds.floatingVue)}
 import { createPinia } from ${JSON.stringify(histoireVendorIds.pinia)}
 import { computed, createApp, defineComponent, h, nextTick, onBeforeUnmount, onMounted, reactive, ref, watch } from ${JSON.stringify(histoireVendorIds.vue)}
-import { ELEMENT_PICK_REQUEST, ELEMENT_PICK_RESULT, MEASURE_REQUEST, MEASURE_RESULT, PROPS_OVERRIDE, applyVariantStateUpdate, createControlsOverlayBridge, createControlsStateRevision, createFailedRunSummary, createVariantStateSyncGuards, getFramePurpose, getFrameworkInspection, invalidateFrameworkInspection, getVariantStateKey, isInteractiveFramePurpose, measureWireValue, serializeTestError } from ${JSON.stringify(histoireSharedId)}
+import { ELEMENT_PICK_REQUEST, ELEMENT_PICK_RESULT, MEASURE_REQUEST, MEASURE_RESULT, PROPS_OVERRIDE, STORY_REMOUNT, applyVariantStateUpdate, createControlsOverlayBridge, createControlsStateRevision, createFailedRunSummary, createVariantStateSyncGuards, getFramePurpose, getFrameworkInspection, invalidateFrameworkInspection, getVariantStateKey, isInteractiveFramePurpose, measureWireValue, serializeTestError } from ${JSON.stringify(histoireSharedId)}
 import { createVariantTestSession, hasVanillaSetupHooks } from ${JSON.stringify(variantTestSessionId)}
 ${hasVitestPreview
   ? `import { createStaticPreviewMockRpc, createStaticPreviewMswOptions, enableStaticPreviewMockInterception } from ${JSON.stringify(staticMockRuntimeId)}`

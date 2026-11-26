@@ -54,6 +54,8 @@ export interface FrameActionOptions {
   frameSession?: (target: FrameActionTarget) => HistoireSession | null
   /** Logical activation invalidates pending actions even when a document is reused. */
   frameRegistration?: (target: FrameActionTarget) => CanvasFrameRegistration | null
+  /** Remount the rendered variant inside its live document; false when none is mounted. */
+  remountFrame?: (target: FrameActionTarget) => boolean
   /** Clipboard abstraction used by behavior tests and native host. */
   copy?: (text: string) => Promise<void>
   /** Workbench tests owner runs exact target so inspector and test panes observe its results. */
@@ -124,6 +126,9 @@ export function createFrameActions(options: FrameActionOptions) {
     /** Caller closes manual recovery after copying or selecting text. */
     dismissCopy(): void { manualCopy.value = null } }
   const actions: FrameAction[] = [
+    { id: 'remount', label: 'Remount', icon: 'renew', group: 'run', shortcut: 'frame.remount', available: () => !!options.remountFrame, disabled: target => options.frameRegistration?.(target)?.documentId ? undefined : 'Variant is not running', run(target) {
+      if (!options.remountFrame?.(target)) throw new Error('Variant unavailable.')
+    } },
     { id: 'open-isolated', label: 'Open isolated', icon: 'launch', group: 'open', shortcut: 'frame.isolated', run(target) {
       const source = options.session.getSnapshot().source
       if (!source) return
@@ -167,6 +172,7 @@ export function registerFrameAction(registry: ReturnType<typeof createFrameActio
 /** Menu hints and native frame shortcuts share action IDs and live capability gates. */
 export function registerFrameShortcuts(shortcuts: ReturnType<typeof createShortcutRegistry>, actions: ReturnType<typeof createFrameActions>, target: (event?: KeyboardEvent) => FrameActionTarget | null): () => void {
   const definitions = [
+    { action: 'remount', id: 'frame.remount' },
     { action: 'open-isolated', id: 'frame.isolated' },
     { action: 'open-editor', id: 'frame.editor' },
     { action: 'copy-source', id: 'frame.source' },

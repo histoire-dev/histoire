@@ -18,6 +18,8 @@ export const ELEMENT_PICK_REQUEST = '__histoire:element-pick-request'
 export const ELEMENT_PICK_RESULT = '__histoire:element-pick-result'
 /** Complete prop override set for one isolated matrix frame. */
 export const PROPS_OVERRIDE = '__histoire:props-override'
+/** Unmount and remount the rendered variant in place, replaying its mount lifecycle. */
+export const STORY_REMOUNT = '__histoire:story-remount'
 
 /** Serializable bounds in frame-local CSS pixels, unaffected by host canvas zoom. */
 export interface HistoireElementRect {
@@ -128,8 +130,14 @@ export interface HistoirePropsOverrideMessage extends HistoireInspectionIdentity
   props: Record<string, unknown>
 }
 
+/** Fresh renderer for the current variant; variant state and props overrides are kept. */
+export interface HistoireStoryRemountMessage extends HistoireInspectionIdentity {
+  /** Remount operation. */
+  type: typeof STORY_REMOUNT
+}
+
 /** Existing portable host protocol with additive workbench frame operations. */
-export type HistoireHostMessage = PortableHostMessage | HistoireElementInspectionRequest | HistoirePropsOverrideMessage
+export type HistoireHostMessage = PortableHostMessage | HistoireElementInspectionRequest | HistoirePropsOverrideMessage | HistoireStoryRemountMessage
 /** Existing portable preview protocol with additive element inspection replies. */
 export type HistoirePreviewMessage = PortablePreviewMessage | HistoireElementInspectionReply
 /** Untrusted inbound traffic retains structural validation at runtime. */

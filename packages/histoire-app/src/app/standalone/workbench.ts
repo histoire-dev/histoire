@@ -76,6 +76,7 @@ export function useWorkbench(props: WorkbenchProps, error: (error: unknown) => v
     },
     frameSession: target => canvas.value?.registry.getFrame(target.frameKey)?.session ?? null,
     frameRegistration: target => canvas.value?.registry.getFrame(target.frameKey) ?? null,
+    remountFrame: target => canvas.value?.registry.remountFrame(target.frameKey) ?? false,
     runTests: target => projectTests.run(target),
     error,
   })
@@ -135,6 +136,7 @@ export function useWorkbench(props: WorkbenchProps, error: (error: unknown) => v
   // Plugin commands, shortcuts and menu entries join the registries above (toolbar reads the host).
   useWorkbenchPluginActions(extensions, { commands: props.commands, shortcuts, actions, menu, error, frameSession: target => canvas.value?.registry.getFrame(target.frameKey)?.session ?? props.session })
   useHistoireResource(shortcuts.bind('global.search', () => openSearch(), { allowInput: true }))
+  useHistoireResource(shortcuts.bind('canvas.remount', () => canvas.value?.registry.remountAll(), { enabled: () => [...canvas.value?.registry.frames.values() ?? []].some(frame => frame.documentId) }))
   if (dev) {
     useHistoireResource(shortcuts.bind('canvas.comment', () => {
       dev.commentMode.value = true
