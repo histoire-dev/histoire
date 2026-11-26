@@ -16,7 +16,7 @@ export default defineConfig({
   },
   embed: { enabled: true, allowedOrigins: [process.env.HISTOIRE_DEVFRAME_ORIGIN ?? 'http://127.0.0.1:4638'] },
   visual: {},
-  ui: { frameBudget: 12 },
+  ui: { frameBudget: 12, framePadding: 24 },
   // outDir: 'hdist',
   plugins: [
     HstVue(),

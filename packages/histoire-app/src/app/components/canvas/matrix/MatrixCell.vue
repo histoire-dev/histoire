@@ -12,6 +12,7 @@ import { formatMatrixValue } from '../../../util/matrix-values.js'
 import CanvasLoadingIndicator from '../CanvasLoadingIndicator.vue'
 import CanvasReplicaPreview from '../CanvasReplicaPreview.vue'
 import { isFrameMenuShortcut, openFrameMenu } from '../frame-menu.js'
+import FramePaddingAligners from '../FramePaddingAligners.vue'
 import { watchMatrixFrameRegistration } from './matrix-registration.js'
 
 const props = defineProps<{
@@ -27,6 +28,10 @@ const props = defineProps<{
   variantId: string
   /** Absolute first-party source URL. */
   previewBase: string
+  /** Gutter around the variant inside the cell, in logical pixels. */
+  padding?: number
+  /** Story declares the variant size, so the document gets it instead of viewport settings. */
+  fixedSize?: boolean
 }>()
 const canvas = useCanvasStore()
 const background = useCanvasFrameBackground(() => props.frame.id)
@@ -38,7 +43,14 @@ const status = ref<'loading' | 'ready' | 'error'>('loading')
 const loadingVisible = useLoadingDelay(() => status.value === 'loading', () => props.frame.id)
 const error = ref<unknown>()
 const position = computed(() => ({ left: `${props.frame.x * canvas.effectiveZoom + canvas.panOffset.x}px`, top: `${props.frame.y * canvas.effectiveZoom + canvas.panOffset.y}px`, width: `${props.frame.width * canvas.effectiveZoom}px`, height: `${props.frame.height * canvas.effectiveZoom}px` }))
-const contentStyle = computed(() => ({ width: `${props.frame.contentRect.width}px`, height: `${props.frame.contentRect.height}px`, transform: `scale(${canvas.effectiveZoom})` }))
+const gutter = computed(() => props.padding ?? 0)
+/** Variant bounds inside the gutter; measuring and comments target these. */
+const inner = computed(() => props.frame.contentRect)
+const contentStyle = computed(() => ({
+  width: `${inner.value.width}px`,
+  height: `${inner.value.height}px`,
+  transform: `translate(${gutter.value * canvas.effectiveZoom}px, ${gutter.value * canvas.effectiveZoom}px) scale(${canvas.effectiveZoom})`,
+}))
 let releaseSource = () => {}
 const unregister = watchMatrixFrameRegistration({ registry, getFrame: () => props.frame, getFitBounds: zoom => props.fitBounds?.(zoom) ?? props.frame, getVariantId: () => props.variantId, getPropsOverride: () => props.cell.props, onTargetChange: () => {
   releaseSource()
@@ -83,8 +95,9 @@ onBeforeUnmount(() => {
 <template>
   <section class="histoire-matrix-cell htw:absolute htw:overflow-hidden htw:border htw:border-solid htw:border-border htw:rounded-[7px] htw:bg-white htw:pointer-events-auto htw:data-[selected=true]:outline-2 htw:data-[selected=true]:outline-solid htw:data-[selected=true]:outline-accent htw:data-[selected=true]:-outline-offset-1" :style="{ ...position, ...getBackgroundStyle(background) }" :data-frame-id="frame.id" :data-selected="matrix.selectedCell.value?.key === cell.key" @contextmenu="openMenu">
     <div class="histoire-matrix-cell-content htw:origin-top-left" :style="contentStyle">
-      <CanvasReplicaPreview v-if="live" :key="variantId" ref="preview" :frame-id="frame.id" :story-id="frame.storyId" :variant-id="variantId" :preview-base="previewBase" :props-override="cell.props" @status="updateStatus" />
+      <CanvasReplicaPreview v-if="live" :key="variantId" ref="preview" :frame-id="frame.id" :story-id="frame.storyId" :variant-id="variantId" :preview-base="previewBase" :props-override="cell.props" :declared-size="fixedSize ? { width: inner.width, height: inner.height } : undefined" @status="updateStatus" />
     </div>
+    <FramePaddingAligners v-if="gutter > 0" :width="inner.width * canvas.effectiveZoom" :height="inner.height * canvas.effectiveZoom" :padding="gutter * canvas.effectiveZoom" :background="background" />
     <button class="histoire-matrix-cell-select htw:absolute htw:inset-0 htw:w-full htw:m-0 htw:p-0 htw:border-0 htw:rounded-[inherit] htw:bg-transparent htw:cursor-pointer htw:[appearance:none] htw:focus-visible:outline-2 htw:focus-visible:outline-solid htw:focus-visible:outline-accent htw:focus-visible:-outline-offset-[3px]" type="button" :aria-label="`Select matrix cell ${formatMatrixValue(cell.row)} · ${formatMatrixValue(cell.col)}`" :aria-pressed="matrix.selectedCell.value?.key === cell.key" @click="matrix.selectCell(cell.key)" @keydown="onKeyDown" />
     <span v-if="!live" class="htw:absolute htw:inset-0 htw:grid htw:[place-content:center] htw:gap-2 htw:p-3 htw:text-muted htw:bg-input htw:text-[11px] htw:text-center htw:pointer-events-none">Not rendered</span>
     <div v-else-if="loadingVisible" class="histoire-matrix-cell-loading htw:absolute htw:inset-0 htw:grid htw:[place-content:center] htw:gap-2 htw:p-3 htw:text-muted htw:bg-input htw:text-[11px] htw:text-center htw:pointer-events-none" role="status" aria-label="Loading variant">

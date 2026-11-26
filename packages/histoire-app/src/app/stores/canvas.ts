@@ -1,3 +1,4 @@
+import type { HistoireStoryFrame } from '@histoire/protocol'
 import type { CanvasFrameLayout } from '../components/canvas/frame-layout.js'
 import type { CanvasMeasureState } from '../components/canvas/measure-controller.js'
 import type { CanvasPoint, CanvasSize } from '../components/canvas/pan/usePanZoom.js'
@@ -6,7 +7,7 @@ import type { SingleZoomListener } from '../components/canvas/single-zoom.js'
 import type { CanvasBackground } from '../util/background.js'
 import type { CanvasArrangement } from './canvas-arrangement.js'
 import type { CanvasContentInsets, CanvasFitTarget, CanvasPreferences, CanvasStorage, CanvasViewSnapshot, CanvasZoom } from './canvas-types.js'
-import { reactive } from 'vue'
+import { computed, reactive, type Ref, ref } from 'vue'
 import { createCanvasContentSizes } from '../components/canvas/content-sizes.js'
 import { canvasContentRect, clampZoom, fitCanvas, zoomAroundPoint } from '../components/canvas/pan/usePanZoom.js'
 import { fitSingleViewport } from '../components/canvas/single-zoom.js'
@@ -17,13 +18,46 @@ export { getCanvasStorage } from './canvas-preferences.js'
 export type { BuiltinCanvasTool, CanvasContentInsets, CanvasFitTarget, CanvasPreferences, CanvasStorage, CanvasTool, CanvasViewSnapshot, CanvasZoom, CanvasZoomByArrange } from './canvas-types.js'
 
 /** Create independent canvas state; nearest shell provides instance to its tools. */
-export function createCanvasStore(options: { storage?: CanvasStorage, singleViewport?: SingleViewportState } = {}) {
+export function createCanvasStore(options: {
+  /** Browser persistence for toolbar and canvas preferences. */
+  storage?: CanvasStorage
+  /** Workbench-owned Single viewport sizing intent. */
+  singleViewport?: SingleViewportState
+  /** Workbench-owned Auto fit preference that survives canvas remounts. */
+  autoFitPreference?: Ref<boolean | undefined>
+  /** Authored size of the active story when From code applies. */
+  frameSizeFromCode?: () => Pick<HistoireStoryFrame, 'width' | 'height'> | undefined
+} = {}) {
   const preferences = readCanvasPreferences(options.storage)
-  const state = reactive({ ...preferences, singleViewport: options.singleViewport ?? { mode: 'responsive' as const }, singleViewportSize: { width: 1, height: 1 }, singleViewportDraft: null as CanvasSize | null, arrangement: 'grid' as CanvasArrangement, zoom: preferences.zoomByArrange.grid, effectiveZoom: typeof preferences.zoomByArrange.grid === 'number' ? preferences.zoomByArrange.grid : 1, panOffset: { x: 32, y: 32 }, selectedFrame: null as string | null, viewport: { width: 0, height: 0 }, bounds: { x: 0, y: 0, width: 0, height: 0 }, inspectorWidth: 0, contentInsets: { topInset: 0, bottomInset: 0 }, frameBackgrounds: {} as Record<string, CanvasBackground>, panning: false, measure: null as CanvasMeasureState | null })
+  const autoFitPreference = options.autoFitPreference ?? ref<boolean>()
+  autoFitPreference.value ??= preferences.autoFitContent
+  const frameSizeFromCode = computed(() => options.frameSizeFromCode?.())
+  const state = reactive({
+    ...preferences,
+    frameSizeFromCode,
+    autoFitContent: computed(() => autoFitPreference.value === true && !frameSizeFromCode.value),
+    singleViewport: options.singleViewport ?? { mode: 'responsive' as const },
+    singleViewportSize: { width: 1, height: 1 },
+    singleViewportDraft: null as CanvasSize | null,
+    arrangement: 'grid' as CanvasArrangement,
+    zoom: preferences.zoomByArrange.grid,
+    effectiveZoom: typeof preferences.zoomByArrange.grid === 'number' ? preferences.zoomByArrange.grid : 1,
+    panOffset: { x: 32, y: 32 },
+    selectedFrame: null as string | null,
+    viewport: { width: 0, height: 0 },
+    bounds: { x: 0, y: 0, width: 0, height: 0 },
+    inspectorWidth: 0,
+    contentInsets: { topInset: 0, bottomInset: 0 },
+    frameBackgrounds: {} as Record<string, CanvasBackground>,
+    panning: false,
+    measure: null as CanvasMeasureState | null,
+  })
   let selectionBounds: CanvasFitTarget | undefined
   // Absent while the active view has no layout (plugin views may opt out of fitting).
   let fitBounds: CanvasFitTarget | undefined = state.bounds
   let singleArea: CanvasSize = { width: 0, height: 0 }
+  /** Story gutter around the Single variant; Fit keeps it in view. */
+  let singlePadding = 0
   const singleZoomListeners = new Set<SingleZoomListener>()
   /** Notify native scroll ownership before replacing the rendered scale. */
   function applySingleZoom(zoom: number, point?: CanvasPoint, fit = false) {
@@ -35,7 +69,12 @@ export function createCanvasStore(options: { storage?: CanvasStorage, singleView
     return canvasContentRect(state.viewport, { inspectorWidth: state.inspectorWidth, ...state.contentInsets })
   }
   /** Persist only contract preferences; failures leave usable current-session state. */
-  const save = () => saveCanvasPreferences(options.storage, state)
+  const save = () => saveCanvasPreferences(options.storage, {
+    zoomByArrange: state.zoomByArrange,
+    tool: state.tool,
+    frameBackground: state.frameBackground,
+    autoFitContent: autoFitPreference.value === true,
+  })
   /** Updates active arrangement preference without mutating another view's scale. */
   function setActiveZoom(zoom: CanvasZoom) {
     state.zoom = zoom
@@ -57,7 +96,7 @@ export function createCanvasStore(options: { storage?: CanvasStorage, singleView
   function fit() {
     setActiveZoom('fit')
     if (state.arrangement === 'single') {
-      if (singleArea.width && singleArea.height) applySingleZoom(fitSingleViewport(singleArea, state.singleViewportSize), undefined, true)
+      if (singleArea.width && singleArea.height) applySingleZoom(fitSingleViewport(singleArea, { width: state.singleViewportSize.width + singlePadding * 2, height: state.singleViewportSize.height + singlePadding * 2 }), undefined, true)
       return save()
     }
     // Setup runs before ResizeObserver measures; fitting an empty viewport would lock at 10%.
@@ -85,8 +124,9 @@ export function createCanvasStore(options: { storage?: CanvasStorage, singleView
     save()
   }
   /** Publish unscaled Single geometry; numeric zoom stays fixed during resizing. */
-  function setSingleGeometry(area: CanvasSize, size: CanvasSize) {
+  function setSingleGeometry(area: CanvasSize, size: CanvasSize, padding = 0) {
     singleArea = area
+    singlePadding = padding
     state.singleViewportSize = size
     if (state.arrangement === 'single' && state.zoom === 'fit') fit()
   }
@@ -223,7 +263,7 @@ export function createCanvasStore(options: { storage?: CanvasStorage, singleView
   return Object.assign(state, { setZoom, setArrangement, fit, resetZoom, setGeometry, setSingleGeometry, panBy, setPanOffset, snapshotView, restoreView, revealFrame, selectFrame, focusFrame, zoomToFrame, zoomToSelection, contentSizes: createCanvasContentSizes(),
     /** Select sizing without modifying manual dimensions or camera intent. */
     setAutoFitContent(value: boolean) {
-      state.autoFitContent = value
+      autoFitPreference.value = value
       save()
     },
     /** Switch Single sizing intent and retire any transient direct-resize draft. */

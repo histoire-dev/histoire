@@ -197,7 +197,8 @@ describe('content-sized workbench browser acceptance', () => {
     const fixture = await createEmbedBridgeFixture({
       mode: 'source-dev',
       embedding: false,
-      story,
+      // Keep the padding while letting the stored Auto fit preference size the cells at startup.
+      story: story.replace(', width: 200, height: 96', ''),
       files: { 'BaseButton.vue': button },
       config: `routerMode:"hash",ui:{frameBudget:${frameBudget}},vite:{server:{watch:{ignored:["**/packages/histoire*/**"]}}},`,
     })
@@ -218,11 +219,13 @@ describe('content-sized workbench browser acceptance', () => {
       await expect.poll(() => cells.evaluateAll((cells) => {
         const fitted: boolean[] = []
         const live: boolean[] = []
+        const widths = new Set<number>()
         for (const cell of cells) {
           // Cached sizes remain on the card after admission moves to other cells.
           const content = cell.querySelector<HTMLElement>('.histoire-matrix-cell-content')!
           const width = Number.parseFloat(content.style.width)
           const height = Number.parseFloat(content.style.height)
+          widths.add(width)
           fitted.push(width > 1 && width < 240 && height > 1 && height < 160)
           const iframe = content.querySelector('iframe[title="Histoire variant"]')
           if (iframe) {
@@ -230,10 +233,11 @@ describe('content-sized workbench browser acceptance', () => {
             live.push(button?.textContent?.trim() === 'Click me' && iframe.clientWidth === width && iframe.clientHeight === height)
           }
         }
-        return { fitted, live }
+        return { fitted, live, fittedWidths: widths.size }
       }), { timeout: 20_000 }).toEqual({
         fitted: Array.from({ length: 9 }, () => true),
         live: Array.from({ length: Math.min(9, frameBudget - 1) }, () => true),
+        fittedWidths: 3,
       })
     }
     finally {

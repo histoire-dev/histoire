@@ -18,6 +18,11 @@ export function singleVariantArea(viewport: CanvasSize, insets: CanvasContentIns
   return { x: padding, y: top, width: Math.max(1, Math.round(viewport.width - inspectorWidth - padding * 2)), height: Math.max(1, Math.round(viewport.height - top - (insets.bottomInset ?? 0) - padding)) }
 }
 
+/** Room left for the variant once a story gutter surrounds it. */
+export function insetArea(area: CanvasSize, padding: number): CanvasSize {
+  return { width: Math.max(1, area.width - padding * 2), height: Math.max(1, area.height - padding * 2) }
+}
+
 /** Resolve logical dimensions without shrinking oversized presets or scaling content. */
 export function resolveSingleViewport(area: CanvasSize, settings: Pick<HistoireSettings, 'responsiveWidth' | 'responsiveHeight' | 'rotate'>, mode: SingleViewportState['mode']): CanvasSize {
   if (mode === 'responsive') return { width: area.width, height: area.height }

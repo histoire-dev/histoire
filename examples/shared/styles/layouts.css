@@ -2,7 +2,6 @@
   box-sizing: border-box;
   min-width: 0;
   max-width: 100%;
-  padding: 24px;
 }
 
 .example-stage .example-stack,
@@ -116,11 +115,5 @@
 @media (max-width: 479px) {
   .example-stage .example-responsive {
     grid-template-columns: minmax(0, 1fr);
-  }
-}
-
-@media (max-width: 399px) {
-  .example-stage {
-    padding: 16px;
   }
 }

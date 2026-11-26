@@ -34,7 +34,7 @@ export function createEmbedExplorerView(context: EmbedSurfaceContext) {
   void ready.catch(() => {})
   const app = createApp({ render: () => h(HistoireProvider, { session: owner.session, extensions: extensions?.host, onError: reject }, {
     default: () => context.presentation
-      ? h(HistoireEmbed, { scope: context.presentation.scope, panels: context.presentation.panels, onReady: () => resolve(owner.runtime()), onError: reject })
+      ? h(HistoireEmbed, { scope: context.presentation.scope, panels: context.presentation.panels, padding: context.padding, onReady: () => resolve(owner.runtime()), onError: reject })
       : h(HistoireExplorer, { onReady: () => resolve(owner.runtime()), onError: reject }),
   }) })
   let closing: Promise<void> | undefined

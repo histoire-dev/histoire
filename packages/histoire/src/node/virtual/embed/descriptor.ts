@@ -2,7 +2,7 @@ import type { HistoireCapabilities, HistoireFramePluginInfo, HistoireSourceDescr
 import type { Context } from '../../context.js'
 import type { CatalogSnapshot } from '../../runtime/catalog/types.js'
 import { createEmbedSurfaceCapabilities } from '@histoire/app/dist/embed/capabilities.js'
-import { validateHistoireSourceDescriptor } from '@histoire/protocol'
+import { isEmbedPadding, validateHistoireSourceDescriptor } from '@histoire/protocol'
 import { resolveEmbedConfig } from '../../config/embed.js'
 import { resolveInspectionConfig } from '../../config/inspection.js'
 import { resolveMatrixNumericValues } from '../../config/matrix.js'
@@ -46,6 +46,7 @@ function framePlugins(ctx: Context, mode: 'dev' | 'static'): HistoireFramePlugin
 export function createEmbedDescriptor(ctx: Context, snapshot: CatalogSnapshot, mode: 'dev' | 'static' = 'dev', buildId?: string, namespace: 'embed' | 'local' = 'embed'): HistoireSourceDescriptor {
   const { enabled: _enabled, channels: _channels, ...embed } = resolveEmbedConfig(ctx.config.embed)
   const theme = ctx.config.theme
+  const framePadding = ctx.config.ui?.framePadding
   const installed = framePlugins(ctx, mode)
   const inspection = resolveInspectionConfig(ctx.config.inspection)
   const sourceCapabilities = capabilities(ctx, snapshot, mode)
@@ -66,6 +67,8 @@ export function createEmbedDescriptor(ctx: Context, snapshot: CatalogSnapshot, m
     // Standalone never receives external authority from opt-in embed settings.
     embed: namespace === 'local' ? { allowedOrigins: [], allowServerTests: true, allowOpenInEditor: true } : embed,
     assets: projectEmbedAssets(snapshot, namespace),
+    // Older v1 readers tolerate top-level extensions and enforce the config schema.
+    ...(isEmbedPadding(framePadding) ? { framePadding } : {}),
     config: {
       title: theme?.title ?? 'Histoire',
       routerMode: ctx.config.routerMode ?? 'history',

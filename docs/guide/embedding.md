@@ -96,6 +96,16 @@ The dialog produces a complete SFC importing `createHistoireSession`, `HistoireP
 
 Keep an active-lifetime guard around asynchronous startup, show connection errors, and dispose the session in `onBeforeUnmount`, even if connection or selection is pending. Provider owns child mounts and observers; session disposal remains caller responsibility. Scoped composition measures its actual canvas area for runtime dimensions. Panels sit beside the canvas on desktop and below it under 760px, with independent scrolling.
 
+### Padding
+
+Embedded variants keep the story's `layout.padding`, or [`ui.framePadding`](../reference/config.md#ui-framepadding) when the story sets none, as plain space around the variant. Embeds draw no aligners. Override it for one embed, including with `0`:
+
+- Direct iframe URL: add `padding`, in CSS pixels, such as `&amp;padding=0`.
+- JavaScript SDK: pass `padding` to `session.mount()` with `surface: 'preview'` or an explorer `presentation`. Other surfaces reject it.
+- Vue SDK: set the `padding` prop on `HistoireEmbed` or `HistoirePreview`.
+
+Padding accepts finite values from `0` to `1024`.
+
 Known story links in embedded Docs open the full book in a new tab, leaving embedded selection unchanged. Local document anchors stay local. Scoped UI excludes full-book navigation, tests, editor actions, and grid/list/matrix controls.
 
 ## Mount an iframe explorer

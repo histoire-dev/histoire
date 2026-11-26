@@ -8,6 +8,12 @@ export function previewAppRoot() {
 // Static embed CSS clips its own host; native Single sandbox must scroll its document.
 if (new URLSearchParams(window.location.search).get('nativeScroll') === 'true') document.body.style.overflow = 'auto'
 root.id = 'app'
+// Embeds without the canvas pass their story gutter; it insets the variant as plain space.
+const framePadding = Number(new URLSearchParams(window.location.search).get('padding'))
+if (framePadding > 0) {
+  root.style.padding = framePadding + 'px'
+  root.style.boxSizing = 'border-box'
+}
 document.body.innerHTML = ''
 document.body.appendChild(root)
 

@@ -169,6 +169,33 @@ describe('generated scoped embeds', () => {
     }
   })
 
+  it('applies an explicit zero padding override to the scoped Explorer runtime', async () => {
+    const fixture = await createEmbedBridgeFixture({ story, hostHtml, config: 'ui:{framePadding:24},' })
+    const page = await fixture.browser.newPage()
+    try {
+      await page.goto(`${fixture.hostOrigin}/host.html`)
+      await page.evaluate(`(async()=>{
+        const {createHistoireSession}=await import('/sdk.js');
+        window.session=createHistoireSession({url:${JSON.stringify(fixture.bookUrl)}});
+        await session.connect();
+        await session.selection.select({storyId:'normal',variantId:'one'});
+      })()`)
+      for (const [padding, expected] of [[undefined, '24px'], [0, '0px']] as const) {
+        const options = { surface: 'explorer', presentation: { type: 'embed', scope: 'variant', panels: [] }, padding }
+        await page.evaluate(`(async()=>{window.embed=session.mount(document.querySelector('#mount'),${JSON.stringify(options)});await embed.ready})()`)
+        const actor = runtime(page, 'surface=explorer')
+        await actor.getByRole('button', { name: 'Count:2', exact: true }).waitFor()
+        expect(await actor.locator('#app').evaluate((root: HTMLElement) => getComputedStyle(root).paddingTop)).toBe(expected)
+        await page.evaluate('embed.unmount()')
+      }
+      await page.evaluate('session.dispose()')
+    }
+    finally {
+      await page.close()
+      await fixture.close()
+    }
+  })
+
   it('runs escaped exact identities and titles through copied iframe and Vue code', async () => {
     const storyId = '日本語:a/b "quoted" </script>'
     const variantId = '.. / : "variant" </script>'

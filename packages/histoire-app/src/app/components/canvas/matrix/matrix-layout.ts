@@ -32,6 +32,8 @@ interface MatrixLayoutOptions {
   cols: readonly MatrixValue[]
   /** Logical preview dimensions from existing viewport settings. */
   size: CanvasSize | ((cell: MatrixCellData) => CanvasSize)
+  /** Logical gutter around each sandbox. */
+  padding?: number
   /** Current numeric zoom; chrome converts screen pixels into world units. */
   zoom: number
 }
@@ -39,14 +41,15 @@ interface MatrixLayoutOptions {
 /** Fill row and column tracks in world coordinates while retaining fixed-pixel chrome. */
 export function layoutMatrixFrames(cells: readonly MatrixCellData[], options: MatrixLayoutOptions): MatrixFrameLayout[] {
   const scale = clampZoom(options.zoom)
+  const padding = options.padding ?? 0
   const sizes = cells.map(cell => typeof options.size === 'function' ? options.size(cell) : options.size)
   const rows = cells.map(cell => options.rows.findIndex(value => equalMatrixValue(value, cell.row)))
   const cols = cells.map(cell => options.cols.findIndex(value => equalMatrixValue(value, cell.col)))
   const widths = options.cols.map(() => 0)
   const heights = options.rows.map(() => 0)
   sizes.forEach((size, index) => {
-    widths[cols[index]] = Math.max(widths[cols[index]], size.width)
-    heights[rows[index]] = Math.max(heights[rows[index]], size.height)
+    widths[cols[index]] = Math.max(widths[cols[index]], size.width + padding * 2)
+    heights[rows[index]] = Math.max(heights[rows[index]], size.height + padding * 2)
   })
   const xs = canvasTrackOffsets(widths, MATRIX_GAP / scale, MATRIX_ROW_GUTTER / scale)
   const ys = canvasTrackOffsets(heights, MATRIX_GAP / scale, MATRIX_COLUMN_HEADER / scale)
@@ -56,7 +59,7 @@ export function layoutMatrixFrames(cells: readonly MatrixCellData[], options: Ma
     const x = xs[column]
     const y = ys[row]
     const { width, height } = sizes[index]
-    const contentRect = { x, y, width, height }
+    const contentRect = { x: x + padding, y: y + padding, width, height }
     return {
       id: cell.key,
       storyId: options.storyId,

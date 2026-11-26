@@ -50,6 +50,8 @@ export interface SingleResizeControllerOptions {
   onResize: (size: SingleResizeSize) => void
   /** Persist completed physical dimensions. */
   onCommit: (size: SingleResizeSize) => void
+  /** Story gutter between frame edge and viewport; pointers measure the frame, sizes exclude it. */
+  getInset?: () => number
 }
 
 /** Clamp and round one logical viewport dimension. */
@@ -95,12 +97,12 @@ export function createSingleResizeController(options: SingleResizeControllerOpti
   function pointerWidth(event: PointerEvent, geometry: SingleResizeGeometry): number {
     const right = event.clientX + edgeOffset.x - geometry.surface.left + geometry.surface.scrollLeft
     const displayed = right > geometry.surface.width ? right : right * 2 - geometry.surface.width
-    return displayed / geometry.zoom
+    return displayed / geometry.zoom - (options.getInset?.() ?? 0) * 2
   }
 
   /** Project a bottom-edge pointer through native scroll and displayed zoom. */
   function pointerHeight(event: PointerEvent, geometry: SingleResizeGeometry): number {
-    return (event.clientY + edgeOffset.y - geometry.surface.top + geometry.surface.scrollTop) / geometry.zoom
+    return (event.clientY + edgeOffset.y - geometry.surface.top + geometry.surface.scrollTop) / geometry.zoom - (options.getInset?.() ?? 0) * 2
   }
 
   /** Begin primary pointer ownership for one grip. */

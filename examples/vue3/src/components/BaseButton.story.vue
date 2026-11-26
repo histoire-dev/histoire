@@ -35,7 +35,7 @@ function initState() {
   <Story
     :meta="{ wrapper: false, design: storyDesigns() }"
     title="BaseButton"
-    :layout="{ type: 'grid' }"
+    :layout="{ type: 'grid', width: 200, height: 96, padding: 24 }"
   >
     <Variant
       title="playground"

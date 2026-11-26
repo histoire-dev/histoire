@@ -31,6 +31,13 @@ export function getBackgroundPreset(settings: CanvasBackground): string {
   return settings.checkerboard ? checkerboards[settings.checkerboardTheme ?? 'light'].color : settings.backgroundColor
 }
 
+/** Readable color on a painted background; transparency shows the workbench, so it has none. */
+export function getBackgroundContrastColor(settings: CanvasBackground, presets: readonly BackgroundPreset[]): string | undefined {
+  if (!settings.checkerboard && settings.backgroundColor === 'transparent') return undefined
+  const color = getBackgroundPreset(settings)
+  return withCheckerboardPresets(presets).find(preset => preset.color === color)?.contrastColor
+}
+
 /** Paint inspection tiles at displayed scale; transparency reveals canvas backing. */
 export function getBackgroundStyle(settings: CanvasBackground): CSSProperties {
   if (!settings.checkerboard) return { backgroundColor: settings.backgroundColor, backgroundImage: 'none', backgroundSize: undefined }

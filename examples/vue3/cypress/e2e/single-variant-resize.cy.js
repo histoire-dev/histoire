@@ -5,6 +5,8 @@ import { setSingleViewportSize, visitSingle } from '../../../cypress/single-vari
 const widthHandle = '[aria-label="Resize viewport width"]'
 const heightHandle = '[aria-label="Resize viewport height"]'
 const cornerHandle = '[data-test-id="single-resize-both"]'
+/** `ui.framePadding` of this example; Fill viewport keeps that gutter on both sides of the viewport. */
+const framePadding = 24
 
 /** Drag one grip through native pointer capture and document listeners. */
 function drag(selector, deltaX, deltaY) {
@@ -98,7 +100,7 @@ describe('single variant resizing', () => {
     cy.contains('[role="dialog"] button', /^Fill viewport/).click()
     cy.get(widthHandle).should(($handle) => {
       const surface = $handle[0].ownerDocument.querySelector('.histoire-single-variant')
-      expect(Number($handle.attr('aria-valuenow')), 'Responsive width').to.equal(surface.clientWidth)
+      expect(Number($handle.attr('aria-valuenow')), 'Responsive width').to.equal(surface.clientWidth - framePadding * 2)
     })
   })
 })

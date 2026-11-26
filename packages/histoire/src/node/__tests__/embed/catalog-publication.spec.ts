@@ -1,5 +1,8 @@
+import { validateHistoireSourceDescriptor } from '@histoire/protocol'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
+import { validateHistoireSourceDescriptor as validateLegacyDescriptor } from '../../../../../histoire-protocol/src/__tests__/fixtures/generated/reader-v1.mjs'
 import { createRuntimeCatalog } from '../../runtime/catalog/publication.js'
+import { createEmbedDescriptor } from '../../virtual/embed/descriptor.js'
 import { createMcpContext, createMcpProjectFixture, createMcpStory, MCP_PROJECT_OPTIONS } from '../utils/mcp/project.js'
 
 describe('completed runtime catalog publication', () => {
@@ -48,6 +51,31 @@ describe('completed runtime catalog publication', () => {
     await catalog.publish(ctx)
     expect(catalog.current.catalog.stories[0].layoutExplicit).toBe(false)
     expect(first.layoutExplicit).toBe(true)
+  })
+
+  it('projects story frame geometry and drops invalid values', async () => {
+    const file = createMcpStory(fixture.root)
+    file.story.layout = { type: 'grid', width: 200, height: Number.NaN, padding: -1 }
+    const ctx = createMcpContext(fixture.root, [file])
+    const catalog = createRuntimeCatalog({ ...MCP_PROJECT_OPTIONS, root: fixture.root })
+    await catalog.publish(ctx)
+    expect(catalog.current.catalog.stories[0].layout).toEqual({ type: 'grid', width: 200 })
+    file.story.layout = { type: 'grid', width: 200, height: 96, padding: 0 }
+    await catalog.publish(ctx)
+    expect(catalog.current.catalog.stories[0].layout).toEqual({ type: 'grid', width: 200, height: 96, padding: 0 })
+  })
+
+  it('publishes project frame padding in descriptors readable by existing v1 clients', async () => {
+    const ctx = createMcpContext(fixture.root)
+    const catalog = createRuntimeCatalog({ ...MCP_PROJECT_OPTIONS, root: fixture.root })
+    await catalog.publish(ctx)
+    expect(() => validateLegacyDescriptor(createEmbedDescriptor(ctx, catalog.current))).not.toThrow()
+
+    ctx.config.ui = { framePadding: 24 }
+    const descriptor = createEmbedDescriptor(ctx, catalog.current)
+    expect(validateLegacyDescriptor(descriptor)).toBe(descriptor)
+    expect(descriptor.framePadding).toBe(24)
+    expect(() => validateHistoireSourceDescriptor({ ...descriptor, framePadding: -1 })).toThrow('Invalid embed padding')
   })
 
   it('distinguishes successful empty, partial and failed batches and rejects ambiguous exact IDs', async () => {

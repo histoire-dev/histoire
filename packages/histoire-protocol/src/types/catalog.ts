@@ -43,6 +43,16 @@ export interface HistoireCatalogVariant {
   meta?: HistoireMeta
 }
 
+/** Story-declared frame geometry in CSS pixels; omitted values follow the canvas viewport. */
+export interface HistoireStoryFrame {
+  /** Variant width, replacing the canvas viewport width. */
+  width?: number
+  /** Variant height, replacing the canvas viewport height. */
+  height?: number
+  /** Space around the variant, its corners marked by aligners. */
+  padding?: number
+}
+
 /** Portable story metadata used by every source projection. */
 export interface HistoireCatalogStory {
   /** Exact collected ID. */
@@ -60,7 +70,7 @@ export interface HistoireCatalogStory {
   /** Standalone documentation story. */
   docsOnly: boolean
   /** Preview layout advertised by source. */
-  layout?: { type: 'single' | 'grid' }
+  layout?: { type: 'single' | 'grid' } & HistoireStoryFrame
   /** Explicit layout declaration, absent on older sources. */
   layoutExplicit?: boolean
   /** Finite prop domains for two-axis preview matrices. */
@@ -143,6 +153,8 @@ export interface HistoireSourceDescriptor {
   inspectionPolicy?: { allowedOrigins: readonly string[] }
   /** Portable source appearance populated by first-party dev/static adapters. */
   config?: HistoireSourceConfig
+  /** Project gutter around embedded variants whose story layout sets no `padding`. */
+  framePadding?: number
   /** Exact document parent-origin policy. */
   embed?: HistoireEmbedPolicy
   /** Lazy same-book content/search inventory. */

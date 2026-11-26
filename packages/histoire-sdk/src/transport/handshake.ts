@@ -1,5 +1,5 @@
 import type { HistoireBridgeAck, HistoireBridgeHello, HistoireEmbedPresentation, HistoirePortRole } from '@histoire/protocol'
-import { HistoireSdkError, validateEmbedOrigin, validateHistoireAck, writeEmbedPresentation } from '@histoire/protocol'
+import { HistoireSdkError, validateEmbedOrigin, validateHistoireAck, writeEmbedPadding, writeEmbedPresentation } from '@histoire/protocol'
 import { HISTOIRE_CONTROL_TIMEOUT } from './validation.js'
 /** One explicit browser attachment; constructing SDK never evaluates these fields. */
 export interface BridgeFrameOptions {
@@ -15,6 +15,8 @@ export interface BridgeFrameOptions {
   surface?: string
   /** Validated explorer-only presentation hints. */
   presentation?: HistoireEmbedPresentation
+  /** Validated variant gutter override in CSS pixels. */
+  padding?: number
   /** Owned attachment container. */
   container: HTMLElement
   /** Cancellation affects handshake immediately. */
@@ -34,6 +36,7 @@ export function createBridgeFrame(options: BridgeFrameOptions) {
   const base = new URL(options.url)
   const url = new URL('__embed.html', base)
   if (options.presentation) writeEmbedPresentation(url.searchParams, options.presentation)
+  if (options.padding !== undefined) writeEmbedPadding(url.searchParams, options.padding)
   const hello: HistoireBridgeHello = { kind: 'histoire:hello', protocolRange: { min: 1, max: 1 }, nonce: `${Date.now()}:${++nextNonce}:${Math.random()}`, sessionId: options.sessionId, mountId: options.mountId, parentOrigin, role: options.role }
   for (const [key, value] of Object.entries({ view: options.surface ? 'surface' : 'bridge', ...(options.surface ? { surface: options.surface } : {}), parentOrigin, sessionId: options.sessionId, mountId: options.mountId })) {
     url.searchParams.set(key, value)

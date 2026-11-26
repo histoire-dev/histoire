@@ -22,6 +22,8 @@ const props = defineProps<{
   previewBase: string
   /** Native Single dimensions, already resolved for orientation. */
   viewport?: { width: number, height: number }
+  /** Story-declared variant size; sizes the document without changing how its frame scrolls or starts. */
+  declaredSize?: { width: number, height: number }
   /** Matrix cell prop projection; never writes into canonical session. */
   propsOverride?: Record<string, unknown>
 }>()
@@ -60,7 +62,7 @@ const frame = acquireStoryFrame({
 function settings() {
   const value = snapshot.value.settings
   const background = store.frameBackgrounds[props.frameId]
-  const viewport = contentSizing.size.value ?? props.viewport
+  const viewport = props.declaredSize ?? contentSizing.size.value ?? props.viewport
   return { ...value, ...(background ?? {}), ...(viewport ? { responsiveWidth: viewport.width, responsiveHeight: viewport.height, rotate: false } : {}) }
 }
 

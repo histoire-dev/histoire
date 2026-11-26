@@ -1,4 +1,4 @@
-import type { HistoireMatrixDeclaration, HistoireMatrixValue, HistoireStoryFileOrigin } from '@histoire/protocol'
+import type { HistoireMatrixDeclaration, HistoireMatrixValue, HistoireStoryFileOrigin, HistoireStoryFrame } from '@histoire/protocol'
 
 export interface StoryFile {
   id: string
@@ -15,10 +15,9 @@ export interface StoryFile {
 }
 
 export type StoryLayout = {
-  type: 'single'
-} | {
-  type: 'grid'
-}
+  /** Omitted, the story follows the default arrangement. */
+  type?: 'single' | 'grid'
+} & HistoireStoryFrame
 
 export interface CommonProps {
   id?: string

@@ -6,6 +6,7 @@ import { referencePlugin } from 'histoire-example-plugin-reference'
  * like in the other examples, so test fixtures that replace this file start without it.
  */
 export default defineConfig({
+  ui: { framePadding: 24 },
   plugins: [
     // Svelte 4 views (`svelte4View`): vite-plugin-svelte dedupes `svelte` to this project's
     // Svelte 4, which the precompiled variant imports; the Svelte 5 variant cannot load here.

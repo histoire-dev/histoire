@@ -14,6 +14,7 @@ import CanvasReplicaPreview from './CanvasReplicaPreview.vue'
 import { useFrameBadges } from './frame-badges.js'
 import { CANVAS_FRAME_LABEL_HEIGHT, type CanvasFrameLayout } from './frame-layout.js'
 import { isFrameMenuShortcut, openFrameMenu } from './frame-menu.js'
+import FramePaddingAligners from './FramePaddingAligners.vue'
 
 const props = defineProps<{
   /** Complete canvas target and logical bounds. */
@@ -33,6 +34,10 @@ const props = defineProps<{
   /** Preview logical dimensions before canvas scaling. */
   width: number
   height: number
+  /** Story-declared gutter around the variant, in logical pixels. */
+  padding?: number
+  /** Story declares the variant size, so the document gets it instead of viewport settings. */
+  fixedSize?: boolean
   /** Known collection failure keeps existing preview visible but inactive. */
   stale?: boolean
   /** Exact search match highlight. */
@@ -62,24 +67,25 @@ const single = computed(() => props.presentation === 'single')
 /** Snapshots need the title row to tell they aren't live yet; Single has none. */
 const showSnapshot = computed(() => snapshotShown.value && !single.value)
 const scale = computed(() => canvas.effectiveZoom)
+const padding = computed(() => props.padding ?? 0)
 const position = computed(() => ({
   'left': single.value ? undefined : `${props.frame.x * canvas.effectiveZoom + canvas.panOffset.x}px`,
   'top': single.value ? undefined : `${props.frame.y * canvas.effectiveZoom + canvas.panOffset.y}px`,
-  'width': `${props.frame.width * scale.value}px`,
+  'width': `${(single.value ? props.width + padding.value * 2 : props.frame.width) * scale.value}px`,
   '--histoire-frame-label-height': `${CANVAS_FRAME_LABEL_HEIGHT}px`,
 }))
-const previewStyle = computed(() => ({ width: `${props.width}px`, height: `${props.height}px`, transform: `scale(${scale.value})` }))
+const previewStyle = computed(() => ({ width: `${props.width}px`, height: `${props.height}px`, transform: `translate(${padding.value * scale.value}px, ${padding.value * scale.value}px) scale(${scale.value})` }))
 const background = useCanvasFrameBackground(() => props.frame.id)
 /** Grid can extend the card beyond the intrinsic sandbox. */
-const bodyStyle = computed(() => ({ height: `${(props.frame.bodyHeight ?? props.height) * scale.value}px`, ...getBackgroundStyle(background.value) }))
+const bodyStyle = computed(() => ({ height: `${(props.frame.bodyHeight ?? (props.height + padding.value * 2)) * scale.value}px`, ...getBackgroundStyle(background.value) }))
 const canSelect = computed(() => !props.stale)
 let unregister = () => {}
 
 /** Returns logical preview coordinates beneath frame title chrome. */
 function previewRect() {
   return {
-    x: props.frame.x,
-    y: props.frame.y + (single.value ? 0 : CANVAS_FRAME_LABEL_HEIGHT / scale.value),
+    x: props.frame.x + padding.value,
+    y: props.frame.y + padding.value + (single.value ? 0 : CANVAS_FRAME_LABEL_HEIGHT / scale.value),
     width: props.width,
     height: props.height,
   }
@@ -97,7 +103,7 @@ watch(() => props.frame.id, () => {
   error.value = undefined
   register()
 }, { flush: 'sync' })
-watch(() => [props.frame, props.width, props.height, canvas.effectiveZoom], () => {
+watch(() => [props.frame, props.width, props.height, padding.value, canvas.effectiveZoom], () => {
   const existing = registry.getFrame(props.frame.id)
   if (existing) existing.rect = previewRect()
 })
@@ -149,8 +155,9 @@ function openMenu(event: MouseEvent | KeyboardEvent) {
     </button>
     <div class="htw:relative htw:w-full htw:overflow-hidden htw:border htw:border-solid htw:border-border htw:rounded-[7px] htw:bg-white htw:group-data-[single=true]/frame:border-0 htw:group-data-[selected=true]/frame:border-accent htw:group-data-[highlighted=true]/frame:border-accent htw:group-data-[selected=true]/frame:after:content-[''] htw:after:hidden htw:group-data-[selected=true]/frame:after:block htw:after:absolute htw:after:inset-0 htw:after:rounded-[inherit] htw:after:pointer-events-none htw:after:z-[3] htw:after:shadow-[inset_0_0_0_1px_var(--histoire-accent)] htw:group-data-[single=true]/frame:after:shadow-[inset_0_0_0_1px_var(--histoire-border)]" data-test-id="responsive-preview-bg" :style="bodyStyle" @click="selectFromBody">
       <div class="histoire-frame-content htw:origin-top-left htw:group-data-[dimmed=true]/frame:group-data-[selected=true]/frame:opacity-35 htw:group-data-[stale=true]/frame:opacity-40 htw:group-data-[stale=true]/frame:pointer-events-none" :style="previewStyle" :aria-busy="status !== 'ready'" :inert="status !== 'ready' || stale ? true : undefined">
-        <CanvasReplicaPreview v-if="live" ref="replica" :interactive="!dragging" :frame-id="frame.id" :story-id="frame.storyId" :variant-id="frame.variantId" :preview-base="previewBase" :viewport="single ? { width, height } : undefined" @status="updateStatus" @snapshot="snapshotShown = $event" />
+        <CanvasReplicaPreview v-if="live" ref="replica" :interactive="!dragging" :frame-id="frame.id" :story-id="frame.storyId" :variant-id="frame.variantId" :preview-base="previewBase" :viewport="single ? { width, height } : undefined" :declared-size="fixedSize ? { width, height } : undefined" @status="updateStatus" @snapshot="snapshotShown = $event" />
       </div>
+      <FramePaddingAligners v-if="padding > 0" :width="width * scale" :height="height * scale" :padding="padding * scale" :background="background" />
       <div v-if="!live" class="htw:absolute htw:inset-0 htw:flex htw:flex-col htw:items-center htw:justify-center htw:gap-3 htw:p-4 htw:text-[12px] htw:text-center htw:text-muted htw:bg-input">
         {{ variant.title }}
       </div>

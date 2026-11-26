@@ -1,6 +1,7 @@
 import type { HistoireCatalog, HistoireCatalogStory, HistoireSourceDescriptor } from '../types/catalog.js'
 import { validateHostChannelNames } from '../channels.js'
 import { getHistoireMatrixValues, isHistoireMatrixPropName } from '../helpers/matrix.js'
+import { isHistoireStoryFrameValue } from '../helpers/story-frame.js'
 import { validateInspectionCapabilities, validateInspectionPolicy } from '../inspection/capabilities.js'
 import { HISTOIRE_META_LIMITS, HISTOIRE_WIRE_LIMITS } from './limits.js'
 import { measureWireValue } from './size.js'
@@ -76,6 +77,10 @@ export function validateHistoireCatalogStory(value: unknown): HistoireCatalogSto
   if (input.layout !== undefined) {
     const layout = wireRecord(input.layout)
     if (!['single', 'grid'].includes(layout.type as string)) invalid('Invalid story layout')
+    for (const key of ['width', 'height', 'padding'] as const) {
+      const item = layout[key]
+      if (item !== undefined && !isHistoireStoryFrameValue(key, item)) invalid('Invalid story frame size')
+    }
   }
   if (input.matrix !== undefined) {
     const axes = wireRecord(wireRecord(input.matrix).axes)

@@ -1,6 +1,7 @@
 import { getHistoireNumericMatrixValues } from '../helpers/matrix-numeric.js'
 import { validateFramePluginInventory } from '../plugin-channels.js'
 import { validateEmbedOrigins } from '../url/embed-origins.js'
+import { validateEmbedPadding } from '../url/embed.js'
 import { invalid, validateSettingsPatch, wireId, wireRecord } from './validation.js'
 
 /** Strict same-base opaque reference; URL normalization must never hide traversal. */
@@ -18,6 +19,7 @@ function keys(input: Record<string, unknown>, allowed: readonly string[]): void 
 export function validateSourceDescriptorFields(input: Record<string, unknown>): void {
   // Data only: ids and contract versions, never module paths or options.
   if (input.framePlugins !== undefined) validateFramePluginInventory(input.framePlugins)
+  if (input.framePadding !== undefined) validateEmbedPadding(input.framePadding)
   if (input.embed !== undefined) {
     const policy = wireRecord(input.embed)
     keys(policy, ['allowedOrigins', 'allowOpenInEditor', 'allowServerTests'])
