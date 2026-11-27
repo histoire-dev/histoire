@@ -2,6 +2,7 @@ import type { Plugin as VitePlugin } from 'vite'
 import type { Context } from '../context.js'
 import type { BrowserRuntimePaths } from './resolve-paths.js'
 import { dirname } from 'pathe'
+import { searchForWorkspaceRoot } from 'vite'
 import { APP_PATH, getHistoireStyleFiles } from '../alias.js'
 import { tailwindRuntimeDirectory } from '../builtin-plugins/tailwind/template.js'
 import { getContextRegistry } from '../runtime/registry.js'
@@ -134,6 +135,8 @@ export function createHistoireVitePlugin(ctx: Context, options: HistoireVitePlug
         server: {
           fs: {
             allow: [
+              // Setting `allow` disables Vite's default workspace root entry.
+              searchForWorkspaceRoot(ctx.root),
               APP_PATH,
               tailwindRuntimeDirectory,
               resolveHistoireAppBundledDir(),
