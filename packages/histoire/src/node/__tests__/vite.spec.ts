@@ -1,7 +1,7 @@
 import type { Context } from '../context.js'
 import fs from 'node:fs'
 import path from 'node:path'
-import { resolveConfig } from 'vite'
+import { normalizePath, resolveConfig, searchForWorkspaceRoot } from 'vite'
 import { describe, expect, it, vi } from 'vitest'
 import { getDefaultConfig } from '../config/index.js'
 import { closeContext } from '../context.js'
@@ -139,6 +139,18 @@ describe('getViteConfigWithPlugins', () => {
     const resolvedConfig = await resolveConfig(viteConfig, 'serve')
 
     expect(resolvedConfig.server.fs.allow).toContain(path.resolve(process.cwd(), '../histoire-controls'))
+  }, 15000)
+
+  it('keeps the workspace root allowed for client and collection servers', async () => {
+    const ctx = createContext()
+    const workspaceRoot = normalizePath(searchForWorkspaceRoot(process.cwd()))
+
+    for (const isServer of [false, true]) {
+      const { viteConfig } = await getViteConfigWithPlugins(isServer, ctx)
+      const resolvedConfig = await resolveConfig(viteConfig, 'serve')
+
+      expect(resolvedConfig.server.fs.allow).toContain(workspaceRoot)
+    }
   }, 15000)
 
   it('does not import expect-type in the browser story vitest shim', async () => {
